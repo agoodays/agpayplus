@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Payment.Api", "src\AGooday.AgPay.Payment.Api\AGooday.AgPay.Payment.Api.csproj", "{CBCDB6FA-9EBF-4EEE-A958-B6FAB310F905}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Payment.Api", "src\AGooday.AgPay.Payment.Api\AGooday.AgPay.Payment.Api.csproj", "{CBCDB6FA-9EBF-4EEE-A958-B6FAB310F905}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{99A7EA44-AC97-420B-B147-E4BF005F2E55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +20,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CBCDB6FA-9EBF-4EEE-A958-B6FAB310F905} = {99A7EA44-AC97-420B-B147-E4BF005F2E55}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACDADF0F-3F17-4DE0-A322-714493E80E85}

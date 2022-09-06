@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         /// 用户 支付条码
         /// </summary>
         [Required(ErrorMessage = "支付条码不能为空")]
-        private string authCode { get; set; }
+        public string authCode { get; set; }
 
         /// <summary>
         /// 构造函数

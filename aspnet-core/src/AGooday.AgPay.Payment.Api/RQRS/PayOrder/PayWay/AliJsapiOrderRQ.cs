@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         /// </summary>
         /// <param name=""></param>
         [Required(ErrorMessage = "用户ID不能为空")]
-        private string buyerUserId { get; set; }
+        public string buyerUserId { get; set; }
 
         /** 构造函数 **/
         public AliJsapiOrderRQ()

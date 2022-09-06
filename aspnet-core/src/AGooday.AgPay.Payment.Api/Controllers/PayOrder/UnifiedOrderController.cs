@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AGooday.AgPay.Payment.Api.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 {
@@ -14,7 +15,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <returns></returns>
         [HttpPost]
         [Route("/api/pay/unifiedOrder")]
-        public ActionResult UnifiedOrder()
+        public ActionResult<ApiRes> UnifiedOrder()
         {
             return Ok();
         }

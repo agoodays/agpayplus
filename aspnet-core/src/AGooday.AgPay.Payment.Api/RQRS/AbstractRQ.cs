@@ -11,24 +11,24 @@ namespace AGooday.AgPay.Payment.Api.RQRS
         /// 版本号
         /// </summary>
         [Required(ErrorMessage = "版本号不能为空")]
-        protected string version { get; set; }
+        public string version { get; set; }
 
         /// <summary>
         /// 签名类型
         /// </summary>
         [Required(ErrorMessage = "签名类型不能为空")]
-        protected string signType { get; set; }
+        public string signType { get; set; }
 
         /// <summary>
         /// 签名值
         /// </summary>
         [Required(ErrorMessage = "签名值不能为空")]
-        protected string sign { get; set; }
+        public string sign { get; set; }
 
         /// <summary>
         /// 接口请求时间
         /// </summary>
         [Required(ErrorMessage = "时间戳不能为空")]
-        protected string reqTime { get; set; }
+        public string reqTime { get; set; }
     }
 }

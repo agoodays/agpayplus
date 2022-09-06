@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="wayCode"></param>
         /// <param name="bizRQ">业务请求报文</param>
         /// <returns></returns>
-        protected ResultBase UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ)
+        protected ApiRes UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ)
         {
             return UnifiedOrder(wayCode, bizRQ, null);
         }
@@ -28,9 +28,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="bizRQ"></param>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        protected ResultBase UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ, Models.PayOrder payOrder)
+        protected ApiRes UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ, Models.PayOrder payOrder)
         {
-            return ResultBase.Ok(bizRQ);
+            return ApiRes.Ok(new UnifiedOrderRS());
         }
     }
 }
