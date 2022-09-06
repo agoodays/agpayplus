@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
@@ -15,11 +16,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
         /// <returns></returns>
         [HttpPost]
         [Route("api/pay/aliBarOrder")]
-        public ActionResult AliBarOrder()
+        public ActionResult AliBarOrder(AliBarOrderRQ bizRQ)
         {
             // 统一下单接口;
             // "ALI_BAR";  //支付宝条码支付
-            return UnifiedOrder("ALI_BAR", null);
+            return Ok(UnifiedOrder("ALI_BAR", bizRQ));
         }
     }
 }

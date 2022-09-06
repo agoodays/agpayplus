@@ -8,7 +8,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     /// </summary>
     [ApiController]
     [Route("api/pay")]
-    public class QueryOrderController : ControllerBase
+    public class QueryOrderController : ApiControllerBase
     {
         [HttpPost]
         [Route("query")]
