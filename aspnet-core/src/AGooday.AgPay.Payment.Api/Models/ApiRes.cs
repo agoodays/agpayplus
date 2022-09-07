@@ -42,19 +42,19 @@
         /** 业务处理成功 **/
         public static ApiRes Ok(object data)
         {
-            return new ApiRes(code: 0, msg: "SUCCESS", data, sign: null);
+            return new ApiRes(ApiCode.SUCCESS().GetCode(), ApiCode.SUCCESS().GetMsg(), data, sign: null);
         }
 
         /** 业务处理成功, 自动签名 **/
-        public static ApiRes OkWithSign(object data, String mchKey)
+        public static ApiRes OkWithSign(object data, string mchKey)
         {
             if (data == null)
             {
-                return new ApiRes(code: 0, msg: "SUCCESS", data: null, sign: null);
+                return new ApiRes(ApiCode.SUCCESS().GetCode(), ApiCode.SUCCESS().GetMsg(), data: null, sign: null);
             }
 
             string sign = "";
-            return new ApiRes(code: 0, msg: "SUCCESS", data, sign);
+            return new ApiRes(ApiCode.SUCCESS().GetCode(), ApiCode.SUCCESS().GetMsg(), data, sign);
         }
 
         /// <summary>
@@ -66,6 +66,31 @@
         public static ApiRes Ok4newJson(string key, object val)
         {
             return Ok(new Dictionary<string, object> { { key, val } });
+        }
+
+        /// <summary>
+        /// 业务处理失败
+        /// </summary>
+        /// <param name="apiCode"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static ApiRes Fail(ApiCode apiCode, params string[] args)
+        {
+
+            if (args == null || args.Length <= 0){
+                return new ApiRes(apiCode.GetCode(), apiCode.GetMsg(), null, null);
+            }
+            return new ApiRes(apiCode.GetCode(), string.Format(apiCode.GetMsg(), args), null, null);
+        }
+
+        /// <summary>
+        /// 自定义错误信息, 原封不用的返回输入的错误信息
+        /// </summary>
+        /// <param name="customMsg"></param>
+        /// <returns></returns>
+        public static ApiRes CustomFail(string customMsg)
+        {
+            return new ApiRes(ApiCode.CUSTOM_FAIL().GetCode(), customMsg, null, null);
         }
     }
 }
