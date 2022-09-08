@@ -6,4 +6,8 @@
     <!--<Nullable>enable</Nullable>-->
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AGooday.AgPay.Domain.Core\AGooday.AgPay.Domain.Core.csproj" />
+  </ItemGroup>
+
 </Project>

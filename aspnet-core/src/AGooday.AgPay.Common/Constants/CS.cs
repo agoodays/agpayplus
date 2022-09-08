@@ -86,8 +86,8 @@ namespace AGooday.AgPay.Common.Constants
         /// <summary>
         /// 图片验证码 缓存key
         /// </summary>
-        private const string CACHE_KEY_IMG_CODE = "img_code_%s";
-        public static string getCacheKeyImgCode(string imgToken)
+        private const string CACHE_KEY_IMG_CODE = "img_code_{0}";
+        public static string GetCacheKeyImgCode(string imgToken)
         {
             return string.Format(CACHE_KEY_IMG_CODE, imgToken);
         }
@@ -116,7 +116,6 @@ namespace AGooday.AgPay.Common.Constants
             public const string MENU_LEFT = "ML";  //左侧显示菜单
             public const string MENU_OTHER = "MO";  //其他菜单
             public const string PAGE_OR_BTN = "PB";  //页面 or 按钮
-
         }
 
         /// <summary>

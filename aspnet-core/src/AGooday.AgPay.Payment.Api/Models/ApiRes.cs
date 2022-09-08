@@ -42,7 +42,7 @@
         /** 业务处理成功 **/
         public static ApiRes Ok(object data)
         {
-            return new ApiRes(ApiCode.SUCCESS().GetCode(), ApiCode.SUCCESS().GetMsg(), data, sign: null);
+            return new ApiRes(ApiCode.SUCCESS.GetCode(), ApiCode.SUCCESS.GetMsg(), data, sign: null);
         }
 
         /** 业务处理成功, 自动签名 **/
@@ -50,11 +50,11 @@
         {
             if (data == null)
             {
-                return new ApiRes(ApiCode.SUCCESS().GetCode(), ApiCode.SUCCESS().GetMsg(), data: null, sign: null);
+                return new ApiRes(ApiCode.SUCCESS.GetCode(), ApiCode.SUCCESS.GetMsg(), data: null, sign: null);
             }
 
             string sign = "";
-            return new ApiRes(ApiCode.SUCCESS().GetCode(), ApiCode.SUCCESS().GetMsg(), data, sign);
+            return new ApiRes(ApiCode.SUCCESS.GetCode(), ApiCode.SUCCESS.GetMsg(), data, sign);
         }
 
         /// <summary>
@@ -76,7 +76,6 @@
         /// <returns></returns>
         public static ApiRes Fail(ApiCode apiCode, params string[] args)
         {
-
             if (args == null || args.Length <= 0){
                 return new ApiRes(apiCode.GetCode(), apiCode.GetMsg(), null, null);
             }
@@ -90,7 +89,7 @@
         /// <returns></returns>
         public static ApiRes CustomFail(string customMsg)
         {
-            return new ApiRes(ApiCode.CUSTOM_FAIL().GetCode(), customMsg, null, null);
+            return new ApiRes(ApiCode.CUSTOM_FAIL.GetCode(), customMsg, null, null);
         }
     }
 }

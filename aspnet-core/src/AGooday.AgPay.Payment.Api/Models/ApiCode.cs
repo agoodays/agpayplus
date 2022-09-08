@@ -2,18 +2,18 @@
 {
     public class ApiCode
     {
-        public static ApiCode SUCCESS() => new ApiCode(0, "SUCCESS");//请求成功
-        public static ApiCode CUSTOM_FAIL() => new ApiCode(9999, "自定义业务异常");//自定义业务异常
+        public static ApiCode SUCCESS => Init(0, "SUCCESS");//请求成功
+        public static ApiCode CUSTOM_FAIL => Init(9999, "自定义业务异常");//自定义业务异常
 
-        public static ApiCode SYSTEM_ERROR() => new ApiCode(10, "系统异常{0}");
-        public static ApiCode PARAMS_ERROR() => new ApiCode(11, "参数有误{0}");
-        public static ApiCode DB_ERROR() => new ApiCode(12, "数据库服务异常");
+        public static ApiCode SYSTEM_ERROR => Init(10, "系统异常{0}");
+        public static ApiCode PARAMS_ERROR => Init(11, "参数有误{0}");
+        public static ApiCode DB_ERROR => Init(12, "数据库服务异常");
 
-        public static ApiCode SYS_OPERATION_FAIL_CREATE() => new ApiCode(5000, "新增失败");
-        public static ApiCode SYS_OPERATION_FAIL_DELETE() => new ApiCode(5001, "删除失败");
-        public static ApiCode SYS_OPERATION_FAIL_UPDATE() => new ApiCode(5002, "修改失败");
-        public static ApiCode SYS_OPERATION_FAIL_SELETE() => new ApiCode(5003, "记录不存在");
-        public static ApiCode SYS_PERMISSION_ERROR() => new ApiCode(5004, "权限错误，当前用户不支持此操作");
+        public static ApiCode SYS_OPERATION_FAIL_CREATE => Init(5000, "新增失败");
+        public static ApiCode SYS_OPERATION_FAIL_DELETE => Init(5001, "删除失败");
+        public static ApiCode SYS_OPERATION_FAIL_UPDATE => Init(5002, "修改失败");
+        public static ApiCode SYS_OPERATION_FAIL_SELETE => Init(5003, "记录不存在");
+        public static ApiCode SYS_PERMISSION_ERROR => Init(5004, "权限错误，当前用户不支持此操作");
 
         private int code;
 
@@ -24,6 +24,8 @@
             this.code = code;
             this.msg = msg;
         }
+
+        private static ApiCode Init(int code, string msg) => new ApiCode(code, msg);
 
         public int GetCode()
         {
