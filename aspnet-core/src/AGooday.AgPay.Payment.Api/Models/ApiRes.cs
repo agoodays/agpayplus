@@ -76,10 +76,23 @@
         /// <returns></returns>
         public static ApiRes Fail(ApiCode apiCode, params string[] args)
         {
-            if (args == null || args.Length <= 0){
+            return Fail(apiCode, null, args);
+        }
+
+        /// <summary>
+        /// 业务处理失败
+        /// </summary>
+        /// <param name="apiCode"></param>
+        /// <param name="data"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static ApiRes Fail(ApiCode apiCode, object data, params string[] args)
+        {
+            if (args == null || args.Length <= 0)
+            {
                 return new ApiRes(apiCode.GetCode(), apiCode.GetMsg(), null, null);
             }
-            return new ApiRes(apiCode.GetCode(), string.Format(apiCode.GetMsg(), args), null, null);
+            return new ApiRes(apiCode.GetCode(), string.Format(apiCode.GetMsg(), args), data, null);
         }
 
         /// <summary>

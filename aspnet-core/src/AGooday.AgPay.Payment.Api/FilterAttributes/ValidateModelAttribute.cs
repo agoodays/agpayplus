@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Payment.Api.FilterAttributes
                 });
 
             // 统一返回格式
-            var result = new ApiRes(StatusCodes.Status400BadRequest, "数据验证不通过！", errors, string.Empty);
+            var result = ApiRes.Fail(ApiCode.PARAMS_ERROR, errors);
 
             // 设置结果
             context.Result = new BadRequestObjectResult(result);
