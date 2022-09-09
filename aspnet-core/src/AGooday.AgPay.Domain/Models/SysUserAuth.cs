@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,11 +11,14 @@ namespace AGooday.AgPay.Domain.Models
     /// <summary>
     /// 系统用户认证表
     /// </summary>
+    [Table("t_sys_user_auth")]
     public class SysUserAuth
     {
-        /**
-         * ID
-         */
+        /// <summary>
+        /// ID
+        /// </summary>
+        [Key, Required, Column("auth_id", TypeName = "bigint")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long AuthId { get; set; }
 
         /**

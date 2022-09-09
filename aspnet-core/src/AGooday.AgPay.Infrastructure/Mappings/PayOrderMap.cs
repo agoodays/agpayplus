@@ -16,11 +16,6 @@ namespace AGooday.AgPay.Infrastructure.Mappings
             //实体名称Map
             builder.ToTable("t_pay_order");
             #region 实体属性Map
-            //实体属性Map
-            builder.Property(c => c.Id)
-                .HasColumnName("id")
-                ;
-
             builder.Property(c => c.PayOrderId)
                 .HasColumnType("varchar(30)")
                 .HasColumnName("pay_order_id")
@@ -28,12 +23,6 @@ namespace AGooday.AgPay.Infrastructure.Mappings
                 .IsRequired()//是否必须
                 ;
 
-            builder.Property(c => c.MchNo)
-                .HasColumnType("varchar(64)")
-                .HasColumnName("mch_no")
-                .HasMaxLength(64)
-                .IsRequired()
-                ;
             builder.Property(c => c.State)
                 .HasDefaultValue(0)//默认值
                 ;

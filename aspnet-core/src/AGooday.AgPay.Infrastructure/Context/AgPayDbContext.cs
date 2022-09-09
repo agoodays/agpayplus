@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //对 UsersMap 进行配置
+            //对 PayOrderMap 进行配置
             modelBuilder.ApplyConfiguration(new PayOrderMap());
 
             base.OnModelCreating(modelBuilder);
@@ -58,31 +58,32 @@ namespace AGooday.AgPay.Infrastructure.Context
             #endregion
 
             #region
-            //switch (BaseDBConfig.DbType)
-            //{
-            //    case DataBaseType.MySql:
-            //        optionsBuilder.
-            //            // 安装NuGet包 Pomelo.EntityFrameworkCore.MySql
-            //            UseMySql(BaseDBConfig.ConnectionString);
-            //        break;
-            //    //case DataBaseType.SqlServer:
-            //    //    optionsBuilder
-            //    //        // 安装NuGet包 Microsoft.EntityFrameworkCore.SqlServer
-            //    //        .UseSqlServer(BaseDBConfig.ConnectionString);
-            //    //    break;
-            //    //case DataBaseType.Sqlite:
-            //    //    optionsBuilder.
-            //    //        // 安装NuGet包 Microsoft.EntityFrameworkCore.Sqlite
-            //    //        UseSqlite(BaseDBConfig.ConnectionString);
-            //    //    break;
-            //    //case DataBaseType.Oracle:
-            //    //    break;
-            //    //case DataBaseType.PostgreSQL:
-            //    //    break;
-            //    //default:
-            //    //    optionsBuilder.UseSqlServer(BaseDBConfig.ConnectionString);
-            //        break;
-            //}
+            switch (BaseDBConfig.DbType)
+            {
+                case DataBaseType.MySql:
+                    var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
+                    optionsBuilder.
+                        // 安装NuGet包 Pomelo.EntityFrameworkCore.MySql
+                        UseMySql(BaseDBConfig.ConnectionString, serverVersion);
+                    break;
+                    //case DataBaseType.SqlServer:
+                    //    optionsBuilder
+                    //        // 安装NuGet包 Microsoft.EntityFrameworkCore.SqlServer
+                    //        .UseSqlServer(BaseDBConfig.ConnectionString);
+                    //    break;
+                    //case DataBaseType.Sqlite:
+                    //    optionsBuilder.
+                    //        // 安装NuGet包 Microsoft.EntityFrameworkCore.Sqlite
+                    //        UseSqlite(BaseDBConfig.ConnectionString);
+                    //    break;
+                    //case DataBaseType.Oracle:
+                    //    break;
+                    //case DataBaseType.PostgreSQL:
+                    //    break;
+                    //default:
+                    //    optionsBuilder.UseSqlServer(BaseDBConfig.ConnectionString);
+                    break;
+            }
             #endregion
 
             //base.OnConfiguring(optionsBuilder);

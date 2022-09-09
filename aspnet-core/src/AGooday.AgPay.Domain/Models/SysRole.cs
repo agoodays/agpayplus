@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace AGooday.AgPay.Domain.Models
     /// <summary>
     /// 系统角色表
     /// </summary>
+    [Table("t_sys_role")]
     public class SysRole
     {
         /**
