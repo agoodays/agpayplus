@@ -24,25 +24,25 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 登录用户名
         /// </summary>
-        [Column("login_username")]
+        [Required, Column("login_username")]
         public string LoginUsername { get; set; }
 
         /// <summary>
         /// 真实姓名
         /// </summary>
-        [Column("realname")]
+        [Required, Column("realname")]
         public string Realname { get; set; }
 
         /// <summary>
         /// 手机号
         /// </summary>
-        [Column("telphone")]
+        [Required, Column("telphone")]
         public string Telphone { get; set; }
 
         /// <summary>
         /// 性别 0-未知, 1-男, 2-女
         /// </summary>
-        [Column("sex")]
+        [Required, Column("sex")]
         public byte Sex { get; set; }
 
         /// <summary>
@@ -60,37 +60,37 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 是否超管（超管拥有全部权限） 0-否 1-是
         /// </summary>
-        [Column("is_admin")]
+        [Required, Column("is_admin")]
         public byte IsAdmin { get; set; }
 
         /// <summary>
         /// 状态 0-停用 1-启用
         /// </summary>
-        [Column("state")]
+        [Required, Column("state")]
         public byte State { get; set; }
 
         /// <summary>
         /// 所属系统： MGR-运营平台, MCH-商户中心
         /// </summary>
-        [Column("sys_type")]
+        [Required, Column("sys_type", TypeName = "varchar(8)")]
         public string SysType { get; set; }
 
         /// <summary>
         /// 所属商户ID / 0(平台)
         /// </summary>
-        [Column("belong_info_id")]
+        [Required, Column("belong_info_id")]
         public string BelongInfoId { get; set; }
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Column("created_at")]
+        [Required, Column("created_at", TypeName = "timestamp")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        [Column("updated_at")]
+        [Required, Column("updated_at", TypeName = "timestamp")]
         public DateTime UpdatedAt { get; set; }
     }
 }

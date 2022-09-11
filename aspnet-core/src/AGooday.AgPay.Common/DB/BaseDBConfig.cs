@@ -28,15 +28,38 @@ namespace AGooday.AgPay.Common.DB
         private static string oracleConnectionFile = Appsettings.app(new string[] { "AppSettings", "Oracle", "OracleConnectionFile" });
         private static bool IsOracleEnabled = (Appsettings.app(new string[] { "AppSettings", "Oracle", "Enabled" })).ObjToBool();
 
-        public static DataBaseType DbType = DataBaseType.SqlServer;
+        public static DataBaseType DbType = InitDbType();
 
         public static string ConnectionString => InitConn();
 
         public static string GetConnectionString(params string[] conn) => DifDBConnOfSecurity(conn);
 
+        private static DataBaseType InitDbType()
+        {
+            if (isSqliteEnabled)
+            {
+                return DataBaseType.Sqlite;
+            }
+            else if (isSqlServerEnabled)
+            {
+                return DataBaseType.SqlServer;
+            }
+            else if (isMySqlEnabled)
+            {
+                return DataBaseType.MySql;
+            }
+            else if (IsOracleEnabled)
+            {
+                return DataBaseType.Oracle;
+            }
+            else
+            {
+                return DataBaseType.SqlServer;
+            }
+        }
+
         private static string InitConn()
         {
-
             if (isSqliteEnabled)
             {
                 DbType = DataBaseType.Sqlite;

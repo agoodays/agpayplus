@@ -15,7 +15,12 @@ namespace AGooday.AgPay.Infrastructure.Context
     {
         #region DbSets
         /// <summary>
-        /// 用户信息
+        /// 系统用户信息
+        /// </summary>
+        public DbSet<SysUser> SysUser { get; set; }
+
+        /// <summary>
+        /// 支付订单信息
         /// </summary>
         public DbSet<PayOrder> PayOrder { get; set; }
         #endregion
@@ -61,7 +66,8 @@ namespace AGooday.AgPay.Infrastructure.Context
             switch (BaseDBConfig.DbType)
             {
                 case DataBaseType.MySql:
-                    var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
+                    var serverVersion = MySqlServerVersion.LatestSupportedServerVersion;
+                    serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
                     optionsBuilder.
                         // 安装NuGet包 Pomelo.EntityFrameworkCore.MySql
                         UseMySql(BaseDBConfig.ConnectionString, serverVersion);
@@ -82,7 +88,7 @@ namespace AGooday.AgPay.Infrastructure.Context
                     //    break;
                     //default:
                     //    optionsBuilder.UseSqlServer(BaseDBConfig.ConnectionString);
-                    break;
+                    //break;
             }
             #endregion
 

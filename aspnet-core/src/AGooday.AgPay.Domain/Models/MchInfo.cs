@@ -97,13 +97,13 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Column("created_at")]
+        [Required, Column("created_at", TypeName = "timestamp")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        [Column("updated_at")]
+        [Required, Column("updated_at", TypeName = "timestamp")]
         public DateTime UpdatedAt { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Payment.Api.Models;
+using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

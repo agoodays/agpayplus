@@ -158,24 +158,24 @@ namespace AGooday.AgPay.Domain.Models
         /// 订单退款成功时间
         /// </summary>
         [Column("success_time", TypeName = "datetime")]
-        public DateTime SuccessTime { get; set; }
+        public DateTime? SuccessTime { get; set; }
 
         /// <summary>
         /// 退款失效时间（失效后系统更改为退款任务关闭状态）
         /// </summary>
         [Column("expired_time", TypeName = "datetime")]
-        public DateTime ExpiredTime { get; set; }
+        public DateTime? ExpiredTime { get; set; }
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Column("created_at")]
+        [Required, Column("created_at", TypeName = "timestamp")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        [Column("updated_at")]
+        [Required, Column("updated_at", TypeName = "timestamp")]
         public DateTime UpdatedAt { get; set; }
     }
 }
