@@ -1,7 +1,9 @@
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Manager.Api.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,8 @@ var services = builder.Services;
 var Env = builder.Environment;
 
 services.AddSingleton(new Appsettings(Env.ContentRootPath));
+
+services.AddDbContext<AgPayDbContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("Default"), MySqlServerVersion.LatestSupportedServerVersion));
 
 // Automapper ×¢Èë
 services.AddAutoMapperSetup();
