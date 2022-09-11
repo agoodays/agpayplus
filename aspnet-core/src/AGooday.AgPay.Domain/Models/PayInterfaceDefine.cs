@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 接口代码 全小写  wxpay alipay 
         /// </summary>
-        [Column("if_code", TypeName = "varchar(20)")]
+        [Key, Column("if_code", TypeName = "varchar(20)")]
         public string IfCode { get; set; }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 支持的支付方式 ["wxpay_jsapi", "wxpay_bar"]
         /// </summary>
         [Required, Column("way_codes", TypeName = "json")]
-        public JsonArray WayCodes { get; set; }
+        public string WayCodes { get; set; }
 
         /// <summary>
         /// 页面展示：卡片-图标

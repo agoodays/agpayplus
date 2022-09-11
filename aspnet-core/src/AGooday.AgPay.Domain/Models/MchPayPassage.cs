@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 风控数据
         /// </summary>
         [Column("risk_config", TypeName = "json")]
-        public JsonObject RiskConfig { get; set; }
+        public string RiskConfig { get; set; }
 
         /// <summary>
         /// 状态: 0-停用, 1-启用
