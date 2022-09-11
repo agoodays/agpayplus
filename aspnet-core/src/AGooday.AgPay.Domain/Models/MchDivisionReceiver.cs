@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 分账接收账号类型: 0-个人(对私) 1-商户(对公)
         /// </summary>
-        [Required, Column("acc_type", TypeName = "tinyint")]
+        [Required, Column("acc_type", TypeName = "tinyint(6)")]
         public byte AccType { get; set; }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 分账状态（本系统状态，并不调用上游关联关系）: 1-正常分账, 0-暂停分账
         /// </summary>
-        [Required, Column("state", TypeName = "tinyint")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>

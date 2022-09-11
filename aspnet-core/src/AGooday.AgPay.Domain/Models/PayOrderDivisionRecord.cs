@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
         /// </summary>
-        [Required, Column("mch_type", TypeName = "tinyint")]
+        [Required, Column("mch_type", TypeName = "tinyint(6)")]
         public byte MchType { get; set; }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 状态: 0-待分账 1-分账成功, 2-分账失败
         /// </summary>
-        [Required, Column("state", TypeName = "tinyint")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 账号快照》 分账接收账号类型: 0-个人 1-商户
         /// </summary>
-        [Required, Column("acc_type", TypeName = "tinyint")]
+        [Required, Column("acc_type", TypeName = "tinyint(6)")]
         public byte AccType { get; set; }
 
         /// <summary>

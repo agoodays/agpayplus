@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 订单类型:1-支付,2-退款
         /// </summary>
-        [Required, Column("order_type", TypeName = "tinyint")]
+        [Required, Column("order_type", TypeName = "tinyint(6)")]
         public byte OrderType { get; set; }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 通知状态,1-通知中,2-通知成功,3-通知失败
         /// </summary>
-        [Required, Column("state", TypeName = "tinyint")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>

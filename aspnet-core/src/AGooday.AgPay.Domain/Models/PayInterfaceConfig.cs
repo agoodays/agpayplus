@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 账号类型:1-服务商 2-商户
         /// </summary>
-        [Required, Column("info_type", TypeName = "tinyint")]
+        [Required, Column("info_type", TypeName = "tinyint(6)")]
         public byte InfoType { get; set; }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 状态: 0-停用, 1-启用
         /// </summary>
-        [Required, Column("state", TypeName = "tinyint")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>

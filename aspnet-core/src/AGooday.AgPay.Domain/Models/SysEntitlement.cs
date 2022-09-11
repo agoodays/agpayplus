@@ -47,19 +47,19 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 权限类型 ML-左侧显示菜单, MO-其他菜单, PB-页面/按钮
         /// </summary>
-        [Required, Column("ent_type")]
+        [Required, Column("ent_type", TypeName = "char(2)")]
         public string EntType { get; set; }
 
         /// <summary>
         /// 快速开始菜单 0-否, 1-是
         /// </summary>
-        [Required, Column("quick_jump", TypeName = "tinyint")]
+        [Required, Column("quick_jump", TypeName = "tinyint(6)")]
         public byte QuickJump { get; set; }
 
         /// <summary>
         /// 状态 0-停用, 1-启用
         /// </summary>
-        [Required, Column("state", TypeName = "tinyint")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 排序字段, 规则：正序
         /// </summary>
-        [Required, Column("ent_sort")]
+        [Required, Column("ent_sort", TypeName = "int(11)")]
         public int EntSort { get; set; }
 
         /// <summary>

@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 自动分账组（当订单分账模式为自动分账，改组将完成分账逻辑） 0-否 1-是
         /// </summary>
-        [Required, Column("auto_division_flag", TypeName = "tinyint")]
+        [Required, Column("auto_division_flag", TypeName = "tinyint(6)")]
         public byte AutoDivisionFlag { get; set; }
 
         /// <summary>

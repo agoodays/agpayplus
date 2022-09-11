@@ -30,19 +30,19 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 是否支持普通商户模式: 0-不支持, 1-支持
         /// </summary>
-        [Required, Column("is_mch_mode", TypeName = "tinyint")]
+        [Required, Column("is_mch_mode", TypeName = "tinyint(6)")]
         public byte IsMchMode { get; set; }
 
         /// <summary>
         /// 是否支持服务商子商户模式: 0-不支持, 1-支持
         /// </summary>
-        [Required, Column("is_isv_mode", TypeName = "tinyint")]
+        [Required, Column("is_isv_mode", TypeName = "tinyint(6)")]
         public byte IsIsvMode { get; set; }
 
         /// <summary>
         /// 支付参数配置页面类型:1-JSON渲染,2-自定义
         /// </summary>
-        [Required, Column("config_page_type", TypeName = "tinyint")]
+        [Required, Column("config_page_type", TypeName = "tinyint(6)")]
         public byte ConfigPageType { get; set; }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 状态: 0-停用, 1-启用
         /// </summary>
-        [Required, Column("state", TypeName = "tinyint")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>

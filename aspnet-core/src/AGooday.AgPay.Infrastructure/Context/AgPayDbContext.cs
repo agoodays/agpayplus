@@ -46,6 +46,10 @@ namespace AGooday.AgPay.Infrastructure.Context
         /// <param name="optionsBuilder"></param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (optionsBuilder.IsConfigured)
+            {
+                return;
+            }
             #region
             //// 从 appsetting.json 中获取配置信息
             //var config = new ConfigurationBuilder()
@@ -66,11 +70,9 @@ namespace AGooday.AgPay.Infrastructure.Context
             switch (BaseDBConfig.DbType)
             {
                 case DataBaseType.MySql:
-                    var serverVersion = MySqlServerVersion.LatestSupportedServerVersion;
-                    serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
                     optionsBuilder.
                         // 安装NuGet包 Pomelo.EntityFrameworkCore.MySql
-                        UseMySql(BaseDBConfig.ConnectionString, serverVersion);
+                        UseMySql(BaseDBConfig.ConnectionString, MySqlServerVersion.LatestSupportedServerVersion);
                     break;
                     //case DataBaseType.SqlServer:
                     //    optionsBuilder

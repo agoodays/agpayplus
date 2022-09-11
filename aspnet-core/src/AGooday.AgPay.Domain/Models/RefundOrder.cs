@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
         /// </summary>
-        [Required, Column("mch_type", TypeName = "tinyint")]
+        [Required, Column("mch_type", TypeName = "tinyint(6)")]
         public byte MchType { get; set; }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 退款状态:0-订单生成,1-退款中,2-退款成功,3-退款失败,4-退款任务关闭
         /// </summary>
-        [Required, Column("state", TypeName = "tinyint")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>

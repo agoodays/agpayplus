@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
         /// </summary>
-        [Required, Column("mch_type", TypeName = "tinyint")]
+        [Required, Column("mch_type", TypeName = "tinyint(6)")]
         public byte MchType { get; set; }
 
         /// <summary>
@@ -97,13 +97,13 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 支付状态: 0-订单生成, 1-支付中, 2-支付成功, 3-支付失败, 4-已撤销, 5-已退款, 6-订单关闭
         /// </summary>
-        [Required, Column("state", TypeName = "tinyint")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>
         /// 向下游回调状态, 0-未发送,  1-已发送
         /// </summary>
-        [Required, Column("notify_state", TypeName = "tinyint")]
+        [Required, Column("notify_state", TypeName = "tinyint(6)")]
         public byte NotifyState { get; set; }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 退款状态: 0-未发生实际退款, 1-部分退款, 2-全额退款
         /// </summary>
-        [Required, Column("refund_state", TypeName = "tinyint")]
+        [Required, Column("refund_state", TypeName = "tinyint(6)")]
         public byte RefundState { get; set; }
 
         /// <summary>
@@ -163,13 +163,13 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 订单分账模式：0-该笔订单不允许分账, 1-支付成功按配置自动完成分账, 2-商户手动分账(解冻商户金额)
         /// </summary>
-        [Column("division_mode", TypeName = "tinyint")]
+        [Column("division_mode", TypeName = "tinyint(6)")]
         public byte DivisionMode { get; set; }
 
         /// <summary>
         /// 0-未发生分账, 1-等待分账任务处理, 2-分账处理中, 3-分账任务已结束(不体现状态)
         /// </summary>
-        [Column("division_state", TypeName = "tinyint")]
+        [Column("division_state", TypeName = "tinyint(6)")]
         public byte DivisionState { get; set; }
 
         /// <summary>

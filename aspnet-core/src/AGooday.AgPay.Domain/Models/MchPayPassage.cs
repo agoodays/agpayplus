@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 状态: 0-停用, 1-启用
         /// </summary>
-        [Required, Column("state", TypeName = "tinyint")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>

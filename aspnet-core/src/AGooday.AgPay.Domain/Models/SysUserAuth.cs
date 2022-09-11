@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 登录类型  1-昵称 2-手机号 3-邮箱  10-微信  11-QQ 12-支付宝 13-微博
         /// </summary>
-        [Required, Column("identity_type", TypeName = "tinyint")]
+        [Required, Column("identity_type", TypeName = "tinyint(6)")]
         public byte IdentityType { get; set; }
 
         /// <summary>

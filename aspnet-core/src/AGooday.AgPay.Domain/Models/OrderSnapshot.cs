@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 订单类型: 1-支付, 2-退款
         /// </summary>
-        [Key, Required, Column("order_type", TypeName = "tinyint")]
+        [Key, Required, Column("order_type", TypeName = "tinyint(6)")]
         public byte OrderType { get; set; }
 
         /// <summary>

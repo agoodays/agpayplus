@@ -24,49 +24,49 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 登录用户名
         /// </summary>
-        [Required, Column("login_username")]
+        [Required, Column("login_username", TypeName = "varchar(32)")]
         public string LoginUsername { get; set; }
 
         /// <summary>
         /// 真实姓名
         /// </summary>
-        [Required, Column("realname")]
+        [Required, Column("realname", TypeName = "varchar(32)")]
         public string Realname { get; set; }
 
         /// <summary>
         /// 手机号
         /// </summary>
-        [Required, Column("telphone")]
+        [Required, Column("telphone", TypeName = "varchar(32)")]
         public string Telphone { get; set; }
 
         /// <summary>
         /// 性别 0-未知, 1-男, 2-女
         /// </summary>
-        [Required, Column("sex")]
+        [Required, Column("sex", TypeName = "tinyint(6)")]
         public byte Sex { get; set; }
 
         /// <summary>
         /// 头像地址
         /// </summary>
-        [Column("avatar_url")]
+        [Column("avatar_url", TypeName = "varchar(128)")]
         public string AvatarUrl { get; set; }
 
         /// <summary>
         /// 员工编号
         /// </summary>
-        [Column("user_no")]
+        [Column("user_no", TypeName = "varchar(32)")]
         public string UserNo { get; set; }
 
         /// <summary>
         /// 是否超管（超管拥有全部权限） 0-否 1-是
         /// </summary>
-        [Required, Column("is_admin")]
+        [Required, Column("is_admin", TypeName = "tinyint(6)")]
         public byte IsAdmin { get; set; }
 
         /// <summary>
         /// 状态 0-停用 1-启用
         /// </summary>
-        [Required, Column("state")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 所属商户ID / 0(平台)
         /// </summary>
-        [Required, Column("belong_info_id")]
+        [Required, Column("belong_info_id", TypeName = "varchar(64)")]
         public string BelongInfoId { get; set; }
 
         /// <summary>
