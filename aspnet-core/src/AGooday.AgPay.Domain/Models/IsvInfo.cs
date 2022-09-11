@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,6 +18,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 服务商号
         /// </summary>
+        [Comment("服务商号")]
         [Key, Required, Column("isv_no", TypeName = "varchar(64)")]
         public string IsvNo { get; set; }
 

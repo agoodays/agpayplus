@@ -17,13 +17,13 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 订单号
         /// </summary>
-        [Key, Required, Column("order_id", TypeName = "varchar(64)")]
+        [Required, Column("order_id", TypeName = "varchar(64)")]
         public string OrderId { get; set; }
 
         /// <summary>
         /// 订单类型: 1-支付, 2-退款
         /// </summary>
-        [Key, Required, Column("order_type", TypeName = "tinyint(6)")]
+        [Required, Column("order_type", TypeName = "tinyint(6)")]
         public byte OrderType { get; set; }
 
         /// <summary>

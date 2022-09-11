@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.ViewModels;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Context;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,15 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ISysUserRepository _sysUserRepository;
+        private readonly AgPayDbContext _agPayDbContext;
         // 用来进行DTO
         private readonly IMapper _mapper;
 
-        public SysUserService(ISysUserRepository sysUserRepository, IMapper mapper)
+        public SysUserService(ISysUserRepository sysUserRepository, IMapper mapper, AgPayDbContext agPayDbContext)
         {
             _sysUserRepository = sysUserRepository;
             _mapper = mapper;
+            _agPayDbContext = agPayDbContext;
         }
 
         public void Dispose()
@@ -38,7 +41,8 @@ namespace AGooday.AgPay.Application.Services
         public IEnumerable<SysUserVM> GetAll()
         {
             //第一种写法 Map
-            var sysUsers = _sysUserRepository.GetAll();
+            //var sysUsers = _sysUserRepository.GetAll().ToList();
+            var sysUsers = _agPayDbContext.SysUser.ToList();
             return _mapper.Map<IEnumerable<SysUserVM>>(sysUsers);
 
             //第二种写法 ProjectTo

@@ -19,6 +19,7 @@ namespace AGooday.AgPay.Infrastructure.Mappings
             builder.Property(c => c.PayOrderId)
                 .HasColumnType("varchar(30)")
                 .HasColumnName("pay_order_id")
+                .HasComment("支付订单号")
                 .HasMaxLength(30)
                 .IsRequired()//是否必须
                 ;

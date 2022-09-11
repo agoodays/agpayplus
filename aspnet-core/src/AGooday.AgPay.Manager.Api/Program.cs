@@ -11,7 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var Env = builder.Environment;
 
-services.AddSingleton(new Appsettings(Env.ContentRootPath));
+//var conn = "server=localhost;port=3306;uid=root;pwd=mysql*;database=agpaydb_dev";//builder.Configuration.GetConnectionString("Default")
+//services.AddDbContext<AgPayDbContext>(options =>
+//    options.UseMySql(conn,
+//    MySqlServerVersion.LatestSupportedServerVersion));
+
+services.AddDbContext<AgPayDbContext>();
 
 // Automapper ×¢Èë
 services.AddAutoMapperSetup();

@@ -18,13 +18,13 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 用户ID
         /// </summary>
-        [Key, Required, Column("user_id", TypeName = "bigint")]
+        [Required, Column("user_id", TypeName = "bigint")]
         public long UserId { get; set; }
 
         /// <summary>
         /// 角色ID
         /// </summary>
-        [Key, Required, Column("role_id", TypeName = "varchar(32)")]
+        [Required, Column("role_id", TypeName = "varchar(32)")]
         public string RoleId { get; set; }
     }
 }

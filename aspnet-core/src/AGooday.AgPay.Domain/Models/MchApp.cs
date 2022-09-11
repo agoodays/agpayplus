@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Domain.Models
         /// <summary>
         /// 应用ID
         /// </summary>
-        [Required, Column("app_id", TypeName = "varchar(64)")]
+        [Key, Required, Column("app_id", TypeName = "varchar(64)")]
         public string AppId { get; set; }
 
         /// <summary>
