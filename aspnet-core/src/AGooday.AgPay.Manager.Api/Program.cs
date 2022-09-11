@@ -13,8 +13,6 @@ var Env = builder.Environment;
 
 services.AddSingleton(new Appsettings(Env.ContentRootPath));
 
-services.AddDbContext<AgPayDbContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("Default"), MySqlServerVersion.LatestSupportedServerVersion));
-
 // Automapper ×¢Èë
 services.AddAutoMapperSetup();
 
