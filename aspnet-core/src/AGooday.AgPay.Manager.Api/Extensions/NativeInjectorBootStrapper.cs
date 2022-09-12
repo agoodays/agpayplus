@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<ISysUserService, SysUserService>();
 
             // 注入 基础设施层 - 数据层
-            services.AddScoped<AgPayDbContext>();
+            //services.AddScoped<AgPayDbContext>();
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<ISysUserRepository, SysUserRepository>();
         }

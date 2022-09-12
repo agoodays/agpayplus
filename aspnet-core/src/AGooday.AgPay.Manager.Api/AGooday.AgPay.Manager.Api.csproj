@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AGooday.AgPay.Application\AGooday.AgPay.Application.csproj" />
-    <ProjectReference Include="..\AGooday.AgPay.Common\AGooday.AgPay.Common.csproj" />
   </ItemGroup>
 
 </Project>
