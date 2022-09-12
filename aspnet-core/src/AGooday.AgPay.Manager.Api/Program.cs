@@ -1,6 +1,7 @@
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Manager.Api.Extensions;
+using AGooday.AgPay.Manager.Api.Middlewares;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 

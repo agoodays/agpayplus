@@ -1,5 +1,7 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Domain.Commands.SysUsers;
+using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
@@ -17,11 +19,14 @@ namespace AGooday.AgPay.Application.Services
         private readonly ISysUserRepository _sysUserRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
+        // 中介者 总线
+        private readonly IMediatorHandler Bus;
 
-        public SysUserService(ISysUserRepository sysUserRepository, IMapper mapper)
+        public SysUserService(ISysUserRepository sysUserRepository, IMapper mapper, IMediatorHandler bus)
         {
             _sysUserRepository = sysUserRepository;
             _mapper = mapper;
+            Bus = bus;
         }
 
         public void Dispose()
@@ -33,6 +38,12 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<SysUser>(vm);
             _sysUserRepository.Add(m);
+        }
+
+        public void Create(SysUserVM vm)
+        {
+            var m = _mapper.Map<CreateSysUserCommand>(vm);
+            Bus.SendCommand(m);
         }
 
         public IEnumerable<SysUserVM> GetAll()

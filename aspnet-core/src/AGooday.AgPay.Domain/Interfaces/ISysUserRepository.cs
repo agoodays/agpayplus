@@ -9,5 +9,6 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface ISysUserRepository : IRepository<SysUser, long>
     {
+        SysUser GetByLoginUsername(string name);
     }
 }

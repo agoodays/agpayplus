@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
 using System;
@@ -20,6 +21,7 @@ namespace AGooday.AgPay.Application.AutoMapper
         public DomainToViewModelMappingProfile()
         {
             CreateMap<SysUser, SysUserVM>();
+            CreateMap<SysUser, SysUserCreatedEvent>();
         }
     }
 }

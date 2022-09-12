@@ -1,8 +1,18 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
+using AGooday.AgPay.Domain.CommandHandlers;
+using AGooday.AgPay.Domain.Commands.SysUsers;
+using AGooday.AgPay.Domain.Communication;
+using AGooday.AgPay.Domain.Core.Bus;
+using AGooday.AgPay.Domain.Core.Notifications;
+using AGooday.AgPay.Domain.EventHandlers;
+using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Interfaces;
+using AGooday.AgPay.Infrastructure.Bus;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Infrastructure.Repositories;
+using AGooday.AgPay.Infrastructure.UoW;
+using MediatR;
 
 namespace AGooday.AgPay.Manager.Api.Extensions
 {
@@ -24,8 +34,23 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             // 注入 应用层Application
             services.AddScoped<ISysUserService, SysUserService>();
 
+            // 命令总线Domain Bus (Mediator) 中介总线接口
+            services.AddScoped<IMediatorHandler, InMemoryBus>();
+            // Domain - Events
+            // 将事件模型和事件处理程序匹配注入
+
+            // 领域通知
+            services.AddScoped<INotificationHandler<DomainNotification>, DomainNotificationHandler>();
+            // 领域事件
+            services.AddScoped<INotificationHandler<SysUserCreatedEvent>, SysUserEventHandler>();
+
+            // 领域层 - 领域命令
+            // 将命令模型和命令处理程序匹配
+            services.AddScoped<IRequestHandler<CreateSysUserCommand, Unit>, SysUserCommandHandler>();
+
             // 注入 基础设施层 - 数据层
             //services.AddScoped<AgPayDbContext>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<ISysUserRepository, SysUserRepository>();
         }
