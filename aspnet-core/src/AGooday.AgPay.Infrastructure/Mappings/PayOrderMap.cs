@@ -29,11 +29,11 @@ namespace AGooday.AgPay.Infrastructure.Mappings
                 ;
 
             builder.Property(c => c.CreatedAt)
-                .HasDefaultValueSql("getdate()")//默认值
+                .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")//默认值
                 ;
 
             builder.Property(c => c.UpdatedAt)
-                .HasDefaultValueSql("getdate()")//默认值
+                .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")//默认值
                 ;
             #endregion
         }

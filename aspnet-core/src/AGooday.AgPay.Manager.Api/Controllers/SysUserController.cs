@@ -1,6 +1,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.ViewModels;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Infrastructure.Context;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
@@ -11,9 +12,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers
     {
         private readonly ILogger<SysUserController> _logger;
         private readonly ISysUserService _sysUserService;
+        private readonly AgPayDbContext _db;
 
-        public SysUserController(ILogger<SysUserController> logger, ISysUserService sysUserService)
+        public SysUserController(ILogger<SysUserController> logger, ISysUserService sysUserService, AgPayDbContext db)
         {
+            _db = db;
             _logger = logger;
             _sysUserService = sysUserService;
         }
@@ -22,7 +25,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [Route("list")]
         public ApiRes List()
         {
-            var users = _sysUserService.GetAll();
+            var users = _db.SysUser.ToList();
             return ApiRes.Ok(users);
         }
 

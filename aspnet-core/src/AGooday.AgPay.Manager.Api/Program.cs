@@ -11,15 +11,19 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var Env = builder.Environment;
 
-//var conn = "server=localhost;port=3306;uid=root;pwd=mysql*;database=agpaydb_dev";//builder.Configuration.GetConnectionString("Default")
+
 //services.AddDbContext<AgPayDbContext>(options =>
-//    options.UseMySql(conn,
+//    options.UseMySql(builder.Configuration.GetConnectionString("Default"),
 //    MySqlServerVersion.LatestSupportedServerVersion));
 
 services.AddDbContext<AgPayDbContext>();
 
 // Automapper 注入
 services.AddAutoMapperSetup();
+
+// .NET Core 原生依赖注入
+// 单写一层用来添加依赖项，从展示层 Presentation 中隔离
+NativeInjectorBootStrapper.RegisterServices(services);
 
 services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -32,10 +36,6 @@ services.AddSwaggerGen();
 //services.AddMediatR(typeof(MyxxxHandler));//单单注入某一个处理程序
 //或
 services.AddMediatR(typeof(Program));//目的是为了扫描Handler的实现对象并添加到IOC的容器中
-
-// .NET Core 原生依赖注入
-// 单写一层用来添加依赖项，从展示层 Presentation 中隔离
-NativeInjectorBootStrapper.RegisterServices(services);
 
 var app = builder.Build();
 
