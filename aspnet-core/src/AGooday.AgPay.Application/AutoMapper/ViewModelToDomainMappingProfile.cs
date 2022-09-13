@@ -24,6 +24,10 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysUserVM, SysUser>();
             CreateMap<SysUserVM, SysUserCommand>();
             CreateMap<SysUserCommand, SysUser>();
+
+            CreateMap<MchInfoVM, MchInfo>();
+
+            CreateMap<IsvInfoVM, IsvInfo>();
         }
     }
 }

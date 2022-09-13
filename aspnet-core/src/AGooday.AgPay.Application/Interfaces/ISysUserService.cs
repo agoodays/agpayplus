@@ -12,6 +12,10 @@ namespace AGooday.AgPay.Application.Interfaces
     public interface ISysUserService : IDisposable
     {
         void Add(SysUserVM vm);
+        void Create(SysUserVM vm);
+        void Remove(long recordId);
+        void Update(SysUserVM recordId);
+        SysUserVM GetById(long recordId);
         IEnumerable<SysUserVM> GetAll();
         Task<IEnumerable<SysUserVM>> ListAsync();
     }

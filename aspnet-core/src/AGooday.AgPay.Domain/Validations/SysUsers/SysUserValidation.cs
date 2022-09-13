@@ -47,7 +47,18 @@ namespace AGooday.AgPay.Domain.Validations.SysUsers
             RuleFor(c => c.Telphone)
                 .NotEmpty()
                 .Must(HavePhone)
-                .WithMessage("手机号应该为11位！");
+                .WithMessage("手机号应该为11位！")
+                ;
+        }
+
+        /// <summary>
+        /// 验证手机号
+        /// </summary>
+        protected void ValidateSex()
+        {
+            RuleFor(c => c.Sex)
+                .NotEmpty().WithMessage("性别不能为空！")
+                ;
         }
 
         // 表达式

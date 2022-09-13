@@ -1,7 +1,11 @@
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
 {
@@ -26,12 +30,41 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             return ApiRes.Ok(users);
         }
 
+        /// <summary>
+        /// 添加管理员
+        /// </summary>
+        /// <param name="vm"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("add")]
         public ApiRes Add(SysUserVM vm)
         {
-            _sysUserService.Add(vm);
+            vm.SysType = CS.SYS_TYPE.MGR;
+            _sysUserService.Create(vm);
             return ApiRes.Ok();
+        }
+
+        [HttpDelete]
+        [Route("delete/{recordId}")]
+        public ApiRes Delete(long recordId)
+        {
+            _sysUserService.Remove(recordId);
+            return ApiRes.Ok();
+        }
+
+        [HttpPut]
+        [Route("update/{recordId}")]
+        public ApiRes Update(SysUserVM vm)
+        {
+            _sysUserService.Update(vm);
+            return ApiRes.Ok();
+        }
+
+        [HttpGet]
+        [Route("detail/{recordId}")]
+        public ApiRes Detail(long recordId)
+        {
+            return ApiRes.Ok(_sysUserService.GetById(recordId));
         }
 
         [HttpGet]

@@ -42,8 +42,26 @@ namespace AGooday.AgPay.Application.Services
 
         public void Create(SysUserVM vm)
         {
-            var m = _mapper.Map<CreateSysUserCommand>(vm);
-            Bus.SendCommand(m);
+            var command = _mapper.Map<CreateSysUserCommand>(vm);
+            Bus.SendCommand(command);
+        }
+
+        public void Remove(long recordId)
+        {
+            _sysUserRepository.Remove(recordId);
+        }
+
+        public void Update(SysUserVM vm)
+        {
+            var m = _mapper.Map<SysUser>(vm);
+            _sysUserRepository.Update(m);
+        }
+
+        public SysUserVM GetById(long recordId)
+        {
+            var entity = _sysUserRepository.GetById(recordId);
+            var vm = _mapper.Map<SysUserVM>(entity);
+            return vm;
         }
 
         public IEnumerable<SysUserVM> GetAll()
@@ -53,7 +71,7 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysUserVM>>(sysUsers);
 
             //第二种写法 ProjectTo
-            //return (_UsersRepository.GetAll()).ProjectTo<UsersViewModel>(_mapper.ConfigurationProvider);
+            //return (_UsersRepository.GetAll()).ProjectTo<SysUserVM>(_mapper.ConfigurationProvider);
         }
 
         public Task<IEnumerable<SysUserVM>> ListAsync()

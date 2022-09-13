@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Domain.Commands.SysUsers;
+﻿using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Domain.Events.SysUsers;
@@ -52,16 +53,37 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             var entity = _mapper.Map<SysUser>(request);
 
             #region 检查
-            // 判断用户名是否存在
+            // 登录用户名不可重复
             // 这些业务逻辑，当然要在领域层中（领域命令处理程序中）进行处理
-            var existingUsers = _sysUserRepository.GetByLoginUsername(entity.LoginUsername);
-            if (existingUsers != null && existingUsers.SysUserId != entity.SysUserId)
+            if (_sysUserRepository.IsExistLoginUsername(entity.LoginUsername, entity.SysType))
             {
-                //引发错误事件
+                // 引发错误事件
                 Bus.RaiseEvent(new DomainNotification("", "该用户名已经被使用！"));
                 return Task.FromResult(new Unit());
             }
+            // 手机号不可重复
+            if (_sysUserRepository.IsExistTelphone(entity.Telphone, entity.SysType))
+            {
+                Bus.RaiseEvent(new DomainNotification("", "手机号已存在！"));
+                return Task.FromResult(new Unit());
+            }
+            // 员工号不可重复
+            if (_sysUserRepository.IsExistUserNo(entity.UserNo, entity.SysType))
+            {
+                Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
+                return Task.FromResult(new Unit());
+            }
             #endregion
+
+            //默认头像
+            switch (entity.Sex) {
+                case CS.SEX_MALE:
+                    entity.AvatarUrl = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_m.png";
+                    break;
+                case CS.SEX_FEMALE:
+                    entity.AvatarUrl = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_f.png";
+                    break;
+            }
 
             _sysUserRepository.AddAsync(entity);
             if (Commit())

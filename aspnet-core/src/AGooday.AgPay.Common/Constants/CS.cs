@@ -51,28 +51,45 @@ namespace AGooday.AgPay.Common.Constants
         /// <summary>
         /// 商户应用
         /// </summary>
-        public const byte INFO_TYPE_MCH_APP = 3; 
+        public const byte INFO_TYPE_MCH_APP = 3;
         #endregion
 
-        /**
-         * 商户类型:1-普通商户 2-特约商户
-         */
+        #region 商户类型:1-普通商户 2-特约商户
+        /// <summary>
+        /// 普通商户
+        /// </summary>
         public const byte MCH_TYPE_NORMAL = 1;
+        /// <summary>
+        /// 特约商户
+        /// </summary>
         public const byte MCH_TYPE_ISVSUB = 2;
+        #endregion
 
-        /**
-         * 性别 1- 男， 2-女
-         */
+        #region 性别 1- 男， 2-女
+        /// <summary>
+        /// 未知
+        /// </summary>
         public const byte SEX_UNKNOWN = 0;
+        /// <summary>
+        /// 男
+        /// </summary>
         public const byte SEX_MALE = 1;
+        /// <summary>
+        /// 女
+        /// </summary>
         public const byte SEX_FEMALE = 2;
+        #endregion
 
-        /** 默认密码 */
+        /// <summary>
+        /// 默认密码
+        /// </summary>
         public const string DEFAULT_PWD = "agpay666";
 
         public const long TOKEN_TIME = 60 * 60 * 2; //单位：s,  两小时
 
-        //access_token 名称
+        /// <summary>
+        /// access_token 名称
+        /// </summary>
         public const string ACCESS_TOKEN_NAME = "iToken";
 
         /** ！！不同系统请放置不同的redis库 ！！ **/

@@ -18,6 +18,7 @@ namespace AGooday.AgPay.Domain.Validations.SysUsers
             ValidateLoginUsername();
             ValidateRealname();
             ValidatePhone();
+            ValidateSex();
         }
     }
 }

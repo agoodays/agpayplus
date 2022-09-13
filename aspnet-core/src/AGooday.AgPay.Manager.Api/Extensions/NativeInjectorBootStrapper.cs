@@ -33,6 +33,8 @@ namespace AGooday.AgPay.Manager.Api.Extensions
         {
             // 注入 应用层Application
             services.AddScoped<ISysUserService, SysUserService>();
+            services.AddScoped<IMchInfoService, MchInfoService>();
+            services.AddScoped<IIsvInfoService, IsvInfoService>();
 
             // 命令总线Domain Bus (Mediator) 中介总线接口
             services.AddScoped<IMediatorHandler, InMemoryBus>();
@@ -53,6 +55,8 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<ISysUserRepository, SysUserRepository>();
+            services.AddScoped<IMchInfoRepository, MchInfoRepository>();
+            services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
         }
     }
 }
