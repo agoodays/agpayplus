@@ -14,18 +14,18 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.Services
 {
-    public class IsvInfoService : IIsvInfoService
+    public class PayOrderService : IPayOrderService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
-        private readonly IIsvInfoRepository _isvInfoRepository;
+        private readonly IPayOrderRepository _payOrderRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public IsvInfoService(IIsvInfoRepository isvInfoRepository, IMapper mapper, IMediatorHandler bus)
+        public PayOrderService(IPayOrderRepository payOrderRepository, IMapper mapper, IMediatorHandler bus)
         {
-            _isvInfoRepository = isvInfoRepository;
+            _payOrderRepository = payOrderRepository;
             _mapper = mapper;
             Bus = bus;
         }
@@ -35,34 +35,34 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(IsvInfoVM vm)
+        public void Add(PayOrderVM vm)
         {
-            var m = _mapper.Map<IsvInfo>(vm);
-            _isvInfoRepository.Add(m);
+            var m = _mapper.Map<PayOrder>(vm);
+            _payOrderRepository.Add(m);
         }
 
         public void Remove(string recordId)
         {
-            _isvInfoRepository.Remove(recordId);
+            _payOrderRepository.Remove(recordId);
         }
 
-        public void Update(IsvInfoVM vm)
+        public void Update(PayOrderVM vm)
         {
-            var m = _mapper.Map<IsvInfo>(vm);
-            _isvInfoRepository.Update(m);
+            var m = _mapper.Map<PayOrder>(vm);
+            _payOrderRepository.Update(m);
         }
 
-        public IsvInfoVM GetById(string recordId)
+        public PayOrderVM GetById(string recordId)
         {
-            var entity = _isvInfoRepository.GetById(recordId);
-            var vm = _mapper.Map<IsvInfoVM>(entity);
+            var entity = _payOrderRepository.GetById(recordId);
+            var vm = _mapper.Map<PayOrderVM>(entity);
             return vm;
         }
 
-        public IEnumerable<IsvInfoVM> GetAll()
+        public IEnumerable<PayOrderVM> GetAll()
         {
-            var isvInfos = _isvInfoRepository.GetAll();
-            return _mapper.Map<IEnumerable<IsvInfoVM>>(isvInfos);
+            var payOrders = _payOrderRepository.GetAll();
+            return _mapper.Map<IEnumerable<PayOrderVM>>(payOrders);
         }
     }
 }

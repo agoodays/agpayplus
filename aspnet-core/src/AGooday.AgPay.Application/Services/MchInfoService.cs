@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.Services
 {
-    public class MchInfoService: IMchInfoService
+    public class MchInfoService : IMchInfoService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchInfoRepository _mchInfoRepository;

@@ -14,18 +14,18 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.Services
 {
-    public class IsvInfoService : IIsvInfoService
+    public class RefundOrderService : IRefundOrderService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
-        private readonly IIsvInfoRepository _isvInfoRepository;
+        private readonly IRefundOrderRepository _refundOrderRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public IsvInfoService(IIsvInfoRepository isvInfoRepository, IMapper mapper, IMediatorHandler bus)
+        public RefundOrderService(IRefundOrderRepository refundOrderRepository, IMapper mapper, IMediatorHandler bus)
         {
-            _isvInfoRepository = isvInfoRepository;
+            _refundOrderRepository = refundOrderRepository;
             _mapper = mapper;
             Bus = bus;
         }
@@ -35,34 +35,34 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(IsvInfoVM vm)
+        public void Add(RefundOrderVM vm)
         {
-            var m = _mapper.Map<IsvInfo>(vm);
-            _isvInfoRepository.Add(m);
+            var m = _mapper.Map<RefundOrder>(vm);
+            _refundOrderRepository.Add(m);
         }
 
         public void Remove(string recordId)
         {
-            _isvInfoRepository.Remove(recordId);
+            _refundOrderRepository.Remove(recordId);
         }
 
-        public void Update(IsvInfoVM vm)
+        public void Update(RefundOrderVM vm)
         {
-            var m = _mapper.Map<IsvInfo>(vm);
-            _isvInfoRepository.Update(m);
+            var m = _mapper.Map<RefundOrder>(vm);
+            _refundOrderRepository.Update(m);
         }
 
-        public IsvInfoVM GetById(string recordId)
+        public RefundOrderVM GetById(string recordId)
         {
-            var entity = _isvInfoRepository.GetById(recordId);
-            var vm = _mapper.Map<IsvInfoVM>(entity);
+            var entity = _refundOrderRepository.GetById(recordId);
+            var vm = _mapper.Map<RefundOrderVM>(entity);
             return vm;
         }
 
-        public IEnumerable<IsvInfoVM> GetAll()
+        public IEnumerable<RefundOrderVM> GetAll()
         {
-            var isvInfos = _isvInfoRepository.GetAll();
-            return _mapper.Map<IEnumerable<IsvInfoVM>>(isvInfos);
+            var refundOrders = _refundOrderRepository.GetAll();
+            return _mapper.Map<IEnumerable<RefundOrderVM>>(refundOrders);
         }
     }
 }

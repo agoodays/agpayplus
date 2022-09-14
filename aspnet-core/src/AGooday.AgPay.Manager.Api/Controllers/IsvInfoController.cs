@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         }
 
         [HttpDelete]
-        [Route("detail/{isvNo}")]
+        [Route("delete/{isvNo}")]
         public ApiRes Delete(string isvNo)
         {
             _isvInfoService.Remove(isvNo);

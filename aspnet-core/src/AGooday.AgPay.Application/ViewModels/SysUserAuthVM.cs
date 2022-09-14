@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Application.ViewModels
     /// <summary>
     /// 系统用户认证表
     /// </summary>
-    public class SysUserAuth
+    public class SysUserAuthVM
     {
         /// <summary>
         /// ID

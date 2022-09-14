@@ -14,18 +14,18 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.Services
 {
-    public class IsvInfoService : IIsvInfoService
+    public class SysLogService : ISysLogService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
-        private readonly IIsvInfoRepository _isvInfoRepository;
+        private readonly ISysLogRepository _sysLogRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public IsvInfoService(IIsvInfoRepository isvInfoRepository, IMapper mapper, IMediatorHandler bus)
+        public SysLogService(ISysLogRepository sysLogRepository, IMapper mapper, IMediatorHandler bus)
         {
-            _isvInfoRepository = isvInfoRepository;
+            _sysLogRepository = sysLogRepository;
             _mapper = mapper;
             Bus = bus;
         }
@@ -35,34 +35,34 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(IsvInfoVM vm)
+        public void Add(SysLogVM vm)
         {
-            var m = _mapper.Map<IsvInfo>(vm);
-            _isvInfoRepository.Add(m);
+            var m = _mapper.Map<SysLog>(vm);
+            _sysLogRepository.Add(m);
         }
 
-        public void Remove(string recordId)
+        public void Remove(long recordId)
         {
-            _isvInfoRepository.Remove(recordId);
+            _sysLogRepository.Remove(recordId);
         }
 
-        public void Update(IsvInfoVM vm)
+        public void Update(SysLogVM vm)
         {
-            var m = _mapper.Map<IsvInfo>(vm);
-            _isvInfoRepository.Update(m);
+            var m = _mapper.Map<SysLog>(vm);
+            _sysLogRepository.Update(m);
         }
 
-        public IsvInfoVM GetById(string recordId)
+        public SysLogVM GetById(long recordId)
         {
-            var entity = _isvInfoRepository.GetById(recordId);
-            var vm = _mapper.Map<IsvInfoVM>(entity);
+            var entity = _sysLogRepository.GetById(recordId);
+            var vm = _mapper.Map<SysLogVM>(entity);
             return vm;
         }
 
-        public IEnumerable<IsvInfoVM> GetAll()
+        public IEnumerable<SysLogVM> GetAll()
         {
-            var isvInfos = _isvInfoRepository.GetAll();
-            return _mapper.Map<IEnumerable<IsvInfoVM>>(isvInfos);
+            var sysLogs = _sysLogRepository.GetAll();
+            return _mapper.Map<IEnumerable<SysLogVM>>(sysLogs);
         }
     }
 }

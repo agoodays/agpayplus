@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Application.ViewModels
     /// <summary>
     /// 退款订单表
     /// </summary>
-    public class RefundOrder
+    public class RefundOrderVM
     {
         /// <summary>
         /// 退款订单号（支付系统生成订单号）

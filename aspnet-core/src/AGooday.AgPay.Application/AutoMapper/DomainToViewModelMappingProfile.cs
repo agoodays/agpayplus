@@ -20,12 +20,30 @@ namespace AGooday.AgPay.Application.AutoMapper
         /// </summary>
         public DomainToViewModelMappingProfile()
         {
+            CreateMap<IsvInfo, IsvInfoVM>();
+            CreateMap<MchApp, MchAppVM>();
+            CreateMap<MchDivisionReceiverGroup, MchDivisionReceiverGroupVM>();
+            CreateMap<MchDivisionReceiver, MchDivisionReceiverVM>();
+            CreateMap<MchInfo, MchInfoVM>();
+            CreateMap<MchNotifyRecord, MchNotifyRecordVM>();
+            CreateMap<MchPayPassage, MchPayPassageVM>();
+            CreateMap<PayInterfaceConfig, PayInterfaceConfigVM>();
+            CreateMap<PayInterfaceDefine, PayInterfaceDefineVM>();
+            CreateMap<PayOrderDivisionRecord, PayOrderDivisionRecordVM>();
+            CreateMap<PayOrder, PayOrderVM>();
+            CreateMap<PayWay, PayWayVM>();
+            CreateMap<RefundOrder, RefundOrderVM>();
+            CreateMap<SysConfig, SysConfigVM>();
+            CreateMap<SysEntitlement, SysEntitlementVM>();
+            CreateMap<SysLog, SysLogVM>();
+            CreateMap<SysRoleEntRela, SysRoleEntRelaVM>();
+            CreateMap<SysUserAuth, SysUserAuthVM>();
+            CreateMap<SysUserRoleRela, SysUserRoleRelaVM>();
+
             CreateMap<SysUser, SysUserVM>();
             CreateMap<SysUser, SysUserCreatedEvent>();
 
-            CreateMap<MchInfo, MchInfoVM>();
-
-            CreateMap<IsvInfo, IsvInfoVM>();
+            CreateMap<TransferOrder, TransferOrderVM>();
         }
     }
 }
