@@ -40,6 +40,8 @@ NativeInjectorBootStrapper.RegisterServices(services);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseCalculateExecutionTime();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -50,7 +52,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseExceptionHandling();
+
+app.UseRequestResponseLogging();
 
 app.MapControllers();
 

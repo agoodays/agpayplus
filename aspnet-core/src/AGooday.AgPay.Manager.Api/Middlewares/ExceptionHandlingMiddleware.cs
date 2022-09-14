@@ -58,4 +58,20 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             await context.Response.WriteAsync(result);
         }
     }
+
+    /// <summary>
+    /// 扩展中间件
+    /// </summary>
+    public static class ExceptionHandlingMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseExceptionHandling(this IApplicationBuilder app)
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            return app.UseMiddleware<ExceptionHandlingMiddleware>();
+        }
+    }
 }
