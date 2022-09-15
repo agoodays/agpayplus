@@ -57,7 +57,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [Route("detail/{appId}")]
         public ApiRes Detail(string appId)
         {
-            return ApiRes.Ok(_mchAppService.GetById(appId));
+            var mchApp = _mchAppService.GetById(appId);
+            if (mchApp == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            return ApiRes.Ok(mchApp);
         }
     }
 }

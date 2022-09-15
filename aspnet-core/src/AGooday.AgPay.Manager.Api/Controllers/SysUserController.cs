@@ -48,6 +48,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         public ApiRes Add(SysUserVM vm)
         {
             //_cache.Remove("ErrorData");
+            vm.IsAdmin = CS.NO;
             vm.SysType = CS.SYS_TYPE.MGR;
             _sysUserService.Create(vm);
             //var errorData = _cache.Get("ErrorData");
@@ -79,7 +80,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [Route("detail/{recordId}")]
         public ApiRes Detail(long recordId)
         {
-            return ApiRes.Ok(_sysUserService.GetById(recordId));
+            var sysUser = _sysUserService.GetById(recordId);
+            if (sysUser == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            return ApiRes.Ok(sysUser);
         }
 
         [HttpGet]

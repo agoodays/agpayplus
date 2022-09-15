@@ -57,7 +57,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [Route("detail/{isvNo}")]
         public ApiRes Detail(string isvNo)
         {
-            return ApiRes.Ok(_isvInfoService.GetById(isvNo));
+            var isvInfo = _isvInfoService.GetById(isvNo);
+            if (isvInfo == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            return ApiRes.Ok(isvInfo);
         }
     }
 }
