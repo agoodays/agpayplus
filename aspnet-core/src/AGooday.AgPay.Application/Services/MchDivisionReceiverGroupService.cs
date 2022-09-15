@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<MchDivisionReceiverGroup>(vm);
             _mchDivisionReceiverGroupRepository.Add(m);
+            _mchDivisionReceiverGroupRepository.SaveChanges();
         }
 
         public void Remove(long recordId)
         {
             _mchDivisionReceiverGroupRepository.Remove(recordId);
+            _mchDivisionReceiverGroupRepository.SaveChanges();
         }
 
         public void Update(MchDivisionReceiverGroupVM vm)
         {
             var m = _mapper.Map<MchDivisionReceiverGroup>(vm);
             _mchDivisionReceiverGroupRepository.Update(m);
+            _mchDivisionReceiverGroupRepository.SaveChanges();
         }
 
         public MchDivisionReceiverGroupVM GetById(long recordId)

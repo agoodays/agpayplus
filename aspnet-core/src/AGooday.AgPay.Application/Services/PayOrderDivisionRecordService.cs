@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<PayOrderDivisionRecord>(vm);
             _payOrderDivisionRecordRepository.Add(m);
+            _payOrderDivisionRecordRepository.SaveChanges();
         }
 
         public void Remove(long recordId)
         {
             _payOrderDivisionRecordRepository.Remove(recordId);
+            _payOrderDivisionRecordRepository.SaveChanges();
         }
 
         public void Update(PayOrderDivisionRecordVM vm)
         {
             var m = _mapper.Map<PayOrderDivisionRecord>(vm);
             _payOrderDivisionRecordRepository.Update(m);
+            _payOrderDivisionRecordRepository.SaveChanges();
         }
 
         public PayOrderDivisionRecordVM GetById(long recordId)

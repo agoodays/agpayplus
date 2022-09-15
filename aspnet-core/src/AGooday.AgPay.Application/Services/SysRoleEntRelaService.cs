@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<SysRoleEntRela>(vm);
             _sysRoleEntRelaRepository.Add(m);
+            _sysRoleEntRelaRepository.SaveChanges();
         }
 
         public void Remove(string recordId)
         {
             _sysRoleEntRelaRepository.Remove(recordId);
+            _sysRoleEntRelaRepository.SaveChanges();
         }
 
         public void Update(SysRoleEntRelaVM vm)
         {
             var m = _mapper.Map<SysRoleEntRela>(vm);
             _sysRoleEntRelaRepository.Update(m);
+            _sysRoleEntRelaRepository.SaveChanges();
         }
 
         public SysRoleEntRelaVM GetById(string recordId)

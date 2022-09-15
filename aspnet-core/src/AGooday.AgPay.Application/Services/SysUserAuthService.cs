@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<SysUserAuth>(vm);
             _sysUserAuthRepository.Add(m);
+            _sysUserAuthRepository.SaveChanges();
         }
 
         public void Remove(long recordId)
         {
             _sysUserAuthRepository.Remove(recordId);
+            _sysUserAuthRepository.SaveChanges();
         }
 
         public void Update(SysUserAuthVM vm)
         {
             var m = _mapper.Map<SysUserAuth>(vm);
             _sysUserAuthRepository.Update(m);
+            _sysUserAuthRepository.SaveChanges();
         }
 
         public SysUserAuthVM GetById(long recordId)

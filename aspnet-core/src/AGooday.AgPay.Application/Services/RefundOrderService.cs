@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<RefundOrder>(vm);
             _refundOrderRepository.Add(m);
+            _refundOrderRepository.SaveChanges();
         }
 
         public void Remove(string recordId)
         {
             _refundOrderRepository.Remove(recordId);
+            _refundOrderRepository.SaveChanges();
         }
 
         public void Update(RefundOrderVM vm)
         {
             var m = _mapper.Map<RefundOrder>(vm);
             _refundOrderRepository.Update(m);
+            _refundOrderRepository.SaveChanges();
         }
 
         public RefundOrderVM GetById(string recordId)

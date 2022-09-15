@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<SysEntitlement>(vm);
             _sysEntitlementRepository.Add(m);
+            _sysEntitlementRepository.SaveChanges();
         }
 
         public void Remove(string recordId)
         {
             _sysEntitlementRepository.Remove(recordId);
+            _sysEntitlementRepository.SaveChanges();
         }
 
         public void Update(SysEntitlementVM vm)
         {
             var m = _mapper.Map<SysEntitlement>(vm);
             _sysEntitlementRepository.Update(m);
+            _sysEntitlementRepository.SaveChanges();
         }
 
         public SysEntitlementVM GetById(string recordId)

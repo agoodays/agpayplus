@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<PayInterfaceConfig>(vm);
             _payInterfaceConfigRepository.Add(m);
+            _payInterfaceConfigRepository.SaveChanges();
         }
 
         public void Remove(long recordId)
         {
             _payInterfaceConfigRepository.Remove(recordId);
+            _payInterfaceConfigRepository.SaveChanges();
         }
 
         public void Update(PayInterfaceConfigVM vm)
         {
             var m = _mapper.Map<PayInterfaceConfig>(vm);
             _payInterfaceConfigRepository.Update(m);
+            _payInterfaceConfigRepository.SaveChanges();
         }
 
         public PayInterfaceConfigVM GetById(long recordId)

@@ -4,6 +4,7 @@ using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<SysUser>(vm);
             _sysUserRepository.Add(m);
+            _sysUserRepository.SaveChanges();
         }
 
         public void Create(SysUserVM vm)
@@ -49,12 +51,14 @@ namespace AGooday.AgPay.Application.Services
         public void Remove(long recordId)
         {
             _sysUserRepository.Remove(recordId);
+            _sysUserRepository.SaveChanges();
         }
 
         public void Update(SysUserVM vm)
         {
             var m = _mapper.Map<SysUser>(vm);
             _sysUserRepository.Update(m);
+            _sysUserRepository.SaveChanges();
         }
 
         public SysUserVM GetById(long recordId)

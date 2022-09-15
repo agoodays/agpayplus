@@ -7,6 +7,7 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,12 +32,14 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
         // 注入总线
         private readonly IMediatorHandler Bus;
+        private IMemoryCache Cache;
 
-        public SysUserCommandHandler(IUnitOfWork uow, IMediatorHandler bus, ISysUserRepository sysUserRepository, IMapper mapper)
-            : base(uow, bus)
+        public SysUserCommandHandler(IUnitOfWork uow, IMediatorHandler bus, ISysUserRepository sysUserRepository, IMapper mapper, IMemoryCache cache)
+            : base(uow, bus, cache)
         {
             _sysUserRepository = sysUserRepository;
             _mapper = mapper;
+            Cache = cache;
         }
 
         public Task<Unit> Handle(CreateSysUserCommand request, CancellationToken cancellationToken)

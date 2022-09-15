@@ -8,16 +8,21 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var logging = builder.Logging;
+// 调用 ClearProviders 以从生成器中删除所有 ILoggerProvider 实例
+logging.ClearProviders();
+// 通常，日志级别应在配置中指定，而不是在代码中指定。
+logging.AddFilter("Microsoft", LogLevel.Warning);
+// 添加控制台日志记录提供程序。
+logging.AddConsole();
+
 // Add services to the container.
 var services = builder.Services;
 var Env = builder.Environment;
 
+services.AddSingleton(new Appsettings(Env.ContentRootPath));
 
-//services.AddDbContext<AgPayDbContext>(options =>
-//    options.UseMySql(builder.Configuration.GetConnectionString("Default"),
-//    MySqlServerVersion.LatestSupportedServerVersion));
-
-services.AddDbContext<AgPayDbContext>();
+services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
 
 // Automapper 注入
 services.AddAutoMapperSetup();

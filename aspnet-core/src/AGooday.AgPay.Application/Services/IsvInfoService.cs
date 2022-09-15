@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<IsvInfo>(vm);
             _isvInfoRepository.Add(m);
+            _isvInfoRepository.SaveChanges();
         }
 
         public void Remove(string recordId)
         {
             _isvInfoRepository.Remove(recordId);
+            _isvInfoRepository.SaveChanges();
         }
 
         public void Update(IsvInfoVM vm)
         {
             var m = _mapper.Map<IsvInfo>(vm);
             _isvInfoRepository.Update(m);
+            _isvInfoRepository.SaveChanges();
         }
 
         public IsvInfoVM GetById(string recordId)

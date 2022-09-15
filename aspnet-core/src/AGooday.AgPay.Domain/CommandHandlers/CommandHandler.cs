@@ -2,6 +2,7 @@
 using AGooday.AgPay.Domain.Core.Commands;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Domain.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,16 +21,20 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         private readonly IUnitOfWork _uow;
         // 注入中介处理接口（目前用不到，在领域事件中用来发布事件）
         private readonly IMediatorHandler _bus;
+        // 注入缓存，用来存储错误信息（目前是错误方法，以后用领域通知替换）
+        private IMemoryCache _cache;
 
         /// <summary>
         /// 构造函数注入
         /// </summary>
         /// <param name="uow"></param>
         /// <param name="bus"></param>
-        public CommandHandler(IUnitOfWork uow, IMediatorHandler bus)
+        /// <param name="cache"></param>
+        public CommandHandler(IUnitOfWork uow, IMediatorHandler bus, IMemoryCache cache)
         {
             _uow = uow;
             _bus = bus;
+            _cache = cache;
         }
 
         //将领域命令中的验证错误信息收集

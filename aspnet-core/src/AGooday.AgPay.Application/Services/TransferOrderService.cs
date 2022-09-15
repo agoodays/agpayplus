@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<TransferOrder>(vm);
             _transferOrderRepository.Add(m);
+            _transferOrderRepository.SaveChanges();
         }
 
         public void Remove(string recordId)
         {
             _transferOrderRepository.Remove(recordId);
+            _transferOrderRepository.SaveChanges();
         }
 
         public void Update(TransferOrderVM vm)
         {
             var m = _mapper.Map<TransferOrder>(vm);
             _transferOrderRepository.Update(m);
+            _transferOrderRepository.SaveChanges();
         }
 
         public TransferOrderVM GetById(string recordId)

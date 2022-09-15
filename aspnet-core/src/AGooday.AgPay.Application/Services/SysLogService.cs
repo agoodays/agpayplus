@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<SysLog>(vm);
             _sysLogRepository.Add(m);
+            _sysLogRepository.SaveChanges();
         }
 
         public void Remove(long recordId)
         {
             _sysLogRepository.Remove(recordId);
+            _sysLogRepository.SaveChanges();
         }
 
         public void Update(SysLogVM vm)
         {
             var m = _mapper.Map<SysLog>(vm);
             _sysLogRepository.Update(m);
+            _sysLogRepository.SaveChanges();
         }
 
         public SysLogVM GetById(long recordId)

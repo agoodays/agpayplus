@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<SysConfig>(vm);
             _sysConfigRepository.Add(m);
+            _sysConfigRepository.SaveChanges();
         }
 
         public void Remove(string recordId)
         {
             _sysConfigRepository.Remove(recordId);
+            _sysConfigRepository.SaveChanges();
         }
 
         public void Update(SysConfigVM vm)
         {
             var m = _mapper.Map<SysConfig>(vm);
             _sysConfigRepository.Update(m);
+            _sysConfigRepository.SaveChanges();
         }
 
         public SysConfigVM GetById(string recordId)

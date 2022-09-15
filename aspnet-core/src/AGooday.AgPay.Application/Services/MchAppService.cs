@@ -39,17 +39,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<MchApp>(vm);
             _mchAppRepository.Add(m);
+            _mchAppRepository.SaveChanges();
         }
 
         public void Remove(string recordId)
         {
             _mchAppRepository.Remove(recordId);
+            _mchAppRepository.SaveChanges();
         }
 
         public void Update(MchAppVM vm)
         {
             var m = _mapper.Map<MchApp>(vm);
             _mchAppRepository.Update(m);
+            _mchAppRepository.SaveChanges();
         }
 
         public MchAppVM GetById(string recordId)

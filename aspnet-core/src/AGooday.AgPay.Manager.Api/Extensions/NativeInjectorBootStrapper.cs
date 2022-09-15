@@ -13,6 +13,7 @@ using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Infrastructure.Repositories;
 using AGooday.AgPay.Infrastructure.UoW;
 using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace AGooday.AgPay.Manager.Api.Extensions
 {
@@ -57,9 +58,9 @@ namespace AGooday.AgPay.Manager.Api.Extensions
 
             // 命令总线Domain Bus (Mediator) 中介总线接口
             services.AddScoped<IMediatorHandler, InMemoryBus>();
+
             // Domain - Events
             // 将事件模型和事件处理程序匹配注入
-
             // 领域通知
             services.AddScoped<INotificationHandler<DomainNotification>, DomainNotificationHandler>();
             // 领域事件
@@ -69,8 +70,15 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             // 将命令模型和命令处理程序匹配
             services.AddScoped<IRequestHandler<CreateSysUserCommand, Unit>, SysUserCommandHandler>();
 
+            // 领域层 - Memory缓存
+            services.AddSingleton<IMemoryCache>(factory =>
+            {
+                var cache = new MemoryCache(new MemoryCacheOptions());
+                return cache;
+            });
+
             // 注入 基础设施层 - 数据层
-            //services.AddScoped<AgPayDbContext>();
+            services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
