@@ -110,5 +110,9 @@ namespace AGooday.AgPay.Common.Models
         {
             return new ApiRes(ApiCode.CUSTOM_FAIL.GetCode(), customMsg, null, null);
         }
+        public static ApiRes CustomFail(string[] customMsgs)
+        {
+            return new ApiRes(ApiCode.CUSTOM_FAIL.GetCode(), string.Join(";", customMsgs), null, null);
+        }
     }
 }

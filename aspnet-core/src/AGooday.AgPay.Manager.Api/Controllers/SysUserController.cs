@@ -50,6 +50,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             //_cache.Remove("ErrorData");
             vm.IsAdmin = CS.NO;
             vm.SysType = CS.SYS_TYPE.MGR;
+            vm.BelongInfoId = "0";
             _sysUserService.Create(vm);
             //var errorData = _cache.Get("ErrorData");
             //if (errorData == null)
@@ -57,23 +58,33 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();
             else
-                return ApiRes.CustomFail(string.Join(";", _notifications.GetNotifications().Select(s => s.Value)));
+                return ApiRes.CustomFail(_notifications.GetNotifications().Select(s => s.Value).ToArray());
         }
 
         [HttpDelete]
         [Route("delete/{recordId}")]
         public ApiRes Delete(long recordId)
         {
-            _sysUserService.Remove(recordId);
-            return ApiRes.Ok();
+            var currentUserId = 0;
+            _sysUserService.Remove(recordId, currentUserId, CS.SYS_TYPE.MGR);
+            // 是否存在消息通知
+            if (!_notifications.HasNotifications())
+                return ApiRes.Ok();
+            else
+                return ApiRes.CustomFail(_notifications.GetNotifications().Select(s => s.Value).ToArray());
         }
 
         [HttpPut]
         [Route("update/{recordId}")]
-        public ApiRes Update(SysUserVM vm)
+        public ApiRes Update(ModifySysUserVM vm)
         {
-            _sysUserService.Update(vm);
-            return ApiRes.Ok();
+            vm.SysType = CS.SYS_TYPE.MGR;
+            _sysUserService.Modify(vm);
+            // 是否存在消息通知
+            if (!_notifications.HasNotifications())
+                return ApiRes.Ok();
+            else
+                return ApiRes.CustomFail(_notifications.GetNotifications().Select(s => s.Value).ToArray());
         }
 
         [HttpGet]

@@ -69,6 +69,8 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             // 领域层 - 领域命令
             // 将命令模型和命令处理程序匹配
             services.AddScoped<IRequestHandler<CreateSysUserCommand, Unit>, SysUserCommandHandler>();
+            services.AddScoped<IRequestHandler<RemoveSysUserCommand, Unit>, SysUserCommandHandler>();
+            services.AddScoped<IRequestHandler<ModifySysUserCommand, Unit>, SysUserCommandHandler>();
 
             // 领域层 - Memory缓存
             services.AddSingleton<IMemoryCache>(factory =>

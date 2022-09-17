@@ -10,5 +10,7 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface ISysUserAuthRepository : IRepository<SysUserAuth, long>
     {
+        void RemoveByUserId(long userId, string sysType);
+        void ResetAuthInfo(long userId, string sysType, string loginUserName, string telphone, string newPwd);
     }
 }

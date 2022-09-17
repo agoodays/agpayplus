@@ -23,11 +23,11 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysUserRoleRelaService(ISysUserRoleRelaRepository sysUserRoleRelaRepository, IMapper mapper, IMediatorHandler bus)
+        public SysUserRoleRelaService(IMapper mapper, IMediatorHandler bus, ISysUserRoleRelaRepository sysUserRoleRelaRepository)
         {
-            _sysUserRoleRelaRepository = sysUserRoleRelaRepository;
             _mapper = mapper;
             Bus = bus;
+            _sysUserRoleRelaRepository = sysUserRoleRelaRepository;
         }
 
         public void Dispose()
@@ -66,6 +66,18 @@ namespace AGooday.AgPay.Application.Services
         {
             var sysUserRoleRelas = _sysUserRoleRelaRepository.GetAll();
             return _mapper.Map<IEnumerable<SysUserRoleRelaVM>>(sysUserRoleRelas);
+        }
+
+        /// <summary>
+        /// 根据用户查询全部角色集合
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public IEnumerable<string> SelectRoleIdsByUserId(long userId)
+        {
+            return _sysUserRoleRelaRepository.GetAll()
+                .Where(w => w.UserId == userId)
+                .Select(s => s.RoleId);
         }
     }
 }

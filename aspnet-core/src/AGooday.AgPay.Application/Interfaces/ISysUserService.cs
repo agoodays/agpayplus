@@ -14,7 +14,9 @@ namespace AGooday.AgPay.Application.Interfaces
         void Add(SysUserVM vm);
         void Create(SysUserVM vm);
         void Remove(long recordId);
+        void Remove(long sysUserId, long currentUserId, string sysType);
         void Update(SysUserVM recordId);
+        void Modify(ModifySysUserVM vm);
         SysUserVM GetById(long recordId);
         IEnumerable<SysUserVM> GetAll();
         Task<IEnumerable<SysUserVM>> ListAsync();

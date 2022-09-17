@@ -16,5 +16,25 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
+
+        /// <summary>
+        /// 当前角色是否已分配到用户
+        /// </summary>
+        /// <param name="telphone"></param>
+        /// <param name="sysType"></param>
+        /// <returns></returns>
+        public bool IsAssignedToUser(string roleId)
+        {
+            return DbSet.AsNoTracking().Any(c => c.RoleId == roleId);
+        }
+
+        public void RemoveByUserId(long userId)
+        {
+            var entitys = DbSet.Where(w => w.UserId == userId);
+            foreach (var entity in entitys)
+            {
+                DbSet.Remove(entity);
+            }
+        }
     }
 }

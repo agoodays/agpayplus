@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 操作员认证表 服务实现类
+    /// </summary>
     public class SysUserAuthService : ISysUserAuthService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
@@ -23,11 +26,11 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysUserAuthService(ISysUserAuthRepository sysUserAuthRepository, IMapper mapper, IMediatorHandler bus)
+        public SysUserAuthService(IMapper mapper, IMediatorHandler bus, ISysUserAuthRepository sysUserAuthRepository)
         {
-            _sysUserAuthRepository = sysUserAuthRepository;
             _mapper = mapper;
             Bus = bus;
+            _sysUserAuthRepository = sysUserAuthRepository;
         }
 
         public void Dispose()

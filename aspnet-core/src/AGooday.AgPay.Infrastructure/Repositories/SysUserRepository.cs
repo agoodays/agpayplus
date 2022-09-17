@@ -31,5 +31,20 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.AsNoTracking().Any(c => c.UserNo == userNo && c.SysType == sysType);
         }
+
+        public bool IsExist(long sysUserId, string sysType)
+        {
+            return DbSet.AsNoTracking().Any(c => c.SysUserId == sysUserId && c.SysType == sysType);
+        }
+
+        public SysUser GetByUserId(long sysUserId, string sysType)
+        {
+            return DbSet.Where(w => w.SysUserId == sysUserId && w.SysType == sysType).FirstOrDefault();
+        }
+
+        public void Remove(SysUser sysUser)
+        {
+            DbSet.Remove(sysUser);
+        }
     }
 }

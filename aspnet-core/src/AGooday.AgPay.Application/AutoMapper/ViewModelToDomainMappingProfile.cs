@@ -44,6 +44,8 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysUserVM, SysUser>();
             CreateMap<SysUserVM, SysUserCommand>();
             CreateMap<SysUserCommand, SysUser>();
+            CreateMap<ModifySysUserVM, ModifySysUserCommand>();
+            CreateMap<ModifySysUserCommand, SysUser>();
 
             CreateMap<TransferOrder, TransferOrderVM>();
         }

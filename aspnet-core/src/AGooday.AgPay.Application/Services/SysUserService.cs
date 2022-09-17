@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static AGooday.AgPay.Common.Constants.CS;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -54,11 +55,28 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository.SaveChanges();
         }
 
+        public void Remove(long sysUserId, long currentUserId, string sysType)
+        {
+            var command = new RemoveSysUserCommand()
+            {
+                SysUserId = sysUserId,
+                CurrentSysUserId = currentUserId,
+                SysType = sysType
+            };
+            Bus.SendCommand(command);
+        }
+
         public void Update(SysUserVM vm)
         {
             var m = _mapper.Map<SysUser>(vm);
             _sysUserRepository.Update(m);
             _sysUserRepository.SaveChanges();
+        }
+
+        public void Modify(ModifySysUserVM vm)
+        {
+            var command = _mapper.Map<ModifySysUserCommand>(vm);
+            Bus.SendCommand(command);
         }
 
         public SysUserVM GetById(long recordId)
