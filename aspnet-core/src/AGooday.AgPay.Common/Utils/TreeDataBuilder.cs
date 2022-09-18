@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Common.Utils
         }
 
         /** 查找当前节点的子节点 */
-        private List<JObject> GetChildNodes(JToken currentNode)
+        private List<JObject> GetChildNodes(JObject currentNode)
         {
             List<JObject> childNodes = new List<JObject>();
             foreach (JObject n in nodes)

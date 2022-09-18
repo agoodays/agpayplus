@@ -12,12 +12,12 @@ namespace AGooday.AgPay.Domain.Commands.SysUsers
         /// <summary>
         /// 默认密码
         /// </summary>
-        public string DefaultPass { get; set; }
+        public bool DefaultPass { get; set; }
 
         /// <summary>
         /// 重置密码
         /// </summary>
-        public string ResetPass { get; set; }
+        public bool ResetPass { get; set; }
 
         /// <summary>
         /// 确认密码

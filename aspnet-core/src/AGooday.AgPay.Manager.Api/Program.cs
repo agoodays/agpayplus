@@ -5,6 +5,8 @@ using AGooday.AgPay.Manager.Api.Middlewares;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +28,14 @@ services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
 
 // Automapper 注入
 services.AddAutoMapperSetup();
-services.AddControllers();
+services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
+        //options.SerializerSettings.Formatting = Formatting.Indented;
+        //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();

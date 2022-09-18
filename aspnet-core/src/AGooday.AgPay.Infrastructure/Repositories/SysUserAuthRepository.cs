@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             {
                 foreach (var sysUserAuth in sysUserAuths)
                 {
-                    sysUserAuth.Credential = newPwd;
+                    sysUserAuth.Credential = BCrypt.Net.BCrypt.HashPassword(newPwd);
                     Update(sysUserAuth);
                 }
             }

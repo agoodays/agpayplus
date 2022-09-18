@@ -16,12 +16,12 @@ namespace AGooday.AgPay.Application.ViewModels
         /// <summary>
         /// 重置密码
         /// </summary>
-        public string ResetPass { get; set; }
+        public bool ResetPass { get; set; }
 
         /// <summary>
         /// 确认密码
         /// </summary>
-        public string ConfirmPwd { get; set; }
+        public bool ConfirmPwd { get; set; }
 
         /// <summary>
         /// 当前系统用户ID

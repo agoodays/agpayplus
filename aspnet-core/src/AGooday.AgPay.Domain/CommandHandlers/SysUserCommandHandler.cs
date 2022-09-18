@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Core.Notifications;
@@ -104,13 +105,15 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             #region 添加默认用户认证表
             string salt = Guid.NewGuid().ToString("N").Substring(0, 6); //6位随机数
+            string authPwd = CS.DEFAULT_PWD;
+            string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
             //用户名登录方式
             var sysUserAuthByLoginUsername = new SysUserAuth()
             {
                 UserId = sysUser.SysUserId,
                 IdentityType = CS.AUTH_TYPE.LOGIN_USER_NAME,
                 Identifier = sysUser.LoginUsername,
-                Credential = CS.DEFAULT_PWD,
+                Credential = userPwd,
                 Salt = salt,
                 SysType = sysUser.SysType
             };
@@ -122,7 +125,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 UserId = sysUser.SysUserId,
                 IdentityType = CS.AUTH_TYPE.TELPHONE,
                 Identifier = sysUser.Telphone,
-                Credential = CS.DEFAULT_PWD,
+                Credential = userPwd,
                 Salt = salt,
                 SysType = sysUser.SysType
             };
@@ -211,22 +214,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             }
 
             //判断是否重置密码
-            if (!string.IsNullOrWhiteSpace(request.ResetPass))
+            if (request.ResetPass)
             {
-                string updatePwd = request.ConfirmPwd;
-                if (!string.IsNullOrWhiteSpace(request.DefaultPass))
-                {
-                    updatePwd = CS.DEFAULT_PWD;
-                }
-                else
-                {
-                    if (request.ResetPass != request.ConfirmPwd)
-                    {
-                        // 引发错误事件
-                        Bus.RaiseEvent(new DomainNotification("", "密码错误！"));
-                        return Task.FromResult(new Unit());
-                    }
-                }
+                string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
                 _sysUserAuthRepository.ResetAuthInfo(sysUser.SysUserId, sysUser.SysType, null, null, updatePwd);
             }
 

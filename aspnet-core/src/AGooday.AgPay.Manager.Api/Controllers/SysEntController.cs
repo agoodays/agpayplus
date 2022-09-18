@@ -48,7 +48,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpGet]
         [Route("showTree")]
-        public ActionResult ShowTree(string sysType)
+        //public ActionResult ShowTree(string sysType)
+        public ApiRes ShowTree(string sysType)
         {
             //查询全部数据
             var sysEnt = _sysEntService.GetBySysType(sysType, null);
@@ -61,8 +62,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             };
             var jsonArray = JArray.FromObject(sysEnt);
             var leftMenuTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
-            var json = JsonConvert.SerializeObject(ApiRes.Ok(leftMenuTree));
-            return Content(json, "application/json");
+            //var json = JsonConvert.SerializeObject(ApiRes.Ok(leftMenuTree));
+            //return Content(json, "application/json");
+            return ApiRes.Ok(leftMenuTree);
         }
     }
 }
