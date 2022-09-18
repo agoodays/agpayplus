@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(MchNotifyRecordVM vm);
         void Remove(long recordId);
-        void Update(MchNotifyRecordVM recordId);
+        void Update(MchNotifyRecordVM vm);
         MchNotifyRecordVM GetById(long recordId);
         IEnumerable<MchNotifyRecordVM> GetAll();
     }

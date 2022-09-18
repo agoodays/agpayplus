@@ -6,12 +6,13 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static AGooday.AgPay.Common.Constants.CS;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -24,11 +25,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysUserService(ISysUserRepository sysUserRepository, IMapper mapper, IMediatorHandler bus)
+        public SysUserService(IMapper mapper, IMediatorHandler bus, IConfiguration configuration,
+            ISysUserRepository sysUserRepository)
         {
-            _sysUserRepository = sysUserRepository;
             _mapper = mapper;
             Bus = bus;
+            _sysUserRepository = sysUserRepository;
         }
 
         public void Dispose()
@@ -94,6 +96,17 @@ namespace AGooday.AgPay.Application.Services
 
             //第二种写法 ProjectTo
             //return (_UsersRepository.GetAll()).ProjectTo<SysUserVM>(_mapper.ConfigurationProvider);
+        }
+
+        public PaginatedList<SysUserVM> GetPaginatedData(SysUserVM vm, int pageIndex = 1, int pageSize = 20)
+        {
+            var sysUsers = _sysUserRepository.GetAll()
+                .Where(w => w.SysType == vm.SysType
+                && (string.IsNullOrWhiteSpace(vm.Realname) || w.Realname.Contains(vm.Realname))
+                && (vm.SysUserId.Equals(0) || w.SysUserId.Equals(vm.SysUserId))
+                ).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<SysUser>.Create<SysUserVM>(sysUsers.AsNoTracking(), _mapper, pageIndex, pageSize);
+            return records;
         }
 
         public Task<IEnumerable<SysUserVM>> ListAsync()

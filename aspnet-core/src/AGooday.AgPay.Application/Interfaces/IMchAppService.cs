@@ -11,8 +11,9 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(MchAppVM vm);
         void Remove(string recordId);
-        void Update(MchAppVM recordId);
+        void Update(MchAppVM vm);
         MchAppVM GetById(string recordId);
         IEnumerable<MchAppVM> GetAll();
+        PaginatedList<MchAppVM> GetPaginatedData(MchAppVM vm, int pageIndex, int pageSize);
     }
 }

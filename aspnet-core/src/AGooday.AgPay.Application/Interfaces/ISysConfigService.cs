@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(SysConfigVM vm);
         void Remove(string recordId);
-        void Update(SysConfigVM recordId);
+        void Update(SysConfigVM vm);
         SysConfigVM GetById(string recordId);
         IEnumerable<SysConfigVM> GetAll();
     }

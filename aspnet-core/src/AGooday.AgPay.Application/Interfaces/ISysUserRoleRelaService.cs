@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(SysUserRoleRelaVM vm);
         void Remove(string recordId);
-        void Update(SysUserRoleRelaVM recordId);
+        void Update(SysUserRoleRelaVM vm);
         SysUserRoleRelaVM GetById(string recordId);
         IEnumerable<SysUserRoleRelaVM> GetAll();
     }

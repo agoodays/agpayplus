@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(TransferOrderVM vm);
         void Remove(string recordId);
-        void Update(TransferOrderVM recordId);
+        void Update(TransferOrderVM vm);
         TransferOrderVM GetById(string recordId);
         IEnumerable<TransferOrderVM> GetAll();
     }

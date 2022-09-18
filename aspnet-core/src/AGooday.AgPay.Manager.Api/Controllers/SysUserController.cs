@@ -7,6 +7,7 @@ using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Caching.Memory;
 using System.Runtime.InteropServices;
 
@@ -32,10 +33,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpGet]
         [Route("list")]
-        public ApiRes List()
+        public ApiRes List([FromBody] SysUserVM vm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
         {
-            var users = _sysUserService.GetAll();
-            return ApiRes.Ok(users);
+            vm.SysType = CS.SYS_TYPE.MGR;
+            var data = _sysUserService.GetPaginatedData(vm, pageNumber, pageSize);
+            return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
         /// <summary>

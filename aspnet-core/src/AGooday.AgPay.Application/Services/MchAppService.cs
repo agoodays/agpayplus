@@ -6,6 +6,7 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +67,18 @@ namespace AGooday.AgPay.Application.Services
         {
             var mchApps = _mchAppRepository.GetAll();
             return _mapper.Map<IEnumerable<MchAppVM>>(mchApps);
+        }
+
+        public PaginatedList<MchAppVM> GetPaginatedData(MchAppVM vm, int pageIndex, int pageSize)
+        {
+            var mchApps = _mchAppRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(vm.MchNo) || w.MchNo.Equals(vm.MchNo))
+                && (string.IsNullOrWhiteSpace(vm.AppId) || w.AppId.Equals(vm.AppId))
+                && (string.IsNullOrWhiteSpace(vm.AppName) || w.AppName.Contains(vm.AppName))
+                && (vm.State.Equals(0) || w.State.Equals(vm.State))
+                ).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<MchApp>.Create<MchAppVM>(mchApps.AsNoTracking(), _mapper, pageIndex, pageSize);
+            return records;
         }
     }
 }

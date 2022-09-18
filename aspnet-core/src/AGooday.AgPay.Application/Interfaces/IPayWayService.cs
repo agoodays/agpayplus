@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(PayWayVM vm);
         void Remove(string recordId);
-        void Update(PayWayVM recordId);
+        void Update(PayWayVM vm);
         PayWayVM GetById(string recordId);
         IEnumerable<PayWayVM> GetAll();
     }

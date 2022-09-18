@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(MchDivisionReceiverVM vm);
         void Remove(long recordId);
-        void Update(MchDivisionReceiverVM recordId);
+        void Update(MchDivisionReceiverVM vm);
         MchDivisionReceiverVM GetById(long recordId);
         IEnumerable<MchDivisionReceiverVM> GetAll();
     }

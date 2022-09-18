@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(PayOrderDivisionRecordVM vm);
         void Remove(long recordId);
-        void Update(PayOrderDivisionRecordVM recordId);
+        void Update(PayOrderDivisionRecordVM vm);
         PayOrderDivisionRecordVM GetById(long recordId);
         IEnumerable<PayOrderDivisionRecordVM> GetAll();
     }

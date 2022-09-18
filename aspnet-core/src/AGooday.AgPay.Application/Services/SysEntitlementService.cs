@@ -61,6 +61,14 @@ namespace AGooday.AgPay.Application.Services
             var vm = _mapper.Map<SysEntitlementVM>(entity);
             return vm;
         }
+        public IEnumerable<SysEntitlementVM> GetBySysType(string sysType, string entId)
+        {
+            var sysEnts = _sysEntitlementRepository.GetAll()
+                .Where(w => w.SysType.Equals(sysType)
+                && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId))
+                );
+            return _mapper.Map<IEnumerable<SysEntitlementVM>>(sysEnts);
+        }
 
         public IEnumerable<SysEntitlementVM> GetAll()
         {

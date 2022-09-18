@@ -23,10 +23,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpGet]
         [Route("list")]
-        public ApiRes List()
+        public ApiRes List([FromBody] MchAppVM vm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
         {
-            var data = _mchAppService.GetAll();
-            return ApiRes.Ok(data);
+            var data = _mchAppService.GetPaginatedData(vm, pageNumber, pageSize);
+            return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
         [HttpPost]

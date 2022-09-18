@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(SysUserAuthVM vm);
         void Remove(long recordId);
-        void Update(SysUserAuthVM recordId);
+        void Update(SysUserAuthVM vm);
         SysUserAuthVM GetById(long recordId);
         IEnumerable<SysUserAuthVM> GetAll();
     }

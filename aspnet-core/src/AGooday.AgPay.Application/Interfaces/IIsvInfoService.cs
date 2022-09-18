@@ -11,8 +11,9 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(IsvInfoVM vm);
         void Remove(string recordId);
-        void Update(IsvInfoVM recordId);
+        void Update(IsvInfoVM vm);
         IsvInfoVM GetById(string recordId);
         IEnumerable<IsvInfoVM> GetAll();
+        PaginatedList<IsvInfoVM> GetPaginatedData(IsvInfoVM vm, int pageIndex, int pageSize);
     }
 }

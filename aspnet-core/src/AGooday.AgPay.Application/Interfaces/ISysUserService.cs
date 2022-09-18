@@ -15,10 +15,11 @@ namespace AGooday.AgPay.Application.Interfaces
         void Create(SysUserVM vm);
         void Remove(long recordId);
         void Remove(long sysUserId, long currentUserId, string sysType);
-        void Update(SysUserVM recordId);
+        void Update(SysUserVM vm);
         void Modify(ModifySysUserVM vm);
         SysUserVM GetById(long recordId);
         IEnumerable<SysUserVM> GetAll();
+        PaginatedList<SysUserVM> GetPaginatedData(SysUserVM vm, int pageIndex = 1, int pageSize = 20);
         Task<IEnumerable<SysUserVM>> ListAsync();
     }
 }
