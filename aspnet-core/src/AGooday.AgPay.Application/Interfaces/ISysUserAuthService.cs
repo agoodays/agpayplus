@@ -14,5 +14,6 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(SysUserAuthVM vm);
         SysUserAuthVM GetById(long recordId);
         IEnumerable<SysUserAuthVM> GetAll();
+        SysUserAuthVM SelectByLogin(string identifier, byte identityType, string sysType);
     }
 }

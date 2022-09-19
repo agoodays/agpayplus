@@ -26,6 +26,18 @@ services.AddSingleton(new Appsettings(Env.ContentRootPath));
 
 services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
 
+#region Redis
+//redis缓存
+var section = builder.Configuration.GetSection("Redis:Default");
+//连接字符串
+string _connectionString = section.GetSection("Connection").Value;
+//实例名称
+string _instanceName = section.GetSection("InstanceName").Value;
+//默认数据库 
+int _defaultDB = int.Parse(section.GetSection("DefaultDB").Value ?? "0");
+services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB)); 
+#endregion
+
 // Automapper 注入
 services.AddAutoMapperSetup();
 services.AddControllers()
