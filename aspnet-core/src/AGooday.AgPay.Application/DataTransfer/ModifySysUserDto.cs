@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
-    public class ModifySysUserVM : SysUserVM
+    public class ModifySysUserDto : SysUserDto
     {
         /// <summary>
         /// 默认密码

@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(TransferOrderVM vm)
+        public void Add(TransferOrderDto dto)
         {
-            var m = _mapper.Map<TransferOrder>(vm);
+            var m = _mapper.Map<TransferOrder>(dto);
             _transferOrderRepository.Add(m);
             _transferOrderRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _transferOrderRepository.SaveChanges();
         }
 
-        public void Update(TransferOrderVM vm)
+        public void Update(TransferOrderDto dto)
         {
-            var m = _mapper.Map<TransferOrder>(vm);
+            var m = _mapper.Map<TransferOrder>(dto);
             _transferOrderRepository.Update(m);
             _transferOrderRepository.SaveChanges();
         }
 
-        public TransferOrderVM GetById(string recordId)
+        public TransferOrderDto GetById(string recordId)
         {
             var entity = _transferOrderRepository.GetById(recordId);
-            var vm = _mapper.Map<TransferOrderVM>(entity);
-            return vm;
+            var dto = _mapper.Map<TransferOrderDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<TransferOrderVM> GetAll()
+        public IEnumerable<TransferOrderDto> GetAll()
         {
             var transferOrders = _transferOrderRepository.GetAll();
-            return _mapper.Map<IEnumerable<TransferOrderVM>>(transferOrders);
+            return _mapper.Map<IEnumerable<TransferOrderDto>>(transferOrders);
         }
     }
 }

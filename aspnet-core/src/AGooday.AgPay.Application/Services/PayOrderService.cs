@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(PayOrderVM vm)
+        public void Add(PayOrderDto dto)
         {
-            var m = _mapper.Map<PayOrder>(vm);
+            var m = _mapper.Map<PayOrder>(dto);
             _payOrderRepository.Add(m);
             _payOrderRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository.SaveChanges();
         }
 
-        public void Update(PayOrderVM vm)
+        public void Update(PayOrderDto dto)
         {
-            var m = _mapper.Map<PayOrder>(vm);
+            var m = _mapper.Map<PayOrder>(dto);
             _payOrderRepository.Update(m);
             _payOrderRepository.SaveChanges();
         }
 
-        public PayOrderVM GetById(string recordId)
+        public PayOrderDto GetById(string recordId)
         {
             var entity = _payOrderRepository.GetById(recordId);
-            var vm = _mapper.Map<PayOrderVM>(entity);
-            return vm;
+            var dto = _mapper.Map<PayOrderDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<PayOrderVM> GetAll()
+        public IEnumerable<PayOrderDto> GetAll()
         {
             var payOrders = _payOrderRepository.GetAll();
-            return _mapper.Map<IEnumerable<PayOrderVM>>(payOrders);
+            return _mapper.Map<IEnumerable<PayOrderDto>>(payOrders);
         }
     }
 }

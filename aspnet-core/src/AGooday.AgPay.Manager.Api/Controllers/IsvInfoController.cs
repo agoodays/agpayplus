@@ -1,6 +1,6 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
@@ -23,17 +23,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpGet]
         [Route("list")]
-        public ApiRes List([FromBody] IsvInfoVM vm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        public ApiRes List([FromBody] IsvInfoDto dto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
         {
-            var data = _isvInfoService.GetPaginatedData(vm, pageNumber, pageSize);
+            var data = _isvInfoService.GetPaginatedData(dto, pageNumber, pageSize);
             return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
         [HttpPost]
         [Route("add")]
-        public ApiRes Add(IsvInfoVM vm)
+        public ApiRes Add(IsvInfoDto dto)
         {
-            _isvInfoService.Add(vm);
+            _isvInfoService.Add(dto);
             return ApiRes.Ok();
         }
 
@@ -47,9 +47,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpPut]
         [Route("update/{isvNo}")]
-        public ApiRes Update(IsvInfoVM vm)
+        public ApiRes Update(IsvInfoDto dto)
         {
-            _isvInfoService.Update(vm);
+            _isvInfoService.Update(dto);
             return ApiRes.Ok();
         }
 

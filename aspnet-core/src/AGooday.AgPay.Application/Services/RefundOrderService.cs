@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(RefundOrderVM vm)
+        public void Add(RefundOrderDto dto)
         {
-            var m = _mapper.Map<RefundOrder>(vm);
+            var m = _mapper.Map<RefundOrder>(dto);
             _refundOrderRepository.Add(m);
             _refundOrderRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _refundOrderRepository.SaveChanges();
         }
 
-        public void Update(RefundOrderVM vm)
+        public void Update(RefundOrderDto dto)
         {
-            var m = _mapper.Map<RefundOrder>(vm);
+            var m = _mapper.Map<RefundOrder>(dto);
             _refundOrderRepository.Update(m);
             _refundOrderRepository.SaveChanges();
         }
 
-        public RefundOrderVM GetById(string recordId)
+        public RefundOrderDto GetById(string recordId)
         {
             var entity = _refundOrderRepository.GetById(recordId);
-            var vm = _mapper.Map<RefundOrderVM>(entity);
-            return vm;
+            var dto = _mapper.Map<RefundOrderDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<RefundOrderVM> GetAll()
+        public IEnumerable<RefundOrderDto> GetAll()
         {
             var refundOrders = _refundOrderRepository.GetAll();
-            return _mapper.Map<IEnumerable<RefundOrderVM>>(refundOrders);
+            return _mapper.Map<IEnumerable<RefundOrderDto>>(refundOrders);
         }
     }
 }

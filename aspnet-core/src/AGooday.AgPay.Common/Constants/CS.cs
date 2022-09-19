@@ -92,9 +92,12 @@ namespace AGooday.AgPay.Common.Constants
         /// </summary>
         public const string ACCESS_TOKEN_NAME = "iToken";
 
+        #region 缓存Key
         /** ！！不同系统请放置不同的redis库 ！！ **/
-        /** 缓存key: 当前用户所有用户的token集合  example: TOKEN_1001_HcNheNDqHzhTIrT0lUXikm7xU5XY4Q */
-        public const string CACHE_KEY_TOKEN = "TOKEN_{0}_{1}";
+        /// <summary>
+        /// 缓存key: 当前用户所有用户的token集合  example: TOKEN_1001_HcNheNDqHzhTIrT0lUXikm7xU5XY4Q
+        /// </summary>
+        public const string CACHE_KEY_TOKEN = "Token:TOKEN_{0}_{1}";
         public static string GetCacheKeyToken(long sysUserId, string uuid)
         {
             return string.Format(CACHE_KEY_TOKEN, sysUserId, uuid);
@@ -103,11 +106,12 @@ namespace AGooday.AgPay.Common.Constants
         /// <summary>
         /// 图片验证码 缓存key
         /// </summary>
-        private const string CACHE_KEY_IMG_CODE = "img_code_{0}";
+        private const string CACHE_KEY_IMG_CODE = "ImgCode:img_code_{0}";
         public static string GetCacheKeyImgCode(string imgToken)
         {
             return string.Format(CACHE_KEY_IMG_CODE, imgToken);
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// 登录认证类型

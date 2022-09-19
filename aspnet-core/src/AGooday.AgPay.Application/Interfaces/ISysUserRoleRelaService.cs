@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,10 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface ISysUserRoleRelaService : IDisposable
     {
-        void Add(SysUserRoleRelaVM vm);
+        void Add(SysUserRoleRelaDto dto);
         void Remove(string recordId);
-        void Update(SysUserRoleRelaVM vm);
-        SysUserRoleRelaVM GetById(string recordId);
-        IEnumerable<SysUserRoleRelaVM> GetAll();
+        void Update(SysUserRoleRelaDto dto);
+        SysUserRoleRelaDto GetById(string recordId);
+        IEnumerable<SysUserRoleRelaDto> GetAll();
     }
 }

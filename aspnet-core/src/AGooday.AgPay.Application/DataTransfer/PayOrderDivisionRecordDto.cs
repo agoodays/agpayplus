@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 分账记录表
     /// </summary>
-    public class PayOrderDivisionRecordVM
+    public class PayOrderDivisionRecordDto
     {
         /// <summary>
         /// 分账记录ID

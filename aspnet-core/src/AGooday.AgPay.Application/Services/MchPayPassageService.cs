@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(MchPayPassageVM vm)
+        public void Add(MchPayPassageDto dto)
         {
-            var m = _mapper.Map<MchPayPassage>(vm);
+            var m = _mapper.Map<MchPayPassage>(dto);
             _mchPayPassageRepository.Add(m);
             _mchPayPassageRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _mchPayPassageRepository.SaveChanges();
         }
 
-        public void Update(MchPayPassageVM vm)
+        public void Update(MchPayPassageDto dto)
         {
-            var m = _mapper.Map<MchPayPassage>(vm);
+            var m = _mapper.Map<MchPayPassage>(dto);
             _mchPayPassageRepository.Update(m);
             _mchPayPassageRepository.SaveChanges();
         }
 
-        public MchPayPassageVM GetById(long recordId)
+        public MchPayPassageDto GetById(long recordId)
         {
             var entity = _mchPayPassageRepository.GetById(recordId);
-            var vm = _mapper.Map<MchPayPassageVM>(entity);
-            return vm;
+            var dto = _mapper.Map<MchPayPassageDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<MchPayPassageVM> GetAll()
+        public IEnumerable<MchPayPassageDto> GetAll()
         {
             var mchPayPassages = _mchPayPassageRepository.GetAll();
-            return _mapper.Map<IEnumerable<MchPayPassageVM>>(mchPayPassages);
+            return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
     }
 }

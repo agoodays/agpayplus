@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,10 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IPayInterfaceConfigService : IDisposable
     {
-        void Add(PayInterfaceConfigVM vm);
+        void Add(PayInterfaceConfigDto dto);
         void Remove(long recordId);
-        void Update(PayInterfaceConfigVM vm);
-        PayInterfaceConfigVM GetById(long recordId);
-        IEnumerable<PayInterfaceConfigVM> GetAll();
+        void Update(PayInterfaceConfigDto dto);
+        PayInterfaceConfigDto GetById(long recordId);
+        IEnumerable<PayInterfaceConfigDto> GetAll();
     }
 }

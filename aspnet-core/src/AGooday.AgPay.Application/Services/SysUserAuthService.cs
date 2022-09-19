@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(SysUserAuthVM vm)
+        public void Add(SysUserAuthDto dto)
         {
-            var m = _mapper.Map<SysUserAuth>(vm);
+            var m = _mapper.Map<SysUserAuth>(dto);
             _sysUserAuthRepository.Add(m);
             _sysUserAuthRepository.SaveChanges();
         }
@@ -55,27 +55,27 @@ namespace AGooday.AgPay.Application.Services
             _sysUserAuthRepository.SaveChanges();
         }
 
-        public void Update(SysUserAuthVM vm)
+        public void Update(SysUserAuthDto dto)
         {
-            var m = _mapper.Map<SysUserAuth>(vm);
+            var m = _mapper.Map<SysUserAuth>(dto);
             _sysUserAuthRepository.Update(m);
             _sysUserAuthRepository.SaveChanges();
         }
 
-        public SysUserAuthVM GetById(long recordId)
+        public SysUserAuthDto GetById(long recordId)
         {
             var entity = _sysUserAuthRepository.GetById(recordId);
-            var vm = _mapper.Map<SysUserAuthVM>(entity);
-            return vm;
+            var dto = _mapper.Map<SysUserAuthDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<SysUserAuthVM> GetAll()
+        public IEnumerable<SysUserAuthDto> GetAll()
         {
             var sysUserAuths = _sysUserAuthRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysUserAuthVM>>(sysUserAuths);
+            return _mapper.Map<IEnumerable<SysUserAuthDto>>(sysUserAuths);
         }
 
-        public SysUserAuthVM SelectByLogin(string identifier, byte identityType, string sysType)
+        public SysUserAuthDto SelectByLogin(string identifier, byte identityType, string sysType)
         {
             var entity = _sysUserAuthRepository.GetAll()
                 .Join(_sysUserRepository.GetAll(),
@@ -83,7 +83,7 @@ namespace AGooday.AgPay.Application.Services
                 (ua, ur) => ua)
                 .Where(w => w.IdentityType == identityType && w.Identifier.Equals(identifier) && w.SysType.Equals(sysType))
                 .FirstOrDefault();
-            return _mapper.Map<SysUserAuthVM>(entity);
+            return _mapper.Map<SysUserAuthDto>(entity);
         }
     }
 }

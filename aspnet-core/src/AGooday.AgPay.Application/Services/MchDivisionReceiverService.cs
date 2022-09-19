@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(MchDivisionReceiverVM vm)
+        public void Add(MchDivisionReceiverDto dto)
         {
-            var m = _mapper.Map<MchDivisionReceiver>(vm);
+            var m = _mapper.Map<MchDivisionReceiver>(dto);
             _mchDivisionReceiverRepository.Add(m);
             _mchDivisionReceiverRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _mchDivisionReceiverRepository.SaveChanges();
         }
 
-        public void Update(MchDivisionReceiverVM vm)
+        public void Update(MchDivisionReceiverDto dto)
         {
-            var m = _mapper.Map<MchDivisionReceiver>(vm);
+            var m = _mapper.Map<MchDivisionReceiver>(dto);
             _mchDivisionReceiverRepository.Update(m);
             _mchDivisionReceiverRepository.SaveChanges();
         }
 
-        public MchDivisionReceiverVM GetById(long recordId)
+        public MchDivisionReceiverDto GetById(long recordId)
         {
             var entity = _mchDivisionReceiverRepository.GetById(recordId);
-            var vm = _mapper.Map<MchDivisionReceiverVM>(entity);
-            return vm;
+            var dto = _mapper.Map<MchDivisionReceiverDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<MchDivisionReceiverVM> GetAll()
+        public IEnumerable<MchDivisionReceiverDto> GetAll()
         {
             var mchDivisionReceivers = _mchDivisionReceiverRepository.GetAll();
-            return _mapper.Map<IEnumerable<MchDivisionReceiverVM>>(mchDivisionReceivers);
+            return _mapper.Map<IEnumerable<MchDivisionReceiverDto>>(mchDivisionReceivers);
         }
     }
 }

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 支付订单表
     /// </summary>
-    public class PayOrderVM
+    public class PayOrderDto
     {
         /// <summary>
         /// 支付订单号

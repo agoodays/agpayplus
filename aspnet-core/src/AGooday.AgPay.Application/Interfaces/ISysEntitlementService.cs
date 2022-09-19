@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,11 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface ISysEntitlementService : IDisposable
     {
-        void Add(SysEntitlementVM vm);
+        void Add(SysEntitlementDto dto);
         void Remove(string recordId);
-        void Update(SysEntitlementVM vm);
-        SysEntitlementVM GetById(string recordId);
-        IEnumerable<SysEntitlementVM> GetBySysType(string sysType, string entId);
-        IEnumerable<SysEntitlementVM> GetAll();
+        void Update(SysEntitlementDto dto);
+        SysEntitlementDto GetById(string recordId);
+        IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId);
+        IEnumerable<SysEntitlementDto> GetAll();
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(SysConfigVM vm)
+        public void Add(SysConfigDto dto)
         {
-            var m = _mapper.Map<SysConfig>(vm);
+            var m = _mapper.Map<SysConfig>(dto);
             _sysConfigRepository.Add(m);
             _sysConfigRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _sysConfigRepository.SaveChanges();
         }
 
-        public void Update(SysConfigVM vm)
+        public void Update(SysConfigDto dto)
         {
-            var m = _mapper.Map<SysConfig>(vm);
+            var m = _mapper.Map<SysConfig>(dto);
             _sysConfigRepository.Update(m);
             _sysConfigRepository.SaveChanges();
         }
 
-        public SysConfigVM GetById(string recordId)
+        public SysConfigDto GetById(string recordId)
         {
             var entity = _sysConfigRepository.GetById(recordId);
-            var vm = _mapper.Map<SysConfigVM>(entity);
-            return vm;
+            var dto = _mapper.Map<SysConfigDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<SysConfigVM> GetAll()
+        public IEnumerable<SysConfigDto> GetAll()
         {
             var sysConfigs = _sysConfigRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysConfigVM>>(sysConfigs);
+            return _mapper.Map<IEnumerable<SysConfigDto>>(sysConfigs);
         }
     }
 }

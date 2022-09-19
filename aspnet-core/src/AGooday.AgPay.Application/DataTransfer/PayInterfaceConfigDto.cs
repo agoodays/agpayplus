@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 支付接口配置参数表
     /// </summary>
-    public class PayInterfaceConfigVM
+    public class PayInterfaceConfigDto
     {
         /// <summary>
         /// ID

@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(PayInterfaceConfigVM vm)
+        public void Add(PayInterfaceConfigDto dto)
         {
-            var m = _mapper.Map<PayInterfaceConfig>(vm);
+            var m = _mapper.Map<PayInterfaceConfig>(dto);
             _payInterfaceConfigRepository.Add(m);
             _payInterfaceConfigRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _payInterfaceConfigRepository.SaveChanges();
         }
 
-        public void Update(PayInterfaceConfigVM vm)
+        public void Update(PayInterfaceConfigDto dto)
         {
-            var m = _mapper.Map<PayInterfaceConfig>(vm);
+            var m = _mapper.Map<PayInterfaceConfig>(dto);
             _payInterfaceConfigRepository.Update(m);
             _payInterfaceConfigRepository.SaveChanges();
         }
 
-        public PayInterfaceConfigVM GetById(long recordId)
+        public PayInterfaceConfigDto GetById(long recordId)
         {
             var entity = _payInterfaceConfigRepository.GetById(recordId);
-            var vm = _mapper.Map<PayInterfaceConfigVM>(entity);
-            return vm;
+            var dto = _mapper.Map<PayInterfaceConfigDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<PayInterfaceConfigVM> GetAll()
+        public IEnumerable<PayInterfaceConfigDto> GetAll()
         {
             var payInterfaceConfigs = _payInterfaceConfigRepository.GetAll();
-            return _mapper.Map<IEnumerable<PayInterfaceConfigVM>>(payInterfaceConfigs);
+            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfigs);
         }
     }
 }

@@ -4,17 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
-    /// 商户支付通道表
+    /// 商户应用表
     /// </summary>
-    public class MchPayPassageVM
+    public class MchAppDto
     {
         /// <summary>
-        /// ID
+        /// 应用ID
         /// </summary>
-        public long Id { get; set; }
+        public string AppId { get; set; }
+
+        /// <summary>
+        /// 应用名称
+        /// </summary>
+        public string AppName { get; set; }
 
         /// <summary>
         /// 商户号
@@ -22,34 +27,29 @@ namespace AGooday.AgPay.Application.ViewModels
         public string MchNo { get; set; }
 
         /// <summary>
-        /// 应用Id
-        /// </summary>
-        public string AppId { get; set; }
-
-        /// <summary>
-        /// 支付接口
-        /// </summary>
-        public string IfCode { get; set; }
-
-        /// <summary>
-        /// 支付方式
-        /// </summary>
-        public string WayCode { get; set; }
-
-        /// <summary>
-        /// 支付方式费率
-        /// </summary>
-        public decimal Rate { get; set; }
-
-        /// <summary>
-        /// 风控数据
-        /// </summary>
-        public string RiskConfig { get; set; }
-
-        /// <summary>
-        /// 状态: 0-停用, 1-启用
+        /// 应用状态: 0-停用, 1-正常
         /// </summary>
         public byte State { get; set; }
+
+        /// <summary>
+        /// 应用私钥
+        /// </summary>
+        public string AppSecret { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
+
+        /// <summary>
+        /// 创建者用户ID
+        /// </summary>
+        public long CreatedUid { get; set; }
+
+        /// <summary>
+        /// 创建者姓名
+        /// </summary>
+        public string CreatedBy { get; set; }
 
         /// <summary>
         /// 创建时间

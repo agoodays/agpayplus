@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 商户通知记录表
     /// </summary>
-    public class MchNotifyRecordVM
+    public class MchNotifyRecordDto
     {
         /// <summary>
         /// 商户通知记录ID

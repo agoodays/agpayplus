@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,10 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchNotifyRecordService : IDisposable
     {
-        void Add(MchNotifyRecordVM vm);
+        void Add(MchNotifyRecordDto dto);
         void Remove(long recordId);
-        void Update(MchNotifyRecordVM vm);
-        MchNotifyRecordVM GetById(long recordId);
-        IEnumerable<MchNotifyRecordVM> GetAll();
+        void Update(MchNotifyRecordDto dto);
+        MchNotifyRecordDto GetById(long recordId);
+        IEnumerable<MchNotifyRecordDto> GetAll();
     }
 }

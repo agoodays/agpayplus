@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(MchDivisionReceiverGroupVM vm)
+        public void Add(MchDivisionReceiverGroupDto dto)
         {
-            var m = _mapper.Map<MchDivisionReceiverGroup>(vm);
+            var m = _mapper.Map<MchDivisionReceiverGroup>(dto);
             _mchDivisionReceiverGroupRepository.Add(m);
             _mchDivisionReceiverGroupRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _mchDivisionReceiverGroupRepository.SaveChanges();
         }
 
-        public void Update(MchDivisionReceiverGroupVM vm)
+        public void Update(MchDivisionReceiverGroupDto dto)
         {
-            var m = _mapper.Map<MchDivisionReceiverGroup>(vm);
+            var m = _mapper.Map<MchDivisionReceiverGroup>(dto);
             _mchDivisionReceiverGroupRepository.Update(m);
             _mchDivisionReceiverGroupRepository.SaveChanges();
         }
 
-        public MchDivisionReceiverGroupVM GetById(long recordId)
+        public MchDivisionReceiverGroupDto GetById(long recordId)
         {
             var entity = _mchDivisionReceiverGroupRepository.GetById(recordId);
-            var vm = _mapper.Map<MchDivisionReceiverGroupVM>(entity);
-            return vm;
+            var dto = _mapper.Map<MchDivisionReceiverGroupDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<MchDivisionReceiverGroupVM> GetAll()
+        public IEnumerable<MchDivisionReceiverGroupDto> GetAll()
         {
             var mchDivisionReceiverGroups = _mchDivisionReceiverGroupRepository.GetAll();
-            return _mapper.Map<IEnumerable<MchDivisionReceiverGroupVM>>(mchDivisionReceiverGroups);
+            return _mapper.Map<IEnumerable<MchDivisionReceiverGroupDto>>(mchDivisionReceiverGroups);
         }
     }
 }

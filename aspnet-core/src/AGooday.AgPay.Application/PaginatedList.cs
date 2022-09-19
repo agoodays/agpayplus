@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System;

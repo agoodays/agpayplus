@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,10 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchDivisionReceiverService : IDisposable
     {
-        void Add(MchDivisionReceiverVM vm);
+        void Add(MchDivisionReceiverDto dto);
         void Remove(long recordId);
-        void Update(MchDivisionReceiverVM vm);
-        MchDivisionReceiverVM GetById(long recordId);
-        IEnumerable<MchDivisionReceiverVM> GetAll();
+        void Update(MchDivisionReceiverDto dto);
+        MchDivisionReceiverDto GetById(long recordId);
+        IEnumerable<MchDivisionReceiverDto> GetAll();
     }
 }

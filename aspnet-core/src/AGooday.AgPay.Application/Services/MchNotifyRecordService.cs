@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(MchNotifyRecordVM vm)
+        public void Add(MchNotifyRecordDto dto)
         {
-            var m = _mapper.Map<MchNotifyRecord>(vm);
+            var m = _mapper.Map<MchNotifyRecord>(dto);
             _mchNotifyRecordRepository.Add(m);
             _mchNotifyRecordRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _mchNotifyRecordRepository.SaveChanges();
         }
 
-        public void Update(MchNotifyRecordVM vm)
+        public void Update(MchNotifyRecordDto dto)
         {
-            var m = _mapper.Map<MchNotifyRecord>(vm);
+            var m = _mapper.Map<MchNotifyRecord>(dto);
             _mchNotifyRecordRepository.Update(m);
             _mchNotifyRecordRepository.SaveChanges();
         }
 
-        public MchNotifyRecordVM GetById(long recordId)
+        public MchNotifyRecordDto GetById(long recordId)
         {
             var entity = _mchNotifyRecordRepository.GetById(recordId);
-            var vm = _mapper.Map<MchNotifyRecordVM>(entity);
-            return vm;
+            var dto = _mapper.Map<MchNotifyRecordDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<MchNotifyRecordVM> GetAll()
+        public IEnumerable<MchNotifyRecordDto> GetAll()
         {
             var mchNotifyRecords = _mchNotifyRecordRepository.GetAll();
-            return _mapper.Map<IEnumerable<MchNotifyRecordVM>>(mchNotifyRecords);
+            return _mapper.Map<IEnumerable<MchNotifyRecordDto>>(mchNotifyRecords);
         }
     }
 }

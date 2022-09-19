@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
@@ -46,9 +46,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(SysRoleEntRelaVM vm)
+        public void Add(SysRoleEntRelaDto dto)
         {
-            var m = _mapper.Map<SysRoleEntRela>(vm);
+            var m = _mapper.Map<SysRoleEntRela>(dto);
             _sysRoleEntRelaRepository.Add(m);
             _sysRoleEntRelaRepository.SaveChanges();
         }
@@ -59,24 +59,24 @@ namespace AGooday.AgPay.Application.Services
             _sysRoleEntRelaRepository.SaveChanges();
         }
 
-        public void Update(SysRoleEntRelaVM vm)
+        public void Update(SysRoleEntRelaDto dto)
         {
-            var m = _mapper.Map<SysRoleEntRela>(vm);
+            var m = _mapper.Map<SysRoleEntRela>(dto);
             _sysRoleEntRelaRepository.Update(m);
             _sysRoleEntRelaRepository.SaveChanges();
         }
 
-        public SysRoleEntRelaVM GetById(string recordId)
+        public SysRoleEntRelaDto GetById(string recordId)
         {
             var entity = _sysRoleEntRelaRepository.GetById(recordId);
-            var vm = _mapper.Map<SysRoleEntRelaVM>(entity);
-            return vm;
+            var dto = _mapper.Map<SysRoleEntRelaDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<SysRoleEntRelaVM> GetAll()
+        public IEnumerable<SysRoleEntRelaDto> GetAll()
         {
             var sysRoleEntRelas = _sysRoleEntRelaRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysRoleEntRelaVM>>(sysRoleEntRelas);
+            return _mapper.Map<IEnumerable<SysRoleEntRelaDto>>(sysRoleEntRelas);
         }
 
         /// <summary>

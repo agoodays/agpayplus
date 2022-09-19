@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,10 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IRefundOrderService : IDisposable
     {
-        void Add(RefundOrderVM vm);
+        void Add(RefundOrderDto dto);
         void Remove(string recordId);
-        void Update(RefundOrderVM vm);
-        RefundOrderVM GetById(string recordId);
-        IEnumerable<RefundOrderVM> GetAll();
+        void Update(RefundOrderDto dto);
+        RefundOrderDto GetById(string recordId);
+        IEnumerable<RefundOrderDto> GetAll();
     }
 }

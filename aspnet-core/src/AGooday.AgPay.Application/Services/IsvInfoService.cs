@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -36,9 +36,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(IsvInfoVM vm)
+        public void Add(IsvInfoDto dto)
         {
-            var m = _mapper.Map<IsvInfo>(vm);
+            var m = _mapper.Map<IsvInfo>(dto);
             _isvInfoRepository.Add(m);
             _isvInfoRepository.SaveChanges();
         }
@@ -49,34 +49,34 @@ namespace AGooday.AgPay.Application.Services
             _isvInfoRepository.SaveChanges();
         }
 
-        public void Update(IsvInfoVM vm)
+        public void Update(IsvInfoDto dto)
         {
-            var m = _mapper.Map<IsvInfo>(vm);
+            var m = _mapper.Map<IsvInfo>(dto);
             _isvInfoRepository.Update(m);
             _isvInfoRepository.SaveChanges();
         }
 
-        public IsvInfoVM GetById(string recordId)
+        public IsvInfoDto GetById(string recordId)
         {
             var entity = _isvInfoRepository.GetById(recordId);
-            var vm = _mapper.Map<IsvInfoVM>(entity);
-            return vm;
+            var dto = _mapper.Map<IsvInfoDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<IsvInfoVM> GetAll()
+        public IEnumerable<IsvInfoDto> GetAll()
         {
             var isvInfos = _isvInfoRepository.GetAll();
-            return _mapper.Map<IEnumerable<IsvInfoVM>>(isvInfos);
+            return _mapper.Map<IEnumerable<IsvInfoDto>>(isvInfos);
         }
 
-        public PaginatedList<IsvInfoVM> GetPaginatedData(IsvInfoVM vm, int pageIndex, int pageSize)
+        public PaginatedList<IsvInfoDto> GetPaginatedData(IsvInfoDto dto, int pageIndex, int pageSize)
         {
             var isvInfos = _isvInfoRepository.GetAll()
-                .Where(w => (string.IsNullOrWhiteSpace(vm.IsvNo) || w.IsvNo.Equals(vm.IsvNo))
-                && (string.IsNullOrWhiteSpace(vm.IsvName) || w.IsvName.Contains(vm.IsvName))
-                && (vm.State.Equals(0) || w.State.Equals(vm.State))
+                .Where(w => (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName))
+                && (dto.State.Equals(0) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<IsvInfo>.Create<IsvInfoVM>(isvInfos.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvInfos.AsNoTracking(), _mapper, pageIndex, pageSize);
             return records;
         }
     }

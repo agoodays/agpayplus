@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,11 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchAppService : IDisposable
     {
-        void Add(MchAppVM vm);
+        void Add(MchAppDto dto);
         void Remove(string recordId);
-        void Update(MchAppVM vm);
-        MchAppVM GetById(string recordId);
-        IEnumerable<MchAppVM> GetAll();
-        PaginatedList<MchAppVM> GetPaginatedData(MchAppVM vm, int pageIndex, int pageSize);
+        void Update(MchAppDto dto);
+        MchAppDto GetById(string recordId);
+        IEnumerable<MchAppDto> GetAll();
+        PaginatedList<MchAppDto> GetPaginatedData(MchAppDto dto, int pageIndex, int pageSize);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(PayOrderDivisionRecordVM vm)
+        public void Add(PayOrderDivisionRecordDto dto)
         {
-            var m = _mapper.Map<PayOrderDivisionRecord>(vm);
+            var m = _mapper.Map<PayOrderDivisionRecord>(dto);
             _payOrderDivisionRecordRepository.Add(m);
             _payOrderDivisionRecordRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _payOrderDivisionRecordRepository.SaveChanges();
         }
 
-        public void Update(PayOrderDivisionRecordVM vm)
+        public void Update(PayOrderDivisionRecordDto dto)
         {
-            var m = _mapper.Map<PayOrderDivisionRecord>(vm);
+            var m = _mapper.Map<PayOrderDivisionRecord>(dto);
             _payOrderDivisionRecordRepository.Update(m);
             _payOrderDivisionRecordRepository.SaveChanges();
         }
 
-        public PayOrderDivisionRecordVM GetById(long recordId)
+        public PayOrderDivisionRecordDto GetById(long recordId)
         {
             var entity = _payOrderDivisionRecordRepository.GetById(recordId);
-            var vm = _mapper.Map<PayOrderDivisionRecordVM>(entity);
-            return vm;
+            var dto = _mapper.Map<PayOrderDivisionRecordDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<PayOrderDivisionRecordVM> GetAll()
+        public IEnumerable<PayOrderDivisionRecordDto> GetAll()
         {
             var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAll();
-            return _mapper.Map<IEnumerable<PayOrderDivisionRecordVM>>(payOrderDivisionRecords);
+            return _mapper.Map<IEnumerable<PayOrderDivisionRecordDto>>(payOrderDivisionRecords);
         }
     }
 }

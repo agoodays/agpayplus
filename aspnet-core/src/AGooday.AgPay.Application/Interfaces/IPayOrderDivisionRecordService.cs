@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,10 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IPayOrderDivisionRecordService : IDisposable
     {
-        void Add(PayOrderDivisionRecordVM vm);
+        void Add(PayOrderDivisionRecordDto dto);
         void Remove(long recordId);
-        void Update(PayOrderDivisionRecordVM vm);
-        PayOrderDivisionRecordVM GetById(long recordId);
-        IEnumerable<PayOrderDivisionRecordVM> GetAll();
+        void Update(PayOrderDivisionRecordDto dto);
+        PayOrderDivisionRecordDto GetById(long recordId);
+        IEnumerable<PayOrderDivisionRecordDto> GetAll();
     }
 }

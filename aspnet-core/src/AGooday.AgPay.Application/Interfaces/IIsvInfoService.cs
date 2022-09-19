@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,11 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IIsvInfoService : IDisposable
     {
-        void Add(IsvInfoVM vm);
+        void Add(IsvInfoDto dto);
         void Remove(string recordId);
-        void Update(IsvInfoVM vm);
-        IsvInfoVM GetById(string recordId);
-        IEnumerable<IsvInfoVM> GetAll();
-        PaginatedList<IsvInfoVM> GetPaginatedData(IsvInfoVM vm, int pageIndex, int pageSize);
+        void Update(IsvInfoDto dto);
+        IsvInfoDto GetById(string recordId);
+        IEnumerable<IsvInfoDto> GetAll();
+        PaginatedList<IsvInfoDto> GetPaginatedData(IsvInfoDto dto, int pageIndex, int pageSize);
     }
 }

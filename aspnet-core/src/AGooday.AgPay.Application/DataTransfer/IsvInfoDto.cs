@@ -4,37 +4,47 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
-    /// 商户应用表
+    /// 服务商信息表
     /// </summary>
-    public class MchAppVM
+    public class IsvInfoDto
     {
         /// <summary>
-        /// 应用ID
+        /// 服务商号
         /// </summary>
-        public string AppId { get; set; }
+        public string IsvNo { get; set; }
 
         /// <summary>
-        /// 应用名称
+        /// 服务商名称
         /// </summary>
-        public string AppName { get; set; }
+        public string IsvName { get; set; }
 
         /// <summary>
-        /// 商户号
+        /// 服务商简称
         /// </summary>
-        public string MchNo { get; set; }
+        public string IsvShortName { get; set; }
 
         /// <summary>
-        /// 应用状态: 0-停用, 1-正常
+        /// 联系人姓名
+        /// </summary>
+        public string ContactName { get; set; }
+
+        /// <summary>
+        /// 联系人手机号
+        /// </summary>
+        public string ContactTel { get; set; }
+
+        /// <summary>
+        /// 联系人邮箱
+        /// </summary>
+        public string ContactEmail { get; set; }
+
+        /// <summary>
+        /// 状态: 0-停用, 1-正常
         /// </summary>
         public byte State { get; set; }
-
-        /// <summary>
-        /// 应用私钥
-        /// </summary>
-        public string AppSecret { get; set; }
 
         /// <summary>
         /// 备注

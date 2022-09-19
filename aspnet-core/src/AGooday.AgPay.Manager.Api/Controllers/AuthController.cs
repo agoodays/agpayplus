@@ -1,12 +1,13 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Manager.Api.Models;
 using CaptchaGen.NetCore;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -44,12 +45,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpPost]
         [Route("validate")]
-        public ApiRes Validate(string ia, string ip, string vc, string vt)
+        public ApiRes Validate(Validate model)
         {
-            string account = Base64Util.DecodeBase64(ia);  //用户名 i account, 已做base64处理
-            string ipassport = Base64Util.DecodeBase64(ip);    //密码 i passport,  已做base64处理
-            string vercode = Base64Util.DecodeBase64(vc);  //验证码 vercode,  已做base64处理
-            string vercodeToken = Base64Util.DecodeBase64(vt);	//验证码token, vercode token ,  已做base64处理
+            string account = Base64Util.DecodeBase64(model.ia);  //用户名 i account, 已做base64处理
+            string ipassport = Base64Util.DecodeBase64(model.ip);    //密码 i passport,  已做base64处理
+            string vercode = Base64Util.DecodeBase64(model.vc);  //验证码 vercode,  已做base64处理
+            string vercodeToken = Base64Util.DecodeBase64(model.vt);	//验证码token, vercode token ,  已做base64处理
 
             string cacheCode = _redis.StringGet(CS.GetCacheKeyImgCode(vercodeToken));
             if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode))
@@ -67,7 +68,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             var auth = _sysUserAuthService.SelectByLogin(account, identityType, CS.SYS_TYPE.MGR);
 
             if (auth == null)
-            { 
+            {
                 //没有该用户信息
                 throw new BizException("用户名/密码错误！");
             }
@@ -83,8 +84,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             // 返回前端 accessToken
             string accessToken = string.Empty;//authService.Auth(account, ipassport);
 
-            //// 删除图形验证码缓存数据
-            //RedisUtil.Del(CS.GetCacheKeyImgCode(vercodeToken));
+            // 删除图形验证码缓存数据
+            _redis.KeyDelete(CS.GetCacheKeyImgCode(vercodeToken));
 
             return ApiRes.Ok4newJson(CS.ACCESS_TOKEN_NAME, accessToken);
         }

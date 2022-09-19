@@ -1,6 +1,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Notifications;
@@ -33,27 +33,27 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpGet]
         [Route("list")]
-        public ApiRes List([FromBody] SysUserVM vm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        public ApiRes List([FromBody] SysUserDto dto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
         {
-            vm.SysType = CS.SYS_TYPE.MGR;
-            var data = _sysUserService.GetPaginatedData(vm, pageNumber, pageSize);
+            dto.SysType = CS.SYS_TYPE.MGR;
+            var data = _sysUserService.GetPaginatedData(dto, pageNumber, pageSize);
             return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
         /// <summary>
         /// 添加管理员
         /// </summary>
-        /// <param name="vm"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("add")]
-        public ApiRes Add(SysUserVM vm)
+        public ApiRes Add(SysUserDto dto)
         {
             //_cache.Remove("ErrorData");
-            vm.IsAdmin = CS.NO;
-            vm.SysType = CS.SYS_TYPE.MGR;
-            vm.BelongInfoId = "0";
-            _sysUserService.Create(vm);
+            dto.IsAdmin = CS.NO;
+            dto.SysType = CS.SYS_TYPE.MGR;
+            dto.BelongInfoId = "0";
+            _sysUserService.Create(dto);
             //var errorData = _cache.Get("ErrorData");
             //if (errorData == null)
             // 是否存在消息通知
@@ -78,10 +78,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpPut]
         [Route("update/{recordId}")]
-        public ApiRes Update(ModifySysUserVM vm)
+        public ApiRes Update(ModifySysUserDto dto)
         {
-            vm.SysType = CS.SYS_TYPE.MGR;
-            _sysUserService.Modify(vm);
+            dto.SysType = CS.SYS_TYPE.MGR;
+            _sysUserService.Modify(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();

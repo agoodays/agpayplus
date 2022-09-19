@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -36,9 +36,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(MchInfoVM vm)
+        public void Add(MchInfoDto dto)
         {
-            var m = _mapper.Map<MchInfo>(vm);
+            var m = _mapper.Map<MchInfo>(dto);
             _mchInfoRepository.Add(m);
             _mchInfoRepository.SaveChanges();
         }
@@ -49,36 +49,36 @@ namespace AGooday.AgPay.Application.Services
             _mchInfoRepository.SaveChanges();
         }
 
-        public void Update(MchInfoVM vm)
+        public void Update(MchInfoDto dto)
         {
-            var m = _mapper.Map<MchInfo>(vm);
+            var m = _mapper.Map<MchInfo>(dto);
             _mchInfoRepository.Update(m);
             _mchInfoRepository.SaveChanges();
         }
 
-        public MchInfoVM GetById(string recordId)
+        public MchInfoDto GetById(string recordId)
         {
             var entity = _mchInfoRepository.GetById(recordId);
-            var vm = _mapper.Map<MchInfoVM>(entity);
-            return vm;
+            var dto = _mapper.Map<MchInfoDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<MchInfoVM> GetAll()
+        public IEnumerable<MchInfoDto> GetAll()
         {
             var mchInfos = _mchInfoRepository.GetAll();
-            return _mapper.Map<IEnumerable<MchInfoVM>>(mchInfos);
+            return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
         }
 
-        public PaginatedList<MchInfoVM> GetPaginatedData(MchInfoVM vm, int pageIndex, int pageSize)
+        public PaginatedList<MchInfoDto> GetPaginatedData(MchInfoDto dto, int pageIndex, int pageSize)
         {
             var mchInfos = _mchInfoRepository.GetAll()
-                .Where(w => (string.IsNullOrWhiteSpace(vm.MchNo) || w.MchNo.Equals(vm.MchNo))
-                && (string.IsNullOrWhiteSpace(vm.IsvNo) || w.IsvNo.Equals(vm.IsvNo))
-                && (string.IsNullOrWhiteSpace(vm.MchName) || w.MchName.Equals(vm.MchName))
-                && (vm.Type.Equals(0) || w.Type.Equals(vm.Type))
-                && (vm.State.Equals(0) || w.State.Equals(vm.State))
+                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                && (string.IsNullOrWhiteSpace(dto.MchName) || w.MchName.Equals(dto.MchName))
+                && (dto.Type.Equals(0) || w.Type.Equals(dto.Type))
+                && (dto.State.Equals(0) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchInfo>.Create<MchInfoVM>(mchInfos.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<MchInfo>.Create<MchInfoDto>(mchInfos.AsNoTracking(), _mapper, pageIndex, pageSize);
             return records;
         }
     }

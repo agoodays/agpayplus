@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 支付方式表
     /// </summary>
-    public class PayWayVM
+    public class PayWayDto
     {
         /// <summary>
         /// 支付方式代码  例如： wxpay_jsapi

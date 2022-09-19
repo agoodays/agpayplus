@@ -1,6 +1,6 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
@@ -40,9 +40,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpPut]
         [Route("update/{entId}")]
-        public ApiRes Update(SysEntitlementVM vm)
+        public ApiRes Update(SysEntitlementDto dto)
         {
-            _sysEntService.Update(vm);
+            _sysEntService.Update(dto);
             return ApiRes.Ok();
         }
 

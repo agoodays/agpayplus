@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -38,16 +38,16 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(SysUserVM vm)
+        public void Add(SysUserDto dto)
         {
-            var m = _mapper.Map<SysUser>(vm);
+            var m = _mapper.Map<SysUser>(dto);
             _sysUserRepository.Add(m);
             _sysUserRepository.SaveChanges();
         }
 
-        public void Create(SysUserVM vm)
+        public void Create(SysUserDto dto)
         {
-            var command = _mapper.Map<CreateSysUserCommand>(vm);
+            var command = _mapper.Map<CreateSysUserCommand>(dto);
             Bus.SendCommand(command);
         }
 
@@ -68,48 +68,48 @@ namespace AGooday.AgPay.Application.Services
             Bus.SendCommand(command);
         }
 
-        public void Update(SysUserVM vm)
+        public void Update(SysUserDto dto)
         {
-            var m = _mapper.Map<SysUser>(vm);
+            var m = _mapper.Map<SysUser>(dto);
             _sysUserRepository.Update(m);
             _sysUserRepository.SaveChanges();
         }
 
-        public void Modify(ModifySysUserVM vm)
+        public void Modify(ModifySysUserDto dto)
         {
-            var command = _mapper.Map<ModifySysUserCommand>(vm);
+            var command = _mapper.Map<ModifySysUserCommand>(dto);
             Bus.SendCommand(command);
         }
 
-        public SysUserVM GetById(long recordId)
+        public SysUserDto GetById(long recordId)
         {
             var entity = _sysUserRepository.GetById(recordId);
-            var vm = _mapper.Map<SysUserVM>(entity);
-            return vm;
+            var dto = _mapper.Map<SysUserDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<SysUserVM> GetAll()
+        public IEnumerable<SysUserDto> GetAll()
         {
             //第一种写法 Map
             var sysUsers = _sysUserRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysUserVM>>(sysUsers);
+            return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
 
             //第二种写法 ProjectTo
             //return (_UsersRepository.GetAll()).ProjectTo<SysUserVM>(_mapper.ConfigurationProvider);
         }
 
-        public PaginatedList<SysUserVM> GetPaginatedData(SysUserVM vm, int pageIndex = 1, int pageSize = 20)
+        public PaginatedList<SysUserDto> GetPaginatedData(SysUserDto dto, int pageIndex = 1, int pageSize = 20)
         {
             var sysUsers = _sysUserRepository.GetAll()
-                .Where(w => w.SysType == vm.SysType
-                && (string.IsNullOrWhiteSpace(vm.Realname) || w.Realname.Contains(vm.Realname))
-                && (vm.SysUserId.Equals(0) || w.SysUserId.Equals(vm.SysUserId))
+                .Where(w => w.SysType == dto.SysType
+                && (string.IsNullOrWhiteSpace(dto.Realname) || w.Realname.Contains(dto.Realname))
+                && (dto.SysUserId.Equals(0) || w.SysUserId.Equals(dto.SysUserId))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysUser>.Create<SysUserVM>(sysUsers.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<SysUser>.Create<SysUserDto>(sysUsers.AsNoTracking(), _mapper, pageIndex, pageSize);
             return records;
         }
 
-        public Task<IEnumerable<SysUserVM>> ListAsync()
+        public Task<IEnumerable<SysUserDto>> ListAsync()
         {
             throw new NotImplementedException();
         }

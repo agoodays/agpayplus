@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 退款订单表
     /// </summary>
-    public class RefundOrderVM
+    public class RefundOrderDto
     {
         /// <summary>
         /// 退款订单号（支付系统生成订单号）

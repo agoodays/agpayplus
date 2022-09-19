@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using System;
@@ -11,15 +11,15 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface ISysUserService : IDisposable
     {
-        void Add(SysUserVM vm);
-        void Create(SysUserVM vm);
+        void Add(SysUserDto dto);
+        void Create(SysUserDto dto);
         void Remove(long recordId);
         void Remove(long sysUserId, long currentUserId, string sysType);
-        void Update(SysUserVM vm);
-        void Modify(ModifySysUserVM vm);
-        SysUserVM GetById(long recordId);
-        IEnumerable<SysUserVM> GetAll();
-        PaginatedList<SysUserVM> GetPaginatedData(SysUserVM vm, int pageIndex = 1, int pageSize = 20);
-        Task<IEnumerable<SysUserVM>> ListAsync();
+        void Update(SysUserDto dto);
+        void Modify(ModifySysUserDto dto);
+        SysUserDto GetById(long recordId);
+        IEnumerable<SysUserDto> GetAll();
+        PaginatedList<SysUserDto> GetPaginatedData(SysUserDto dto, int pageIndex = 1, int pageSize = 20);
+        Task<IEnumerable<SysUserDto>> ListAsync();
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(SysEntitlementVM vm)
+        public void Add(SysEntitlementDto dto)
         {
-            var m = _mapper.Map<SysEntitlement>(vm);
+            var m = _mapper.Map<SysEntitlement>(dto);
             _sysEntitlementRepository.Add(m);
             _sysEntitlementRepository.SaveChanges();
         }
@@ -48,32 +48,32 @@ namespace AGooday.AgPay.Application.Services
             _sysEntitlementRepository.SaveChanges();
         }
 
-        public void Update(SysEntitlementVM vm)
+        public void Update(SysEntitlementDto dto)
         {
-            var m = _mapper.Map<SysEntitlement>(vm);
+            var m = _mapper.Map<SysEntitlement>(dto);
             _sysEntitlementRepository.Update(m);
             _sysEntitlementRepository.SaveChanges();
         }
 
-        public SysEntitlementVM GetById(string recordId)
+        public SysEntitlementDto GetById(string recordId)
         {
             var entity = _sysEntitlementRepository.GetById(recordId);
-            var vm = _mapper.Map<SysEntitlementVM>(entity);
-            return vm;
+            var dto = _mapper.Map<SysEntitlementDto>(entity);
+            return dto;
         }
-        public IEnumerable<SysEntitlementVM> GetBySysType(string sysType, string entId)
+        public IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId)
         {
             var sysEnts = _sysEntitlementRepository.GetAll()
                 .Where(w => w.SysType.Equals(sysType)
                 && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId))
                 );
-            return _mapper.Map<IEnumerable<SysEntitlementVM>>(sysEnts);
+            return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
         }
 
-        public IEnumerable<SysEntitlementVM> GetAll()
+        public IEnumerable<SysEntitlementDto> GetAll()
         {
             var sysEntitlements = _sysEntitlementRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysEntitlementVM>>(sysEntitlements);
+            return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEntitlements);
         }
     }
 }

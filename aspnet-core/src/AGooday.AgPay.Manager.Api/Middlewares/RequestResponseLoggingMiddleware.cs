@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
 
                 Stream stream = request.Body;
                 byte[] buffer = new byte[request.ContentLength.Value];
-                stream.Read(buffer, 0, buffer.Length);
+                await stream.ReadAsync(buffer, 0, buffer.Length);
                 _data.Add("request.body", Encoding.UTF8.GetString(buffer));
 
                 request.Body.Position = 0;

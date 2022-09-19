@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.ViewModels;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,11 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface ISysUserAuthService : IDisposable
     {
-        void Add(SysUserAuthVM vm);
+        void Add(SysUserAuthDto dto);
         void Remove(long recordId);
-        void Update(SysUserAuthVM vm);
-        SysUserAuthVM GetById(long recordId);
-        IEnumerable<SysUserAuthVM> GetAll();
-        SysUserAuthVM SelectByLogin(string identifier, byte identityType, string sysType);
+        void Update(SysUserAuthDto dto);
+        SysUserAuthDto GetById(long recordId);
+        IEnumerable<SysUserAuthDto> GetAll();
+        SysUserAuthDto SelectByLogin(string identifier, byte identityType, string sysType);
     }
 }

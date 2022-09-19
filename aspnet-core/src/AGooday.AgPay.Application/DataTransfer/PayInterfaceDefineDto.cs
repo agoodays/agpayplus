@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 支付接口定义表
     /// </summary>
-    public class PayInterfaceDefineVM
+    public class PayInterfaceDefineDto
     {
         /// <summary>
         /// 接口代码 全小写  wxpay alipay 

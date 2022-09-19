@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 系统角色表
     /// </summary>
-    public class SysRoleVM
+    public class SysRoleDto
     {
         /// <summary>
         /// 角色ID, ROLE_开头

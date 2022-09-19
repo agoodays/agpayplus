@@ -1,6 +1,6 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
@@ -23,17 +23,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpGet]
         [Route("list")]
-        public ApiRes List([FromBody] MchInfoVM vm, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        public ApiRes List([FromBody] MchInfoDto dto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
         {
-            var data = _mchInfoService.GetPaginatedData(vm, pageNumber, pageSize);
+            var data = _mchInfoService.GetPaginatedData(dto, pageNumber, pageSize);
             return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
         [HttpPost]
         [Route("add")]
-        public ApiRes Add(MchInfoVM vm)
+        public ApiRes Add(MchInfoDto dto)
         {
-            _mchInfoService.Add(vm);
+            _mchInfoService.Add(dto);
             return ApiRes.Ok();
         }
 
@@ -47,9 +47,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         [HttpPut]
         [Route("update/{mchNo}")]
-        public ApiRes Update(MchInfoVM vm)
+        public ApiRes Update(MchInfoDto dto)
         {
-            _mchInfoService.Update(vm);
+            _mchInfoService.Update(dto);
             return ApiRes.Ok();
         }
 

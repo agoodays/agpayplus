@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 商户分账接收者账号绑定关系表
     /// </summary>
-    public class MchDivisionReceiverVM
+    public class MchDivisionReceiverDto
     {
         /// <summary>
         /// 分账接收者ID

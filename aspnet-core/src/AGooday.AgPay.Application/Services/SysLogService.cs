@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.ViewModels;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(SysLogVM vm)
+        public void Add(SysLogDto dto)
         {
-            var m = _mapper.Map<SysLog>(vm);
+            var m = _mapper.Map<SysLog>(dto);
             _sysLogRepository.Add(m);
             _sysLogRepository.SaveChanges();
         }
@@ -48,24 +48,24 @@ namespace AGooday.AgPay.Application.Services
             _sysLogRepository.SaveChanges();
         }
 
-        public void Update(SysLogVM vm)
+        public void Update(SysLogDto dto)
         {
-            var m = _mapper.Map<SysLog>(vm);
+            var m = _mapper.Map<SysLog>(dto);
             _sysLogRepository.Update(m);
             _sysLogRepository.SaveChanges();
         }
 
-        public SysLogVM GetById(long recordId)
+        public SysLogDto GetById(long recordId)
         {
             var entity = _sysLogRepository.GetById(recordId);
-            var vm = _mapper.Map<SysLogVM>(entity);
-            return vm;
+            var dto = _mapper.Map<SysLogDto>(entity);
+            return dto;
         }
 
-        public IEnumerable<SysLogVM> GetAll()
+        public IEnumerable<SysLogDto> GetAll()
         {
             var sysLogs = _sysLogRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysLogVM>>(sysLogs);
+            return _mapper.Map<IEnumerable<SysLogDto>>(sysLogs);
         }
     }
 }

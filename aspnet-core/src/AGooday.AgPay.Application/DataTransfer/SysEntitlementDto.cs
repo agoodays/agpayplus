@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.Application.ViewModels
+namespace AGooday.AgPay.Application.DataTransfer
 {
-    public class SysEntitlementVM
+    public class SysEntitlementDto
     {
         /// <summary>
         /// 权限ID[ENT_功能模块_子模块_操作], eg: ENT_ROLE_LIST_ADD
