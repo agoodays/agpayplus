@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -79,6 +80,21 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysRoleEntRelaDto>>(sysRoleEntRelas);
         }
 
+        public bool UserHasLeftMenu(long userId, string sysType)
+        {
+            var result = _sysUserRoleRelaRepository.GetAll()
+                .Join(_sysRoleEntRelaRepository.GetAll(),
+                ur => ur.RoleId, re => re.RoleId,
+                (ur, re) => new { ur.UserId, re.EntId })
+                .Join(_sysEntitlementRepository.GetAll(),
+                    ue => ue.EntId, ent => ent.EntId,
+                    (ue, ent) => new { ue.UserId, ent.EntId, ent.EntType, ent.SysType, ent.State })
+                .AsNoTracking().Any(w => w.UserId.Equals(userId) 
+                && w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE) && w.EntType.Equals(CS.ENT_TYPE.MENU_LEFT));
+
+            return result;
+        }
+
         /// <summary>
         /// 根据人查询出所有权限ID集合
         /// </summary>
@@ -91,7 +107,7 @@ namespace AGooday.AgPay.Application.Services
             if (isAdmin == CS.YES)
             {
                 var result = _sysEntitlementRepository.GetAll()
-                    .Where(w => w.SysType == sysType && w.State == CS.PUB_USABLE)
+                    .Where(w => w.SysType.Equals(sysType) && w.State == CS.PUB_USABLE)
                     .Select(s => s.EntId);
                 return result;
             }
@@ -104,7 +120,7 @@ namespace AGooday.AgPay.Application.Services
                     .Join(_sysEntitlementRepository.GetAll(),
                         ue => ue.EntId, ent => ent.EntId,
                         (ue, ent) => new { ue.UserId, ent.EntId, ent.SysType, ent.State })
-                    .Where(w => w.UserId == userId && w.SysType == sysType && w.State == CS.PUB_USABLE)
+                    .Where(w => w.UserId.Equals(userId) && w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE))
                     .Select(s => s.EntId);
                 return result;
             }

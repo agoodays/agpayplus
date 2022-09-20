@@ -13,6 +13,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Remove(string recordId);
         void Update(SysUserRoleRelaDto dto);
         SysUserRoleRelaDto GetById(string recordId);
+        IEnumerable<string> SelectRoleIdsByUserId(long userId);
         IEnumerable<SysUserRoleRelaDto> GetAll();
     }
 }

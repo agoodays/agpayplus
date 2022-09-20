@@ -14,6 +14,6 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(SysUserAuthDto dto);
         SysUserAuthDto GetById(long recordId);
         IEnumerable<SysUserAuthDto> GetAll();
-        SysUserAuthDto SelectByLogin(string identifier, byte identityType, string sysType);
+        SysUserAuthInfoDto SelectByLogin(string identifier, byte identityType, string sysType);
     }
 }

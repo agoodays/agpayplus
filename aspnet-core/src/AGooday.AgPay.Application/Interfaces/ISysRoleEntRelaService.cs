@@ -14,5 +14,8 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(SysRoleEntRelaDto dto);
         SysRoleEntRelaDto GetById(string recordId);
         IEnumerable<SysRoleEntRelaDto> GetAll();
+        bool UserHasLeftMenu(long userId, string sysType);
+        IEnumerable<string> SelectEntIdsByUserId(long userId, byte isAdmin, string sysType);
+        void ResetRela(string roleId, List<string> entIdList);
     }
 }

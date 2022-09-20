@@ -21,6 +21,7 @@ using System.Runtime.InteropServices;
 using AGooday.AgPay.Manager.Api.Extensions;
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
 {
@@ -31,6 +32,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         private readonly ILogger<AuthController> _logger;
         private readonly JwtSettings _jwtSettings;
         private readonly ISysUserAuthService _sysUserAuthService;
+        private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
+        private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         // 将领域通知处理程序注入Controller
@@ -38,7 +41,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         public AuthController(ILogger<AuthController> logger, IOptions<JwtSettings> jwtSettings, IMemoryCache cache, RedisUtil client,
             INotificationHandler<DomainNotification> notifications,
-            ISysUserAuthService sysUserAuthService)
+            ISysUserAuthService sysUserAuthService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
@@ -46,6 +51,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             _cache = cache;
             _redis = client.GetDatabase();
             _notifications = (DomainNotificationHandler)notifications;
+            _sysRoleEntRelaService = sysRoleEntRelaService;
+            _sysUserRoleRelaService = sysUserRoleRelaService;
         }
 
         [HttpPost]
@@ -86,18 +93,42 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                 //没有该用户信息
                 throw new BizException("用户名/密码错误！");
             }
+
+            //非超级管理员 && 不包含左侧菜单 进行错误提示
+            if (auth.IsAdmin != CS.YES && !_sysRoleEntRelaService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
+            {
+                throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
+            }
+
+            //生成token
+            string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());
+            var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
+            authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.IsAdmin, auth.SysType));
+
             // 返回前端 accessToken
             var claimsIdentity = new ClaimsIdentity(new Claim[]
             {
                 new Claim(ClaimTypes.Name, auth.Identifier),
-                new Claim("userid",auth.UserId.ToString()),
-                new Claim("avatar",""),
-                new Claim("displayName",""),
-                new Claim("loginName",""),
-                new Claim("emailAddress",""),
-                new Claim("sysType",auth.SysType)
+                new Claim("userid",auth.SysUserId.ToString()),
+                new Claim("avatar",auth.AvatarUrl),
+                new Claim("displayName",auth.Realname),
+                new Claim("loginName",auth.Realname),
+                new Claim("telphone",auth.Telphone),
+                new Claim("userNo",auth.UserNo.ToString()),
+                new Claim("isAdmin",auth.IsAdmin.ToString()),
+                new Claim("identityType",auth.IdentityType.ToString()),
+                new Claim("sysType",auth.SysType),
+                new Claim("cacheKey",cacheKey)
             });
             var accessToken = JwtBearerAuthenticationExtension.GetJwtAccessToken(_jwtSettings, claimsIdentity);
+
+            var currentUser = JsonConvert.SerializeObject(new CurrentUser
+            {
+                CacheKey = cacheKey,
+                User = auth,
+                Authorities = authorities
+            });
+            _redis.StringSet(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
 
             // 删除图形验证码缓存数据
             _redis.KeyDelete(CS.GetCacheKeyImgCode(vercodeToken));

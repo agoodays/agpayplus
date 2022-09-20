@@ -56,7 +56,7 @@ services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 services.Configure<JwtSettings>(jwtSettingsSection);
 // JWT
-var appSettings = jwtSettingsSection.Get<AppAuthenticationSettings>();
+var appSettings = jwtSettingsSection.Get<JwtSettings>();
 services.AddJwtBearerAuthentication(appSettings);
 
 // Automapper ×¢Èë
@@ -94,6 +94,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 

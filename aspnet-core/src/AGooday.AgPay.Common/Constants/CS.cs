@@ -85,7 +85,7 @@ namespace AGooday.AgPay.Common.Constants
         /// </summary>
         public const string DEFAULT_PWD = "agpay666";
 
-        public const long TOKEN_TIME = 60 * 60 * 2; //单位：s,  两小时
+        public const int TOKEN_TIME = 60 * 60 * 2; //单位：s,  两小时
 
         /// <summary>
         /// access_token 名称
