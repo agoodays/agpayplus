@@ -2,8 +2,10 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.Middlewares;
+using AGooday.AgPay.Manager.Api.Models;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -35,8 +37,27 @@ string _connectionString = section.GetSection("Connection").Value;
 string _instanceName = section.GetSection("InstanceName").Value;
 //默认数据库 
 int _defaultDB = int.Parse(section.GetSection("DefaultDB").Value ?? "0");
-services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB)); 
+services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB));
 #endregion
+
+services.AddCors(o =>
+    o.AddPolicy("CorsPolicy",
+        builder => builder
+            .WithOrigins("http://localhost:9000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            //.AllowAnyOrigin()
+            .AllowCredentials()
+    ));
+
+services.AddMemoryCache();
+services.AddHttpContextAccessor();
+services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
+services.Configure<JwtSettings>(jwtSettingsSection);
+// JWT
+var appSettings = jwtSettingsSection.Get<AppAuthenticationSettings>();
+services.AddJwtBearerAuthentication(appSettings);
 
 // Automapper 注入
 services.AddAutoMapperSetup();

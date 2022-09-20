@@ -18,6 +18,9 @@ using StackExchange.Redis;
 using System;
 using System.Buffers.Text;
 using System.Runtime.InteropServices;
+using AGooday.AgPay.Manager.Api.Extensions;
+using System.Security.Claims;
+using Microsoft.Extensions.Options;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
 {
@@ -26,17 +29,19 @@ namespace AGooday.AgPay.Manager.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
+        private readonly JwtSettings _jwtSettings;
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
-        public AuthController(ILogger<AuthController> logger, IMemoryCache cache, RedisUtil client,
+        public AuthController(ILogger<AuthController> logger, IOptions<JwtSettings> jwtSettings, IMemoryCache cache, RedisUtil client,
             INotificationHandler<DomainNotification> notifications,
             ISysUserAuthService sysUserAuthService)
         {
             _logger = logger;
+            _jwtSettings = jwtSettings.Value;
             _sysUserAuthService = sysUserAuthService;
             _cache = cache;
             _redis = client.GetDatabase();
@@ -82,7 +87,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                 throw new BizException("用户名/密码错误！");
             }
             // 返回前端 accessToken
-            string accessToken = string.Empty;//authService.Auth(account, ipassport);
+            var claimsIdentity = new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.Name, auth.Identifier),
+                new Claim("userid",auth.UserId.ToString()),
+                new Claim("avatar",""),
+                new Claim("displayName",""),
+                new Claim("loginName",""),
+                new Claim("emailAddress",""),
+                new Claim("sysType",auth.SysType)
+            });
+            var accessToken = JwtBearerAuthenticationExtension.GetJwtAccessToken(_jwtSettings, claimsIdentity);
 
             // 删除图形验证码缓存数据
             _redis.KeyDelete(CS.GetCacheKeyImgCode(vercodeToken));
