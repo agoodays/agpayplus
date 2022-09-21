@@ -98,6 +98,12 @@ namespace AGooday.AgPay.Application.Services
             //return (_UsersRepository.GetAll()).ProjectTo<SysUserVM>(_mapper.ConfigurationProvider);
         }
 
+        public IEnumerable<SysUserDto> GetAll(List<long> recordIds)
+        {
+            var sysUsers = _sysUserRepository.GetAll().Where(w => recordIds.Contains(w.SysUserId));
+            return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
+        }
+
         public PaginatedList<SysUserDto> GetPaginatedData(SysUserDto dto, int pageIndex = 1, int pageSize = 20)
         {
             var sysUsers = _sysUserRepository.GetAll()

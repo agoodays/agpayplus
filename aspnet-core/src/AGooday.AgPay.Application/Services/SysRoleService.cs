@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -79,11 +80,22 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysRoleDto>>(sysRoles);
         }
 
+        public PaginatedList<SysRoleDto> GetPaginatedData(SysRoleDto dto, int pageIndex = 1, int pageSize = 20)
+        {
+            var sysRoles = _sysRoleRepository.GetAll()
+                .Where(w => w.SysType == dto.SysType
+                && (string.IsNullOrWhiteSpace(dto.RoleName) || w.RoleName.Contains(dto.RoleName))
+                && (dto.RoleId.Equals(0) || w.RoleId.Equals(dto.RoleId))
+                ).OrderByDescending(o => o.UpdatedAt);
+            var records = PaginatedList<SysRole>.Create<SysRoleDto>(sysRoles.AsNoTracking(), _mapper, pageIndex, pageSize);
+            return records;
+        }
+
         public void RemoveRole(string roleId)
         {
             if (_sysUserRoleRelaRepository.IsAssignedToUser(roleId))
             {
-                throw new BizException("当前角色已分配到用户， 不可删除！");
+                throw new BizException("当前角色已分配到用户，不可删除！");
             }
 
             //删除当前表

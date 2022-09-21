@@ -14,17 +14,25 @@ using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text.Json.Nodes;
+using AGooday.AgPay.Manager.Api.Extensions;
+using StackExchange.Redis;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
 {
     [Route("/api/sysEnt")]
     [ApiController]
-    public class SysEntController : ControllerBase
+    public class SysEntController : CommonController
     {
         private readonly ILogger<SysEntController> _logger;
+        private readonly IDatabase _redis;
         private readonly ISysEntitlementService _sysEntService;
 
-        public SysEntController(ILogger<SysEntController> logger, ISysEntitlementService sysEntService)
+        public SysEntController(ILogger<SysEntController> logger, RedisUtil client,
+            ISysUserService sysUserService,
+            ISysEntitlementService sysEntService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             _logger = logger;
             _sysEntService = sysEntService;

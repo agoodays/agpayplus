@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -68,6 +69,14 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysUserRoleRelaDto>>(sysUserRoleRelas);
         }
 
+        public PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaDto dto, int pageIndex = 1, int pageSize = 20)
+        {
+            var sysUserRoleRelas = _sysUserRoleRelaRepository.GetAll()
+                .Where(w => dto.UserId.Equals(0) || w.UserId.Equals(dto.UserId));
+            var records = PaginatedList<SysUserRoleRela>.Create<SysUserRoleRelaDto>(sysUserRoleRelas.AsNoTracking(), _mapper, pageIndex, pageSize);
+            return records;
+        }
+
         /// <summary>
         /// 根据用户查询全部角色集合
         /// </summary>
@@ -78,6 +87,18 @@ namespace AGooday.AgPay.Application.Services
             return _sysUserRoleRelaRepository.GetAll()
                 .Where(w => w.UserId == userId)
                 .Select(s => s.RoleId);
+        }
+
+        /// <summary>
+        /// 根据角色查询全部用户集合
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <returns></returns>
+        public IEnumerable<long> SelectRoleIdsByRoleId(string roleId)
+        {
+            return _sysUserRoleRelaRepository.GetAll()
+                .Where(w => w.RoleId.Equals(roleId))
+                .Select(s => s.UserId);
         }
     }
 }

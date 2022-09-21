@@ -14,5 +14,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(SysRoleDto dto);
         SysRoleDto GetById(string recordId);
         IEnumerable<SysRoleDto> GetAll();
+        PaginatedList<SysRoleDto> GetPaginatedData(SysRoleDto dto, int pageIndex = 1, int pageSize = 20);
+        void RemoveRole(string roleId);
     }
 }

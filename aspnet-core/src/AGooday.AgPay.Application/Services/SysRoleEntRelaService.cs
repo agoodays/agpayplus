@@ -80,6 +80,14 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysRoleEntRelaDto>>(sysRoleEntRelas);
         }
 
+        public PaginatedList<SysRoleEntRelaDto> GetPaginatedData(SysRoleEntRelaDto dto, int pageIndex = 1, int pageSize = 20)
+        {
+            var sysRoleEntRelas = _sysRoleEntRelaRepository.GetAll()
+                .Where(w => string.IsNullOrWhiteSpace(dto.RoleId) || w.RoleId.Contains(dto.RoleId));
+            var records = PaginatedList<SysRoleEntRela>.Create<SysRoleEntRelaDto>(sysRoleEntRelas.AsNoTracking(), _mapper, pageIndex, pageSize);
+            return records;
+        }
+
         public bool UserHasLeftMenu(long userId, string sysType)
         {
             var result = _sysUserRoleRelaRepository.GetAll()
