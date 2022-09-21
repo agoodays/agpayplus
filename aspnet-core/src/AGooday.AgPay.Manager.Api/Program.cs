@@ -1,6 +1,7 @@
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Manager.Api.Extensions;
+using AGooday.AgPay.Manager.Api.Extensions.AuthContext;
 using AGooday.AgPay.Manager.Api.Middlewares;
 using AGooday.AgPay.Manager.Api.Models;
 using MediatR;
@@ -26,6 +27,12 @@ var Env = builder.Environment;
 
 services.AddSingleton(new Appsettings(Env.ContentRootPath));
 
+//// ×¢ÈëÈÕÖ¾
+//services.AddLogging(config =>
+//{
+//    //Microsoft.Extensions.Logging.Log4Net.AspNetCore
+//    config.AddLog4Net();
+//});
 services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
 
 #region Redis
@@ -94,11 +101,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseCors("CorsPolicy");
 
-app.UseHttpsRedirection();
+var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
+AuthContextService.Configure(httpContextAccessor);
 
 app.UseAuthorization();
 
