@@ -11,7 +11,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Models;
 using Newtonsoft.Json;
 
-namespace AGooday.AgPay.Manager.Api.Controllers
+namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
     [Route("/api/sysRole")]
     [ApiController]
@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         public SysRoleController(ILogger<SysRoleController> logger, RedisUtil client,
             ISysRoleService sysRoleService,
             ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService, 
+            ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {

@@ -74,6 +74,32 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysUserAuthDto>>(sysUserAuths);
         }
 
+        public SysUserAuthInfoDto GetUserAuthInfoById(long userId)
+        {
+            var entity = _sysUserAuthRepository.GetAll()
+                .Join(_sysUserRepository.GetAll(),
+                ua => ua.UserId, ur => ur.SysUserId,
+                (ua, ur) => new { ua, ur })
+                .Where(w => w.ua.UserId == userId)
+                .Select(s => new SysUserAuthInfoDto
+                {
+                    SysUserId = s.ur.SysUserId,
+                    LoginUsername = s.ur.LoginUsername,
+                    Realname = s.ur.Realname,
+                    Telphone = s.ur.Telphone,
+                    Sex = s.ur.Sex,
+                    AvatarUrl = s.ur.AvatarUrl,
+                    UserNo = s.ur.UserNo,
+                    IsAdmin = s.ur.IsAdmin,
+                    SysType = s.ur.SysType,
+                    IdentityType = s.ua.IdentityType,
+                    Identifier = s.ua.Identifier,
+                    Credential = s.ua.Credential
+                })
+                .First();
+            return entity;
+        }
+
         public SysUserAuthInfoDto SelectByLogin(string identifier, byte identityType, string sysType)
         {
             var entity = _sysUserAuthRepository.GetAll()
@@ -98,6 +124,11 @@ namespace AGooday.AgPay.Application.Services
                 })
                 .First();
             return entity;
+        }
+
+        public void ResetAuthInfo(long resetUserId, string authLoginUserName, string telphone, string newPwd, string sysType)
+        {
+            _sysUserAuthRepository.ResetAuthInfo(resetUserId, authLoginUserName, telphone, newPwd, sysType);
         }
     }
 }

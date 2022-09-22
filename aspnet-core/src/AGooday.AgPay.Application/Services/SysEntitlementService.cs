@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AGooday.AgPay.Common.Constants;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -61,11 +62,22 @@ namespace AGooday.AgPay.Application.Services
             var dto = _mapper.Map<SysEntitlementDto>(entity);
             return dto;
         }
+
         public IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId)
         {
             var sysEnts = _sysEntitlementRepository.GetAll()
-                .Where(w => w.SysType.Equals(sysType)
+                .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
                 && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId))
+                );
+            return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
+        }
+
+        public IEnumerable<SysEntitlementDto> GetBySysType(string sysType, List<string> entIds, List<string> entTypes)
+        {
+            var sysEnts = _sysEntitlementRepository.GetAll()
+                .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
+                && ((entIds != null && entIds.Count() > 0) || entIds.Contains(w.EntId))
+                && ((entTypes != null && entTypes.Count() > 0) || entTypes.Contains(w.EntType))
                 );
             return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
         }

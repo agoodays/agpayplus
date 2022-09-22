@@ -17,7 +17,7 @@ using System.Text.Json.Nodes;
 using AGooday.AgPay.Manager.Api.Extensions;
 using StackExchange.Redis;
 
-namespace AGooday.AgPay.Manager.Api.Controllers
+namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
     [Route("/api/sysEnt")]
     [ApiController]

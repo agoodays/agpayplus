@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -37,6 +38,7 @@ namespace AGooday.AgPay.Application.Services
 
         public void Add(PayWayDto dto)
         {
+            dto.WayCode = dto.WayCode.ToUpper();
             var m = _mapper.Map<PayWay>(dto);
             _payWayRepository.Add(m);
             _payWayRepository.SaveChanges();
@@ -62,10 +64,25 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public bool IsExistPayWayCode(string wayCode)
+        {
+            return _payWayRepository.IsExistPayWayCode(wayCode);
+        }
+
         public IEnumerable<PayWayDto> GetAll()
         {
             var payWays = _payWayRepository.GetAll();
             return _mapper.Map<IEnumerable<PayWayDto>>(payWays);
+        }
+
+        public PaginatedList<PayWayDto> GetPaginatedData(PayWayDto dto, int pageIndex = 1, int pageSize = 20)
+        {
+            var sysLogs = _payWayRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Contains(dto.WayCode))
+                && (string.IsNullOrWhiteSpace(dto.WayName) || w.WayName.Contains(dto.WayName))
+                ).OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
+            var records = PaginatedList<PayWay>.Create<PayWayDto>(sysLogs.AsNoTracking(), _mapper, pageIndex, pageSize);
+            return records;
         }
     }
 }

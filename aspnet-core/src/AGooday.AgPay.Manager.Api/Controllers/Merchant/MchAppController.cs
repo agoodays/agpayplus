@@ -6,7 +6,7 @@ using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AGooday.AgPay.Manager.Api.Controllers
+namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
     [Route("/api/mchApp")]
     [ApiController]

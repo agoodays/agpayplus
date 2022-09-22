@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,8 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(SysUserAuthDto dto);
         SysUserAuthDto GetById(long recordId);
         IEnumerable<SysUserAuthDto> GetAll();
+        SysUserAuthInfoDto GetUserAuthInfoById(long userId);
         SysUserAuthInfoDto SelectByLogin(string identifier, byte identityType, string sysType);
+        void ResetAuthInfo(long resetUserId, string authLoginUserName, string telphone, string newPwd, string sysType);
     }
 }

@@ -20,5 +20,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 权限ID
         /// </summary>
         public string EntId { get; set; }
+
+        public string EntIdListStr { get; set; }
     }
 }

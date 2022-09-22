@@ -14,8 +14,6 @@ using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public abstract class CommonController : ControllerBase
     {
         private readonly ILogger<CommonController> _logger;
@@ -38,7 +36,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             _sysUserRoleRelaService = sysUserRoleRelaService;
         }
 
-        public CurrentUser GetCurrentUser()
+        protected CurrentUser GetCurrentUser()
         {
             string currentUser = _redis.StringGet(AuthContextService.CurrentUser.CacheKey);
             return JsonConvert.DeserializeObject<CurrentUser>(currentUser);
@@ -47,7 +45,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// 根据用户ID 删除用户缓存信息
         /// </summary>
         /// <param name="sysUserIdList"></param>
-        public void DelAuthentication(List<long> sysUserIdList)
+        protected void DelAuthentication(List<long> sysUserIdList)
         {
             if (sysUserIdList == null || sysUserIdList.Count<=0)
             {
@@ -67,7 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// 根据用户ID 更新缓存中的权限集合， 使得分配实时生效
         /// </summary>
         /// <param name="sysUserIdList"></param>
-        public void RefAuthentication(List<long> sysUserIdList)
+        protected void RefAuthentication(List<long> sysUserIdList)
         {
             var sysUserMap = _sysUserService.GetAll(sysUserIdList);
             sysUserIdList.ForEach(sysUserId =>

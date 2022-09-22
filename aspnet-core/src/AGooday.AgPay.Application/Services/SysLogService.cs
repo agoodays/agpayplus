@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -66,6 +67,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var sysLogs = _sysLogRepository.GetAll();
             return _mapper.Map<IEnumerable<SysLogDto>>(sysLogs);
+        }
+
+        public PaginatedList<SysLogDto> GetPaginatedData(SysLogDto dto, int pageIndex = 1, int pageSize = 20)
+        {
+            var sysLogs = _sysLogRepository.GetAll()
+                .Where(w => w.SysType == dto.SysType
+                && (dto.UserId.Equals(0) || w.UserId.Equals(dto.UserId))
+                && (string.IsNullOrWhiteSpace(dto.UserName) || w.UserName.Contains(dto.UserName))
+                && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Contains(dto.SysType))
+                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
+                ).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<SysLog>.Create<SysLogDto>(sysLogs.AsNoTracking(), _mapper, pageIndex, pageSize);
+            return records;
         }
     }
 }

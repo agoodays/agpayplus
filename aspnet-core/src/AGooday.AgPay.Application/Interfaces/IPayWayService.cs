@@ -13,6 +13,8 @@ namespace AGooday.AgPay.Application.Interfaces
         void Remove(string recordId);
         void Update(PayWayDto dto);
         PayWayDto GetById(string recordId);
+        bool IsExistPayWayCode(string wayCode);
         IEnumerable<PayWayDto> GetAll();
+        PaginatedList<PayWayDto> GetPaginatedData(PayWayDto dto, int pageIndex = 1, int pageSize = 20);
     }
 }

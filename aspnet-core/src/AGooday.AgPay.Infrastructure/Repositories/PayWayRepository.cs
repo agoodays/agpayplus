@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static AGooday.AgPay.Common.Constants.CS;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -15,6 +16,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public PayWayRepository(AgPayDbContext context)
             : base(context)
         {
+        }
+
+        public bool IsExistPayWayCode(string wayCode)
+        {
+            return DbSet.AsNoTracking().Any(c => c.WayCode == wayCode.ToUpper());
         }
     }
 }

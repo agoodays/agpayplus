@@ -23,7 +23,7 @@ using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace AGooday.AgPay.Manager.Api.Controllers
+namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 {
     [ApiController]
     [Route("api/anon/auth")]
@@ -153,7 +153,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             string vercodeToken = Guid.NewGuid().ToString("N");
             _redis.StringSet(CS.GetCacheKeyImgCode(vercodeToken), code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
 
-            return ApiRes.Ok(new { imageBase64Data = imageBase64Data, vercodeToken = vercodeToken, expireTime = CS.VERCODE_CACHE_TIME });
+            return ApiRes.Ok(new { imageBase64Data, vercodeToken, expireTime = CS.VERCODE_CACHE_TIME });
         }
     }
 }

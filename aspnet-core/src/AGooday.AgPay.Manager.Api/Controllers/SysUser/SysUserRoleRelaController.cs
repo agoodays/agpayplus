@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
 using AGooday.AgPay.Common.Utils;
 
-namespace AGooday.AgPay.Manager.Api.Controllers
+namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
     [Route("/api/sysUserRoleRela")]
     [ApiController]

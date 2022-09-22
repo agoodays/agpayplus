@@ -12,7 +12,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Runtime.InteropServices;
 using AGooday.AgPay.Common.Utils;
 
-namespace AGooday.AgPay.Manager.Api.Controllers
+namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
     [ApiController]
     [Route("api/sysUsers")]

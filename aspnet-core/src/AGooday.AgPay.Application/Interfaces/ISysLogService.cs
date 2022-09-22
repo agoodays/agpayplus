@@ -14,5 +14,6 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(SysLogDto dto);
         SysLogDto GetById(long recordId);
         IEnumerable<SysLogDto> GetAll();
+        PaginatedList<SysLogDto> GetPaginatedData(SysLogDto dto, int pageIndex = 1, int pageSize = 20);
     }
 }
