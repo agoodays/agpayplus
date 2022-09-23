@@ -67,5 +67,10 @@ namespace AGooday.AgPay.Application.Services
             var payOrders = _payOrderRepository.GetAll();
             return _mapper.Map<IEnumerable<PayOrderDto>>(payOrders);
         }
+
+        public bool IsExistOrderUseIfCode(string ifCode)
+        {
+            return _payOrderRepository.IsExistOrderUseIfCode(ifCode);
+        }
     }
 }

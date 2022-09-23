@@ -16,5 +16,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
+
+        public bool IsExistUseIfCode(string ifCode)
+        {
+            return DbSet.AsNoTracking().Any(c => c.IfCode.Equals(ifCode));
+        }
     }
 }

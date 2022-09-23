@@ -80,5 +80,10 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 更新时间
         /// </summary>
         public DateTime UpdatedAt { get; set; }
+
+        /// <summary>
+        /// 状态: 0-停用, 1-启用
+        /// </summary>
+        public byte? IfConfigState { get; set; }
     }
 }
