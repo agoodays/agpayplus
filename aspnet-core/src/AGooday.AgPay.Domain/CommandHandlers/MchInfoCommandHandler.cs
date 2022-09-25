@@ -150,9 +150,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 SysType = sysUser.SysType
             };
             _sysUserAuthRepository.Add(sysUserAuthByTelphone);
-            #endregion 
+            #endregion
             #endregion
 
+            #region 插入商户默认应用
             // 插入商户默认应用
             var hmac = new HMACSHA256();
             var key = Convert.ToBase64String(hmac.Key);
@@ -165,7 +166,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             mchApp.CreatedBy = sysUser.Realname;
             mchApp.CreatedUid = sysUser.SysUserId;
 
-            _mchAppRepository.Add(mchApp);
+            _mchAppRepository.Add(mchApp); 
+            #endregion
 
             // 插入商户基本信息
             // 存入商户默认用户ID
