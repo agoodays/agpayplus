@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,16 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.DataTransfer
 {
-    public class ModifySysUserDto : SysUserDto
+    /// <summary>
+    /// 系统用户表
+    /// </summary>
+    public class SysUserModifyDto : SysUserCreateDto
     {
+        /// <summary>
+        /// 系统用户ID
+        /// </summary>
+        public long SysUserId { get; set; }
+
         /// <summary>
         /// 默认密码
         /// </summary>

@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Application.Services
             _sysEntitlementRepository.SaveChanges();
         }
 
-        public void Update(SysEntitlementDto dto)
+        public void Update(SysEntModifyDto dto)
         {
             var m = _mapper.Map<SysEntitlement>(dto);
             _sysEntitlementRepository.Update(m);

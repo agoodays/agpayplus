@@ -31,11 +31,15 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<PayInterfaceDefine, PayInterfaceDefineDto>();
             CreateMap<PayOrderDivisionRecord, PayOrderDivisionRecordDto>();
             CreateMap<PayOrder, PayOrderDto>();
+
             CreateMap<PayWay, PayWayDto>();
+            CreateMap<PayWay, MchPayPassagePayWayDto>();
+
             CreateMap<RefundOrder, RefundOrderDto>();
             CreateMap<SysConfig, SysConfigDto>();
             CreateMap<SysEntitlement, SysEntitlementDto>();
             CreateMap<SysLog, SysLogDto>();
+            CreateMap<SysRole, SysRoleDto>();
             CreateMap<SysRoleEntRela, SysRoleEntRelaDto>();
             CreateMap<SysUserAuth, SysUserAuthDto>();
             CreateMap<SysUserRoleRela, SysUserRoleRelaDto>();

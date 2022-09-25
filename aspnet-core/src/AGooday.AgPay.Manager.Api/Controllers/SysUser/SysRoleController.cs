@@ -13,7 +13,10 @@ using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
-    [Route("/api/sysRole")]
+    /// <summary>
+    /// 角色管理
+    /// </summary>
+    [Route("/api/sysRoles")]
     [ApiController]
     public class SysRoleController : CommonController
     {
@@ -36,51 +39,69 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             _sysUserRoleRelaService = sysUserRoleRelaService;
         }
 
+        /// <summary>
+        /// 角色信息
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("list")]
-        public ApiRes List([FromBody] SysRoleDto dto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        [Route("")]
+        public ApiRes List([FromQuery] SysRoleQueryDto dto)
         {
-            var data = _sysRoleService.GetPaginatedData(dto, pageNumber, pageSize);
+            var data = _sysRoleService.GetPaginatedData(dto);
             return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
+        /// <summary>
+        /// 添加角色信息
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("add")]
-        public ApiRes Add(SysRoleDto dto)
+        [Route("")]
+        public ApiRes Add(SysRoleCreateDto dto)
         {
             dto.RoleId = $"ROLE_{Guid.NewGuid().ToString("N").Substring(0, 6)}";
             dto.SysType = CS.SYS_TYPE.MGR;
+            dto.BelongInfoId = "0";
             _sysRoleService.Add(dto);
 
-            //如果包含： 可分配权限的权限 && entIdListStr 不为空
-            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST)
-                && !string.IsNullOrEmpty(dto.EntIdListStr))
+            //如果包含： 可分配权限的权限 && EntIds 不为空
+            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST) && dto.EntIds?.Count > 0)
             {
-                var entIdList = JsonConvert.DeserializeObject<List<string>>(dto.EntIdListStr);
-                _sysRoleEntRelaService.ResetRela(dto.RoleId, entIdList);
+                _sysRoleEntRelaService.ResetRela(dto.RoleId, dto.EntIds);
             }
 
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 删除角色
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
         [HttpDelete]
-        [Route("delete/{recordId}")]
+        [Route("{recordId}")]
         public ApiRes Delete(string recordId)
         {
             _sysRoleService.RemoveRole(recordId);
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 更新角色信息
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPut]
-        [Route("update/{recordId}")]
-        public ApiRes Update(SysRoleDto dto)
+        [Route("{recordId}")]
+        public ApiRes Update(SysRoleModifyDto dto)
         {
             _sysRoleService.Update(dto);
-            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST)
-                && !string.IsNullOrEmpty(dto.EntIdListStr))
+            //如果包含： 可分配权限的权限 && EntIds 不为空
+            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST) && dto.EntIds?.Count > 0)
             {
-                var entIdList = JsonConvert.DeserializeObject<List<string>>(dto.EntIdListStr);
-                _sysRoleEntRelaService.ResetRela(dto.RoleId, entIdList);
+                _sysRoleEntRelaService.ResetRela(dto.RoleId, dto.EntIds);
 
                 //查询到该角色的人员， 将redis更新
                 var sysUserIdList = _sysUserRoleRelaService.SelectRoleIdsByRoleId(dto.RoleId).ToList();
@@ -89,12 +110,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 查看角色信息
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("detail/{recordId}")]
+        [Route("{recordId}")]
         public ApiRes Detail(string recordId)
         {
             var sysRole = _sysRoleService.GetById(recordId);
-            if (sysRole == null)
+            if (sysRole is null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

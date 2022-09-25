@@ -69,14 +69,14 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<IsvInfoDto>>(isvInfos);
         }
 
-        public PaginatedList<IsvInfoDto> GetPaginatedData(IsvInfoDto dto, int pageIndex, int pageSize)
+        public PaginatedList<IsvInfoDto> GetPaginatedData(IsvInfoQueryDto dto)
         {
             var isvInfos = _isvInfoRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName))
+                && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
                 && (dto.State.Equals(0) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvInfos.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

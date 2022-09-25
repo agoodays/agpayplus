@@ -14,6 +14,6 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(MchAppDto dto);
         MchAppDto GetById(string recordId);
         IEnumerable<MchAppDto> GetAll();
-        PaginatedList<MchAppDto> GetPaginatedData(MchAppDto dto, int pageIndex, int pageSize);
+        PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto);
     }
 }

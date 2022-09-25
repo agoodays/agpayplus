@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Models;
@@ -25,7 +26,11 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<MchAppDto, MchApp>();
             CreateMap<MchDivisionReceiverGroupDto, MchDivisionReceiverGroup>();
             CreateMap<MchDivisionReceiverDto, MchDivisionReceiver>();
+
             CreateMap<MchInfoDto, MchInfo>();
+            CreateMap<MchInfoCreateDto, MchInfoCommand>();
+            CreateMap<MchInfoCommand, MchInfo>();
+
             CreateMap<MchNotifyRecordDto, MchNotifyRecord>();
             CreateMap<MchPayPassageDto, MchPayPassage>();
             CreateMap<PayInterfaceConfigDto, PayInterfaceConfig>();
@@ -37,14 +42,20 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysConfigDto, SysConfig>();
             CreateMap<SysEntitlementDto, SysEntitlement>();
             CreateMap<SysLogDto, SysLog>();
+
+            CreateMap<SysRoleDto, SysRole>();
+            CreateMap<SysRoleCreateDto, SysRole>();
+            CreateMap<SysRoleModifyDto, SysRole>();
+
             CreateMap<SysRoleEntRelaDto, SysRoleEntRela>();
+
             CreateMap<SysUserAuthDto, SysUserAuth>();
             CreateMap<SysUserRoleRelaDto, SysUserRoleRela>();
 
             CreateMap<SysUserDto, SysUser>();
-            CreateMap<SysUserDto, SysUserCommand>();
+            CreateMap<SysUserCreateDto, SysUserCommand>();
             CreateMap<SysUserCommand, SysUser>();
-            CreateMap<ModifySysUserDto, ModifySysUserCommand>();
+            CreateMap<SysUserModifyDto, ModifySysUserCommand>();
             CreateMap<ModifySysUserCommand, SysUser>();
 
             CreateMap<TransferOrder, TransferOrderDto>();

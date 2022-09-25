@@ -9,12 +9,12 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IPayWayService : IDisposable
     {
-        void Add(PayWayDto dto);
-        void Remove(string recordId);
-        void Update(PayWayDto dto);
+        bool Add(PayWayDto dto);
+        bool Remove(string recordId);
+        bool Update(PayWayDto dto);
         PayWayDto GetById(string recordId);
         bool IsExistPayWayCode(string wayCode);
         IEnumerable<PayWayDto> GetAll();
-        PaginatedList<PayWayDto> GetPaginatedData(PayWayDto dto, int pageIndex = 1, int pageSize = 20);
+        PaginatedList<T> GetPaginatedData<T>(PayWayQueryDto dto);
     }
 }

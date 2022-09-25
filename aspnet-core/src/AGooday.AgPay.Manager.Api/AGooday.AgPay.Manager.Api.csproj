@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Order\" />
-    <Folder Include="Controllers\Config\" />
   </ItemGroup>
 
 </Project>

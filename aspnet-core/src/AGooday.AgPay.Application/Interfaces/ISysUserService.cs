@@ -12,15 +12,15 @@ namespace AGooday.AgPay.Application.Interfaces
     public interface ISysUserService : IDisposable
     {
         void Add(SysUserDto dto);
-        void Create(SysUserDto dto);
+        void Create(SysUserCreateDto dto);
         void Remove(long recordId);
         void Remove(long sysUserId, long currentUserId, string sysType);
         void Update(SysUserDto dto);
-        void Modify(ModifySysUserDto dto);
+        void Modify(SysUserModifyDto dto);
         SysUserDto GetById(long recordId);
         IEnumerable<SysUserDto> GetAll();
         IEnumerable<SysUserDto> GetAll(List<long> recordIds);
-        PaginatedList<SysUserDto> GetPaginatedData(SysUserDto dto, int pageIndex = 1, int pageSize = 20);
+        PaginatedList<SysUserDto> GetPaginatedData(SysUserQueryDto dto);
         Task<IEnumerable<SysUserDto>> ListAsync();
     }
 }

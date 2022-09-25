@@ -11,10 +11,15 @@ using MediatR;
 using AGooday.AgPay.Application.Permissions;
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using AGooday.AgPay.Common.Exceptions;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
-    [Route("/api/sysRoleEntRela")]
+
+    /// <summary>
+    /// 角色 权限管理
+    /// </summary>
+    [Route("/api/sysRoleEntRelas")]
     [ApiController]
     public class SysRoleEntRelaController : CommonController
     {
@@ -36,26 +41,34 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             _sysRoleService = sysRoleService;
         }
 
+        /// <summary>
+        /// 角色权限列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("list")]
-        public ApiRes List([FromBody] SysRoleEntRelaDto dto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        [Route("")]
+        public ApiRes List([FromQuery] SysRoleEntRelaQueryDto dto)
         {
-            var data = _sysRoleEntRelaService.GetPaginatedData(dto, pageNumber, pageSize);
+            var data = _sysRoleEntRelaService.GetPaginatedData(dto);
             return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
         [HttpPost]
         [Route("relas/{roleId}")]
-        public ApiRes Relas(SysRoleEntRelaDto dto)
+        public ApiRes Relas(string roleId, List<string> entIds)
         {
-            var s = _sysRoleService.GetById(dto.RoleId);
-            if (!string.IsNullOrEmpty(dto.EntIdListStr))
+            var role = _sysRoleService.GetById(roleId);
+            if (role == null || !role.SysType.Equals(CS.SYS_TYPE.MGR) || !role.BelongInfoId.Equals("0"))
             {
-                var entIdList = JsonConvert.DeserializeObject<List<string>>(dto.EntIdListStr);
-                _sysRoleEntRelaService.ResetRela(dto.RoleId, entIdList);
+                ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            if (entIds.Count() > 0)
+            {
+                _sysRoleEntRelaService.ResetRela(roleId, entIds);
 
                 //查询到该角色的人员， 将redis更新
-                var sysUserIdList = _sysUserRoleRelaService.SelectRoleIdsByRoleId(dto.RoleId).ToList();
+                var sysUserIdList = _sysUserRoleRelaService.SelectRoleIdsByRoleId(roleId).ToList();
                 RefAuthentication(sysUserIdList);
             }
             return ApiRes.Ok();

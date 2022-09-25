@@ -45,7 +45,7 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository.SaveChanges();
         }
 
-        public void Create(SysUserDto dto)
+        public void Create(SysUserCreateDto dto)
         {
             var command = _mapper.Map<CreateSysUserCommand>(dto);
             Bus.SendCommand(command);
@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository.SaveChanges();
         }
 
-        public void Modify(ModifySysUserDto dto)
+        public void Modify(SysUserModifyDto dto)
         {
             var command = _mapper.Map<ModifySysUserCommand>(dto);
             Bus.SendCommand(command);
@@ -104,14 +104,14 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
 
-        public PaginatedList<SysUserDto> GetPaginatedData(SysUserDto dto, int pageIndex = 1, int pageSize = 20)
+        public PaginatedList<SysUserDto> GetPaginatedData(SysUserQueryDto dto)
         {
             var sysUsers = _sysUserRepository.GetAll()
                 .Where(w => w.SysType == dto.SysType
                 && (string.IsNullOrWhiteSpace(dto.Realname) || w.Realname.Contains(dto.Realname))
                 && (dto.SysUserId.Equals(0) || w.SysUserId.Equals(dto.SysUserId))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysUser>.Create<SysUserDto>(sysUsers.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<SysUser>.Create<SysUserDto>(sysUsers.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

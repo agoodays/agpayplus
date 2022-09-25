@@ -9,13 +9,15 @@ using AGooday.AgPay.Common.Exceptions;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Isv
 {
-    [Route("/api/isv/payConfig")]
+    /// <summary>
+    /// 服务商支付接口管理类
+    /// </summary>
+    [Route("/api/isv/payConfigs")]
     [ApiController]
     public class IsvPayInterfaceConfigController : ControllerBase
     {
         private readonly ILogger<IsvPayInterfaceConfigController> _logger;
         private readonly IPayInterfaceConfigService _payIfConfigService;
-        private readonly IPayOrderService _payOrderService;
 
         public IsvPayInterfaceConfigController(ILogger<IsvPayInterfaceConfigController> logger,
             IPayInterfaceConfigService payIfConfigService,
@@ -23,27 +25,37 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         {
             _logger = logger;
             _payIfConfigService = payIfConfigService;
-            _payOrderService = payOrderService;
         }
 
         [HttpGet]
-        [Route("list/{isvNo}")]
+        [Route("")]
         public ApiRes List(string isvNo)
         {
             var data = _payIfConfigService.SelectAllPayIfConfigListByIsvNo(CS.INFO_TYPE_ISV, isvNo);
             return ApiRes.Ok(data);
         }
 
+        /// <summary>
+        /// 根据 服务商号、接口类型 获取商户参数配置
+        /// </summary>
+        /// <param name="isvNo"></param>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{isvNo}/{ifCode}")]
-        public ApiRes GetByIfCode(string isvNo, string ifCode)
+        public ApiRes GetByIsvNo(string isvNo, string ifCode)
         {
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 服务商支付接口参数配置
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("save")]
-        public ApiRes Save(PayInterfaceConfigDto dto)
+        [Route("")]
+        public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
             return ApiRes.Ok();
         }

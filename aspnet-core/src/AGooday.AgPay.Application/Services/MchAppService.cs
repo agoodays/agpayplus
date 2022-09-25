@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
         }
 
-        public PaginatedList<MchAppDto> GetPaginatedData(MchAppDto dto, int pageIndex, int pageSize)
+        public PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto)
         {
             var mchApps = _mchAppRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AppName) || w.AppName.Contains(dto.AppName))
                 && (dto.State.Equals(0) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchApp>.Create<MchAppDto>(mchApps.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<MchApp>.Create<MchAppDto>(mchApps.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

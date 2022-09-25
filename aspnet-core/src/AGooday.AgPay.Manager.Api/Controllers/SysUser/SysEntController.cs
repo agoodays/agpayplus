@@ -19,12 +19,14 @@ using StackExchange.Redis;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
-    [Route("/api/sysEnt")]
+    /// <summary>
+    /// 权限 菜单 管理
+    /// </summary>
+    [Route("/api/sysEnts")]
     [ApiController]
     public class SysEntController : CommonController
     {
         private readonly ILogger<SysEntController> _logger;
-        private readonly IDatabase _redis;
         private readonly ISysEntitlementService _sysEntService;
 
         public SysEntController(ILogger<SysEntController> logger, RedisUtil client,
@@ -38,6 +40,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             _sysEntService = sysEntService;
         }
 
+        /// <summary>
+        /// 查看资源权限
+        /// </summary>
+        /// <param name="sysType"></param>
+        /// <param name="entId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("bySysType")]
         public ApiRes BySystem(string sysType, string entId)
@@ -46,14 +54,24 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             return ApiRes.Ok(sysEnts);
         }
 
+        /// <summary>
+        /// 更新资源权限
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPut]
-        [Route("update/{entId}")]
-        public ApiRes Update(SysEntitlementDto dto)
+        [Route("{entId}")]
+        public ApiRes Update(SysEntModifyDto dto)
         {
             _sysEntService.Update(dto);
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 查询权限集合
+        /// </summary>
+        /// <param name="sysType"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("showTree")]
         //public ActionResult ShowTree(string sysType)

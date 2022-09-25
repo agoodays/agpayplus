@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AGooday.AgPay.Common.Constants;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -18,16 +19,23 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchPayPassageRepository _mchPayPassageRepository;
+        private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
+        private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public MchPayPassageService(IMchPayPassageRepository mchPayPassageRepository, IMapper mapper, IMediatorHandler bus)
+        public MchPayPassageService(IMapper mapper, IMediatorHandler bus,
+            IMchPayPassageRepository mchPayPassageRepository,
+            IPayInterfaceDefineRepository payInterfaceDefineRepository,
+            IPayInterfaceConfigRepository payInterfaceConfigRepository)
         {
-            _mchPayPassageRepository = mchPayPassageRepository;
             _mapper = mapper;
             Bus = bus;
+            _mchPayPassageRepository = mchPayPassageRepository;
+            _payInterfaceDefineRepository = payInterfaceDefineRepository;
+            _payInterfaceConfigRepository = payInterfaceConfigRepository;
         }
 
         public void Dispose()
@@ -66,6 +74,69 @@ namespace AGooday.AgPay.Application.Services
         {
             var mchPayPassages = _mchPayPassageRepository.GetAll();
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
+        }
+
+        public IEnumerable<MchPayPassageDto> GetAll(string appId, List<string> wayCodes)
+        {
+            var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId)
+            && (wayCodes.Count.Equals(0) || wayCodes.Contains(w.WayCode)));
+            return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
+        }
+
+        public IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, byte infoType, byte type)
+        {
+            var result = _payInterfaceDefineRepository.GetAll().Join(_payInterfaceConfigRepository.GetAll(),
+                pid => pid.IfCode, pic => pic.IfCode,
+                (pid, pic) => new { pid, pic })
+                .Where(w => w.pid.State.Equals(CS.YES) && w.pic.State.Equals(CS.YES)
+                && w.pid.WayCodes.Contains(wayCode) && w.pic.InfoType.Equals(infoType) && w.pic.InfoId.Equals(appId)
+                && !string.IsNullOrWhiteSpace(w.pic.IfParams.Trim()))
+                .Select(s => new AvailablePayInterfaceDto()
+                {
+                    IfCode = s.pid.IfCode,
+                    IfName = s.pid.IfName,
+                    ConfigPageType = s.pid.ConfigPageType,
+                    Icon = s.pid.Icon,
+                    BgColor = s.pid.BgColor,
+                    IfParams = s.pic.IfParams,
+                    IfRate = s.pic.IfRate * 100,
+                });
+            if (result != null)
+            {
+                var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
+                foreach (var item in result)
+                {
+                    var payPassage = mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).First();
+                    if (payPassage != null)
+                    {
+                        item.PassageId = payPassage.Id;
+                        item.State = payPassage.State;
+                        item.Rate = payPassage.Rate * 100;
+                    }
+                }
+            }
+            return result;
+        }
+
+        public void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo)
+        {
+            foreach (var payPassage in mchPayPassages)
+            {
+                if (payPassage.State == CS.NO && payPassage.Id == null)
+                {
+                    continue;
+                }
+                // 商户系统配置通道，添加商户号参数
+                if (!string.IsNullOrWhiteSpace(mchNo))
+                {
+                    payPassage.MchNo = mchNo;
+                }
+                payPassage.Rate = payPassage.Rate / 100;
+
+                var m = _mapper.Map<MchPayPassage>(payPassage);
+                _mchPayPassageRepository.Add(obj: m);
+            }
+            _mchPayPassageRepository.SaveChanges();
         }
     }
 }

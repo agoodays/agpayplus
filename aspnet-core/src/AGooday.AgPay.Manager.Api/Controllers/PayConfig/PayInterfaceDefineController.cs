@@ -9,7 +9,10 @@ using AGooday.AgPay.Common.Exceptions;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 {
-    [Route("/api/payIfDefine")]
+    /// <summary>
+    /// 支付接口定义管理类
+    /// </summary>
+    [Route("/api/payIfDefines")]
     [ApiController]
     public class PayInterfaceDefineController : ControllerBase
     {
@@ -29,24 +32,39 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             _payOrderService = payOrderService;
         }
 
+        /// <summary>
+        /// 支付接口
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        [Route("list")]
+        [Route("")]
         public ApiRes List()
         {
-            var data = _payIfDefineService.GetAll();
+            var data = _payIfDefineService.GetAll().OrderByDescending(o => o.CreatedAt);
             return ApiRes.Ok(data);
         }
 
+        /// <summary>
+        /// 新增支付接口
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("add")]
+        [Route("")]
         public ApiRes Add(PayInterfaceDefineDto dto)
         {
             _payIfDefineService.Add(dto);
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 删除支付接口
+        /// </summary>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
         [HttpDelete]
-        [Route("delete/{ifCode}")]
+        [Route("{ifCode}")]
         public ApiRes Delete(string ifCode)
         {
             // 校验该支付方式是否有服务商或商户配置参数或者已有订单
@@ -58,16 +76,26 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 更新支付接口
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPut]
-        [Route("update/{ifCode}")]
+        [Route("{ifCode}")]
         public ApiRes Update(PayInterfaceDefineDto dto)
         {
             _payIfDefineService.Update(dto);
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 查看支付接口
+        /// </summary>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("detail/{ifCode}")]
+        [Route("{ifCode}")]
         public ApiRes Detail(string ifCode)
         {
             var payIfDefine = _payIfDefineService.GetById(ifCode);

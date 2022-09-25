@@ -55,6 +55,14 @@ namespace AGooday.AgPay.Application.Services
             _sysConfigRepository.SaveChanges();
         }
 
+        public void SaveOrUpdate(SysConfigDto dto)
+        {
+            var m = _sysConfigRepository.GetById(dto.ConfigKey);
+            m.ConfigVal = dto.ConfigVal;
+            _sysConfigRepository.Update(m);
+            _sysConfigRepository.SaveChanges();
+        }
+
         public SysConfigDto GetById(string recordId)
         {
             var entity = _sysConfigRepository.GetById(recordId);

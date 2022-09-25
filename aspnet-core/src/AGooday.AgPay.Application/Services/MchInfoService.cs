@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AGooday.AgPay.Domain.Commands.MchInfos;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -43,6 +44,12 @@ namespace AGooday.AgPay.Application.Services
             _mchInfoRepository.SaveChanges();
         }
 
+        public void Create(MchInfoCreateDto dto)
+        {
+            var command = _mapper.Map<CreateMchInfoCommand>(dto);
+            Bus.SendCommand(command);
+        }
+
         public void Remove(string recordId)
         {
             _mchInfoRepository.Remove(recordId);
@@ -69,16 +76,16 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
         }
 
-        public PaginatedList<MchInfoDto> GetPaginatedData(MchInfoDto dto, int pageIndex, int pageSize)
+        public PaginatedList<MchInfoDto> GetPaginatedData(MchInfoQueryDto dto)
         {
             var mchInfos = _mchInfoRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (string.IsNullOrWhiteSpace(dto.MchName) || w.MchName.Equals(dto.MchName))
+                && (string.IsNullOrWhiteSpace(dto.MchName) || w.MchName.Contains(dto.MchName) || w.MchShortName.Contains(dto.MchName))
                 && (dto.Type.Equals(0) || w.Type.Equals(dto.Type))
                 && (dto.State.Equals(0) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchInfo>.Create<MchInfoDto>(mchInfos.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<MchInfo>.Create<MchInfoDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

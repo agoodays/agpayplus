@@ -16,5 +16,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
+
+        public bool IsExistMchNo(string mchNo)
+        {
+            return DbSet.AsNoTracking().Any(c => c.MchNo.Equals(mchNo));
+        }
     }
 }

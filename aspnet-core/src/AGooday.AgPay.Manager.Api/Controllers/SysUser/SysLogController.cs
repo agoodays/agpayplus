@@ -9,6 +9,9 @@ using AGooday.AgPay.Domain.Models;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
+    /// <summary>
+    /// 系统日志记录类
+    /// </summary>
     [Route("/api/sysLog")]
     [ApiController]
     public class SysLogController : ControllerBase
@@ -22,30 +25,42 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             _sysLogService = sysLogService;
         }
 
+        /// <summary>
+        /// 日志记录列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("list")]
-        public ApiRes List([FromBody] SysLogDto dto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        [Route("")]
+        public ApiRes List([FromQuery] SysLogQueryDto dto)
         {
-            var data = _sysLogService.GetPaginatedData(dto, pageNumber, pageSize);
+            var data = _sysLogService.GetPaginatedData(dto);
             return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
+        /// <summary>
+        /// 查看日志信息
+        /// </summary>
+        /// <param name="sysLogId"></param>
+        /// <returns></returns>
         [HttpDelete]
-        [Route("delete/{sysLogId}")]
-        public ApiRes Delete(long sysLogId)
+        [Route("{selectedIds}")]
+        public ApiRes Delete(string selectedIds)
         {
-            _sysLogService.Remove(sysLogId);
+            var ids = selectedIds.Split(",").Select(s => Convert.ToInt64(s)).ToList();
+            var result = _sysLogService.RemoveByIds(ids);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_DELETE);
+            }
             return ApiRes.Ok();
         }
 
-        [HttpPut]
-        [Route("update/{isvNo}")]
-        public ApiRes Update(SysLogDto dto)
-        {
-            _sysLogService.Update(dto);
-            return ApiRes.Ok();
-        }
-
+        /// <summary>
+        /// 查看日志信息
+        /// </summary>
+        /// <param name="sysLogId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("detail/{sysLogId}")]
         public ApiRes Detail(long sysLogId)

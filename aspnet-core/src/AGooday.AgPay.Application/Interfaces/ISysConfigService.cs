@@ -12,6 +12,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Add(SysConfigDto dto);
         void Remove(string recordId);
         void Update(SysConfigDto dto);
+        void SaveOrUpdate(SysConfigDto dto);
         SysConfigDto GetById(string recordId);
         IEnumerable<SysConfigDto> GetAll();
     }

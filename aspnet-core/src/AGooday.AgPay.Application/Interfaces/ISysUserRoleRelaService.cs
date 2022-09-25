@@ -12,10 +12,11 @@ namespace AGooday.AgPay.Application.Interfaces
         void Add(SysUserRoleRelaDto dto);
         void Remove(string recordId);
         void Update(SysUserRoleRelaDto dto);
+        void SaveUserRole(long userId, List<string> roleIds);
         SysUserRoleRelaDto GetById(string recordId);
         IEnumerable<string> SelectRoleIdsByUserId(long userId);
         IEnumerable<long> SelectRoleIdsByRoleId(string roleId);
         IEnumerable<SysUserRoleRelaDto> GetAll();
-        PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaDto dto, int pageIndex = 1, int pageSize = 20);
+        PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaQueryDto dto);
     }
 }

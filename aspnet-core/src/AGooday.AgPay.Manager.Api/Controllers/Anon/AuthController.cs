@@ -25,6 +25,9 @@ using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 {
+    /// <summary>
+    /// 认证接口
+    /// </summary>
     [ApiController]
     [Route("api/anon/auth")]
     public class AuthController : ControllerBase
@@ -55,6 +58,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             _sysUserRoleRelaService = sysUserRoleRelaService;
         }
 
+        /// <summary>
+        /// 用户信息认证 获取iToken
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
         [HttpPost]
         [Route("validate")]
         public ApiRes Validate(Validate model)
@@ -136,6 +145,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             return ApiRes.Ok4newJson(CS.ACCESS_TOKEN_NAME, accessToken);
         }
 
+        /// <summary>
+        /// 图片验证码
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("vercode")]
         public ApiRes Vercode()

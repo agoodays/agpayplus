@@ -14,6 +14,9 @@ using AGooday.AgPay.Common.Utils;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
+    /// <summary>
+    /// 操作员列表
+    /// </summary>
     [ApiController]
     [Route("api/sysUsers")]
     public class SysUserController : CommonController
@@ -36,23 +39,28 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             _notifications = (DomainNotificationHandler)notifications;
         }
 
+        /// <summary>
+        /// 操作员信息列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("list")]
-        public ApiRes List([FromBody] SysUserDto dto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        [Route("")]
+        public ApiRes List([FromQuery] SysUserQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MGR;
-            var data = _sysUserService.GetPaginatedData(dto, pageNumber, pageSize);
+            var data = _sysUserService.GetPaginatedData(dto);
             return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
         /// <summary>
-        /// 添加管理员
+        /// 添加操作员信息
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("add")]
-        public ApiRes Add(SysUserDto dto)
+        [Route("")]
+        public ApiRes Add(SysUserCreateDto dto)
         {
             //_cache.Remove("ErrorData");
             dto.IsAdmin = CS.NO;
@@ -68,8 +76,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
                 return ApiRes.CustomFail(_notifications.GetNotifications().Select(s => s.Value).ToArray());
         }
 
+        /// <summary>
+        /// 删除操作员
+        /// </summary>
+        /// <param name="recordId">系统用户ID</param>
+        /// <returns></returns>
         [HttpDelete]
-        [Route("delete/{recordId}")]
+        [Route("{recordId}")]
         public ApiRes Delete(long recordId)
         {
             var currentUserId = 0;
@@ -85,9 +98,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
                 return ApiRes.CustomFail(_notifications.GetNotifications().Select(s => s.Value).ToArray());
         }
 
+        /// <summary>
+        /// 更新操作员信息
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPut]
-        [Route("update/{recordId}")]
-        public ApiRes Update(ModifySysUserDto dto)
+        [Route("{recordId}")]
+        public ApiRes Update(SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MGR;
             _sysUserService.Modify(dto);
@@ -110,8 +128,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
                 return ApiRes.CustomFail(_notifications.GetNotifications().Select(s => s.Value).ToArray());
         }
 
+        /// <summary>
+        /// 查看操作员信息
+        /// </summary>
+        /// <param name="recordId">系统用户ID</param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("detail/{recordId}")]
+        [Route("{recordId}")]
         public ApiRes Detail(long recordId)
         {
             var sysUser = _sysUserService.GetById(recordId);
@@ -120,13 +143,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             return ApiRes.Ok(sysUser);
-        }
-
-        [HttpGet]
-        [Route("get")]
-        public IEnumerable<int> Get()
-        {
-            return Enumerable.Range(1, 5).Select(index => Random.Shared.Next(index, 55)).ToArray();
         }
     }
 }

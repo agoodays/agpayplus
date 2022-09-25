@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(SysRoleDto dto)
+        public void Add(SysRoleCreateDto dto)
         {
             var m = _mapper.Map<SysRole>(dto);
             _sysRoleRepository.Add(m);
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Application.Services
             _sysRoleRepository.SaveChanges();
         }
 
-        public void Update(SysRoleDto dto)
+        public void Update(SysRoleModifyDto dto)
         {
             var m = _mapper.Map<SysRole>(dto);
             _sysRoleRepository.Update(m);
@@ -80,14 +80,14 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysRoleDto>>(sysRoles);
         }
 
-        public PaginatedList<SysRoleDto> GetPaginatedData(SysRoleDto dto, int pageIndex = 1, int pageSize = 20)
+        public PaginatedList<SysRoleDto> GetPaginatedData(SysRoleQueryDto dto)
         {
             var sysRoles = _sysRoleRepository.GetAll()
-                .Where(w => w.SysType == dto.SysType
+                .Where(w => w.SysType.Equals(dto.SysType) && w.BelongInfoId.Equals(dto.BelongInfoId)
                 && (string.IsNullOrWhiteSpace(dto.RoleName) || w.RoleName.Contains(dto.RoleName))
                 && (dto.RoleId.Equals(0) || w.RoleId.Equals(dto.RoleId))
                 ).OrderByDescending(o => o.UpdatedAt);
-            var records = PaginatedList<SysRole>.Create<SysRoleDto>(sysRoles.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<SysRole>.Create<SysRoleDto>(sysRoles.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

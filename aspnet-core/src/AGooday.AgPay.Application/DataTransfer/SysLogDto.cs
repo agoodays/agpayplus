@@ -65,8 +65,5 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 创建时间
         /// </summary>
         public DateTime CreatedAt { get; set; }
-
-        public DateTime? CreatedStart { get; set; }
-        public DateTime? CreatedEnd { get; set; }
     }
 }

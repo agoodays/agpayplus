@@ -56,6 +56,16 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRoleRelaRepository.SaveChanges();
         }
 
+        public void SaveUserRole(long userId, List<string> roleIds) {
+
+            foreach (var roleId in roleIds)
+            {
+                var m = new SysUserRoleRela() { UserId = userId, RoleId = roleId };
+                _sysUserRoleRelaRepository.Add(m);
+            }
+            _sysUserRoleRelaRepository.SaveChanges();
+        }
+
         public SysUserRoleRelaDto GetById(string recordId)
         {
             var entity = _sysUserRoleRelaRepository.GetById(recordId);
@@ -69,11 +79,11 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysUserRoleRelaDto>>(sysUserRoleRelas);
         }
 
-        public PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaDto dto, int pageIndex = 1, int pageSize = 20)
+        public PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaQueryDto dto)
         {
             var sysUserRoleRelas = _sysUserRoleRelaRepository.GetAll()
                 .Where(w => dto.UserId.Equals(0) || w.UserId.Equals(dto.UserId));
-            var records = PaginatedList<SysUserRoleRela>.Create<SysUserRoleRelaDto>(sysUserRoleRelas.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<SysUserRoleRela>.Create<SysUserRoleRelaDto>(sysUserRoleRelas.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

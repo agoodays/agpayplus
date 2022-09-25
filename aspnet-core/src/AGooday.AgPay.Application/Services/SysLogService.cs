@@ -49,6 +49,15 @@ namespace AGooday.AgPay.Application.Services
             _sysLogRepository.SaveChanges();
         }
 
+        public bool RemoveByIds(List<long> recordIds)
+        {
+            foreach (var recordId in recordIds)
+            {
+                _sysLogRepository.Remove(recordId); 
+            }
+            return _sysLogRepository.SaveChanges()>0;
+        }
+
         public void Update(SysLogDto dto)
         {
             var m = _mapper.Map<SysLog>(dto);
@@ -69,17 +78,17 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysLogDto>>(sysLogs);
         }
 
-        public PaginatedList<SysLogDto> GetPaginatedData(SysLogDto dto, int pageIndex = 1, int pageSize = 20)
+        public PaginatedList<SysLogDto> GetPaginatedData(SysLogQueryDto dto)
         {
             var sysLogs = _sysLogRepository.GetAll()
-                .Where(w => w.SysType == dto.SysType
+                .Where(w => w.SysType.Equals(dto.SysType)
                 && (dto.UserId.Equals(0) || w.UserId.Equals(dto.UserId))
                 && (string.IsNullOrWhiteSpace(dto.UserName) || w.UserName.Contains(dto.UserName))
                 && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Contains(dto.SysType))
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysLog>.Create<SysLogDto>(sysLogs.AsNoTracking(), _mapper, pageIndex, pageSize);
+                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd))
+                .OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<SysLog>.Create<SysLogDto>(sysLogs.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

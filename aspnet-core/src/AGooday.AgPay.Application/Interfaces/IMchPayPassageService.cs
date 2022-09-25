@@ -14,5 +14,8 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(MchPayPassageDto dto);
         MchPayPassageDto GetById(long recordId);
         IEnumerable<MchPayPassageDto> GetAll();
+        IEnumerable<MchPayPassageDto> GetAll(string appId,List<string> wayCodes);
+        IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, byte infoType, byte type);
+        void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo);
     }
 }

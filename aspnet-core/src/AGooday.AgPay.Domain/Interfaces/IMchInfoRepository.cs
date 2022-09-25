@@ -10,5 +10,6 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IMchInfoRepository : IRepository<MchInfo>
     {
+        bool IsExistMchNo(string mchNo);
     }
 }

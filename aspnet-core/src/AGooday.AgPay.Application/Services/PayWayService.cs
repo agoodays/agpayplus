@@ -36,25 +36,25 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(PayWayDto dto)
+        public bool Add(PayWayDto dto)
         {
             dto.WayCode = dto.WayCode.ToUpper();
             var m = _mapper.Map<PayWay>(dto);
             _payWayRepository.Add(m);
-            _payWayRepository.SaveChanges();
+            return _payWayRepository.SaveChanges() > 0;
         }
 
-        public void Remove(string recordId)
+        public bool Remove(string recordId)
         {
             _payWayRepository.Remove(recordId);
-            _payWayRepository.SaveChanges();
+            return _payWayRepository.SaveChanges() > 0;
         }
 
-        public void Update(PayWayDto dto)
+        public bool Update(PayWayDto dto)
         {
             var m = _mapper.Map<PayWay>(dto);
             _payWayRepository.Update(m);
-            _payWayRepository.SaveChanges();
+            return _payWayRepository.SaveChanges() > 0;
         }
 
         public PayWayDto GetById(string recordId)
@@ -75,13 +75,13 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<PayWayDto>>(payWays);
         }
 
-        public PaginatedList<PayWayDto> GetPaginatedData(PayWayDto dto, int pageIndex = 1, int pageSize = 20)
+        public PaginatedList<T> GetPaginatedData<T>(PayWayQueryDto dto)
         {
             var sysLogs = _payWayRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Contains(dto.WayCode))
                 && (string.IsNullOrWhiteSpace(dto.WayName) || w.WayName.Contains(dto.WayName))
                 ).OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayWay>.Create<PayWayDto>(sysLogs.AsNoTracking(), _mapper, pageIndex, pageSize);
+            var records = PaginatedList<PayWay>.Create<T>(sysLogs.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

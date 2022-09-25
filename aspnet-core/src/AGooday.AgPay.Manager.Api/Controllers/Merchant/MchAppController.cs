@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
-    [Route("/api/mchApp")]
+    /// <summary>
+    /// 商户应用管理类
+    /// </summary>
+    [Route("/api/mchApps")]
     [ApiController]
     public class MchAppController : ControllerBase
     {
@@ -21,40 +24,65 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             _mchAppService = mchAppService;
         }
 
+        /// <summary>
+        /// 应用列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("list")]
-        public ApiRes List([FromBody] MchAppDto dto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        [Route("")]
+        public ApiRes List([FromQuery] MchAppQueryDto dto)
         {
-            var data = _mchAppService.GetPaginatedData(dto, pageNumber, pageSize);
+            var data = _mchAppService.GetPaginatedData(dto);
             return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
         }
 
+        /// <summary>
+        /// 新建应用
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("add")]
+        [Route("")]
         public ApiRes Add(MchAppDto dto)
         {
             _mchAppService.Add(dto);
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 删除应用
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <returns></returns>
         [HttpDelete]
-        [Route("delete/{appId}")]
+        [Route("{appId}")]
         public ApiRes Delete(string appId)
         {
             _mchAppService.Remove(appId);
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 更新应用信息
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPut]
-        [Route("update/{appId}")]
+        [Route("{appId}")]
         public ApiRes Update(MchAppDto dto)
         {
             _mchAppService.Update(dto);
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 应用详情
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("detail/{appId}")]
+        [Route("{appId}")]
         public ApiRes Detail(string appId)
         {
             var mchApp = _mchAppService.GetById(appId);

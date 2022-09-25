@@ -9,12 +9,12 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface ISysRoleService : IDisposable
     {
-        void Add(SysRoleDto dto);
+        void Add(SysRoleCreateDto dto);
         void Remove(string recordId);
-        void Update(SysRoleDto dto);
+        void Update(SysRoleModifyDto dto);
         SysRoleDto GetById(string recordId);
         IEnumerable<SysRoleDto> GetAll();
-        PaginatedList<SysRoleDto> GetPaginatedData(SysRoleDto dto, int pageIndex = 1, int pageSize = 20);
+        PaginatedList<SysRoleDto> GetPaginatedData(SysRoleQueryDto dto);
         void RemoveRole(string roleId);
     }
 }
