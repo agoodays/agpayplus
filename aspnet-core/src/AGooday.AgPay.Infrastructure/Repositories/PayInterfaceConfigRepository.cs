@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             foreach (string infoId in infoIds)
             {
-                var entity = DbSet.Where(w => w.InfoId.Equals(infoId)&& w.InfoType.Equals(infoType)).First();
+                var entity = DbSet.Where(w => w.InfoId.Equals(infoId) && w.InfoType.Equals(infoType)).First();
                 Remove(entity.Id);
             }
         }

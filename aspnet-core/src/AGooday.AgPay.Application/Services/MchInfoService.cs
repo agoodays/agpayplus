@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public MchInfoService(IMapper mapper, IMediatorHandler bus, 
+        public MchInfoService(IMapper mapper, IMediatorHandler bus,
             IMchInfoRepository mchInfoRepository,
             ISysUserRepository sysUserRepository)
         {
@@ -37,6 +37,11 @@ namespace AGooday.AgPay.Application.Services
         public void Dispose()
         {
             GC.SuppressFinalize(this);
+        }
+
+        public bool IsExistMchNo(string mchNo)
+        {
+            return _mchInfoRepository.IsExistMchNo(mchNo);
         }
 
         public void Add(MchInfoDto dto)

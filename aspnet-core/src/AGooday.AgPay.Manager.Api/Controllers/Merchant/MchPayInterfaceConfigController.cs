@@ -6,7 +6,7 @@ using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Application.Params;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -19,25 +19,30 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     {
         private readonly ILogger<MchPayInterfaceConfigController> _logger;
         private readonly IPayInterfaceConfigService _payIfConfigService;
+        private readonly IMchAppService _mchAppService;
+        private readonly IMchInfoService _mchInfoService;
 
         public MchPayInterfaceConfigController(ILogger<MchPayInterfaceConfigController> logger,
             IPayInterfaceConfigService payIfConfigService,
-            IPayOrderService payOrderService)
+            IMchAppService mchAppService,
+            IMchInfoService mchInfoService)
         {
             _logger = logger;
             _payIfConfigService = payIfConfigService;
+            _mchAppService = mchAppService;
+            _mchInfoService = mchInfoService;
         }
 
         /// <summary>
         /// 查询应用支付接口配置列表
         /// </summary>
-        /// <param name="isvNo"></param>
+        /// <param name="appId"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("")]
-        public ApiRes List(string isvNo)
+        public ApiRes List(string appId)
         {
-            var data = _payIfConfigService.SelectAllPayIfConfigListByIsvNo(CS.INFO_TYPE_ISV, isvNo);
+            var data = _payIfConfigService.SelectAllPayIfConfigListByAppId(appId);
             return ApiRes.Ok(data);
         }
 
@@ -48,9 +53,32 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="ifCode"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("{isvNo}/{ifCode}")]
+        [Route("{appId}/{ifCode}")]
         public ApiRes GetByAppId(string appId, string ifCode)
         {
+            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_MCH_APP, appId, ifCode);
+            if (payInterfaceConfig != null)
+            {
+                // 费率转换为百分比数值
+                payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
+
+                // 敏感数据脱敏
+                if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
+                {
+                    var mchApp = _mchAppService.GetById(appId);
+                    var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+
+                    // 普通商户的支付参数执行数据脱敏
+                    if (mchInfo.Type == CS.MCH_TYPE_NORMAL)
+                    {
+                        NormalMchParams mchParams = NormalMchParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
+                        if (mchParams != null)
+                        {
+                            payInterfaceConfig.IfParams = mchParams.DeSenData();
+                        }
+                    }
+                }
+            }
             return ApiRes.Ok();
         }
 

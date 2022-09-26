@@ -9,9 +9,9 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchAppService : IDisposable
     {
-        void Add(MchAppDto dto);
-        void Remove(string recordId);
-        void Update(MchAppDto dto);
+        bool Add(MchAppDto dto);
+        bool Remove(string recordId);
+        bool Update(MchAppDto dto);
         MchAppDto GetById(string recordId);
         IEnumerable<MchAppDto> GetAll();
         PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto);

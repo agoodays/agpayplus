@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Models;
+using AGooday.AgPay.Common.Exceptions;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -21,6 +22,8 @@ namespace AGooday.AgPay.Application.Services
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
         private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
+        private readonly IMchAppRepository _mchAppRepository;
+        private readonly IMchInfoRepository _mchInfoRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
@@ -80,6 +83,20 @@ namespace AGooday.AgPay.Application.Services
         }
 
         /// <summary>
+        /// 根据 账户类型、账户号、接口类型 获取支付参数配置
+        /// </summary>
+        /// <param name="infoType">账户类型</param>
+        /// <param name="infoId">账户号</param>
+        /// <param name="ifCode">接口类型</param>
+        /// <returns></returns>
+        public PayInterfaceConfigDto GetByInfoIdAndIfCode(byte infoType, string infoId, string ifCode)
+        {
+            var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.Equals(infoId)
+            && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode)).First();
+            return _mapper.Map<PayInterfaceConfigDto>(payInterfaceConfig);
+        }
+
+        /// <summary>
         /// 根据 账户类型、账户号 获取支付参数配置列表
         /// </summary>
         /// <param name="infoType"></param>
@@ -95,7 +112,56 @@ namespace AGooday.AgPay.Application.Services
             var result = defineList.ToList().Select(s =>
             {
                 var entity = _mapper.Map<PayInterfaceConfigDto>(s);
-                entity.IfConfigState = configList.Any(a => a.IfCode.Equals(s.IfCode)) ? CS.YES : CS.NO;
+                entity.IfConfigState = configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
+                return entity;
+            }).ToList();
+
+            return result;
+        }
+
+        public List<PayInterfaceConfigDto> SelectAllPayIfConfigListByAppId(string appId)
+        {
+            MchApp mchApp = _mchAppRepository.GetById(appId);
+            if (mchApp == null || mchApp.State != CS.YES)
+            {
+                throw new BizException("商户应用不存在");
+            }
+            MchInfo mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
+            if (mchInfo == null || mchInfo.State != CS.YES)
+            {
+                throw new BizException("商户不存在");
+            }
+            // 支付定义列表
+            var defineList = _payInterfaceDefineRepository.GetAll().Where(w => w.State.Equals(CS.YES)
+            && ((mchInfo.Type.Equals(CS.MCH_TYPE_NORMAL) && w.IsMchMode.Equals(CS.YES))// 支持普通商户模式
+            || (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB) && w.IsIsvMode.Equals(CS.YES)))// 支持服务商模式
+            );
+            var isvPayConfigMap = new Dictionary<string, PayInterfaceConfigDto>();// 服务商支付参数配置集合
+            if (mchInfo.Type == CS.MCH_TYPE_ISVSUB)
+            {
+                // 商户类型为特约商户，服务商应已经配置支付参数
+                var isvConfigList = _payInterfaceConfigRepository.GetAll().Where(w => w.State.Equals(CS.YES)
+                && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE_ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
+                );
+
+                foreach (var isvConfig in isvConfigList)
+                {
+                    var entity = _mapper.Map<PayInterfaceConfigDto>(isvConfig);
+                    entity.MchType = mchInfo.Type;
+                    isvPayConfigMap.Add(entity.IfCode, entity);
+                }
+            }
+
+            // 支付参数列表
+            var configList = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.Equals(appId)
+            && w.InfoType.Equals(CS.INFO_TYPE_MCH_APP));
+
+            var result = defineList.ToList().Select(define =>
+            {
+                var entity = _mapper.Map<PayInterfaceConfigDto>(define);
+                entity.MchType = mchInfo.Type;// 所属商户类型
+                entity.IfConfigState = configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
+                entity.SubMchIsvConfig = mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.TryGetValue(define.IfCode, out _) ? CS.NO : null;
                 return entity;
             }).ToList();
 

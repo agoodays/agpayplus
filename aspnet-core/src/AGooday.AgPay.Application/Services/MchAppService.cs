@@ -36,24 +36,24 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(MchAppDto dto)
+        public bool Add(MchAppDto dto)
         {
             var m = _mapper.Map<MchApp>(dto);
             _mchAppRepository.Add(m);
-            _mchAppRepository.SaveChanges();
+            return _mchAppRepository.SaveChanges() > 0;
         }
 
-        public void Remove(string recordId)
+        public bool Remove(string recordId)
         {
             _mchAppRepository.Remove(recordId);
-            _mchAppRepository.SaveChanges();
+            return _mchAppRepository.SaveChanges() > 0;
         }
 
-        public void Update(MchAppDto dto)
+        public bool Update(MchAppDto dto)
         {
             var m = _mapper.Map<MchApp>(dto);
             _mchAppRepository.Update(m);
-            _mchAppRepository.SaveChanges();
+            return _mchAppRepository.SaveChanges() > 0;
         }
 
         public MchAppDto GetById(string recordId)

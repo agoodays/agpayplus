@@ -9,6 +9,7 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchInfoService : IDisposable
     {
+        bool IsExistMchNo(string mchNo);
         void Add(MchInfoDto dto);
         void Create(MchInfoCreateDto dto);
         void Remove(string recordId);

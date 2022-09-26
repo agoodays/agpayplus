@@ -17,11 +17,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     {
         private readonly ILogger<MchAppController> _logger;
         private readonly IMchAppService _mchAppService;
+        private readonly IMchInfoService _mchInfoService;
 
-        public MchAppController(ILogger<MchAppController> logger, IMchAppService mchAppService)
+        public MchAppController(ILogger<MchAppController> logger,
+            IMchAppService mchAppService,
+            IMchInfoService mchInfoService)
         {
             _logger = logger;
             _mchAppService = mchAppService;
+            _mchInfoService = mchInfoService;
         }
 
         /// <summary>
@@ -46,7 +50,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [Route("")]
         public ApiRes Add(MchAppDto dto)
         {
-            _mchAppService.Add(dto);
+            if (!_mchInfoService.IsExistMchNo(dto.MchNo))
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+
+            var result = _mchAppService.Add(dto);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
+            }
             return ApiRes.Ok();
         }
 
@@ -59,7 +72,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [Route("{appId}")]
         public ApiRes Delete(string appId)
         {
+            var mchApp = _mchAppService.GetById(appId);
             _mchAppService.Remove(appId);
+
+            // 推送mq到目前节点进行更新数据
+
             return ApiRes.Ok();
         }
 
@@ -72,7 +89,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [Route("{appId}")]
         public ApiRes Update(MchAppDto dto)
         {
-            _mchAppService.Update(dto);
+            var result = _mchAppService.Update(dto);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
+            }
+            // 推送修改应用消息
+
             return ApiRes.Ok();
         }
 
