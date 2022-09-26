@@ -16,5 +16,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
+
+        public void RemoveByMchNo(string mchNo)
+        {
+            var mchPayPassages = DbSet.Where(w => w.MchNo.Equals(mchNo));
+            foreach (var mchPayPassage in mchPayPassages)
+            {
+                Remove(mchPayPassage.Id);
+            }
+        }
     }
 }

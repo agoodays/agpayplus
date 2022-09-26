@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
@@ -11,8 +12,10 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +23,9 @@ using System.Threading.Tasks;
 namespace AGooday.AgPay.Domain.CommandHandlers
 {
     public class MchInfoCommandHandler : CommandHandler,
-        IRequestHandler<CreateMchInfoCommand, Unit>
+        IRequestHandler<CreateMchInfoCommand, Unit>,
+        IRequestHandler<ModifyMchInfoCommand, Unit>,
+        IRequestHandler<RemoveMchInfoCommand, Unit>
     {
         // 注入仓储接口
         private readonly IMchInfoRepository _mchInfoRepository;
@@ -28,6 +33,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         private readonly ISysUserRepository _sysUserRepository;
         private readonly ISysUserAuthRepository _sysUserAuthRepository;
         private readonly IMchAppRepository _mchAppRepository;
+        private readonly IPayOrderRepository _payOrderRepository;
+        private readonly IMchPayPassageRepository _mchPayPassageRepository;
+        private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
+        private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
 
         // 用来进行DTO
         private readonly IMapper _mapper;
@@ -41,7 +50,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             IIsvInfoRepository isvInfoRepository,
             ISysUserRepository sysUserRepository,
             ISysUserAuthRepository sysUserAuthRepository,
-            IMchAppRepository mchAppRepository)
+            IMchAppRepository mchAppRepository,
+            IPayOrderRepository payOrderRepository,
+            IMchPayPassageRepository mchPayPassageRepository,
+            IPayInterfaceConfigRepository payInterfaceConfigRepository)
             : base(uow, bus, cache)
         {
             _mapper = mapper;
@@ -51,6 +63,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _isvInfoRepository = isvInfoRepository;
             _mchAppRepository = mchAppRepository;
             _sysUserAuthRepository = sysUserAuthRepository;
+            _payOrderRepository = payOrderRepository;
+            _mchPayPassageRepository = mchPayPassageRepository;
+            _payInterfaceConfigRepository = payInterfaceConfigRepository;
         }
 
         public Task<Unit> Handle(CreateMchInfoCommand request, CancellationToken cancellationToken)
@@ -166,7 +181,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             mchApp.CreatedBy = sysUser.Realname;
             mchApp.CreatedUid = sysUser.SysUserId;
 
-            _mchAppRepository.Add(mchApp); 
+            _mchAppRepository.Add(mchApp);
             #endregion
 
             // 插入商户基本信息
@@ -181,6 +196,117 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 var createdevent = _mapper.Map<MchInfoCreatedEvent>(mchInfo);
                 Bus.RaiseEvent(createdevent);
             }
+
+            return Task.FromResult(new Unit());
+        }
+
+        public Task<Unit> Handle(ModifyMchInfoCommand request, CancellationToken cancellationToken)
+        {
+            // 命令验证
+            if (!request.IsValid())
+            {
+                // 错误信息收集
+                NotifyValidationErrors(request);
+                // 返回，结束当前线程
+                return Task.FromResult(new Unit());
+            }
+
+            var mchInfo = _mapper.Map<MchInfo>(request);
+
+            // 待删除用户登录信息的ID list
+            var removeCacheUserIdList = new List<long>();
+
+            // 如果商户状态为禁用状态，清除该商户用户登录信息
+            if (mchInfo.State == CS.NO)
+            {
+                removeCacheUserIdList = _sysUserRepository.GetAll().Where(w => w.SysType.Equals(CS.SYS_TYPE.MCH) && w.BelongInfoId.Equals(mchInfo.MchNo))
+                    .Select(w => w.SysUserId).ToList();
+            }
+
+            //判断是否重置密码
+            if (request.ResetPass)
+            {
+                // 待更新的密码
+                string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
+                // 获取商户超管
+                long mchAdminUserId = _sysUserRepository.FindMchAdminUserId(mchInfo.MchNo);
+
+                //重置超管密码
+                _sysUserAuthRepository.ResetAuthInfo(mchAdminUserId, null, null, updatePwd, CS.SYS_TYPE.MCH);
+
+                //删除超管登录信息
+                removeCacheUserIdList.Add(mchAdminUserId);
+            }
+
+            // 推送mq删除redis用户认证信息
+
+            //更新商户信息
+            _mchInfoRepository.Update(mchInfo);
+
+            // 推送mq到目前节点进行更新数据
+
+            return Task.FromResult(new Unit());
+        }
+
+        Task<Unit> IRequestHandler<RemoveMchInfoCommand, Unit>.Handle(RemoveMchInfoCommand request, CancellationToken cancellationToken)
+        {
+            // 命令验证
+            if (!request.IsValid())
+            {
+                // 错误信息收集
+                NotifyValidationErrors(request);
+                // 返回，结束当前线程
+                return Task.FromResult(new Unit());
+            }
+
+            // 0.当前商户是否存在
+            var mchInfo = _mchInfoRepository.GetById(request.MchNo);
+            if (mchInfo is null)
+            {
+                // 引发错误事件
+                Bus.RaiseEvent(new DomainNotification("", "该商户不存在！"));
+                return Task.FromResult(new Unit());
+            }
+            // 1.查看当前商户是否存在交易数据
+            if (_payOrderRepository.IsExistOrderUseMchNo(request.MchNo))
+            {
+                // 引发错误事件
+                Bus.RaiseEvent(new DomainNotification("", "该商户已存在交易数据，不可删除！"));
+                return Task.FromResult(new Unit());
+            }
+
+            // 2.删除当前商户配置的支付通道
+            _mchPayPassageRepository.RemoveByMchNo(request.MchNo);
+
+            // 3.删除当前商户支付接口配置参数
+            var appIds = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(request.MchNo)).Select(s => s.AppId).ToList();
+            _payInterfaceConfigRepository.RemoveByInfoIds(appIds, CS.INFO_TYPE_MCH_APP);
+            foreach (var appId in appIds)
+            {
+                _mchAppRepository.Remove(appId);
+            }
+
+            var sysUsers = _sysUserRepository.GetAll().Where(w => w.BelongInfoId.Equals(request.MchNo) && w.SysType.Equals(CS.SYS_TYPE.MCH));
+            foreach (var sysUser in sysUsers)
+            {
+                var sysUserAuths = _sysUserAuthRepository.GetAll().Where(w => w.UserId.Equals(sysUser.SysUserId));
+                // 删除当前商户用户认证信息
+                foreach (var sysUserAuth in sysUserAuths)
+                {
+                    _sysUserAuthRepository.Remove(sysUserAuth.AuthId);
+                }
+                // 删除当前商户的登录用户
+                _sysUserRepository.Remove(sysUser.SysUserId);
+            }
+
+            // 4.删除当前商户应用信息
+            _mchInfoRepository.Remove(mchInfo.MchNo);
+
+            // 推送mq删除redis用户缓存
+
+            // 推送mq到目前节点进行更新数据
+
+            Commit();
 
             return Task.FromResult(new Unit());
         }

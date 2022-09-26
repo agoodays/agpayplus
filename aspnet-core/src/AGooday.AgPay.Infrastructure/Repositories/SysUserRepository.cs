@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Domain.Interfaces;
+﻿using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public SysUser GetByUserId(long sysUserId, string sysType)
         {
             return DbSet.Where(w => w.SysUserId == sysUserId && w.SysType == sysType).FirstOrDefault();
+        }
+
+        public long FindMchAdminUserId(string mchNo)
+        {
+            return DbSet.Where(w => w.BelongInfoId == mchNo && w.SysType == CS.SYS_TYPE.MCH && w.IsAdmin == CS.YES).First().SysUserId;
         }
 
         public void Remove(SysUser sysUser)

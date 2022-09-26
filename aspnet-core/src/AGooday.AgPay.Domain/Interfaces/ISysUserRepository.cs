@@ -15,5 +15,6 @@ namespace AGooday.AgPay.Domain.Interfaces
         bool IsExist(long sysUserId, string sysType);
         SysUser GetByUserId(long sysUserId, string sysType);
         void Remove(SysUser sysUser);
+        long FindMchAdminUserId(string mchNo);
     }
 }

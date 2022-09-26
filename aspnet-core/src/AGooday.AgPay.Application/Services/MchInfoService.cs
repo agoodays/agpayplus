@@ -1,10 +1,8 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,16 +18,20 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchInfoRepository _mchInfoRepository;
+        private readonly ISysUserRepository _sysUserRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public MchInfoService(IMchInfoRepository mchInfoRepository, IMapper mapper, IMediatorHandler bus)
+        public MchInfoService(IMapper mapper, IMediatorHandler bus, 
+            IMchInfoRepository mchInfoRepository,
+            ISysUserRepository sysUserRepository)
         {
-            _mchInfoRepository = mchInfoRepository;
             _mapper = mapper;
             Bus = bus;
+            _mchInfoRepository = mchInfoRepository;
+            _sysUserRepository = sysUserRepository;
         }
 
         public void Dispose()
@@ -52,8 +54,10 @@ namespace AGooday.AgPay.Application.Services
 
         public void Remove(string recordId)
         {
-            _mchInfoRepository.Remove(recordId);
-            _mchInfoRepository.SaveChanges();
+            //_mchInfoRepository.Remove(recordId);
+            //_mchInfoRepository.SaveChanges();
+            var command = new RemoveMchInfoCommand() { MchNo = recordId };
+            Bus.SendCommand(command);
         }
 
         public void Update(MchInfoDto dto)
@@ -63,10 +67,25 @@ namespace AGooday.AgPay.Application.Services
             _mchInfoRepository.SaveChanges();
         }
 
+        public void Modify(MchInfoModifyDto dto)
+        {
+            var command = _mapper.Map<ModifyMchInfoCommand>(dto);
+            Bus.SendCommand(command);
+        }
+
         public MchInfoDto GetById(string recordId)
         {
             var entity = _mchInfoRepository.GetById(recordId);
             var dto = _mapper.Map<MchInfoDto>(entity);
+            return dto;
+        }
+
+        public MchInfoDetailDto GetByMchNo(string mchNo)
+        {
+            var mchInfo = _mchInfoRepository.GetById(mchNo);
+            var dto = _mapper.Map<MchInfoDetailDto>(mchInfo);
+            var sysUser = _sysUserRepository.GetById(mchInfo.InitUserId.Value);
+            dto.LoginUsername = sysUser.LoginUsername;
             return dto;
         }
 

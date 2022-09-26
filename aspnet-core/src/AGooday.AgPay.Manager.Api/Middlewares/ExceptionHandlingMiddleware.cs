@@ -38,19 +38,19 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                     if (ex.Message.Contains("Invalid token"))
                     {
                         response.StatusCode = (int)HttpStatusCode.Forbidden;
-                        errorResponse.msg = ex.Message;
+                        errorResponse.Msg = ex.Message;
                         break;
                     }
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    errorResponse.msg = ex.Message;
+                    errorResponse.Msg = ex.Message;
                     break;
                 case KeyNotFoundException ex:
                     response.StatusCode = (int)HttpStatusCode.NotFound;
-                    errorResponse.msg = ex.Message;
+                    errorResponse.Msg = ex.Message;
                     break;
                 default:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    errorResponse.msg = "Internal Server errors. Check Logs!";
+                    errorResponse.Msg = "Internal Server errors. Check Logs!";
                     break;
             }
             _logger.LogError(exception.Message);

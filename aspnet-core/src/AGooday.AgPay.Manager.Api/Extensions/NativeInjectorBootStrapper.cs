@@ -74,6 +74,8 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IRequestHandler<ModifySysUserCommand, Unit>, SysUserCommandHandler>();
 
             services.AddScoped<IRequestHandler<CreateMchInfoCommand, Unit>, MchInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<RemoveMchInfoCommand, Unit>, MchInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<ModifyMchInfoCommand, Unit>, MchInfoCommandHandler>();
 
             // 领域层 - Memory缓存
             services.AddSingleton<IMemoryCache>(factory =>

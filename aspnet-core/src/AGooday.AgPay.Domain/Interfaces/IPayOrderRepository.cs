@@ -11,5 +11,6 @@ namespace AGooday.AgPay.Domain.Interfaces
     public interface IPayOrderRepository : IRepository<PayOrder>
     {
         bool IsExistOrderUseIfCode(string ifCode);
+        bool IsExistOrderUseMchNo(string mchNo);
     }
 }

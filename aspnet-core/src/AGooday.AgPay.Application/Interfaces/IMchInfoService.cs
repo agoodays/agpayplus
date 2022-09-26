@@ -13,7 +13,9 @@ namespace AGooday.AgPay.Application.Interfaces
         void Create(MchInfoCreateDto dto);
         void Remove(string recordId);
         void Update(MchInfoDto dto);
+        void Modify(MchInfoModifyDto dto);
         MchInfoDto GetById(string recordId);
+        MchInfoDetailDto GetByMchNo(string mchNo);
         IEnumerable<MchInfoDto> GetAll();
         PaginatedList<MchInfoDto> GetPaginatedData(MchInfoQueryDto dto);
     }

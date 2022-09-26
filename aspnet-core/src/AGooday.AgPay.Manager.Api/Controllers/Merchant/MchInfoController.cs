@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         public ApiRes List([FromQuery] MchInfoQueryDto dto)
         {
             var data = _mchInfoService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
+            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
         /// <summary>
@@ -79,10 +79,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut]
         [Route("{mchNo}")]
-        public ApiRes Update(MchInfoDto dto)
+        public ApiRes Update(MchInfoModifyDto dto)
         {
-            _mchInfoService.Update(dto);
-            return ApiRes.Ok();
+            _mchInfoService.Modify(dto);
+            // 是否存在消息通知
+            if (!_notifications.HasNotifications())
+                return ApiRes.Ok();
+            else
+                return ApiRes.CustomFail(_notifications.GetNotifications().Select(s => s.Value).ToArray());
         }
 
         /// <summary>
@@ -94,7 +98,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [Route("{mchNo}")]
         public ApiRes Detail(string mchNo)
         {
-            var mchInfo = _mchInfoService.GetById(mchNo);
+            var mchInfo = _mchInfoService.GetByMchNo(mchNo);
             if (mchInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

@@ -21,5 +21,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.AsNoTracking().Any(c => c.IfCode.Equals(ifCode));
         }
+
+        public void RemoveByInfoIds(List<string> infoIds, byte infoType)
+        {
+            foreach (string infoId in infoIds)
+            {
+                var entity = DbSet.Where(w => w.InfoId.Equals(infoId)&& w.InfoType.Equals(infoType)).First();
+                Remove(entity.Id);
+            }
+        }
     }
 }

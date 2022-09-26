@@ -10,5 +10,6 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IMchPayPassageRepository : IRepository<MchPayPassage, long>
     {
+        void RemoveByMchNo(string mchNo);
     }
 }

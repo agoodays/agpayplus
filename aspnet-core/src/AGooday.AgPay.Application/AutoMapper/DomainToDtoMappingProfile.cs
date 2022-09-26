@@ -24,7 +24,10 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<MchApp, MchAppDto>();
             CreateMap<MchDivisionReceiverGroup, MchDivisionReceiverGroupDto>();
             CreateMap<MchDivisionReceiver, MchDivisionReceiverDto>();
+
             CreateMap<MchInfo, MchInfoDto>();
+            CreateMap<MchInfo, MchInfoDetailDto>();
+
             CreateMap<MchNotifyRecord, MchNotifyRecordDto>();
             CreateMap<MchPayPassage, MchPayPassageDto>();
             CreateMap<PayInterfaceConfig, PayInterfaceConfigDto>();

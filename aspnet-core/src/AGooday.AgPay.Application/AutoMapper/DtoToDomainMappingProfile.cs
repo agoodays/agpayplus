@@ -28,8 +28,10 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<MchDivisionReceiverDto, MchDivisionReceiver>();
 
             CreateMap<MchInfoDto, MchInfo>();
-            CreateMap<MchInfoCreateDto, MchInfoCommand>();
-            CreateMap<MchInfoCommand, MchInfo>();
+            CreateMap<MchInfoCreateDto, CreateMchInfoCommand>();
+            CreateMap<CreateMchInfoCommand, MchInfo>();
+            CreateMap<MchInfoModifyDto, ModifyMchInfoCommand>();
+            CreateMap<ModifyMchInfoCommand, MchInfo>();
 
             CreateMap<MchNotifyRecordDto, MchNotifyRecord>();
             CreateMap<MchPayPassageDto, MchPayPassage>();
@@ -53,8 +55,8 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysUserRoleRelaDto, SysUserRoleRela>();
 
             CreateMap<SysUserDto, SysUser>();
-            CreateMap<SysUserCreateDto, SysUserCommand>();
-            CreateMap<SysUserCommand, SysUser>();
+            CreateMap<SysUserCreateDto, CreateSysUserCommand>();
+            CreateMap<CreateSysUserCommand, SysUser>();
             CreateMap<SysUserModifyDto, ModifySysUserCommand>();
             CreateMap<ModifySysUserCommand, SysUser>();
 

@@ -11,5 +11,6 @@ namespace AGooday.AgPay.Domain.Interfaces
     public interface IPayInterfaceConfigRepository : IRepository<PayInterfaceConfig, long>
     {
         bool IsExistUseIfCode(string ifCode);
+        void RemoveByInfoIds(List<string> infoIds, byte infoType);
     }
 }

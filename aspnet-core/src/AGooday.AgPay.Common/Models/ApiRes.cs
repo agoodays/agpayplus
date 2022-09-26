@@ -11,29 +11,29 @@ namespace AGooday.AgPay.Common.Models
         /// <summary>
         /// 业务响应码
         /// </summary>
-        public int code { get; set; }
+        public int Code { get; set; }
 
         /// <summary>
         /// 业务响应信息
         /// </summary>
-        public string msg { get; set; }
+        public string Msg { get; set; }
 
         /// <summary>
         /// 数据对象
         /// </summary>
-        public object data { get; set; }
+        public object Data { get; set; }
 
         /// <summary>
         /// 签名值
         /// </summary>
-        public string sign { get; set; }
+        public string Sign { get; set; }
 
         public ApiRes(int code, string msg, object data, string sign)
         {
-            this.code = code;
-            this.msg = msg;
-            this.data = data;
-            this.sign = sign;
+            this.Code = code;
+            this.Msg = msg;
+            this.Data = data;
+            this.Sign = sign;
         }
 
         /// <summary>

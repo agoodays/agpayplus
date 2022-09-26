@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         public ApiRes List([FromQuery] SysRoleEntRelaQueryDto dto)
         {
             var data = _sysRoleEntRelaService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { records = data.ToList(), total = data.TotalCount, current = data.PageIndex, hasNext = data.HasNext });
+            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
         [HttpPost]

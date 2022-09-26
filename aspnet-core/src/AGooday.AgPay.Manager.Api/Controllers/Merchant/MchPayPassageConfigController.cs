@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                     }
                 }
             }
-            return ApiRes.Ok(new { records = payWays.ToList(), total = payWays.TotalCount, current = payWays.PageIndex, hasNext = payWays.HasNext });
+            return ApiRes.Ok(new { Records = payWays.ToList(), Total = payWays.TotalCount, Current = payWays.PageIndex, HasNext = payWays.HasNext });
         }
 
         /// <summary>
