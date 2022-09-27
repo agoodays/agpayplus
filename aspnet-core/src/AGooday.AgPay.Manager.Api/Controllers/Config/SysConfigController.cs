@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Config
 {
@@ -24,10 +25,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         [HttpPut, Route("update/{groupKey}")]
         public ApiRes Update(string groupKey, Dictionary<string, string> configs)
         {
-            foreach (var config in configs)
+            //foreach (var config in configs)
+            //{
+            //    _sysConfigService.SaveOrUpdate(new SysConfigDto() { ConfigKey = config.Key, ConfigVal = config.Value });
+            //}
+            int update = _sysConfigService.UpdateByConfigKey(configs);
+            if (update <= 0)
             {
-                _sysConfigService.SaveOrUpdate(new SysConfigDto() { ConfigKey = config.Key, ConfigVal = config.Value });
+                return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");
             }
+            // 异步更新到MQ
+
             return ApiRes.Ok();
         }
     }

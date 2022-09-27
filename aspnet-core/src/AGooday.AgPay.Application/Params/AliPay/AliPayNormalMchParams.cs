@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.Params.AliPay
 {
+    /// <summary>
+    /// 支付宝 普通商户参数定义
+    /// </summary>
     public class AliPayNormalMchParams : NormalMchParams
     {
         /** 是否沙箱环境 */

@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoType"></param>
         /// <param name="infoId"></param>
         /// <returns></returns>
-        public List<PayInterfaceConfigDto> SelectAllPayIfConfigListByIsvNo(byte infoType, string infoId)
+        public List<PayInterfaceDefineDto> SelectAllPayIfConfigListByIsvNo(byte infoType, string infoId)
         {
             // 支付定义列表
             var defineList = _payInterfaceDefineRepository.GetAll().Where(w => w.IsIsvMode.Equals(CS.YES) && w.State.Equals(CS.YES));
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Application.Services
 
             var result = defineList.ToList().Select(s =>
             {
-                var entity = _mapper.Map<PayInterfaceConfigDto>(s);
+                var entity = _mapper.Map<PayInterfaceDefineDto>(s);
                 entity.IfConfigState = configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
                 return entity;
             }).ToList();
@@ -119,7 +119,7 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public List<PayInterfaceConfigDto> SelectAllPayIfConfigListByAppId(string appId)
+        public List<PayInterfaceDefineDto> SelectAllPayIfConfigListByAppId(string appId)
         {
             MchApp mchApp = _mchAppRepository.GetById(appId);
             if (mchApp == null || mchApp.State != CS.YES)
@@ -146,9 +146,9 @@ namespace AGooday.AgPay.Application.Services
 
                 foreach (var isvConfig in isvConfigList)
                 {
-                    var entity = _mapper.Map<PayInterfaceConfigDto>(isvConfig);
-                    entity.MchType = mchInfo.Type;
-                    isvPayConfigMap.Add(entity.IfCode, entity);
+                    var config = _mapper.Map<PayInterfaceConfigDto>(isvConfig);
+                    config.MchType = mchInfo.Type;
+                    isvPayConfigMap.Add(config.IfCode, config);
                 }
             }
 
@@ -158,7 +158,7 @@ namespace AGooday.AgPay.Application.Services
 
             var result = defineList.ToList().Select(define =>
             {
-                var entity = _mapper.Map<PayInterfaceConfigDto>(define);
+                var entity = _mapper.Map<PayInterfaceDefineDto>(define);
                 entity.MchType = mchInfo.Type;// 所属商户类型
                 entity.IfConfigState = configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
                 entity.SubMchIsvConfig = mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.TryGetValue(define.IfCode, out _) ? CS.NO : null;
@@ -166,6 +166,17 @@ namespace AGooday.AgPay.Application.Services
             }).ToList();
 
             return result;
+        }
+
+        /// <summary>
+        /// 查询商户app使用已正确配置了通道信息
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
+        public bool MchAppHasAvailableIfCode(string appId, string ifCode)
+        {
+            return _payInterfaceConfigRepository.MchAppHasAvailableIfCode(appId, ifCode);
         }
     }
 }

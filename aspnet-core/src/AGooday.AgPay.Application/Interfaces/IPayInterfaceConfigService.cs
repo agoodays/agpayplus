@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Application.Interfaces
         PayInterfaceConfigDto GetById(long recordId);
         IEnumerable<PayInterfaceConfigDto> GetAll();
         bool IsExistUseIfCode(string ifCode);
-        List<PayInterfaceConfigDto> SelectAllPayIfConfigListByIsvNo(byte infoType, string infoId);
+        List<PayInterfaceDefineDto> SelectAllPayIfConfigListByIsvNo(byte infoType, string infoId);
         /// <summary>
         /// 根据 账户类型、账户号、接口类型 获取支付参数配置
         /// </summary>
@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="infoId">账户号</param>
         /// <param name="ifCode">接口类型</param>
         /// <returns></returns>
-        List<PayInterfaceConfigDto> SelectAllPayIfConfigListByAppId(string appId);
+        List<PayInterfaceDefineDto> SelectAllPayIfConfigListByAppId(string appId);
         /// <summary>
         /// 根据 账户类型、账户号 获取支付参数配置列表
         /// </summary>

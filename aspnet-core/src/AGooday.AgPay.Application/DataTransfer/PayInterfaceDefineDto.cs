@@ -85,5 +85,20 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 更新时间
         /// </summary>
         public DateTime UpdatedAt { get; set; }
+
+        /// <summary>
+        /// 类型: 1-普通商户, 2-特约商户(服务商模式)
+        /// </summary>
+        public byte? MchType { get; set; }
+
+        /// <summary>
+        /// 配置状态: 0-停用, 1-启用
+        /// </summary>
+        public byte? IfConfigState { get; set; }
+
+        /// <summary>
+        /// 特约商户，服务商支付参数的配置状态，0表示未配置
+        /// </summary>
+        public byte? SubMchIsvConfig { get; set; }
     }
 }

@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Application.Params;
+using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Domain.Models;
+using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -15,22 +18,29 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     /// </summary>
     [Route("/api/mch/payConfigs")]
     [ApiController]
-    public class MchPayInterfaceConfigController : ControllerBase
+    public class MchPayInterfaceConfigController : CommonController
     {
         private readonly ILogger<MchPayInterfaceConfigController> _logger;
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
+        private readonly ISysConfigService _sysConfigService;
 
-        public MchPayInterfaceConfigController(ILogger<MchPayInterfaceConfigController> logger,
+        public MchPayInterfaceConfigController(ILogger<MchPayInterfaceConfigController> logger, RedisUtil client,
             IPayInterfaceConfigService payIfConfigService,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService)
+            IMchInfoService mchInfoService,
+            ISysUserService sysUserService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService,
+            ISysConfigService sysConfigService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             _logger = logger;
             _payIfConfigService = payIfConfigService;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
+            _sysConfigService = sysConfigService;
         }
 
         /// <summary>
@@ -91,6 +101,36 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [Route("")]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
+            var mchApp = _mchAppService.GetById(dto.InfoId);
+            if (mchApp == null || mchApp.State != CS.YES)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            dto.InfoType = CS.INFO_TYPE_MCH_APP;
+            dto.IfRate = dto.IfRate / 100;// 存入真实费率
+            //添加更新者信息
+            long userId = GetCurrentUser().User.SysUserId;
+            string realName = GetCurrentUser().User.Realname;
+            dto.UpdatedUid = userId;
+            dto.UpdatedBy = realName;
+
+            //根据 商户号、接口类型 获取商户参数配置
+            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_MCH_APP, dto.InfoId, dto.IfCode);
+            //若配置存在，为saveOrUpdate添加ID，第一次配置添加创建者
+            if (dbRecoed != null)
+            {
+                dto.Id = dbRecoed.Id;
+                _payIfConfigService.Update(dto);
+            }
+            else
+            {
+                dto.CreatedUid = userId;
+                dto.CreatedBy = realName;
+                _payIfConfigService.Add(dto);
+            }
+
+            // 推送mq到目前节点进行更新数据
+
             return ApiRes.Ok();
         }
 
@@ -98,7 +138,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [Route("alipayIsvsubMchAuthUrls/{mchAppId}")]
         public ApiRes QueryAlipayIsvsubMchAuthUrl(string mchAppId)
         {
-            return ApiRes.Ok(new { authUrl = "", authQrImgUrl = "" });
+            var mchApp = _mchAppService.GetById(mchAppId);
+            var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+            var dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+            string authUrl = dbApplicationConfig.GenAlipayIsvsubMchAuthUrl(mchInfo.IsvNo, mchAppId);
+            string authQrImgUrl = dbApplicationConfig.GenScanImgUrl(authUrl);
+            return ApiRes.Ok(new { AuthUrl = authUrl, AuthQrImgUrl = authQrImgUrl });
         }
     }
 }

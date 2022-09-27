@@ -9,57 +9,60 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.Params.WxPay
 {
+    /// <summary>
+    /// 微信官方支付 配置参数
+    /// </summary>
     public class WxPayNormalMchParams : NormalMchParams
     {
         /**
          * 应用App ID
          */
-        public string appId{get;set;}
+        public string appId { get; set; }
 
         /**
          * 应用AppSecret
          */
-        public string appSecret{get;set;}
+        public string appSecret { get; set; }
 
         /**
          * 微信支付商户号
          */
-        public string mchId{get;set;}
+        public string mchId { get; set; }
 
         /**
          * oauth2地址
          */
-        public string oauth2Url{get;set;}
+        public string oauth2Url { get; set; }
 
         /**
          * API密钥
          */
-        public string key{get;set;}
+        public string key { get; set; }
 
         /**
          * 微信支付API版本
          **/
-        public string apiVersion{get;set;}
+        public string apiVersion { get; set; }
 
         /**
          * API V3秘钥
          **/
-        public string apiV3Key{get;set;}
+        public string apiV3Key { get; set; }
 
         /**
          * 序列号
          **/
-        public string serialNo{get;set;}
+        public string serialNo { get; set; }
 
         /**
          * API证书(.p12格式)
          **/
-        public string cert{get;set;}
+        public string cert { get; set; }
 
         /**
          * 私钥文件(.pem格式)
          **/
-        public string apiClientKey{get;set;}
+        public string apiClientKey { get; set; }
 
         public override string DeSenData()
         {

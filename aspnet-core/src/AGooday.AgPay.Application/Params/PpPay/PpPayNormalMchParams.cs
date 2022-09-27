@@ -13,29 +13,29 @@ namespace AGooday.AgPay.Application.Params.PpPay
         /**
          * 是否沙箱环境
          */
-        private byte sandbox { get; set; }
+        public byte sandbox { get; set; }
 
         /**
          * clientId
          * 客户端 ID
          */
-        private string clientId { get; set; }
+        public string clientId { get; set; }
 
         /**
          * secret
          * 密钥
          */
-        private string secret { get; set; }
+        public string secret { get; set; }
 
         /**
          * 支付 Webhook 通知 ID
          */
-        private string notifyWebhook { get; set; }
+        public string notifyWebhook { get; set; }
 
         /**
          * 退款 Webhook 通知 ID
          */
-        private string refundWebhook { get; set; }
+        public string refundWebhook { get; set; }
 
         public override string DeSenData()
         {
