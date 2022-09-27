@@ -28,10 +28,6 @@ namespace AGooday.AgPay.Application.Params
             {
                 return JsonConvert.DeserializeObject<AliPayNormalMchParams>(paramsStr);
             }
-            else if (CS.IF_CODE.YSFPAY.Equals(ifCode))
-            {
-                return JsonConvert.DeserializeObject<AliPayNormalMchParams>(paramsStr);
-            }
             else if (CS.IF_CODE.XXPAY.Equals(ifCode))
             {
                 return JsonConvert.DeserializeObject<XxPayNormalMchParams>(paramsStr);
