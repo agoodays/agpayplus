@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                     }
                 }
             }
-            return ApiRes.Ok();
+            return ApiRes.Ok(payInterfaceConfig);
         }
 
         /// <summary>

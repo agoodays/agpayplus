@@ -11,10 +11,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using AGooday.AgPay.Common.Enumerator;
 
 namespace AGooday.AgPay.Application.Services
 {
-    public class MchNotifyRecordService: IMchNotifyRecordService
+    public class MchNotifyRecordService : IMchNotifyRecordService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchNotifyRecordRepository _mchNotifyRecordRepository;
@@ -66,6 +68,30 @@ namespace AGooday.AgPay.Application.Services
         {
             var mchNotifyRecords = _mchNotifyRecordRepository.GetAll();
             return _mapper.Map<IEnumerable<MchNotifyRecordDto>>(mchNotifyRecords);
+        }
+        public PaginatedList<MchNotifyRecordDto> GetPaginatedData(MchNotifyQueryDto dto)
+        {
+            var mchInfos = _mchNotifyRecordRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                && (string.IsNullOrWhiteSpace(dto.OrderId) || w.OrderId.Equals(dto.OrderId))
+                && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
+                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+                && (dto.OrderType.Equals(0) || w.OrderType.Equals(dto.OrderType))
+                && (dto.State.Equals(0) || w.State.Equals(dto.State))
+                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd))
+                .OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<MchNotifyRecord>.Create<MchNotifyRecordDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            return records;
+        }
+        public void UpdateIngAndAddNotifyCountLimit(long notifyId)
+        {
+            var notify = _mchNotifyRecordRepository.GetById(notifyId);
+            notify.NotifyCountLimit += 1;
+            notify.State = (byte)MchNotifyRecordState.STATE_ING;
+            _mchNotifyRecordRepository.Update(notify);
+            _mchNotifyRecordRepository.SaveChanges();
         }
     }
 }

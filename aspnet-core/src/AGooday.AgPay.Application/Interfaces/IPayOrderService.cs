@@ -16,5 +16,6 @@ namespace AGooday.AgPay.Application.Interfaces
         IEnumerable<PayOrderDto> GetAll();
         bool IsExistOrderUseIfCode(string ifCode);
         bool IsExistOrderUseWayCode(string wayCode);
+        PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto);
     }
 }

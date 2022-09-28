@@ -53,10 +53,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         [Route("")]
         public ApiRes Add(IsvInfoDto dto)
         {
-            do
-            {
-                dto.IsvNo = $"V{DateTimeOffset.Now.ToUnixTimeSeconds()}";
-            } while (_isvInfoService.IsExistIsvNo(dto.IsvNo));
             dto.CreatedUid = GetCurrentUser().User.SysUserId;
             dto.CreatedBy = GetCurrentUser().User.Realname;
             var result = _isvInfoService.Add(dto);

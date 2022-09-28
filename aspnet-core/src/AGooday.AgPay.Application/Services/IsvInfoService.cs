@@ -38,6 +38,10 @@ namespace AGooday.AgPay.Application.Services
 
         public bool Add(IsvInfoDto dto)
         {
+            do
+            {
+                dto.IsvNo = $"V{DateTimeOffset.Now.ToUnixTimeSeconds()}";
+            } while (IsExistIsvNo(dto.IsvNo));
             var m = _mapper.Map<IsvInfo>(dto);
             _isvInfoRepository.Add(m);
             return _isvInfoRepository.SaveChanges() > 0;

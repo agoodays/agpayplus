@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -66,6 +67,30 @@ namespace AGooday.AgPay.Application.Services
         {
             var payOrders = _payOrderRepository.GetAll();
             return _mapper.Map<IEnumerable<PayOrderDto>>(payOrders);
+        }
+
+        /// <summary>
+        /// 通用列表查询条件
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto)
+        {
+            var mchInfos = _payOrderRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                && (dto.MchType.Equals(0) || w.MchType.Equals(dto.MchType))
+                && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
+                && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
+                && (dto.State.Equals(null) || w.State.Equals(dto.State))
+                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+                && (dto.DivisionState.Equals(null) || w.DivisionState.Equals(dto.DivisionState))
+                && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
+                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
+                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                ).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<PayOrder>.Create<PayOrderDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            return records;
         }
 
         public bool IsExistOrderUseIfCode(string ifCode)

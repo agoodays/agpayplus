@@ -27,8 +27,4 @@
     <ProjectReference Include="..\AGooday.AgPay.Application\AGooday.AgPay.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\Order\" />
-  </ItemGroup>
-
 </Project>

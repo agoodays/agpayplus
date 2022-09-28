@@ -13,6 +13,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
     {
         private readonly ISysConfigService _sysConfigService;
 
+        /// <summary>
+        /// 分组下的配置
+        /// </summary>
+        /// <param name="groupKey"></param>
+        /// <returns></returns>
         [HttpGet, Route("{groupKey}")]
         public ApiRes GetConfigs(string groupKey)
         {
@@ -22,7 +27,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
             return ApiRes.Ok(configList);
         }
 
-        [HttpPut, Route("update/{groupKey}")]
+        /// <summary>
+        /// 系统配置修改
+        /// </summary>
+        /// <param name="groupKey"></param>
+        /// <param name="configs"></param>
+        /// <returns></returns>
+        [HttpPut, Route("{groupKey}")]
         public ApiRes Update(string groupKey, Dictionary<string, string> configs)
         {
             //foreach (var config in configs)
@@ -37,6 +48,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
             // 异步更新到MQ
 
             return ApiRes.Ok();
+        }
+
+        public void UpdateSysConfigMQ(string groupKey) { 
+        
         }
     }
 }

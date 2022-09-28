@@ -14,5 +14,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(MchNotifyRecordDto dto);
         MchNotifyRecordDto GetById(long recordId);
         IEnumerable<MchNotifyRecordDto> GetAll();
+        PaginatedList<MchNotifyRecordDto> GetPaginatedData(MchNotifyQueryDto dto);
+        void UpdateIngAndAddNotifyCountLimit(long notifyId);
     }
 }

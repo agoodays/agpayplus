@@ -42,8 +42,12 @@ namespace AGooday.AgPay.Application
         public static PaginatedList<TSource> Create(IQueryable<TSource> source, int pageIndex, int pageSize)
         {
             var count = source.Count();
-            var records = source.Skip((pageIndex - 1) * pageSize)
-                .Take(pageSize).ToList();
+            if (pageIndex > 0)
+            {
+                source = source.Skip((pageIndex - 1) * pageSize)
+                   .Take(pageSize);
+            }
+            var records = source.ToList();
             return new PaginatedList<TSource>(records, count, pageIndex, pageSize);
         }
 

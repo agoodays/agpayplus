@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Application.Services
         public PaginatedList<T> GetPaginatedData<T>(PayWayQueryDto dto)
         {
             var sysLogs = _payWayRepository.GetAll()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Contains(dto.WayCode))
+                .Where(w => (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
                 && (string.IsNullOrWhiteSpace(dto.WayName) || w.WayName.Contains(dto.WayName))
                 ).OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayWay>.Create<T>(sysLogs.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
