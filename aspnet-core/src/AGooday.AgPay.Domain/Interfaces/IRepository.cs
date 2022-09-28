@@ -45,6 +45,12 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="id"></param>
         void Remove(TPrimaryKey id);
         /// <summary>
+        /// 保存或更新
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="id"></param>
+        void SaveOrUpdate(TEntity obj, TPrimaryKey? id);
+        /// <summary>
         /// 保存
         /// </summary>
         /// <returns></returns>
@@ -83,6 +89,13 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <param name="id"></param>
         void Remove<TPrimaryKey>(TPrimaryKey id);
+        /// <summary>
+        /// 保存或更新
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="obj"></param>
+        /// <param name="id"></param>
+        void SaveOrUpdate<TPrimaryKey>(TEntity obj, TPrimaryKey id);
         /// <summary>
         /// 保存
         /// </summary>

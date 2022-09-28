@@ -26,5 +26,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.AsNoTracking().Any(c => c.MchNo.Equals(mchNo));
         }
+
+        public bool IsExistOrderUseWayCode(string wayCode)
+        {
+            return DbSet.AsNoTracking().Any(c => c.WayCode.Equals(wayCode));
+        }
     }
 }

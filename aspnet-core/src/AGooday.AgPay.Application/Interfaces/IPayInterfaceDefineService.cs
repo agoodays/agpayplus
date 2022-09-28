@@ -9,9 +9,9 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IPayInterfaceDefineService : IDisposable
     {
-        void Add(PayInterfaceDefineDto dto);
-        void Remove(string recordId);
-        void Update(PayInterfaceDefineDto dto);
+        bool Add(PayInterfaceDefineDto dto);
+        bool Remove(string recordId);
+        bool Update(PayInterfaceDefineDto dto);
         PayInterfaceDefineDto GetById(string recordId);
         IEnumerable<PayInterfaceDefineDto> GetAll();
     }

@@ -83,6 +83,14 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 
+        /// <summary>
+        /// 根据支付方式查询可用的支付接口列表
+        /// </summary>
+        /// <param name="wayCode"></param>
+        /// <param name="appId"></param>
+        /// <param name="infoType"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, byte infoType, byte type)
         {
             var result = _payInterfaceDefineRepository.GetAll().Join(_payInterfaceConfigRepository.GetAll(),
@@ -134,9 +142,31 @@ namespace AGooday.AgPay.Application.Services
                 payPassage.Rate = payPassage.Rate / 100;
 
                 var m = _mapper.Map<MchPayPassage>(payPassage);
-                _mchPayPassageRepository.Add(obj: m);
+                _mchPayPassageRepository.SaveOrUpdate(m, payPassage.Id);
             }
             _mchPayPassageRepository.SaveChanges();
+        }
+
+        /// <summary>
+        /// 根据应用ID 和 支付方式， 查询出商户可用的支付接口
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="appId"></param>
+        /// <param name="wayCode"></param>
+        /// <returns></returns>
+        public MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode)
+        {
+            var entity = _mchPayPassageRepository.GetAll().Where(w => w.State.Equals(CS.YES)
+            && w.MchNo.Equals(mchNo)
+            && w.AppId.Equals(appId)
+            && w.WayCode.Equals(wayCode)).First();
+            var dto = _mapper.Map<MchPayPassageDto>(entity);
+            return dto;
+        }
+
+        public bool IsExistMchPayPassageUseWayCode(string wayCode)
+        {
+            return _mchPayPassageRepository.IsExistMchPayPassageUseWayCode(wayCode);
         }
     }
 }

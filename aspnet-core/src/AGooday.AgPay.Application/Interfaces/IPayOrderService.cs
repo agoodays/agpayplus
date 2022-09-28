@@ -15,5 +15,6 @@ namespace AGooday.AgPay.Application.Interfaces
         PayOrderDto GetById(string recordId);
         IEnumerable<PayOrderDto> GetAll();
         bool IsExistOrderUseIfCode(string ifCode);
+        bool IsExistOrderUseWayCode(string wayCode);
     }
 }

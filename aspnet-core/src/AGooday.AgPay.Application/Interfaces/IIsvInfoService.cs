@@ -9,11 +9,12 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IIsvInfoService : IDisposable
     {
-        void Add(IsvInfoDto dto);
-        void Remove(string recordId);
-        void Update(IsvInfoDto dto);
+        bool Add(IsvInfoDto dto);
+        bool Remove(string recordId);
+        bool Update(IsvInfoDto dto);
         IsvInfoDto GetById(string recordId);
         IEnumerable<IsvInfoDto> GetAll();
         PaginatedList<IsvInfoDto> GetPaginatedData(IsvInfoQueryDto dto);
+        bool IsExistIsvNo(string isvNo);
     }
 }

@@ -36,24 +36,24 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(IsvInfoDto dto)
+        public bool Add(IsvInfoDto dto)
         {
             var m = _mapper.Map<IsvInfo>(dto);
             _isvInfoRepository.Add(m);
-            _isvInfoRepository.SaveChanges();
+            return _isvInfoRepository.SaveChanges() > 0;
         }
 
-        public void Remove(string recordId)
+        public bool Remove(string recordId)
         {
             _isvInfoRepository.Remove(recordId);
-            _isvInfoRepository.SaveChanges();
+            return _isvInfoRepository.SaveChanges() > 0;
         }
 
-        public void Update(IsvInfoDto dto)
+        public bool Update(IsvInfoDto dto)
         {
             var m = _mapper.Map<IsvInfo>(dto);
             _isvInfoRepository.Update(m);
-            _isvInfoRepository.SaveChanges();
+            return _isvInfoRepository.SaveChanges() > 0;
         }
 
         public IsvInfoDto GetById(string recordId)
@@ -78,6 +78,10 @@ namespace AGooday.AgPay.Application.Services
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
+        }
+        public bool IsExistIsvNo(string isvNo)
+        {
+            return _isvInfoRepository.IsExistIsvNo(isvNo);
         }
     }
 }

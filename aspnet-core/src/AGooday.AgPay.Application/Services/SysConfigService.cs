@@ -131,17 +131,8 @@ namespace AGooday.AgPay.Application.Services
 
         public bool SaveOrUpdate(SysConfigDto dto)
         {
-            var m = _sysConfigRepository.GetById(dto.ConfigKey);
-            if (m == null)
-            {
-                var config = _mapper.Map<SysConfig>(dto);
-                _sysConfigRepository.Add(config);
-            }
-            else
-            {
-                m.ConfigVal = dto.ConfigVal;
-                _sysConfigRepository.Update(m);
-            }
+            var config = _mapper.Map<SysConfig>(dto);
+            _sysConfigRepository.SaveOrUpdate(config, dto.ConfigKey);
             return _sysConfigRepository.SaveChanges() > 0;
         }
 

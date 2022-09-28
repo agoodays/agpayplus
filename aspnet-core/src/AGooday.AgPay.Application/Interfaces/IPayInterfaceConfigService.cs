@@ -12,6 +12,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Add(PayInterfaceConfigDto dto);
         void Remove(long recordId);
         void Update(PayInterfaceConfigDto dto);
+        bool SaveOrUpdate(PayInterfaceConfigDto dto);
         PayInterfaceConfigDto GetById(long recordId);
         IEnumerable<PayInterfaceConfigDto> GetAll();
         bool IsExistUseIfCode(string ifCode);

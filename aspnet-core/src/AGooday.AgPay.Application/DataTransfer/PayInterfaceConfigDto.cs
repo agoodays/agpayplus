@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// ID
         /// </summary>
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// 账号类型:1-服务商 2-商户

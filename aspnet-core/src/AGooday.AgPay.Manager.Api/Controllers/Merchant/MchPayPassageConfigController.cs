@@ -90,6 +90,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
+            // 根据支付方式查询可用支付接口列表
             var result = _mchPayPassageService.SelectAvailablePayInterfaceList(wayCode, appId, CS.INFO_TYPE_MCH_APP, mchInfo.Type);
             return ApiRes.Ok(result);
         }

@@ -12,5 +12,6 @@ namespace AGooday.AgPay.Domain.Interfaces
     {
         bool IsExistOrderUseIfCode(string ifCode);
         bool IsExistOrderUseMchNo(string mchNo);
+        bool IsExistOrderUseWayCode(string wayCode);
     }
 }

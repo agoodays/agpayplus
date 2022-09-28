@@ -80,6 +80,18 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             DbSet.Remove(DbSet.Find(id));
         }
         /// <summary>
+        /// 保存或更新
+        /// </summary>
+        /// <returns></returns>
+        public virtual void SaveOrUpdate(TEntity obj, TPrimaryKey? id)
+        {
+            var entity = DbSet.Find(id);
+            if (id != null && entity != null)
+                Update(obj);
+            else
+                Add(obj);
+        }
+        /// <summary>
         /// 保存
         /// </summary>
         /// <returns></returns>
@@ -158,6 +170,18 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public virtual void Remove<TPrimaryKey>(TPrimaryKey id)
         {
             DbSet.Remove(DbSet.Find(id));
+        }
+        /// <summary>
+        /// 保存或更新
+        /// </summary>
+        /// <returns></returns>
+        public virtual void SaveOrUpdate<TPrimaryKey>(TEntity obj, TPrimaryKey id)
+        {
+            var entity = DbSet.Find(id);
+            if (id != null && entity != null)
+                Update(obj);
+            else
+                Add(obj);
         }
         /// <summary>
         /// 保存

@@ -64,6 +64,13 @@ namespace AGooday.AgPay.Application.Services
             _payInterfaceConfigRepository.SaveChanges();
         }
 
+        public bool SaveOrUpdate(PayInterfaceConfigDto dto)
+        {
+            var m = _mapper.Map<PayInterfaceConfig>(dto);
+            _payInterfaceConfigRepository.SaveOrUpdate(m, dto.Id);
+            return _payInterfaceConfigRepository.SaveChanges() > 0;
+        }
+
         public PayInterfaceConfigDto GetById(long recordId)
         {
             var entity = _payInterfaceConfigRepository.GetById(recordId);

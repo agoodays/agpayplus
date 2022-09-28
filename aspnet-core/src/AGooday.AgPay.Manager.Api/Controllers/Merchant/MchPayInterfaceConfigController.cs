@@ -120,13 +120,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             if (dbRecoed != null)
             {
                 dto.Id = dbRecoed.Id;
-                _payIfConfigService.Update(dto);
             }
             else
             {
                 dto.CreatedUid = userId;
                 dto.CreatedBy = realName;
-                _payIfConfigService.Add(dto);
+            }
+
+            var result= _payIfConfigService.SaveOrUpdate(dto);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "配置失败");
             }
 
             // 推送mq到目前节点进行更新数据

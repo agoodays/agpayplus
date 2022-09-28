@@ -53,7 +53,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [Route("")]
         public ApiRes Add(PayInterfaceDefineDto dto)
         {
-            _payIfDefineService.Add(dto);
+            var result = _payIfDefineService.Add(dto);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
+            }
             return ApiRes.Ok();
         }
 
@@ -72,7 +76,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             {
                 throw new BizException("该支付接口已有服务商或商户配置参数或已发生交易，无法删除！");
             }
-            _payIfDefineService.Remove(ifCode);
+            var result = _payIfDefineService.Remove(ifCode);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_DELETE);
+            }
             return ApiRes.Ok();
         }
 
@@ -85,7 +93,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [Route("{ifCode}")]
         public ApiRes Update(PayInterfaceDefineDto dto)
         {
-            _payIfDefineService.Update(dto);
+            var result = _payIfDefineService.Update(dto);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
+            }
             return ApiRes.Ok();
         }
 

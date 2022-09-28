@@ -16,5 +16,9 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
+        public bool IsExistIsvNo(string isvNo)
+        {
+            return DbSet.AsNoTracking().Any(c => c.IsvNo.Equals(isvNo));
+        }
     }
 }

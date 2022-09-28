@@ -17,6 +17,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
+        public bool IsExistMchPayPassageUseWayCode(string wayCode)
+        {
+            return DbSet.AsNoTracking().Any(c => c.WayCode.Equals(wayCode));
+        }
+
         public void RemoveByMchNo(string mchNo)
         {
             var mchPayPassages = DbSet.Where(w => w.MchNo.Equals(mchNo));

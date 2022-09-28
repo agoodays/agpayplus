@@ -20,11 +20,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
     {
         private readonly ILogger<PayWayController> _logger;
         private readonly IPayWayService _payWayService;
+        private readonly IMchPayPassageService _mchPayPassageService;
+        private readonly IPayOrderService _payOrderService;
 
-        public PayWayController(ILogger<PayWayController> logger, IPayWayService payWayService)
+        public PayWayController(ILogger<PayWayController> logger,
+            IPayWayService payWayService,
+            IMchPayPassageService mchPayPassageService,
+            IPayOrderService payOrderService)
         {
             _logger = logger;
             _payWayService = payWayService;
+            _mchPayPassageService = mchPayPassageService;
+            _payOrderService = payOrderService;
         }
 
         /// <summary>
@@ -71,6 +78,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [Route("{wayCode}")]
         public ApiRes Delete(string wayCode)
         {
+            // 校验该支付方式是否有商户已配置通道或者已有订单
+            if (_mchPayPassageService.IsExistMchPayPassageUseWayCode(wayCode)
+                || _payOrderService.IsExistOrderUseWayCode(wayCode))
+            {
+                throw new BizException("该支付方式已有商户配置通道或已发生交易，无法删除！");
+            }
+
             bool result = _payWayService.Remove(wayCode);
             if (!result)
             {
@@ -88,7 +102,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [Route("{wayCode}")]
         public ApiRes Update(PayWayDto dto)
         {
-            _payWayService.Update(dto);
             bool result = _payWayService.Update(dto);
             if (!result)
             {

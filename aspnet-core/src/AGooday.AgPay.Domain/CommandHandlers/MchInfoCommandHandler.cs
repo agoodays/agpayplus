@@ -16,7 +16,6 @@ using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -170,13 +169,11 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             #region 插入商户默认应用
             // 插入商户默认应用
-            var hmac = new HMACSHA256();
-            var key = Convert.ToBase64String(hmac.Key);
             MchApp mchApp = new MchApp();
             mchApp.AppId = Guid.NewGuid().ToString("N").Substring(0, 24);
             mchApp.MchNo = mchInfo.MchNo;
             mchApp.AppName = "默认应用";
-            mchApp.AppSecret = key;
+            mchApp.AppSecret = RandomUtil.RandomString(128);
             mchApp.State = CS.YES;
             mchApp.CreatedBy = sysUser.Realname;
             mchApp.CreatedUid = sysUser.SysUserId;
@@ -248,7 +245,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             return Task.FromResult(new Unit());
         }
 
-        Task<Unit> IRequestHandler<RemoveMchInfoCommand, Unit>.Handle(RemoveMchInfoCommand request, CancellationToken cancellationToken)
+        public Task<Unit> Handle(RemoveMchInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())

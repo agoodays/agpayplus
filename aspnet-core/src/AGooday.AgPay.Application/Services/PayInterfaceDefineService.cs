@@ -35,24 +35,24 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(PayInterfaceDefineDto dto)
+        public bool Add(PayInterfaceDefineDto dto)
         {
             var m = _mapper.Map<PayInterfaceDefine>(dto);
             _payInterfaceDefineRepository.Add(m);
-            _payInterfaceDefineRepository.SaveChanges();
+            return _payInterfaceDefineRepository.SaveChanges() > 0;
         }
 
-        public void Remove(string recordId)
+        public bool Remove(string recordId)
         {
             _payInterfaceDefineRepository.Remove(recordId);
-            _payInterfaceDefineRepository.SaveChanges();
+            return _payInterfaceDefineRepository.SaveChanges() > 0;
         }
 
-        public void Update(PayInterfaceDefineDto dto)
+        public bool Update(PayInterfaceDefineDto dto)
         {
             var m = _mapper.Map<PayInterfaceDefine>(dto);
             _payInterfaceDefineRepository.Update(m);
-            _payInterfaceDefineRepository.SaveChanges();
+            return _payInterfaceDefineRepository.SaveChanges() > 0;
         }
 
         public PayInterfaceDefineDto GetById(string recordId)
