@@ -115,6 +115,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             model.RefundAmount = refundAmount;
             model.RefundReason = refundReason;
             model.Currency = "CNY";
+            request.SetBizModel(model);
 
             var mchApp = _mchAppService.GetById(payOrder.AppId);
 

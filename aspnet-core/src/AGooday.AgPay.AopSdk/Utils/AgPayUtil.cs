@@ -15,7 +15,7 @@ namespace AGooday.AgPay.AopSdk.Utils
         /// <param name="param"></param>
         /// <param name="key">商户秘钥</param>
         /// <returns></returns>
-        public static string GetSign(JObject param, string key)
+        public static string GetSign(Dictionary<string, object> @params, string key)
         {
             return string.Empty;
         }

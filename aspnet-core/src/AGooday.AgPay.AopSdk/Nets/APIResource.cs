@@ -15,6 +15,8 @@ namespace AGooday.AgPay.AopSdk.Nets
     /// </summary>
     public abstract class APIResource
     {
+        public const string CHARSET = "utf-8";
+
         public enum RequestMethod
         {
             GET,
@@ -25,6 +27,10 @@ namespace AGooday.AgPay.AopSdk.Nets
 
         public T Execute<T>(IAgPayRequest<T> request, RequestMethod method, string url) where T : AgPayResponse
         {
+            var jsonParam = JsonConvert.SerializeObject(request.GetBizModel());
+            var @params = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonParam);
+            var apiAgPayRequest = new APIAgPayRequest(method, url, @params, request.GetRequestOptions());
+
             return JsonConvert.DeserializeObject<T>("");
         }
     }

@@ -19,5 +19,11 @@ namespace AGooday.AgPay.AopSdk.Exceptions
             : base(errorMessage)
         {
         }
+
+        public AgPayException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
     }
 }
