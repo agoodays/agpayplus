@@ -11,5 +11,9 @@ namespace AGooday.AgPay.AopSdk.Exceptions
     /// </summary>
     public class APIConnectionException : AgPayException
     {
+        public APIConnectionException(string errorMessage) 
+            : base(errorMessage)
+        {
+        }
     }
 }

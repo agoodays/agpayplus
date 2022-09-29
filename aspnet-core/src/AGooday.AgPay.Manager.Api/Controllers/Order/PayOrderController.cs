@@ -1,9 +1,14 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.AopSdk;
+using AGooday.AgPay.AopSdk.Exceptions;
+using AGooday.AgPay.AopSdk.Models;
+using AGooday.AgPay.AopSdk.Request;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
@@ -101,8 +106,32 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             }
 
             //发起退款
+            RefundOrderCreateRequest request = new RefundOrderCreateRequest();
+            RefundOrderCreateReqModel model = new RefundOrderCreateReqModel();
+            model.MchNo = payOrder.MchNo;// 商户号
+            model.AppId = payOrder.AppId;
+            model.PayOrderId = payOrderId;
+            model.MchRefundNo = SeqUtil.GenMhoOrderId();
+            model.RefundAmount = refundAmount;
+            model.RefundReason = refundReason;
+            model.Currency = "CNY";
 
-            return ApiRes.Ok();
+            var mchApp = _mchAppService.GetById(payOrder.AppId);
+
+            var agpayClient = new AgPayClient(_sysConfigService.GetDBApplicationConfig().PaySiteUrl, mchApp.AppSecret);
+            try
+            {
+                var response = agpayClient.Execute(request);
+                if (response.code != 0)
+                {
+                    throw new BizException(response.msg);
+                }
+                return ApiRes.Ok(response);
+            }
+            catch (AgPayException e)
+            {
+                throw new BizException(e.Message);
+            }
         }
     }
 }

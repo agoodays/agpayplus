@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGooday.AgPay.AopSdk.Request
+namespace AGooday.AgPay.AopSdk.Models
 {
-    public class JeepayRequest
+    public class AgPayObject
     {
     }
 }

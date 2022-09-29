@@ -11,5 +11,13 @@ namespace AGooday.AgPay.AopSdk.Exceptions
     /// </summary>
     public abstract class AgPayException : Exception
     {
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="errorMessage">错误信息</param>
+        public AgPayException(string errorMessage)
+            : base(errorMessage)
+        {
+        }
     }
 }

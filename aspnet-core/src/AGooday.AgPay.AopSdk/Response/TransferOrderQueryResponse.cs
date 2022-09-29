@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.AopSdk.Response
 {
-    public class JeepayResponse
+    /// <summary>
+    /// 转账查单响应实现
+    /// </summary>
+    public class TransferOrderQueryResponse : AgPayResponse
     {
+
     }
 }

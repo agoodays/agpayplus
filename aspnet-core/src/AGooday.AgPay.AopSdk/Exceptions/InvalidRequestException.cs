@@ -9,7 +9,11 @@ namespace AGooday.AgPay.AopSdk.Exceptions
     /// <summary>
     /// 无效请求异常
     /// </summary>
-    public class InvalidRequestException
+    public class InvalidRequestException : AgPayException
     {
+        public InvalidRequestException(string errorMessage) 
+            : base(errorMessage)
+        {
+        }
     }
 }
