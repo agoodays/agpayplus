@@ -16,7 +16,7 @@ namespace AGooday.AgPay.AopSdk.Nets
 
         public string ContentType { get; private set; }
 
-        private HttpContent(byte[] byteArrayContent, String contentType)
+        private HttpContent(byte[] byteArrayContent, string contentType)
         {
             this.ByteArrayContent = byteArrayContent;
             this.ContentType = contentType;

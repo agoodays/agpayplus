@@ -14,5 +14,6 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(TransferOrderDto dto);
         TransferOrderDto GetById(string recordId);
         IEnumerable<TransferOrderDto> GetAll();
+        PaginatedList<TransferOrderDto> GetPaginatedData(TransferOrderQueryDto dto);
     }
 }

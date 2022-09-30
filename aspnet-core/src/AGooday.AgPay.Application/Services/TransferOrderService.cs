@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -66,6 +67,26 @@ namespace AGooday.AgPay.Application.Services
         {
             var transferOrders = _transferOrderRepository.GetAll();
             return _mapper.Map<IEnumerable<TransferOrderDto>>(transferOrders);
+        }
+
+        public PaginatedList<TransferOrderDto> GetPaginatedData(TransferOrderQueryDto dto)
+        {
+            var mchInfos = _transferOrderRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                && (dto.MchType.Equals(0) || w.MchType.Equals(dto.MchType))
+                && (string.IsNullOrWhiteSpace(dto.TransferId) || w.TransferId.Equals(dto.TransferId))
+                && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
+                && (string.IsNullOrWhiteSpace(dto.ChannelOrderNo) || w.ChannelOrderNo.Equals(dto.ChannelOrderNo))
+                && (dto.State.Equals(null) || w.State.Equals(dto.State))
+                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+                && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.TransferId.Equals(dto.UnionOrderId)
+                || w.MchOrderNo.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
+                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
+                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                ).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<TransferOrder>.Create<TransferOrderDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            return records;
         }
     }
 }

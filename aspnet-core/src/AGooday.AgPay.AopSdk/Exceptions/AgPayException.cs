@@ -11,6 +11,8 @@ namespace AGooday.AgPay.AopSdk.Exceptions
     /// </summary>
     public abstract class AgPayException : Exception
     {
+        public int StatusCode { get; private set; }
+
         /// <summary>
         /// 初始化
         /// </summary>
@@ -24,6 +26,12 @@ namespace AGooday.AgPay.AopSdk.Exceptions
             : base(message, innerException)
         {
 
+        }
+
+        public AgPayException(int statusCode, string message, Exception innerException)
+            : base(message, innerException)
+        {
+            this.StatusCode = statusCode;
         }
     }
 }

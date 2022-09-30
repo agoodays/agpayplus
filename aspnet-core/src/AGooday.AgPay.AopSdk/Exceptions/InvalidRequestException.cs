@@ -11,8 +11,17 @@ namespace AGooday.AgPay.AopSdk.Exceptions
     /// </summary>
     public class InvalidRequestException : AgPayException
     {
-        public InvalidRequestException(string errorMessage) 
+        public InvalidRequestException(string errorMessage)
             : base(errorMessage)
+        {
+        }
+        public InvalidRequestException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
+        public InvalidRequestException(int statusCode, string message, Exception innerException)
+            : base(statusCode, message, innerException)
         {
         }
     }

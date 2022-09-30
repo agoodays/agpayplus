@@ -14,5 +14,6 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(RefundOrderDto dto);
         RefundOrderDto GetById(string recordId);
         IEnumerable<RefundOrderDto> GetAll();
+        PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto);
     }
 }

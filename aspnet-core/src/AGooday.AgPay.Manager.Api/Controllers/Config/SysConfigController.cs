@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
             return ApiRes.Ok();
         }
 
-        public void UpdateSysConfigMQ(string groupKey) { 
+        private void UpdateSysConfigMQ(string groupKey) { 
         
         }
     }

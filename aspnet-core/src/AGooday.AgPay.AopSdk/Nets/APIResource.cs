@@ -1,6 +1,8 @@
-﻿using AGooday.AgPay.AopSdk.Request;
+﻿using AGooday.AgPay.AopSdk.Exceptions;
+using AGooday.AgPay.AopSdk.Request;
 using AGooday.AgPay.AopSdk.Response;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
@@ -32,11 +34,43 @@ namespace AGooday.AgPay.AopSdk.Nets
             var jsonParam = JsonConvert.SerializeObject(request.GetBizModel());
             var @params = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonParam);
             var apiAgPayRequest = new APIAgPayRequest(method, url, @params, request.GetRequestOptions());
+            var response = httpClient.Request(apiAgPayRequest);
+            int responseCode = response.ResponseCode;
+            string responseBody = response.ResponseBody;
+            if (responseCode != 200)
+            {
+                HandleAPIError(response);
+            }
+            return JsonConvert.DeserializeObject<T>(responseBody);
+        }
 
-            var content = apiAgPayRequest.Content;
-            var byteArrayContent = content.ByteArrayContent;
-            var contentType = content.ContentType;
-            return JsonConvert.DeserializeObject<T>("");
+        private static void HandleAPIError(APIAgPayResponse response)
+        {
+            string rBody = response.ResponseBody;
+            int rCode = response.ResponseCode;
+            var jsonObject = new JObject();
+            try
+            {
+                jsonObject = JObject.Parse(rBody);
+            }
+            catch (JsonException e)
+            {
+                RaiseMalformedJsonError(rBody, rCode, e);
+            }
+
+            if (rCode == 404)
+            {
+                throw new InvalidRequestException(rCode,
+                    $"{jsonObject.GetValue("status")}, {jsonObject.GetValue("error")}, {jsonObject.GetValue("path")}",
+                    null);
+            }
+        }
+
+        private static void RaiseMalformedJsonError(string responseBody, int responseCode, Exception innerException)
+        {
+            throw new APIException(responseCode,
+                $"Invalid response object from API: {responseBody}. (HTTP response code was {responseCode})",
+                innerException);
         }
     }
 }

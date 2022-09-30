@@ -70,7 +70,8 @@ namespace AGooday.AgPay.AopSdk.Nets
             StringBuilder sb = new StringBuilder();
             sb.Append(spec);
 
-            if ((method != APIResource.RequestMethod.POST && method != APIResource.RequestMethod.PUT) && (@params != null)) {
+            if ((method != APIResource.RequestMethod.POST && method != APIResource.RequestMethod.PUT) && (@params != null))
+            {
                 string queryString = CreateQuery(@params);
                 if (!string.IsNullOrWhiteSpace(queryString))
                 {
@@ -81,55 +82,10 @@ namespace AGooday.AgPay.AopSdk.Nets
             return sb.ToString();
         }
 
-        public static Dictionary<string, string> FlattenParams(JObject jobjparams)
-        {
-            if (jobjparams == null)
-            {
-                return new Dictionary<string, string>();
-            }
-            Dictionary<string, string> flatParams = new Dictionary<string, string>();
-            foreach (var entry in jobjparams)
-            {
-                var key = entry.Key;
-                var value = entry.Value;
-                if (value.GetType() == typeof(JObject))
-                {
-                    var flatNestedMap = new JObject();
-                    var nestedMap = (JObject)value;
-                    foreach (var nestedEntry in nestedMap)
-                    {
-                        flatNestedMap.Add($"{key}[{nestedEntry.Key}]", nestedEntry.Value);
-                    }
-                    flatParams = flatParams.Concat(FlattenParams(flatNestedMap))
-                        .ToDictionary(k => k.Key, v => v.Value);
-                }
-                else if (value.GetType() == typeof(JArray))
-                {
-                    var arr = (JArray)value;
-                    var flatNestedMap = new JObject();
-                    int size = arr.Count();
-                    for (int i = 0; i < size; i++)
-                    {
-                        flatNestedMap.Add($"{key}[{i:d}]", arr[i]);
-                    }
-                    flatParams = flatParams.Concat(FlattenParams(flatNestedMap))
-                        .ToDictionary(k => k.Key, v => v.Value);
-                }
-                else if (value == null)
-                {
-                    flatParams.Add(key, "");
-                }
-                else
-                {
-                    flatParams.Add(key, value.ToString());
-                }
-            }
-            return flatParams;
-        }
-
         private static string CreateQuery(Dictionary<string, object> @params)
         {
-            if (@params == null) {
+            if (@params == null)
+            {
                 return "";
             }
 
@@ -170,18 +126,31 @@ namespace AGooday.AgPay.AopSdk.Nets
 
         private static Dictionary<string, string> FlattenParams(Dictionary<string, object> @params)
         {
-            if (@params == null) {
+            if (@params == null)
+            {
+                return new Dictionary<string, string>();
+            }
+            var jsonparams = JsonConvert.SerializeObject(@params);
+            var jobjparams = JsonConvert.DeserializeObject<JObject>(jsonparams);
+            var flatParams = FlattenParams(jobjparams);
+            return flatParams;
+        }
+
+        private static Dictionary<string, string> FlattenParams(JObject jobjParams)
+        {
+            if (jobjParams == null)
+            {
                 return new Dictionary<string, string>();
             }
             Dictionary<string, string> flatParams = new Dictionary<string, string>();
-            foreach (var entry in @params)
+            foreach (var entry in jobjParams)
             {
                 var key = entry.Key;
                 var value = entry.Value;
-                if (value.GetType().FullName.IndexOf("Dictionary") > 0)
+                if (value.GetType() == typeof(JObject))
                 {
-                    var flatNestedMap = new Dictionary<string, object>();
-                    var nestedMap = (Dictionary<string, object>)value;
+                    var flatNestedMap = new JObject();
+                    var nestedMap = (JObject)value;
                     foreach (var nestedEntry in nestedMap)
                     {
                         flatNestedMap.Add($"{key}[{nestedEntry.Key}]", nestedEntry.Value);
@@ -189,14 +158,14 @@ namespace AGooday.AgPay.AopSdk.Nets
                     flatParams = flatParams.Concat(FlattenParams(flatNestedMap))
                         .ToDictionary(k => k.Key, v => v.Value);
                 }
-                else if (value.GetType().FullName.IndexOf("List") > 0)
+                else if (value.GetType() == typeof(JArray))
                 {
-                    List<string> ar = (List<string>)value;
-                    var flatNestedMap = new Dictionary<string, object>();
-                    int size = ar.Count();
+                    var arr = (JArray)value;
+                    var flatNestedMap = new JObject();
+                    int size = arr.Count();
                     for (int i = 0; i < size; i++)
                     {
-                        flatNestedMap.Add($"{key}[{i:d}]", ar[i]);
+                        flatNestedMap.Add($"{key}[{i:d}]", arr[i]);
                     }
                     flatParams = flatParams.Concat(FlattenParams(flatNestedMap))
                         .ToDictionary(k => k.Key, v => v.Value);
