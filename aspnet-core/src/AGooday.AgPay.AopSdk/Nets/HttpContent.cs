@@ -12,9 +12,9 @@ namespace AGooday.AgPay.AopSdk.Nets
 {
     public class HttpContent
     {
-        private byte[] ByteArrayContent;
+        public byte[] ByteArrayContent { get; private set; }
 
-        private string ContentType;
+        public string ContentType { get; private set; }
 
         private HttpContent(byte[] byteArrayContent, String contentType)
         {
@@ -29,11 +29,11 @@ namespace AGooday.AgPay.AopSdk.Nets
                 throw new ArgumentNullException();
             }
             return new HttpContent(
-                Encoding.GetEncoding(APIResource.CHARSET).GetBytes(CreateJSONString(@params)),
+                Encoding.GetEncoding(APIResource.CHARSET).GetBytes(CreateJsonString(@params)),
                 $"application/json; charset={APIResource.CHARSET}");
         }
 
-        private static string CreateJSONString(Dictionary<string, object> @params)
+        private static string CreateJsonString(Dictionary<string, object> @params)
         {
             return JsonConvert.SerializeObject(@params);
         }

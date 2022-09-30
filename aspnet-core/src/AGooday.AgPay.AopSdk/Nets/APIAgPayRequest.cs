@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using System.Web;
+using System.Globalization;
 
 namespace AGooday.AgPay.AopSdk.Nets
 {
@@ -21,27 +22,27 @@ namespace AGooday.AgPay.AopSdk.Nets
         /// <summary>
         /// 请求方法 (GET, POST, DELETE or PUT)
         /// </summary>
-        private APIResource.RequestMethod Method;
+        public APIResource.RequestMethod Method { get; private set; }
         /// <summary>
         /// 请求URL
         /// </summary>
-        private string Url;
+        public string Url { get; private set; }
         /// <summary>
         /// 请求Body
         /// </summary>
-        private HttpContent Content;
+        public HttpContent Content { get; private set; }
         /// <summary>
         /// 请求Header
         /// </summary>
-        private HttpHeaders Headers;
+        public HttpHeaders Headers { get; private set; }
         /// <summary>
         /// 请求参数
         /// </summary>
-        private Dictionary<string, object> Params;
+        public Dictionary<string, object> Params { get; private set; }
         /// <summary>
         /// 请求选项
         /// </summary>
-        private RequestOptions Options;
+        public RequestOptions Options { get; private set; }
 
         public APIAgPayRequest(
             APIResource.RequestMethod method,
@@ -64,11 +65,20 @@ namespace AGooday.AgPay.AopSdk.Nets
             }
         }
 
-        private string BuildURL(APIResource.RequestMethod method, string url, Dictionary<string, object> @params)
+        private string BuildURL(APIResource.RequestMethod method, string spec, Dictionary<string, object> @params)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(url);
-            return url;
+            sb.Append(spec);
+
+            if ((method != APIResource.RequestMethod.POST && method != APIResource.RequestMethod.PUT) && (@params != null)) {
+                string queryString = CreateQuery(@params);
+                if (!string.IsNullOrWhiteSpace(queryString))
+                {
+                    sb.Append("?");
+                    sb.Append(queryString);
+                }
+            }
+            return sb.ToString();
         }
 
         public static Dictionary<string, string> FlattenParams(JObject jobjparams)
@@ -90,7 +100,8 @@ namespace AGooday.AgPay.AopSdk.Nets
                     {
                         flatNestedMap.Add($"{key}[{nestedEntry.Key}]", nestedEntry.Value);
                     }
-                    //flatParams.PutAll(FlattenParams(flatNestedMap));
+                    flatParams = flatParams.Concat(FlattenParams(flatNestedMap))
+                        .ToDictionary(k => k.Key, v => v.Value);
                 }
                 else if (value.GetType() == typeof(JArray))
                 {
@@ -101,7 +112,8 @@ namespace AGooday.AgPay.AopSdk.Nets
                     {
                         flatNestedMap.Add($"{key}[{i:d}]", arr[i]);
                     }
-                    //flatParams.PutAll(FlattenParams(flatNestedMap));
+                    flatParams = flatParams.Concat(FlattenParams(flatNestedMap))
+                        .ToDictionary(k => k.Key, v => v.Value);
                 }
                 else if (value == null)
                 {
@@ -174,7 +186,8 @@ namespace AGooday.AgPay.AopSdk.Nets
                     {
                         flatNestedMap.Add($"{key}[{nestedEntry.Key}]", nestedEntry.Value);
                     }
-                    //flatParams.PutAll(FlattenParams(flatNestedMap));
+                    flatParams = flatParams.Concat(FlattenParams(flatNestedMap))
+                        .ToDictionary(k => k.Key, v => v.Value);
                 }
                 else if (value.GetType().FullName.IndexOf("List") > 0)
                 {
@@ -185,7 +198,8 @@ namespace AGooday.AgPay.AopSdk.Nets
                     {
                         flatNestedMap.Add($"{key}[{i:d}]", ar[i]);
                     }
-                    //flatParams.PutAll(FlattenParams(flatNestedMap));
+                    flatParams = flatParams.Concat(FlattenParams(flatNestedMap))
+                        .ToDictionary(k => k.Key, v => v.Value);
                 }
                 else if (value == null)
                 {

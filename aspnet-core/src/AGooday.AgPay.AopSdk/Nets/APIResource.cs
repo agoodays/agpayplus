@@ -17,6 +17,8 @@ namespace AGooday.AgPay.AopSdk.Nets
     {
         public const string CHARSET = "utf-8";
 
+        private static HttpClient httpClient = new HttpClient();
+
         public enum RequestMethod
         {
             GET,
@@ -31,6 +33,9 @@ namespace AGooday.AgPay.AopSdk.Nets
             var @params = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonParam);
             var apiAgPayRequest = new APIAgPayRequest(method, url, @params, request.GetRequestOptions());
 
+            var content = apiAgPayRequest.Content;
+            var byteArrayContent = content.ByteArrayContent;
+            var contentType = content.ContentType;
             return JsonConvert.DeserializeObject<T>("");
         }
     }

@@ -14,7 +14,6 @@ namespace AGooday.AgPay.Common.Utils
 		private const string TRANSFER_ID_SEQ_PREFIX = "T";
 		private const string DIVISION_BATCH_ID_SEQ_PREFIX = "D";
 
-
         /** 生成支付订单号 **/
         public static string GenPayOrderId()
         {
@@ -28,7 +27,6 @@ namespace AGooday.AgPay.Common.Utils
             Random rd = new Random();
             return $"{REFUND_ORDER_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
         }
-
 
         /** 模拟生成商户订单号 **/
         public static string GenMhoOrderId()
