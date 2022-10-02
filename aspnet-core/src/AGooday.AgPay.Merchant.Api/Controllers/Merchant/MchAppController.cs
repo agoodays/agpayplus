@@ -5,23 +5,28 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using AGooday.AgPay.Common.Utils;
 
-namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
+namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 {
     /// <summary>
     /// 商户应用管理类
     /// </summary>
     [Route("/api/mchApps")]
     [ApiController]
-    public class MchAppController : ControllerBase
+    public class MchAppController : CommonController
     {
         private readonly ILogger<MchAppController> _logger;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MchAppController(ILogger<MchAppController> logger,
+        public MchAppController(ILogger<MchAppController> logger, RedisUtil client,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService)
+            IMchInfoService mchInfoService,
+            ISysUserService sysUserService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             _logger = logger;
             _mchAppService = mchAppService;
@@ -37,6 +42,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [Route("")]
         public ApiRes List([FromQuery] MchAppQueryDto dto)
         {
+            dto.MchNo = GetCurrentUser().User.BelongInfoId;
             var data = _mchAppService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
@@ -50,6 +56,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [Route("")]
         public ApiRes Add(MchAppDto dto)
         {
+            dto.MchNo = GetCurrentUser().User.BelongInfoId;
             dto.AppId = Guid.NewGuid().ToString("N").Substring(0, 24);
             if (!_mchInfoService.IsExistMchNo(dto.MchNo))
             {

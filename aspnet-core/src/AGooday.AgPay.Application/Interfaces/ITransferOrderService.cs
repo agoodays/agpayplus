@@ -13,6 +13,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Remove(string recordId);
         void Update(TransferOrderDto dto);
         TransferOrderDto GetById(string recordId);
+        TransferOrderDto QueryMchOrder(string mchNo, string mchOrderNo, string transferId);
         IEnumerable<TransferOrderDto> GetAll();
         PaginatedList<TransferOrderDto> GetPaginatedData(TransferOrderQueryDto dto);
     }

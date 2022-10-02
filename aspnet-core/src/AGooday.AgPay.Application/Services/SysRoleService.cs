@@ -74,6 +74,13 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public SysRoleDto GetById(string recordId, string belongInfoId)
+        {
+            var entity = _sysRoleRepository.GetAll().Where(w => w.RoleId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).First();
+            var dto = _mapper.Map<SysRoleDto>(entity);
+            return dto;
+        }
+
         public IEnumerable<SysRoleDto> GetAll()
         {
             var sysRoles = _sysRoleRepository.GetAll();

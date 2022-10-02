@@ -88,6 +88,13 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public SysUserDto GetById(long recordId, string belongInfoId)
+        {
+            var entity = _sysUserRepository.GetAll().Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).First();
+            var dto = _mapper.Map<SysUserDto>(entity);
+            return dto;
+        }
+
         public IEnumerable<SysUserDto> GetAll()
         {
             //第一种写法 Map

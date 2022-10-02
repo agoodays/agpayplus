@@ -63,6 +63,24 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public TransferOrderDto QueryMchOrder(string mchNo, string mchOrderNo, string transferId)
+        {
+            if (string.IsNullOrEmpty(transferId))
+            {
+                var entity = _transferOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.TransferId.Equals(transferId)).First();
+                return _mapper.Map<TransferOrderDto>(entity);
+            }
+            else if (string.IsNullOrEmpty(mchOrderNo))
+            {
+                var entity = _transferOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.MchOrderNo.Equals(mchOrderNo)).First();
+                return _mapper.Map<TransferOrderDto>(entity);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public IEnumerable<TransferOrderDto> GetAll()
         {
             var transferOrders = _transferOrderRepository.GetAll();

@@ -67,5 +67,10 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 密码凭证
         /// </summary>
         public string Credential { get; set; }
+
+        /// <summary>
+        /// 所属商户ID / 0(平台)
+        /// </summary>
+        public string BelongInfoId { get; set; }
     }
 }

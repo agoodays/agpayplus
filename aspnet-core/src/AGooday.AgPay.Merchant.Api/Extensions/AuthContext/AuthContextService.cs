@@ -1,7 +1,7 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using System.Security.Claims;
 
-namespace AGooday.AgPay.Manager.Api.Extensions.AuthContext
+namespace AGooday.AgPay.Merchant.Api.Extensions.AuthContext
 {
     public static class AuthContextService
     {

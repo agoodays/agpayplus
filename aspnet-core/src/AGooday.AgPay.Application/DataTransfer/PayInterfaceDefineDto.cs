@@ -42,6 +42,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string IsvParams { get; set; }
 
         /// <summary>
+        /// 商户接口配置定义描述,json字符串
+        /// </summary>
+        public string MchParams { get; set; }
+
+        /// <summary>
         /// 特约商户接口配置定义描述,json字符串
         /// </summary>
         public string IsvsubMchParams { get; set; }
