@@ -2,15 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AGooday.AgPay.AopSdk.Models
 {
-    /// <summary>
-    /// 退款下单请求实体类
-    /// </summary>
-    public class RefundOrderCreateReqModel : AgPayObject
+    public class PayOrderCreateReqModel : AgPayObject
     {
         /// <summary>
         /// 商户号
@@ -28,49 +26,69 @@ namespace AGooday.AgPay.AopSdk.Models
         [JsonProperty("mchOrderNo")]
         public string MchOrderNo { get; set; }
         /// <summary>
-        /// 支付系统订单号
+        /// 支付方式
         /// </summary>
-        [JsonProperty("payOrderId")]
-        public string PayOrderId { get; set; }
+        [JsonProperty("wayCode")]
+        public string WayCode { get; set; }
         /// <summary>
-        /// 退款单号
+        /// 支付金额
         /// </summary>
-        [JsonProperty("mchRefundNo")]
-        public string MchRefundNo { get; set; }
-        /// <summary>
-        /// 退款金额
-        /// </summary>
-        [JsonProperty("refundAmount")]
-        public long RefundAmount { get; set; }
+        [JsonProperty("amount")]
+        public long Amount { get; set; }
         /// <summary>
         /// 货币代码，当前只支持cny
         /// </summary>
         [JsonProperty("currency")]
         public string Currency { get; set; }
         /// <summary>
-        /// 退款原因
-        /// </summary>
-        [JsonProperty("refundReason")]
-        public string RefundReason { get; set; }
-        /// <summary>
         /// 客户端IP
         /// </summary>
         [JsonProperty("clientIp")]
         public string ClientIp { get; set; }
+        /// <summary>
+        /// 商品标题
+        /// </summary>
+        [JsonProperty("subject")]
+        public string Subject { get; set; }
+        /// <summary>
+        /// 商品描述
+        /// </summary>
+        [JsonProperty("body")]
+        public string Body { get; set; }
         /// <summary>
         /// 异步通知地址
         /// </summary>
         [JsonProperty("notifyUrl")]
         public string NotifyUrl { get; set; }
         /// <summary>
+        /// 跳转通知地址
+        /// </summary>
+        [JsonProperty("returnUrl")]
+        public string ReturnUrl { get; set; }
+        /// <summary>
+        /// 订单失效时间
+        /// </summary>
+        [JsonProperty("expiredTime")]
+        public string ExpiredTime { get; set; }
+        /// <summary>
         /// 特定渠道额外支付参数
         /// </summary>
         [JsonProperty("channelExtra")]
         public string ChannelExtra { get; set; }
         /// <summary>
+        /// 渠道用户标识,如微信openId,支付宝账号
+        /// </summary>
+        [JsonProperty("channelUser")]
+        public string ChannelUser { get; set; }
+        /// <summary>
         /// 商户扩展参数
         /// </summary>
         [JsonProperty("extParam")]
         public string ExtParam { get; set; }
+        /// <summary>
+        /// 分账模式： 0-该笔订单不允许分账[默认], 1-支付成功按配置自动完成分账, 2-商户手动分账(解冻商户金额)
+        /// </summary>
+        [JsonProperty("divisionMode")]
+        public byte DivisionMode { get; set; }
     }
 }

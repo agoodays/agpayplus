@@ -70,6 +70,13 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public IEnumerable<MchPayPassageDto> GetMchPayPassageByAppId(string mchNo, string appId)
+        {
+            var mchPayPassages = _mchPayPassageRepository.GetAll()
+                .Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.State.Equals(CS.PUB_USABLE));
+            return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
+        }
+
         public IEnumerable<MchPayPassageDto> GetAll()
         {
             var mchPayPassages = _mchPayPassageRepository.GetAll();

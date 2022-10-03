@@ -1,0 +1,127 @@
+﻿using AGooday.AgPay.AopSdk;
+using AGooday.AgPay.AopSdk.Exceptions;
+using AGooday.AgPay.AopSdk.Models;
+using AGooday.AgPay.AopSdk.Request;
+using AGooday.AgPay.AopSdk.Response;
+using AGooday.AgPay.Application;
+using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Services;
+using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Merchant.Api.Controllers.PayTest;
+using AGooday.AgPay.Merchant.Api.Models;
+using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+
+namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
+{
+    [Route("api/mchTransfers")]
+    [ApiController]
+    public class MchTransferController : CommonController
+    {
+        private readonly ILogger<MchTransferController> _logger;
+        private readonly IPayInterfaceConfigService _payIfConfigService;
+        private readonly IPayInterfaceDefineService _payIfDefineService;
+        private readonly ISysConfigService _sysConfigService;
+        private readonly IMchAppService _mchAppService;
+
+        public MchTransferController(ILogger<MchTransferController> logger,
+            IPayInterfaceConfigService payIfConfigService,
+            IPayInterfaceDefineService payIfDefineService,
+            IMchAppService mchAppService,
+            ISysConfigService sysConfigService, RedisUtil client,
+            ISysUserService sysUserService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+        {
+            _logger = logger;
+            _payIfConfigService = payIfConfigService;
+            _payIfDefineService = payIfDefineService;
+            _mchAppService = mchAppService;
+            _sysConfigService = sysConfigService;
+        }
+
+        /// <summary>
+        /// 查询商户对应应用下支持的支付通道
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <returns></returns>
+        [HttpGet, Route("ifCodes/{appId}")]
+        public ApiRes IfCodeList(string appId)
+        {
+            var ifCodes = _payIfConfigService.GetByInfoId(CS.INFO_TYPE_MCH_APP, appId)
+                .Select(s => s.IfCode);
+            if (ifCodes is null)
+                return ApiRes.Ok(ifCodes);
+            var result = _payIfDefineService.GetAll().Where(w => ifCodes.Contains(w.IfCode));
+            return ApiRes.Ok(result);
+        }
+
+        [HttpGet, Route("channelUserId")]
+        public ApiRes ChannelUserId(string appId, string ifCode, string extParam)
+        {
+            var mchApp = _mchAppService.GetById(appId);
+            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            {
+                throw new BizException("商户应用不存在或不可用");
+            }
+            var param = new JObject();
+            param.Add("mchNo", GetCurrentUser().User.BelongInfoId);
+            param.Add("appId", appId);
+            param.Add("ifCode", ifCode);
+            param.Add("extParam", extParam);
+            param.Add("reqTime", DateTimeOffset.Now.ToUnixTimeSeconds());
+            param.Add("version", "1.0");
+            param.Add("signType", "MD5");
+
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+
+            param.Add("redirectUrl", $"{dbApplicationConfig.MchSiteUrl}/api/anon/channelUserIdCallback");
+
+            param.Add("sign", AgPayUtil.GetSign(param, mchApp.AppSecret));
+
+            var url = URLUtil.AppendUrlQuery($"{dbApplicationConfig.PaySiteUrl}/api/channelUserId/jump", param);
+            return ApiRes.Ok();
+        }
+
+        [HttpPost, Route("doTransfer")]
+        public ApiRes DoTransfer(TransferOrderModel transferOrder)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<TransferOrderModel, TransferOrderCreateReqModel>());
+            var mapper = config.CreateMapper();
+            var model = mapper.Map<TransferOrderModel, TransferOrderCreateReqModel>(transferOrder);
+            var mchApp = _mchAppService.GetById(model.AppId);
+            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            {
+                throw new BizException("商户应用不存在或不可用");
+            }
+            TransferOrderCreateRequest request = new TransferOrderCreateRequest();
+            model.MchNo = GetCurrentUser().User.BelongInfoId;
+            model.AppId = mchApp.AppId;
+            model.Currency = "CNY";
+            request.SetBizModel(model);
+
+            var agPayClient = new AgPayClient(_sysConfigService.GetDBApplicationConfig().PaySiteUrl, mchApp.AppSecret);
+
+            try
+            {
+                TransferOrderCreateResponse response = agPayClient.Execute(request);
+                if (response.code != 0)
+                {
+                    throw new BizException(response.msg);
+                }
+                return ApiRes.Ok(response);
+            }
+            catch (AgPayException e)
+            {
+                throw new BizException(e.Message);
+            }
+        }
+    }
+}

@@ -2,15 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AGooday.AgPay.AopSdk.Models
 {
     /// <summary>
-    /// 退款下单请求实体类
+    /// 转账下单请求实体类
     /// </summary>
-    public class RefundOrderCreateReqModel : AgPayObject
+    public class TransferOrderCreateReqModel : AgPayObject
     {
         /// <summary>
         /// 商户号
@@ -28,35 +29,50 @@ namespace AGooday.AgPay.AopSdk.Models
         [JsonProperty("mchOrderNo")]
         public string MchOrderNo { get; set; }
         /// <summary>
-        /// 支付系统订单号
+        /// 支付接口代码
         /// </summary>
-        [JsonProperty("payOrderId")]
-        public string PayOrderId { get; set; }
+        [JsonProperty("ifCode")]
+        public string IfCode { get; set; }
         /// <summary>
-        /// 退款单号
+        /// 入账方式
         /// </summary>
-        [JsonProperty("mchRefundNo")]
-        public string MchRefundNo { get; set; }
+        [JsonProperty("entryType")]
+        public string EntryType { get; set; }
         /// <summary>
-        /// 退款金额
+        /// 转账金额
         /// </summary>
-        [JsonProperty("refundAmount")]
-        public long RefundAmount { get; set; }
+        [JsonProperty("amount")]
+        public long Amount { get; set; }
         /// <summary>
         /// 货币代码，当前只支持cny
         /// </summary>
         [JsonProperty("currency")]
         public string Currency { get; set; }
         /// <summary>
-        /// 退款原因
+        /// 收款账号
         /// </summary>
-        [JsonProperty("refundReason")]
-        public string RefundReason { get; set; }
+        [JsonProperty("accountNo")]
+        public string AccountNo { get; set; }
+        /// <summary>
+        /// 收款人姓名
+        /// </summary>
+        [JsonProperty("accountName")]
+        public string AccountName { get; set; }
+        /// <summary>
+        /// 收款人开户行名称
+        /// </summary>
+        [JsonProperty("bankName")]
+        public string BankName { get; set; }
         /// <summary>
         /// 客户端IP
         /// </summary>
         [JsonProperty("clientIp")]
         public string ClientIp { get; set; }
+        /// <summary>
+        /// 转账备注信息
+        /// </summary>
+        [JsonProperty("transferDesc")]
+        public string TransferDesc { get; set; }
         /// <summary>
         /// 异步通知地址
         /// </summary>

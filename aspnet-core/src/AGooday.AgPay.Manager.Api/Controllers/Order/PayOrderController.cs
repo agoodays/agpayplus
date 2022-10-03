@@ -9,6 +9,7 @@ using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
@@ -88,8 +89,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="refundAmount"></param>
         /// <param name="refundReason"></param>
         /// <returns></returns>
-        [HttpGet, Route("refunds/{payOrderId}")]
-        public ApiRes Refund(string payOrderId, long refundAmount, string refundReason)
+        [HttpPost, Route("refunds/{payOrderId}")]
+        public ApiRes Refund(string payOrderId, RefundOrderModel refundOrder)
         {
             var payOrder = _payOrderService.GetById(payOrderId);
             if (payOrder == null)
@@ -100,7 +101,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             {
                 throw new BizException("订单状态不正确");
             }
-            if (payOrder.RefundAmount + refundAmount > payOrder.Amount)
+            if (payOrder.RefundAmount + refundOrder.RefundAmount > payOrder.Amount)
             {
                 throw new BizException("退款金额超过订单可退款金额！");
             }
@@ -112,8 +113,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             model.AppId = payOrder.AppId;
             model.PayOrderId = payOrderId;
             model.MchRefundNo = SeqUtil.GenMhoOrderId();
-            model.RefundAmount = refundAmount;
-            model.RefundReason = refundReason;
+            model.RefundAmount = refundOrder.RefundAmount;
+            model.RefundReason = refundOrder.RefundReason;
             model.Currency = "CNY";
             request.SetBizModel(model);
 

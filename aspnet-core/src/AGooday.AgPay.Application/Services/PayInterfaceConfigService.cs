@@ -104,6 +104,19 @@ namespace AGooday.AgPay.Application.Services
         }
 
         /// <summary>
+        /// 根据 账户类型、账户号 获取支付参数配置
+        /// </summary>
+        /// <param name="infoType">账户类型</param>
+        /// <param name="infoId">账户号</param>
+        /// <returns></returns>
+        public IEnumerable<PayInterfaceConfigDto> GetByInfoId(byte infoType, string infoId)
+        {
+            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.Equals(infoId)
+            && w.InfoType.Equals(infoType) && w.State.Equals(CS.PUB_USABLE));
+            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfigs);
+        }
+
+        /// <summary>
         /// 根据 账户类型、账户号 获取支付参数配置列表
         /// </summary>
         /// <param name="infoType"></param>

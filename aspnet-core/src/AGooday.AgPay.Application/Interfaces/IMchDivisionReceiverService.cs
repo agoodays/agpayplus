@@ -13,6 +13,8 @@ namespace AGooday.AgPay.Application.Interfaces
         void Remove(long recordId);
         void Update(MchDivisionReceiverDto dto);
         MchDivisionReceiverDto GetById(long recordId);
+        MchDivisionReceiverDto GetById(long recordId, string mchNo);
         IEnumerable<MchDivisionReceiverDto> GetAll();
+        PaginatedList<MchDivisionReceiverDto> GetPaginatedData(MchDivisionReceiverQueryDto dto);
     }
 }

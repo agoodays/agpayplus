@@ -32,5 +32,6 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="infoId"></param>
         /// <returns></returns>
         PayInterfaceConfigDto GetByInfoIdAndIfCode(byte infoType, string infoId, string ifCode);
+        IEnumerable<PayInterfaceConfigDto> GetByInfoId(byte infoType, string infoId);
     }
 }

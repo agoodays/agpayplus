@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -62,10 +63,33 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public MchDivisionReceiverDto GetById(long recordId, string mchNo)
+        {
+            var entity = _mchDivisionReceiverRepository.GetAll().Where(w=>w.ReceiverId.Equals(recordId) && w.MchNo.Equals(mchNo)).First();
+            var dto = _mapper.Map<MchDivisionReceiverDto>(entity);
+            return dto;
+        }
+
         public IEnumerable<MchDivisionReceiverDto> GetAll()
         {
             var mchDivisionReceivers = _mchDivisionReceiverRepository.GetAll();
             return _mapper.Map<IEnumerable<MchDivisionReceiverDto>>(mchDivisionReceivers);
+        }
+
+        public PaginatedList<MchDivisionReceiverDto> GetPaginatedData(MchDivisionReceiverQueryDto dto)
+        {
+            var mchInfos = _mchDivisionReceiverRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                && (dto.ReceiverId.Equals(0) || w.ReceiverId.Equals(dto.ReceiverId))
+                && (string.IsNullOrWhiteSpace(dto.ReceiverAlias) || w.ReceiverAlias.Equals(dto.ReceiverAlias))
+                && (dto.ReceiverGroupId.Equals(0) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
+                && (string.IsNullOrWhiteSpace(dto.ReceiverGroupName) || w.ReceiverGroupName.Equals(dto.ReceiverGroupName))
+                && (dto.State.Equals(null) || w.State.Equals(dto.State))
+                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+                ).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<MchDivisionReceiver>.Create<MchDivisionReceiverDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            return records;
         }
     }
 }

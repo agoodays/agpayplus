@@ -13,8 +13,9 @@ namespace AGooday.AgPay.Application.Interfaces
         void Remove(long recordId);
         void Update(MchPayPassageDto dto);
         MchPayPassageDto GetById(long recordId);
+        IEnumerable<MchPayPassageDto> GetMchPayPassageByAppId(string mchNo, string appId);
         IEnumerable<MchPayPassageDto> GetAll();
-        IEnumerable<MchPayPassageDto> GetAll(string appId,List<string> wayCodes);
+        IEnumerable<MchPayPassageDto> GetAll(string appId, List<string> wayCodes);
         /// <summary>
         /// 根据支付方式查询可用的支付接口列表
         /// </summary>
