@@ -3,6 +3,7 @@ using AGooday.AgPay.Domain.Core.Models;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                     Update(sysUserAuth);
                 }
             }
+        }
+
+        public List<SysUserAuth> GetUserAuths(string identifier, string sysType)
+        {
+            var sql = @"select a.* from t_sys_user_auth a left join t_sys_user u on a.user_id = u.sys_user_id
+        where a.identity_type = #{identityType} and a.identifier = @Identifier and a.sys_type = @SysType";
+
+            var result = Db.Database.FromSql<SysUserAuth>(sql, new { Identifier = identifier, SysType = sysType });
+
+            return result;
         }
     }
 }

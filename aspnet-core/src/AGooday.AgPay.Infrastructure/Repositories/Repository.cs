@@ -99,6 +99,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return Db.SaveChanges();
         }
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <param name="count">影响行数</param>
+        /// <returns></returns>
+        public bool SaveChanges(out int count)
+        {
+            count = Db.SaveChanges();
+            return count > 0;
+        }
 
         public void Dispose()
         {
@@ -190,6 +200,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public int SaveChanges()
         {
             return Db.SaveChanges();
+        }
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <param name="count">影响行数</param>
+        /// <returns></returns>
+        public bool SaveChanges(out int count)
+        {
+            count = Db.SaveChanges();
+            return count > 0;
         }
 
         public void Dispose()

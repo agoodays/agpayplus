@@ -44,20 +44,20 @@ namespace AGooday.AgPay.Application.Services
             } while (IsExistIsvNo(dto.IsvNo));
             var m = _mapper.Map<IsvInfo>(dto);
             _isvInfoRepository.Add(m);
-            return _isvInfoRepository.SaveChanges() > 0;
+            return _isvInfoRepository.SaveChanges(out int _);
         }
 
         public bool Remove(string recordId)
         {
             _isvInfoRepository.Remove(recordId);
-            return _isvInfoRepository.SaveChanges() > 0;
+            return _isvInfoRepository.SaveChanges(out int _);
         }
 
         public bool Update(IsvInfoDto dto)
         {
             var m = _mapper.Map<IsvInfo>(dto);
             _isvInfoRepository.Update(m);
-            return _isvInfoRepository.SaveChanges() > 0;
+            return _isvInfoRepository.SaveChanges(out int _);
         }
 
         public IsvInfoDto GetById(string recordId)

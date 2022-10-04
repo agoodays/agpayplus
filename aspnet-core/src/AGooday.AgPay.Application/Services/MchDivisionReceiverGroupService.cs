@@ -11,10 +11,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
-    public class MchDivisionReceiverGroupService: IMchDivisionReceiverGroupService
+    public class MchDivisionReceiverGroupService : IMchDivisionReceiverGroupService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchDivisionReceiverGroupRepository _mchDivisionReceiverGroupRepository;
@@ -35,24 +36,24 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(MchDivisionReceiverGroupDto dto)
+        public bool Add(MchDivisionReceiverGroupDto dto)
         {
             var m = _mapper.Map<MchDivisionReceiverGroup>(dto);
             _mchDivisionReceiverGroupRepository.Add(m);
-            _mchDivisionReceiverGroupRepository.SaveChanges();
+            return _mchDivisionReceiverGroupRepository.SaveChanges(out int _);
         }
 
-        public void Remove(long recordId)
+        public bool Remove(long recordId)
         {
             _mchDivisionReceiverGroupRepository.Remove(recordId);
-            _mchDivisionReceiverGroupRepository.SaveChanges();
+            return _mchDivisionReceiverGroupRepository.SaveChanges(out int _);
         }
 
-        public void Update(MchDivisionReceiverGroupDto dto)
+        public bool Update(MchDivisionReceiverGroupDto dto)
         {
             var m = _mapper.Map<MchDivisionReceiverGroup>(dto);
             _mchDivisionReceiverGroupRepository.Update(m);
-            _mchDivisionReceiverGroupRepository.SaveChanges();
+            return _mchDivisionReceiverGroupRepository.SaveChanges(out int _);
         }
 
         public MchDivisionReceiverGroupDto GetById(long recordId)
@@ -62,10 +63,33 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public MchDivisionReceiverGroupDto GetById(long recordId, string mchNo)
+        {
+            var entity = _mchDivisionReceiverGroupRepository.GetAll().Where(w => w.ReceiverGroupId.Equals(recordId) && w.MchNo.Equals(mchNo)).First();
+            return _mapper.Map<MchDivisionReceiverGroupDto>(entity);
+        }
+
         public IEnumerable<MchDivisionReceiverGroupDto> GetAll()
         {
             var mchDivisionReceiverGroups = _mchDivisionReceiverGroupRepository.GetAll();
             return _mapper.Map<IEnumerable<MchDivisionReceiverGroupDto>>(mchDivisionReceiverGroups);
+        }
+
+        public MchDivisionReceiverGroupDto FindByIdAndMchNo(long receiverGroupId, string mchNo)
+        {
+            var entity = _mchDivisionReceiverGroupRepository.GetAll().Where(w => w.ReceiverGroupId.Equals(receiverGroupId) && w.MchNo.Equals(mchNo));
+            return _mapper.Map<MchDivisionReceiverGroupDto>(entity);
+        }
+
+        public PaginatedList<MchDivisionReceiverGroupDto> GetPaginatedData(MchDivisionReceiverGroupQueryDto dto)
+        {
+            var mchInfos = _mchDivisionReceiverGroupRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+                && (string.IsNullOrWhiteSpace(dto.ReceiverGroupName) || w.ReceiverGroupName.Equals(dto.ReceiverGroupName))
+                && (dto.ReceiverGroupId.Equals(0) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
+                ).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<MchDivisionReceiverGroup>.Create<MchDivisionReceiverGroupDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            return records;
         }
     }
 }

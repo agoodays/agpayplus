@@ -21,7 +21,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     public class SysRoleController : CommonController
     {
         private readonly ILogger<SysRoleController> _logger;
-        private readonly IDatabase _redis;
         private readonly ISysRoleService _sysRoleService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;

@@ -13,6 +13,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
     {
         private readonly ISysConfigService _sysConfigService;
 
+        public SysConfigController(ISysConfigService sysConfigService)
+        {
+            _sysConfigService = sysConfigService;
+        }
+
         /// <summary>
         /// 分组下的配置
         /// </summary>

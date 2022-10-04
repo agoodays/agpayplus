@@ -44,11 +44,11 @@ namespace AGooday.AgPay.Application.Services
             return _mchInfoRepository.IsExistMchNo(mchNo);
         }
 
-        public void Add(MchInfoDto dto)
+        public bool Add(MchInfoDto dto)
         {
             var m = _mapper.Map<MchInfo>(dto);
             _mchInfoRepository.Add(m);
-            _mchInfoRepository.SaveChanges();
+            return _mchInfoRepository.SaveChanges(out int _);
         }
 
         public void Create(MchInfoCreateDto dto)
@@ -65,11 +65,11 @@ namespace AGooday.AgPay.Application.Services
             Bus.SendCommand(command);
         }
 
-        public void Update(MchInfoDto dto)
+        public bool Update(MchInfoDto dto)
         {
             var m = _mapper.Map<MchInfo>(dto);
             _mchInfoRepository.Update(m);
-            _mchInfoRepository.SaveChanges();
+            return _mchInfoRepository.SaveChanges(out int _);
         }
 
         public void Modify(MchInfoModifyDto dto)

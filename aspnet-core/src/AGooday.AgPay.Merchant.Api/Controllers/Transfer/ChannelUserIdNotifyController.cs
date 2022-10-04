@@ -8,7 +8,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
     [ApiController]
     public class ChannelUserIdNotifyController : ControllerBase
     {
-        [HttpGet, Route("channelUserId")]
+        [HttpGet, Route("")]
         public string ChannelUserId(string appId, string channelUserId, string extParam)
         {
             // WebSocket 推送到前端

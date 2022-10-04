@@ -5,19 +5,19 @@ using AGooday.AgPay.AopSdk.Request;
 using AGooday.AgPay.AopSdk.Response;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Merchant.Api.Models;
-using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using AGooday.AgPay.Application.Services;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 {
+    /// <summary>
+    /// 商户分账接收者账号关系维护
+    /// </summary>
     [Route("api/divisionReceivers")]
     [ApiController]
     public class MchDivisionReceiverController : CommonController
@@ -64,6 +64,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             return ApiRes.Ok(record);
         }
 
+        /// <summary>
+        /// 新增分账接收账号
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
         [HttpPost, Route("")]
         public ApiRes Add(DivisionReceiverBindReqModel model)
         {
@@ -76,6 +82,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             request.SetBizModel(model);
             model.MchNo = GetCurrentUser().User.BelongInfoId;
             model.AppId = mchApp.AppId;
+            model.DivisionProfit = (Convert.ToDecimal(model.DivisionProfit) / 100).ToString();
 
             var agPayClient = new AgPayClient(_sysConfigService.GetDBApplicationConfig().PaySiteUrl, mchApp.AppSecret);
 
@@ -92,6 +99,54 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             {
                 throw new BizException(e.Message);
             }
+        }
+
+        /// <summary>
+        /// 更新分账接收账号
+        /// </summary>
+        /// <param name="record"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
+        [HttpPut]
+        [Route("{appId}")]
+        public ApiRes Update(MchDivisionReceiverDto record)
+        {
+            // 改为真实比例
+            record.DivisionProfit = record.DivisionProfit / 100;
+            if (record.ReceiverGroupId != null)
+            {
+                var groupRecord = _mchDivisionReceiverGroupService.FindByIdAndMchNo(record.ReceiverGroupId.Value, GetCurrentUser().User.BelongInfoId);
+                if (record == null)
+                {
+                    throw new BizException("账号组不存在");
+                }
+                record.ReceiverGroupId = groupRecord.ReceiverGroupId;
+                record.ReceiverGroupName = groupRecord.ReceiverGroupName;
+            }
+            var result = _mchDivisionReceiverService.Update(record);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
+            }
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 删除分账接收账号
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{recordId}")]
+        public ApiRes Delete(long recordId)
+        {
+            var record = _mchDivisionReceiverService.GetById(recordId);
+            if (record == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            _mchDivisionReceiverService.Remove(recordId);
+            return ApiRes.Ok();
         }
     }
 }

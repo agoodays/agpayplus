@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using AGooday.AgPay.Domain.Core.Models;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -35,24 +37,24 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(PayOrderDivisionRecordDto dto)
+        public bool Add(PayOrderDivisionRecordDto dto)
         {
             var m = _mapper.Map<PayOrderDivisionRecord>(dto);
             _payOrderDivisionRecordRepository.Add(m);
-            _payOrderDivisionRecordRepository.SaveChanges();
+            return _payOrderDivisionRecordRepository.SaveChanges(out int _);
         }
 
-        public void Remove(long recordId)
+        public bool Remove(long recordId)
         {
             _payOrderDivisionRecordRepository.Remove(recordId);
-            _payOrderDivisionRecordRepository.SaveChanges();
+            return _payOrderDivisionRecordRepository.SaveChanges(out int _);
         }
 
-        public void Update(PayOrderDivisionRecordDto dto)
+        public bool Update(PayOrderDivisionRecordDto dto)
         {
             var m = _mapper.Map<PayOrderDivisionRecord>(dto);
             _payOrderDivisionRecordRepository.Update(m);
-            _payOrderDivisionRecordRepository.SaveChanges();
+            return _payOrderDivisionRecordRepository.SaveChanges(out int _);
         }
 
         public PayOrderDivisionRecordDto GetById(long recordId)
@@ -62,10 +64,34 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public PayOrderDivisionRecordDto GetById(long recordId, string mchNo)
+        {
+            var entity = _payOrderDivisionRecordRepository.GetAll().Where(w => w.RecordId.Equals(recordId) && w.MchNo.Equals(mchNo)).First();
+            return _mapper.Map<PayOrderDivisionRecordDto>(entity);
+        }
+
         public IEnumerable<PayOrderDivisionRecordDto> GetAll()
         {
             var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAll();
             return _mapper.Map<IEnumerable<PayOrderDivisionRecordDto>>(payOrderDivisionRecords);
+        }
+
+        public PaginatedList<PayOrderDivisionRecordDto> GetPaginatedData(PayOrderDivisionRecordQueryDto dto)
+        {
+            var mchInfos = _payOrderDivisionRecordRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                && (dto.ReceiverId.Equals(0) || w.ReceiverId.Equals(dto.ReceiverId))
+                && (dto.ReceiverGroupId.Equals(0) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
+                && (string.IsNullOrWhiteSpace(dto.PayOrderId) || w.PayOrderId.Equals(dto.PayOrderId))
+                && (string.IsNullOrWhiteSpace(dto.AccNo) || w.AccNo.Equals(dto.AccNo))
+                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+                && (dto.State.Equals(null) || w.State.Equals(dto.State))
+                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
+                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                ).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            return records;
         }
     }
 }

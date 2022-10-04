@@ -1,24 +1,120 @@
+using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Infrastructure.Context;
+using AGooday.AgPay.Merchant.Api.Extensions;
+using AGooday.AgPay.Merchant.Api.Extensions.AuthContext;
+using AGooday.AgPay.Merchant.Api.Middlewares;
+using AGooday.AgPay.Merchant.Api.Models;
+using MediatR;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var logging = builder.Logging;
+// 调用 ClearProviders 以从生成器中删除所有 ILoggerProvider 实例
+logging.ClearProviders();
+//// 通常，日志级别应在配置中指定，而不是在代码中指定。
+//logging.AddFilter("Microsoft", LogLevel.Warning);
+// 添加控制台日志记录提供程序。
+logging.AddConsole();
 
-builder.Services.AddControllers();
+// Add services to the container.
+var services = builder.Services;
+var Env = builder.Environment;
+
+services.AddSingleton(new Appsettings(Env.ContentRootPath));
+
+//// 注入日志
+//services.AddLogging(config =>
+//{
+//    //Microsoft.Extensions.Logging.Log4Net.AspNetCore
+//    config.AddLog4Net();
+//});
+services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
+
+#region Redis
+//redis缓存
+var section = builder.Configuration.GetSection("Redis:Default");
+//连接字符串
+string _connectionString = section.GetSection("Connection").Value;
+//实例名称
+string _instanceName = section.GetSection("InstanceName").Value;
+//默认数据库 
+int _defaultDB = int.Parse(section.GetSection("DefaultDB").Value ?? "0");
+services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB));
+#endregion
+
+services.AddCors(o =>
+    o.AddPolicy("CorsPolicy",
+        builder => builder
+            .WithOrigins("http://localhost:9001")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            //.AllowAnyOrigin()
+            .AllowCredentials()
+    ));
+
+services.AddMemoryCache();
+services.AddHttpContextAccessor();
+services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
+services.Configure<JwtSettings>(jwtSettingsSection);
+// JWT
+var appSettings = jwtSettingsSection.Get<JwtSettings>();
+services.AddJwtBearerAuthentication(appSettings);
+
+// Automapper 注入
+services.AddAutoMapperSetup();
+services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
+        //options.SerializerSettings.Formatting = Formatting.Indented;
+        //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+
+// Adding MediatR for Domain Events
+// 领域命令、领域事件等注入
+// 引用包 MediatR.Extensions.Microsoft.DependencyInjection
+//services.AddMediatR(typeof(MyxxxHandler));//单单注入某一个处理程序
+//或
+services.AddMediatR(typeof(Program));//目的是为了扫描Handler的实现对象并添加到IOC的容器中
+
+// .NET Core 原生依赖注入
+// 单写一层用来添加依赖项，从展示层 Presentation 中隔离
+NativeInjectorBootStrapper.RegisterServices(services);
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseCalculateExecutionTime();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseAuthentication();
+app.UseCors("CorsPolicy");
+
+var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
+AuthContextService.Configure(httpContextAccessor);
 
 app.UseAuthorization();
+
+app.UseExceptionHandling();
+
+app.UseRequestResponseLogging();
 
 app.MapControllers();
 

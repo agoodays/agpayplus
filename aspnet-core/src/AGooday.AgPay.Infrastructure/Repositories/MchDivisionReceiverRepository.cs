@@ -16,5 +16,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
+
+        public bool IsExistUseReceiverGroup(long receiverGroupId)
+        {
+            return DbSet.AsNoTracking().Any(c => c.ReceiverGroupId.Equals(receiverGroupId));
+        }
     }
 }

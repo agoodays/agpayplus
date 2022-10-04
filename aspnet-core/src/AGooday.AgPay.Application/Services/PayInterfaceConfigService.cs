@@ -31,12 +31,16 @@ namespace AGooday.AgPay.Application.Services
 
         public PayInterfaceConfigService(IMapper mapper, IMediatorHandler bus,
             IPayInterfaceConfigRepository payInterfaceConfigRepository,
-            IPayInterfaceDefineRepository payInterfaceDefineRepository)
+            IPayInterfaceDefineRepository payInterfaceDefineRepository, 
+            IMchAppRepository mchAppRepository, 
+            IMchInfoRepository mchInfoRepository)
         {
             _mapper = mapper;
             Bus = bus;
             _payInterfaceConfigRepository = payInterfaceConfigRepository;
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
+            _mchAppRepository = mchAppRepository;
+            _mchInfoRepository = mchInfoRepository;
         }
 
         public void Dispose()

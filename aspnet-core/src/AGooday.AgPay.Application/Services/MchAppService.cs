@@ -40,20 +40,20 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<MchApp>(dto);
             _mchAppRepository.Add(m);
-            return _mchAppRepository.SaveChanges() > 0;
+            return _mchAppRepository.SaveChanges(out int _);
         }
 
         public bool Remove(string recordId)
         {
             _mchAppRepository.Remove(recordId);
-            return _mchAppRepository.SaveChanges() > 0;
+            return _mchAppRepository.SaveChanges(out _);
         }
 
         public bool Update(MchAppDto dto)
         {
             var m = _mapper.Map<MchApp>(dto);
             _mchAppRepository.Update(m);
-            return _mchAppRepository.SaveChanges() > 0;
+            return _mchAppRepository.SaveChanges(out int _);
         }
 
         public MchAppDto GetById(string recordId)

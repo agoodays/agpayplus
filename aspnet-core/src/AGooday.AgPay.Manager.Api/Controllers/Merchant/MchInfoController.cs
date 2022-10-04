@@ -27,6 +27,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         {
             _logger = logger;
             _mchInfoService = mchInfoService;
+            _notifications = (DomainNotificationHandler)notifications;
         }
 
         /// <summary>

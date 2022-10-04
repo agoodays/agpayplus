@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
-    public class MchDivisionReceiverService: IMchDivisionReceiverService
+    public class MchDivisionReceiverService : IMchDivisionReceiverService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchDivisionReceiverRepository _mchDivisionReceiverRepository;
@@ -36,24 +36,24 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(MchDivisionReceiverDto dto)
+        public bool Add(MchDivisionReceiverDto dto)
         {
             var m = _mapper.Map<MchDivisionReceiver>(dto);
             _mchDivisionReceiverRepository.Add(m);
-            _mchDivisionReceiverRepository.SaveChanges();
+            return _mchDivisionReceiverRepository.SaveChanges(out int _);
         }
 
-        public void Remove(long recordId)
+        public bool Remove(long recordId)
         {
             _mchDivisionReceiverRepository.Remove(recordId);
-            _mchDivisionReceiverRepository.SaveChanges();
+            return _mchDivisionReceiverRepository.SaveChanges(out int _);
         }
 
-        public void Update(MchDivisionReceiverDto dto)
+        public bool Update(MchDivisionReceiverDto dto)
         {
             var m = _mapper.Map<MchDivisionReceiver>(dto);
             _mchDivisionReceiverRepository.Update(m);
-            _mchDivisionReceiverRepository.SaveChanges();
+            return _mchDivisionReceiverRepository.SaveChanges(out int _);
         }
 
         public MchDivisionReceiverDto GetById(long recordId)
@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Application.Services
 
         public MchDivisionReceiverDto GetById(long recordId, string mchNo)
         {
-            var entity = _mchDivisionReceiverRepository.GetAll().Where(w=>w.ReceiverId.Equals(recordId) && w.MchNo.Equals(mchNo)).First();
+            var entity = _mchDivisionReceiverRepository.GetAll().Where(w => w.ReceiverId.Equals(recordId) && w.MchNo.Equals(mchNo)).First();
             var dto = _mapper.Map<MchDivisionReceiverDto>(entity);
             return dto;
         }
@@ -74,6 +74,11 @@ namespace AGooday.AgPay.Application.Services
         {
             var mchDivisionReceivers = _mchDivisionReceiverRepository.GetAll();
             return _mapper.Map<IEnumerable<MchDivisionReceiverDto>>(mchDivisionReceivers);
+        }
+
+        public bool IsExistUseReceiverGroup(long receiverGroupId)
+        {
+            return _mchDivisionReceiverRepository.IsExistUseReceiverGroup(receiverGroupId);
         }
 
         public PaginatedList<MchDivisionReceiverDto> GetPaginatedData(MchDivisionReceiverQueryDto dto)

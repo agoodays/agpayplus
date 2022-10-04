@@ -55,6 +55,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <returns></returns>
         int SaveChanges();
+        bool SaveChanges(out int count);
     }
     public interface IRepository<TEntity> : IDisposable
         where TEntity : class
@@ -101,6 +102,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <returns></returns>
         int SaveChanges();
+        bool SaveChanges(out int count);
     }
     public interface IRepository : IDisposable
     {

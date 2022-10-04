@@ -41,20 +41,20 @@ namespace AGooday.AgPay.Application.Services
             dto.WayCode = dto.WayCode.ToUpper();
             var m = _mapper.Map<PayWay>(dto);
             _payWayRepository.Add(m);
-            return _payWayRepository.SaveChanges() > 0;
+            return _payWayRepository.SaveChanges(out int _);
         }
 
         public bool Remove(string recordId)
         {
             _payWayRepository.Remove(recordId);
-            return _payWayRepository.SaveChanges() > 0;
+            return _payWayRepository.SaveChanges(out int _);
         }
 
         public bool Update(PayWayDto dto)
         {
             var m = _mapper.Map<PayWay>(dto);
             _payWayRepository.Update(m);
-            return _payWayRepository.SaveChanges() > 0;
+            return _payWayRepository.SaveChanges(out int _);
         }
 
         public PayWayDto GetById(string recordId)

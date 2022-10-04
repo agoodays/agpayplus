@@ -9,10 +9,12 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IPayOrderDivisionRecordService : IDisposable
     {
-        void Add(PayOrderDivisionRecordDto dto);
-        void Remove(long recordId);
-        void Update(PayOrderDivisionRecordDto dto);
+        bool Add(PayOrderDivisionRecordDto dto);
+        bool Remove(long recordId);
+        bool Update(PayOrderDivisionRecordDto dto);
         PayOrderDivisionRecordDto GetById(long recordId);
+        PayOrderDivisionRecordDto GetById(long recordId, string mchNo);
         IEnumerable<PayOrderDivisionRecordDto> GetAll();
+        PaginatedList<PayOrderDivisionRecordDto> GetPaginatedData(PayOrderDivisionRecordQueryDto dto);
     }
 }

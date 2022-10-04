@@ -10,10 +10,10 @@ namespace AGooday.AgPay.Application.Interfaces
     public interface IMchInfoService : IDisposable
     {
         bool IsExistMchNo(string mchNo);
-        void Add(MchInfoDto dto);
+        bool Add(MchInfoDto dto);
         void Create(MchInfoCreateDto dto);
         void Remove(string recordId);
-        void Update(MchInfoDto dto);
+        bool Update(MchInfoDto dto);
         void Modify(MchInfoModifyDto dto);
         MchInfoDto GetById(string recordId);
         MchInfoDetailDto GetByMchNo(string mchNo);
