@@ -11,12 +11,12 @@ namespace AGooday.AgPay.Payment.Api.RQRS
         /// 商户号
         /// </summary>
         [Required(ErrorMessage = "商户号不能为空")]
-        public string mchNo { get; set; }
+        public string MchNo { get; set; }
 
         /// <summary>
         /// 商户应用ID
         /// </summary>
         [Required(ErrorMessage = "商户应用ID不能为空")]
-        public string appId { get; set; }
+        public string AppId { get; set; }
     }
 }

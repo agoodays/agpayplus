@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Common.Models;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="bizRQ"></param>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        protected ApiRes UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ, Models.PayOrder payOrder)
+        protected ApiRes UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
         {
             return ApiRes.Ok(new UnifiedOrderRS());
         }

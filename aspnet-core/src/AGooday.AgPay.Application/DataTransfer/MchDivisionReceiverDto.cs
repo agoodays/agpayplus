@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 绑定成功时间
         /// </summary>
-        public DateTime BindSuccessTime { get; set; }
+        public DateTime? BindSuccessTime { get; set; }
 
         /// <summary>
         /// 创建时间

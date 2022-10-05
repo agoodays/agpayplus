@@ -7,42 +7,42 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <summary>
         /// 上游渠道返回状态
         /// </summary>
-        public ChannelState channelState { get; set; }
+        public ChannelState ChannelState { get; set; }
 
         /// <summary>
         /// 渠道订单号
         /// </summary>
-        public string channelOrderId { get; set; }
+        public string ChannelOrderId { get; set; }
 
         /// <summary>
         /// 渠道用户标识
         /// </summary>
-        public string channelUserId { get; set; }
+        public string ChannelUserId { get; set; }
 
         /// <summary>
         /// 渠道错误码
         /// </summary>
-        public string channelErrCode { get; set; }
+        public string ChannelErrCode { get; set; }
 
         /// <summary>
         /// 渠道错误描述
         /// </summary>
-        public string channelErrMsg { get; set; }
+        public string ChannelErrMsg { get; set; }
 
         /// <summary>
         /// 渠道支付数据包, 一般用于支付订单的继续支付操作
         /// </summary>
-        public string channelAttach { get; set; }
+        public string ChannelAttach { get; set; }
 
         /// <summary>
         /// 上游渠道返回的原始报文, 一般用于[运营平台的查询上游结果]功能
         /// </summary>
-        public string channelOriginResponse { get; set; }
+        public string ChannelOriginResponse { get; set; }
 
         /// <summary>
         /// 是否需要轮询查单（比如微信条码支付） 默认不查询订单
         /// </summary>
-        public bool isNeedQuery { get; set; } = false;
+        public bool IsNeedQuery { get; set; } = false;
 
         /// <summary>
         /// 响应结果（一般用于回调接口返回给上游数据 ）
@@ -53,10 +53,10 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         public ChannelRetMsg() { }
         public ChannelRetMsg(ChannelState channelState, string channelOrderId, string channelErrCode, string channelErrMsg)
         {
-            this.channelState = channelState;
-            this.channelOrderId = channelOrderId;
-            this.channelErrCode = channelErrCode;
-            this.channelErrMsg = channelErrMsg;
+            this.ChannelState = channelState;
+            this.ChannelOrderId = channelOrderId;
+            this.ChannelErrCode = channelErrCode;
+            this.ChannelErrMsg = channelErrMsg;
         }
 
         /// <summary>

@@ -12,17 +12,17 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         /// </summary>
         /// <param name=""></param>
         [Required(ErrorMessage = "用户ID不能为空")]
-        public string buyerUserId { get; set; }
+        public string BuyerUserId { get; set; }
 
         /** 构造函数 **/
         public AliJsapiOrderRQ()
         {
-            this.wayCode = "ALI_JSAPI";
+            this.WayCode = "ALI_JSAPI";
         }
 
         public override string GetChannelUserId()
         {
-            return this.buyerUserId;
+            return this.BuyerUserId;
         }
     }
 }
