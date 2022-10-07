@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
         /// 生成聚合支付参数 (仅统一下单接口使用)
         /// </summary>
         /// <returns></returns>
-        public string BuildPayDataType()
+        public virtual string BuildPayDataType()
         {
             return "none";
         }
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
         /// 生成支付参数
         /// </summary>
         /// <returns></returns>
-        public string BuildPayData()
+        public virtual string BuildPayData()
         {
             return "";
         }

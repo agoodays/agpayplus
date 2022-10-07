@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PayOrderDivisionRecordDto GetById(long recordId, string mchNo)
         {
-            var entity = _payOrderDivisionRecordRepository.GetAll().Where(w => w.RecordId.Equals(recordId) && w.MchNo.Equals(mchNo)).First();
+            var entity = _payOrderDivisionRecordRepository.GetAll().Where(w => w.RecordId.Equals(recordId) && w.MchNo.Equals(mchNo)).FirstOrDefault();
             return _mapper.Map<PayOrderDivisionRecordDto>(entity);
         }
 

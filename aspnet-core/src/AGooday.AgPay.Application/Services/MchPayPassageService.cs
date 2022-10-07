@@ -121,7 +121,7 @@ namespace AGooday.AgPay.Application.Services
                 var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
                 foreach (var item in result)
                 {
-                    var payPassage = mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).First();
+                    var payPassage = mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).FirstOrDefault();
                     if (payPassage != null)
                     {
                         item.PassageId = payPassage.Id;
@@ -166,7 +166,7 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mchPayPassageRepository.GetAll().Where(w => w.State.Equals(CS.YES)
             && w.MchNo.Equals(mchNo)
             && w.AppId.Equals(appId)
-            && w.WayCode.Equals(wayCode)).First();
+            && w.WayCode.Equals(wayCode)).FirstOrDefault();
             var dto = _mapper.Map<MchPayPassageDto>(entity);
             return dto;
         }

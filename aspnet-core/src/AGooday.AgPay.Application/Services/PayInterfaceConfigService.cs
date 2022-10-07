@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Application.Services
         public PayInterfaceConfigDto GetByInfoIdAndIfCode(byte infoType, string infoId, string ifCode)
         {
             var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.Equals(infoId)
-            && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode)).First();
+            && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode)).FirstOrDefault();
             return _mapper.Map<PayInterfaceConfigDto>(payInterfaceConfig);
         }
 

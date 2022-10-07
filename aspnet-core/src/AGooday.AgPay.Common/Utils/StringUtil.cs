@@ -128,5 +128,15 @@ namespace AGooday.AgPay.Common.Utils
             return content.Substring(0, frontNum) + starStr
                     + content.Substring(content.Length - endNum, content.Length);
         }
+
+        public static bool IsAvailableUrl(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return false;
+            }
+
+            return url.StartsWith("http://") || url.StartsWith("https://");
+        }
     }
 }

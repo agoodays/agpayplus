@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Application.Services
 
         public SysUserDto GetById(long recordId, string belongInfoId)
         {
-            var entity = _sysUserRepository.GetAll().Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).First();
+            var entity = _sysUserRepository.GetAll().Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefault();
             var dto = _mapper.Map<SysUserDto>(entity);
             return dto;
         }

@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
         /// <summary>
         /// 订单失效时间, 单位：秒
         /// </summary>
-        public int ExpiredTime { get; set; }
+        public int? ExpiredTime { get; set; }
 
         /// <summary>
         /// 特定渠道发起额外参数
@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
         /// 分账模式： 0-该笔订单不允许分账, 1-支付成功按配置自动完成分账, 2-商户手动分账(解冻商户金额) 
         /// </summary>
         [Range(0, 2, ErrorMessage = "分账模式设置值有误")]
-        public byte DivisionMode { get; set; }
+        public byte? DivisionMode { get; set; }
 
         /// <summary>
         /// 返回真实的bizRQ

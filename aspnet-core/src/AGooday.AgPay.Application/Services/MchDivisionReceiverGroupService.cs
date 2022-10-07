@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Application.Services
 
         public MchDivisionReceiverGroupDto GetById(long recordId, string mchNo)
         {
-            var entity = _mchDivisionReceiverGroupRepository.GetAll().Where(w => w.ReceiverGroupId.Equals(recordId) && w.MchNo.Equals(mchNo)).First();
+            var entity = _mchDivisionReceiverGroupRepository.GetAll().Where(w => w.ReceiverGroupId.Equals(recordId) && w.MchNo.Equals(mchNo)).FirstOrDefault();
             return _mapper.Map<MchDivisionReceiverGroupDto>(entity);
         }
 

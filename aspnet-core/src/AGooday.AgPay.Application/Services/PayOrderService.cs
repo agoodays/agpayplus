@@ -102,5 +102,9 @@ namespace AGooday.AgPay.Application.Services
         {
             return _payOrderRepository.IsExistOrderUseWayCode(wayCode);
         }
+        public bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo)
+        {
+            return _payOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchOrderNo);
+        }
     }
 }

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AGooday.AgPay.Domain.Core.Models;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -62,7 +63,11 @@ namespace AGooday.AgPay.Application.Services
             var dto = _mapper.Map<MchAppDto>(entity);
             return dto;
         }
-
+        public MchAppDto GetById(string recordId, string mchNo)
+        {
+            var entity = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId)).FirstOrDefault();
+            return _mapper.Map<MchAppDto>(entity);
+        }
         public IEnumerable<MchAppDto> GetAll()
         {
             var mchApps = _mchAppRepository.GetAll();

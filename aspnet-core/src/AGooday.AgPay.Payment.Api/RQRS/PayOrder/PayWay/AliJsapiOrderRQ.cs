@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AGooday.AgPay.Common.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 {
@@ -17,7 +18,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         /** 构造函数 **/
         public AliJsapiOrderRQ()
         {
-            this.WayCode = "ALI_JSAPI";
+            this.WayCode = CS.PAY_WAY_CODE.ALI_JSAPI;
         }
 
         public override string GetChannelUserId()

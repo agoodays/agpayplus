@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AGooday.AgPay.Common.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 {
@@ -18,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         /// </summary>
         public AliBarOrderRQ()
         {
-            this.WayCode = "ALI_BAR"; //默认 ali_bar, 避免validate出现问题
+            this.WayCode = CS.PAY_WAY_CODE.ALI_BAR; //默认 ali_bar, 避免validate出现问题
         }
     }
 }

@@ -96,7 +96,7 @@ namespace AGooday.AgPay.Application.Services
                     Identifier = s.ua.Identifier,
                     Credential = s.ua.Credential
                 })
-                .First();
+                .FirstOrDefault();
             return entity;
         }
 
@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Application.Services
                     Identifier = s.ua.Identifier,
                     Credential = s.ua.Credential
                 })
-                .First();
+                .FirstOrDefault();
             return entity;
         }
 

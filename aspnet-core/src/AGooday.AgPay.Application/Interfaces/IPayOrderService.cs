@@ -17,5 +17,6 @@ namespace AGooday.AgPay.Application.Interfaces
         bool IsExistOrderUseIfCode(string ifCode);
         bool IsExistOrderUseWayCode(string wayCode);
         PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto);
+        bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo);
     }
 }

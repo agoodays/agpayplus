@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers
 {
-    [Route("api/[controller]")]
+    /// <summary>
+    /// api 抽象接口， 公共函数
+    /// </summary>
     [ApiController]
     public abstract class ApiControllerBase : ControllerBase
     {
