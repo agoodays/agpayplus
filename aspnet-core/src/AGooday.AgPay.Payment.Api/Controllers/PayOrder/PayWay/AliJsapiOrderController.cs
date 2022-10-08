@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,13 +16,15 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
     [ApiController]
     public class AliJsapiOrderController : AbstractPayOrderController
     {
-        public AliJsapiOrderController(Func<string, IPaymentService> paymentServiceFactory, 
-            ConfigContextQueryService configContextQueryService, 
+        public AliJsapiOrderController(Func<string, IPaymentService> paymentServiceFactory,
+            ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
+            RequestIpUtil requestIpUtil,
+            ILogger<AliJsapiOrderController> logger,
             IMchPayPassageService mchPayPassageService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService)
-            : base(paymentServiceFactory, configContextQueryService, payOrderProcessService, mchPayPassageService, payOrderService, sysConfigService)
+            : base(paymentServiceFactory, configContextQueryService, payOrderProcessService, requestIpUtil, logger, mchPayPassageService, payOrderService, sysConfigService)
         {
         }
 

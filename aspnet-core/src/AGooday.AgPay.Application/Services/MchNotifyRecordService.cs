@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using AGooday.AgPay.Common.Enumerator;
+using static AGooday.AgPay.Application.Permissions.PermCode;
+using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -92,6 +94,57 @@ namespace AGooday.AgPay.Application.Services
             notify.State = (byte)MchNotifyRecordState.STATE_ING;
             _mchNotifyRecordRepository.Update(notify);
             _mchNotifyRecordRepository.SaveChanges();
+        }
+
+        /// <summary>
+        /// 根据订单号和类型查询
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <param name="orderType"></param>
+        /// <returns></returns>
+        public MchNotifyRecordDto FindByOrderAndType(string orderId, byte orderType)
+        {
+            var entity = _mchNotifyRecordRepository.GetAll().Where(w => w.OrderId.Equals(orderId) && w.OrderType.Equals(orderType)).FirstOrDefault();
+            return _mapper.Map<MchNotifyRecordDto>(entity);
+        }
+
+        /// <summary>
+        /// 查询支付订单
+        /// </summary>
+        /// <param name="payOrderId"></param>
+        /// <returns></returns>
+        public MchNotifyRecordDto FindByPayOrder(string payOrderId)
+        {
+            return FindByOrderAndType(payOrderId, (byte)MchNotifyRecordType.TYPE_PAY_ORDER);
+        }
+
+        /// <summary>
+        /// 查询退款订单订单
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public MchNotifyRecordDto FindByRefundOrder(string orderId)
+        {
+            return FindByOrderAndType(orderId, (byte)MchNotifyRecordType.TYPE_REFUND_ORDER);
+        }
+
+        /// <summary>
+        /// 查询退款订单订单
+        /// </summary>
+        /// <param name="transferId"></param>
+        /// <returns></returns>
+        public MchNotifyRecordDto FindByTransferOrder(string transferId)
+        {
+            return FindByOrderAndType(transferId, (byte)MchNotifyRecordType.TYPE_TRANSFER_ORDER);
+        }
+
+        public int UpdateNotifyResult(long notifyId, byte state, string resResult)
+        {
+            var notify = _mchNotifyRecordRepository.GetById(notifyId);
+            notify.State = state;
+            notify.ResResult = resResult;
+            _mchNotifyRecordRepository.Update(notify);
+            return _mchNotifyRecordRepository.SaveChanges();
         }
     }
 }

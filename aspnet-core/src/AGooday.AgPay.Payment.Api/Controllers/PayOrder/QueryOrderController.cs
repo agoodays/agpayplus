@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AGooday.AgPay.Payment.Api.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
@@ -10,6 +11,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     [Route("api/pay")]
     public class QueryOrderController : ApiControllerBase
     {
+        public QueryOrderController(RequestIpUtil requestIpUtil) : base(requestIpUtil)
+        {
+        }
+
         [HttpPost]
         [Route("query")]
         public ActionResult QueryOrder()

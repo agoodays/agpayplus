@@ -12,6 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using AGooday.AgPay.Common.Enumerator;
+using System.Data;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -105,6 +107,87 @@ namespace AGooday.AgPay.Application.Services
         public bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo)
         {
             return _payOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchOrderNo);
+        }
+        public bool UpdateInit2Ing(string payOrderId, PayOrderDto payOrder)
+        {
+            var updateRecord = _payOrderRepository.GetById(payOrderId);
+            if (updateRecord.State != (byte)PayOrderState.STATE_INIT)
+            {
+                return false;
+            }
+
+            updateRecord.State = (byte)PayOrderState.STATE_ING;
+
+            //同时更新， 未确定 --》 已确定的其他信息。  如支付接口的确认、 费率的计算。
+            updateRecord.IfCode = payOrder.IfCode;
+            updateRecord.WayCode = payOrder.WayCode;
+            updateRecord.MchFeeRate = payOrder.MchFeeRate;
+            updateRecord.MchFeeAmount = payOrder.MchFeeAmount;
+            updateRecord.ChannelUser = payOrder.ChannelUser;
+            _payOrderRepository.Update(updateRecord);
+            return _payOrderRepository.SaveChanges(out int _);
+        }
+
+        /** 更新订单状态  【支付中】 --》 【支付成功】 **/
+        public bool UpdateIng2Success(string payOrderId, string channelOrderNo, string channelUserId)
+        {
+            var updateRecord = _payOrderRepository.GetById(payOrderId);
+            if (updateRecord.State != (byte)PayOrderState.STATE_ING)
+            {
+                return false;
+            }
+            updateRecord.State = (byte)PayOrderState.STATE_SUCCESS;
+            updateRecord.ChannelOrderNo = channelOrderNo;
+            updateRecord.ChannelUser = channelUserId;
+            updateRecord.SuccessTime = DateTime.Now;
+            _payOrderRepository.Update(updateRecord);
+            return _payOrderRepository.SaveChanges(out int _);
+        }
+
+        /** 更新订单状态  【支付中】 --》 【支付成功】 **/
+        public bool UpdateIng2Fail(string payOrderId, string channelOrderNo, string channelUserId, string channelErrCode, string channelErrMsg)
+        {
+            var updateRecord = _payOrderRepository.GetById(payOrderId);
+            if (updateRecord.State != (byte)PayOrderState.STATE_ING)
+            {
+                return false;
+            }
+            updateRecord.State = (byte)PayOrderState.STATE_FAIL;
+            updateRecord.ErrCode = channelErrCode;
+            updateRecord.ErrMsg = channelErrMsg;
+            updateRecord.ChannelOrderNo = channelOrderNo;
+            updateRecord.ChannelUser = channelUserId;
+            _payOrderRepository.Update(updateRecord);
+            return _payOrderRepository.SaveChanges(out int _);
+        }
+
+        public bool UpdateIng2SuccessOrFail(string payOrderId, byte updateState, string channelOrderNo, string channelUserId, string channelErrCode, string channelErrMsg)
+        {
+            if (updateState == (byte)PayOrderState.STATE_ING)
+            {
+                return true;
+            }
+            else if (updateState == (byte)PayOrderState.STATE_SUCCESS)
+            {
+                return UpdateIng2Success(payOrderId, channelOrderNo, channelUserId);
+            }
+            else if (updateState == (byte)PayOrderState.STATE_FAIL)
+            {
+                return UpdateIng2Fail(payOrderId, channelOrderNo, channelUserId, channelErrCode, channelErrMsg);
+            }
+            return false;
+        }
+
+        public bool UpdateDivisionState(PayOrderDto payOrder)
+        {
+            var updateRecord = _payOrderRepository.GetById(payOrder.PayOrderId);
+            if (updateRecord.DivisionState != (byte)PayOrderDivision.DIVISION_STATE_UNHAPPEN)
+            {
+                return false;
+            }
+            updateRecord.DivisionState = (byte)PayOrderDivision.DIVISION_STATE_WAIT_TASK;
+            _payOrderRepository.Update(updateRecord);
+            return _payOrderRepository.SaveChanges(out int _);
         }
     }
 }

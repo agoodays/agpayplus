@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 订单分账模式：0-该笔订单不允许分账, 1-支付成功按配置自动完成分账, 2-商户手动分账(解冻商户金额)
         /// </summary>
-        public byte DivisionMode { get; set; }
+        public byte? DivisionMode { get; set; }
 
         /// <summary>
         /// 0-未发生分账, 1-等待分账任务处理, 2-分账处理中, 3-分账任务已结束(不体现状态)
@@ -184,12 +184,12 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 订单支付成功时间
         /// </summary>
-        public DateTime SuccessTime { get; set; }
+        public DateTime? SuccessTime { get; set; }
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间

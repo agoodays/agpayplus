@@ -18,5 +18,8 @@ namespace AGooday.AgPay.Application.Interfaces
         bool IsExistOrderUseWayCode(string wayCode);
         PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto);
         bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo);
+        bool UpdateInit2Ing(string payOrderId, PayOrderDto payOrder);
+        bool UpdateIng2SuccessOrFail(string payOrderId, byte state, string channelOrderId, string channelUserId, string channelErrCode, string channelErrMsg);
+        bool UpdateDivisionState(PayOrderDto payOrder);
     }
 }

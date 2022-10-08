@@ -7,7 +7,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <summary>
         /// 上游渠道返回状态
         /// </summary>
-        public ChannelState ChannelState { get; set; }
+        public ChannelState? ChannelState { get; set; }
 
         /// <summary>
         /// 渠道订单号
@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg ConfirmSuccess(string channelOrderId)
         {
-            return new ChannelRetMsg(ChannelState.CONFIRM_SUCCESS, channelOrderId, null, null);
+            return new ChannelRetMsg(Msg.ChannelState.CONFIRM_SUCCESS, channelOrderId, null, null);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg ConfirmFail(string channelErrCode, string channelErrMsg)
         {
-            return new ChannelRetMsg(ChannelState.CONFIRM_FAIL, null, channelErrCode, channelErrMsg);
+            return new ChannelRetMsg(Msg.ChannelState.CONFIRM_FAIL, null, channelErrCode, channelErrMsg);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg ConfirmFail(string channelOrderId, string channelErrCode, string channelErrMsg)
         {
-            return new ChannelRetMsg(ChannelState.CONFIRM_FAIL, channelOrderId, channelErrCode, channelErrMsg);
+            return new ChannelRetMsg(Msg.ChannelState.CONFIRM_FAIL, channelOrderId, channelErrCode, channelErrMsg);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg ConfirmFail(string channelOrderId)
         {
-            return new ChannelRetMsg(ChannelState.CONFIRM_FAIL, channelOrderId, null, null);
+            return new ChannelRetMsg(Msg.ChannelState.CONFIRM_FAIL, channelOrderId, null, null);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg ConfirmFail()
         {
-            return new ChannelRetMsg(ChannelState.CONFIRM_FAIL, null, null, null);
+            return new ChannelRetMsg(Msg.ChannelState.CONFIRM_FAIL, null, null, null);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg Waiting()
         {
-            return new ChannelRetMsg(ChannelState.WAITING, null, null, null);
+            return new ChannelRetMsg(Msg.ChannelState.WAITING, null, null, null);
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg SysError(string channelErrMsg)
         {
-            return new ChannelRetMsg(ChannelState.SYS_ERROR, null, null, "系统：" + channelErrMsg);
+            return new ChannelRetMsg(Msg.ChannelState.SYS_ERROR, null, null, "系统：" + channelErrMsg);
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg Unknown()
         {
-            return new ChannelRetMsg(ChannelState.UNKNOWN, null, null, null);
+            return new ChannelRetMsg(Msg.ChannelState.UNKNOWN, null, null, null);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg Unknown(string channelErrMsg)
         {
-            return new ChannelRetMsg(ChannelState.UNKNOWN, null, null, channelErrMsg);
+            return new ChannelRetMsg(Msg.ChannelState.UNKNOWN, null, null, channelErrMsg);
         }
     }
 

@@ -17,6 +17,7 @@ using AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay;
 using AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay;
 using AGooday.AgPay.Payment.Api.Channel.XxPay;
+using AGooday.AgPay.Payment.Api.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +67,8 @@ services.Configure<MvcOptions>(options =>
     options.Filters.Add<ValidateModelAttribute>();
 });
 
+services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+services.AddSingleton<RequestIpUtil>();
 // .NET Core 原生依赖注入
 // 单写一层用来添加依赖项，从展示层 Presentation 中隔离
 NativeInjectorBootStrapper.RegisterServices(services);
@@ -84,6 +87,8 @@ services.AddSingleton<ConfigContextService>();
 //services.AddSingleton<IDivisionService, WxPayDivisionService>();
 services.AddSingleton<AliPayDivisionService>();
 services.AddSingleton<WxPayDivisionService>();
+services.AddSingleton<PayMchNotifyService>();
+services.AddSingleton<PayOrderProcessService>();
 services.AddSingleton(provider =>
 {
     Func<string, IDivisionService> funcFactory = ifCode =>
