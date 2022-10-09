@@ -132,6 +132,25 @@ services.AddSingleton<IPaymentService, AliBar>();
 services.AddSingleton<IPaymentService, WxApp>();
 services.AddSingleton<IPaymentService, WxBar>();
 
+services.AddSingleton<AliPayChannelUserService>();
+services.AddSingleton<WxPayChannelUserService>();
+services.AddSingleton(provider =>
+{
+    Func<string, IChannelUserService> funcFactory = ifCode =>
+    {
+        switch (ifCode)
+        {
+            case CS.IF_CODE.ALIPAY:
+                return provider.GetService<AliPayChannelUserService>();
+            case CS.IF_CODE.WXPAY:
+                return provider.GetService<WxPayChannelUserService>();
+            default:
+                return null;
+        }
+    };
+    return funcFactory;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

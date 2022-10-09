@@ -1,13 +1,14 @@
 ﻿using AGooday.AgPay.Common.Constants;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 {
     /// <summary>
-    /// 支付方式： ALI_APP
+    /// 支付方式： ALI_JSAPI
     /// </summary>
-    public class AliAppOrderRS : UnifiedOrderRS
+    public class AliJsapiOrderRS : UnifiedOrderRS
     {
-        //private string PayData { get; set; }
+        public string AlipayTradeNo { get; set; }
 
         public override string BuildPayDataType()
         {
@@ -16,7 +17,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 
         public override string BuildPayData()
         {
-            return PayData;
+            return JsonConvert.SerializeObject(new { alipayTradeNo = AlipayTradeNo });
         }
     }
 }

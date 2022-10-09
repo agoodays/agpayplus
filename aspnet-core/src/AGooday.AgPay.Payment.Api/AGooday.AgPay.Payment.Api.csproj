@@ -19,8 +19,10 @@
   <ItemGroup>
     <Compile Include="Controllers\PayOrder\AbstractPayOrderController.cs" />
     <Compile Include="Controllers\PayOrder\PayWay\AliBarOrderController.cs" />
+    <Compile Include="Controllers\PayOrder\PayWay\YsfJsapiOrderController.cs" />
     <Compile Include="Controllers\PayOrder\PayWay\AliJsapiOrderController.cs" />
     <Compile Include="Controllers\PayOrder\ChannelNoticeController.cs" />
+    <Compile Include="Controllers\PayOrder\PayWay\YsfBarOrderController.cs" />
     <Compile Include="Controllers\PayOrder\QueryOrderController.cs" />
     <Compile Include="Controllers\PayOrder\UnifiedOrderController.cs" />
   </ItemGroup>

@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Application.Params.AliPay
     public class AliPayNormalMchParams : NormalMchParams
     {
         /** 是否沙箱环境 */
-        public byte sandbox { get; set; }
+        public byte? sandbox { get; set; }
 
         /** appId */
         public string appId { get; set; }

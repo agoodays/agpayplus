@@ -2,6 +2,9 @@
 using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Controllers
 {
@@ -40,14 +43,28 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             return default(T);
         }
 
-        private T GetObject<T>()
+        protected T GetObject<T>()
         {
-            return this.GetReqParamJSON<T>();
+            return JsonConvert.DeserializeObject<T>(this.GetReqParamJson().ToString());
         }
 
-        private T GetReqParamJSON<T>()
+        protected JObject GetReqParamJson()
         {
-            return default(T);
+            Request.EnableBuffering();
+
+            string body = "";
+            var stream = Request.Body;
+            if (stream != null)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                using (var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true))
+                {
+                    body = reader.ReadToEndAsync().Result;
+                }
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
+            return JObject.FromObject(body);
         }
 
         /** 获取客户端ip地址 **/

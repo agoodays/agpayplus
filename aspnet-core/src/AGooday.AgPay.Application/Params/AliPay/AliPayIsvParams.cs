@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Application.Params.AliPay
     public class AliPayIsvParams : IsvParams
     {
         /** 是否沙箱环境 */
-        public Byte sandbox { get; set; }
+        public byte sandbox { get; set; }
 
         /** pid */
         public string pid { get; set; }
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Application.Params.AliPay
         public string signType { get; set; }
 
         /** 是否使用证书方式 **/
-        public Byte useCert { get; set; }
+        public byte useCert { get; set; }
 
         /** app 证书 **/
         public string appPublicCert { get; set; }
