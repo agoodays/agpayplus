@@ -13,45 +13,65 @@ namespace AGooday.AgPay.Application.Params.AliPay
     /// </summary>
     public class AliPayIsvParams : IsvParams
     {
-        /** 是否沙箱环境 */
-        public byte sandbox { get; set; }
+        /// <summary>
+        /// 是否沙箱环境
+        /// </summary>
+        public byte Sandbox { get; set; }
 
-        /** pid */
-        public string pid { get; set; }
+        /// <summary>
+        /// pid
+        /// </summary>
+        public string Pid { get; set; }
 
-        /** appId */
-        public string appId { get; set; }
+        /// <summary>
+        /// appId
+        /// </summary>
+        public string AppId { get; set; }
 
-        /** privateKey */
-        public string privateKey { get; set; }
+        /// <summary>
+        /// privateKey
+        /// </summary>
+        public string PrivateKey { get; set; }
 
-        /** alipayPublicKey */
-        public string alipayPublicKey { get; set; }
+        /// <summary>
+        /// alipayPublicKey
+        /// </summary>
+        public string AlipayPublicKey { get; set; }
 
-        /** 签名方式 **/
-        public string signType { get; set; }
+        /// <summary>
+        /// 签名方式
+        /// </summary>
+        public string SignType { get; set; }
 
-        /** 是否使用证书方式 **/
-        public byte useCert { get; set; }
+        /// <summary>
+        /// 是否使用证书方式
+        /// </summary>
+        public byte UseCert { get; set; }
 
-        /** app 证书 **/
-        public string appPublicCert { get; set; }
+        /// <summary>
+        /// app 证书
+        /// </summary>
+        public string AppPublicCert { get; set; }
 
-        /** 支付宝公钥证书（.crt格式） **/
-        public string alipayPublicCert { get; set; }
+        /// <summary>
+        /// 支付宝公钥证书（.crt格式）
+        /// </summary>
+        public string AlipayPublicCert { get; set; }
 
-        /** 支付宝根证书 **/
-        public string alipayRootCert { get; set; }
+        /// <summary>
+        /// 支付宝根证书
+        /// </summary>
+        public string AlipayRootCert { get; set; }
 
         public override string DeSenData()
         {
-            if (!string.IsNullOrWhiteSpace(privateKey))
+            if (!string.IsNullOrWhiteSpace(PrivateKey))
             {
-                privateKey = StringUtil.Str2Star(privateKey, 4, 4, 6);
+                PrivateKey = StringUtil.Str2Star(PrivateKey, 4, 4, 6);
             }
-            if (!string.IsNullOrWhiteSpace(alipayPublicKey))
+            if (!string.IsNullOrWhiteSpace(AlipayPublicKey))
             {
-                alipayPublicKey = StringUtil.Str2Star(alipayPublicKey, 6, 6, 6);
+                AlipayPublicKey = StringUtil.Str2Star(AlipayPublicKey, 6, 6, 6);
             }
             return JsonConvert.SerializeObject(this);
         }

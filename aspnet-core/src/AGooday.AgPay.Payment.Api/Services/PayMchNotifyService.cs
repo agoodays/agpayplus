@@ -5,6 +5,8 @@ using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
+using AGooday.AgPay.Payment.Api.RQRS.Refund;
+using AGooday.AgPay.Payment.Api.RQRS.Transfer;
 using log4net;
 using MediatR;
 using Newtonsoft.Json;
@@ -15,6 +17,9 @@ using System.Text.Json.Nodes;
 
 namespace AGooday.AgPay.Payment.Api.Services
 {
+    /// <summary>
+    /// 商户通知 service
+    /// </summary>
     public class PayMchNotifyService
     {
         private readonly IMchNotifyRecordService _mchNotifyRecordService;
@@ -28,7 +33,10 @@ namespace AGooday.AgPay.Payment.Api.Services
             _logger = logger;
         }
 
-        /** 商户通知信息， 只有订单是终态，才会发送通知， 如明确成功和明确失败 **/
+        /// <summary>
+        /// 商户通知信息， 只有订单是终态，才会发送通知， 如明确成功和明确失败
+        /// </summary>
+        /// <param name="dbPayOrder"></param>
         public void PayOrderNotify(PayOrderDto dbPayOrder)
         {
             try
@@ -84,9 +92,12 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
         }
 
-        /**
-         * 创建响应URL
-         */
+        /// <summary>
+        /// 创建响应URL
+        /// </summary>
+        /// <param name="payOrder"></param>
+        /// <param name="appSecret"></param>
+        /// <returns></returns>
         public string CreateNotifyUrl(PayOrderDto payOrder, string appSecret)
         {
 
@@ -99,6 +110,70 @@ namespace AGooday.AgPay.Payment.Api.Services
 
             // 生成通知
             return URLUtil.AppendUrlQuery(payOrder.NotifyUrl, jsonObject);
+        }
+
+        /// <summary>
+        /// 创建响应URL
+        /// </summary>
+        /// <param name="refundOrder"></param>
+        /// <param name="appSecret"></param>
+        /// <returns></returns>
+        public string createNotifyUrl(RefundOrderDto refundOrder, String appSecret)
+        {
+
+            QueryRefundOrderRS queryRefundOrderRS = QueryRefundOrderRS.BuildByRefundOrder(refundOrder);
+            JObject jsonObject = JObject.FromObject(queryRefundOrderRS);
+            jsonObject.Add("reqTime", DateTimeOffset.Now.ToUnixTimeSeconds()); //添加请求时间
+
+            // 报文签名
+            jsonObject.Add("sign", AgPayUtil.GetSign(jsonObject, appSecret));   // 签名
+
+            // 生成通知
+            return URLUtil.AppendUrlQuery(refundOrder.NotifyUrl, jsonObject);
+        }
+
+        /// <summary>
+        /// 创建响应URL
+        /// </summary>
+        /// <param name="transferOrder"></param>
+        /// <param name="appSecret"></param>
+        /// <returns></returns>
+        public string CreateNotifyUrl(TransferOrderDto transferOrder, String appSecret)
+        {
+
+            QueryTransferOrderRS rs = QueryTransferOrderRS.BuildByRecord(transferOrder);
+            JObject jsonObject = JObject.FromObject(rs);
+            jsonObject.Add("reqTime", DateTimeOffset.Now.ToUnixTimeSeconds()); //添加请求时间
+
+            // 报文签名
+            jsonObject.Add("sign", AgPayUtil.GetSign(jsonObject, appSecret));   // 签名
+
+            // 生成通知
+            return URLUtil.AppendUrlQuery(transferOrder.NotifyUrl, jsonObject);
+        }
+
+        /// <summary>
+        /// 创建响应URL
+        /// </summary>
+        /// <param name="payOrder"></param>
+        /// <param name="appSecret"></param>
+        /// <returns></returns>
+        public string CreateReturnUrl(PayOrderDto payOrder, string appSecret)
+        {
+            if (string.IsNullOrWhiteSpace(payOrder.ReturnUrl))
+            {
+                return "";
+            }
+
+            QueryPayOrderRS queryPayOrderRS = QueryPayOrderRS.BuildByPayOrder(payOrder);
+            JObject jsonObject = JObject.FromObject(queryPayOrderRS);
+            jsonObject.Add("reqTime", DateTimeOffset.Now.ToUnixTimeSeconds()); //添加请求时间
+
+            // 报文签名
+            jsonObject.Add("sign", AgPayUtil.GetSign(jsonObject, appSecret));   // 签名
+
+            // 生成跳转地址
+            return URLUtil.AppendUrlQuery(payOrder.ReturnUrl, jsonObject);
         }
     }
 }

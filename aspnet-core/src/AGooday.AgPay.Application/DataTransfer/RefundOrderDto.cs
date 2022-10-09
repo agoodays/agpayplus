@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 订单退款成功时间
         /// </summary>
-        public DateTime SuccessTime { get; set; }
+        public DateTime? SuccessTime { get; set; }
 
         /// <summary>
         /// 退款失效时间（失效后系统更改为退款任务关闭状态）
@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间

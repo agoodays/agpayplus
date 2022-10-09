@@ -157,7 +157,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     {
                         //二维码地址
                         qrCashierOrderRS.CodeImgUrl = dbApplicationConfig.GenScanImgUrl(payUrl);
-
                     }
                     else
                     {

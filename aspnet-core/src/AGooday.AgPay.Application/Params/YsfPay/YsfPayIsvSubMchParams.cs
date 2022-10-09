@@ -14,6 +14,6 @@ namespace AGooday.AgPay.Application.Params.YsfPay
         /// <summary>
         /// 商户编号
         /// </summary>
-        public string merId { get; set; }
+        public string MerId { get; set; }
     }
 }

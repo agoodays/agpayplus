@@ -11,7 +11,9 @@ namespace AGooday.AgPay.Application.Params.YsfPay
     /// </summary>
     public class YsfPayConfig
     {
-        /** 网关地址 */
+        /// <summary>
+        /// 网关地址
+        /// </summary>
         public static string PROD_SERVER_URL = "https://partner.95516.com";
         public static string SANDBOX_SERVER_URL = "http://ysf.bcbip.cn:10240";
     }

@@ -14,73 +14,73 @@ namespace AGooday.AgPay.Application.Params.WxPay
     /// </summary>
     public class WxPayNormalMchParams : NormalMchParams
     {
-        /**
-         * 应用App ID
-         */
-        public string appId { get; set; }
+        /// <summary>
+        /// 应用App ID
+        /// </summary>
+        public string AppId { get; set; }
 
-        /**
-         * 应用AppSecret
-         */
-        public string appSecret { get; set; }
+        /// <summary>
+        /// 应用AppSecret
+        /// </summary>
+        public string AppSecret { get; set; }
 
-        /**
-         * 微信支付商户号
-         */
-        public string mchId { get; set; }
+        /// <summary>
+        /// 微信支付商户号
+        /// </summary>
+        public string MchId { get; set; }
 
-        /**
-         * oauth2地址
-         */
-        public string oauth2Url { get; set; }
+        /// <summary>
+        /// oauth2地址
+        /// </summary>
+        public string Oauth2Url { get; set; }
 
-        /**
-         * API密钥
-         */
-        public string key { get; set; }
+        /// <summary>
+        /// API密钥
+        /// </summary>
+        public string Key { get; set; }
 
-        /**
-         * 微信支付API版本
-         **/
-        public string apiVersion { get; set; }
+        /// <summary>
+        /// 微信支付API版本
+        /// </summary>
+        public string ApiVersion { get; set; }
 
-        /**
-         * API V3秘钥
-         **/
-        public string apiV3Key { get; set; }
+        /// <summary>
+        /// API V3秘钥
+        /// </summary>
+        public string ApiV3Key { get; set; }
 
-        /**
-         * 序列号
-         **/
-        public string serialNo { get; set; }
+        /// <summary>
+        /// 序列号
+        /// </summary>
+        public string SerialNo { get; set; }
 
-        /**
-         * API证书(.p12格式)
-         **/
-        public string cert { get; set; }
+        /// <summary>
+        /// API证书(.p12格式)
+        /// </summary>
+        public string Cert { get; set; }
 
-        /**
-         * 私钥文件(.pem格式)
-         **/
-        public string apiClientKey { get; set; }
+        /// <summary>
+        /// 私钥文件(.pem格式)
+        /// </summary>
+        public string ApiClientKey { get; set; }
 
         public override string DeSenData()
         {
-            if (!string.IsNullOrWhiteSpace(appSecret))
+            if (!string.IsNullOrWhiteSpace(AppSecret))
             {
-                appSecret = StringUtil.Str2Star(appSecret, 4, 4, 6);
+                AppSecret = StringUtil.Str2Star(AppSecret, 4, 4, 6);
             }
-            if (!string.IsNullOrWhiteSpace(key))
+            if (!string.IsNullOrWhiteSpace(Key))
             {
-                appSecret = StringUtil.Str2Star(appSecret, 4, 4, 6);
+                Key = StringUtil.Str2Star(Key, 4, 4, 6);
             }
-            if (!string.IsNullOrWhiteSpace(appSecret))
+            if (!string.IsNullOrWhiteSpace(ApiV3Key))
             {
-                appSecret = StringUtil.Str2Star(appSecret, 4, 4, 6);
+                ApiV3Key = StringUtil.Str2Star(ApiV3Key, 4, 4, 6);
             }
-            if (!string.IsNullOrWhiteSpace(appSecret))
+            if (!string.IsNullOrWhiteSpace(SerialNo))
             {
-                appSecret = StringUtil.Str2Star(appSecret, 4, 4, 6);
+                SerialNo = StringUtil.Str2Star(SerialNo, 4, 4, 6);
             }
             return JsonConvert.SerializeObject(this);
         }

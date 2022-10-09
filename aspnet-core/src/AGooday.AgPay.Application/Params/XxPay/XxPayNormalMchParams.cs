@@ -13,20 +13,26 @@ namespace AGooday.AgPay.Application.Params.XxPay
     /// </summary>
     public class XxPayNormalMchParams : NormalMchParams
     {
-        /** 商户号 */
-        public string mchId { get; set; }
+        /// <summary>
+        /// 商户号
+        /// </summary>
+        public string MchId { get; set; }
 
-        /** 私钥 */
-        public string key { get; set; }
+        /// <summary>
+        /// 私钥
+        /// </summary>
+        public string Key { get; set; }
 
-        /** 支付网关地址 */
-        public string payUrl { get; set; }
+        /// <summary>
+        /// 支付网关地址
+        /// </summary>
+        public string PayUrl { get; set; }
 
         public override string DeSenData()
         {
-            if (!string.IsNullOrWhiteSpace(key))
+            if (!string.IsNullOrWhiteSpace(Key))
             {
-                key = StringUtil.Str2Star(key, 4, 4, 6);
+                Key = StringUtil.Str2Star(Key, 4, 4, 6);
             }
             return JsonConvert.SerializeObject(this);
         }

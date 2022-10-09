@@ -129,12 +129,12 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 转账成功时间
         /// </summary>
-        public DateTime SuccessTime { get; set; }
+        public DateTime? SuccessTime { get; set; }
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间

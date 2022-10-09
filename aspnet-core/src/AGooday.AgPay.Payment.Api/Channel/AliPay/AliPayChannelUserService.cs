@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 {
                     throw new BizException("服务商支付宝接口没有配置！");
                 }
-                appId = isvParams.appId;
+                appId = isvParams.AppId;
             }
             else
             {
@@ -40,8 +40,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 {
                     throw new BizException("商户支付宝接口没有配置！");
                 }
-                appId = normalMchParams.appId;
-                if (normalMchParams.sandbox != null && normalMchParams.sandbox == CS.YES)
+                appId = normalMchParams.AppId;
+                if (normalMchParams.Sandbox != null && normalMchParams.Sandbox == CS.YES)
                 {
                     oauthUrl = AliPayConfig.SANDBOX_OAUTH_URL;
                 }

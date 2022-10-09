@@ -11,6 +11,6 @@ namespace AGooday.AgPay.Application.Params.AliPay
     /// </summary>
     public class AliPayIsvSubMchParams : IsvSubMchParams
     {
-        public string appAuthToken { get; set; }
+        public string AppAuthToken { get; set; }
     }
 }

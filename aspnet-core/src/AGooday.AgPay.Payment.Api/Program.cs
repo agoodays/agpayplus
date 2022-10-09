@@ -151,6 +151,8 @@ services.AddSingleton(provider =>
     return funcFactory;
 });
 
+services.AddSingleton<IQRCodeService, QRCodeService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

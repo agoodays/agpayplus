@@ -13,35 +13,35 @@ namespace AGooday.AgPay.Application.Params.PpPay
         /**
          * 是否沙箱环境
          */
-        public byte sandbox { get; set; }
+        public byte Sandbox { get; set; }
 
         /**
          * clientId
          * 客户端 ID
          */
-        public string clientId { get; set; }
+        public string ClientId { get; set; }
 
         /**
          * secret
          * 密钥
          */
-        public string secret { get; set; }
+        public string Secret { get; set; }
 
         /**
          * 支付 Webhook 通知 ID
          */
-        public string notifyWebhook { get; set; }
+        public string NotifyWebhook { get; set; }
 
         /**
          * 退款 Webhook 通知 ID
          */
-        public string refundWebhook { get; set; }
+        public string RefundWebhook { get; set; }
 
         public override string DeSenData()
         {
-            if (!string.IsNullOrWhiteSpace(secret))
+            if (!string.IsNullOrWhiteSpace(Secret))
             {
-                secret = StringUtil.Str2Star(secret, 6, 6, 6);
+                Secret = StringUtil.Str2Star(Secret, 6, 6, 6);
             }
             return JsonConvert.SerializeObject(this);
         }

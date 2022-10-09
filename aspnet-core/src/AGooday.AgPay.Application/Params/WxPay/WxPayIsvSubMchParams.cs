@@ -11,10 +11,14 @@ namespace AGooday.AgPay.Application.Params.WxPay
     /// </summary>
     public class WxPayIsvSubMchParams : IsvSubMchParams
     {
-        /** 子商户ID **/
-        public string subMchId { get; set; }
+        /// <summary>
+        /// 子商户ID
+        /// </summary>
+        public string SubMchId { get; set; }
 
-        /** 子账户appID **/
-        public string subMchAppId { get; set; }
+        /// <summary>
+        /// 子账户appID
+        /// </summary>
+        public string SubMchAppId { get; set; }
     }
 }

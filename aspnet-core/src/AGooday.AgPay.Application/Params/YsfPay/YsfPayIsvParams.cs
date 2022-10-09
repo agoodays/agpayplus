@@ -14,33 +14,45 @@ namespace AGooday.AgPay.Application.Params.YsfPay
     /// </summary>
     public class YsfPayIsvParams : IsvParams
     {
-        /** 是否沙箱环境 */
-        public byte sandbox;
+        /// <summary>
+        /// 是否沙箱环境
+        /// </summary>
+        public byte Sandbox { get; set; }
 
-        /** serProvId **/
-        public string serProvId;
+        /// <summary>
+        /// serProvId
+        /// </summary>
+        public string SerProvId { get; set; }
 
-        /** isvPrivateCertFile 证书 **/
-        public string isvPrivateCertFile;
+        /// <summary>
+        /// isvPrivateCertFile 证书
+        /// </summary>
+        public string IsvPrivateCertFile { get; set; }
 
-        /** isvPrivateCertPwd **/
-        public string isvPrivateCertPwd;
+        /// <summary>
+        /// isvPrivateCertPwd
+        /// </summary>
+        public string IsvPrivateCertPwd { get; set; }
 
-        /** ysfpayPublicKey **/
-        public string ysfpayPublicKey;
+        /// <summary>
+        /// ysfpayPublicKey
+        /// </summary>
+        public string YsfpayPublicKey { get; set; }
 
-        /** acqOrgCodeList 支付机构号 **/
-        public string acqOrgCode;
+        /// <summary>
+        /// acqOrgCodeList 支付机构号
+        /// </summary>
+        public string AcqOrgCode;
 
         public override string DeSenData()
         {
-            if (!string.IsNullOrWhiteSpace(isvPrivateCertPwd))
+            if (!string.IsNullOrWhiteSpace(IsvPrivateCertPwd))
             {
-                isvPrivateCertPwd = StringUtil.Str2Star(isvPrivateCertPwd, 0, 3, 6);
+                IsvPrivateCertPwd = StringUtil.Str2Star(IsvPrivateCertPwd, 0, 3, 6);
             }
-            if (!string.IsNullOrWhiteSpace(ysfpayPublicKey))
+            if (!string.IsNullOrWhiteSpace(YsfpayPublicKey))
             {
-                ysfpayPublicKey = StringUtil.Str2Star(ysfpayPublicKey, 6, 6, 6);
+                YsfpayPublicKey = StringUtil.Str2Star(YsfpayPublicKey, 6, 6, 6);
             }
             return JsonConvert.SerializeObject(this);
         }
