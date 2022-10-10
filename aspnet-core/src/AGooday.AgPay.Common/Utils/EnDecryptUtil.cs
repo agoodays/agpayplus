@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,151 +13,338 @@ namespace AGooday.AgPay.Common.Utils
     /// </summary>
     public class EnDecryptUtil
     {
-        /// <summary>
-        /// AES解密（默认为CBC模式）
-        /// </summary>
-        /// <param name="inputdata">输入的数据</param>
-        /// <param name="iv">向量</param>
-        /// <param name="strKey">key</param>
-        /// <returns></returns>
-        public static byte[] AESDecrypt(byte[] inputdata, byte[] iv, string strKey)
+        /// <summary>  
+        /// AES加密  
+        /// </summary>  
+        /// <param name="plainText">明文</param>  
+        /// <param name="Key">密钥</param>   
+        /// <param name="Vector">向量</param>  
+        /// <returns>密文</returns>  
+        public static string AESEncrypt(string plainText, string Key, string Vector)
         {
-            SymmetricAlgorithm bytes = Aes.Create();
-            bytes.Key = Encoding.UTF8.GetBytes(strKey.PadRight(32));
-            bytes.IV = iv;
-            byte[] array = null;
-            using (MemoryStream memoryStream = new MemoryStream(inputdata))
+            return Convert.ToBase64String(AESEncryptToBytes(plainText, Key, Vector));
+        }
+        /// <summary>  
+        /// AES加密  
+        /// </summary>  
+        /// <param name="plainText">明文</param>  
+        /// <param name="Key">密钥</param>  
+        /// <param name="Vector">向量</param>  
+        /// <returns>密文</returns>  
+        public static string AESEncryptToHex(string plainText, string Key, string Vector)
+        {
+            return StringUtil.ToHex(AESEncryptToBytes(plainText, Key, Vector));
+        }
+        /// <summary>  
+        /// AES加密  
+        /// </summary>  
+        /// <param name="plainText">明文</param>  
+        /// <param name="Key">密钥</param>  
+        /// <param name="Vector">向量</param>  
+        /// <returns>密文</returns>  
+        public static byte[] AESEncryptToBytes(string plainText, string Key, string Vector)
+        {
+            Byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+
+            Byte[] bKey = new Byte[32];
+            Array.Copy(Encoding.UTF8.GetBytes(Key.PadRight(bKey.Length)), bKey, bKey.Length);
+            Byte[] bVector = new Byte[16];
+            Array.Copy(Encoding.UTF8.GetBytes(Vector.PadRight(bVector.Length)), bVector, bVector.Length);
+
+            Byte[] Cryptograph = null; // 加密后的密文  
+
+            Rijndael Aes = Rijndael.Create();
+            try
             {
-                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, bytes.CreateDecryptor(), CryptoStreamMode.Read))
+                // 开辟一块内存流  
+                using (MemoryStream Memory = new MemoryStream())
                 {
-                    using (MemoryStream memoryStream1 = new MemoryStream())
+                    // 把内存流对象包装成加密流对象  
+                    using (CryptoStream Encryptor = new CryptoStream(Memory,
+                     Aes.CreateEncryptor(bKey, bVector),
+                     CryptoStreamMode.Write))
                     {
-                        byte[] numArray = new Byte[1024];
-                        int num = 0;
-                        while (true)
-                        {
-                            int num1 = cryptoStream.Read(numArray, 0, (int)numArray.Length);
-                            num = num1;
-                            if (num1 <= 0)
-                            {
-                                break;
-                            }
-                            memoryStream1.Write(numArray, 0, num);
-                        }
-                        array = memoryStream1.ToArray();
+                        // 明文数据写入加密流  
+                        Encryptor.Write(plainBytes, 0, plainBytes.Length);
+                        Encryptor.FlushFinalBlock();
+
+                        Cryptograph = Memory.ToArray();
                     }
                 }
             }
-            return array;
-        }
-
-        /// <summary>  
-        /// AES 解密（无向量，CEB模式，秘钥长度=128）
-        /// </summary>  
-        /// <param name="data">被加密的明文（注意：为Base64编码）</param>  
-        /// <param name="key">密钥</param>  
-        /// <returns>明文</returns>  
-        public static string AESDecrypt(string data, string key)
-        {
-            byte[] numArray = Convert.FromBase64String(data);
-            byte[] numArray1 = new Byte[32];
-            Array.Copy(Encoding.UTF8.GetBytes(key.PadRight((int)numArray1.Length)), numArray1, (int)numArray1.Length);
-            MemoryStream memoryStream = new MemoryStream(numArray);
-            SymmetricAlgorithm symmetricAlgorithm = Aes.Create();
-            symmetricAlgorithm.Mode = CipherMode.ECB;
-            symmetricAlgorithm.Padding = PaddingMode.PKCS7;
-            symmetricAlgorithm.KeySize = 128;
-            symmetricAlgorithm.Key = numArray1;
-            CryptoStream cryptoStream = new CryptoStream(memoryStream, symmetricAlgorithm.CreateDecryptor(), CryptoStreamMode.Read);
-            byte[] numArray2 = new Byte[(int)numArray.Length + 32];
-            int num = cryptoStream.Read(numArray2, 0, (int)numArray.Length + 32);
-            byte[] numArray3 = new Byte[num];
-            Array.Copy(numArray2, 0, numArray3, 0, num);
-            return Encoding.UTF8.GetString(numArray3);
-        }
-
-        public static string AESDecryptUnHex(string data, string key)
-        {
-            byte[] numArray = StringUtil.UnHex(data);
-            byte[] numArray1 = new Byte[32];
-            Array.Copy(Encoding.UTF8.GetBytes(key.PadRight((int)numArray1.Length)), numArray1, (int)numArray1.Length);
-            MemoryStream memoryStream = new MemoryStream(numArray);
-            SymmetricAlgorithm symmetricAlgorithm = Aes.Create();
-            symmetricAlgorithm.Mode = CipherMode.ECB;
-            symmetricAlgorithm.Padding = PaddingMode.PKCS7;
-            symmetricAlgorithm.KeySize = 128;
-            symmetricAlgorithm.Key = numArray1;
-            CryptoStream cryptoStream = new CryptoStream(memoryStream, symmetricAlgorithm.CreateDecryptor(), CryptoStreamMode.Read);
-            byte[] numArray2 = new Byte[(int)numArray.Length + 32];
-            int num = cryptoStream.Read(numArray2, 0, (int)numArray.Length + 32);
-            byte[] numArray3 = new Byte[num];
-            Array.Copy(numArray2, 0, numArray3, 0, num);
-            return Encoding.UTF8.GetString(numArray3);
-        }
-
-        /// <summary>
-        /// AES加密（默认为CBC模式）
-        /// </summary>
-        /// <param name="inputdata">输入的数据</param>
-        /// <param name="iv">向量</param>
-        /// <param name="strKey">加密密钥</param>
-        /// <returns></returns>
-        public static byte[] AESEncrypt(byte[] inputdata, byte[] iv, string strKey)
-        {
-            byte[] array;
-            SymmetricAlgorithm bytes = Aes.Create();
-            byte[] numArray = inputdata;
-            bytes.Key = Encoding.UTF8.GetBytes(strKey.PadRight(32));
-            bytes.IV = iv;
-            using (MemoryStream memoryStream = new MemoryStream())
+            catch
             {
-                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, bytes.CreateEncryptor(), CryptoStreamMode.Write))
+                Cryptograph = null;
+            }
+
+            return Cryptograph;
+        }
+        /// <summary>  
+        /// AES解密  
+        /// </summary>  
+        /// <param name="cipherText">被解密的密文</param>  
+        /// <param name="Key">密钥</param>  
+        /// <param name="Vector">向量</param>  
+        /// <returns>明文</returns>  
+        public static string AESDecrypt(string cipherText, string Key, string Vector)
+        {
+            return AESDecryptFromBytes(Convert.FromBase64String(cipherText), Key, Vector);
+        }
+        /// <summary>  
+        /// AES解密  
+        /// </summary>  
+        /// <param name="cipherText">密文</param>  
+        /// <param name="Key">密钥</param>  
+        /// <param name="Vector">向量</param>  
+        /// <returns>明文</returns>  
+        public static string AESDecryptUnHex(string cipherText, string Key, string Vector)
+        {
+            return AESDecryptFromBytes(StringUtil.UnHex(cipherText), Key, Vector);
+        }
+        /// <summary>  
+        /// AES解密  
+        /// </summary>  
+        /// <param name="cipherText">密文</param>  
+        /// <param name="Key">密钥</param>  
+        /// <param name="Vector">向量</param>  
+        /// <returns>明文</returns>  
+        public static string AESDecryptFromBytes(byte[] cipherText, string Key, string Vector)
+        {
+            Byte[] bKey = new Byte[32];
+            Array.Copy(Encoding.UTF8.GetBytes(Key.PadRight(bKey.Length)), bKey, bKey.Length);
+            Byte[] bVector = new Byte[16];
+            Array.Copy(Encoding.UTF8.GetBytes(Vector.PadRight(bVector.Length)), bVector, bVector.Length);
+
+            Byte[] original = null; // 解密后的明文  
+
+            Rijndael Aes = Rijndael.Create();
+            try
+            {
+                // 开辟一块内存流，存储密文  
+                using (MemoryStream Memory = new MemoryStream(cipherText))
                 {
-                    cryptoStream.Write(numArray, 0, (int)numArray.Length);
-                    cryptoStream.FlushFinalBlock();
-                    array = memoryStream.ToArray();
+                    // 把内存流对象包装成加密流对象  
+                    using (CryptoStream Decryptor = new CryptoStream(Memory,
+                    Aes.CreateDecryptor(bKey, bVector),
+                    CryptoStreamMode.Read))
+                    {
+                        // 明文存储区  
+                        using (MemoryStream originalMemory = new MemoryStream())
+                        {
+                            Byte[] Buffer = new Byte[1024];
+                            Int32 readBytes = 0;
+                            while ((readBytes = Decryptor.Read(Buffer, 0, Buffer.Length)) > 0)
+                            {
+                                originalMemory.Write(Buffer, 0, readBytes);
+                            }
+
+                            original = originalMemory.ToArray();
+                        }
+                    }
                 }
             }
-            return array;
+            catch
+            {
+                original = null;
+            }
+            return Encoding.UTF8.GetString(original);
         }
-
         /// <summary>
-        ///  AES 加密（无向量，CEB模式，秘钥长度=128）
+        /// ES加密(无向量)
         /// </summary>
-        /// <param name="str">明文（待加密）</param>
-        /// <param name="key">密文</param>
+        /// <param name="plainText">明文</param>
+        /// <param name="Key">密钥</param>
         /// <returns></returns>
-        public static string AESEncrypt(string str, string key)
+        public static string AESEncrypt(string plainText, string Key)
         {
-            if (string.IsNullOrEmpty(str))
+            return Convert.ToBase64String(AESEncryptToBytes(plainText, Key));
+        }
+        /// <summary>
+        /// ES加密(无向量)
+        /// </summary>
+        /// <param name="plainText">明文</param>
+        /// <param name="Key">密钥</param>
+        /// <returns></returns>
+        public static string AESEncryptToHex(string plainText, string Key)
+        {
+            return StringUtil.ToHex(AESEncryptToBytes(plainText, Key));
+        }
+        /// <summary>
+        /// ES加密(无向量)
+        /// </summary>
+        /// <param name="plainText">明文</param>
+        /// <param name="Key">密钥</param>
+        /// <returns></returns>
+        public static byte[] AESEncryptToBytes(string plainText, string Key)
+        {
+            MemoryStream mStream = new MemoryStream();
+            RijndaelManaged aes = new RijndaelManaged();
+
+            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+            Byte[] bKey = new Byte[32];
+            Array.Copy(Encoding.UTF8.GetBytes(Key.PadRight(bKey.Length)), bKey, bKey.Length);
+
+            aes.Mode = CipherMode.ECB;
+            aes.Padding = PaddingMode.PKCS7;
+            aes.KeySize = 128;
+            //aes.Key = _key;  
+            aes.Key = bKey;
+            //aes.IV = _iV;  
+            CryptoStream cryptoStream = new CryptoStream(mStream, aes.CreateEncryptor(), CryptoStreamMode.Write);
+            try
             {
-                return null;
+                cryptoStream.Write(plainBytes, 0, plainBytes.Length);
+                cryptoStream.FlushFinalBlock();
+                return mStream.ToArray();
             }
-            byte[] bytes = Encoding.UTF8.GetBytes(str);
-            byte[] numArray = (new RijndaelManaged()
+            finally
             {
-                Key = Encoding.UTF8.GetBytes(key.PadRight(32)),
-                Mode = CipherMode.ECB,
-                Padding = PaddingMode.PKCS7
-            }).CreateEncryptor().TransformFinalBlock(bytes, 0, (int)bytes.Length);
-            return Convert.ToBase64String(numArray, 0, (int)numArray.Length);
+                cryptoStream.Close();
+                mStream.Close();
+                aes.Clear();
+            }
+        }
+        /// <summary>  
+        /// AES解密(无向量)  
+        /// </summary>  
+        /// <param name="cipherText">密文</param>  
+        /// <param name="Key">密钥</param>  
+        /// <returns>明文</returns>  
+        public static string AESDecrypt(string cipherText, string Key)
+        {
+            return AESDecryptFromBytes(Convert.FromBase64String(cipherText), Key);
+        }
+        /// <summary>  
+        /// AES解密(无向量)  
+        /// </summary>  
+        /// <param name="cipherText">密文</param>  
+        /// <param name="Key">密钥</param>  
+        /// <returns>明文</returns>  
+        public static string AESDecryptUnHex(string cipherText, string Key)
+        {
+            return AESDecryptFromBytes(StringUtil.UnHex(cipherText), Key);
+        }
+        /// <summary>  
+        /// AES解密(无向量)  
+        /// </summary>  
+        /// <param name="encryptedBytes">被加密的明文</param>  
+        /// <param name="key">密钥</param>  
+        /// <returns>明文</returns>  
+        public static string AESDecryptFromBytes(byte[] cipherText, string Key)
+        {
+            Byte[] bKey = new Byte[32];
+            Array.Copy(Encoding.UTF8.GetBytes(Key.PadRight(bKey.Length)), bKey, bKey.Length);
+
+            MemoryStream mStream = new MemoryStream(cipherText);
+            //mStream.Write( encryptedBytes, 0, encryptedBytes.Length );  
+            //mStream.Seek( 0, SeekOrigin.Begin );  
+            RijndaelManaged aes = new RijndaelManaged();
+            aes.Mode = CipherMode.ECB;
+            aes.Padding = PaddingMode.PKCS7;
+            aes.KeySize = 128;
+            aes.Key = bKey;
+            //aes.IV = _iV;  
+            CryptoStream cryptoStream = new CryptoStream(mStream, aes.CreateDecryptor(), CryptoStreamMode.Read);
+            try
+            {
+                byte[] tmp = new byte[cipherText.Length + 32];
+                int len = cryptoStream.Read(tmp, 0, cipherText.Length + 32);
+                byte[] ret = new byte[len];
+                Array.Copy(tmp, 0, ret, 0, len);
+                return Encoding.UTF8.GetString(ret);
+            }
+            finally
+            {
+                cryptoStream.Close();
+                mStream.Close();
+                aes.Clear();
+            }
         }
 
-        public static string AESEncryptToHex(string str, string key)
+        #region https://learn.microsoft.com/zh-cn/dotnet/api/system.security.cryptography.aes?view=net-6.0
+        public static byte[] AesEncryptToBytes(string plainText, byte[] Key, byte[] IV)
         {
-            if (string.IsNullOrEmpty(str))
+            // Check arguments.
+            if (plainText == null || plainText.Length <= 0)
+                throw new ArgumentNullException("plainText");
+            if (Key == null || Key.Length <= 0)
+                throw new ArgumentNullException("Key");
+            if (IV == null || IV.Length <= 0)
+                throw new ArgumentNullException("IV");
+            byte[] encrypted;
+
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
             {
-                return null;
+                aesAlg.Key = Key;
+                aesAlg.IV = IV;
+
+                // Create an encryptor to perform the stream transform.
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                // Create the streams used for encryption.
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            //Write all data to the stream.
+                            swEncrypt.Write(plainText);
+                        }
+                        encrypted = msEncrypt.ToArray();
+                    }
+                }
             }
-            byte[] bytes = Encoding.UTF8.GetBytes(str);
-            byte[] numArray = (new RijndaelManaged()
-            {
-                Key = Encoding.UTF8.GetBytes(key.PadRight(32)),
-                Mode = CipherMode.ECB,
-                Padding = PaddingMode.PKCS7
-            }).CreateEncryptor().TransformFinalBlock(bytes, 0, (int)bytes.Length);
-            return StringUtil.ToHex(bytes);
+
+            // Return the encrypted bytes from the memory stream.
+            return encrypted;
         }
+
+        public static string AesDecryptFromBytes(byte[] cipherText, byte[] Key, byte[] IV)
+        {
+            // Check arguments.
+            if (cipherText == null || cipherText.Length <= 0)
+                throw new ArgumentNullException("cipherText");
+            if (Key == null || Key.Length <= 0)
+                throw new ArgumentNullException("Key");
+            if (IV == null || IV.Length <= 0)
+                throw new ArgumentNullException("IV");
+
+            // Declare the string used to hold
+            // the decrypted text.
+            string plaintext = null;
+
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Key;
+                aesAlg.IV = IV;
+
+                // Create a decryptor to perform the stream transform.
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                // Create the streams used for decryption.
+                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+
+                            // Read the decrypted bytes from the decrypting stream
+                            // and place them in a string.
+                            plaintext = srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+            }
+
+            return plaintext;
+        }
+        #endregion
 
         /// <summary>
         /// HMAC SHA256 加密
