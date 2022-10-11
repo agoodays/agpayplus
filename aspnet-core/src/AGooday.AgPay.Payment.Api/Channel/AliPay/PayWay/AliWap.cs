@@ -13,15 +13,17 @@ using Aop.Api.Request;
 using Aop.Api.Domain;
 using Aop.Api;
 using AGooday.AgPay.Payment.Api.Exceptions;
+using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Application.Services;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 {
     /// <summary>
     /// 支付宝 APP支付
     /// </summary>
-    public class AliApp : AliPayPaymentService
+    public class AliWap : AliPayPaymentService
     {
-        public AliApp(IServiceProvider serviceProvider,
+        public AliWap(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -30,40 +32,56 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            AlipayTradeAppPayRequest req = new AlipayTradeAppPayRequest();
-            AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+            AliWapOrderRQ bizRQ = (AliWapOrderRQ)rq;
+
+            AlipayTradeWapPayRequest req = new AlipayTradeWapPayRequest();
+            AlipayTradeWapPayModel model = new AlipayTradeWapPayModel();
             model.OutTradeNo = payOrder.PayOrderId;
             model.Subject = payOrder.Subject; //订单标题
             model.Body = payOrder.Body; //订单描述信息
             model.TotalAmount = (Convert.ToDouble(payOrder.Amount) / 100).ToString("0.00");  //支付金额
+            model.ProductCode = "QUICK_WAP_PAY";
             req.SetNotifyUrl(GetNotifyUrl()); // 设置异步通知地址
+            req.SetReturnUrl(GetReturnUrl()); // 同步跳转地址
             req.SetBizModel(model);
 
             //统一放置 isv接口必传信息
             AliPayKit.PutApiIsvInfo(_serviceProvider, mchAppConfigContext, req, model);
 
+            // 构造函数响应数据
+            AliWapOrderRS res = ApiResBuilder.BuildSuccess<AliWapOrderRS>();
 
-            string payData = null;
-
-            // sdk方式需自行拦截接口异常信息
             try
             {
-                payData = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.SdkExecute(req).Body;
+                //表单方式
+                if (CS.PAY_DATA_TYPE.FORM.Equals(bizRQ.PayDataType))
+                {
+                    res.FormContent = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req).Body;
+
+                }
+                //二维码图片地址
+                else if (CS.PAY_DATA_TYPE.CODE_IMG_URL.Equals(bizRQ.PayDataType))
+                {
+
+                    string payUrl = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req, null, "GET").Body;
+                    res.CodeImgUrl = _sysConfigService.GetDBApplicationConfig().GenScanImgUrl(payUrl);
+                }
+                else
+                { // 默认都为 payUrl方式
+
+                    res.PayUrl = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req, null, "GET").Body;
+                }
             }
             catch (AopException e)
             {
                 throw ChannelException.SysError(e.Message);
             }
 
-            // 构造函数响应数据
-            AliAppOrderRS res = ApiResBuilder.BuildSuccess<AliAppOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
             //放置 响应数据
-            channelRetMsg.ChannelAttach = payData;
             channelRetMsg.ChannelState = ChannelState.WAITING;
-            res.PayData = payData;
             return res;
         }
 

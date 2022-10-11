@@ -1,5 +1,8 @@
 ﻿namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
 {
+    /// <summary>
+    /// 通用支付数据RQ
+    /// </summary>
     public class CommonPayDataRQ : UnifiedOrderRQ
     {
         /// <summary>

@@ -4,6 +4,9 @@ using System.Text.Json.Nodes;
 
 namespace AGooday.AgPay.Payment.Api.Channel
 {
+    /// <summary>
+    /// 301方式获取渠道侧用户ID， 如微信openId 支付宝的userId等
+    /// </summary>
     public interface IChannelUserService
     {
         /// <summary>

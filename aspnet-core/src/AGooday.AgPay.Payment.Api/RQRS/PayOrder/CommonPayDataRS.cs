@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
 {
+    /// <summary>
+    /// 通用支付数据RS
+    /// 根据set的值，响应不同的payDataType
+    /// </summary>
     public class CommonPayDataRS : UnifiedOrderRS
     {
         /// <summary>

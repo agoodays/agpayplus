@@ -10,11 +10,14 @@ using System;
 
 namespace AGooday.AgPay.Payment.Api.Channel
 {
+    /// <summary>
+    /// 支付接口抽象类
+    /// </summary>
     public abstract class AbstractPaymentService : IPaymentService
     {
-        protected ISysConfigService _sysConfigService;
+        protected readonly ISysConfigService _sysConfigService;
         protected readonly IServiceProvider _serviceProvider;
-        protected ConfigContextQueryService _configContextQueryService;
+        protected readonly ConfigContextQueryService _configContextQueryService;
         protected AbstractPaymentService(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -24,7 +27,16 @@ namespace AGooday.AgPay.Payment.Api.Channel
             _sysConfigService = sysConfigService;
         }
 
-        /** 订单分账（一般用作 如微信订单将在下单处做标记） */
+        public abstract string GetIfCode();
+        public abstract bool IsSupport(string wayCode);
+        public abstract AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
+        public abstract string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder);
+
+        /// <summary>
+        /// 订单分账（一般用作 如微信订单将在下单处做标记）
+        /// </summary>
+        /// <param name="payOrder"></param>
+        /// <returns></returns>
         protected bool IsDivisionOrder(PayOrderDto payOrder)
         {
             //订单分账， 将冻结商户资金。
@@ -54,10 +66,5 @@ namespace AGooday.AgPay.Payment.Api.Channel
         {
             return _sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/pay/return/" + GetIfCode() + "/" + payOrderId;
         }
-
-        public abstract string GetIfCode();
-        public abstract bool IsSupport(string wayCode);
-        public abstract AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
-        public abstract string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder);
     }
 }

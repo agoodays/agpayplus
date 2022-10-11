@@ -5,18 +5,38 @@ using System;
 
 namespace AGooday.AgPay.Payment.Api.Channel
 {
+    /// <summary>
+    /// 分账接口
+    /// </summary>
     public interface IDivisionService
     {
-        /** 获取到接口code **/
+        /// <summary>
+        /// 获取到接口code
+        /// </summary>
+        /// <returns></returns>
         string GetIfCode();
 
-        /** 是否支持该分账 */
+        /// <summary>
+        /// 是否支持该分账
+        /// </summary>
+        /// <returns></returns>
         bool IsSupport();
 
-        /** 绑定关系 **/
+        /// <summary>
+        /// 绑定关系
+        /// </summary>
+        /// <param name="mchDivisionReceiver"></param>
+        /// <param name="mchAppConfigContext"></param>
+        /// <returns></returns>
         ChannelRetMsg Bind(MchDivisionReceiverDto mchDivisionReceiver, MchAppConfigContext mchAppConfigContext);
 
-        /** 单次分账 （无需调用完结接口，或自动解冻商户资金)  **/
+        /// <summary>
+        /// 单次分账 （无需调用完结接口，或自动解冻商户资金)
+        /// </summary>
+        /// <param name="payOrder"></param>
+        /// <param name="recordList"></param>
+        /// <param name="mchAppConfigContext"></param>
+        /// <returns></returns>
         ChannelRetMsg SingleDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
     }
 }

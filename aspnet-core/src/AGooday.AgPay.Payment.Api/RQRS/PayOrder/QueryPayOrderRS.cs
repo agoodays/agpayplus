@@ -4,102 +4,103 @@ using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
 {
+    /// <summary>
+    /// 查询订单 响应参数
+    /// </summary>
     public class QueryPayOrderRS : AbstractRS
     {
-        /**
-         * 支付订单号
-         */
+        /// <summary>
+        /// 支付订单号
+        /// </summary>
         public string PAyOrderId { get; set; }
 
-        /**
-         * 商户号
-         */
+        /// <summary>
+        /// 商户号
+        /// </summary>
         public string MchNo { get; set; }
 
-        /**
-         * 商户应用ID
-         */
+        /// <summary>
+        /// 商户应用ID
+        /// </summary>
         public string AppId { get; set; }
 
-        /**
-         * 商户订单号
-         */
+        /// <summary>
+        /// 商户订单号
+        /// </summary>
         public string MchOrderNo { get; set; }
 
-        /**
-         * 支付接口代码
-         */
+        /// <summary>
+        /// 支付接口代码
+        /// </summary>
         public string IfCode { get; set; }
 
-        /**
-         * 支付方式代码
-         */
+        /// <summary>
+        /// 支付方式代码
+        /// </summary>
         public string WayCode { get; set; }
 
-        /**
-         * 支付金额,单位分
-         */
+        /// <summary>
+        /// 支付金额,单位分
+        /// </summary>
         public long Amount { get; set; }
 
-        /**
-         * 三位货币代码,人民币:cny
-         */
+        /// <summary>
+        /// 三位货币代码,人民币:cny
+        /// </summary>
         public string Currency { get; set; }
 
-        /**
-         * 支付状态: 0-订单生成, 1-支付中, 2-支付成功, 3-支付失败, 4-已撤销, 5-已退款, 6-订单关闭
-         */
+        /// <summary>
+        /// 支付状态: 0-订单生成, 1-支付中, 2-支付成功, 3-支付失败, 4-已撤销, 5-已退款, 6-订单关闭
+        /// </summary>
         public byte State { get; set; }
 
-        /**
-         * 客户端IP
-         */
+        /// <summary>
+        /// 客户端IP
+        /// </summary>
         public string ClientIp { get; set; }
 
-        /**
-         * 商品标题
-         */
+        /// <summary>
+        /// 商品标题
+        /// </summary>
         public string Subject { get; set; }
 
-        /**
-         * 商品描述信息
-         */
+        /// <summary>
+        /// 商品描述信息
+        /// </summary>
         public string Body { get; set; }
 
-        /**
-         * 渠道订单号
-         */
+        /// <summary>
+        /// 渠道订单号
+        /// </summary>
         public string ChannelOrderNo { get; set; }
 
-        /**
-         * 渠道支付错误码
-         */
+        /// <summary>
+        /// 渠道支付错误码
+        /// </summary>
         public string ErrCode { get; set; }
 
-        /**
-         * 渠道支付错误描述
-         */
+        /// <summary>
+        /// 渠道支付错误描述
+        /// </summary>
         public string ErrMsg { get; set; }
 
-        /**
-         * 商户扩展参数
-         */
+        /// <summary>
+        /// 商户扩展参数
+        /// </summary>
         public string ExtParam { get; set; }
 
-        /**
-         * 订单支付成功时间
-         */
+        /// <summary>
+        /// 订单支付成功时间
+        /// </summary>
         public long? SuccessTime { get; set; }
 
-        /**
-         * 创建时间
-         */
+        /// <summary>
+        /// 创建时间
+        /// </summary>
         public long? CreatedAt { get; set; }
-
 
         public static QueryPayOrderRS BuildByPayOrder(PayOrderDto payOrder)
         {
-
             if (payOrder == null)
             {
                 return null;
