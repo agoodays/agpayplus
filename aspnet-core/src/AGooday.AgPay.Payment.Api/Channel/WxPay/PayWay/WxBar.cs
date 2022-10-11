@@ -6,6 +6,8 @@ using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Utils;
+using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Payment.Api.Services;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
 {
@@ -14,8 +16,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
     /// </summary>
     public class WxBar : WxPayPaymentService
     {
-        public WxBar(IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public WxBar(IServiceProvider serviceProvider,
+            ISysConfigService sysConfigService,
+            ConfigContextQueryService configContextQueryService)
+            : base(serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

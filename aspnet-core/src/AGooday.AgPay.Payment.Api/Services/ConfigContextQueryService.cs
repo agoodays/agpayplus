@@ -13,18 +13,19 @@ namespace AGooday.AgPay.Payment.Api.Services
 {
     public class ConfigContextQueryService
     {
-        private readonly ConfigContextService configContextService;
+        private readonly ConfigContextService _configContextService;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly IIsvInfoService _isvInfoService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
-        public ConfigContextQueryService(IMchAppService mchAppService, IMchInfoService mchInfoService, IIsvInfoService isvInfoService, IPayInterfaceConfigService payInterfaceConfigService)
+        public ConfigContextQueryService(IMchAppService mchAppService, IMchInfoService mchInfoService, IIsvInfoService isvInfoService, IPayInterfaceConfigService payInterfaceConfigService, ConfigContextService configContextService)
         {
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
             _isvInfoService = isvInfoService;
             _payInterfaceConfigService = payInterfaceConfigService;
+            _configContextService = configContextService;
         }
 
         private bool IsCache()
@@ -34,10 +35,9 @@ namespace AGooday.AgPay.Payment.Api.Services
 
         public MchAppDto QueryMchApp(string mchNo, string mchAppId)
         {
-
             if (IsCache())
             {
-                return configContextService.GetMchAppConfigContext(mchNo, mchAppId).MchApp;
+                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).MchApp;
             }
 
             return _mchAppService.GetById(mchAppId, mchNo);
@@ -45,10 +45,9 @@ namespace AGooday.AgPay.Payment.Api.Services
 
         public MchAppConfigContext QueryMchInfoAndAppInfo(string mchNo, string mchAppId)
         {
-
             if (IsCache())
             {
-                return configContextService.GetMchAppConfigContext(mchNo, mchAppId);
+                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId);
             }
 
             var mchInfo = _mchInfoService.GetById(mchNo);
@@ -72,10 +71,9 @@ namespace AGooday.AgPay.Payment.Api.Services
 
         public NormalMchParams QueryNormalMchParams(string mchNo, string mchAppId, string ifCode)
         {
-
             if (IsCache())
             {
-                return configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetNormalMchParamsByIfCode(ifCode);
+                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetNormalMchParamsByIfCode(ifCode);
             }
 
             // 查询商户的所有支持的参数配置
@@ -91,10 +89,9 @@ namespace AGooday.AgPay.Payment.Api.Services
 
         public IsvSubMchParams QueryIsvSubMchParams(string mchNo, string mchAppId, string ifCode)
         {
-
             if (IsCache())
             {
-                return configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetIsvsubMchParamsByIfCode<IsvSubMchParams>(ifCode);
+                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetIsvsubMchParamsByIfCode<IsvSubMchParams>(ifCode);
             }
 
             // 查询商户的所有支持的参数配置
@@ -108,13 +105,11 @@ namespace AGooday.AgPay.Payment.Api.Services
             return IsvSubMchParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
         }
 
-
         public IsvParams QueryIsvParams(string isvNo, string ifCode)
         {
-
             if (IsCache())
             {
-                IsvConfigContext isvConfigContext = configContextService.GetIsvConfigContext(isvNo);
+                IsvConfigContext isvConfigContext = _configContextService.GetIsvConfigContext(isvNo);
                 return isvConfigContext == null ? null : isvConfigContext.GetIsvParamsByIfCode(ifCode);
             }
 
@@ -127,60 +122,51 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
 
             return IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
-
         }
 
         public AlipayClientWrapper GetAlipayClientWrapper(MchAppConfigContext mchAppConfigContext)
         {
-
             if (IsCache())
             {
-                return configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetAlipayClientWrapper();
+                return _configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetAlipayClientWrapper();
             }
 
             if (mchAppConfigContext.IsIsvsubMch())
             {
-
                 AliPayIsvParams alipayParams = (AliPayIsvParams)QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.ALIPAY);
                 return AlipayClientWrapper.BuildAlipayClientWrapper(alipayParams);
             }
             else
             {
-
                 AliPayNormalMchParams alipayParams = (AliPayNormalMchParams)QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.ALIPAY);
                 return AlipayClientWrapper.BuildAlipayClientWrapper(alipayParams);
             }
-
         }
 
         public WxServiceWrapper GetWxServiceWrapper(MchAppConfigContext mchAppConfigContext)
         {
-
             if (IsCache())
             {
-                return configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetWxServiceWrapper();
+                return _configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetWxServiceWrapper();
             }
 
             if (mchAppConfigContext.IsIsvsubMch())
             {
-
                 WxPayIsvParams wxParams = (WxPayIsvParams)QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.WXPAY);
                 return WxServiceWrapper.BuildWxServiceWrapper(wxParams);
             }
             else
             {
-
                 WxPayNormalMchParams wxParams = (WxPayNormalMchParams)QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
                 return WxServiceWrapper.BuildWxServiceWrapper(wxParams);
             }
-
         }
 
         public PaypalWrapper GetPaypalWrapper(MchAppConfigContext mchAppConfigContext)
         {
             if (IsCache())
             {
-                return configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetPaypalWrapper();
+                return _configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetPaypalWrapper();
             }
             PpPayNormalMchParams ppPayNormalMchParams = (PpPayNormalMchParams)QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.PPPAY); ;
             return PaypalWrapper.BuildPaypalWrapper(ppPayNormalMchParams);

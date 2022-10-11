@@ -8,6 +8,7 @@ using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
+using AGooday.AgPay.Application.Interfaces;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 {
@@ -16,12 +17,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
     /// </summary>
     public class AliApp : AliPayPaymentService
     {
-        private readonly ConfigContextQueryService _configContextQueryService;
         public AliApp(IServiceProvider serviceProvider,
+            ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider)
+            : base(serviceProvider,sysConfigService, configContextQueryService)
         {
-            _configContextQueryService = configContextQueryService;
         }
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)

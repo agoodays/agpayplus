@@ -15,13 +15,13 @@ namespace AGooday.AgPay.Payment.Api.Services
     public class ConfigContextService
     {
         /** <商户ID, 商户配置项>  **/
-        private static Dictionary<string, MchInfoConfigContext> mchInfoConfigContextMap;
+        private static Dictionary<string, MchInfoConfigContext> mchInfoConfigContextMap = new Dictionary<string, MchInfoConfigContext>();
 
         /** <应用ID, 商户配置上下文>  **/
-        private static Dictionary<string, MchAppConfigContext> mchAppConfigContextMap;
+        private static Dictionary<string, MchAppConfigContext> mchAppConfigContextMap = new Dictionary<string, MchAppConfigContext>();
 
         /** <服务商号, 服务商配置上下文>  **/
-        private static Dictionary<string, IsvConfigContext> isvConfigContextMap;
+        private static Dictionary<string, IsvConfigContext> isvConfigContextMap = new Dictionary<string, IsvConfigContext>();
 
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;

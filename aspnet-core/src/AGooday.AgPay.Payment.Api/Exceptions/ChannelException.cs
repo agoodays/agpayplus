@@ -15,10 +15,34 @@ namespace AGooday.AgPay.Payment.Api.Exceptions
         {
         }
 
-        public ChannelException(string errorMessage, ChannelRetMsg channelRetMsg)
-            : base(errorMessage)
+        /// <summary>
+        /// 业务自定义异常
+        /// </summary>
+        /// <param name="channelRetMsg"></param>
+        private ChannelException(ChannelRetMsg channelRetMsg)
+            : base(channelRetMsg.ChannelErrMsg)
         {
             ChannelRetMsg = channelRetMsg;
+        }
+
+        /// <summary>
+        /// 未知状态
+        /// </summary>
+        /// <param name="channelErrMsg"></param>
+        /// <returns></returns>
+        public static ChannelException Unknown(string channelErrMsg)
+        {
+            return new ChannelException(ChannelRetMsg.Unknown(channelErrMsg));
+        }
+
+        /// <summary>
+        /// 系统内异常
+        /// </summary>
+        /// <param name="channelErrMsg"></param>
+        /// <returns></returns>
+        public static ChannelException SysError(string channelErrMsg)
+        {
+            return new ChannelException(ChannelRetMsg.SysError(channelErrMsg));
         }
     }
 }

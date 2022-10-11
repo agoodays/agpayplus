@@ -1,16 +1,20 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
+using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
 
 namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 {
     public class YsfPayPaymentService : AbstractPaymentService
     {
-        public YsfPayPaymentService(IServiceProvider serviceProvider) 
-            : base(serviceProvider)
+        public YsfPayPaymentService(IServiceProvider serviceProvider,
+            ISysConfigService sysConfigService,
+            ConfigContextQueryService configContextQueryService)
+            : base(serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
