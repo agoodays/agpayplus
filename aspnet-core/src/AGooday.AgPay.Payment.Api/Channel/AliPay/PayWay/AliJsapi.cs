@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
     public class AliJsapi : AliPayPaymentService
     {
         /// <summary>
-        /// 支付宝 条码支付
+        /// 支付宝 jsapi
         /// </summary>
         /// <param name="serviceProvider"></param>
         public AliJsapi(IServiceProvider serviceProvider,

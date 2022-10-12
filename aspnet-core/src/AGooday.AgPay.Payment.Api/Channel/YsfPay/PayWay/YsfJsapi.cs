@@ -18,16 +18,18 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Text.Json.Nodes;
 using Aop.Api.Util;
+using AGooday.AgPay.Application.Params.WxPay;
+using AGooday.AgPay.Common.Constants;
 
 namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 {
-    public class AliJsapi : YsfPayPaymentService
+    public class YsfJsapi : YsfPayPaymentService
     {
         /// <summary>
-        /// 云闪付 支付宝 jsapi
+        /// 云闪付 微信jsapi
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public AliJsapi(IServiceProvider serviceProvider,
+        public YsfJsapi(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -36,23 +38,23 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【云闪付(alipayJs)jsapi支付】";
+            string logPrefix = "【云闪付(unionpay)jsapi支付】";
             JObject reqParams = new JObject();
-            AliJsapiOrderRS res = ApiResBuilder.BuildSuccess<AliJsapiOrderRS>();
+            YsfJsapiOrderRS res = ApiResBuilder.BuildSuccess<YsfJsapiOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
+            YsfJsapiOrderRQ bizRQ = (YsfJsapiOrderRQ)rq;
+
             // 请求参数赋值
             JsapiParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
-
-            AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
-            //云闪付扫一扫支付， 需要传入buyerUserId参数
-            reqParams.Add("userId", bizRQ.BuyerUserId);// buyerUserId
+            //云闪付扫一扫支付， 需要传入termInfo参数
+            reqParams.Add("termInfo", JsonConvert.SerializeObject(new { ip = !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1" }));
 
             //客户端IP
             reqParams.Add("customerIp", !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1");
 
-            // 发送请求
+            // 发送请求并返回订单状态
             JObject resJSON = PackageParamAndReq("/gateway/api/pay/unifiedorder", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string respCode = resJSON.GetValue("respCode").ToString(); //应答码
@@ -63,27 +65,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
                 if ("00".Equals(respCode))
                 {
                     //付款信息
-                    JObject payDataJSON = JObject.Parse(resJSON.GetValue("payData").ToString());
-                    string tradeNo = "";
-                    if (!string.IsNullOrWhiteSpace(payDataJSON.GetValue("tradeNo").ToString()))
-                    {
-                        tradeNo = payDataJSON.GetValue("tradeNo").ToString();
-                    }
-                    else
-                    {
-                        string prepayId = payDataJSON.GetValue("prepayId").ToString();
-                        if (prepayId != null && prepayId.Length > 2 && !prepayId.StartsWith($"{DateTime.Now:yyyy}"))
-                        {
-                            tradeNo = prepayId.Substring(2);
-                        }
-                        else
-                        {
-                            tradeNo = prepayId;
-                        }
-                    }
-                    res.AlipayTradeNo = tradeNo;
-                    res.PayData = payDataJSON.ToString();
+                    res.PayData = resJSON.GetValue("payData").ToString();
                     channelRetMsg.ChannelState = ChannelState.WAITING;
+                }
+                else
+                {
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    channelRetMsg.ChannelErrCode = respCode;
+                    channelRetMsg.ChannelErrMsg = respMsg;
                 }
             }
             catch (Exception e)
@@ -96,12 +85,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
-            {
-                throw new BizException("[buyerUserId]不可为空");
-            }
-
             return null;
         }
     }

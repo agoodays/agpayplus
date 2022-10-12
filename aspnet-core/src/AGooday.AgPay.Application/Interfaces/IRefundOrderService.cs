@@ -15,5 +15,9 @@ namespace AGooday.AgPay.Application.Interfaces
         RefundOrderDto GetById(string recordId);
         IEnumerable<RefundOrderDto> GetAll();
         PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto);
+        long SumSuccessRefundAmount(string payOrderId);
+        bool UpdateInit2Ing(string refundOrderId);
+        bool UpdateIng2SuccessOrFail(string refundOrderId, byte state, string channelOrderId, string channelErrCode, string channelErrMsg);
+        bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo);
     }
 }

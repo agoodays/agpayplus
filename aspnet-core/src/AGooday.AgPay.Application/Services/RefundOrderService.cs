@@ -12,6 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using AGooday.AgPay.Common.Enumerator;
+using System.Data;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -88,6 +90,75 @@ namespace AGooday.AgPay.Application.Services
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<RefundOrder>.Create<RefundOrderDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
+        }
+        public long SumSuccessRefundAmount(string payOrderId)
+        {
+            return _refundOrderRepository.GetAll().Where(w => w.PayOrderId.Equals(payOrderId) && w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).Sum(s => s.RefundAmount);
+        }
+        public bool UpdateInit2Ing(string refundOrderId)
+        {
+            var updateRecord = _refundOrderRepository.GetById(refundOrderId);
+            if (updateRecord.State != (byte)RefundOrderState.STATE_INIT)
+            {
+                return false;
+            }
+
+            updateRecord.State = (byte)RefundOrderState.STATE_ING;
+            _refundOrderRepository.Update(updateRecord);
+            return _refundOrderRepository.SaveChanges(out int _);
+        }
+
+        public bool UpdateIng2Success(string refundOrderId, string channelOrderNo)
+        {
+            var updateRecord = _refundOrderRepository.GetById(refundOrderId);
+            if (updateRecord.State != (byte)RefundOrderState.STATE_ING)
+            {
+                return false;
+            }
+
+            updateRecord.State = (byte)RefundOrderState.STATE_SUCCESS;
+            updateRecord.ChannelOrderNo = channelOrderNo;
+            updateRecord.SuccessTime = DateTime.Now;
+            _refundOrderRepository.Update(updateRecord);
+            return _refundOrderRepository.SaveChanges(out int _);
+        }
+
+        public bool UpdateIng2Fail(string refundOrderId, string channelOrderNo, string channelErrCode, string channelErrMsg)
+        {
+            var updateRecord = _refundOrderRepository.GetById(refundOrderId);
+            if (updateRecord.State != (byte)RefundOrderState.STATE_ING)
+            {
+                return false;
+            }
+
+            updateRecord.State = (byte)RefundOrderState.STATE_FAIL;
+            updateRecord.ErrCode = channelErrCode;
+            updateRecord.ErrMsg = channelErrMsg;
+            updateRecord.ChannelOrderNo = channelOrderNo;
+            _refundOrderRepository.Update(updateRecord);
+            return _refundOrderRepository.SaveChanges(out int _);
+        }
+
+        public bool UpdateIng2SuccessOrFail(string refundOrderId, byte updateState, string channelOrderNo, string channelErrCode, string channelErrMsg)
+        {
+            if (updateState == (byte)RefundOrderState.STATE_ING)
+            {
+                return true;
+            }
+            else if (updateState == (byte)RefundOrderState.STATE_SUCCESS)
+            {
+                return UpdateIng2Success(refundOrderId, channelOrderNo);
+            }
+            else if (updateState == (byte)RefundOrderState.STATE_FAIL)
+            {
+                return UpdateIng2Fail(refundOrderId, channelOrderNo, channelErrCode, channelErrMsg);
+            }
+            return false;
+
+        }
+        public bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo)
+        {
+            return _refundOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchRefundNo);
         }
     }
 }

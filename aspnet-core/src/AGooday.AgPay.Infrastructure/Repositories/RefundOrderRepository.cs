@@ -16,5 +16,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
+
+        public bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo)
+        {
+            return DbSet.AsNoTracking().Any(c => c.MchNo.Equals(mchNo) && c.MchRefundNo.Equals(mchRefundNo));
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
     public class AliBar : YsfPayPaymentService
     {
         /// <summary>
-        /// 支付宝 条码支付
+        /// 云闪付 支付宝 条码支付
         /// </summary>
         /// <param name="serviceProvider"></param>
         public AliBar(IServiceProvider serviceProvider,
@@ -50,6 +50,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 
             //客户端IP
             reqParams.Add("termInfo", JsonConvert.SerializeObject(new { ip = !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1" })); //终端信息
+            
             // 发送请求
             JObject resJSON = PackageParamAndReq("/gateway/api/pay/micropay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑

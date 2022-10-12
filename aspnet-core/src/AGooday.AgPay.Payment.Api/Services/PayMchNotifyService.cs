@@ -1,17 +1,12 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS.Refund;
 using AGooday.AgPay.Payment.Api.RQRS.Transfer;
-using log4net;
-using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text.Json.Nodes;
 
@@ -118,7 +113,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="refundOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string createNotifyUrl(RefundOrderDto refundOrder, String appSecret)
+        public string CreateNotifyUrl(RefundOrderDto refundOrder, string appSecret)
         {
 
             QueryRefundOrderRS queryRefundOrderRS = QueryRefundOrderRS.BuildByRefundOrder(refundOrder);
@@ -138,7 +133,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="transferOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(TransferOrderDto transferOrder, String appSecret)
+        public string CreateNotifyUrl(TransferOrderDto transferOrder, string appSecret)
         {
 
             QueryTransferOrderRS rs = QueryTransferOrderRS.BuildByRecord(transferOrder);
@@ -174,6 +169,62 @@ namespace AGooday.AgPay.Payment.Api.Services
 
             // 生成跳转地址
             return URLUtil.AppendUrlQuery(payOrder.ReturnUrl, jsonObject);
+        }
+
+        public void RefundOrderNotify(RefundOrderDto dbRefundOrder)
+        {
+            try
+            {
+                // 通知地址为空
+                if (string.IsNullOrWhiteSpace(dbRefundOrder.NotifyUrl))
+                {
+                    return;
+                }
+
+                //获取到通知对象
+                MchNotifyRecordDto mchNotifyRecord = _mchNotifyRecordService.FindByRefundOrder(dbRefundOrder.RefundOrderId);
+
+                if (mchNotifyRecord != null)
+                {
+                    _logger.LogInformation("当前已存在通知消息， 不再发送。");
+                    return;
+                }
+
+                //商户app私钥
+                string appSecret = _configContextQueryService.QueryMchApp(dbRefundOrder.MchNo, dbRefundOrder.AppId).AppSecret;
+
+                // 封装通知url
+                string notifyUrl = CreateNotifyUrl(dbRefundOrder, appSecret);
+                mchNotifyRecord = new MchNotifyRecordDto();
+                mchNotifyRecord.OrderId = dbRefundOrder.RefundOrderId;
+                mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
+                mchNotifyRecord.MchNo = dbRefundOrder.MchNo;
+                mchNotifyRecord.MchOrderNo = dbRefundOrder.MchRefundNo; //商户订单号
+                mchNotifyRecord.IsvNo = dbRefundOrder.IsvNo;
+                mchNotifyRecord.AppId = dbRefundOrder.AppId;
+                mchNotifyRecord.NotifyUrl = notifyUrl;
+                mchNotifyRecord.ResResult = "";
+                mchNotifyRecord.NotifyCount = 0;
+                mchNotifyRecord.State = (byte)MchNotifyRecordState.STATE_ING; // 通知中
+
+                try
+                {
+                    _mchNotifyRecordService.Add(mchNotifyRecord);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
+                    return;
+                }
+
+                //推送到MQ
+                long notifyId = mchNotifyRecord.NotifyId;
+                //mqSender.send(PayOrderMchNotifyMQ.build(notifyId));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "推送失败！");
+            }
         }
     }
 }

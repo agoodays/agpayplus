@@ -20,7 +20,13 @@ using AGooday.AgPay.Payment.Api.Channel.XxPay;
 using AGooday.AgPay.Payment.Api.Utils;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay;
 using AliBar = AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay.AliBar;
+using AliJsapi = AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay.AliJsapi;
+using WxBar = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxBar;
+using WxJsapi = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxJsapi;
 using YsfAliBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliBar;
+using YsfAliJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliJsapi;
+using YsfWxBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxBar;
+using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,12 +92,12 @@ NativeInjectorBootStrapper.RegisterServices(services);
 //services.AddSingleton(typeof(ConfigContextService));
 services.AddSingleton<ConfigContextQueryService>();
 services.AddSingleton<ConfigContextService>();
+services.AddSingleton<PayMchNotifyService>();
+services.AddSingleton<PayOrderProcessService>();
 //services.AddSingleton<IDivisionService, AliPayDivisionService>();
 //services.AddSingleton<IDivisionService, WxPayDivisionService>();
 services.AddSingleton<AliPayDivisionService>();
 services.AddSingleton<WxPayDivisionService>();
-services.AddSingleton<PayMchNotifyService>();
-services.AddSingleton<PayOrderProcessService>();
 services.AddSingleton(provider =>
 {
     Func<string, IDivisionService> funcFactory = ifCode =>
@@ -111,6 +117,7 @@ services.AddSingleton(provider =>
 
 services.AddSingleton<AliPayPaymentService>();
 services.AddSingleton<WxPayPaymentService>();
+services.AddSingleton<YsfPayPaymentService>();
 services.AddSingleton(provider =>
 {
     Func<string, IPaymentService> funcFactory = ifCode =>
@@ -130,10 +137,47 @@ services.AddSingleton(provider =>
     return funcFactory;
 });
 
+services.AddSingleton<AliPayRefundService>();
+services.AddSingleton<WxPayRefundService>();
+services.AddSingleton<YsfPayRefundService>();
+services.AddSingleton(provider =>
+{
+    Func<string, IRefundService> funcFactory = ifCode =>
+    {
+        switch (ifCode)
+        {
+            case CS.IF_CODE.ALIPAY:
+                return provider.GetService<AliPayRefundService>();
+            case CS.IF_CODE.WXPAY:
+                return provider.GetService<WxPayRefundService>();
+            case CS.IF_CODE.YSFPAY:
+                return provider.GetService<YsfPayRefundService>();
+            default:
+                return null;
+        }
+    };
+    return funcFactory;
+});
+
+#region AliPay
 services.AddSingleton<IPaymentService, AliApp>();
 services.AddSingleton<IPaymentService, AliBar>();
+services.AddSingleton<IPaymentService, AliJsapi>();
+services.AddSingleton<IPaymentService, AliPc>();
+services.AddSingleton<IPaymentService, AliQr>();
+services.AddSingleton<IPaymentService, AliWap>(); 
+#endregion
+#region WxPay
 services.AddSingleton<IPaymentService, WxApp>();
 services.AddSingleton<IPaymentService, WxBar>();
+services.AddSingleton<IPaymentService, WxJsapi>(); 
+#endregion
+#region YsfPay
+services.AddSingleton<IPaymentService, YsfAliBar>();
+services.AddSingleton<IPaymentService, YsfAliJsapi>();
+services.AddSingleton<IPaymentService, YsfWxBar>();
+services.AddSingleton<IPaymentService, YsfWxJsapi>(); 
+#endregion
 
 services.AddSingleton<AliPayChannelUserService>();
 services.AddSingleton<WxPayChannelUserService>();

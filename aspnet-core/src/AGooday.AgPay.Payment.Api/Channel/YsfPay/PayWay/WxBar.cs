@@ -14,20 +14,20 @@ using Aop.Api.Response;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 using Aop.Api.Util;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 {
-    public class AliJsapi : YsfPayPaymentService
+    public class WxBar : YsfPayPaymentService
     {
         /// <summary>
-        /// 云闪付 支付宝 jsapi
+        /// 云闪付 微信bar
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public AliJsapi(IServiceProvider serviceProvider,
+        public WxBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -36,24 +36,24 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【云闪付(alipayJs)jsapi支付】";
-            JObject reqParams = new JObject();
-            AliJsapiOrderRS res = ApiResBuilder.BuildSuccess<AliJsapiOrderRS>();
+            string logPrefix = "【云闪付条码(wechat)支付】";
+            WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
+            // 构造函数响应数据
+            WxBarOrderRS res = ApiResBuilder.BuildSuccess<WxBarOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
-            // 请求参数赋值
-            JsapiParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
+            JObject reqParams = new JObject();
+            reqParams.Add("authCode", bizRQ.AuthCode.Trim()); //付款码： 用户 APP 展示的付款条码或二维码
 
-            AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
-            //云闪付扫一扫支付， 需要传入buyerUserId参数
-            reqParams.Add("userId", bizRQ.BuyerUserId);// buyerUserId
+            // 云闪付 bar 统一参数赋值
+            BarParamsSet(reqParams, payOrder);
 
             //客户端IP
-            reqParams.Add("customerIp", !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1");
-
+            reqParams.Add("termInfo", JsonConvert.SerializeObject(new { ip = !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1" })); //终端信息
+            
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/gateway/api/pay/unifiedorder", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = PackageParamAndReq("/gateway/api/pay/micropay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string respCode = resJSON.GetValue("respCode").ToString(); //应答码
             string respMsg = resJSON.GetValue("respMsg").ToString(); //应答信息
@@ -62,28 +62,19 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
                 //00-交易成功， 02-用户支付中 , 12-交易重复， 需要发起查询处理    其他认为失败
                 if ("00".Equals(respCode))
                 {
-                    //付款信息
-                    JObject payDataJSON = JObject.Parse(resJSON.GetValue("payData").ToString());
-                    string tradeNo = "";
-                    if (!string.IsNullOrWhiteSpace(payDataJSON.GetValue("tradeNo").ToString()))
-                    {
-                        tradeNo = payDataJSON.GetValue("tradeNo").ToString();
-                    }
-                    else
-                    {
-                        string prepayId = payDataJSON.GetValue("prepayId").ToString();
-                        if (prepayId != null && prepayId.Length > 2 && !prepayId.StartsWith($"{DateTime.Now:yyyy}"))
-                        {
-                            tradeNo = prepayId.Substring(2);
-                        }
-                        else
-                        {
-                            tradeNo = prepayId;
-                        }
-                    }
-                    res.AlipayTradeNo = tradeNo;
-                    res.PayData = payDataJSON.ToString();
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                    res.PayData = resJSON.GetValue("payData").ToString();
+                }
+                else if ("02".Equals(respCode) || "12".Equals(respCode) || "99".Equals(respCode))
+                {
                     channelRetMsg.ChannelState = ChannelState.WAITING;
+                    channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                }
+                else
+                {
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    channelRetMsg.ChannelErrCode = respCode;
+                    channelRetMsg.ChannelErrMsg = respMsg;
                 }
             }
             catch (Exception e)
@@ -96,10 +87,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
+            WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
+            if (string.IsNullOrWhiteSpace(bizRQ.AuthCode))
             {
-                throw new BizException("[buyerUserId]不可为空");
+                throw new BizException("用户支付条码[authCode]不可为空");
             }
 
             return null;
