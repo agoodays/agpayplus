@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         /// 用户 支付条码
         /// </summary>
         [Required(ErrorMessage = "支付条码不能为空")]
-        public string AuthCode;
+        public string AuthCode { get; set; }
 
         /// <summary>
         /// 构造函数

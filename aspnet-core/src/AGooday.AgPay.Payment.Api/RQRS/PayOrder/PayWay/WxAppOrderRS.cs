@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         /// <summary>
         /// 预支付数据包
         /// </summary>
-        private string payInfo;
+        public string PayInfo { get; set; }
 
         public override string BuildPayDataType()
         {
@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 
         public override string BuildPayData()
         {
-            return payInfo;
+            return PayInfo;
         }
     }
 }
