@@ -30,12 +30,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 
         public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPaywayService(_serviceProvider, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPaywayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
         {
-            return PayWayUtil.GetRealPaywayService(_serviceProvider, payOrder.WayCode).PreCheck(bizRQ, payOrder);
+            return PayWayUtil.GetRealPaywayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Common.Utils
 {
-    public static class LogUtil
+    public static class LogUtil<T> where T : class
     {
         /// <summary>
         /// 日志记录器
@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Common.Utils
 
         static LogUtil()
         {
-            Log = LogManager.GetLogger("");
+            Log = LogManager.GetLogger(typeof(T));
         }
 
         public static void Info(string message)

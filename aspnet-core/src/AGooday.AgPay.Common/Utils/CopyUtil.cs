@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EmitMapper.MappingConfiguration;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,6 +13,8 @@ namespace AGooday.AgPay.Common.Utils
 {
     public static class CopyUtil
     {
+        private static ILog logger = LogManager.GetLogger(typeof(CopyUtil));
+
         /// <summary>
         /// 深度克隆对象
         /// </summary>
@@ -43,7 +46,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                LogUtil.Error($"深度克隆对象方法报错，错误：{e.Message}", e);
+                logger.Error($"深度克隆对象方法报错，错误：{e.Message}", e);
                 return default(T);
             }
         }

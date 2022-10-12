@@ -28,6 +28,24 @@ namespace AGooday.AgPay.Common.Utils
         }
 
         /// <summary>
+        /// 将蛇形命名转为大驼峰命名
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string SnakeCaseToUpperCamelCase(string str)
+        {
+            var splits = str.Split('_');
+            var result = splits.Select(s =>
+            {
+                if (s.Length > 0)
+                    return s.Substring(0, 1).ToUpper() + s.Substring(1);
+                else
+                    return "";
+            }).ToArray();
+            return string.Join("", result);
+        }
+
+        /// <summary>
         /// 将大驼峰命名转为蛇形命名
         /// </summary>
         public static string UpperCamelCaseToSnakeCase(string str)

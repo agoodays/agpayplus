@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
             req.SetBizModel(model);
 
             //统一放置 isv接口必传信息
-            AliPayKit.PutApiIsvInfo(_serviceProvider, mchAppConfigContext, req, model);
+            AliPayKit.PutApiIsvInfo(mchAppConfigContext, req, model);
 
 
             string payData = null;

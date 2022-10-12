@@ -46,13 +46,13 @@ namespace AGooday.AgPay.Payment.Api.Models
             // 调起接口前出现异常，如私钥问题。  调起后出现验签异常等。
             catch (AopException e)
             {
-                LogUtil.Error("调起支付宝Execute[AopException]异常！", e);
+                LogUtil<AlipayClientWrapper>.Error("调起支付宝Execute[AopException]异常！", e);
                 //如果数据返回出现验签异常，则需要抛出： UNKNOWN 异常。
                 throw ChannelException.SysError(e.Message);
             }
             catch (Exception e)
             {
-                LogUtil.Error("调起支付宝Execute[Exception]异常！", e);
+                LogUtil<AlipayClientWrapper>.Error("调起支付宝Execute[Exception]异常！", e);
                 throw ChannelException.SysError($"调用支付宝client服务异常：{e.Message}");
             }
         }

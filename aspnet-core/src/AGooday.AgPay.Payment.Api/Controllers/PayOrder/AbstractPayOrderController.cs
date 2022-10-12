@@ -85,9 +85,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
             try
             {
+                //当订单存在时，封装公共参数。
                 if (payOrder != null)
-                { //当订单存在时，封装公共参数。
-
+                {
                     if (payOrder.State != (sbyte)PayOrderState.STATE_INIT)
                     {
                         throw new BizException("订单状态异常");
@@ -217,8 +217,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             {
                 return ApiRes.CustomFail(e.Message);
             }
+            //处理上游返回数据
             catch (ChannelException e)
-            {//处理上游返回数据
+            {
                 this.ProcessChannelMsg(e.ChannelRetMsg, payOrder);
 
                 if (e.ChannelRetMsg.ChannelState == ChannelState.SYS_ERROR)
@@ -237,7 +238,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
         private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, string ifCode, MchPayPassageDto mchPayPassage)
         {
-
             PayOrderDto payOrder = new PayOrderDto();
             payOrder.PayOrderId = SeqUtil.GenPayOrderId(); //生成订单ID
             payOrder.MchNo = mchInfo.MchNo; //商户号

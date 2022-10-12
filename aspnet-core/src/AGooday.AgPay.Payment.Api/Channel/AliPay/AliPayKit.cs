@@ -13,20 +13,23 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
     /// </summary>
     public class AliPayKit
     {
+        public static IServiceProvider ServiceProvider { get; set; }
+
         /// <summary>
         /// 放置 isv特殊信息
         /// </summary>
         /// <param name="mchAppConfigContext"></param>
         /// <param name="req"></param>
         /// <param name="model"></param>
-        public static void PutApiIsvInfo<T>(IServiceProvider serviceProvider, MchAppConfigContext mchAppConfigContext, IAopRequest<T> req, AopObject model) where T : AopResponse
+        public static void PutApiIsvInfo<T>(MchAppConfigContext mchAppConfigContext, IAopRequest<T> req, AopObject model) where T : AopResponse
         {
             //不是特约商户， 无需放置此值
             if (!mchAppConfigContext.IsIsvsubMch())
             {
                 return;
             }
-            ConfigContextQueryService configContextQueryService = serviceProvider.GetService<ConfigContextQueryService>();
+
+            ConfigContextQueryService configContextQueryService = ServiceProvider.GetService<ConfigContextQueryService>();
 
             // 获取支付参数
             AliPayIsvParams isvParams = (AliPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.ALIPAY);

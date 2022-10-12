@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Application.Params.YsfPay
     /// <summary>
     /// 云闪付 配置信息
     /// </summary>
-    public class YsfPayIsvsubMchParams : IsvSubMchParams
+    public class YsfPayIsvSubMchParams : IsvSubMchParams
     {
         /// <summary>
         /// 商户编号

@@ -18,6 +18,9 @@ using AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay;
 using AGooday.AgPay.Payment.Api.Channel.XxPay;
 using AGooday.AgPay.Payment.Api.Utils;
+using AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay;
+using AliBar = AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay.AliBar;
+using YsfAliBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliBar;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -152,6 +155,10 @@ services.AddSingleton(provider =>
 });
 
 services.AddSingleton<IQRCodeService, QRCodeService>();
+
+var serviceProvider = services.BuildServiceProvider();
+PayWayUtil.ServiceProvider = serviceProvider;
+AliPayKit.ServiceProvider = serviceProvider;
 
 var app = builder.Build();
 

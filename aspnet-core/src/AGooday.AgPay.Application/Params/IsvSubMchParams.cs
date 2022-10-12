@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Application.Params
             }
             else if (CS.IF_CODE.YSFPAY.Equals(ifCode))
             {
-                return JsonConvert.DeserializeObject<YsfPayIsvsubMchParams>(paramsStr);
+                return JsonConvert.DeserializeObject<YsfPayIsvSubMchParams>(paramsStr);
             }
             return null;
         }
