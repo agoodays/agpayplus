@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Manager.Api",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.AopSdk", "src\AGooday.AgPay.AopSdk\AGooday.AgPay.AopSdk.csproj", "{45CCA81B-5310-4B86-8E2E-BF365B4D2EF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Merchant.Api", "src\AGooday.AgPay.Merchant.Api\AGooday.AgPay.Merchant.Api.csproj", "{D62B2A5F-C083-46BD-ADE4-DA1D5D51C48A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Merchant.Api", "src\AGooday.AgPay.Merchant.Api\AGooday.AgPay.Merchant.Api.csproj", "{D62B2A5F-C083-46BD-ADE4-DA1D5D51C48A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Components.MQ", "src\AGooday.AgPay.Components.MQ\AGooday.AgPay.Components.MQ.csproj", "{FB5092B3-1D43-4FDA-BC4D-09CE95E08594}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +67,10 @@ Global
 		{D62B2A5F-C083-46BD-ADE4-DA1D5D51C48A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D62B2A5F-C083-46BD-ADE4-DA1D5D51C48A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D62B2A5F-C083-46BD-ADE4-DA1D5D51C48A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB5092B3-1D43-4FDA-BC4D-09CE95E08594}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB5092B3-1D43-4FDA-BC4D-09CE95E08594}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB5092B3-1D43-4FDA-BC4D-09CE95E08594}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB5092B3-1D43-4FDA-BC4D-09CE95E08594}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,6 +85,7 @@ Global
 		{E7E63B3F-36B9-4BB2-8242-A37072E2DDDC} = {99A7EA44-AC97-420B-B147-E4BF005F2E55}
 		{45CCA81B-5310-4B86-8E2E-BF365B4D2EF6} = {99A7EA44-AC97-420B-B147-E4BF005F2E55}
 		{D62B2A5F-C083-46BD-ADE4-DA1D5D51C48A} = {99A7EA44-AC97-420B-B147-E4BF005F2E55}
+		{FB5092B3-1D43-4FDA-BC4D-09CE95E08594} = {99A7EA44-AC97-420B-B147-E4BF005F2E55}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACDADF0F-3F17-4DE0-A322-714493E80E85}

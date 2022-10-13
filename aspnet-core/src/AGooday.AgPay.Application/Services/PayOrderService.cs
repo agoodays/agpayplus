@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using AGooday.AgPay.Common.Enumerator;
 using System.Data;
 using AGooday.AgPay.Domain.Core.Models;
+using AGooday.AgPay.Common.Constants;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -197,6 +198,14 @@ namespace AGooday.AgPay.Application.Services
             w.PayOrderId.Equals(payOrderId) || w.MchOrderNo.Equals(mchOrderNo)
             )).FirstOrDefault();
             return _mapper.Map<PayOrderDto>(entity);
+        }
+
+        public bool UpdateNotifySent(string orderId)
+        {
+            var updateRecord = _payOrderRepository.GetById(orderId);
+            updateRecord.NotifyState = CS.YES;
+            _payOrderRepository.Update(updateRecord);
+            return _payOrderRepository.SaveChanges(out int _);
         }
     }
 }

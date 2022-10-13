@@ -87,6 +87,10 @@ namespace AGooday.AgPay.Application.Services
             var records = PaginatedList<MchNotifyRecord>.Create<MchNotifyRecordDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
+        /// <summary>
+        /// 更改为通知中 & 增加允许重发通知次数
+        /// </summary>
+        /// <param name="notifyId"></param>
         public void UpdateIngAndAddNotifyCountLimit(long notifyId)
         {
             var notify = _mchNotifyRecordRepository.GetById(notifyId);
@@ -138,10 +142,18 @@ namespace AGooday.AgPay.Application.Services
             return FindByOrderAndType(transferId, (byte)MchNotifyRecordType.TYPE_TRANSFER_ORDER);
         }
 
+        /// <summary>
+        /// 更新商户回调的结果即状态
+        /// </summary>
+        /// <param name="notifyId"></param>
+        /// <param name="state"></param>
+        /// <param name="resResult"></param>
+        /// <returns></returns>
         public int UpdateNotifyResult(long notifyId, byte state, string resResult)
         {
             var notify = _mchNotifyRecordRepository.GetById(notifyId);
             notify.State = state;
+            notify.NotifyCount += 1;
             notify.ResResult = resResult;
             _mchNotifyRecordRepository.Update(notify);
             return _mchNotifyRecordRepository.SaveChanges();

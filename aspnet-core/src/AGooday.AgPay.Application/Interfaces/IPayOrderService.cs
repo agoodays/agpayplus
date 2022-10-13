@@ -22,5 +22,6 @@ namespace AGooday.AgPay.Application.Interfaces
         bool UpdateIng2SuccessOrFail(string payOrderId, byte state, string channelOrderId, string channelUserId, string channelErrCode, string channelErrMsg);
         bool UpdateDivisionState(PayOrderDto payOrder);
         PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo);
+        bool UpdateNotifySent(string orderId);
     }
 }

@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Application.Services
             {
                 return false;
             }
-
+            
             updateRecord.State = (byte)RefundOrderState.STATE_ING;
             _refundOrderRepository.Update(updateRecord);
             return _refundOrderRepository.SaveChanges(out int _);
