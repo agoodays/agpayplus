@@ -160,5 +160,9 @@ namespace AGooday.AgPay.Application.Services
         {
             return _refundOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchRefundNo);
         }
+        public bool IsExistRefundingOrder(string payOrderId)
+        {
+            return _refundOrderRepository.IsExistRefundingOrder(payOrderId);
+        }
     }
 }

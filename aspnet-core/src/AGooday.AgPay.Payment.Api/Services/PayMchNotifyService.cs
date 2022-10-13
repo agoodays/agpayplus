@@ -55,7 +55,8 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string appSecret = _configContextQueryService.QueryMchApp(dbPayOrder.MchNo, dbPayOrder.AppId).AppSecret;
 
                 // 封装通知url
-                string notifyUrl = CreateNotifyUrl(dbPayOrder, appSecret);
+                string reqMethod = "POST";
+                string notifyUrl = CreateNotifyUrl(dbPayOrder, appSecret, reqMethod, out string reqBody);
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbPayOrder.PayOrderId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_PAY_ORDER;
@@ -64,6 +65,8 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchNotifyRecord.IsvNo = dbPayOrder.IsvNo;
                 mchNotifyRecord.AppId = dbPayOrder.AppId;
                 mchNotifyRecord.NotifyUrl = notifyUrl;
+                mchNotifyRecord.ReqMethod = reqMethod;
+                mchNotifyRecord.ReqBody = "";
                 mchNotifyRecord.ResResult = "";
                 mchNotifyRecord.NotifyCount = 0;
                 mchNotifyRecord.State = (byte)MchNotifyRecordState.STATE_ING; // 通知中
@@ -88,23 +91,142 @@ namespace AGooday.AgPay.Payment.Api.Services
         }
 
         /// <summary>
+        /// 商户通知信息，退款成功的发送通知
+        /// </summary>
+        /// <param name="dbRefundOrder"></param>
+        public void RefundOrderNotify(RefundOrderDto dbRefundOrder)
+        {
+            try
+            {
+                // 通知地址为空
+                if (string.IsNullOrWhiteSpace(dbRefundOrder.NotifyUrl))
+                {
+                    return;
+                }
+
+                //获取到通知对象
+                MchNotifyRecordDto mchNotifyRecord = _mchNotifyRecordService.FindByRefundOrder(dbRefundOrder.RefundOrderId);
+
+                if (mchNotifyRecord != null)
+                {
+                    _logger.LogInformation("当前已存在通知消息， 不再发送。");
+                    return;
+                }
+
+                //商户app私钥
+                string appSecret = _configContextQueryService.QueryMchApp(dbRefundOrder.MchNo, dbRefundOrder.AppId).AppSecret;
+
+                // 封装通知url
+                string reqMethod = "POST";
+                string notifyUrl = CreateNotifyUrl(dbRefundOrder, appSecret, reqMethod, out string reqBody);
+                mchNotifyRecord = new MchNotifyRecordDto();
+                mchNotifyRecord.OrderId = dbRefundOrder.RefundOrderId;
+                mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
+                mchNotifyRecord.MchNo = dbRefundOrder.MchNo;
+                mchNotifyRecord.MchOrderNo = dbRefundOrder.MchRefundNo; //商户订单号
+                mchNotifyRecord.IsvNo = dbRefundOrder.IsvNo;
+                mchNotifyRecord.AppId = dbRefundOrder.AppId;
+                mchNotifyRecord.NotifyUrl = notifyUrl;
+                mchNotifyRecord.ReqMethod = reqMethod;
+                mchNotifyRecord.ReqBody = reqBody;
+                mchNotifyRecord.ResResult = "";
+                mchNotifyRecord.NotifyCount = 0;
+                mchNotifyRecord.State = (byte)MchNotifyRecordState.STATE_ING; // 通知中
+
+                try
+                {
+                    _mchNotifyRecordService.Add(mchNotifyRecord);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
+                    return;
+                }
+
+                //推送到MQ
+                long notifyId = mchNotifyRecord.NotifyId;
+                //mqSender.send(PayOrderMchNotifyMQ.build(notifyId));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "推送失败！");
+            }
+        }
+
+        /// <summary>
+        /// 商户通知信息，转账订单的通知接口
+        /// </summary>
+        /// <param name="dbTransferOrder"></param>
+        public void TransferOrderNotify(TransferOrderDto dbTransferOrder)
+        {
+            try
+            {
+                // 通知地址为空
+                if (string.IsNullOrWhiteSpace(dbTransferOrder.NotifyUrl))
+                {
+                    return;
+                }
+
+                //获取到通知对象
+                MchNotifyRecordDto mchNotifyRecord = _mchNotifyRecordService.FindByRefundOrder(dbTransferOrder.TransferId);
+
+                if (mchNotifyRecord != null)
+                {
+                    _logger.LogInformation("当前已存在通知消息， 不再发送。");
+                    return;
+                }
+
+                //商户app私钥
+                string appSecret = _configContextQueryService.QueryMchApp(dbTransferOrder.MchNo, dbTransferOrder.AppId).AppSecret;
+
+                // 封装通知url
+                string reqMethod = "POST";
+                string notifyUrl = CreateNotifyUrl(dbTransferOrder, appSecret, reqMethod, out string reqBody);
+                mchNotifyRecord = new MchNotifyRecordDto();
+                mchNotifyRecord.OrderId = dbTransferOrder.TransferId;
+                mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
+                mchNotifyRecord.MchNo = dbTransferOrder.MchNo;
+                mchNotifyRecord.MchOrderNo = dbTransferOrder.MchOrderNo; //商户订单号
+                mchNotifyRecord.IsvNo = dbTransferOrder.IsvNo;
+                mchNotifyRecord.AppId = dbTransferOrder.AppId;
+                mchNotifyRecord.NotifyUrl = notifyUrl;
+                mchNotifyRecord.ReqMethod = reqMethod;
+                mchNotifyRecord.ReqBody = reqBody;
+                mchNotifyRecord.ResResult = "";
+                mchNotifyRecord.NotifyCount = 0;
+                mchNotifyRecord.State = (byte)MchNotifyRecordState.STATE_ING; // 通知中
+
+                try
+                {
+                    _mchNotifyRecordService.Add(mchNotifyRecord);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
+                    return;
+                }
+
+                //推送到MQ
+                long notifyId = mchNotifyRecord.NotifyId;
+                //mqSender.send(PayOrderMchNotifyMQ.build(notifyId));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "推送失败！");
+            }
+        }
+
+        /// <summary>
         /// 创建响应URL
         /// </summary>
         /// <param name="payOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(PayOrderDto payOrder, string appSecret)
+        public string CreateNotifyUrl(PayOrderDto payOrder, string appSecret, string method, out string body)
         {
-
             QueryPayOrderRS queryPayOrderRS = QueryPayOrderRS.BuildByPayOrder(payOrder);
             JObject jsonObject = JObject.FromObject(queryPayOrderRS);
-            jsonObject.Add("reqTime", DateTimeOffset.Now.ToUnixTimeSeconds()); //添加请求时间
-
-            // 报文签名
-            jsonObject.Add("sign", AgPayUtil.GetSign(jsonObject, appSecret));
-
-            // 生成通知
-            return URLUtil.AppendUrlQuery(payOrder.NotifyUrl, jsonObject);
+            return GenNotifyUrlAndBody(jsonObject, appSecret, payOrder.NotifyUrl, method, out body);
         }
 
         /// <summary>
@@ -113,18 +235,11 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="refundOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(RefundOrderDto refundOrder, string appSecret)
+        public string CreateNotifyUrl(RefundOrderDto refundOrder, string appSecret, string method, out string body)
         {
-
             QueryRefundOrderRS queryRefundOrderRS = QueryRefundOrderRS.BuildByRefundOrder(refundOrder);
             JObject jsonObject = JObject.FromObject(queryRefundOrderRS);
-            jsonObject.Add("reqTime", DateTimeOffset.Now.ToUnixTimeSeconds()); //添加请求时间
-
-            // 报文签名
-            jsonObject.Add("sign", AgPayUtil.GetSign(jsonObject, appSecret));   // 签名
-
-            // 生成通知
-            return URLUtil.AppendUrlQuery(refundOrder.NotifyUrl, jsonObject);
+            return GenNotifyUrlAndBody(jsonObject, appSecret, refundOrder.NotifyUrl, method, out body);
         }
 
         /// <summary>
@@ -133,18 +248,11 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="transferOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(TransferOrderDto transferOrder, string appSecret)
+        public string CreateNotifyUrl(TransferOrderDto transferOrder, string appSecret, string method, out string body)
         {
-
             QueryTransferOrderRS rs = QueryTransferOrderRS.BuildByRecord(transferOrder);
             JObject jsonObject = JObject.FromObject(rs);
-            jsonObject.Add("reqTime", DateTimeOffset.Now.ToUnixTimeSeconds()); //添加请求时间
-
-            // 报文签名
-            jsonObject.Add("sign", AgPayUtil.GetSign(jsonObject, appSecret));   // 签名
-
-            // 生成通知
-            return URLUtil.AppendUrlQuery(transferOrder.NotifyUrl, jsonObject);
+            return GenNotifyUrlAndBody(jsonObject, appSecret, transferOrder.NotifyUrl, method, out body);
         }
 
         /// <summary>
@@ -171,60 +279,24 @@ namespace AGooday.AgPay.Payment.Api.Services
             return URLUtil.AppendUrlQuery(payOrder.ReturnUrl, jsonObject);
         }
 
-        public void RefundOrderNotify(RefundOrderDto dbRefundOrder)
+        private static string GenNotifyUrlAndBody(JObject jsonObject, string appSecret, string notifyUrl, string method, out string body)
         {
-            try
+            jsonObject.Add("reqTime", DateTimeOffset.Now.ToUnixTimeSeconds());// 添加请求时间
+            jsonObject.Add("sign", AgPayUtil.GetSign(jsonObject, appSecret));// 报文签名
+
+            body = string.Empty;
+            switch (method)
             {
-                // 通知地址为空
-                if (string.IsNullOrWhiteSpace(dbRefundOrder.NotifyUrl))
-                {
-                    return;
-                }
-
-                //获取到通知对象
-                MchNotifyRecordDto mchNotifyRecord = _mchNotifyRecordService.FindByRefundOrder(dbRefundOrder.RefundOrderId);
-
-                if (mchNotifyRecord != null)
-                {
-                    _logger.LogInformation("当前已存在通知消息， 不再发送。");
-                    return;
-                }
-
-                //商户app私钥
-                string appSecret = _configContextQueryService.QueryMchApp(dbRefundOrder.MchNo, dbRefundOrder.AppId).AppSecret;
-
-                // 封装通知url
-                string notifyUrl = CreateNotifyUrl(dbRefundOrder, appSecret);
-                mchNotifyRecord = new MchNotifyRecordDto();
-                mchNotifyRecord.OrderId = dbRefundOrder.RefundOrderId;
-                mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
-                mchNotifyRecord.MchNo = dbRefundOrder.MchNo;
-                mchNotifyRecord.MchOrderNo = dbRefundOrder.MchRefundNo; //商户订单号
-                mchNotifyRecord.IsvNo = dbRefundOrder.IsvNo;
-                mchNotifyRecord.AppId = dbRefundOrder.AppId;
-                mchNotifyRecord.NotifyUrl = notifyUrl;
-                mchNotifyRecord.ResResult = "";
-                mchNotifyRecord.NotifyCount = 0;
-                mchNotifyRecord.State = (byte)MchNotifyRecordState.STATE_ING; // 通知中
-
-                try
-                {
-                    _mchNotifyRecordService.Add(mchNotifyRecord);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
-                    return;
-                }
-
-                //推送到MQ
-                long notifyId = mchNotifyRecord.NotifyId;
-                //mqSender.send(PayOrderMchNotifyMQ.build(notifyId));
+                case "POST":
+                    body = JsonConvert.SerializeObject(jsonObject);
+                    break;
+                case "GET":
+                    notifyUrl = URLUtil.AppendUrlQuery(notifyUrl, jsonObject);
+                    break;
+                default:
+                    break;
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "推送失败！");
-            }
+            return notifyUrl;
         }
     }
 }

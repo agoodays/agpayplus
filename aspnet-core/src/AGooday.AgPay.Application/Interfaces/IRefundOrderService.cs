@@ -19,5 +19,6 @@ namespace AGooday.AgPay.Application.Interfaces
         bool UpdateInit2Ing(string refundOrderId);
         bool UpdateIng2SuccessOrFail(string refundOrderId, byte state, string channelOrderId, string channelErrCode, string channelErrMsg);
         bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo);
+        bool IsExistRefundingOrder(string payOrderId);
     }
 }

@@ -12,6 +12,9 @@ namespace AGooday.AgPay.Common.Enumerator
         TYPE_ISVSUB = 2, //商户类型： 2-特约商户
     }
 
+    /// <summary>
+    /// 订单类型:1-支付,2-退款, 3-转账
+    /// </summary>
     public enum MchNotifyRecordType
     {
         TYPE_PAY_ORDER = 1,
@@ -81,6 +84,9 @@ namespace AGooday.AgPay.Common.Enumerator
         STATE_CLOSED = 4, //退款任务关闭
     }
 
+    /// <summary>
+    /// 入账方式
+    /// </summary>
     public enum TransferOrderEntry
     {
         WX_CASH,

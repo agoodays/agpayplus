@@ -7,11 +7,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
 {
     [Route("api/anon/paytestNotify")]
     [ApiController]
-    public class PaytestNotifyController : ControllerBase
+    public class PayTestNotifyController : ControllerBase
     {
-        private readonly ILogger<PaytestNotifyController> _logger;
+        private readonly ILogger<PayTestNotifyController> _logger;
 
-        public PaytestNotifyController(ILogger<PaytestNotifyController> logger)
+        public PayTestNotifyController(ILogger<PayTestNotifyController> logger)
         {
             _logger = logger;
         }

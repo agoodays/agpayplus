@@ -52,6 +52,16 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string NotifyUrl { get; set; }
 
         /// <summary>
+        /// 通知请求方法
+        /// </summary>
+        public string ReqMethod { get; set; }
+
+        /// <summary>
+        /// 通知请求正文
+        /// </summary>
+        public string ReqBody { get; set; }
+
+        /// <summary>
         /// 通知响应结果
         /// </summary>
         public string ResResult { get; set; }

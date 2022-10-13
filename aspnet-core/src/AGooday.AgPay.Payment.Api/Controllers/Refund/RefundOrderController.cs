@@ -78,9 +78,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                     throw new BizException("申请金额超出订单可退款余额，请检查退款金额");
                 }
 
-                //if(refundOrderService.count(RefundOrder.gw().eq(RefundOrder::getPayOrderId, payOrder.PayOrderId()).eq(RefundOrder::getState, (byte)RefundOrderState.STATE_ING)) > 0){
-                //    throw new BizException("支付订单具有在途退款申请，请稍后再试");
-                //}
+                if (_refundOrderService.IsExistRefundingOrder(payOrder.PayOrderId))
+                {
+                    throw new BizException("支付订单具有在途退款申请，请稍后再试");
+                }
 
                 //全部退款金额 （退款订单表）
                 long sumSuccessRefundAmount = _refundOrderService.SumSuccessRefundAmount(payOrder.PayOrderId);
@@ -96,7 +97,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 
                 string mchNo = rq.MchNo;
                 string appId = rq.AppId;
-
 
                 // 校验退款单号是否重复
                 if (_refundOrderService.IsExistOrderByMchOrderNo(mchNo, rq.MchRefundNo))
@@ -255,7 +255,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             refundOrder.ChannelOrderNo = channelRetMsg.ChannelOrderId;
             refundOrder.ErrCode = channelRetMsg.ChannelErrCode;
             refundOrder.ErrMsg = channelRetMsg.ChannelErrMsg;
-
 
             bool isSuccess = _refundOrderService.UpdateInit2Ing(refundOrder.RefundOrderId);
             if (!isSuccess)
