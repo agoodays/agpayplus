@@ -7,6 +7,8 @@ using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Exceptions;
@@ -30,6 +32,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     /// </summary>
     public abstract class AbstractPayOrderController : ApiControllerBase
     {
+        protected readonly IMQSender mqSender;
         protected readonly Func<string, IPaymentService> _paymentServiceFactory;
         protected readonly ConfigContextQueryService _configContextQueryService;
         protected readonly PayOrderProcessService _payOrderProcessService;
@@ -38,7 +41,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         protected readonly IPayOrderService _payOrderService;
         protected readonly ISysConfigService _sysConfigService;
 
-        protected AbstractPayOrderController(Func<string, IPaymentService> paymentServiceFactory,
+        protected AbstractPayOrderController(IMQSender mqSender,
+            Func<string, IPaymentService> paymentServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
             RequestIpUtil requestIpUtil,
@@ -55,6 +59,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             _mchPayPassageService = mchPayPassageService;
             _payOrderService = payOrderService;
             _sysConfigService = sysConfigService;
+            this.mqSender = mqSender;
         }
 
         /// <summary>
@@ -389,6 +394,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             if (channelRetMsg.IsNeedQuery)
             {
                 //推送到MQ
+                mqSender.Send(PayOrderReissueMQ.Build(payOrderId, 1), 5);
             }
         }
 

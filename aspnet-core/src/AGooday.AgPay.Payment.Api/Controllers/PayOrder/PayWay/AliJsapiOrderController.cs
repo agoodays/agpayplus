@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
@@ -16,7 +17,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
     [ApiController]
     public class AliJsapiOrderController : AbstractPayOrderController
     {
-        public AliJsapiOrderController(Func<string, IPaymentService> paymentServiceFactory,
+        public AliJsapiOrderController(IMQSender mqSender,
+            Func<string, IPaymentService> paymentServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
             RequestIpUtil requestIpUtil,
@@ -24,7 +26,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
             IMchPayPassageService mchPayPassageService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService)
-            : base(paymentServiceFactory, configContextQueryService, payOrderProcessService, requestIpUtil, logger, mchPayPassageService, payOrderService, sysConfigService)
+            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestIpUtil, logger, mchPayPassageService, payOrderService, sysConfigService)
         {
         }
 

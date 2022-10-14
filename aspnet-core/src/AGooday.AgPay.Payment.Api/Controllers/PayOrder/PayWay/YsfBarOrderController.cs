@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
@@ -12,9 +13,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
     /// <summary>
     /// 云闪付 条码支付 controller
     /// </summary>
-    public class YsfBarOrderController: AbstractPayOrderController
+    public class YsfBarOrderController : AbstractPayOrderController
     {
-        public YsfBarOrderController(Func<string, IPaymentService> paymentServiceFactory,
+        public YsfBarOrderController(IMQSender mqSender,
+            Func<string, IPaymentService> paymentServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
             RequestIpUtil requestIpUtil,
@@ -22,7 +24,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
             IMchPayPassageService mchPayPassageService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService)
-            : base(paymentServiceFactory, configContextQueryService, payOrderProcessService, requestIpUtil, logger, mchPayPassageService, payOrderService, sysConfigService)
+            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestIpUtil, logger, mchPayPassageService, payOrderService, sysConfigService)
         {
         }
 

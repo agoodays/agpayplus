@@ -6,6 +6,7 @@ using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Controllers.PayOrder;
@@ -25,7 +26,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
     {
         private readonly Func<string, IChannelUserService> _channelUserServiceFactory;
         private readonly PayMchNotifyService _payMchNotifyService;
-        public QrCashierController(Func<string, IChannelUserService> channelUserServiceFactory,
+        public QrCashierController(IMQSender mqSender, 
+            Func<string, IChannelUserService> channelUserServiceFactory,
             Func<string, IPaymentService> paymentServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
@@ -35,7 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             IMchPayPassageService mchPayPassageService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService)
-            : base(paymentServiceFactory, configContextQueryService, payOrderProcessService, requestIpUtil, logger, mchPayPassageService, payOrderService, sysConfigService)
+            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestIpUtil, logger, mchPayPassageService, payOrderService, sysConfigService)
         {
             _channelUserServiceFactory = channelUserServiceFactory;
             _payMchNotifyService = payMchNotifyService;

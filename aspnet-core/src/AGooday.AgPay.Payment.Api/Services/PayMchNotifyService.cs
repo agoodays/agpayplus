@@ -2,6 +2,8 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS.Refund;
 using AGooday.AgPay.Payment.Api.RQRS.Transfer;
@@ -17,15 +19,17 @@ namespace AGooday.AgPay.Payment.Api.Services
     /// </summary>
     public class PayMchNotifyService
     {
+        private readonly IMQSender mqSender;
         private readonly IMchNotifyRecordService _mchNotifyRecordService;
         private readonly ConfigContextQueryService _configContextQueryService;
         private readonly ILogger<PayMchNotifyService> _logger;
 
-        public PayMchNotifyService(IMchNotifyRecordService mchNotifyRecordService, ConfigContextQueryService configContextQueryService, ILogger<PayMchNotifyService> logger)
+        public PayMchNotifyService(IMQSender mqSender, ILogger<PayMchNotifyService> logger, IMchNotifyRecordService mchNotifyRecordService, ConfigContextQueryService configContextQueryService)
         {
+            this.mqSender = mqSender;
+            _logger = logger;
             _mchNotifyRecordService = mchNotifyRecordService;
             _configContextQueryService = configContextQueryService;
-            _logger = logger;
         }
 
         /// <summary>
@@ -83,6 +87,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
                 //推送到MQ
                 long notifyId = mchNotifyRecord.NotifyId;
+                mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId));
             }
             catch (Exception e)
             {
@@ -145,7 +150,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
                 //推送到MQ
                 long notifyId = mchNotifyRecord.NotifyId;
-                //mqSender.send(PayOrderMchNotifyMQ.build(notifyId));
+                mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId));
             }
             catch (Exception e)
             {
@@ -208,7 +213,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
                 //推送到MQ
                 long notifyId = mchNotifyRecord.NotifyId;
-                //mqSender.send(PayOrderMchNotifyMQ.build(notifyId));
+                mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId));
             }
             catch (Exception e)
             {

@@ -27,6 +27,8 @@ using YsfAliBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliBar;
 using YsfAliJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliJsapi;
 using YsfWxBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxBar;
 using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi;
+using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -165,18 +167,18 @@ services.AddSingleton<IPaymentService, AliBar>();
 services.AddSingleton<IPaymentService, AliJsapi>();
 services.AddSingleton<IPaymentService, AliPc>();
 services.AddSingleton<IPaymentService, AliQr>();
-services.AddSingleton<IPaymentService, AliWap>(); 
+services.AddSingleton<IPaymentService, AliWap>();
 #endregion
 #region WxPay
 services.AddSingleton<IPaymentService, WxApp>();
 services.AddSingleton<IPaymentService, WxBar>();
-services.AddSingleton<IPaymentService, WxJsapi>(); 
+services.AddSingleton<IPaymentService, WxJsapi>();
 #endregion
 #region YsfPay
 services.AddSingleton<IPaymentService, YsfAliBar>();
 services.AddSingleton<IPaymentService, YsfAliJsapi>();
 services.AddSingleton<IPaymentService, YsfWxBar>();
-services.AddSingleton<IPaymentService, YsfWxJsapi>(); 
+services.AddSingleton<IPaymentService, YsfWxJsapi>();
 #endregion
 
 services.AddSingleton<AliPayChannelUserService>();
@@ -199,6 +201,7 @@ services.AddSingleton(provider =>
 });
 
 services.AddSingleton<IQRCodeService, QRCodeService>();
+services.AddSingleton<IMQSender, RabbitMQSender>();
 
 var serviceProvider = services.BuildServiceProvider();
 PayWayUtil.ServiceProvider = serviceProvider;
