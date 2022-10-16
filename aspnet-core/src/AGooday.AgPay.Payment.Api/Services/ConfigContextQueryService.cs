@@ -162,14 +162,14 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
         }
 
-        public PaypalWrapper GetPaypalWrapper(MchAppConfigContext mchAppConfigContext)
+        public PayPalWrapper GetPaypalWrapper(MchAppConfigContext mchAppConfigContext)
         {
             if (IsCache())
             {
                 return _configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetPaypalWrapper();
             }
             PpPayNormalMchParams ppPayNormalMchParams = (PpPayNormalMchParams)QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.PPPAY); ;
-            return PaypalWrapper.BuildPaypalWrapper(ppPayNormalMchParams);
+            return PayPalWrapper.BuildPaypalWrapper(ppPayNormalMchParams);
         }
     }
 }

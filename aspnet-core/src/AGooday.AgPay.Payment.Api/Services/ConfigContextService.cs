@@ -215,7 +215,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 PpPayNormalMchParams ppPayMchParams = mchAppConfigContext.GetNormalMchParamsByIfCode<PpPayNormalMchParams>(CS.IF_CODE.PPPAY);
                 if (ppPayMchParams != null)
                 {
-                    mchAppConfigContext.PaypalWrapper = PaypalWrapper.BuildPaypalWrapper(ppPayMchParams);
+                    mchAppConfigContext.PaypalWrapper = PayPalWrapper.BuildPaypalWrapper(ppPayMchParams);
                 }
 
 

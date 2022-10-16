@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         public IsvConfigContext IsvConfigContext { get; set; }
 
         /** 缓存 Paypal 对象 **/
-        public PaypalWrapper PaypalWrapper { get; set; }
+        public PayPalWrapper PaypalWrapper { get; set; }
 
         /** 缓存支付宝client 对象 **/
         public AlipayClientWrapper AlipayClientWrapper { get; set; }
@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Models
             return IsIsvsubMch() ? this.IsvConfigContext.WxServiceWrapper : this.WxServiceWrapper;
         }
 
-        public PaypalWrapper GetPaypalWrapper()
+        public PayPalWrapper GetPaypalWrapper()
         {
             return this.PaypalWrapper;
         }

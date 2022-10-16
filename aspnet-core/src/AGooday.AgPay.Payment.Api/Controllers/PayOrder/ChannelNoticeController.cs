@@ -30,13 +30,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         private readonly PayMchNotifyService payMchNotifyService;
         private readonly PayOrderProcessService payOrderProcessService;
 
-        public ChannelNoticeController(ILogger<AbstractPayOrderController> log,
+        public ChannelNoticeController(ILogger<AbstractPayOrderController> logger,
             IPayOrderService payOrderService,
             ConfigContextQueryService configContextQueryService,
             PayMchNotifyService payMchNotifyService,
             PayOrderProcessService payOrderProcessService)
         {
-            this.log = log;
+            this.log = logger;
             this.payOrderService = payOrderService;
             this.configContextQueryService = configContextQueryService;
             this.payMchNotifyService = payMchNotifyService;
