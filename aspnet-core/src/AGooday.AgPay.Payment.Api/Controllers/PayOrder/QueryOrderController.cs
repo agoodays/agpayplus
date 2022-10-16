@@ -1,4 +1,10 @@
-﻿using AGooday.AgPay.Payment.Api.Utils;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
+using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,15 +17,37 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     [Route("api/pay")]
     public class QueryOrderController : ApiControllerBase
     {
-        public QueryOrderController(RequestIpUtil requestIpUtil) : base(requestIpUtil)
+        private readonly IPayOrderService payOrderService;
+        private readonly ConfigContextQueryService configContextQueryService;
+
+        public QueryOrderController(RequestIpUtil requestIpUtil,
+            IPayOrderService payOrderService,
+            ConfigContextQueryService configContextQueryService) : base(requestIpUtil)
         {
+            this.payOrderService = payOrderService;
+            this.configContextQueryService = configContextQueryService;
         }
 
         [HttpPost]
         [Route("query")]
-        public ActionResult QueryOrder()
+        public ActionResult<ApiRes> QueryOrder()
         {
-            return Ok();
+            //获取参数 & 验签
+            QueryPayOrderRQ rq = GetRQByWithMchSign<QueryPayOrderRQ>();
+
+            if (string.IsNullOrWhiteSpace(rq.MchOrderNo) && string.IsNullOrWhiteSpace(rq.PayOrderId))
+            {
+                throw new BizException("mchOrderNo 和 payOrderId不能同时为空");
+            }
+
+            PayOrderDto payOrder = payOrderService.QueryMchOrder(rq.MchNo, rq.PayOrderId, rq.MchOrderNo);
+            if (payOrder == null)
+            {
+                throw new BizException("订单不存在");
+            }
+
+            QueryPayOrderRS bizRes = QueryPayOrderRS.BuildByPayOrder(payOrder);
+            return ApiRes.OkWithSign(bizRes, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
         }
     }
 }

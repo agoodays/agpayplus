@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Msg
 {
@@ -47,7 +48,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <summary>
         /// 响应结果（一般用于回调接口返回给上游数据 ）
         /// </summary>
-        //private ResponseEntity responseEntity { get; set; }
+        public ActionResult ResponseEntity { get; set; }
 
         //静态初始函数
         public ChannelRetMsg() { }

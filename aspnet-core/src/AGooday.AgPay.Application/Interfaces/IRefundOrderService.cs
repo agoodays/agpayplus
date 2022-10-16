@@ -16,9 +16,11 @@ namespace AGooday.AgPay.Application.Interfaces
         IEnumerable<RefundOrderDto> GetAll();
         PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto);
         long SumSuccessRefundAmount(string payOrderId);
-        bool UpdateInit2Ing(string refundOrderId);
-        bool UpdateIng2SuccessOrFail(string refundOrderId, byte state, string channelOrderId, string channelErrCode, string channelErrMsg);
         bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo);
         bool IsExistRefundingOrder(string payOrderId);
+        bool UpdateInit2Ing(string refundOrderId);
+        bool UpdateIng2Success(string refundOrderId, string channelOrderId);
+        bool UpdateIng2Fail(string refundOrderId, string channelOrderId, string channelErrCode, string channelErrMsg);
+        bool UpdateIng2SuccessOrFail(string refundOrderId, byte state, string channelOrderId, string channelErrCode, string channelErrMsg);
     }
 }

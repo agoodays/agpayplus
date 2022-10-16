@@ -14,14 +14,16 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(PayOrderDto dto);
         PayOrderDto GetById(string recordId);
         IEnumerable<PayOrderDto> GetAll();
+        PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo);
+        PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto);
         bool IsExistOrderUseIfCode(string ifCode);
         bool IsExistOrderUseWayCode(string wayCode);
-        PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto);
         bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo);
+        bool UpdateDivisionState(PayOrderDto payOrder);
         bool UpdateInit2Ing(string payOrderId, PayOrderDto payOrder);
         bool UpdateIng2SuccessOrFail(string payOrderId, byte state, string channelOrderId, string channelUserId, string channelErrCode, string channelErrMsg);
-        bool UpdateDivisionState(PayOrderDto payOrder);
-        PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo);
         bool UpdateNotifySent(string orderId);
+        bool UpdateIng2Success(string payOrderId, string channelOrderId, string channelUserId);
+        bool UpdateIng2Fail(string payOrderId, string channelOrderId, string channelUserId, string channelErrCode, string channelErrMsg);
     }
 }

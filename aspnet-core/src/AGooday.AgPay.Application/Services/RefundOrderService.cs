@@ -102,12 +102,11 @@ namespace AGooday.AgPay.Application.Services
             {
                 return false;
             }
-            
+
             updateRecord.State = (byte)RefundOrderState.STATE_ING;
             _refundOrderRepository.Update(updateRecord);
             return _refundOrderRepository.SaveChanges(out int _);
         }
-
         public bool UpdateIng2Success(string refundOrderId, string channelOrderNo)
         {
             var updateRecord = _refundOrderRepository.GetById(refundOrderId);
@@ -122,7 +121,6 @@ namespace AGooday.AgPay.Application.Services
             _refundOrderRepository.Update(updateRecord);
             return _refundOrderRepository.SaveChanges(out int _);
         }
-
         public bool UpdateIng2Fail(string refundOrderId, string channelOrderNo, string channelErrCode, string channelErrMsg)
         {
             var updateRecord = _refundOrderRepository.GetById(refundOrderId);
@@ -138,7 +136,6 @@ namespace AGooday.AgPay.Application.Services
             _refundOrderRepository.Update(updateRecord);
             return _refundOrderRepository.SaveChanges(out int _);
         }
-
         public bool UpdateIng2SuccessOrFail(string refundOrderId, byte updateState, string channelOrderNo, string channelErrCode, string channelErrMsg)
         {
             if (updateState == (byte)RefundOrderState.STATE_ING)

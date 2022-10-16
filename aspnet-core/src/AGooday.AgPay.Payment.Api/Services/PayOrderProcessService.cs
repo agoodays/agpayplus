@@ -3,6 +3,8 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Enumerator;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 using log4net;
 using MediatR;
 using System;
@@ -14,15 +16,17 @@ namespace AGooday.AgPay.Payment.Api.Services
     /// </summary>
     public class PayOrderProcessService
     {
+        private readonly IMQSender mqSender;
         private readonly IPayOrderService _payOrderService;
         private readonly PayMchNotifyService _payMchNotifyService;
         private readonly ILogger<PayOrderProcessService> _logger;
 
-        public PayOrderProcessService(IPayOrderService payOrderService, PayMchNotifyService payMchNotifyService, ILogger<PayOrderProcessService> logger)
+        public PayOrderProcessService(IMQSender mqSender, ILogger<PayOrderProcessService> logger, IPayOrderService payOrderService, PayMchNotifyService payMchNotifyService)
         {
+            this.mqSender = mqSender;
+            _logger = logger;
             _payOrderService = payOrderService;
             _payMchNotifyService = payMchNotifyService;
-            _logger = logger;
         }
 
         public void ConfirmSuccess(PayOrderDto payOrder)
@@ -54,6 +58,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 if (updDivisionState)
                 {
                     //推送到分账MQ
+                    mqSender.Send(PayOrderDivisionMQ.Build(payOrder.PayOrderId, CS.YES, null), 60); //1分钟后执行
                 }
             }
             catch (Exception e)

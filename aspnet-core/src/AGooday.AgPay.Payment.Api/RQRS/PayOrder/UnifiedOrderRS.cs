@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Payment.Api.RQRS.Msg;
+﻿using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using System.Text.Json.Serialization;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
@@ -21,7 +22,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
         /// <summary>
         /// 订单状态
         /// </summary>
-        public byte OrderState { get; set; }
+        public byte? OrderState { get; set; }
 
         /// <summary>
         /// 支付参数类型  ( 无参数，  调起支付插件参数， 重定向到指定地址，  用户扫码   ) 
@@ -55,7 +56,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
         /// <returns></returns>
         public virtual string BuildPayDataType()
         {
-            return "none";
+            return CS.PAY_DATA_TYPE.NONE;
         }
 
         /// <summary>

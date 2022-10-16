@@ -73,6 +73,14 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<PayOrderDto>>(payOrders);
         }
 
+        public PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo)
+        {
+            var entity = _payOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && (
+            w.PayOrderId.Equals(payOrderId) || w.MchOrderNo.Equals(mchOrderNo)
+            )).FirstOrDefault();
+            return _mapper.Map<PayOrderDto>(entity);
+        }
+
         /// <summary>
         /// 通用列表查询条件
         /// </summary>
@@ -101,7 +109,6 @@ namespace AGooday.AgPay.Application.Services
         {
             return _payOrderRepository.IsExistOrderUseIfCode(ifCode);
         }
-
         public bool IsExistOrderUseWayCode(string wayCode)
         {
             return _payOrderRepository.IsExistOrderUseWayCode(wayCode);
@@ -129,7 +136,6 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
         }
-
         /** 更新订单状态  【支付中】 --》 【支付成功】 **/
         public bool UpdateIng2Success(string payOrderId, string channelOrderNo, string channelUserId)
         {
@@ -145,7 +151,6 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
         }
-
         /** 更新订单状态  【支付中】 --》 【支付成功】 **/
         public bool UpdateIng2Fail(string payOrderId, string channelOrderNo, string channelUserId, string channelErrCode, string channelErrMsg)
         {
@@ -162,7 +167,6 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
         }
-
         public bool UpdateIng2SuccessOrFail(string payOrderId, byte updateState, string channelOrderNo, string channelUserId, string channelErrCode, string channelErrMsg)
         {
             if (updateState == (byte)PayOrderState.STATE_ING)
@@ -179,7 +183,6 @@ namespace AGooday.AgPay.Application.Services
             }
             return false;
         }
-
         public bool UpdateDivisionState(PayOrderDto payOrder)
         {
             var updateRecord = _payOrderRepository.GetById(payOrder.PayOrderId);
@@ -191,15 +194,6 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
         }
-
-        public PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo)
-        {
-            var entity = _payOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && (
-            w.PayOrderId.Equals(payOrderId) || w.MchOrderNo.Equals(mchOrderNo)
-            )).FirstOrDefault();
-            return _mapper.Map<PayOrderDto>(entity);
-        }
-
         public bool UpdateNotifySent(string orderId)
         {
             var updateRecord = _payOrderRepository.GetById(orderId);

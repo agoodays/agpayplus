@@ -29,6 +29,8 @@ using YsfWxBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxBar;
 using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
+using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.MQ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,33 @@ logging.AddConsole();
 // Add services to the container.
 var services = builder.Services;
 var Env = builder.Environment;
+
+services.AddSingleton(new Appsettings(Env.ContentRootPath));
+
+//// 注入日志
+//services.AddLogging(config =>
+//{
+//    //Microsoft.Extensions.Logging.Log4Net.AspNetCore
+//    config.AddLog4Net();
+//});
+services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
+
+#region Redis
+//redis缓存
+var section = builder.Configuration.GetSection("Redis:Default");
+//连接字符串
+string _connectionString = section.GetSection("Connection").Value;
+//实例名称
+string _instanceName = section.GetSection("InstanceName").Value;
+//默认数据库 
+int _defaultDB = int.Parse(section.GetSection("DefaultDB").Value ?? "0");
+services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB));
+#endregion
+
+#region MQ
+var mqconfiguration = builder.Configuration.GetSection("Redis:Default");
+services.Configure<RabbitMQConfiguration>(mqconfiguration);
+#endregion
 
 services.AddMemoryCache();
 
@@ -96,6 +125,7 @@ services.AddSingleton<ConfigContextQueryService>();
 services.AddSingleton<ConfigContextService>();
 services.AddSingleton<PayMchNotifyService>();
 services.AddSingleton<PayOrderProcessService>();
+#region DivisionService
 //services.AddSingleton<IDivisionService, AliPayDivisionService>();
 //services.AddSingleton<IDivisionService, WxPayDivisionService>();
 services.AddSingleton<AliPayDivisionService>();
@@ -115,8 +145,9 @@ services.AddSingleton(provider =>
         }
     };
     return funcFactory;
-});
-
+}); 
+#endregion
+#region PaymentService
 services.AddSingleton<AliPayPaymentService>();
 services.AddSingleton<WxPayPaymentService>();
 services.AddSingleton<YsfPayPaymentService>();
@@ -138,7 +169,8 @@ services.AddSingleton(provider =>
     };
     return funcFactory;
 });
-
+#endregion
+#region RefundService
 services.AddSingleton<AliPayRefundService>();
 services.AddSingleton<WxPayRefundService>();
 services.AddSingleton<YsfPayRefundService>();
@@ -160,7 +192,30 @@ services.AddSingleton(provider =>
     };
     return funcFactory;
 });
-
+#endregion
+#region QueryService
+services.AddSingleton<AliPayPaymentService>();
+services.AddSingleton<WxPayPaymentService>();
+services.AddSingleton<YsfPayPaymentService>();
+services.AddSingleton(provider =>
+{
+    Func<string, IPayOrderQueryService> funcFactory = ifCode =>
+    {
+        switch (ifCode)
+        {
+            case CS.IF_CODE.ALIPAY:
+                return provider.GetService<AliPayPayOrderQueryService>();
+            case CS.IF_CODE.WXPAY:
+                return provider.GetService<WxPayPayOrderQueryService>();
+            case CS.IF_CODE.YSFPAY:
+                return provider.GetService<YsfPayPayOrderQueryService>();
+            default:
+                return null;
+        }
+    };
+    return funcFactory;
+});
+#endregion
 #region AliPay
 services.AddSingleton<IPaymentService, AliApp>();
 services.AddSingleton<IPaymentService, AliBar>();
@@ -180,7 +235,7 @@ services.AddSingleton<IPaymentService, YsfAliJsapi>();
 services.AddSingleton<IPaymentService, YsfWxBar>();
 services.AddSingleton<IPaymentService, YsfWxJsapi>();
 #endregion
-
+#region ChannelUserService
 services.AddSingleton<AliPayChannelUserService>();
 services.AddSingleton<WxPayChannelUserService>();
 services.AddSingleton(provider =>
@@ -198,7 +253,8 @@ services.AddSingleton(provider =>
         }
     };
     return funcFactory;
-});
+}); 
+#endregion
 
 services.AddSingleton<IQRCodeService, QRCodeService>();
 services.AddSingleton<IMQSender, RabbitMQSender>();
@@ -206,6 +262,8 @@ services.AddSingleton<IMQSender, RabbitMQSender>();
 var serviceProvider = services.BuildServiceProvider();
 PayWayUtil.ServiceProvider = serviceProvider;
 AliPayKit.ServiceProvider = serviceProvider;
+
+services.AddHostedService<RabbitListener>();
 
 var app = builder.Build();
 

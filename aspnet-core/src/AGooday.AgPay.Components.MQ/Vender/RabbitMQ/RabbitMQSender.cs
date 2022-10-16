@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 
         private static void ConvertAndSend(string exchange, string queue, string routingKey, string message)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            var factory = new ConnectionFactory() { HostName = "127.0.0.1", UserName = "guest", Password = "guest", Port = 5672 };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {

@@ -18,17 +18,17 @@ namespace AGooday.AgPay.Payment.Api.MQ
 {
     public class PayOrderMchNotifyMQReceiver : PayOrderMchNotifyMQ.IMQReceiver
     {
-        protected readonly ILogger<PayOrderMchNotifyMQReceiver> log;
-        private IPayOrderService payOrderService;
-        private IMchNotifyRecordService mchNotifyRecordService;
-        private IMQSender mqSender;
+        private readonly IMQSender mqSender;
+        private readonly ILogger<PayOrderMchNotifyMQReceiver> log;
+        private readonly IPayOrderService payOrderService;
+        private readonly IMchNotifyRecordService mchNotifyRecordService;
 
-        public PayOrderMchNotifyMQReceiver(ILogger<PayOrderMchNotifyMQReceiver> logger, IPayOrderService payOrderService, IMchNotifyRecordService mchNotifyRecordService, IMQSender mqSender)
+        public PayOrderMchNotifyMQReceiver(IMQSender mqSender, ILogger<PayOrderMchNotifyMQReceiver> logger, IPayOrderService payOrderService, IMchNotifyRecordService mchNotifyRecordService)
         {
+            this.mqSender = mqSender;
             log = logger;
             this.payOrderService = payOrderService;
             this.mchNotifyRecordService = mchNotifyRecordService;
-            this.mqSender = mqSender;
         }
 
         public void Receive(PayOrderMchNotifyMQ.MsgPayload payload)

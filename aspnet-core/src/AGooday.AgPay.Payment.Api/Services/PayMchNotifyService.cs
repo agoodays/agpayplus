@@ -20,9 +20,9 @@ namespace AGooday.AgPay.Payment.Api.Services
     public class PayMchNotifyService
     {
         private readonly IMQSender mqSender;
+        private readonly ILogger<PayMchNotifyService> _logger;
         private readonly IMchNotifyRecordService _mchNotifyRecordService;
         private readonly ConfigContextQueryService _configContextQueryService;
-        private readonly ILogger<PayMchNotifyService> _logger;
 
         public PayMchNotifyService(IMQSender mqSender, ILogger<PayMchNotifyService> logger, IMchNotifyRecordService mchNotifyRecordService, ConfigContextQueryService configContextQueryService)
         {
