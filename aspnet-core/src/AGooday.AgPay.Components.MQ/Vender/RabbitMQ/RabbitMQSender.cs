@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                 properties.Persistent = true;
 
                 channel.BasicPublish(exchange: exchange,
-                                     routingKey: routingKey,
+                                     routingKey: queue,
                                      basicProperties: properties,
                                      body: body);
             }

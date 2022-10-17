@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
 {
     public class RabbitListener : IHostedService
     {
-        protected readonly IServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
         public RabbitListener(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;

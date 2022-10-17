@@ -7,13 +7,22 @@ namespace AGooday.AgPay.Components.MQ.Models
     /// </summary>
     public abstract class AbstractMQ
     {
-        /** MQ名称 **/
+        /// <summary>
+        /// MQ名称
+        /// </summary>
+        /// <returns></returns>
         public abstract string GetMQName();
 
-        /** MQ 类型 **/
+        /// <summary>
+        /// MQ 类型
+        /// </summary>
+        /// <returns></returns>
         public abstract MQSendTypeEnum GetMQType();
 
-        /** 构造MQ消息体 String类型 **/
+        /// <summary>
+        /// 构造MQ消息体 String类型
+        /// </summary>
+        /// <returns></returns>
         public abstract string ToMessage();
     }
 }

@@ -31,6 +31,8 @@ using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.MQ;
+using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
+using AGooday.AgPay.Components.MQ.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -258,12 +260,15 @@ services.AddSingleton(provider =>
 
 services.AddSingleton<IQRCodeService, QRCodeService>();
 services.AddSingleton<IMQSender, RabbitMQSender>();
+services.AddSingleton<IMQMsgReceiver, PayOrderDivisionRabbitMQReceiver>();
+services.AddSingleton<IMQMsgReceiver, PayOrderMchNotifyRabbitMQReceiver>();
+services.AddSingleton<PayOrderDivisionMQ.IMQReceiver, PayOrderDivisionMQReceiver>();
+services.AddSingleton<PayOrderMchNotifyMQ.IMQReceiver, PayOrderMchNotifyMQReceiver>();
+services.AddHostedService<RabbitListener>();
 
 var serviceProvider = services.BuildServiceProvider();
 PayWayUtil.ServiceProvider = serviceProvider;
 AliPayKit.ServiceProvider = serviceProvider;
-
-services.AddHostedService<RabbitListener>();
 
 var app = builder.Build();
 
