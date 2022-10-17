@@ -14,18 +14,26 @@ namespace AGooday.AgPay.Payment.Api.MQ
         private IConnection connection;
         private IModel channel;
         private readonly ILogger<RabbitListener> _logger;
+        private readonly IOptions<RabbitMQConfiguration> rabbitMQConfiguration;
         private readonly IServiceProvider _serviceProvider;
-        public RabbitListener(ILogger<RabbitListener> logger, IServiceProvider serviceProvider)
+        public RabbitListener(ILogger<RabbitListener> logger, IServiceProvider serviceProvider, IOptions<RabbitMQConfiguration> rabbitMQConfiguration)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
+            this.rabbitMQConfiguration = rabbitMQConfiguration;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
             try
             {
-                var factory = new ConnectionFactory() { HostName = "127.0.0.1", UserName = "guest", Password = "guest", Port = 5672 };
+                var factory = new ConnectionFactory()
+                {
+                    HostName = rabbitMQConfiguration.Value.RabbitHost,
+                    UserName = rabbitMQConfiguration.Value.RabbitUserName,
+                    Password = rabbitMQConfiguration.Value.RabbitPassword,
+                    Port = rabbitMQConfiguration.Value.RabbitPort
+                };
                 connection = factory.CreateConnection();
                 channel = connection.CreateModel();
                 var msgReceivers = _serviceProvider.GetServices<IMQMsgReceiver>();

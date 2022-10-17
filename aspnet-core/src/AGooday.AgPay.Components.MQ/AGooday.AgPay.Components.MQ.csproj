@@ -11,4 +11,8 @@
     <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AGooday.AgPay.Common\AGooday.AgPay.Common.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Components.MQ.Constant;
+﻿using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Constant;
 using AGooday.AgPay.Components.MQ.Models;
 using RabbitMQ.Client;
 using System;
@@ -16,7 +17,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
         {
             if (mqModel.GetMQType() == MQSendTypeEnum.QUEUE)
             {
-                ConvertAndSend("",mqModel.GetMQName(), "task_queue", mqModel.ToMessage());
+                ConvertAndSend("", mqModel.GetMQName(), "task_queue", mqModel.ToMessage());
             }
             else
             {
@@ -43,7 +44,11 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 
         private static void ConvertAndSend(string exchange, string queue, string routingKey, string message)
         {
-            var factory = new ConnectionFactory() { HostName = "127.0.0.1", UserName = "guest", Password = "guest", Port = 5672 };
+            var hostName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "RabbitHost" });
+            var userName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "RabbitUserName" });
+            var password = Appsettings.app(new string[] { "MQ", "RabbitMQ", "RabbitPassword" });
+            var port = Convert.ToInt32(Appsettings.app(new string[] { "MQ", "RabbitMQ", "RabbitPort" }));
+            var factory = new ConnectionFactory() { HostName = hostName, UserName = userName, Password = password, Port = port };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {

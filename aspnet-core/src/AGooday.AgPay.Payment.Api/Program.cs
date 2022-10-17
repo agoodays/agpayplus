@@ -71,7 +71,7 @@ services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB
 #endregion
 
 #region MQ
-var mqconfiguration = builder.Configuration.GetSection("Redis:Default");
+var mqconfiguration = builder.Configuration.GetSection("MQ:RabbitMQ");
 services.Configure<RabbitMQConfiguration>(mqconfiguration);
 #endregion
 

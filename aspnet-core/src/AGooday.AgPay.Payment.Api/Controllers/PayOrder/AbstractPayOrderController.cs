@@ -70,6 +70,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <returns></returns>
         protected ApiRes UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ)
         {
+            mqSender.Send(PayOrderMchNotifyMQ.Build(new Random().Next(1,100)));return ApiRes.Ok();
             return UnifiedOrder(wayCode, bizRQ, null);
         }
 
