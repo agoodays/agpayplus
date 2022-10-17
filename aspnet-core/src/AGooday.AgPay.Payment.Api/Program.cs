@@ -255,16 +255,19 @@ services.AddSingleton(provider =>
         }
     };
     return funcFactory;
-}); 
+});
 #endregion
 
-services.AddSingleton<IQRCodeService, QRCodeService>();
+#region RabbitMQ
 services.AddSingleton<IMQSender, RabbitMQSender>();
 services.AddSingleton<IMQMsgReceiver, PayOrderDivisionRabbitMQReceiver>();
 services.AddSingleton<IMQMsgReceiver, PayOrderMchNotifyRabbitMQReceiver>();
 services.AddSingleton<PayOrderDivisionMQ.IMQReceiver, PayOrderDivisionMQReceiver>();
 services.AddSingleton<PayOrderMchNotifyMQ.IMQReceiver, PayOrderMchNotifyMQReceiver>();
 services.AddHostedService<RabbitListener>();
+#endregion
+
+services.AddSingleton<IQRCodeService, QRCodeService>();
 
 var serviceProvider = services.BuildServiceProvider();
 PayWayUtil.ServiceProvider = serviceProvider;

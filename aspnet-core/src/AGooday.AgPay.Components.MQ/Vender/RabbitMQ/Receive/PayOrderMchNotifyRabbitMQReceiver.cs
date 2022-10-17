@@ -21,6 +21,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
         {
             this.mqReceiver = mqReceiver;
         }
+        public string GetMQName() => PayOrderMchNotifyMQ.MQ_NAME;
 
         /// <summary>
         /// 接收 【 queue 】 类型的消息
@@ -29,39 +30,6 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
         public void ReceiveMsg(string msg)
         {
             mqReceiver.Receive(PayOrderMchNotifyMQ.Parse(msg));
-        }
-
-        /// <summary>
-        /// 注册消费者
-        /// </summary>
-        public void Register()
-        {
-            var queue = PayOrderMchNotifyMQ.MQ_NAME;
-            var factory = new ConnectionFactory() { HostName = "127.0.0.1", UserName = "guest", Password = "guest", Port = 5672 };
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
-                channel.QueueDeclare(queue: queue,
-                                     durable: true,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
-
-                channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
-
-                var consumer = new EventingBasicConsumer(channel);
-                consumer.Received += (model, ea) =>
-                {
-                    var body = ea.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
-                    ReceiveMsg(message);
-
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                };
-                channel.BasicConsume(queue: queue,
-                                     autoAck: false,
-                                     consumer: consumer);
-            }
         }
     }
 }

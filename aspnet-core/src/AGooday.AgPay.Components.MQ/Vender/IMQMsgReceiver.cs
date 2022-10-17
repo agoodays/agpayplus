@@ -12,9 +12,10 @@ namespace AGooday.AgPay.Components.MQ.Vender
     public interface IMQMsgReceiver
     {
         /// <summary>
-        /// 注册消费者
+        /// MQ名称
         /// </summary>
-        void Register();
+        /// <returns></returns>
+        string GetMQName();
 
         /// <summary>
         /// 接收消息
