@@ -3,6 +3,10 @@ using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Payment.Api.MQ
 {
+    /// <summary>
+    /// 接收MQ消息
+    /// 业务： 支付订单分账处理逻辑
+    /// </summary>
     public class PayOrderDivisionMQReceiver : PayOrderDivisionMQ.IMQReceiver
     {
         private readonly ILogger<PayOrderDivisionMQReceiver> log;

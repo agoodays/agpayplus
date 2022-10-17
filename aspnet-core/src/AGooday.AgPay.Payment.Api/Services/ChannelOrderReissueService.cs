@@ -130,7 +130,8 @@ namespace AGooday.AgPay.Payment.Api.Services
                 return channelRetMsg;
             }
             catch (Exception e)
-            {  //继续下一次迭代查询
+            {  
+                //继续下一次迭代查询
                 log.LogError(e, $"退款补单：error refundOrderId = {refundOrder.RefundOrderId}");
                 return null;
             }

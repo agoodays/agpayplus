@@ -16,6 +16,10 @@ using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.MQ
 {
+    /// <summary>
+    /// 接收MQ消息
+    /// 业务： 支付订单商户通知
+    /// </summary>
     public class PayOrderMchNotifyMQReceiver : PayOrderMchNotifyMQ.IMQReceiver
     {
         private readonly IMQSender mqSender;

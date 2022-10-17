@@ -237,7 +237,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"系统异常：{e.Message}");
+                _logger.LogError(e, $"系统异常");
                 return ApiRes.CustomFail("系统异常");
             }
         }
