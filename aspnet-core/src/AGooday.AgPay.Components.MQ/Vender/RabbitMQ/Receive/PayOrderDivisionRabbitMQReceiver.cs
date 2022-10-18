@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Components.MQ.Models;
+﻿using AGooday.AgPay.Components.MQ.Constant;
+using AGooday.AgPay.Components.MQ.Models;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -21,6 +22,8 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
         {
             this.mqReceiver = mqReceiver;
         }
+
+        public MQSendTypeEnum GetMQType() => PayOrderDivisionMQ.MQ_TYPE;
 
         public string GetMQName() => PayOrderDivisionMQ.MQ_NAME;
 

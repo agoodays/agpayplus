@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AGooday.AgPay.Components.MQ.Constant;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,12 @@ namespace AGooday.AgPay.Components.MQ.Vender
     /// </summary>
     public interface IMQMsgReceiver
     {
+        /// <summary>
+        /// MQ类型
+        /// </summary>
+        /// <returns></returns>
+        MQSendTypeEnum GetMQType();
+
         /// <summary>
         /// MQ名称
         /// </summary>

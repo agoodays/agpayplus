@@ -16,6 +16,7 @@ using AGooday.AgPay.Common.Enumerator;
 using System.Data;
 using AGooday.AgPay.Domain.Core.Models;
 using AGooday.AgPay.Common.Constants;
+using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -23,6 +24,7 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IPayOrderRepository _payOrderRepository;
+        private readonly IPayOrderDivisionRecordRepository _payOrderDivisionRecordRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
@@ -40,24 +42,24 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public void Add(PayOrderDto dto)
+        public bool Add(PayOrderDto dto)
         {
             var m = _mapper.Map<PayOrder>(dto);
             _payOrderRepository.Add(m);
-            _payOrderRepository.SaveChanges();
+            return _payOrderRepository.SaveChanges(out int _);
         }
 
-        public void Remove(string recordId)
+        public bool Remove(string recordId)
         {
             _payOrderRepository.Remove(recordId);
-            _payOrderRepository.SaveChanges();
+            return _payOrderRepository.SaveChanges(out int _);
         }
 
-        public void Update(PayOrderDto dto)
+        public bool Update(PayOrderDto dto)
         {
             var m = _mapper.Map<PayOrder>(dto);
             _payOrderRepository.Update(m);
-            _payOrderRepository.SaveChanges();
+            return _payOrderRepository.SaveChanges(out int _);
         }
 
         public PayOrderDto GetById(string recordId)
@@ -200,6 +202,24 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.NotifyState = CS.YES;
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
+        }
+
+        /// <summary>
+        /// 计算支付订单商家入账金额
+        /// 商家订单入账金额 （支付金额 - 手续费 - 退款金额 - 总分账金额）</summary>
+        /// <param name="dbPayOrder"></param>
+        /// <returns></returns>
+        public long CalMchIncomeAmount(PayOrderDto dbPayOrder)
+        {
+
+            //商家订单入账金额 （支付金额 - 手续费 - 退款金额 - 总分账金额）
+            long mchIncomeAmount = dbPayOrder.Amount - dbPayOrder.MchFeeAmount - dbPayOrder.RefundAmount;
+
+            //减去已分账金额
+            mchIncomeAmount -= _payOrderDivisionRecordRepository.SumSuccessDivisionAmount(dbPayOrder.PayOrderId);
+
+            return mchIncomeAmount <= 0 ? 0 : mchIncomeAmount;
+
         }
     }
 }

@@ -9,9 +9,9 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IPayOrderService : IDisposable
     {
-        void Add(PayOrderDto dto);
-        void Remove(string recordId);
-        void Update(PayOrderDto dto);
+        bool Add(PayOrderDto dto);
+        bool Remove(string recordId);
+        bool Update(PayOrderDto dto);
         PayOrderDto GetById(string recordId);
         IEnumerable<PayOrderDto> GetAll();
         PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo);
@@ -25,5 +25,6 @@ namespace AGooday.AgPay.Application.Interfaces
         bool UpdateNotifySent(string orderId);
         bool UpdateIng2Success(string payOrderId, string channelOrderId, string channelUserId);
         bool UpdateIng2Fail(string payOrderId, string channelOrderId, string channelUserId, string channelErrCode, string channelErrMsg);
+        long CalMchIncomeAmount(PayOrderDto payOrder);
     }
 }

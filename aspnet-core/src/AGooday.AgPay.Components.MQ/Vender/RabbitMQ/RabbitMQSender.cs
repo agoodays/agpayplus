@@ -17,12 +17,12 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
         {
             if (mqModel.GetMQType() == MQSendTypeEnum.QUEUE)
             {
-                ConvertAndSend("", mqModel.GetMQName(), "task_queue", mqModel.ToMessage());
+                ConvertAndSend("", mqModel.GetMQName(), "", mqModel.ToMessage());
             }
             else
             {
                 // fanout模式 的 routeKEY 没意义。
-                ConvertAndSend(RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX, mqModel.GetMQName(), "", mqModel.ToMessage());
+                ConvertAndSend(RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + mqModel.GetMQName(), "", "", mqModel.ToMessage());
             }
         }
 
@@ -30,24 +30,28 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
         {
             if (mqModel.GetMQType() == MQSendTypeEnum.QUEUE)
             {
-                //rabbitTemplate.convertAndSend(RabbitMQConfig.DELAYED_EXCHANGE_NAME, mqModel.getMQName(), mqModel.toMessage(), messagePostProcessor->{
-                //    messagePostProcessor.getMessageProperties().setDelay(Math.toIntExact(delay * 1000));
-                //    return messagePostProcessor;
-                //});
+                var queue = mqModel.GetMQName();
+                //https://jaskey.github.io/blog/2018/08/15/rabbitmq-delay-queue/
+                Dictionary<string, object> arguments = new Dictionary<string, object>();
+                arguments.Add("x-expires", delay * 60 * 1000);
+                arguments.Add("x-message-ttl", delay * 1000);//队列上消息过期时间，应小于队列过期时间  
+                arguments.Add("x-dead-letter-exchange", "");//过期消息转向指定的exchange中
+                arguments.Add("x-dead-letter-routing-key", queue);//过期消息转向路由相匹配routingkey 
+                ConvertAndSend(RabbitMQConfig.DELAYED_EXCHANGE_NAME, queue, "", mqModel.ToMessage(), arguments);
             }
             else
             {
                 // fanout模式 的 routeKEY 没意义。  没有延迟属性
-                ConvertAndSend(RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX, mqModel.GetMQName(), "", mqModel.ToMessage());
+                ConvertAndSend(RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + mqModel.GetMQName(), "", "", mqModel.ToMessage());
             }
         }
 
-        private static void ConvertAndSend(string exchange, string queue, string routingKey, string message)
+        private static void ConvertAndSend(string exchange, string queue, string routingKey, string message, Dictionary<string, object> arguments = null)
         {
-            var hostName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "RabbitHost" });
-            var userName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "RabbitUserName" });
-            var password = Appsettings.app(new string[] { "MQ", "RabbitMQ", "RabbitPassword" });
-            var port = Convert.ToInt32(Appsettings.app(new string[] { "MQ", "RabbitMQ", "RabbitPort" }));
+            var hostName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "HostName" });
+            var userName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "UserName" });
+            var password = Appsettings.app(new string[] { "MQ", "RabbitMQ", "Password" });
+            var port = Convert.ToInt32(Appsettings.app(new string[] { "MQ", "RabbitMQ", "Port" }));
             var factory = new ConnectionFactory() { HostName = hostName, UserName = userName, Password = password, Port = port };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
@@ -56,7 +60,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                                      durable: true,
                                      exclusive: false,
                                      autoDelete: false,
-                                     arguments: null);
+                                     arguments: arguments);
 
                 var body = Encoding.UTF8.GetBytes(message);
 

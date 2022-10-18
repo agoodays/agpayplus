@@ -20,6 +20,7 @@ namespace AGooday.AgPay.Components.MQ.Models
         /// 【！重要配置项！】 定义MQ名称
         /// </summary>
         public static readonly string MQ_NAME = "BROADCAST_RESET_ISV_MCH_APP_INFO_CONFIG";
+        public static readonly MQSendTypeEnum MQ_TYPE = MQSendTypeEnum.BROADCAST;
 
         // 重置类型 （枚举类型，无法json反序列化）
         public static readonly byte RESET_TYPE_ISV_INFO = 1;
@@ -61,7 +62,7 @@ namespace AGooday.AgPay.Components.MQ.Models
         /// 【！重要配置项！】
         /// </summary>
         /// <returns></returns>
-        public override MQSendTypeEnum GetMQType() => MQSendTypeEnum.QUEUE;  // QUEUE - 点对点 、 BROADCAST - 广播模式
+        public override MQSendTypeEnum GetMQType() => MQ_TYPE;  // QUEUE - 点对点 、 BROADCAST - 广播模式
 
         public override string ToMessage() => JsonConvert.SerializeObject(Payload);
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AGooday.AgPay.Components.MQ.Constant;
 
 namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
 {
@@ -21,6 +22,9 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
         {
             this.mqReceiver = mqReceiver;
         }
+
+        public MQSendTypeEnum GetMQType() => PayOrderReissueMQ.MQ_TYPE;
+
         public string GetMQName() => PayOrderReissueMQ.MQ_NAME;
 
         /// <summary>

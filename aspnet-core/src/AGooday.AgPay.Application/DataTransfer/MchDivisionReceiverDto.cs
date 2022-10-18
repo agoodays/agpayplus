@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 分账比例
         /// </summary>
-        public decimal DivisionProfit { get; set; }
+        public decimal? DivisionProfit { get; set; }
 
         /// <summary>
         /// 分账状态（本系统状态，并不调用上游关联关系）: 1-正常分账, 0-暂停分账

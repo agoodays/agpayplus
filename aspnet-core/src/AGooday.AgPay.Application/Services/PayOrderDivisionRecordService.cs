@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using AGooday.AgPay.Domain.Core.Models;
+using AGooday.AgPay.Common.Enumerator;
+using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -92,6 +94,25 @@ namespace AGooday.AgPay.Application.Services
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
+        }
+
+        public void UpdateRecordSuccessOrFail(List<PayOrderDivisionRecordDto> records, byte state, string channelBatchOrderId, string channelRespResult)
+        {
+            if (records == null || !records.Any())
+            {
+                return;
+            }
+            var recordIds = records.Select(s => s.RecordId);
+
+            var updateRecords = _payOrderDivisionRecordRepository.GetAll().Where(w => recordIds.Contains(w.RecordId) && w.State.Equals((byte)PayOrderDivisionState.STATE_WAIT));
+            foreach (var updateRecord in updateRecords)
+            {
+                updateRecord.State = state;
+                updateRecord.ChannelBatchOrderId = channelBatchOrderId;
+                updateRecord.ChannelRespResult = channelRespResult;
+                _payOrderDivisionRecordRepository.Update(updateRecord);
+            }
+            _payOrderDivisionRecordRepository.SaveChanges(out int _);
         }
     }
 }

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using AGooday.AgPay.Common.Constants;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -75,9 +76,17 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchDivisionReceiverGroupDto>>(mchDivisionReceiverGroups);
         }
 
+        public IEnumerable<MchDivisionReceiverGroupDto> GetByMchNo(string mchNo)
+        {
+            var mchDivisionReceiverGroups = _mchDivisionReceiverGroupRepository.GetAll()
+                .Where(w => w.MchNo.Equals(mchNo) && w.AutoDivisionFlag.Equals(CS.YES));
+            return _mapper.Map<IEnumerable<MchDivisionReceiverGroupDto>>(mchDivisionReceiverGroups);
+        }
+
         public MchDivisionReceiverGroupDto FindByIdAndMchNo(long receiverGroupId, string mchNo)
         {
-            var entity = _mchDivisionReceiverGroupRepository.GetAll().Where(w => w.ReceiverGroupId.Equals(receiverGroupId) && w.MchNo.Equals(mchNo));
+            var entity = _mchDivisionReceiverGroupRepository.GetAll()
+                .Where(w => w.ReceiverGroupId.Equals(receiverGroupId) && w.MchNo.Equals(mchNo));
             return _mapper.Map<MchDivisionReceiverGroupDto>(entity);
         }
 

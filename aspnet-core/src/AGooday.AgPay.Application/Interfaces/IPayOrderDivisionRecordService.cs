@@ -16,5 +16,6 @@ namespace AGooday.AgPay.Application.Interfaces
         PayOrderDivisionRecordDto GetById(long recordId, string mchNo);
         IEnumerable<PayOrderDivisionRecordDto> GetAll();
         PaginatedList<PayOrderDivisionRecordDto> GetPaginatedData(PayOrderDivisionRecordQueryDto dto);
+        void UpdateRecordSuccessOrFail(List<PayOrderDivisionRecordDto> records, byte state, string channelBatchOrderId, string channelRespResult);
     }
 }

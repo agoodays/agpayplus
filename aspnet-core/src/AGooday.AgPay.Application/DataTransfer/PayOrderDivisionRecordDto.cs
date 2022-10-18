@@ -89,12 +89,12 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 账号快照》 分账接收者ID
         /// </summary>
-        public long ReceiverId { get; set; }
+        public long? ReceiverId { get; set; }
 
         /// <summary>
         /// 账号快照》 组ID（便于商户接口使用）
         /// </summary>
-        public long ReceiverGroupId { get; set; }
+        public long? ReceiverGroupId { get; set; }
 
         /// <summary>
         /// 账号快照》 分账接收者别名
@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 账号快照》 配置的实际分账比例
         /// </summary>
-        public decimal DivisionProfit { get; set; }
+        public decimal? DivisionProfit { get; set; }
 
         /// <summary>
         /// 计算该接收方的分账金额,单位分

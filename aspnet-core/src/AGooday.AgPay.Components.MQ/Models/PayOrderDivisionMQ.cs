@@ -20,6 +20,7 @@ namespace AGooday.AgPay.Components.MQ.Models
         /// 【！重要配置项！】 定义MQ名称
         /// </summary>
         public static readonly string MQ_NAME = "QUEUE_PAY_ORDER_DIVISION";
+        public static readonly MQSendTypeEnum MQ_TYPE = MQSendTypeEnum.QUEUE;
 
         /// <summary>
         /// 内置msg 消息体定义
@@ -64,7 +65,7 @@ namespace AGooday.AgPay.Components.MQ.Models
         /// 【！重要配置项！】
         /// </summary>
         /// <returns></returns>
-        public override MQSendTypeEnum GetMQType() => MQSendTypeEnum.QUEUE;  // QUEUE - 点对点 、 BROADCAST - 广播模式
+        public override MQSendTypeEnum GetMQType() => MQ_TYPE;  // QUEUE - 点对点 、 BROADCAST - 广播模式
 
         public override string ToMessage() => JsonConvert.SerializeObject(Payload);
 
@@ -98,17 +99,17 @@ namespace AGooday.AgPay.Components.MQ.Models
             /// <summary>
             /// 分账接收者ID (与receiverGroupId 二选一)
             /// </summary>
-            private long ReceiverId;
+            public long ReceiverId { get; set; }
 
             /// <summary>
             /// 组ID（便于商户接口使用） (与 receiverId 二选一)
             /// </summary>
-            private long ReceiverGroupId;
+            public long ReceiverGroupId { get; set; }
 
             /// <summary>
             /// 分账比例 （可以为空， 为空表示使用系统默认值）
             /// </summary>
-            private decimal DivisionProfit;
+            public decimal? DivisionProfit { get; set; }
 
             public CustomerDivisionReceiver(long receiverId, long receiverGroupId, decimal divisionProfit)
             {

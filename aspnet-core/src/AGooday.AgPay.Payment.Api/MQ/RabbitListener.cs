@@ -1,6 +1,6 @@
-﻿using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
-using AGooday.AgPay.Payment.Api.Channel;
+﻿using AGooday.AgPay.Components.MQ.Constant;
+using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using Microsoft.Extensions.Options;
 using Pipelines.Sockets.Unofficial;
 using RabbitMQ.Client;
@@ -29,22 +29,33 @@ namespace AGooday.AgPay.Payment.Api.MQ
             {
                 var factory = new ConnectionFactory()
                 {
-                    HostName = rabbitMQConfiguration.Value.RabbitHost,
-                    UserName = rabbitMQConfiguration.Value.RabbitUserName,
-                    Password = rabbitMQConfiguration.Value.RabbitPassword,
-                    Port = rabbitMQConfiguration.Value.RabbitPort
+                    HostName = rabbitMQConfiguration.Value.HostName,
+                    UserName = rabbitMQConfiguration.Value.UserName,
+                    Password = rabbitMQConfiguration.Value.Password,
+                    Port = rabbitMQConfiguration.Value.Port
                 };
                 connection = factory.CreateConnection();
                 channel = connection.CreateModel();
                 var msgReceivers = _serviceProvider.GetServices<IMQMsgReceiver>();
                 foreach (var msgReceiver in msgReceivers)
                 {
-                    var queue = msgReceiver.GetMQName();
-                    channel.QueueDeclare(queue: queue,
-                                         durable: true,
-                                         exclusive: false,
-                                         autoDelete: false,
-                                         arguments: null);
+                    string queue = string.Empty;
+                    if (msgReceiver.GetMQType() == MQSendTypeEnum.QUEUE)
+                    {
+                        queue = msgReceiver.GetMQName();
+                        channel.QueueDeclare(queue: queue,
+                                             durable: true,
+                                             exclusive: false,
+                                             autoDelete: false,
+                                             arguments: null);
+                    }
+                    else
+                    {
+                        var exchange = RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + msgReceiver.GetMQName();
+                        channel.ExchangeDeclare(exchange: exchange, type: "fanout");
+                        queue = channel.QueueDeclare().QueueName;
+                        channel.QueueBind(queue: queue, exchange: exchange, routingKey: "");
+                    }
 
                     channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
 
@@ -71,10 +82,10 @@ namespace AGooday.AgPay.Payment.Api.MQ
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            if (connection != null)
-                this.connection.Close();
             if (channel != null)
                 this.channel.Close();
+            if (connection != null)
+                this.connection.Close();
             return Task.CompletedTask;
         }
     }
