@@ -14,6 +14,7 @@ using Aop.Api.Domain;
 using Aop.Api;
 using AGooday.AgPay.Payment.Api.Exceptions;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 {
@@ -38,7 +39,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
             model.OutTradeNo = payOrder.PayOrderId;
             model.Subject = payOrder.Subject; //订单标题
             model.Body = payOrder.Body; //订单描述信息
-            model.TotalAmount = (Convert.ToDouble(payOrder.Amount) / 100).ToString("0.00");  //支付金额
+            model.TotalAmount = AmountUtil.ConvertCent2Dollar(payOrder.Amount);  //支付金额
             model.ProductCode = "FAST_INSTANT_TRADE_PAY";
             model.QrPayMode = "2"; //订单码-跳转模式
             req.SetNotifyUrl(GetNotifyUrl()); // 设置异步通知地址

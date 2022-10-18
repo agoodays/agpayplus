@@ -138,5 +138,9 @@ namespace AGooday.AgPay.Common.Utils
 
             return url.StartsWith("http://") || url.StartsWith("https://");
         }
+
+        public static T DefaultIfEmpty<T>(T value, T defaultValue) => value == null ? defaultValue : value;
+        public static string DefaultString(string str) => DefaultString(str, "");
+        public static string DefaultString(string str, string defaultStr) => string.IsNullOrWhiteSpace(str) ? defaultStr : str;
     }
 }

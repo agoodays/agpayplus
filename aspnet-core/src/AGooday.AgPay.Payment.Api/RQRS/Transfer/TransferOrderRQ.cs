@@ -4,9 +4,11 @@ using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Transfer
 {
+    /// <summary>
+    /// 申请转账 请求参数
+    /// </summary>
     public class TransferOrderRQ : AbstractMchAppRQ
     {
-
         /// <summary>
         /// 商户订单号
         /// </summary>

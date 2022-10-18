@@ -10,6 +10,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
 {
+    /// <summary>
+    /// 创建订单请求参数对象
+    /// 聚合支付接口（统一下单）
+    /// </summary>
     public class UnifiedOrderRQ : AbstractMchAppRQ
     {
         /// <summary>

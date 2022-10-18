@@ -1,5 +1,8 @@
 ﻿namespace AGooday.AgPay.Payment.Api.RQRS.Division
 {
+    /// <summary>
+    /// 发起订单分账 响应参数
+    /// </summary>
     public class PayOrderDivisionExecRS : AbstractRS
     {
         /// <summary>

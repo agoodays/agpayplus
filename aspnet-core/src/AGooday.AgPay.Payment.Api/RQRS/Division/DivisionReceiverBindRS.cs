@@ -4,6 +4,9 @@ using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Division
 {
+    /// <summary>
+    /// 绑定账户 响应参数
+    /// </summary>
     public class DivisionReceiverBindRS : AbstractRS
     {
 

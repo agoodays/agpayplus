@@ -1,6 +1,8 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
+using AGooday.AgPay.Payment.Api.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +17,16 @@ namespace AGooday.AgPay.Payment.Api.Channel
 {
     public abstract class AbstractChannelNoticeService : IChannelNoticeService
     {
+        protected readonly ILogger<AbstractChannelNoticeService> log;
+        protected ConfigContextQueryService configContextQueryService;
+
+        protected AbstractChannelNoticeService(ILogger<AbstractChannelNoticeService> logger, 
+            ConfigContextQueryService configContextQueryService)
+        {
+            this.log = logger;
+            this.configContextQueryService = configContextQueryService;
+        }
+
         public ActionResult DoNotifyOrderNotExists(HttpRequest request)
         {
             return TextResp("order not exists");

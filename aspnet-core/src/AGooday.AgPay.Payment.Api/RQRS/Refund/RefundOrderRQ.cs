@@ -4,9 +4,11 @@ using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Refund
 {
+    /// <summary>
+    /// 创建退款订单请求参数对象
+    /// </summary>
     public class RefundOrderRQ : AbstractMchAppRQ
     {
-
         /// <summary>
         /// 商户订单号
         /// </summary>

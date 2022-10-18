@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             model.OutTradeNo = refundOrder.PayOrderId;
             model.TradeNo = refundOrder.ChannelPayOrderNo;
             model.OutRequestNo = refundOrder.RefundOrderId;
-            model.RefundAmount = (Convert.ToDouble(refundOrder.RefundAmount) / 100).ToString("0.00");
+            model.RefundAmount = AmountUtil.ConvertCent2Dollar(refundOrder.RefundAmount);
             model.RefundReason = refundOrder.RefundReason;
             request.SetBizModel(model);
 

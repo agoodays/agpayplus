@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.Params.AliPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Payment.Api.Controllers.Division;
 using AGooday.AgPay.Payment.Api.Exceptions;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.Services;
@@ -11,11 +12,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {
     public class AliPayChannelUserService : IChannelUserService
     {
-        private readonly ConfigContextQueryService _configContextQueryService;
+        private readonly ILogger<AliPayChannelUserService> log;
+        private readonly ConfigContextQueryService configContextQueryService;
 
-        public AliPayChannelUserService(ConfigContextQueryService configContextQueryService)
+        public AliPayChannelUserService(ILogger<AliPayChannelUserService> logger, ConfigContextQueryService configContextQueryService)
         {
-            _configContextQueryService = configContextQueryService;
+            this.log = logger;
+            this.configContextQueryService = configContextQueryService;
         }
 
         public string BuildUserRedirectUrl(string callbackUrlEncode, MchAppConfigContext mchAppConfigContext)
@@ -25,7 +28,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 
             if (mchAppConfigContext.IsIsvsubMch())
             {
-                AliPayIsvParams isvParams = (AliPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                AliPayIsvParams isvParams = (AliPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
                 if (isvParams == null)
                 {
                     throw new BizException("服务商支付宝接口没有配置！");
@@ -35,7 +38,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             else
             {
                 //获取商户配置信息
-                AliPayNormalMchParams normalMchParams = (AliPayNormalMchParams)_configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                AliPayNormalMchParams normalMchParams = (AliPayNormalMchParams)configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
                 if (normalMchParams == null)
                 {
                     throw new BizException("商户支付宝接口没有配置！");
@@ -47,7 +50,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 }
             }
             string alipayUserRedirectUrl = string.Format(oauthUrl, appId, callbackUrlEncode);
-            //log.info("alipayUserRedirectUrl={}", alipayUserRedirectUrl);
+            log.LogInformation($"alipayUserRedirectUrl={alipayUserRedirectUrl}");
             return alipayUserRedirectUrl;
         }
 

@@ -123,7 +123,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                     return null;
                 }
 
-                log.LogInformation("退款补单：[{}]查询结果为：{}", refundOrderId, channelRetMsg);
+                log.LogInformation($"退款补单：[{refundOrderId}]查询结果为：{channelRetMsg}");
                 // 根据渠道返回结果，处理退款订单
                 refundOrderProcessService.HandleRefundOrder4Channel(channelRetMsg, refundOrder);
 

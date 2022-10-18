@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
             model.AuthCode = bizRQ.AuthCode.Trim(); //支付授权码
             model.Subject = payOrder.Subject; //订单标题
             model.Body = payOrder.Body; //订单描述信息
-            model.TotalAmount = (Convert.ToDouble(payOrder.Amount) / 100).ToString("0.00");  //支付金额
+            model.TotalAmount = AmountUtil.ConvertCent2Dollar(payOrder.Amount);  //支付金额
             req.SetNotifyUrl(GetNotifyUrl()); // 设置异步通知地址
             req.SetBizModel(model);
 

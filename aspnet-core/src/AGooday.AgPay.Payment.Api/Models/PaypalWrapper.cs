@@ -10,11 +10,21 @@ namespace AGooday.AgPay.Payment.Api.Models
         {
             return ProcessOrder(token, payOrder, false);
         }
-        public List<string> processOrder(string order)
+
+        public List<string> ProcessOrder(string order)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 处理并捕获订单
+        /// 由于 Paypal 创建订单后需要进行一次 Capture(捕获) 才可以正确获取到订单的支付状态
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="payOrder"></param>
+        /// <param name="isCapture"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public ChannelRetMsg ProcessOrder(string token, PayOrderDto payOrder, bool isCapture)
         {
             throw new NotImplementedException();

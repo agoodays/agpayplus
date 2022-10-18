@@ -4,9 +4,11 @@ using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Refund
 {
-    public class RefundOrderRS: AbstractRS
+    /// <summary>
+    /// 退款订单 响应参数
+    /// </summary>
+    public class RefundOrderRS : AbstractRS
     {
-
         /// <summary>
         /// 支付系统退款订单号
         /// </summary>

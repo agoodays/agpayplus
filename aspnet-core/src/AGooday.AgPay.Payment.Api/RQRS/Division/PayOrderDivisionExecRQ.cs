@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Division
 {
+    /// <summary>
+    /// 发起订单分账 请求参数
+    /// </summary>
     public class PayOrderDivisionExecRQ : AbstractMchAppRQ
     {
         /// <summary>

@@ -3,6 +3,9 @@ using System;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Msg
 {
+    /// <summary>
+    /// 上游渠道侧响应信息包装类
+    /// </summary>
     public class ChannelRetMsg
     {
         /// <summary>

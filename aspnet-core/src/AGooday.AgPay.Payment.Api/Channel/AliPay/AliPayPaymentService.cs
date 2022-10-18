@@ -10,6 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {
+    /// <summary>
+    /// 支付接口： 支付宝官方
+    /// 支付方式： 自适应
+    /// </summary>
     public class AliPayPaymentService : AbstractPaymentService
     {
         public AliPayPaymentService(IServiceProvider serviceProvider,

@@ -44,25 +44,32 @@ namespace AGooday.AgPay.Payment.Api.MQ
         /// 接收 [商户配置信息] 的消息
         /// </summary>
         /// <param name="mchNo"></param>
-        private void ModifyMchInfo(String mchNo)
+        private void ModifyMchInfo(string mchNo)
         {
-            log.LogInformation("成功接收 [商户配置信息] 的消息, msg={}", mchNo);
+            log.LogInformation($"成功接收 [商户配置信息] 的消息, msg={mchNo}");
             configContextService.InitMchInfoConfigContext(mchNo);
             log.LogInformation(" [商户配置信息] 已重置");
         }
 
-        /** 接收 [商户应用支付参数配置信息] 的消息 **/
-        private void ModifyMchApp(String mchNo, String appId)
+        /// <summary>
+        /// 接收 [商户应用支付参数配置信息] 的消息
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="appId"></param>
+        private void ModifyMchApp(string mchNo, string appId)
         {
-            log.LogInformation("成功接收 [商户应用支付参数配置信息] 的消息, mchNo={}, appId={}", mchNo, appId);
+            log.LogInformation($"成功接收 [商户应用支付参数配置信息] 的消息, mchNo={mchNo}, appId={appId}");
             configContextService.InitMchAppConfigContext(mchNo, appId);
             log.LogInformation(" [商户应用支付参数配置信息] 已重置");
         }
 
-        /** 重置ISV信息 **/
-        private void ModifyIsvInfo(String isvNo)
+        /// <summary>
+        /// 重置ISV信息
+        /// </summary>
+        /// <param name="isvNo"></param>
+        private void ModifyIsvInfo(string isvNo)
         {
-            log.LogInformation("成功接收 [ISV信息] 重置, msg={}", isvNo);
+            log.LogInformation($"成功接收 [ISV信息] 重置, msg={isvNo}");
             configContextService.InitIsvConfigContext(isvNo);
             log.LogInformation("[ISV信息] 已重置");
         }

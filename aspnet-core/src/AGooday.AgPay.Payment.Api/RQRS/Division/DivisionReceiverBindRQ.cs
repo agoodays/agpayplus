@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Division
 {
+    /// <summary>
+    /// 分账账号的绑定 请求参数
+    /// </summary>
     public class DivisionReceiverBindRQ : AbstractMchAppRQ
     {
         /// <summary>
