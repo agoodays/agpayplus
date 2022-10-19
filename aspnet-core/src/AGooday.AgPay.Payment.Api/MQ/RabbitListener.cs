@@ -27,13 +27,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
         {
             try
             {
-                var factory = new ConnectionFactory()
-                {
-                    HostName = rabbitMQConfiguration.Value.HostName,
-                    UserName = rabbitMQConfiguration.Value.UserName,
-                    Password = rabbitMQConfiguration.Value.Password,
-                    Port = rabbitMQConfiguration.Value.Port
-                };
+                var factory = new ConnectionFactory() { HostName = "localhost", UserName = "guest", Password = "guest", Port = 5672 };
                 connection = factory.CreateConnection();
                 channel = connection.CreateModel();
                 var msgReceivers = _serviceProvider.GetServices<IMQMsgReceiver>();
@@ -43,21 +37,17 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     if (msgReceiver.GetMQType() == MQSendTypeEnum.QUEUE)
                     {
                         queue = msgReceiver.GetMQName();
-                        channel.QueueDeclare(queue: queue,
-                                             durable: true,
-                                             exclusive: false,
-                                             autoDelete: false,
-                                             arguments: null);
+                        channel.QueueDeclare(queue, true, false, false, null);
                     }
                     else
                     {
                         var exchange = RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + msgReceiver.GetMQName();
-                        channel.ExchangeDeclare(exchange: exchange, type: "fanout");
+                        channel.ExchangeDeclare(exchange, "fanout");
                         queue = channel.QueueDeclare().QueueName;
-                        channel.QueueBind(queue: queue, exchange: exchange, routingKey: "");
+                        channel.QueueBind(queue, exchange, "");
                     }
 
-                    channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
+                    channel.BasicQos(0, 1, false);
 
                     var consumer = new EventingBasicConsumer(channel);
                     consumer.Received += (model, ea) =>
@@ -66,11 +56,9 @@ namespace AGooday.AgPay.Payment.Api.MQ
                         var message = Encoding.UTF8.GetString(body);
                         msgReceiver.ReceiveMsg(message);
 
-                        channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                        channel.BasicAck(ea.DeliveryTag, false);
                     };
-                    channel.BasicConsume(queue: queue,
-                                         autoAck: false,
-                                         consumer: consumer);
+                    channel.BasicConsume(queue, false, consumer);
                 }
             }
             catch (Exception ex)
