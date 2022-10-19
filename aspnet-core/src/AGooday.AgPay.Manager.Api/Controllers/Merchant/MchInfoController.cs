@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using AGooday.AgPay.Domain.Core.Notifications;
+using AGooday.AgPay.Components.MQ.Vender;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -17,14 +18,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     [ApiController]
     public class MchInfoController : ControllerBase
     {
+        private readonly IMQSender mqSender;
         private readonly ILogger<MchInfoController> _logger;
         private readonly IMchInfoService _mchInfoService;
 
         private readonly DomainNotificationHandler _notifications;
 
-        public MchInfoController(ILogger<MchInfoController> logger, INotificationHandler<DomainNotification> notifications, 
+        public MchInfoController(IMQSender mqSender, ILogger<MchInfoController> logger, INotificationHandler<DomainNotification> notifications, 
             IMchInfoService mchInfoService)
         {
+            this.mqSender = mqSender;
             _logger = logger;
             _mchInfoService = mchInfoService;
             _notifications = (DomainNotificationHandler)notifications;

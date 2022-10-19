@@ -1,5 +1,7 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
@@ -42,9 +44,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
         // 注入总线
         private readonly IMediatorHandler Bus;
+        private readonly IMQSender mqSender;
         private IMemoryCache Cache;
 
-        public MchInfoCommandHandler(IUnitOfWork uow, IMediatorHandler bus, IMapper mapper, IMemoryCache cache,
+        public MchInfoCommandHandler(IUnitOfWork uow, IMediatorHandler bus, IMapper mapper, IMQSender mqSender, IMemoryCache cache,
             IMchInfoRepository mchInfoRepository,
             IIsvInfoRepository isvInfoRepository,
             ISysUserRepository sysUserRepository,
@@ -57,6 +60,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         {
             _mapper = mapper;
             Cache = cache;
+            this.mqSender = mqSender;
             _sysUserRepository = sysUserRepository;
             _mchInfoRepository = mchInfoRepository;
             _isvInfoRepository = isvInfoRepository;
@@ -236,11 +240,16 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             }
 
             // 推送mq删除redis用户认证信息
+            if (removeCacheUserIdList.Any())
+            {
+                mqSender.Send(CleanMchLoginAuthCacheMQ.Build(removeCacheUserIdList));
+            }
 
             //更新商户信息
             _mchInfoRepository.Update(mchInfo);
 
             // 推送mq到目前节点进行更新数据
+            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, mchInfo.MchNo, null));
 
             return Task.FromResult(new Unit());
         }
@@ -300,8 +309,11 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _mchInfoRepository.Remove(mchInfo.MchNo);
 
             // 推送mq删除redis用户缓存
+            var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
+            mqSender.Send(CleanMchLoginAuthCacheMQ.Build(userIdList));
 
             // 推送mq到目前节点进行更新数据
+            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, request.MchNo, null));
 
             Commit();
 

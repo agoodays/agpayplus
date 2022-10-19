@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             }
             foreach (var sysUserId in sysUserIdList)
             {
-                var redisKeys = _redisServer.Keys(1, CS.GetCacheKeyToken(sysUserId, "*"));
+                var redisKeys = _redisServer.Keys(2, CS.GetCacheKeyToken(sysUserId, "*"));
                 foreach (var key in redisKeys)
                 {
                     _redis.KeyDelete(key);

@@ -9,6 +9,8 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Application.Params;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Isv
 {
@@ -19,16 +21,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
     [ApiController]
     public class IsvPayInterfaceConfigController : CommonController
     {
+        private readonly IMQSender mqSender;
         private readonly ILogger<IsvPayInterfaceConfigController> _logger;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
-        public IsvPayInterfaceConfigController(ILogger<IsvPayInterfaceConfigController> logger, RedisUtil client,
+        public IsvPayInterfaceConfigController(IMQSender mqSender, ILogger<IsvPayInterfaceConfigController> logger, RedisUtil client,
             IPayInterfaceConfigService payIfConfigService,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
+            this.mqSender = mqSender;
             _logger = logger;
             _payIfConfigService = payIfConfigService;
         }
@@ -108,6 +112,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             }
 
             // 推送mq到目前节点进行更新数据
+            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null));
 
             return ApiRes.Ok();
         }

@@ -1,4 +1,8 @@
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
+using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
+using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.Extensions.AuthContext;
@@ -10,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using AGooday.AgPay.Manager.Api.MQ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +50,11 @@ string _instanceName = section.GetSection("InstanceName").Value;
 //默认数据库 
 int _defaultDB = int.Parse(section.GetSection("DefaultDB").Value ?? "0");
 services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB));
+#endregion
+
+#region MQ
+var mqconfiguration = builder.Configuration.GetSection("MQ:RabbitMQ");
+services.Configure<RabbitMQConfiguration>(mqconfiguration);
 #endregion
 
 services.AddCors(o =>
@@ -90,6 +100,13 @@ services.AddMediatR(typeof(Program));//目的是为了扫描Handler的实现对象并添加到IO
 // .NET Core 原生依赖注入
 // 单写一层用来添加依赖项，从展示层 Presentation 中隔离
 NativeInjectorBootStrapper.RegisterServices(services);
+
+#region RabbitMQ
+services.AddSingleton<IMQSender, RabbitMQSender>();
+services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
+services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
+services.AddHostedService<RabbitListener>();
+#endregion
 
 var app = builder.Build();
 

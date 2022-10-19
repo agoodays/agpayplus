@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Manager.Api.Controllers.Config;
+using AGooday.AgPay.Components.MQ.Models;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Isv
 {
@@ -17,16 +20,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
     [ApiController]
     public class IsvInfoController : CommonController
     {
+        private readonly IMQSender mqSender;
         private readonly ILogger<IsvInfoController> _logger;
         private readonly IIsvInfoService _isvInfoService;
 
-        public IsvInfoController(ILogger<IsvInfoController> logger, RedisUtil client,
+        public IsvInfoController(IMQSender mqSender, ILogger<IsvInfoController> logger, RedisUtil client,
             IIsvInfoService isvInfoService,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
+            this.mqSender = mqSender;
             _logger = logger;
             _isvInfoService = isvInfoService;
         }
@@ -75,6 +80,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             _isvInfoService.Remove(isvNo);
 
             // 推送mq到目前节点进行更新数据
+            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, isvNo, null, null));
 
             return ApiRes.Ok();
         }
@@ -91,6 +97,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             _isvInfoService.Update(dto);
 
             // 推送mq到目前节点进行更新数据
+            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.IsvNo, null, null));
 
             return ApiRes.Ok();
         }

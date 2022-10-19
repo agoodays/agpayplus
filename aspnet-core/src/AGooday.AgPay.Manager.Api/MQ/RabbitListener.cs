@@ -7,7 +7,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 
-namespace AGooday.AgPay.Payment.Api.MQ
+namespace AGooday.AgPay.Manager.Api.MQ
 {
     public class RabbitListener : IHostedService
     {

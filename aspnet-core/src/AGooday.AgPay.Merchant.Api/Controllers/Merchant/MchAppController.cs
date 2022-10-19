@@ -6,6 +6,9 @@ using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Domain.Models;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 {
@@ -16,11 +19,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
     [ApiController]
     public class MchAppController : CommonController
     {
+        private readonly IMQSender mqSender;
         private readonly ILogger<MchAppController> _logger;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MchAppController(ILogger<MchAppController> logger, RedisUtil client,
+        public MchAppController(IMQSender mqSender, ILogger<MchAppController> logger, RedisUtil client,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
             ISysUserService sysUserService,
@@ -28,6 +32,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             ISysUserRoleRelaService sysUserRoleRelaService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
+            this.mqSender = mqSender;
             _logger = logger;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
@@ -84,6 +89,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             _mchAppService.Remove(appId);
 
             // 推送mq到目前节点进行更新数据
+            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, mchApp.MchNo, appId));
 
             return ApiRes.Ok();
         }
@@ -103,6 +109,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
             }
             // 推送修改应用消息
+            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, dto.MchNo, dto.AppId));
 
             return ApiRes.Ok();
         }

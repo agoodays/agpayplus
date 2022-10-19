@@ -1,6 +1,8 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -11,10 +13,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
     [ApiController]
     public class SysConfigController : ControllerBase
     {
+        private readonly IMQSender mqSender;
+        private readonly Logger<SysConfigController> _logger;
         private readonly ISysConfigService _sysConfigService;
 
-        public SysConfigController(ISysConfigService sysConfigService)
+        public SysConfigController(IMQSender mqSender, 
+            Logger<SysConfigController> logger, 
+            ISysConfigService sysConfigService)
         {
+            this.mqSender = mqSender;
+            _logger = logger;
             _sysConfigService = sysConfigService;
         }
 
@@ -51,12 +59,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");
             }
             // 异步更新到MQ
+            UpdateSysConfigMQ(groupKey);
 
             return ApiRes.Ok();
         }
 
-        private void UpdateSysConfigMQ(string groupKey) { 
-        
+        private void UpdateSysConfigMQ(string groupKey)
+        {
+            mqSender.Send(ResetAppConfigMQ.Build(groupKey));
         }
     }
 }

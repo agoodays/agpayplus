@@ -3,6 +3,8 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Controllers.Merchant;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +18,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     [ApiController]
     public class MchNotifyController : ControllerBase
     {
+        private readonly IMQSender mqSender;
         private readonly ILogger<MchNotifyController> _logger;
         private readonly IMchNotifyRecordService _mchNotifyService;
 
-        public MchNotifyController(IMchNotifyRecordService mchNotifyService, ILogger<MchNotifyController> logger)
+        public MchNotifyController(IMQSender mqSender, IMchNotifyRecordService mchNotifyService, ILogger<MchNotifyController> logger)
         {
-            _mchNotifyService = mchNotifyService;
+            this.mqSender = mqSender;
             _logger = logger;
+            _mchNotifyService = mchNotifyService;
         }
 
         /// <summary>
@@ -76,6 +80,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             _mchNotifyService.UpdateIngAndAddNotifyCountLimit(notifyId);
 
             //调起MQ重发
+            mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId));
 
             return ApiRes.Ok(mchNotify);
         }

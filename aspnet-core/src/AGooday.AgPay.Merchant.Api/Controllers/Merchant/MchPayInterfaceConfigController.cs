@@ -11,6 +11,8 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Models;
 using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Components.MQ.Models;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 {
@@ -21,13 +23,14 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
     [ApiController]
     public class MchPayInterfaceConfigController : CommonController
     {
+        private readonly IMQSender mqSender;
         private readonly ILogger<MchPayInterfaceConfigController> _logger;
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly ISysConfigService _sysConfigService;
 
-        public MchPayInterfaceConfigController(ILogger<MchPayInterfaceConfigController> logger, RedisUtil client,
+        public MchPayInterfaceConfigController(IMQSender mqSender, ILogger<MchPayInterfaceConfigController> logger, RedisUtil client,
             IPayInterfaceConfigService payIfConfigService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
@@ -37,6 +40,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             ISysConfigService sysConfigService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
+            this.mqSender = mqSender;
             _logger = logger;
             _payIfConfigService = payIfConfigService;
             _mchAppService = mchAppService;
@@ -142,6 +146,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             }
 
             // 推送mq到目前节点进行更新数据
+            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, GetCurrentUser().User.BelongInfoId, dto.InfoId));
 
             return ApiRes.Ok();
         }
