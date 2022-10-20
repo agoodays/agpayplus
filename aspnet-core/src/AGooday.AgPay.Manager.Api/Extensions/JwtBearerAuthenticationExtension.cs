@@ -30,10 +30,13 @@ namespace AGooday.AgPay.Manager.Api.Extensions
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidIssuer = appSettings.Issuer,
+                    ValidAudience = appSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
             });
         }
@@ -46,6 +49,8 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             {
                 Subject = claimsIdentity,
                 Expires = DateTime.UtcNow.AddDays(7),
+                Issuer = appSettings.Issuer,
+                Audience = appSettings.Audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

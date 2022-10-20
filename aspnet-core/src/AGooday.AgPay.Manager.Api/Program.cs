@@ -15,6 +15,10 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using AGooday.AgPay.Manager.Api.MQ;
+using AGooday.AgPay.Manager.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,9 +76,11 @@ services.AddHttpContextAccessor();
 services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 services.Configure<JwtSettings>(jwtSettingsSection);
-// JWT
+// JWT 认证
 var appSettings = jwtSettingsSection.Get<JwtSettings>();
 services.AddJwtBearerAuthentication(appSettings);
+
+services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 // Automapper 注入
 services.AddAutoMapperSetup();
@@ -88,7 +94,36 @@ services.AddControllers()
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
+services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AGooday.AgPay.Manager.Api", Version = "1.0" });
+    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+    {
+        Description = $"JWT Authorization header using the Bearer scheme. \r\n\r\nEnter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: 'Bearer 12345abcdef'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
+    });
+    c.OperationFilter<SwaggerSecurityScheme>();
+    //c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    //{
+    //    {
+    //        new OpenApiSecurityScheme
+    //        {
+    //            Reference = new OpenApiReference
+    //            {
+    //                Type = ReferenceType.SecurityScheme,
+    //                Id = JwtBearerDefaults.AuthenticationScheme
+    //            },
+    //            Scheme = "oauth2",
+    //            Name = JwtBearerDefaults.AuthenticationScheme,
+    //            In = ParameterLocation.Header,
+    //        },
+    //        new List<string>()
+    //    }
+    //});
+});
 
 // Adding MediatR for Domain Events
 // 领域命令、领域事件等注入

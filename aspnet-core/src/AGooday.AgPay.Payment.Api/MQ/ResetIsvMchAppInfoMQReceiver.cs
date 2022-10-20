@@ -13,13 +13,10 @@ namespace AGooday.AgPay.Payment.Api.MQ
         private readonly ILogger<ResetIsvMchAppInfoMQReceiver> log;
         private readonly ConfigContextService configContextService;
 
-        public ResetIsvMchAppInfoMQReceiver(ILogger<ResetIsvMchAppInfoMQReceiver> log)
+        public ResetIsvMchAppInfoMQReceiver(ILogger<ResetIsvMchAppInfoMQReceiver> log, 
+            ConfigContextService configContextService)
         {
             this.log = log;
-        }
-
-        public ResetIsvMchAppInfoMQReceiver(ConfigContextService configContextService)
-        {
             this.configContextService = configContextService;
         }
 

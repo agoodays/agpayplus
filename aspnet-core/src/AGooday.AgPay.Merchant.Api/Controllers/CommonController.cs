@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             var sysUserMap = _sysUserService.GetAll(sysUserIdList);
             sysUserIdList.ForEach(sysUserId =>
             {
-                var redisKeys = _redisServer.Keys(1, CS.GetCacheKeyToken(sysUserId, "*"));
+                var redisKeys = _redisServer.Keys(2, CS.GetCacheKeyToken(sysUserId, "*"));
                 foreach (var key in redisKeys)
                 {
                     //用户不存在 || 已禁用 需要删除Redis

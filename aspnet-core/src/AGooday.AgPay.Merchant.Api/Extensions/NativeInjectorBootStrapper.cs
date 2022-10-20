@@ -34,48 +34,48 @@ namespace AGooday.AgPay.Merchant.Api.Extensions
         public static void RegisterServices(IServiceCollection services)
         {
             // 注入 应用层Application
-            services.AddScoped<IIsvInfoService, IsvInfoService>();
-            services.AddScoped<IMchAppService, MchAppService>();
-            services.AddScoped<IMchDivisionReceiverGroupService, MchDivisionReceiverGroupService>();
-            services.AddScoped<IMchDivisionReceiverService, MchDivisionReceiverService>();
-            services.AddScoped<IMchInfoService, MchInfoService>();
-            services.AddScoped<IMchNotifyRecordService, MchNotifyRecordService>();
-            services.AddScoped<IMchPayPassageService, MchPayPassageService>();
-            services.AddScoped<IPayInterfaceConfigService, PayInterfaceConfigService>();
-            services.AddScoped<IPayInterfaceDefineService, PayInterfaceDefineService>();
-            services.AddScoped<IPayOrderDivisionRecordService, PayOrderDivisionRecordService>();
-            services.AddScoped<IPayOrderService, PayOrderService>();
-            services.AddScoped<IPayWayService, PayWayService>();
-            services.AddScoped<IRefundOrderService, RefundOrderService>();
-            services.AddScoped<ISysConfigService, SysConfigService>();
-            services.AddScoped<ISysEntitlementService, SysEntitlementService>();
-            services.AddScoped<ISysLogService, SysLogService>();
-            services.AddScoped<ISysRoleEntRelaService, SysRoleEntRelaService>();
-            services.AddScoped<ISysRoleService, SysRoleService>();
-            services.AddScoped<ISysUserAuthService, SysUserAuthService>();
-            services.AddScoped<ISysUserRoleRelaService, SysUserRoleRelaService>();
-            services.AddScoped<ISysUserService, SysUserService>();
-            services.AddScoped<ITransferOrderService, TransferOrderService>();
+            services.AddSingleton<IIsvInfoService, IsvInfoService>();
+            services.AddSingleton<IMchAppService, MchAppService>();
+            services.AddSingleton<IMchDivisionReceiverGroupService, MchDivisionReceiverGroupService>();
+            services.AddSingleton<IMchDivisionReceiverService, MchDivisionReceiverService>();
+            services.AddSingleton<IMchInfoService, MchInfoService>();
+            services.AddSingleton<IMchNotifyRecordService, MchNotifyRecordService>();
+            services.AddSingleton<IMchPayPassageService, MchPayPassageService>();
+            services.AddSingleton<IPayInterfaceConfigService, PayInterfaceConfigService>();
+            services.AddSingleton<IPayInterfaceDefineService, PayInterfaceDefineService>();
+            services.AddSingleton<IPayOrderDivisionRecordService, PayOrderDivisionRecordService>();
+            services.AddSingleton<IPayOrderService, PayOrderService>();
+            services.AddSingleton<IPayWayService, PayWayService>();
+            services.AddSingleton<IRefundOrderService, RefundOrderService>();
+            services.AddSingleton<ISysConfigService, SysConfigService>();
+            services.AddSingleton<ISysEntitlementService, SysEntitlementService>();
+            services.AddSingleton<ISysLogService, SysLogService>();
+            services.AddSingleton<ISysRoleEntRelaService, SysRoleEntRelaService>();
+            services.AddSingleton<ISysRoleService, SysRoleService>();
+            services.AddSingleton<ISysUserAuthService, SysUserAuthService>();
+            services.AddSingleton<ISysUserRoleRelaService, SysUserRoleRelaService>();
+            services.AddSingleton<ISysUserService, SysUserService>();
+            services.AddSingleton<ITransferOrderService, TransferOrderService>();
 
             // 命令总线Domain Bus (Mediator) 中介总线接口
-            services.AddScoped<IMediatorHandler, InMemoryBus>();
+            services.AddSingleton<IMediatorHandler, InMemoryBus>();
 
             // Domain - Events
             // 将事件模型和事件处理程序匹配注入
             // 领域通知
-            services.AddScoped<INotificationHandler<DomainNotification>, DomainNotificationHandler>();
+            services.AddSingleton<INotificationHandler<DomainNotification>, DomainNotificationHandler>();
             // 领域事件
-            services.AddScoped<INotificationHandler<SysUserCreatedEvent>, SysUserEventHandler>();
+            services.AddSingleton<INotificationHandler<SysUserCreatedEvent>, SysUserEventHandler>();
 
             // 领域层 - 领域命令
             // 将命令模型和命令处理程序匹配
-            services.AddScoped<IRequestHandler<CreateSysUserCommand, Unit>, SysUserCommandHandler>();
-            services.AddScoped<IRequestHandler<RemoveSysUserCommand, Unit>, SysUserCommandHandler>();
-            services.AddScoped<IRequestHandler<ModifySysUserCommand, Unit>, SysUserCommandHandler>();
+            services.AddSingleton<IRequestHandler<CreateSysUserCommand, Unit>, SysUserCommandHandler>();
+            services.AddSingleton<IRequestHandler<RemoveSysUserCommand, Unit>, SysUserCommandHandler>();
+            services.AddSingleton<IRequestHandler<ModifySysUserCommand, Unit>, SysUserCommandHandler>();
 
-            services.AddScoped<IRequestHandler<CreateMchInfoCommand, Unit>, MchInfoCommandHandler>();
-            services.AddScoped<IRequestHandler<RemoveMchInfoCommand, Unit>, MchInfoCommandHandler>();
-            services.AddScoped<IRequestHandler<ModifyMchInfoCommand, Unit>, MchInfoCommandHandler>();
+            services.AddSingleton<IRequestHandler<CreateMchInfoCommand, Unit>, MchInfoCommandHandler>();
+            services.AddSingleton<IRequestHandler<RemoveMchInfoCommand, Unit>, MchInfoCommandHandler>();
+            services.AddSingleton<IRequestHandler<ModifyMchInfoCommand, Unit>, MchInfoCommandHandler>();
 
             // 领域层 - Memory缓存
             services.AddSingleton<IMemoryCache>(factory =>
@@ -85,31 +85,31 @@ namespace AGooday.AgPay.Merchant.Api.Extensions
             });
 
             // 注入 基础设施层 - 数据层
-            services.AddScoped<AgPayDbContext>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IRepository, Repository>();
-            services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
-            services.AddScoped<IMchAppRepository, MchAppRepository>();
-            services.AddScoped<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();
-            services.AddScoped<IMchDivisionReceiverRepository, MchDivisionReceiverRepository>();
-            services.AddScoped<IMchInfoRepository, MchInfoRepository>();
-            services.AddScoped<IMchNotifyRecordRepository, MchNotifyRecordRepository>();
-            services.AddScoped<IMchPayPassageRepository, MchPayPassageRepository>();
-            services.AddScoped<IPayInterfaceConfigRepository, PayInterfaceConfigRepository>();
-            services.AddScoped<IPayInterfaceDefineRepository, PayInterfaceDefineRepository>();
-            services.AddScoped<IPayOrderDivisionRecordRepository, PayOrderDivisionRecordRepository>();
-            services.AddScoped<IPayOrderRepository, PayOrderRepository>();
-            services.AddScoped<IPayWayRepository, PayWayRepository>();
-            services.AddScoped<IRefundOrderRepository, RefundOrderRepository>();
-            services.AddScoped<ISysConfigRepository, SysConfigRepository>();
-            services.AddScoped<ISysEntitlementRepository, SysEntitlementRepository>();
-            services.AddScoped<ISysLogRepository, SysLogRepository>();
-            services.AddScoped<ISysRoleEntRelaRepository, SysRoleEntRelaRepository>();
-            services.AddScoped<ISysRoleRepository, SysRoleRepository>();
-            services.AddScoped<ISysUserAuthRepository, SysUserAuthRepository>();
-            services.AddScoped<ISysUserRoleRelaRepository, SysUserRoleRelaRepository>();
-            services.AddScoped<ISysUserRepository, SysUserRepository>();
-            services.AddScoped<ITransferOrderRepository, TransferOrderRepository>();
+            services.AddSingleton<AgPayDbContext>();
+            services.AddSingleton<IUnitOfWork, UnitOfWork>();
+            services.AddSingleton<IRepository, Repository>();
+            services.AddSingleton<IIsvInfoRepository, IsvInfoRepository>();
+            services.AddSingleton<IMchAppRepository, MchAppRepository>();
+            services.AddSingleton<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();
+            services.AddSingleton<IMchDivisionReceiverRepository, MchDivisionReceiverRepository>();
+            services.AddSingleton<IMchInfoRepository, MchInfoRepository>();
+            services.AddSingleton<IMchNotifyRecordRepository, MchNotifyRecordRepository>();
+            services.AddSingleton<IMchPayPassageRepository, MchPayPassageRepository>();
+            services.AddSingleton<IPayInterfaceConfigRepository, PayInterfaceConfigRepository>();
+            services.AddSingleton<IPayInterfaceDefineRepository, PayInterfaceDefineRepository>();
+            services.AddSingleton<IPayOrderDivisionRecordRepository, PayOrderDivisionRecordRepository>();
+            services.AddSingleton<IPayOrderRepository, PayOrderRepository>();
+            services.AddSingleton<IPayWayRepository, PayWayRepository>();
+            services.AddSingleton<IRefundOrderRepository, RefundOrderRepository>();
+            services.AddSingleton<ISysConfigRepository, SysConfigRepository>();
+            services.AddSingleton<ISysEntitlementRepository, SysEntitlementRepository>();
+            services.AddSingleton<ISysLogRepository, SysLogRepository>();
+            services.AddSingleton<ISysRoleEntRelaRepository, SysRoleEntRelaRepository>();
+            services.AddSingleton<ISysRoleRepository, SysRoleRepository>();
+            services.AddSingleton<ISysUserAuthRepository, SysUserAuthRepository>();
+            services.AddSingleton<ISysUserRoleRelaRepository, SysUserRoleRelaRepository>();
+            services.AddSingleton<ISysUserRepository, SysUserRepository>();
+            services.AddSingleton<ITransferOrderRepository, TransferOrderRepository>();
         }
     }
 }

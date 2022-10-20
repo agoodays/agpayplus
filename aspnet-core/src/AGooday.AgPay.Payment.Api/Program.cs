@@ -123,10 +123,13 @@ NativeInjectorBootStrapper.RegisterServices(services);
 //services.AddSingleton(new ConfigContextService(mchAppService, mchInfoService, isvInfoService, payInterfaceConfigService));
 //services.AddSingleton(typeof(ConfigContextQueryService));
 //services.AddSingleton(typeof(ConfigContextService));
+services.AddSingleton<ChannelOrderReissueService>();
 services.AddSingleton<ConfigContextQueryService>();
 services.AddSingleton<ConfigContextService>();
 services.AddSingleton<PayMchNotifyService>();
+services.AddSingleton<PayOrderDivisionProcessService>();
 services.AddSingleton<PayOrderProcessService>();
+services.AddSingleton<RefundOrderProcessService>();
 #region DivisionService
 //services.AddSingleton<IDivisionService, AliPayDivisionService>();
 //services.AddSingleton<IDivisionService, WxPayDivisionService>();

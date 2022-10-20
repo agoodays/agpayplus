@@ -10,7 +10,6 @@
         /// <summary>
         /// 头像地址
         /// </summary>
-        public string Avator { get; set; }
         public string Avatar { get; set; }
         /// <summary>
         /// 显示名

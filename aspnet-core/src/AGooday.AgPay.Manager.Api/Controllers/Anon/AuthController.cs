@@ -22,13 +22,14 @@ using AGooday.AgPay.Manager.Api.Extensions;
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 {
     /// <summary>
     /// 认证接口
     /// </summary>
-    [ApiController]
+    [ApiController, AllowAnonymous]
     [Route("api/anon/auth")]
     public class AuthController : ControllerBase
     {
@@ -117,6 +118,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             // 返回前端 accessToken
             var claimsIdentity = new ClaimsIdentity(new Claim[]
             {
+                new Claim(ClaimTypes.NameIdentifier, auth.SysUserId.ToString()),
                 new Claim(ClaimTypes.Name, auth.Identifier),
                 new Claim("userid",auth.SysUserId.ToString()),
                 new Claim("avatar",auth.AvatarUrl),

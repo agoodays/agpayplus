@@ -1,8 +1,12 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -10,15 +14,15 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace AGooday.AgPay.Manager.Api.Controllers.Config
 {
     [Route("/api/sysConfigs")]
-    [ApiController]
+    [ApiController, Authorize]
     public class SysConfigController : ControllerBase
     {
         private readonly IMQSender mqSender;
         private readonly Logger<SysConfigController> _logger;
         private readonly ISysConfigService _sysConfigService;
 
-        public SysConfigController(IMQSender mqSender, 
-            Logger<SysConfigController> logger, 
+        public SysConfigController(IMQSender mqSender,
+            Logger<SysConfigController> logger,
             ISysConfigService sysConfigService)
         {
             this.mqSender = mqSender;
@@ -32,6 +36,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         /// <param name="groupKey"></param>
         /// <returns></returns>
         [HttpGet, Route("{groupKey}")]
+        [PermissionFilter(PermCode.MGR.ENT_SYS_CONFIG_INFO)]
         public ApiRes GetConfigs(string groupKey)
         {
             var configList = _sysConfigService.GetAll()
@@ -47,6 +52,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         /// <param name="configs"></param>
         /// <returns></returns>
         [HttpPut, Route("{groupKey}")]
+        [PermissionFilter(PermCode.MGR.ENT_SYS_CONFIG_EDIT)]
         public ApiRes Update(string groupKey, Dictionary<string, string> configs)
         {
             //foreach (var config in configs)
