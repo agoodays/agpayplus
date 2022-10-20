@@ -18,11 +18,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
     public class SysConfigController : ControllerBase
     {
         private readonly IMQSender mqSender;
-        private readonly Logger<SysConfigController> _logger;
+        private readonly ILogger<SysConfigController> _logger;
         private readonly ISysConfigService _sysConfigService;
 
         public SysConfigController(IMQSender mqSender,
-            Logger<SysConfigController> logger,
+            ILogger<SysConfigController> logger,
             ISysConfigService sysConfigService)
         {
             this.mqSender = mqSender;

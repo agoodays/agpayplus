@@ -1,6 +1,7 @@
-﻿using AGooday.AgPay.Common.Models;
+﻿using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Models;
+using Newtonsoft.Json;
 using System.Net;
-using System.Text.Json;
 
 namespace AGooday.AgPay.Manager.Api.Middlewares
 {
@@ -48,14 +49,18 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                     response.StatusCode = (int)HttpStatusCode.NotFound;
                     errorResponse.Msg = ex.Message;
                     break;
+                case BizException ex:
+                    response.StatusCode = (int)HttpStatusCode.OK;
+                    errorResponse.Msg = ex.Message;
+                    break;
                 default:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     errorResponse.Msg = "Internal Server errors. Check Logs!";
                     break;
             }
             _logger.LogError(exception.Message);
-            var result = JsonSerializer.Serialize(errorResponse);
-            await context.Response.WriteAsync(result);
+            var result = JsonConvert.SerializeObject(errorResponse);
+            await response.WriteAsync(result);
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Common.Models;
+using Newtonsoft.Json;
 using System.Net;
 using System.Text.Json;
 
@@ -54,7 +55,7 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
                     break;
             }
             _logger.LogError(exception.Message);
-            var result = JsonSerializer.Serialize(errorResponse);
+            var result = JsonConvert.SerializeObject(errorResponse);
             await context.Response.WriteAsync(result);
         }
     }

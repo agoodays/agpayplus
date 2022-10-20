@@ -1,6 +1,7 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System.Security.Claims;
@@ -20,17 +21,22 @@ namespace AGooday.AgPay.Manager.Api.Authorization
         {
             if (context.User != null)
             {
+                if (!context.User.Identity.IsAuthenticated)
+                {
+                    throw new UnauthorizeException();
+                }
+
                 if (context.User.IsInRole("admin"))
                 {
                     context.Succeed(requirement);
                 }
                 else
                 {
-                    var n = requirement.Name;
                     var cacheKey = context.User.FindFirstValue("cacheKey");
-                    string currentUser = _redis.StringGet(cacheKey);
-                    var userIdClaim = context.User.FindFirst(_ => _.Type == ClaimTypes.NameIdentifier);
-                    if (userIdClaim != null)
+                    string currentUserJson = _redis.StringGet(cacheKey);
+                    var currentUser = JsonConvert.DeserializeObject<CurrentUser>(currentUserJson);
+                    var userIdClaim = context.User.FindFirst(_ => _.Type == ClaimTypes.NameIdentifier).Value;
+                    if (userIdClaim != null && currentUser.Authorities.Contains(requirement.Name))
                     {
                         context.Succeed(requirement);
                     }

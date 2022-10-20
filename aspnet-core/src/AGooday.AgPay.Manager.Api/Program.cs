@@ -74,7 +74,7 @@ services.AddCors(o =>
 services.AddMemoryCache();
 services.AddHttpContextAccessor();
 services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
+var jwtSettingsSection = builder.Configuration.GetSection("JWT");
 services.Configure<JwtSettings>(jwtSettingsSection);
 // JWT хож╓
 var appSettings = jwtSettingsSection.Get<JwtSettings>();
