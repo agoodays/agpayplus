@@ -9,6 +9,9 @@ using System.Runtime.InteropServices;
 using AGooday.AgPay.Common.Utils;
 using Newtonsoft.Json;
 using AGooday.AgPay.Common.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Merchant.Api.Authorization;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
 {
@@ -16,7 +19,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
     /// 用户角色管理类
     /// </summary>
     [Route("/api/sysUserRoleRelas")]
-    [ApiController]
+    [ApiController, Authorize]
     public class SysUserRoleRelaController : CommonController
     {
         private readonly ILogger<SysUserRoleRelaController> _logger;
@@ -39,8 +42,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_USER_UPD_ROLE)]
         public ApiRes List([FromQuery] SysUserRoleRelaQueryDto dto)
         {
             var data = _sysUserRoleRelaService.GetPaginatedData(dto);
@@ -52,8 +55,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysUserId"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("relas/{sysUserId}")]
+        [HttpPost, Route("relas/{sysUserId}")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_USER_UPD_ROLE)]
         public ApiRes Relas(long sysUserId, List<string> entIds)
         {
             var dbRecord = _sysUserService.GetById(sysUserId, GetCurrentUser().User.BelongInfoId);

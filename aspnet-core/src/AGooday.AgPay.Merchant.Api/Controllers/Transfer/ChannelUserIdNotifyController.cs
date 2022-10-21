@@ -1,11 +1,12 @@
 ﻿using AGooday.AgPay.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
 {
     [Route("api/anon/channelUserIdCallback")]
-    [ApiController]
+    [ApiController, AllowAnonymous]
     public class ChannelUserIdNotifyController : ControllerBase
     {
         [HttpGet, Route("")]

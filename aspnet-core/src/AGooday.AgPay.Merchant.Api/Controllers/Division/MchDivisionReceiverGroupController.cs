@@ -1,11 +1,14 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Merchant.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +18,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
     /// 商户分账接收者账号组
     /// </summary>
     [Route("api/divisionReceiverGroups")]
-    [ApiController]
+    [ApiController, Authorize]
     public class MchDivisionReceiverGroupController : CommonController
     {
         private readonly ILogger<MchDivisionReceiverGroupController> _logger;
@@ -36,6 +39,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         }
 
         [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_LIST)]
         public ApiRes List([FromQuery] MchDivisionReceiverGroupQueryDto dto)
         {
             dto.MchNo = GetCurrentUser().User.BelongInfoId;
@@ -44,6 +48,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         }
 
         [HttpGet, Route("{recordId}")]
+        [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_VIEW)]
         public ApiRes Detail(long recordId)
         {
             var record = _mchDivisionReceiverGroupService.GetById(recordId, GetCurrentUser().User.BelongInfoId);
@@ -60,6 +65,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <param name="record"></param>
         /// <returns></returns>
         [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_ADD)]
         public ApiRes Add(MchDivisionReceiverGroupDto record)
         {
             record.MchNo = GetCurrentUser().User.BelongInfoId;
@@ -89,8 +95,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// </summary>
         /// <param name="record"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{appId}")]
+        [HttpPut,Route("{appId}")]
+        [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_EDIT)]
         public ApiRes Update(MchDivisionReceiverGroupDto record)
         {
             record.MchNo = GetCurrentUser().User.BelongInfoId;
@@ -118,8 +124,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <param name="recordId"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpDelete]
-        [Route("{recordId}")]
+        [HttpDelete,Route("{recordId}")]
+        [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_DELETE)]
         public ApiRes Delete(long recordId)
         {
             var record = _mchDivisionReceiverGroupService.GetById(recordId);

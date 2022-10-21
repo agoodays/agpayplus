@@ -15,6 +15,10 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using AGooday.AgPay.Merchant.Api.MQ;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Merchant.Api.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +80,8 @@ services.Configure<JwtSettings>(jwtSettingsSection);
 var appSettings = jwtSettingsSection.Get<JwtSettings>();
 services.AddJwtBearerAuthentication(appSettings);
 
+services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
 // Automapper 注入
 services.AddAutoMapperSetup();
 services.AddControllers()
@@ -88,7 +94,19 @@ services.AddControllers()
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
+services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "AGooday.AgPay.Merchant.Api", Version = "1.0" });
+    options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+    {
+        Description = $"JWT Authorization header using the Bearer scheme. \r\n\r\nEnter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: 'Bearer 12345abcdef'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
+    });
+    options.OperationFilter<SwaggerSecurityScheme>();
+});
 
 // Adding MediatR for Domain Events
 // 领域命令、领域事件等注入

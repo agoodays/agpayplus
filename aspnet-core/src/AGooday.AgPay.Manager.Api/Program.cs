@@ -94,10 +94,10 @@ services.AddControllers()
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen(c =>
+services.AddSwaggerGen(options =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AGooday.AgPay.Manager.Api", Version = "1.0" });
-    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "AGooday.AgPay.Manager.Api", Version = "1.0" });
+    options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
         Description = $"JWT Authorization header using the Bearer scheme. \r\n\r\nEnter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: 'Bearer 12345abcdef'",
         Name = "Authorization",
@@ -105,8 +105,8 @@ services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = JwtBearerDefaults.AuthenticationScheme,
     });
-    c.OperationFilter<SwaggerSecurityScheme>();
-    //c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    options.OperationFilter<SwaggerSecurityScheme>();
+    //options.AddSecurityRequirement(new OpenApiSecurityRequirement()
     //{
     //    {
     //        new OpenApiSecurityScheme

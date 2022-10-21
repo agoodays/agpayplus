@@ -65,20 +65,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost]
-        [Route("validate")]
+        [HttpPost, Route("validate")]
         public ApiRes Validate(Validate model)
         {
-            string account = Base64Util.DecodeBase64(model.ia);  //用户名 i account, 已做base64处理
-            string ipassport = Base64Util.DecodeBase64(model.ip);    //密码 i passport,  已做base64处理
-            string vercode = Base64Util.DecodeBase64(model.vc);  //验证码 vercode,  已做base64处理
-            string vercodeToken = Base64Util.DecodeBase64(model.vt);	//验证码token, vercode token ,  已做base64处理
+            string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理
+            string ipassport = Base64Util.DecodeBase64(model.ip); //密码 i passport, 已做base64处理
+            string vercode = Base64Util.DecodeBase64(model.vc); //验证码 vercode, 已做base64处理
+            string vercodeToken = Base64Util.DecodeBase64(model.vt); //验证码token, vercode token , 已做base64处理
 
+#if !DEBUG
             string cacheCode = _redis.StringGet(CS.GetCacheKeyImgCode(vercodeToken));
             if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode))
             {
                 throw new BizException("验证码有误！");
-            }
+            } 
+#endif
 
             //登录方式， 默认为账号密码登录
             byte identityType = CS.AUTH_TYPE.LOGIN_USER_NAME;
@@ -151,8 +152,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// 图片验证码
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        [Route("vercode")]
+        [HttpGet, Route("vercode")]
         public ApiRes Vercode()
         {
             //定义图形验证码的长和宽 // 4位验证码

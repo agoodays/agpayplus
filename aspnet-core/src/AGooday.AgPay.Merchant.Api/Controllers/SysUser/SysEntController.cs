@@ -16,6 +16,9 @@ using System.Collections.Immutable;
 using System.Text.Json.Nodes;
 using AGooday.AgPay.Merchant.Api.Extensions;
 using StackExchange.Redis;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Merchant.Api.Authorization;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
 {
@@ -23,7 +26,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
     /// 权限 菜单 管理
     /// </summary>
     [Route("/api/sysEnts")]
-    [ApiController]
+    [ApiController, Authorize]
     public class SysEntController : CommonController
     {
         private readonly ILogger<SysEntController> _logger;
@@ -44,8 +47,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// 查询权限集合
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        [Route("showTree")]
+        [HttpGet, Route("showTree")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST)]
         public ApiRes ShowTree()
         {
             //查询全部数据

@@ -5,15 +5,18 @@ using AGooday.AgPay.AopSdk.Request;
 using AGooday.AgPay.AopSdk.Response;
 using AGooday.AgPay.Application;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Controllers.PayTest;
 using AGooday.AgPay.Merchant.Api.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -21,7 +24,7 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
 {
     [Route("api/mchTransfers")]
-    [ApiController]
+    [ApiController, Authorize]
     public class MchTransferController : CommonController
     {
         private readonly ILogger<MchTransferController> _logger;
@@ -53,6 +56,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
         /// <param name="appId"></param>
         /// <returns></returns>
         [HttpGet, Route("ifCodes/{appId}")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_TRANSFER_IF_CODE_LIST)]
         public ApiRes IfCodeList(string appId)
         {
             var ifCodes = _payIfConfigService.GetByInfoId(CS.INFO_TYPE_MCH_APP, appId)
@@ -64,6 +68,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
         }
 
         [HttpGet, Route("channelUserId")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_TRANSFER_CHANNEL_USER)]
         public ApiRes ChannelUserId(string appId, string ifCode, string extParam)
         {
             var mchApp = _mchAppService.GetById(appId);
@@ -91,6 +96,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
         }
 
         [HttpPost, Route("doTransfer")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_TEST_DO)]
         public ApiRes DoTransfer(TransferOrderModel transferOrder)
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<TransferOrderModel, TransferOrderCreateReqModel>());

@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Domain.Models;
 using System;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Merchant.Api.Authorization;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
 {
@@ -15,7 +18,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
     /// 支付方式管理类
     /// </summary>
     [Route("/api/payWays")]
-    [ApiController]
+    [ApiController, Authorize]
     public class PayWayController : ControllerBase
     {
         private readonly ILogger<PayWayController> _logger;
@@ -33,8 +36,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet,Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_PAY_ORDER_SEARCH_PAY_WAY)]
         public ApiRes List([FromQuery] PayWayQueryDto dto)
         {
             var data = _payWayService.GetPaginatedData<PayWayDto>(dto);

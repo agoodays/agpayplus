@@ -46,8 +46,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             _notifications = (DomainNotificationHandler)notifications;
         }
 
-        [HttpGet]
-        [Route("user")]
+        [HttpGet, Route("user")]
         public ApiRes CurrentUserInfo()
         {
             //当前用户信息
@@ -70,8 +69,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             return ApiRes.Ok(new { currentUser.User, leftMenuTree });
         }
 
-        [HttpPut]
-        [Route("user")]
+        [HttpPut, Route("user")]
         public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfo dto)
         {
             var user = _sysUserService.GetById(dto.SysUserId);
@@ -91,8 +89,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             return ApiRes.Ok();
         }
 
-        [HttpPut]
-        [Route("modifyPwd")]
+        [HttpPut, Route("modifyPwd")]
         public ApiRes ModifyPwd(ModifyPwd dto)
         {
             string currentUserPwd = Base64Util.DecodeBase64(dto.OriginalPwd); //当前用户登录密码
@@ -113,8 +110,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             return Logout();
         }
 
-        [HttpPost()]
-        [Route("logout")]
+        [HttpPost, Route("logout")]
         public ApiRes Logout()
         {
             var currentUser = GetCurrentUser();

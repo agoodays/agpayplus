@@ -11,13 +11,16 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Caching.Memory;
 using System.Runtime.InteropServices;
 using AGooday.AgPay.Common.Utils;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Merchant.Api.Authorization;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
 {
     /// <summary>
     /// 操作员列表
     /// </summary>
-    [ApiController]
+    [ApiController, Authorize]
     [Route("api/sysUsers")]
     public class SysUserController : CommonController
     {
@@ -44,8 +47,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_USER_LIST)]
         public ApiRes List([FromQuery] SysUserQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
@@ -58,8 +61,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
+        [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_USER_ADD)]
         public ApiRes Add(SysUserCreateDto dto)
         {
             //_cache.Remove("ErrorData");
@@ -81,8 +84,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId">系统用户ID</param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("{recordId}")]
+        [HttpDelete, Route("{recordId}")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_USER_DELETE)]
         public ApiRes Delete(long recordId)
         {
             var currentUserId = 0;
@@ -109,8 +112,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{recordId}")]
+        [HttpPut, Route("{recordId}")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_USER_EDIT)]
         public ApiRes Update(SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
@@ -144,8 +147,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId">系统用户ID</param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("{recordId}")]
+        [HttpGet, Route("{recordId}")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_USER_EDIT)]
         public ApiRes Detail(long recordId)
         {
             var sysUser = _sysUserService.GetById(recordId);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Web;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Common
 {
@@ -10,7 +11,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
         [HttpGet, Route("api/anon/localOssFiles/{folder}/{name}.{format}")]
         public ActionResult ImgView(string folder, string name, string format)
         {
-            string path = $"{folder}/{name}.{format}";
+            string path = $"{HttpUtility.UrlDecode(folder)}/{name}.{format}";
             using (var sw = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 var bytes = new byte[sw.Length];

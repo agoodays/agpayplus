@@ -12,6 +12,8 @@ using AGooday.AgPay.Application.Permissions;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using AGooday.AgPay.Common.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Merchant.Api.Authorization;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
 {
@@ -20,7 +22,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
     /// 角色 权限管理
     /// </summary>
     [Route("/api/sysRoleEntRelas")]
-    [ApiController]
+    [ApiController, Authorize]
     public class SysRoleEntRelaController : CommonController
     {
         private readonly ILogger<SysRoleEntRelaController> _logger;
@@ -46,16 +48,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST)]
         public ApiRes List([FromQuery] SysRoleEntRelaQueryDto dto)
         {
             var data = _sysRoleEntRelaService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
-        [HttpPost]
-        [Route("relas/{roleId}")]
+        [HttpPost, Route("relas/{roleId}")]
+        [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST)]
         public ApiRes Relas(string roleId, List<string> entIds)
         {
             var role = _sysRoleService.GetById(roleId);

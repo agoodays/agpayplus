@@ -9,6 +9,9 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Merchant.Api.Authorization;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 {
@@ -16,7 +19,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
     /// 商户应用管理类
     /// </summary>
     [Route("/api/mchApps")]
-    [ApiController]
+    [ApiController, Authorize]
     public class MchAppController : CommonController
     {
         private readonly IMQSender mqSender;
@@ -43,8 +46,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_APP_LIST)]
         public ApiRes List([FromQuery] MchAppQueryDto dto)
         {
             dto.MchNo = GetCurrentUser().User.BelongInfoId;
@@ -57,8 +60,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
+        [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_APP_ADD)]
         public ApiRes Add(MchAppDto dto)
         {
             dto.MchNo = GetCurrentUser().User.BelongInfoId;
@@ -81,8 +84,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("{appId}")]
+        [HttpDelete, Route("{appId}")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_APP_DEL)]
         public ApiRes Delete(string appId)
         {
             var mchApp = _mchAppService.GetById(appId);
@@ -99,8 +102,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{appId}")]
+        [HttpPut, Route("{appId}")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_APP_EDIT)]
         public ApiRes Update(MchAppDto dto)
         {
             var result = _mchAppService.Update(dto);
@@ -119,8 +122,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("{appId}")]
+        [HttpGet, Route("{appId}")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_APP_VIEW, PermCode.MCH.ENT_MCH_APP_EDIT)]
         public ApiRes Detail(string appId)
         {
             var mchApp = _mchAppService.GetById(appId);

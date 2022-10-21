@@ -18,6 +18,9 @@ using System.Text.Json.Nodes;
 using AGooday.AgPay.AopSdk;
 using Newtonsoft.Json.Linq;
 using AGooday.AgPay.AopSdk.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Merchant.Api.Authorization;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
 {
@@ -25,7 +28,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
     /// 支付测试类
     /// </summary>
     [Route("api/paytest")]
-    [ApiController]
+    [ApiController, Authorize]
     public class PayTestController : CommonController
     {
         private readonly ILogger<PayTestController> _logger;
@@ -57,6 +60,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         /// <param name="payOrderId"></param>
         /// <returns></returns>
         [HttpGet, Route("payways/{appId}")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_TEST_PAYWAY_LIST)]
         public ApiRes PayWayList(string appId)
         {
             var payWays = _mchPayPassageService.GetMchPayPassageByAppId(GetCurrentUser().User.BelongInfoId, appId)
@@ -66,6 +70,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
 
         //调起下单接口
         [HttpPost, Route("payOrders")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_TEST_DO)]
         public ApiRes DoPay(PayOrderModel payOrder)
         {
             if (string.IsNullOrWhiteSpace(payOrder.OrderTitle))
