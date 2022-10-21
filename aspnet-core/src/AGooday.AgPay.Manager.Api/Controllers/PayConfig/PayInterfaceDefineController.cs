@@ -6,6 +6,9 @@ using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Manager.Api.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 {
@@ -13,7 +16,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
     /// 支付接口定义管理类
     /// </summary>
     [Route("/api/payIfDefines")]
-    [ApiController]
+    [ApiController, Authorize]
     public class PayInterfaceDefineController : ControllerBase
     {
         private readonly ILogger<PayInterfaceDefineController> _logger;
@@ -36,8 +39,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// 支付接口
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_LIST)]
         public ApiRes List()
         {
             var data = _payIfDefineService.GetAll().OrderByDescending(o => o.CreatedAt);
@@ -49,8 +52,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
+        [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_ADD)]
         public ApiRes Add(PayInterfaceDefineDto dto)
         {
             var result = _payIfDefineService.Add(dto);
@@ -67,8 +70,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="ifCode"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpDelete]
-        [Route("{ifCode}")]
+        [HttpDelete, Route("{ifCode}")]
+        [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_DEL)]
         public ApiRes Delete(string ifCode)
         {
             // 校验该支付方式是否有服务商或商户配置参数或者已有订单
@@ -89,8 +92,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{ifCode}")]
+        [HttpPut, Route("{ifCode}")]
+        [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
         public ApiRes Update(PayInterfaceDefineDto dto)
         {
             var result = _payIfDefineService.Update(dto);
@@ -106,8 +109,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("{ifCode}")]
+        [HttpGet, Route("{ifCode}")]
+        [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_VIEW, PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
         public ApiRes Detail(string ifCode)
         {
             var payIfDefine = _payIfDefineService.GetById(ifCode);

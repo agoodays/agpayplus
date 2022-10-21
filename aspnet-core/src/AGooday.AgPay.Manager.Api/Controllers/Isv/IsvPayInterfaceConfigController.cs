@@ -11,6 +11,9 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Manager.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Isv
 {
@@ -18,7 +21,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
     /// 服务商支付接口管理类
     /// </summary>
     [Route("/api/isv/payConfigs")]
-    [ApiController]
+    [ApiController, Authorize]
     public class IsvPayInterfaceConfigController : CommonController
     {
         private readonly IMQSender mqSender;
@@ -42,8 +45,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="isvNo"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST)]
         public ApiRes List(string isvNo)
         {
             var data = _payIfConfigService.SelectAllPayIfConfigListByIsvNo(CS.INFO_TYPE_ISV, isvNo);
@@ -56,12 +59,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <param name="isvNo"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("{isvNo}/{ifCode}")]
+        [HttpGet, Route("{isvNo}/{ifCode}")]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_VIEW)]
         public ApiRes GetByIsvNo(string isvNo, string ifCode)
         {
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_ISV, isvNo, ifCode);
-            if (payInterfaceConfig != null) {
+            if (payInterfaceConfig != null)
+            {
                 // 费率转换为百分比数值
                 payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
                 if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
@@ -81,8 +85,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
+        [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
             dto.InfoType = CS.INFO_TYPE_ISV;

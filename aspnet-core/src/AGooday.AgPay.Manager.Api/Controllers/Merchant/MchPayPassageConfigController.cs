@@ -6,6 +6,9 @@ using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Manager.Api.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -13,7 +16,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     /// 商户支付通道管理类
     /// </summary>
     [Route("/api/mch/payPassages")]
-    [ApiController]
+    [ApiController, Authorize]
     public class MchPayPassageConfigController : ControllerBase
     {
         private readonly ILogger<MchPayInterfaceConfigController> _logger;
@@ -41,8 +44,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="appId"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_LIST)]
         public ApiRes List(string appId, [FromQuery] PayWayQueryDto dto)
         {
             var payWays = _payWayService.GetPaginatedData<MchPayPassagePayWayDto>(dto);
@@ -76,8 +79,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="isvNo"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("availablePayInterface/{appId}/{wayCode}")]
+        [HttpGet, Route("availablePayInterface/{appId}/{wayCode}")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_CONFIG)]
         public ApiRes AvailablePayInterface(string appId, string wayCode)
         {
             var mchApp = _mchAppService.GetById(appId);
@@ -100,8 +103,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
+        [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_ADD)]
         public ApiRes SaveOrUpdate(List<MchPayPassageDto> mchPayPassages)
         {
             if (!(mchPayPassages?.Count() > 0))

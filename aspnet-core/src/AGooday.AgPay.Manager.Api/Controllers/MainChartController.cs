@@ -1,4 +1,7 @@
-﻿using AGooday.AgPay.Common.Models;
+﻿using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Manager.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +11,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
     /// 首页统计类
     /// </summary>
     [Route("api/mainChart")]
-    [ApiController]
+    [ApiController,Authorize]
     public class MainChartController : ControllerBase
     {
         /// <summary>
@@ -16,6 +19,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("payAmountWeek")]
+        [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_AMOUNT_WEEK)]
         public ApiRes PayAmountWeek()
         {
             return ApiRes.Ok();
@@ -26,6 +30,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("numCount")]
+        [PermissionAuth(PermCode.MGR.ENT_C_MAIN_NUMBER_COUNT)]
         public ApiRes NumCount()
         {
             return ApiRes.Ok();
@@ -36,6 +41,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("payCount")]
+        [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_COUNT)]
         public ApiRes PayCount()
         {
             return ApiRes.Ok();
@@ -46,6 +52,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("payTypeCount")]
+        [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_TYPE_COUNT)]
         public ApiRes PayWayCount()
         {
             return ApiRes.Ok();

@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             _stopwatch = new Stopwatch();
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             _stopwatch.Restart();
             _data = new SortedDictionary<string, object>();

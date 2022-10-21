@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Manager.Api.Authorization
                     string currentUserJson = _redis.StringGet(cacheKey);
                     var currentUser = JsonConvert.DeserializeObject<CurrentUser>(currentUserJson);
                     var userIdClaim = context.User.FindFirst(_ => _.Type == ClaimTypes.NameIdentifier).Value;
-                    if (userIdClaim != null && currentUser.Authorities.Contains(requirement.Name))
+                    if (userIdClaim != null && currentUser.Authorities.Intersect(requirement.Name).Any())
                     {
                         context.Succeed(requirement);
                     }

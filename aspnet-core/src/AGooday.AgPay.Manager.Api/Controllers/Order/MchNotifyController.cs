@@ -1,11 +1,14 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Controllers.Merchant;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +18,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// 商户通知类
     /// </summary>
     [Route("/api/mchNotify")]
-    [ApiController]
+    [ApiController, Authorize]
     public class MchNotifyController : ControllerBase
     {
         private readonly IMQSender mqSender;
@@ -35,6 +38,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_NOTIFY_LIST)]
         public ApiRes List([FromQuery] MchNotifyQueryDto dto)
         {
             var data = _mchNotifyService.GetPaginatedData(dto);
@@ -47,6 +51,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="notifyId"></param>
         /// <returns></returns>
         [HttpGet, Route("{notifyId}")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_NOTIFY_VIEW)]
         public ApiRes Detail(long notifyId)
         {
             var mchNotify = _mchNotifyService.GetById(notifyId);
@@ -64,6 +69,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("{notifyId}")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_NOTIFY_RESEND)]
         public ApiRes Resend(long notifyId)
         {
             var mchNotify = _mchNotifyService.GetById(notifyId);

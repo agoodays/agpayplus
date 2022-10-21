@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         /// <param name="groupKey"></param>
         /// <returns></returns>
         [HttpGet, Route("{groupKey}")]
-        [PermissionFilter(PermCode.MGR.ENT_SYS_CONFIG_INFO)]
+        [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_INFO)]
         public ApiRes GetConfigs(string groupKey)
         {
             var configList = _sysConfigService.GetAll()
@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         /// <param name="configs"></param>
         /// <returns></returns>
         [HttpPut, Route("{groupKey}")]
-        [PermissionFilter(PermCode.MGR.ENT_SYS_CONFIG_EDIT)]
+        [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_EDIT)]
         public ApiRes Update(string groupKey, Dictionary<string, string> configs)
         {
             //foreach (var config in configs)

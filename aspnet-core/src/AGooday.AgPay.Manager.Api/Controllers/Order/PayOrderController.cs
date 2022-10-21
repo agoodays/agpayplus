@@ -4,12 +4,15 @@ using AGooday.AgPay.AopSdk.Models;
 using AGooday.AgPay.AopSdk.Request;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
@@ -20,7 +23,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// 支付订单类
     /// </summary>
     [Route("/api/payOrder")]
-    [ApiController]
+    [ApiController, Authorize]
     public class PayOrderController : ControllerBase
     {
         private readonly ILogger<PayOrderController> _logger;
@@ -48,6 +51,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
         public ApiRes List([FromQuery] PayOrderQueryDto dto)
         {
             var payOrders = _payOrderService.GetPaginatedData(dto);
@@ -72,6 +76,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="payOrderId"></param>
         /// <returns></returns>
         [HttpGet, Route("{payOrderId}")]
+        [PermissionAuth(PermCode.MGR.ENT_PAY_ORDER_VIEW)]
         public ApiRes Detail(string payOrderId)
         {
             var payOrder = _payOrderService.GetById(payOrderId);
@@ -90,6 +95,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="refundReason"></param>
         /// <returns></returns>
         [HttpPost, Route("refunds/{payOrderId}")]
+        [PermissionAuth(PermCode.MGR.ENT_PAY_ORDER_REFUND)]
         public ApiRes Refund(string payOrderId, RefundOrderModel refundOrder)
         {
             var payOrder = _payOrderService.GetById(payOrderId);

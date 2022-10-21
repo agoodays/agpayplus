@@ -4,7 +4,7 @@ namespace AGooday.AgPay.Manager.Api.Authorization
 {
     public class PermissionAuthorizationRequirement : IAuthorizationRequirement
     {
-        public PermissionAuthorizationRequirement(string name)
+        public PermissionAuthorizationRequirement(params string[] name)
         {
             Name = name;
         }
@@ -12,6 +12,6 @@ namespace AGooday.AgPay.Manager.Api.Authorization
         /// <summary>
         /// 权限名称
         /// </summary>
-        public string Name { get; set; }
+        public string[] Name { get; set; }
     }
 }

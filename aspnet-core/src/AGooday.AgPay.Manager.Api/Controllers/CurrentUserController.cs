@@ -16,8 +16,8 @@ using AGooday.AgPay.Common.Exceptions;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
 {
-    [ApiController]
     [Route("api/current")]
+    [ApiController]
     public class CurrentUserController : CommonController
     {
         private readonly ILogger<CurrentUserController> _logger;

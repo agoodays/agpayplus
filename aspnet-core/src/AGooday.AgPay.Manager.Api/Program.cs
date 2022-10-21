@@ -164,7 +164,7 @@ AuthContextService.Configure(httpContextAccessor);
 
 app.UseAuthorization();
 
-app.UseExceptionHandling();
+//app.UseExceptionHandling();
 
 app.UseRequestResponseLogging();
 

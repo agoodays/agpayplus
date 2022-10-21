@@ -10,6 +10,8 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Models;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Manager.Api.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -17,7 +19,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     /// 角色管理
     /// </summary>
     [Route("/api/sysRoles")]
-    [ApiController]
+    [ApiController, Authorize]
     public class SysRoleController : CommonController
     {
         private readonly ILogger<SysRoleController> _logger;
@@ -43,8 +45,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_LIST, PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
         public ApiRes List([FromQuery] SysRoleQueryDto dto)
         {
             var data = _sysRoleService.GetPaginatedData(dto);
@@ -56,8 +58,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
+        [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ADD)]
         public ApiRes Add(SysRoleCreateDto dto)
         {
             dto.RoleId = $"ROLE_{Guid.NewGuid().ToString("N").Substring(0, 6)}";
@@ -79,8 +81,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("{recordId}")]
+        [HttpDelete, Route("{recordId}")]
+        [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_DEL)]
         public ApiRes Delete(string recordId)
         {
             _sysRoleService.RemoveRole(recordId);
@@ -92,8 +94,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{recordId}")]
+        [HttpPut, Route("{recordId}")]
+        [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_EDIT)]
         public ApiRes Update(SysRoleModifyDto dto)
         {
             _sysRoleService.Update(dto);
@@ -114,8 +116,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("{recordId}")]
+        [HttpGet, Route("{recordId}")]
+        [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_EDIT)]
         public ApiRes Detail(string recordId)
         {
             var sysRole = _sysRoleService.GetById(recordId);

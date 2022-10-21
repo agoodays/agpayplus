@@ -12,6 +12,9 @@ using AGooday.AgPay.Domain.Models;
 using System.Runtime.InteropServices;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Manager.Api.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -19,7 +22,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     /// 服务商支付接口管理类
     /// </summary>
     [Route("/api/mch/payConfigs")]
-    [ApiController]
+    [ApiController, Authorize]
     public class MchPayInterfaceConfigController : CommonController
     {
         private readonly IMQSender mqSender;
@@ -52,8 +55,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes List(string appId)
         {
             var data = _payIfConfigService.SelectAllPayIfConfigListByAppId(appId);
@@ -66,8 +69,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="isvNo"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("{appId}/{ifCode}")]
+        [HttpGet, Route("{appId}/{ifCode}")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
         public ApiRes GetByAppId(string appId, string ifCode)
         {
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_MCH_APP, appId, ifCode);
@@ -101,8 +104,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
+        [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
             var mchApp = _mchAppService.GetById(dto.InfoId);
@@ -131,7 +134,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 dto.CreatedBy = realName;
             }
 
-            var result= _payIfConfigService.SaveOrUpdate(dto);
+            var result = _payIfConfigService.SaveOrUpdate(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "配置失败");
@@ -143,8 +146,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             return ApiRes.Ok();
         }
 
-        [HttpGet]
-        [Route("alipayIsvsubMchAuthUrls/{mchAppId}")]
+        [HttpGet, Route("alipayIsvsubMchAuthUrls/{mchAppId}")]
+        [AllowAnonymous]
         public ApiRes QueryAlipayIsvsubMchAuthUrl(string mchAppId)
         {
             var mchApp = _mchAppService.GetById(mchAppId);

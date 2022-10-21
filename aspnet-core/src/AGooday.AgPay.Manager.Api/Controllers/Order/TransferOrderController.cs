@@ -1,7 +1,10 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Manager.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +14,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// 转账订单
     /// </summary>
     [Route("/api/transferOrders")]
-    [ApiController]
+    [ApiController, Authorize]
     public class TransferOrderController : ControllerBase
     {
         private readonly ILogger<TransferOrderController> _logger;
@@ -30,6 +33,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_TRANSFER_ORDER_LIST)]
         public ApiRes List([FromQuery] TransferOrderQueryDto dto)
         {
             var transferOrders = _transferOrderService.GetPaginatedData(dto);
@@ -42,6 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="transferId"></param>
         /// <returns></returns>
         [HttpGet, Route("{transferId}")]
+        [PermissionAuth(PermCode.MGR.ENT_TRANSFER_ORDER_VIEW)]
         public ApiRes Detail(string transferId)
         {
             var refundOrder = _transferOrderService.GetById(transferId);

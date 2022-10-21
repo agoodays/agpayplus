@@ -16,6 +16,9 @@ using System.Collections.Immutable;
 using System.Text.Json.Nodes;
 using AGooday.AgPay.Manager.Api.Extensions;
 using StackExchange.Redis;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Manager.Api.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -23,7 +26,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     /// 权限 菜单 管理
     /// </summary>
     [Route("/api/sysEnts")]
-    [ApiController]
+    [ApiController, Authorize]
     public class SysEntController : CommonController
     {
         private readonly ILogger<SysEntController> _logger;
@@ -46,8 +49,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <param name="sysType"></param>
         /// <param name="entId"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("bySysType")]
+        [HttpGet, Route("bySysType")]
+        [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_LIST)]
         public ApiRes BySystem(string sysType, string entId)
         {
             var sysEnts = _sysEntService.GetBySysType(sysType, entId);
@@ -59,8 +62,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{entId}")]
+        [HttpPut, Route("{entId}")]
+        [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
         public ApiRes Update(SysEntModifyDto dto)
         {
             _sysEntService.Update(dto);
@@ -72,8 +75,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysType"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("showTree")]
+        [HttpGet, Route("showTree")]
+        [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_LIST, PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
         //public ActionResult ShowTree(string sysType)
         public ApiRes ShowTree(string sysType)
         {

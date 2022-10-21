@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Components.MQ.Vender;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Manager.Api.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -15,7 +18,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     /// 商户管理类
     /// </summary>
     [Route("/api/mchInfo")]
-    [ApiController]
+    [ApiController, Authorize]
     public class MchInfoController : ControllerBase
     {
         private readonly IMQSender mqSender;
@@ -24,7 +27,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 
         private readonly DomainNotificationHandler _notifications;
 
-        public MchInfoController(IMQSender mqSender, ILogger<MchInfoController> logger, INotificationHandler<DomainNotification> notifications, 
+        public MchInfoController(IMQSender mqSender, ILogger<MchInfoController> logger, INotificationHandler<DomainNotification> notifications,
             IMchInfoService mchInfoService)
         {
             this.mqSender = mqSender;
@@ -38,8 +41,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_LIST)]
         public ApiRes List([FromQuery] MchInfoQueryDto dto)
         {
             var data = _mchInfoService.GetPaginatedData(dto);
@@ -51,8 +54,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
+        [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_ADD)]
         public ApiRes Add(MchInfoCreateDto dto)
         {
             _mchInfoService.Create(dto);
@@ -68,8 +71,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="mchNo"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("{mchNo}")]
+        [HttpDelete, Route("{mchNo}")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_DEL)]
         public ApiRes Delete(string mchNo)
         {
             _mchInfoService.Remove(mchNo);
@@ -81,8 +84,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{mchNo}")]
+        [HttpPut, Route("{mchNo}")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_EDIT)]
         public ApiRes Update(MchInfoModifyDto dto)
         {
             _mchInfoService.Modify(dto);
@@ -98,8 +101,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="mchNo"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("{mchNo}")]
+        [HttpGet, Route("{mchNo}")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_VIEW, PermCode.MGR.ENT_MCH_INFO_EDIT)]
         public ApiRes Detail(string mchNo)
         {
             var mchInfo = _mchInfoService.GetByMchNo(mchNo);

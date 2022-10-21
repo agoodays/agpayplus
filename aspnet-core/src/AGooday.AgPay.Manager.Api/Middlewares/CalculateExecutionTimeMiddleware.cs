@@ -24,10 +24,11 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             _logger = loggerFactory.CreateLogger<CalculateExecutionTimeMiddleware>();
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             stopwatch = new Stopwatch();
             stopwatch.Start();
+
             await _next.Invoke(context);
 
             stopwatch.Stop();

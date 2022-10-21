@@ -6,6 +6,9 @@ using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Manager.Api.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -13,7 +16,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     /// 系统日志记录类
     /// </summary>
     [Route("/api/sysLog")]
-    [ApiController]
+    [ApiController, Authorize]
     public class SysLogController : ControllerBase
     {
         private readonly ILogger<SysLogController> _logger;
@@ -30,8 +33,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_LOG_LIST)]
         public ApiRes List([FromQuery] SysLogQueryDto dto)
         {
             var data = _sysLogService.GetPaginatedData(dto);
@@ -43,8 +46,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysLogId"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("{selectedIds}")]
+        [HttpDelete, Route("{selectedIds}")]
+        [PermissionAuth(PermCode.MGR.ENT_SYS_LOG_DEL)]
         public ApiRes Delete(string selectedIds)
         {
             var ids = selectedIds.Split(",").Select(s => Convert.ToInt64(s)).ToList();
@@ -61,8 +64,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysLogId"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("detail/{sysLogId}")]
+        [HttpGet, Route("detail/{sysLogId}")]
+        [PermissionAuth(PermCode.MGR.ENT_SYS_LOG_VIEW)]
         public ApiRes Detail(long sysLogId)
         {
             var sysLog = _sysLogService.GetById(sysLogId);

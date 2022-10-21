@@ -1,7 +1,10 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Manager.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +14,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// 退款订单类
     /// </summary>
     [Route("/api/refundOrder")]
-    [ApiController]
+    [ApiController, Authorize]
     public class RefundOrderController : ControllerBase
     {
         private readonly ILogger<RefundOrderController> _logger;
@@ -30,6 +33,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_REFUND_LIST)]
         public ApiRes List([FromQuery] RefundOrderQueryDto dto)
         {
             var refundOrders = _refundOrderService.GetPaginatedData(dto);
@@ -42,6 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="refundOrderId"></param>
         /// <returns></returns>
         [HttpGet, Route("{refundOrderId}")]
+        [PermissionAuth(PermCode.MGR.ENT_REFUND_ORDER_VIEW)]
         public ApiRes Detail(string refundOrderId)
         {
             var refundOrder = _refundOrderService.GetById(refundOrderId);

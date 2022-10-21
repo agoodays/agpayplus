@@ -10,6 +10,9 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Controllers.Config;
 using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Application.Permissions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Isv
 {
@@ -17,7 +20,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
     /// 服务商管理类
     /// </summary>
     [Route("/api/isvInfo")]
-    [ApiController]
+    [ApiController, Authorize]
     public class IsvInfoController : CommonController
     {
         private readonly IMQSender mqSender;
@@ -41,8 +44,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_LIST)]
         public ApiRes List([FromQuery] IsvInfoQueryDto dto)
         {
             var data = _isvInfoService.GetPaginatedData(dto);
@@ -54,8 +57,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("")]
+        [HttpPost, Route("")]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_ADD)]
         public ApiRes Add(IsvInfoDto dto)
         {
             dto.CreatedUid = GetCurrentUser().User.SysUserId;
@@ -73,8 +76,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="isvNo"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("{isvNo}")]
+        [HttpDelete, Route("{isvNo}")]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_DEL)]
         public ApiRes Delete(string isvNo)
         {
             _isvInfoService.Remove(isvNo);
@@ -90,8 +93,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{isvNo}")]
+        [HttpPut, Route("{isvNo}")]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_EDIT)]
         public ApiRes Update(IsvInfoDto dto)
         {
             _isvInfoService.Update(dto);
@@ -107,8 +110,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="isvNo"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("{isvNo}")]
+        [HttpGet, Route("{isvNo}")]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_VIEW, PermCode.MGR.ENT_ISV_INFO_EDIT)]
         public ApiRes Detail(string isvNo)
         {
             var isvInfo = _isvInfoService.GetById(isvNo);
