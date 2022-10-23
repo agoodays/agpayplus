@@ -117,10 +117,14 @@ namespace AGooday.AgPay.Application.Services
                     AvatarUrl = s.ur.AvatarUrl,
                     UserNo = s.ur.UserNo,
                     IsAdmin = s.ur.IsAdmin,
+                    State = s.ur.State,
                     SysType = s.ur.SysType,
                     IdentityType = s.ua.IdentityType,
                     Identifier = s.ua.Identifier,
-                    Credential = s.ua.Credential
+                    Credential = s.ua.Credential,
+                    BelongInfoId = s.ur.BelongInfoId,
+                    CreatedAt = s.ur.CreatedAt,
+                    UpdatedAt = s.ur.UpdatedAt
                 })
                 .FirstOrDefault();
             return entity;

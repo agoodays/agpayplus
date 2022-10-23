@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPut, Route("{wayCode}")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_EDIT)]
-        public ApiRes Update(PayWayDto dto)
+        public ApiRes Update(string wayCode, PayWayDto dto)
         {
             bool result = _payWayService.Update(dto);
             if (!result)

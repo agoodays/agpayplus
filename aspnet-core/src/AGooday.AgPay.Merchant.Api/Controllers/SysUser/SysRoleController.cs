@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_EDIT)]
-        public ApiRes Update(SysRoleModifyDto dto)
+        public ApiRes Update(string recordId, SysRoleModifyDto dto)
         {
             _sysRoleService.Update(dto);
             //如果包含： 可分配权限的权限 && EntIds 不为空

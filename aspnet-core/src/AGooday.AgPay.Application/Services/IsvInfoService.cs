@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Application.Services
             var isvInfos = _isvInfoRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
-                && (dto.State.Equals(0) || w.State.Equals(dto.State))
+                && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;

@@ -156,13 +156,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         public ApiRes Vercode()
         {
             //定义图形验证码的长和宽 // 4位验证码
-            string code = ImageFactory.CreateCode(6);
-            string imageBase64Data;
-            using (var picStream = ImageFactory.BuildImage(code, 40, 137, 20, 10))
-            {
-                var imageBytes = picStream.ToArray();
-                imageBase64Data = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
-            }
+            //string code = ImageFactory.CreateCode(6);
+            //string imageBase64Data;
+            //using (var picStream = ImageFactory.BuildImage(code, 40, 137, 20, 10))
+            //{
+            //    var imageBytes = picStream.ToArray();
+            //    imageBase64Data = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
+            //}
+            var code = VerificationCodeUtil.RandomVerificationCode(6);
+            var bitmap = VerificationCodeUtil.DrawImage(code, 137, 40, 20);
+            var imageBase64Data = $"data:image/jpg;base64,{VerificationCodeUtil.BitmapToBase64Str(bitmap)}";
 
             //redis
             string vercodeToken = Guid.NewGuid().ToString("N");

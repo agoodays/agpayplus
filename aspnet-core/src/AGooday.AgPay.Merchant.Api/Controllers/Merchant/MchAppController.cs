@@ -104,7 +104,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{appId}")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_EDIT)]
-        public ApiRes Update(MchAppDto dto)
+        public ApiRes Update(string appId, MchAppDto dto)
         {
             var result = _mchAppService.Update(dto);
             if (!result)

@@ -113,9 +113,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <param name="record"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPut, Route("{appId}")]
+        [HttpPut, Route("{recordId}")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_EDIT)]
-        public ApiRes Update(MchDivisionReceiverDto record)
+        public ApiRes Update(long recordId, MchDivisionReceiverDto record)
         {
             // 改为真实比例
             record.DivisionProfit = record.DivisionProfit / 100;

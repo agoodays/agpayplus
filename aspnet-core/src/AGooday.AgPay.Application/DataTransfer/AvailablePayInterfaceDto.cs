@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 支付接口费率
         /// </summary>
-        public decimal IfRate { get; set; }
+        public decimal? IfRate { get; set; }
 
         /// <summary>
         /// 通道ID

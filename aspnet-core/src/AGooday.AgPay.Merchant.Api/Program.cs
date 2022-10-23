@@ -64,7 +64,7 @@ services.Configure<RabbitMQConfiguration>(mqconfiguration);
 services.AddCors(o =>
     o.AddPolicy("CorsPolicy",
         builder => builder
-            .WithOrigins("http://localhost:9001")
+            .WithOrigins("https://localhost:8218", "http://localhost:8218")
             .AllowAnyHeader()
             .AllowAnyMethod()
             //.AllowAnyOrigin()

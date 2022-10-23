@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 商户退款单号（商户系统的订单号）
         /// </summary>
         [Comment("商户退款单号（商户系统的订单号）")]
-        [Required, Column("mch_order_no", TypeName = "varchar(64)")]
+        [Required, Column("mch_refund_no", TypeName = "varchar(64)")]
         public string MchRefundNo { get; set; }
 
         /// <summary>

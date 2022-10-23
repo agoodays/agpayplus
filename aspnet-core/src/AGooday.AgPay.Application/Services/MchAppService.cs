@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.AppName) || w.AppName.Contains(dto.AppName))
-                && (dto.State.Equals(0) || w.State.Equals(dto.State))
+                && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<MchApp>.Create<MchAppDto>(mchApps.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;

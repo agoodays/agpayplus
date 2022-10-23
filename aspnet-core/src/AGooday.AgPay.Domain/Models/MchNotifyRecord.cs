@@ -74,6 +74,20 @@ namespace AGooday.AgPay.Domain.Models
         public string NotifyUrl { get; set; }
 
         /// <summary>
+        /// 通知请求方法
+        /// </summary>
+        [Comment("通知请求方法")]
+        [Required, Column("req_method", TypeName = "varchar(10)")]
+        public string ReqMethod { get; set; }
+
+        /// <summary>
+        /// 通知请求正文
+        /// </summary>
+        [Comment("通知请求正文")]
+        [Column("req_body", TypeName = "text")]
+        public string ReqBody { get; set; }
+
+        /// <summary>
         /// 通知响应结果
         /// </summary>
         [Comment("通知响应结果")]

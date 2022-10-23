@@ -49,6 +49,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public byte IsAdmin { get; set; }
 
         /// <summary>
+        /// 状态 0-停用 1-启用
+        /// </summary>
+        public byte State { get; set; }
+
+        /// <summary>
         /// 所属系统： MGR-运营平台, MCH-商户中心
         /// </summary>
         public string SysType { get; set; }
@@ -72,5 +77,15 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 所属商户ID / 0(平台)
         /// </summary>
         public string BelongInfoId { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdatedAt { get; set; }
     }
 }

@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysLogId"></param>
         /// <returns></returns>
-        [HttpGet, Route("detail/{sysLogId}")]
+        [HttpGet, Route("{sysLogId}")]
         [PermissionAuth(PermCode.MGR.ENT_SYS_LOG_VIEW)]
         public ApiRes Detail(long sysLogId)
         {

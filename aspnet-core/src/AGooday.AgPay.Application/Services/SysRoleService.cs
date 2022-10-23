@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Application.Services
             var sysRoles = _sysRoleRepository.GetAll()
                 .Where(w => w.SysType.Equals(dto.SysType) && w.BelongInfoId.Equals(dto.BelongInfoId)
                 && (string.IsNullOrWhiteSpace(dto.RoleName) || w.RoleName.Contains(dto.RoleName))
-                && (dto.RoleId.Equals(0) || w.RoleId.Equals(dto.RoleId))
+                && (string.IsNullOrWhiteSpace(dto.RoleId) || w.RoleId.Equals(dto.RoleId))
                 ).OrderByDescending(o => o.UpdatedAt);
             var records = PaginatedList<SysRole>.Create<SysRoleDto>(sysRoles.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;

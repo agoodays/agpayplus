@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Application
         public static PaginatedList<TDestination> Create<TDestination>(IQueryable<TSource> source, IMapper mapper, int pageIndex, int pageSize)
         {
             var count = source.Count();
-            if (pageIndex > 0)
+            if (pageIndex > 0 && pageSize > 0)
             {
                 source = source.Skip((pageIndex - 1) * pageSize)
                    .Take(pageSize);

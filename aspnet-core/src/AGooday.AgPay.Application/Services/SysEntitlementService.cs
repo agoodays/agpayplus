@@ -76,8 +76,8 @@ namespace AGooday.AgPay.Application.Services
         {
             var sysEnts = _sysEntitlementRepository.GetAll()
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
-                && ((entIds != null && entIds.Count() > 0) || entIds.Contains(w.EntId))
-                && ((entTypes != null && entTypes.Count() > 0) || entTypes.Contains(w.EntType))
+                && (!(entIds != null && entIds.Count() > 0) || entIds.Contains(w.EntId))
+                && (!(entTypes != null && entTypes.Count() > 0) || entTypes.Contains(w.EntType))
                 );
             return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
         }

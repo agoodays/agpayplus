@@ -108,9 +108,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
-        public ApiRes Update(SysUserModifyDto dto)
+        public ApiRes Update(long recordId, SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MGR;
+            dto.SysUserId = dto.SysUserId > 0 ? dto.SysUserId : recordId;
             _sysUserService.Modify(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

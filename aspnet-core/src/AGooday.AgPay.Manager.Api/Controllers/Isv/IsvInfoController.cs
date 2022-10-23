@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <returns></returns>
         [HttpPut, Route("{isvNo}")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_EDIT)]
-        public ApiRes Update(IsvInfoDto dto)
+        public ApiRes Update(string isvNo, IsvInfoDto dto)
         {
             _isvInfoService.Update(dto);
 

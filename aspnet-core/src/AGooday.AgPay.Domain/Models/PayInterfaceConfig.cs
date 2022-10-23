@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Domain.Models
         /// ID
         /// </summary>
         [Comment("ID")]
-        [Key, Required, Column("sys_user_id", TypeName = "bigint")]
+        [Key, Required, Column("id", TypeName = "bigint")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long Id { get; set; }
 
@@ -56,8 +56,8 @@ namespace AGooday.AgPay.Domain.Models
         /// 支付接口费率
         /// </summary>
         [Comment("支付接口费率")]
-        [Required, Column("if_rate", TypeName = "decimal(20,6)")]
-        public decimal IfRate { get; set; }
+        [Column("if_rate", TypeName = "decimal(20,6)")]
+        public decimal? IfRate { get; set; }
 
         /// <summary>
         /// 状态: 0-停用, 1-启用

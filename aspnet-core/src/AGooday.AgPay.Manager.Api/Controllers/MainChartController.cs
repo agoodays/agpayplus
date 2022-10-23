@@ -1,4 +1,6 @@
-﻿using AGooday.AgPay.Application.Permissions;
+﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -11,9 +13,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers
     /// 首页统计类
     /// </summary>
     [Route("api/mainChart")]
-    [ApiController,Authorize]
+    [ApiController, Authorize]
     public class MainChartController : ControllerBase
     {
+        private readonly ILogger<MainChartController> _logger;
+        private readonly IPayOrderService _payOrderService;
+
+        public MainChartController(ILogger<MainChartController> logger, IPayOrderService payOrderService)
+        {
+            _logger = logger;
+            _payOrderService = payOrderService;
+        }
+
         /// <summary>
         /// 周交易总金额
         /// </summary>
@@ -22,7 +33,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_AMOUNT_WEEK)]
         public ApiRes PayAmountWeek()
         {
-            return ApiRes.Ok();
+            return ApiRes.Ok(_payOrderService.MainPageWeekCount(null));
         }
 
         /// <summary>
@@ -33,7 +44,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_NUMBER_COUNT)]
         public ApiRes NumCount()
         {
-            return ApiRes.Ok();
+            return ApiRes.Ok(_payOrderService.MainPageNumCount(null));
         }
 
         /// <summary>
@@ -42,9 +53,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// <returns></returns>
         [HttpGet, Route("payCount")]
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_COUNT)]
-        public ApiRes PayCount()
+        public ApiRes PayCount(string createdStart, string createdEnd)
         {
-            return ApiRes.Ok();
+            return ApiRes.Ok(_payOrderService.MainPagePayCount(null, createdStart, createdEnd));
         }
 
         /// <summary>
@@ -53,9 +64,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// <returns></returns>
         [HttpGet, Route("payTypeCount")]
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_TYPE_COUNT)]
-        public ApiRes PayWayCount()
+        public ApiRes PayWayCount(string createdStart, string createdEnd)
         {
-            return ApiRes.Ok();
+            return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(null, createdStart, createdEnd));
         }
     }
 }

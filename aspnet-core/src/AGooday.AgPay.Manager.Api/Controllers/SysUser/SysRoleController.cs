@@ -49,6 +49,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_LIST, PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
         public ApiRes List([FromQuery] SysRoleQueryDto dto)
         {
+            dto.SysType = CS.SYS_TYPE.MGR;
+            dto.BelongInfoId = "0";
             var data = _sysRoleService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
@@ -96,7 +98,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_EDIT)]
-        public ApiRes Update(SysRoleModifyDto dto)
+        public ApiRes Update(string recordId, SysRoleModifyDto dto)
         {
             _sysRoleService.Update(dto);
             //如果包含： 可分配权限的权限 && EntIds 不为空

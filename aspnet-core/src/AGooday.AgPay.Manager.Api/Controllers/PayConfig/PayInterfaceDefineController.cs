@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPut, Route("{ifCode}")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
-        public ApiRes Update(PayInterfaceDefineDto dto)
+        public ApiRes Update(string ifCode, PayInterfaceDefineDto dto)
         {
             var result = _payIfDefineService.Update(dto);
             if (!result)

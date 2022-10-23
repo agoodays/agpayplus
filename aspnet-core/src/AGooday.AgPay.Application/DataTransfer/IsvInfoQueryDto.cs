@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 状态: 0-停用, 1-正常
         /// </summary>
-        public byte State { get; set; }
+        public byte? State { get; set; }
 
         /// <summary>
         /// 备注

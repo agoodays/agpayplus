@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 转账订单号
         /// </summary>
         [Comment("转账订单号")]
-        [Key, Required, Column("refund_order_id", TypeName = "varchar(32)")]
+        [Key, Required, Column("transfer_id", TypeName = "varchar(32)")]
         public string TransferId { get; set; }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace AGooday.AgPay.Domain.Models
         /// </summary>
         [Comment("转账成功时间")]
         [Column("success_time", TypeName = "datetime")]
-        public DateTime SuccessTime { get; set; }
+        public DateTime? SuccessTime { get; set; }
 
         /// <summary>
         /// 创建时间

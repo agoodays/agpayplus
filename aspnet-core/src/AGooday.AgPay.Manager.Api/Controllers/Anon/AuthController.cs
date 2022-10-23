@@ -120,18 +120,26 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             var claimsIdentity = new ClaimsIdentity(new Claim[]
             {
                 new Claim(ClaimTypes.NameIdentifier, auth.SysUserId.ToString()),
-                new Claim(ClaimTypes.Name, auth.Identifier),
-                new Claim("userid",auth.SysUserId.ToString()),
-                new Claim("avatar",auth.AvatarUrl),
-                new Claim("displayName",auth.Realname),
-                new Claim("loginName",auth.Realname),
+                new Claim(ClaimTypes.Name, auth.LoginUsername),
+                new Claim("sysUserId",auth.SysUserId.ToString()),
+                new Claim("avatarUrl",auth.AvatarUrl),
+                new Claim("realname",auth.Realname),
+                new Claim("loginUsername",auth.LoginUsername),
                 new Claim("telphone",auth.Telphone),
                 new Claim("userNo",auth.UserNo.ToString()),
+                new Claim("sex",auth.Sex.ToString()),
+                new Claim("state",auth.State.ToString()),
                 new Claim("isAdmin",auth.IsAdmin.ToString()),
-                new Claim("identityType",auth.IdentityType.ToString()),
                 new Claim("sysType",auth.SysType),
+                new Claim("belongInfoId",auth.BelongInfoId),
+                new Claim("createdAt",auth.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
+                new Claim("updatedAt",auth.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
                 new Claim("cacheKey",cacheKey)
             });
+            if (auth.IsAdmin == CS.YES)
+            {
+                claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Admin"));
+            }
             var accessToken = JwtBearerAuthenticationExtension.GetJwtAccessToken(_jwtSettings, claimsIdentity);
 
             var currentUser = JsonConvert.SerializeObject(new CurrentUser
@@ -155,14 +163,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         [HttpGet, Route("vercode")]
         public ApiRes Vercode()
         {
-            //定义图形验证码的长和宽 // 4位验证码
-            string code = ImageFactory.CreateCode(6);
-            string imageBase64Data;
-            using (var picStream = ImageFactory.BuildImage(code, 40, 137, 20, 10))
-            {
-                var imageBytes = picStream.ToArray();
-                imageBase64Data = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
-            }
+            //定义图形验证码的长和宽 // 6位验证码
+            //string code = ImageFactory.CreateCode(6);
+            //string imageBase64Data;
+            //using (var picStream = ImageFactory.BuildImage(code, 40, 137, 20, 10))
+            //{
+            //    var imageBytes = picStream.ToArray();
+            //    imageBase64Data = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
+            //}
+            var code = VerificationCodeUtil.RandomVerificationCode(6);
+            var bitmap = VerificationCodeUtil.DrawImage(code, 137, 40, 20);
+            var imageBase64Data = $"data:image/jpg;base64,{VerificationCodeUtil.BitmapToBase64Str(bitmap)}";
 
             //redis
             string vercodeToken = Guid.NewGuid().ToString("N");

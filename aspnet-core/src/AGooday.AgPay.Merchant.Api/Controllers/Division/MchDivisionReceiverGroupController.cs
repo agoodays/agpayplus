@@ -95,9 +95,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// </summary>
         /// <param name="record"></param>
         /// <returns></returns>
-        [HttpPut,Route("{appId}")]
+        [HttpPut,Route("{recordId}")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_EDIT)]
-        public ApiRes Update(MchDivisionReceiverGroupDto record)
+        public ApiRes Update(long recordId, MchDivisionReceiverGroupDto record)
         {
             record.MchNo = GetCurrentUser().User.BelongInfoId;
             var result = _mchDivisionReceiverGroupService.Update(record);

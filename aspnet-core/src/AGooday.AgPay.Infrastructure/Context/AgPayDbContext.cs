@@ -60,6 +60,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         {
             if (!optionsBuilder.IsConfigured)
             {
+                optionsBuilder.EnableSensitiveDataLogging();
                 optionsBuilder.UseMySql(Configuration.GetConnectionString("Default"),
                     MySqlServerVersion.LatestSupportedServerVersion);
             }

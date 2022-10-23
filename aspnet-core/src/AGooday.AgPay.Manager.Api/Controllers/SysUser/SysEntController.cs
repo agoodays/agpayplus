@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{entId}")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
-        public ApiRes Update(SysEntModifyDto dto)
+        public ApiRes Update(string entId, SysEntModifyDto dto)
         {
             _sysEntService.Update(dto);
             return ApiRes.Ok();

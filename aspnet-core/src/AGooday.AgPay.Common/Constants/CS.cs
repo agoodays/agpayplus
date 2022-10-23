@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Common.Constants
         /// <summary>
         /// access_token 名称
         /// </summary>
-        public const string ACCESS_TOKEN_NAME = "iToken";
+        public const string ACCESS_TOKEN_NAME = "authorization";
 
         #region 缓存Key
         /** ！！不同系统请放置不同的redis库 ！！ **/

@@ -361,3 +361,23 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# ################################################  前端  ###################
+# [npm包管理依赖]
+node_modules/
+
+# [dist目录]
+dist/
+
+# [HBuilderX  编译目录 ]
+unpackage/
+
+# [vscode IDE]
+.vscode/
+
+# [ IDEA ]
+.idea/
+*.iml
+
+# [package-lock.json。 已放开，请添加到假定未更改文件 ]
+# package-lock.json

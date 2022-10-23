@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Domain.Models
         /// ID
         /// </summary>
         [Comment("ID")]
-        [Key, Required, Column("role_id", TypeName = "bigint")]
+        [Key, Required, Column("sys_log_id", TypeName = "bigint")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long SysLogId { get; set; }
 
@@ -28,14 +28,14 @@ namespace AGooday.AgPay.Domain.Models
         /// 系统用户ID
         /// </summary>
         [Comment("系统用户ID")]
-        [Required, Column("sys_user_id", TypeName = "bigint")]
-        public long UserId { get; set; }
+        [Column("user_id", TypeName = "bigint")]
+        public long? UserId { get; set; }
 
         /// <summary>
         /// 用户姓名
         /// </summary>
         [Comment("用户姓名")]
-        [Required, Column("user_name", TypeName = "varchar(32)")]
+        [Column("user_name", TypeName = "varchar(32)")]
         public string UserName { get; set; }
 
         /// <summary>

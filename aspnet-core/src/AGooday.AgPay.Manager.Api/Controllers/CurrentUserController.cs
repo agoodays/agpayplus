@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             var entIds = currentUser.Authorities.ToList();
 
             //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-            var sysEnts = _sysEntService.GetBySysType(CS.SYS_TYPE.MCH, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
+            var sysEnts = _sysEntService.GetBySysType(CS.SYS_TYPE.MGR, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
 
             //递归转换为树状结构
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings
@@ -65,8 +65,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
             var jsonArray = JArray.FromObject(sysEnts);
-            var leftMenuTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
-            return ApiRes.Ok(new { currentUser.User, leftMenuTree });
+            var allMenuRouteTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
+            var user = JObject.FromObject(currentUser.User);
+            user.Add("entIdList", JArray.FromObject(entIds));
+            user.Add("allMenuRouteTree", JToken.FromObject(allMenuRouteTree));
+            return ApiRes.Ok(user);
         }
 
         [HttpPut, Route("user")]
@@ -106,7 +109,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            _sysUserAuthService.ResetAuthInfo(dto.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MCH);
+            _sysUserAuthService.ResetAuthInfo(dto.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MGR);
             return Logout();
         }
 

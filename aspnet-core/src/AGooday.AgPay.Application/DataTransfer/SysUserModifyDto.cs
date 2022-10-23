@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 默认密码
         /// </summary>
-        public string DefaultPass { get; set; }
+        public bool DefaultPass { get; set; }
 
         /// <summary>
         /// 重置密码
@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 确认密码
         /// </summary>
-        public bool ConfirmPwd { get; set; }
+        public string ConfirmPwd { get; set; }
 
         /// <summary>
         /// 当前系统用户ID

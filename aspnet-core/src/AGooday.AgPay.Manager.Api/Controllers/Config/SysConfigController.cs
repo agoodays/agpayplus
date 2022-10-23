@@ -70,9 +70,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
             return ApiRes.Ok();
         }
 
-        private void UpdateSysConfigMQ(string groupKey)
+        private async void UpdateSysConfigMQ(string groupKey)
         {
-            mqSender.Send(ResetAppConfigMQ.Build(groupKey));
+            await Task.Run(() =>
+            {
+                mqSender.Send(ResetAppConfigMQ.Build(groupKey));
+            });
         }
     }
 }

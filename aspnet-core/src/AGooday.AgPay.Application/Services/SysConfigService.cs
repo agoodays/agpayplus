@@ -94,19 +94,18 @@ namespace AGooday.AgPay.Application.Services
 
         public int UpdateByConfigKey(Dictionary<string, string> configs)
         {
-            int count = 0;
             foreach (KeyValuePair<string, string> config in configs)
             {
-                var sysConfig = new SysConfigDto();
+                var sysConfig = _sysConfigRepository.GetById(config.Key);
+                if (sysConfig == null)
+                {
+                    sysConfig = new SysConfig();
+                }
                 sysConfig.ConfigKey = config.Key;
                 sysConfig.ConfigVal = config.Value;
-                bool update = this.SaveOrUpdate(sysConfig);
-                if (update)
-                {
-                    count++;
-                }
+                _sysConfigRepository.SaveOrUpdate(sysConfig, sysConfig.ConfigKey);
             }
-            return count;
+            return _sysConfigRepository.SaveChanges();
         }
 
         public void Add(SysConfigDto dto)
@@ -131,7 +130,7 @@ namespace AGooday.AgPay.Application.Services
 
         public bool SaveOrUpdate(SysConfigDto dto)
         {
-            var config = _mapper.Map<SysConfig>(dto);
+            var config = _mapper.Map<SysConfig>(source: dto);
             _sysConfigRepository.SaveOrUpdate(config, dto.ConfigKey);
             return _sysConfigRepository.SaveChanges() > 0;
         }

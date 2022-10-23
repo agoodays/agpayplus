@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,5 +27,9 @@ namespace AGooday.AgPay.Application.Interfaces
         bool UpdateIng2Success(string payOrderId, string channelOrderId, string channelUserId);
         bool UpdateIng2Fail(string payOrderId, string channelOrderId, string channelUserId, string channelErrCode, string channelErrMsg);
         long CalMchIncomeAmount(PayOrderDto payOrder);
+        JObject MainPageWeekCount(string mchNo);
+        JObject MainPageNumCount(string mchNo);
+        List<Dictionary<string, object>> MainPagePayCount(string mchNo, string createdStart, string createdEnd);
+        List<PayTypeCountDto> MainPagePayTypeCount(string mchNo, string createdStart, string createdEnd);
     }
 }

@@ -114,7 +114,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}")]
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_EDIT)]
-        public ApiRes Update(SysUserModifyDto dto)
+        public ApiRes Update(long recordId, SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
             var dbRecord = _sysUserService.GetById(dto.SysUserId, GetCurrentUser().User.BelongInfoId);

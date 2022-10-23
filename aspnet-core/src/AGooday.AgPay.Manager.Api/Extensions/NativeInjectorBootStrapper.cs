@@ -14,6 +14,7 @@ using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Infrastructure.Repositories;
 using AGooday.AgPay.Infrastructure.UoW;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AGooday.AgPay.Manager.Api.Extensions
@@ -85,6 +86,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             });
 
             // 注入 基础设施层 - 数据层
+            //services.AddDbContext<AgPayDbContext>(ServiceLifetime.Transient);
             services.AddSingleton<AgPayDbContext>();
             services.AddSingleton<IUnitOfWork, UnitOfWork>();
             services.AddSingleton<IRepository, Repository>();
