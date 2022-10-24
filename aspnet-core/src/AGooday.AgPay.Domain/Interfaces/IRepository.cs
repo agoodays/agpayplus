@@ -33,6 +33,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <returns></returns>
         IQueryable<TEntity> GetAll();
+        IQueryable<T> GetAll<T>() where T : class;
         Task<IEnumerable<TEntity>> ListAsync();
         /// <summary>
         /// 根据对象进行更新
@@ -79,6 +80,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <returns></returns>
         IQueryable<TEntity> GetAll();
+        IQueryable<T> GetAll<T>() where T : class;
         Task<IEnumerable<TEntity>> ListAsync();
         /// <summary>
         /// 根据对象进行更新

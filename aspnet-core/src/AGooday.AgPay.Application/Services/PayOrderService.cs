@@ -154,7 +154,13 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
         }
-        /** 更新订单状态  【支付中】 --》 【支付成功】 **/
+        /// <summary>
+        /// 更新订单状态  【支付中】 --》 【支付成功】
+        /// </summary>
+        /// <param name="payOrderId"></param>
+        /// <param name="channelOrderNo"></param>
+        /// <param name="channelUserId"></param>
+        /// <returns></returns>
         public bool UpdateIng2Success(string payOrderId, string channelOrderNo, string channelUserId)
         {
             var updateRecord = _payOrderRepository.GetById(payOrderId);
@@ -169,7 +175,15 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
         }
-        /** 更新订单状态  【支付中】 --》 【支付成功】 **/
+        /// <summary>
+        /// 更新订单状态  【支付中】 --》 【支付成功】
+        /// </summary>
+        /// <param name="payOrderId"></param>
+        /// <param name="channelOrderNo"></param>
+        /// <param name="channelUserId"></param>
+        /// <param name="channelErrCode"></param>
+        /// <param name="channelErrMsg"></param>
+        /// <returns></returns>
         public bool UpdateIng2Fail(string payOrderId, string channelOrderNo, string channelUserId, string channelErrCode, string channelErrMsg)
         {
             var updateRecord = _payOrderRepository.GetById(payOrderId);
@@ -227,7 +241,6 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public long CalMchIncomeAmount(PayOrderDto dbPayOrder)
         {
-
             //商家订单入账金额 （支付金额 - 手续费 - 退款金额 - 总分账金额）
             long mchIncomeAmount = dbPayOrder.Amount - dbPayOrder.MchFeeAmount - dbPayOrder.RefundAmount;
 
@@ -235,7 +248,6 @@ namespace AGooday.AgPay.Application.Services
             mchIncomeAmount -= _payOrderDivisionRecordRepository.SumSuccessDivisionAmount(dbPayOrder.PayOrderId);
 
             return mchIncomeAmount <= 0 ? 0 : mchIncomeAmount;
-
         }
 
         /// <summary>
@@ -394,7 +406,9 @@ namespace AGooday.AgPay.Application.Services
             if (DateTime.TryParse(createdStart, out DateTime dayStart) && DateTime.TryParse(createdEnd, out DateTime dayEnd))
             {
                 dayStart = dayStart.Date;
-                dayEnd.Date.AddDays(1);
+                dayEnd = dayEnd.Date.AddDays(1);
+                // 计算两时间间隔天数
+                daySpace = dayEnd.AddSeconds(-1).Subtract(dayStart).Days;
             }
             else
             {
@@ -408,7 +422,7 @@ namespace AGooday.AgPay.Application.Services
             // 查询退款的记录
             var refundOrderList = SelectOrderCount(mchNo, dayStart, dayEnd);
             // 生成前端返回参数类型
-            var returnList = GetReturnList(daySpace, createdEnd, payOrderList, refundOrderList);
+            var returnList = GetReturnList(daySpace, dayEnd.AddDays(-1), payOrderList, refundOrderList);
             return returnList;
         }
 
@@ -424,7 +438,7 @@ namespace AGooday.AgPay.Application.Services
             if (DateTime.TryParse(createdStart, out DateTime dayStart) && DateTime.TryParse(createdEnd, out DateTime dayEnd))
             {
                 dayStart = dayStart.Date;
-                dayEnd.Date.AddDays(1);
+                dayEnd = dayEnd.Date.AddDays(1);
             }
             else
             {
@@ -462,24 +476,23 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="payOrderList"></param>
         /// <param name="refundOrderList"></param>
         /// <returns></returns>
-        public List<Dictionary<string, object>> GetReturnList(int daySpace, string createdStart, List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> payOrderList, List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> refundOrderList)
+        public List<Dictionary<string, object>> GetReturnList(int daySpace, DateTime endDay, List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> payOrderList, List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> refundOrderList)
         {
-            List<Dictionary<string, string>> dayList = new List<Dictionary<string, string>>();
-            DateTime.TryParse(createdStart, out DateTime endDay);
+            List<KeyValuePair<string, string>> dayList = new List<KeyValuePair<string, string>>();
             // 先判断间隔天数 根据天数设置空的list
             for (int i = 0; i <= daySpace; i++)
             {
-                Dictionary<string, string> map = new Dictionary<string, string>();
-                map.Add("date", endDay.AddDays(-i).ToString("MM-dd"));
+                KeyValuePair<string, string> map = new KeyValuePair<string, string>("date", endDay.AddDays(-i).ToString("MM-dd"));
                 dayList.Add(map);
             }
             // 日期倒序排列
+            dayList.OrderBy(s => s.Value);
 
             List<Dictionary<string, object>> payListMap = new List<Dictionary<string, object>>(); // 收款的列
             List<Dictionary<string, object>> refundListMap = new List<Dictionary<string, object>>(); // 退款的列
-            foreach (var dayMap in dayList)
+            foreach (var dayMap in dayList.OrderBy(s => s.Value))// 日期升序排列
             {
-                dayMap.TryGetValue("date", out string date);
+                var date = dayMap.Value;
 
                 // 为收款列和退款列赋值默认参数【payAmount字段切记不可为string，否则前端图表解析不出来】
                 Dictionary<string, object> payMap = new Dictionary<string, object>();

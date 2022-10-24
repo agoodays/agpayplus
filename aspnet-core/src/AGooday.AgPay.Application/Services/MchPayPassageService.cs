@@ -100,7 +100,8 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, byte infoType, byte type)
         {
-            var result = _payInterfaceDefineRepository.GetAll().Join(_payInterfaceConfigRepository.GetAll(),
+            var result = _payInterfaceDefineRepository.GetAll()
+                .Join(_payInterfaceDefineRepository.GetAll<PayInterfaceConfig>(),
                 pid => pid.IfCode, pic => pic.IfCode,
                 (pid, pic) => new { pid, pic })
                 .Where(w => w.pid.State.Equals(CS.YES) && w.pic.State.Equals(CS.YES)

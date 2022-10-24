@@ -59,6 +59,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet;
         }
+        public virtual IQueryable<T> GetAll<T>() where T : class
+        {
+            return Db.Set<T>();
+        }
         public virtual async Task<IEnumerable<TEntity>> ListAsync()
         {
             return await DbSet.AsNoTracking().ToListAsync();
@@ -160,6 +164,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public virtual IQueryable<TEntity> GetAll()
         {
             return DbSet;
+        }
+        public virtual IQueryable<T> GetAll<T>() where T : class
+        {
+            return Db.Set<T>();
         }
         public virtual async Task<IEnumerable<TEntity>> ListAsync()
         {

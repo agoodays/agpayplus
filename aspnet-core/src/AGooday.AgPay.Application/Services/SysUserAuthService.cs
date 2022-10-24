@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Application.Services
         public SysUserAuthInfoDto GetUserAuthInfoById(long userId)
         {
             var entity = _sysUserAuthRepository.GetAll()
-                .Join(_sysUserRepository.GetAll(),
+                .Join(_sysUserAuthRepository.GetAll<SysUser>(),
                 ua => ua.UserId, ur => ur.SysUserId,
                 (ua, ur) => new { ua, ur })
                 .Where(w => w.ua.UserId == userId)
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Application.Services
         public SysUserAuthInfoDto SelectByLogin(string identifier, byte identityType, string sysType)
         {
             var entity = _sysUserAuthRepository.GetAll()
-                .Join(_sysUserRepository.GetAll(),
+                .Join(_sysUserAuthRepository.GetAll<SysUser>(),
                 ua => ua.UserId, ur => ur.SysUserId,
                 (ua, ur) => new { ua, ur })
                 .Where(w => w.ua.IdentityType == identityType && w.ua.Identifier.Equals(identifier) && w.ua.SysType.Equals(sysType) && w.ur.State == CS.PUB_USABLE)

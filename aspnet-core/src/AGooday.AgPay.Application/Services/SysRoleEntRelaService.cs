@@ -90,11 +90,11 @@ namespace AGooday.AgPay.Application.Services
 
         public bool UserHasLeftMenu(long userId, string sysType)
         {
-            var result = _sysUserRoleRelaRepository.GetAll()
+            var result = _sysRoleEntRelaRepository.GetAll<SysUserRoleRela>()
                 .Join(_sysRoleEntRelaRepository.GetAll(),
                 ur => ur.RoleId, re => re.RoleId,
                 (ur, re) => new { ur.UserId, re.EntId })
-                .Join(_sysEntitlementRepository.GetAll(),
+                .Join(_sysRoleEntRelaRepository.GetAll<SysEntitlement>(),
                     ue => ue.EntId, ent => ent.EntId,
                     (ue, ent) => new { ue.UserId, ent.EntId, ent.EntType, ent.SysType, ent.State })
                 .AsNoTracking().Any(w => w.UserId.Equals(userId) 
@@ -122,10 +122,10 @@ namespace AGooday.AgPay.Application.Services
             else
             {
                 var result = _sysUserRoleRelaRepository.GetAll()
-                    .Join(_sysRoleEntRelaRepository.GetAll(),
+                    .Join(_sysUserRoleRelaRepository.GetAll<SysRoleEntRela>(),
                     ur => ur.RoleId, re => re.RoleId,
                     (ur, re) => new { ur.UserId, re.EntId })
-                    .Join(_sysEntitlementRepository.GetAll(),
+                    .Join(_sysUserRoleRelaRepository.GetAll<SysEntitlement>(),
                         ue => ue.EntId, ent => ent.EntId,
                         (ue, ent) => new { ue.UserId, ent.EntId, ent.SysType, ent.State })
                     .Where(w => w.UserId.Equals(userId) && w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE))
