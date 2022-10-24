@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_TEST_PAYWAY_LIST)]
         public ApiRes PayWayList(string appId)
         {
-            var payWays = _mchPayPassageService.GetMchPayPassageByAppId(GetCurrentUser().User.BelongInfoId, appId)
+            var payWays = _mchPayPassageService.GetMchPayPassageByAppId(GetCurrentMchNo(), appId)
                 .Select(s => s.WayCode);
             return ApiRes.Ok(payWays);
         }
@@ -85,7 +85,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             PayOrderCreateRequest request = new PayOrderCreateRequest();
             PayOrderCreateReqModel model = new PayOrderCreateReqModel();
             request.SetBizModel(model);
-            model.MchNo = GetCurrentUser().User.BelongInfoId; // 商户号
+            model.MchNo = GetCurrentMchNo(); // 商户号
             model.AppId = payOrder.AppId;
             model.MchOrderNo = payOrder.MchOrderNo;
             model.WayCode = payOrder.WayCode;

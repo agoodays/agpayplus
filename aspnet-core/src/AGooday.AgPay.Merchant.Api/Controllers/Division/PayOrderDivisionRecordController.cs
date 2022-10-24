@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_LIST)]
         public ApiRes List([FromQuery] PayOrderDivisionRecordQueryDto dto)
         {
-            dto.MchNo = GetCurrentUser().User.BelongInfoId;
+            dto.MchNo = GetCurrentMchNo();
             var data = _payOrderDivisionRecordService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_VIEW)]
         public ApiRes Detail(long recordId)
         {
-            var record = _payOrderDivisionRecordService.GetById(recordId, GetCurrentUser().User.BelongInfoId);
+            var record = _payOrderDivisionRecordService.GetById(recordId, GetCurrentMchNo());
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

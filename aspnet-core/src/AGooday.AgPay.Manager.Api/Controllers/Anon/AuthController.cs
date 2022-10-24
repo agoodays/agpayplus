@@ -145,7 +145,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             var currentUser = JsonConvert.SerializeObject(new CurrentUser
             {
                 CacheKey = cacheKey,
-                User = auth,
+                SysUser = auth,
                 Authorities = authorities
             });
             _redis.StringSet(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));

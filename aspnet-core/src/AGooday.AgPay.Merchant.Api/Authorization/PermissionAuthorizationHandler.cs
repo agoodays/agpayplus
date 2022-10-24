@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Merchant.Api.Authorization
                     throw new UnauthorizeException();
                 }
 
-                if (context.User.IsInRole("admin"))
+                if (context.User.IsInRole("Admin"))
                 {
                     context.Succeed(requirement);
                 }

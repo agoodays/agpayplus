@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         [PermissionAuth(PermCode.MCH.ENT_ORDER_LIST)]
         public ApiRes List([FromQuery] PayOrderQueryDto dto)
         {
-            dto.MchNo = GetCurrentUser().User.BelongInfoId;
+            dto.MchNo = GetCurrentMchNo();
             var payOrders = _payOrderService.GetPaginatedData(dto);
             // 得到所有支付方式
             Dictionary<string, string> payWayNameMap = new Dictionary<string, string>();
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (payOrder.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (payOrder.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }
@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         public ApiRes Refund(string payOrderId, RefundOrderModel refundOrder)
         {
             var payOrder = _payOrderService.GetById(payOrderId);
-            if (payOrder == null || !payOrder.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (payOrder == null || !payOrder.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

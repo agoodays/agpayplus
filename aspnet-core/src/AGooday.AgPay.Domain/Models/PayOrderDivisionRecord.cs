@@ -12,8 +12,8 @@ namespace AGooday.AgPay.Domain.Models
     /// <summary>
     /// 分账记录表
     /// </summary>
-    [Comment("分账接收者ID")]
-    [Table("分账记录表")]
+    [Comment("分账记录表")]
+    [Table("t_pay_order_division_record")]
     public class PayOrderDivisionRecord
     {
         /// <summary>

@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         [PermissionAuth(PermCode.MCH.ENT_REFUND_LIST)]
         public ApiRes List([FromQuery] RefundOrderQueryDto dto)
         {
-            dto.MchNo = GetCurrentUser().User.BelongInfoId;
+            dto.MchNo = GetCurrentMchNo();
             var refundOrders = _refundOrderService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = refundOrders.ToList(), Total = refundOrders.TotalCount, Current = refundOrders.PageIndex, HasNext = refundOrders.HasNext });
         }
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (refundOrder.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (refundOrder.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }

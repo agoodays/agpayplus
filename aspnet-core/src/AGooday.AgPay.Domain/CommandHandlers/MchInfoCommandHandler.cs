@@ -224,7 +224,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     .Select(w => w.SysUserId).ToList();
             }
 
-            //判断是否重置密码
+            // 判断是否重置密码
             if (request.ResetPass)
             {
                 // 待更新的密码
@@ -232,10 +232,11 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 获取商户超管
                 long mchAdminUserId = _sysUserRepository.FindMchAdminUserId(mchInfo.MchNo);
 
-                //重置超管密码
+                // 重置超管密码
                 _sysUserAuthRepository.ResetAuthInfo(mchAdminUserId, null, null, updatePwd, CS.SYS_TYPE.MCH);
+                _sysUserAuthRepository.SaveChanges();
 
-                //删除超管登录信息
+                // 删除超管登录信息
                 removeCacheUserIdList.Add(mchAdminUserId);
             }
 
@@ -245,11 +246,14 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 mqSender.Send(CleanMchLoginAuthCacheMQ.Build(removeCacheUserIdList));
             }
 
-            //更新商户信息
+            // 更新商户信息
             _mchInfoRepository.Update(mchInfo);
+            _mchInfoRepository.SaveChanges();
 
             // 推送mq到目前节点进行更新数据
             mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, mchInfo.MchNo, null));
+
+            Commit();
 
             return Task.FromResult(new Unit());
         }

@@ -17,8 +17,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
     public abstract class CommonController : ControllerBase
     {
         private readonly ILogger<CommonController> _logger;
-        private readonly IDatabase _redis;
-        private readonly IServer _redisServer;
+        private readonly int defaultDB;
+        private readonly IDatabase redis;
+        private readonly IServer redisServer;
         private readonly ISysUserService _sysUserService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
@@ -29,8 +30,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             ISysUserRoleRelaService sysUserRoleRelaService)
         {
             _logger = logger;
-            _redis = client.GetDatabase();
-            _redisServer = client.GetServer();
+            defaultDB = client.GetDefaultDB();
+            redis = client.GetDatabase();
+            redisServer = client.GetServer();
             _sysUserService = sysUserService;
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
@@ -38,7 +40,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
 
         protected CurrentUser GetCurrentUser()
         {
-            string currentUser = _redis.StringGet(AuthContextService.CurrentUser.CacheKey);
+            string currentUser = redis.StringGet(AuthContextService.CurrentUser.CacheKey);
             return JsonConvert.DeserializeObject<CurrentUser>(currentUser);
         }
         /// <summary>
@@ -53,10 +55,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             }
             foreach (var sysUserId in sysUserIdList)
             {
-                var redisKeys = _redisServer.Keys(1, CS.GetCacheKeyToken(sysUserId, "*"));
+                var redisKeys = redisServer.Keys(defaultDB, CS.GetCacheKeyToken(sysUserId, "*"));
                 foreach (var key in redisKeys)
                 {
-                    _redis.KeyDelete(key);
+                    redis.KeyDelete(key);
                 }
             }
         }
@@ -70,17 +72,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             var sysUserMap = _sysUserService.GetAll(sysUserIdList);
             sysUserIdList.ForEach(sysUserId =>
             {
-                var redisKeys = _redisServer.Keys(1, CS.GetCacheKeyToken(sysUserId, "*"));
+                var redisKeys = redisServer.Keys(defaultDB, CS.GetCacheKeyToken(sysUserId, "*"));
                 foreach (var key in redisKeys)
                 {
                     //用户不存在 || 已禁用 需要删除Redis
                     if (!sysUserMap.Any(a => a.SysUserId.Equals(sysUserId))
                     || sysUserMap.Any(a => a.SysUserId.Equals(sysUserId) || a.State.Equals(CS.PUB_DISABLE)))
                     {
-                        _redis.KeyDelete(key);
+                        redis.KeyDelete(key);
                         continue;
                     }
-                    string currentUserJson = _redis.StringGet(AuthContextService.CurrentUser.CacheKey);
+                    string currentUserJson = redis.StringGet(AuthContextService.CurrentUser.CacheKey);
                     var currentUser = JsonConvert.DeserializeObject<CurrentUser>(currentUserJson);
                     if (currentUser == null)
                     {
@@ -92,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                     currentUser.Authorities = authorities;
                     currentUserJson = JsonConvert.SerializeObject(currentUser);
                     //保存token  失效时间不变
-                    _redis.StringSet(key, currentUserJson);
+                    redis.StringSet(key, currentUserJson);
                 }
             });
         }

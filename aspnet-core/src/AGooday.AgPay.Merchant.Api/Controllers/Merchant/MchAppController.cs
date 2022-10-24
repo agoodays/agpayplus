@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_LIST)]
         public ApiRes List([FromQuery] MchAppQueryDto dto)
         {
-            dto.MchNo = GetCurrentUser().User.BelongInfoId;
+            dto.MchNo = GetCurrentMchNo();
             var data = _mchAppService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_ADD)]
         public ApiRes Add(MchAppDto dto)
         {
-            dto.MchNo = GetCurrentUser().User.BelongInfoId;
+            dto.MchNo = GetCurrentMchNo();
             dto.AppId = Guid.NewGuid().ToString("N").Substring(0, 24);
             if (!_mchInfoService.IsExistMchNo(dto.MchNo))
             {

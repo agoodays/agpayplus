@@ -61,8 +61,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_ADD)]
         public ApiRes Add(IsvInfoDto dto)
         {
-            dto.CreatedUid = GetCurrentUser().User.SysUserId;
-            dto.CreatedBy = GetCurrentUser().User.Realname;
+            dto.CreatedUid = GetCurrentUser().SysUser.SysUserId;
+            dto.CreatedBy = GetCurrentUser().SysUser.Realname;
             var result = _isvInfoService.Add(dto);
             if (!result)
             {

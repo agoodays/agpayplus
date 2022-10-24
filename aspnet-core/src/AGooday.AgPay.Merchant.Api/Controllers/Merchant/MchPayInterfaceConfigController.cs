@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes List(string appId)
         {
-            var mchInfo = _mchInfoService.GetById(GetCurrentUser().User.BelongInfoId);
+            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
             var data = _payIfConfigService.SelectAllPayIfConfigListByAppId(appId);
             foreach (var define in data)
             {
@@ -124,8 +124,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             dto.InfoType = CS.INFO_TYPE_MCH_APP;
             dto.IfRate = dto.IfRate / 100;// 存入真实费率
             //添加更新者信息
-            long userId = GetCurrentUser().User.SysUserId;
-            string realName = GetCurrentUser().User.Realname;
+            long userId = GetCurrentUser().SysUser.SysUserId;
+            string realName = GetCurrentUser().SysUser.Realname;
             dto.UpdatedUid = userId;
             dto.UpdatedBy = realName;
 
@@ -149,7 +149,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             }
 
             // 推送mq到目前节点进行更新数据
-            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, GetCurrentUser().User.BelongInfoId, dto.InfoId));
+            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, GetCurrentMchNo(), dto.InfoId));
 
             return ApiRes.Ok();
         }
@@ -159,7 +159,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         public ApiRes QueryAlipayIsvsubMchAuthUrl(string mchAppId)
         {
             var mchApp = _mchAppService.GetById(mchAppId);
-            if (mchApp == null || !mchApp.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (mchApp == null || !mchApp.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
@@ -180,7 +180,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         public ApiRes GetIfCodeByAppId(string appId)
         {
             var mchApp = _mchAppService.GetById(appId);
-            if (mchApp == null || !mchApp.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (mchApp == null || !mchApp.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

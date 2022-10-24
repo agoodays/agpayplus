@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         public ApiRes List([FromQuery] SysRoleQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
-            dto.BelongInfoId = GetCurrentUser().User.BelongInfoId;
+            dto.BelongInfoId = GetCurrentMchNo();
             var data = _sysRoleService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         {
             dto.RoleId = $"ROLE_{Guid.NewGuid().ToString("N").Substring(0, 6)}";
             dto.SysType = CS.SYS_TYPE.MCH;
-            dto.BelongInfoId = GetCurrentUser().User.BelongInfoId;
+            dto.BelongInfoId = GetCurrentMchNo();
             _sysRoleService.Add(dto);
 
             //如果包含： 可分配权限的权限 && EntIds 不为空
@@ -87,7 +87,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DEL)]
         public ApiRes Delete(string recordId)
         {
-            var sysRole = _sysRoleService.GetById(recordId, GetCurrentUser().User.BelongInfoId);
+            var sysRole = _sysRoleService.GetById(recordId, GetCurrentMchNo());
             if (sysRole is null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_EDIT)]
         public ApiRes Detail(string recordId)
         {
-            var sysRole = _sysRoleService.GetById(recordId, GetCurrentUser().User.BelongInfoId);
+            var sysRole = _sysRoleService.GetById(recordId, GetCurrentMchNo());
             if (sysRole is null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

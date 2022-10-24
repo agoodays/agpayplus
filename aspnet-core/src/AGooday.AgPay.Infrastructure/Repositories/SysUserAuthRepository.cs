@@ -29,14 +29,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             }
         }
 
-        public void ResetAuthInfo(long userId, string sysType, string loginUserName, string telphone, string newPwd)
+        public void ResetAuthInfo(long userId, string loginUserName, string telphone, string newPwd, string sysType)
         {
             var sysUserAuths = DbSet.Where(w => w.UserId == userId && w.SysType == sysType);
 
             //更改登录用户名
             if (!string.IsNullOrWhiteSpace(loginUserName))
             {
-                var sysUserAuth = sysUserAuths.Where(w => w.IdentityType == CS.AUTH_TYPE.LOGIN_USER_NAME).First();
+                var sysUserAuth = sysUserAuths.Where(w => w.IdentityType == CS.AUTH_TYPE.LOGIN_USER_NAME).FirstOrDefault();
                 if (sysUserAuth != null)
                 {
                     sysUserAuth.Identifier = loginUserName;
@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             //更新手机号认证
             if (!string.IsNullOrWhiteSpace(telphone))
             {
-                var sysUserAuth = sysUserAuths.Where(w => w.IdentityType == CS.AUTH_TYPE.TELPHONE).First();
+                var sysUserAuth = sysUserAuths.Where(w => w.IdentityType == CS.AUTH_TYPE.TELPHONE).FirstOrDefault();
                 if (sysUserAuth != null)
                 {
                     sysUserAuth.Identifier = telphone;

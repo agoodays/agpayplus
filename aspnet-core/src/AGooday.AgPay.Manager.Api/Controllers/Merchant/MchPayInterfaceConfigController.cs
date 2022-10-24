@@ -116,8 +116,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             dto.InfoType = CS.INFO_TYPE_MCH_APP;
             dto.IfRate = dto.IfRate / 100;// 存入真实费率
             //添加更新者信息
-            long userId = GetCurrentUser().User.SysUserId;
-            string realName = GetCurrentUser().User.Realname;
+            long userId = GetCurrentUser().SysUser.SysUserId;
+            string realName = GetCurrentUser().SysUser.Realname;
             dto.UpdatedUid = userId;
             dto.UpdatedBy = realName;
 

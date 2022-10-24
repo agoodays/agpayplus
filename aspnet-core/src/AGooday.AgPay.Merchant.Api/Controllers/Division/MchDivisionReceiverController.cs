@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_LIST)]
         public ApiRes List([FromQuery] MchDivisionReceiverQueryDto dto)
         {
-            dto.MchNo = GetCurrentUser().User.BelongInfoId;
+            dto.MchNo = GetCurrentMchNo();
             var data = _mchDivisionReceiverService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_VIEW)]
         public ApiRes Detail(long recordId)
         {
-            var record = _mchDivisionReceiverService.GetById(recordId, GetCurrentUser().User.BelongInfoId);
+            var record = _mchDivisionReceiverService.GetById(recordId, GetCurrentMchNo());
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -80,13 +80,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         public ApiRes Add(DivisionReceiverBindReqModel model)
         {
             var mchApp = _mchAppService.GetById(model.AppId);
-            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentMchNo()))
             {
                 throw new BizException("商户应用不存在或不可用");
             }
             DivisionReceiverBindRequest request = new DivisionReceiverBindRequest();
             request.SetBizModel(model);
-            model.MchNo = GetCurrentUser().User.BelongInfoId;
+            model.MchNo = GetCurrentMchNo();
             model.AppId = mchApp.AppId;
             model.DivisionProfit = (Convert.ToDecimal(model.DivisionProfit) / 100).ToString();
 
@@ -121,7 +121,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             record.DivisionProfit = record.DivisionProfit / 100;
             if (record.ReceiverGroupId != null)
             {
-                var groupRecord = _mchDivisionReceiverGroupService.FindByIdAndMchNo(record.ReceiverGroupId.Value, GetCurrentUser().User.BelongInfoId);
+                var groupRecord = _mchDivisionReceiverGroupService.FindByIdAndMchNo(record.ReceiverGroupId.Value, GetCurrentMchNo());
                 if (record == null)
                 {
                     throw new BizException("账号组不存在");

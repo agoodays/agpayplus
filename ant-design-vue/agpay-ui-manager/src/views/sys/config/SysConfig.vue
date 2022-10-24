@@ -62,16 +62,10 @@ import { API_URL_SYS_CONFIG, req, getConfigs } from '@/api/manage'
       const that = this
       this.$infoBox.confirmPrimary('确认修改应用配置吗？', '', () => {
         that.btnLoading = true // 打开按钮上的 loading
-        const formData = new FormData()
         const jsonObject = {}
         for (var i in that.configData) {
-          formData.append(that.configData[i].configKey, that.configData[i].configVal)
           jsonObject[that.configData[i].configKey] = that.configData[i].configVal
         }
-        console.log(jsonObject)
-        console.log(formData)
-        console.log(JSON.stringify(formData))
-        console.log(JSON.parse(JSON.stringify(formData)))
         req.updateById(API_URL_SYS_CONFIG, that.groupKey, jsonObject).then(res => {
           that.$message.success('修改成功')
           that.btnLoading = false

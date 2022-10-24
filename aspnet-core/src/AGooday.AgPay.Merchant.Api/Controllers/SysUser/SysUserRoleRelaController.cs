@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_UPD_ROLE)]
         public ApiRes Relas(long sysUserId, List<string> entIds)
         {
-            var dbRecord = _sysUserService.GetById(sysUserId, GetCurrentUser().User.BelongInfoId);
+            var dbRecord = _sysUserService.GetById(sysUserId, GetCurrentMchNo());
             if (dbRecord == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

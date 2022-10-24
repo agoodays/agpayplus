@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         [PermissionAuth(PermCode.MCH.ENT_TRANSFER_ORDER_LIST)]
         public ApiRes List([FromQuery] TransferOrderQueryDto dto)
         {
-            dto.MchNo = GetCurrentUser().User.BelongInfoId;
+            dto.MchNo = GetCurrentMchNo();
             var transferOrders = _transferOrderService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = transferOrders.ToList(), Total = transferOrders.TotalCount, Current = transferOrders.PageIndex, HasNext = transferOrders.HasNext });
         }
@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         [PermissionAuth(PermCode.MCH.ENT_TRANSFER_ORDER_VIEW)]
         public ApiRes Detail(string transferId)
         {
-            var refundOrder = _transferOrderService.QueryMchOrder(GetCurrentUser().User.BelongInfoId, null, transferId);
+            var refundOrder = _transferOrderService.QueryMchOrder(GetCurrentMchNo(), null, transferId);
             if (refundOrder == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

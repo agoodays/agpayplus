@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         public ApiRes Relas(string roleId, List<string> entIds)
         {
             var role = _sysRoleService.GetById(roleId);
-            if (role == null || !role.SysType.Equals(CS.SYS_TYPE.MCH) || !role.BelongInfoId.Equals(GetCurrentUser().User.BelongInfoId))
+            if (role == null || !role.SysType.Equals(CS.SYS_TYPE.MCH) || !role.BelongInfoId.Equals(GetCurrentMchNo()))
             {
                 ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

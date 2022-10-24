@@ -119,17 +119,21 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             // ·µ»ØÇ°¶Ë accessToken
             var claimsIdentity = new ClaimsIdentity(new Claim[]
             {
-                new Claim(ClaimTypes.Name, auth.Identifier),
-                new Claim("userid",auth.SysUserId.ToString()),
-                new Claim("avatar",auth.AvatarUrl),
-                new Claim("displayName",auth.Realname),
-                new Claim("loginName",auth.Realname),
+                new Claim(ClaimTypes.NameIdentifier, auth.SysUserId.ToString()),
+                new Claim(ClaimTypes.Name, auth.LoginUsername),
+                new Claim("sysUserId",auth.SysUserId.ToString()),
+                new Claim("avatarUrl",auth.AvatarUrl),
+                new Claim("realname",auth.Realname),
+                new Claim("loginUsername",auth.LoginUsername),
                 new Claim("telphone",auth.Telphone),
                 new Claim("userNo",auth.UserNo.ToString()),
+                new Claim("sex",auth.Sex.ToString()),
+                new Claim("state",auth.State.ToString()),
                 new Claim("isAdmin",auth.IsAdmin.ToString()),
-                new Claim("identityType",auth.IdentityType.ToString()),
-                new Claim("belongInfoId",auth.BelongInfoId),
                 new Claim("sysType",auth.SysType),
+                new Claim("belongInfoId",auth.BelongInfoId),
+                new Claim("createdAt",auth.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
+                new Claim("updatedAt",auth.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
                 new Claim("cacheKey",cacheKey)
             });
             var accessToken = JwtBearerAuthenticationExtension.GetJwtAccessToken(_jwtSettings, claimsIdentity);
@@ -137,7 +141,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             var currentUser = JsonConvert.SerializeObject(new CurrentUser
             {
                 CacheKey = cacheKey,
-                User = auth,
+                SysUser = auth,
                 Authorities = authorities
             });
             _redis.StringSet(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));

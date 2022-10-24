@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 var wayCodes = payWays.Select(s => s.WayCode).ToList();
 
                 // 商户支付通道集合
-                var mchPayPassages = _mchPayPassageService.GetAll(appId, wayCodes).Where(w => w.MchNo.Equals(GetCurrentUser().User.BelongInfoId));
+                var mchPayPassages = _mchPayPassageService.GetAll(appId, wayCodes).Where(w => w.MchNo.Equals(GetCurrentMchNo()));
 
                 foreach (var payWay in payWays)
                 {
@@ -119,7 +119,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (payPassage.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (payPassage.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }

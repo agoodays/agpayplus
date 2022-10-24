@@ -17,10 +17,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
     public class MainChartController : CommonController
     {
         private readonly ILogger<MainChartController> _logger;
+        private readonly IPayOrderService _payOrderService;
         private readonly ISysUserService _sysUserService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MainChartController(ILogger<MainChartController> logger, RedisUtil client,
+        public MainChartController(ILogger<MainChartController> logger, RedisUtil client, 
+            IPayOrderService payOrderService,
             IMchInfoService mchInfoService,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
@@ -28,6 +30,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             _logger = logger;
+            _payOrderService = payOrderService;
             _mchInfoService = mchInfoService;
             _sysUserService = sysUserService;
         }
@@ -39,7 +42,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpGet, Route("payAmountWeek")]
         public ApiRes PayAmountWeek()
         {
-            return ApiRes.Ok();
+            return ApiRes.Ok(_payOrderService.MainPageWeekCount(GetCurrentMchNo()));
         }
 
         /// <summary>
@@ -49,7 +52,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpGet, Route("numCount")]
         public ApiRes NumCount()
         {
-            return ApiRes.Ok();
+            return ApiRes.Ok(_payOrderService.MainPageNumCount(GetCurrentMchNo()));
         }
 
         /// <summary>
@@ -57,9 +60,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("payCount")]
-        public ApiRes PayCount()
+        public ApiRes PayCount(string createdStart, string createdEnd)
         {
-            return ApiRes.Ok();
+            return ApiRes.Ok(_payOrderService.MainPagePayCount(GetCurrentMchNo(), createdStart, createdEnd));
         }
 
         /// <summary>
@@ -67,9 +70,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("payTypeCount")]
-        public ApiRes PayWayCount()
+        public ApiRes PayWayCount(string createdStart, string createdEnd)
         {
-            return ApiRes.Ok();
+            return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(GetCurrentMchNo(), createdStart, createdEnd));
         }
 
         /// <summary>
@@ -79,8 +82,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpGet, Route("")]
         public ApiRes UserDetail()
         {
-            var sysUser = _sysUserService.GetById(GetCurrentUser().User.SysUserId);
-            var mchInfo = _mchInfoService.GetById(GetCurrentUser().User.BelongInfoId);
+            var sysUser = _sysUserService.GetById(GetCurrentUser().SysUser.SysUserId);
+            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
             var jobj = JObject.FromObject(mchInfo);
             jobj.Add("loginUsername", sysUser.LoginUsername);
             jobj.Add("realname", sysUser.Realname);

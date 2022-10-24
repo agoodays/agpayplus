@@ -72,12 +72,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
         public ApiRes ChannelUserId(string appId, string ifCode, string extParam)
         {
             var mchApp = _mchAppService.GetById(appId);
-            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentMchNo()))
             {
                 throw new BizException("商户应用不存在或不可用");
             }
             var param = new JObject();
-            param.Add("mchNo", GetCurrentUser().User.BelongInfoId);
+            param.Add("mchNo", GetCurrentMchNo());
             param.Add("appId", appId);
             param.Add("ifCode", ifCode);
             param.Add("extParam", extParam);
@@ -103,12 +103,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
             var mapper = config.CreateMapper();
             var model = mapper.Map<TransferOrderModel, TransferOrderCreateReqModel>(transferOrder);
             var mchApp = _mchAppService.GetById(model.AppId);
-            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentMchNo()))
             {
                 throw new BizException("商户应用不存在或不可用");
             }
             TransferOrderCreateRequest request = new TransferOrderCreateRequest();
-            model.MchNo = GetCurrentUser().User.BelongInfoId;
+            model.MchNo = GetCurrentMchNo();
             model.AppId = mchApp.AppId;
             model.Currency = "CNY";
             request.SetBizModel(model);

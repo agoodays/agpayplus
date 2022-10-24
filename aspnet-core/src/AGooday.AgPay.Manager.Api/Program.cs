@@ -90,6 +90,7 @@ services.AddControllers()
         //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
         //options.SerializerSettings.Formatting = Formatting.Indented;
         //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+        options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -138,8 +139,8 @@ NativeInjectorBootStrapper.RegisterServices(services);
 
 #region RabbitMQ
 services.AddSingleton<IMQSender, RabbitMQSender>();
-services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
-services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
+services.AddScoped<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
+services.AddScoped<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
 services.AddHostedService<RabbitListener>();
 #endregion
 

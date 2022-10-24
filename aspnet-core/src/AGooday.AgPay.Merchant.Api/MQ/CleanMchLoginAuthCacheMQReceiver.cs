@@ -16,12 +16,14 @@ namespace AGooday.AgPay.Merchant.Api.MQ
     public class CleanMchLoginAuthCacheMQReceiver : CleanMchLoginAuthCacheMQ.IMQReceiver
     {
         private readonly ILogger<CleanMchLoginAuthCacheMQReceiver> log;
+        private readonly int defaultDB;
         private readonly IDatabase redis;
         private readonly IServer redisServer;
 
         public CleanMchLoginAuthCacheMQReceiver(ILogger<CleanMchLoginAuthCacheMQReceiver> log, RedisUtil client)
         {
             this.log = log;
+            defaultDB = client.GetDefaultDB();
             redis = client.GetDatabase();
             redisServer = client.GetServer();
         }
@@ -39,7 +41,7 @@ namespace AGooday.AgPay.Merchant.Api.MQ
             }
             foreach (long sysUserId in userIdList)
             {
-                var cacheKeyList = redisServer.Keys(2, CS.GetCacheKeyToken(sysUserId, "*"));
+                var cacheKeyList = redisServer.Keys(defaultDB, CS.GetCacheKeyToken(sysUserId, "*"));
                 if (cacheKeyList == null || !cacheKeyList.Any())
                 {
                     continue;

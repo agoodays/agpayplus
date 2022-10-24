@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             //_cache.Remove("ErrorData");
             dto.IsAdmin = CS.NO;
             dto.SysType = CS.SYS_TYPE.MCH;
-            dto.BelongInfoId = GetCurrentUser().User.BelongInfoId;
+            dto.BelongInfoId = GetCurrentMchNo();
             _sysUserService.Create(dto);
             //var errorData = _cache.Get("ErrorData");
             //if (errorData == null)
@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         {
             var currentUserId = 0;
             //判断是否删除商户默认超管
-            var dbRecord = _sysUserService.GetById(recordId, GetCurrentUser().User.BelongInfoId);
+            var dbRecord = _sysUserService.GetById(recordId, GetCurrentMchNo());
             if (dbRecord != null && dbRecord.SysType == CS.SYS_TYPE.MCH && dbRecord.IsAdmin == CS.YES)
             {
                 return ApiRes.CustomFail("系统不允许删除商户默认用户！");
@@ -117,7 +117,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         public ApiRes Update(long recordId, SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
-            var dbRecord = _sysUserService.GetById(dto.SysUserId, GetCurrentUser().User.BelongInfoId);
+            var dbRecord = _sysUserService.GetById(dto.SysUserId, GetCurrentMchNo());
             if (dbRecord == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -156,7 +156,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (sysUser.BelongInfoId.Equals(GetCurrentUser().User.BelongInfoId))
+            if (sysUser.BelongInfoId.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }

@@ -66,7 +66,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             };
             var jsonArray = JArray.FromObject(sysEnts);
             var leftMenuTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
-            return ApiRes.Ok(new { currentUser.User, leftMenuTree });
+            var user = JObject.FromObject(currentUser.SysUser);
+            user.Add("entIdList", JArray.FromObject(entIds));
+            user.Add("allMenuRouteTree", JToken.FromObject(leftMenuTree));
+            return ApiRes.Ok(user);
         }
 
         [HttpPut, Route("user")]
@@ -82,7 +85,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             _sysUserService.Update(user);
             var currentUser = GetCurrentUser();
             var userinfo = _sysUserAuthService.GetUserAuthInfoById(dto.SysUserId);
-            currentUser.User = userinfo;
+            currentUser.SysUser = userinfo;
             //保存redis最新数据
             var currentUserJson = JsonConvert.SerializeObject(currentUser);
             _redis.StringSet(currentUser.CacheKey, currentUserJson, new TimeSpan(0, 0, CS.TOKEN_TIME));

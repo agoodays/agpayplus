@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_LIST)]
         public ApiRes List([FromQuery] MchDivisionReceiverGroupQueryDto dto)
         {
-            dto.MchNo = GetCurrentUser().User.BelongInfoId;
+            dto.MchNo = GetCurrentMchNo();
             var data = _mchDivisionReceiverGroupService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_VIEW)]
         public ApiRes Detail(long recordId)
         {
-            var record = _mchDivisionReceiverGroupService.GetById(recordId, GetCurrentUser().User.BelongInfoId);
+            var record = _mchDivisionReceiverGroupService.GetById(recordId, GetCurrentMchNo());
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -68,9 +68,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_ADD)]
         public ApiRes Add(MchDivisionReceiverGroupDto record)
         {
-            record.MchNo = GetCurrentUser().User.BelongInfoId;
-            record.CreatedUid = GetCurrentUser().User.SysUserId;
-            record.CreatedBy = GetCurrentUser().User.Realname;
+            record.MchNo = GetCurrentMchNo();
+            record.CreatedUid = GetCurrentUser().SysUser.SysUserId;
+            record.CreatedBy = GetCurrentUser().SysUser.Realname;
 
             var result = _mchDivisionReceiverGroupService.Add(record);
             if (result)
@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_EDIT)]
         public ApiRes Update(long recordId, MchDivisionReceiverGroupDto record)
         {
-            record.MchNo = GetCurrentUser().User.BelongInfoId;
+            record.MchNo = GetCurrentMchNo();
             var result = _mchDivisionReceiverGroupService.Update(record);
             if (result)
             {
@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         public ApiRes Delete(long recordId)
         {
             var record = _mchDivisionReceiverGroupService.GetById(recordId);
-            if (record == null || !record.MchNo.Equals(GetCurrentUser().User.BelongInfoId))
+            if (record == null || !record.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

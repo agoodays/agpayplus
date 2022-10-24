@@ -34,6 +34,11 @@ namespace AGooday.AgPay.Common.Utils
             return _connections.GetOrAdd(_instanceName, p => ConnectionMultiplexer.Connect(_connectionString));
         }
 
+        public int GetDefaultDB()
+        {
+            return _defaultDB;
+        }
+
         /// <summary>
         /// 获取数据库
         /// </summary>
