@@ -26,7 +26,7 @@
           <!--            <a href="_self">条款</a>-->
           <!--          </div>-->
           <!-- <div class="copyright">
-            Copyright &copy; 2021 jeequan.com
+            Copyright &copy; 2021 agooday.com
           </div> -->
         </div>
       </div>

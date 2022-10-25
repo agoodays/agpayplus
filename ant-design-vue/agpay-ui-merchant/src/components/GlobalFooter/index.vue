@@ -3,7 +3,7 @@
     <template v-slot:links>
     </template>
     <template v-slot:copyright>
-      <a href="http://www.jeequan.com" target="_blank">@计全科技</a>
+      <a href="http://www.agooday.com" target="_blank">@吉日科技</a>
     </template>
   </global-footer>
 </template>

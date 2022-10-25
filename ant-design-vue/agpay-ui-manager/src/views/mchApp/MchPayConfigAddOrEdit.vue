@@ -248,19 +248,19 @@ export default {
   .agpay-card-content {
     width: 100%;
     position: relative;
-    background-color: @jee-card-back;
+    background-color: @ag-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
   .agpay-card-ops {
     width: 100%;
     height: 50px;
-    background-color: @jee-card-back;
+    background-color: @ag-card-back;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    border-top: 1px solid @jee-back;
+    border-top: 1px solid @ag-back;
     position: absolute;
     bottom: 0;
   }

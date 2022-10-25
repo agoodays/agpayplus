@@ -121,7 +121,7 @@
                 <span class="chart-title">交易统计</span>
                 <div class="chart-padding" style="border: 1px solid #ddd;" >
                   <a-range-picker
-                    ref="jeeRange"
+                    ref="agRange"
                     style="width:100%"
                     :ranges="{ '最近一个月': [moment().subtract(1, 'months'),moment()] }"
                     :default-value="[moment().subtract(7, 'days'),moment()]"
@@ -133,7 +133,7 @@
                     :allowClear="false"
                   >
                     <div class="change-date-layout">
-                      {{ jeeDate ? jeeDate : '最近七天' }}
+                      {{ agDate ? agDate : '最近七天' }}
                       <div class="pay-icon">
                         <div v-if="lastSevenDays" class="change-date-icon"><a-icon type="down" /></div>
                         <div v-else @click.stop="iconClick" class="change-date-icon" ><a-icon type="close-circle" /></div>
@@ -164,7 +164,7 @@
               <div class="chart-padding" style="border: 1px solid #ddd;">
                 <a-range-picker
                   style="width:100%"
-                  ref="jeeRangePie"
+                  ref="agRangePie"
                   :ranges="{ '最近一个月': [moment().subtract(1, 'months'),moment()] }"
                   @change="payOnChange"
                   :default-value="[moment().subtract(7, 'days'),moment()]"
@@ -175,7 +175,7 @@
                   :allowClear="false"
                 >
                   <div class="change-date-layout">
-                    {{ jeeDatePie ? jeeDatePie : '最近七天' }}
+                    {{ agDatePie ? agDatePie : '最近七天' }}
                     <div class="pay-icon">
                       <div v-if="!pieDays" class="change-date-icon"><a-icon type="down" /></div>
                       <div v-else @click.stop="iconPieClick" class="change-date-icon" ><a-icon type="close-circle" /></div>
@@ -365,8 +365,8 @@
       this.mainTips.helloTitle = `${timeFix()}，` + this.$store.state.user.userName
       this.init()
       // 去掉交易统计 日期选择框，原生的边框
-      this.$refs.jeeRange.$refs.picker.$el.firstChild.style.border = 'none'
-      this.$refs.jeeRangePie.$refs.picker.$el.firstChild.style.border = 'none'
+      this.$refs.agRange.$refs.picker.$el.firstChild.style.border = 'none'
+      this.$refs.agRangePie.$refs.picker.$el.firstChild.style.border = 'none'
     },
     components: { empty },
     data () {
@@ -384,8 +384,8 @@
         isPayType: true, // 支付方式是否存在数据
         isPayCount: true, // 交易统计是否存在数据
         ispayAmount: true, // 今日交易金额是否存在数据
-        jeeDate: undefined, // 自定义日期选择框所用状态-交易统计
-        jeeDatePie: undefined, // 自定义日期选择框所用状态-支付方式
+        agDate: undefined, // 自定义日期选择框所用状态-交易统计
+        agDatePie: undefined, // 自定义日期选择框所用状态-支付方式
         mainTips: { // 主页提示
           todayAmountTip: '今日成功交易金额及笔数', // 今日交易提示文字
           totalAmountTip: '成功交易总金额', // 交易总金额提示文字
@@ -547,14 +547,14 @@
         this.searchData.createdStart = dateString[0] // 开始时间
         this.searchData.createdEnd = dateString[1] // 结束时间
         this.pieDays = true
-        this.jeeDatePie = dateString[0] + ' ~ ' + dateString[1]
+        this.agDatePie = dateString[0] + ' ~ ' + dateString[1]
       },
       // 支付方式，日期选择器，关闭按钮点击事件
       iconPieClick () {
         this.searchData.createdStart = moment().subtract(7, 'days').format('YYYY-MM-DD') // 开始时间
         this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
         this.payTypeOk()
-        this.jeeDatePie = '最近七天'
+        this.agDatePie = '最近七天'
         this.pieDays = false
       },
       moment,
@@ -567,14 +567,14 @@
         this.searchData.createdStart = moment().subtract(7, 'days').format('YYYY-MM-DD') // 开始时间
         this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
         this.payCountOk()
-        this.jeeDate = '最近七天'
+        this.agDate = '最近七天'
         this.lastSevenDays = true
       },
       // 交易统计日期改变的回调
       transactionChange (dates, dateStrings) {
         this.searchData.createdStart = dateStrings[0] // 开始时间
         this.searchData.createdEnd = dateStrings[1] // 结束时间
-        this.jeeDate = dateStrings[0] + ' ~ ' + dateStrings[1]
+        this.agDate = dateStrings[0] + ' ~ ' + dateStrings[1]
         this.lastSevenDays = false
       },
       // 交易统计点击确定按钮的回调
@@ -632,7 +632,7 @@
           text-align: left;
 
           :hover {
-            color: @jee-inside-link
+            color: @ag-inside-link
           }
         }
         li:hover {

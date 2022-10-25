@@ -1,5 +1,5 @@
 <template>
-  <div class="jee-text-up" >
+  <div class="ag-text-up" >
     <a-input required="required" :value="msg" @input="$emit('input', $event.target.value)">
     </a-input>
     <label>{{ placeholder }}</label>
@@ -19,7 +19,7 @@ export default {
 
 <style scoped lang="less">
 // 文字上移 效果
-.jee-text-up {
+.ag-text-up {
   flex-grow:1;
   flex-shrink: 1;
   position: relative;
@@ -79,12 +79,12 @@ export default {
   input:active + label,
   input:valid + label {
     color: #fff;
-    background: @jee-theme;
+    background: @ag-theme;
     transform: translateY(-33px);
   }
   input:focus + label:after,
   input:active + label:after {
-    border-top: 4px solid @jee-theme;
+    border-top: 4px solid @ag-theme;
   }
 
   input:valid {
@@ -100,10 +100,10 @@ export default {
 }
 
 // 初版文字上移 效果
-// .jee-text-up {
+// .ag-text-up {
 //   position: relative;
 
-//   .jee-text-label {
+//   .ag-text-label {
 //     position: absolute;
 //     z-index: 1;
 //     left: 15px;
@@ -115,11 +115,11 @@ export default {
 //     line-height: 20px;
 //   }
 
-//   input:focus + .jee-text-label, input:valid + .jee-text-label {
+//   input:focus + .ag-text-label, input:valid + .ag-text-label {
 //     top: -35px;
 //     padding: 1px 10px;
 //     border-radius: 5px;
-//     background: @jee-theme;
+//     background: @ag-theme;
 //     color: #fff;
 //   }
 // }

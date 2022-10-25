@@ -174,7 +174,7 @@ export default {
 
   .forge-password {
     font-size: 14px;
-    color: @jee-theme;
+    color: @ag-theme;
   }
 
   button.login-button {
