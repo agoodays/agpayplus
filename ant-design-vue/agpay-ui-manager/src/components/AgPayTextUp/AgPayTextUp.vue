@@ -1,5 +1,5 @@
 <template>
-  <div class="jee-text-up" >
+  <div class="jee-text-up table-head-layout">
     <a-input required="required" :value="msg" @input="$emit('input', $event.target.value)">
     </a-input>
     <label>{{ placeholder }}</label>
@@ -8,11 +8,11 @@
 
 <script>
 export default {
-  name: 'JeepayTextUp',
+  name: 'AgPayTextUp',
   // props: ['msg', 'placeholder']
   props: {
-    msg: { type: String },
-    placeholder: { type: String }
+    msg: { type: String, default: '' },
+    placeholder: { type: String, default: '' }
   }
 }
 </script>
@@ -20,19 +20,14 @@ export default {
 <style scoped lang="less">
 // 文字上移 效果
 .jee-text-up {
-  flex-grow:1;
-  flex-shrink: 1;
   position: relative;
-  min-width: 180px;
-  max-width: 230px;
-  margin-bottom:30px;
-  margin-right: 16px;
 
   input {
 
     outline: 0;
     text-indent: 60px;
     transition: all .3s ease-in-out;
+
   }
   input::-webkit-input-placeholder {
     color: #BFBFBF;
@@ -99,7 +94,7 @@ export default {
   }
 }
 
-// 初版文字上移 效果
+// 文字上移效果 初版
 // .jee-text-up {
 //   position: relative;
 

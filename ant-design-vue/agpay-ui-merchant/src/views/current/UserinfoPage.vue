@@ -37,7 +37,7 @@
               </div> -->
               <div class="ant-upload-preview" >
                 <img :src="saveObject.avatarUrl" style="border: 1px solid rgba(0,0,0,0.08)"/>
-                <JeepayUpload
+                <AgPayUpload
                   style="margin-top:10px"
                   :action="action"
                   accept=".jpg, .jpeg, .png"
@@ -46,7 +46,7 @@
                   <template slot="uploadSlot" slot-scope="{loading}">
                     <a-button style="marginLeft:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '更换头像' }} </a-button>
                   </template>
-                </JeepayUpload>
+                </AgPayUpload>
               </div>
             </a-col>
 
@@ -80,7 +80,7 @@
   </div>
 </template>
 <script>
-import JeepayUpload from '@/components/JeepayUpload/JeepayUpload'
+import AgPayUpload from '@/components/AgPayUpload/AgPayUpload'
 import { getInfo } from '@/api/login'
 import { Base64 } from 'js-base64'
 import { updateUserInfo, updateUserPass, getUserInfo, upload } from '@/api/manage'
@@ -88,7 +88,7 @@ import AvatarModal from './AvatarModal'
 import store from '@/store'
 export default {
   components: {
-    AvatarModal, JeepayUpload
+    AvatarModal, AgPayUpload
   },
   data () {
     return {

@@ -2,7 +2,7 @@
  *  全系列 restful api格式, 定义通用req对象
  *
  *  @author terrfly
- *  @site https://www.jeepay.vip
+ *  @site https://www.agpay.vip
  *  @date 2021/5/8 07:18
  */
 

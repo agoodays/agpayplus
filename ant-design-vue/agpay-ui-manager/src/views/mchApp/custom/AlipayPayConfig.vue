@@ -78,7 +78,7 @@
         <a-col span="24">
           <a-form-model-item label="应用公钥证书（.crt格式）" prop="appPublicCert">
             <a-input v-model="ifParams.appPublicCert" disabled="disabled" />
-            <JeepayUpload
+            <AgPayUpload
               :action="action"
               :fileUrl="ifParams.appPublicCert"
               @uploadSuccess="uploadSuccess($event, 'appPublicCert')"
@@ -86,13 +86,13 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </JeepayUpload>
+            </AgPayUpload>
           </a-form-model-item>
         </a-col>
         <a-col span="24">
           <a-form-model-item label="支付宝公钥证书（.crt格式）" prop="alipayPublicCert">
             <a-input v-model="ifParams.alipayPublicCert" disabled="disabled" />
-            <JeepayUpload
+            <AgPayUpload
               :action="action"
               :fileUrl="ifParams.alipayPublicCert"
               @uploadSuccess="uploadSuccess($event, 'alipayPublicCert')"
@@ -100,13 +100,13 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </JeepayUpload>
+            </AgPayUpload>
           </a-form-model-item>
         </a-col>
         <a-col span="24">
           <a-form-model-item label="支付宝根证书（.crt格式）" prop="alipayRootCert">
             <a-input v-model="ifParams.alipayRootCert" disabled="disabled" />
-            <JeepayUpload
+            <AgPayUpload
               :action="action"
               :fileUrl="ifParams.alipayRootCert"
               @uploadSuccess="uploadSuccess($event, 'alipayRootCert')"
@@ -114,7 +114,7 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </JeepayUpload>
+            </AgPayUpload>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -135,13 +135,13 @@
 </template>
 
 <script>
-import JeepayCard from '@/components/JeepayCard/JeepayCard'
-import JeepayUpload from '@/components/JeepayUpload/JeepayUpload'
+import AgPayCard from '@/components/AgPayCard/AgPayCard'
+import AgPayUpload from '@/components/AgPayUpload/AgPayUpload'
 import { API_URL_MCH_PAYCONFIGS_LIST, req, getMchPayConfigUnique, upload } from '@/api/manage'
 export default {
   components: {
-      JeepayCard,
-      JeepayUpload
+      AgPayCard,
+      AgPayUpload
   },
   props: {
     callbackFunc: { type: Function, default: () => ({}) }

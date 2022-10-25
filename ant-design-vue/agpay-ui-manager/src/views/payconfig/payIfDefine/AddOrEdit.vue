@@ -94,7 +94,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-model-item label="页面展示：卡片icon" prop="icon">
-            <JeepayUpload
+            <AgPayUpload
               :action="action"
               accept=".jpg, .jpeg, .png"
               @uploadSuccess="uploadSuccess($event, '')"
@@ -103,7 +103,7 @@
                 <img :src="saveObject.icon" style="width:80px" />
                 <a-button style="marginLeft:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </JeepayUpload>
+            </AgPayUpload>
           </a-form-model-item>
         </a-col>
         <a-col :span="12">
@@ -123,12 +123,12 @@
 </template>
 
 <script>
-import JeepayUpload from '@/components/JeepayUpload/JeepayUpload'
+import AgPayUpload from '@/components/AgPayUpload/AgPayUpload'
 import { API_URL_IFDEFINES_LIST, API_URL_PAYWAYS_LIST, req, upload } from '@/api/manage'
 
 export default {
   components: {
-    JeepayUpload
+    AgPayUpload
   },
   props: {
     callbackFunc: { type: Function, default: () => () => ({}) }

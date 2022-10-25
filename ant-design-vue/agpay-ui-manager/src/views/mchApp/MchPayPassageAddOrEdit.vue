@@ -15,20 +15,20 @@
         <a-col
           v-for="(record, key) in cardList"
           :key="key"
-          :xxl="24/jeepayCard.span.xxl"
-          :xl="24/jeepayCard.span.xl"
-          :lg="24/jeepayCard.span.lg"
-          :md="24/jeepayCard.span.md"
-          :sm="24/jeepayCard.span.sm"
-          :xs="24/jeepayCard.span.xs"
+          :xxl="24/agpayCard.span.xxl"
+          :xl="24/agpayCard.span.xl"
+          :lg="24/agpayCard.span.lg"
+          :md="24/agpayCard.span.md"
+          :sm="24/agpayCard.span.sm"
+          :xs="24/agpayCard.span.xs"
         >
-          <div :style="{'height': jeepayCard.height + 'px'}" class="jeepay-card-content">
+          <div :style="{'height': agpayCard.height + 'px'}" class="agpay-card-content">
             <!-- 卡片自定义样式 -->
-            <div class="jeepay-card-content-header" :style="{backgroundColor: record.bgColor, height: (jeepayCard.height-50)/2 + 'px'}">
-              <img v-if="record.icon" :src="record.icon" :style="{height: (jeepayCard.height-50)/5 + 'px'}">
+            <div class="agpay-card-content-header" :style="{backgroundColor: record.bgColor, height: (agpayCard.height-50)/2 + 'px'}">
+              <img v-if="record.icon" :src="record.icon" :style="{height: (agpayCard.height-50)/5 + 'px'}">
             </div>
-            <div class="jeepay-card-content-body" :style="{height: ((jeepayCard.height-50)/2) + 'px'}">
-              <div class="title" :style="{height: ((jeepayCard.height-50)/4) + 'px', lineHeight: ((jeepayCard.height-50)/4) + 'px'}">
+            <div class="agpay-card-content-body" :style="{height: ((agpayCard.height-50)/2) + 'px'}">
+              <div class="title" :style="{height: ((agpayCard.height-50)/4) + 'px', lineHeight: ((agpayCard.height-50)/4) + 'px'}">
                 {{ record.ifName }}
               </div>
               <a-form layout="inline" :labelCol="{span:8}" :wrapperCol="{span:14}">
@@ -38,7 +38,7 @@
               </a-form>
             </div>
             <!-- 卡片底部操作栏 -->
-            <div class="jeepay-card-ops">
+            <div class="agpay-card-ops">
               <a-switch checked-children="启用" un-checked-children="停用" v-model="record.state"></a-switch>
             </div>
           </div>
@@ -70,11 +70,11 @@
 </template>
 
 <script>
-import JeepayCard from '@/components/JeepayCard/JeepayCard'
+import AgPayCard from '@/components/AgPayCard/AgPayCard'
 import { API_URL_MCH_PAYPASSAGE_LIST, req, getAvailablePayInterfaceList } from '@/api/manage'
 export default {
   components: {
-      JeepayCard
+      AgPayCard
   },
   props: {
     callbackFunc: { type: Function, default: () => ({}) }
@@ -86,7 +86,7 @@ export default {
       appId: null, // 应用appId
       wayCode: null, // 支付方式代码
       visible: false, // 是否显示弹层/抽屉
-      jeepayCard: {
+      agpayCard: {
         height: 300,
         span: { xxl: 3, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }
       }
@@ -177,14 +177,14 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-  .jeepay-card-content {
+  .agpay-card-content {
     width: 100%;
     position: relative;
     background-color: @jee-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .jeepay-card-ops {
+  .agpay-card-ops {
     width: 100%;
     height: 50px;
     background-color: @jee-card-back;
@@ -196,14 +196,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .jeepay-card-content-header {
+  .agpay-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .jeepay-card-content-body {
+  .agpay-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: start;

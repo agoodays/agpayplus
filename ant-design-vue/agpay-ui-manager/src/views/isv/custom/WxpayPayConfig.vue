@@ -87,7 +87,7 @@
         <a-col span="24">
           <a-form-model-item label="API证书(apiclient_cert.p12)" prop="cert">
             <a-input v-model="ifParams.cert" disabled="disabled" />
-            <JeepayUpload
+            <AgPayUpload
               :action="action"
               :fileUrl="ifParams.cert"
               @uploadSuccess="uploadSuccess($event, 'cert')"
@@ -95,13 +95,13 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </JeepayUpload>
+            </AgPayUpload>
           </a-form-model-item>
         </a-col>
         <a-col span="24">
           <a-form-model-item label="证书文件(apiclient_cert.pem)" prop="apiClientCert">
             <a-input v-model="ifParams.apiClientCert" disabled="disabled" />
-            <JeepayUpload
+            <AgPayUpload
               :action="action"
               :fileUrl="ifParams.apiClientCert"
               @uploadSuccess="uploadSuccess($event, 'apiClientCert')"
@@ -109,13 +109,13 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </JeepayUpload>
+            </AgPayUpload>
           </a-form-model-item>
         </a-col>
         <a-col span="24">
           <a-form-model-item label="私钥文件(apiclient_key.pem)" prop="apiClientKey">
             <a-input v-model="ifParams.apiClientKey" disabled="disabled" />
-            <JeepayUpload
+            <AgPayUpload
               :action="action"
               :fileUrl="ifParams.apiClientKey"
               @uploadSuccess="uploadSuccess($event, 'apiClientKey')"
@@ -123,7 +123,7 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </JeepayUpload>
+            </AgPayUpload>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -137,13 +137,13 @@
 </template>
 
 <script>
-import JeepayCard from '@/components/JeepayCard/JeepayCard'
-import JeepayUpload from '@/components/JeepayUpload/JeepayUpload'
+import AgPayCard from '@/components/AgPayCard/AgPayCard'
+import AgPayUpload from '@/components/AgPayUpload/AgPayUpload'
 import { API_URL_ISV_PAYCONFIGS_LIST, req, getIsvPayConfigUnique, upload } from '@/api/manage'
 export default {
   components: {
-      JeepayCard,
-      JeepayUpload
+      AgPayCard,
+      AgPayUpload
   },
   props: {
     callbackFunc: { type: Function, default: () => ({}) }

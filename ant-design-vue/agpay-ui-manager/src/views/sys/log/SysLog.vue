@@ -14,8 +14,8 @@
                 <a-icon slot="suffixIcon" type="sync" />
               </a-range-picker>
             </a-form-item>
-            <jeepay-text-up :placeholder="'用户ID'" :msg="searchData.userId" v-model="searchData.userId" />
-            <jeepay-text-up :placeholder="'用户名'" :msg="searchData.userName" v-model="searchData.userName" />
+            <agpay-text-up :placeholder="'用户ID'" :msg="searchData.userId" v-model="searchData.userId" />
+            <agpay-text-up :placeholder="'用户名'" :msg="searchData.userName" v-model="searchData.userName" />
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -36,7 +36,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <JeepayTable
+      <AgPayTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
@@ -53,11 +53,11 @@
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <JeepayTableColumns>
+          <AgPayTableColumns>
             <a-button type="link" v-if="$access('ENT_SYS_LOG_VIEW')" @click="detailFunc(record.sysLogId)">详情</a-button>
-          </JeepayTableColumns>
+          </AgPayTableColumns>
         </template>
-      </JeepayTable>
+      </AgPayTable>
     </a-card>
     <!-- 日志详情抽屉 -->
     <template>
@@ -156,9 +156,9 @@
   </page-header-wrapper>
 </template>
 <script>
-import JeepayTextUp from '@/components/JeepayTextUp/JeepayTextUp' // 文字上移组件
-import JeepayTable from '@/components/JeepayTable/JeepayTable'
-import JeepayTableColumns from '@/components/JeepayTable/JeepayTableColumns'
+import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
+import AgPayTable from '@/components/AgPayTable/AgPayTable'
+import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
 import { API_URL_SYS_LOG, req } from '@/api/manage'
 import moment from 'moment'
 import { message, Modal } from 'ant-design-vue'
@@ -176,7 +176,7 @@ const tableColumns = [
 
 export default {
   name: 'IsvListPage',
-  components: { JeepayTable, JeepayTableColumns, JeepayTextUp },
+  components: { AgPayTable, AgPayTableColumns, AgPayTextUp },
   data () {
     return {
       tableColumns: tableColumns,

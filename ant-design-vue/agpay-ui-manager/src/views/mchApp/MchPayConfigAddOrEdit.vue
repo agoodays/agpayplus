@@ -49,7 +49,7 @@
           </a-form-model-item>
           <a-form-model-item :label="item.desc" :prop="item.name" v-else-if="item.type === 'file'">
             <a-input v-model="ifParams[item.name]" disabled="disabled" />
-            <JeepayUpload
+            <AgPayUpload
               :action="action"
               :fileUrl="ifParams[item.name]"
               @uploadSuccess="uploadSuccess($event, item.name)"
@@ -57,7 +57,7 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </JeepayUpload>
+            </AgPayUpload>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -71,13 +71,13 @@
 </template>
 
 <script>
-import JeepayCard from '@/components/JeepayCard/JeepayCard'
-import JeepayUpload from '@/components/JeepayUpload/JeepayUpload'
+import AgPayCard from '@/components/AgPayCard/AgPayCard'
+import AgPayUpload from '@/components/AgPayUpload/AgPayUpload'
 import { API_URL_MCH_PAYCONFIGS_LIST, req, getMchPayConfigUnique, upload } from '@/api/manage'
 export default {
   components: {
-      JeepayCard,
-      JeepayUpload
+      AgPayCard,
+      AgPayUpload
   },
   props: {
     callbackFunc: { type: Function, default: () => ({}) }
@@ -245,14 +245,14 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-  .jeepay-card-content {
+  .agpay-card-content {
     width: 100%;
     position: relative;
     background-color: @jee-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .jeepay-card-ops {
+  .agpay-card-ops {
     width: 100%;
     height: 50px;
     background-color: @jee-card-back;
@@ -264,14 +264,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .jeepay-card-content-header {
+  .agpay-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .jeepay-card-content-body {
+  .agpay-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: start;

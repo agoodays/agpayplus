@@ -14,26 +14,26 @@
       </a-steps>
     </template>
     <div v-if="currentStep === 0">
-      <JeepayCard
+      <AgPayCard
         ref="infoCard"
         :reqCardListFunc="reqCardListFunc"
-        :span="jeepayCard.span"
-        :height="jeepayCard.height"
+        :span="agpayCard.span"
+        :height="agpayCard.height"
       >
         <div slot="cardContentSlot" slot-scope="{record}">
-          <div :style="{'height': jeepayCard.height + 'px'}" class="jeepay-card-content">
+          <div :style="{'height': agpayCard.height + 'px'}" class="agpay-card-content">
             <!-- 卡片自定义样式 -->
-            <div class="jeepay-card-content-header" :style="{backgroundColor: record.bgColor, height: jeepayCard.height/2 + 'px'}">
-              <img v-if="record.icon" :src="record.icon" :style="{height: jeepayCard.height/5 + 'px'}">
+            <div class="agpay-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
+              <img v-if="record.icon" :src="record.icon" :style="{height: agpayCard.height/5 + 'px'}">
             </div>
-            <div class="jeepay-card-content-body" :style="{height: (jeepayCard.height/2 - 50) + 'px'}">
+            <div class="agpay-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
               <div class="title">
                 {{ record.ifName }}
               </div>
               <a-badge :status="record.ifConfigState ===1 ? 'processing' : 'error'" :text="record.ifConfigState ===1 ? '启用' : '未开通'" ></a-badge>
             </div>
             <!-- 卡片底部操作栏 -->
-            <div class="jeepay-card-ops">
+            <div class="agpay-card-ops">
               <a v-if="record.mchType == 2 && record.ifCode == 'alipay' && $access('ENT_MCH_PAY_CONFIG_ADD')" @click="toAlipayAuthPageFunc(record)">扫码授权 <a-icon key="right" type="right" style="fontSize: 13px"></a-icon></a>
 
               <a v-if="$access('ENT_MCH_PAY_CONFIG_ADD')" @click="editPayIfConfigFunc(record)">填写参数 <a-icon key="right" type="right" style="fontSize: 13px"></a-icon></a>
@@ -42,7 +42,7 @@
             </div>
           </div>
         </div>
-      </JeepayCard>
+      </AgPayCard>
     </div>
     <div v-else-if="currentStep === 1">
       <a-card>
@@ -70,7 +70,7 @@
         </div>
 
         <!-- 列表渲染 -->
-        <JeepayTable
+        <AgPayTable
           ref="infoTable"
           :initData="true"
           :reqTableDataFunc="reqTableDataFunc"
@@ -82,11 +82,11 @@
             <a-badge :status="record.passageState === 0?'error':'processing'" :text="record.passageState === 0?'禁用':'启用'" />
           </template>
           <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-            <JeepayTableColumns>
+            <AgPayTableColumns>
               <a-button type="link" v-if="$access('ENT_MCH_PAY_PASSAGE_CONFIG')" @click="editPayPassageFunc(record)">配置</a-button>
-            </JeepayTableColumns>
+            </AgPayTableColumns>
           </template>
-        </JeepayTable>
+        </AgPayTable>
       </a-card>
     </div>
     <div class="drawer-btn-center ">
@@ -110,9 +110,9 @@
 </template>
 
 <script>
-import JeepayCard from '@/components/JeepayCard/JeepayCard'
-import JeepayTable from '@/components/JeepayTable/JeepayTable'
-import JeepayTableColumns from '@/components/JeepayTable/JeepayTableColumns'
+import AgPayCard from '@/components/AgPayCard/AgPayCard'
+import AgPayTable from '@/components/AgPayTable/AgPayTable'
+import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
 import { API_URL_MCH_PAYCONFIGS_LIST, API_URL_MCH_PAYPASSAGE_LIST, req, getAvailablePayInterfaceList } from '@/api/manage'
 import MchPayConfigAddOrEdit from './MchPayConfigAddOrEdit'
 import MchPayPassageAddOrEdit from './MchPayPassageAddOrEdit'
@@ -130,9 +130,9 @@ const tableColumns = [
 
 export default {
   components: {
-    JeepayCard,
-    JeepayTable,
-    JeepayTableColumns,
+    AgPayCard,
+    AgPayTable,
+    AgPayTableColumns,
     MchPayConfigAddOrEdit,
     MchPayPassageAddOrEdit,
     WxpayPayConfig,
@@ -145,7 +145,7 @@ export default {
       btnLoading: false,
       appId: null, // 应用appId
       visible: false, // 抽屉开关
-      jeepayCard: { // 卡片配置
+      agpayCard: { // 卡片配置
         height: 300,
         span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 }
       },
@@ -238,14 +238,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .jeepay-card-content {
+  .agpay-card-content {
     width: 100%;
     position: relative;
     background-color: @jee-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .jeepay-card-ops {
+  .agpay-card-ops {
     width: 100%;
     height: 50px;
     background-color: @jee-card-back;
@@ -257,14 +257,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .jeepay-card-content-header {
+  .agpay-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .jeepay-card-content-body {
+  .agpay-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: space-around;

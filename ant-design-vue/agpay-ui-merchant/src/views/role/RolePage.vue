@@ -6,8 +6,8 @@
           <div
             class="table-layer"
           >
-            <jeepay-text-up :placeholder="'角色ID'" :msg="searchData.roleId" v-model="searchData.roleId" />
-            <jeepay-text-up :placeholder="'角色名称'" :msg="searchData.roleName" v-model="searchData.roleName" />
+            <agpay-text-up :placeholder="'角色ID'" :msg="searchData.roleId" v-model="searchData.roleId" />
+            <agpay-text-up :placeholder="'角色名称'" :msg="searchData.roleName" v-model="searchData.roleName" />
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -20,7 +20,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <JeepayTable
+      <AgPayTable
         ref="infoTable"
         :initData="true"
         :reqTableDataFunc="reqTableDataFunc"
@@ -31,12 +31,12 @@
       >
         <template slot="roleIdSlot" slot-scope="{record}"><b>{{ record.roleId }}</b></template> <!-- 自定义插槽 -->
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <JeepayTableColumns>
+          <AgPayTableColumns>
             <a v-if="$access('ENT_UR_ROLE_EDIT')" @click="editFunc(record.roleId)">修改</a>
             <a style="color: red" v-if="$access('ENT_UR_ROLE_DEL')" @click="delFunc(record.roleId)">删除</a>
-          </JeepayTableColumns>
+          </AgPayTableColumns>
         </template>
-      </JeepayTable>
+      </AgPayTable>
     </a-card>
 
     <!-- 新增 / 修改 页面组件  -->
@@ -46,11 +46,11 @@
 
 </template>
 <script>
-import JeepayTable from '@/components/JeepayTable/JeepayTable'
-import JeepayTableColumns from '@/components/JeepayTable/JeepayTableColumns'
+import AgPayTable from '@/components/AgPayTable/AgPayTable'
+import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
 import { API_URL_ROLE_LIST, req } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
-import JeepayTextUp from '@/components/JeepayTextUp/JeepayTextUp' // 文字上移组件
+import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
@@ -78,7 +78,7 @@ const tableColumns = [
 
 export default {
   name: 'RolePage',
-  components: { JeepayTable, JeepayTableColumns, InfoAddOrEdit, JeepayTextUp },
+  components: { AgPayTable, AgPayTableColumns, InfoAddOrEdit, AgPayTextUp },
   data () {
     return {
       tableColumns: tableColumns,

@@ -9,32 +9,32 @@
     width="80%"
 
   >
-    <JeepayCard
+    <AgPayCard
       ref="infoCard"
       :reqCardListFunc="reqCardListFunc"
-      :span="jeepayCard.span"
-      :height="jeepayCard.height"
+      :span="agpayCard.span"
+      :height="agpayCard.height"
     >
       <div slot="cardContentSlot" slot-scope="{record}">
-        <div :style="{'height': jeepayCard.height + 'px'}" class="jeepay-card-content">
+        <div :style="{'height': agpayCard.height + 'px'}" class="agpay-card-content">
           <!-- 卡片自定义样式 -->
-          <div class="jeepay-card-content-header" :style="{backgroundColor: record.bgColor, height: jeepayCard.height/2 + 'px'}">
-            <img v-if="record.icon" :src="record.icon" :style="{height: jeepayCard.height/5 + 'px'}">
+          <div class="agpay-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
+            <img v-if="record.icon" :src="record.icon" :style="{height: agpayCard.height/5 + 'px'}">
           </div>
-          <div class="jeepay-card-content-body" :style="{height: (jeepayCard.height/2 - 50) + 'px'}">
+          <div class="agpay-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
             <div class="title">
               {{ record.ifName }}
             </div>
             <a-badge :status="record.ifConfigState ===1 ? 'processing' : 'error'" :text="record.ifConfigState ===1 ? '启用' : '未开通'" ></a-badge>
           </div>
           <!-- 卡片底部操作栏 -->
-          <div class="jeepay-card-ops">
+          <div class="agpay-card-ops">
             <a v-if="$access('ENT_ISV_PAY_CONFIG_ADD')" @click="editPayIfConfigFunc(record)">填写参数 <a-icon key="right" type="right" style="fontSize: 13px"></a-icon></a>
             <a v-else>暂无操作</a>
           </div>
         </div>
       </div>
-    </JeepayCard>
+    </AgPayCard>
     <a-drawer
       title="支付参数配置"
       width="40%"
@@ -91,7 +91,7 @@
             </a-form-model-item>
             <a-form-model-item :label="item.desc" :prop="item.name" v-else-if="item.type === 'file'">
               <a-input v-model="ifParams[item.name]" disabled="disabled" />
-              <JeepayUpload
+              <AgPayUpload
                 :action="action"
                 :fileUrl="ifParams[item.name]"
                 @uploadSuccess="uploadSuccess($event, item.name)"
@@ -99,7 +99,7 @@
                 <template slot="uploadSlot" slot-scope="{loading}">
                   <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
                 </template>
-              </JeepayUpload>
+              </AgPayUpload>
             </a-form-model-item>
           </a-col>
         </a-row>
@@ -122,16 +122,16 @@
 </template>
 
 <script>
-import JeepayCard from '@/components/JeepayCard/JeepayCard'
-import JeepayUpload from '@/components/JeepayUpload/JeepayUpload'
+import AgPayCard from '@/components/AgPayCard/AgPayCard'
+import AgPayUpload from '@/components/AgPayUpload/AgPayUpload'
 import WxpayPayConfig from './custom/WxpayPayConfig'
 import AlipayPayConfig from './custom/AlipayPayConfig'
 import { API_URL_ISV_PAYCONFIGS_LIST, getIsvPayConfigUnique, req, upload } from '@/api/manage'
 
 export default {
   components: {
-    JeepayCard,
-    JeepayUpload,
+    AgPayCard,
+    AgPayUpload,
     WxpayPayConfig,
     AlipayPayConfig
   },
@@ -145,7 +145,7 @@ export default {
       isvParams: {}, // 支付接口定义描述
       saveObject: {}, // 保存的对象
       ifParams: {}, // 参数配置对象
-      jeepayCard: { // 卡片配置
+      agpayCard: { // 卡片配置
         height: 300,
         span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 }
       },
@@ -320,14 +320,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .jeepay-card-content {
+  .agpay-card-content {
     width: 100%;
     position: relative;
     background-color: @jee-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .jeepay-card-ops {
+  .agpay-card-ops {
     width: 100%;
     height: 50px;
     background-color: @jee-card-back;
@@ -339,14 +339,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .jeepay-card-content-header {
+  .agpay-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .jeepay-card-content-body {
+  .agpay-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: space-around;

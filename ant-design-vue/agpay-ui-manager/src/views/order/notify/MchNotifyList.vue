@@ -14,11 +14,11 @@
                 <a-icon slot="suffixIcon" type="sync" />
               </a-range-picker>
             </a-form-item>
-            <jeepay-text-up :placeholder="'订单ID'" :msg="searchData.orderId" v-model="searchData.orderId" />
-            <jeepay-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />
-            <jeepay-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
-            <jeepay-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
-            <jeepay-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+            <agpay-text-up :placeholder="'订单ID'" :msg="searchData.orderId" v-model="searchData.orderId" />
+            <agpay-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />
+            <agpay-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+            <agpay-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
+            <agpay-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="通知状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -45,7 +45,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <JeepayTable
+      <AgPayTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :closable="true"
@@ -73,12 +73,12 @@
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <JeepayTableColumns>
+          <AgPayTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_NOTIFY_VIEW')" @click="detailFunc(record.notifyId)">详情</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_NOTIFY_RESEND') && record.state === 3" @click="resendFunc(record.notifyId)">重发通知</a-button>
-          </JeepayTableColumns>
+          </AgPayTableColumns>
         </template>
-      </JeepayTable>
+      </AgPayTable>
     </a-card>
     <!-- 日志详情抽屉 -->
     <template>
@@ -200,9 +200,9 @@
   </page-header-wrapper>
 </template>
 <script>
-  import JeepayTable from '@/components/JeepayTable/JeepayTable'
-  import JeepayTextUp from '@/components/JeepayTextUp/JeepayTextUp' // 文字上移组件
-  import JeepayTableColumns from '@/components/JeepayTable/JeepayTableColumns'
+  import AgPayTable from '@/components/AgPayTable/AgPayTable'
+  import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
+  import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
   import { API_URL_MCH_NOTIFY_LIST, req, mchNotifyResend } from '@/api/manage'
   import moment from 'moment'
 
@@ -218,7 +218,7 @@
 
   export default {
     name: 'IsvListPage',
-    components: { JeepayTable, JeepayTableColumns, JeepayTextUp },
+    components: { AgPayTable, AgPayTableColumns, AgPayTextUp },
     data () {
       return {
         btnLoading: true,

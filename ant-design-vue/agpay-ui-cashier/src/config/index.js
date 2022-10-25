@@ -2,7 +2,7 @@
  *  全局定义信息
  *
  *  @author terrfly
- *  @site https://www.jeepay.vip
+ *  @site https://www.agpay.vip
  *  @date 2021/5/8 07:18
  */
 
@@ -18,7 +18,7 @@ const payWay = {
 export default {
     errorPageRouteName: errorPageRouteName,
     passGuardRouteList: passGuardRouteList,
-    urlTokenName: "jeepayToken", //URL传递的token名称
+    urlTokenName: "agpayToken", //URL传递的token名称
     payWay: payWay,
     cacheToken: ""
 }

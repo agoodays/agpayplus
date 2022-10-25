@@ -1,8 +1,8 @@
 <!--
-  Jeepay 通用表格, 支持基础分页， 检索
+  AgPay 通用表格, 支持基础分页， 检索
 
   @author terrfly
-  @site https://www.jeepay.vip
+  @site https://www.agpay.vip
   @date 2021/5/8 07:18
 -->
 <template>
@@ -35,7 +35,7 @@
 
 export default {
 
-  name: 'JeepayTable', // 定义组件名称
+  name: 'AgPayTable', // 定义组件名称
 
   // 传递数据参数 ( 父-->子 参数 )
   props: {

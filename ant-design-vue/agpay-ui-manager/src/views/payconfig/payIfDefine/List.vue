@@ -1,27 +1,27 @@
 <template>
   <page-header-wrapper>
-    <JeepayCard
+    <AgPayCard
       ref="infoCard"
       :reqCardListFunc="reqCardListFunc"
-      :span="jeepayCard.span"
-      :height="jeepayCard.height"
-      :name="jeepayCard.name"
-      :addAuthority="jeepayCard.addAuthority"
-      @addJeepayCard="addOrEdit"
+      :span="agpayCard.span"
+      :height="agpayCard.height"
+      :name="agpayCard.name"
+      :addAuthority="agpayCard.addAuthority"
+      @addAgPayCard="addOrEdit"
     >
       <div slot="cardContentSlot" slot-scope="{record}">
-        <div :style="{'height': jeepayCard.height + 'px'}" class="jeepay-card-content">
+        <div :style="{'height': agpayCard.height + 'px'}" class="agpay-card-content">
           <!-- 卡片自定义样式 -->
-          <div class="jeepay-card-content-header" :style="{backgroundColor: record.bgColor, height: jeepayCard.height/2 + 'px'}">
-            <img v-if="record.icon" :src="record.icon" :style="{height: jeepayCard.height/5 + 'px'}">
+          <div class="agpay-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
+            <img v-if="record.icon" :src="record.icon" :style="{height: agpayCard.height/5 + 'px'}">
           </div>
-          <div class="jeepay-card-content-body" :style="{height: (jeepayCard.height/2 - 50) + 'px'}">
+          <div class="agpay-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
             <div class="title">
               {{ record.ifName }}
             </div>
           </div>
           <!-- 卡片底部操作栏 -->
-          <div class="jeepay-card-ops">
+          <div class="agpay-card-ops">
             <a-tooltip placement="top" title="编辑">
               <a-icon key="edit" type="edit" @click="addOrEdit(record.ifCode)" />
             </a-tooltip>
@@ -31,7 +31,7 @@
           </div>
         </div>
       </div>
-    </JeepayCard>
+    </AgPayCard>
 
     <!-- 新增页面组件  -->
     <PayIfDefineAddOrEdit ref="payIfDefineAddOrEdit" :callbackFunc="refCardList"/>
@@ -39,19 +39,19 @@
 </template>
 
 <script>
-import JeepayCard from '@/components/JeepayCard/JeepayCard'
+import AgPayCard from '@/components/AgPayCard/AgPayCard'
 import { API_URL_IFDEFINES_LIST, req } from '@/api/manage'
 import PayIfDefineAddOrEdit from './AddOrEdit'
 
 export default {
   name: 'IfDefinePage',
   components: {
-    JeepayCard,
+    AgPayCard,
     PayIfDefineAddOrEdit
   },
   data () {
     return {
-      jeepayCard: {
+      agpayCard: {
         name: '支付接口',
         height: 300,
         span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 },
@@ -85,14 +85,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .jeepay-card-content {
+  .agpay-card-content {
     width: 100%;
     position: relative;
     background-color: @jee-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .jeepay-card-ops {
+  .agpay-card-ops {
     width: 100%;
     height: 50px;
     background-color: @jee-card-back;
@@ -104,14 +104,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .jeepay-card-content-header {
+  .agpay-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .jeepay-card-content-body {
+  .agpay-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: space-around;

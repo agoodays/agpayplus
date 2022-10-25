@@ -14,12 +14,12 @@
                 <a-icon slot="suffixIcon" type="sync" />
               </a-range-picker>
             </a-form-item>
-            <jeepay-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-<!--            <jeepay-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
-<!--            <jeepay-text-up :placeholder="'商户退款单号'" :msg="searchData.mchRefundNo" v-model="searchData.mchRefundNo" />-->
-<!--            <jeepay-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
-<!--            <jeepay-text-up :placeholder="'渠道订单号'" :msg="searchData.channelPayOrderNo" v-model="searchData.channelPayOrderNo" />-->
-            <jeepay-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+            <agpay-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
+<!--            <agpay-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
+<!--            <agpay-text-up :placeholder="'商户退款单号'" :msg="searchData.mchRefundNo" v-model="searchData.mchRefundNo" />-->
+<!--            <agpay-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
+<!--            <agpay-text-up :placeholder="'渠道订单号'" :msg="searchData.channelPayOrderNo" v-model="searchData.channelPayOrderNo" />-->
+            <agpay-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="退款状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -39,7 +39,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <JeepayTable
+      <AgPayTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
@@ -94,11 +94,11 @@
           </div>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <JeepayTableColumns>
+          <AgPayTableColumns>
             <a-button type="link" v-if="$access('ENT_REFUND_ORDER_VIEW')" @click="detailFunc(record.refundOrderId)">详情</a-button>
-          </JeepayTableColumns>
+          </AgPayTableColumns>
         </template>
-      </JeepayTable>
+      </AgPayTable>
     </a-card>
     <!-- 日志详情抽屉 -->
     <template>
@@ -312,9 +312,9 @@
   </page-header-wrapper>
 </template>
 <script>
-  import JeepayTextUp from '@/components/JeepayTextUp/JeepayTextUp' // 文字上移组件
-  import JeepayTable from '@/components/JeepayTable/JeepayTable'
-  import JeepayTableColumns from '@/components/JeepayTable/JeepayTableColumns'
+  import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
+  import AgPayTable from '@/components/AgPayTable/AgPayTable'
+  import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
   import { API_URL_REFUND_ORDER_LIST, req } from '@/api/manage'
   import moment from 'moment'
 
@@ -335,7 +335,7 @@
 
   export default {
     name: 'IsvListPage',
-    components: { JeepayTable, JeepayTableColumns, JeepayTextUp },
+    components: { AgPayTable, AgPayTableColumns, AgPayTextUp },
     data () {
       return {
         btnLoading: false,

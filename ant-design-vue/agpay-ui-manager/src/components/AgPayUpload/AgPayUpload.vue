@@ -20,7 +20,7 @@
 
 <script>
 import appConfig from '@/config/appConfig'
-import storage from '@/utils/jeepayStorageWrapper'
+import storage from '@/utils/agpayStorageWrapper'
 
 function getHeaders () {
   const headers = {}
@@ -29,7 +29,7 @@ function getHeaders () {
 }
 
 export default {
-  name: 'JeepayUpload',
+  name: 'AgPayUpload',
   props: {
     action: { type: String, default: '' },
     accept: { type: String, default: '' },

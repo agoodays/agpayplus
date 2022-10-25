@@ -3,11 +3,11 @@
  * 参考： iview https://gitee.com/icarusion/iview-admin/blob/master/src/libs/axios.js
  *
  * @author terrfly
- * @site https://www.jeepay.vip
+ * @site https://www.agpay.vip
  * @date 2021/5/8 07:18
  */
 import axios from 'axios'
-import storage from '@/utils/jeepayStorageWrapper'
+import storage from '@/utils/agpayStorageWrapper'
 import appConfig from '@/config/appConfig'
 import Vue from 'vue'
 import store from '@/store/index'

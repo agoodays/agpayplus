@@ -9,12 +9,12 @@
         :md="24/span.md"
         :sm="24/span.sm"
         :xs="24/span.xs"
-        @click="$emit('addJeepayCard')"
+        @click="$emit('addAgPayCard')"
         v-if="addAuthority"
       >
-        <div class="jeepay-card-add" :style="{'height': height + 'px'}">
+        <div class="agpay-card-add" :style="{'height': height + 'px'}">
           <img src="~@/assets/svg/add-icon.svg" alt="add-icon" :style="{'width': height/3 + 'px', 'height': height/3 + 'px'}">
-          <div class="jeepay-card-add-text">
+          <div class="agpay-card-add-text">
             新建{{ name }}
           </div>
         </div>
@@ -39,7 +39,7 @@
 
 <script>
 export default {
-  name: 'JeepayCard',
+  name: 'AgPayCard',
   props: {
     span: { type: Object, default: () => ({ xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 }) },
     height: { type: Number, default: 200 },
@@ -67,7 +67,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .jeepay-card-add {
+  .agpay-card-add {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -77,7 +77,7 @@ export default {
     border-radius: 6px;
     box-sizing: border-box;
   }
-  .jeepay-card-add-text {
+  .agpay-card-add-text {
     padding-top: 5px;
     font-size: 16px;
     color: rgba(0, 0, 0, 0.35);

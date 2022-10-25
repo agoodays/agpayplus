@@ -71,8 +71,8 @@
       ></Keyboard>
     </div> -->
 
-    <!-- jeepay中，付款的点击事件 由 payment 修改为 pay  -->
-    <!-- jeepay中，付款页面是唯一的，颜色不在需要v-bind，去掉即可 -->
+    <!-- agpay中，付款的点击事件 由 payment 修改为 pay  -->
+    <!-- agpay中，付款页面是唯一的，颜色不在需要v-bind，去掉即可 -->
     <!-- <div class="bnt-pay" v-if="!isAllowModifyAmount"> -->
     <div class="bnt-pay">
       <div
@@ -96,7 +96,7 @@ export default {
   // components: { MyDialog, Keyboard },
   data: function (){
     return {
-      merchantName: 'jeepay',  // 付款的商户默认
+      merchantName: 'agpay',  // 付款的商户默认
       avatar: require("../../assets/icon/wx.svg"), // 商户头像默认
       amount: 1,  // 支付金额默认
       resData : {},

@@ -14,11 +14,11 @@
                 <a-icon slot="suffixIcon" type="sync" />
               </a-range-picker>
             </a-form-item>
-            <jeepay-text-up placeholder="分账接受者ID" :msg="searchData.receiverId" v-model="searchData.receiverId" />
-            <jeepay-text-up placeholder="分账账号组ID" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
-            <jeepay-text-up placeholder="应用AppId" :msg="searchData.appId" v-model="searchData.appId"/>
-            <jeepay-text-up placeholder="支付订单号" :msg="searchData.payOrderId" v-model="searchData.payOrderId"/>
-            <jeepay-text-up placeholder="分账接收账号" :msg="searchData.accNo" v-model="searchData.accNo"/>
+            <agpay-text-up placeholder="分账接受者ID" :msg="searchData.receiverId" v-model="searchData.receiverId" />
+            <agpay-text-up placeholder="分账账号组ID" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
+            <agpay-text-up placeholder="应用AppId" :msg="searchData.appId" v-model="searchData.appId"/>
+            <agpay-text-up placeholder="支付订单号" :msg="searchData.payOrderId" v-model="searchData.payOrderId"/>
+            <agpay-text-up placeholder="分账接收账号" :msg="searchData.accNo" v-model="searchData.accNo"/>
 
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="分账状态" default-value="">
@@ -38,7 +38,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <JeepayTable
+      <AgPayTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
@@ -57,12 +57,12 @@
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <JeepayTableColumns>
+          <AgPayTableColumns>
             <a-button type="link" v-if="$access('ENT_DIVISION_RECORD_VIEW')" @click="detailFunc(record.recordId)">详情</a-button>
             <a-button type="link" v-if="record.state == 2 && $access('ENT_DIVISION_RECORD_RESEND')" @click="redivFunc(record.recordId)">重试</a-button>
-          </JeepayTableColumns>
+          </AgPayTableColumns>
         </template>
-      </JeepayTable>
+      </AgPayTable>
     </a-card>
 
     <Detail ref="recordDetail" />
@@ -70,9 +70,9 @@
   </page-header-wrapper>
 </template>
 <script>
-import JeepayTextUp from '@/components/JeepayTextUp/JeepayTextUp' // 文字上移组件
-import JeepayTable from '@/components/JeepayTable/JeepayTable'
-import JeepayTableColumns from '@/components/JeepayTable/JeepayTableColumns'
+import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
+import AgPayTable from '@/components/AgPayTable/AgPayTable'
+import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
 import { API_URL_PAY_ORDER_DIVISION_RECORD_LIST, req, resendDivision } from '@/api/manage'
 import moment from 'moment'
 import Detail from './Detail'
@@ -96,7 +96,7 @@ const tableColumns = [
 ]
 
 export default {
-  components: { JeepayTable, JeepayTableColumns, JeepayTextUp, Detail },
+  components: { AgPayTable, AgPayTableColumns, AgPayTextUp, Detail },
   data () {
     return {
       btnLoading: false,

@@ -1,6 +1,6 @@
 import router from './router'
 import store from './store'
-import storage from '@/utils/jeepayStorageWrapper'
+import storage from '@/utils/agpayStorageWrapper'
 import NProgress from 'nprogress' // progress bar
 import '@/components/NProgress/nprogress.less' // progress bar custom style
 import { setDocumentTitle } from '@/utils/domUtil'

@@ -3,7 +3,7 @@
  * 参考： iview https://gitee.com/icarusion/iview-admin/blob/master/src/libs/axios.js
  *
  * @author terrfly
- * @site https://www.jeepay.vip
+ * @site https://www.agpay.vip
  * @date 2021/5/8 07:18
  */
 

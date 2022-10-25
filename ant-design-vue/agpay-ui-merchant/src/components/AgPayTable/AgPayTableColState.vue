@@ -1,8 +1,8 @@
 <!--
-  Jeepay 通用状态切换按钮，  支持switch和badge两个格式， 根据权限进行判断
+  AgPay 通用状态切换按钮，  支持switch和badge两个格式， 根据权限进行判断
 
   @author terrfly
-  @site https://www.jeepay.vip
+  @site https://www.agpay.vip
   @date 2021/5/8 07:18
 -->
 <template>
@@ -23,7 +23,7 @@
 
 <script>
 export default {
-  name: 'JeepayTableColState', // 定义组件名称
+  name: 'AgPayTableColState', // 定义组件名称
 
   // 传递数据参数 ( 父-->子 参数 )
   props: {

@@ -2,13 +2,13 @@
 * 全局配置信息， 包含网站标题，  动态组件定义
 *
 * @author terrfly
-* @site https://www.jeepay.vip
+* @site https://www.agpay.vip
 * @date 2021/5/8 07:18
 */
 
 /** 应用配置项 **/
 export default {
-  APP_TITLE: 'Jeepay商户系统', // 设置浏览器title
+  APP_TITLE: 'AgPay商户系统', // 设置浏览器title
   ACCESS_TOKEN_NAME: 'authorization' // 设置请求token的名字， 用于请求header 和 localstorage中存在名称
 }
 

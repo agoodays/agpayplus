@@ -2,7 +2,7 @@
  * 获取支付方式工具类
  *
  * @author terrfly
- * @site https://www.jeepay.vip
+ * @site https://www.agpay.vip
  * @date 2021/5/8 07:18
  */
 

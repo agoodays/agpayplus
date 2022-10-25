@@ -1,4 +1,4 @@
-import storage from '@/utils/jeepayStorageWrapper'
+import storage from '@/utils/agpayStorageWrapper'
 import { login, logout } from '@/api/login'
 import appConfig from '@/config/appConfig'
 

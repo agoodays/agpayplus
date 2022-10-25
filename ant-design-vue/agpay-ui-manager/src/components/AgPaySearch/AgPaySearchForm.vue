@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'JeepaySearchForm'
+  name: 'AgPaySearchForm'
 }
 </script>
 

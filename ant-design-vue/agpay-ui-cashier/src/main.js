@@ -10,7 +10,7 @@ Vue.config.productionTip = false
  * 路由守卫
  *
  * @author terrfly
- * @site https://www.jeepay.vip
+ * @site https://www.agpay.vip
  * @date 2021/5/8 07:18
  */
 router.beforeEach((to, from, next) => {

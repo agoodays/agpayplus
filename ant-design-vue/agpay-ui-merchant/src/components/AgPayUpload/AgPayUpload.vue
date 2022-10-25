@@ -19,7 +19,7 @@
 
 <script>
 import appConfig from '@/config/appConfig'
-import storage from '@/utils/jeepayStorageWrapper'
+import storage from '@/utils/agpayStorageWrapper'
 
 function getHeaders () {
   const headers = {}
@@ -28,7 +28,7 @@ function getHeaders () {
 }
 
 export default {
-  name: 'JeepayUpload',
+  name: 'AgPayUpload',
   props: {
     action: { type: String, default: '' },
     size: { type: Number, default: 10 }, // 文件大小限制

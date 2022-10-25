@@ -2,7 +2,7 @@
  * 全局配置信息， 包含网站标题，  动态组件定义
  *
  * @author terrfly
- * @site https://www.jeepay.vip
+ * @site https://www.agpay.vip
  * @date 2021/5/8 07:18
  */
 

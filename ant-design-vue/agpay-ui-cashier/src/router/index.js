@@ -2,7 +2,7 @@
  * 路由配置信息
  *
  * @author terrfly
- * @site https://www.jeepay.vip
+ * @site https://www.agpay.vip
  * @date 2021/5/8 07:18
  */
 
@@ -21,9 +21,9 @@ VueRouter.prototype.push = function push (location, onResolve, onReject) {
 Vue.use(VueRouter)
 
 const routes = [
-  {path: '/hub/:jeepayToken', name: 'Hub', component: () => import('../views/Hub.vue')}, //自动分发器
+  {path: '/hub/:agpayToken', name: 'Hub', component: () => import('../views/Hub.vue')}, //自动分发器
   {path: '/error', name: 'Error', component: () => import('../views/Error.vue')},
-  {path: '/oauth2Callback/:jeepayToken', name: 'Oauth2Callback', component: () => import('../views/Oauth2Callback.vue')}, //oauth回调地址
+  {path: '/oauth2Callback/:agpayToken', name: 'Oauth2Callback', component: () => import('../views/Oauth2Callback.vue')}, //oauth回调地址
   {path: '/cashier', name: 'Cashier', component: () => import('../views/Cashier.vue'), //收银台（该地址无意义）
     children: [
         { path: '/cashier/wxpay', name: 'CashierWxpay', component: () => import('../views/payway/Wxpay.vue') },
