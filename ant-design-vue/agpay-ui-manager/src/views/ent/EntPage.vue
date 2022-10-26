@@ -29,12 +29,12 @@
         rowKey="entId"
         :scroll="{ x: 1450 }">
         <template slot="stateSlot" slot-scope="record">
-          <AgPayTableColState :state="record.state" :showSwitchType="$access('ENT_UR_ROLE_ENT_EDIT')" :onChange="(state) => { return updateState(record.entId, state)}"/>
+          <AgTableColState :state="record.state" :showSwitchType="$access('ENT_UR_ROLE_ENT_EDIT')" :onChange="(state) => { return updateState(record.entId, state)}"/>
         </template>
         <template slot="opSlot" slot-scope="record">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a v-if="$access('ENT_UR_ROLE_ENT_EDIT')" @click="editFunc(record.entId)">修改</a>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
       </a-table>
     </a-card>
@@ -47,8 +47,8 @@
 </template>
 <script>
 import { getEntTree, API_URL_ENT_LIST, reqLoad } from '@/api/manage'
-import AgPayTableColState from '@/components/AgPayTable/AgPayTableColState'
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+import AgTableColState from '@/components/AgTable/AgTableColState'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import InfoAddOrEdit from './AddOrEdit'
 
 const tableColumns = [
@@ -66,7 +66,7 @@ const tableColumns = [
 
 export default {
   name: 'EntPage',
-  components: { AgPayTableColState, AgPayTableColumns, InfoAddOrEdit },
+  components: { AgTableColState, AgTableColumns, InfoAddOrEdit },
   data () {
     return {
       querySysType: 'MGR', // 默认查询运营平台

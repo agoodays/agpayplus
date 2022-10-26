@@ -22,12 +22,12 @@
           :sm="24/agpayCard.span.sm"
           :xs="24/agpayCard.span.xs"
         >
-          <div :style="{'height': agpayCard.height + 'px'}" class="agpay-card-content">
+          <div :style="{'height': agpayCard.height + 'px'}" class="ag-card-content">
             <!-- 卡片自定义样式 -->
-            <div class="agpay-card-content-header" :style="{backgroundColor: record.bgColor, height: (agpayCard.height-50)/2 + 'px'}">
+            <div class="ag-card-content-header" :style="{backgroundColor: record.bgColor, height: (agpayCard.height-50)/2 + 'px'}">
               <img v-if="record.icon" :src="record.icon" :style="{height: (agpayCard.height-50)/5 + 'px'}">
             </div>
-            <div class="agpay-card-content-body" :style="{height: ((agpayCard.height-50)/2) + 'px'}">
+            <div class="ag-card-content-body" :style="{height: ((agpayCard.height-50)/2) + 'px'}">
               <div class="title" :style="{height: ((agpayCard.height-50)/4) + 'px', lineHeight: ((agpayCard.height-50)/4) + 'px'}">
                 {{ record.ifName }}
               </div>
@@ -38,7 +38,7 @@
               </a-form>
             </div>
             <!-- 卡片底部操作栏 -->
-            <div class="agpay-card-ops">
+            <div class="ag-card-ops">
               <a-switch checked-children="启用" un-checked-children="停用" v-model="record.state"></a-switch>
             </div>
           </div>
@@ -70,11 +70,11 @@
 </template>
 
 <script>
-import AgPayCard from '@/components/AgPayCard/AgPayCard'
+import AgCard from '@/components/AgCard/AgCard'
 import { API_URL_MCH_PAYPASSAGE_LIST, req, getAvailablePayInterfaceList } from '@/api/manage'
 export default {
   components: {
-      AgPayCard
+      AgCard
   },
   props: {
     callbackFunc: { type: Function, default: () => ({}) }
@@ -177,14 +177,14 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-  .agpay-card-content {
+  .ag-card-content {
     width: 100%;
     position: relative;
     background-color: @ag-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .agpay-card-ops {
+  .ag-card-ops {
     width: 100%;
     height: 50px;
     background-color: @ag-card-back;
@@ -196,14 +196,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .agpay-card-content-header {
+  .ag-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .agpay-card-content-body {
+  .ag-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: start;

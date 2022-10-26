@@ -437,6 +437,7 @@
         if (this.$access('ENT_MCH_MAIN_PAY_AMOUNT_WEEK')) {
           // 周总交易金额
           getPayAmountWeek().then(res => {
+            // console.log('周总交易金额', res)
             that.mainChart.payAmountData = res.dataArray
             res.dataArray.length === 0 ? this.ispayAmount = false : this.ispayAmount = true
             that.mainChart.todayAmount = res.todayAmount
@@ -457,6 +458,7 @@
         if (this.$access('ENT_MCH_MAIN_NUMBER_COUNT')) {
           // 数据统计
           getNumCount().then(res => {
+            // console.log('数据统计', res)
             that.skeletonClose(that)
             that.mainChart.totalAmount = res.totalAmount
             that.mainChart.totalPayCount = res.totalCount
@@ -470,6 +472,7 @@
         // 交易统计
         if (this.$access('ENT_MCH_MAIN_PAY_COUNT')) {
           getPayCount(that.searchData).then(res => {
+            // console.log('交易统计', res)
             that.mainChart.payCount = res
             res.length === 0 ? this.isPayCount = false : this.isPayCount = true
             that.initPayCount()
@@ -486,8 +489,9 @@
         if (this.$access('ENT_MCH_MAIN_PAY_TYPE_COUNT')) {
           // 支付类型统计
           getPayType(that.searchData).then(res => {
-            that.mainChart.payType = res[0]
-            res[0].length === 0 ? this.isPayType = false : this.isPayType = true
+            // console.log('支付类型统计', res)
+            that.mainChart.payType = res
+            res.length === 0 ? this.isPayType = false : this.isPayType = true
             that.initPayType()
             that.skeletonClose(that)
           }).catch(err => {

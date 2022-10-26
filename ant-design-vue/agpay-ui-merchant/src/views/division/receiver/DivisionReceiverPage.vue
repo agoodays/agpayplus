@@ -14,9 +14,9 @@
               </a-select>
             </a-form-item>
 
-            <agpay-text-up placeholder="分账接收者ID[精准]" :msg="searchData.receiverId" v-model="searchData.receiverId" />
-            <agpay-text-up placeholder="接收者账号别名[模糊]" :msg="searchData.receiverAlias" v-model="searchData.receiverAlias" />
-            <agpay-text-up placeholder="组ID[精准]" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
+            <ag-text-up placeholder="分账接收者ID[精准]" :msg="searchData.receiverId" v-model="searchData.receiverId" />
+            <ag-text-up placeholder="接收者账号别名[模糊]" :msg="searchData.receiverAlias" v-model="searchData.receiverAlias" />
+            <ag-text-up placeholder="组ID[精准]" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
 
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="账号状态（本系统）" default-value="">
@@ -38,7 +38,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <AgPayTable
+      <AgTable
         ref="infoTable"
         :initData="false"
         :reqTableDataFunc="reqTableDataFunc"
@@ -63,11 +63,11 @@
         </template>
 
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a v-if="$access('ENT_DIVISION_RECEIVER_EDIT')" @click="editFunc(record.receiverId)">修改</a>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
-      </AgPayTable>
+      </AgTable>
 
       <!-- 新增收款账号页面  -->
       <ReceiverAdd ref="receiverAdd" :callbackFunc="searchFunc"/>
@@ -80,10 +80,10 @@
 
 </template>
 <script>
-import AgPayTable from '@/components/AgPayTable/AgPayTable'
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_DIVISION_RECEIVER, API_URL_MCH_APP, req } from '@/api/manage'
-import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import ReceiverAdd from './ReceiverAdd'
 import ReceiverEdit from './ReceiverEdit'
 
@@ -103,7 +103,7 @@ const tableColumns = [
 ]
 
 export default {
-  components: { AgPayTable, AgPayTableColumns, AgPayTextUp, ReceiverAdd, ReceiverEdit },
+  components: { AgTable, AgTableColumns, AgTextUp, ReceiverAdd, ReceiverEdit },
   data () {
     return {
       tableColumns: tableColumns,

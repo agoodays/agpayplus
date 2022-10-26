@@ -1,5 +1,5 @@
 <template>
-  <div class="ag-text-up table-head-layout">
+  <div class="ag-text-up" >
     <a-input required="required" :value="msg" @input="$emit('input', $event.target.value)">
     </a-input>
     <label>{{ placeholder }}</label>
@@ -8,11 +8,11 @@
 
 <script>
 export default {
-  name: 'AgPayTextUp',
+  name: 'AgTextUp',
   // props: ['msg', 'placeholder']
   props: {
-    msg: { type: String, default: '' },
-    placeholder: { type: String, default: '' }
+    msg: { type: String },
+    placeholder: { type: String }
   }
 }
 </script>
@@ -20,14 +20,19 @@ export default {
 <style scoped lang="less">
 // 文字上移 效果
 .ag-text-up {
+  flex-grow:1;
+  flex-shrink: 1;
   position: relative;
+  min-width: 180px;
+  max-width: 230px;
+  margin-bottom:30px;
+  margin-right: 16px;
 
   input {
 
     outline: 0;
     text-indent: 60px;
     transition: all .3s ease-in-out;
-
   }
   input::-webkit-input-placeholder {
     color: #BFBFBF;
@@ -94,7 +99,7 @@ export default {
   }
 }
 
-// 文字上移效果 初版
+// 初版文字上移 效果
 // .ag-text-up {
 //   position: relative;
 

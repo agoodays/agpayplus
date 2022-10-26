@@ -5,10 +5,9 @@
   @site https://www.agpay.vip
   @date 2021/5/8 07:18
 -->
-
 <script>
 export default {
-  name: 'AgPayTableColumns', // 定义组件名称
+  name: 'AgTableColumns', // 定义组件名称
   render (createElement, context) {
     const slots = []
     this.$slots.default.map(item => {
@@ -31,7 +30,7 @@ export default {
       }
       return <div style="display:flex; justify-content: space-evenly;"> {firstEL}
                   <a-dropdown>
-                      <a-button class="ant-dropdown-link" type="link" style="">更多<a-icon type="down" /></a-button>
+                      <a-button style="" type="link" class="ant-dropdown-link">更多<a-icon type="down" /></a-button>
                       <a-menu slot="overlay">
                         {menuEL}
                       </a-menu>

@@ -14,26 +14,26 @@
       </a-steps>
     </template>
     <div v-if="currentStep === 0">
-      <AgPayCard
+      <AgCard
         ref="infoCard"
         :reqCardListFunc="reqCardListFunc"
         :span="agpayCard.span"
         :height="agpayCard.height"
       >
         <div slot="cardContentSlot" slot-scope="{record}">
-          <div :style="{'height': agpayCard.height + 'px'}" class="agpay-card-content">
+          <div :style="{'height': agpayCard.height + 'px'}" class="ag-card-content">
             <!-- 卡片自定义样式 -->
-            <div class="agpay-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
+            <div class="ag-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
               <img v-if="record.icon" :src="record.icon" :style="{height: agpayCard.height/5 + 'px'}">
             </div>
-            <div class="agpay-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
+            <div class="ag-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
               <div class="title">
                 {{ record.ifName }}
               </div>
               <a-badge :status="record.ifConfigState ===1 ? 'processing' : 'error'" :text="record.ifConfigState ===1 ? '启用' : '未开通'" ></a-badge>
             </div>
             <!-- 卡片底部操作栏 -->
-            <div class="agpay-card-ops">
+            <div class="ag-card-ops">
               <a v-if="record.mchType == 2 && record.ifCode == 'alipay' && $access('ENT_MCH_PAY_CONFIG_ADD')" @click="toAlipayAuthPageFunc(record)">扫码授权 <a-icon key="right" type="right" style="fontSize: 13px"></a-icon></a>
 
               <a v-if="$access('ENT_MCH_PAY_CONFIG_ADD')" @click="editPayIfConfigFunc(record)">填写参数 <a-icon key="right" type="right" style="fontSize: 13px"></a-icon></a>
@@ -41,7 +41,7 @@
             </div>
           </div>
         </div>
-      </AgPayCard>
+      </AgCard>
     </div>
     <div v-else-if="currentStep === 1">
       <a-card>
@@ -69,7 +69,7 @@
         </div>
 
         <!-- 列表渲染 -->
-        <AgPayTable
+        <AgTable
           ref="infoTable"
           :initData="true"
           :reqTableDataFunc="reqTableDataFunc"
@@ -81,11 +81,11 @@
             <a-badge :status="record.passageState === 0?'error':'processing'" :text="record.passageState === 0?'禁用':'启用'" />
           </template>
           <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-            <AgPayTableColumns>
+            <AgTableColumns>
               <a-button type="link" v-if="$access('ENT_MCH_PAY_PASSAGE_CONFIG')" @click="editPayPassageFunc(record)">配置</a-button>
-            </AgPayTableColumns>
+            </AgTableColumns>
           </template>
-        </AgPayTable>
+        </AgTable>
       </a-card>
     </div>
     <div class="drawer-btn-center ">
@@ -108,9 +108,9 @@
 </template>
 
 <script>
-import AgPayCard from '@/components/AgPayCard/AgPayCard'
-import AgPayTable from '@/components/AgPayTable/AgPayTable'
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+import AgCard from '@/components/AgCard/AgCard'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_MCH_PAYCONFIGS_LIST, API_URL_MCH_PAYPASSAGE_LIST, req, getAvailablePayInterfaceList } from '@/api/manage'
 import MchPayConfigAddOrEdit from './MchPayConfigAddOrEdit'
 import MchPayPassageAddOrEdit from './MchPayPassageAddOrEdit'
@@ -128,9 +128,9 @@ const tableColumns = [
 
 export default {
   components: {
-    AgPayCard,
-    AgPayTable,
-    AgPayTableColumns,
+    AgCard,
+    AgTable,
+    AgTableColumns,
     MchPayConfigAddOrEdit,
     MchPayPassageAddOrEdit,
     WxpayPayConfig,
@@ -236,14 +236,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .agpay-card-content {
+  .ag-card-content {
     width: 100%;
     position: relative;
     background-color: @ag-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .agpay-card-ops {
+  .ag-card-ops {
     width: 100%;
     height: 50px;
     background-color: @ag-card-back;
@@ -255,14 +255,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .agpay-card-content-header {
+  .ag-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .agpay-card-content-body {
+  .ag-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: space-around;

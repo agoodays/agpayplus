@@ -1,27 +1,27 @@
 <template>
   <page-header-wrapper>
-    <AgPayCard
+    <AgCard
       ref="infoCard"
       :reqCardListFunc="reqCardListFunc"
       :span="agpayCard.span"
       :height="agpayCard.height"
       :name="agpayCard.name"
       :addAuthority="agpayCard.addAuthority"
-      @addAgPayCard="addOrEdit"
+      @addAgCard="addOrEdit"
     >
       <div slot="cardContentSlot" slot-scope="{record}">
-        <div :style="{'height': agpayCard.height + 'px'}" class="agpay-card-content">
+        <div :style="{'height': agpayCard.height + 'px'}" class="ag-card-content">
           <!-- 卡片自定义样式 -->
-          <div class="agpay-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
+          <div class="ag-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
             <img v-if="record.icon" :src="record.icon" :style="{height: agpayCard.height/5 + 'px'}">
           </div>
-          <div class="agpay-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
+          <div class="ag-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
             <div class="title">
               {{ record.ifName }}
             </div>
           </div>
           <!-- 卡片底部操作栏 -->
-          <div class="agpay-card-ops">
+          <div class="ag-card-ops">
             <a-tooltip placement="top" title="编辑">
               <a-icon key="edit" type="edit" @click="addOrEdit(record.ifCode)" />
             </a-tooltip>
@@ -31,7 +31,7 @@
           </div>
         </div>
       </div>
-    </AgPayCard>
+    </AgCard>
 
     <!-- 新增页面组件  -->
     <PayIfDefineAddOrEdit ref="payIfDefineAddOrEdit" :callbackFunc="refCardList"/>
@@ -39,14 +39,14 @@
 </template>
 
 <script>
-import AgPayCard from '@/components/AgPayCard/AgPayCard'
+import AgCard from '@/components/AgCard/AgCard'
 import { API_URL_IFDEFINES_LIST, req } from '@/api/manage'
 import PayIfDefineAddOrEdit from './AddOrEdit'
 
 export default {
   name: 'IfDefinePage',
   components: {
-    AgPayCard,
+    AgCard,
     PayIfDefineAddOrEdit
   },
   data () {
@@ -85,14 +85,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .agpay-card-content {
+  .ag-card-content {
     width: 100%;
     position: relative;
     background-color: @ag-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .agpay-card-ops {
+  .ag-card-ops {
     width: 100%;
     height: 50px;
     background-color: @ag-card-back;
@@ -104,14 +104,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .agpay-card-content-header {
+  .ag-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .agpay-card-content-body {
+  .ag-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: space-around;

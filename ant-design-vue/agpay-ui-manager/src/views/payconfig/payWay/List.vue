@@ -4,8 +4,8 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" v-if="$access('ENT_PC_WAY_SEARCH')" class="table-head-ground">
           <div class="table-layer">
-            <agpay-text-up :placeholder="'支付方式代码'" :msg="searchData.wayCode" v-model="searchData.wayCode" />
-            <agpay-text-up :placeholder="'支付方式名称'" :msg="searchData.wayName" v-model="searchData.wayName" />
+            <ag-text-up :placeholder="'支付方式代码'" :msg="searchData.wayCode" v-model="searchData.wayCode" />
+            <ag-text-up :placeholder="'支付方式名称'" :msg="searchData.wayName" v-model="searchData.wayName" />
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc(true)" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -16,7 +16,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <AgPayTable
+      <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
@@ -27,12 +27,12 @@
       >
         <template slot="wayCodeSlot" slot-scope="{record}"><b>{{ record.wayCode }}</b></template> <!-- 自定义插槽 -->
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a v-if="$access('ENT_PC_WAY_EDIT')" @click="editFunc(record.wayCode)">修改</a>
             <a style="color: red" v-if="$access('ENT_PC_WAY_DEL')" @click="delFunc(record.wayCode)">删除</a>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
-      </AgPayTable>
+      </AgTable>
     </a-card>
 
     <!-- 新增页面组件  -->
@@ -41,11 +41,11 @@
 
 </template>
 <script>
-import AgPayTable from '@/components/AgPayTable/AgPayTable'
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_PAYWAYS_LIST, req } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
-import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   {
@@ -71,7 +71,7 @@ const tableColumns = [
 
 export default {
   name: 'PayWayPage',
-  components: { AgPayTable, AgPayTableColumns, InfoAddOrEdit, AgPayTextUp },
+  components: { AgTable, AgTableColumns, InfoAddOrEdit, AgTextUp },
   data () {
     return {
       tableColumns: tableColumns,

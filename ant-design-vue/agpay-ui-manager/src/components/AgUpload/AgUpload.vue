@@ -29,7 +29,7 @@ function getHeaders () {
 }
 
 export default {
-  name: 'AgPayUpload',
+  name: 'AgUpload',
   props: {
     action: { type: String, default: '' },
     accept: { type: String, default: '' },

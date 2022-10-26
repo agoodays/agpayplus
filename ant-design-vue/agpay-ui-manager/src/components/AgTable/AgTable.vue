@@ -18,8 +18,8 @@
       :scroll="{ x: scrollX }"
       :customRow="(record, index) => {
         if(!tableRowCrossColor){
-            return {};
-         }
+          return {};
+        }
         return { style: { 'background-color': index % 2 == 0 ? '#FCFCFC' : '#FFFFFF'} }
       }"
     >
@@ -35,7 +35,7 @@
 
 export default {
 
-  name: 'AgPayTable', // 定义组件名称
+  name: 'AgTable', // 定义组件名称
 
   // 传递数据参数 ( 父-->子 参数 )
   props: {
@@ -47,7 +47,7 @@ export default {
     pageSize: { type: Number, default: 10 }, // 默认每页条数
     rowSelection: Object, // checkbox选择
     rowKey: { type: [String, Function] }, // 定义rowKey 如果不定义将会出现（树状结构出问题， checkbox不消失等）
-    scrollX: { type: Number, default: 800 }, // 定义表格的最小宽度，在小就会出现横向的滚动条
+    scrollX: { type: Number, default: 500 }, // 表格显示滚动条的宽度
     tableRowCrossColor: { type: Boolean, default: false } // 是隔行换色
   },
 
@@ -143,5 +143,4 @@ export default {
     }
   }
 }
-
 </style>

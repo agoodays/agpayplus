@@ -23,7 +23,7 @@
 
 <script>
 export default {
-  name: 'AgPayTableColState', // 定义组件名称
+  name: 'AgTableColState', // 定义组件名称
 
   // 传递数据参数 ( 父-->子 参数 )
   props: {

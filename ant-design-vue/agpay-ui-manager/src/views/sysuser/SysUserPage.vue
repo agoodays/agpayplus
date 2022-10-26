@@ -4,8 +4,8 @@
       <div v-if="$access('ENT_UR_USER_SEARCH')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <agpay-text-up :placeholder="'用户ID'" :msg="searchData.sysUserId" v-model="searchData.sysUserId" />
-            <agpay-text-up :placeholder="'用户姓名'" :msg="searchData.realname" v-model="searchData.realname" />
+            <ag-text-up :placeholder="'用户ID'" :msg="searchData.sysUserId" v-model="searchData.sysUserId" />
+            <ag-text-up :placeholder="'用户姓名'" :msg="searchData.realname" v-model="searchData.realname" />
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -19,7 +19,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <AgPayTable
+      <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
@@ -34,17 +34,17 @@
         </template>
 
         <template slot="stateSlot" slot-scope="{record}">
-          <AgPayTableColState :state="record.state" :showSwitchType="$access('ENT_UR_USER_EDIT')" :onChange="(state) => { return updateState(record.sysUserId, state)}"/>
+          <AgTableColState :state="record.state" :showSwitchType="$access('ENT_UR_USER_EDIT')" :onChange="(state) => { return updateState(record.sysUserId, state)}"/>
         </template>
 
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a v-if="$access('ENT_UR_USER_UPD_ROLE')" @click="roleDist(record.sysUserId)" >变更角色</a>
             <a v-if="$access('ENT_UR_USER_EDIT')" @click="editFunc(record.sysUserId)">修改</a>
             <a v-if="$access('ENT_UR_USER_DELETE')" style="color: red" @click="delFunc(record.sysUserId)">删除</a>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
-      </AgPayTable>
+      </AgTable>
     </a-card>
 
     <!-- 新增 / 修改 页面组件  -->
@@ -57,13 +57,13 @@
 
 </template>
 <script>
-import AgPayTable from '@/components/AgPayTable/AgPayTable'
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
-import AgPayTableColState from '@/components/AgPayTable/AgPayTableColState'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import AgTableColState from '@/components/AgTable/AgTableColState'
 import { API_URL_SYS_USER_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import RoleDist from './RoleDist'
-import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 const tableColumns = [
   { title: '用户ID', dataIndex: 'sysUserId', fixed: 'left' },
@@ -87,7 +87,7 @@ const tableColumns = [
 ]
 
 export default {
-  components: { AgPayTable, AgPayTableColumns, InfoAddOrEdit, RoleDist, AgPayTableColState, AgPayTextUp },
+  components: { AgTable, AgTableColumns, InfoAddOrEdit, RoleDist, AgTableColState, AgTextUp },
   data () {
     return {
       tableColumns: tableColumns,

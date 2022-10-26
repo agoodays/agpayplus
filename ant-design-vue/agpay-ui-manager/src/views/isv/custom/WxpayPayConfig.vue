@@ -87,7 +87,7 @@
         <a-col span="24">
           <a-form-model-item label="API证书(apiclient_cert.p12)" prop="cert">
             <a-input v-model="ifParams.cert" disabled="disabled" />
-            <AgPayUpload
+            <AgUpload
               :action="action"
               :fileUrl="ifParams.cert"
               @uploadSuccess="uploadSuccess($event, 'cert')"
@@ -95,13 +95,13 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </AgPayUpload>
+            </AgUpload>
           </a-form-model-item>
         </a-col>
         <a-col span="24">
           <a-form-model-item label="证书文件(apiclient_cert.pem)" prop="apiClientCert">
             <a-input v-model="ifParams.apiClientCert" disabled="disabled" />
-            <AgPayUpload
+            <AgUpload
               :action="action"
               :fileUrl="ifParams.apiClientCert"
               @uploadSuccess="uploadSuccess($event, 'apiClientCert')"
@@ -109,13 +109,13 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </AgPayUpload>
+            </AgUpload>
           </a-form-model-item>
         </a-col>
         <a-col span="24">
           <a-form-model-item label="私钥文件(apiclient_key.pem)" prop="apiClientKey">
             <a-input v-model="ifParams.apiClientKey" disabled="disabled" />
-            <AgPayUpload
+            <AgUpload
               :action="action"
               :fileUrl="ifParams.apiClientKey"
               @uploadSuccess="uploadSuccess($event, 'apiClientKey')"
@@ -123,7 +123,7 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </AgPayUpload>
+            </AgUpload>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -137,13 +137,13 @@
 </template>
 
 <script>
-import AgPayCard from '@/components/AgPayCard/AgPayCard'
-import AgPayUpload from '@/components/AgPayUpload/AgPayUpload'
+import AgCard from '@/components/AgCard/AgCard'
+import AgUpload from '@/components/AgUpload/AgUpload'
 import { API_URL_ISV_PAYCONFIGS_LIST, req, getIsvPayConfigUnique, upload } from '@/api/manage'
 export default {
   components: {
-      AgPayCard,
-      AgPayUpload
+      AgCard,
+      AgUpload
   },
   props: {
     callbackFunc: { type: Function, default: () => ({}) }

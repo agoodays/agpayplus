@@ -4,8 +4,8 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <agpay-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
-            <agpay-text-up :placeholder="'服务商名称'" :msg="searchData.isvName" v-model="searchData.isvName" />
+            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
+            <ag-text-up :placeholder="'服务商名称'" :msg="searchData.isvName" v-model="searchData.isvName" />
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="服务商状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -25,7 +25,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <AgPayTable
+      <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
@@ -39,13 +39,13 @@
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_ISV_INFO_EDIT')" @click="editFunc(record.isvNo)">修改</a-button>
             <a-button type="link" v-if="$access('ENT_ISV_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.isvNo)">支付配置</a-button>
             <a-button type="link" v-if="$access('ENT_ISV_INFO_DEL')" style="color: red" @click="delFunc(record.isvNo)">删除</a-button>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
-      </AgPayTable>
+      </AgTable>
     </a-card>
     <!-- 新增页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
@@ -54,9 +54,9 @@
   </page-header-wrapper>
 </template>
 <script>
-import AgPayTable from '@/components/AgPayTable/AgPayTable'
-import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_ISV_LIST, req } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import IsvPayIfConfigList from './IsvPayIfConfigList'
@@ -72,7 +72,7 @@ const tableColumns = [
 
 export default {
   name: 'IsvListPage',
-  components: { AgPayTable, AgPayTableColumns, InfoAddOrEdit, IsvPayIfConfigList, AgPayTextUp },
+  components: { AgTable, AgTableColumns, InfoAddOrEdit, IsvPayIfConfigList, AgTextUp },
   data () {
     return {
       btnLoading: false,

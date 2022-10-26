@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: 'AgPayDateRangePicker',
+  name: 'AgDateRangePicker',
   props: {
     msg: { type: String, default: '' },
     placeholder: { type: String, default: '' }

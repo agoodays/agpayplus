@@ -14,11 +14,11 @@
                 <a-icon slot="suffixIcon" type="sync" />
               </a-range-picker>
             </a-form-item>
-            <agpay-text-up :placeholder="'转账/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-<!--            <agpay-text-up :placeholder="'转账订单号'" :msg="searchData.transferId" v-model="searchData.transferId" />-->
-<!--            <agpay-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
-<!--            <agpay-text-up :placeholder="'渠道支付订单号'" :msg="searchData.channelOrderNo" v-model="searchData.channelOrderNo" />-->
-            <agpay-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+            <ag-text-up :placeholder="'转账/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
+<!--            <ag-text-up :placeholder="'转账订单号'" :msg="searchData.transferId" v-model="searchData.transferId" />-->
+<!--            <ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
+<!--            <ag-text-up :placeholder="'渠道支付订单号'" :msg="searchData.channelOrderNo" v-model="searchData.channelOrderNo" />-->
+            <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="转账状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -37,7 +37,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <AgPayTable
+      <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
@@ -82,11 +82,11 @@
           </div>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_TRANSFER_ORDER_VIEW')" @click="detailFunc(record.transferId)">详情</a-button>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
-      </AgPayTable>
+      </AgTable>
     </a-card>
 
     <!-- 订单详情 页面组件  -->
@@ -95,9 +95,9 @@
   </page-header-wrapper>
 </template>
 <script>
-  import AgPayTable from '@/components/AgPayTable/AgPayTable'
-  import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
-  import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+  import AgTable from '@/components/AgTable/AgTable'
+  import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+  import AgTableColumns from '@/components/AgTable/AgTableColumns'
   import TransferOrderDetail from './TransferOrderDetail'
   import { API_URL_TRANSFER_ORDER_LIST, req } from '@/api/manage'
   import moment from 'moment'
@@ -119,7 +119,7 @@
 
   export default {
     name: 'IsvListPage',
-    components: { AgPayTable, AgPayTableColumns, AgPayTextUp, TransferOrderDetail },
+    components: { AgTable, AgTableColumns, AgTextUp, TransferOrderDetail },
     data () {
       return {
         btnLoading: false,

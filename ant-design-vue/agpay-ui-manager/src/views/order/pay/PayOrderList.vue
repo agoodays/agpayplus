@@ -22,12 +22,12 @@
                 <a-icon slot="suffixIcon" type="sync" />
               </a-range-picker>
             </a-form-item>
-            <agpay-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-<!--            <agpay-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
-<!--            <agpay-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
-            <agpay-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
-            <agpay-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
-            <agpay-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+            <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
+<!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
+<!--            <ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
+            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
+            <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
             <a-form-item v-if="$access('ENT_PAY_ORDER_SEARCH_PAY_WAY')" label="" class="table-head-layout">
               <a-select v-model="searchData.wayCode" placeholder="支付方式" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -73,7 +73,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <AgPayTable
+      <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
@@ -129,12 +129,12 @@
           </div>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_PAY_ORDER_VIEW')" @click="detailFunc(record.payOrderId)">详情</a-button>
             <a-button type="link" v-if="$access('ENT_PAY_ORDER_REFUND')" style="color: red" v-show="(record.state === 2 && record.refundState !== 2)" @click="openFunc(record, record.payOrderId)">退款</a-button>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
-      </AgPayTable>
+      </AgTable>
     </a-card>
     <!-- 退款弹出框 -->
     <refund-modal ref="refundModalInfo" :callbackFunc="searchFunc"></refund-modal>
@@ -412,9 +412,9 @@
 </template>
 <script>
 import RefundModal from './RefundModal' // 退款弹出框
-import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
-import AgPayTable from '@/components/AgPayTable/AgPayTable'
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgTable from '@/components/AgTable/AgTable'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_PAY_ORDER_LIST, API_URL_PAYWAYS_LIST, req } from '@/api/manage'
 import moment from 'moment'
 
@@ -437,7 +437,7 @@ const tableColumns = [
 
 export default {
   name: 'IsvListPage',
-  components: { AgPayTable, AgPayTableColumns, AgPayTextUp, RefundModal },
+  components: { AgTable, AgTableColumns, AgTextUp, RefundModal },
   data () {
     return {
       btnLoading: false,

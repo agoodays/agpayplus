@@ -28,7 +28,7 @@ function getHeaders () {
 }
 
 export default {
-  name: 'AgPayUpload',
+  name: 'AgUpload',
   props: {
     action: { type: String, default: '' },
     size: { type: Number, default: 10 }, // 文件大小限制

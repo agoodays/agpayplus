@@ -9,15 +9,15 @@
         :md="24/span.md"
         :sm="24/span.sm"
         :xs="24/span.xs"
-        @click="$emit('addAgPayCard')"
+        @click="$emit('addAgCard')"
         v-if="addAuthority"
       >
-        <div class="agpay-card-add" :style="{'height': height + 'px'}">
-          <div class="agpay-card-add-top">
-            <img src="~@/assets/svg/add-icon.svg" alt="add-icon" class="agpay-card-add-icon">
-            <img src="~@/assets/svg/add-icon-hover.svg" alt="add-icon" class="agpay-card-add-icon-hover">
+        <div class="ag-card-add" :style="{'height': height + 'px'}">
+          <div class="ag-card-add-top">
+            <img src="~@/assets/svg/add-icon.svg" alt="add-icon" class="ag-card-add-icon">
+            <img src="~@/assets/svg/add-icon-hover.svg" alt="add-icon" class="ag-card-add-icon-hover">
           </div>
-          <div class="agpay-card-add-text">
+          <div class="ag-card-add-text">
             新建{{ name }}
           </div>
         </div>
@@ -42,7 +42,7 @@
 
 <script>
 export default {
-  name: 'AgPayCard',
+  name: 'AgCard',
   props: {
     span: { type: Object, default: () => ({ xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 }) },
     height: { type: Number, default: 200 },
@@ -70,7 +70,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .agpay-card-add {
+  .ag-card-add {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -81,41 +81,41 @@ export default {
     box-sizing: border-box;
     cursor: pointer;
   }
-  .agpay-card-add-top {
+  .ag-card-add-top {
     width: 80px;
     height: 80px;
     position: relative;
   }
-  .agpay-card-add:hover {
+  .ag-card-add:hover {
     border-color: rgba(25,83,255,0.3);
     background: rgba(25,83,255,0.06);
     transition: all 0.3s ease-in-out;
   }
-   .agpay-card-add:hover .agpay-card-add-icon {
+   .ag-card-add:hover .ag-card-add-icon {
      opacity: 0;
      transition: all 0.2s ease-in-out;
    }
-   .agpay-card-add:hover .agpay-card-add-icon-hover {
+   .ag-card-add:hover .ag-card-add-icon-hover {
      opacity: 1;
      transition: all 0.5s ease-in-out;
    }
-   .agpay-card-add:hover .agpay-card-add-text {
+   .ag-card-add:hover .ag-card-add-text {
      color: rgba(25,83,255,1);
      transition: all 0.3s ease-in-out;
    }
-   .agpay-card-add-icon {
+   .ag-card-add-icon {
      position: absolute;
      width: 80px;
      height: 80px;
      opacity: 1;
    }
-   .agpay-card-add-icon-hover {
+   .ag-card-add-icon-hover {
      position: absolute;
      width: 80px;
      height: 80px;
      opacity: 0;
    }
-  .agpay-card-add-text {
+  .ag-card-add-text {
     padding-top: 5px;
     font-size: 16px;
     color: rgba(0, 0, 0, 0.35);

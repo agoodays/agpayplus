@@ -4,9 +4,9 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <agpay-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
-            <agpay-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
-            <agpay-text-up :placeholder="'商户名称'" :msg="searchData.mchName" v-model="searchData.mchName"/>
+            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
+            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
+            <ag-text-up :placeholder="'商户名称'" :msg="searchData.mchName" v-model="searchData.mchName"/>
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="商户状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -33,7 +33,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <AgPayTable
+      <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
@@ -55,13 +55,13 @@
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_INFO_EDIT')" @click="editFunc(record.mchNo)">修改</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_APP_CONFIG')" @click="mchAppConfig(record.mchNo)">应用配置</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_INFO_DEL')" style="color: red" @click="delFunc(record.mchNo)">删除</a-button>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
-      </AgPayTable>
+      </AgTable>
     </a-card>
     <!-- 新增页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
@@ -70,9 +70,9 @@
   </page-header-wrapper>
 </template>
 <script>
-import AgPayTable from '@/components/AgPayTable/AgPayTable'
-import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_MCH_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import InfoDetail from './Detail'
@@ -90,7 +90,7 @@ const tableColumns = [
 
 export default {
   name: 'MchListPage',
-  components: { AgPayTable, AgPayTableColumns, InfoAddOrEdit, InfoDetail, AgPayTextUp },
+  components: { AgTable, AgTableColumns, InfoAddOrEdit, InfoDetail, AgTextUp },
   data () {
     return {
       btnLoading: false,

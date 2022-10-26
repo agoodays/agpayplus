@@ -49,7 +49,7 @@
           </a-form-model-item>
           <a-form-model-item :label="item.desc" :prop="item.name" v-else-if="item.type === 'file'">
             <a-input v-model="ifParams[item.name]" disabled="disabled" />
-            <AgPayUpload
+            <AgUpload
               :action="action"
               :fileUrl="ifParams[item.name]"
               @uploadSuccess="uploadSuccess($event, item.name)"
@@ -57,7 +57,7 @@
               <template slot="uploadSlot" slot-scope="{loading}">
                 <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
-            </AgPayUpload>
+            </AgUpload>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -71,13 +71,13 @@
 </template>
 
 <script>
-import AgPayCard from '@/components/AgPayCard/AgPayCard'
-import AgPayUpload from '@/components/AgPayUpload/AgPayUpload'
+import AgCard from '@/components/AgCard/AgCard'
+import AgUpload from '@/components/AgUpload/AgUpload'
 import { API_URL_MCH_PAYCONFIGS_LIST, req, getMchPayConfigUnique, upload } from '@/api/manage'
 export default {
   components: {
-      AgPayCard,
-      AgPayUpload
+      AgCard,
+      AgUpload
   },
   props: {
     callbackFunc: { type: Function, default: () => ({}) }
@@ -245,14 +245,14 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-  .agpay-card-content {
+  .ag-card-content {
     width: 100%;
     position: relative;
     background-color: @ag-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .agpay-card-ops {
+  .ag-card-ops {
     width: 100%;
     height: 50px;
     background-color: @ag-card-back;
@@ -264,14 +264,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .agpay-card-content-header {
+  .ag-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .agpay-card-content-body {
+  .ag-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: start;

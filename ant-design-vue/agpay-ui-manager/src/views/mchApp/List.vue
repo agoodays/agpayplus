@@ -4,9 +4,9 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <agpay-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
-            <agpay-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <agpay-text-up :placeholder="'应用名称'" :msg="searchData.appName" v-model="searchData.appName"/>
+            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
+            <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+            <ag-text-up :placeholder="'应用名称'" :msg="searchData.appName" v-model="searchData.appName"/>
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -27,7 +27,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <AgPayTable
+      <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="false"
@@ -43,13 +43,13 @@
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_APP_EDIT')" @click="editFunc(record.appId)">修改</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.appId)">支付配置</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_APP_DEL')" style="color: red" @click="delFunc(record.appId)">删除</a-button>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
-      </AgPayTable>
+      </AgTable>
     </a-card>
     <!-- 新增应用  -->
     <MchAppAddOrEdit ref="mchAppAddOrEdit" :callbackFunc="searchFunc"/>
@@ -59,9 +59,9 @@
 </template>
 
 <script>
-import AgPayTable from '@/components/AgPayTable/AgPayTable'
-import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_MCH_APP, req } from '@/api/manage'
 import MchAppAddOrEdit from './AddOrEdit'
 import MchPayIfConfigList from './MchPayIfConfigList'
@@ -78,7 +78,7 @@ const tableColumns = [
 
 export default {
   name: 'MchAppPage',
-  components: { AgPayTable, AgPayTableColumns, AgPayTextUp, MchAppAddOrEdit, MchPayIfConfigList },
+  components: { AgTable, AgTableColumns, AgTextUp, MchAppAddOrEdit, MchPayIfConfigList },
   data () {
     return {
       btnLoading: false,

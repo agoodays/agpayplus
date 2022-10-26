@@ -6,8 +6,8 @@
           <div
               class="table-layer"
           >
-            <agpay-text-up :placeholder="'组ID'" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
-            <agpay-text-up :placeholder="'组名称'" :msg="searchData.receiverGroupName" v-model="searchData.receiverGroupName" />
+            <ag-text-up :placeholder="'组ID'" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
+            <ag-text-up :placeholder="'组名称'" :msg="searchData.receiverGroupName" v-model="searchData.receiverGroupName" />
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -20,7 +20,7 @@
       </div>
 
       <!-- 列表渲染 -->
-      <AgPayTable
+      <AgTable
           ref="infoTable"
           :initData="true"
           :reqTableDataFunc="reqTableDataFunc"
@@ -30,12 +30,12 @@
           rowKey="receiverGroupId"
       >
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgPayTableColumns>
+          <AgTableColumns>
             <a v-if="$access('ENT_DIVISION_RECEIVER_GROUP_EDIT')" @click="editFunc(record.receiverGroupId)">修改</a>
             <a style="color: red" v-if="$access('ENT_DIVISION_RECEIVER_GROUP_DELETE')" @click="delFunc(record.receiverGroupId)">删除</a>
-          </AgPayTableColumns>
+          </AgTableColumns>
         </template>
-      </AgPayTable>
+      </AgTable>
     </a-card>
 
     <!-- 新增 / 修改 页面组件  -->
@@ -45,11 +45,11 @@
 
 </template>
 <script>
-import AgPayTable from '@/components/AgPayTable/AgPayTable'
-import AgPayTableColumns from '@/components/AgPayTable/AgPayTableColumns'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_DIVISION_RECEIVER_GROUP, req } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
-import AgPayTextUp from '@/components/AgPayTextUp/AgPayTextUp' // 文字上移组件
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
@@ -63,7 +63,7 @@ const tableColumns = [
 
 export default {
   name: 'RolePage',
-  components: { AgPayTable, AgPayTableColumns, InfoAddOrEdit, AgPayTextUp },
+  components: { AgTable, AgTableColumns, InfoAddOrEdit, AgTextUp },
   data () {
     return {
       tableColumns: tableColumns,

@@ -9,32 +9,32 @@
     width="80%"
 
   >
-    <AgPayCard
+    <AgCard
       ref="infoCard"
       :reqCardListFunc="reqCardListFunc"
       :span="agpayCard.span"
       :height="agpayCard.height"
     >
       <div slot="cardContentSlot" slot-scope="{record}">
-        <div :style="{'height': agpayCard.height + 'px'}" class="agpay-card-content">
+        <div :style="{'height': agpayCard.height + 'px'}" class="ag-card-content">
           <!-- 卡片自定义样式 -->
-          <div class="agpay-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
+          <div class="ag-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
             <img v-if="record.icon" :src="record.icon" :style="{height: agpayCard.height/5 + 'px'}">
           </div>
-          <div class="agpay-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
+          <div class="ag-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
             <div class="title">
               {{ record.ifName }}
             </div>
             <a-badge :status="record.ifConfigState ===1 ? 'processing' : 'error'" :text="record.ifConfigState ===1 ? '启用' : '未开通'" ></a-badge>
           </div>
           <!-- 卡片底部操作栏 -->
-          <div class="agpay-card-ops">
+          <div class="ag-card-ops">
             <a v-if="$access('ENT_ISV_PAY_CONFIG_ADD')" @click="editPayIfConfigFunc(record)">填写参数 <a-icon key="right" type="right" style="fontSize: 13px"></a-icon></a>
             <a v-else>暂无操作</a>
           </div>
         </div>
       </div>
-    </AgPayCard>
+    </AgCard>
     <a-drawer
       title="支付参数配置"
       width="40%"
@@ -91,7 +91,7 @@
             </a-form-model-item>
             <a-form-model-item :label="item.desc" :prop="item.name" v-else-if="item.type === 'file'">
               <a-input v-model="ifParams[item.name]" disabled="disabled" />
-              <AgPayUpload
+              <AgUpload
                 :action="action"
                 :fileUrl="ifParams[item.name]"
                 @uploadSuccess="uploadSuccess($event, item.name)"
@@ -99,7 +99,7 @@
                 <template slot="uploadSlot" slot-scope="{loading}">
                   <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
                 </template>
-              </AgPayUpload>
+              </AgUpload>
             </a-form-model-item>
           </a-col>
         </a-row>
@@ -122,16 +122,16 @@
 </template>
 
 <script>
-import AgPayCard from '@/components/AgPayCard/AgPayCard'
-import AgPayUpload from '@/components/AgPayUpload/AgPayUpload'
+import AgCard from '@/components/AgCard/AgCard'
+import AgUpload from '@/components/AgUpload/AgUpload'
 import WxpayPayConfig from './custom/WxpayPayConfig'
 import AlipayPayConfig from './custom/AlipayPayConfig'
 import { API_URL_ISV_PAYCONFIGS_LIST, getIsvPayConfigUnique, req, upload } from '@/api/manage'
 
 export default {
   components: {
-    AgPayCard,
-    AgPayUpload,
+    AgCard,
+    AgUpload,
     WxpayPayConfig,
     AlipayPayConfig
   },
@@ -320,14 +320,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .agpay-card-content {
+  .ag-card-content {
     width: 100%;
     position: relative;
     background-color: @ag-card-back;
     border-radius: 6px;
     overflow:hidden;
   }
-  .agpay-card-ops {
+  .ag-card-ops {
     width: 100%;
     height: 50px;
     background-color: @ag-card-back;
@@ -339,14 +339,14 @@ export default {
     position: absolute;
     bottom: 0;
   }
-  .agpay-card-content-header {
+  .ag-card-content-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .agpay-card-content-body {
+  .ag-card-content-body {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
