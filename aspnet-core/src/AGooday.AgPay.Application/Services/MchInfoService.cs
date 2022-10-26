@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Application.Services
             var mchInfo = _mchInfoRepository.GetById(mchNo);
             var dto = _mapper.Map<MchInfoDetailDto>(mchInfo);
             var sysUser = _sysUserRepository.GetById(mchInfo.InitUserId.Value);
-            dto.LoginUserName = sysUser.LoginUsername;
+            dto.LoginUsername = sysUser.LoginUsername;
             return dto;
         }
 

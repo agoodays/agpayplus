@@ -20,10 +20,10 @@
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="登录名" prop="loginUserName">
+          <a-form-model-item label="登录名" prop="loginUsername">
             <a-input
               placeholder="请输入商户登录名"
-              v-model="saveObject.loginUserName"
+              v-model="saveObject.loginUsername"
               :disabled="!this.isAdd"
             />
           </a-form-model-item>
@@ -219,7 +219,7 @@ export default {
       isvList: null, // 服务商下拉列表
       rules: {
         mchName: [{ required: true, message: '请输入商户名称', trigger: 'blur' }],
-        loginUserName: [{ required: true, pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/, message: '请输入字母开头，长度为6-18位的登录名', trigger: 'blur' }],
+        loginUsername: [{ required: true, pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/, message: '请输入字母开头，长度为6-18位的登录名', trigger: 'blur' }],
         mchShortName: [{ required: true, message: '请输入商户简称', trigger: 'blur' }],
         contactName: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
         isvNo: [{ validator: checkIsvNo, trigger: 'blur' }],

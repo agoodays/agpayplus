@@ -15,6 +15,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 登录名
         /// </summary>
-        public string LoginUserName { get; set; }
+        public string LoginUsername { get; set; }
     }
 }

@@ -24,7 +24,7 @@
       <a-col :sm="12">
         <a-descriptions>
           <a-descriptions-item label="登录名">
-            {{ detailData.loginUserName }}
+            {{ detailData.loginUsername }}
           </a-descriptions-item>
         </a-descriptions>
       </a-col>
