@@ -52,8 +52,11 @@ namespace AGooday.AgPay.Application.Services
 
         public bool Update(MchAppDto dto)
         {
-            var m = _mapper.Map<MchApp>(dto);
-            _mchAppRepository.Update(m);
+            var renew = _mapper.Map<MchApp>(dto);
+            var old = _mchAppRepository.GetById(dto.AppId);
+            renew.UpdatedAt = DateTime.Now;
+            renew.AppSecret = string.IsNullOrWhiteSpace(renew.AppSecret) ? old.AppSecret : renew.AppSecret;
+            _mchAppRepository.Update(renew);
             return _mchAppRepository.SaveChanges(out int _);
         }
 

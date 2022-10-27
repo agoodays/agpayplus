@@ -212,6 +212,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return Task.FromResult(new Unit());
             }
 
+            request.UpdatedAt = DateTime.Now;
             var mchInfo = _mapper.Map<MchInfo>(request);
 
             // 待删除用户登录信息的ID list

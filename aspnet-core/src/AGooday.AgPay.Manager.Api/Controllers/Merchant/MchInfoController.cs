@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{mchNo}")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_EDIT)]
-        public ApiRes Update(string mchNo, MchInfoModifyDto dto)
+        public async Task<ApiRes> Update(string mchNo, MchInfoModifyDto dto)
         {
             _mchInfoService.Modify(dto);
             // 是否存在消息通知

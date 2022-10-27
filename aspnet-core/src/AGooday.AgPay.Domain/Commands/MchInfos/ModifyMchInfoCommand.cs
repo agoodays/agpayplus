@@ -11,11 +11,6 @@ namespace AGooday.AgPay.Domain.Commands.MchInfos
     public class ModifyMchInfoCommand : MchInfoCommand
     {
         /// <summary>
-        /// 商户号
-        /// </summary>
-        public string MchNo { get; set; }
-
-        /// <summary>
         /// 默认密码
         /// </summary>
         public bool DefaultPass { get; set; }

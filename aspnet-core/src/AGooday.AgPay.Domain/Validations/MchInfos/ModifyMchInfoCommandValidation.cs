@@ -13,7 +13,6 @@ namespace AGooday.AgPay.Domain.Validations.MchInfos
         {
             ValidateMchName();
             ValidateMchShortName();
-            ValidateLoginUsername();
             ValidateContactName();
             ValidateContactTel();
         }

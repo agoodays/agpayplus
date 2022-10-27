@@ -10,6 +10,11 @@ namespace AGooday.AgPay.Domain.Commands.MchInfos
     public abstract class MchInfoCommand : Command
     {
         /// <summary>
+        /// 商户号
+        /// </summary>
+        public string MchNo { get; set; }
+
+        /// <summary>
         /// 商户名称
         /// </summary>
         public string MchName { get; set; }
@@ -55,8 +60,28 @@ namespace AGooday.AgPay.Domain.Commands.MchInfos
         public string Remark { get; set; }
 
         /// <summary>
-        /// 登录名
+        /// 初始用户ID（创建商户时，允许商户登录的用户）
         /// </summary>
-        public string LoginUsername { get; set; }
+        public long? InitUserId { get; set; }
+
+        /// <summary>
+        /// 创建者用户ID
+        /// </summary>
+        public long? CreatedUid { get; set; }
+
+        /// <summary>
+        /// 创建者姓名
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdatedAt { get; set; }
     }
 }

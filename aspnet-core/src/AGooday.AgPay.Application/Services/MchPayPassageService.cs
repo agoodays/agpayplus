@@ -1,17 +1,17 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Domain.Commands.SysUsers;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AGooday.AgPay.Common.Constants;
+using Microsoft.EntityFrameworkCore;
+using AGooday.AgPay.Common.Enumerator;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -98,25 +98,29 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoType"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, byte infoType, byte type)
+        public IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, byte infoType, byte mchType)
         {
-            var result = _payInterfaceDefineRepository.GetAll()
-                .Join(_payInterfaceDefineRepository.GetAll<PayInterfaceConfig>(),
-                pid => pid.IfCode, pic => pic.IfCode,
-                (pid, pic) => new { pid, pic })
-                .Where(w => w.pid.State.Equals(CS.YES) && w.pic.State.Equals(CS.YES)
-                && w.pid.WayCodes.Contains(wayCode) && w.pic.InfoType.Equals(infoType) && w.pic.InfoId.Equals(appId)
-                && !string.IsNullOrWhiteSpace(w.pic.IfParams.Trim()))
-                .Select(s => new AvailablePayInterfaceDto()
-                {
-                    IfCode = s.pid.IfCode,
-                    IfName = s.pid.IfName,
-                    ConfigPageType = s.pid.ConfigPageType,
-                    Icon = s.pid.Icon,
-                    BgColor = s.pid.BgColor,
-                    IfParams = s.pic.IfParams,
-                    IfRate = s.pic.IfRate * 100,
-                });
+            //var result = _payInterfaceDefineRepository.GetAll()
+            //    .Join(_payInterfaceDefineRepository.GetAll<PayInterfaceConfig>(),
+            //    pid => pid.IfCode, pic => pic.IfCode,
+            //    (pid, pic) => new { pid, pic })
+            //    .Where(w => w.pid.State.Equals(CS.YES) && w.pic.State.Equals(CS.YES)
+            //    && EF.Functions.JsonContains(w.pid.WayCodes, new { wayCode = wayCode })//&& w.pid.WayCodes.Contains(wayCode) 
+            //    && w.pic.InfoType.Equals(infoType) && w.pic.InfoId.Equals(appId)
+            //    && ((mchType.Equals(CS.MCH_TYPE_NORMAL) && w.pid.IsMchMode.Equals(CS.YES)) || (mchType.Equals(CS.MCH_TYPE_ISVSUB) && w.pid.IsIsvMode.Equals(CS.YES)))
+            //    && !string.IsNullOrWhiteSpace(w.pic.IfParams.Trim()))
+            //    .Select(s => new AvailablePayInterfaceDto()
+            //    {
+            //        IfCode = s.pid.IfCode,
+            //        IfName = s.pid.IfName,
+            //        ConfigPageType = s.pid.ConfigPageType,
+            //        Icon = s.pid.Icon,
+            //        BgColor = s.pid.BgColor,
+            //        IfParams = s.pic.IfParams,
+            //        IfRate = s.pic.IfRate * 100,
+            //    });
+            var result = _payInterfaceDefineRepository.SelectAvailablePayInterfaceList<AvailablePayInterfaceDto>(wayCode, appId, infoType, mchType);
+
             if (result != null)
             {
                 var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));

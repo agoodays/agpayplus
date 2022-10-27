@@ -55,8 +55,10 @@ namespace AGooday.AgPay.Application.Services
 
         public bool Update(IsvInfoDto dto)
         {
-            var m = _mapper.Map<IsvInfo>(dto);
-            _isvInfoRepository.Update(m);
+            var renew = _mapper.Map<IsvInfo>(dto);
+            //var old = _isvInfoRepository.GetById(dto.IsvNo);
+            renew.UpdatedAt = DateTime.Now;
+            _isvInfoRepository.Update(renew);
             return _isvInfoRepository.SaveChanges(out int _);
         }
 

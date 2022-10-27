@@ -10,13 +10,8 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// <summary>
     /// 商户信息表
     /// </summary>
-    public class MchInfoModifyDto : MchInfoCreateDto
+    public class MchInfoModifyDto : MchInfoDto
     {
-        /// <summary>
-        /// 商户号
-        /// </summary>
-        public string MchNo { get; set; }
-
         /// <summary>
         /// 系统用户ID
         /// </summary>

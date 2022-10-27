@@ -72,10 +72,10 @@ namespace AGooday.AgPay.Application.Services
             return _mchInfoRepository.SaveChanges(out int _);
         }
 
-        public void Modify(MchInfoModifyDto dto)
+        public async void Modify(MchInfoModifyDto dto)
         {
             var command = _mapper.Map<ModifyMchInfoCommand>(dto);
-            Bus.SendCommand(command);
+            await Bus.SendCommand(command);
         }
 
         public MchInfoDto GetById(string recordId)
