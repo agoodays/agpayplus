@@ -130,7 +130,7 @@ namespace AGooday.AgPay.Application.Services
                     if (payPassage != null)
                     {
                         item.PassageId = payPassage.Id;
-                        item.State = payPassage.State;
+                        item.State = (sbyte)payPassage.State;
                         item.Rate = payPassage.Rate * 100;
                     }
                 }

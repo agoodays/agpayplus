@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 支付参数配置页面类型:1-JSON渲染,2-自定义
         /// </summary>
-        public byte ConfigPageType { get; set; }
+        public sbyte ConfigPageType { get; set; }
 
         /// <summary>
         /// 页面展示：卡片-图标
@@ -56,6 +56,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 通道状态: 0-停用, 1-启用
         /// </summary>
-        public byte? State { get; set; }
+        public sbyte? State { get; set; }
     }
 }

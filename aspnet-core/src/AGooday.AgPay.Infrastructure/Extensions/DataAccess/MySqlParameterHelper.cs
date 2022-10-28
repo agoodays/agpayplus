@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
     /// <summary>
     /// Use for an alternative param name other than the propery name
     /// </summary>
-    [System.AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class QueryParamNameAttribute : Attribute
     {
         public string Name { get; set; }
@@ -26,12 +26,12 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
     /// <summary>
     /// Ignore this property
     /// </summary>
-    [System.AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class QueryParamIgnoreAttribute : Attribute
     {
     }
 
-    public static class SqlParameterExtensions
+    public static class MySqlParameterExtensions
     {
         private class QueryParamInfo
         {
@@ -41,12 +41,12 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
 
 
 
-        public static object[] ToSqlParamsArray(this object obj, SqlParameter[] additionalParams = null)
+        public static object[] ToSqlParamsArray(this object obj, MySqlParameter[] additionalParams = null)
         {
             var result = ToSqlParamsList(obj, additionalParams);
             return result.ToArray<object>();
         }
-        public static List<SqlParameter> ToSqlParamsList(this object obj, SqlParameter[] additionalParams = null)
+        public static List<MySqlParameter> ToSqlParamsList(this object obj, MySqlParameter[] additionalParams = null)
         {
             var props = (
                 from p in obj.GetType().GetProperties()
@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
                 let ignoreAttr = p.GetCustomAttributes(typeof(QueryParamIgnoreAttribute), true)
                 select new { Property = p, Names = nameAttr, Ignores = ignoreAttr }).ToList();
 
-            var result = new List<SqlParameter>();
+            var result = new List<MySqlParameter>();
 
             props.ForEach(p =>
             {
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
                     pinfo.Name = p.Property.Name.Replace("@", "");
 
                 pinfo.Value = p.Property.GetValue(obj) ?? DBNull.Value;
-                var sqlParam = new SqlParameter(pinfo.Name, TypeConvertor.ToSqlDbType(p.Property.PropertyType))
+                var sqlParam = new MySqlParameter(pinfo.Name, TypeConvertor.ToSqlDbType(p.Property.PropertyType))
                 {
                     Value = pinfo.Value
                 };

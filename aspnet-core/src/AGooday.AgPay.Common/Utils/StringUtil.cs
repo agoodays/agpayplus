@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Common.Utils
 {
-    public class StringUtil
+    public static class  StringUtil
     {
         public static string ToHex(byte[] bytes) // 0xae00cf => "AE00CF "
         {
@@ -125,8 +126,28 @@ namespace AGooday.AgPay.Common.Utils
             {
                 starStr = starStr + "*";
             }
-            return content.Substring(0, frontNum) + starStr
-                    + content.Substring(content.Length - endNum, content.Length);
+            return content.SubstringUp(0, frontNum) + starStr
+                    + content.SubstringUp(content.Length - endNum, content.Length);
+        }
+
+        public static string SubstringUp(this string value, int beginIndex, int endIndex)
+        {
+            int length = value.Length;
+            CheckBoundsBeginEnd(beginIndex, endIndex, length);
+            int subLen = endIndex - beginIndex;
+            if (beginIndex == 0 && endIndex == length)
+            {
+                return value;
+            }
+            return value.Substring(beginIndex, endIndex - beginIndex);
+        }
+
+        public static void CheckBoundsBeginEnd(int begin, int end, int length)
+        {
+            if (begin < 0 || begin > end || end > length)
+            {
+                throw new ArgumentException("begin " + begin + ", end " + end + ", length " + length);
+            }
         }
 
         public static bool IsAvailableUrl(string url)

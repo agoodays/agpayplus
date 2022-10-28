@@ -85,14 +85,24 @@ services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 // Automapper 注入
 services.AddAutoMapperSetup();
 services.AddControllers()
-    .AddNewtonsoftJson(options =>
-    {
-        //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
-        //options.SerializerSettings.Formatting = Formatting.Indented;
-        //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-        options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
-        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
-    });
+    .AddNewtonsoftJson();
+    //.AddNewtonsoftJson(options =>
+    //{
+    //    //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
+    //    //options.SerializerSettings.Formatting = Formatting.Indented;
+    //    //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+    //    options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+    //    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
+    //});
+
+// Newtonsoft.Json 全部配置 
+JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+{
+    Formatting = Formatting.Indented,
+    DateFormatString = "yyyy-MM-dd HH:mm:ss",
+    ContractResolver = new CamelCasePropertyNamesContractResolver()
+};
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(options =>
