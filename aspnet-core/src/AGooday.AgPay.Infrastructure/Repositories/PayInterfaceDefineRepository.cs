@@ -2,10 +2,8 @@
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,12 +36,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                     sql += "\nand pid.is_isv_mode = 1";
                     break;
             }
-            SqlParameter[] para =  {
-                new  SqlParameter("@wayCode",wayCode),
-                new  SqlParameter("@infoType",infoType),
-                new  SqlParameter("@appId",appId),
-            };
-            return Db.Database.FromSql<T>(sql, para);
+            return Db.Database.FromSql<T>(sql, new {
+                WayCode= wayCode,
+                InfoType = infoType,
+                AppId= appId
+            });
         }
     }
 }
