@@ -185,7 +185,7 @@ namespace AGooday.AgPay.Application.Services
                 var entity = _mapper.Map<PayInterfaceDefineDto>(define);
                 entity.MchType = mchInfo.Type;// 所属商户类型
                 entity.IfConfigState = configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
-                entity.SubMchIsvConfig = mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.TryGetValue(define.IfCode, out _) ? CS.NO : null;
+                entity.SubMchIsvConfig = mchInfo.Type == CS.MCH_TYPE_ISVSUB && !isvPayConfigMap.TryGetValue(define.IfCode, out _) ? CS.NO : null;
                 return entity;
             }).ToList();
 

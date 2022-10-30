@@ -41,6 +41,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         protected CurrentUser GetCurrentUser()
         {
             string currentUser = redis.StringGet(AuthContextService.CurrentUser.CacheKey);
+            if (currentUser == null)
+            {
+                return null;
+            }
             return JsonConvert.DeserializeObject<CurrentUser>(currentUser);
         }
         /// <summary>

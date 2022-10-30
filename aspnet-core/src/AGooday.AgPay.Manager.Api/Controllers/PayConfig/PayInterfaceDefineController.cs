@@ -111,11 +111,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             var wayCodes = dto.WayCodeStrs.Split(",");
             foreach (var wayCode in wayCodes)
             {
-                JObject value = new JObject();
-                value.Add("wayCode", wayCode);
-                jsonArray.Add(value);
+                JObject jsonObject = new JObject();
+                jsonObject.Add("wayCode", wayCode);
+                jsonArray.Add(jsonObject);
             }
-            dto.WayCodes = JArray.FromObject(wayCodes);
+            dto.WayCodes = jsonArray;
             var result = _payIfDefineService.Update(dto);
             if (!result)
             {

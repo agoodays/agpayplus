@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Application.Params.AliPay
         /// <summary>
         /// 是否沙箱环境
         /// </summary>
-        public byte Sandbox { get; set; }
+        public byte? Sandbox { get; set; }
 
         /// <summary>
         /// pid
