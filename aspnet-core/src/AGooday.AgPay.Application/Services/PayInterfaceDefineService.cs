@@ -50,8 +50,10 @@ namespace AGooday.AgPay.Application.Services
 
         public bool Update(PayInterfaceDefineDto dto)
         {
-            var m = _mapper.Map<PayInterfaceDefine>(dto);
-            _payInterfaceDefineRepository.Update(m);
+            var renew = _mapper.Map<PayInterfaceDefine>(dto);
+            //var old = _payInterfaceDefineRepository.GetById(dto.IfCode);
+            renew.UpdatedAt = DateTime.Now;
+            _payInterfaceDefineRepository.Update(renew);
             return _payInterfaceDefineRepository.SaveChanges(out int _);
         }
 

@@ -9,6 +9,8 @@ using AGooday.AgPay.Common.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 {
@@ -54,8 +56,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPost, Route("")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_ADD)]
-        public ApiRes Add(PayInterfaceDefineDto dto)
+        public ApiRes Add(PayInterfaceDefineAddOrEditDto dto)
         {
+            JArray jsonArray = new JArray();
+            var wayCodes = dto.WayCodeStrs.Split(",");
+            foreach (var wayCode in wayCodes)
+            {
+                JObject value = new JObject();
+                value.Add("wayCode", wayCode);
+                jsonArray.Add(value);
+            }
+            dto.WayCodes = JArray.FromObject(wayCodes);
             var result = _payIfDefineService.Add(dto);
             if (!result)
             {
@@ -94,8 +105,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPut, Route("{ifCode}")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
-        public ApiRes Update(string ifCode, PayInterfaceDefineDto dto)
+        public ApiRes Update(string ifCode, PayInterfaceDefineAddOrEditDto dto)
         {
+            JArray jsonArray = new JArray();
+            var wayCodes = dto.WayCodeStrs.Split(",");
+            foreach (var wayCode in wayCodes)
+            {
+                JObject value = new JObject();
+                value.Add("wayCode", wayCode);
+                jsonArray.Add(value);
+            }
+            dto.WayCodes = JArray.FromObject(wayCodes);
             var result = _payIfDefineService.Update(dto);
             if (!result)
             {

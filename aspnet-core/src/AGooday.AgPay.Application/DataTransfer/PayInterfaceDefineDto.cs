@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,7 +60,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 支持的支付方式 ["wxpay_jsapi", "wxpay_bar"]
         /// </summary>
-        public string WayCodes { get; set; }
+        public JArray WayCodes { get; set; }
 
         /// <summary>
         /// 页面展示：卡片-图标

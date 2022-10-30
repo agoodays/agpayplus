@@ -4,6 +4,8 @@ using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +38,9 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<MchNotifyRecordDto, MchNotifyRecord>();
             CreateMap<MchPayPassageDto, MchPayPassage>();
             CreateMap<PayInterfaceConfigDto, PayInterfaceConfig>();
-            CreateMap<PayInterfaceDefineDto, PayInterfaceDefine>();
+            CreateMap<PayInterfaceDefineAddOrEditDto, PayInterfaceDefine>();
+            CreateMap<PayInterfaceDefineDto, PayInterfaceDefine>()
+                .ForMember(d => d.WayCodes, o => o.MapFrom(s => JsonConvert.SerializeObject(s.WayCodes)));
             CreateMap<PayOrderDivisionRecordDto, PayOrderDivisionRecord>();
             CreateMap<PayOrderDto, PayOrder>();
             CreateMap<PayWayDto, PayWay>();
