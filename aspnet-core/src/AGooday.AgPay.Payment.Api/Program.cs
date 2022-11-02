@@ -80,7 +80,7 @@ services.AddMemoryCache();
 
 // Automapper ×¢Èë
 services.AddAutoMapperSetup();
-services.AddControllers()
+services.AddControllersWithViews()
     .AddNewtonsoftJson();
     //.AddNewtonsoftJson(options =>
     //{

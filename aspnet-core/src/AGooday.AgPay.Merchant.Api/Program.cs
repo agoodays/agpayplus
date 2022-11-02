@@ -84,7 +84,7 @@ services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 // Automapper ×¢Èë
 services.AddAutoMapperSetup();
-services.AddControllers()
+services.AddControllersWithViews()
     .AddNewtonsoftJson();
     //.AddNewtonsoftJson(options =>
     //{

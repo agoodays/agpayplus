@@ -7,14 +7,21 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
 {
     [Route("api/anon/channelUserIdCallback")]
     [ApiController, AllowAnonymous]
-    public class ChannelUserIdNotifyController : ControllerBase
+    public class ChannelUserIdNotifyController : Controller
     {
         [HttpGet, Route("")]
-        public string ChannelUserId(string appId, string channelUserId, string extParam)
+        public ActionResult ChannelUserId(string appId, string channelUserId, string extParam)
         {
-            // WebSocket 推送到前端
+            try
+            {
+                // WebSocket 推送到前端
 
-            return "channelUser/getChannelUserIdPage";
+            }
+            catch (Exception e)
+            {
+                ViewBag.ErrMsg = e.Message;
+            }
+            return View("~/Views/ChannelUser/GetChannelUserIdPage.cshtml");
         }
     }
 }

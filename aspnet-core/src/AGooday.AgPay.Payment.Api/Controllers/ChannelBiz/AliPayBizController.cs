@@ -116,7 +116,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
 
                     // 更新应用配置信息
                     mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, mchApp.MchNo, mchApp.AppId));
-
                 }
             }
             catch (Exception e)
