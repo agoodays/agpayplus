@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     /// </summary>
     [ApiController]
     [Route("api/pay")]
-    public class ChannelNoticeController : ControllerBase
+    public class ChannelNoticeController : Controller
     {
         private readonly ILogger<AbstractPayOrderController> log;
         private readonly IPayOrderService payOrderService;
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         [HttpPost]
         [Route("/api/pay/return/{ifCode}")]
         [Route("/api/pay/return/{ifCode}/{payOrderId}")]
-        public string DoReturn(string ifCode, string payOrderId)
+        public ActionResult DoReturn(string ifCode, string payOrderId)
         {
             string urlOrderId = payOrderId;
             string logPrefix = $"进入[{ifCode}]支付同步跳转：urlOrderId：[{payOrderId}] ";
@@ -143,7 +143,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             {
                 log.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, BizException");
                 return this.ToReturnPage(e.Message);
-
             }
             catch (WebException e)
             {
@@ -289,9 +288,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// </summary>
         /// <param name="errInfo"></param>
         /// <returns></returns>
-        private string ToReturnPage(string errInfo)
+        private ActionResult ToReturnPage(string errInfo)
         {
-            return "cashier/returnPage";
+            return View("~/Views/Cashier/ReturnPage.cshtml");
         }
     }
 }
