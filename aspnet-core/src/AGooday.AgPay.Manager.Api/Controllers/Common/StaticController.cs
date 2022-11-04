@@ -8,7 +8,7 @@ using System.Web;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Common
 {
-    [ApiController, AllowAnonymous]
+    [ApiController, Authorize, AllowAnonymous]
     public class StaticController : ControllerBase
     {
         [HttpGet, Route("api/anon/localOssFiles/{*path}")]

@@ -19,6 +19,7 @@ using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AGooday.AgPay.Components.OSS.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +86,7 @@ services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 // Automapper ×¢Èë
 services.AddAutoMapperSetup();
 services.AddControllers()
+    .AddApplicationPart(typeof(OssFileController).Assembly)
     .AddNewtonsoftJson();
     //.AddNewtonsoftJson(options =>
     //{

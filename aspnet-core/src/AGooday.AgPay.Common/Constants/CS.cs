@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Common.Constants
         /// <summary>
         /// 停用
         /// </summary>
-        public const int PUB_DISABLE = 0; 
+        public const int PUB_DISABLE = 0;
         #endregion
 
         #region 账号类型:1-服务商 2-商户 3-商户应用
@@ -85,6 +85,11 @@ namespace AGooday.AgPay.Common.Constants
         /// </summary>
         public const string DEFAULT_PWD = "agpay666";
 
+        /// <summary>
+        /// 允许上传的的图片文件格式，需要与 WebSecurityConfig对应
+        /// </summary>
+        public static List<string> ALLOW_UPLOAD_IMG_SUFFIX = new List<string>() { "jpg" ,"png" ,"jpeg" ,"gif" ,"mp4" };
+
         public const int TOKEN_TIME = 60 * 60 * 2; //单位：s,  两小时
 
         /// <summary>
@@ -110,7 +115,7 @@ namespace AGooday.AgPay.Common.Constants
         public static string GetCacheKeyImgCode(string imgToken)
         {
             return string.Format(CACHE_KEY_IMG_CODE, imgToken);
-        } 
+        }
         #endregion
 
         /// <summary>
