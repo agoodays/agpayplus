@@ -1,6 +1,6 @@
 ﻿namespace AGooday.AgPay.Components.OSS.Config
 {
-    public class AliyunOssYmlConfig
+    public class AliyunOssConfig
     {
         public string Endpoint { get; set; }
         public string PublicBucketName { get; set; }

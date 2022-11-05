@@ -10,7 +10,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpGet, Route("index")]
         public ActionResult Index()
         {
-            return View("~/Views/Home/Index.cshtml");
+            return View();
+            //return View("~/Views/Home/Index.cshtml");
         }
     }
 }

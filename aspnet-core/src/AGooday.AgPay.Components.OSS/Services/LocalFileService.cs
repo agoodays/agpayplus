@@ -14,32 +14,25 @@ namespace AGooday.AgPay.Components.OSS.Services
     public class LocalFileService : IOssService
     {
         private readonly ISysConfigService sysConfigService;
-        private readonly OssYmlConfig ossYmlConfig;
         private readonly ILogger<LocalFileService> logger;
 
-        public LocalFileService(ISysConfigService sysConfigService, OssYmlConfig ossYmlConfig, ILogger<LocalFileService> logger)
+        public LocalFileService(ILogger<LocalFileService> logger, ISysConfigService sysConfigService)
         {
-            this.sysConfigService = sysConfigService;
-            this.ossYmlConfig = ossYmlConfig;
             this.logger = logger;
-        }
-
-        public bool DownloadFile(OssSavePlaceEnum ossSavePlaceEnum, string source, string target)
-        {
-            throw new NotImplementedException();
+            this.sysConfigService = sysConfigService;
         }
 
         public async Task<string> Upload2PreviewUrl(OssSavePlaceEnum ossSavePlaceEnum, List<IFormFile> multipartFile, string saveDirAndFileName)
         {
             try
             {
-                string savePath = ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? ossYmlConfig.Oss.FilePublicPath : ossYmlConfig.Oss.FilePrivatePath;
-
+                string savePath = ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? LocalOssConfig.oss.FilePublicPath : LocalOssConfig.oss.FilePrivatePath;
+                savePath = savePath.Replace("/", @"\");
                 foreach (var formFile in multipartFile)
                 {
                     if (formFile.Length > 0)
                     {
-                        var filePath = $"{savePath}/{saveDirAndFileName}";
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), savePath, saveDirAndFileName); 
 
                         using (var stream = File.Create(filePath))
                         {
@@ -50,7 +43,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             }
             catch (Exception e)
             {
-                logger.LogError("", e);
+                logger.LogError(e.Message, e);
             }
 
             // 私有文件 不返回预览文件地址
@@ -59,7 +52,12 @@ namespace AGooday.AgPay.Components.OSS.Services
                 return saveDirAndFileName;
             }
 
-            return sysConfigService.GetDBApplicationConfig().OssPublicSiteUrl + "/" + saveDirAndFileName;
+            return $"{sysConfigService.GetDBApplicationConfig().OssPublicSiteUrl}/{saveDirAndFileName.Replace(@"\","/")}";
+        }
+
+        public bool DownloadFile(OssSavePlaceEnum ossSavePlaceEnum, string source, string target)
+        {
+            return false;
         }
     }
 }

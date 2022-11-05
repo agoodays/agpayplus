@@ -67,9 +67,7 @@
     <script src="https://cdn.staticfile.org/layui/2.4.3/layui.min.js"></script>
     <script>
         layui.use(['jquery'], function () {
-
             layui.$(".closeBtn").click(function () {
-
                 var ua = navigator.userAgent.toLowerCase();
                 if (ua.match(/MicroMessenger/i) == "micromessenger") {
                     WeixinJSBridge.call('closeWindow');
@@ -81,8 +79,6 @@
                 }
             });
         });
-
-
     </script>
 </body>
 </html>

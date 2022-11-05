@@ -20,6 +20,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using AGooday.AgPay.Components.OSS.Controllers;
+using AGooday.AgPay.Components.OSS.Services;
+using AGooday.AgPay.Components.OSS.Config;
+using AGooday.AgPay.Components.OSS.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +63,10 @@ services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB
 #region MQ
 var mqconfiguration = builder.Configuration.GetSection("MQ:RabbitMQ");
 services.Configure<RabbitMQConfiguration>(mqconfiguration);
+#endregion
+
+#region OSS
+builder.Configuration.GetSection("OSS").Bind(LocalOssConfig.oss);
 #endregion
 
 services.AddCors(o =>
@@ -154,6 +161,13 @@ services.AddSingleton<IMQSender, RabbitMQSender>();
 services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
 services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
 services.AddHostedService<RabbitListener>();
+#endregion
+
+#region OSS
+if (builder.Configuration.GetSection("OSS:ServiceType").Value .Equals("local"))
+{
+    services.AddScoped<IOssService, LocalFileService>();
+}
 #endregion
 
 var app = builder.Build();

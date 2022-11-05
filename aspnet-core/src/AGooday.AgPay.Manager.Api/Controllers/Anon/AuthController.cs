@@ -33,6 +33,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
     [Route("api/anon/auth")]
     public class AuthController : ControllerBase
     {
+        private readonly IWebHostEnvironment _appEnvironment;
         private readonly ILogger<AuthController> _logger;
         private readonly JwtSettings _jwtSettings;
         private readonly ISysUserAuthService _sysUserAuthService;

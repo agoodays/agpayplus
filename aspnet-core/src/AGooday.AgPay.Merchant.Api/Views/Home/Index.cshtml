@@ -46,5 +46,22 @@
     <div class="mainDiv3 layui-fluid">
         <a class="layui-btn layui-btn-primary closeBtn">关闭页面</a>
     </div>
+
+    <script src="https://cdn.staticfile.org/layui/2.4.3/layui.min.js"></script>
+    <script>
+        layui.use(['jquery'], function () {
+            layui.$(".closeBtn").click(function () {
+                var ua = navigator.userAgent.toLowerCase();
+                if (ua.match(/MicroMessenger/i) == "micromessenger") {
+                    WeixinJSBridge.call('closeWindow');
+                } else if (ua.indexOf("alipay") != -1) {
+                    AlipayJSBridge.call('closeWebview');
+                }
+                else {
+                    window.close();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

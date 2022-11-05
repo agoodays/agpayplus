@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,6 +33,15 @@ namespace AGooday.AgPay.Components.OSS.Controllers
         [HttpPost, Route("{bizType}")]
         public async Task<ApiRes> SingleFileUpload([FromForm] IFormFile file, string bizType)
         {
+            //var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", bizType + Path.GetExtension(file.FileName));//Path.GetTempFileName();
+            //if (file.Length > 0)
+            //{
+            //    using (var stream = System.IO.File.Create(filePath))
+            //    {
+            //        await file.CopyToAsync(stream);
+            //    }
+            //}
+            //return ApiRes.Ok(filePath);
             if (file == null)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "选择文件不存在");
@@ -47,6 +57,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
                 }
 
                 // 2. 判断文件是否支持
+                string suffix = Path.GetExtension(file.FileName);
                 string fileSuffix = FileKit.GetFileSuffix(file.FileName, false);
                 if (!ossFileConfig.IsAllowFileSuffix(fileSuffix))
                 {
@@ -60,16 +71,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
                 }
 
                 // 新文件地址 (xxx/xxx.jpg 格式)
-                string saveDirAndFileName = bizType + "/" + Guid.NewGuid().ToString("N") + "." + fileSuffix;
-                if (file.Length > 0)
-                {
-                    var filePath = Path.GetTempFileName();
-
-                    using (var stream = System.IO.File.Create(filePath))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-                }
+                string saveDirAndFileName = Path.Combine(bizType, $"{Guid.NewGuid().ToString("N")}{Path.GetExtension(file.FileName)}");
                 string url = await ossService.Upload2PreviewUrl(ossFileConfig.OssSavePlaceEnum, new List<IFormFile>() { file }, saveDirAndFileName);
                 return ApiRes.Ok(url);
             }

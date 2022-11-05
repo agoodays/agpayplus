@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AGooday.AgPay.Components.OSS.Config;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.SqlServer.Server;
@@ -78,6 +79,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
 
         private ActionResult ImgView(string path, string format)
         {
+            path = Path.Combine(Directory.GetCurrentDirectory(), LocalOssConfig.oss.FilePublicPath, path);
             using (var sw = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 var bytes = new byte[sw.Length];
@@ -95,7 +97,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
         private bool IsImage(string format)
         {
             var formats = new List<string> { "jpg", "tiff", "gif", "jfif", "png", "tif", "ico", "jpeg", "wbmp", "fax", "net", "jpe" };
-            return string.IsNullOrEmpty(format) && formats.Contains(format.ToLower());
+            return !string.IsNullOrEmpty(format) && formats.Contains(format.ToLower());
         }
 
         private string GetContentType(string format)
