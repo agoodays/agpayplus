@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 权限ID[ENT_功能模块_子模块_操作], eg: ENT_ROLE_LIST_ADD
         /// </summary>
         [Comment("权限ID[ENT_功能模块_子模块_操作], eg: ENT_ROLE_LIST_ADD")]
-        [Key, Required, Column("ent_id", TypeName = "varchar(64)")]
+        [Required, Column("ent_id", TypeName = "varchar(64)")]
         public string EntId { get; set; }
 
         /// <summary>

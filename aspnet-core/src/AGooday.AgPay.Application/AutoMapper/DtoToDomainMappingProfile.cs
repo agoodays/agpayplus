@@ -47,6 +47,7 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<RefundOrderDto, RefundOrder>();
             CreateMap<SysConfigDto, SysConfig>();
             CreateMap<SysEntitlementDto, SysEntitlement>();
+            CreateMap<SysEntModifyDto, SysEntitlement>();
             CreateMap<SysLogDto, SysLog>();
 
             CreateMap<SysRoleDto, SysRole>();

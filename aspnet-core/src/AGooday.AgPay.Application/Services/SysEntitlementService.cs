@@ -51,8 +51,9 @@ namespace AGooday.AgPay.Application.Services
 
         public void Update(SysEntModifyDto dto)
         {
-            var m = _mapper.Map<SysEntitlement>(dto);
-            _sysEntitlementRepository.Update(m);
+            var renew = _mapper.Map<SysEntitlement>(dto);
+            renew.UpdatedAt = DateTime.Now;
+            _sysEntitlementRepository.Update(renew);
             _sysEntitlementRepository.SaveChanges();
         }
 

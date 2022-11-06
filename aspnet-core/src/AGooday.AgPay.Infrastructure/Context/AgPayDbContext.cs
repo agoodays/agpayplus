@@ -215,6 +215,7 @@ namespace AGooday.AgPay.Infrastructure.Context
 
             modelBuilder.Entity<OrderSnapshot>().HasKey(c => new { c.OrderId, c.OrderType });
             modelBuilder.Entity<OrderSnapshot>().HasKey(c => new { c.OrderId, c.OrderType });
+            modelBuilder.Entity<SysEntitlement>().HasKey(c => new { c.EntId, c.SysType });
             modelBuilder.Entity<SysRoleEntRela>().HasKey(c => new { c.RoleId, c.EntId });
             modelBuilder.Entity<SysUserRoleRela>().HasKey(c => new { c.UserId, c.RoleId });
 
