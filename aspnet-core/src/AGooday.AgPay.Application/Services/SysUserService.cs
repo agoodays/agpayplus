@@ -70,8 +70,23 @@ namespace AGooday.AgPay.Application.Services
 
         public void Update(SysUserDto dto)
         {
-            var m = _mapper.Map<SysUser>(dto);
-            _sysUserRepository.Update(m);
+            var renew = _mapper.Map<SysUser>(dto);
+            renew.UpdatedAt = DateTime.Now;
+            _sysUserRepository.Update(renew);
+            _sysUserRepository.SaveChanges();
+        }
+
+        public void ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
+        {
+            var user = _sysUserRepository.GetByUserId(dto.SysUserId);
+            if (!string.IsNullOrWhiteSpace(dto.AvatarUrl))
+                user.AvatarUrl = dto.AvatarUrl;
+            if (!string.IsNullOrWhiteSpace(dto.Realname))
+                user.Realname = dto.Realname;
+            if (dto.Sex > 0)
+                user.Sex = dto.Sex;
+            user.UpdatedAt = DateTime.Now;
+            _sysUserRepository.Update(user);
             _sysUserRepository.SaveChanges();
         }
 
@@ -84,6 +99,13 @@ namespace AGooday.AgPay.Application.Services
         public SysUserDto GetById(long recordId)
         {
             var entity = _sysUserRepository.GetById(recordId);
+            var dto = _mapper.Map<SysUserDto>(entity);
+            return dto;
+        }
+
+        public SysUserDto GetByUserId(long sysUserId)
+        {
+            var entity = _sysUserRepository.GetByUserId(sysUserId);
             var dto = _mapper.Map<SysUserDto>(entity);
             return dto;
         }

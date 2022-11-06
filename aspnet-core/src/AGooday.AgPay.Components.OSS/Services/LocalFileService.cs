@@ -32,7 +32,13 @@ namespace AGooday.AgPay.Components.OSS.Services
                 {
                     if (formFile.Length > 0)
                     {
-                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), savePath, saveDirAndFileName); 
+                        var filePath = Path.Combine(savePath, saveDirAndFileName); //Directory.GetCurrentDirectory(), 
+                        var directorys = filePath.Split(@"\");
+                        var lastdir = directorys.Last();
+                        var directoryPath = string.Join(@"\", directorys.Where(dir => dir != lastdir));
+
+                        if (!Directory.Exists(directoryPath))
+                            Directory.CreateDirectory(directoryPath);
 
                         using (var stream = File.Create(filePath))
                         {

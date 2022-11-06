@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
 
         private ActionResult ImgView(string path, string format)
         {
-            path = Path.Combine(Directory.GetCurrentDirectory(), LocalOssConfig.oss.FilePublicPath, path);
+            path = Path.Combine(LocalOssConfig.oss.FilePublicPath.Replace("/", @"\"), path.Replace("/", @"\"));//Directory.GetCurrentDirectory(), 
             using (var sw = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 var bytes = new byte[sw.Length];

@@ -13,6 +13,7 @@ using Newtonsoft.Json.Serialization;
 using StackExchange.Redis;
 using AGooday.AgPay.Manager.Api.Models;
 using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Application.DataTransfer;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
 {
@@ -73,18 +74,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         }
 
         [HttpPut, Route("user")]
-        public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfo dto)
+        public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
         {
-            var user = _sysUserService.GetById(dto.SysUserId);
-            if (!string.IsNullOrWhiteSpace(dto.AvatarUrl))
-                user.AvatarUrl = dto.AvatarUrl;
-            if (!string.IsNullOrWhiteSpace(dto.Realname))
-                user.Realname = dto.Realname;
-            if (dto.Sex > 0)
-                user.Sex = dto.Sex;
-            _sysUserService.Update(user);
             var currentUser = GetCurrentUser();
-            var userinfo = _sysUserAuthService.GetUserAuthInfoById(dto.SysUserId);
+            _sysUserService.ModifyCurrentUserInfo(dto);
+            var userinfo = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             currentUser.SysUser = userinfo;
             //保存redis最新数据
             var currentUserJson = JsonConvert.SerializeObject(currentUser);
@@ -95,8 +89,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [HttpPut, Route("modifyPwd")]
         public ApiRes ModifyPwd(ModifyPwd dto)
         {
-            string currentUserPwd = Base64Util.DecodeBase64(dto.OriginalPwd); //当前用户登录密码
-            var user = _sysUserAuthService.GetUserAuthInfoById(dto.SysUserId);
+            var currentUser = GetCurrentUser();
+            string currentUserPwd = Base64Util.DecodeBase64(dto.OriginalPwd); //当前用户登录密码currentUser
+            var user = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             bool verified = BCrypt.Net.BCrypt.Verify(currentUserPwd, user.Credential);
             //验证当前密码是否正确
             if (!verified)
@@ -109,7 +104,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            _sysUserAuthService.ResetAuthInfo(dto.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MGR);
+            _sysUserAuthService.ResetAuthInfo(dto.RecordId, null, null, opUserPwd, CS.SYS_TYPE.MGR);
             return Logout();
         }
 

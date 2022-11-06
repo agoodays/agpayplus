@@ -33,15 +33,6 @@ namespace AGooday.AgPay.Components.OSS.Controllers
         [HttpPost, Route("{bizType}")]
         public async Task<ApiRes> SingleFileUpload([FromForm] IFormFile file, string bizType)
         {
-            //var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", bizType + Path.GetExtension(file.FileName));//Path.GetTempFileName();
-            //if (file.Length > 0)
-            //{
-            //    using (var stream = System.IO.File.Create(filePath))
-            //    {
-            //        await file.CopyToAsync(stream);
-            //    }
-            //}
-            //return ApiRes.Ok(filePath);
             if (file == null)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "选择文件不存在");

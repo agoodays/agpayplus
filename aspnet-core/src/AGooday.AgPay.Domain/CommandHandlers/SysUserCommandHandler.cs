@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static AGooday.AgPay.Common.Constants.CS;
 
 namespace AGooday.AgPay.Domain.CommandHandlers
 {
@@ -194,11 +193,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return Task.FromResult(new Unit());
             }
 
-            var sysUser = _mapper.Map<SysUser>(request);
-
             //查询该操作员信息
-            var originSysUser = _sysUserRepository.GetByUserId(request.SysUserId, request.SysType);
-            if (originSysUser is null)
+            var sysUser = _sysUserRepository.GetByUserId(request.SysUserId, request.SysType);
+            if (sysUser is null)
             {
                 // 引发错误事件
                 Bus.RaiseEvent(new DomainNotification("", "该用户不存在！"));
@@ -206,7 +203,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             }
 
             //判断是否自己禁用自己
-            if (sysUser.SysUserId.Equals(request.CurrentSysUserId) && sysUser.State == CS.PUB_DISABLE)
+            if (request.SysUserId.Equals(request.CurrentSysUserId) && request.State == CS.PUB_DISABLE)
             {
                 // 引发错误事件
                 Bus.RaiseEvent(new DomainNotification("", "系统不允许禁用当前登陆用户！"));
@@ -217,31 +214,33 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             if (request.ResetPass)
             {
                 string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
-                _sysUserAuthRepository.ResetAuthInfo(sysUser.SysUserId, sysUser.SysType, null, null, updatePwd);
+                _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, null, updatePwd);
             }
 
             //修改了手机号， 需要修改auth表信息
-            if (!originSysUser.Telphone.Equals(sysUser.Telphone))
+            if (!sysUser.Telphone.Equals(request.Telphone))
             {
-                if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
+                if (_sysUserRepository.IsExistTelphone(request.Telphone, request.SysType))
                 {
                     Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
                     return Task.FromResult(new Unit());
                 }
-                _sysUserAuthRepository.ResetAuthInfo(sysUser.SysUserId, sysUser.SysType, null, sysUser.Telphone, null);
+                _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, request.Telphone, null);
             }
 
             //修改了用户名， 需要修改auth表信息
-            if (!originSysUser.LoginUsername.Equals(sysUser.LoginUsername))
+            if (!sysUser.LoginUsername.Equals(request.LoginUsername))
             {
-                if (_sysUserRepository.IsExistLoginUsername(sysUser.LoginUsername, sysUser.SysType))
+                if (_sysUserRepository.IsExistLoginUsername(request.LoginUsername, request.SysType))
                 {
                     Bus.RaiseEvent(new DomainNotification("", "该登录用户名已关联其他用户！"));
                     return Task.FromResult(new Unit());
                 }
-                _sysUserAuthRepository.ResetAuthInfo(sysUser.SysUserId, sysUser.SysType, sysUser.LoginUsername, null, null);
+                _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, request.LoginUsername, null, null);
             }
 
+            _mapper.Map(request, sysUser);
+            sysUser.UpdatedAt = DateTime.Now;
             _sysUserRepository.Update(sysUser);
 
             Commit();

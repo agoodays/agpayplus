@@ -133,6 +133,7 @@ namespace AGooday.AgPay.Application.Services
         public void ResetAuthInfo(long resetUserId, string authLoginUserName, string telphone, string newPwd, string sysType)
         {
             _sysUserAuthRepository.ResetAuthInfo(resetUserId, authLoginUserName, telphone, newPwd, sysType);
+            _sysUserAuthRepository.SaveChanges();
         }
     }
 }
