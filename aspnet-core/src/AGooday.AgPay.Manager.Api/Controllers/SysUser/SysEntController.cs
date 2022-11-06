@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_LIST)]
         public ApiRes BySystem(string sysType, string entId)
         {
-            var sysEnts = _sysEntService.GetBySysType(sysType, entId);
+            var sysEnts = _sysEntService.GetBySysType(sysType, entId).FirstOrDefault();
             return ApiRes.Ok(sysEnts);
         }
 
