@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
             reqParams.Add("merId", isvsubMchParams.MerId); // 商户号
 
             //签名
-            string isvPrivateCertFile = isvParams.IsvPrivateCertFile;
+            string isvPrivateCertFile = ChannelCertConfigKit.GetCertFilePath(isvParams.IsvPrivateCertFile);
             string isvPrivateCertPwd = isvParams.IsvPrivateCertPwd;
             reqParams.Add("signature", YsfSignUtil.SignBy256(reqParams, isvPrivateCertFile, isvPrivateCertPwd)); //RSA 签名串
 

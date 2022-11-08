@@ -23,6 +23,7 @@ using AGooday.AgPay.Components.OSS.Controllers;
 using AGooday.AgPay.Components.OSS.Services;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Constants;
+using AGooday.AgPay.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,12 +62,12 @@ services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB
 #endregion
 
 #region MQ
-var mqconfiguration = builder.Configuration.GetSection("MQ:RabbitMQ");
-services.Configure<RabbitMQConfiguration>(mqconfiguration);
+builder.Configuration.GetSection("MQ:RabbitMQ").Bind(RabbitMQConfig.MQ);
 #endregion
 
 #region OSS
-builder.Configuration.GetSection("OSS").Bind(LocalOssConfig.oss);
+builder.Configuration.GetSection("OSS").Bind(LocalOssConfig.Oss);
+builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
 #endregion
 
 services.AddCors(o =>
@@ -95,19 +96,19 @@ services.AddAutoMapperSetup();
 services.AddControllers()
     .AddApplicationPart(typeof(OssFileController).Assembly)
     .AddNewtonsoftJson();
-    //.AddNewtonsoftJson(options =>
-    //{
-    //    //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
-    //    //options.SerializerSettings.Formatting = Formatting.Indented;
-    //    //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-    //    options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
-    //    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
-    //});
+//.AddNewtonsoftJson(options =>
+//{
+//    //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
+//    //options.SerializerSettings.Formatting = Formatting.Indented;
+//    //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+//    options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+//    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
+//});
 
 // Newtonsoft.Json 全部配置 
 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
-    Formatting = Formatting.Indented,
+    Formatting = Formatting.Indented,//格式化
     DateFormatString = "yyyy-MM-dd HH:mm:ss",
     ContractResolver = new CamelCasePropertyNamesContractResolver()
 };
@@ -164,7 +165,7 @@ services.AddHostedService<RabbitListener>();
 #endregion
 
 #region OSS
-if (builder.Configuration.GetSection("OSS:ServiceType").Value .Equals("local"))
+if (OssServiceTypeEnum.LOCAL.GetDescription().Equals(LocalOssConfig.Oss.ServiceType))
 {
     services.AddScoped<IOssService, LocalFileService>();
 }

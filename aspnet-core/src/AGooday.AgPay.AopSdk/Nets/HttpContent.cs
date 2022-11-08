@@ -24,7 +24,7 @@ namespace AGooday.AgPay.AopSdk.Nets
 
         public static HttpContent BuildJsonContent(Dictionary<string, object> @params)
         {
-            if (@params != null)
+            if (@params == null)
             {
                 throw new ArgumentNullException();
             }

@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (payOrder.MchNo.Equals(GetCurrentMchNo()))
+            if (!payOrder.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }

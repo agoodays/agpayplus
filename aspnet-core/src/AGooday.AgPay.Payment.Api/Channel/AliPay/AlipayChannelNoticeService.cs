@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 
                 //配置参数获取
                 byte? useCert = null;
-                String alipaySignType, alipayPublicCert, alipayPublicKey = null;
+                string alipaySignType, alipayPublicCert, alipayPublicKey = null;
                 if (mchAppConfigContext.IsIsvsubMch())
                 {
 
@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 if (useCert != null && useCert == CS.YES)
                 {
                     //证书方式
-                    verifyResult = AlipaySignature.RSACertCheckV1(jsonParams.ToKeyValue(), alipayPublicCert, AliPayConfig.CHARSET, alipaySignType);
+                    verifyResult = AlipaySignature.RSACertCheckV1(jsonParams.ToKeyValue(), GetCertFilePath(alipayPublicCert), AliPayConfig.CHARSET, alipaySignType);
                 }
                 else
                 {

@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Models;
 using AGooday.AgPay.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -102,7 +103,8 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public PayInterfaceConfigDto GetByInfoIdAndIfCode(byte infoType, string infoId, string ifCode)
         {
-            var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.Equals(infoId)
+            // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
+            var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().AsNoTracking().Where(w => w.InfoId.Equals(infoId)
             && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode)).FirstOrDefault();
             return _mapper.Map<PayInterfaceConfigDto>(payInterfaceConfig);
         }

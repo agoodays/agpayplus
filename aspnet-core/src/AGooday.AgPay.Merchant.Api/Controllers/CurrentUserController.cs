@@ -13,6 +13,7 @@ using Newtonsoft.Json.Serialization;
 using StackExchange.Redis;
 using AGooday.AgPay.Merchant.Api.Models;
 using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Application.DataTransfer;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers
 {
@@ -49,42 +50,42 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpGet, Route("user")]
         public ApiRes CurrentUserInfo()
         {
-            //当前用户信息
-            var currentUser = GetCurrentUser();
-
-            //1. 当前用户所有权限ID集合
-            var entIds = currentUser.Authorities.ToList();
-
-            //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-            var sysEnts = _sysEntService.GetBySysType(CS.SYS_TYPE.MCH, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
-
-            //递归转换为树状结构
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            try
             {
-                Formatting = Formatting.Indented,
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-            var jsonArray = JArray.FromObject(sysEnts);
-            var leftMenuTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
-            var user = JObject.FromObject(currentUser.SysUser);
-            user.Add("entIdList", JArray.FromObject(entIds));
-            user.Add("allMenuRouteTree", JToken.FromObject(leftMenuTree));
-            return ApiRes.Ok(user);
+                //当前用户信息
+                var currentUser = GetCurrentUser();
+
+                //1. 当前用户所有权限ID集合
+                var entIds = currentUser.Authorities.ToList();
+
+                //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
+                var sysEnts = _sysEntService.GetBySysType(CS.SYS_TYPE.MCH, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
+
+                //递归转换为树状结构
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                {
+                    Formatting = Formatting.Indented,
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                };
+                var jsonArray = JArray.FromObject(sysEnts);
+                var leftMenuTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
+                var user = JObject.FromObject(currentUser.SysUser);
+                user.Add("entIdList", JArray.FromObject(entIds));
+                user.Add("allMenuRouteTree", JToken.FromObject(leftMenuTree));
+                return ApiRes.Ok(user);
+            }
+            catch (Exception)
+            {
+                return ApiRes.CustomFail("登录失效");
+            }
         }
 
         [HttpPut, Route("user")]
-        public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfo dto)
+        public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
         {
-            var user = _sysUserService.GetById(dto.SysUserId);
-            if (!string.IsNullOrWhiteSpace(dto.AvatarUrl))
-                user.AvatarUrl = dto.AvatarUrl;
-            if (!string.IsNullOrWhiteSpace(dto.Realname))
-                user.Realname = dto.Realname;
-            if (dto.Sex > 0)
-                user.Sex = dto.Sex;
-            _sysUserService.Update(user);
             var currentUser = GetCurrentUser();
-            var userinfo = _sysUserAuthService.GetUserAuthInfoById(dto.SysUserId);
+            _sysUserService.ModifyCurrentUserInfo(dto);
+            var userinfo = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             currentUser.SysUser = userinfo;
             //保存redis最新数据
             var currentUserJson = JsonConvert.SerializeObject(currentUser);

@@ -90,12 +90,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            AliBarOrderRQ bizRQ = (AliBarOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.AuthCode))
-            {
-                throw new BizException("用户支付条码[authCode]不可为空");
-            }
-
             return null;
         }
     }

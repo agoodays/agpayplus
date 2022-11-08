@@ -89,8 +89,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <returns></returns>
         public virtual void SaveOrUpdate(TEntity obj, TPrimaryKey? id)
         {
-            var entity = DbSet.Find(id);
-            if (id != null && entity != null)
+            if (id != null)
                 Update(obj);
             else
                 Add(obj);

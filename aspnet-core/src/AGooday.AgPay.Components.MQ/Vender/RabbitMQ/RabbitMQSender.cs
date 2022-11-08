@@ -42,63 +42,81 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 
         private static void ConvertAndSend(MQSendTypeEnum mqtype, string exchange, string queue, string routingKey, string message)
         {
-            var hostName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "HostName" });
-            var userName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "UserName" });
-            var password = Appsettings.app(new string[] { "MQ", "RabbitMQ", "Password" });
-            var port = Convert.ToInt32(Appsettings.app(new string[] { "MQ", "RabbitMQ", "Port" }));
-            var factory = new ConnectionFactory() { HostName = hostName, UserName = userName, Password = password, Port = port };
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
+            try
             {
-                if (mqtype == MQSendTypeEnum.QUEUE && !string.IsNullOrWhiteSpace(queue))
+                var factory = new ConnectionFactory()
                 {
-                    channel.QueueDeclare(queue, true, false, false, null);
-                }
-
-                if (mqtype == MQSendTypeEnum.BROADCAST && !string.IsNullOrWhiteSpace(exchange))
+                    HostName = RabbitMQConfig.MQ.HostName,
+                    UserName = RabbitMQConfig.MQ.UserName,
+                    Password = RabbitMQConfig.MQ.Password,
+                    Port = RabbitMQConfig.MQ.Port
+                };
+                using (var connection = factory.CreateConnection())
+                using (var channel = connection.CreateModel())
                 {
-                    channel.ExchangeDeclare(exchange, type: "fanout");
+                    if (mqtype == MQSendTypeEnum.QUEUE && !string.IsNullOrWhiteSpace(queue))
+                    {
+                        channel.QueueDeclare(queue, true, false, false, null);
+                    }
+
+                    if (mqtype == MQSendTypeEnum.BROADCAST && !string.IsNullOrWhiteSpace(exchange))
+                    {
+                        channel.ExchangeDeclare(exchange, type: "fanout");
+                    }
+
+                    var body = Encoding.UTF8.GetBytes(message);
+
+                    var properties = channel.CreateBasicProperties();
+                    properties.Persistent = true;
+
+                    channel.BasicPublish(exchange, routingKey, properties, body);
                 }
-
-                var body = Encoding.UTF8.GetBytes(message);
-
-                var properties = channel.CreateBasicProperties();
-                properties.Persistent = true;
-
-                channel.BasicPublish(exchange, routingKey, properties, body);
+            }
+            catch (Exception e)
+            {
+                LogUtil<RabbitMQSender>.Error("Rabbit连接出现异常", e);
             }
         }
 
         private static void ConvertAndDelaySend(string exchange, string queue, string routingKey, string message, int delay)
         {
-            var hostName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "HostName" });
-            var userName = Appsettings.app(new string[] { "MQ", "RabbitMQ", "UserName" });
-            var password = Appsettings.app(new string[] { "MQ", "RabbitMQ", "Password" });
-            var port = Convert.ToInt32(Appsettings.app(new string[] { "MQ", "RabbitMQ", "Port" }));
-            var factory = new ConnectionFactory() { HostName = hostName, UserName = userName, Password = password, Port = port };
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
+            try
             {
-                //设置Exchange队列类型
-                var arguments = new Dictionary<string, object>()
+                var factory = new ConnectionFactory()
+                {
+                    HostName = RabbitMQConfig.MQ.HostName,
+                    UserName = RabbitMQConfig.MQ.UserName,
+                    Password = RabbitMQConfig.MQ.Password,
+                    Port = RabbitMQConfig.MQ.Port
+                };
+                using (var connection = factory.CreateConnection())
+                using (var channel = connection.CreateModel())
+                {
+                    //设置Exchange队列类型
+                    var arguments = new Dictionary<string, object>()
                 {
                     {"x-delayed-type", "topic"}
                 };
-                //设置当前消息为延时队列
-                channel.ExchangeDeclare(exchange, "x-delayed-message", true, false, arguments);
-                channel.QueueDeclare(queue, true, false, false, arguments);
-                channel.QueueBind(queue, exchange, routingKey);
+                    //设置当前消息为延时队列
+                    channel.ExchangeDeclare(exchange, "x-delayed-message", true, false, arguments);
+                    channel.QueueDeclare(queue, true, false, false, arguments);
+                    channel.QueueBind(queue, exchange, routingKey);
 
-                var body = Encoding.UTF8.GetBytes(message);
+                    var body = Encoding.UTF8.GetBytes(message);
 
-                var properties = channel.CreateBasicProperties();
-                //设置消息的过期时间
-                properties.Headers = new Dictionary<string, object>()
+                    var properties = channel.CreateBasicProperties();
+                    //设置消息的过期时间
+                    properties.Headers = new Dictionary<string, object>()
                 {
                     {  "x-delay", delay * 1000 }
                 };
 
-                channel.BasicPublish(exchange, routingKey, properties, body);
+                    channel.BasicPublish(exchange, routingKey, properties, body);
+                }
+            }
+            catch (Exception e)
+            {
+                LogUtil<RabbitMQSender>.Error("Rabbit连接出现异常", e);
             }
         }
     }

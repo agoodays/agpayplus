@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             model.AppId = payOrder.AppId;
             model.MchOrderNo = payOrder.MchOrderNo;
             model.WayCode = payOrder.WayCode;
-            model.Amount = payOrder.Amount;
+            model.Amount = AmountUtil.ConvertDollar2Cent(payOrder.Amount);
             // paypal通道使用USD类型货币
             if (payOrder.WayCode.Equals(CS.PAY_WAY_CODE.PP_PC.ToLower()))
             {
@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
                 {
                     throw new BizException(response.msg);
                 }
-                return ApiRes.Ok(response);
+                return ApiRes.Ok(response.Get());
             }
             catch (AgPayException e)
             {

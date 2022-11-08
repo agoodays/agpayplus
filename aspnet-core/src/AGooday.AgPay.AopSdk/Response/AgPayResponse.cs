@@ -23,7 +23,7 @@ namespace AGooday.AgPay.AopSdk.Response
             if (data == null && string.IsNullOrWhiteSpace(sign)) return true;
             return sign.Equals(AgPayUtil.GetSign(data.ToObject<Dictionary<string, object>>(), apiKey));
         }
-        public bool IsSuccess(string apiKey)
+        public virtual bool IsSuccess(string apiKey)
         {
             if (string.IsNullOrWhiteSpace(apiKey)) return code == 0;
             return code == 0 && CheckSign(apiKey);

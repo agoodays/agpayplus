@@ -29,6 +29,7 @@ namespace AGooday.AgPay.Common.Utils
             // 费率乘以订单金额   结果四舍五入并保留0位小数
             return (long)decimal.Round(amount * rate, 0, mode);
         }
+
         /// <summary>
         /// 将Long "分"转换成"元"（长格式），如：100分被转换为1.00元。
         /// </summary>
@@ -42,5 +43,19 @@ namespace AGooday.AgPay.Common.Utils
         /// <param name="amount"></param>
         /// <returns></returns>
         public static string ConvertCent2Dollar(long amount) => (Convert.ToDouble(amount) / 100).ToString("0.00");
+
+        /// <summary>
+        /// 将"元"转换成"分"，如：1.00分被转换为100元。
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public static long ConvertDollar2Cent(string amount) => ConvertDollar2Cent(Convert.ToDecimal(amount));
+
+        /// <summary>
+        /// 将"元"转换成"分"，如：1.00分被转换为100元。
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public static long ConvertDollar2Cent(decimal amount) => Convert.ToInt64(amount * 100);
     }
 }

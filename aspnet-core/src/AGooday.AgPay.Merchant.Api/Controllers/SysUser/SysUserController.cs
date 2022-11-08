@@ -156,7 +156,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (sysUser.BelongInfoId.Equals(GetCurrentMchNo()))
+            if (!sysUser.BelongInfoId.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }

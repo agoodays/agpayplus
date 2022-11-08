@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Common.Models;
+﻿using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Models;
 using Newtonsoft.Json;
 using System.Net;
 using System.Text.Json;
@@ -47,6 +48,10 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
                     break;
                 case KeyNotFoundException ex:
                     response.StatusCode = (int)HttpStatusCode.NotFound;
+                    errorResponse.Msg = ex.Message;
+                    break;
+                case BizException ex:
+                    response.StatusCode = (int)HttpStatusCode.OK;
                     errorResponse.Msg = ex.Message;
                     break;
                 default:

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AGooday.AgPay.AopSdk.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,20 @@ namespace AGooday.AgPay.AopSdk.Response
     public class PayOrderCreateResponse : AgPayResponse
     {
 
+        public PayOrderCreateResModel Get()
+        {
+            if (data == null) return new PayOrderCreateResModel();
+            return data.ToObject<PayOrderCreateResModel>();
+        }
+
+        public override bool IsSuccess(string apiKey)
+        {
+            if (base.IsSuccess(apiKey))
+            {
+                int orderState = Get().OrderState;
+                return orderState == 0 || orderState == 1 || orderState == 2;
+            }
+            return false;
+        }
     }
 }

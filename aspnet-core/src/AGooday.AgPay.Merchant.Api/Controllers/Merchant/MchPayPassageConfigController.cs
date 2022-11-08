@@ -11,6 +11,8 @@ using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using Newtonsoft.Json;
+using AGooday.AgPay.Merchant.Api.Models;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 {
@@ -119,7 +121,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (payPassage.MchNo.Equals(GetCurrentMchNo()))
+            if (!payPassage.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }
@@ -134,19 +136,27 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPost,Route("")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_PASSAGE_ADD)]
-        public ApiRes SaveOrUpdate(List<MchPayPassageDto> mchPayPassages)
+        public ApiRes SaveOrUpdate(ReqParams model)
         {
-            if (!(mchPayPassages?.Count() > 0))
+            try
             {
-                throw new BizException("操作失败");
+                List<MchPayPassageDto> mchPayPassages = JsonConvert.DeserializeObject<List<MchPayPassageDto>>(model.reqParams);
+                if (!(mchPayPassages?.Count() > 0))
+                {
+                    throw new BizException("操作失败");
+                }
+                var mchApp = _mchAppService.GetById(mchPayPassages.First().AppId);
+                if (mchApp == null || mchApp.State != CS.YES)
+                {
+                    return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+                }
+                _mchPayPassageService.SaveOrUpdateBatchSelf(mchPayPassages, mchApp.MchNo);
+                return ApiRes.Ok();
             }
-            var mchApp = _mchAppService.GetById(mchPayPassages.First().AppId);
-            if (mchApp == null || mchApp.State != CS.YES)
+            catch (Exception)
             {
-                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+                return ApiRes.Fail(ApiCode.SYSTEM_ERROR);
             }
-            _mchPayPassageService.SaveOrUpdateBatchSelf(mchPayPassages, mchApp.MchNo);
-            return ApiRes.Ok();
         }
     }
 }

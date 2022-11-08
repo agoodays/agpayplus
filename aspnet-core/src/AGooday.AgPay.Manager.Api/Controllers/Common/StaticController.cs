@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
 
         private ActionResult ImgView(string path, string format)
         {
-            path = Path.Combine(LocalOssConfig.oss.FilePublicPath.Replace("/", @"\"), path.Replace("/", @"\"));//Directory.GetCurrentDirectory(), 
+            path = Path.Combine(LocalOssConfig.Oss.FilePublicPath.Replace("/", @"\"), path.Replace("/", @"\"));//Directory.GetCurrentDirectory(), 
             using (var sw = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 var bytes = new byte[sw.Length];
@@ -126,6 +126,47 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
         public IEnumerable<int> Get()
         {
             return Enumerable.Range(1, 5).Select(index => Random.Shared.Next(index, 55)).ToArray();
+        }
+
+        [HttpGet, Route("api/anon/getfile")]
+        public ActionResult GetFile(string path)
+        {
+            path = HttpUtility.UrlDecode(path);
+            var format = GetFormat(path);
+            var filePath = Path.Combine(LocalOssConfig.Oss.FilePublicPath.Replace("/", @"\"), path.Replace("/", @"\"));
+
+            FileInfo certFile = new FileInfo(filePath);
+            if (certFile.Exists)
+            {
+                using (var sw = certFile.Open(FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read))
+                {
+                    var bytes = new byte[sw.Length];
+                    sw.Read(bytes, 0, bytes.Length);
+                    sw.Close();
+                    return File(bytes, GetContentType(format));
+                }
+            }
+            else
+            {
+                var notexists = new FileInfo(certFile.FullName + ".notexists");
+                if (notexists.Exists)
+                {
+                    using (var sw = notexists.Open(FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read))
+                    {
+                        var bytes = new byte[sw.Length];
+                        sw.Read(bytes, 0, bytes.Length);
+                        sw.Close();
+                        return File(bytes, GetContentType(format));
+                    }
+                }
+                using (var sw = notexists.Create())
+                {
+                    var bytes = new byte[sw.Length];
+                    sw.Read(bytes, 0, bytes.Length);
+                    sw.Close();
+                    return File(bytes, GetContentType(format));
+                }
+            }
         }
     }
 }

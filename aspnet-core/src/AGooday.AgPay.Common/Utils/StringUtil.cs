@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -128,6 +130,34 @@ namespace AGooday.AgPay.Common.Utils
             }
             return content.SubstringUp(0, frontNum) + starStr
                     + content.SubstringUp(content.Length - endNum, content.Length);
+        }
+
+        /// <summary>
+        /// 合并两个json字符串
+        /// key相同，则后者覆盖前者的值
+        /// key不同，则合并至前者
+        /// </summary>
+        /// <param name="originStr"></param>
+        /// <param name="mergeStr"></param>
+        /// <returns>合并后的json字符串</returns>
+        public static string Marge(string originStr, string mergeStr)
+        {
+            if (string.IsNullOrWhiteSpace(originStr) || string.IsNullOrWhiteSpace(mergeStr))
+            {
+                return null;
+            }
+
+            JObject originJSON = JObject.Parse(originStr);
+            JObject mergeJSON = JObject.Parse(mergeStr);
+
+            if (originJSON == null || mergeJSON == null)
+            {
+                return null;
+            }
+
+            originJSON.Merge(mergeJSON);
+            //return originJSON.ToString();
+            return JsonConvert.SerializeObject(originJSON, Formatting.None);//压缩Json
         }
 
         public static string SubstringUp(this string value, int beginIndex, int endIndex)

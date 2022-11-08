@@ -34,6 +34,10 @@ using AGooday.AgPay.Payment.Api.MQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.MQ.Models;
 using Newtonsoft.Json;
+using AGooday.AgPay.Components.OSS.Config;
+using AGooday.AgPay.Components.OSS.Constants;
+using AGooday.AgPay.Components.OSS.Services;
+using AGooday.AgPay.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +78,11 @@ services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB
 #region MQ
 var mqconfiguration = builder.Configuration.GetSection("MQ:RabbitMQ");
 services.Configure<RabbitMQConfiguration>(mqconfiguration);
+#endregion
+
+#region OSS
+builder.Configuration.GetSection("OSS").Bind(LocalOssConfig.Oss);
+builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
 #endregion
 
 services.AddMemoryCache();
@@ -126,6 +135,30 @@ services.AddSingleton<RequestIpUtil>();
 // .NET Core 原生依赖注入
 // 单写一层用来添加依赖项，从展示层 Presentation 中隔离
 NativeInjectorBootStrapper.RegisterServices(services);
+
+#region RabbitMQ
+services.AddSingleton<IMQSender, RabbitMQSender>();
+services.AddSingleton<IMQMsgReceiver, PayOrderDivisionRabbitMQReceiver>();
+services.AddSingleton<IMQMsgReceiver, PayOrderMchNotifyRabbitMQReceiver>();
+services.AddSingleton<IMQMsgReceiver, PayOrderReissueRabbitMQReceiver>();
+services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
+services.AddSingleton<IMQMsgReceiver, ResetIsvMchAppInfoRabbitMQReceiver>();
+services.AddSingleton<PayOrderDivisionMQ.IMQReceiver, PayOrderDivisionMQReceiver>();
+services.AddSingleton<PayOrderMchNotifyMQ.IMQReceiver, PayOrderMchNotifyMQReceiver>();
+services.AddSingleton<PayOrderReissueMQ.IMQReceiver, PayOrderReissueMQReceiver>();
+services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
+services.AddSingleton<ResetIsvMchAppInfoConfigMQ.IMQReceiver, ResetIsvMchAppInfoMQReceiver>();
+services.AddHostedService<RabbitListener>();
+#endregion
+
+#region OSS
+if (OssServiceTypeEnum.LOCAL.GetDescription().Equals(LocalOssConfig.Oss.ServiceType))
+{
+    services.AddScoped<IOssService, LocalFileService>();
+}
+#endregion
+
+services.AddSingleton<ChannelCertConfigKit>();
 
 //var provider = services.BuildServiceProvider();
 //var mchAppService = (IMchAppService)provider.GetService(typeof(IMchAppService));
@@ -273,24 +306,10 @@ services.AddSingleton(provider =>
 });
 #endregion
 
-#region RabbitMQ
-services.AddSingleton<IMQSender, RabbitMQSender>();
-services.AddSingleton<IMQMsgReceiver, PayOrderDivisionRabbitMQReceiver>();
-services.AddSingleton<IMQMsgReceiver, PayOrderMchNotifyRabbitMQReceiver>();
-services.AddSingleton<IMQMsgReceiver, PayOrderReissueRabbitMQReceiver>();
-services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
-services.AddSingleton<IMQMsgReceiver, ResetIsvMchAppInfoRabbitMQReceiver>();
-services.AddSingleton<PayOrderDivisionMQ.IMQReceiver, PayOrderDivisionMQReceiver>();
-services.AddSingleton<PayOrderMchNotifyMQ.IMQReceiver, PayOrderMchNotifyMQReceiver>();
-services.AddSingleton<PayOrderReissueMQ.IMQReceiver, PayOrderReissueMQReceiver>();
-services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
-services.AddSingleton<ResetIsvMchAppInfoConfigMQ.IMQReceiver, ResetIsvMchAppInfoMQReceiver>();
-services.AddHostedService<RabbitListener>();
-#endregion
-
 services.AddSingleton<IQRCodeService, QRCodeService>();
 
 var serviceProvider = services.BuildServiceProvider();
+ChannelCertConfigKit.ServiceProvider = serviceProvider;
 PayWayUtil.ServiceProvider = serviceProvider;
 AliPayKit.ServiceProvider = serviceProvider;
 

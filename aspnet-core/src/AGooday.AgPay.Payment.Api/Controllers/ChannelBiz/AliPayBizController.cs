@@ -29,6 +29,21 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
         private readonly IMchAppService mchAppService;
         private readonly IMQSender mqSender;
 
+        public AliPayBizController(ILogger<AliPayBizController> log, 
+            ConfigContextQueryService configContextQueryService, 
+            IPayInterfaceConfigService payInterfaceConfigService, 
+            ISysConfigService sysConfigService, 
+            IMchAppService mchAppService, 
+            IMQSender mqSender)
+        {
+            this.log = log;
+            this.configContextQueryService = configContextQueryService;
+            this.payInterfaceConfigService = payInterfaceConfigService;
+            this.sysConfigService = sysConfigService;
+            this.mchAppService = mchAppService;
+            this.mqSender = mqSender;
+        }
+
         /// <summary>
         /// 跳转到支付宝的授权页面 （统一从pay项目获取到isv配置信息）
         /// isvAndMchNo 格式:  ISVNO_MCHAPPID
@@ -36,7 +51,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
         /// </summary>
         /// <param name="isvAndMchAppId"></param>
         [HttpGet, Route("redirectAppToAppAuth/{isvAndMchAppId}")]
-        public void RedirectAppToAppAuth(string isvAndMchAppId)
+        public IActionResult RedirectAppToAppAuth(string isvAndMchAppId)
         {
             string isvNo = isvAndMchAppId.Split("_")[0];
 
@@ -47,7 +62,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
 
             string redirectUrl = sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/channelbiz/alipay/appToAppAuthCallback";
 
-            Redirect(string.Format(oauthUrl, alipayIsvParams.AppId, URLUtil.EncodeAll(redirectUrl), isvAndMchAppId));
+            return Redirect(string.Format(oauthUrl, alipayIsvParams.AppId, URLUtil.EncodeAll(redirectUrl), isvAndMchAppId));
         }
 
         [HttpGet, Route("appToAppAuthCallback")]

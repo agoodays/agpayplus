@@ -16,12 +16,12 @@ using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Channel
 {
-    public abstract class AbstractChannelNoticeService : IChannelNoticeService
+    public abstract class AbstractChannelRefundNoticeService : IChannelRefundNoticeService
     {
-        protected readonly ILogger<AbstractChannelNoticeService> log;
+        protected readonly ILogger<AbstractChannelRefundNoticeService> log;
         protected ConfigContextQueryService configContextQueryService;
 
-        protected AbstractChannelNoticeService(ILogger<AbstractChannelNoticeService> logger, 
+        protected AbstractChannelRefundNoticeService(ILogger<AbstractChannelRefundNoticeService> logger, 
             ConfigContextQueryService configContextQueryService)
         {
             this.log = logger;
@@ -109,7 +109,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
         }
 
         public abstract string GetIfCode();
-        public abstract Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, IChannelNoticeService.NoticeTypeEnum noticeTypeEnum);
-        public abstract ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, IChannelNoticeService.NoticeTypeEnum noticeTypeEnum);
+        public abstract Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, IChannelRefundNoticeService.NoticeTypeEnum noticeTypeEnum);
+        public abstract ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, IChannelRefundNoticeService.NoticeTypeEnum noticeTypeEnum);
     }
 }

@@ -2,8 +2,8 @@
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Exceptions;
+using AGooday.AgPay.Payment.Api.Utils;
 using Aop.Api;
-using log4net;
 
 namespace AGooday.AgPay.Payment.Api.Models
 {
@@ -89,9 +89,9 @@ namespace AGooday.AgPay.Payment.Api.Models
                 //设置证书相关参数
                 CertParams certParams = new CertParams
                 {
-                    AlipayPublicCertPath = alipayPublicCert,
-                    AppCertPath = appCert,
-                    RootCertPath = alipayRootCert
+                    AlipayPublicCertPath = ChannelCertConfigKit.GetCertFilePath(alipayPublicCert),
+                    AppCertPath = ChannelCertConfigKit.GetCertFilePath(appCert),
+                    RootCertPath = ChannelCertConfigKit.GetCertFilePath(alipayRootCert)
                 };
                 alipayClient = new DefaultAopClient(sandbox == CS.YES ? AliPayConfig.SANDBOX_SERVER_URL : AliPayConfig.PROD_SERVER_URL,
                     appId, privateKey, AliPayConfig.FORMAT, "1.0", signType, AliPayConfig.CHARSET, false, certParams);

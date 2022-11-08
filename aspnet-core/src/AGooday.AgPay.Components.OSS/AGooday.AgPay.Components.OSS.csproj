@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AGooday.AgPay.Application\AGooday.AgPay.Application.csproj" />
   </ItemGroup>
 

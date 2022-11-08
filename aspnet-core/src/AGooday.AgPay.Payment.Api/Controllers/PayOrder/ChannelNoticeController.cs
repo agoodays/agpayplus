@@ -130,8 +130,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 if (hasReturnUrl)
                 {
                     // 重定向
-                    Redirect(payMchNotifyService.CreateReturnUrl(payOrder, mchAppConfigContext.MchApp.AppSecret));
-                    return null;
+                    return Redirect(payMchNotifyService.CreateReturnUrl(payOrder, mchAppConfigContext.MchApp.AppSecret));
                 }
                 else
                 {

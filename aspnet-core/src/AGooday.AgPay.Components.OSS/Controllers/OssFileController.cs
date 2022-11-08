@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
 
                 // 新文件地址 (xxx/xxx.jpg 格式)
                 string saveDirAndFileName = Path.Combine(bizType, $"{Guid.NewGuid().ToString("N")}{Path.GetExtension(file.FileName)}");
-                string url = await ossService.Upload2PreviewUrl(ossFileConfig.OssSavePlaceEnum, new List<IFormFile>() { file }, saveDirAndFileName);
+                string url = await ossService.Upload2PreviewUrl(ossFileConfig.OssSavePlaceEnum, file, saveDirAndFileName);
                 return ApiRes.Ok(url);
             }
             catch (BizException biz)

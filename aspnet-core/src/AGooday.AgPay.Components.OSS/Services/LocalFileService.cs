@@ -22,28 +22,39 @@ namespace AGooday.AgPay.Components.OSS.Services
             this.sysConfigService = sysConfigService;
         }
 
-        public async Task<string> Upload2PreviewUrl(OssSavePlaceEnum ossSavePlaceEnum, List<IFormFile> multipartFile, string saveDirAndFileName)
+        public async Task<string> Upload2PreviewUrl(OssSavePlaceEnum ossSavePlaceEnum, IFormFile multipartFile, string saveDirAndFileName)
         {
             try
             {
-                string savePath = ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? LocalOssConfig.oss.FilePublicPath : LocalOssConfig.oss.FilePrivatePath;
+                string savePath = ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? LocalOssConfig.Oss.FilePublicPath : LocalOssConfig.Oss.FilePrivatePath;
                 savePath = savePath.Replace("/", @"\");
-                foreach (var formFile in multipartFile)
+
+                if (multipartFile.Length > 0)
                 {
-                    if (formFile.Length > 0)
+                    var filePath = Path.Combine(savePath, saveDirAndFileName); //Directory.GetCurrentDirectory(), 
+                    //var directorys = filePath.Split(@"\");
+                    //var lastdir = directorys.Last();
+                    //var directoryPath = string.Join(@"\", directorys.Where(dir => dir != lastdir));
+
+                    /** 根据文件完整路径 获取文件名 文件夹名
+                     * string fileFullPath = @"D:\Temp\aa.txt";
+                     * string fileName = Path.GetFileName(fileFullPath);  //aa.txt
+                     * string fileNameNoExt = Path.GetFileNameWithoutExtension(fileFullPath);  //aa
+                     * string fileExt = Path.GetExtension(fileFullPath);  //.txt
+                     * 
+                     * string filePathOnly = Path.GetDirectoryName(fileFullPath);  //D:\Temp
+                     * string folderName = Path.GetFileName(filePathOnly);  //Temp
+                     * 
+                     **/
+
+                    var directoryPath = Path.GetDirectoryName(filePath);
+
+                    if (!Directory.Exists(directoryPath))
+                        Directory.CreateDirectory(directoryPath);
+
+                    using (var stream = File.Create(filePath))
                     {
-                        var filePath = Path.Combine(savePath, saveDirAndFileName); //Directory.GetCurrentDirectory(), 
-                        var directorys = filePath.Split(@"\");
-                        var lastdir = directorys.Last();
-                        var directoryPath = string.Join(@"\", directorys.Where(dir => dir != lastdir));
-
-                        if (!Directory.Exists(directoryPath))
-                            Directory.CreateDirectory(directoryPath);
-
-                        using (var stream = File.Create(filePath))
-                        {
-                            await formFile.CopyToAsync(stream);
-                        }
+                        await multipartFile.CopyToAsync(stream);
                     }
                 }
             }
@@ -58,7 +69,7 @@ namespace AGooday.AgPay.Components.OSS.Services
                 return saveDirAndFileName;
             }
 
-            return $"{sysConfigService.GetDBApplicationConfig().OssPublicSiteUrl}/{saveDirAndFileName.Replace(@"\","/")}";
+            return $"{sysConfigService.GetDBApplicationConfig().OssPublicSiteUrl}/{saveDirAndFileName.Replace(@"\", "/")}";
         }
 
         public bool DownloadFile(OssSavePlaceEnum ossSavePlaceEnum, string source, string target)

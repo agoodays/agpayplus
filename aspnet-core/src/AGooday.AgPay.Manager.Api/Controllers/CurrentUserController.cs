@@ -50,27 +50,34 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [HttpGet, Route("user")]
         public ApiRes CurrentUserInfo()
         {
-            //当前用户信息
-            var currentUser = GetCurrentUser();
-
-            //1. 当前用户所有权限ID集合
-            var entIds = currentUser.Authorities.ToList();
-
-            //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-            var sysEnts = _sysEntService.GetBySysType(CS.SYS_TYPE.MGR, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
-
-            //递归转换为树状结构
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            try
             {
-                Formatting = Formatting.Indented,
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-            var jsonArray = JArray.FromObject(sysEnts);
-            var allMenuRouteTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
-            var user = JObject.FromObject(currentUser.SysUser);
-            user.Add("entIdList", JArray.FromObject(entIds));
-            user.Add("allMenuRouteTree", JToken.FromObject(allMenuRouteTree));
-            return ApiRes.Ok(user);
+                //当前用户信息
+                var currentUser = GetCurrentUser();
+
+                //1. 当前用户所有权限ID集合
+                var entIds = currentUser.Authorities.ToList();
+
+                //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
+                var sysEnts = _sysEntService.GetBySysType(CS.SYS_TYPE.MGR, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
+
+                //递归转换为树状结构
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                {
+                    Formatting = Formatting.Indented,
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                };
+                var jsonArray = JArray.FromObject(sysEnts);
+                var allMenuRouteTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
+                var user = JObject.FromObject(currentUser.SysUser);
+                user.Add("entIdList", JArray.FromObject(entIds));
+                user.Add("allMenuRouteTree", JToken.FromObject(allMenuRouteTree));
+                return ApiRes.Ok(user);
+            }
+            catch (Exception)
+            {
+                return ApiRes.CustomFail("登录失效");
+            }
         }
 
         [HttpPut, Route("user")]

@@ -70,7 +70,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <returns></returns>
         protected ApiRes UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ)
         {
-            mqSender.Send(PayOrderMchNotifyMQ.Build(new Random().Next(1,100)));return ApiRes.Ok();
             return UnifiedOrder(wayCode, bizRQ, null);
         }
 
@@ -200,7 +199,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
                 //预先校验
                 string errMsg = paymentService.PreCheck(bizRQ, payOrder);
-                if (string.IsNullOrWhiteSpace(errMsg))
+                if (!string.IsNullOrWhiteSpace(errMsg))
                 {
                     throw new BizException(errMsg);
                 }

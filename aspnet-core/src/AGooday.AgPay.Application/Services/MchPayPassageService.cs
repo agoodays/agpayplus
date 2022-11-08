@@ -11,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using AGooday.AgPay.Common.Enumerator;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -140,6 +139,8 @@ namespace AGooday.AgPay.Application.Services
 
         public void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo)
         {
+            var _smchPayPassages = _mchPayPassageRepository.GetAll().AsNoTracking()
+                .Where(w => w.MchNo.Equals(mchNo) && mchPayPassages.Select(s => s.Id).Contains(w.Id));
             foreach (var payPassage in mchPayPassages)
             {
                 if (payPassage.State == CS.NO && payPassage.Id == null)
@@ -152,9 +153,11 @@ namespace AGooday.AgPay.Application.Services
                     payPassage.MchNo = mchNo;
                 }
                 payPassage.Rate = payPassage.Rate / 100;
-
+                var _payPassage = _smchPayPassages.Where(w => w.Id.Equals(payPassage.Id)).FirstOrDefault();
+                payPassage.CreatedAt = _payPassage?.CreatedAt ?? DateTime.Now;
+                payPassage.UpdatedAt = payPassage.UpdatedAt ?? DateTime.Now;
                 var m = _mapper.Map<MchPayPassage>(payPassage);
-                _mchPayPassageRepository.SaveOrUpdate(m, payPassage.Id);
+                _mchPayPassageRepository.SaveOrUpdate(m, _payPassage.Id);
             }
             _mchPayPassageRepository.SaveChanges();
         }

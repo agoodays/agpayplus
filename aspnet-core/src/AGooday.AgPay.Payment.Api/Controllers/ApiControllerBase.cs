@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
         /// <returns></returns>
         protected T GetRQByWithMchSign<T>() where T : AbstractRQ
         {
-            return default(T);
+            return GetObject<T>();
         }
 
         protected T GetObject<T>()
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
                 stream.Seek(0, SeekOrigin.Begin);
             }
 
-            return JObject.FromObject(body);
+            return JObject.Parse(body);
         }
 
         /** 获取客户端ip地址 **/

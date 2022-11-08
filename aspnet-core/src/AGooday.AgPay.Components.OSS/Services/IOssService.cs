@@ -13,7 +13,6 @@ namespace AGooday.AgPay.Components.OSS.Services
     /// </summary>
     public interface IOssService
     {
-
         /// <summary>
         /// 上传文件 & 生成下载/预览URL
         /// </summary>
@@ -21,7 +20,7 @@ namespace AGooday.AgPay.Components.OSS.Services
         /// <param name="multipartFile"></param>
         /// <param name="saveDirAndFileName"></param>
         /// <returns></returns>
-        Task<string> Upload2PreviewUrl(OssSavePlaceEnum ossSavePlaceEnum, List<IFormFile> multipartFile, string saveDirAndFileName);
+        Task<string> Upload2PreviewUrl(OssSavePlaceEnum ossSavePlaceEnum, IFormFile multipartFile, string saveDirAndFileName);
 
         /// <summary>
         /// 将文件下载到本地
@@ -33,6 +32,5 @@ namespace AGooday.AgPay.Components.OSS.Services
         /// <param name="target"></param>
         /// <returns></returns>
         bool DownloadFile(OssSavePlaceEnum ossSavePlaceEnum, string source, string target);
-
     }
 }
