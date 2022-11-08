@@ -144,12 +144,12 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 0-未发生分账, 1-等待分账任务处理, 2-分账处理中, 3-分账任务已结束(不体现状态)
         /// </summary>
-        public byte DivisionState { get; set; }
+        public byte? DivisionState { get; set; }
 
         /// <summary>
         /// 最新分账时间
         /// </summary>
-        public DateTime DivisionLastTime { get; set; }
+        public DateTime? DivisionLastTime { get; set; }
 
         /// <summary>
         /// 渠道支付错误码
@@ -179,7 +179,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 订单失效时间
         /// </summary>
-        public DateTime ExpiredTime { get; set; }
+        public DateTime? ExpiredTime { get; set; }
 
         /// <summary>
         /// 订单支付成功时间

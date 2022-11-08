@@ -109,8 +109,8 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
             var config = new MapperConfiguration(cfg => cfg.CreateMap<PayOrderDto, QueryPayOrderRS>());
             var mapper = config.CreateMapper();
             var result = mapper.Map<PayOrderDto, QueryPayOrderRS>(payOrder);
-            result.SuccessTime = payOrder.SuccessTime == null ? null :new DateTimeOffset(payOrder.SuccessTime.Value).ToUnixTimeSeconds();
-            result.CreatedAt= payOrder.CreatedAt == null ? null : new DateTimeOffset(payOrder.CreatedAt.Value).ToUnixTimeSeconds();
+            result.SuccessTime = payOrder.SuccessTime == null ? null : new DateTimeOffset(payOrder.SuccessTime.Value).ToUnixTimeSeconds();
+            result.CreatedAt = payOrder.CreatedAt == null ? null : new DateTimeOffset(payOrder.CreatedAt.Value).ToUnixTimeSeconds();
 
             return result;
         }

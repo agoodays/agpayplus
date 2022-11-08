@@ -158,7 +158,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 订单分账模式：0-该笔订单不允许分账, 1-支付成功按配置自动完成分账, 2-商户手动分账(解冻商户金额)
         /// </summary>
         [BindNever]
-        public byte DivisionMode { get; set; }
+        public byte? DivisionMode { get; set; }
 
         /// <summary>
         /// 0-未发生分账, 1-等待分账任务处理, 2-分账处理中, 3-分账任务已结束(不体现状态)
@@ -169,7 +169,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 最新分账时间
         /// </summary>
         [BindNever]
-        public DateTime DivisionLastTime { get; set; }
+        public DateTime? DivisionLastTime { get; set; }
 
         /// <summary>
         /// 渠道支付错误码
@@ -205,13 +205,13 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 订单失效时间
         /// </summary>
         [BindNever]
-        public DateTime ExpiredTime { get; set; }
+        public DateTime? ExpiredTime { get; set; }
 
         /// <summary>
         /// 订单支付成功时间
         /// </summary>
         [BindNever]
-        public DateTime SuccessTime { get; set; }
+        public DateTime? SuccessTime { get; set; }
 
         /// <summary>
         /// 创建时间

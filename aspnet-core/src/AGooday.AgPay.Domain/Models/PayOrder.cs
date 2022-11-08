@@ -191,21 +191,21 @@ namespace AGooday.AgPay.Domain.Models
         /// </summary>
         [Comment("订单分账模式：0-该笔订单不允许分账, 1-支付成功按配置自动完成分账, 2-商户手动分账(解冻商户金额)")]
         [Column("division_mode", TypeName = "tinyint(6)")]
-        public byte DivisionMode { get; set; }
+        public byte? DivisionMode { get; set; }
 
         /// <summary>
         /// 0-未发生分账, 1-等待分账任务处理, 2-分账处理中, 3-分账任务已结束(不体现状态)
         /// </summary>
         [Comment("0-未发生分账, 1-等待分账任务处理, 2-分账处理中, 3-分账任务已结束(不体现状态)")]
         [Column("division_state", TypeName = "tinyint(6)")]
-        public byte DivisionState { get; set; }
+        public byte? DivisionState { get; set; }
 
         /// <summary>
         /// 最新分账时间
         /// </summary>
         [Comment("最新分账时间")]
         [Column("division_last_time", TypeName = "datetime")]
-        public DateTime DivisionLastTime { get; set; }
+        public DateTime? DivisionLastTime { get; set; }
 
         /// <summary>
         /// 渠道支付错误码
@@ -247,14 +247,14 @@ namespace AGooday.AgPay.Domain.Models
         /// </summary>
         [Comment("订单失效时间")]
         [Column("expired_time", TypeName = "datetime")]
-        public DateTime ExpiredTime { get; set; }
+        public DateTime? ExpiredTime { get; set; }
 
         /// <summary>
         /// 订单支付成功时间
         /// </summary>
         [Comment("订单支付成功时间")]
         [Column("success_time", TypeName = "datetime")]
-        public DateTime SuccessTime { get; set; }
+        public DateTime? SuccessTime { get; set; }
 
         /// <summary>
         /// 创建时间

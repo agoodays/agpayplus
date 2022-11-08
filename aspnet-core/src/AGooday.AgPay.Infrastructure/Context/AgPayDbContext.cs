@@ -156,8 +156,8 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<PayOrder>().Property(c => c.RefundState).HasDefaultValue(0);
             modelBuilder.Entity<PayOrder>().Property(c => c.RefundTimes).HasDefaultValue(0);
             modelBuilder.Entity<PayOrder>().Property(c => c.RefundAmount).HasDefaultValue(0);
-            modelBuilder.Entity<PayOrder>().Property(c => c.DivisionMode).HasDefaultValue(0);
-            modelBuilder.Entity<PayOrder>().Property(c => c.DivisionState).HasDefaultValue(0);
+            //modelBuilder.Entity<PayOrder>().Property(c => c.DivisionMode).HasDefaultValue(0);
+            //modelBuilder.Entity<PayOrder>().Property(c => c.DivisionState).HasDefaultValue(0);
             modelBuilder.Entity<PayOrder>().Property(c => c.NotifyUrl).HasDefaultValue("");
             modelBuilder.Entity<PayOrder>().Property(c => c.ReturnUrl).HasDefaultValue("");
             modelBuilder.Entity<PayOrder>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
