@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
@@ -30,7 +31,21 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 
         public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPaywayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            // 微信API版本
+            WxServiceWrapper wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+            string apiVersion = wxServiceWrapper.ApiVersion; 
+            if (CS.PAY_IF_VERSION.WX_V2.Equals(apiVersion))
+            {
+                return PayWayUtil.GetRealPaywayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            }
+            else if (CS.PAY_IF_VERSION.WX_V3.Equals(apiVersion))
+            {
+                return PayWayUtil.GetRealPaywayV3Service(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            }
+            else
+            {
+                throw new BizException("不支持的微信支付API版本");
+            }
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
