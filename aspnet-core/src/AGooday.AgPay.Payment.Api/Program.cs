@@ -1,32 +1,17 @@
-using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Channel.WxPay;
 using AGooday.AgPay.Payment.Api.Extensions;
 using AGooday.AgPay.Payment.Api.FilterAttributes;
-using AGooday.AgPay.Payment.Api.Models;
 using MediatR;
 using AGooday.AgPay.Payment.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json.Serialization;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay;
-using AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay;
-using AGooday.AgPay.Payment.Api.Channel.XxPay;
 using AGooday.AgPay.Payment.Api.Utils;
-using AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay;
-using AliBar = AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay.AliBar;
-using AliJsapi = AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay.AliJsapi;
-using WxBar = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxBar;
-using WxJsapi = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxJsapi;
-using YsfAliBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliBar;
-using YsfAliJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliJsapi;
-using YsfWxBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxBar;
-using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Common.Utils;
@@ -38,6 +23,31 @@ using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Components.OSS.Services;
 using AGooday.AgPay.Common.Extensions;
+
+#region PayWay
+#region AliPay
+using AliBar = AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay.AliBar;
+using AliJsapi = AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay.AliJsapi;
+#endregion
+#region WxPay
+using WxApp = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxApp;
+using WxBar = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxBar;
+using WxH5 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxH5;
+using WxJsapi = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxJsapi;
+
+using WxAppV3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxApp;
+using WxBarV3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxBar;
+using WxH5V3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxH5;
+using WxJsapiV3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxJsapi;
+#endregion
+#region YsfPay
+using YsfAliBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliBar;
+using YsfAliJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliJsapi;
+
+using YsfWxBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxBar;
+using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi; 
+#endregion
+#endregion
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -277,11 +287,18 @@ services.AddSingleton<IPaymentService, AliWap>();
 #region WxPay
 services.AddSingleton<IPaymentService, WxApp>();
 services.AddSingleton<IPaymentService, WxBar>();
+services.AddSingleton<IPaymentService, WxH5>();
 services.AddSingleton<IPaymentService, WxJsapi>();
+
+services.AddSingleton<IPaymentService, WxAppV3>();
+services.AddSingleton<IPaymentService, WxBarV3>();
+services.AddSingleton<IPaymentService, WxH5V3>();
+services.AddSingleton<IPaymentService, WxJsapiV3>();
 #endregion
 #region YsfPay
 services.AddSingleton<IPaymentService, YsfAliBar>();
 services.AddSingleton<IPaymentService, YsfAliJsapi>();
+
 services.AddSingleton<IPaymentService, YsfWxBar>();
 services.AddSingleton<IPaymentService, YsfWxJsapi>();
 #endregion
