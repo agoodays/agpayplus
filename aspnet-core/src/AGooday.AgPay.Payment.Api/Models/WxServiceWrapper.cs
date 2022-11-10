@@ -1,15 +1,17 @@
 ﻿using AGooday.AgPay.Application.Params.WxPay;
 using SKIT.FlurlHttpClient;
 using SKIT.FlurlHttpClient.Wechat.TenpayV3.Settings;
-using WechatTenpayClientV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClient;
-using WechatTenpayClientOptionsV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClientOptions;
-using WechatTenpayClientV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClient;
-using WechatTenpayClientOptionsV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClientOptions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Payment.Api.Utils;
+using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Models
 {
+    using WechatTenpayClientV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClient;
+    using WechatTenpayClientOptionsV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClientOptions;
+    using WechatTenpayClientV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClient;
+    using WechatTenpayClientOptionsV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClientOptions;
     public class WxServiceWrapper
     {
         /// <summary>
@@ -38,12 +40,17 @@ namespace AGooday.AgPay.Payment.Api.Models
             // 微信API  V2
             if (CS.PAY_IF_VERSION.WX_V2.Equals(apiVersion))
             {
+                var certFilePath = ChannelCertConfigKit.GetCertFilePath(cert);
+                var fileStream = new FileStream(certFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                byte[] merchantCertificateBytes = new byte[fileStream.Length];
+                fileStream.Read(merchantCertificateBytes, 0, merchantCertificateBytes.Length);
+                fileStream.Close();
                 var optionsv2 = new WechatTenpayClientOptionsV2()
                 {
                     MerchantId = mchId,// 微信商户号
-                    MerchantSecret = appSecret,// 微信商户 API 密钥
-                    MerchantCertificateBytes = Convert.FromBase64String(""),// 微信商户证书内容，即 `apiclient_cert.p12` 文件内容的 Base64 编码结果
-                    MerchantCertificatePassword = ""// 微信商户证书密码，通常是商户号
+                    MerchantSecret = mchKey,// 微信商户 API 密钥
+                    MerchantCertificateBytes = merchantCertificateBytes,// 微信商户证书内容，即 `apiclient_cert.p12` 文件内容的 Base64 编码结果
+                    MerchantCertificatePassword = mchId// 微信商户证书密码，通常是商户号
                 };
                 //var clientv2 = new WechatTenpayClientV2(optionsv2);
                 client = new WechatTenpayClientV2(optionsv2);
@@ -53,22 +60,25 @@ namespace AGooday.AgPay.Payment.Api.Models
             {
                 var manager = new InMemoryCertificateManager();
 
+                var certFilePath = ChannelCertConfigKit.GetCertFilePath(apiClientKey);
+                string merchantCertificatePrivateKey = File.ReadAllText(certFilePath, Encoding.UTF8);
                 var optionsv3 = new WechatTenpayClientOptionsV3()
                 {
                     MerchantId = mchId,// 微信商户号
-                    MerchantV3Secret = appSecret,// 微信商户 v3 API 密钥
+                    MerchantV3Secret = apiV3Key,// 微信商户 v3 API 密钥
                     MerchantCertificateSerialNumber = serialNo,// 微信商户证书序列号
-                    MerchantCertificatePrivateKey = "",// -----BEGIN PRIVATE KEY-----微信商户证书私钥，即 `apiclient_key.pem` 文件内容-----END PRIVATE KEY-----
+                    MerchantCertificatePrivateKey = merchantCertificatePrivateKey,// -----BEGIN PRIVATE KEY-----微信商户证书私钥，即 `apiclient_key.pem` 文件内容-----END PRIVATE KEY-----
                     PlatformCertificateManager = manager // 证书管理器的具体用法请参阅下文的高级技巧与加密、验签有关的章节
                 };
-                var clientv3 = new WechatTenpayClientV3(optionsv3);
+                //var clientv3 = new WechatTenpayClientV3(optionsv3);
+                client = new WechatTenpayClientV3(optionsv3);
             }
             else
             {
                 throw new BizException("不支持的微信支付API版本");
             }
             //return new WxServiceWrapper(apiVersion, clientv2, clientv3);
-            return null;
+            return new WxServiceWrapper(apiVersion, client);
         }
 
         public static WxServiceWrapper BuildWxServiceWrapper(WxPayIsvParams wxpayParams)

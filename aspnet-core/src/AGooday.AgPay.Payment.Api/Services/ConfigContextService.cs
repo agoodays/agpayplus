@@ -14,13 +14,19 @@ namespace AGooday.AgPay.Payment.Api.Services
 {
     public class ConfigContextService
     {
-        /** <商户ID, 商户配置项>  **/
+        /// <summary>
+        /// <商户ID, 商户配置项>
+        /// </summary>
         private static Dictionary<string, MchInfoConfigContext> mchInfoConfigContextMap = new Dictionary<string, MchInfoConfigContext>();
 
-        /** <应用ID, 商户配置上下文>  **/
+        /// <summary>
+        /// <应用ID, 商户配置上下文>
+        /// </summary>
         private static Dictionary<string, MchAppConfigContext> mchAppConfigContextMap = new Dictionary<string, MchAppConfigContext>();
 
-        /** <服务商号, 服务商配置上下文>  **/
+        /// <summary>
+        /// <服务商号, 服务商配置上下文>
+        /// </summary>
         private static Dictionary<string, IsvConfigContext> isvConfigContextMap = new Dictionary<string, IsvConfigContext>();
 
         private readonly IMchAppService _mchAppService;
@@ -36,7 +42,11 @@ namespace AGooday.AgPay.Payment.Api.Services
             _payInterfaceConfigService = payInterfaceConfigService;
         }
 
-        /** 获取 [商户配置信息] **/
+        /// <summary>
+        /// 获取 [商户配置信息]
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <returns></returns>
         public MchInfoConfigContext GetMchInfoConfigContext(string mchNo)
         {
             mchInfoConfigContextMap.TryGetValue(mchNo, out MchInfoConfigContext _mchInfoConfigContext);
@@ -51,7 +61,12 @@ namespace AGooday.AgPay.Payment.Api.Services
             return _mchInfoConfigContext;
         }
 
-        /** 获取 [商户应用支付参数配置信息] **/
+        /// <summary>
+        /// 获取 [商户应用支付参数配置信息]
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="appId"></param>
+        /// <returns></returns>
         public MchAppConfigContext GetMchAppConfigContext(string mchNo, string appId)
         {
             mchAppConfigContextMap.TryGetValue(mchNo, out MchAppConfigContext _mchAppConfigContext);
@@ -66,7 +81,11 @@ namespace AGooday.AgPay.Payment.Api.Services
             return _mchAppConfigContext;
         }
 
-        /** 获取 [ISV支付参数配置信息] **/
+        /// <summary>
+        /// 获取 [ISV支付参数配置信息]
+        /// </summary>
+        /// <param name="isvNo"></param>
+        /// <returns></returns>
         public IsvConfigContext GetIsvConfigContext(string isvNo)
         {
             isvConfigContextMap.TryGetValue(isvNo, out IsvConfigContext _isvConfigContext);
@@ -80,7 +99,10 @@ namespace AGooday.AgPay.Payment.Api.Services
             return _isvConfigContext;
         }
 
-        /** 初始化 [商户配置信息] **/
+        /// <summary>
+        /// 初始化 [商户配置信息]
+        /// </summary>
+        /// <param name="mchNo"></param>
         public void InitMchInfoConfigContext(string mchNo)
         {
             // 当前系统不进行缓存
@@ -133,7 +155,11 @@ namespace AGooday.AgPay.Payment.Api.Services
             mchInfoConfigContextMap.Add(mchNo, mchInfoConfigContext);
         }
 
-        /** 初始化 [商户应用支付参数配置信息] **/
+        /// <summary>
+        /// 初始化 [商户应用支付参数配置信息]
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="appId"></param>
         public void InitMchAppConfigContext(string mchNo, string appId)
         {
             // 当前系统不进行缓存
@@ -217,8 +243,6 @@ namespace AGooday.AgPay.Payment.Api.Services
                 {
                     mchAppConfigContext.PaypalWrapper = PayPalWrapper.BuildPaypalWrapper(ppPayMchParams);
                 }
-
-
             }
             else
             {
@@ -233,13 +257,15 @@ namespace AGooday.AgPay.Payment.Api.Services
 
                 //放置 当前商户的 服务商信息
                 mchAppConfigContext.IsvConfigContext = GetIsvConfigContext(mchInfo.IsvNo);
-
             }
 
             mchAppConfigContextMap.Add(appId, mchAppConfigContext);
         }
 
-        /** 初始化 [ISV支付参数配置信息]  **/
+        /// <summary>
+        /// 初始化 [ISV支付参数配置信息]
+        /// </summary>
+        /// <param name="isvNo"></param>
         public void InitIsvConfigContext(string isvNo)
         {
 

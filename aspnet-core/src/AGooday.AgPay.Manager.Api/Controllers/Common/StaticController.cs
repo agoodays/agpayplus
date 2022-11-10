@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.SqlServer.Server;
 using Microsoft.VisualBasic;
 using System.IO;
+using System.Text;
 using System.Web;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Common
@@ -167,6 +168,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
                     return File(bytes, GetContentType(format));
                 }
             }
+        }
+
+        [HttpGet, Route("api/anon/getfilecontent")]
+        public string GetFileContent(string path)
+        {
+            string merchantCertificatePrivateKey = System.IO.File.ReadAllText(path, Encoding.UTF8);
+            return merchantCertificatePrivateKey;
         }
     }
 }
