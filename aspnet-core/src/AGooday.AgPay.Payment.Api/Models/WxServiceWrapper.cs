@@ -20,14 +20,16 @@ namespace AGooday.AgPay.Payment.Api.Models
         public string ApiVersion { get; private set; }
         public string AppId { get; private set; }
         public string MchKey { get; private set; }
+        public string ApiClientKey { get; private set; }
         public CommonClientBase Client { get; private set; }
         //public WechatTenpayClientV2 ClientV2 { get; private set; }
         //public WechatTenpayClientV3 ClientV3 { get; private set; }
-        public WxServiceWrapper(string apiVersion, string appId, string mchKey, CommonClientBase client)
+        public WxServiceWrapper(string apiVersion, string appId, string mchKey, string apiClientKey, CommonClientBase client)
         {
             ApiVersion = apiVersion;
             AppId = appId;
             MchKey = mchKey;
+            ApiClientKey = apiClientKey;
             Client = client;
         }
         //public WxServiceWrapper(string apiVersion, WechatTenpayClientV2 clientv2, WechatTenpayClientV3 clientv3)
@@ -82,7 +84,7 @@ namespace AGooday.AgPay.Payment.Api.Models
                 throw new BizException("不支持的微信支付API版本");
             }
             //return new WxServiceWrapper(apiVersion, clientv2, clientv3);
-            return new WxServiceWrapper(apiVersion, appId, mchKey, client);
+            return new WxServiceWrapper(apiVersion, appId, mchKey, apiClientKey, client);
         }
 
         public static WxServiceWrapper BuildWxServiceWrapper(WxPayIsvParams wxpayParams)

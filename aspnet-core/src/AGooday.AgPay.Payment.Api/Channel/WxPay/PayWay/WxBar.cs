@@ -81,7 +81,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
                 // 微信返回支付状态为【支付结果未知】, 需进行查单操作
                 if (response.ErrorCode.Equals("SYSTEMERROR") || response.ErrorCode.Equals("USERPAYING") || response.ErrorCode.Equals("BANKERROR"))
                 {
-
                     // 轮询查询订单
                     channelRetMsg.ChannelState = ChannelState.WAITING;
                     channelRetMsg.IsNeedQuery = true;

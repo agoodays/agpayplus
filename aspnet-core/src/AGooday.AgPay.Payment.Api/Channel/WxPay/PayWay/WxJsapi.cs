@@ -85,8 +85,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
                 payInfo.Add("nonceStr", Guid.NewGuid().ToString("N"));
                 payInfo.Add("package", $"prepay_id={response.PrepayId}");
                 payInfo.Add("signType", "MD5");
-                var paySign = Sign(payInfo, wxServiceWrapper.MchKey);
+                var paySign = WxPayKit.Sign(payInfo, wxServiceWrapper.MchKey);
                 payInfo.Add("paySign", paySign);
+
                 res.PayInfo = JsonConvert.SerializeObject(payInfo);
                 channelRetMsg.ChannelState = ChannelState.WAITING;
             }
@@ -100,20 +101,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
             }
 
             return res;
-        }
-        private string Sign(Dictionary<string, string> dictionary, string key)
-        {
-            var json = string.Join("&", dictionary.OrderBy(o => o.Key)
-                .Select(s => $"{s.Key}={s.Value}")) + "&key=" + key;
-            var bytes = Encoding.UTF8.GetBytes(json);
-            MD5 md5 = MD5.Create();
-            byte[] temp = md5.ComputeHash(bytes);
-            String sign = "";
-            foreach (byte b in temp)
-            {
-                sign = sign + b.ToString("X").PadLeft(2, '0');
-            }
-            return sign.ToUpper();
         }
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
