@@ -12,15 +12,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
     /// </summary>
     public class WxLite : WxPayPaymentService
     {
-        private readonly WxJsapi wxJsapi;
+        private readonly IPaymentService wxJsapi;
 
         public WxLite(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
-            ConfigContextQueryService configContextQueryService,
-            WxJsapi wxJsapi)
+            ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.wxJsapi = wxJsapi;
+            this.wxJsapi = serviceProvider.GetService<WxJsapi>();//serviceProvider.GetServices<IPaymentService>().FirstOrDefault(f => f.GetType().Equals(typeof(WxJsapi)));
         }
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)

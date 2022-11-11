@@ -12,15 +12,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
     /// </summary>
     public class WxBar : WxPayPaymentService
     {
-        private readonly PayWay.WxBar wxBar;
+        private readonly IPaymentService wxBar;
 
         public WxBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
-            ConfigContextQueryService configContextQueryService,
-            PayWay.WxBar wxBar)
+            ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.wxBar = wxBar;
+            this.wxBar = serviceProvider.GetService<PayWay.WxBar>(); //serviceProvider.GetServices<IPaymentService>().FirstOrDefault(f => f.GetType().Equals(typeof(PayWay.WxBar)));
         }
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
