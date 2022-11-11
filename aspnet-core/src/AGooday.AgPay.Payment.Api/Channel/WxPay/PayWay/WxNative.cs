@@ -18,7 +18,7 @@ using AGooday.AgPay.Common.Constants;
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
 {
     /// <summary>
-    /// 微信 bar
+    /// 微信 native支付
     /// </summary>
     public class WxNative : WxPayPaymentService
     {

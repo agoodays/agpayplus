@@ -19,7 +19,7 @@ using AGooday.AgPay.Common.Constants;
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
 {
     /// <summary>
-    /// 微信 bar
+    /// 微信 native支付
     /// </summary>
     public class WxNative : WxPayPaymentService
     {
@@ -98,7 +98,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                     NotifyUrl = GetNotifyUrl(payOrder.PayOrderId),
                     Amount = new CreatePayTransactionNativeRequest.Types.Amount()
                     {
-                        Total = 1,
+                        Total = Convert.ToInt32(payOrder.Amount),
                         Currency = "CNY"
                     },
                     Scene = new CreatePayPartnerTransactionNativeRequest.Types.Scene()

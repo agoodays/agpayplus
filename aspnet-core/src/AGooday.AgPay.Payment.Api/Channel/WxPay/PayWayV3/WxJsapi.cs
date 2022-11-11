@@ -107,7 +107,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                     NotifyUrl = GetNotifyUrl(payOrder.PayOrderId),
                     Amount = new CreatePayTransactionJsapiRequest.Types.Amount()
                     {
-                        Total = 1,
+                        Total = Convert.ToInt32(payOrder.Amount),
                         Currency = "CNY"
                     },
                     Payer = new CreatePayTransactionJsapiRequest.Types.Payer()
@@ -141,7 +141,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                 payInfo.Add("nonceStr", nonceStr);
                 payInfo.Add("package", $"prepay_id={response.PrepayId}");
                 payInfo.Add("signType", "RSA");
-                string beforeSign =$"{appid}\n{timestamp}\n{nonceStr}\nprepay_id={response.PrepayId}\n";
+                string beforeSign = $"{appid}\n{timestamp}\n{nonceStr}\nprepay_id={response.PrepayId}\n";
                 var paySign = WxPayV3Util.RSASign(beforeSign, wxServiceWrapper.Config.MchPrivateKey);
                 payInfo.Add("paySign", paySign);// 签名以后在增加prepayId参数
                 payInfo.Add("prepayId", response.PrepayId);

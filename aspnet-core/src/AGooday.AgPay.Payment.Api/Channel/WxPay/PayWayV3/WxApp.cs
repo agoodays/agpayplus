@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                     NotifyUrl = GetNotifyUrl(payOrder.PayOrderId),
                     Amount = new CreatePayTransactionAppRequest.Types.Amount()
                     {
-                        Total = 1,
+                        Total = Convert.ToInt32(payOrder.Amount),
                         Currency = "CNY"
                     },
                 };

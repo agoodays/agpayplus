@@ -57,7 +57,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                     },
                     Scene = new CreatePayPartnerTransactionH5Request.Types.Scene()
                     {
-                        H5 = new CreatePayTransactionH5Request.Types.Scene.Types.H5() {
+                        H5 = new CreatePayTransactionH5Request.Types.Scene.Types.H5()
+                        {
                             Type = "iOS, Android, Wap"
                         },
                         ClientIp = payOrder.ClientIp,
@@ -98,7 +99,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                     NotifyUrl = GetNotifyUrl(payOrder.PayOrderId),
                     Amount = new CreatePayTransactionH5Request.Types.Amount()
                     {
-                        Total = 1,
+                        Total = Convert.ToInt32(payOrder.Amount),
                         Currency = "CNY"
                     },
                     Scene = new CreatePayPartnerTransactionH5Request.Types.Scene()
