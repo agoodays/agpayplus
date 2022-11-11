@@ -12,6 +12,7 @@ using SKIT.FlurlHttpClient.Wechat.TenpayV2.Models;
 using SKIT.FlurlHttpClient.Wechat.TenpayV2;
 using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
 using Newtonsoft.Json;
+using AGooday.AgPay.Application.Params.WxPay;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
 {
@@ -32,7 +33,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
             WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
             var wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
 
-            /* 以付款码付款接口为例 */
+            // 微信统一下单请求对象
             var request = new CreatePayMicroPayRequest()
             {
                 OutTradeNumber = payOrder.PayOrderId,// 商户订单号
@@ -53,7 +54,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
             }
 
             //放置isv信息
-            //WxPayKit.PutApiIsvInfo(mchAppConfigContext, request);
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                var isvSubMchParams = (WxPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                request.SubMerchantId = isvSubMchParams.SubMchId;
+                request.SubAppId = isvSubMchParams.SubMchAppId;
+            }
 
             // 构造函数响应数据
             WxBarOrderRS res = ApiResBuilder.BuildSuccess<WxBarOrderRS>();

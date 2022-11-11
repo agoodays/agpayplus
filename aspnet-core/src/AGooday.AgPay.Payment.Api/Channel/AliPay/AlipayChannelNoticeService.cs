@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 //配置参数获取
                 byte? useCert = null;
                 string alipaySignType, alipayPublicCert, alipayPublicKey = null;
-                if (mchAppConfigContext.IsIsvsubMch())
+                if (mchAppConfigContext.IsIsvSubMch())
                 {
 
                     // 获取支付参数

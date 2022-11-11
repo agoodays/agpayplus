@@ -131,7 +131,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 return _configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetAlipayClientWrapper();
             }
 
-            if (mchAppConfigContext.IsIsvsubMch())
+            if (mchAppConfigContext.IsIsvSubMch())
             {
                 AliPayIsvParams alipayParams = (AliPayIsvParams)QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.ALIPAY);
                 return AlipayClientWrapper.BuildAlipayClientWrapper(alipayParams);
@@ -150,7 +150,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 return _configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetWxServiceWrapper();
             }
 
-            if (mchAppConfigContext.IsIsvsubMch())
+            if (mchAppConfigContext.IsIsvSubMch())
             {
                 WxPayIsvParams wxParams = (WxPayIsvParams)QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.WXPAY);
                 return WxServiceWrapper.BuildWxServiceWrapper(wxParams);

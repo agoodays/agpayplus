@@ -8,6 +8,9 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Utils;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Payment.Api.Services;
+using SKIT.FlurlHttpClient.Wechat.TenpayV3.Models;
+using SKIT.FlurlHttpClient.Wechat.TenpayV3;
+using AGooday.AgPay.Application.Params.WxPay;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
 {
@@ -27,17 +30,103 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
         {
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
 
-            // 微信统一下单请求对象
+            var wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
 
             // 构造函数响应数据
             WxJsapiOrderRS res = ApiResBuilder.BuildSuccess<WxJsapiOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
-            // 调起上游接口：
-            // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
-            // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
+            // 微信统一下单请求对象
 
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                var isvSubMchParams = (WxPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+
+                var request = new CreatePayPartnerTransactionJsapiRequest()
+                {
+                    OutTradeNumber = payOrder.PayOrderId,// 商户订单号
+                    AppId = wxServiceWrapper.AppId,// 微信 AppId
+                    Description = payOrder.Subject,// 订单描述
+                    NotifyUrl = GetNotifyUrl(payOrder.PayOrderId),
+                    Amount = new CreatePayPartnerTransactionJsapiRequest.Types.Amount()
+                    {
+                        Total = Convert.ToInt32(payOrder.Amount),
+                        Currency = "CNY"
+                    },
+                    Scene = new CreatePayPartnerTransactionJsapiRequest.Types.Scene()
+                    {
+                        ClientIp = payOrder.ClientIp,
+                    },
+                    // 添加子商户参数
+                    SubMerchantId = isvSubMchParams.SubMchId,
+                    ExpireTime = DateTimeOffset.Now.AddMinutes(15),
+                };
+
+                //订单分账， 将冻结商户资金。
+                if (IsDivisionOrder(payOrder))
+                {
+                    request.Settlement = new CreatePayPartnerTransactionJsapiRequest.Types.Settlement()
+                    {
+                        IsProfitSharing = true,
+                    };
+                }
+
+                var payer = new CreatePayPartnerTransactionJsapiRequest.Types.Payer()
+                {
+                    SubOpenId = bizRQ.Openid,
+                    OpenId = bizRQ.Openid,
+                };
+                // 子商户subAppId不为空
+                if (!string.IsNullOrEmpty(isvSubMchParams.SubMchAppId))
+                {
+                    request.SubAppId = isvSubMchParams.SubMchAppId;
+                    payer.SubOpenId = bizRQ.Openid;// 用户在子商户appid下的唯一标识
+                }
+                else
+                {
+                    payer.OpenId = bizRQ.Openid;// 用户在服务商appid下的唯一标识
+                }
+                request.Payer = payer;
+                // 调起上游接口：
+                // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
+                // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
+                var response = ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayPartnerTransactionJsapiAsync(request).Result;
+            }
+            else
+            {
+                var request = new CreatePayTransactionJsapiRequest()
+                {
+                    OutTradeNumber = payOrder.PayOrderId,// 商户订单号
+                    AppId = wxServiceWrapper.AppId,// 微信 AppId
+                    Description = payOrder.Subject,// 订单描述
+                    ExpireTime = DateTimeOffset.Now.AddMinutes(15),
+                    NotifyUrl = GetNotifyUrl(payOrder.PayOrderId),
+                    Amount = new CreatePayTransactionJsapiRequest.Types.Amount()
+                    {
+                        Total = 1,
+                        Currency = "CNY"
+                    },
+                    Payer = new CreatePayTransactionJsapiRequest.Types.Payer()
+                    {
+                        OpenId = bizRQ.Openid
+                    }
+                };
+
+                //订单分账， 将冻结商户资金。
+                if (IsDivisionOrder(payOrder))
+                {
+                    request.Settlement = new CreatePayPartnerTransactionJsapiRequest.Types.Settlement()
+                    {
+                        IsProfitSharing = true,
+                    };
+                }
+
+                // 调起上游接口：
+                // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
+                // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
+                var response = ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayTransactionJsapiAsync(request).Result;
+            }
             return res;
         }
 

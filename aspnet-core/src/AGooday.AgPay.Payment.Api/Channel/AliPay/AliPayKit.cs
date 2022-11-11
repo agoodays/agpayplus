@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
         public static void PutApiIsvInfo<T>(MchAppConfigContext mchAppConfigContext, IAopRequest<T> req, AopObject model) where T : AopResponse
         {
             //不是特约商户， 无需放置此值
-            if (!mchAppConfigContext.IsIsvsubMch())
+            if (!mchAppConfigContext.IsIsvSubMch())
             {
                 return;
             }

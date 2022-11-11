@@ -254,9 +254,9 @@ services.AddSingleton(provider =>
 });
 #endregion
 #region QueryService
-services.AddSingleton<AliPayPaymentService>();
-services.AddSingleton<WxPayPaymentService>();
-services.AddSingleton<YsfPayPaymentService>();
+services.AddSingleton<AliPayPayOrderQueryService>();
+services.AddSingleton<WxPayPayOrderQueryService>();
+services.AddSingleton<YsfPayPayOrderQueryService>();
 services.AddSingleton(provider =>
 {
     Func<string, IPayOrderQueryService> funcFactory = ifCode =>

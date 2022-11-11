@@ -58,19 +58,19 @@ namespace AGooday.AgPay.Payment.Api.Models
         }
 
         /** 是否为 服务商特约商户 **/
-        public bool IsIsvsubMch()
+        public bool IsIsvSubMch()
         {
             return this.MchType == (byte)MchInfoType.TYPE_ISVSUB;
         }
 
         public AlipayClientWrapper GetAlipayClientWrapper()
         {
-            return IsIsvsubMch() ? this.IsvConfigContext.AlipayClientWrapper : this.AlipayClientWrapper;
+            return IsIsvSubMch() ? this.IsvConfigContext.AlipayClientWrapper : this.AlipayClientWrapper;
         }
 
         public WxServiceWrapper GetWxServiceWrapper()
         {
-            return IsIsvsubMch() ? this.IsvConfigContext.WxServiceWrapper : this.WxServiceWrapper;
+            return IsIsvSubMch() ? this.IsvConfigContext.WxServiceWrapper : this.WxServiceWrapper;
         }
 
         public PayPalWrapper GetPaypalWrapper()

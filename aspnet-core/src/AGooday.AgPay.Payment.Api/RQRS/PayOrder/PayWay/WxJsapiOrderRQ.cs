@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
     public class WxJsapiOrderRQ : UnifiedOrderRQ
     {
         /// <summary>
-        /// 用户 支付条码
+        /// 微信openid
         /// </summary>
         [Required(ErrorMessage = "openid不能为空")]
         public string Openid { get; set; }

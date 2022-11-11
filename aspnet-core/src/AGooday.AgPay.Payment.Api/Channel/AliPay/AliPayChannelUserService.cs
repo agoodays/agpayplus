@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             string oauthUrl = AliPayConfig.PROD_OAUTH_URL;
             string appId = null;
 
-            if (mchAppConfigContext.IsIsvsubMch())
+            if (mchAppConfigContext.IsIsvSubMch())
             {
                 AliPayIsvParams isvParams = (AliPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
                 if (isvParams == null)
