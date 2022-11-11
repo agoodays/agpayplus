@@ -34,11 +34,15 @@ using WxApp = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxApp;
 using WxBar = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxBar;
 using WxH5 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxH5;
 using WxJsapi = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxJsapi;
+using WxLite = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxLite;
+using WxNative = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay.WxNative;
 
 using WxAppV3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxApp;
 using WxBarV3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxBar;
 using WxH5V3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxH5;
 using WxJsapiV3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxJsapi;
+using WxLiteV3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxLite;
+using WxNativeV3 = AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3.WxNative;
 #endregion
 #region YsfPay
 using YsfAliBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliBar;
@@ -289,11 +293,15 @@ services.AddSingleton<IPaymentService, WxApp>();
 services.AddSingleton<IPaymentService, WxBar>();
 services.AddSingleton<IPaymentService, WxH5>();
 services.AddSingleton<IPaymentService, WxJsapi>();
+services.AddSingleton<IPaymentService, WxLite>();
+services.AddSingleton<IPaymentService, WxNative>();
 
 services.AddSingleton<IPaymentService, WxAppV3>();
 services.AddSingleton<IPaymentService, WxBarV3>();
 services.AddSingleton<IPaymentService, WxH5V3>();
 services.AddSingleton<IPaymentService, WxJsapiV3>();
+services.AddSingleton<IPaymentService, WxLiteV3>();
+services.AddSingleton<IPaymentService, WxNativeV3>();
 #endregion
 #region YsfPay
 services.AddSingleton<IPaymentService, YsfAliBar>();

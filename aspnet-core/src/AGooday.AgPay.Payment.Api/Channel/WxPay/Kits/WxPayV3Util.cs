@@ -1,10 +1,12 @@
-﻿namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
+﻿using SKIT.FlurlHttpClient.Wechat.TenpayV3.Utilities;
+
+namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
 {
     public class WxPayV3Util
     {
-        public static string RSASign(string dictionary, string privateKey)
+        public static string RSASign(string plainText, string privateKey)
         {
-            return null;
+            return RSAUtility.SignWithSHA256(privateKey, plainText);
         }
     }
 }

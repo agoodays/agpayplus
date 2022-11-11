@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
             {
                 TradeType = "APP",
                 OutTradeNumber = payOrder.PayOrderId,// 商户订单号
-                AppId = wxServiceWrapper.AppId,// 微信 AppId
+                AppId = wxServiceWrapper.Config.AppId,// 微信 AppId
                 Body = payOrder.Subject,// 订单描述
                 Detail = JsonConvert.DeserializeObject<CreatePayMicroPayRequest.Types.Detail>(payOrder.Body),
                 FeeType = "CNY",
@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
                 payInfo.Add("timeStamp", DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
                 payInfo.Add("nonceStr", Guid.NewGuid().ToString("N"));
                 payInfo.Add("appId", response.AppId);
-                var paySign = WxPayKit.Sign(payInfo, wxServiceWrapper.MchKey);
+                var paySign = WxPayKit.Sign(payInfo, wxServiceWrapper.Config.MchKey);
                 payInfo.Add("sign", paySign);
 
                 res.PayInfo = JsonConvert.SerializeObject(payInfo);

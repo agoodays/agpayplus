@@ -14,23 +14,14 @@ namespace AGooday.AgPay.Payment.Api.Models
     using WechatTenpayClientOptionsV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClientOptions;
     public class WxServiceWrapper
     {
-        /// <summary>
-        /// 缓存微信API版本
-        /// </summary>
-        public string ApiVersion { get; private set; }
-        public string AppId { get; private set; }
-        public string MchKey { get; private set; }
-        public string ApiClientKey { get; private set; }
+        public WxPayConfig Config { get; private set; }
         public CommonClientBase Client { get; private set; }
         //public WechatTenpayClientV2 ClientV2 { get; private set; }
         //public WechatTenpayClientV3 ClientV3 { get; private set; }
-        public WxServiceWrapper(string apiVersion, string appId, string mchKey, string apiClientKey, CommonClientBase client)
+        public WxServiceWrapper(CommonClientBase client, WxPayConfig config)
         {
-            ApiVersion = apiVersion;
-            AppId = appId;
-            MchKey = mchKey;
-            ApiClientKey = apiClientKey;
             Client = client;
+            Config = config;
         }
         //public WxServiceWrapper(string apiVersion, WechatTenpayClientV2 clientv2, WechatTenpayClientV3 clientv3)
         //{
@@ -43,6 +34,15 @@ namespace AGooday.AgPay.Payment.Api.Models
             string serialNo, string cert, string apiClientKey)
         {
             CommonClientBase client;
+            var config = new WxPayConfig()
+            {
+                ApiVersion = apiVersion,
+                MchId = mchId,
+                AppId = appId,
+                AppSecret = appSecret,
+                MchKey = mchKey,
+                ApiV3Key = apiV3Key,
+            };
             // 微信API  V2
             if (CS.PAY_IF_VERSION.WX_V2.Equals(apiVersion))
             {
@@ -76,6 +76,8 @@ namespace AGooday.AgPay.Payment.Api.Models
                     MerchantCertificatePrivateKey = merchantCertificatePrivateKey,// -----BEGIN PRIVATE KEY-----微信商户证书私钥，即 `apiclient_key.pem` 文件内容-----END PRIVATE KEY-----
                     PlatformCertificateManager = manager // 证书管理器的具体用法请参阅下文的高级技巧与加密、验签有关的章节
                 };
+                config.ApiClientKey = apiClientKey;
+                config.MchPrivateKey = merchantCertificatePrivateKey;
                 //var clientv3 = new WechatTenpayClientV3(optionsv3);
                 client = new WechatTenpayClientV3(optionsv3);
             }
@@ -84,7 +86,7 @@ namespace AGooday.AgPay.Payment.Api.Models
                 throw new BizException("不支持的微信支付API版本");
             }
             //return new WxServiceWrapper(apiVersion, clientv2, clientv3);
-            return new WxServiceWrapper(apiVersion, appId, mchKey, apiClientKey, client);
+            return new WxServiceWrapper(client, config);
         }
 
         public static WxServiceWrapper BuildWxServiceWrapper(WxPayIsvParams wxpayParams)
@@ -101,6 +103,42 @@ namespace AGooday.AgPay.Payment.Api.Models
             return BuildWxServiceWrapper(wxpayParams.MchId, wxpayParams.AppId,
                     wxpayParams.AppSecret, wxpayParams.Key, wxpayParams.ApiVersion, wxpayParams.ApiV3Key,
                     wxpayParams.SerialNo, wxpayParams.Cert, wxpayParams.ApiClientKey);
+        }
+
+        public class WxPayConfig
+        {
+            /// <summary>
+            /// 缓存微信API版本
+            /// </summary>
+            public string ApiVersion { get; set; }
+            /// <summary>
+            /// 微信ApiId
+            /// </summary>
+            public string AppId { get; set; }
+            /// <summary>
+            /// 微信商户号
+            /// </summary>
+            public string MchId { get; set; }
+            /// <summary>
+            /// API密钥
+            /// </summary>
+            public string MchKey { get; set; }
+            /// <summary>
+            /// 应用AppSecret
+            /// </summary>
+            public string AppSecret { get; set; }
+            /// <summary>
+            /// 私钥文件(.pem格式)
+            /// </summary>
+            public string ApiClientKey { get; set; }
+            /// <summary>
+            /// 私钥文件(.pem格式)内容 商户私钥
+            /// </summary>
+            public string MchPrivateKey { get; set; }
+            /// <summary>
+            /// API V3秘钥
+            /// </summary>
+            public string ApiV3Key { get; set; }
         }
     }
 }

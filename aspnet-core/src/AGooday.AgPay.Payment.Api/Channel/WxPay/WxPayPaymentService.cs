@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
         {
             // 微信API版本
             WxServiceWrapper wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
-            string apiVersion = wxServiceWrapper.ApiVersion; 
+            string apiVersion = wxServiceWrapper.Config.ApiVersion; 
             if (CS.PAY_IF_VERSION.WX_V2.Equals(apiVersion))
             {
                 return PayWayUtil.GetRealPaywayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);

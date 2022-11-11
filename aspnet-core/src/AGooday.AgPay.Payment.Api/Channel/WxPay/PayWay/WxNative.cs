@@ -20,9 +20,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
     /// <summary>
     /// 微信 bar
     /// </summary>
-    public class WxH5 : WxPayPaymentService
+    public class WxNative : WxPayPaymentService
     {
-        public WxH5(IServiceProvider serviceProvider,
+        public WxNative(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -31,14 +31,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            WxH5OrderRQ bizRQ = (WxH5OrderRQ)rq;
+            WxNativeOrderRQ bizRQ = (WxNativeOrderRQ)rq;
 
             var wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
 
             // 微信统一下单请求对象
             var request = new CreatePayUnifiedOrderRequest()
             {
-                TradeType = "MWEB",
+                TradeType = "NATIVE",
                 OutTradeNumber = payOrder.PayOrderId,// 商户订单号
                 AppId = wxServiceWrapper.Config.AppId,// 微信 AppId
                 Body = payOrder.Subject,// 订单描述
@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
             }
 
             // 构造函数响应数据
-            WxH5OrderRS res = ApiResBuilder.BuildSuccess<WxH5OrderRS>();
+            WxNativeOrderRS res = ApiResBuilder.BuildSuccess<WxNativeOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
@@ -79,18 +79,22 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
             var response = ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayUnifiedOrderAsync(request).Result;
             if (response.IsSuccessful())
             {
-                string codeUrl = response.CodeUrl;
+                string payUrl = response.MobileWebUrl;
                 if (CS.PAY_DATA_TYPE.FORM.Equals(bizRQ.PayDataType))
                 {
+                    //表单方式
+                    res.FormContent = payUrl;
+                }
+                else if (CS.PAY_DATA_TYPE.CODE_IMG_URL.Equals(bizRQ.PayDataType))
+                {
                     //二维码图片地址
-                    res.CodeImgUrl = codeUrl;
+                    res.CodeImgUrl = _sysConfigService.GetDBApplicationConfig().GenScanImgUrl(payUrl);
                 }
                 else
                 {
-                    res.CodeUrl = codeUrl;
+                    // 默认都为 payUrl方式
+                    res.PayUrl = payUrl;
                 }
-
-                // 支付中
                 channelRetMsg.ChannelState = ChannelState.WAITING;
             }
             else

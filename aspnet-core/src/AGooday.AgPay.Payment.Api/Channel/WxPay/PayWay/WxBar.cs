@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
             var request = new CreatePayMicroPayRequest()
             {
                 OutTradeNumber = payOrder.PayOrderId,// 商户订单号
-                AppId = wxServiceWrapper.AppId,// 微信 AppId
+                AppId = wxServiceWrapper.Config.AppId,// 微信 AppId
                 Body = payOrder.Subject,// 订单详情,
                 Detail = JsonConvert.DeserializeObject<CreatePayMicroPayRequest.Types.Detail>(payOrder.Body),
                 FeeType = "CNY",
