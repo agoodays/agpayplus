@@ -99,7 +99,7 @@ services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
-        options.SerializerSettings.Formatting = Formatting.Indented;
+        options.SerializerSettings.Formatting = Formatting.None;
         //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
         options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
@@ -108,7 +108,7 @@ services.AddControllers()
 // Newtonsoft.Json 全部配置 
 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
-    Formatting = Formatting.Indented,//格式化
+    Formatting = Formatting.None,//格式化
     DateFormatString = "yyyy-MM-dd HH:mm:ss",
     ContractResolver = new CamelCasePropertyNamesContractResolver()
 };
@@ -190,11 +190,11 @@ app.UseCors("CorsPolicy");
 var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 AuthContextService.Configure(httpContextAccessor);
 
+app.UseRequestResponseLogging();
+
 app.UseAuthorization();
 
 app.UseExceptionHandling();
-
-//app.UseRequestResponseLogging();
 
 app.MapControllers();
 
