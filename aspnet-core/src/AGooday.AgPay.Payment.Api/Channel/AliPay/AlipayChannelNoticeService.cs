@@ -45,24 +45,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
         {
             try
             {
-
                 //配置参数获取
                 byte? useCert = null;
                 string alipaySignType, alipayPublicCert, alipayPublicKey = null;
                 if (mchAppConfigContext.IsIsvSubMch())
                 {
-
                     // 获取支付参数
                     AliPayIsvParams alipayParams = (AliPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
                     useCert = alipayParams.UseCert;
                     alipaySignType = alipayParams.SignType;
                     alipayPublicCert = alipayParams.AlipayPublicCert;
                     alipayPublicKey = alipayParams.AlipayPublicKey;
-
                 }
                 else
                 {
-
                     // 获取支付参数
                     AliPayNormalMchParams alipayParams = (AliPayNormalMchParams)configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
@@ -105,12 +101,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 if ("TRADE_SUCCESS".Equals(jsonParams.GetValue("trade_status").ToString()))
                 {
                     result.ChannelState = ChannelState.CONFIRM_SUCCESS;
-
                 }
                 else if ("TRADE_CLOSED".Equals(jsonParams.GetValue("trade_status").ToString()))
                 {
                     result.ChannelState = ChannelState.CONFIRM_FAIL;
-
                 }
 
                 return result;
