@@ -1,33 +1,54 @@
-﻿using Castle.DynamicProxy;
-using Microsoft.AspNetCore.SignalR;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Constants;
+using AspectCore.DynamicProxy;
+using MediatR;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using IInterceptor = Castle.DynamicProxy.IInterceptor;
+using Microsoft.Extensions.Logging;
 
 namespace AGooday.AgPay.Manager.Api.AOP
 {
-    public class MethodLogAop : IInterceptor
+    public class MethodLog : AbstractInterceptorAttribute
     {
-        private readonly ILogger<MethodLogAop> _logger;
-        private readonly IHttpContextAccessor _accessor;
+        private readonly string Remark;
 
-        public MethodLogAop(ILogger<MethodLogAop> logger, IHttpContextAccessor accessor)
+        public MethodLog(string remark)
         {
-            _logger = logger;
-            _accessor = accessor;
+            Remark = remark;
         }
-        /// <summary>
-        /// 实例化IInterceptor唯一方法 
-        /// </summary>
-        /// <param name="invocation">包含被拦截方法的信息</param>
-        public void Intercept(IInvocation invocation)
+
+        public async override Task Invoke(AspectContext context, AspectDelegate next)
         {
-            var name = $"{invocation.Method.DeclaringType}.{invocation.Method.Name}";
-            var args = string.Join(", ", invocation.Arguments.Select(a => (a ?? "").ToString()));
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            invocation.Proceed(); //Intercepted method is executed here.
-            watch.Stop();
-            var executionTime = watch.ElapsedMilliseconds;
-            _logger.LogInformation($"MethodLogAop: {name}{args}{invocation.ReturnValue}{executionTime} ms");
+            var accessor = context.ServiceProvider.GetService<IHttpContextAccessor>();
+            var sysLogService = context.ServiceProvider.GetService<ISysLogService>();
+            //var loggerFactory = context.ServiceProvider.GetService<ILoggerFactory>();
+            //var logger = loggerFactory.CreateLogger<MethodLog>();
+            var logger = context.ServiceProvider.GetService<ILogger<MethodLog>>();
+            var sysLog = new SysLogDto();
+            try
+            {
+                sysLog.SysType = CS.SYS_TYPE.MGR;                
+                sysLog.MethodName = context.ServiceMethod.Name;
+                sysLog.MethodRemark = Remark;
+                sysLog.ReqUrl = "";
+                await next(context);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                //try
+                //{
+                //    sysLogService.Add(sysLog);
+                //}
+                //catch (Exception ex)
+                //{
+                //    logger.LogError(ex, ex.Message);
+                //}
+            }
         }
     }
 }

@@ -23,6 +23,7 @@ using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Manager.Api.AOP;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 {
@@ -33,7 +34,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
     [Route("api/anon/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly IWebHostEnvironment _appEnvironment;
         private readonly ILogger<AuthController> _logger;
         private readonly JwtSettings _jwtSettings;
         private readonly ISysUserAuthService _sysUserAuthService;
@@ -67,6 +67,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("validate")]
+        [MethodLog("登录认证")]
         public ApiRes Validate(Validate model)
         {
             string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理

@@ -2,6 +2,9 @@
 
 namespace AGooday.AgPay.Manager.Api.Middlewares
 {
+    /// <summary>
+    /// 计算执行时间
+    /// </summary>
     public class CalculateExecutionTimeMiddleware
     {
         private readonly RequestDelegate _next;
@@ -32,7 +35,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             await _next.Invoke(context);
 
             stopwatch.Stop();
-            _logger.LogInformation($@"接口{context.Request.Path}耗时{stopwatch.ElapsedMilliseconds}ms");
+            _logger.LogInformation($"TraceId:{context.TraceIdentifier}, RequestMethod:{context.Request.Method}, RequestPath:{context.Request.Path}, ElapsedMilliseconds:{stopwatch.ElapsedMilliseconds}, Response StatusCode: {context.Response.StatusCode}");
         }
     }
     public static class CalculateExecutionTimeMiddlewareExtensions

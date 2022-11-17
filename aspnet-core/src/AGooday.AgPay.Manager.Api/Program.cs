@@ -176,6 +176,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseCalculateExecutionTime();
 
+app.UseRequestResponseLogging();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -184,14 +186,14 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+// 鉴权 监测用户是否登录
 app.UseAuthentication();
 app.UseCors("CorsPolicy");
 
 var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 AuthContextService.Configure(httpContextAccessor);
 
-app.UseRequestResponseLogging();
-
+// 授权 监测有没有权限访问后续页面
 app.UseAuthorization();
 
 app.UseExceptionHandling();
