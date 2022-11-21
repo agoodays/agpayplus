@@ -119,9 +119,9 @@ export default {
         if(isAutoPay){
           that.pay()
         }
-      }).catch(res => {
+      })/*.catch(res => {
         that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})
-      });
+      })*/;
     },
 
     // 支付事件

@@ -45,7 +45,7 @@
 
 <script>
 import {getPayPackage}from '@/api/api'
-import config from "@/config";
+// import config from "@/config";
 export default {
 
   data: function (){
@@ -79,9 +79,9 @@ export default {
           that.doAlipay(res.alipayTradeNo);
         }
 
-      }).catch(res => {
+      })/*.catch(res => {
         that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})
-      });
+      })*/;
     },
 
 
