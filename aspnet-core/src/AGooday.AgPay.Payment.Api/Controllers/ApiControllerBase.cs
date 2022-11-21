@@ -67,7 +67,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             return JObject.Parse(body);
         }
 
-        /** 获取客户端ip地址 **/
+        /// <summary>
+        /// 获取客户端ip地址
+        /// </summary>
+        /// <returns></returns>
         protected string GetClientIp()
         {
             return _requestIpUtil.GetRequestIP();

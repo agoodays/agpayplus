@@ -5,7 +5,7 @@ using AGooday.AgPay.Payment.Api.Controllers.Division;
 using AGooday.AgPay.Payment.Api.Exceptions;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.Services;
-using log4net;
+using Aop.Api.Request;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay
@@ -58,12 +58,16 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
         {
             try
             {
-                //通过code 换取openId
                 string authCode = reqParams.GetValue("auth_code").ToString();
-                return string.Empty;
+                //通过code 换取openId
+                AlipaySystemOauthTokenRequest request = new AlipaySystemOauthTokenRequest();
+                request.Code = authCode;
+                request.GrantType = "authorization_code";
+                return configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request).UserId;
             }
             catch (ChannelException e)
             {
+                log.LogError(e, e.Message);
                 return null;
             }
         }
