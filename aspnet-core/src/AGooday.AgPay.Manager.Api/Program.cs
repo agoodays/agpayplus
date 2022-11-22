@@ -24,6 +24,8 @@ using AGooday.AgPay.Components.OSS.Services;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Common.Extensions;
+using AGooday.AgPay.Manager.Api.Filter;
+using AGooday.AgPay.Manager.Api.Logs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,9 @@ var Env = builder.Environment;
 
 services.AddSingleton(new Appsettings(Env.ContentRootPath));
 
+//用户信息
+services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 //// 注入日志
 //services.AddLogging(config =>
 //{
@@ -48,6 +53,8 @@ services.AddSingleton(new Appsettings(Env.ContentRootPath));
 //    config.AddLog4Net();
 //});
 services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
+
+services.AddScoped<ILogHandler, LogHandler>();
 
 #region Redis
 //redis缓存
@@ -93,7 +100,13 @@ services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 // Automapper 注入
 services.AddAutoMapperSetup();
-services.AddControllers()
+services.AddControllers(options =>
+{
+    ////添加全局异常过滤器
+    //options.Filters.Add<GlobalExceptionsFilter>();
+    //日志过滤器
+    options.Filters.Add<LogActionFilter>();
+})
     .AddApplicationPart(typeof(OssFileController).Assembly)
     //.AddNewtonsoftJson();
     .AddNewtonsoftJson(options =>

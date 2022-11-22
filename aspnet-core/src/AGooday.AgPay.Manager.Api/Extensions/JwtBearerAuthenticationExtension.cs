@@ -30,13 +30,13 @@ namespace AGooday.AgPay.Manager.Api.Extensions
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = appSettings.Issuer,
-                    ValidAudience = appSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    ValidateIssuer = true,//是否验证Issuer
+                    ValidateAudience = true,//是否验证Audience
+                    ValidateLifetime = true,//是否验证失效时间
+                    ValidateIssuerSigningKey = true,//是否验证SecurityKey
+                    ValidIssuer = appSettings.Issuer,//Issuer，这两项和前面签发jwt的设置一致
+                    ValidAudience = appSettings.Audience,//订阅者
+                    IssuerSigningKey = new SymmetricSecurityKey(key)//密钥
                 };
             });
         }
