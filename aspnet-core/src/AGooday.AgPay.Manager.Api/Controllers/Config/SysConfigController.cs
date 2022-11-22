@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -35,7 +36,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         /// </summary>
         /// <param name="groupKey"></param>
         /// <returns></returns>
-        [HttpGet, Route("{groupKey}")]
+        [HttpGet, Route("{groupKey}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_INFO)]
         public ApiRes GetConfigs(string groupKey)
         {
@@ -51,7 +52,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         /// <param name="groupKey"></param>
         /// <param name="configs"></param>
         /// <returns></returns>
-        [HttpPut, Route("{groupKey}")]
+        [HttpPut, Route("{groupKey}"), MethodRemark("系统配置修改")]
         [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_EDIT)]
         public ApiRes Update(string groupKey, Dictionary<string, string> configs)
         {

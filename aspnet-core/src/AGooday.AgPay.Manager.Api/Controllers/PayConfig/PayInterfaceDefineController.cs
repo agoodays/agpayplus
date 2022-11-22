@@ -11,6 +11,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 {
@@ -41,7 +42,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// 支付接口
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_LIST)]
         public ApiRes List()
         {
@@ -54,7 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodRemark("新增支付接口")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_ADD)]
         public ApiRes Add(PayInterfaceDefineAddOrEditDto dto)
         {
@@ -81,7 +82,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="ifCode"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpDelete, Route("{ifCode}")]
+        [HttpDelete, Route("{ifCode}"), MethodRemark("删除支付接口")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_DEL)]
         public ApiRes Delete(string ifCode)
         {
@@ -103,7 +104,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{ifCode}")]
+        [HttpPut, Route("{ifCode}"), MethodRemark("更新支付接口")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
         public ApiRes Update(string ifCode, PayInterfaceDefineAddOrEditDto dto)
         {
@@ -129,7 +130,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet, Route("{ifCode}")]
+        [HttpGet, Route("{ifCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_VIEW, PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
         public ApiRes Detail(string ifCode)
         {

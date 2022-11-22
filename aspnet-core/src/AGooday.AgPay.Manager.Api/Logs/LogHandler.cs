@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Utils;
-using static AGooday.AgPay.Common.Constants.CS;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Manager.Api.Attributes;
 using System.Security.Claims;
@@ -40,21 +38,18 @@ namespace AGooday.AgPay.Manager.Api.Logs
             var args = JsonConvert.SerializeObject(context.ActionArguments);
             //操作结果
             //var result = JsonConvert.SerializeObject(actionResult?.Value);
-
+            var model = new SysLogDto();
             try
             {
                 var sysUserId = _context.HttpContext.User.FindFirstValue("sysUserId");
                 var realname = _context.HttpContext.User.FindFirstValue("realname");
-                var model = new SysLogDto
-                {
-                    UserId = string.IsNullOrWhiteSpace(sysUserId) ? null : Convert.ToInt64(sysUserId),
-                    UserName = string.IsNullOrWhiteSpace(realname) ? null : realname,
-                    UserIp = IpUtil.GetIP(context?.HttpContext?.Request),
-                    SysType = CS.SYS_TYPE.MGR,
-                    MethodName = context.HttpContext.Request.Method.ToLower(),
-                    ReqUrl = context.ActionDescriptor.AttributeRouteInfo.Template.ToLower(),
-                    OptReqParam = args
-                };
+                model.UserId = string.IsNullOrWhiteSpace(sysUserId) ? null : Convert.ToInt64(sysUserId);
+                model.UserName = string.IsNullOrWhiteSpace(realname) ? null : realname;
+                model.UserIp = IpUtil.GetIP(context?.HttpContext?.Request);
+                model.SysType = CS.SYS_TYPE.MGR;
+                model.MethodName = context.HttpContext.Request.Method.ToLower();
+                model.ReqUrl = context.ActionDescriptor.AttributeRouteInfo.Template.ToLower();
+                model.OptReqParam = args;
                 if (context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(MethodRemarkAttribute)))
                 {
                     model.MethodRemark = ((MethodRemarkAttribute)context.ActionDescriptor.EndpointMetadata.First(m => m.GetType() == typeof(MethodRemarkAttribute))).Remark;
@@ -63,13 +58,20 @@ namespace AGooday.AgPay.Manager.Api.Logs
                 if (result != null)
                 {
                     model.OptResInfo = JsonConvert.SerializeObject(result.Value);
-                    model.CreatedAt = DateTime.Now;
                 }
+                else
+                {
+                    if (actionExecutedContext.Exception != null)
+                    {
+                        model.OptResInfo = actionExecutedContext.Exception.Message;
+                    }
+                }
+                model.CreatedAt = DateTime.Now;
                 _sysLogService.Add(model);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"操作时间：{sw.ElapsedMilliseconds}s，操作日志插入异常：{ex.Message}");
+                _logger.LogError(ex, $"操作日志：{JsonConvert.SerializeObject(model)}");
             }
         }
     }

@@ -11,6 +11,7 @@ using AGooday.AgPay.Components.MQ.Vender;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -41,7 +42,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_LIST)]
         public ApiRes List([FromQuery] MchInfoQueryDto dto)
         {
@@ -54,7 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodRemark("新增商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_ADD)]
         public ApiRes Add(MchInfoCreateDto dto)
         {
@@ -71,7 +72,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="mchNo"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{mchNo}")]
+        [HttpDelete, Route("{mchNo}"), MethodRemark("删除商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_DEL)]
         public ApiRes Delete(string mchNo)
         {
@@ -84,7 +85,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{mchNo}")]
+        [HttpPut, Route("{mchNo}"), MethodRemark("更新商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_EDIT)]
         public async Task<ApiRes> Update(string mchNo, MchInfoModifyDto dto)
         {
@@ -101,7 +102,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="mchNo"></param>
         /// <returns></returns>
-        [HttpGet, Route("{mchNo}")]
+        [HttpGet, Route("{mchNo}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_VIEW, PermCode.MGR.ENT_MCH_INFO_EDIT)]
         public ApiRes Detail(string mchNo)
         {

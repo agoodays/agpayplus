@@ -11,6 +11,7 @@ using AGooday.AgPay.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -41,7 +42,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_LIST)]
         public ApiRes List([FromQuery] MchAppQueryDto dto)
         {
@@ -54,7 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodRemark("新建应用")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_ADD)]
         public ApiRes Add(MchAppDto dto)
         {
@@ -77,7 +78,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{appId}")]
+        [HttpDelete, Route("{appId}"), MethodRemark("删除应用")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_VIEW, PermCode.MGR.ENT_MCH_APP_EDIT)]
         public ApiRes Delete(string appId)
         {
@@ -95,7 +96,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{appId}")]
+        [HttpPut, Route("{appId}"), MethodRemark("更新应用信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_EDIT)]
         public ApiRes Update(string appId, MchAppDto dto)
         {
@@ -115,7 +116,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        [HttpGet, Route("{appId}")]
+        [HttpGet, Route("{appId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_DEL)]
         public ApiRes Detail(string appId)
         {

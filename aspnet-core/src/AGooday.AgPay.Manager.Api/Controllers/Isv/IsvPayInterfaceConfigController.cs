@@ -14,6 +14,7 @@ using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Isv
 {
@@ -45,7 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="isvNo"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST)]
         public ApiRes List(string isvNo)
         {
@@ -59,7 +60,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <param name="isvNo"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet, Route("{isvNo}/{ifCode}")]
+        [HttpGet, Route("{isvNo}/{ifCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_VIEW)]
         public ApiRes GetByIsvNo(string isvNo, string ifCode)
         {
@@ -85,7 +86,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodRemark("更新服务商支付参数")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {

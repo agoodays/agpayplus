@@ -6,6 +6,7 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Controllers.Merchant;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// 商户通知类
     /// </summary>
     [Route("/api/mchNotify")]
-    [ApiController, Authorize]
+    [ApiController, Authorize, NoLog]
     public class MchNotifyController : ControllerBase
     {
         private readonly IMQSender mqSender;

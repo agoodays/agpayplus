@@ -15,6 +15,7 @@ using AGooday.AgPay.Components.MQ.Vender;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -55,7 +56,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes List(string appId)
         {
@@ -69,7 +70,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="isvNo"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet, Route("{appId}/{ifCode}")]
+        [HttpGet, Route("{appId}/{ifCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
         public ApiRes GetByAppId(string appId, string ifCode)
         {
@@ -104,7 +105,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodRemark("更新应用支付参数")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
@@ -146,8 +147,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             return ApiRes.Ok();
         }
 
-        [HttpGet, Route("alipayIsvsubMchAuthUrls/{mchAppId}")]
-        [AllowAnonymous]
+        [HttpGet, Route("alipayIsvsubMchAuthUrls/{mchAppId}"), AllowAnonymous, NoLog]
         public ApiRes QueryAlipayIsvsubMchAuthUrl(string mchAppId)
         {
             var mchApp = _mchAppService.GetById(mchAppId);

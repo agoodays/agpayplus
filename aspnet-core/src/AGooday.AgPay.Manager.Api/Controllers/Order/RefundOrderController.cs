@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,13 +15,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// 退款订单类
     /// </summary>
     [Route("/api/refundOrder")]
-    [ApiController, Authorize]
+    [ApiController, Authorize, NoLog]
     public class RefundOrderController : ControllerBase
     {
         private readonly ILogger<RefundOrderController> _logger;
         private readonly IRefundOrderService _refundOrderService;
 
-        public RefundOrderController(ILogger<RefundOrderController> logger, 
+        public RefundOrderController(ILogger<RefundOrderController> logger,
             IRefundOrderService refundOrderService)
         {
             _logger = logger;

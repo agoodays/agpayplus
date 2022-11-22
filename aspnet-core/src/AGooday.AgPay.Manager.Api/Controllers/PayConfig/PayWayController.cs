@@ -11,6 +11,7 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 {
@@ -42,7 +43,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_LIST, PermCode.MGR.ENT_PAY_ORDER_SEARCH_PAY_WAY)]
         public ApiRes List([FromQuery] PayWayQueryDto dto)
         {
@@ -56,7 +57,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="dto"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodRemark("新增支付方式")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_ADD)]
         public ApiRes Add(PayWayDto dto)
         {
@@ -77,7 +78,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="wayCode"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{wayCode}")]
+        [HttpDelete, Route("{wayCode}"), MethodRemark("删除支付方式")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_DEL)]
         public ApiRes Delete(string wayCode)
         {
@@ -101,7 +102,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{wayCode}")]
+        [HttpPut, Route("{wayCode}"), MethodRemark("更新支付方式")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_EDIT)]
         public ApiRes Update(string wayCode, PayWayDto dto)
         {
@@ -118,7 +119,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="wayCode"></param>
         /// <returns></returns>
-        [HttpGet, Route("{wayCode}")]
+        [HttpGet, Route("{wayCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_VIEW, PermCode.MGR.ENT_PC_WAY_EDIT)]
         public ApiRes Detail(string wayCode)
         {

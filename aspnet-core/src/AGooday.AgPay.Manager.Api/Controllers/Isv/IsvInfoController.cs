@@ -13,6 +13,7 @@ using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Isv
 {
@@ -44,7 +45,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_LIST)]
         public ApiRes List([FromQuery] IsvInfoQueryDto dto)
         {
@@ -57,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodRemark("新增服务商")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_ADD)]
         public ApiRes Add(IsvInfoDto dto)
         {
@@ -76,7 +77,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="isvNo"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{isvNo}")]
+        [HttpDelete, Route("{isvNo}"), MethodRemark("删除服务商")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_DEL)]
         public ApiRes Delete(string isvNo)
         {
@@ -93,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{isvNo}")]
+        [HttpPut, Route("{isvNo}"), MethodRemark("更新服务商信息")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_EDIT)]
         public ApiRes Update(string isvNo, IsvInfoDto dto)
         {
@@ -110,7 +111,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="isvNo"></param>
         /// <returns></returns>
-        [HttpGet, Route("{isvNo}")]
+        [HttpGet, Route("{isvNo}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_VIEW, PermCode.MGR.ENT_ISV_INFO_EDIT)]
         public ApiRes Detail(string isvNo)
         {

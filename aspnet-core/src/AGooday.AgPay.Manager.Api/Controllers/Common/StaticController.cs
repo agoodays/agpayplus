@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Components.OSS.Config;
+using AGooday.AgPay.Manager.Api.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ using System.Web;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Common
 {
-    [ApiController, Authorize, AllowAnonymous]
+    [ApiController, Authorize, AllowAnonymous, NoLog]
     public class StaticController : ControllerBase
     {
         [HttpGet, Route("api/anon/localOssFiles/{*path}")]

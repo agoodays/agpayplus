@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,13 +15,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// 转账订单
     /// </summary>
     [Route("/api/transferOrders")]
-    [ApiController, Authorize]
+    [ApiController, Authorize, NoLog]
     public class TransferOrderController : ControllerBase
     {
         private readonly ILogger<TransferOrderController> _logger;
         private readonly ITransferOrderService _transferOrderService;
 
-        public TransferOrderController(ILogger<TransferOrderController> logger, 
+        public TransferOrderController(ILogger<TransferOrderController> logger,
             ITransferOrderService transferOrderService)
         {
             _logger = logger;

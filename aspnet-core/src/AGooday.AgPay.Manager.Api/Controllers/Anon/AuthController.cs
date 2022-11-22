@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
     /// <summary>
     /// 认证接口
     /// </summary>
-    [ApiController, AllowAnonymous, NoLog]
+    [ApiController, AllowAnonymous]
     [Route("api/anon/auth")]
     public class AuthController : ControllerBase
     {
@@ -162,7 +162,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// 图片验证码
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("vercode")]
+        [HttpGet, Route("vercode"), NoLog]
         public ApiRes Vercode()
         {
             //定义图形验证码的长和宽 // 6位验证码

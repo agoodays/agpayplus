@@ -11,6 +11,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Newtonsoft.Json;
 using AGooday.AgPay.Manager.Api.Models;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -46,7 +47,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="appId"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_LIST)]
         public ApiRes List(string appId, [FromQuery] PayWayQueryDto dto)
         {
@@ -81,7 +82,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="isvNo"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet, Route("availablePayInterface/{appId}/{wayCode}")]
+        [HttpGet, Route("availablePayInterface/{appId}/{wayCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_CONFIG)]
         public ApiRes AvailablePayInterface(string appId, string wayCode)
         {
@@ -105,7 +106,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodRemark("更新商户支付通道")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_ADD)]
         public ApiRes SaveOrUpdate(ReqParams model)
         {
