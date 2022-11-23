@@ -9,6 +9,7 @@ using AGooday.AgPay.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -33,7 +34,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_LOG_LIST)]
         public ApiRes List([FromQuery] SysLogQueryDto dto)
         {
@@ -46,7 +47,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysLogId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{selectedIds}")]
+        [HttpDelete, Route("{selectedIds}"), MethodRemark("删除日志信息")]
         [PermissionAuth(PermCode.MGR.ENT_SYS_LOG_DEL)]
         public ApiRes Delete(string selectedIds)
         {
@@ -64,7 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysLogId"></param>
         /// <returns></returns>
-        [HttpGet, Route("{sysLogId}")]
+        [HttpGet, Route("{sysLogId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_SYS_LOG_VIEW)]
         public ApiRes Detail(long sysLogId)
         {

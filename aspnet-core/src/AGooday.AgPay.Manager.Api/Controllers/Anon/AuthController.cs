@@ -119,30 +119,22 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.IsAdmin, auth.SysType));
 
             // ·µ»ØÇ°¶Ë accessToken
-            var claimsIdentity = new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, auth.SysUserId.ToString()),
-                new Claim(ClaimTypes.Name, auth.LoginUsername),
-                new Claim("sysUserId",auth.SysUserId.ToString()),
-                new Claim("avatarUrl",auth.AvatarUrl),
-                new Claim("realname",auth.Realname),
-                new Claim("loginUsername",auth.LoginUsername),
-                new Claim("telphone",auth.Telphone),
-                new Claim("userNo",auth.UserNo.ToString()),
-                new Claim("sex",auth.Sex.ToString()),
-                new Claim("state",auth.State.ToString()),
-                new Claim("isAdmin",auth.IsAdmin.ToString()),
-                new Claim("sysType",auth.SysType),
-                new Claim("belongInfoId",auth.BelongInfoId),
-                new Claim("createdAt",auth.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
-                new Claim("updatedAt",auth.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
-                new Claim("cacheKey",cacheKey)
-            });
-            if (auth.IsAdmin == CS.YES)
-            {
-                claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Admin"));
-            }
-            var accessToken = JwtBearerAuthenticationExtension.GetJwtAccessToken(_jwtSettings, claimsIdentity);
+            TokenModelJwt tokenModel = new TokenModelJwt();
+            tokenModel.SysUserId = auth.SysUserId.ToString();
+            tokenModel.AvatarUrl = auth.AvatarUrl;
+            tokenModel.Realname = auth.Realname;
+            tokenModel.LoginUsername = auth.LoginUsername;
+            tokenModel.Telphone = auth.Telphone;
+            tokenModel.UserNo = auth.UserNo.ToString();
+            tokenModel.Sex = auth.Sex.ToString();
+            tokenModel.State = auth.State.ToString();
+            tokenModel.IsAdmin = auth.IsAdmin.ToString();
+            tokenModel.SysType = auth.SysType;
+            tokenModel.BelongInfoId = auth.BelongInfoId;
+            tokenModel.CreatedAt = auth.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+            tokenModel.UpdatedAt = auth.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+            tokenModel.CacheKey = cacheKey;
+            var accessToken = JwtBearerAuthenticationExtension.IssueJwt(_jwtSettings, tokenModel);
 
             var currentUser = JsonConvert.SerializeObject(new CurrentUser
             {

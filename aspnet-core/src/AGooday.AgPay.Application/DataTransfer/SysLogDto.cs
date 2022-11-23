@@ -27,6 +27,26 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string UserName { get; set; }
 
         /// <summary>
+        /// 浏览器
+        /// </summary>
+        public string Browser { get; set; }
+
+        /// <summary>
+        /// 操作系统
+        /// </summary>
+        public string Os { get; set; }
+
+        /// <summary>
+        /// 设备
+        /// </summary>
+        public string Device { get; set; }
+
+        /// <summary>
+        /// 浏览器信息
+        /// </summary>
+        public string BrowserInfo { get; set; }
+
+        /// <summary>
         /// 用户IP
         /// </summary>
         public string UserIp { get; set; }
@@ -52,6 +72,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string ReqUrl { get; set; }
 
         /// <summary>
+        /// 请求方法
+        /// </summary>
+        public string ReqMethod { get; set; }
+
+        /// <summary>
         /// 操作请求参数
         /// </summary>
         public string OptReqParam { get; set; }
@@ -60,6 +85,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 操作响应结果
         /// </summary>
         public string OptResInfo { get; set; }
+
+        /// <summary>
+        /// 耗时（毫秒）
+        /// </summary>
+        public long ElapsedMs { get; set; }
 
         /// <summary>
         /// 创建时间

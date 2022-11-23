@@ -1,19 +1,12 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Core.Notifications;
-using MediatR;
 using AGooday.AgPay.Application.Permissions;
-using Newtonsoft.Json;
-using StackExchange.Redis;
-using AGooday.AgPay.Common.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -48,7 +41,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ADD, PermCode.MGR.ENT_UR_ROLE_DIST)]
         public ApiRes List([FromQuery] SysRoleEntRelaQueryDto dto)
         {

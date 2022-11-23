@@ -39,6 +39,34 @@ namespace AGooday.AgPay.Domain.Models
         public string UserName { get; set; }
 
         /// <summary>
+        /// 浏览器
+        /// </summary>
+        [Comment("浏览器")]
+        [Required, Column("browser", TypeName = "varchar(60)")]
+        public string Browser { get; set; }
+
+        /// <summary>
+        /// 操作系统
+        /// </summary>
+        [Comment("操作系统")]
+        [Required, Column("os", TypeName = "varchar(60)")]
+        public string Os { get; set; }
+
+        /// <summary>
+        /// 设备
+        /// </summary>
+        [Comment("设备")]
+        [Required, Column("device", TypeName = "varchar(60)")]
+        public string Device { get; set; }
+
+        /// <summary>
+        /// 浏览器信息
+        /// </summary>
+        [Comment("浏览器信息")]
+        [Required, Column("browser_info", TypeName = "varchar(200)")]
+        public string BrowserInfo { get; set; }
+
+        /// <summary>
         /// 用户IP
         /// </summary>
         [Comment("用户IP")]
@@ -74,6 +102,13 @@ namespace AGooday.AgPay.Domain.Models
         public string ReqUrl { get; set; }
 
         /// <summary>
+        /// 请求地址
+        /// </summary>
+        [Comment("请求方法")]
+        [Required, Column("req_method", TypeName = "varchar(10)")]
+        public string ReqMethod { get; set; }
+
+        /// <summary>
         /// 操作请求参数
         /// </summary>
         [Comment("操作请求参数")]
@@ -86,6 +121,13 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("操作响应结果")]
         [Required, Column("opt_res_info", TypeName = "varchar(2048)")]
         public string OptResInfo { get; set; }
+
+        /// <summary>
+        /// 耗时（毫秒）
+        /// </summary>
+        [Comment("耗时（毫秒）")]
+        [Column("elapsed_ms", TypeName = "bigint")]
+        public long ElapsedMs { get; set; }
 
         /// <summary>
         /// 创建时间

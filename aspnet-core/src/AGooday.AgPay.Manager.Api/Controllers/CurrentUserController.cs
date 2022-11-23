@@ -14,6 +14,7 @@ using StackExchange.Redis;
 using AGooday.AgPay.Manager.Api.Models;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
 {
@@ -47,7 +48,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             _notifications = (DomainNotificationHandler)notifications;
         }
 
-        [HttpGet, Route("user")]
+        [HttpGet, Route("user"), NoLog]
         public ApiRes CurrentUserInfo()
         {
             try
@@ -80,7 +81,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             }
         }
 
-        [HttpPut, Route("user")]
+        [HttpPut, Route("user"), MethodRemark("修改信息")]
         public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
         {
             var currentUser = GetCurrentUser();
@@ -93,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             return ApiRes.Ok();
         }
 
-        [HttpPut, Route("modifyPwd")]
+        [HttpPut, Route("modifyPwd"), MethodRemark("修改密码")]
         public ApiRes ModifyPwd(ModifyPwd dto)
         {
             var currentUser = GetCurrentUser();
@@ -115,7 +116,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             return Logout();
         }
 
-        [HttpPost, Route("logout")]
+        [HttpPost, Route("logout"), MethodRemark("登出")]
         public ApiRes Logout()
         {
             var currentUser = GetCurrentUser();

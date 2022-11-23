@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -39,7 +40,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
         public ApiRes List([FromQuery] SysUserRoleRelaQueryDto dto)
         {
@@ -52,7 +53,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysUserId"></param>
         /// <returns></returns>
-        [HttpPost, Route("relas/{sysUserId}")]
+        [HttpPost, Route("relas/{sysUserId}"), MethodRemark("更改用户角色信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
         public ApiRes Relas(long sysUserId, List<string> entIds)
         {

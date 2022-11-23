@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
@@ -32,7 +33,7 @@ namespace AGooday.AgPay.Manager.Api.Authorization
                 }
                 else
                 {
-                    var cacheKey = context.User.FindFirstValue("cacheKey");
+                    var cacheKey = context.User.FindFirstValue(ClaimAttributes.CacheKey);
                     string currentUserJson = _redis.StringGet(cacheKey);
                     var currentUser = JsonConvert.DeserializeObject<CurrentUser>(currentUserJson);
                     var userIdClaim = context.User.FindFirst(_ => _.Type == ClaimTypes.NameIdentifier).Value;

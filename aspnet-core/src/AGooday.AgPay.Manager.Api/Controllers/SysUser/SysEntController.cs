@@ -19,6 +19,7 @@ using StackExchange.Redis;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -49,7 +50,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <param name="sysType"></param>
         /// <param name="entId"></param>
         /// <returns></returns>
-        [HttpGet, Route("bySysType")]
+        [HttpGet, Route("bySysType"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_LIST)]
         public ApiRes BySystem(string sysType, string entId)
         {
@@ -62,7 +63,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{entId}")]
+        [HttpPut, Route("{entId}"), MethodRemark("更新资源权限")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
         public ApiRes Update(string entId, SysEntModifyDto dto)
         {
@@ -75,7 +76,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysType"></param>
         /// <returns></returns>
-        [HttpGet, Route("showTree")]
+        [HttpGet, Route("showTree"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_LIST, PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
         //public ActionResult ShowTree(string sysType)
         public ApiRes ShowTree(string sysType)

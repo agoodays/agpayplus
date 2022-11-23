@@ -12,6 +12,7 @@ using AGooday.AgPay.Manager.Api.Models;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -45,7 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_LIST, PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
         public ApiRes List([FromQuery] SysRoleQueryDto dto)
         {
@@ -60,7 +61,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""),MethodRemark("添加角色信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ADD)]
         public ApiRes Add(SysRoleCreateDto dto)
         {
@@ -83,7 +84,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}")]
+        [HttpDelete, Route("{recordId}"), MethodRemark("删除角色")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_DEL)]
         public ApiRes Delete(string recordId)
         {
@@ -96,7 +97,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}")]
+        [HttpPut, Route("{recordId}"), MethodRemark("更新角色信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_EDIT)]
         public ApiRes Update(string recordId, SysRoleModifyDto dto)
         {
@@ -118,7 +119,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpGet, Route("{recordId}")]
+        [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_EDIT)]
         public ApiRes Detail(string recordId)
         {

@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions.AuthContext
         /// <summary>
         /// 
         /// </summary>
-        public static HttpContext Current => _context.HttpContext;
+        public static HttpContext Current => _context?.HttpContext;
         /// <summary>
         /// 
         /// </summary>
@@ -27,20 +27,20 @@ namespace AGooday.AgPay.Merchant.Api.Extensions.AuthContext
             {
                 var user = new AuthContextUser
                 {
-                    SysUserId = Convert.ToInt64(Current.User.FindFirstValue("sysUserId")),
-                    AvatarUrl = Current.User.FindFirstValue("avatarUrl"),
-                    Realname = Current.User.FindFirstValue("realname"),
-                    LoginUsername = Current.User.FindFirstValue("loginUsername"),
-                    Telphone = Current.User.FindFirstValue("telphone"),
-                    UserNo = Current.User.FindFirstValue("userNo"),
-                    Sex = Convert.ToByte(Current.User.FindFirstValue("sex")),
-                    State = Convert.ToByte(Current.User.FindFirstValue("state")),
-                    IsAdmin = Convert.ToByte(Current.User.FindFirstValue("isAdmin")),
-                    SysType = Current.User.FindFirstValue("sysType"),
-                    BelongInfoId = Current.User.FindFirstValue("belongInfoId"),
-                    CreatedAt = Convert.ToDateTime(Current.User.FindFirstValue("createdAt")),
-                    UpdatedAt = Convert.ToDateTime(Current.User.FindFirstValue("updatedAt")),
-                    CacheKey = Current.User.FindFirstValue("cacheKey")
+                    SysUserId = Convert.ToInt64(Current?.User?.FindFirstValue("sysUserId")),
+                    AvatarUrl = Current?.User?.FindFirstValue("avatarUrl"),
+                    Realname = Current?.User?.FindFirstValue("realname"),
+                    LoginUsername = Current?.User?.FindFirstValue("loginUsername"),
+                    Telphone = Current?.User?.FindFirstValue("telphone"),
+                    UserNo = Current?.User?.FindFirstValue("userNo"),
+                    Sex = Convert.ToByte(Current?.User?.FindFirstValue("sex")),
+                    State = Convert.ToByte(Current?.User?.FindFirstValue("state")),
+                    IsAdmin = Convert.ToByte(Current?.User?.FindFirstValue("isAdmin")),
+                    SysType = Current?.User?.FindFirstValue("sysType"),
+                    BelongInfoId = Current?.User?.FindFirstValue("belongInfoId"),
+                    CreatedAt = Convert.ToDateTime(Current?.User?.FindFirstValue("createdAt")),
+                    UpdatedAt = Convert.ToDateTime(Current?.User?.FindFirstValue("updatedAt")),
+                    CacheKey = Current?.User?.FindFirstValue("cacheKey")
                 };
                 return user;
             }
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions.AuthContext
         {
             get
             {
-                return Current.User.Identity.IsAuthenticated;
+                return Current?.User?.Identity?.IsAuthenticated ?? false;
             }
         }
 
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions.AuthContext
         {
             get
             {
-                return (Convert.ToSByte(Current.User.FindFirstValue("isAdmin")) == CS.YES);
+                return (Convert.ToSByte(Current?.User?.FindFirstValue("isAdmin")) == CS.YES);
             }
         }
     }

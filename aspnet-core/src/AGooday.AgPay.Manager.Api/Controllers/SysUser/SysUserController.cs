@@ -1,19 +1,16 @@
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Notifications;
-using AGooday.AgPay.Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Caching.Memory;
-using System.Runtime.InteropServices;
 using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -47,7 +44,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_LIST)]
         public ApiRes List([FromQuery] SysUserQueryDto dto)
         {
@@ -61,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodRemark("添加操作员信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_ADD)]
         public ApiRes Add(SysUserCreateDto dto)
         {
@@ -84,7 +81,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId">系统用户ID</param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}")]
+        [HttpDelete, Route("{recordId}"), MethodRemark("删除操作员")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_DELETE)]
         public ApiRes Delete(long recordId)
         {
@@ -106,7 +103,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}")]
+        [HttpPut, Route("{recordId}"), MethodRemark("修改操作员信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
         public ApiRes Update(long recordId, SysUserModifyDto dto)
         {
@@ -137,7 +134,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId">系统用户ID</param>
         /// <returns></returns>
-        [HttpGet, Route("{recordId}")]
+        [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
         public ApiRes Detail(long recordId)
         {

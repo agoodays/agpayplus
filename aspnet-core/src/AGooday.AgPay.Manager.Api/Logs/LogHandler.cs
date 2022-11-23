@@ -8,6 +8,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Manager.Api.Attributes;
 using System.Security.Claims;
+using System.Text;
 
 namespace AGooday.AgPay.Manager.Api.Logs
 {
@@ -20,11 +21,11 @@ namespace AGooday.AgPay.Manager.Api.Logs
         private readonly ISysLogService _sysLogService;
         private static IHttpContextAccessor _context;
 
-        public LogHandler(ILogger<LogHandler> logger, ISysLogService sysLogService, IHttpContextAccessor httpContextAccessor)
+        public LogHandler(ILogger<LogHandler> logger, IHttpContextAccessor httpContextAccessor, ISysLogService sysLogService)
         {
             _logger = logger;
-            _sysLogService = sysLogService;
             _context = httpContextAccessor;
+            _sysLogService = sysLogService;
         }
 
         public async Task LogAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -45,10 +46,19 @@ namespace AGooday.AgPay.Manager.Api.Logs
                 var realname = _context.HttpContext.User.FindFirstValue("realname");
                 model.UserId = string.IsNullOrWhiteSpace(sysUserId) ? null : Convert.ToInt64(sysUserId);
                 model.UserName = string.IsNullOrWhiteSpace(realname) ? null : realname;
+                string ua = context.HttpContext.Request.Headers["User-Agent"];
+                var clientInfo = UAParser.Parser.GetDefault().Parse(ua);
+                var device = clientInfo.Device.Family;
+                device = device.ToLower() == "other" ? "" : device;
+                model.Browser = clientInfo.UA.Family;
+                model.Os = clientInfo.OS.Family;
+                model.Device = device;
+                model.BrowserInfo = ua;
                 model.UserIp = IpUtil.GetIP(context?.HttpContext?.Request);
                 model.SysType = CS.SYS_TYPE.MGR;
-                model.MethodName = context.HttpContext.Request.Method.ToLower();
-                model.ReqUrl = context.ActionDescriptor.AttributeRouteInfo.Template.ToLower();
+                model.MethodName = context.ActionDescriptor.DisplayName;
+                model.ReqUrl = GetAbsoluteUri(context?.HttpContext?.Request).ToLower();//context.ActionDescriptor.AttributeRouteInfo.Template.ToLower();
+                model.ReqMethod = context.HttpContext.Request.Method.ToLower();
                 model.OptReqParam = args;
                 if (context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(MethodRemarkAttribute)))
                 {
@@ -66,6 +76,7 @@ namespace AGooday.AgPay.Manager.Api.Logs
                         model.OptResInfo = actionExecutedContext.Exception.Message;
                     }
                 }
+                model.ElapsedMs = sw.ElapsedMilliseconds;
                 model.CreatedAt = DateTime.Now;
                 _sysLogService.Add(model);
             }
@@ -73,6 +84,33 @@ namespace AGooday.AgPay.Manager.Api.Logs
             {
                 _logger.LogError(ex, $"操作日志：{JsonConvert.SerializeObject(model)}");
             }
+        }
+
+        /// <summary>
+        /// 获取绝对路径 https://localhost:9417/api/anon/auth/validate
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private string GetAbsoluteUri(HttpRequest request)
+        {
+            return new StringBuilder()
+             .Append(request.Scheme)
+             .Append("://")
+             .Append(request.Host)
+             .Append(request.PathBase)
+             .Append(request.Path)
+             .Append(request.QueryString)
+             .ToString();
+        }
+
+        /// <summary>
+        /// 获取接口相对路径 /api/anon/auth/validate
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private string GetrelativeUri(HttpRequest request)
+        {
+            return request.Path;
         }
     }
 }
