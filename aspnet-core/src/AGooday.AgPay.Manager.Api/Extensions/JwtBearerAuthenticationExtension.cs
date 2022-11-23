@@ -131,19 +131,61 @@ namespace AGooday.AgPay.Manager.Api.Extensions
     /// </summary>
     public class TokenModelJwt
     {
+        /// <summary>
+        /// 系统用户ID
+        /// </summary>
         public string SysUserId { get; set; }
+        /// <summary>
+        /// 头像地址
+        /// </summary>
         public string AvatarUrl { get; set; }
+        /// <summary>
+        /// 真实姓名
+        /// </summary>
         public string Realname { get; set; }
+        /// <summary>
+        /// 登录用户名
+        /// </summary>
         public string LoginUsername { get; set; }
+        /// <summary>
+        /// 手机号
+        /// </summary>
         public string Telphone { get; set; }
+        /// <summary>
+        /// 员工编号
+        /// </summary>
         public string UserNo { get; set; }
+        /// <summary>
+        /// 性别 0-未知, 1-男, 2-女
+        /// </summary>
         public string Sex { get; set; }
+        /// <summary>
+        /// 状态 0-停用 1-启用
+        /// </summary>
         public string State { get; set; }
+        /// <summary>
+        /// 是否超管（超管拥有全部权限） 0-否 1-是
+        /// </summary>
         public string IsAdmin { get; set; }
+        /// <summary>
+        /// 所属系统： MGR-运营平台, MCH-商户中心
+        /// </summary>
         public string SysType { get; set; }
+        /// <summary>
+        /// 所属商户ID / 0(平台)
+        /// </summary>
         public string BelongInfoId { get; set; }
+        /// <summary>
+        /// 创建时间
+        /// </summary>
         public string CreatedAt { get; set; }
+        /// <summary>
+        /// 更新时间
+        /// </summary>
         public string UpdatedAt { get; set; }
+        /// <summary>
+        /// 缓存Key
+        /// </summary>
         public string CacheKey { get; set; }
     }
 
@@ -152,20 +194,65 @@ namespace AGooday.AgPay.Manager.Api.Extensions
     /// </summary>
     public static class ClaimAttributes
     {
+        /// <summary>
+        /// 系统用户ID
+        /// </summary>
         public const string SysUserId = "sui";
+        /// <summary>
+        /// 头像地址
+        /// </summary>
         public const string AvatarUrl = "au";
+        /// <summary>
+        /// 真实姓名
+        /// </summary>
         public const string Realname = "rn";
+        /// <summary>
+        /// 登录用户名
+        /// </summary>
         public const string LoginUsername = "lun";
+        /// <summary>
+        /// 手机号
+        /// </summary>
         public const string Telphone = "tel";
+        /// <summary>
+        /// 员工编号
+        /// </summary>
         public const string UserNo = "un";
+        /// <summary>
+        /// 性别 0-未知, 1-男, 2-女
+        /// </summary>
         public const string Sex = "sex";
+        /// <summary>
+        /// 状态 0-停用 1-启用
+        /// </summary>
         public const string State = "sta";
+        /// <summary>
+        /// 是否超管（超管拥有全部权限） 0-否 1-是
+        /// </summary>
         public const string IsAdmin = "ia";
+        /// <summary>
+        /// 所属系统： MGR-运营平台, MCH-商户中心
+        /// </summary>
         public const string SysType = "st";
+        /// <summary>
+        /// 所属商户ID / 0(平台)
+        /// </summary>
         public const string BelongInfoId = "bii";
+        /// <summary>
+        /// 创建时间
+        /// </summary>
         public const string CreatedAt = "cat";
+        /// <summary>
+        /// 更新时间
+        /// </summary>
         public const string UpdatedAt = "uat";
+        /// <summary>
+        /// 缓存Key
+        /// </summary>
         public const string CacheKey = "ck";
+        /// <summary>
+        /// 刷新过期时间
+        /// </summary>
         public const string RefreshExpires = "re";
     }
 }

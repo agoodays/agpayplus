@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Domain.Models
         /// </summary>
         [Comment("耗时（毫秒）")]
         [Column("elapsed_ms", TypeName = "bigint")]
-        public long ElapsedMs { get; set; }
+        public long? ElapsedMs { get; set; }
 
         /// <summary>
         /// 创建时间

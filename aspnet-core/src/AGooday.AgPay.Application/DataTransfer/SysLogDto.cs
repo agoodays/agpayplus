@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 耗时（毫秒）
         /// </summary>
-        public long ElapsedMs { get; set; }
+        public long? ElapsedMs { get; set; }
 
         /// <summary>
         /// 创建时间

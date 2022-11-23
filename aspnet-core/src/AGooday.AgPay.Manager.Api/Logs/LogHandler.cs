@@ -7,6 +7,7 @@ using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Manager.Api.Attributes;
+using AGooday.AgPay.Manager.Api.Extensions;
 using System.Security.Claims;
 using System.Text;
 
@@ -42,8 +43,8 @@ namespace AGooday.AgPay.Manager.Api.Logs
             var model = new SysLogDto();
             try
             {
-                var sysUserId = _context.HttpContext.User.FindFirstValue("sysUserId");
-                var realname = _context.HttpContext.User.FindFirstValue("realname");
+                var sysUserId = _context.HttpContext.User.FindFirstValue(ClaimAttributes.SysUserId);
+                var realname = _context.HttpContext.User.FindFirstValue(ClaimAttributes.Realname);
                 model.UserId = string.IsNullOrWhiteSpace(sysUserId) ? null : Convert.ToInt64(sysUserId);
                 model.UserName = string.IsNullOrWhiteSpace(realname) ? null : realname;
                 string ua = context.HttpContext.Request.Headers["User-Agent"];
@@ -56,7 +57,7 @@ namespace AGooday.AgPay.Manager.Api.Logs
                 model.BrowserInfo = ua;
                 model.UserIp = IpUtil.GetIP(context?.HttpContext?.Request);
                 model.SysType = CS.SYS_TYPE.MGR;
-                model.MethodName = context.ActionDescriptor.DisplayName;
+                model.MethodName = context.ActionDescriptor.DisplayName.Split(" (").First();
                 model.ReqUrl = GetAbsoluteUri(context?.HttpContext?.Request).ToLower();//context.ActionDescriptor.AttributeRouteInfo.Template.ToLower();
                 model.ReqMethod = context.HttpContext.Request.Method.ToLower();
                 model.OptReqParam = args;
