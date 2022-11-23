@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""),MethodRemark("添加角色信息")]
+        [HttpPost, Route(""), MethodLog("添加角色信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ADD)]
         public ApiRes Add(SysRoleCreateDto dto)
         {
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}"), MethodRemark("删除角色")]
+        [HttpDelete, Route("{recordId}"), MethodLog("删除角色")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_DEL)]
         public ApiRes Delete(string recordId)
         {
@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}"), MethodRemark("更新角色信息")]
+        [HttpPut, Route("{recordId}"), MethodLog("更新角色信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_EDIT)]
         public ApiRes Update(string recordId, SysRoleModifyDto dto)
         {

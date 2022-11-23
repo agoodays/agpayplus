@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodRemark("新增服务商")]
+        [HttpPost, Route(""), MethodLog("新增服务商")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_ADD)]
         public ApiRes Add(IsvInfoDto dto)
         {
@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="isvNo"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{isvNo}"), MethodRemark("删除服务商")]
+        [HttpDelete, Route("{isvNo}"), MethodLog("删除服务商")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_DEL)]
         public ApiRes Delete(string isvNo)
         {
@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{isvNo}"), MethodRemark("更新服务商信息")]
+        [HttpPut, Route("{isvNo}"), MethodLog("更新服务商信息")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_EDIT)]
         public ApiRes Update(string isvNo, IsvInfoDto dto)
         {

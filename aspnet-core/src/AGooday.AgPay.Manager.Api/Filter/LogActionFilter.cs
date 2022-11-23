@@ -18,9 +18,9 @@ namespace AGooday.AgPay.Manager.Api.Filter
 
         public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (!context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(MethodRemarkAttribute)))
+            if (!context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(MethodLogAttribute)))
             //if (context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(NoLogAttribute))
-            //    && !context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(MethodRemarkAttribute)))
+            //    && !context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(MethodLogAttribute)))
             {
                 return next();
             }

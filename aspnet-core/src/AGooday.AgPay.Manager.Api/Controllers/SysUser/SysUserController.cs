@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodRemark("添加操作员信息")]
+        [HttpPost, Route(""), MethodLog("添加操作员信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_ADD)]
         public ApiRes Add(SysUserCreateDto dto)
         {
@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId">系统用户ID</param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}"), MethodRemark("删除操作员")]
+        [HttpDelete, Route("{recordId}"), MethodLog("删除操作员")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_DELETE)]
         public ApiRes Delete(long recordId)
         {
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}"), MethodRemark("修改操作员信息")]
+        [HttpPut, Route("{recordId}"), MethodLog("修改操作员信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
         public ApiRes Update(long recordId, SysUserModifyDto dto)
         {

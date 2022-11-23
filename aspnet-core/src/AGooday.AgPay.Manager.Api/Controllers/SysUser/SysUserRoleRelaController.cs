@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysUserId"></param>
         /// <returns></returns>
-        [HttpPost, Route("relas/{sysUserId}"), MethodRemark("更改用户角色信息")]
+        [HttpPost, Route("relas/{sysUserId}"), MethodLog("更改用户角色信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
         public ApiRes Relas(long sysUserId, List<string> entIds)
         {

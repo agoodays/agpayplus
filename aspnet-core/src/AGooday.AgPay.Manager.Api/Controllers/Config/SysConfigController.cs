@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         /// <param name="groupKey"></param>
         /// <param name="configs"></param>
         /// <returns></returns>
-        [HttpPut, Route("{groupKey}"), MethodRemark("系统配置修改")]
+        [HttpPut, Route("{groupKey}"), MethodLog("系统配置修改")]
         [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_EDIT)]
         public ApiRes Update(string groupKey, Dictionary<string, string> configs)
         {

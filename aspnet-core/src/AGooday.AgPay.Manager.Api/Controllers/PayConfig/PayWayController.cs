@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="dto"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route(""), MethodRemark("新增支付方式")]
+        [HttpPost, Route(""), MethodLog("新增支付方式")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_ADD)]
         public ApiRes Add(PayWayDto dto)
         {
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="wayCode"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{wayCode}"), MethodRemark("删除支付方式")]
+        [HttpDelete, Route("{wayCode}"), MethodLog("删除支付方式")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_DEL)]
         public ApiRes Delete(string wayCode)
         {
@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{wayCode}"), MethodRemark("更新支付方式")]
+        [HttpPut, Route("{wayCode}"), MethodLog("更新支付方式")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_EDIT)]
         public ApiRes Update(string wayCode, PayWayDto dto)
         {

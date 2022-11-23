@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             }
         }
 
-        [HttpPut, Route("user"), MethodRemark("修改信息")]
+        [HttpPut, Route("user"), MethodLog("修改信息")]
         public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
         {
             var currentUser = GetCurrentUser();
@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             return ApiRes.Ok();
         }
 
-        [HttpPut, Route("modifyPwd"), MethodRemark("修改密码")]
+        [HttpPut, Route("modifyPwd"), MethodLog("修改密码")]
         public ApiRes ModifyPwd(ModifyPwd dto)
         {
             var currentUser = GetCurrentUser();
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             return Logout();
         }
 
-        [HttpPost, Route("logout"), MethodRemark("登出")]
+        [HttpPost, Route("logout"), MethodLog("登出")]
         public ApiRes Logout()
         {
             var currentUser = GetCurrentUser();

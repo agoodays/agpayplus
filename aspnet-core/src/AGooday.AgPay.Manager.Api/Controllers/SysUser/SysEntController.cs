@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{entId}"), MethodRemark("更新资源权限")]
+        [HttpPut, Route("{entId}"), MethodLog("更新资源权限")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
         public ApiRes Update(string entId, SysEntModifyDto dto)
         {

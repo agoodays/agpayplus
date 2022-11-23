@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodRemark("新建应用")]
+        [HttpPost, Route(""), MethodLog("新建应用")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_ADD)]
         public ApiRes Add(MchAppDto dto)
         {
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{appId}"), MethodRemark("删除应用")]
+        [HttpDelete, Route("{appId}"), MethodLog("删除应用")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_VIEW, PermCode.MGR.ENT_MCH_APP_EDIT)]
         public ApiRes Delete(string appId)
         {
@@ -96,7 +96,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{appId}"), MethodRemark("更新应用信息")]
+        [HttpPut, Route("{appId}"), MethodLog("更新应用信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_EDIT)]
         public ApiRes Update(string appId, MchAppDto dto)
         {

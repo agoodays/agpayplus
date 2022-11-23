@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="refundAmount"></param>
         /// <param name="refundReason"></param>
         /// <returns></returns>
-        [HttpPost, Route("refunds/{payOrderId}"), MethodRemark("发起订单退款")]
+        [HttpPost, Route("refunds/{payOrderId}"), MethodLog("发起订单退款")]
         [PermissionAuth(PermCode.MGR.ENT_PAY_ORDER_REFUND)]
         public ApiRes Refund(string payOrderId, RefundOrderModel refundOrder)
         {

@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodRemark("新增支付接口")]
+        [HttpPost, Route(""), MethodLog("新增支付接口")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_ADD)]
         public ApiRes Add(PayInterfaceDefineAddOrEditDto dto)
         {
@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="ifCode"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpDelete, Route("{ifCode}"), MethodRemark("删除支付接口")]
+        [HttpDelete, Route("{ifCode}"), MethodLog("删除支付接口")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_DEL)]
         public ApiRes Delete(string ifCode)
         {
@@ -104,7 +104,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{ifCode}"), MethodRemark("更新支付接口")]
+        [HttpPut, Route("{ifCode}"), MethodLog("更新支付接口")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
         public ApiRes Update(string ifCode, PayInterfaceDefineAddOrEditDto dto)
         {

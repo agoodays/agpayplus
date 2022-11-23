@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodRemark("更新服务商支付参数")]
+        [HttpPost, Route(""), MethodLog("更新服务商支付参数")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {

@@ -105,7 +105,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodRemark("更新应用支付参数")]
+        [HttpPost, Route(""), MethodLog("更新应用支付参数")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {

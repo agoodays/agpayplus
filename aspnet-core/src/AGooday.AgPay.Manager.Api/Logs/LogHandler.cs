@@ -61,9 +61,9 @@ namespace AGooday.AgPay.Manager.Api.Logs
                 model.ReqUrl = GetAbsoluteUri(context?.HttpContext?.Request).ToLower();//context.ActionDescriptor.AttributeRouteInfo.Template.ToLower();
                 model.ReqMethod = context.HttpContext.Request.Method.ToLower();
                 model.OptReqParam = args;
-                if (context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(MethodRemarkAttribute)))
+                if (context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(MethodLogAttribute)))
                 {
-                    model.MethodRemark = ((MethodRemarkAttribute)context.ActionDescriptor.EndpointMetadata.First(m => m.GetType() == typeof(MethodRemarkAttribute))).Remark;
+                    model.MethodRemark = ((MethodLogAttribute)context.ActionDescriptor.EndpointMetadata.First(m => m.GetType() == typeof(MethodLogAttribute))).Remark;
                 }
                 ObjectResult result = actionExecutedContext.Result as ObjectResult;
                 if (result != null)

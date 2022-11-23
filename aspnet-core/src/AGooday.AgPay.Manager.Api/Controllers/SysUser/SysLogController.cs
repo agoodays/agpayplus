@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysLogId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{selectedIds}"), MethodRemark("删除日志信息")]
+        [HttpDelete, Route("{selectedIds}"), MethodLog("删除日志信息")]
         [PermissionAuth(PermCode.MGR.ENT_SYS_LOG_DEL)]
         public ApiRes Delete(string selectedIds)
         {

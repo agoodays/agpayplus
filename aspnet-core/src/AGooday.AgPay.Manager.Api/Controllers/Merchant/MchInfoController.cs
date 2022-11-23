@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodRemark("新增商户信息")]
+        [HttpPost, Route(""), MethodLog("新增商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_ADD)]
         public ApiRes Add(MchInfoCreateDto dto)
         {
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="mchNo"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{mchNo}"), MethodRemark("删除商户信息")]
+        [HttpDelete, Route("{mchNo}"), MethodLog("删除商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_DEL)]
         public ApiRes Delete(string mchNo)
         {
@@ -85,7 +85,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{mchNo}"), MethodRemark("更新商户信息")]
+        [HttpPut, Route("{mchNo}"), MethodLog("更新商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_EDIT)]
         public async Task<ApiRes> Update(string mchNo, MchInfoModifyDto dto)
         {
