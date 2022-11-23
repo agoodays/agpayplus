@@ -9,13 +9,11 @@ using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Order
 {
@@ -54,7 +52,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_ORDER_LIST)]
         public ApiRes List([FromQuery] PayOrderQueryDto dto)
         {
@@ -80,7 +78,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// </summary>
         /// <param name="payOrderId"></param>
         /// <returns></returns>
-        [HttpGet, Route("{payOrderId}")]
+        [HttpGet, Route("{payOrderId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_PAY_ORDER_VIEW)]
         public ApiRes Detail(string payOrderId)
         {
@@ -103,7 +101,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// <param name="refundAmount"></param>
         /// <param name="refundReason"></param>
         /// <returns></returns>
-        [HttpPost, Route("refunds/{payOrderId}")]
+        [HttpPost, Route("refunds/{payOrderId}"), MethodLog("发起订单退款")]
         [PermissionAuth(PermCode.MCH.ENT_PAY_ORDER_REFUND)]
         public ApiRes Refund(string payOrderId, RefundOrderModel refundOrder)
         {

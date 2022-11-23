@@ -1,17 +1,13 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.Redis;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Merchant.Api.Models;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
 {
@@ -45,7 +41,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_LIST, PermCode.MCH.ENT_UR_USER_UPD_ROLE)]
         public ApiRes List([FromQuery] SysRoleQueryDto dto)
         {
@@ -60,7 +56,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodLog("添加角色信息")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_ADD)]
         public ApiRes Add(SysRoleCreateDto dto)
         {
@@ -83,7 +79,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}")]
+        [HttpDelete, Route("{recordId}"), MethodLog("删除角色")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DEL)]
         public ApiRes Delete(string recordId)
         {
@@ -101,7 +97,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}")]
+        [HttpPut, Route("{recordId}"), MethodLog("更新角色信息")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_EDIT)]
         public ApiRes Update(string recordId, SysRoleModifyDto dto)
         {
@@ -123,7 +119,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpGet, Route("{recordId}")]
+        [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_EDIT)]
         public ApiRes Detail(string recordId)
         {

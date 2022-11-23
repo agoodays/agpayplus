@@ -3,15 +3,12 @@ using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Merchant.Api.Extensions;
 using AGooday.AgPay.Merchant.Api.Extensions.AuthContext;
 using AGooday.AgPay.Merchant.Api.Middlewares;
 using AGooday.AgPay.Merchant.Api.Models;
 using MediatR;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using AGooday.AgPay.Merchant.Api.MQ;
@@ -19,6 +16,8 @@ using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using AGooday.AgPay.Merchant.Api.Logs;
+using AGooday.AgPay.Merchant.Api.Filter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +33,9 @@ logging.AddConsole();
 var services = builder.Services;
 var Env = builder.Environment;
 
+//用户信息
+services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 services.AddSingleton(new Appsettings(Env.ContentRootPath));
 
 //// 注入日志
@@ -43,6 +45,8 @@ services.AddSingleton(new Appsettings(Env.ContentRootPath));
 //    config.AddLog4Net();
 //});
 services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
+
+services.AddScoped<ILogHandler, LogHandler>();
 
 #region Redis
 //redis缓存
@@ -84,12 +88,16 @@ services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 // Automapper 注入
 services.AddAutoMapperSetup();
-services.AddControllersWithViews()
+services.AddControllersWithViews(options =>
+{
+    //日志过滤器
+    options.Filters.Add<LogActionFilter>();
+})
     //.AddNewtonsoftJson();
     .AddNewtonsoftJson(options =>
     {
         //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
-        options.SerializerSettings.Formatting = Formatting.Indented;
+        //options.SerializerSettings.Formatting = Formatting.Indented;
         //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
         options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
@@ -98,7 +106,7 @@ services.AddControllersWithViews()
 // Newtonsoft.Json 全部配置 
 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
-    Formatting = Formatting.Indented,
+    //Formatting = Formatting.Indented,
     DateFormatString = "yyyy-MM-dd HH:mm:ss",
     ContractResolver = new CamelCasePropertyNamesContractResolver()
 };

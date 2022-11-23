@@ -10,17 +10,14 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Merchant.Api.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static AGooday.AgPay.Common.Constants.CS;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
-using System.Text.Json.Nodes;
 using AGooday.AgPay.AopSdk;
 using Newtonsoft.Json.Linq;
 using AGooday.AgPay.AopSdk.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
 {
@@ -28,7 +25,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
     /// 支付测试类
     /// </summary>
     [Route("api/paytest")]
-    [ApiController, Authorize]
+    [ApiController, Authorize, NoLog]
     public class PayTestController : CommonController
     {
         private readonly ILogger<PayTestController> _logger;
@@ -68,7 +65,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             return ApiRes.Ok(payWays);
         }
 
-        //调起下单接口
+        /// <summary>
+        /// 调起下单接口
+        /// </summary>
+        /// <param name="payOrder"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
         [HttpPost, Route("payOrders")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_TEST_DO)]
         public ApiRes DoPay(PayOrderModel payOrder)

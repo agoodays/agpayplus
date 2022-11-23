@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Merchant.Api.Logs
                 model.Device = device;
                 model.BrowserInfo = ua;
                 model.UserIp = IpUtil.GetIP(context?.HttpContext?.Request);
-                model.SysType = CS.SYS_TYPE.MGR;
+                model.SysType = CS.SYS_TYPE.MCH;
                 model.MethodName = context.ActionDescriptor.DisplayName.Split(" (").First();
                 model.ReqUrl = GetAbsoluteUri(context?.HttpContext?.Request).ToLower();//context.ActionDescriptor.AttributeRouteInfo.Template.ToLower();
                 model.ReqMethod = context.HttpContext.Request.Method.ToLower();
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Merchant.Api.Logs
         }
 
         /// <summary>
-        /// 获取绝对路径 https://localhost:9417/api/anon/auth/validate
+        /// 获取绝对路径 https://localhost:9418/api/anon/auth/validate
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>

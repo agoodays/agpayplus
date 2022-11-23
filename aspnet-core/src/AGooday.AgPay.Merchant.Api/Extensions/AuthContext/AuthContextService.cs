@@ -27,20 +27,20 @@ namespace AGooday.AgPay.Merchant.Api.Extensions.AuthContext
             {
                 var user = new AuthContextUser
                 {
-                    SysUserId = Convert.ToInt64(Current?.User?.FindFirstValue("sysUserId")),
-                    AvatarUrl = Current?.User?.FindFirstValue("avatarUrl"),
-                    Realname = Current?.User?.FindFirstValue("realname"),
-                    LoginUsername = Current?.User?.FindFirstValue("loginUsername"),
-                    Telphone = Current?.User?.FindFirstValue("telphone"),
-                    UserNo = Current?.User?.FindFirstValue("userNo"),
-                    Sex = Convert.ToByte(Current?.User?.FindFirstValue("sex")),
-                    State = Convert.ToByte(Current?.User?.FindFirstValue("state")),
-                    IsAdmin = Convert.ToByte(Current?.User?.FindFirstValue("isAdmin")),
-                    SysType = Current?.User?.FindFirstValue("sysType"),
-                    BelongInfoId = Current?.User?.FindFirstValue("belongInfoId"),
-                    CreatedAt = Convert.ToDateTime(Current?.User?.FindFirstValue("createdAt")),
-                    UpdatedAt = Convert.ToDateTime(Current?.User?.FindFirstValue("updatedAt")),
-                    CacheKey = Current?.User?.FindFirstValue("cacheKey")
+                    SysUserId = Convert.ToInt64(Current?.User?.FindFirstValue(ClaimAttributes.SysUserId)),
+                    AvatarUrl = Current?.User?.FindFirstValue(ClaimAttributes.AvatarUrl),
+                    Realname = Current?.User?.FindFirstValue(ClaimAttributes.Realname),
+                    LoginUsername = Current?.User?.FindFirstValue(ClaimAttributes.LoginUsername),
+                    Telphone = Current?.User?.FindFirstValue(ClaimAttributes.Telphone),
+                    UserNo = Current?.User?.FindFirstValue(ClaimAttributes.UserNo),
+                    Sex = Convert.ToByte(Current?.User?.FindFirstValue(ClaimAttributes.Sex)),
+                    State = Convert.ToByte(Current?.User?.FindFirstValue(ClaimAttributes.State)),
+                    IsAdmin = Convert.ToByte(Current?.User?.FindFirstValue(ClaimAttributes.IsAdmin)),
+                    SysType = Current?.User?.FindFirstValue(ClaimAttributes.SysType),
+                    BelongInfoId = Current?.User?.FindFirstValue(ClaimAttributes.BelongInfoId),
+                    CreatedAt = Convert.ToDateTime(Current?.User?.FindFirstValue(ClaimAttributes.CreatedAt)),
+                    UpdatedAt = Convert.ToDateTime(Current?.User?.FindFirstValue(ClaimAttributes.UpdatedAt)),
+                    CacheKey = Current?.User?.FindFirstValue(ClaimAttributes.CacheKey)
                 };
                 return user;
             }
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions.AuthContext
         {
             get
             {
-                return (Convert.ToSByte(Current?.User?.FindFirstValue("isAdmin")) == CS.YES);
+                return (Convert.ToSByte(Current?.User?.FindFirstValue(ClaimAttributes.IsAdmin)) == CS.YES);
             }
         }
     }

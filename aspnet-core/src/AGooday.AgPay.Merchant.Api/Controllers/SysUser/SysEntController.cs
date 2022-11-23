@@ -1,24 +1,15 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Text.Json.Nodes;
-using AGooday.AgPay.Merchant.Api.Extensions;
-using StackExchange.Redis;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
 {
@@ -26,7 +17,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
     /// 权限 菜单 管理
     /// </summary>
     [Route("/api/sysEnts")]
-    [ApiController, Authorize]
+    [ApiController, Authorize, NoLog]
     public class SysEntController : CommonController
     {
         private readonly ILogger<SysEntController> _logger;

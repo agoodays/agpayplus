@@ -1,21 +1,16 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Application.Params;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
-using System.Runtime.InteropServices;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Models;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 {
@@ -56,7 +51,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes List(string appId)
         {
@@ -77,7 +72,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="isvNo"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet, Route("{appId}/{ifCode}")]
+        [HttpGet, Route("{appId}/{ifCode}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_VIEW)]
         public ApiRes GetByAppId(string appId, string ifCode)
         {
@@ -112,7 +107,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodLog("更新商户支付参数")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
@@ -155,7 +150,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         }
 
         [HttpGet, Route("alipayIsvsubMchAuthUrls/{mchAppId}")]
-        [AllowAnonymous]
+        [AllowAnonymous, NoLog]
         public ApiRes QueryAlipayIsvsubMchAuthUrl(string mchAppId)
         {
             var mchApp = _mchAppService.GetById(mchAppId);
@@ -175,7 +170,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        [HttpGet, Route("ifCodes/{appId}")]
+        [HttpGet, Route("ifCodes/{appId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_ADD)]
         public ApiRes GetIfCodeByAppId(string appId)
         {

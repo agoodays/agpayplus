@@ -5,7 +5,6 @@ using AGooday.AgPay.Domain.Core.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using System.Runtime.InteropServices;
 using AGooday.AgPay.Common.Utils;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
@@ -81,7 +80,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             }
         }
 
-        [HttpPut, Route("user"), MethodLog("修改信息")]
+        /// <summary>
+        /// 修改个人信息
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut, Route("user"), MethodLog("修改个人信息")]
         public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
         {
             var currentUser = GetCurrentUser();
@@ -94,6 +98,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             return ApiRes.Ok();
         }
 
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
         [HttpPut, Route("modifyPwd"), MethodLog("修改密码")]
         public ApiRes ModifyPwd(ModifyPwd dto)
         {
@@ -116,6 +126,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             return Logout();
         }
 
+        /// <summary>
+        /// 登出
+        /// </summary>
+        /// <returns></returns>
         [HttpPost, Route("logout"), MethodLog("登出")]
         public ApiRes Logout()
         {

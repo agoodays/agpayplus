@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
             context.Response.ContentType = "application/json";// 返回json 类型
             var response = context.Response;
 
-            ApiRes errorResponse = ApiRes.CustomFail("");// 自定义的异常错误信息类型
+            ApiRes errorResponse = ApiRes.Fail(ApiCode.SYSTEM_ERROR, exception.Message);
             switch (exception)
             {
                 case ApplicationException ex:
@@ -47,21 +47,22 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
                     errorResponse.Msg = ex.Message;
                     break;
                 case KeyNotFoundException ex:
-                    response.StatusCode = (int)HttpStatusCode.NotFound;
-                    errorResponse.Msg = ex.Message;
+                    //response.StatusCode = (int)HttpStatusCode.NotFound;
+                    //errorResponse.Msg = ex.Message;
                     break;
                 case BizException ex:
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    errorResponse.Msg = ex.Message;
+                    errorResponse = ApiRes.CustomFail("");// 自定义的异常错误信息类型
+                    //response.StatusCode = (int)HttpStatusCode.OK;
+                    //errorResponse.Msg = ex.Message;
                     break;
                 default:
-                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    errorResponse.Msg = "Internal Server errors. Check Logs!";
+                    //response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    //errorResponse.Msg = "Internal Server errors. Check Logs!";
                     break;
             }
             _logger.LogError(exception.Message);
             var result = JsonConvert.SerializeObject(errorResponse);
-            await context.Response.WriteAsync(result);
+            await response.WriteAsync(result);
         }
     }
 

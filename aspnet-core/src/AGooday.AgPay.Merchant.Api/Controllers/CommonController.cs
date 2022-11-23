@@ -52,7 +52,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             return JsonConvert.DeserializeObject<CurrentUser>(currentUser);
         }
 
-        /** 获取当前商户ID **/
+        /// <summary>
+        /// 获取当前商户ID
+        /// </summary>
+        /// <returns></returns>
         protected string GetCurrentMchNo()
         {
             return GetCurrentUser().SysUser.BelongInfoId;

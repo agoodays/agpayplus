@@ -1,16 +1,16 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Notifications;
+using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Manager.Api.Authorization;
-using AGooday.AgPay.Manager.Api.Attributes;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {

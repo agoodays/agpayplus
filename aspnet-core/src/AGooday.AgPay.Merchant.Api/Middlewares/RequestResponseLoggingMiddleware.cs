@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AGooday.AgPay.Merchant.Api.Middlewares
 {
@@ -9,83 +10,86 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
         private readonly RequestDelegate _next;
         private readonly ILogger<RequestResponseLoggingMiddleware> _logger;
 
-        private SortedDictionary<string, object> _data;
-        private Stopwatch _stopwatch;
-
         public RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<RequestResponseLoggingMiddleware> logger)
         {
             _next = next;
             _logger = logger;
-            _stopwatch = new Stopwatch();
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
-            _stopwatch.Restart();
-            _data = new SortedDictionary<string, object>();
-
-            HttpRequest request = context.Request;
-            _data.Add("request.url", request.Path.ToString());
-            _data.Add("request.headers", request.Headers.ToDictionary(x => x.Key, v => string.Join(";", v.Value.ToList())));
-            _data.Add("request.method", request.Method);
-            _data.Add("request.executeStartTime", DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
-
-            // 获取请求body内容
-            if (request.Method.ToLower().Equals("post"))
+            // 过滤，只有接口
+            if (context.Request.Path.Value.Contains("api") && !context.Request.Path.Value.Contains("localOssFiles"))
             {
-                // 启用倒带功能，就可以让 Request.Body 可以再次读取
-                request.EnableBuffering();
+                context.TraceIdentifier = Guid.NewGuid().ToString("N");
+                context.Request.EnableBuffering();
+                Stream originalBody = context.Response.Body;
 
-                Stream stream = request.Body;
-                byte[] buffer = new byte[request.ContentLength.Value];
-                await stream.ReadAsync(buffer, 0, buffer.Length);
-                _data.Add("request.body", Encoding.UTF8.GetString(buffer));
+                try
+                {
+                    // 存储请求数据
+                    await RequestDataLog(context);
 
-                request.Body.Position = 0;
+                    using (var ms = new MemoryStream())
+                    {
+                        context.Response.Body = ms;
+
+                        await _next(context);
+
+                        // 存储响应数据
+                        ResponseDataLog(context, ms);
+
+                        ms.Position = 0;
+                        await ms.CopyToAsync(originalBody);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // 记录异常                        
+                    _logger.LogError(ex.Message + "" + ex.InnerException);
+                }
+                finally
+                {
+                    context.Response.Body = originalBody;
+                }
             }
-            else if (request.Method.ToLower().Equals("get"))
+            else
             {
-                _data.Add("request.body", request.QueryString.Value);
-            }
-
-            // 获取Response.Body内容
-            var originalBodyStream = context.Response.Body;
-
-            using (var responseBody = new MemoryStream())
-            {
-                context.Response.Body = responseBody;
-
                 await _next(context);
-
-                _data.Add("response.body", await GetResponse(context.Response));
-                _data.Add("response.executeEndTime", DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
-
-                await responseBody.CopyToAsync(originalBodyStream);
             }
-
-            // 响应完成记录时间和存入日志
-            context.Response.OnCompleted(() =>
-            {
-                _stopwatch.Stop();
-                _data.Add("elaspedTime", _stopwatch.ElapsedMilliseconds + "ms");
-                var json = JsonConvert.SerializeObject(_data);
-                _logger.LogDebug(json);
-                return Task.CompletedTask;
-            });
-
         }
 
-        /// <summary>
-        /// 获取响应内容
-        /// </summary>
-        /// <param name="response"></param>
-        /// <returns></returns>
-        public async Task<string> GetResponse(HttpResponse response)
+        private async Task RequestDataLog(HttpContext context)
         {
-            response.Body.Seek(0, SeekOrigin.Begin);
-            var text = await new StreamReader(response.Body).ReadToEndAsync();
-            response.Body.Seek(0, SeekOrigin.Begin);
-            return text;
+            var request = context.Request;
+            var sr = new StreamReader(request.Body);
+            var content = new
+            {
+                url = request.Path.Value,
+                headers = request.Headers.ToDictionary(x => x.Key, v => string.Join(";", v.Value.ToList())),
+                method = request.Method,
+                query = request.QueryString,
+                body = await sr.ReadToEndAsync(),
+            };
+
+            _logger.LogInformation($"[{context.TraceIdentifier}] RequestData:{JsonConvert.SerializeObject(content)}");
+
+            request.Body.Position = 0;
+        }
+
+        private void ResponseDataLog(HttpContext context, MemoryStream ms)
+        {
+            ms.Position = 0;
+            var responseBody = new StreamReader(ms).ReadToEnd();
+
+            // 去除 Html
+            var reg = "<[^>]+>";
+            var isHtml = Regex.IsMatch(responseBody, reg);
+
+            if (!string.IsNullOrEmpty(responseBody))
+            {
+                _logger.LogInformation($"[{context.TraceIdentifier}] ResponseData:{responseBody}");
+            }
         }
     }
 

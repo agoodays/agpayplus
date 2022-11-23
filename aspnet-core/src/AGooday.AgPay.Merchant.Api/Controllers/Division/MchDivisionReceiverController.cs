@@ -9,12 +9,11 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 {
@@ -48,7 +47,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             _sysConfigService = sysConfigService;
         }
 
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_LIST)]
         public ApiRes List([FromQuery] MchDivisionReceiverQueryDto dto)
         {
@@ -57,7 +56,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
-        [HttpGet, Route("{recordId}")]
+        [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_VIEW)]
         public ApiRes Detail(long recordId)
         {
@@ -75,7 +74,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route("")]
+        [HttpPost, Route(""), MethodLog("新增分账接收账号")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_ADD)]
         public ApiRes Add(DivisionReceiverBindReqModel model)
         {
@@ -113,7 +112,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <param name="record"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPut, Route("{recordId}")]
+        [HttpPut, Route("{recordId}"), MethodLog("更新分账接收账号")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_EDIT)]
         public ApiRes Update(long recordId, MchDivisionReceiverDto record)
         {
@@ -142,7 +141,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}")]
+        [HttpDelete, Route("{recordId}"), MethodLog("删除分账接收账号")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_DELETE)]
         public ApiRes Delete(long recordId)
         {

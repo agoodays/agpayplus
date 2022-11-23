@@ -1,16 +1,11 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Domain.Models;
-using System;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
 {
@@ -18,7 +13,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
     /// 支付方式管理类
     /// </summary>
     [Route("/api/payWays")]
-    [ApiController, Authorize]
+    [ApiController, Authorize, NoLog]
     public class PayWayController : ControllerBase
     {
         private readonly ILogger<PayWayController> _logger;

@@ -1,17 +1,13 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Domain.Communication;
-using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static AGooday.AgPay.Application.Permissions.PermCode;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
 {
     [Route("api/anon/paytestNotify")]
-    [ApiController, AllowAnonymous]
+    [ApiController, AllowAnonymous, NoLog]
     public class PayTestNotifyController : ControllerBase
     {
         private readonly ILogger<PayTestNotifyController> _logger;

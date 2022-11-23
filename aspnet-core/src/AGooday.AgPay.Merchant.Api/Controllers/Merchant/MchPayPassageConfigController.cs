@@ -1,18 +1,16 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Newtonsoft.Json;
 using AGooday.AgPay.Merchant.Api.Models;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 {
@@ -52,7 +50,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="appId"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet,Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_PASSAGE_LIST)]
         public ApiRes List(string appId, [FromQuery] PayWayQueryDto dto)
         {
@@ -88,7 +86,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="isvNo"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet,Route("availablePayInterface/{appId}/{wayCode}")]
+        [HttpGet, Route("availablePayInterface/{appId}/{wayCode}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_PASSAGE_CONFIG)]
         public ApiRes AvailablePayInterface(string appId, string wayCode)
         {
@@ -113,7 +111,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="payOrderId"></param>
         /// <returns></returns>
         [HttpGet, Route("{payOrderId}")]
-        [AllowAnonymous]
+        [AllowAnonymous, NoLog]
         public ApiRes Detail(long id)
         {
             var payPassage = _mchPayPassageService.GetById(id);
@@ -134,7 +132,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost,Route("")]
+        [HttpPost, Route(""), MethodLog("更新应用支付通道")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_PASSAGE_ADD)]
         public ApiRes SaveOrUpdate(ReqParams model)
         {

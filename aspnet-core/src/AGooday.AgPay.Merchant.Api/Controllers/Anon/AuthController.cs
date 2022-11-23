@@ -1,28 +1,19 @@
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Notifications;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Merchant.Api.Models;
-using CaptchaGen.NetCore;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Caching.Memory;
 using StackExchange.Redis;
-using System;
-using System.Buffers.Text;
-using System.Runtime.InteropServices;
 using AGooday.AgPay.Merchant.Api.Extensions;
-using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
 {
@@ -65,7 +56,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route("validate")]
+        [HttpPost, Route("validate"), MethodLog("登录认证")]
         public ApiRes Validate(Validate model)
         {
             string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理
@@ -117,26 +108,22 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.IsAdmin, auth.SysType));
 
             // 返回前端 accessToken
-            var claimsIdentity = new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, auth.SysUserId.ToString()),
-                new Claim(ClaimTypes.Name, auth.LoginUsername),
-                new Claim("sysUserId",auth.SysUserId.ToString()),
-                new Claim("avatarUrl",auth.AvatarUrl),
-                new Claim("realname",auth.Realname),
-                new Claim("loginUsername",auth.LoginUsername),
-                new Claim("telphone",auth.Telphone),
-                new Claim("userNo",auth.UserNo.ToString()),
-                new Claim("sex",auth.Sex.ToString()),
-                new Claim("state",auth.State.ToString()),
-                new Claim("isAdmin",auth.IsAdmin.ToString()),
-                new Claim("sysType",auth.SysType),
-                new Claim("belongInfoId",auth.BelongInfoId),
-                new Claim("createdAt",auth.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
-                new Claim("updatedAt",auth.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
-                new Claim("cacheKey",cacheKey)
-            });
-            var accessToken = JwtBearerAuthenticationExtension.GetJwtAccessToken(_jwtSettings, claimsIdentity);
+            TokenModelJwt tokenModel = new TokenModelJwt();
+            tokenModel.SysUserId = auth.SysUserId.ToString();
+            tokenModel.AvatarUrl = auth.AvatarUrl;
+            tokenModel.Realname = auth.Realname;
+            tokenModel.LoginUsername = auth.LoginUsername;
+            tokenModel.Telphone = auth.Telphone;
+            tokenModel.UserNo = auth.UserNo.ToString();
+            tokenModel.Sex = auth.Sex.ToString();
+            tokenModel.State = auth.State.ToString();
+            tokenModel.IsAdmin = auth.IsAdmin.ToString();
+            tokenModel.SysType = auth.SysType;
+            tokenModel.BelongInfoId = auth.BelongInfoId;
+            tokenModel.CreatedAt = auth.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+            tokenModel.UpdatedAt = auth.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+            tokenModel.CacheKey = cacheKey;
+            var accessToken = JwtBearerAuthenticationExtension.IssueJwt(_jwtSettings, tokenModel);
 
             var currentUser = JsonConvert.SerializeObject(new CurrentUser
             {
@@ -156,7 +143,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         /// 图片验证码
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("vercode")]
+        [HttpGet, Route("vercode"), NoLog]
         public ApiRes Vercode()
         {
             //定义图形验证码的长和宽 // 4位验证码

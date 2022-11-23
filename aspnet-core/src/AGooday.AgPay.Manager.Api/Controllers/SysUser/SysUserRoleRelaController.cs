@@ -1,13 +1,8 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.InteropServices;
 using AGooday.AgPay.Common.Utils;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Manager.Api.Authorization;
@@ -53,7 +48,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysUserId"></param>
         /// <returns></returns>
-        [HttpPost, Route("relas/{sysUserId}"), MethodLog("更改用户角色信息")]
+        [HttpPost, Route("relas/{sysUserId}"), MethodLog("重置用户角色关联信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
         public ApiRes Relas(long sysUserId, List<string> entIds)
         {

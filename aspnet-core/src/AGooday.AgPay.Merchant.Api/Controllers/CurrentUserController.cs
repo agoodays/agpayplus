@@ -5,7 +5,6 @@ using AGooday.AgPay.Domain.Core.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using System.Runtime.InteropServices;
 using AGooday.AgPay.Common.Utils;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
@@ -14,6 +13,7 @@ using StackExchange.Redis;
 using AGooday.AgPay.Merchant.Api.Models;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers
 {
@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             _notifications = (DomainNotificationHandler)notifications;
         }
 
-        [HttpGet, Route("user")]
+        [HttpGet, Route("user"), NoLog]
         public ApiRes CurrentUserInfo()
         {
             try
@@ -80,7 +80,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             }
         }
 
-        [HttpPut, Route("user")]
+        /// <summary>
+        /// 修改个人信息
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut, Route("user"), MethodLog("修改个人信息")]
         public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
         {
             var currentUser = GetCurrentUser();
@@ -93,7 +98,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             return ApiRes.Ok();
         }
 
-        [HttpPut, Route("modifyPwd")]
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
+        [HttpPut, Route("modifyPwd"), MethodLog("修改密码")]
         public ApiRes ModifyPwd(ModifyPwd dto)
         {
             string currentUserPwd = Base64Util.DecodeBase64(dto.OriginalPwd); //当前用户登录密码
@@ -114,7 +125,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             return Logout();
         }
 
-        [HttpPost, Route("logout")]
+        /// <summary>
+        /// 登出
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost, Route("logout"), MethodLog("退出")]
         public ApiRes Logout()
         {
             var currentUser = GetCurrentUser();

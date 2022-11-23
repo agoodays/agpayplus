@@ -1,15 +1,11 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Division
@@ -35,7 +31,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             _payOrderDivisionRecordService = payOrderDivisionRecordService;
         }
 
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_LIST)]
         public ApiRes List([FromQuery] PayOrderDivisionRecordQueryDto dto)
         {
@@ -44,7 +40,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
-        [HttpGet, Route("{recordId}")]
+        [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_VIEW)]
         public ApiRes Detail(long recordId)
         {

@@ -1,19 +1,13 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Core.Notifications;
-using MediatR;
 using AGooday.AgPay.Application.Permissions;
-using Newtonsoft.Json;
-using StackExchange.Redis;
-using AGooday.AgPay.Common.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
 {
@@ -49,14 +43,20 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("")]
-        [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST)]
+        [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST), NoLog]
         public ApiRes List([FromQuery] SysRoleEntRelaQueryDto dto)
         {
             var data = _sysRoleEntRelaService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
-        [HttpPost, Route("relas/{roleId}")]
+        /// <summary>
+        /// 重置角色权限关联信息
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="entIds"></param>
+        /// <returns></returns>
+        [HttpPost, Route("relas/{roleId}"), MethodLog("重置角色权限关联信息")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST)]
         public ApiRes Relas(string roleId, List<string> entIds)
         {

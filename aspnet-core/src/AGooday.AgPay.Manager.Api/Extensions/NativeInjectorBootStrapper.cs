@@ -3,7 +3,6 @@ using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Domain.CommandHandlers;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
-using AGooday.AgPay.Domain.Communication;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Domain.EventHandlers;
@@ -14,7 +13,6 @@ using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Infrastructure.Repositories;
 using AGooday.AgPay.Infrastructure.UoW;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AGooday.AgPay.Manager.Api.Extensions

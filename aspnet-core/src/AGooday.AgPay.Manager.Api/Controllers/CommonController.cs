@@ -1,16 +1,11 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Manager.Api.Extensions.AuthContext;
 using AGooday.AgPay.Manager.Api.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using StackExchange.Redis;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Manager.Api.Controllers
 {
@@ -51,6 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             }
             return JsonConvert.DeserializeObject<CurrentUser>(currentUser);
         }
+
         /// <summary>
         /// 根据用户ID 删除用户缓存信息
         /// </summary>

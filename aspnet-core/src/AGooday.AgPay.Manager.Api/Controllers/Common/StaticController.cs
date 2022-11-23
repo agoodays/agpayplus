@@ -1,11 +1,7 @@
 ﻿using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Manager.Api.Attributes;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.SqlServer.Server;
-using Microsoft.VisualBasic;
-using System.IO;
 using System.Text;
 using System.Web;
 

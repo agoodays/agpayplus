@@ -1,17 +1,12 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.InteropServices;
 using AGooday.AgPay.Common.Utils;
-using Newtonsoft.Json;
-using AGooday.AgPay.Common.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
 {
@@ -42,7 +37,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("")]
+        [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_UPD_ROLE)]
         public ApiRes List([FromQuery] SysUserRoleRelaQueryDto dto)
         {
@@ -55,7 +50,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// </summary>
         /// <param name="sysUserId"></param>
         /// <returns></returns>
-        [HttpPost, Route("relas/{sysUserId}")]
+        [HttpPost, Route("relas/{sysUserId}"), MethodLog("重置用户角色关联信息")]
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_UPD_ROLE)]
         public ApiRes Relas(long sysUserId, List<string> entIds)
         {

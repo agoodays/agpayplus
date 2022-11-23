@@ -1,11 +1,9 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using Microsoft.AspNetCore.Http;
+using AGooday.AgPay.Merchant.Api.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using StackExchange.Redis;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers
 {
@@ -13,7 +11,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
     /// 主页数据
     /// </summary>
     [Route("api/mainChart")]
-    [ApiController]
+    [ApiController, NoLog]
     public class MainChartController : CommonController
     {
         private readonly ILogger<MainChartController> _logger;
@@ -21,7 +19,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         private readonly ISysUserService _sysUserService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MainChartController(ILogger<MainChartController> logger, RedisUtil client, 
+        public MainChartController(ILogger<MainChartController> logger, RedisUtil client,
             IPayOrderService payOrderService,
             IMchInfoService mchInfoService,
             ISysUserService sysUserService,

@@ -6,25 +6,22 @@ using AGooday.AgPay.AopSdk.Response;
 using AGooday.AgPay.Application;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
-using AGooday.AgPay.Merchant.Api.Controllers.PayTest;
 using AGooday.AgPay.Merchant.Api.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
 {
     [Route("api/mchTransfers")]
-    [ApiController, Authorize]
+    [ApiController, Authorize, NoLog]
     public class MchTransferController : CommonController
     {
         private readonly ILogger<MchTransferController> _logger;

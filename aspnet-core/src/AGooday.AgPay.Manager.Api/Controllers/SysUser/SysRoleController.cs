@@ -1,15 +1,10 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.Redis;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Manager.Api.Models;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Attributes;
