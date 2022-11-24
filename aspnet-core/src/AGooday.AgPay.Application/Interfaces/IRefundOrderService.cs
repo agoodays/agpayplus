@@ -13,6 +13,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Remove(string recordId);
         void Update(RefundOrderDto dto);
         RefundOrderDto GetById(string recordId);
+        RefundOrderDto QueryMchOrder(string mchNo, string mchRefundNo, string refundOrderId);
         IEnumerable<RefundOrderDto> GetAll();
         PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto);
         long SumSuccessRefundAmount(string payOrderId);

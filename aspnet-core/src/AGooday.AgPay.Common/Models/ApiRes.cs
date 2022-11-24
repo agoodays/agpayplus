@@ -1,7 +1,10 @@
-﻿using System;
+﻿using AGooday.AgPay.Common.Utils;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Common.Models
@@ -45,21 +48,30 @@ namespace AGooday.AgPay.Common.Models
             return Ok(null);
         }
 
-        /** 业务处理成功 **/
+        /// <summary>
+        /// 业务处理成功
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static ApiRes Ok(object data)
         {
             return new ApiRes(ApiCode.SUCCESS.GetCode(), ApiCode.SUCCESS.GetMsg(), data, sign: null);
         }
 
-        /** 业务处理成功, 自动签名 **/
+        /// <summary>
+        /// 业务处理成功, 自动签名
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="mchKey"></param>
+        /// <returns></returns>
         public static ApiRes OkWithSign(object data, string mchKey)
         {
             if (data == null)
             {
                 return new ApiRes(ApiCode.SUCCESS.GetCode(), ApiCode.SUCCESS.GetMsg(), data: null, sign: null);
             }
-
-            string sign = "";
+            var jsonObject = JObject.FromObject(data);
+            string sign = AgPayUtil.GetSign(jsonObject, mchKey);
             return new ApiRes(ApiCode.SUCCESS.GetCode(), ApiCode.SUCCESS.GetMsg(), data, sign);
         }
 

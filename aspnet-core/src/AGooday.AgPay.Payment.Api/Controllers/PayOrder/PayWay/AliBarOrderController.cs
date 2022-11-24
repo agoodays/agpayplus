@@ -35,8 +35,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
         /// <returns></returns>
         [HttpPost]
         [Route("api/pay/aliBarOrder")]
-        public ActionResult<ApiRes> AliBarOrder(AliBarOrderRQ bizRQ)
+        public ActionResult<ApiRes> AliBarOrder()
         {
+            //获取参数 & 验证
+            AliBarOrderRQ bizRQ = GetRQByWithMchSign<AliBarOrderRQ>();
+
             // 统一下单接口;
             return UnifiedOrder(CS.PAY_WAY_CODE.ALI_BAR, bizRQ);// "ALI_BAR";  //支付宝条码支付
         }

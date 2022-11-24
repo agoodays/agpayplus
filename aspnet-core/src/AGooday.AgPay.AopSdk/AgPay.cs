@@ -88,11 +88,11 @@
             return ReadTimeout;
         }
 
-        /**
-         * 设置数据读取超时时间 (毫秒)
-         * 不同接口的耗时时间不一样，部分接口的耗时可能比较长。
-         * @param timeout
-         */
+        /// <summary>
+        /// 设置数据读取超时时间 (毫秒)
+        /// 不同接口的耗时时间不一样，部分接口的耗时可能比较长。
+        /// </summary>
+        /// <param name="timeout"></param>
         public static void SetReadTimeout(int timeout)
         {
             ReadTimeout = timeout;

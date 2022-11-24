@@ -4,7 +4,6 @@ using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -14,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using AGooday.AgPay.Common.Enumerator;
 using System.Data;
+using AGooday.AgPay.Infrastructure.Repositories;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -63,6 +63,24 @@ namespace AGooday.AgPay.Application.Services
             var entity = _refundOrderRepository.GetById(recordId);
             var dto = _mapper.Map<RefundOrderDto>(entity);
             return dto;
+        }
+
+        public RefundOrderDto QueryMchOrder(string mchNo, string mchRefundNo, string refundOrderId)
+        {
+            if (string.IsNullOrEmpty(refundOrderId))
+            {
+                var entity = _refundOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.RefundOrderId.Equals(refundOrderId)).FirstOrDefault();
+                return _mapper.Map<RefundOrderDto>(entity);
+            }
+            else if (string.IsNullOrEmpty(mchRefundNo))
+            {
+                var entity = _refundOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.MchRefundNo.Equals(mchRefundNo)).FirstOrDefault();
+                return _mapper.Map<RefundOrderDto>(entity);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public IEnumerable<RefundOrderDto> GetAll()

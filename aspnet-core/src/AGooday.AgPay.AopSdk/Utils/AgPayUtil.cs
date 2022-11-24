@@ -22,7 +22,7 @@ namespace AGooday.AgPay.AopSdk.Utils
             var result = GetStrSort(map);
             result += "key=" + key;
             result = Md5(result, encodingCharset).ToUpper();
-            return string.Empty;
+            return result;
         }
 
         public static string GetStrSort(Dictionary<string, object> map)

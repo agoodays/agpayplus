@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using AGooday.AgPay.Common.Enumerator;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -105,6 +106,92 @@ namespace AGooday.AgPay.Application.Services
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<TransferOrder>.Create<TransferOrderDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
+        }
+        /// <summary>
+        /// 更新转账订单状态 【转账订单生成】 --》 【转账中】
+        /// </summary>
+        /// <param name="transferId"></param>
+        /// <returns></returns>
+        public bool UpdateInit2Ing(string transferId)
+        {
+            var updateRecord = _transferOrderRepository.GetById(transferId);
+            if (updateRecord.State != (byte)TransferOrderState.STATE_INIT)
+            {
+                return false;
+            }
+            updateRecord.State = (byte)TransferOrderState.STATE_ING;
+            _transferOrderRepository.Update(updateRecord);
+            return _transferOrderRepository.SaveChanges(out int _);
+        }
+        /// <summary>
+        /// 更新转账订单状态 【转账中】 --》 【转账成功】
+        /// </summary>
+        /// <param name="transferId"></param>
+        /// <param name="channelOrderNo"></param>
+        /// <returns></returns>
+        public bool UpdateIng2Success(string transferId, string channelOrderNo)
+        {
+            var updateRecord = _transferOrderRepository.GetById(transferId);
+            if (updateRecord.State != (byte)TransferOrderState.STATE_ING)
+            {
+                return false;
+            }
+            updateRecord.State = (byte)TransferOrderState.STATE_SUCCESS;
+            updateRecord.ChannelOrderNo = channelOrderNo;
+            updateRecord.SuccessTime = DateTime.Now;
+            _transferOrderRepository.Update(updateRecord);
+            return _transferOrderRepository.SaveChanges(out int _);
+        }
+        /// <summary>
+        /// 更新转账订单状态 【转账中】 --》 【转账失败】
+        /// </summary>
+        /// <param name="transferId"></param>
+        /// <param name="channelOrderNo"></param>
+        /// <param name="channelErrCode"></param>
+        /// <param name="channelErrMsg"></param>
+        /// <returns></returns>
+        public bool UpdateIng2Fail(string transferId, string channelOrderNo, string channelErrCode, string channelErrMsg)
+        {
+            var updateRecord = _transferOrderRepository.GetById(transferId);
+            if (updateRecord.State != (byte)TransferOrderState.STATE_ING)
+            {
+                return false;
+            }
+            updateRecord.State = (byte)TransferOrderState.STATE_FAIL;
+            updateRecord.ErrCode = channelErrCode;
+            updateRecord.ErrMsg = channelErrMsg;
+            updateRecord.ChannelOrderNo = channelOrderNo;
+            _transferOrderRepository.Update(updateRecord);
+            return _transferOrderRepository.SaveChanges(out int _);
+        }
+        /// <summary>
+        /// 更新转账订单状态 【转账中】 --》 【转账成功/转账失败】
+        /// </summary>
+        /// <param name="transferId"></param>
+        /// <param name="state"></param>
+        /// <param name="channelOrderId"></param>
+        /// <param name="channelErrCode"></param>
+        /// <param name="channelErrMsg"></param>
+        /// <returns></returns>
+        public bool UpdateIng2SuccessOrFail(string transferId, byte updateState, string channelOrderNo, string channelErrCode, string channelErrMsg)
+        {
+            if (updateState == (byte)TransferOrderState.STATE_ING)
+            {
+                return true;
+            }
+            else if (updateState == (byte)TransferOrderState.STATE_SUCCESS)
+            {
+                return UpdateIng2Success(transferId, channelOrderNo);
+            }
+            else if (updateState == (byte)TransferOrderState.STATE_FAIL)
+            {
+                return UpdateIng2Fail(transferId, channelOrderNo, channelErrCode, channelErrMsg);
+            }
+            return false;
+        }
+        public bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo)
+        {
+            return _transferOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchOrderNo);
         }
     }
 }

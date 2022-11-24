@@ -6,6 +6,9 @@ using System.Drawing.Imaging;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.ScanImg
 {
+    /// <summary>
+    /// 扫描图片生成器
+    /// </summary>
     [Route("api/scan")]
     [ApiController]
     public class ScanImgController : ControllerBase

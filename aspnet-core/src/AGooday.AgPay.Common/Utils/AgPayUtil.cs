@@ -21,6 +21,7 @@ namespace AGooday.AgPay.Common.Utils
         {
             return EnDecryptUtil.AESEncryptToHex(data, AES_KEY);
         }
+
         public static string AesDecode(string data)
         {
             return EnDecryptUtil.AESDecryptUnHex(data, AES_KEY);
@@ -63,7 +64,7 @@ namespace AGooday.AgPay.Common.Utils
             }
         }
 
-        public static JToken GetSign(JObject param, string key)
+        public static string GetSign(JObject param, string key)
         {
             var map = param.ToObject<Dictionary<string, object>>();
             return GetSign(map, key);
@@ -80,7 +81,7 @@ namespace AGooday.AgPay.Common.Utils
             var result = GetStrSort(map);
             result += "key=" + key;
             result = Md5(result, encodingCharset).ToUpper();
-            return string.Empty;
+            return result;
         }
 
         public static string GetStrSort(Dictionary<string, object> map)

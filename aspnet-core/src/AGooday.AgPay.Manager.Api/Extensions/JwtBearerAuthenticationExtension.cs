@@ -18,27 +18,30 @@ namespace AGooday.AgPay.Manager.Api.Extensions
         /// <param name="appSettings">JWT授权的配置项</param>
         public static void AddJwtBearerAuthentication(this IServiceCollection services, JwtSettings appSettings)
         {
-            //使用应用密钥得到一个加密密钥字节数组
+            //设置secret，使用应用密钥得到一个加密密钥字节数组
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            //添加认证服务
             services.AddAuthentication(options =>
             {
+                //设置默认架构
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddCookie(cfg => cfg.SlidingExpiration = true)
-            .AddJwtBearer(x =>
+            .AddCookie(options => options.SlidingExpiration = true)
+            //添加Jwt自定义配置
+            .AddJwtBearer(options =>
             {
-                x.RequireHttpsMetadata = true;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                options.RequireHttpsMetadata = true;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,//是否验证Issuer
-                    ValidateAudience = true,//是否验证Audience
+                    ValidateIssuer = true,//是否验证颁发者
+                    ValidateAudience = true,//是否验证订阅者
                     ValidateLifetime = true,//是否验证失效时间
                     ValidateIssuerSigningKey = true,//是否验证SecurityKey
-                    ValidIssuer = appSettings.Issuer,//Issuer，这两项和前面签发jwt的设置一致
+                    ValidIssuer = appSettings.Issuer,//颁发者，这两项和前面签发jwt的设置一致
                     ValidAudience = appSettings.Audience,//订阅者
-                    IssuerSigningKey = new SymmetricSecurityKey(key)//密钥
+                    IssuerSigningKey = new SymmetricSecurityKey(key)//认证秘钥
                 };
             });
         }

@@ -9,7 +9,6 @@ using AGooday.AgPay.Payment.Api.Services;
 using Aop.Api.Domain;
 using Aop.Api.Request;
 using Aop.Api.Response;
-using log4net;
 using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
@@ -18,6 +17,9 @@ using AGooday.AgPay.Components.MQ.Vender;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
 {
+    /// <summary>
+    /// 渠道侧自定义业务
+    /// </summary>
     [Route("api/channelbiz/alipay")]
     [ApiController]
     public class AliPayBizController : Controller

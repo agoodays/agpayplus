@@ -1,10 +1,5 @@
 ﻿using AGooday.AgPay.Common.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application
 {
@@ -55,9 +50,9 @@ namespace AGooday.AgPay.Application
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public string GenMchChannelUserIdApiOauth2RedirectUrlEncode(JsonObject param)
+        public string GenMchChannelUserIdApiOauth2RedirectUrlEncode(JObject param)
         {
-            return URLUtil.EncodeAll($"{PaySiteUrl}/api/channelUserId/oauth2Callback/{AgPayUtil.AesEncode(param.ToJsonString())}");
+            return URLUtil.EncodeAll($"{PaySiteUrl}/api/channelUserId/oauth2Callback/{AgPayUtil.AesEncode(param.ToString())}");
         }
 
         /// <summary>

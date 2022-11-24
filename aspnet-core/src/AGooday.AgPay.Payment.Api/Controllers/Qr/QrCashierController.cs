@@ -20,6 +20,9 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 {
+    /// <summary>
+    /// 聚合码支付二维码收银台
+    /// </summary>
     [Route("api/cashier")]
     [ApiController]
     public class QrCashierController : AbstractPayOrderController

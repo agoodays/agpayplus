@@ -34,8 +34,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
         /// </summary>
         [HttpPost]
         [Route("api/pay/ysfJsapiOrder")]
-        public ActionResult<ApiRes> YsfJsapiOrder(AliJsapiOrderRQ bizRQ)
+        public ActionResult<ApiRes> YsfJsapiOrder()
         {
+            //获取参数 & 验证
+            YsfJsapiOrderRQ bizRQ = GetRQByWithMchSign<YsfJsapiOrderRQ>();
+
             // 统一下单接口
             return UnifiedOrder(CS.PAY_WAY_CODE.YSF_JSAPI, bizRQ);
         }

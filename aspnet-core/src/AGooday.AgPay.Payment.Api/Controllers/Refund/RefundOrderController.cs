@@ -18,6 +18,9 @@ using System;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 {
+    /// <summary>
+    /// 商户发起退款
+    /// </summary>
     [ApiController]
     public class RefundOrderController : ApiControllerBase
     {
@@ -26,7 +29,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         private readonly IPayOrderService _payOrderService;
         private readonly IRefundOrderService _refundOrderService;
         private readonly PayMchNotifyService _payMchNotifyService;
-        private readonly ConfigContextQueryService _configContextQueryService;
 
         public RefundOrderController(Func<string, IRefundService> refundServiceFactory,
             ILogger<RefundOrderController> logger,
@@ -35,20 +37,22 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             PayMchNotifyService payMchNotifyService,
             ConfigContextQueryService configContextQueryService,
             RequestIpUtil requestIpUtil)
-            : base(requestIpUtil)
+            : base(requestIpUtil, configContextQueryService)
         {
             _refundServiceFactory = refundServiceFactory;
             _logger = logger;
             _payOrderService = payOrderService;
             _refundOrderService = refundOrderService;
             _payMchNotifyService = payMchNotifyService;
-            _configContextQueryService = configContextQueryService;
         }
 
         [HttpPost, Route("api/refund/refundOrder")]
-        public ApiRes RefundOrder(RefundOrderRQ rq)
+        public ApiRes RefundOrder()
         {
             RefundOrderDto refundOrder = null;
+
+            //获取参数 & 验签
+            RefundOrderRQ rq = GetRQByWithMchSign<RefundOrderRQ>();
 
             try
             {

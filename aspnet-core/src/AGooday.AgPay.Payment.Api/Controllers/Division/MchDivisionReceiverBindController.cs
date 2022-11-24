@@ -1,27 +1,26 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Division;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
-using Microsoft.AspNetCore.Http;
+using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Division
 {
+    /// <summary>
+    /// 分账账号绑定
+    /// </summary>
     [ApiController]
-    public class MchDivisionReceiverBindController : ControllerBase
+    public class MchDivisionReceiverBindController : ApiControllerBase
     {
         private readonly ILogger<MchDivisionReceiverBindController> _logger;
         private readonly Func<string, IDivisionService> _divisionServiceFactory;
-        private readonly ConfigContextQueryService _configContextQueryService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
         private readonly IMchDivisionReceiverService _mchDivisionReceiverService;
         private readonly IMchDivisionReceiverGroupService _mchDivisionReceiverGroupService;
@@ -33,11 +32,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             ConfigContextQueryService configContextQueryService,
             IPayInterfaceConfigService payInterfaceConfigService,
             IMchDivisionReceiverService mchDivisionReceiverService,
-            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService)
+            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
+            RequestIpUtil requestIpUtil)
+            : base(requestIpUtil, configContextQueryService)
         {
             _logger = logger;
             _divisionServiceFactory = divisionServiceFactory;
-            _configContextQueryService = configContextQueryService;
             _payInterfaceConfigService = payInterfaceConfigService;
             _mchDivisionReceiverService = mchDivisionReceiverService;
             _mchDivisionReceiverGroupService = mchDivisionReceiverGroupService;
@@ -48,9 +48,17 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             //var wxpay = divisionServices.FirstOrDefault(f => f.GetType().Equals(typeof(AliPayDivisionService)));
         }
 
+        /// <summary>
+        /// 分账账号绑定
+        /// </summary>
+        /// <param name="bizRQ"></param>
+        /// <returns></returns>
         [HttpPost, Route("api/division/receiver/bind")]
-        public ApiRes Bind(DivisionReceiverBindRQ bizRQ)
+        public ApiRes Bind()
         {
+            //获取参数 & 验签
+            DivisionReceiverBindRQ bizRQ = GetRQByWithMchSign<DivisionReceiverBindRQ>();
+
             try
             {
                 //检查商户应用是否存在该接口
@@ -120,7 +128,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             catch (BizException e)
             {
                 return ApiRes.CustomFail(e.Message);
-
             }
             catch (Exception e)
             {

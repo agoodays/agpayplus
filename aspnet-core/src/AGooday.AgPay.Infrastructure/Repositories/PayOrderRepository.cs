@@ -31,6 +31,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.AsNoTracking().Any(c => c.WayCode.Equals(wayCode));
         }
+
         public bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo)
         {
             return DbSet.AsNoTracking().Any(c => c.MchNo.Equals(mchNo) && c.MchOrderNo.Equals(mchOrderNo));

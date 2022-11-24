@@ -34,8 +34,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
         /// <returns></returns>
         [HttpPost]
         [Route("api/pay/ysfBarOrder")]
-        public ActionResult<ApiRes> YsfBarOrder(YsfBarOrderRQ bizRQ)
+        public ActionResult<ApiRes> YsfBarOrder()
         {
+            //获取参数 & 验证
+            YsfBarOrderRQ bizRQ = GetRQByWithMchSign<YsfBarOrderRQ>();
+
             // 统一下单接口;
             return UnifiedOrder(CS.PAY_WAY_CODE.YSF_BAR, bizRQ);// "ALI_BAR";  //支付宝条码支付
         }

@@ -34,7 +34,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     {
         protected readonly IMQSender mqSender;
         protected readonly Func<string, IPaymentService> _paymentServiceFactory;
-        protected readonly ConfigContextQueryService _configContextQueryService;
         protected readonly PayOrderProcessService _payOrderProcessService;
         protected readonly ILogger<AbstractPayOrderController> _logger;
         protected readonly IMchPayPassageService _mchPayPassageService;
@@ -50,10 +49,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             IMchPayPassageService mchPayPassageService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService)
-            : base(requestIpUtil)
+            : base(requestIpUtil, configContextQueryService)
         {
             _paymentServiceFactory = paymentServiceFactory;
-            _configContextQueryService = configContextQueryService;
             _payOrderProcessService = payOrderProcessService;
             _logger = logger;
             _mchPayPassageService = mchPayPassageService;

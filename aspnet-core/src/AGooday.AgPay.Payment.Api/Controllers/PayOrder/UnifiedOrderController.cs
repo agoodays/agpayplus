@@ -76,7 +76,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         }
         private UnifiedOrderRQ BuildBizRQ(UnifiedOrderRQ rq)
         {
-
             //支付方式  比如： ali_bar
             string wayCode = rq.WayCode;
 

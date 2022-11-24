@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Transfer
         /// </summary>
         public string ErrMsg { get; set; }
 
-        public static QueryTransferOrderRS BuildByRecord(TransferOrderDto record)
+        public static TransferOrderRS BuildByRecord(TransferOrderDto record)
         {
             if (record == null)
             {
@@ -70,9 +70,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Transfer
 
             var config = new MapperConfiguration(cfg => cfg.CreateMap<TransferOrderDto, QueryTransferOrderRS>());
             var mapper = config.CreateMapper();
-            var result = mapper.Map<TransferOrderDto, QueryTransferOrderRS>(record);
-            result.SuccessTime = record.SuccessTime == null ? null : new DateTimeOffset(record.SuccessTime.Value).ToUnixTimeSeconds();
-            result.CreatedAt = record.CreatedAt == null ? null : new DateTimeOffset(record.CreatedAt.Value).ToUnixTimeSeconds();
+            var result = mapper.Map<TransferOrderDto, TransferOrderRS>(record);
             return result;
         }
     }

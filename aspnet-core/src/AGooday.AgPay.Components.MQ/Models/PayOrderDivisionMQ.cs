@@ -99,12 +99,12 @@ namespace AGooday.AgPay.Components.MQ.Models
             /// <summary>
             /// 分账接收者ID (与receiverGroupId 二选一)
             /// </summary>
-            public long ReceiverId { get; set; }
+            public long? ReceiverId { get; set; }
 
             /// <summary>
             /// 组ID（便于商户接口使用） (与 receiverId 二选一)
             /// </summary>
-            public long ReceiverGroupId { get; set; }
+            public long? ReceiverGroupId { get; set; }
 
             /// <summary>
             /// 分账比例 （可以为空， 为空表示使用系统默认值）

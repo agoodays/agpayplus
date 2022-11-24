@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Payment.Api.FilterAttributes
             var result = ApiRes.Fail(ApiCode.PARAMS_ERROR, errors);
 
             // 设置结果
-            context.Result = new BadRequestObjectResult(result);
+            context.Result = new OkObjectResult(result);
         }
     }
 }

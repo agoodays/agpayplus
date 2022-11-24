@@ -18,14 +18,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     public class QueryOrderController : ApiControllerBase
     {
         private readonly IPayOrderService payOrderService;
-        private readonly ConfigContextQueryService configContextQueryService;
 
         public QueryOrderController(RequestIpUtil requestIpUtil,
             IPayOrderService payOrderService,
-            ConfigContextQueryService configContextQueryService) : base(requestIpUtil)
+            ConfigContextQueryService configContextQueryService)
+            : base(requestIpUtil, configContextQueryService)
         {
             this.payOrderService = payOrderService;
-            this.configContextQueryService = configContextQueryService;
         }
 
         [HttpPost]
@@ -47,7 +46,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
 
             QueryPayOrderRS bizRes = QueryPayOrderRS.BuildByPayOrder(payOrder);
-            return ApiRes.OkWithSign(bizRes, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRes, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
         }
     }
 }

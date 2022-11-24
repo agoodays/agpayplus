@@ -22,7 +22,7 @@ namespace AGooday.AgPay.AopSdk.Nets
         private int maxNetworkRetries;
         private string acceptLanguage;
 
-        public static RequestOptions getDefault(string uri, string version)
+        public static RequestOptions GetDefault(string uri, string version)
         {
             return new RequestOptions(
                     uri,
