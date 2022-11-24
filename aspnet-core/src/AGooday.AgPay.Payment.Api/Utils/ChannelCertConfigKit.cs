@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
 
         public static string GetCertFilePath(string certFilePath)
         {
-            return GetCertFile(certFilePath).DirectoryName;
+            return GetCertFile(certFilePath).FullName;
         }
 
         public static FileInfo GetCertFile(string certFilePath)

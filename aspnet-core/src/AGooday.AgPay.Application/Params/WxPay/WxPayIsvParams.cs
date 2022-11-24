@@ -65,6 +65,11 @@ namespace AGooday.AgPay.Application.Params.WxPay
         public string Cert { get; set; }
 
         /// <summary>
+        /// 证书文件(.pem格式)
+        /// </summary>
+        public string ApiClientCert { get; set; }
+
+        /// <summary>
         /// 私钥文件(.pem格式)
         /// </summary>
         public string ApiClientKey { get; set; }

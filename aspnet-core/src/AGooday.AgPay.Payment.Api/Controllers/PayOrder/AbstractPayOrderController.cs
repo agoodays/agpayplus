@@ -277,6 +277,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
             // 分账模式
             payOrder.DivisionMode = rq.DivisionMode ?? (byte)PayOrderDivision.DIVISION_MODE_FORBID;
+            payOrder.DivisionState = payOrder.DivisionState ?? (byte)PayOrderDivision.DIVISION_STATE_UNHAPPEN;
 
             var nowDate = DateTime.Now;
 

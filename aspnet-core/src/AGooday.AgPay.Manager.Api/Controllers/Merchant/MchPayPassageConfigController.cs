@@ -124,9 +124,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 _mchPayPassageService.SaveOrUpdateBatchSelf(mchPayPassages, mchApp.MchNo);
                 return ApiRes.Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return ApiRes.Fail(ApiCode.SYSTEM_ERROR);
+                return ApiRes.Fail(ApiCode.SYSTEM_ERROR,e.Message);
             }
         }
     }

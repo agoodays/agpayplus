@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
             try
             {
-                if (string.IsNullOrWhiteSpace(bizRQ.MchOrderNo) && string.IsNullOrWhiteSpace(bizRQ.PayOrderId))
+                if (StringUtil.IsAllNullOrWhiteSpace(bizRQ.MchOrderNo) && string.IsNullOrWhiteSpace(bizRQ.PayOrderId))
                 {
                     throw new BizException("mchOrderNo 和 payOrderId不能同时为空");
                 }

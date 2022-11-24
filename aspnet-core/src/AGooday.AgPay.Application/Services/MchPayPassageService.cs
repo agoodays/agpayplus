@@ -157,7 +157,7 @@ namespace AGooday.AgPay.Application.Services
                 payPassage.CreatedAt = _payPassage?.CreatedAt ?? DateTime.Now;
                 payPassage.UpdatedAt = payPassage.UpdatedAt ?? DateTime.Now;
                 var m = _mapper.Map<MchPayPassage>(payPassage);
-                _mchPayPassageRepository.SaveOrUpdate(m, _payPassage.Id);
+                _mchPayPassageRepository.SaveOrUpdate(m, payPassage.Id);
             }
             _mchPayPassageRepository.SaveChanges();
         }

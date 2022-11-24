@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.RQRS.Refund;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
@@ -35,7 +36,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             //获取参数 & 验签
             QueryRefundOrderRQ rq = GetRQByWithMchSign<QueryRefundOrderRQ>();
 
-            if (string.IsNullOrWhiteSpace(rq.MchRefundNo) && string.IsNullOrWhiteSpace(rq.RefundOrderId))
+            if (StringUtil.IsAllNullOrWhiteSpace(rq.MchRefundNo, rq.RefundOrderId))
             {
                 throw new BizException("mchRefundNo 和 refundOrderId不能同时为空");
             }

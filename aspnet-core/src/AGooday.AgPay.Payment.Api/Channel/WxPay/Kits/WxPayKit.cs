@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
 
         public static string AppendErrMsg(string msg, string subMsg)
         {
-            if (!string.IsNullOrEmpty(msg) && !string.IsNullOrEmpty(subMsg))
+            if (StringUtil.IsAllNotNullOrWhiteSpace(msg, subMsg))
             {
                 return msg + "【" + subMsg + "】";
             }

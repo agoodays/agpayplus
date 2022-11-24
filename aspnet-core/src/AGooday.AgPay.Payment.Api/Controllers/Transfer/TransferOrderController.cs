@@ -5,14 +5,12 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Controllers.Refund;
 using AGooday.AgPay.Payment.Api.Exceptions;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.Transfer;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
@@ -49,7 +47,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         /// 转账
         /// </summary>
         /// <returns></returns>
-        [Route("/api/transferOrder")]
+        [HttpPost, Route("/api/transferOrder")]
         public ApiRes TransferOrder()
         {
             TransferOrderDto transferOrder = null;
@@ -186,7 +184,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         /// <exception cref="BizException"></exception>
         private void ProcessChannelMsg(ChannelRetMsg channelRetMsg, TransferOrderDto transferOrder)
         {
-            //对象为空 || 上游返回状态为空， 则无需操作
+            // 对象为空 || 上游返回状态为空， 则无需操作
             if (channelRetMsg == null || channelRetMsg.ChannelState == null)
             {
                 return;
@@ -194,16 +192,16 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
 
             string transferId = transferOrder.TransferId;
 
-            //明确成功
+            // 明确成功
             if (ChannelState.CONFIRM_SUCCESS == channelRetMsg.ChannelState)
             {
-                this.updateInitOrderStateThrowException((byte)TransferOrderState.STATE_SUCCESS, transferOrder, channelRetMsg);
+                this.UpdateInitOrderStateThrowException((byte)TransferOrderState.STATE_SUCCESS, transferOrder, channelRetMsg);
                 _payMchNotifyService.TransferOrderNotify(transferOrder);
             }
-            //明确失败
+            // 明确失败
             else if (ChannelState.CONFIRM_FAIL == channelRetMsg.ChannelState)
             {
-                this.updateInitOrderStateThrowException((byte)TransferOrderState.STATE_FAIL, transferOrder, channelRetMsg);
+                this.UpdateInitOrderStateThrowException((byte)TransferOrderState.STATE_FAIL, transferOrder, channelRetMsg);
                 _payMchNotifyService.TransferOrderNotify(transferOrder);
             }
             // 上游处理中 || 未知 || 上游接口返回异常  订单为支付中状态
@@ -211,7 +209,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                     ChannelState.UNKNOWN == channelRetMsg.ChannelState ||
                     ChannelState.API_RET_ERROR == channelRetMsg.ChannelState)
             {
-                this.updateInitOrderStateThrowException((byte)TransferOrderState.STATE_ING, transferOrder, channelRetMsg);
+                this.UpdateInitOrderStateThrowException((byte)TransferOrderState.STATE_ING, transferOrder, channelRetMsg);
             }
             // 系统异常：  订单不再处理。  为： 生成状态
             else if (ChannelState.SYS_ERROR == channelRetMsg.ChannelState)
@@ -222,7 +220,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 throw new BizException("ChannelState 返回异常！");
             }
         }
-
 
         /// <summary>
         /// 更新订单状态 --》 订单生成--》 其他状态  (向外抛出异常)

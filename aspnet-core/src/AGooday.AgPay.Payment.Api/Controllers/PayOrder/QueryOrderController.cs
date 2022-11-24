@@ -2,10 +2,10 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             //获取参数 & 验签
             QueryPayOrderRQ rq = GetRQByWithMchSign<QueryPayOrderRQ>();
 
-            if (string.IsNullOrWhiteSpace(rq.MchOrderNo) && string.IsNullOrWhiteSpace(rq.PayOrderId))
+            if (StringUtil.IsAllNullOrWhiteSpace(rq.MchOrderNo, rq.PayOrderId))
             {
                 throw new BizException("mchOrderNo 和 payOrderId不能同时为空");
             }

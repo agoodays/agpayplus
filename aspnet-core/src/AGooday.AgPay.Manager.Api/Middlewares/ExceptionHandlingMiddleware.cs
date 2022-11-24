@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                     //errorResponse.Msg = ex.Message;
                     break;
                 case BizException ex:
-                    errorResponse = ApiRes.CustomFail("");// 自定义的异常错误信息类型
+                    errorResponse = ApiRes.CustomFail(ex.Message);// 自定义的异常错误信息类型
                     //response.StatusCode = (int)HttpStatusCode.OK;
                     //errorResponse.Msg = ex.Message;
                     break;

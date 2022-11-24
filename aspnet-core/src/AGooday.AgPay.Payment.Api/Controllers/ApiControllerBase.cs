@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             string appId = abstractMchAppRQ.AppId;
             string sign = bizRQ.Sign;
 
-            if (string.IsNullOrWhiteSpace(mchNo) || string.IsNullOrWhiteSpace(appId) || string.IsNullOrWhiteSpace(sign))
+            if (StringUtil.IsAnyNullOrEmpty(mchNo, appId, sign))
             {
                 throw new BizException("参数有误！");
             }

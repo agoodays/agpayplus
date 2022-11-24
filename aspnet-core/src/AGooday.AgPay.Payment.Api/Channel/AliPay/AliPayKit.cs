@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.Params.AliPay;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.Services;
 using Aop.Api;
@@ -123,7 +124,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
         {
 
             string result = null;
-            if (!string.IsNullOrWhiteSpace(msg) && !string.IsNullOrWhiteSpace(subMsg))
+            if (StringUtil.IsAllNotNullOrWhiteSpace(msg, subMsg))
             {
                 result = msg + "【" + subMsg + "】";
             }

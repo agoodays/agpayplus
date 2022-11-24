@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
@@ -12,9 +11,7 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.Refund;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 {
@@ -56,7 +53,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 
             try
             {
-                if (string.IsNullOrWhiteSpace(rq.MchOrderNo) && string.IsNullOrWhiteSpace(rq.PayOrderId))
+                if (StringUtil.IsAllNullOrWhiteSpace(rq.MchOrderNo, rq.PayOrderId))
                 {
                     throw new BizException("mchOrderNo 和 payOrderId不能同时为空");
                 }

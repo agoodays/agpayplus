@@ -2,7 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Controllers.Refund;
 using AGooday.AgPay.Payment.Api.RQRS.Transfer;
 using AGooday.AgPay.Payment.Api.Services;
@@ -19,17 +19,15 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
     {
         protected readonly ILogger<QueryRefundOrderController> _logger;
         private readonly ITransferOrderService _transferOrderService;
-        private readonly ConfigContextQueryService _configContextQueryService;
 
         public QueryTransferOrderController(ILogger<QueryRefundOrderController> logger,
-            ITransferOrderService transferOrderService, 
+            ITransferOrderService transferOrderService,
             ConfigContextQueryService configContextQueryService,
             RequestIpUtil requestIpUtil)
             : base(requestIpUtil, configContextQueryService)
         {
             _logger = logger;
             _transferOrderService = transferOrderService;
-            _configContextQueryService = configContextQueryService;
         }
 
         [HttpPost, Route("/api/transfer/query")]
@@ -38,7 +36,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             //获取参数 & 验签
             QueryTransferOrderRQ rq = GetRQByWithMchSign<QueryTransferOrderRQ>();
 
-            if (string.IsNullOrWhiteSpace(rq.MchOrderNo) && string.IsNullOrWhiteSpace(rq.TransferId))
+            if (StringUtil.IsAllNullOrWhiteSpace(rq.MchOrderNo, rq.TransferId))
             {
                 throw new BizException("mchOrderNo 和 transferId不能同时为空");
             }

@@ -48,9 +48,11 @@ namespace AGooday.AgPay.Common.Enumerator
         REFUND_STATE_NONE = 0, //未发生实际退款
         REFUND_STATE_SUB = 1, //部分退款
         REFUND_STATE_ALL = 2, //全额退款
+
         DIVISION_MODE_FORBID = 0, //该笔订单不允许分账
         DIVISION_MODE_AUTO = 1, //支付成功按配置自动完成分账
         DIVISION_MODE_MANUAL = 2, //商户手动分账(解冻商户金额)
+
         DIVISION_STATE_UNHAPPEN = 0, //未发生分账
         DIVISION_STATE_WAIT_TASK = 1, //等待分账任务处理
         DIVISION_STATE_ING = 2, //分账处理中
@@ -62,6 +64,7 @@ namespace AGooday.AgPay.Common.Enumerator
         DIVISION_MODE_FORBID = 0, //该笔订单不允许分账
         DIVISION_MODE_AUTO = 1, //支付成功按配置自动完成分账
         DIVISION_MODE_MANUAL = 2, //商户手动分账(解冻商户金额)
+
         DIVISION_STATE_UNHAPPEN = 0, //未发生分账
         DIVISION_STATE_WAIT_TASK = 1, //等待分账任务处理
         DIVISION_STATE_ING = 2, //分账处理中

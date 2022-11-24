@@ -41,7 +41,10 @@ namespace AGooday.AgPay.Payment.Api.Services
             _payMchNotifyService.PayOrderNotify(payOrder);
         }
 
-        /** 更新订单自动分账业务 **/
+        /// <summary>
+        /// 更新订单自动分账业务
+        /// </summary>
+        /// <param name="payOrder"></param>
         private void UpdatePayOrderAutoDivision(PayOrderDto payOrder)
         {
             try

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Common.Utils
 {
-    public static class  StringUtil
+    public static class StringUtil
     {
         public static string ToHex(byte[] bytes) // 0xae00cf => "AE00CF "
         {
@@ -189,9 +189,62 @@ namespace AGooday.AgPay.Common.Utils
 
             return url.StartsWith("http://") || url.StartsWith("https://");
         }
-
+        /// <summary>
+        /// 值为Null使用默认值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static T DefaultIfEmpty<T>(T value, T defaultValue) => value == null ? defaultValue : value;
+        /// <summary>
+        /// 值为Null或空白时使用默认值空字符
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static string DefaultString(string str) => DefaultString(str, "");
+        /// <summary>
+        /// 值为Null或空白时使用默认值
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="defaultStr"></param>
+        /// <returns></returns>
         public static string DefaultString(string str, string defaultStr) => string.IsNullOrWhiteSpace(str) ? defaultStr : str;
+        /// <summary>
+        /// 任意为Null或空
+        /// </summary>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool IsAnyNullOrEmpty(params string[] strs) => strs.Any(s => string.IsNullOrEmpty(s));
+        /// <summary>
+        /// 任意为Null或空白
+        /// </summary>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool IsAnyNullOrWhiteSpace(params string[] strs) => strs.Any(s => string.IsNullOrWhiteSpace(s));
+        /// <summary>
+        /// 全部为Null或空
+        /// </summary>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool IsAllNullOrEmpty(params string[] strs) => !strs.Any(s => !string.IsNullOrEmpty(s));
+        /// <summary>
+        /// 全部为Null或空白
+        /// </summary>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool IsAllNullOrWhiteSpace(params string[] strs) => !strs.Any(s => !string.IsNullOrWhiteSpace(s));
+        /// <summary>
+        /// 全部不为Null或空
+        /// </summary>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool IsAllNotNullOrEmpty(params string[] strs) => !strs.Any(s => string.IsNullOrEmpty(s));
+        /// <summary>
+        /// 全部不为Null或空白
+        /// </summary>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool IsAllNotNullOrWhiteSpace(params string[] strs) => !strs.Any(s => string.IsNullOrWhiteSpace(s));
     }
 }

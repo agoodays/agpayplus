@@ -31,11 +31,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
         private readonly IMchAppService mchAppService;
         private readonly IMQSender mqSender;
 
-        public AliPayBizController(ILogger<AliPayBizController> log, 
-            ConfigContextQueryService configContextQueryService, 
-            IPayInterfaceConfigService payInterfaceConfigService, 
-            ISysConfigService sysConfigService, 
-            IMchAppService mchAppService, 
+        public AliPayBizController(ILogger<AliPayBizController> log,
+            ConfigContextQueryService configContextQueryService,
+            IPayInterfaceConfigService payInterfaceConfigService,
+            ISysConfigService sysConfigService,
+            IMchAppService mchAppService,
             IMQSender mqSender)
         {
             this.log = log;
@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
                 string isvAndMchAppId = state;
                 string appAuthCode = app_auth_code; // 支付宝授权code
 
-                if (!string.IsNullOrWhiteSpace(isvAndMchAppId) && !string.IsNullOrWhiteSpace(appAuthCode))
+                if (StringUtil.IsAllNotNullOrWhiteSpace(isvAndMchAppId, appAuthCode))
                 {
                     isAlipaySysAuth = false;
                     string isvNo = isvAndMchAppId.Split("_")[0];
