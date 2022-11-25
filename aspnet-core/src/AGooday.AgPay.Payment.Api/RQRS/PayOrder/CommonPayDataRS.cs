@@ -1,6 +1,4 @@
 ﻿using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Common.Utils;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
 {

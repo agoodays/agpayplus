@@ -1,12 +1,12 @@
-﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Attributes;
-using Microsoft.AspNetCore.Mvc;
+using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {

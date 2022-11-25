@@ -1,10 +1,5 @@
 ﻿using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.DataTransfer
 {

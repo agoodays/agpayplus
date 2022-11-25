@@ -1,11 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Common.Utils
 {
@@ -180,6 +175,21 @@ namespace AGooday.AgPay.Common.Utils
             }
         }
 
+        public static string GetUUID()
+        {
+            return Guid.NewGuid().ToString("N") + Thread.CurrentThread.ManagedThreadId;
+        }
+
+        public static string GetUUID(int endAt)
+        {
+            return GetUUID().Substring(0, endAt);
+        }
+
+        /// <summary>
+        /// 是否 http 或 https连接
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public static bool IsAvailableUrl(string url)
         {
             if (string.IsNullOrWhiteSpace(url))

@@ -1,16 +1,16 @@
-﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Common.Utils;
-using Microsoft.AspNetCore.Authorization;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Merchant.Api.Authorization;
-using Newtonsoft.Json;
-using AGooday.AgPay.Merchant.Api.Models;
+using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Merchant.Api.Attributes;
+using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 {

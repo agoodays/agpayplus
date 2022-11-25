@@ -1,14 +1,11 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Params;
 using AGooday.AgPay.Application.Params.AliPay;
 using AGooday.AgPay.Application.Params.PpPay;
 using AGooday.AgPay.Application.Params.WxPay;
-using AGooday.AgPay.Application.Params;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Models;
-using System;
-using System.Collections.Generic;
-using AGooday.AgPay.Application.DataTransfer;
 
 namespace AGooday.AgPay.Payment.Api.Services
 {

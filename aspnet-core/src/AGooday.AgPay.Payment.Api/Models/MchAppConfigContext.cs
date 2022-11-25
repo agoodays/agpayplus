@@ -6,58 +6,110 @@ namespace AGooday.AgPay.Payment.Api.Models
 {
     public class MchAppConfigContext
     {
-        /** 商户信息缓存 */
+        #region 商户信息缓存
+        /// <summary>
+        /// 商户号
+        /// </summary>
         public string MchNo { get; set; }
+        /// <summary>
+        /// 应用ID
+        /// </summary>
         public string AppId { get; set; }
+        /// <summary>
+        /// 商户类型: 1-普通商户, 2-特约商户(服务商模式)
+        /// </summary>
         public byte MchType { get; set; }
+        /// <summary>
+        /// 商户信息
+        /// </summary>
         public MchInfoDto MchInfo { get; set; }
+        /// <summary>
+        /// 商户应用信息
+        /// </summary>
         public MchAppDto MchApp { get; set; }
+        #endregion
 
-        /** 商户支付配置信息缓存,  <接口代码, 支付参数>  */
+        #region 商户支付配置信息缓存,  <接口代码, 支付参数>
+        /// <summary>
+        /// 普通商户支付配置信息缓存
+        /// </summary>
         public Dictionary<string, NormalMchParams> NormalMchParamsMap { get; set; } = new Dictionary<string, NormalMchParams>();
+        /// <summary>
+        /// 特约商户支付配置信息缓存
+        /// </summary>
         public Dictionary<string, IsvSubMchParams> IsvSubMchParamsMap { get; set; } = new Dictionary<string, IsvSubMchParams>();
+        #endregion
 
-        /** 放置所属服务商的信息 **/
+        /// <summary>
+        /// 放置所属服务商的信息
+        /// </summary>
         public IsvConfigContext IsvConfigContext { get; set; }
 
-        /** 缓存 Paypal 对象 **/
+        /// <summary>
+        /// 缓存 Paypal 对象
+        /// </summary>
         public PayPalWrapper PaypalWrapper { get; set; }
 
-        /** 缓存支付宝client 对象 **/
+        /// <summary>
+        /// 缓存支付宝client 对象
+        /// </summary>
         public AlipayClientWrapper AlipayClientWrapper { get; set; }
 
-        /** 缓存 wxServiceWrapper 对象 **/
+        /// <summary>
+        /// 缓存 wxServiceWrapper 对象
+        /// </summary>
         public WxServiceWrapper WxServiceWrapper { get; set; }
 
-        /** 获取普通商户配置信息 **/
+        /// <summary>
+        /// 获取普通商户配置信息
+        /// </summary>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
         public NormalMchParams GetNormalMchParamsByIfCode(String ifCode)
         {
             NormalMchParamsMap.TryGetValue(ifCode, out NormalMchParams normalMchParams);
             return normalMchParams;
         }
 
-        /** 获取isv配置信息 **/
+        /// <summary>
+        /// 获取isv配置信息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
         public T GetNormalMchParamsByIfCode<T>(String ifCode) where T : NormalMchParams
         {
             NormalMchParamsMap.TryGetValue(ifCode, out NormalMchParams normalMchParams);
             return (T)normalMchParams;
         }
 
-        /** 获取特约商户配置信息 **/
+        /// <summary>
+        /// 获取特约商户配置信息
+        /// </summary>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
         public IsvSubMchParams GetIsvSubMchParamsByIfCode(String ifCode)
         {
             IsvSubMchParamsMap.TryGetValue(ifCode, out IsvSubMchParams isvSubMchParams);
             return isvSubMchParams;
         }
 
-        /** 获取isv配置信息 **/
+        /// <summary>
+        /// 获取isv配置信息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
         public T GetIsvsubMchParamsByIfCode<T>(String ifCode) where T : IsvSubMchParams
         {
             IsvSubMchParamsMap.TryGetValue(ifCode, out IsvSubMchParams isvSubMchParams);
             return (T)isvSubMchParams;
         }
 
-        /** 是否为 服务商特约商户 **/
+        /// <summary>
+        ///  是否为 服务商特约商户
+        /// </summary>
+        /// <returns></returns>
         public bool IsIsvSubMch()
         {
             return this.MchType == (byte)MchInfoType.TYPE_ISVSUB;

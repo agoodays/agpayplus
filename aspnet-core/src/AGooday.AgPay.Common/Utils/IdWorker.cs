@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AGooday.AgPay.Common.Utils
+﻿namespace AGooday.AgPay.Common.Utils
 {
     /// <summary>
     /// https://www.cnblogs.com/zhaoshujie/p/12010052.html

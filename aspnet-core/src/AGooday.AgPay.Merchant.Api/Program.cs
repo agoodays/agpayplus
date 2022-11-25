@@ -1,23 +1,23 @@
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
-using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
-using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
+using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
+using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Extensions;
 using AGooday.AgPay.Merchant.Api.Extensions.AuthContext;
+using AGooday.AgPay.Merchant.Api.Filter;
+using AGooday.AgPay.Merchant.Api.Logs;
 using AGooday.AgPay.Merchant.Api.Middlewares;
 using AGooday.AgPay.Merchant.Api.Models;
+using AGooday.AgPay.Merchant.Api.MQ;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using AGooday.AgPay.Merchant.Api.MQ;
-using Microsoft.AspNetCore.Authorization;
-using AGooday.AgPay.Merchant.Api.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.OpenApi.Models;
-using AGooday.AgPay.Merchant.Api.Logs;
-using AGooday.AgPay.Merchant.Api.Filter;
 
 var builder = WebApplication.CreateBuilder(args);
 

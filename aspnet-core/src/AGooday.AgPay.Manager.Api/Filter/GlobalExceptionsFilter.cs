@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Common.Models;
-using System;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace AGooday.AgPay.Manager.Api.Filter
 {

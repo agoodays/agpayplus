@@ -2,7 +2,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.Refund;
@@ -10,7 +9,6 @@ using AGooday.AgPay.Payment.Api.Services;
 using Aop.Api.Domain;
 using Aop.Api.Request;
 using Aop.Api.Response;
-using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {

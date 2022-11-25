@@ -1,13 +1,13 @@
-﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Mvc;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Application.Permissions;
-using Microsoft.AspNetCore.Authorization;
-using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Attributes;
+using AGooday.AgPay.Manager.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ADD)]
         public ApiRes Add(SysRoleCreateDto dto)
         {
-            dto.RoleId = $"ROLE_{Guid.NewGuid().ToString("N").Substring(0, 6)}";
+            dto.RoleId = $"ROLE_{StringUtil.GetUUID(6)}";
             dto.SysType = CS.SYS_TYPE.MGR;
             dto.BelongInfoId = "0";
             _sysRoleService.Add(dto);

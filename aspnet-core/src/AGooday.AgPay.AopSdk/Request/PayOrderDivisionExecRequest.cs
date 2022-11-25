@@ -1,11 +1,6 @@
 ﻿using AGooday.AgPay.AopSdk.Models;
 using AGooday.AgPay.AopSdk.Nets;
 using AGooday.AgPay.AopSdk.Response;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AGooday.AgPay.AopSdk.Request
 {

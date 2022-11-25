@@ -4,16 +4,16 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Notifications;
+using AGooday.AgPay.Manager.Api.Attributes;
+using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using StackExchange.Redis;
-using AGooday.AgPay.Manager.Api.Extensions;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Authorization;
-using AGooday.AgPay.Manager.Api.Attributes;
+using StackExchange.Redis;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 {

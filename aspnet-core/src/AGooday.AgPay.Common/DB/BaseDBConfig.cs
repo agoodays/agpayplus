@@ -1,10 +1,5 @@
 ﻿using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Common.DB
 {

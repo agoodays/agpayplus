@@ -1,28 +1,27 @@
 using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Channel.AliPay;
-using AGooday.AgPay.Payment.Api.Channel.WxPay;
-using AGooday.AgPay.Payment.Api.Extensions;
-using AGooday.AgPay.Payment.Api.FilterAttributes;
-using MediatR;
-using AGooday.AgPay.Payment.Api.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Newtonsoft.Json.Serialization;
-using AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay;
-using AGooday.AgPay.Payment.Api.Channel.YsfPay;
-using AGooday.AgPay.Payment.Api.Utils;
+using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Channel;
+using AGooday.AgPay.Payment.Api.Channel.AliPay;
+using AGooday.AgPay.Payment.Api.Channel.WxPay;
+using AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay;
+using AGooday.AgPay.Payment.Api.Channel.YsfPay;
+using AGooday.AgPay.Payment.Api.Extensions;
+using AGooday.AgPay.Payment.Api.FilterAttributes;
+using AGooday.AgPay.Payment.Api.Utils;
 using AGooday.AgPay.Payment.Api.MQ;
+using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.MQ.Models;
-using Newtonsoft.Json;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Components.OSS.Services;
-using AGooday.AgPay.Common.Extensions;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 #region PayWay
 #region AliPay
@@ -49,7 +48,7 @@ using YsfAliBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliBar;
 using YsfAliJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliJsapi;
 
 using YsfWxBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxBar;
-using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi; 
+using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi;
 #endregion
 #endregion
 

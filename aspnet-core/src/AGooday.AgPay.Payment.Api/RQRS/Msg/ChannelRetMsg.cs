@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Msg
 {

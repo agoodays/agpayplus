@@ -2,13 +2,7 @@
 using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Application.AutoMapper
 {

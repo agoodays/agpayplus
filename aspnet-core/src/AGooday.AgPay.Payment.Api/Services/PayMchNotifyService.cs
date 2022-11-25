@@ -9,8 +9,6 @@ using AGooday.AgPay.Payment.Api.RQRS.Refund;
 using AGooday.AgPay.Payment.Api.RQRS.Transfer;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Runtime.InteropServices;
-using System.Text.Json.Nodes;
 
 namespace AGooday.AgPay.Payment.Api.Services
 {

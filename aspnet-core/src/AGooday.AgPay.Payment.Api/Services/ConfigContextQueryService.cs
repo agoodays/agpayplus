@@ -7,7 +7,6 @@ using AGooday.AgPay.Application.Params.WxPay;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Models;
-using System;
 
 namespace AGooday.AgPay.Payment.Api.Services
 {

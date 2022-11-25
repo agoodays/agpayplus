@@ -1,7 +1,5 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using Newtonsoft.Json;
-using System.Drawing.Drawing2D;
-using System.Security.Cryptography.Xml;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 {

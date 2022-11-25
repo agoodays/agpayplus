@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.Params.AliPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Payment.Api.Controllers.Division;
 using AGooday.AgPay.Payment.Api.Exceptions;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.Services;

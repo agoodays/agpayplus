@@ -1,11 +1,8 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
 using StackExchange.Redis;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Merchant.Api.MQ
 {

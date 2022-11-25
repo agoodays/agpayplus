@@ -8,27 +8,49 @@ namespace AGooday.AgPay.Payment.Api.Models
     /// </summary>
     public class IsvConfigContext
     {
-        /** isv信息缓存 */
+        #region isv信息缓存
+        /// <summary>
+        /// 服务商号
+        /// </summary>
         public string IsvNo { get; set; }
+        /// <summary>
+        /// 服务商信息
+        /// </summary>
         public IsvInfoDto IsvInfo { get; set; }
+        #endregion
 
-        /** 商户支付配置信息缓存 */
+        /// <summary>
+        /// 商户支付配置信息缓存
+        /// </summary>
         public Dictionary<string, IsvParams> IsvParamsMap { get; set; } = new Dictionary<string, IsvParams>();
 
-        /** 缓存支付宝client 对象 **/
+        /// <summary>
+        /// 缓存支付宝client 对象
+        /// </summary>
         public AlipayClientWrapper AlipayClientWrapper { get; set; }
 
-        /** 缓存 wxServiceWrapper 对象 **/
+        /// <summary>
+        /// 缓存 wxServiceWrapper 对象
+        /// </summary>
         public WxServiceWrapper WxServiceWrapper { get; set; }
 
-        /** 获取isv配置信息 **/
+        /// <summary>
+        /// 获取isv配置信息
+        /// </summary>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
         public IsvParams GetIsvParamsByIfCode(string ifCode)
         {
             IsvParamsMap.TryGetValue(ifCode, out IsvParams isvParams);
             return isvParams;
         }
 
-        /** 获取isv配置信息 **/
+        /// <summary>
+        /// 获取isv配置信息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ifCode"></param>
+        /// <returns></returns>
         public T GetIsvParamsByIfCode<T>(string ifCode) where T : IsvParams
         {
             IsvParamsMap.TryGetValue(ifCode, out IsvParams isvParams);

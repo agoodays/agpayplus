@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Division
 {

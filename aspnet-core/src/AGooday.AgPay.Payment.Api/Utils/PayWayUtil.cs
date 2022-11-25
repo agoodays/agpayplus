@@ -1,7 +1,5 @@
 ﻿using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel;
-using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace AGooday.AgPay.Payment.Api.Utils
 {

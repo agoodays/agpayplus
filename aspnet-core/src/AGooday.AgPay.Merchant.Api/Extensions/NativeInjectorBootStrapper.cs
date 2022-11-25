@@ -3,7 +3,6 @@ using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Domain.CommandHandlers;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
-using AGooday.AgPay.Domain.Communication;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Domain.EventHandlers;

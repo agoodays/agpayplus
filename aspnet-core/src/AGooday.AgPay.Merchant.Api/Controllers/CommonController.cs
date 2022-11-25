@@ -1,16 +1,11 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Merchant.Api.Extensions.AuthContext;
 using AGooday.AgPay.Merchant.Api.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using StackExchange.Redis;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers
 {

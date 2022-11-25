@@ -1,18 +1,17 @@
-﻿
-using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
-using AGooday.AgPay.Payment.Api.RQRS;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
+using AGooday.AgPay.Payment.Api.Models;
+using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.Utils;
-using Aop.Api.Request;
-using Aop.Api.Domain;
-using Aop.Api.Response;
+using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
+using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
-using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Payment.Api.Utils;
+using Aop.Api.Domain;
+using Aop.Api.Request;
+using Aop.Api.Response;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 {

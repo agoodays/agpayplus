@@ -2,7 +2,6 @@
 using AGooday.AgPay.Common.Models;
 using Newtonsoft.Json;
 using System.Net;
-using System.Text.Json;
 
 namespace AGooday.AgPay.Merchant.Api.Middlewares
 {

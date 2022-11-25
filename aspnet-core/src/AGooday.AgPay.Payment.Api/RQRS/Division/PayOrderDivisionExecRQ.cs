@@ -1,5 +1,4 @@
-﻿using AGooday.AgPay.Domain.Core.Events;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Division
 {

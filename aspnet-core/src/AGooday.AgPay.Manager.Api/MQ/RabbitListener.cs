@@ -1,8 +1,6 @@
 ﻿using AGooday.AgPay.Components.MQ.Constant;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
-using Microsoft.Extensions.Options;
-using Pipelines.Sockets.Unofficial;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;

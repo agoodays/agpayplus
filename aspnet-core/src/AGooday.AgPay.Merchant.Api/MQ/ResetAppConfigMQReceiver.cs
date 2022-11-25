@@ -1,7 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Components.MQ.Models;
-using log4net;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Merchant.Api.MQ

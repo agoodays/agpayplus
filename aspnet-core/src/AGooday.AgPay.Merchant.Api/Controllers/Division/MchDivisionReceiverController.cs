@@ -1,19 +1,19 @@
-﻿using AGooday.AgPay.AopSdk.Exceptions;
-using AGooday.AgPay.AopSdk;
+﻿using AGooday.AgPay.AopSdk;
+using AGooday.AgPay.AopSdk.Exceptions;
 using AGooday.AgPay.AopSdk.Models;
 using AGooday.AgPay.AopSdk.Request;
 using AGooday.AgPay.AopSdk.Response;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using AGooday.AgPay.Merchant.Api.Attributes;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 {

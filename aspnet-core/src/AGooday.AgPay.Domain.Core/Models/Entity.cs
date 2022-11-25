@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AGooday.AgPay.Domain.Core.Models
+﻿namespace AGooday.AgPay.Domain.Core.Models
 {
     /// <summary>
     /// 定义领域实体基类

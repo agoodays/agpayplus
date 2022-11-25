@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using System;
 
 namespace AGooday.AgPay.Payment.Api.Services
 {

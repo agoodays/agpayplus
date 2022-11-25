@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AGooday.AgPay.Domain.Interfaces
+﻿namespace AGooday.AgPay.Domain.Interfaces
 {
     /// <summary>
     /// 定义泛型仓储接口，并继承IDisposable，显式释放资源

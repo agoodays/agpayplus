@@ -1,10 +1,4 @@
 ﻿using AGooday.AgPay.Domain.Validations.MchInfos;
-using AGooday.AgPay.Domain.Validations.SysUsers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Domain.Commands.MchInfos
 {

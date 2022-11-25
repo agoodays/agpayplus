@@ -1,13 +1,10 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
-using Aliyun.OSS.Util;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 {

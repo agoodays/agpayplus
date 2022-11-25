@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS;
-using System;
 using AGooday.AgPay.Application.DataTransfer;
 
 namespace AGooday.AgPay.Payment.Api.Channel

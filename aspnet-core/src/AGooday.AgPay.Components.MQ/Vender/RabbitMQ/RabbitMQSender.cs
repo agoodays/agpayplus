@@ -2,12 +2,7 @@
 using AGooday.AgPay.Components.MQ.Constant;
 using AGooday.AgPay.Components.MQ.Models;
 using RabbitMQ.Client;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 {

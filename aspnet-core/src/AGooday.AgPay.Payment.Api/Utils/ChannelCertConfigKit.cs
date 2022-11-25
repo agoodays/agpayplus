@@ -2,9 +2,6 @@
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Components.OSS.Services;
-using AGooday.AgPay.Payment.Api.Channel;
-using Microsoft.OpenApi.Extensions;
-using System;
 
 namespace AGooday.AgPay.Payment.Api.Utils
 {

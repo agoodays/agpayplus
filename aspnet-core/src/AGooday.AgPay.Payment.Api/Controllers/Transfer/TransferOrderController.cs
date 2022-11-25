@@ -88,7 +88,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                     throw new BizException("应用未开通此接口配置!");
                 }
 
-
                 ITransferService transferService = _transferServiceFactory(ifCode);
                 if (transferService == null)
                 {
@@ -125,11 +124,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             catch (BizException e)
             {
                 return ApiRes.CustomFail(e.Message);
-
             }
             catch (ChannelException e)
             {
-
                 //处理上游返回数据
                 this.ProcessChannelMsg(e.ChannelRetMsg, transferOrder);
 
@@ -140,7 +137,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
 
                 TransferOrderRS bizRes = TransferOrderRS.BuildByRecord(transferOrder);
                 return ApiRes.OkWithSign(bizRes, _configContextQueryService.QueryMchApp(bizRQ.MchNo, bizRQ.AppId).AppSecret);
-
             }
             catch (Exception e)
             {

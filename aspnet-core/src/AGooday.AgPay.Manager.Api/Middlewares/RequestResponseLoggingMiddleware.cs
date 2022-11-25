@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AGooday.AgPay.Manager.Api.Middlewares

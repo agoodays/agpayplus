@@ -1,5 +1,4 @@
 ﻿using AGooday.AgPay.Common.Constants;
-using System.ComponentModel.DataAnnotations;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 {

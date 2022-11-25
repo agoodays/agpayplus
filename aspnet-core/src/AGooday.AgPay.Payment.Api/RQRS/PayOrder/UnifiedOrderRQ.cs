@@ -1,11 +1,7 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
-using AutoMapper;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder

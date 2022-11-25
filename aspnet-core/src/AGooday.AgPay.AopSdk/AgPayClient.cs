@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.AopSdk.Nets;
 using AGooday.AgPay.AopSdk.Request;
 using AGooday.AgPay.AopSdk.Response;
-using Newtonsoft.Json;
 
 namespace AGooday.AgPay.AopSdk
 {

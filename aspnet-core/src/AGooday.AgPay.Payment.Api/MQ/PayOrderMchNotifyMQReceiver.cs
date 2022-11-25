@@ -1,17 +1,9 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
-using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Domain.Models;
-using Aop.Api.Domain;
-using log4net;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Tsp;
-using System.Reflection.PortableExecutable;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.MQ

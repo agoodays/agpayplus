@@ -7,7 +7,6 @@ using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
 using Aop.Api.Util;
-using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 

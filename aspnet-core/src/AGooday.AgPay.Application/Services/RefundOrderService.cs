@@ -1,19 +1,12 @@
-﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Domain.Commands.SysUsers;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using AGooday.AgPay.Common.Enumerator;
 using System.Data;
-using AGooday.AgPay.Infrastructure.Repositories;
 
 namespace AGooday.AgPay.Application.Services
 {

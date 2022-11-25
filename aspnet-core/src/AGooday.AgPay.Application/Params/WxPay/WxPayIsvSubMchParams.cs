@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AGooday.AgPay.Application.Params.WxPay
+﻿namespace AGooday.AgPay.Application.Params.WxPay
 {
     /// <summary>
     /// 微信官方支付 配置参数

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AGooday.AgPay.Common.Constants
+﻿namespace AGooday.AgPay.Common.Constants
 {
     /// <summary>
     /// Constants 常量对象

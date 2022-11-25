@@ -4,7 +4,6 @@ using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.MQ;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using log4net;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Payment.Api.Services

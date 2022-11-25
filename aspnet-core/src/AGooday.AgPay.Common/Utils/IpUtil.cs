@@ -1,7 +1,6 @@
-﻿using System.Linq;
+﻿using Microsoft.AspNetCore.Http;
 using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Http;
 
 namespace AGooday.AgPay.Common.Utils
 {

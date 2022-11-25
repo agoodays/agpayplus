@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
+﻿namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 {
     public class RabbitMQConfig
     {

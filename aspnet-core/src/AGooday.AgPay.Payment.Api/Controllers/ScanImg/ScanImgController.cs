@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing.Imaging;
 

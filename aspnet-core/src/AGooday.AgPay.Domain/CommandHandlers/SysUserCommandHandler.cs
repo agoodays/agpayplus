@@ -9,12 +9,6 @@ using AGooday.AgPay.Domain.Models;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Buffers.Text;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Domain.CommandHandlers
 {
@@ -103,7 +97,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _sysUserRepository.Add(sysUser);
 
             #region 添加默认用户认证表
-            string salt = Guid.NewGuid().ToString("N").Substring(0, 6); //6位随机数
+            string salt = StringUtil.GetUUID(6); //6位随机数
             string authPwd = CS.DEFAULT_PWD;
             string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
             //用户名登录方式

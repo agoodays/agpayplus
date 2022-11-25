@@ -11,8 +11,6 @@ using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using System.Drawing;
-using System.Text.Json.Nodes;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 {

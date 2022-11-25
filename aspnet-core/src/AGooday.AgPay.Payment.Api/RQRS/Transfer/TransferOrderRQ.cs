@@ -1,6 +1,4 @@
-﻿using AGooday.AgPay.Domain.Core.Events;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Transfer
 {

@@ -1,8 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AutoMapper;
-using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.Refund
 {

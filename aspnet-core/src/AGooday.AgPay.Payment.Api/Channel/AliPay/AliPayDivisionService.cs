@@ -8,8 +8,6 @@ using AGooday.AgPay.Payment.Api.Services;
 using Aop.Api.Domain;
 using Aop.Api.Request;
 using Aop.Api.Response;
-using log4net;
-using Org.BouncyCastle.Utilities;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {

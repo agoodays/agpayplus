@@ -1,10 +1,5 @@
 ﻿using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.OSS.Constants;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AGooday.AgPay.Components.OSS.Models
 {

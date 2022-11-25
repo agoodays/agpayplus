@@ -6,7 +6,6 @@ using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {

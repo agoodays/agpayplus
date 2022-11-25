@@ -1,13 +1,13 @@
-﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Common.Models;
-using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Common.Exceptions;
-using Microsoft.AspNetCore.Authorization;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Manager.Api.Authorization;
-using Newtonsoft.Json.Linq;
+using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Manager.Api.Attributes;
+using AGooday.AgPay.Manager.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 {
