@@ -116,6 +116,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             string realName = GetCurrentUser().SysUser.Realname;
             dto.UpdatedUid = userId;
             dto.UpdatedBy = realName;
+            dto.UpdatedAt = DateTime.Now;
 
             //根据 商户号、接口类型 获取商户参数配置
             var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_MCH_APP, dto.InfoId, dto.IfCode);
@@ -123,11 +124,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             if (dbRecoed != null)
             {
                 dto.Id = dbRecoed.Id;
+                dto.CreatedUid = dbRecoed.CreatedUid;
+                dto.CreatedBy = dbRecoed.CreatedBy;
+                dto.CreatedAt = dbRecoed.CreatedAt;
+                // 合并支付参数
+                dto.IfParams = StringUtil.Marge(dbRecoed.IfParams, dto.IfParams);
             }
             else
             {
                 dto.CreatedUid = userId;
                 dto.CreatedBy = realName;
+                dto.CreatedAt = DateTime.Now;
             }
 
             var result = _payIfConfigService.SaveOrUpdate(dto);

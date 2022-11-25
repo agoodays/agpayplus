@@ -35,6 +35,10 @@ namespace AGooday.AgPay.Merchant.Api.Authorization
                 {
                     var cacheKey = context.User.FindFirstValue(ClaimAttributes.CacheKey);
                     string currentUserJson = _redis.StringGet(cacheKey);
+                    if (string.IsNullOrWhiteSpace(currentUserJson))
+                    {
+                        throw new BizException("登录失效");
+                    }
                     var currentUser = JsonConvert.DeserializeObject<CurrentUser>(currentUserJson);
                     var userIdClaim = context.User.FindFirst(_ => _.Type == ClaimTypes.NameIdentifier).Value;
                     if (userIdClaim != null && currentUser.Authorities.Intersect(requirement.Name).Any())
