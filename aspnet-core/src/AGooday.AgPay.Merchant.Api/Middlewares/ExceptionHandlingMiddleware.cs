@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
                 case ApplicationException ex:
                     if (ex.Message.Contains("Invalid token"))
                     {
-                        response.StatusCode = (int)HttpStatusCode.Forbidden;
+                        response.StatusCode = (int)HttpStatusCode.Unauthorized;
                         errorResponse.Msg = ex.Message;
                         break;
                     }
@@ -48,6 +48,11 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
                 case KeyNotFoundException ex:
                     //response.StatusCode = (int)HttpStatusCode.NotFound;
                     //errorResponse.Msg = ex.Message;
+                    break;
+                case UnauthorizeException ex:
+                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    errorResponse.Code = ApiCode.SUCCESS.GetCode();
+                    errorResponse.Msg = "登录失效";
                     break;
                 case BizException ex:
                     errorResponse = ApiRes.CustomFail(ex.Message);// 自定义的异常错误信息类型

@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// </summary>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        public NormalMchParams GetNormalMchParamsByIfCode(String ifCode)
+        public NormalMchParams GetNormalMchParamsByIfCode(string ifCode)
         {
             NormalMchParamsMap.TryGetValue(ifCode, out NormalMchParams normalMchParams);
             return normalMchParams;
@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// <typeparam name="T"></typeparam>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        public T GetNormalMchParamsByIfCode<T>(String ifCode) where T : NormalMchParams
+        public T GetNormalMchParamsByIfCode<T>(string ifCode) where T : NormalMchParams
         {
             NormalMchParamsMap.TryGetValue(ifCode, out NormalMchParams normalMchParams);
             return (T)normalMchParams;
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// </summary>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        public IsvSubMchParams GetIsvSubMchParamsByIfCode(String ifCode)
+        public IsvSubMchParams GetIsvSubMchParamsByIfCode(string ifCode)
         {
             IsvSubMchParamsMap.TryGetValue(ifCode, out IsvSubMchParams isvSubMchParams);
             return isvSubMchParams;
@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// <typeparam name="T"></typeparam>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        public T GetIsvsubMchParamsByIfCode<T>(String ifCode) where T : IsvSubMchParams
+        public T GetIsvsubMchParamsByIfCode<T>(string ifCode) where T : IsvSubMchParams
         {
             IsvSubMchParamsMap.TryGetValue(ifCode, out IsvSubMchParams isvSubMchParams);
             return (T)isvSubMchParams;

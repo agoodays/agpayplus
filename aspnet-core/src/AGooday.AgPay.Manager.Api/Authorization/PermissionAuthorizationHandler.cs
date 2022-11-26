@@ -37,7 +37,8 @@ namespace AGooday.AgPay.Manager.Api.Authorization
                     string currentUserJson = _redis.StringGet(cacheKey);
                     if (string.IsNullOrWhiteSpace(currentUserJson))
                     {
-                        throw new BizException("登录失效");
+                        throw new UnauthorizeException();
+                        //throw new BizException("登录失效");
                     }
                     var currentUser = JsonConvert.DeserializeObject<CurrentUser>(currentUserJson);
                     var userIdClaim = context.User.FindFirst(_ => _.Type == ClaimTypes.NameIdentifier).Value;

@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Extensions.AuthContext;
 using AGooday.AgPay.Manager.Api.Models;
@@ -37,12 +38,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         {
             if (AuthContextService.CurrentUser.CacheKey == null)
             {
-                return null;
+                throw new UnauthorizeException();
+                //throw new BizException("登录失效");
             }
             string currentUser = redis.StringGet(AuthContextService.CurrentUser.CacheKey);
             if (currentUser == null)
             {
-                return null;
+                throw new UnauthorizeException();
+                //throw new BizException("登录失效");
             }
             return JsonConvert.DeserializeObject<CurrentUser>(currentUser);
         }

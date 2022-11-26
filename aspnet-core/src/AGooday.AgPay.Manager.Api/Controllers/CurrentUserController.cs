@@ -54,10 +54,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             {
                 //当前用户信息
                 var currentUser = GetCurrentUser();
-                if (currentUser == null)
-                {
-                    return ApiRes.CustomFail("登录失效");
-                }
 
                 //1. 当前用户所有权限ID集合
                 var entIds = currentUser.Authorities.ToList();
@@ -80,7 +76,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             }
             catch (Exception)
             {
-                return ApiRes.CustomFail("登录失效");
+                throw new UnauthorizeException();
+                //throw new BizException("登录失效");
+                //return ApiRes.CustomFail("登录失效");
             }
         }
 
