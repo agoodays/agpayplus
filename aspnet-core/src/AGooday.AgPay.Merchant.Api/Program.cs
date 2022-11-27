@@ -11,6 +11,7 @@ using AGooday.AgPay.Merchant.Api.Logs;
 using AGooday.AgPay.Merchant.Api.Middlewares;
 using AGooday.AgPay.Merchant.Api.Models;
 using AGooday.AgPay.Merchant.Api.MQ;
+using AGooday.AgPay.Merchant.Api.WebSockets;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -147,7 +148,16 @@ services.AddScoped<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
 services.AddHostedService<RabbitListener>();
 #endregion
 
+//加入 WebSocket 处理服务
+builder.Services.AddSingleton<WsPayOrderServer>();
+
 var app = builder.Build();
+
+//加入 WebSocket 功能
+app.UseWebSockets(new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(30)
+});
 
 // Configure the HTTP request pipeline.
 app.UseCalculateExecutionTime();

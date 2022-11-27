@@ -103,8 +103,8 @@ export default {
           setTimeout(() => { succModal.destroy() }, 2000)
         } else {
           that.handleClose()
-          that.$infoBox.modalError('支付失败', <div><div>错误码：{ apiRes.errCode}</div>
-          <div>错误信息：{ apiRes.errMsg}</div></div>)
+          that.$infoBox.modalError('支付失败', <div><div>错误码：{ resMsgObject.errCode}</div>
+          <div>错误信息：{ resMsgObject.errMsg}</div></div>)
         }
       }
     },

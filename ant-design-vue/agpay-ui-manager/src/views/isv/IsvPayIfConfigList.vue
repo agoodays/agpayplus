@@ -192,7 +192,9 @@ export default {
     },
     // 刷新card列表
     refCardList () {
-      this.$refs.infoCard.refCardList()
+      if (this.$refs.infoCard) {
+        this.$refs.infoCard.refCardList()
+      }
     },
     // 支付参数配置
     editPayIfConfigFunc (record) {
