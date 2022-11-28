@@ -149,6 +149,7 @@ services.AddHostedService<RabbitListener>();
 #endregion
 
 //加入 WebSocket 处理服务
+builder.Services.AddSingleton<WsChannelUserIdServer>();
 builder.Services.AddSingleton<WsPayOrderServer>();
 
 var app = builder.Build();

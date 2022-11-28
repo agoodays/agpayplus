@@ -14,6 +14,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.WebSockets
             _wsPayOrderServer = webSocketHandler;
         }
 
+        /// <summary>
+        /// /ws/payOrder/{訂單ID}/{客戶端自定義ID}
+        /// </summary>
+        /// <param name="payOrderId">訂單ID</param>
+        /// <param name="cid">客戶端自定義ID</param>
+        /// <returns></returns>
         [HttpGet, Route("api/anon/ws/payOrder/{payOrderId}/{cid}")]
         public async Task Get(string payOrderId, string cid)
         {
