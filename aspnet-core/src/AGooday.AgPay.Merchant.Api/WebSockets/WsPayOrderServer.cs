@@ -20,8 +20,7 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
 
         // payOrderId 与 WsPayOrderServer 存储关系, ConcurrentHashMap保证线程安全
         //REF: https://radu-matei.com/blog/aspnet-core-websockets-middleware/
-        ConcurrentDictionary<int, WebSocket> WebSockets = new ConcurrentDictionary<int, WebSocket>();
-        ConcurrentDictionary<string, WsPayOrderServer> wsOrderIdMap = new ConcurrentDictionary<string, WsPayOrderServer>();
+        ConcurrentDictionary<string, ISet<WsPayOrderServer>> wsOrderIdMap = new ConcurrentDictionary<string, ISet<WsPayOrderServer>>();
 
         //与某个客户端的连接会话，需要通过它来给客户端发送数据
         private WebSocket ClientSession;
@@ -41,28 +40,21 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
                 this.PayOrderId = payOrderId;
                 this.ClientSession = webSocket;
 
-                await Handle();
+                var isExist = wsOrderIdMap.TryGetValue(this.PayOrderId, out ISet<WsPayOrderServer> wsServerSet);
+                if (!isExist)
+                {
+                    wsServerSet = new HashSet<WsPayOrderServer>();
+                }
+                wsServerSet.Add(this);
+                wsOrderIdMap.TryAdd(this.PayOrderId, wsServerSet);
 
-                logger.LogInformation($"cid[{cid}],payOrderId[{payOrderId}]连接开启监听！当前在线人数为{OnlineClientSize}");
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"ws监听异常cid[{cid}],payOrderId[{payOrderId}]");
-            }
-        }
-
-        private async Task Handle()
-        {
-            var isExist = wsOrderIdMap.TryAdd(this.PayOrderId,this);
-            if (!isExist)
-            {
                 AddOnlineCount(); //在线数加1
 
                 WebSocketReceiveResult result = null;
                 do
                 {
                     var buffer = new byte[1024 * 1];
-                    result = await this.ClientSession.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                     if (result.MessageType == WebSocketMessageType.Text && !result.CloseStatus.HasValue)
                     {
                         var msgString = Encoding.UTF8.GetString(buffer);
@@ -70,14 +62,22 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
                     }
                     else
                     {
-                        var isSuccess = wsOrderIdMap.TryRemove(this.PayOrderId, out WsPayOrderServer _);
-                        if (!isSuccess)
+                        wsServerSet.Remove(this);
+                        if (!wsServerSet.Any())
                         {
-                            SubOnlineCount();
+                            wsOrderIdMap.TryRemove(this.PayOrderId, out ISet<WsPayOrderServer> wsSet);
                         }
+                        this.SubOnlineCount();
+                        logger.LogInformation($"Websocket客户端cid[{this.Cid}],payOrderId[{this.PayOrderId}],{this.GetOnlineClientSize()}");
                     }
                 }
                 while (!result.CloseStatus.HasValue);
+
+                logger.LogInformation($"cid[{cid}],payOrderId[{payOrderId}]连接开启监听！当前在线人数为{OnlineClientSize}");
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"ws监听异常cid[{cid}],payOrderId[{payOrderId}]");
             }
         }
 
@@ -106,20 +106,23 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
             {
                 logger.LogInformation($"推送ws消息到浏览器, payOrderId={payOrderId}，msg={msg}");
 
-                wsOrderIdMap.TryGetValue(payOrderId, out WsPayOrderServer wsSet);
-                if (wsSet == null)
+                var isExist = wsOrderIdMap.TryGetValue(payOrderId, out ISet<WsPayOrderServer> wsSet);
+                if (!isExist)
                 {
                     logger.LogInformation($"payOrderId[{payOrderId}] 无ws监听客户端");
                     return;
                 }
 
-                try
+                foreach (var item in wsSet)
                 {
-                    await wsSet.SendMessage(msg);
-                }
-                catch (Exception e)
-                {
-                    logger.LogInformation(e, $"推送设备消息时异常，payOrderId={payOrderId}, cid={wsSet.Cid}");
+                    try
+                    {
+                        await item.SendMessage(msg);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogInformation(e, $"推送设备消息时异常，payOrderId={payOrderId}, cid={item.Cid}");
+                    }
                 }
             }
             catch (Exception e)
