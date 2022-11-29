@@ -5,6 +5,9 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 {
+    /// <summary>
+    /// 微信查单接口
+    /// </summary>
     public class WxPayPayOrderQueryService : IPayOrderQueryService
     {
         public string GetIfCode()

@@ -12,9 +12,12 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {
-    public class AlipayChannelNoticeService : AbstractChannelNoticeService
+    /// <summary>
+    /// 支付宝 回调接口实现类
+    /// </summary>
+    public class AliPayChannelNoticeService : AbstractChannelNoticeService
     {
-        public AlipayChannelNoticeService(ILogger<AlipayChannelNoticeService> logger,
+        public AliPayChannelNoticeService(ILogger<AliPayChannelNoticeService> logger,
             ConfigContextQueryService configContextQueryService)
             : base(logger, configContextQueryService)
         {
@@ -36,7 +39,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             catch (Exception e)
             {
                 log.LogError(e, "error");
-                throw;
+                throw ResponseException.BuildText("ERROR");
             }
         }
 
@@ -84,7 +87,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 //验签失败
                 if (!verifyResult)
                 {
-                    throw new ResponseException("ERROR");
+                    throw ResponseException.BuildText("ERROR");
                 }
 
                 //验签成功后判断上游订单状态
@@ -111,7 +114,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             catch (Exception e)
             {
                 log.LogError(e, "error");
-                throw new ResponseException("ERROR");
+                throw ResponseException.BuildText("ERROR");
             }
         }
     }

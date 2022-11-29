@@ -9,6 +9,9 @@ using SKIT.FlurlHttpClient.Wechat.Api.Models;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 {
+    /// <summary>
+    /// 微信支付 获取微信openID实现类
+    /// </summary>
     public class WxPayChannelUserService : IChannelUserService
     {
         private readonly ILogger<WxPayChannelUserService> log;

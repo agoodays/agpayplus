@@ -3,7 +3,6 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.YsfPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
@@ -16,9 +15,12 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 {
+    /// <summary>
+    /// 云闪付下单
+    /// </summary>
     public class YsfPayPaymentService : AbstractPaymentService
     {
-        private static ILog logger = LogManager.GetLogger(typeof(YsfPayPaymentService));
+        private readonly ILog log = LogManager.GetLogger(typeof(YsfPayPaymentService));
 
         public YsfPayPaymentService(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
@@ -56,13 +58,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext) {
-
+        public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        {
             YsfPayIsvParams isvParams = (YsfPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
-            
+
             if (isvParams.SerProvId == null)
             {
-                LogUtil<YsfPayPaymentService>.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                log.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -76,9 +78,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
             reqParams.Add("signature", YsfSignUtil.SignBy256(reqParams, isvPrivateCertFile, isvPrivateCertPwd)); //RSA 签名串
 
             // 调起上游接口
-            logger.Info($"{logPrefix} reqJSON={reqParams}");
+            log.Info($"{logPrefix} reqJSON={reqParams}");
             string resText = YsfHttpUtil.DoPostJson(GetYsfpayHost4env(isvParams) + apiUri, null, reqParams);
-            logger.Info($"{logPrefix} resJSON={resText}");
+            log.Info($"{logPrefix} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

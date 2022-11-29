@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// <summary>
         /// 缓存支付宝client 对象
         /// </summary>
-        public AlipayClientWrapper AlipayClientWrapper { get; set; }
+        public AliPayClientWrapper AlipayClientWrapper { get; set; }
 
         /// <summary>
         /// 缓存 wxServiceWrapper 对象

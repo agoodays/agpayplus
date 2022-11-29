@@ -123,7 +123,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             return IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
         }
 
-        public AlipayClientWrapper GetAlipayClientWrapper(MchAppConfigContext mchAppConfigContext)
+        public AliPayClientWrapper GetAlipayClientWrapper(MchAppConfigContext mchAppConfigContext)
         {
             if (IsCache())
             {
@@ -133,12 +133,12 @@ namespace AGooday.AgPay.Payment.Api.Services
             if (mchAppConfigContext.IsIsvSubMch())
             {
                 AliPayIsvParams alipayParams = (AliPayIsvParams)QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.ALIPAY);
-                return AlipayClientWrapper.BuildAlipayClientWrapper(alipayParams);
+                return AliPayClientWrapper.BuildAlipayClientWrapper(alipayParams);
             }
             else
             {
                 AliPayNormalMchParams alipayParams = (AliPayNormalMchParams)QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.ALIPAY);
-                return AlipayClientWrapper.BuildAlipayClientWrapper(alipayParams);
+                return AliPayClientWrapper.BuildAlipayClientWrapper(alipayParams);
             }
         }
 

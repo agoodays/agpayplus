@@ -256,6 +256,29 @@ services.AddSingleton(provider =>
     return funcFactory;
 });
 #endregion
+#region ChannelNoticeService
+services.AddSingleton<AliPayChannelNoticeService>();
+services.AddSingleton<WxPayChannelNoticeService>();
+services.AddSingleton<YsfPayChannelNoticeService>();
+services.AddSingleton(provider =>
+{
+    Func<string, IChannelNoticeService> funcFactory = ifCode =>
+    {
+        switch (ifCode)
+        {
+            case CS.IF_CODE.ALIPAY:
+                return provider.GetService<AliPayChannelNoticeService>();
+            case CS.IF_CODE.WXPAY:
+                return provider.GetService<WxPayChannelNoticeService>();
+            case CS.IF_CODE.YSFPAY:
+                return provider.GetService<YsfPayChannelNoticeService>();
+            default:
+                return null;
+        }
+    };
+    return funcFactory;
+});
+#endregion
 #region QueryService
 services.AddSingleton<AliPayPayOrderQueryService>();
 services.AddSingleton<WxPayPayOrderQueryService>();

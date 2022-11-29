@@ -8,6 +8,9 @@ using AGooday.AgPay.Payment.Api.Services;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 {
+    /// <summary>
+    /// 退款接口： 微信官方
+    /// </summary>
     public class WxPayRefundService : AbstractRefundService
     {
         public WxPayRefundService(IServiceProvider serviceProvider,

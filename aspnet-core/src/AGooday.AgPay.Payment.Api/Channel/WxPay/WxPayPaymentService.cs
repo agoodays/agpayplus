@@ -10,6 +10,10 @@ using AGooday.AgPay.Payment.Api.Utils;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 {
+    /// <summary>
+    /// 支付接口： 微信官方
+    /// 支付方式： 自适应
+    /// </summary>
     public class WxPayPaymentService : AbstractPaymentService
     {
         public WxPayPaymentService(IServiceProvider serviceProvider,

@@ -5,22 +5,34 @@ namespace AGooday.AgPay.Common.Utils
 {
     public class TreeDataBuilder
     {
-        /** 所有数据集合 **/
+        /// <summary>
+        /// 所有数据集合
+        /// </summary>
         private JArray nodes { get; set; }
 
-        /** 默认数据中的主键key */
+        /// <summary>
+        /// 默认数据中的主键key
+        /// </summary>
         private string idName = "id";
 
-        /** 默认数据中的父级id的key */
+        /// <summary>
+        /// 默认数据中的父级id的key
+        /// </summary>
         private string pidName = "pid";
 
-        /** 默认数据中的子类对象key   */
+        /// <summary>
+        /// 默认数据中的子类对象key
+        /// </summary>
         private string childrenName = "children";
 
-        /** 排序字段， 默认按照ID排序 **/
+        /// <summary>
+        /// 排序字段， 默认按照ID排序
+        /// </summary>
         private string sortName = "id";
 
-        /** 默认按照升序排序 **/
+        /// <summary>
+        /// 默认按照升序排序
+        /// </summary>
         private bool isAscSort = true;
 
         public TreeDataBuilder(JArray nodes)
@@ -89,7 +101,10 @@ namespace AGooday.AgPay.Common.Utils
             return resultNodes;
         }
 
-        /** 递归查找并赋值子节点 **/
+        /// <summary>
+        /// 递归查找并赋值子节点
+        /// </summary>
+        /// <param name="node"></param>
         private void BuildChildNodes(JObject node)
         {
             List<JObject> children = GetChildNodes(node);
@@ -105,7 +120,11 @@ namespace AGooday.AgPay.Common.Utils
             }
         }
 
-        /** 查找当前节点的子节点 */
+        /// <summary>
+        /// 查找当前节点的子节点
+        /// </summary>
+        /// <param name="currentNode"></param>
+        /// <returns></returns>
         private List<JObject> GetChildNodes(JObject currentNode)
         {
             List<JObject> childNodes = new List<JObject>();
@@ -119,7 +138,11 @@ namespace AGooday.AgPay.Common.Utils
             return childNodes;
         }
 
-        /** 判断是否为根节点 */
+        /// <summary>
+        /// 判断是否为根节点
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         private bool IsRootNode(JObject node)
         {
             bool isRootNode = true;
@@ -134,7 +157,10 @@ namespace AGooday.AgPay.Common.Utils
             return isRootNode;
         }
 
-        /** 获取集合中所有的根节点 */
+        /// <summary>
+        /// 获取集合中所有的根节点
+        /// </summary>
+        /// <returns></returns>
         private List<JObject> GetRootNodes()
         {
             List<JObject> rootNodes = new List<JObject>();
@@ -148,7 +174,10 @@ namespace AGooday.AgPay.Common.Utils
             return rootNodes;
         }
 
-        /** 将list进行排序  */
+        /// <summary>
+        /// 将list进行排序
+        /// </summary>
+        /// <param name="list"></param>
         private void ListSort(List<JObject> list)
         {
             list.Sort((o1, o2) =>

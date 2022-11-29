@@ -101,7 +101,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                     receiver.State = CS.YES;
                     receiver.BindSuccessTime = DateTime.Now;
                     _mchDivisionReceiverService.Add(receiver);
-
                 }
                 else
                 {
@@ -114,7 +113,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 if (retMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
                     bizRes.BindState = CS.YES;
-
                 }
                 else
                 {
@@ -138,7 +136,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
         private MchDivisionReceiverDto GenRecord(DivisionReceiverBindRQ bizRQ, MchDivisionReceiverGroupDto group, MchInfoDto mchInfo, decimal divisionProfit)
         {
-
             MchDivisionReceiverDto receiver = new MchDivisionReceiverDto();
             receiver.ReceiverAlias = string.IsNullOrWhiteSpace(bizRQ.ReceiverAlias) ? bizRQ.AccNo : bizRQ.ReceiverAlias; //别名
             receiver.ReceiverGroupId = bizRQ.ReceiverGroupId; //分组ID
@@ -167,7 +164,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
         private string GetRelationTypeName(string relationType)
         {
-
             if ("PARTNER".Equals(relationType))
             {
                 return "合作伙伴";

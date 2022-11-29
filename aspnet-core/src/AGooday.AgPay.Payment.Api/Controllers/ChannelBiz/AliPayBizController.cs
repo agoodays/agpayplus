@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
                     MchAppDto mchApp = mchAppService.GetById(mchAppId);
 
                     MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(mchApp.MchNo, mchAppId);
-                    AlipayClientWrapper alipayClientWrapper = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext);
+                    AliPayClientWrapper alipayClientWrapper = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext);
 
                     AlipayOpenAuthTokenAppRequest request = new AlipayOpenAuthTokenAppRequest();
                     AlipayOpenAuthTokenAppModel model = new AlipayOpenAuthTokenAppModel();

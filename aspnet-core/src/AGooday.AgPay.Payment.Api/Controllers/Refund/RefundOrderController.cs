@@ -43,6 +43,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             _payMchNotifyService = payMchNotifyService;
         }
 
+        /// <summary>
+        /// 申请退款
+        /// </summary>
+        /// <returns></returns>
         [HttpPost, Route("api/refund/refundOrder")]
         public ApiRes RefundOrder()
         {

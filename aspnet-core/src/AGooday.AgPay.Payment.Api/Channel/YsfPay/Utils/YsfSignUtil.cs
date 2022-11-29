@@ -1,6 +1,10 @@
-﻿using log4net;
+﻿using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Utils;
+using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils
 {
@@ -12,16 +16,41 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils
         {
             try
             {
+                var certFilePath = ChannelCertConfigKit.GetCertFilePath(isvPrivateCertFile);
+                string privateKey = File.ReadAllText(certFilePath, Encoding.UTF8);
+
                 //0. 将请求参数 转换成key1=value1&key2=value2的形式
                 string stringSign = ConvertSignStringIncludeEmpty(jobjParams);
 
-                throw new NotImplementedException();
+                //1. 通过SHA256进行摘要并转16进制
+                //byte[] signDigest = Sha256X16(stringSign, "UTF-8");
+                return SHA256WithRSAUtil.CertSign(stringSign, certFilePath, isvPrivateCertPwd);
             }
             catch (Exception e)
             {
                 logger.Error("银联签名失败", e);
                 return null;
             }
+        }
+
+        public static bool Validate(JObject jsonParams, string ysfPayPublicKey)
+        {
+            //签名串
+            string signature = jsonParams.GetValue("signature").ToString();
+
+            // 将请求参数信息转换成key1=value1&key2=value2的形式
+            string stringData = ConvertSignStringIncludeEmpty(jsonParams);
+            try
+            {
+                //1. 通过SHA256进行摘要并转16进制
+                //byte[] signDigest = Sha256X16(stringData, "UTF-8");
+                return SHA256WithRSAUtil.VerifySign(signature, stringData, ysfPayPublicKey);
+            }
+            catch (Exception e)
+            {
+                logger.Error("验签失败！", e);
+            }
+            return false;
         }
 
         /// <summary>
@@ -38,6 +67,26 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils
                 .OrderBy(o => o.Key)
                 .Select(s => $"{s.Key}={s.Value}");
             return string.Join("&", keyvalues);
+        }
+
+        /// <summary>
+        /// 通过SHA256进行摘要并转16进制
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        private static byte[] Sha256X16(string data, string encoding)
+        {
+            byte[] clearBytes = Encoding.GetEncoding(encoding).GetBytes(data);
+            using (var sha256 = SHA256.Create())
+            {
+                sha256.ComputeHash(clearBytes);
+                byte[] hashedBytes = sha256.Hash;
+                string sha256Str = BitConverter.ToString(hashedBytes)//转为16进制字符串
+                                                                     //.Replace("-", "").ToLower() //64位
+                    ;
+                return Encoding.GetEncoding(encoding).GetBytes(sha256Str);
+            }
         }
     }
 }

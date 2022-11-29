@@ -7,6 +7,9 @@ using AGooday.AgPay.Payment.Api.RQRS.Transfer;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 {
+    /// <summary>
+    /// 转账接口： 微信官方
+    /// </summary>
     public class WxPayTransferService : ITransferService
     {
         public string GetIfCode()

@@ -1,14 +1,18 @@
 ﻿using AGooday.AgPay.Application.Params.AliPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Channel.YsfPay;
 using AGooday.AgPay.Payment.Api.Exceptions;
 using AGooday.AgPay.Payment.Api.Utils;
 using Aop.Api;
+using log4net;
 
 namespace AGooday.AgPay.Payment.Api.Models
 {
-    public class AlipayClientWrapper
+    public class AliPayClientWrapper
     {
+        private readonly ILog logger = LogManager.GetLogger(typeof(YsfPayRefundService));
+
         /// <summary>
         /// 默认为 不使用证书方式
         /// </summary>
@@ -46,17 +50,17 @@ namespace AGooday.AgPay.Payment.Api.Models
             // 调起接口前出现异常，如私钥问题。  调起后出现验签异常等。
             catch (AopException e)
             {
-                LogUtil<AlipayClientWrapper>.Error("调起支付宝Execute[AopException]异常！", e);
+                logger.Error("调起支付宝Execute[AopException]异常！", e);
                 //如果数据返回出现验签异常，则需要抛出： UNKNOWN 异常。
                 throw ChannelException.SysError(e.Message);
             }
             catch (Exception e)
             {
-                LogUtil<AlipayClientWrapper>.Error("调起支付宝Execute[Exception]异常！", e);
+                logger.Error("调起支付宝Execute[Exception]异常！", e);
                 throw ChannelException.SysError($"调用支付宝client服务异常：{e.Message}");
             }
         }
-        public AlipayClientWrapper(byte useCert, IAopClient alipayClient)
+        public AliPayClientWrapper(byte useCert, IAopClient alipayClient)
         {
             this.UseCert = useCert;
             this.AlipayClient = alipayClient;
@@ -75,7 +79,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// <param name="alipayPublicCert">支付宝公钥证书路径（.crt格式）</param>
         /// <param name="alipayRootCert">支付宝根证书路径</param>
         /// <returns></returns>
-        public static AlipayClientWrapper BuildAlipayClientWrapper(byte useCert, byte? sandbox, string appId, string privateKey,
+        public static AliPayClientWrapper BuildAlipayClientWrapper(byte useCert, byte? sandbox, string appId, string privateKey,
             string alipayPublicKey, string signType, string appCert,
             string alipayPublicCert, string alipayRootCert)
         {
@@ -114,17 +118,17 @@ namespace AGooday.AgPay.Payment.Api.Models
                     , appId, privateKey, AliPayConfig.FORMAT, "1.0", signType, alipayPublicKey, AliPayConfig.CHARSET,
                         false);
             }
-            return new AlipayClientWrapper(useCert, alipayClient);
+            return new AliPayClientWrapper(useCert, alipayClient);
         }
 
-        public static AlipayClientWrapper BuildAlipayClientWrapper(AliPayIsvParams alipayParams)
+        public static AliPayClientWrapper BuildAlipayClientWrapper(AliPayIsvParams alipayParams)
         {
             return BuildAlipayClientWrapper(alipayParams.UseCert, alipayParams.Sandbox, alipayParams.AppId, alipayParams.PrivateKey,
                 alipayParams.AlipayPublicKey, alipayParams.SignType, alipayParams.AppPublicCert,
                 alipayParams.AlipayPublicCert, alipayParams.AlipayRootCert);
         }
 
-        public static AlipayClientWrapper BuildAlipayClientWrapper(AliPayNormalMchParams alipayParams)
+        public static AliPayClientWrapper BuildAlipayClientWrapper(AliPayNormalMchParams alipayParams)
         {
             return BuildAlipayClientWrapper(alipayParams.UseCert, alipayParams.Sandbox, alipayParams.AppId, alipayParams.PrivateKey,
                 alipayParams.AlipayPublicKey, alipayParams.SignType, alipayParams.AppPublicCert,

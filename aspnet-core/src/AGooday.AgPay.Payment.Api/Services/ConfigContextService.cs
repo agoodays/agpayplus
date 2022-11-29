@@ -224,7 +224,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 AliPayNormalMchParams alipayParams = mchAppConfigContext.GetNormalMchParamsByIfCode<AliPayNormalMchParams>(CS.IF_CODE.ALIPAY);
                 if (alipayParams != null)
                 {
-                    mchAppConfigContext.AlipayClientWrapper = AlipayClientWrapper.BuildAlipayClientWrapper(alipayParams);
+                    mchAppConfigContext.AlipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(alipayParams);
                 }
 
                 //放置 wxJavaService
@@ -319,7 +319,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             AliPayIsvParams alipayParams = isvConfigContext.GetIsvParamsByIfCode<AliPayIsvParams>(CS.IF_CODE.ALIPAY);
             if (alipayParams != null)
             {
-                isvConfigContext.AlipayClientWrapper = AlipayClientWrapper.BuildAlipayClientWrapper(alipayParams);
+                isvConfigContext.AlipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(alipayParams);
             }
 
             //放置 wxJavaService

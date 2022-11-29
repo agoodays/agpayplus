@@ -20,19 +20,21 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     {
         private readonly ILogger<AbstractPayOrderController> log;
         private readonly IPayOrderService payOrderService;
-        protected readonly Func<string, IChannelNoticeService> _channelNoticeServiceFactory;
+        protected readonly Func<string, IChannelNoticeService> channelNoticeServiceFactory;
         private readonly ConfigContextQueryService configContextQueryService;
         private readonly PayMchNotifyService payMchNotifyService;
         private readonly PayOrderProcessService payOrderProcessService;
 
         public ChannelNoticeController(ILogger<AbstractPayOrderController> logger,
             IPayOrderService payOrderService,
+            Func<string, IChannelNoticeService> channelNoticeServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayMchNotifyService payMchNotifyService,
             PayOrderProcessService payOrderProcessService)
         {
             this.log = logger;
             this.payOrderService = payOrderService;
+            this.channelNoticeServiceFactory = channelNoticeServiceFactory;
             this.configContextQueryService = configContextQueryService;
             this.payMchNotifyService = payMchNotifyService;
             this.payOrderProcessService = payOrderProcessService;
@@ -58,7 +60,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     return this.ToReturnPage("ifCode is empty");
                 }
                 //查询支付接口是否存在
-                IChannelNoticeService payNotifyService = _channelNoticeServiceFactory(ifCode);
+                IChannelNoticeService payNotifyService = channelNoticeServiceFactory(ifCode);
 
                 // 支付通道接口实现不存在
                 if (payNotifyService == null)
@@ -138,7 +140,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 log.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, BizException");
                 return this.ToReturnPage(e.Message);
             }
-            catch (WebException e)
+            catch (ResponseException e)
             {
                 log.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, ResponseException");
                 return this.ToReturnPage(e.Message);
@@ -171,7 +173,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     return StatusCode((int)HttpStatusCode.BadRequest, "ifCode is empty");
                 }
                 //查询支付接口是否存在
-                IChannelNoticeService payNotifyService = _channelNoticeServiceFactory(ifCode);
+                IChannelNoticeService payNotifyService = channelNoticeServiceFactory(ifCode);
 
                 // 支付通道接口实现不存在
                 if (payNotifyService == null)
@@ -183,7 +185,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 解析订单号 和 请求参数
                 Dictionary<string, object> mutablePair = payNotifyService.ParseParams(Request, urlOrderId, IChannelNoticeService.NoticeTypeEnum.DO_RETURN);
                 if (mutablePair == null)
-                { // 解析数据失败， 响应已处理
+                {
+                    // 解析数据失败， 响应已处理
                     log.LogError($"{logPrefix}, mutablePair is null ", logPrefix);
                     throw new BizException("解析数据异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
@@ -205,8 +208,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 if (payOrder == null)
                 {
                     log.LogError($"{logPrefix}, 订单不存在. payOrderId={payOrderId} ");
-                    payNotifyService.DoNotifyOrderNotExists(Request);
-                    throw new BizException("订单不存在！");
+                    return payNotifyService.DoNotifyOrderNotExists(Request);
                 }
 
                 //查询出商户应用的配置信息
@@ -265,10 +267,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 log.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, BizException");
                 return BadRequest(e.Message);
             }
-            catch (WebException e)
+            catch (ResponseException e)
             {
                 log.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, ResponseException");
-                return BadRequest(e.Message);
+                return e.ResponseEntity;
             }
             catch (Exception e)
             {

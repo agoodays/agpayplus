@@ -241,6 +241,11 @@ namespace AGooday.AgPay.Common.Utils
         {
             return Json == null ? JObject.Parse("{}") : JObject.Parse(Json.Replace("&nbsp;", ""));
         }
+
+        public static string GetString(this JObject jobj, string propertyName)
+        {
+            return jobj.GetValue(propertyName).ToString();
+        }
         #endregion
         public static IDictionary<string, string> ToKeyValue(this object metaToken)
         {

@@ -8,6 +8,9 @@ using AGooday.AgPay.Payment.Api.Services;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 {
+    /// <summary>
+    /// 微信回调
+    /// </summary>
     public class WxPayChannelNoticeService : AbstractChannelNoticeService
     {
         private readonly IPayOrderService payOrderService;
@@ -62,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             catch (Exception e)
             {
                 logger.LogError(e, "error");
-                throw new ResponseException("ERROR");
+                throw ResponseException.BuildText("ERROR");
             }
         }
 
