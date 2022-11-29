@@ -24,6 +24,19 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         private readonly RefundOrderProcessService refundOrderProcessService;
         protected readonly Func<string, IChannelRefundNoticeService> channelRefundNoticeServiceFactory;
 
+        public ChannelRefundNoticeController(ILogger<AbstractPayOrderController> log, 
+            IRefundOrderService refundOrderService, 
+            ConfigContextQueryService configContextQueryService, 
+            RefundOrderProcessService refundOrderProcessService, 
+            Func<string, IChannelRefundNoticeService> channelRefundNoticeServiceFactory)
+        {
+            this.log = log;
+            this.refundOrderService = refundOrderService;
+            this.configContextQueryService = configContextQueryService;
+            this.refundOrderProcessService = refundOrderProcessService;
+            this.channelRefundNoticeServiceFactory = channelRefundNoticeServiceFactory;
+        }
+
         /// <summary>
         /// 异步回调入口
         /// </summary>
@@ -31,6 +44,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         /// <param name="refundOrderId"></param>
         /// <param name="urlOrderId"></param>
         /// <returns></returns>
+        [HttpPost]
         [Route("/api/refund/notify/{ifCode}")]
         [Route("/api/refund/notify/{ifCode}/{refundOrderId}")]
         public ActionResult DoNotify(string ifCode, string refundOrderId, string urlOrderId)

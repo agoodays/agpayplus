@@ -21,6 +21,7 @@ namespace AGooday.AgPay.Application.Interfaces
         bool UpdateNotifySent(string orderId);
         bool UpdateIng2Success(string payOrderId, string channelOrderId, string channelUserId);
         bool UpdateIng2Fail(string payOrderId, string channelOrderId, string channelUserId, string channelErrCode, string channelErrMsg);
+        int UpdateOrderExpired();
         long CalMchIncomeAmount(PayOrderDto payOrder);
         JObject MainPageWeekCount(string mchNo);
         JObject MainPageNumCount(string mchNo);

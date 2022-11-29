@@ -10,6 +10,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Data;
+using System.Linq;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -187,6 +188,18 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.ChannelUser = channelUserId;
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
+        }
+        public int UpdateOrderExpired()
+        {
+            var updateRecords = _payOrderRepository.GetAll().Where(
+                w => (new List<byte>() { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }).Contains(w.State)
+                && w.ExpiredTime < DateTime.Now);
+            foreach (var payOrder in updateRecords)
+            {
+                payOrder.State = (byte)PayOrderState.STATE_CLOSED;
+                _payOrderRepository.Update(payOrder);
+            }
+            return _payOrderRepository.SaveChanges();
         }
         public bool UpdateIng2SuccessOrFail(string payOrderId, byte updateState, string channelOrderNo, string channelUserId, string channelErrCode, string channelErrMsg)
         {

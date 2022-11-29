@@ -5,6 +5,7 @@ using AGooday.AgPay.Merchant.Api.Models;
 using AGooday.AgPay.Merchant.Api.WebSockets;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
@@ -46,7 +47,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             msg.Add("errMsg", payOrderNotify.ErrMsg);
 
             //推送到前端
-            await _wsPayOrderServer.SendMsgByOrderId(payOrderNotify.PayOrderId, msg.ToString());
+            await _wsPayOrderServer.SendMsgByOrderId(payOrderNotify.PayOrderId, msg.ToString(Formatting.None));
 
             return Content("SUCCESS");
         }
