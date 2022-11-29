@@ -368,14 +368,7 @@ PayWayUtil.ServiceProvider = serviceProvider;
 AliPayKit.ServiceProvider = serviceProvider;
 QuartzUtil.ServiceProvider = serviceProvider;
 
-var trigger = TriggerBuilder.Create()
-    .WithDescription("订单过期定时任务")
-    .WithIdentity("payment.api.payorder.trigger")
-    .WithSchedule(CronScheduleBuilder.CronSchedule("0 0/1 * * * ?").WithMisfireHandlingInstructionDoNothing())// 每分钟执行一次
-    //.WithSimpleSchedule(x => x.WithIntervalInSeconds(5).RepeatForever().WithMisfireHandlingInstructionIgnoreMisfires())
-    .Build();
-JobKey jobKey = new JobKey("payment.api", "payorder");
-await QuartzUtil.Add(typeof(PayOrderExpiredJob), jobKey, trigger);
+services.AddHostedService<QuartzHostedService>();
 
 var app = builder.Build();
 
