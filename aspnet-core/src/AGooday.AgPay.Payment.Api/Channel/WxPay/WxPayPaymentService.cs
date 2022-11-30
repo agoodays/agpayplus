@@ -40,11 +40,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             string apiVersion = wxServiceWrapper.Config.ApiVersion; 
             if (CS.PAY_IF_VERSION.WX_V2.Equals(apiVersion))
             {
-                return PayWayUtil.GetRealPaywayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+                return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
             }
             else if (CS.PAY_IF_VERSION.WX_V3.Equals(apiVersion))
             {
-                return PayWayUtil.GetRealPaywayV3Service(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+                return PayWayUtil.GetRealPayWayV3Service(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
             }
             else
             {
@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
         {
-            return PayWayUtil.GetRealPaywayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
     }
 }

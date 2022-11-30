@@ -1,26 +1,64 @@
-﻿using AGooday.AgPay.Payment.Api.Utils;
-using Quartz;
+﻿using Quartz;
+using Quartz.Spi;
 
 namespace AGooday.AgPay.Payment.Api.Jobs
 {
     public class QuartzHostedService : IHostedService
     {
-        public Task StartAsync(CancellationToken cancellationToken)
+        private readonly ISchedulerFactory _schedulerFactory;
+        private readonly IJobFactory _jobFactory;
+        private readonly IEnumerable<JobSchedule> _jobSchedules;
+
+        public QuartzHostedService(
+            ISchedulerFactory schedulerFactory,
+            IJobFactory jobFactory,
+            IEnumerable<JobSchedule> jobSchedules)
         {
-            var trigger = TriggerBuilder.Create()
-                .WithDescription("订单过期定时任务")
-                .WithIdentity("payment.api.payorder.trigger")
-                .WithSchedule(CronScheduleBuilder.CronSchedule("0 0/1 * * * ?").WithMisfireHandlingInstructionDoNothing())// 每分钟执行一次
-                                                                                                                          //.WithSimpleSchedule(x => x.WithIntervalInSeconds(5).RepeatForever().WithMisfireHandlingInstructionIgnoreMisfires())
-                .Build();
-            JobKey jobKey = new JobKey("payment.api", "payorder");
-            QuartzUtil.Add(typeof(PayOrderExpiredJob), jobKey, trigger).Wait();
-            return Task.CompletedTask;
+            _schedulerFactory = schedulerFactory;
+            _jobSchedules = jobSchedules;
+            _jobFactory = jobFactory;
+        }
+        public IScheduler Scheduler { get; set; }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            Scheduler = await _schedulerFactory.GetScheduler(cancellationToken);
+            Scheduler.JobFactory = _jobFactory;
+
+            foreach (var jobSchedule in _jobSchedules)
+            {
+                var job = CreateJob(jobSchedule);
+                var trigger = CreateTrigger(jobSchedule);
+
+                await Scheduler.ScheduleJob(job, trigger, cancellationToken);
+            }
+
+            await Scheduler.Start(cancellationToken);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            await Scheduler?.Shutdown(cancellationToken);
+        }
+
+        private static IJobDetail CreateJob(JobSchedule schedule)
+        {
+            var jobType = schedule.JobType;
+            return JobBuilder
+                .Create(jobType)
+                .WithIdentity(jobType.FullName)
+                .WithDescription(jobType.Name)
+                .Build();
+        }
+
+        private static ITrigger CreateTrigger(JobSchedule schedule)
+        {
+            return TriggerBuilder
+                .Create()
+                .WithIdentity($"{schedule.JobType.FullName.ToLower()}.trigger")
+                .WithCronSchedule(schedule.CronExpression)
+                .WithDescription(schedule.CronExpression)
+                .Build();
         }
     }
 }

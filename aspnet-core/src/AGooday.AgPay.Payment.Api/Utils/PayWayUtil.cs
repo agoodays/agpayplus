@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
         /// <param name="service"></param>
         /// <param name="wayCode"></param>
         /// <returns></returns>
-        public static IPaymentService GetRealPaywayService(IPaymentService service, string wayCode)
+        public static IPaymentService GetRealPayWayService(IPaymentService service, string wayCode)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
         /// <param name="service"></param>
         /// <param name="wayCode"></param>
         /// <returns></returns>
-        public static IPaymentService GetRealPaywayV3Service(IPaymentService service, string wayCode)
+        public static IPaymentService GetRealPayWayV3Service(IPaymentService service, string wayCode)
         {
             try
             {

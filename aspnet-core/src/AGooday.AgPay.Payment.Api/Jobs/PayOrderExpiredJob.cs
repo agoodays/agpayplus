@@ -7,12 +7,15 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     /// <summary>
     /// 订单过期定时任务
     /// </summary>
+    [DisallowConcurrentExecution]
     public class PayOrderExpiredJob : IJob
     {
+        private readonly ILogger<PayOrderExpiredJob> logger;
         private readonly IPayOrderService payOrderService;
 
-        public PayOrderExpiredJob(IPayOrderService payOrderService)
+        public PayOrderExpiredJob(ILogger<PayOrderExpiredJob> logger,IPayOrderService payOrderService)
         {
+            this.logger = logger;
             this.payOrderService = payOrderService;
         }
 
@@ -21,7 +24,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
             return Task.Run(() =>
             {
                 int updateCount = payOrderService.UpdateOrderExpired();
-                LogUtil<PayOrderExpiredJob>.Info($"处理订单超时{updateCount}条.");
+                logger.LogInformation($"处理订单超时{updateCount}条.");
             });
         }
     }

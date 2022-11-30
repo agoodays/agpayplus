@@ -21,10 +21,10 @@ using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Components.OSS.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using Quartz.Impl;
+using Quartz.Spi;
 using Quartz;
 
 #region PayWay
@@ -359,16 +359,23 @@ services.AddSingleton(provider =>
 
 services.AddSingleton<IQRCodeService, QRCodeService>();
 
-//任务调度 https://www.jianshu.com/p/d73c2bd2d442
-services.TryAddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+// https://andrewlock.net/creating-a-quartz-net-hosted-service-with-asp-net-core/
+// 添加Quartz服务
+services.AddSingleton<IJobFactory, SingletonJobFactory>();
+services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+
+// 添加任务
+services.AddSingleton<PayOrderExpiredJob>();
+services.AddSingleton(new JobSchedule(
+    jobType: typeof(PayOrderExpiredJob),
+    cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
+
+services.AddHostedService<QuartzHostedService>();
 
 var serviceProvider = services.BuildServiceProvider();
 ChannelCertConfigKit.ServiceProvider = serviceProvider;
 PayWayUtil.ServiceProvider = serviceProvider;
 AliPayKit.ServiceProvider = serviceProvider;
-QuartzUtil.ServiceProvider = serviceProvider;
-
-services.AddHostedService<QuartzHostedService>();
 
 var app = builder.Build();
 
