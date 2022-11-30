@@ -1,5 +1,4 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Common.Utils;
 using Quartz;
 
 namespace AGooday.AgPay.Payment.Api.Jobs

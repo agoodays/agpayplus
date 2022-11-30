@@ -164,6 +164,18 @@ namespace AGooday.AgPay.Application.Services
             return false;
 
         }
+        public int UpdateOrderExpired()
+        {
+            var updateRecords = _refundOrderRepository.GetAll().Where(
+                w => (new List<byte>() { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
+                && w.ExpiredTime < DateTime.Now);
+            foreach (var refundOrder in updateRecords)
+            {
+                refundOrder.State = (byte)PayOrderState.STATE_CLOSED;
+                _refundOrderRepository.Update(refundOrder);
+            }
+            return _refundOrderRepository.SaveChanges();
+        }
         public bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo)
         {
             return _refundOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchRefundNo);

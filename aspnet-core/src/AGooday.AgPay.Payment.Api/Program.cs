@@ -168,6 +168,33 @@ services.AddSingleton<ResetIsvMchAppInfoConfigMQ.IMQReceiver, ResetIsvMchAppInfo
 services.AddHostedService<RabbitListener>();
 #endregion
 
+#region Quartz
+// https://andrewlock.net/creating-a-quartz-net-hosted-service-with-asp-net-core/
+// 添加Quartz服务
+services.AddSingleton<IJobFactory, SingletonJobFactory>();
+services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+
+// 添加任务
+services.AddSingleton<PayOrderExpiredJob>();
+services.AddSingleton<PayOrderReissueJob>();
+services.AddSingleton<RefundOrderExpiredJob>();
+services.AddSingleton<RefundOrderReissueJob>();
+services.AddSingleton(new JobSchedule(
+    jobType: typeof(PayOrderExpiredJob),
+    cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
+services.AddSingleton(new JobSchedule(
+    jobType: typeof(PayOrderReissueJob),
+    cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
+services.AddSingleton(new JobSchedule(
+    jobType: typeof(RefundOrderExpiredJob),
+    cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
+services.AddSingleton(new JobSchedule(
+    jobType: typeof(RefundOrderReissueJob),
+    cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
+
+services.AddHostedService<QuartzHostedService>();
+#endregion
+
 #region OSS
 if (OssServiceTypeEnum.LOCAL.GetDescription().Equals(LocalOssConfig.Oss.ServiceType))
 {
@@ -358,19 +385,6 @@ services.AddSingleton(provider =>
 #endregion
 
 services.AddSingleton<IQRCodeService, QRCodeService>();
-
-// https://andrewlock.net/creating-a-quartz-net-hosted-service-with-asp-net-core/
-// 添加Quartz服务
-services.AddSingleton<IJobFactory, SingletonJobFactory>();
-services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
-
-// 添加任务
-services.AddSingleton<PayOrderExpiredJob>();
-services.AddSingleton(new JobSchedule(
-    jobType: typeof(PayOrderExpiredJob),
-    cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
-
-services.AddHostedService<QuartzHostedService>();
 
 var serviceProvider = services.BuildServiceProvider();
 ChannelCertConfigKit.ServiceProvider = serviceProvider;
