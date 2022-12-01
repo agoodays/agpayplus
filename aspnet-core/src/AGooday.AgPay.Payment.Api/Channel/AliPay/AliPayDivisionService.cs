@@ -75,12 +75,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (ChannelException e)
             {
-
                 ChannelRetMsg channelRetMsg = ChannelRetMsg.ConfirmFail();
                 channelRetMsg.ChannelErrCode = e.ChannelRetMsg.ChannelErrCode;
                 channelRetMsg.ChannelErrMsg = e.ChannelRetMsg.ChannelErrMsg;
                 return channelRetMsg;
-
             }
             catch (Exception e)
             {

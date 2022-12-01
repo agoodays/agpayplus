@@ -6,11 +6,13 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
+using Newtonsoft.Json.Linq;
 using SKIT.FlurlHttpClient.Wechat.TenpayV2;
 using SKIT.FlurlHttpClient.Wechat.TenpayV2.Events;
 using SKIT.FlurlHttpClient.Wechat.TenpayV3;
 using SKIT.FlurlHttpClient.Wechat.TenpayV3.Events;
 using System.Text.Json;
+using WechatTenpayClientV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClient;
 using WechatTenpayClientV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClient;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
@@ -67,8 +69,16 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     var signature = request.Headers["Wechatpay-Signature"].FirstOrDefault();
                     var serialNumber = request.Headers["Wechatpay-Serial"].FirstOrDefault();
                     string callbackJson = GetReqParamFromBody(request);
+
+                    JObject headerJSON = new JObject();
+                    headerJSON.Add("Wechatpay-Timestamp", timestamp);
+                    headerJSON.Add("Wechatpay-Nonce", nonce);
+                    headerJSON.Add("Wechatpay-Signature", signature);
+                    headerJSON.Add("Wechatpay-Serial", serialNumber);
+                    log.LogInformation($"\n【请求头信息】：{headerJSON}\n【加密数据】：{callbackJson}");
+
                     bool valid = client.VerifyEventSignature(
-                         callbackTimestamp: timestamp,
+                        callbackTimestamp: timestamp,
                         callbackNonce: nonce,
                         callbackBody: callbackJson,
                         callbackSignature: signature,
@@ -121,7 +131,129 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 
         public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, IChannelNoticeService.NoticeTypeEnum noticeTypeEnum)
         {
-            throw new NotImplementedException();
+            try
+            {
+                ChannelRetMsg channelResult = new ChannelRetMsg();
+                channelResult.ChannelState = ChannelState.WAITING; // 默认支付中
+
+                var wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+
+                // V2
+                if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion))
+                {
+                    // 获取回调参数
+                    //var result = (OrderEvent)@params;
+                    var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
+                    string callbackXml = GetReqParamFromBody(request);
+                    var result = client.JsonSerializer.Deserialize<OrderEvent>(callbackXml);
+                    // 验证参数
+                    bool valid = client.VerifyEventSignature(callbackXml, out Exception error);
+                    if (!valid)
+                    {
+                        log.LogError(error, "error");
+                        throw ResponseException.BuildText("ERROR");
+                    }
+                    // 核对金额
+                    long wxPayAmt = result.TotalFee; ;
+                    long dbPayAmt = payOrder.Amount;
+                    if (dbPayAmt != wxPayAmt)
+                    {
+                        throw ResponseException.BuildText("AMOUNT ERROR");
+                    }
+
+                    channelResult.ChannelOrderId = result.TransactionId; //渠道订单号
+                    channelResult.ChannelUserId = result.OpenId; //支付用户ID
+                    channelResult.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                    channelResult.ResponseEntity = TextResp(SuccessResp("OK"));
+                }
+                else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))
+                {
+                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    var timestamp = request.Headers["Wechatpay-Timestamp"].FirstOrDefault();
+                    var nonce = request.Headers["Wechatpay-Nonce"].FirstOrDefault();
+                    var signature = request.Headers["Wechatpay-Signature"].FirstOrDefault();
+                    var serialNumber = request.Headers["Wechatpay-Serial"].FirstOrDefault();
+                    string callbackJson = GetReqParamFromBody(request);
+                    // 验证参数
+                    bool valid = client.VerifyEventSignature(
+                        callbackTimestamp: timestamp,
+                        callbackNonce: nonce,
+                        callbackBody: callbackJson,
+                        callbackSignature: signature,
+                        callbackSerialNumber: serialNumber, out Exception error);
+                    if (!valid)
+                    {
+                        log.LogError(error, "error");
+                        throw ResponseException.BuildText("ERROR");
+                    }
+                    // 获取回调参数
+                    string channelState = string.Empty;
+                    string channelOrderId = string.Empty;
+                    if (mchAppConfigContext.IsIsvSubMch())
+                    {
+                        var result = (PartnerTransactionResource)@params;
+                        channelState = result.TradeState;
+                        channelResult.ChannelOrderId = result.TransactionId;//渠道订单号
+                        if (result.Payer != null)
+                        {
+                            channelResult.ChannelUserId = result.Payer.OpenId;//支付用户ID
+                        }
+                    }
+                    else
+                    {
+                        var result = (TransactionResource)@params;
+                        channelState = result.TradeState;
+                        channelResult.ChannelOrderId = result.TransactionId;//渠道订单号
+                        if (result.Payer != null)
+                        {
+                            channelResult.ChannelUserId = result.Payer.OpenId;//支付用户ID
+                        }
+                    }
+                    if ("SUCCESS".Equals(channelState))
+                    {
+                        channelResult.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                    }
+                    //CLOSED—已关闭， REVOKED—已撤销, PAYERROR--支付失败
+                    else if ("CLOSED".Equals(channelState)
+                        || "REVOKED".Equals(channelState)
+                        || "PAYERROR".Equals(channelState))
+                    {
+                        channelResult.ChannelState = ChannelState.CONFIRM_FAIL;//支付失败
+                    }
+
+                    JObject resJSON = new JObject();
+                    resJSON.Add("code", "SUCCESS");
+                    resJSON.Add("message", "成功");
+
+                    var okResponse = JsonResp(resJSON);
+                    channelResult.ResponseEntity = okResponse;
+                }
+                else
+                {
+                    throw ResponseException.BuildText("API_VERSION ERROR");
+                }
+                return channelResult;
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "error");
+                throw ResponseException.BuildText("ERROR");
+            }
+        }
+
+        private static string FailResp(string msg)
+        {
+            return GenerateXml("FAIL", msg);
+        }
+
+        private static string SuccessResp(string msg)
+        {
+            return GenerateXml("SUCCESS", msg);
+        }
+
+        private static string GenerateXml(string code, string msg)
+        {
+            return $"<xml><return_code><![CDATA[{code}]]></return_code><return_msg><![CDATA[{msg}]]></return_msg></xml>";
         }
     }
 }

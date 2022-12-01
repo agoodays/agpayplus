@@ -53,6 +53,7 @@ using YsfAliJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliJsapi;
 
 using YsfWxBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxBar;
 using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi;
+using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
 #endregion
 #endregion
 
@@ -390,6 +391,7 @@ var serviceProvider = services.BuildServiceProvider();
 ChannelCertConfigKit.ServiceProvider = serviceProvider;
 PayWayUtil.ServiceProvider = serviceProvider;
 AliPayKit.ServiceProvider = serviceProvider;
+WxPayKit.ServiceProvider = serviceProvider;
 
 var app = builder.Build();
 
