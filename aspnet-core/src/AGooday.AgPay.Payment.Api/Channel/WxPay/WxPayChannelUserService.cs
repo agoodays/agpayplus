@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             {
                 oauth2Url = DEFAULT_OAUTH_URL;
             }
-            string wxUserRedirectUrl = string.Format($"{oauth2Url}?appid=%s&scope=snsapi_base&state=&redirect_uri=%s&response_type=code#wechat_redirect", appId, callbackUrlEncode);
+            string wxUserRedirectUrl = $"{oauth2Url}?appid={appId}&scope=snsapi_base&state=&redirect_uri={callbackUrlEncode}&response_type=code#wechat_redirect";
             log.LogInformation($"wxUserRedirectUrl={wxUserRedirectUrl}");
             return wxUserRedirectUrl;
         }

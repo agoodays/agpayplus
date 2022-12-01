@@ -83,6 +83,25 @@ namespace AGooday.AgPay.Payment.Api.Channel
             return JObject.FromObject(body);
         }
 
+        protected string GetReqParamFromBody(HttpRequest request)
+        {
+            request.EnableBuffering();
+
+            string body = "";
+            var stream = request.Body;
+            if (stream != null)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                using (var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true))
+                {
+                    body = reader.ReadToEndAsync().Result;
+                }
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
+            return body;
+        }
+
         /// <summary>
         /// 获取文件路径
         /// </summary>
