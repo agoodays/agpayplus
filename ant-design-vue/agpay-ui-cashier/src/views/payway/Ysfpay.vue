@@ -13,8 +13,8 @@
       </div>
 
       <!-- 手写输入框 -->
-      <div  class="input-c">
-        <div  class="input-c-div-1">{{ amount }}</div>
+      <div class="input-c">
+        <div class="input-c-div-1">{{ amount }}</div>
       </div>
       <!-- 手写输入框的提示文字 -->
       <div v-show="!amount" class="placeholder">请输入金额</div>

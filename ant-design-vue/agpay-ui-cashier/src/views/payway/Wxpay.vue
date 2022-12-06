@@ -21,8 +21,8 @@
       </div> -->
 
       <!-- 手写输入框 -->
-      <div  class="input-c">
-        <div  class="input-c-div-1">{{ payOrderInfo.amount/100 }}</div>
+      <div class="input-c">
+        <div class="input-c-div-1">{{ amount }}</div>
         <!-- 数字金额后边的光标 -->
         <!-- <div class="input-c-div" style="background:#07c160"></div> -->
       </div>
@@ -44,22 +44,22 @@
       </li>
     </ul>
     <!-- 备注板块 ，目前不需要添加备注，隐藏-->
-    <!-- <div class="remark-k" :class="payType != 'wx' ? 'margin-top-30' : ''">
+    <div class="remark-k" :class="payType != 'wx' ? 'margin-top-30' : ''">
       <div class="remark">
         <div class="remark-hui" v-show="remark">{{ remark }}</div>
         <div @click="myDialogStateFn">{{ remark ? "修改" : "添加备注" }}</div>
       </div>
-    </div> -->
+    </div>
     <!-- dialog 对话框 目前不需要添加备注，隐藏-->
-    <!-- <MyDialog
+     <MyDialog
       v-show="myDialogState"
       @myDialogStateFn="myDialogStateFn"
       :remark="remark"
     >
-    </MyDialog> -->
+    </MyDialog>
 
     <!-- 键盘板块 目前不需要键盘 隐藏 -->
-    <!-- <div class="keyboard-plus" v-if="isAllowModifyAmount">
+    <div class="keyboard-plus" v-if="isAllowModifyAmount">
       <Keyboard
         @delTheAmount="delTheAmount"
         @conceal="conceal"
@@ -69,47 +69,98 @@
         :concealSate="concealSate"
         :typeColor="typeColor[payType]"
       ></Keyboard>
-    </div> -->
+    </div>
 
     <!-- agpay中，付款的点击事件 由 payment 修改为 pay  -->
     <!-- agpay中，付款页面是唯一的，颜色不在需要v-bind，去掉即可 -->
-    <!-- <div class="bnt-pay" v-if="!isAllowModifyAmount"> -->
-    <div class="bnt-pay">
-      <div
-        class="bnt-pay-text"
-        style="background-color:#07c160"
-        @click="pay"
-      >
-        付款
+    <div class="bnt-pay" v-if="!isAllowModifyAmount">
+      <div class="bnt-pay">
+        <div
+          class="bnt-pay-text"
+          style="background-color:#07c160"
+          @click="pay"
+        >
+          付款
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-// import MyDialog from "./../dialog/dialog";  // 添加备注弹出的对话框
-// import Keyboard from "./../keyboard/keyboard";  // 手写键盘
+import MyDialog from "./../dialog/dialog";  // 添加备注弹出的对话框
+import Keyboard from "./../keyboard/keyboard";  // 手写键盘
 import {getPayPackage, getPayOrderInfo }from '@/api/api'
 import config from "@/config";
 export default {
   // 注册备注对话框，和 手写键盘组件，由于这里是直接掉起支付事件，所以目前不应用
-  // components: { MyDialog, Keyboard },
-  data: function (){
+  components: { MyDialog, Keyboard },
+  data: function () {
     return {
       merchantName: 'agpay',  // 付款的商户默认
       avatar: require("../../assets/icon/wx.svg"), // 商户头像默认
-      amount: 1,  // 支付金额默认
-      resData : {},
+      amount: "",  // 支付金额默认
+      resData: {},
       wxImg: require("../../assets/icon/wx.svg"), // 微信支付图片
       payOrderInfo: {}, //订单信息
+      isAllowModifyAmount: true,
+      myDialogState: false,
+      remark: "",
+      money: -1,
+      concealSate: true,
+      payType: "wxpay",
+      typeColor: {
+        alipay: "#1678ff",
+        wxpay: "#07c160",
+        ysfpay: "#ff534d"
+      },
     }
   },
 
   mounted() {
-    this.setPayOrderInfo(true); //获取订单信息 & 调起支付插件
+    //this.setPayOrderInfo(true); //获取订单信息 & 调起支付插件
   },
 
   methods: {
+    payment() {
+      if (this.money == -1)
+        return;
+      console.log('payment');
+    },
+    conceal() {
+      this.concealSate = !this.concealSate
+    },
+    enterTheAmount(item) {
+      if (this.amount.length >= 12
+          || (item === "." && this.amount.includes("."))
+          || (this.amount.includes(".") && this.amount.split(".").pop().length >= 2)
+      ) {
+        return;
+      }
+      this.amount = `${this.amount}${item}`;
+      if (this.amount === ".") {
+        this.amount = "0.";
+      }
+      if (!Number.isNaN(this.amount)) {
+        this.payOrderInfo.amount = this.amount * 100;
+      } else {
+        this.payOrderInfo.amount = 0;
+      }
+      this.money = this.payOrderInfo.amount > 0 ? this.payOrderInfo.amount : -1;
+    },
+    delTheAmount() {
+      this.amount = this.amount.substring(0, this.amount.length - 1)
+      if (!Number.isNaN(this.amount)) {
+        this.payOrderInfo.amount = this.amount * 100;
+      } else {
+        this.payOrderInfo.amount = 0;
+      }
+      this.money = this.payOrderInfo.amount > 0 ? this.payOrderInfo.amount : -1;
+    },
+    myDialogStateFn: function (remark) {
+      this.remark = remark;
+      this.myDialogState = !this.myDialogState;
+    },
 
     setPayOrderInfo(isAutoPay){
       const that = this

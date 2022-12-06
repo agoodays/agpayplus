@@ -44,7 +44,7 @@
           <template class="" v-if="it == 'del'">
             <!-- <div class="jiao"></div>
             <div class="juxing"></div> -->
-            <img src="../../assets/icon/del.png" alt="" />
+            <img src="../../assets/icon/del.svg" alt="" />
           </template>
         </div>
       </div>
@@ -105,6 +105,7 @@ export default {
       default: "#07c160",
     },
     money: {
+      // eslint-disable-next-line vue/require-prop-type-constructor
       type: String | Number,
       default: -1,
     },
@@ -113,6 +114,7 @@ export default {
       default: true,
     },
   },
+  //emits: ["payment","conceal","delTheAmount","enterTheAmount"],
   mounted() {
     this.concealSateC = this.concealSate;
   },
@@ -126,9 +128,9 @@ export default {
       this.$emit("conceal");
     },
     onKeyboard(item, $event) {
-      /* setTimeout(() => {
+      setTimeout(() => {
         $event.style.background = "#fafafa";
-      }, 100); */
+      }, 100);
       // animation: heartBeat 0.2s;
       if (item == "del") {
         this.$emit("delTheAmount", item);
@@ -306,8 +308,8 @@ img {
   letter-spacing: 2px;
 }
 .number img {
-  height: 37px;
-  width: 51px;
+  height: 67px;
+  width: 81px;
 }
 /* .number:active {
 

@@ -135,7 +135,7 @@ body {
 }
 .input-c-div-1 {
   flex-shrink: 0;
-  width: 36px;
+  /*width: 36px;*/
   padding-left: 2px;
   text-align: center;
   /* width: auto; */
