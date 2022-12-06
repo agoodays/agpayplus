@@ -135,7 +135,7 @@ body {
 }
 .input-c-div-1 {
   flex-shrink: 0;
-  width: 36px;
+  /*width: 36px;*/
   padding-left: 2px;
   text-align: center;
   /* width: auto; */
@@ -150,6 +150,17 @@ body {
   /* background: #07c160; */
   animation: blink 1s linear infinite;
   border: 1px solid #07c160;
+}
+.input-c-div-del {
+    flex-shrink: 0;
+    /*width: 36px;*/
+    padding-left: 2px;
+    text-align: center;
+    /* width: auto; */
+}
+.input-c-div-del img{
+  width: 35px;
+  height: 35px;
 }
 
 .placeholder {

@@ -14,52 +14,52 @@
       <div class="keyboard-tite">@小新支付</div>
       <div class="triangle-topleft-k" @click="concealSateFn">
         <div
-          class="triangle-topleft"
-          :style="
+            class="triangle-topleft"
+            :style="
             concealSate ? '' : 'transform:rotate(-135deg);margin-top: 12px;'
           "
         ></div>
       </div>
     </div>
     <div
-      class="keyboard-main"
-      v-show="concealSate"
-      style="transition: all 1s ease"
+        class="keyboard-main"
+        v-show="concealSate"
+        style="transition: all 1s ease"
     >
       <div
-        v-for="(item, index) in numberList"
-        :key="index"
-        class="keyborad-key"
+          v-for="(item, index) in numberList"
+          :key="index"
+          class="keyborad-key"
       >
         <!--   @click="onKeyboard(it, $event)" -->
         <div
-          ref="number"
-          class="number"
-          v-for="(it, ind) in item"
-          :key="ind"
-          @touchstart.prevent="goTouchstart(it, $event)"
-          @touchend.prevent="goTouchend(it, $event)"
+            ref="number"
+            class="number"
+            v-for="(it, ind) in item"
+            :key="ind"
+            @touchstart.prevent="goTouchstart(it, $event)"
+            @touchend.prevent="goTouchend(it, $event)"
         >
           {{ it != "del" ? it : "" }}
           <template class="" v-if="it == 'del'">
             <!-- <div class="jiao"></div>
             <div class="juxing"></div> -->
-            <img src="../../assets/icon/del.png" alt="" />
+            <img src="../../assets/icon/del.svg" alt="" />
           </template>
         </div>
       </div>
       <div class="keyborad-key">
         <div
-          class="number"
-          @touchstart.prevent="goTouchstart('dot', $event)"
-          @touchend.prevent="goTouchend('dot', $event)"
+            class="number"
+            @touchstart.prevent="goTouchstart('dot', $event)"
+            @touchend.prevent="goTouchend('dot', $event)"
         >
           <div class="dot"></div>
         </div>
         <div
-          class="number zero"
-          @touchstart.prevent="goTouchstart('zero', $event)"
-          @touchend.prevent="goTouchend('zero', $event)"
+            class="number zero"
+            @touchstart.prevent="goTouchstart('zero', $event)"
+            @touchend.prevent="goTouchend('zero', $event)"
         >
           0
         </div>
@@ -67,9 +67,9 @@
     </div>
 
     <div
-      :class="paymentClassFn"
-      :style="'background:' + typeColor + ';'"
-      @click="payment"
+        :class="paymentClassFn"
+        :style="'background:' + typeColor + ';'"
+        @click="payment"
     >
       <div>付款</div>
     </div>
@@ -105,6 +105,7 @@ export default {
       default: "#07c160",
     },
     money: {
+      // eslint-disable-next-line vue/require-prop-type-constructor
       type: String | Number,
       default: -1,
     },
@@ -113,6 +114,7 @@ export default {
       default: true,
     },
   },
+  //emits: ["payment","conceal","delTheAmount","enterTheAmount"],
   mounted() {
     this.concealSateC = this.concealSate;
   },
@@ -126,9 +128,9 @@ export default {
       this.$emit("conceal");
     },
     onKeyboard(item, $event) {
-      /* setTimeout(() => {
+      setTimeout(() => {
         $event.style.background = "#fafafa";
-      }, 100); */
+      }, 100);
       // animation: heartBeat 0.2s;
       if (item == "del") {
         this.$emit("delTheAmount", item);
@@ -146,8 +148,8 @@ export default {
 
     goTouchstart(it, $event) {
       if (
-        $event.srcElement.localName == "img" ||
-        $event.srcElement.className == "dot"
+          $event.srcElement.localName == "img" ||
+          $event.srcElement.className == "dot"
       ) {
         $event = $event.target.parentNode;
       } else {
@@ -170,8 +172,8 @@ export default {
     goTouchend(it, $event) {
       console.log("goTouchend");
       if (
-        $event.srcElement.localName == "img" ||
-        $event.srcElement.className == "dot"
+          $event.srcElement.localName == "img" ||
+          $event.srcElement.className == "dot"
       ) {
         $event = $event.target.parentNode;
       } else {
@@ -306,8 +308,8 @@ img {
   letter-spacing: 2px;
 }
 .number img {
-  height: 37px;
-  width: 51px;
+  height: 67px;
+  width: 81px;
 }
 /* .number:active {
 
