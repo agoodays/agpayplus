@@ -12,14 +12,15 @@
         <div class="plus-input">
           <!-- ￥字符 货币的符号-->
           <div class="S">
-            <img src="../../assets/icon/S.svg" alt="" />
+            <span :style="'color:' + typeColor[payType] + ';'">￥</span>
+<!--            <img src="../../assets/icon/S.svg" alt="" />-->
           </div>
 
           <!-- 手写输入框 -->
           <div class="input-c" :style="'color:' + typeColor[payType] + ';'">
-            <div class="input-c-div-1">{{ amount.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,') }}</div>
+            <div class="input-c-div-1">{{ formatMoney(amount) }}</div>
             <!-- 数字金额后边的光标 -->
-            <div class="input-c-div" :style="'border-color:' + typeColor[payType] + ';'"></div>
+            <div class="input-c-div" :style="'background:' + typeColor[payType] + ';border-color:' + typeColor[payType] + ';'"></div>
           </div>
           <!-- 手写输入框的提示文字 -->
           <div v-show="!amount" class="placeholder">请输入金额</div>
@@ -131,7 +132,7 @@ export default {
       this.concealSate = !this.concealSate
     },
     enterTheAmount(item) {
-      if (this.amount.length >= 9999999
+      if (this.amount >= 9999999
           || (item === "." && this.amount.includes("."))
           || (this.amount.includes(".") && this.amount.split(".").pop().length >= 2)
       ) {
@@ -161,6 +162,12 @@ export default {
       this.amount = "";
       this.payOrderInfo.amount = 0;
       this.money = -1;
+    },
+    formatMoney(money) {
+      let part = money.split('.');
+      let l = part[0].replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+      let r = part.length > 1 ? `.${part.pop()}` : '';
+      return `${l}${r}`
     },
     myDialogStateFn: function (remark) {
       this.remark = remark;

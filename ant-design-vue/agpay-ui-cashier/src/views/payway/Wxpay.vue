@@ -12,7 +12,8 @@
         <div class="plus-input">
           <!-- ￥字符 货币的符号-->
           <div class="S">
-            <img src="../../assets/icon/S.svg" alt="" />
+            <span :style="'color:' + typeColor[payType] + ';'">￥</span>
+<!--            <img src="../../assets/icon/S.svg" alt="" />-->
           </div>
           <!-- 输入框光标 -->
           <!-- <div class="ttt">
@@ -23,9 +24,9 @@
           </div> -->
           <!-- 手写输入框 -->
           <div class="input-c" :style="'color:' + typeColor[payType] + ';'">
-            <div class="input-c-div-1">{{ amount.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,') }}</div>
+            <div class="input-c-div-1">{{ formatMoney(amount) }}</div>
             <!-- 数字金额后边的光标 -->
-            <div class="input-c-div" :style="'border-color:' + typeColor[payType] + ';'"></div>
+            <div class="input-c-div" :style="'background:' + typeColor[payType] + ';border-color:' + typeColor[payType] + ';'"></div>
             <!--        <div class="input-c-div-del" v-if="amount" @click="clearTheAmount">
                       <img src="../../assets/icon/delete.svg" alt="" />
                     </div>-->
@@ -173,6 +174,13 @@ export default {
       this.amount = "";
       this.payOrderInfo.amount = 0;
       this.money = -1;
+    },
+    formatMoney(s) {
+      console.log(s);
+      let sarr = s.split('.');
+      let l = sarr[0].replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+      let r = sarr.length > 1 ? `.${sarr[1]}` : '';
+      return `${l}${r}`
     },
     myDialogStateFn: function (remark) {
       this.remark = remark;

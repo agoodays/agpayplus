@@ -113,7 +113,12 @@ body {
   position: relative;
   width: 30px;
   height: 40px;
-  margin: 15px 15px 15px 0;
+  margin: 45px 15px 15px 0;
+  font-size: 35px;
+}
+.plus-input .S span{
+  position: relative;
+  color: #07c160;
 }
 .plus-input .S img {
   position: absolute;
