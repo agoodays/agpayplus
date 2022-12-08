@@ -21,6 +21,42 @@
 body {
   background-color: #f5f7fa;
 }
+.pay-panel{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center
+}
+.content .content-top-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 200px;
+  border-radius: 0 0 35px 35px;
+  background: #07c160;
+  z-index: 0
+}
+.content-body {
+  position: relative;
+  width: 90%;
+  height: 285px;
+  margin-top: 20px;
+  border-radius: 25px;
+  background: #fff;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center
+}
 .header {
   box-sizing: border-box;
   display: flex;
@@ -29,6 +65,7 @@ body {
   padding: 50px;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #f5f7fa;
 }
 .margin-top-30 {
   margin-top: 30px;
@@ -42,7 +79,7 @@ body {
   height: 50px;
   font-size: 36px;
   font-family: PingFang SC, PingFang SC-Medium;
-  font-weight: 500;
+  font-weight: 400;
   color: #323232;
   letter-spacing: 1px;
   overflow: hidden;
@@ -121,9 +158,9 @@ body {
   align-items: center;
   height: 98px;
   width: 40px;
-  font-size: 70px;
+  font-size: 80px;
   font-family: wxFirstFont SC, PingFang SC, PingFang SC-Medium;
-  font-weight: 800;
+  font-weight: 400;
   text-align: center;
   color: #07c160;
   letter-spacing: 2px;
@@ -163,10 +200,10 @@ body {
 }
 
 .placeholder {
-  color: #6b6b6b;
+  color: #e3e4e5;
   font-weight: 400;
   text-align: left;
-  padding-top: 4px;
+  padding-top: 20px;
   font-size: 60px;
 }
 .plus-input input::-webkit-input-placeholder {

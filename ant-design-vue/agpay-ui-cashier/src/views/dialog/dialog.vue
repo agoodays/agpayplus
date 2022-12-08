@@ -9,7 +9,9 @@
 <template>
   <div class="dialog">
     <div class="dialog-box">
-      <div class="dialog-remark">添加备注</div>
+      <div class="dialog-remark"
+           :style="'color:' + typeColor + ';'"
+      >添加备注</div>
       <div class="dialog-input">
         <input
           type="text"
@@ -20,7 +22,9 @@
       </div>
       <div class="dialog-bnt">
         <div class="dialog-bnt-l" @click="myDialogStateFn(false)">取消</div>
-        <div class="dialog-bnt-r" @click="myDialogStateFn(true)">确认</div>
+        <div class="dialog-bnt-r"
+             :style="'background:' + typeColor + ';border-top-color:' + typeColor + ';'"
+             @click="myDialogStateFn(true)">确认</div>
       </div>
     </div>
   </div>
@@ -37,6 +41,10 @@ export default {
     };
   },
   props: {
+    typeColor: {
+      type: String,
+      default: "#07c160",
+    },
     remark: {
       type: String,
       default: () => "",

@@ -21,7 +21,7 @@ router.beforeEach((to, from, next) => {
     // to: 即将要进入的目标路由对象
 
     // 如果在免登录页面则直接放行
-    if (config.errorPageRouteName.includes(to.name)) {
+    if (config.passGuardRouteList.includes(to.name)) {
       // 在免登录名单，直接进入
       next()
       return false

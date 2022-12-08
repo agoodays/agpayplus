@@ -1,25 +1,30 @@
 <template>
-  <div>
-    <header class="header">
-      <div class="header-text">付款给 {{ payOrderInfo.mchName }}</div>
-      <div class="header-img">
-        <img :src="avatar ? avatar : icon_member_default" alt="" />
-      </div>
-    </header>
-    <div class="plus-input">
-      <!-- ￥字符 货币的符号-->
-      <div class="S">
-        <img src="../../assets/icon/S.svg" alt="" />
-      </div>
+  <div class="pay-panel">
+    <div class="content">
+      <div class="content-top-bg" :style="'background:' + typeColor[payType] + ';'"></div>
+      <div class="content-body">
+        <header class="header">
+          <div class="header-text">付款给 {{ merchantName }}</div>
+          <div class="header-img">
+            <img :src="avatar ? avatar : icon_member_default" alt="" />
+          </div>
+        </header>
+        <div class="plus-input">
+          <!-- ￥字符 货币的符号-->
+          <div class="S">
+            <img src="../../assets/icon/S.svg" alt="" />
+          </div>
 
-      <!-- 手写输入框 -->
-      <div class="input-c">
-        <div class="input-c-div-1">{{ amount }}</div>
-        <!-- 数字金额后边的光标 -->
-        <div class="input-c-div" :style="'border-color:' + typeColor[payType] + ';'"></div>
+          <!-- 手写输入框 -->
+          <div class="input-c" :style="'color:' + typeColor[payType] + ';'">
+            <div class="input-c-div-1">{{ amount.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,') }}</div>
+            <!-- 数字金额后边的光标 -->
+            <div class="input-c-div" :style="'border-color:' + typeColor[payType] + ';'"></div>
+          </div>
+          <!-- 手写输入框的提示文字 -->
+          <div v-show="!amount" class="placeholder">请输入金额</div>
+        </div>
       </div>
-      <!-- 手写输入框的提示文字 -->
-      <div v-show="!amount" class="placeholder">请输入金额</div>
     </div>
     <ul class="plus-ul" >
       <!-- 支付板块 -->
@@ -37,7 +42,7 @@
     <div class="remark-k" :class="payType != 'wx' ? 'margin-top-30' : ''">
       <div class="remark">
         <div class="remark-hui" v-show="remark">{{ remark }}</div>
-        <div @click="myDialogStateFn">{{ remark ? "修改" : "添加备注" }}</div>
+        <div @click="myDialogStateFn(remark)" :style="'color:' + typeColor[payType] + ';'">{{ remark ? "修改" : "添加备注" }}</div>
       </div>
     </div>
     <!-- dialog 对话框 目前不需要添加备注，隐藏-->
@@ -45,6 +50,7 @@
         v-show="myDialogState"
         @myDialogStateFn="myDialogStateFn"
         :remark="remark"
+        :typeColor="typeColor[payType]"
     >
     </MyDialog>
 
@@ -54,10 +60,12 @@
           @delTheAmount="delTheAmount"
           @conceal="conceal"
           @enterTheAmount="enterTheAmount"
+          @clearTheAmount="clearTheAmount"
           @payment="payment"
           :money="money"
           :concealSate="concealSate"
           :typeColor="typeColor[payType]"
+          :touchTypeColor="touchTypeColor[payType]"
       ></Keyboard>
     </div>
     <div class="bnt-pay" v-if="!isAllowModifyAmount">
@@ -100,6 +108,11 @@ export default {
         alipay: "#1678ff",
         wxpay: "#07c160",
         ysfpay: "#ff534d"
+      },
+      touchTypeColor: {
+        alipay: "rgba(20, 98, 206, 1)",
+        wxpay: "rgba(7, 130, 65, 1)",
+        ysfpay: "rgb(248 70 65, 1)"
       },
     }
   },
@@ -144,6 +157,11 @@ export default {
       }
       this.money = this.payOrderInfo.amount > 0 ? this.payOrderInfo.amount : -1;
     },
+    clearTheAmount(){
+      this.amount = "";
+      this.payOrderInfo.amount = 0;
+      this.money = -1;
+    },
     myDialogStateFn: function (remark) {
       this.remark = remark;
       this.myDialogState = !this.myDialogState;
@@ -153,7 +171,8 @@ export default {
       const that = this
       getPayOrderInfo().then(res => {
         that.payOrderInfo = res
-
+        that.merchantName = res.mchName
+        that.amount = res.amount
         if(isAutoPay){
           that.pay()
         }
@@ -162,36 +181,31 @@ export default {
       });
     },
 
-    pay: function (){
-
+    pay: function () {
       let that = this;
       getPayPackage(this.amount).then(res => {
 
         //订单创建异常
-        if(res.code != '0') {
+        if (res.code != '0') {
           return alert(res.msg);
         }
 
-        if(res.data.orderState != 1 ) { //订单不是支付中，说明订单异常
+        if (res.data.orderState != 1) { //订单不是支付中，说明订单异常
           return alert(res.data.errMsg);
         }
 
         if (!window.AlipayJSBridge) {
-          document.addEventListener('AlipayJSBridgeReady', function(){
+          document.addEventListener('AlipayJSBridgeReady', function () {
             that.doAlipay(res.data.alipayTradeNo);
           }, false);
-        }else{
+        } else {
           that.doAlipay(res.data.alipayTradeNo);
         }
-
       }).catch(res => {
         that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})
       });
     },
-
-
-    doAlipay(alipayTradeNo){
-
+    doAlipay(alipayTradeNo) {
       const that = this
 
       // eslint-disable-next-line no-undef
@@ -202,30 +216,24 @@ export default {
           // alert('支付成功！');
 
           // //重定向
-          if(that.payOrderInfo.returnUrl){
+          if (that.payOrderInfo.returnUrl) {
             location.href = that.payOrderInfo.returnUrl;
-          }else{
+          } else {
             alert('支付成功！');
             window.AlipayJSBridge.call('closeWebview')
           }
-
-          //‘8000’：后台获取支付结果超时，暂时未拿到支付结果;
-        // ‘6004’：支付过程中网络出错， 暂时未拿到支付结果;
-        }else if("8000" == data.resultCode || "6004" == data.resultCode){ //其他
-
+          // ‘8000’：后台获取支付结果超时，暂时未拿到支付结果;
+          // ‘6004’：支付过程中网络出错， 暂时未拿到支付结果;
+        } else if ("8000" == data.resultCode || "6004" == data.resultCode) { //其他
           alert(JSON.stringify(data));
           window.AlipayJSBridge.call('closeWebview')
-
-        }else{ ///其他异常信息， 需要取消订单
+        } else { ///其他异常信息， 需要取消订单
           alert('用户已取消！');
           window.AlipayJSBridge.call('closeWebview')
         }
       });
     },
-
   }
-
-
 }
 </script>
 <style lang="css" scoped>

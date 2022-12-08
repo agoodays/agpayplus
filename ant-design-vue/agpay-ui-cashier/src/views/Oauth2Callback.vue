@@ -15,13 +15,10 @@ export default {
   components: {
   },
   mounted() {
-
-
     const allQuery = Object.assign({}, this.searchToObject(), this.$route.query)
 
     const that = this;
     getChannelUserId(allQuery).then(res => {
-
       //设置channelUserId
       channelUserIdUtil.setChannelUserId(res);
 
@@ -29,12 +26,9 @@ export default {
     }).catch(res => {
       that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})
     });
-
   },
   methods: {
-
     searchToObject: function() {
-
       if(!window.location.search){
         return {};
       }
@@ -50,7 +44,6 @@ export default {
       }
       return result;
     }
-
   }
 }
 </script>

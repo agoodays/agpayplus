@@ -1,42 +1,43 @@
 <template>
-  <div>
-    <header class="header">
-      <div class="header-text">付款给{{ payOrderInfo.mchName }}</div>
-      <div class="header-img">
-        <img :src="avatar ? avatar : icon_member_default" alt="" />
+  <div class="pay-panel">
+    <div class="content">
+      <div class="content-top-bg" :style="'background:' + typeColor[payType] + ';'"></div>
+      <div class="content-body">
+        <header class="header">
+          <div class="header-text">付款给 {{ merchantName }}</div>
+          <div class="header-img">
+            <img :src="avatar ? avatar : icon_member_default" alt="" />
+          </div>
+        </header>
+        <div class="plus-input">
+          <!-- ￥字符 货币的符号-->
+          <div class="S">
+            <img src="../../assets/icon/S.svg" alt="" />
+          </div>
+          <!-- 输入框光标 -->
+          <!-- <div class="ttt">
+            <div
+              class="input-c-div"
+              style="background: #07c160"
+            ></div>
+          </div> -->
+          <!-- 手写输入框 -->
+          <div class="input-c" :style="'color:' + typeColor[payType] + ';'">
+            <div class="input-c-div-1">{{ amount.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,') }}</div>
+            <!-- 数字金额后边的光标 -->
+            <div class="input-c-div" :style="'border-color:' + typeColor[payType] + ';'"></div>
+            <!--        <div class="input-c-div-del" v-if="amount" @click="clearTheAmount">
+                      <img src="../../assets/icon/delete.svg" alt="" />
+                    </div>-->
+          </div>
+          <!-- 手写输入框的提示文字 -->
+          <div v-show="!amount" class="placeholder">请输入金额</div>
+        </div>
       </div>
-    </header>
-    <div class="plus-input">
-      <!-- ￥字符 货币的符号-->
-      <div class="S">
-        <img src="../../assets/icon/S.svg" alt="" />
-      </div>
-
-      <!-- 输入框光标 -->
-      <!-- <div class="ttt">
-        <div
-          class="input-c-div"
-          style="background: #07c160"
-        ></div>
-      </div> -->
-
-      <!-- 手写输入框 -->
-      <div class="input-c">
-        <div class="input-c-div-1">{{ amount }}</div>
-        <!-- 数字金额后边的光标 -->
-        <div class="input-c-div" :style="'border-color:' + typeColor[payType] + ';'"></div>
-<!--        <div class="input-c-div-del" v-if="amount" @click="clearTheAmount">
-          <img src="../../assets/icon/delete.svg" alt="" />
-        </div>-->
-      </div>
-      <!-- 手写输入框的提示文字 -->
-      <div v-show="!amount" class="placeholder">请输入金额</div>
     </div>
     <ul class="plus-ul" >
       <!-- 支付板块 -->
-      <li
-          style="border-radius:10px;"
-      >
+      <li style="border-radius:10px;">
         <!-- 支付金额板块 -->
         <div class="img-div">
           <img :src="payImg" alt="" />
@@ -58,6 +59,7 @@
         v-show="myDialogState"
         @myDialogStateFn="myDialogStateFn"
         :remark="remark"
+        :typeColor="typeColor[payType]"
     >
     </MyDialog>
 
@@ -118,6 +120,11 @@ export default {
         wxpay: "#07c160",
         ysfpay: "#ff534d"
       },
+      touchTypeColor: {
+        alipay: "rgba(20, 98, 206, 1)",
+        wxpay: "rgba(7, 130, 65, 1)",
+        ysfpay: "rgb(248 70 65, 1)"
+      },
     }
   },
 
@@ -127,8 +134,9 @@ export default {
 
   methods: {
     payment() {
-      if (this.money == -1)
+      if (this.money == -1) {
         return;
+      }
       console.log('payment');
     },
     conceal() {
@@ -175,7 +183,8 @@ export default {
       const that = this
       getPayOrderInfo().then(res => {
         that.payOrderInfo = res
-
+        that.merchantName = res.mchName
+        that.amount = res.amount
         if(isAutoPay){
           that.pay()
         }
@@ -185,40 +194,36 @@ export default {
     },
 
     // 支付事件
-    pay: function (){
+    pay: function () {
       // 该函数执行效果慢
       let that = this;
       getPayPackage(this.amount).then(res => {
-
-        if(res.code != '0') {
+        if (res.code != '0') {
           return alert(res.msg);
         }
 
-        if(res.data.orderState != 1 ) { //订单不是支付中，说明订单异常
+        if (res.data.orderState != 1) { //订单不是支付中，说明订单异常
           return alert(res.data.errMsg);
         }
 
         that.resData = res.data;
-        if (typeof WeixinJSBridge == "undefined"){
-          if( document.addEventListener ){
+        if (typeof WeixinJSBridge == "undefined") {
+          if (document.addEventListener) {
             document.addEventListener('WeixinJSBridgeReady', that.onBridgeReady, false);
-          }else if (document.attachEvent){
+          } else if (document.attachEvent) {
             document.attachEvent('WeixinJSBridgeReady', that.onBridgeReady);
             document.attachEvent('onWeixinJSBridgeReady', that.onBridgeReady);
           }
-        }else{
+        } else {
           that.onBridgeReady();
         }
-
       }).catch(res => {
         that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})
       });
     },
 
-
     /* 唤醒微信支付*/
     onBridgeReady() {
-
       let that = this;
 
       // eslint-disable-next-line no-undef
@@ -235,7 +240,6 @@ export default {
                 alert('支付成功！');
                 window.WeixinJSBridge.call('closeWindow')
               }
-
             }
             if (res.err_msg == "get_brand_wcpay_request:cancel") {
               alert("支付取消");
@@ -252,10 +256,7 @@ export default {
           }
       );
     },
-
   }
-
-
 }
 </script>
 <style lang="css" scoped>

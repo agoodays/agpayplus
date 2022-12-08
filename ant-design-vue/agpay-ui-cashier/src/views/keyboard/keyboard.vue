@@ -11,7 +11,7 @@
   <div class="keyboard">
     <div class="keyboard-top">
       <div class="triangle-topleft-k"></div>
-      <div class="keyboard-tite">@小新支付</div>
+      <div class="keyboard-tite">@Ag支付</div>
       <div class="triangle-topleft-k" @click="concealSateFn">
         <div
             class="triangle-topleft"
@@ -69,9 +69,10 @@
     <div
         :class="paymentClassFn"
         :style="'background:' + typeColor + ';'"
-        @click="payment"
+        @touchstart.prevent="goTouchstart('pay', $event)"
+        @touchend.prevent="goTouchend('pay', $event)"
     >
-      <div>付款</div>
+      <div class="pay">付款</div>
     </div>
   </div>
 </template>
@@ -104,6 +105,10 @@ export default {
       type: String,
       default: "#07c160",
     },
+    touchTypeColor: {
+      type: String,
+      default: "rgba(7, 130, 65, 1)",
+    },
     money: {
       // eslint-disable-next-line vue/require-prop-type-constructor
       type: String | Number,
@@ -119,17 +124,17 @@ export default {
     this.concealSateC = this.concealSate;
   },
   methods: {
-    f() {},
-    payment() {
-      this.$emit("payment");
-    },
     concealSateFn() {
       //   this.concealSateC = !this.concealSateC;
       this.$emit("conceal");
     },
     onKeyboard(item, $event) {
       setTimeout(() => {
-        $event.style.background = "#fff";
+        if (item == "pay") {
+          $event.style.background = this.typeColor;
+        } else {
+          $event.style.background = "#fff";
+        }
       }, 100);
       // animation: heartBeat 0.2s;
       if (item == "del") {
@@ -138,6 +143,10 @@ export default {
       }
       if (item == "C") {
         this.$emit("clearTheAmount", item);
+        return;
+      }
+      if (item == "pay") {
+        this.$emit("payment");
         return;
       }
       let obj = {
@@ -151,15 +160,25 @@ export default {
     },
 
     goTouchstart(it, $event) {
+      console.log("goTouchstart");
       if (
           $event.srcElement.localName == "img" ||
-          $event.srcElement.className == "dot"
+          $event.srcElement.className == "dot" ||
+          $event.srcElement.className == "pay"
       ) {
         $event = $event.target.parentNode;
       } else {
         $event = $event.target;
       }
-      $event.style.background = "rgba(197, 197, 197, 0.7)";
+      if (it == "pay") {
+        if (this.money != -1 && this.money != "") {
+          $event.style.background = this.touchTypeColor;
+        } else {
+          return;
+        }
+      } else {
+        $event.style.background = "rgba(197, 197, 197, 0.7)";
+      }
       let _this = this;
       clearTimeout(_this.timeOutEvent);
       _this.timeOutEvent = setTimeout(function () {
@@ -177,22 +196,31 @@ export default {
       console.log("goTouchend");
       if (
           $event.srcElement.localName == "img" ||
-          $event.srcElement.className == "dot"
+          $event.srcElement.className == "dot" ||
+          $event.srcElement.className == "pay"
       ) {
         $event = $event.target.parentNode;
       } else {
         $event = $event.target;
       }
-      $event.style.background = "#fff";
+      if (it == "pay") {
+        if (this.money != -1 && this.money != "") {
+          $event.style.background = this.typeColor;
+        } else {
+          return;
+        }
+      } else {
+        $event.style.background = "#fff";
+      }
       let _this = this;
       clearTimeout(_this.timeOutEvent);
       clearInterval(_this.tiemIntervalEvent);
       if (_this.timeOutEvent !== 0) {
-        //  处理单击事件
+        // 处理单击事件
         this.onKeyboard(it, $event);
       }
     },
-    //  长按退格
+    // 长按退格
     delLong(item) {
       // 定时触发
       this.tiemIntervalEvent = setInterval(() => {
