@@ -19,7 +19,7 @@
   box-sizing: border-box;
 }
 body {
-  background-color: #ededed;
+  background-color: #f5f7fa;
 }
 .header {
   box-sizing: border-box;
@@ -67,7 +67,7 @@ body {
   flex-shrink: 0;
   justify-content: safe;
   margin: 0 auto;
-  border-bottom: 1px solid #cccccc;
+  /*border-bottom: 1px solid #cccccc;*/
   width: calc(100vw - 140px);
   min-width: 160px;
   height: 180px;
@@ -119,14 +119,13 @@ body {
 .input-c {
   display: flex;
   align-items: center;
-
   height: 98px;
   width: 40px;
   font-size: 70px;
   font-family: wxFirstFont SC, PingFang SC, PingFang SC-Medium;
   font-weight: 800;
   text-align: center;
-  color: #000000;
+  color: #07c160;
   letter-spacing: 2px;
   border: none;
   outline: none;
@@ -187,7 +186,7 @@ body {
 }
 .plus-ul li {
   position: relative;
-  background: #fafafa;
+  background: #fff;
   padding: 41px 30px;
   display: flex;
   justify-content: space-between;
@@ -280,7 +279,7 @@ body {
   font-family: PingFang SC, PingFang SC-Medium;
   font-weight: 500;
   text-align: left;
-  color: #587cca;
+  color: #07c160;
   letter-spacing: 1px;
 }
 .remark {

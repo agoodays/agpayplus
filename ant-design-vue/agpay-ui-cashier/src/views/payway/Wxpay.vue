@@ -25,9 +25,9 @@
         <div class="input-c-div-1">{{ amount }}</div>
         <!-- 数字金额后边的光标 -->
         <div class="input-c-div" :style="'border-color:' + typeColor[payType] + ';'"></div>
-        <div class="input-c-div-del" v-if="amount" @click="clear">
+<!--        <div class="input-c-div-del" v-if="amount" @click="clearTheAmount">
           <img src="../../assets/icon/delete.svg" alt="" />
-        </div>
+        </div>-->
       </div>
       <!-- 手写输入框的提示文字 -->
       <div v-show="!amount" class="placeholder">请输入金额</div>
@@ -50,7 +50,7 @@
     <div class="remark-k" :class="payType != 'wx' ? 'margin-top-30' : ''">
       <div class="remark">
         <div class="remark-hui" v-show="remark">{{ remark }}</div>
-        <div @click="myDialogStateFn">{{ remark ? "修改" : "添加备注" }}</div>
+        <div @click="myDialogStateFn(remark)" :style="'color:' + typeColor[payType] + ';'">{{ remark ? "修改" : "添加备注" }}</div>
       </div>
     </div>
     <!-- dialog 对话框 目前不需要添加备注，隐藏-->
@@ -67,6 +67,7 @@
           @delTheAmount="delTheAmount"
           @conceal="conceal"
           @enterTheAmount="enterTheAmount"
+          @clearTheAmount="clearTheAmount"
           @payment="payment"
           :money="money"
           :concealSate="concealSate"
@@ -160,14 +161,14 @@ export default {
       }
       this.money = this.payOrderInfo.amount > 0 ? this.payOrderInfo.amount : -1;
     },
-    myDialogStateFn: function (remark) {
-      this.remark = remark;
-      this.myDialogState = !this.myDialogState;
-    },
-    clear(){
+    clearTheAmount(){
       this.amount = "";
       this.payOrderInfo.amount = 0;
       this.money = -1;
+    },
+    myDialogStateFn: function (remark) {
+      this.remark = remark;
+      this.myDialogState = !this.myDialogState;
     },
 
     setPayOrderInfo(isAutoPay){
