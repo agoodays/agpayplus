@@ -24,7 +24,10 @@
       <div class="input-c">
         <div class="input-c-div-1">{{ amount }}</div>
         <!-- 数字金额后边的光标 -->
-        <!-- <div class="input-c-div" style="background:#07c160"></div> -->
+        <div class="input-c-div" :style="'border-color:' + typeColor[payType] + ';'"></div>
+<!--        <div class="input-c-div-del" v-if="amount" @click="clearTheAmount">
+          <img src="../../assets/icon/delete.svg" alt="" />
+        </div>-->
       </div>
       <!-- 手写输入框的提示文字 -->
       <div v-show="!amount" class="placeholder">请输入金额</div>
@@ -32,11 +35,11 @@
     <ul class="plus-ul" >
       <!-- 支付板块 -->
       <li
-        style="border-radius:10px;"
+          style="border-radius:10px;"
       >
         <!-- 支付金额板块 -->
         <div class="img-div">
-          <img :src="wxImg" alt="" />
+          <img :src="payImg" alt="" />
           <div class="div-text">
             微信支付
           </div>
@@ -47,27 +50,28 @@
     <div class="remark-k" :class="payType != 'wx' ? 'margin-top-30' : ''">
       <div class="remark">
         <div class="remark-hui" v-show="remark">{{ remark }}</div>
-        <div @click="myDialogStateFn">{{ remark ? "修改" : "添加备注" }}</div>
+        <div @click="myDialogStateFn(remark)" :style="'color:' + typeColor[payType] + ';'">{{ remark ? "修改" : "添加备注" }}</div>
       </div>
     </div>
     <!-- dialog 对话框 目前不需要添加备注，隐藏-->
-     <MyDialog
-      v-show="myDialogState"
-      @myDialogStateFn="myDialogStateFn"
-      :remark="remark"
+    <MyDialog
+        v-show="myDialogState"
+        @myDialogStateFn="myDialogStateFn"
+        :remark="remark"
     >
     </MyDialog>
 
     <!-- 键盘板块 目前不需要键盘 隐藏 -->
     <div class="keyboard-plus" v-if="isAllowModifyAmount">
       <Keyboard
-        @delTheAmount="delTheAmount"
-        @conceal="conceal"
-        @enterTheAmount="enterTheAmount"
-        @payment="payment"
-        :money="money"
-        :concealSate="concealSate"
-        :typeColor="typeColor[payType]"
+          @delTheAmount="delTheAmount"
+          @conceal="conceal"
+          @enterTheAmount="enterTheAmount"
+          @clearTheAmount="clearTheAmount"
+          @payment="payment"
+          :money="money"
+          :concealSate="concealSate"
+          :typeColor="typeColor[payType]"
       ></Keyboard>
     </div>
 
@@ -76,9 +80,9 @@
     <div class="bnt-pay" v-if="!isAllowModifyAmount">
       <div class="bnt-pay">
         <div
-          class="bnt-pay-text"
-          style="background-color:#07c160"
-          @click="pay"
+            class="bnt-pay-text"
+            :style="'background:' + typeColor[payType] + ';'"
+            @click="pay"
         >
           付款
         </div>
@@ -101,7 +105,7 @@ export default {
       avatar: require("../../assets/icon/wx.svg"), // 商户头像默认
       amount: "",  // 支付金额默认
       resData: {},
-      wxImg: require("../../assets/icon/wx.svg"), // 微信支付图片
+      payImg: require("../../assets/icon/wx.svg"), // 微信支付图片
       payOrderInfo: {}, //订单信息
       isAllowModifyAmount: true,
       myDialogState: false,
@@ -131,7 +135,7 @@ export default {
       this.concealSate = !this.concealSate
     },
     enterTheAmount(item) {
-      if (this.amount.length >= 12
+      if (this.amount >= 9999999
           || (item === "." && this.amount.includes("."))
           || (this.amount.includes(".") && this.amount.split(".").pop().length >= 2)
       ) {
@@ -156,6 +160,11 @@ export default {
         this.payOrderInfo.amount = 0;
       }
       this.money = this.payOrderInfo.amount > 0 ? this.payOrderInfo.amount : -1;
+    },
+    clearTheAmount(){
+      this.amount = "";
+      this.payOrderInfo.amount = 0;
+      this.money = -1;
     },
     myDialogStateFn: function (remark) {
       this.remark = remark;
@@ -250,5 +259,5 @@ export default {
 }
 </script>
 <style lang="css" scoped>
- @import './pay.css';
+@import './pay.css';
 </style>

@@ -13,8 +13,8 @@
       <div class="dialog-input">
         <input
           type="text"
-          placeholder="最多输入10个字"
-          maxlength="10"
+          placeholder="最多输入12个字"
+          maxlength="12"
           v-model="remarkC2"
         />
       </div>
@@ -31,7 +31,7 @@ export default {
   name: "MyDialog",
   data() {
     return {
-      //   remark: "",
+      // remark: "",
       remarkC: "",
       remarkC2: "",
     };
@@ -75,7 +75,7 @@ export default {
 }
 .dialog-box {
   width: 600px;
-  height: 359px;
+  height: 356px;
   background: #ffffff;
   border-radius: 15px;
   padding: 50px 0;
@@ -86,14 +86,15 @@ export default {
   font-size: 33px;
   font-family: PingFang SC, PingFang SC-Bold;
   font-weight: 700;
-  text-align: center;
-  color: #000000;
+  text-align: left;
+  color: #07c160;
+  margin-left: 50px;
 }
 .dialog-input {
   margin: 50px auto;
   width: 510px;
   height: 60px;
-  border-bottom: 1px solid #cccccc;
+  /*border-bottom: 1px solid #cccccc;*/
 }
 .dialog-input input {
   margin-bottom: 5px;
@@ -111,7 +112,7 @@ export default {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  border-top: 1px solid #e5e5e5;
+  /*border-top: 1px solid #e5e5e5;*/
 }
 .dialog-bnt div {
   width: 50%;
@@ -124,10 +125,14 @@ export default {
 }
 .dialog-bnt-l {
   color: #b2b2b2;
-  border-right: 1px solid #e5e5e5;
+  /*border-right: 1px solid #e5e5e5;*/
+  border-top: 1px solid #e5e5e5;
 }
 .dialog-bnt-r {
   /* border-left: 1px solid #e5e5e5; */
-  color: #587cca;
+  color: #ffffff;
+  background: #07c160;
+  border-bottom-right-radius: 15px;
+  border-top: 1px solid #07c160;
 }
 </style>

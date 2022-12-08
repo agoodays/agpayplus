@@ -14,31 +14,31 @@
       <div class="keyboard-tite">@小新支付</div>
       <div class="triangle-topleft-k" @click="concealSateFn">
         <div
-          class="triangle-topleft"
-          :style="
+            class="triangle-topleft"
+            :style="
             concealSate ? '' : 'transform:rotate(-135deg);margin-top: 12px;'
           "
         ></div>
       </div>
     </div>
     <div
-      class="keyboard-main"
-      v-show="concealSate"
-      style="transition: all 1s ease"
+        class="keyboard-main"
+        v-show="concealSate"
+        style="transition: all 1s ease"
     >
       <div
-        v-for="(item, index) in numberList"
-        :key="index"
-        class="keyborad-key"
+          v-for="(item, index) in numberList"
+          :key="index"
+          class="keyborad-key"
       >
         <!--   @click="onKeyboard(it, $event)" -->
         <div
-          ref="number"
-          class="number"
-          v-for="(it, ind) in item"
-          :key="ind"
-          @touchstart.prevent="goTouchstart(it, $event)"
-          @touchend.prevent="goTouchend(it, $event)"
+            ref="number"
+            class="number"
+            v-for="(it, ind) in item"
+            :key="ind"
+            @touchstart.prevent="goTouchstart(it, $event)"
+            @touchend.prevent="goTouchend(it, $event)"
         >
           {{ it != "del" ? it : "" }}
           <template class="" v-if="it == 'del'">
@@ -50,26 +50,26 @@
       </div>
       <div class="keyborad-key">
         <div
-          class="number"
-          @touchstart.prevent="goTouchstart('dot', $event)"
-          @touchend.prevent="goTouchend('dot', $event)"
-        >
-          <div class="dot"></div>
-        </div>
-        <div
-          class="number zero"
-          @touchstart.prevent="goTouchstart('zero', $event)"
-          @touchend.prevent="goTouchend('zero', $event)"
+            class="number zero"
+            @touchstart.prevent="goTouchstart('zero', $event)"
+            @touchend.prevent="goTouchend('zero', $event)"
         >
           0
+        </div>
+        <div
+            class="number"
+            @touchstart.prevent="goTouchstart('dot', $event)"
+            @touchend.prevent="goTouchend('dot', $event)"
+        >
+          <div class="dot"></div>
         </div>
       </div>
     </div>
 
     <div
-      :class="paymentClassFn"
-      :style="'background:' + typeColor + ';'"
-      @click="payment"
+        :class="paymentClassFn"
+        :style="'background:' + typeColor + ';'"
+        @click="payment"
     >
       <div>付款</div>
     </div>
@@ -86,7 +86,7 @@ export default {
       concealSateC: true,
       numberList: [
         [1, 2, 3, "del"],
-        [4, 5, 6],
+        [4, 5, 6, "C"],
         [7, 8, 9],
       ],
     };
@@ -129,11 +129,15 @@ export default {
     },
     onKeyboard(item, $event) {
       setTimeout(() => {
-        $event.style.background = "#fafafa";
+        $event.style.background = "#fff";
       }, 100);
       // animation: heartBeat 0.2s;
       if (item == "del") {
         this.$emit("delTheAmount", item);
+        return;
+      }
+      if (item == "C") {
+        this.$emit("clearTheAmount", item);
         return;
       }
       let obj = {
@@ -148,8 +152,8 @@ export default {
 
     goTouchstart(it, $event) {
       if (
-        $event.srcElement.localName == "img" ||
-        $event.srcElement.className == "dot"
+          $event.srcElement.localName == "img" ||
+          $event.srcElement.className == "dot"
       ) {
         $event = $event.target.parentNode;
       } else {
@@ -172,14 +176,14 @@ export default {
     goTouchend(it, $event) {
       console.log("goTouchend");
       if (
-        $event.srcElement.localName == "img" ||
-        $event.srcElement.className == "dot"
+          $event.srcElement.localName == "img" ||
+          $event.srcElement.className == "dot"
       ) {
         $event = $event.target.parentNode;
       } else {
         $event = $event.target;
       }
-      $event.style.background = "#fafafa";
+      $event.style.background = "#fff";
       let _this = this;
       clearTimeout(_this.timeOutEvent);
       clearInterval(_this.tiemIntervalEvent);
@@ -222,7 +226,7 @@ img {
 }
 .keyboard {
   position: relative;
-  background-color: #ffffff;
+  background-color: #f5f7fa;
 }
 .keyboard-top {
   display: flex;
@@ -230,9 +234,10 @@ img {
   align-items: center;
   width: 100%;
   height: 60px;
-  background: #fafafa;
-  border: 1px solid #e1e2e6;
-  border-bottom: 0px solid #e1e2e6;
+  background: #fff;
+  /*border: 1px solid #e1e2e6;*/
+  /*border-bottom: 0px solid #e1e2e6;*/
+  border-radius: 10px;
 }
 .keyboard-tite {
   /* margin-right: -40px; */
@@ -293,9 +298,9 @@ img {
   justify-content: center;
   align-items: center;
   /* width: 187px; */
-  width: 25%;
-  height: 100px;
-  background: #fafafa;
+  width: 24%;
+  height: 155px;
+  background: #fff;
   border: 1px solid #e1e2e6;
   border-bottom: none;
   border-left: none;
@@ -306,6 +311,8 @@ img {
   line-height: 100px;
   color: #242526;
   letter-spacing: 2px;
+  margin: 0.5%;
+  border-radius: 10px;
 }
 .number img {
   height: 67px;
@@ -323,8 +330,9 @@ img {
 }
 .keyboard-main .zero {
   /* flex-grow: 2; */
-  width: 50%;
+  width: 49%;
   /* width: 374px; */
+  margin: 0.5%;
 }
 .payment {
   flex-grow: 1;
@@ -333,10 +341,12 @@ img {
   align-items: center;
   bottom: 0;
   right: 0;
-  width: calc(100vw / 4);
-  height: 300px;
+  width: calc(96vw / 4);
+  height: 316px;
   background: #07c160;
   transition: all 0.3s ease;
+  margin: 0.5%;
+  border-radius: 10px;
 }
 .paymentConceal {
   flex-grow: 1;
