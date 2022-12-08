@@ -162,11 +162,10 @@ export default {
       this.payOrderInfo.amount = 0;
       this.money = -1;
     },
-    formatMoney(s) {
-      console.log(s);
-      let sarr = s.split('.');
-      let l = sarr[0].replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
-      let r = sarr.length > 1 ? `.${sarr[1]}` : '';
+    formatMoney(money) {
+      let part = money.split('.');
+      let l = part[0].replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+      let r = part.length > 1 ? `.${part.pop()}` : '';
       return `${l}${r}`
     },
     myDialogStateFn: function (remark) {
