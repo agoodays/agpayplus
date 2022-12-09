@@ -137,7 +137,11 @@ export default {
       ) {
         return;
       }
-      this.amount = `${this.amount}${item}`;
+      if (this.amount === "0") {
+        this.amount = item.toString();
+      } else {
+        this.amount = `${this.amount}${item}`;
+      }
       if (this.amount === ".") {
         this.amount = "0.";
       }
@@ -163,7 +167,7 @@ export default {
       this.money = -1;
     },
     formatMoney(money) {
-      let part = money.split('.');
+      let part = money.toString().split('.');
       let l = part[0].replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
       let r = part.length > 1 ? `.${part.pop()}` : '';
       return `${l}${r}`
