@@ -160,11 +160,11 @@ export default {
     },
 
     goTouchstart(it, $event) {
-      console.log("goTouchstart");
+      // console.log("goTouchstart");
       if (
-          $event.srcElement.localName == "img" ||
-          $event.srcElement.className == "dot" ||
-          $event.srcElement.className == "pay"
+          $event.target.localName == "img" ||
+          $event.target.className == "dot" ||
+          $event.target.className == "pay"
       ) {
         $event = $event.target.parentNode;
       } else {
@@ -188,16 +188,16 @@ export default {
           _this.delLong(it);
           return;
         }
-        //  处理长按事件...
+        // 处理长按事件...
       }, 600);
     },
-    //手如果在600毫秒内就释放，则取消长按事件
+    // 手如果在600毫秒内就释放，则取消长按事件
     goTouchend(it, $event) {
-      console.log("goTouchend");
+      // console.log("goTouchend");
       if (
-          $event.srcElement.localName == "img" ||
-          $event.srcElement.className == "dot" ||
-          $event.srcElement.className == "pay"
+          $event.target.localName == "img" ||
+          $event.target.className == "dot" ||
+          $event.target.className == "pay"
       ) {
         $event = $event.target.parentNode;
       } else {
@@ -213,6 +213,7 @@ export default {
         $event.style.background = "#fff";
       }
       let _this = this;
+      // console.log(_this.timeOutEvent);
       clearTimeout(_this.timeOutEvent);
       clearInterval(_this.tiemIntervalEvent);
       if (_this.timeOutEvent !== 0) {
