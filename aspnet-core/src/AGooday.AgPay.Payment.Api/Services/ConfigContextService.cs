@@ -184,7 +184,6 @@ namespace AGooday.AgPay.Payment.Api.Services
                 return;
             }
 
-
             // 商户应用mchNo 与参数不匹配
             if (!dbMchApp.MchNo.Equals(mchNo))
             {
@@ -220,7 +219,6 @@ namespace AGooday.AgPay.Payment.Api.Services
                 }
 
                 //放置alipay client
-
                 AliPayNormalMchParams alipayParams = mchAppConfigContext.GetNormalMchParamsByIfCode<AliPayNormalMchParams>(CS.IF_CODE.ALIPAY);
                 if (alipayParams != null)
                 {
@@ -265,9 +263,9 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="isvNo"></param>
         public void InitIsvConfigContext(string isvNo)
         {
-
+            // 当前系统不进行缓存
             if (!IsCache())
-            { // 当前系统不进行缓存
+            { 
                 return;
             }
 
@@ -310,8 +308,8 @@ namespace AGooday.AgPay.Payment.Api.Services
             foreach (var payInterfaceConfig in allConfigList)
             {
                 isvConfigContext.IsvParamsMap.Add(
-                        payInterfaceConfig.IfCode,
-                        IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams)
+                    payInterfaceConfig.IfCode,
+                    IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams)
                 );
             }
 

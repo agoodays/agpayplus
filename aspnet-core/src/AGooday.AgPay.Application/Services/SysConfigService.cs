@@ -29,20 +29,22 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        /** 是否启用缓存
-         * true: 表示将使用内存缓存， 将部分系统配置项 或 商户应用/服务商信息进行缓存并读取
-         * false: 直接查询DB
-         * **/
+        /// <summary>
+        /// 是否启用缓存
+        /// true: 表示将使用内存缓存， 将部分系统配置项 或 商户应用/服务商信息进行缓存并读取
+        /// false: 直接查询DB
+        /// </summary>
         public static bool IS_USE_CACHE = false;
 
-        /** 数据库application配置参数 **/
+        /// <summary>
+        /// 数据库application配置参数
+        /// </summary>
         private static Dictionary<string, DBApplicationConfig> APPLICATION_CONFIG = new Dictionary<string, DBApplicationConfig> {
             {"applicationConfig", null }
         };
 
         public void InitDBConfig(string groupKey)
         {
-
             // 若当前系统不缓存，则直接返回
             if (!IS_USE_CACHE)
             {
