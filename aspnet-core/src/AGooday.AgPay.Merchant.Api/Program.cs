@@ -66,10 +66,11 @@ var mqconfiguration = builder.Configuration.GetSection("MQ:RabbitMQ");
 services.Configure<RabbitMQConfiguration>(mqconfiguration);
 #endregion
 
+var cors = builder.Configuration.GetSection("Cors").Value;
 services.AddCors(o =>
     o.AddPolicy("CorsPolicy",
         builder => builder
-            .WithOrigins("https://localhost:8218", "http://localhost:8218")
+            .WithOrigins(cors.Split(","))
             .AllowAnyHeader()
             .AllowAnyMethod()
             //.AllowAnyOrigin()

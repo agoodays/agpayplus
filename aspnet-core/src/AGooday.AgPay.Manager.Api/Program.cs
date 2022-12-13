@@ -74,10 +74,11 @@ builder.Configuration.GetSection("OSS").Bind(LocalOssConfig.Oss);
 builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
 #endregion
 
+var cors = builder.Configuration.GetSection("Cors").Value;
 services.AddCors(o =>
     o.AddPolicy("CorsPolicy",
         builder => builder
-            .WithOrigins("https://localhost:8217", "http://localhost:8217")
+            .WithOrigins(cors.Split(","))
             .AllowAnyHeader()
             .AllowAnyMethod()
             //.AllowAnyOrigin()
