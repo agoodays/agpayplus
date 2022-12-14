@@ -32,7 +32,6 @@ namespace AGooday.AgPay.Payment.Api.MQ
             try
             {
                 log.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
-                return;
 
                 long notifyId = payload.NotifyId;
                 MchNotifyRecordDto record = mchNotifyRecordService.GetById(notifyId);

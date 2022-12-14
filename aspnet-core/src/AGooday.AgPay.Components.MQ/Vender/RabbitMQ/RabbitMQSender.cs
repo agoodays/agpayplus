@@ -89,10 +89,10 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                 {
                     //设置Exchange队列类型
                     var arguments = new Dictionary<string, object>()
-                {
-                    {"x-delayed-type", "topic"}
-                };
-                    //设置当前消息为延时队列
+                    {
+                        {"x-delayed-type", "topic"}
+                    };
+                    //设置当前消息为延时队列, 需要安装延时插件: https://www.yuque.com/xiangyisheng/kgcg9t/vmhkyo
                     channel.ExchangeDeclare(exchange, "x-delayed-message", true, false, arguments);
                     channel.QueueDeclare(queue, true, false, false, arguments);
                     channel.QueueBind(queue, exchange, routingKey);
@@ -102,9 +102,9 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                     var properties = channel.CreateBasicProperties();
                     //设置消息的过期时间
                     properties.Headers = new Dictionary<string, object>()
-                {
-                    {  "x-delay", delay * 1000 }
-                };
+                    {
+                        {  "x-delay", delay * 1000 }
+                    };
 
                     channel.BasicPublish(exchange, routingKey, properties, body);
                 }

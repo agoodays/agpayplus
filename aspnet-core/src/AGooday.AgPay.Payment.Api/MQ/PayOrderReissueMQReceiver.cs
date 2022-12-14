@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
         {
             try
             {
-                log.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                log.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject()}");
                 string payOrderId = payload.PayOrderId;
                 int currentCount = payload.Count;
                 currentCount++;
@@ -55,7 +55,6 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 //返回null 可能为接口报错等， 需要再次轮询
                 if (channelRetMsg == null || channelRetMsg.ChannelState == null || channelRetMsg.ChannelState.Equals(ChannelState.WAITING))
                 {
-
                     //最多查询6次
                     if (currentCount <= 6)
                     {
@@ -65,7 +64,6 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     {
                         //TODO 调用【撤销订单】接口
                     }
-
                 }
                 else
                 {
