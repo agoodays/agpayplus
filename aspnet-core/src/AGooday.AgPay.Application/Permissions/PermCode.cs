@@ -9,6 +9,7 @@
             public const string ENT_ISV = "ENT_ISV";
             public const string ENT_PC = "ENT_PC";
             public const string ENT_MCH = "ENT_MCH";
+            public const string ENT_AGENT = "ENT_AGENT";
             public const string ENT_SYS_CONFIG = "ENT_SYS_CONFIG";
             public const string ENT_ORDER = "ENT_ORDER";
             public const string ENT_UR_USER_ADD = "ENT_UR_USER_ADD";
@@ -84,6 +85,12 @@
             public const string ENT_MCH_APP_ADD = "ENT_MCH_APP_ADD";
             public const string ENT_MCH_INFO = "ENT_MCH_INFO";
             public const string ENT_MCH_APP = "ENT_MCH_APP";
+            public const string ENT_AGENT_INFO = "ENT_AGENT_INFO";
+            public const string ENT_AGENT_LIST = "ENT_AGENT_LIST";
+            public const string ENT_AGENT_INFO_VIEW = "ENT_AGENT_INFO_VIEW";
+            public const string ENT_AGENT_INFO_EDIT = "ENT_AGENT_INFO_EDIT";
+            public const string ENT_AGENT_INFO_DEL = "ENT_AGENT_INFO_DEL";
+            public const string ENT_AGENT_INFO_ADD = "ENT_AGENT_INFO_ADD";
             public const string ENT_ISV_PAY_CONFIG_ADD = "ENT_ISV_PAY_CONFIG_ADD";
             public const string ENT_ISV_PAY_CONFIG_VIEW = "ENT_ISV_PAY_CONFIG_VIEW";
             public const string ENT_ISV_INFO_EDIT = "ENT_ISV_INFO_EDIT";

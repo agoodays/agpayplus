@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
         {
             try
             {
-                log.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject()}");
+                log.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject(payload)}");
                 string payOrderId = payload.PayOrderId;
                 int currentCount = payload.Count;
                 currentCount++;

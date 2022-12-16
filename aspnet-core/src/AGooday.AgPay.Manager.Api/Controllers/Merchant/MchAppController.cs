@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -55,7 +56,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_ADD)]
         public ApiRes Add(MchAppDto dto)
         {
-            dto.AppId = Guid.NewGuid().ToString("N").Substring(0, 24);
+            dto.AppId = SeqUtil.GenAppId();
             if (!_mchInfoService.IsExistMchNo(dto.MchNo))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

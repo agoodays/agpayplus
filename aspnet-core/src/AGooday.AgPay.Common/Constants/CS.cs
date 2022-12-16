@@ -14,6 +14,7 @@
         public interface SYS_TYPE
         {
             public const string MCH = "MCH";
+            public const string AGENT = "AGENT";
             public const string MGR = "MGR";
         }
 
@@ -56,6 +57,17 @@
         /// 特约商户
         /// </summary>
         public const byte MCH_TYPE_ISVSUB = 2;
+        #endregion
+
+        #region 代理商类型:1-普通商户 2-特约商户
+        /// <summary>
+        /// 普通代理商
+        /// </summary>
+        public const byte AGENT_TYPE_NORMAL = 1;
+        /// <summary>
+        /// 特约代理商
+        /// </summary>
+        public const byte AGENT_TYPE_ISVSUB = 2;
         #endregion
 
         #region 性别 1- 男， 2-女

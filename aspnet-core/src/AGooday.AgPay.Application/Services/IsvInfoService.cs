@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
@@ -33,7 +34,7 @@ namespace AGooday.AgPay.Application.Services
         {
             do
             {
-                dto.IsvNo = $"V{DateTimeOffset.Now.ToUnixTimeSeconds()}";
+                dto.IsvNo = SeqUtil.GenIsvNo();
             } while (IsExistIsvNo(dto.IsvNo));
             var m = _mapper.Map<IsvInfo>(dto);
             _isvInfoRepository.Add(m);

@@ -12,5 +12,6 @@ namespace AGooday.AgPay.Domain.Interfaces
         SysUser GetByUserId(long sysUserId, string sysType);
         void Remove(SysUser sysUser);
         long FindMchAdminUserId(string mchNo);
+        long FindAgentAdminUserId(string agentNo);
     }
 }

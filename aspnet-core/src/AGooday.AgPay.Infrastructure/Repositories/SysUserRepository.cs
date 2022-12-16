@@ -48,6 +48,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return DbSet.Where(w => w.BelongInfoId == mchNo && w.SysType == CS.SYS_TYPE.MCH && w.IsAdmin == CS.YES).First().SysUserId;
         }
 
+        public long FindAgentAdminUserId(string agentNo)
+        {
+            return DbSet.Where(w => w.BelongInfoId == agentNo && w.SysType == CS.SYS_TYPE.AGENT && w.IsAdmin == CS.YES).First().SysUserId;
+        }
+
         public void Remove(SysUser sysUser)
         {
             DbSet.Remove(sysUser);

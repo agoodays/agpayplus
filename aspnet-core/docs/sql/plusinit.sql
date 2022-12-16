@@ -202,7 +202,14 @@ ALTER TABLE `t_pay_order`
   ADD COLUMN `seller_remark` VARCHAR(255) NULL COMMENT '买家备注' AFTER `body`;
   ADD COLUMN `buyer_remark` VARCHAR(255) NULL COMMENT '卖家备注' AFTER `seller_remark`;
 
-
+-- 代理商管理
+insert into t_sys_entitlement values('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '30', 'MGR', now(), now());
+    insert into t_sys_entitlement values('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1,  'ENT_AGENT', '10', 'MGR', now(), now());
+        insert into t_sys_entitlement values('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', now(), now());
+        insert into t_sys_entitlement values('ENT_AGENT_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', now(), now());
+        insert into t_sys_entitlement values('ENT_AGENT_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', now(), now());
+        insert into t_sys_entitlement values('ENT_AGENT_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', now(), now());
+        insert into t_sys_entitlement values('ENT_AGENT_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', now(), now());
 
 
 

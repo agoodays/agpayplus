@@ -144,7 +144,9 @@ NativeInjectorBootStrapper.RegisterServices(services);
 services.AddSingleton<IMQSender, RabbitMQSender>();
 services.AddScoped<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
 services.AddScoped<IMQMsgReceiver, CleanMchLoginAuthCacheRabbitMQReceiver>();
+services.AddScoped<IMQMsgReceiver, CleanAgentLoginAuthCacheRabbitMQReceiver>();
 services.AddScoped<CleanMchLoginAuthCacheMQ.IMQReceiver, CleanMchLoginAuthCacheMQReceiver>();
+services.AddScoped<CleanAgentLoginAuthCacheMQ.IMQReceiver, CleanAgentLoginAuthCacheMQReceiver>();
 services.AddScoped<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
 services.AddHostedService<RabbitListener>();
 #endregion
