@@ -121,7 +121,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             #region 添加默认用户认证表
             string salt = StringUtil.GetUUID(6); //6位随机数
-            string authPwd = CS.DEFAULT_PWD;
+            string authPwd = request.PasswordType.Equals("custom") ? request.LoginPassword : CS.DEFAULT_PWD;
             string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
             //用户名登录方式
             var sysUserAuthByLoginUsername = new SysUserAuth()
@@ -158,8 +158,11 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 // 提交成功后，这里需要发布领域事件
                 // 比如欢迎用户注册邮件呀，短信呀等
-                var createdevent = _mapper.Map<AgentInfoCreatedEvent>(agentInfo);
-                Bus.RaiseEvent(createdevent);
+                var createdEvent = _mapper.Map<AgentInfoCreatedEvent>(agentInfo);
+                createdEvent.LoginUsername = request.LoginUsername;
+                createdEvent.LoginPassword = authPwd;
+                createdEvent.IsNotify = request.IsNotify;
+                Bus.RaiseEvent(createdEvent);
             }
 
             return Task.FromResult(new Unit());

@@ -8,6 +8,11 @@ namespace AGooday.AgPay.Domain.EventHandlers
     {
         public Task Handle(MchInfoCreatedEvent notification, CancellationToken cancellationToken)
         {
+            if (notification.IsNotify.Equals(1))
+            {
+                // 发送开通提醒
+                return Task.CompletedTask;
+            }
             throw new NotImplementedException();
         }
     }

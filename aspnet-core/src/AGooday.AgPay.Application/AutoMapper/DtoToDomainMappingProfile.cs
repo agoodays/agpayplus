@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Models;
@@ -17,6 +18,13 @@ namespace AGooday.AgPay.Application.AutoMapper
         /// </summary>
         public DtoToDomainMappingProfile()
         {
+
+            CreateMap<AgentInfoDto, AgentInfo>();
+            CreateMap<AgentInfoCreateDto, CreateAgentInfoCommand>();
+            CreateMap<CreateAgentInfoCommand, AgentInfo>();
+            CreateMap<AgentInfoModifyDto, ModifyAgentInfoCommand>();
+            CreateMap<ModifyAgentInfoCommand, AgentInfo>();
+
             CreateMap<IsvInfoDto, IsvInfo>();
             CreateMap<MchAppDto, MchApp>();
             CreateMap<MchDivisionReceiverGroupDto, MchDivisionReceiverGroup>();

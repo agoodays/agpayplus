@@ -1,4 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Domain.Events.AgentInfos;
+using AGooday.AgPay.Domain.Events.MchInfos;
 using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
@@ -16,6 +18,11 @@ namespace AGooday.AgPay.Application.AutoMapper
         /// </summary>
         public DomainToDtoMappingProfile()
         {
+
+            CreateMap<AgentInfo, AgentInfoDto>();
+            CreateMap<AgentInfo, AgentInfoDetailDto>();
+            CreateMap<AgentInfo, AgentInfoCreatedEvent>();
+
             CreateMap<IsvInfo, IsvInfoDto>();
             CreateMap<MchApp, MchAppDto>();
             CreateMap<MchDivisionReceiverGroup, MchDivisionReceiverGroupDto>();
@@ -23,6 +30,7 @@ namespace AGooday.AgPay.Application.AutoMapper
 
             CreateMap<MchInfo, MchInfoDto>();
             CreateMap<MchInfo, MchInfoDetailDto>();
+            CreateMap<MchInfo, MchInfoCreatedEvent>();
 
             CreateMap<MchNotifyRecord, MchNotifyRecordDto>();
             CreateMap<MchPayPassage, MchPayPassageDto>();

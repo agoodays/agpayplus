@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Domain.CommandHandlers;
+using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
@@ -33,6 +34,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
         public static void RegisterServices(IServiceCollection services)
         {
             // 注入 应用层Application
+            services.AddScoped<IAgentInfoService, AgentInfoService>();
             services.AddScoped<IIsvInfoService, IsvInfoService>();
             services.AddScoped<IMchAppService, MchAppService>();
             services.AddScoped<IMchDivisionReceiverGroupService, MchDivisionReceiverGroupService>();
@@ -72,6 +74,10 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IRequestHandler<RemoveSysUserCommand, Unit>, SysUserCommandHandler>();
             services.AddScoped<IRequestHandler<ModifySysUserCommand, Unit>, SysUserCommandHandler>();
 
+            services.AddScoped<IRequestHandler<CreateAgentInfoCommand, Unit>, AgentInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<RemoveAgentInfoCommand, Unit>, AgentInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<ModifyAgentInfoCommand, Unit>, AgentInfoCommandHandler>();
+
             services.AddScoped<IRequestHandler<CreateMchInfoCommand, Unit>, MchInfoCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveMchInfoCommand, Unit>, MchInfoCommandHandler>();
             services.AddScoped<IRequestHandler<ModifyMchInfoCommand, Unit>, MchInfoCommandHandler>();
@@ -88,6 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
             services.AddScoped<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();

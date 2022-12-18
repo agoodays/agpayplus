@@ -27,6 +27,7 @@ export const asyncRouteDefine = {
   'PayWayPage': { defaultPath: '/payways', component: () => import('@/views/payconfig/payWay/List') },
   'IfDefinePage': { defaultPath: '/ifdefines', component: () => import('@/views/payconfig/payIfDefine/List') },
   'IsvListPage': { defaultPath: '/isv', component: () => import('@/views/isv/IsvList') }, // 服务商列表
+  'AgentListPage': { defaultPath: '/agent', component: () => import('@/views/agent/AgentList') }, // 代理商列表
   'MchListPage': { defaultPath: '/mch', component: () => import('@/views/mch/MchList') }, // 商户列表
   'MchAppPage': { defaultPath: '/apps', component: () => import ('@/views/mchApp/List') }, // 商户应用列表
   'PayOrderListPage': { defaultPath: '/payOrder', component: () => import('@/views/order/pay/PayOrderList') }, // 支付订单列表

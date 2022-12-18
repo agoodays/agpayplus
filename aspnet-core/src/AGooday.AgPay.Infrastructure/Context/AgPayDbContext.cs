@@ -15,6 +15,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         }
 
         #region DbSets
+        public DbSet<AgentInfo> AgentInfo { get; set; }
         public DbSet<IsvInfo> IsvInfo { get; set; }
         public DbSet<MchApp> MchApp { get; set; }
         public DbSet<MchDivisionReceiver> MchDivisionReceiver { get; set; }
@@ -110,6 +111,10 @@ namespace AGooday.AgPay.Infrastructure.Context
         /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AgentInfo>().Property(c => c.Type).HasDefaultValue(1);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.State).HasDefaultValue(1);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<AgentInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<IsvInfo>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<IsvInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<IsvInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");

@@ -71,8 +71,9 @@ export const API_URL_ROLE_ENT_RELA_LIST = '/api/sysRoleEntRelas'
 export const API_URL_SYS_USER_LIST = '/api/sysUsers'
 export const API_URL_USER_ROLE_RELA_LIST = '/api/sysUserRoleRelas'
 
-/** 服务商、商户管理 **/
+/** 服务商、代理商、商户管理 **/
 export const API_URL_ISV_LIST = '/api/isvInfo'
+export const API_URL_AGENT_LIST = '/api/agentInfo'
 export const API_URL_MCH_LIST = '/api/mchInfo'
 /** 商户App管理 **/
 export const API_URL_MCH_APP = '/api/mchApps'
@@ -92,8 +93,9 @@ export const API_URL_MAIN_STATISTIC = 'api/mainChart'
 /** 支付接口定义页面 **/
 export const API_URL_IFDEFINES_LIST = '/api/payIfDefines'
 export const API_URL_PAYWAYS_LIST = '/api/payWays'
-/** 服务商、商户支付参数配置 **/
+/** 服务商、代理商、商户支付参数配置 **/
 export const API_URL_ISV_PAYCONFIGS_LIST = '/api/isv/payConfigs'
+export const API_URL_AGENT_PAYCONFIGS_LIST = '/api/agent/payConfigs'
 export const API_URL_MCH_PAYCONFIGS_LIST = '/api/mch/payConfigs'
 /** 商户支付通道配置 **/
 export const API_URL_MCH_PAYPASSAGE_LIST = '/api/mch/payPassages'
