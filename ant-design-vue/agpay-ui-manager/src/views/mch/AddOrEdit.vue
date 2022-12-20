@@ -65,6 +65,7 @@
               v-model="saveObject.contactTel"
             >
             </a-input>
+            <p class="agpay-tip-text">(同步更改登录手机号)</p>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -411,5 +412,27 @@ export default {
     position: absolute;
     top: 0;
     left:62px;
+  }
+  .agpay-tip-text:before {
+    content: "";
+    width: 0;
+    height: 0;
+    border: 10px;
+    border-style: solid;
+    border-color: transparent transparent #ffeed8 transparent;
+    position: absolute;
+    top: -20px;
+    left: 30px;
+  }
+  .agpay-tip-text {
+    font-size: 10px !important;
+    border-radius: 5px;
+    background: #ffeed8;
+    color: #c57000 !important;
+    padding: 5px 10px;
+    display: inline-block;
+    max-width: 100%;
+    position: relative;
+    margin-top: 15px;
   }
 </style>

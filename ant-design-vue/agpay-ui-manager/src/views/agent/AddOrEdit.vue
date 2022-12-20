@@ -293,7 +293,7 @@
             <div class="ant-col ant-form-item-label"><label title="设置提现手续费规则" class="">设置提现手续费规则</label></div>
           </a-col>
           <a-col :span="24">
-            <a-form-model-item label="配置类型：" style="display: flex;margin-bottom: auto;" prop="cashoutFeeRuleType">
+            <a-form-model-item class="cashout-fee" label="配置类型：" prop="cashoutFeeRuleType">
               <a-radio-group v-model="saveObject.cashoutFeeRuleType">
                 <a-radio :value='1'>
                   使用系统默认
@@ -307,42 +307,42 @@
         </a-row>
         <a-row justify="space-between" type="flex" v-if="this.saveObject.cashoutFeeRuleType === 2">
           <a-col :span="24">
-            <a-form-model-item class="cashout-fee" label="额度：设置最低" prop="applyLimit">
-              <a-input-number v-model="cashoutFeeRule.applyLimit" style="width: 100px"/>
-              <div class="ant-col ant-form-item-label"><label title="额度: 设置最低" class="">元可发起提现</label></div>
+            <a-form-model-item class="cashout-fee" :title='"额度：设置最低"+this.cashoutFeeRule.applyLimit+"元可发起提现"' prop="applyLimit">
+              <div class="ant-col ant-form-item-label cashout-fee-label"><label>额度：设置最低</label></div>
+              <a-input-number v-model="cashoutFeeRule.applyLimit"/>
+              <div class="ant-col ant-form-item-label cashout-fee-label"><label>元可发起提现</label></div>
             </a-form-model-item>
           </a-col>
           <a-col :span="24">
-            <a-form-model-item class="cashout-fee" label="规则：提现" prop="freeLimit">
-              <a-input-number v-model="cashoutFeeRule.freeLimit" style="width: 100px"/>
-              <div class="ant-col ant-form-item-label"><label title="额度: 设置最低" class="">元可发起提现</label></div>
+            <a-form-model-item class="cashout-fee" :title='"规则：提现"+this.cashoutFeeRule.freeLimit+"元以内免收手续费"' prop="freeLimit">
+              <div class="ant-col ant-form-item-label cashout-fee-label"><label>规则：提现</label></div>
+              <a-input-number v-model="cashoutFeeRule.freeLimit"/>
+              <div class="ant-col ant-form-item-label cashout-fee-label"><label>元以内免收手续费</label></div>
             </a-form-model-item>
           </a-col>
           <a-col :span="24">
-            <a-form-model-item label="手续费计算模式：" prop="feeType">
+            <a-form-model-item class="cashout-fee-type" label="手续费计算模式：" prop="feeType">
               <a-radio-group v-model="cashoutFeeRule.feeType">
                 <a-radio value='FIX'>
                   单笔固定
                   <div v-if="cashoutFeeRule.feeType === 'FIX'" style="display: contents;">
-                    <a-input-number v-model="cashoutFeeRule.fixFee" style="width: 100px"/>
+                    <a-input-number v-model="cashoutFeeRule.fixFee"/>
                     元
                   </div>
-                  <a-input-number v-if="cashoutFeeRule.feeType === 'FIX'" v-model="cashoutFeeRule.fixFee" style="width: 100px"/>
                 </a-radio>
                 <a-radio value='SINGLE'>
                   单笔费率
                   <div v-if="cashoutFeeRule.feeType === 'SINGLE'" style="display: contents;">
-                    <a-input-number v-model="cashoutFeeRule.feeRate" style="width: 100px"/>
+                    <a-input-number v-model="cashoutFeeRule.feeRate"/>
                     %
                   </div>
-                  <a-input-number v-if="cashoutFeeRule.feeType === 'SINGLE'" v-model="cashoutFeeRule.feeRate" style="width: 100px"/>
                 </a-radio>
                 <a-radio value='FIXANDRATE'>
                   固定+费率
                   <div v-if="cashoutFeeRule.feeType === 'FIXANDRATE'" style="display: contents;">
-                    <a-input-number v-model="cashoutFeeRule.fixFee" style="width: 100px"/>
+                    <a-input-number v-model="cashoutFeeRule.fixFee"/>
                     元 +
-                    <a-input-number v-model="cashoutFeeRule.feeRate" style="width: 100px"/>
+                    <a-input-number v-model="cashoutFeeRule.feeRate"/>
                     %
                   </div>
                 </a-radio>
@@ -807,13 +807,27 @@ export default {
   }
   .cashout-fee {
     display: flex;
-    margin: auto;
+    /*margin: auto;*/
+    margin-bottom: 8px;
   }
-  .cashout-fee .ant-form-item-label {
-    padding-top: 5px;
-    text-align: center;
+  .cashout-fee .ant-input-number {
+    /*width: 100px;*/
+    margin: 0 5px 0 5px;
+  }
+  .cashout-fee-type .ant-radio-group {
+    display: grid;
+  }
+  .cashout-fee-type .ant-radio-group .ant-radio-wrapper {
+    margin-bottom: 18px;
+  }
+  .cashout-fee-type .ant-radio-group .ant-radio-wrapper:last-child {
+    margin-bottom: 0px;
   }
   .cashout-fee .ant-form-item-children {
     display: flex;
+  }
+  .ant-form-item-label.cashout-fee-label {
+    padding-top: 5px;
+    text-align: center;
   }
 </style>
