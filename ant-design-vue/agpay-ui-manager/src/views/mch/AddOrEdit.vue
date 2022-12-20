@@ -306,12 +306,12 @@ export default {
   methods: {
     show: function (recordId) { // 弹层打开事件
       this.isAdd = !recordId
-      this.saveObject = {'state': 1, 'type': 1, 'isNotify': 0, 'passwordType': 'default', 'loginPassword': ''} // 数据清空
+      this.saveObject = { 'state': 1, 'type': 1, 'isNotify': 0, 'passwordType': 'default', 'loginPassword': '' } // 数据清空
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
       }
       const that = this
-      req.list(API_URL_ISV_LIST, {'pageSize': -1, 'state': 1}).then(res => { // 服务商下拉选择列表
+      req.list(API_URL_ISV_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 服务商下拉选择列表
         that.isvList = res.records
       })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
@@ -327,13 +327,13 @@ export default {
       }
     },
     // 随机生成六位数密码
-    genRandomPassword() {
+    genRandomPassword: function () {
       if (!this.passwordLength) return
 
-      let password = ""
-      let characters = "abcdefghijklmnopqrstuvwxyz"
-      if (this.includeUpperCase) characters += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      if (this.includeNumber) characters += "0123456789"
+      let password = ''
+      let characters = 'abcdefghijklmnopqrstuvwxyz'
+      if (this.includeUpperCase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+      if (this.includeNumber) characters += '0123456789'
       if (this.includeSymbol) characters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
       for (let i = 0; i < this.passwordLength; i++) {
         password += characters.charAt(Math.floor(Math.random() * characters.length))
@@ -381,7 +381,7 @@ export default {
         }
       })
     },
-    onClose() {
+    onClose () {
       this.visible = false
       this.resetIsShow = false // 取消重置密码板块展示
       this.sysPassword.resetPass = false
@@ -392,14 +392,14 @@ export default {
       this.$refs.infoTable.refTable(true)
     },
     // 使用默认密码重置是否为true
-    isResetPass() {
+    isResetPass () {
       if (!this.sysPassword.defaultPass) {
         this.newPwd = ''
         this.sysPassword.confirmPwd = ''
       }
     },
     // 保存后清空密码
-    resetPassEmpty(that) {
+    resetPassEmpty (that) {
       that.newPwd = ''
       that.sysPassword.confirmPwd = ''
     }
