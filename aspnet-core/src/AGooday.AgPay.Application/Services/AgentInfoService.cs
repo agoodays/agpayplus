@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
-        public bool IsExistMchNo(string mchNo)
+        public bool IsExistAgentNo(string mchNo)
         {
             return _agentInfoRepository.IsExistAgentNo(mchNo);
         }
@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public AgentInfoDetailDto GetByMchNo(string mchNo)
+        public AgentInfoDetailDto GetByAgentNo(string mchNo)
         {
             var agentInfo = _agentInfoRepository.GetById(mchNo);
             var dto = _mapper.Map<AgentInfoDetailDto>(agentInfo);
@@ -101,14 +101,13 @@ namespace AGooday.AgPay.Application.Services
             var agentNos = new List<string>();
             if (!string.IsNullOrWhiteSpace(dto.LoginUsername))
             {
-                agentNos = _sysUserRepository.GetAll().Where(w => w.SysType.Equals(CS.SYS_TYPE.AGENT)
-                && w.LoginUsername.Equals(dto.LoginUsername))
+                agentNos = _sysUserRepository.GetAll().Where(w => w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.LoginUsername.Equals(dto.LoginUsername))
                     .Select(s => s.BelongInfoId).AsNoTracking().ToList();
             }
 
             var agentInfos = _agentInfoRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                && (agentNos.Any() || agentNos.Contains(dto.AgentNo))
+                && (!agentNos.Any() || agentNos.Contains(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.Pid) || w.IsvNo.Equals(dto.Pid))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.AgentName))

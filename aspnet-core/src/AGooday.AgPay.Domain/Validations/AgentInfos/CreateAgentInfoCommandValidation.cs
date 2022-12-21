@@ -7,11 +7,12 @@ namespace AGooday.AgPay.Domain.Validations.AgentInfos
     {
         public CreateAgentInfoCommandValidation()
         {
-            ValidateMchName();
-            ValidateMchShortName();
+            ValidateAgentName();
+            ValidateAgentShortName();
             ValidateLoginUsername();
             ValidateContactName();
             ValidateContactTel();
+            ValidateIsvNo();
         }
 
         /// <summary>

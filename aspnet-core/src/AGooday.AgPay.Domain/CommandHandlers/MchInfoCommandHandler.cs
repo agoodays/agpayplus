@@ -51,6 +51,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         {
             _mapper = mapper;
             Cache = cache;
+            Bus = bus;
             this.mqSender = mqSender;
             _sysUserRepository = sysUserRepository;
             _mchInfoRepository = mchInfoRepository;

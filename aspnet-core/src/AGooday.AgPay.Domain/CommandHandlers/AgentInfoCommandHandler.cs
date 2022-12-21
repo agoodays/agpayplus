@@ -42,6 +42,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         {
             _mapper = mapper;
             Cache = cache;
+            Bus = bus;
             this.mqSender = mqSender;
             _sysUserRepository = sysUserRepository;
             _agentInfoRepository = agentInfoRepository;
@@ -67,14 +68,35 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             } while (_agentInfoRepository.IsExistAgentNo(agentInfo.AgentNo));
 
             #region 检查
-            // 校验特邀代理商信息
+            // 校验上级代理商信息
+            if (!string.IsNullOrWhiteSpace(agentInfo.Pid))
+            {
+                // 当前服务商状态是否正确
+                var pagentInfo = _agentInfoRepository.GetById(agentInfo.IsvNo);
+                if (pagentInfo == null || pagentInfo.State == CS.NO)
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "上级代理商不可用！"));
+                    return Task.FromResult(new Unit());
+                }
+                if (!agentInfo.IsvNo.Equals(pagentInfo.IsvNo))
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "上级代理商/服务商信息有误！"));
+                    return Task.FromResult(new Unit());
+                }
+                agentInfo.Level = ++pagentInfo.Level;
+            }
+            else
+            {
+                agentInfo.Level = 1;
+            }
+            // 校验服务商信息
             if (!string.IsNullOrWhiteSpace(agentInfo.IsvNo))
             {
                 // 当前服务商状态是否正确
                 var isvInfo = _isvInfoRepository.GetById(agentInfo.IsvNo);
                 if (isvInfo == null || isvInfo.State == CS.NO)
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "当前服务商不可用！"));
+                    Bus.RaiseEvent(new DomainNotification("", "服务商号不可用！"));
                     return Task.FromResult(new Unit());
                 }
             }

@@ -6,10 +6,11 @@ namespace AGooday.AgPay.Domain.Validations.AgentInfos
     {
         public ModifyAgentInfoCommandValidation()
         {
-            ValidateMchName();
-            ValidateMchShortName();
+            ValidateAgentName();
+            ValidateAgentShortName();
             ValidateContactName();
             ValidateContactTel();
+            ValidateIsvNo();
         }
     }
 }

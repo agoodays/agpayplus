@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 代理商类型: 1-个人, 2-企业
         /// </summary>
         [Comment("代理商类型: 1-个人, 2-企业")]
-        [Required, Column("type", TypeName = "tinyint(6)")]
+        [Required, Column("agent_type", TypeName = "tinyint(6)")]
         public byte AgentType { get; set; }
 
         /// <summary>
@@ -162,42 +162,42 @@ namespace AGooday.AgPay.Domain.Models
         /// 营业执照照片
         /// </summary>
         [Comment("营业执照照片")]
-        [Column("cashout_fee_rule", TypeName = "varchar(128)")]
+        [Column("license_img", TypeName = "varchar(128)")]
         public string LicenseImg { get; set; }
 
         /// <summary>
         /// 开户许可证照片
         /// </summary>
         [Comment("开户许可证照片")]
-        [Column("cashout_fee_rule", TypeName = "varchar(128)")]
+        [Column("permit_img", TypeName = "varchar(128)")]
         public string PermitImg { get; set; }
 
         /// <summary>
         /// 营业执照照片
         /// </summary>
         [Comment("身份证人像面照片")]
-        [Column("cashout_fee_rule", TypeName = "varchar(128)")]
+        [Column("idcard1_img", TypeName = "varchar(128)")]
         public string Idcard1Img { get; set; }
 
         /// <summary>
         /// 营业执照照片
         /// </summary>
         [Comment("身份证国徽面照片")]
-        [Column("cashout_fee_rule", TypeName = "varchar(128)")]
+        [Column("idcard2_img", TypeName = "varchar(128)")]
         public string Idcard2Img { get; set; }
 
         /// <summary>
         /// 营业执照照片
         /// </summary>
         [Comment("手持身份证照片")]
-        [Column("cashout_fee_rule", TypeName = "varchar(128)")]
+        [Column("idcard_in_hand_img", TypeName = "varchar(128)")]
         public string IdcardInHandImg { get; set; }
 
         /// <summary>
         /// 营业执照照片
         /// </summary>
         [Comment("银行卡照片")]
-        [Column("cashout_fee_rule", TypeName = "varchar(128)")]
+        [Column("bank_card_img", TypeName = "varchar(128)")]
         public string BankCardImg { get; set; }
 
         /// <summary>

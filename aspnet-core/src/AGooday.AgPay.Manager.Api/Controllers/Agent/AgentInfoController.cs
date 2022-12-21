@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         [PermissionAuth(PermCode.MGR.ENT_AGENT_INFO_VIEW, PermCode.MGR.ENT_AGENT_INFO_EDIT)]
         public ApiRes Detail(string agentNo)
         {
-            var agentInfo = _agentInfoService.GetByMchNo(agentNo);
+            var agentInfo = _agentInfoService.GetByAgentNo(agentNo);
             if (agentInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

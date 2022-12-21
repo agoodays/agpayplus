@@ -8,17 +8,18 @@ namespace AGooday.AgPay.Domain.Validations.AgentInfos
         /// <summary>
         /// 验证代理商名称
         /// </summary>
-        protected void ValidateMchName()
+        protected void ValidateAgentName()
         {
             //定义规则，c 就是当前 AgentInfoValidation 类
             RuleFor(c => c.AgentName)
                 .NotEmpty().WithMessage("代理商名称不能为空！")//判断不能为空，如果为空则显示Message
                 ;
         }
+
         /// <summary>
         /// 验证代理商简称
         /// </summary>
-        protected void ValidateMchShortName()
+        protected void ValidateAgentShortName()
         {
             //定义规则，c 就是当前 AgentInfoValidation 类
             RuleFor(c => c.AgentShortName)
@@ -45,6 +46,16 @@ namespace AGooday.AgPay.Domain.Validations.AgentInfos
                 .NotEmpty()
                 .Must(HavePhone)
                 .WithMessage("联系人手机号应该为11位！")
+                ;
+        }
+
+        /// <summary>
+        /// 验证服务商号
+        /// </summary>
+        protected void ValidateIsvNo()
+        {
+            RuleFor(c => c.IsvNo)
+                .NotEmpty().WithMessage("服务商号不能为空！")
                 ;
         }
 

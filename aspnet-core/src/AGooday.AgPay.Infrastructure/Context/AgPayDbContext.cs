@@ -111,8 +111,14 @@ namespace AGooday.AgPay.Infrastructure.Context
         /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AgentInfo>().Property(c => c.Type).HasDefaultValue(1);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.AgentType).HasDefaultValue(1);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.Level).HasDefaultValue(1);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.AddAgentFlag).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.State).HasDefaultValue(1);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.CashoutFeeRuleType).HasDefaultValue(1);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.UnAmount).HasDefaultValue(0);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.BalanceAmount).HasDefaultValue(0);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.AuditProfitAmount).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<AgentInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<IsvInfo>().Property(c => c.State).HasDefaultValue(1);
