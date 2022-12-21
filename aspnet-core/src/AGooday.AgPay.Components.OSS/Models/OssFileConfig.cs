@@ -25,6 +25,10 @@ namespace AGooday.AgPay.Components.OSS.Models
             /// 接口参数
             /// </summary>
             public const string CERT = "cert";
+            /// <summary>
+            /// 表单参数
+            /// </summary>
+            public const string FORM = "form";
         }
 
         /// <summary>
@@ -52,6 +56,7 @@ namespace AGooday.AgPay.Components.OSS.Models
             { BIZ_TYPE.AVATAR, new OssFileConfig(OssSavePlaceEnum.PUBLIC, IMG_SUFFIX) },
             { BIZ_TYPE.IF_BG, new OssFileConfig(OssSavePlaceEnum.PUBLIC, IMG_SUFFIX) },
             { BIZ_TYPE.CERT, new OssFileConfig(OssSavePlaceEnum.PRIVATE, new List<string>(){ ALL_SUFFIX_FLAG})},
+            { BIZ_TYPE.FORM, new OssFileConfig(OssSavePlaceEnum.PUBLIC, IMG_SUFFIX) },
         };
 
         /// <summary>

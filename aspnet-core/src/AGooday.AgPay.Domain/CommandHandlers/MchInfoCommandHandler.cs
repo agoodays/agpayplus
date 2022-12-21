@@ -219,17 +219,31 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     .Select(w => w.SysUserId).ToList();
             }
 
+            //修改了手机号， 需要修改auth表信息
+            // 获取商户超管
+            long mchAdminUserId = _sysUserRepository.FindMchAdminUserId(mchInfo.MchNo);
+            var sysUserAuth = _sysUserAuthRepository.GetAll()
+                 .Where(w => w.UserId.Equals(mchAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.MCH)
+                 && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE)).FirstOrDefault();
+            if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
+            {
+                if (_sysUserRepository.IsExistTelphone(request.ContactTel, request.ContactTel))
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                    return Task.FromResult(new Unit());
+                }
+                sysUserAuth.Identifier = request.ContactTel;
+                _sysUserAuthRepository.Update(sysUserAuth);
+            }
+
             // 判断是否重置密码
             if (request.ResetPass)
             {
                 // 待更新的密码
                 string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
-                // 获取商户超管
-                long mchAdminUserId = _sysUserRepository.FindMchAdminUserId(mchInfo.MchNo);
 
                 // 重置超管密码
-                _sysUserAuthRepository.ResetAuthInfo(mchAdminUserId, null, null, updatePwd, CS.SYS_TYPE.MCH);
-                _sysUserAuthRepository.SaveChanges();
+                _sysUserAuthRepository.ResetAuthInfo(mchAdminUserId, CS.SYS_TYPE.MCH, null, null, updatePwd);
 
                 // 删除超管登录信息
                 removeCacheUserIdList.Add(mchAdminUserId);
@@ -243,7 +257,6 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             // 更新商户信息
             _mchInfoRepository.Update(mchInfo);
-            _mchInfoRepository.SaveChanges();
 
             // 推送mq到目前节点进行更新数据
             mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, mchInfo.MchNo, null));

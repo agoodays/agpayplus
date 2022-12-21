@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -97,11 +98,21 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<AgentInfoDto> GetPaginatedData(AgentInfoQueryDto dto)
         {
+            var agentNos = new List<string>();
+            if (!string.IsNullOrWhiteSpace(dto.LoginUsername))
+            {
+                agentNos = _sysUserRepository.GetAll().Where(w => w.SysType.Equals(CS.SYS_TYPE.AGENT)
+                && w.LoginUsername.Equals(dto.LoginUsername))
+                    .Select(s => s.BelongInfoId).AsNoTracking().ToList();
+            }
+
             var agentInfos = _agentInfoRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
+                && (agentNos.Any() || agentNos.Contains(dto.AgentNo))
+                && (string.IsNullOrWhiteSpace(dto.Pid) || w.IsvNo.Equals(dto.Pid))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.AgentName))
-                && (dto.Type.Equals(0) || w.Type.Equals(dto.Type))
+                && (string.IsNullOrWhiteSpace(dto.ContactTel) || w.IsvNo.Equals(dto.ContactTel))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(agentInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);

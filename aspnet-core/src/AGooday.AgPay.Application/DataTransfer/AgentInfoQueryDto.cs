@@ -19,9 +19,20 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string AgentName { get; set; }
 
         /// <summary>
-        /// 类型: 1-普通代理商, 2-特约代理商(服务商模式)
+        /// 初始用户ID（创建代理商时，允许代理商登录的用户）
         /// </summary>
-        public byte Type { get; set; }
+        public string LoginUsername { get; set; }
+
+        /// <summary>
+        /// 代理商类型: 1-个人, 2-企业
+        /// </summary>
+        [BindNever]
+        public byte AgentType { get; set; }
+
+        /// <summary>
+        /// 上级代理商号
+        /// </summary>
+        public string Pid { get; set; }
 
         /// <summary>
         /// 服务商号

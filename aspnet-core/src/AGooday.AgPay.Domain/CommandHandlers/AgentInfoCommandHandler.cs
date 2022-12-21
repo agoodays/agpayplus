@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             #region 检查
             // 校验特邀代理商信息
-            if (agentInfo.Type.Equals(CS.AGENT_TYPE_ISVSUB) && !string.IsNullOrWhiteSpace(agentInfo.IsvNo))
+            if (!string.IsNullOrWhiteSpace(agentInfo.IsvNo))
             {
                 // 当前服务商状态是否正确
                 var isvInfo = _isvInfoRepository.GetById(agentInfo.IsvNo);
@@ -192,20 +192,35 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     .Select(w => w.SysUserId).ToList();
             }
 
+            //修改了手机号， 需要修改auth表信息
+            // 获取代理商超管
+            long agentAdminUserId = _sysUserRepository.FindMchAdminUserId(agentInfo.AgentNo);
+            var sysUserAuth = _sysUserAuthRepository.GetAll()
+                 .Where(w => w.UserId.Equals(agentAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.AGENT)
+                 && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE)).FirstOrDefault();
+            if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
+            {
+                if (_sysUserRepository.IsExistTelphone(request.ContactTel, request.ContactTel))
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                    return Task.FromResult(new Unit());
+                }
+                sysUserAuth.Identifier = request.ContactTel;
+                _sysUserAuthRepository.Update(sysUserAuth);
+            }
+
             // 判断是否重置密码
             if (request.ResetPass)
             {
                 // 待更新的密码
                 string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
-                // 获取代理商超管
-                long mchAdminUserId = _sysUserRepository.FindAgentAdminUserId(agentInfo.AgentNo);
 
                 // 重置超管密码
-                _sysUserAuthRepository.ResetAuthInfo(mchAdminUserId, null, null, updatePwd, CS.SYS_TYPE.AGENT);
+                _sysUserAuthRepository.ResetAuthInfo(agentAdminUserId, CS.SYS_TYPE.AGENT, null, null, updatePwd);
                 _sysUserAuthRepository.SaveChanges();
 
                 // 删除超管登录信息
-                removeCacheUserIdList.Add(mchAdminUserId);
+                removeCacheUserIdList.Add(agentAdminUserId);
             }
 
             // 推送mq删除redis用户认证信息

@@ -368,21 +368,15 @@
           <a-col :span="10" v-if="this.saveObject.agentType === 2">
             <a-form-model-item label="营业执照照片" prop="licenseImg">
               <a-upload
-                  v-model="saveObject.licenseImg"
-                  name="avatar"
-                  list-type="picture-card"
-                  class="avatar-uploader"
-                  :show-upload-list="false"
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  :before-upload="beforeUpload"
-                  @change="handleChange"
+                  :action="action"
+                  :default-file-list="getDefaultFileList('licenseImg')"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'licenseImg')"
               >
-                <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
-                <div v-else>
-                  <loading-outlined v-if="loading"></loading-outlined>
-                  <plus-outlined v-else></plus-outlined>
-                  <div class="ant-upload-text">上传</div>
-                </div>
+                <a-button icon="upload" v-if="this.imgIsShow.licenseImg">
+                  上传
+                </a-button>
               </a-upload>
             </a-form-model-item>
           </a-col>
@@ -390,106 +384,76 @@
           <a-col :span="10" v-if="this.saveObject.agentType === 2 && this.saveObject.settAccountType === 'BANK_PUBLIC'">
             <a-form-model-item label="开户许可证照片" prop="permitImg">
               <a-upload
-                  v-model="saveObject.permitImg"
-                  name="avatar"
-                  list-type="picture-card"
-                  class="avatar-uploader"
-                  :show-upload-list="false"
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  :before-upload="beforeUpload"
-                  @change="handleChange"
+                  :action="action"
+                  :default-file-list="getDefaultFileList('permitImg')"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'permitImg')"
               >
-                <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
-                <div v-else>
-                  <loading-outlined v-if="loading"></loading-outlined>
-                  <plus-outlined v-else></plus-outlined>
-                  <div class="ant-upload-text">上传</div>
-                </div>
+                <a-button icon="upload" v-if="this.imgIsShow.permitImg">
+                  上传
+                </a-button>
               </a-upload>
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
-            <a-form-model-item :label='"["+this.imgLabel +"]身份证人像面照片"' prop="idcard1Img">
+            <a-form-model-item :label='"["+this.imgLabel+"]身份证人像面照片"' prop="idcard1Img">
               <a-upload
-                  v-model="saveObject.idcard1Img"
-                  name="avatar"
-                  list-type="picture-card"
-                  class="avatar-uploader"
-                  :show-upload-list="false"
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  :before-upload="beforeUpload"
-                  @change="handleChange"
+                  :action="action"
+                  :default-file-list="getDefaultFileList('idcard1Img')"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'idcard1Img')"
               >
-                <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
-                <div v-else>
-                  <loading-outlined v-if="loading"></loading-outlined>
-                  <plus-outlined v-else></plus-outlined>
-                  <div class="ant-upload-text">上传</div>
-                </div>
+                <a-button icon="upload" v-if="this.imgIsShow.idcard1Img">
+                  上传
+                </a-button>
               </a-upload>
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
-            <a-form-model-item :label='"["+this.imgLabel +"]身份证国徽面照片"' prop="idcard2Img">
+            <a-form-model-item :label='"["+this.imgLabel+"]身份证国徽面照片"' prop="idcard2Img">
               <a-upload
-                  v-model="saveObject.idcard2Img"
-                  name="avatar"
-                  list-type="picture-card"
-                  class="avatar-uploader"
-                  :show-upload-list="false"
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  :before-upload="beforeUpload"
-                  @change="handleChange"
+                  :action="action"
+                  :default-file-list="getDefaultFileList('idcard2Img')"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'idcard2Img')"
               >
-                <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
-                <div v-else>
-                  <loading-outlined v-if="loading"></loading-outlined>
-                  <plus-outlined v-else></plus-outlined>
-                  <div class="ant-upload-text">上传</div>
-                </div>
+                <a-button icon="upload" v-if="this.imgIsShow.idcard2Img">
+                  上传
+                </a-button>
               </a-upload>
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
             <a-form-model-item label="[联系人]手持身份证照片" prop="idcardInHandImg">
               <a-upload
-                  v-model="saveObject.idcardInHandImg"
-                  name="avatar"
-                  list-type="picture-card"
-                  class="avatar-uploader"
-                  :show-upload-list="false"
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  :before-upload="beforeUpload"
-                  @change="handleChange"
+                 :action="action"
+                 :default-file-list="getDefaultFileList('idcardInHandImg')"
+                 list-type="picture"
+                 class="upload-list-inline"
+                 @change="handleChange($event, 'idcardInHandImg')"
               >
-                <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
-                <div v-else>
-                  <loading-outlined v-if="loading"></loading-outlined>
-                  <plus-outlined v-else></plus-outlined>
-                  <div class="ant-upload-text">上传</div>
-                </div>
+                <a-button icon="upload" v-if="this.imgIsShow.idcardInHandImg">
+                  上传
+                </a-button>
               </a-upload>
             </a-form-model-item>
           </a-col>
           <!-- 个人对私/企业对私 -->
           <a-col :span="10" v-if="this.saveObject.settAccountType === 'BANK_PRIVATE'">
-            <a-form-model-item :label='"["+this.imgLabel +"]银行卡照片"' prop="bankCardImg">
+            <a-form-model-item :label='"["+this.imgLabel+"]银行卡照片"' prop="bankCardImg">
               <a-upload
-                  v-model="saveObject.bankCardImg"
-                  name="avatar"
-                  list-type="picture-card"
-                  class="avatar-uploader"
-                  :show-upload-list="false"
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  :before-upload="beforeUpload"
-                  @change="handleChange"
+                 :action="action"
+                 :default-file-list="getDefaultFileList('bankCardImg')"
+                 list-type="picture"
+                 class="upload-list-inline"
+                 @change="handleChange($event, 'bankCardImg')"
               >
-                <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
-                <div v-else>
-                  <loading-outlined v-if="loading"></loading-outlined>
-                  <plus-outlined v-else></plus-outlined>
-                  <div class="ant-upload-text">上传</div>
-                </div>
+                <a-button icon="upload" v-if="this.imgIsShow.bankCardImg">
+                  上传
+                </a-button>
               </a-upload>
             </a-form-model-item>
           </a-col>
@@ -509,7 +473,7 @@
 </template>
 
 <script>
-import { API_URL_AGENT_LIST, API_URL_ISV_LIST, req } from '@/api/manage'
+import { API_URL_AGENT_LIST, API_URL_ISV_LIST, req, upload } from '@/api/manage'
 import { Base64 } from 'js-base64'
 export default {
   name: 'AddOrEdit',
@@ -554,6 +518,15 @@ export default {
         { settAccountType: 'ALIPAY_CASH', settAccountTypeName: '个人支付宝' },
         { settAccountType: 'BANK_PRIVATE', settAccountTypeName: '对私账户' }
       ],
+      action: upload.form, // 上传文件地址
+      imgIsShow: {
+        licenseImg: true,
+        permitImg: true,
+        idcard1Img: true,
+        idcard2Img: true,
+        idcardInHandImg: true,
+        bankCardImg: true
+      },
       imgLabel: '联系人',
       settAccountNoLabel: '个人微信号',
       agentList: null, // 代理商下拉列表
@@ -721,6 +694,9 @@ export default {
         this.imgLabel = '联系人'
         this.settAccountTypeList.pop()
       }
+      if (this.saveObject.agentType === 1 && this.saveObject.settAccountType === 'BANK_PUBLIC') {
+        this.saveObject.settAccountType = 'WX_CASH'
+      }
     },
     settAccountTypeChange (value) {
       switch (value) {
@@ -738,17 +714,31 @@ export default {
           break
       }
     },
+    getDefaultFileList (name) {
+      const url = this.saveObject[name]
+      if (!url) {
+        this.imgIsShow[name] = true
+        return []
+      }
+      this.imgIsShow[name] = false
+      return [{
+        uid: '-1',
+        name: url.split('/').pop(),
+        status: 'done',
+        url: url,
+        thumbUrl: url
+      }]
+    },
     // 上传回调
-    handleChange (info) {
-      // 限制文件数量
-      /* let fileList = [...info.fileList]
-      fileList = fileList.length > this.num ? fileList.splice(0 - this.num) : fileList // 取最新加入的元素
-      fileList = fileList.map(file => {
-        if (file.response) {
-          file.url = file.response.data
-        }
-        return file
-      }) */
+    handleChange (info, name) {
+      console.log(info)
+      if (info.fileList.length) {
+        this.imgIsShow[name] = false
+      } else {
+        this.imgIsShow[name] = true
+        this.saveObject[name] = ''
+      }
+
       const res = info.file.response
 
       if (info.file.status === 'uploading') {
@@ -759,7 +749,14 @@ export default {
           this.$message.error(res.msg)
         }
         this.loading = false
-        this.$emit('uploadSuccess', res.data)
+        this.saveObject[name] = res.data
+        info.file.name = res.data.split('/').pop()
+        info.file.url = res.data
+        info.file.thumbUrl = res.data
+        const fileinfo = info.fileList.find(f => f.lastModified === info.file.lastModified)
+        fileinfo.name = res.data.split('/').pop()
+        fileinfo.url = res.data
+        fileinfo.thumbUrl = res.data
       } else if (info.file.status === 'error') {
         console.log(info)
         this.$message.error(`上传失败`)
@@ -767,6 +764,7 @@ export default {
     },
     // 上传图片前的校验
     beforeUpload (file) {
+      console.log(file)
       const validate = file.size / 1024 / 1024 < this.size
       if (!validate) {
         this.$message.error('文件应小于' + this.size + 'M!')
@@ -829,5 +827,8 @@ export default {
   .ant-form-item-label.cashout-fee-label {
     padding-top: 5px;
     text-align: center;
+  }
+  .upload-list-inline .ant-btn {
+    height: 66px;
   }
 </style>

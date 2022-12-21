@@ -106,7 +106,8 @@ export const API_URL_TRANSFER_ORDER_LIST = '/api/transferOrders'
 export const upload = {
   avatar: request.baseUrl + '/api/ossFiles/avatar',
   ifBG: request.baseUrl + '/api/ossFiles/ifBG',
-  cert: request.baseUrl + '/api/ossFiles/cert'
+  cert: request.baseUrl + '/api/ossFiles/cert',
+  form: request.baseUrl + '/api/ossFiles/form'
 }
 
 const api = {

@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             }
         }
 
-        public void ResetAuthInfo(long userId, string loginUserName, string telphone, string newPwd, string sysType)
+        public void ResetAuthInfo(long userId, string sysType, string loginUserName, string telphone, string newPwd)
         {
             var sysUserAuths = DbSet.Where(w => w.UserId == userId && w.SysType == sysType);
 

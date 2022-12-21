@@ -5,20 +5,16 @@
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
             <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo"/>
+            <ag-text-up :placeholder="'上级代理商号'" :msg="searchData.pid" v-model="searchData.pid"/>
             <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
             <ag-text-up :placeholder="'代理商名称'" :msg="searchData.agentName" v-model="searchData.agentName"/>
+            <ag-text-up :placeholder="'代理商登录名'" :msg="searchData.loginUsername" v-model="searchData.loginUsername"/>
+            <ag-text-up :placeholder="'手机号'" :msg="searchData.contactTel" v-model="searchData.contactTel"/>
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="代理商状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">禁用</a-select-option>
                 <a-select-option value="1">启用</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.type" placeholder="代理商类型" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="1">普通代理商</a-select-option>
-                <a-select-option value="2">特约代理商</a-select-option>
               </a-select>
             </a-form-item>
             <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
@@ -49,11 +45,6 @@
         <template slot="stateSlot" slot-scope="{record}">
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />
         </template>
-        <template slot="typeSlot" slot-scope="{record}">
-          <a-tag :color="record.type === 1 ? 'green' : 'orange'">
-            {{ record.type === 1 ? '普通代理商':'特约代理商' }}
-          </a-tag>
-        </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_AGENT_INFO_EDIT')" @click="editFunc(record.agentNo)">修改</a-button>
@@ -81,9 +72,14 @@ import InfoDetail from './Detail'
 const tableColumns = [
   { key: 'agentName', fixed: 'left', width: '200px', title: '代理商名称', scopedSlots: { customRender: 'agentNameSlot' } },
   { key: 'agentNo', title: '代理商号', dataIndex: 'agentNo' },
+  { key: 'contactTel', title: '手机号', dataIndex: 'contactTel' },
+  { key: 'level', title: '等级', dataIndex: 'level' },
+  { key: 'pid', title: '上级代理', dataIndex: 'pid' },
   { key: 'isvNo', title: '服务商号', dataIndex: 'isvNo' },
+  { key: 'auditProfitAmount', title: '在途佣金', dataIndex: 'auditProfitAmount' },
+  { key: 'balanceAmount', title: '钱包余额', dataIndex: 'balanceAmount' },
+  { key: 'unAmount', title: '不可用金额', dataIndex: 'unAmount' },
   { key: 'state', title: '状态', width: '130px', scopedSlots: { customRender: 'stateSlot' } },
-  { key: 'type', title: '代理商类型', width: '130px', scopedSlots: { customRender: 'typeSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]

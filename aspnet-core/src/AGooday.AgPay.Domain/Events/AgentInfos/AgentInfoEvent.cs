@@ -20,14 +20,19 @@ namespace AGooday.AgPay.Domain.Events.AgentInfos
         public string AgentShortName { get; set; }
 
         /// <summary>
-        /// 类型: 1-普通代理商, 2-特约代理商(服务商模式)
+        /// 代理商类型: 1-个人, 2-企业
         /// </summary>
-        public byte Type { get; set; }
+        public byte AgentType { get; set; }
 
         /// <summary>
         /// 等级: 1-一级, 2-二级, 3-三级 ...
         /// </summary>
         public byte Level { get; set; }
+
+        /// <summary>
+        /// 上级代理商号
+        /// </summary>
+        public string Pid { get; set; }
 
         /// <summary>
         /// 服务商号
@@ -70,11 +75,6 @@ namespace AGooday.AgPay.Domain.Events.AgentInfos
         public long InitUserId { get; set; }
 
         /// <summary>
-        /// 支付宝账户PID
-        /// </summary>
-        public string Pid { get; set; }
-
-        /// <summary>
         /// 账户类型: ALIPAY_CASH-支付宝转账, WX_CASH-微信零钱, BANK_CARD-银行卡
         /// </summary>
         public string SettAccountType { get; set; }
@@ -108,6 +108,36 @@ namespace AGooday.AgPay.Domain.Events.AgentInfos
         /// 提现手续费规则
         /// </summary>
         public string CashoutFeeRule { get; set; }
+
+        /// <summary>
+        /// 营业执照照片
+        /// </summary>
+        public string LicenseImg { get; set; }
+
+        /// <summary>
+        /// 开户许可证照片
+        /// </summary>
+        public string PermitImg { get; set; }
+
+        /// <summary>
+        /// 营业执照照片
+        /// </summary>
+        public string Idcard1Img { get; set; }
+
+        /// <summary>
+        /// 营业执照照片
+        /// </summary>
+        public string Idcard2Img { get; set; }
+
+        /// <summary>
+        /// 营业执照照片
+        /// </summary>
+        public string IdcardInHandImg { get; set; }
+
+        /// <summary>
+        /// 营业执照照片
+        /// </summary>
+        public string BankCardImg { get; set; }
 
         /// <summary>
         /// 钱包余额
