@@ -141,7 +141,7 @@
         public string BankCardImg { get; set; }
 
         /// <summary>
-        /// 钱包余额
+        /// 不可用金额
         /// </summary>
         public int UnAmount { get; set; }
 

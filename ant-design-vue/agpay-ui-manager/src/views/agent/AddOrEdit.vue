@@ -367,94 +367,154 @@
           <!-- 企业 -->
           <a-col :span="10" v-if="this.saveObject.agentType === 2">
             <a-form-model-item label="营业执照照片" prop="licenseImg">
-              <a-upload
-                  :action="action"
-                  :default-file-list="getDefaultFileList('licenseImg')"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'licenseImg')"
-              >
-                <a-button icon="upload" v-if="this.imgIsShow.licenseImg">
-                  上传
-                </a-button>
-              </a-upload>
+              <div v-if="this.imgDefaultFileList.licenseImg">
+                <a-upload
+                    :file-list="this.imgDefaultFileList.licenseImg"
+                    list-type="picture"
+                    class="default-upload-list-inline"
+                    @change="handleChange($event, 'licenseImg')"
+                >
+                </a-upload>
+              </div>
+              <div v-else>
+                <a-upload
+                    :action="action"
+                    list-type="picture"
+                    class="upload-list-inline"
+                    @change="handleChange($event, 'licenseImg')"
+                >
+                  <a-button icon="upload" v-if="this.imgIsShow.licenseImg">
+                    上传
+                  </a-button>
+                </a-upload>
+              </div>
             </a-form-model-item>
           </a-col>
           <!-- 企业对公 -->
           <a-col :span="10" v-if="this.saveObject.agentType === 2 && this.saveObject.settAccountType === 'BANK_PUBLIC'">
             <a-form-model-item label="开户许可证照片" prop="permitImg">
-              <a-upload
-                  :action="action"
-                  :default-file-list="getDefaultFileList('permitImg')"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'permitImg')"
-              >
-                <a-button icon="upload" v-if="this.imgIsShow.permitImg">
-                  上传
-                </a-button>
-              </a-upload>
+              <div v-if="this.imgDefaultFileList.permitImg">
+                <a-upload
+                    :file-list="this.imgDefaultFileList.permitImg"
+                    list-type="picture"
+                    class="default-upload-list-inline"
+                    @change="handleChange($event, 'permitImg')"
+                >
+                </a-upload>
+              </div>
+              <div v-else>
+                <a-upload
+                    :action="action"
+                    list-type="picture"
+                    class="upload-list-inline"
+                    @change="handleChange($event, 'permitImg')"
+                >
+                  <a-button icon="upload" v-if="this.imgIsShow.permitImg">
+                    上传
+                  </a-button>
+                </a-upload>
+              </div>
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
             <a-form-model-item :label='"["+this.imgLabel+"]身份证人像面照片"' prop="idcard1Img">
-              <a-upload
-                  :action="action"
-                  :default-file-list="getDefaultFileList('idcard1Img')"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'idcard1Img')"
-              >
-                <a-button icon="upload" v-if="this.imgIsShow.idcard1Img">
-                  上传
-                </a-button>
-              </a-upload>
+              <div v-if="this.imgDefaultFileList.idcard1Img">
+                <a-upload
+                    :file-list="this.imgDefaultFileList.idcard1Img"
+                    list-type="picture"
+                    class="default-upload-list-inline"
+                    @change="handleChange($event, 'idcard1Img')"
+                >
+                </a-upload>
+              </div>
+              <div v-else>
+                <a-upload
+                    :action="action"
+                    list-type="picture"
+                    class="upload-list-inline"
+                    @change="handleChange($event, 'idcard1Img')"
+                >
+                  <a-button icon="upload" v-if="this.imgIsShow.idcard1Img">
+                    上传
+                  </a-button>
+                </a-upload>
+              </div>
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
             <a-form-model-item :label='"["+this.imgLabel+"]身份证国徽面照片"' prop="idcard2Img">
-              <a-upload
-                  :action="action"
-                  :default-file-list="getDefaultFileList('idcard2Img')"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'idcard2Img')"
-              >
-                <a-button icon="upload" v-if="this.imgIsShow.idcard2Img">
-                  上传
-                </a-button>
-              </a-upload>
+              <div v-if="this.imgDefaultFileList.idcard2Img">
+                <a-upload
+                    :file-list="this.imgDefaultFileList.idcard2Img"
+                    list-type="picture"
+                    class="default-upload-list-inline"
+                    @change="handleChange($event, 'idcard2Img')"
+                >
+                </a-upload>
+              </div>
+              <div v-else>
+                <a-upload
+                    :action="action"
+                    list-type="picture"
+                    class="upload-list-inline"
+                    @change="handleChange($event, 'idcard2Img')"
+                >
+                  <a-button icon="upload" v-if="this.imgIsShow.idcard2Img">
+                    上传
+                  </a-button>
+                </a-upload>
+              </div>
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
             <a-form-model-item label="[联系人]手持身份证照片" prop="idcardInHandImg">
-              <a-upload
-                 :action="action"
-                 :default-file-list="getDefaultFileList('idcardInHandImg')"
-                 list-type="picture"
-                 class="upload-list-inline"
-                 @change="handleChange($event, 'idcardInHandImg')"
-              >
-                <a-button icon="upload" v-if="this.imgIsShow.idcardInHandImg">
-                  上传
-                </a-button>
-              </a-upload>
+              <div v-if="this.imgDefaultFileList.idcardInHandImg">
+                <a-upload
+                    :file-list="this.imgDefaultFileList.idcardInHandImg"
+                    list-type="picture"
+                    class="default-upload-list-inline"
+                    @change="handleChange($event, 'idcardInHandImg')"
+                >
+                </a-upload>
+              </div>
+              <div v-else>
+                <a-upload
+                    :action="action"
+                    list-type="picture"
+                    class="upload-list-inline"
+                    @change="handleChange($event, 'idcardInHandImg')"
+                >
+                  <a-button icon="upload" v-if="this.imgIsShow.idcardInHandImg">
+                    上传
+                  </a-button>
+                </a-upload>
+              </div>
             </a-form-model-item>
           </a-col>
           <!-- 个人对私/企业对私 -->
           <a-col :span="10" v-if="this.saveObject.settAccountType === 'BANK_PRIVATE'">
             <a-form-model-item :label='"["+this.imgLabel+"]银行卡照片"' prop="bankCardImg">
-              <a-upload
-                 :action="action"
-                 :default-file-list="getDefaultFileList('bankCardImg')"
-                 list-type="picture"
-                 class="upload-list-inline"
-                 @change="handleChange($event, 'bankCardImg')"
-              >
-                <a-button icon="upload" v-if="this.imgIsShow.bankCardImg">
-                  上传
-                </a-button>
-              </a-upload>
+              <div v-if="this.imgDefaultFileList.bankCardImg">
+                <a-upload
+                    :file-list="this.imgDefaultFileList.bankCardImg"
+                    list-type="picture"
+                    class="default-upload-list-inline"
+                    @change="handleChange($event, 'bankCardImg')"
+                >
+                </a-upload>
+              </div>
+              <div v-else>
+                <a-upload
+                    :action="action"
+                    list-type="picture"
+                    class="upload-list-inline"
+                    @change="handleChange($event, 'bankCardImg')"
+                >
+                  <a-button icon="upload" v-if="this.imgIsShow.bankCardImg">
+                    上传
+                  </a-button>
+                </a-upload>
+              </div>
             </a-form-model-item>
           </a-col>
         </a-row>
@@ -517,8 +577,17 @@ export default {
         { settAccountType: 'WX_CASH', settAccountTypeName: '个人微信' },
         { settAccountType: 'ALIPAY_CASH', settAccountTypeName: '个人支付宝' },
         { settAccountType: 'BANK_PRIVATE', settAccountTypeName: '对私账户' }
+        // ,{ settAccountType: 'BANK_PUBLIC', settAccountTypeName: '对公账户' }
       ],
       action: upload.form, // 上传文件地址
+      imgDefaultFileList: {
+        licenseImg: null,
+        permitImg: null,
+        idcard1Img: null,
+        idcard2Img: null,
+        idcardInHandImg: null,
+        bankCardImg: null
+      },
       imgIsShow: {
         licenseImg: true,
         permitImg: true,
@@ -588,16 +657,45 @@ export default {
         that.isvList = res.records
       })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
-        console.log(555)
         that.resetIsShow = true // 展示重置密码板块
         that.recordId = recordId
         req.getById(API_URL_AGENT_LIST, recordId).then(res => {
           that.saveObject = res
+          Object.keys(that.imgDefaultFileList).forEach((field) => {
+            const url = that.saveObject[field]
+            if (!url) {
+              this.imgIsShow[field] = true
+              return null
+            }
+            this.imgIsShow[field] = false
+            that.imgDefaultFileList[field] = [{
+              uid: '-1',
+              name: url.split('/').pop(),
+              status: 'done',
+              url: url,
+              thumbUrl: url
+            }]
+          })
         })
         this.visible = true
       } else {
         that.visible = true // 立马展示弹层信息
       }
+    },
+    getDefaultFileList (name) {
+      const url = this.saveObject[name]
+      if (!url) {
+        this.imgIsShow[name] = true
+        return null
+      }
+      this.imgIsShow[name] = false
+      return [{
+        uid: '-1',
+        name: url.split('/').pop(),
+        status: 'done',
+        url: url,
+        thumbUrl: url
+      }]
     },
     // 随机生成六位数密码
     genRandomPassword: function () {
@@ -714,21 +812,6 @@ export default {
           break
       }
     },
-    getDefaultFileList (name) {
-      const url = this.saveObject[name]
-      if (!url) {
-        this.imgIsShow[name] = true
-        return []
-      }
-      this.imgIsShow[name] = false
-      return [{
-        uid: '-1',
-        name: url.split('/').pop(),
-        status: 'done',
-        url: url,
-        thumbUrl: url
-      }]
-    },
     // 上传回调
     handleChange (info, name) {
       console.log(info)
@@ -760,6 +843,8 @@ export default {
       } else if (info.file.status === 'error') {
         console.log(info)
         this.$message.error(`上传失败`)
+      } else if (info.file.status === 'removed') {
+        this.imgDefaultFileList[name] = null
       }
     },
     // 上传图片前的校验

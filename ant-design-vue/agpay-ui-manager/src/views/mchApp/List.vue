@@ -69,10 +69,10 @@ import MchPayIfConfigList from './MchPayIfConfigList'
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'appId', fixed: 'left', width: '320px', title: '应用AppId', scopedSlots: { customRender: 'appIdSlot' } },
-  { key: 'appName', title: '应用名称', dataIndex: 'appName' },
-  { key: 'mchNo', title: '商户号', dataIndex: 'mchNo' },
-  { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' } },
-  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
+  { key: 'appName', title: '应用名称', width: '200px', dataIndex: 'appName' },
+  { key: 'mchNo', title: '商户号', width: '140px', dataIndex: 'mchNo' },
+  { key: 'state', title: '状态', width: '80px', scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 

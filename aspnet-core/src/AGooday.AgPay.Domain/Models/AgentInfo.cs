@@ -201,9 +201,9 @@ namespace AGooday.AgPay.Domain.Models
         public string BankCardImg { get; set; }
 
         /// <summary>
-        /// 钱包余额
+        /// 不可用金额
         /// </summary>
-        [Comment("钱包余额")]
+        [Comment("不可用金额")]
         [Required, Column("un_amount", TypeName = "int")]
         public int UnAmount { get; set; }
 
