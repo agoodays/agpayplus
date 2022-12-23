@@ -71,6 +71,7 @@
         <a-col :span="10">
           <a-form-model-item label="上级代理商号" prop="pid">
             <a-select v-model="saveObject.pid" placeholder="请选择上级代理商" @change="pidChange" :disabled="!isAdd">
+              <a-select-option value="" key="">请选择代理商</a-select-option>
               <a-select-option v-for="d in agentList" :value="d.agentNo" :key="d.agentNo">
                 {{ d.agentName + " [ ID: " + d.agentNo + " ]" }}
               </a-select-option>
@@ -79,7 +80,7 @@
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="服务商号" prop="isvNo">
-            <a-select v-model="saveObject.isvNo" placeholder="请选择服务商" :disabled="!isAdd || saveObject.pid">
+            <a-select v-model="saveObject.isvNo" placeholder="请选择服务商" :disabled="!isAdd || saveObject.pid?.length>0">
               <a-select-option v-for="d in isvList" :value="d.isvNo" :key="d.isvNo">
                 {{ d.isvName + " [ ID: " + d.isvNo + " ]" }}
               </a-select-option>

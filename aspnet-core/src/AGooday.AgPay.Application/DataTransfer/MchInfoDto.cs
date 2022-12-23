@@ -26,6 +26,21 @@
         public byte Type { get; set; }
 
         /// <summary>
+        /// 商户级别: M0商户-简单模式（页面简洁，仅基础收款功能）, M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）
+        /// </summary>
+        public string MchLevel { get; set; }
+
+        /// <summary>
+        /// 退款方式["plat", "api"],平台退款、接口退款，平台退款方式必须包含接口退款。
+        /// </summary>
+        public string RefundMode { get; set; }
+
+        /// <summary>
+        /// 代理商号
+        /// </summary>
+        public string AgentNo { get; set; }
+
+        /// <summary>
         /// 服务商号
         /// </summary>
         public string IsvNo { get; set; }

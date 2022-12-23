@@ -135,6 +135,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<MchDivisionReceiverGroup>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<MchDivisionReceiverGroup>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<MchInfo>().Property(c => c.Type).HasDefaultValue(1);
+            modelBuilder.Entity<MchInfo>().Property(c => c.MchLevel).HasDefaultValue("M0");
             modelBuilder.Entity<MchInfo>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<MchInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<MchInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");

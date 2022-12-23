@@ -177,6 +177,11 @@ CREATE TABLE `t_mch_qrcodes` (
   PRIMARY KEY (id)
 );
 
+ALTER TABLE `t_mch_info`   
+  ADD COLUMN `mch_level` VARCHAR(8) DEFAULT 'M0' NOT NULL COMMENT '商户级别: M0商户-简单模式（页面简洁，仅基础收款功能）, M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）' AFTER `type`,
+  ADD COLUMN `refund_mode` JSON NULL COMMENT '退款方式[\"plat\", \"api\"],平台退款、接口退款，平台退款方式必须包含接口退款。' AFTER `mch_level`,
+  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `refund_mode`;
+
 ALTER TABLE `t_sys_user`   
   CHANGE `sex` `sex` TINYINT DEFAULT 0 NOT NULL COMMENT '性别: 0-未知, 1-男, 2-女',
   CHANGE `is_admin` `is_admin` TINYINT DEFAULT 0 NOT NULL COMMENT '是否超管（超管拥有全部权限）: 0-否 1-是',
@@ -210,7 +215,7 @@ ALTER TABLE `t_pay_order`
   ADD COLUMN `buyer_remark` VARCHAR(255) NULL COMMENT '卖家备注' AFTER `seller_remark`;
 
 -- 代理商管理
-INSERT INTO t_sys_entitlement VALUES('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '30', 'MGR', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '35', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1,  'ENT_AGENT', '10', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());

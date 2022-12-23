@@ -40,7 +40,7 @@
       >
         <template slot="agentNameSlot" slot-scope="{record}">
           <b v-if="!$access('ENT_AGENT_INFO_VIEW')">{{ record.agentName }}</b>
-          <a v-if="$access('ENT_AGENT_INFO_VIEW')" @click="detailFunc(record.agentNo)">{{ record.agentName }}</a>
+          <a v-if="$access('ENT_AGENT_INFO_VIEW')" @click="detailFunc(record.agentNo)"><b>{{ record.agentName }}</b></a>
         </template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />

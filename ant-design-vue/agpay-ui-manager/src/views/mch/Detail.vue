@@ -49,10 +49,10 @@
           </a-descriptions-item>
         </a-descriptions>
       </a-col>
-      <a-col :sm="12">
+      <a-col :sm="12" v-if="detailData.type === 2">
         <a-descriptions>
-          <a-descriptions-item label="联系人姓名">
-            {{ detailData.contactName }}
+          <a-descriptions-item label="代理商号">
+            {{ detailData.agentNo }}
           </a-descriptions-item>
         </a-descriptions>
       </a-col>
@@ -65,8 +65,22 @@
       </a-col>
       <a-col :sm="12">
         <a-descriptions>
+          <a-descriptions-item label="联系人姓名">
+            {{ detailData.contactName }}
+          </a-descriptions-item>
+        </a-descriptions>
+      </a-col>
+      <a-col :sm="12">
+        <a-descriptions>
           <a-descriptions-item label="联系人手机号">
             {{ detailData.contactTel }}
+          </a-descriptions-item>
+        </a-descriptions>
+      </a-col>
+      <a-col :sm="12">
+        <a-descriptions>
+          <a-descriptions-item label="联系人邮箱">
+            {{ detailData.contactEmail }}
           </a-descriptions-item>
         </a-descriptions>
       </a-col>
@@ -76,13 +90,6 @@
             <a-tag :color="detailData.state === 1?'green':'volcano'">
               {{ detailData.state === 0?'禁用':detailData.state === 1?'启用':'未知' }}
             </a-tag>
-          </a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-      <a-col :sm="12">
-        <a-descriptions>
-          <a-descriptions-item label="联系人邮箱">
-            {{ detailData.contactEmail }}
           </a-descriptions-item>
         </a-descriptions>
       </a-col>
