@@ -208,12 +208,12 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'orderId', title: '订单ID', fixed: 'left', dataIndex: 'orderId' },
-    { key: 'mchOrderNo', title: '商户订单号', dataIndex: 'mchOrderNo' },
+    { key: 'orderId', title: '订单ID', width: '180px', fixed: 'left', dataIndex: 'orderId' },
+    { key: 'mchOrderNo', title: '商户订单号', width: '200px', dataIndex: 'mchOrderNo' },
     { key: 'state', title: '通知状态', width: '130px', scopedSlots: { customRender: 'stateSlot' } },
     { key: 'orderType', title: '订单类型', width: '130px', scopedSlots: { customRender: 'orderTypeSlot' } },
-    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
-    { key: 'op', title: '操作', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+    { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
+    { key: 'op', title: '操作', width: '160px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
   ]
 
   export default {

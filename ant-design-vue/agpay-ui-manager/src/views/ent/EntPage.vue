@@ -11,6 +11,7 @@
                   <a-form-item label="">
                     <a-select v-model="querySysType" placeholder="选择系统菜单" @change="refTable" class="table-head-layout">
                       <a-select-option value="MGR">显示菜单：运营平台</a-select-option>
+                      <a-select-option value="AGENT">显示菜单：代理商系统</a-select-option>
                       <a-select-option value="MCH">显示菜单：商户系统</a-select-option>
                     </a-select>
                   </a-form-item>
@@ -52,7 +53,7 @@ import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import InfoAddOrEdit from './AddOrEdit'
 
 const tableColumns = [
-  { title: '资源权限ID', dataIndex: 'entId' }, // key为必填项，用于标志该列的唯一
+  { title: '资源权限ID', width: 260, dataIndex: 'entId' }, // key为必填项，用于标志该列的唯一
   { title: '资源名称', dataIndex: 'entName' },
   { title: '图标', dataIndex: 'menuIcon' },
   { title: '路径', dataIndex: 'menuUri' },

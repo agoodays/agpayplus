@@ -113,15 +113,15 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { title: '转账金额', scopedSlots: { customRender: 'transferAmountSlot' }, width: 108 },
-    { title: '商户名称', dataIndex: 'mchName' },
-    { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 260 },
+    { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 260, fixed: 'left' },
+    { title: '转账金额', scopedSlots: { customRender: 'transferAmountSlot' }, width: 110 },
+    { title: '商户名称', dataIndex: 'mchName', width: 130 },
     // { title: '渠道订单号', dataIndex: 'channelOrderNo' },
     { title: '收款账号', dataIndex: 'accountNo', width: 200 },
-    { title: '收款人姓名', dataIndex: 'accountName' },
-    { title: '转账备注', dataIndex: 'transferDesc' },
+    { title: '收款人姓名', dataIndex: 'accountName', width: 120 },
+    { title: '转账备注', dataIndex: 'transferDesc', width: 150 },
     { title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
-    { title: '创建日期', dataIndex: 'createdAt' },
+    { title: '创建日期', dataIndex: 'createdAt', width: 200 },
     { title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
   ]
 

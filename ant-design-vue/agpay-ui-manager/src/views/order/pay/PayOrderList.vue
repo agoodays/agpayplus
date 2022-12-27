@@ -420,11 +420,11 @@ import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'amount', title: '支付金额', ellipsis: true, width: 108, fixed: 'left', scopedSlots: { customRender: 'amountSlot' } },
+  { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 210, fixed: 'left' },
+  { key: 'amount', title: '支付金额', ellipsis: true, width: 108, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'refundAmount', title: '退款金额', width: 108, scopedSlots: { customRender: 'refundAmountSlot' } },
   { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', customRender: (text) => '￥' + (text / 100).toFixed(2), width: 100 },
   { key: 'mchName', title: '商户名称', dataIndex: 'mchName', ellipsis: true, width: 100 },
-  { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 210 },
   // { key: 'payOrderId', title: '支付订单号', dataIndex: 'payOrderId' },
   // { key: 'mchOrderNo', title: '商户订单号', dataIndex: 'mchOrderNo' },
   { key: 'wayName', title: '支付方式', dataIndex: 'wayName', width: 120 },

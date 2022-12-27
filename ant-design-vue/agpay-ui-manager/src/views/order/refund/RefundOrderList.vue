@@ -334,10 +334,10 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'payAmount', title: '支付金额', ellipsis: true, fixed: 'left', scopedSlots: { customRender: 'payAmountSlot' }, width: 100 },
-    { key: 'refundAmount', title: '退款金额', ellipsis: true, scopedSlots: { customRender: 'refundAmountSlot' }, width: 100 },
-    { key: 'pay', title: '退款订单号', scopedSlots: { customRender: 'refundOrderSlot' }, width: 220 },
+    { key: 'pay', title: '退款订单号', scopedSlots: { customRender: 'refundOrderSlot' }, width: 220, fixed: 'left' },
     { key: 'refund', title: '支付订单号', scopedSlots: { customRender: 'payOrderSlot' }, width: 220 },
+    { key: 'payAmount', title: '支付金额', ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' }, width: 100 },
+    { key: 'refundAmount', title: '退款金额', ellipsis: true, scopedSlots: { customRender: 'refundAmountSlot' }, width: 100 },
     // { key: 'payOrderId', title: '支付订单号', dataIndex: 'payOrderId' },
     // { key: 'mchRefundNo', title: '商户退款单号', dataIndex: 'mchRefundNo' },
     { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },

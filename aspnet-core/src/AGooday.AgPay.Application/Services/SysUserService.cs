@@ -131,6 +131,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var sysUsers = _sysUserRepository.GetAll()
                 .Where(w => w.SysType == dto.SysType
+                && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Contains(dto.BelongInfoId))
                 && (string.IsNullOrWhiteSpace(dto.Realname) || w.Realname.Contains(dto.Realname))
                 && (dto.SysUserId.Equals(0) || w.SysUserId.Equals(dto.SysUserId))
                 ).OrderByDescending(o => o.CreatedAt);

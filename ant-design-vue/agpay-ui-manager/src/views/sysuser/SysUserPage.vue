@@ -4,6 +4,15 @@
       <div v-if="$access('ENT_UR_USER_SEARCH')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="MGR">运营平台</a-select-option>
+                <a-select-option value="AGENT">代理商</a-select-option>
+                <a-select-option value="MCH">商户</a-select-option>
+              </a-select>
+            </a-form-item>
+            <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />
             <ag-text-up :placeholder="'用户ID'" :msg="searchData.sysUserId" v-model="searchData.sysUserId" />
             <ag-text-up :placeholder="'用户姓名'" :msg="searchData.realname" v-model="searchData.realname" />
             <span class="table-page-search-submitButtons">
@@ -66,16 +75,16 @@ import RoleDist from './RoleDist'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 const tableColumns = [
-  { title: '用户ID', dataIndex: 'sysUserId', fixed: 'left' },
-  { title: '姓名', dataIndex: 'realname' },
-  { title: '性别', dataIndex: 'sex', customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
-  { title: '头像', scopedSlots: { customRender: 'avatarSlot' } },
-  { title: '编号', dataIndex: 'userNo' },
-  { title: '手机号', dataIndex: 'telphone' },
-  { title: '超管', dataIndex: 'isAdmin', customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
-  { title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
-  { title: '创建时间', dataIndex: 'createdAt' },
-  { title: '修改时间', dataIndex: 'updatedAt' },
+  { title: '头像', fixed: 'left', width: 60, scopedSlots: { customRender: 'avatarSlot' } },
+  { title: '姓名', fixed: 'left', width: 120, dataIndex: 'realname' },
+  { title: '用户ID', fixed: 'left', width: 120, dataIndex: 'sysUserId' },
+  { title: '性别', width: 60, dataIndex: 'sex', customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
+  { title: '编号', width: 120, dataIndex: 'userNo' },
+  { title: '手机号', width: 160, dataIndex: 'telphone' },
+  { title: '超管', width: 60, dataIndex: 'isAdmin', customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
+  { title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { title: '创建时间', width: 200, dataIndex: 'createdAt' },
+  { title: '修改时间', width: 200, dataIndex: 'updatedAt' },
   {
     key: 'op',
     title: '操作',
@@ -91,7 +100,9 @@ export default {
   data () {
     return {
       tableColumns: tableColumns,
-      searchData: {},
+      searchData: {
+        sysType: 'MGR'
+      },
       btnLoading: false
     }
   },
