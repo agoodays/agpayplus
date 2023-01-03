@@ -171,7 +171,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
         /// </summary>
         public string IsAdmin { get; set; }
         /// <summary>
-        /// 所属系统： MGR-运营平台, MCH-商户中心
+        /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
         /// </summary>
         public string SysType { get; set; }
         /// <summary>
@@ -234,7 +234,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
         /// </summary>
         public const string IsAdmin = "ia";
         /// <summary>
-        /// 所属系统： MGR-运营平台, MCH-商户中心
+        /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
         /// </summary>
         public const string SysType = "st";
         /// <summary>

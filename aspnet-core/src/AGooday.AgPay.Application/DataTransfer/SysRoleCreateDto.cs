@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string RoleName { get; set; }
 
         /// <summary>
-        /// 所属系统： MGR-运营平台, MCH-商户中心
+        /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
         /// </summary>
         [BindNever]
         public string SysType { get; set; }

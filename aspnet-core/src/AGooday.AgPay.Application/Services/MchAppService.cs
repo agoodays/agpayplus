@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,14 +13,16 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchAppRepository _mchAppRepository;
+        private readonly IMchInfoRepository _mchInfoRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public MchAppService(IMchAppRepository mchAppRepository, IMapper mapper, IMediatorHandler bus)
+        public MchAppService(IMchAppRepository mchAppRepository, IMchInfoRepository mchInfoRepository, IMapper mapper, IMediatorHandler bus)
         {
             _mchAppRepository = mchAppRepository;
+            _mchInfoRepository = mchInfoRepository;
             _mapper = mapper;
             Bus = bus;
         }
@@ -69,14 +72,23 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
         }
 
-        public PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto)
+        public PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto, string agentNo = null)
         {
+
             var mchApps = _mchAppRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.AppName) || w.AppName.Contains(dto.AppName))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
+
+            if (!string.IsNullOrWhiteSpace(agentNo))
+            {
+                var mchNos = _mchInfoRepository.GetAll()
+                    .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+                    && w.AgentNo.Equals(agentNo)).Select(s => s.MchNo);
+                mchApps = mchApps.Where(w => mchNos.Contains(dto.MchNo)).OrderByDescending(o => o.CreatedAt);
+            }
             var records = PaginatedList<MchApp>.Create<MchAppDto>(mchApps.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }

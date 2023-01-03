@@ -66,5 +66,17 @@ namespace AGooday.AgPay.Application
             var records = mapper.Map<List<TDestination>>(source.ToList());
             return new PaginatedList<TDestination>(records, count, pageIndex, pageSize);
         }
+
+        public static PaginatedList<TDestination> Create<TDestination>(IEnumerable<TSource> source, IMapper mapper, int pageIndex, int pageSize)
+        {
+            var count = source.Count();
+            if (pageIndex > 0 && pageSize > 0)
+            {
+                source = source.Skip((pageIndex - 1) * pageSize)
+                   .Take(pageSize);
+            }
+            var records = mapper.Map<List<TDestination>>(source.ToList());
+            return new PaginatedList<TDestination>(records, count, pageIndex, pageSize);
+        }
     }
 }

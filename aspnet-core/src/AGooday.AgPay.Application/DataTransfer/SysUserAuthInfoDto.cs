@@ -48,7 +48,7 @@
         public byte State { get; set; }
 
         /// <summary>
-        /// 所属系统： MGR-运营平台, MCH-商户中心
+        /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
         /// </summary>
         public string SysType { get; set; }
 

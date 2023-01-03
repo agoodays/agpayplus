@@ -98,6 +98,21 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<AgentInfoDto> GetPaginatedData(AgentInfoQueryDto dto)
         {
+            IOrderedQueryable<AgentInfo> agentInfos = GetAgentInfos(dto);
+            var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(agentInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            return records;
+        }
+
+        public PaginatedList<AgentInfoDto> GetPaginatedData(string agentNo, AgentInfoQueryDto dto)
+        {
+            IOrderedQueryable<AgentInfo> agentInfos = GetAgentInfos(dto);
+            var subAgentInfos = GetSons(agentInfos.AsNoTracking(), agentNo);
+            var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(subAgentInfos, _mapper, dto.PageNumber, dto.PageSize);
+            return records;
+        }
+
+        private IOrderedQueryable<AgentInfo> GetAgentInfos(AgentInfoQueryDto dto)
+        {
             var agentNos = new List<string>();
             if (!string.IsNullOrWhiteSpace(dto.LoginUsername))
             {
@@ -114,8 +129,30 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.ContactTel) || w.IsvNo.Equals(dto.ContactTel))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(agentInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return agentInfos;
         }
+
+        #region 获取所有下级
+        private IEnumerable<AgentInfo> GetSons(IQueryable<AgentInfo> list, string pid)
+        {
+            var query = list.Where(p => p.AgentNo == pid).ToList();
+            var list2 = query.Concat(GetSonList(list, pid));
+            return list2;
+        }
+
+        private IEnumerable<AgentInfo> GetSonList(IQueryable<AgentInfo> list, string pid)
+        {
+            var query = list.Where(p => p.Pid == pid).ToList();
+            return query.ToList().Concat(query.ToList().SelectMany(t => GetSonList(list, t.AgentNo)));
+        }
+        #endregion
+
+        #region 获取所有上级
+        private IEnumerable<AgentInfo> GetFatherList(IList<AgentInfo> list, string Id)
+        {
+            var query = list.Where(p => p.AgentNo == Id).ToList();
+            return query.ToList().Concat(query.ToList().SelectMany(t => GetFatherList(list, t.Pid)));
+        }
+        #endregion
     }
 }
