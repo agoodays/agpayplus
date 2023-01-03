@@ -290,13 +290,13 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_ORDER', '订单管理', 'transaction'
 	INSERT INTO t_sys_entitlement VALUES ('ENT_REFUND_ORDER', '退款订单', 'exception', '/refund', 'RefundOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 20, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_REFUND_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_REFUND_ORDER', 0, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_REFUND_LIST', '页面：退款订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_REFUND_ORDER', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 25, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_TRANSFER_ORDER', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_TRANSFER_ORDER', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY', '商户通知', 'notification', '/notify', 'MchNotifyListPage', 'ML', 0, 1, 'ENT_ORDER', 30, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_NOTIFY_LIST', '页面：商户通知列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_RESEND', '按钮：重发通知', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
+-- 	INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 25, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_TRANSFER_ORDER', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_TRANSFER_ORDER', 0, 'AGENT', NOW(), NOW());
+-- 	INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY', '商户通知', 'notification', '/notify', 'MchNotifyListPage', 'ML', 0, 1, 'ENT_ORDER', 30, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_NOTIFY_LIST', '页面：商户通知列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_RESEND', '按钮：重发通知', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
 
 -- 支付配置菜单
 INSERT INTO t_sys_entitlement VALUES ('ENT_PC', '支付配置', 'file-done', '', 'RouteView', 'ML', 0, 1, 'ROOT', 60, 'AGENT', NOW(), NOW());
