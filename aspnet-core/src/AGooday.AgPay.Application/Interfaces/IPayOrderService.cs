@@ -23,9 +23,9 @@ namespace AGooday.AgPay.Application.Interfaces
         bool UpdateIng2Fail(string payOrderId, string channelOrderId, string channelUserId, string channelErrCode, string channelErrMsg);
         int UpdateOrderExpired();
         long CalMchIncomeAmount(PayOrderDto payOrder);
-        JObject MainPageWeekCount(string mchNo);
-        JObject MainPageNumCount(string mchNo);
-        List<Dictionary<string, object>> MainPagePayCount(string mchNo, string createdStart, string createdEnd);
-        List<PayTypeCountDto> MainPagePayTypeCount(string mchNo, string createdStart, string createdEnd);
+        JObject MainPageWeekCount(string mchNo, string agentNo);
+        JObject MainPageNumCount(string mchNo, string agentNo);
+        List<Dictionary<string, object>> MainPagePayCount(string mchNo, string agentNo, string createdStart, string createdEnd);
+        List<PayTypeCountDto> MainPagePayTypeCount(string mchNo, string agentNo, string createdStart, string createdEnd);
     }
 }

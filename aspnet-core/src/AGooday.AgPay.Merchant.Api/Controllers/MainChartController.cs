@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpGet, Route("payAmountWeek")]
         public ApiRes PayAmountWeek()
         {
-            return ApiRes.Ok(_payOrderService.MainPageWeekCount(GetCurrentMchNo()));
+            return ApiRes.Ok(_payOrderService.MainPageWeekCount(GetCurrentMchNo(), null));
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpGet, Route("numCount")]
         public ApiRes NumCount()
         {
-            return ApiRes.Ok(_payOrderService.MainPageNumCount(GetCurrentMchNo()));
+            return ApiRes.Ok(_payOrderService.MainPageNumCount(GetCurrentMchNo(), null));
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpGet, Route("payCount")]
         public ApiRes PayCount(string createdStart, string createdEnd)
         {
-            return ApiRes.Ok(_payOrderService.MainPagePayCount(GetCurrentMchNo(), createdStart, createdEnd));
+            return ApiRes.Ok(_payOrderService.MainPagePayCount(GetCurrentMchNo(), null, createdStart, createdEnd));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpGet, Route("payTypeCount")]
         public ApiRes PayWayCount(string createdStart, string createdEnd)
         {
-            return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(GetCurrentMchNo(), createdStart, createdEnd));
+            return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(GetCurrentMchNo(), null, createdStart, createdEnd));
         }
 
         /// <summary>

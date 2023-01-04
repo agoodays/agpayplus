@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_AMOUNT_WEEK)]
         public ApiRes PayAmountWeek()
         {
-            return ApiRes.Ok(_payOrderService.MainPageWeekCount(null));
+            return ApiRes.Ok(_payOrderService.MainPageWeekCount(null, null));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_NUMBER_COUNT)]
         public ApiRes NumCount()
         {
-            return ApiRes.Ok(_payOrderService.MainPageNumCount(null));
+            return ApiRes.Ok(_payOrderService.MainPageNumCount(null, null));
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_COUNT)]
         public ApiRes PayCount(string createdStart, string createdEnd)
         {
-            return ApiRes.Ok(_payOrderService.MainPagePayCount(null, createdStart, createdEnd));
+            return ApiRes.Ok(_payOrderService.MainPagePayCount(null, null, createdStart, createdEnd));
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_TYPE_COUNT)]
         public ApiRes PayWayCount(string createdStart, string createdEnd)
         {
-            return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(null, createdStart, createdEnd));
+            return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(null, null, createdStart, createdEnd));
         }
     }
 }

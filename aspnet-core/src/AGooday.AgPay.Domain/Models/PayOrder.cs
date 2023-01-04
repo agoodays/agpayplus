@@ -26,11 +26,60 @@ namespace AGooday.AgPay.Domain.Models
         public string MchNo { get; set; }
 
         /// <summary>
+        /// 商户名称
+        /// </summary>
+        [Comment("商户名称")]
+        [Required, Column("mch_name", TypeName = "varchar(64)")]
+        public string MchName { get; set; }
+
+        /// <summary>
+        /// 商户简称
+        /// </summary>
+        [Comment("商户简称")]
+        [Column("mch_short_name", TypeName = "varchar(32)")]
+        public string MchShortName { get; set; }
+
+        /// <summary>
+        /// 代理商号
+        /// </summary>
+        [Comment("代理商号")]
+        [Column("agent_no", TypeName = "varchar(64)")]
+        public string AgentNo { get; set; }
+
+        /// <summary>
+        /// 代理商名称
+        /// </summary>
+        [Comment("代理商名称")]
+        [Column("agent_name", TypeName = "varchar(64)")]
+        public string AgentName { get; set; }
+
+        /// <summary>
+        /// 代理商简称
+        /// </summary>
+        [Comment("代理商简称")]
+        [Column("agent_short_name", TypeName = "varchar(32)")]
+        public string AgentShortName { get; set; }
+
+        /// <summary>
         /// 服务商号
         /// </summary>
         [Comment("服务商号")]
         [Column("isv_no", TypeName = "varchar(64)")]
         public string IsvNo { get; set; }
+
+        /// <summary>
+        /// 服务商名称
+        /// </summary>
+        [Comment("服务商名称")]
+        [Column("isv_name", TypeName = "varchar(64)")]
+        public string IsvName { get; set; }
+
+        /// <summary>
+        /// 服务商简称
+        /// </summary>
+        [Comment("服务商简称")]
+        [Column("isv_short_name", TypeName = "varchar(32)")]
+        public string IsvShortName { get; set; }
 
         /// <summary>
         /// 应用ID
@@ -40,11 +89,32 @@ namespace AGooday.AgPay.Domain.Models
         public string AppId { get; set; }
 
         /// <summary>
-        /// 商户名称
+        /// 应用名称
         /// </summary>
-        [Comment("商户名称")]
-        [Required, Column("mch_name", TypeName = "varchar(30)")]
-        public string MchName { get; set; }
+        [Comment("应用名称")]
+        [Column("app_name", TypeName = "varchar(64)")]
+        public string AppName { get; set; }
+
+        /// <summary>
+        /// 门店ID
+        /// </summary>
+        [Comment("门店ID")]
+        [Column("store_id", TypeName = "varchar(64)")]
+        public string StoreId { get; set; }
+
+        /// <summary>
+        /// 门店名称
+        /// </summary>
+        [Comment("门店名称")]
+        [Column("store_name", TypeName = "varchar(64)")]
+        public string StoreName { get; set; }
+
+        /// <summary>
+        /// 门店ID
+        /// </summary>
+        [Comment("门店ID")]
+        [Column("qrc_id", TypeName = "varchar(64)")]
+        public string QrcId { get; set; }
 
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
@@ -136,6 +206,20 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("商品描述信息")]
         [Required, Column("body", TypeName = "varchar(256)")]
         public string Body { get; set; }
+
+        /// <summary>
+        /// 买家备注
+        /// </summary>
+        [Comment("买家备注")]
+        [Column("seller_remark", TypeName = "varchar(256)")]
+        public string SellerRemark { get; set; }
+
+        /// <summary>
+        /// 卖家备注
+        /// </summary>
+        [Comment("卖家备注")]
+        [Column("buyer_remark", TypeName = "varchar(256)")]
+        public string BuyerRemark { get; set; }
 
         /// <summary>
         /// 特定渠道发起额外参数
