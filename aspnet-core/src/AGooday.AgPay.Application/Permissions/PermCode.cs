@@ -111,7 +111,7 @@
         {
             public const string ENT_C_MAIN = "ENT_C_MAIN";
             public const string ENT_COMMONS = "ENT_COMMONS";
-            public const string ENT_ISV = "ENT_ISV";
+            //public const string ENT_ISV = "ENT_ISV";
             public const string ENT_PC = "ENT_PC";
             public const string ENT_MCH = "ENT_MCH";
             public const string ENT_AGENT = "ENT_AGENT";
@@ -196,15 +196,15 @@
             public const string ENT_AGENT_INFO_EDIT = "ENT_AGENT_INFO_EDIT";
             public const string ENT_AGENT_INFO_DEL = "ENT_AGENT_INFO_DEL";
             public const string ENT_AGENT_INFO_ADD = "ENT_AGENT_INFO_ADD";
-            public const string ENT_ISV_PAY_CONFIG_ADD = "ENT_ISV_PAY_CONFIG_ADD";
-            public const string ENT_ISV_PAY_CONFIG_VIEW = "ENT_ISV_PAY_CONFIG_VIEW";
-            public const string ENT_ISV_INFO_EDIT = "ENT_ISV_INFO_EDIT";
-            public const string ENT_ISV_PAY_CONFIG_LIST = "ENT_ISV_PAY_CONFIG_LIST";
-            public const string ENT_ISV_LIST = "ENT_ISV_LIST";
-            public const string ENT_ISV_INFO_VIEW = "ENT_ISV_INFO_VIEW";
-            public const string ENT_ISV_INFO_DEL = "ENT_ISV_INFO_DEL";
-            public const string ENT_ISV_INFO_ADD = "ENT_ISV_INFO_ADD";
-            public const string ENT_ISV_INFO = "ENT_ISV_INFO";
+            //public const string ENT_ISV_PAY_CONFIG_ADD = "ENT_ISV_PAY_CONFIG_ADD";
+            //public const string ENT_ISV_PAY_CONFIG_VIEW = "ENT_ISV_PAY_CONFIG_VIEW";
+            //public const string ENT_ISV_INFO_EDIT = "ENT_ISV_INFO_EDIT";
+            //public const string ENT_ISV_PAY_CONFIG_LIST = "ENT_ISV_PAY_CONFIG_LIST";
+            //public const string ENT_ISV_LIST = "ENT_ISV_LIST";
+            //public const string ENT_ISV_INFO_VIEW = "ENT_ISV_INFO_VIEW";
+            //public const string ENT_ISV_INFO_DEL = "ENT_ISV_INFO_DEL";
+            //public const string ENT_ISV_INFO_ADD = "ENT_ISV_INFO_ADD";
+            //public const string ENT_ISV_INFO = "ENT_ISV_INFO";
             public const string ENT_C_USERINFO = "ENT_C_USERINFO";
             public const string ENT_C_MAIN_PAY_TYPE_COUNT = "ENT_C_MAIN_PAY_TYPE_COUNT";
             public const string ENT_C_MAIN_PAY_COUNT = "ENT_C_MAIN_PAY_COUNT";

@@ -268,17 +268,17 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', ''
 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
 		
--- 服务商管理
-INSERT INTO t_sys_entitlement VALUES ('ENT_ISV', '服务商管理', 'block', '', 'RouteView', 'ML', 0, 1, 'ROOT', 40, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO', '服务商列表', 'profile', '/isv', 'IsvListPage', 'ML', 0, 1, 'ENT_ISV', 10, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_VIEW', '服务商支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_LIST', '服务商支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_ADD', '服务商支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_LIST', '页面：服务商列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+-- -- 服务商管理
+-- INSERT INTO t_sys_entitlement VALUES ('ENT_ISV', '服务商管理', 'block', '', 'RouteView', 'ML', 0, 1, 'ROOT', 40, 'AGENT', NOW(), NOW());
+-- 	INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO', '服务商列表', 'profile', '/isv', 'IsvListPage', 'ML', 0, 1, 'ENT_ISV', 10, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_VIEW', '服务商支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_LIST', '服务商支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_ADD', '服务商支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_LIST', '页面：服务商列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
 
 -- 订单管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_ORDER', '订单管理', 'transaction', '', 'RouteView', 'ML', 0, 1, 'ROOT', 50, 'AGENT', NOW(), NOW());
