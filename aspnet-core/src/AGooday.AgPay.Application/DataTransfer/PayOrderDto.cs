@@ -16,9 +16,44 @@
         public string MchNo { get; set; }
 
         /// <summary>
+        /// 商户名称
+        /// </summary>
+        public string MchName { get; set; }
+
+        /// <summary>
+        /// 商户简称
+        /// </summary>
+        public string MchShortName { get; set; }
+
+        /// <summary>
+        /// 代理商号
+        /// </summary>
+        public string AgentNo { get; set; }
+
+        /// <summary>
+        /// 代理商名称
+        /// </summary>
+        public string AgentName { get; set; }
+
+        /// <summary>
+        /// 代理商简称
+        /// </summary>
+        public string AgentShortName { get; set; }
+
+        /// <summary>
         /// 服务商号
         /// </summary>
         public string IsvNo { get; set; }
+
+        /// <summary>
+        /// 服务商名称
+        /// </summary>
+        public string IsvName { get; set; }
+
+        /// <summary>
+        /// 服务商简称
+        /// </summary>
+        public string IsvShortName { get; set; }
 
         /// <summary>
         /// 应用ID
@@ -26,9 +61,24 @@
         public string AppId { get; set; }
 
         /// <summary>
-        /// 商户名称
+        /// 应用名称
         /// </summary>
-        public string MchName { get; set; }
+        public string AppName { get; set; }
+
+        /// <summary>
+        /// 门店ID
+        /// </summary>
+        public string StoreId { get; set; }
+
+        /// <summary>
+        /// 门店名称
+        /// </summary>
+        public string StoreName { get; set; }
+
+        /// <summary>
+        /// 二维码ID
+        /// </summary>
+        public string QrcId { get; set; }
 
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
@@ -99,6 +149,16 @@
         /// 商品描述信息
         /// </summary>
         public string Body { get; set; }
+
+        /// <summary>
+        /// 买家备注
+        /// </summary>
+        public string SellerRemark { get; set; }
+
+        /// <summary>
+        /// 卖家备注
+        /// </summary>
+        public string BuyerRemark { get; set; }
 
         /// <summary>
         /// 特定渠道发起额外参数

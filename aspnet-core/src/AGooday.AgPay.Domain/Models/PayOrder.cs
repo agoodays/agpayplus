@@ -110,9 +110,9 @@ namespace AGooday.AgPay.Domain.Models
         public string StoreName { get; set; }
 
         /// <summary>
-        /// 门店ID
+        /// 二维码ID
         /// </summary>
-        [Comment("门店ID")]
+        [Comment("二维码ID")]
         [Column("qrc_id", TypeName = "varchar(64)")]
         public string QrcId { get; set; }
 

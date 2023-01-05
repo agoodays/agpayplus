@@ -1,35 +1,37 @@
 -- 商户门店表
 DROP TABLE IF EXISTS `t_mch_store`;
 CREATE TABLE `t_mch_store` (
-  `store_id` VARCHAR(64) NOT NULL COMMENT '门店ID',
+  `store_id` BIGINT NOT NULL COMMENT '门店ID',
   `store_name` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '门店名称',
-  `isv_no` VARCHAR(64) DEFAULT NULL COMMENT '服务商号',
   `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
+  `agent_no` VARCHAR(64) NULL COMMENT '代理商号',
+  `isv_no` VARCHAR(64) DEFAULT NULL COMMENT '服务商号',
   `contact_phone` VARCHAR(32) NOT NULL COMMENT '联系人电话',
   `store_logo` VARCHAR(64) NOT NULL COMMENT '门店LOGO',
   `store_outer_img` VARCHAR(64) NOT NULL COMMENT '门头照',
   `store_inner_img` VARCHAR(64) NOT NULL COMMENT '门店内景照',
   `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
-  `province_code` VARCHAR(32) NOT NULL COMMENT '省代码'
-  `city_code` VARCHAR(32) NOT NULL COMMENT '市代码'
-  `area_code` VARCHAR(32) NOT NULL COMMENT '区代码'
+  `province_code` VARCHAR(32) NOT NULL COMMENT '省代码',
+  `city_code` VARCHAR(32) NOT NULL COMMENT '市代码',
+  `area_code` VARCHAR(32) NOT NULL COMMENT '区代码',
   `address` VARCHAR(128) NOT NULL COMMENT '详细地址',
-  `lng` VARCHAR(32) NOT NULL COMMENT '经度'
-  `lat` VARCHAR(32) NOT NULL COMMENT '纬度'
+  `lng` VARCHAR(32) NOT NULL COMMENT '经度',
+  `lat` VARCHAR(32) NOT NULL COMMENT '纬度',
   `default_flag` TINYINT NOT NULL DEFAULT '0' COMMENT '是否默认: 0-否, 1-是',
   `created_uid` BIGINT DEFAULT NULL COMMENT '创建者用户ID',
   `created_by` VARCHAR(64) DEFAULT NULL COMMENT '创建者姓名',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-  PRIMARY KEY (`app_id`)
+  PRIMARY KEY (`store_id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='商户门店表';
 
 -- 商户进件表
 DROP TABLE IF EXISTS `t_mch_apply`;
 CREATE TABLE `t_mch_apply` (
   `apply_id` VARCHAR(64) NOT NULL COMMENT '进件单号',
-  `isv_no` VARCHAR(64) DEFAULT NULL COMMENT '服务商号',
   `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
+  `agent_no` VARCHAR(64) NOT NULL COMMENT '代理商号',
+  `isv_no` VARCHAR(64) DEFAULT NULL COMMENT '服务商号',
   `if_code` VARCHAR(20) NOT NULL COMMENT '接口代码 全小写  wxpay alipay ',
   `apply_page_type` VARCHAR(20) NOT NULL COMMENT '来源: PLATFORM_WEB-运营平台(WEB) AGENT_WEB-代理商(WEB) MCH_WEB-商户(WEB) AGENT_LITE-代理商(小程序) MCH_LITE-商户(小程序)',
   `apply_detail_info` VARCHAR(255) NOT NULL COMMENT '申请详细信息', 
@@ -42,9 +44,9 @@ CREATE TABLE `t_mch_apply` (
   `contact_name` VARCHAR(32) NOT NULL COMMENT '商户联系人姓名', 
   `contact_phone` VARCHAR(32) NOT NULL COMMENT '商户联系人电话', 
   `contact_email` VARCHAR(32) NULL COMMENT '商户联系人邮箱', 
-  `province_code` VARCHAR(32) NOT NULL COMMENT '省代码'
-  `city_code` VARCHAR(32) NOT NULL COMMENT '市代码'
-  `area_code` VARCHAR(32) NOT NULL COMMENT '区代码'
+  `province_code` VARCHAR(32) NOT NULL COMMENT '省代码',
+  `city_code` VARCHAR(32) NOT NULL COMMENT '市代码',
+  `area_code` VARCHAR(32) NOT NULL COMMENT '区代码',
   `address` VARCHAR(128) NOT NULL COMMENT '商户详细地址',
   `created_uid` BIGINT DEFAULT NULL COMMENT '创建者用户ID',
   `created_by` VARCHAR(64) DEFAULT NULL COMMENT '创建者姓名',
@@ -102,7 +104,7 @@ CREATE TABLE `t_sys_team` (
   `team_name` VARCHAR(32) NOT NULL COMMENT '团队名称', 
   `team_no` VARCHAR(64) NOT NULL COMMENT '团队编号', 
   `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
-  `stat_range_type` VARCHAR(20) NOT NULL COMMENT '统计周期', 
+  `stat_range_type` VARCHAR(20) NOT NULL COMMENT '统计周期: year-年, quarter-季度, month-月, week-周', 
   `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
   `created_uid` BIGINT DEFAULT NULL COMMENT '创建者用户ID',
   `created_by` VARCHAR(64) DEFAULT NULL COMMENT '创建者姓名',
