@@ -1,4 +1,6 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using Newtonsoft.Json.Linq;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 商户应用表
@@ -26,9 +28,24 @@
         public byte State { get; set; }
 
         /// <summary>
+        /// 是否默认: 0-否, 1-是
+        /// </summary>
+        public byte DefaultFlag { get; set; }
+
+        /// <summary>
+        /// 支持的签名方式 ["MD5", "RSA2"]
+        /// </summary>
+        public JArray AppSignType { get; set; }
+
+        /// <summary>
         /// 应用私钥
         /// </summary>
         public string AppSecret { get; set; }
+
+        /// <summary>
+        /// RSA2应用公钥
+        /// </summary>
+        public string AppRsa2PublicKey { get; set; }
 
         /// <summary>
         /// 备注

@@ -6,9 +6,7 @@
     @close="onClose"
     :body-style="{ paddingBottom: '80px' }"
     width="40%"
-    class="drawer-width"
-
-  >
+    class="drawer-width">
     <a-form-model v-if="visible" ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
@@ -101,7 +99,7 @@
           </div>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="退款方式" prop="mchLevel">
+          <a-form-model-item label="退款方式" prop="refundMode">
             <!-- 退款方式 气泡弹窗 -->
             <a-checkbox-group v-model="saveObject.refundMode" :options="refundModeOptions" @change="refundModeChange" />
           </a-form-model-item>
@@ -494,7 +492,7 @@ export default {
   .typePopover {
     position: absolute;
     top: 0;
-    left:62px;
+    left: 62px;
   }
   .agpay-tip-text:before {
     content: "";

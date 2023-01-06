@@ -304,3 +304,8 @@ export function queryAlipayIsvsubMchAuthUrl (mchAppId) {
     method: 'GET'
   })
 }
+
+/** 获取支付网关系统公钥 **/
+export function getSysRSA2PublicKey () {
+  return request.request({ url: '/api/mchApps/sysRSA2PublicKey', method: 'GET' })
+}

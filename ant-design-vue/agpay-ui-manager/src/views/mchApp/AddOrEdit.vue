@@ -7,24 +7,28 @@
     @close="onClose">
 
     <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
-
-      <a-row :gutter="16">
-        <a-col :span="12" v-if="!isAdd">
+      <a-row justify="space-between" type="flex">
+        <a-col :span="10" v-if="!isAdd">
           <a-form-model-item label="应用 AppId" prop="appId">
             <a-input v-model="saveObject.appId" placeholder="请输入" :disabled="!isAdd" />
           </a-form-model-item>
         </a-col>
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-model-item label="商户号" prop="mchNo">
             <a-input v-model="saveObject.mchNo" placeholder="请输入" :disabled="!isAdd" />
           </a-form-model-item>
         </a-col>
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-model-item label="应用名称" prop="appName">
             <a-input v-model="saveObject.appName" placeholder="请输入" />
           </a-form-model-item>
         </a-col>
-        <a-col :span="12">
+        <a-col :span="10">
+          <a-form-model-item label="备注" prop="remark">
+            <a-input v-model="saveObject.remark" placeholder="请输入" />
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="10">
           <a-form-model-item label="状态" prop="state">
             <a-radio-group v-model="saveObject.state">
               <a-radio :value="1">
@@ -36,18 +40,75 @@
             </a-radio-group>
           </a-form-model-item>
         </a-col>
-        <a-col :span="24">
-          <a-form-model-item label="私钥 AppSecret" prop="appSecret" >
-            <a-input v-model="saveObject.appSecret" :placeholder="saveObject.appSecret_ph" type="textarea" />
-            <a-button type="primary" ghost @click="randomKey(false, 128, 0)"><a-icon type="file-sync" />随机生成私钥</a-button>
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-model-item label="备注" prop="remark">
-            <a-input v-model="saveObject.remark" placeholder="请输入" />
+        <a-col :span="10">
+          <a-form-model-item label="是否设置为默认应用" prop="defaultFlag">
+            <a-radio-group v-model="saveObject.defaultFlag">
+              <a-radio :value="1">
+                启用
+              </a-radio>
+              <a-radio :value="0">
+                停用
+              </a-radio>
+            </a-radio-group>
           </a-form-model-item>
         </a-col>
       </a-row>
+
+      <!-- 签名配置板块 -->
+      <a-row justify="space-between" type="flex">
+        <a-col :span="24">
+          <a-divider orientation="left" color="rgb(26, 102, 255)">
+            签名配置
+<!--            <a-tag color="rgb(26, 102, 255)">
+              签名配置
+            </a-tag>-->
+          </a-divider>
+        </a-col>
+      </a-row>
+      <div>
+        <a-row justify="space-between" type="flex">
+          <a-col :span="24">
+            <a-form-model-item label="支持的签名方式" prop="appSignType">
+              <!-- 支持的签名方式 气泡弹窗 -->
+              <a-checkbox-group v-model="saveObject.appSignType" :options="appSignTypeOptions" />
+            </a-form-model-item>
+            <div class="components-popover-demo-placement">
+              <div class="typePopover">
+                <!-- title可省略，就不显示 -->
+                <a-popover placement="top">
+                  <template slot="content">
+                    <p>若需要使用系统测试或者商户通APP则必须支持MD5， 若仅通过API调用则根据需求进行选择。</p>
+                  </template>
+                  <template slot="title">
+                    <span>签名方式</span>
+                  </template>
+                  <a-icon type="question-circle" />
+                </a-popover>
+              </div>
+            </div>
+          </a-col>
+        </a-row>
+        <a-row justify="space-between" type="flex" v-if="this.saveObject.appSignType?.includes('MD5')">
+          <a-col :span="24">
+            <a-form-model-item label="设置MD5秘钥" prop="appSecret" >
+              <a-input v-model="saveObject.appSecret" :placeholder="saveObject.appSecret_ph" type="textarea" />
+              <a-button type="primary" ghost @click="randomKey(false, 128, 0)"><a-icon type="file-sync" />随机生成私钥</a-button>
+            </a-form-model-item>
+          </a-col>
+        </a-row>
+        <a-row justify="space-between" type="flex" v-if="this.saveObject.appSignType?.includes('RSA2')">
+          <a-col :span="24">
+            <a-form-model-item label="设置RSA2应用公钥" prop="appRsa2PublicKey" >
+              <a-input v-model="saveObject.appRsa2PublicKey" type="textarea" />
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-model-item label="支付网关系统公钥（回调验签使用）" prop="sysRSA2PublicKey" >
+              <a-input v-model="sysRSA2PublicKey" type="textarea" disabled="disabled" rows="6"/>
+            </a-form-model-item>
+          </a-col>
+        </a-row>
+      </div>
     </a-form-model>
 
     <div class="drawer-btn-center">
@@ -59,7 +120,7 @@
 </template>
 
 <script>
-import { API_URL_MCH_APP, req } from '@/api/manage'
+import { API_URL_MCH_APP, req, getSysRSA2PublicKey } from '@/api/manage'
 
 export default {
   props: {
@@ -72,6 +133,11 @@ export default {
       visible: false, // 抽屉开关
       appId: '', // 应用AppId
       saveObject: {}, // 数据对象
+      appSignTypeOptions: [
+        { label: 'MD5', value: 'MD5' },
+        { label: 'RSA2', value: 'RSA2' }
+      ],
+      sysRSA2PublicKey: '',
       rules: {
         mchNo: [{ required: true, message: '请输入商户号', trigger: 'blur' }],
         appName: [{ required: true, message: '请输入应用名称', trigger: 'blur' }]
@@ -85,6 +151,7 @@ export default {
        // 数据清空
       this.saveObject = {
         'state': 1,
+        'appSignType': [],
         'appSecret': '',
         'mchNo': mchNo,
         'appSecret_ph': '请输入'
@@ -116,6 +183,11 @@ export default {
 
         that.visible = true // 展示弹层信息
       }
+
+      getSysRSA2PublicKey().then(res => {
+        console.log(res)
+        that.sysRSA2PublicKey = res
+      })
     },
     // 表单提交
     onSubmit () {
@@ -164,5 +236,13 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
+  .typePopover {
+    position: absolute;
+    top: 0;
+    left: 105px;
+  }
+  .ant-divider-inner-text {
+    color: rgb(26, 102, 255);
+  }
 </style>

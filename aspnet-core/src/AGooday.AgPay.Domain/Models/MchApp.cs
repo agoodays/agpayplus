@@ -40,11 +40,32 @@ namespace AGooday.AgPay.Domain.Models
         public byte State { get; set; }
 
         /// <summary>
+        /// 是否默认: 0-否, 1-是
+        /// </summary>
+        [Comment("是否默认: 0-否, 1-是")]
+        [Required, Column("default_flag", TypeName = "tinyint(6)")]
+        public byte DefaultFlag { get; set; }
+
+        /// <summary>
+        /// 支持的签名方式 ["MD5", "RSA2"]
+        /// </summary>
+        [Comment("支持的签名方式 [\"MD5\", \"RSA2\"]")]
+        [Required, Column("app_sign_type", TypeName = "json")]
+        public string AppSignType { get; set; }
+
+        /// <summary>
         /// 应用私钥
         /// </summary>
         [Comment("应用私钥")]
         [Required, Column("app_secret", TypeName = "varchar(128)")]
         public string AppSecret { get; set; }
+
+        /// <summary>
+        /// RSA2应用公钥
+        /// </summary>
+        [Comment("RSA2应用公钥")]
+        [Column("app_rsa2_public_key", TypeName = "varchar(256)")]
+        public string AppRsa2PublicKey { get; set; }
 
         /// <summary>
         /// 备注

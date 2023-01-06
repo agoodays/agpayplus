@@ -4,11 +4,8 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using static AGooday.AgPay.Application.Permissions.PermCode;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -51,7 +48,7 @@ namespace AGooday.AgPay.Application.Services
         public bool Update(MchStoreDto dto)
         {
             var renew = _mapper.Map<MchStore>(dto);
-            var old = _mchStoreRepository.GetById(dto.StoreId);
+            //var old = _mchStoreRepository.GetById(dto.StoreId);
             renew.UpdatedAt = DateTime.Now;
             _mchStoreRepository.Update(renew);
             return _mchStoreRepository.SaveChanges(out int _);

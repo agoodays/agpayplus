@@ -24,7 +24,8 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<AgentInfo, AgentInfoCreatedEvent>();
 
             CreateMap<IsvInfo, IsvInfoDto>();
-            CreateMap<MchApp, MchAppDto>();
+            CreateMap<MchApp, MchAppDto>()
+                .ForMember(d => d.AppSignType, o => o.MapFrom(s => JArray.Parse(s.AppSignType)));
             CreateMap<MchStore, MchStoreDto>();
             CreateMap<MchStore, MchStoreListDto>();
             CreateMap<MchDivisionReceiverGroup, MchDivisionReceiverGroupDto>();

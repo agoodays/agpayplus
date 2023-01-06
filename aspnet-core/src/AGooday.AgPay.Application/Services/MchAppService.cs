@@ -3,7 +3,6 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,7 +47,7 @@ namespace AGooday.AgPay.Application.Services
         public bool Update(MchAppDto dto)
         {
             var renew = _mapper.Map<MchApp>(dto);
-            var old = _mchAppRepository.GetById(dto.AppId);
+            var old = _mchAppRepository.GetAsNoTrackingById(dto.AppId);
             renew.UpdatedAt = DateTime.Now;
             renew.AppSecret = string.IsNullOrWhiteSpace(renew.AppSecret) ? old.AppSecret : renew.AppSecret;
             _mchAppRepository.Update(renew);

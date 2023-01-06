@@ -128,7 +128,20 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
+            mchApp.AppSecret = StringUtil.Str2Star(mchApp.AppSecret, 0, 3, 6);
             return ApiRes.Ok(mchApp);
+        }
+
+        /// <summary>
+        /// 获取支付网关系统公钥
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <returns></returns>
+        [HttpGet, Route("sysRSA2PublicKey"), AllowAnonymous, NoLog]
+        public ApiRes SysRSA2PublicKey(string appId)
+        {
+            var sysRSA2PublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi1NJVybvb3CQsK8BRsE9Qql1EmPiTFtokkT7YC8OpcY1ONN4UtVcisQObk2aJL/NFnfm3MQzKzPQ8B3hqoY5Vr2wf5amkZYiSUXYC1VHnaw2Pt2Eje+bhwbS5sWW52lKVev2lgP2vpZDah8WAlgdY4IBQfQ4VYNkoKDBgzmBwzQOWQ5eO7CqWp1tJHxvZSDUleMYAz5gCcVJ4ZBv+3lRAQ3r/RCIXPiyDAu2Y/lGHPrP0yuHN9XxU1uHWQKdy1RHXLfal1Oapv31yF8XqNxNG1sjj91S+F5sdkvR6LLdWM481z0otUyY1+68UJIZmxP3UCfsLP1byj7lKZixDxrJvwIDAQAB";
+            return ApiRes.Ok(sysRSA2PublicKey);
         }
     }
 }
