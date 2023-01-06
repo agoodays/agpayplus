@@ -41,6 +41,9 @@
         <template slot="stateSlot" slot-scope="{record}">
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />
         </template>
+        <template slot="defaultFlagSlot" slot-scope="{record}">
+          <a-badge :status="record.defaultFlag === 0?'error':'processing'" :text="record.defaultFlag === 0?'否':'是'" />
+        </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_APP_EDIT')" @click="editFunc(record.appId)">修改</a-button>
@@ -80,6 +83,7 @@ const tableColumns = [
   { key: 'appId', fixed: 'left', width: '320px', title: '应用AppId', scopedSlots: { customRender: 'appIdSlot' } },
   { key: 'appName', title: '应用名称', dataIndex: 'appName' },
   { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'defaultFlag', title: '默认', width: '80px', scopedSlots: { customRender: 'defaultFlagSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]

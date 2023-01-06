@@ -38,11 +38,11 @@
         <a-col :span="10">
           <a-form-model-item label="是否设置为默认应用" prop="defaultFlag">
             <a-radio-group v-model="saveObject.defaultFlag">
-              <a-radio :value="1">
-                启用
-              </a-radio>
               <a-radio :value="0">
-                停用
+                否
+              </a-radio>
+              <a-radio :value="1">
+                是
               </a-radio>
             </a-radio-group>
           </a-form-model-item>
@@ -145,6 +145,7 @@ export default {
       // 数据清空
       this.saveObject = {
         'state': 1,
+        'defaultFlag': 0,
         'appSignType': [],
         'appSecret': '',
         'appSecret_ph': '请输入'
