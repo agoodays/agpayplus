@@ -178,7 +178,6 @@ export default {
       }
 
       getSysRSA2PublicKey().then(res => {
-        console.log(res)
         that.sysRSA2PublicKey = res
       })
     },
