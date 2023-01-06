@@ -23,6 +23,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         public DbSet<MchInfo> MchInfo { get; set; }
         public DbSet<MchNotifyRecord> MchNotifyRecord { get; set; }
         public DbSet<MchPayPassage> MchPayPassage { get; set; }
+        public DbSet<MchStore> MchStore { get; set; }
         public DbSet<OrderSnapshot> OrderSnapshot { get; set; }
         public DbSet<PayInterfaceConfig> PayInterfaceConfig { get; set; }
         public DbSet<PayInterfaceDefine> PayInterfaceDefine { get; set; }
@@ -144,6 +145,9 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<MchNotifyRecord>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<MchNotifyRecord>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<MchNotifyRecord>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<MchStore>().Property(c => c.DefaultFlag).HasDefaultValue(0);
+            modelBuilder.Entity<MchStore>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<MchStore>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<OrderSnapshot>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<OrderSnapshot>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayInterfaceConfig>().Property(c => c.State).HasDefaultValue(1);

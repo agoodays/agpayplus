@@ -1,15 +1,15 @@
 -- 商户门店表
 DROP TABLE IF EXISTS `t_mch_store`;
 CREATE TABLE `t_mch_store` (
-  `store_id` BIGINT NOT NULL COMMENT '门店ID',
+  `store_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '门店ID',
   `store_name` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '门店名称',
   `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
   `agent_no` VARCHAR(64) NULL COMMENT '代理商号',
   `isv_no` VARCHAR(64) DEFAULT NULL COMMENT '服务商号',
   `contact_phone` VARCHAR(32) NOT NULL COMMENT '联系人电话',
-  `store_logo` VARCHAR(64) NOT NULL COMMENT '门店LOGO',
-  `store_outer_img` VARCHAR(64) NOT NULL COMMENT '门头照',
-  `store_inner_img` VARCHAR(64) NOT NULL COMMENT '门店内景照',
+  `store_logo` VARCHAR(128) NOT NULL COMMENT '门店LOGO',
+  `store_outer_img` VARCHAR(128) NOT NULL COMMENT '门头照',
+  `store_inner_img` VARCHAR(128) NOT NULL COMMENT '门店内景照',
   `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
   `province_code` VARCHAR(32) NOT NULL COMMENT '省代码',
   `city_code` VARCHAR(32) NOT NULL COMMENT '市代码',
@@ -23,8 +23,32 @@ CREATE TABLE `t_mch_store` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`store_id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='商户门店表';
-
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci AUTO_INCREMENT=1001 COMMENT='商户门店表';
+  
+-- 门店管理
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE', '门店管理', 'profile', '/store', 'MchStoreListPage', 'ML', 0, 1,  'ENT_MCH', '40', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_LIST', '页面：门店列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
+    
+-- 门店管理
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE', '门店管理', 'profile', '/store', 'MchStoreListPage', 'ML', 0, 1,  'ENT_MCH', '40', 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_LIST', '页面：门店列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
+    
+-- 门店管理
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE', '门店管理', 'shop', '/store', 'MchStoreListPage', 'ML', 0, 1,  'ENT_MCH_CENTER', '60', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_LIST', '页面：门店列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
+        
 -- 商户进件表
 DROP TABLE IF EXISTS `t_mch_apply`;
 CREATE TABLE `t_mch_apply` (

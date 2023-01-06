@@ -27,6 +27,7 @@ namespace AGooday.AgPay.Application.AutoMapper
 
             CreateMap<IsvInfoDto, IsvInfo>();
             CreateMap<MchAppDto, MchApp>();
+            CreateMap<MchStoreDto, MchStore>();
             CreateMap<MchDivisionReceiverGroupDto, MchDivisionReceiverGroup>();
             CreateMap<MchDivisionReceiverDto, MchDivisionReceiver>();
 

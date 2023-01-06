@@ -20,7 +20,8 @@ namespace AGooday.AgPay.Domain.Models
         /// 门店ID
         /// </summary>
         [Comment("门店ID")]
-        [Key, Required, Column("store_id", TypeName = "varchar(64)")]
+        [Key, Required, Column("store_id", TypeName = "bigint")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long StoreId { get; set; }
 
         /// <summary>

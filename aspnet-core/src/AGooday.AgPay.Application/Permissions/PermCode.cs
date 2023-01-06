@@ -85,6 +85,12 @@
             public const string ENT_MCH_APP_ADD = "ENT_MCH_APP_ADD";
             public const string ENT_MCH_INFO = "ENT_MCH_INFO";
             public const string ENT_MCH_APP = "ENT_MCH_APP";
+            public const string ENT_MCH_STORE = "ENT_MCH_STORE";
+            public const string ENT_MCH_STORE_VIEW = "ENT_MCH_STORE_VIEW";
+            public const string ENT_MCH_STORE_LIST = "ENT_MCH_STORE_LIST";
+            public const string ENT_MCH_STORE_ADD = "ENT_MCH_STORE_ADD";
+            public const string ENT_MCH_STORE_EDIT = "ENT_MCH_STORE_EDIT";
+            public const string ENT_MCH_STORE_DEL = "ENT_MCH_STORE_DEL";
             public const string ENT_AGENT_INFO = "ENT_AGENT_INFO";
             public const string ENT_AGENT_LIST = "ENT_AGENT_LIST";
             public const string ENT_AGENT_INFO_VIEW = "ENT_AGENT_INFO_VIEW";
