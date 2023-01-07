@@ -35,6 +35,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions
             // 注入 应用层Application
             services.AddScoped<IIsvInfoService, IsvInfoService>();
             services.AddScoped<IMchAppService, MchAppService>();
+            services.AddScoped<IMchStoreService, MchStoreService>();
             services.AddScoped<IMchDivisionReceiverGroupService, MchDivisionReceiverGroupService>();
             services.AddScoped<IMchDivisionReceiverService, MchDivisionReceiverService>();
             services.AddScoped<IMchInfoService, MchInfoService>();
@@ -89,6 +90,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
+            services.AddScoped<IMchStoreRepository, MchStoreRepository>();
             services.AddScoped<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();
             services.AddScoped<IMchDivisionReceiverRepository, MchDivisionReceiverRepository>();
             services.AddScoped<IMchInfoRepository, MchInfoRepository>();

@@ -97,6 +97,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public byte DefaultFlag { get; set; }
 
         /// <summary>
+        /// 绑定AppId
+        /// </summary>
+        public string BindAppId { get; set; }
+
+        /// <summary>
         /// 创建者用户ID
         /// </summary>
         public long? CreatedUid { get; set; }

@@ -1,22 +1,22 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Authorization;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Manager.Api.Attributes;
-using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
+namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
 {
     /// <summary>
     /// 商户门店管理类
     /// </summary>
     [Route("/api/mchStore")]
     [ApiController, Authorize]
-    public class MchStoreController : ControllerBase
+    public class MchStoreController : CommonController
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<MchStoreController> _logger;
@@ -25,7 +25,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 
         public MchStoreController(IMQSender mqSender, ILogger<MchStoreController> logger,
             IMchStoreService mchStoreService,
-            IMchInfoService mchInfoService)
+            IMchInfoService mchInfoService, RedisUtil client,
+            ISysUserService sysUserService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             this.mqSender = mqSender;
             _logger = logger;
@@ -42,7 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_LIST)]
         public ApiRes List([FromQuery] MchStoreQueryDto dto)
         {
-            var data = _mchStoreService.GetPaginatedData(dto);
+            var data = _mchStoreService.GetPaginatedData(dto, GetCurrentAgentNo());
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 

@@ -5,7 +5,6 @@
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
             <ag-text-up :placeholder="'门店编号'" :msg="searchData.storeId" v-model="searchData.storeId"/>
-            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
             <ag-text-up :placeholder="'门店名称'" :msg="searchData.storeName" v-model="searchData.storeName"/>
             <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
               <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
@@ -61,9 +60,8 @@ import InfoDetail from './Detail'
 const tableColumns = [
   { key: 'storeName', fixed: 'left', width: '200px', title: '门店名称', scopedSlots: { customRender: 'storeNameSlot' } },
   { key: 'storeId', title: '门店编号', width: '140px', dataIndex: 'storeId' },
-  { key: 'mchNo', title: '商户号', width: '140px', dataIndex: 'mchNo' },
-  { key: 'mchName', title: '商户名称', width: '140px', dataIndex: 'mchName' },
   { key: 'defaultFlag', title: '默认', width: '80px', scopedSlots: { customRender: 'defaultFlagSlot' } },
+  { key: 'bindAppId', title: 'AppId', width: '320px', dataIndex: 'bindAppId' },
   { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]

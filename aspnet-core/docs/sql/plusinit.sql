@@ -18,6 +18,7 @@ CREATE TABLE `t_mch_store` (
   `lng` VARCHAR(32) NOT NULL COMMENT '经度',
   `lat` VARCHAR(32) NOT NULL COMMENT '纬度',
   `default_flag` TINYINT NOT NULL DEFAULT '0' COMMENT '是否默认: 0-否, 1-是',
+  `bind_app_id` VARCHAR(64) NULL COMMENT '绑定AppId',
   `created_uid` BIGINT DEFAULT NULL COMMENT '创建者用户ID',
   `created_by` VARCHAR(64) DEFAULT NULL COMMENT '创建者姓名',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',

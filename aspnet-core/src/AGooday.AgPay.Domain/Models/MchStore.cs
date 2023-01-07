@@ -137,6 +137,12 @@ namespace AGooday.AgPay.Domain.Models
         public byte DefaultFlag { get; set; }
 
         /// <summary>
+        /// 绑定AppId
+        /// </summary>
+        [Column("bind_app_id", TypeName = "varchar(64)")]
+        public string BindAppId { get; set; }
+
+        /// <summary>
         /// 创建者用户ID
         /// </summary>
         [Comment("创建者用户ID")]

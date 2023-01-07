@@ -37,6 +37,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<IAgentInfoService, AgentInfoService>();
             services.AddScoped<IIsvInfoService, IsvInfoService>();
             services.AddScoped<IMchAppService, MchAppService>();
+            services.AddScoped<IMchStoreService, MchStoreService>();
             services.AddScoped<IMchDivisionReceiverGroupService, MchDivisionReceiverGroupService>();
             services.AddScoped<IMchDivisionReceiverService, MchDivisionReceiverService>();
             services.AddScoped<IMchInfoService, MchInfoService>();
@@ -97,6 +98,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
+            services.AddScoped<IMchStoreRepository, MchStoreRepository>();
             services.AddScoped<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();
             services.AddScoped<IMchDivisionReceiverRepository, MchDivisionReceiverRepository>();
             services.AddScoped<IMchInfoRepository, MchInfoRepository>();

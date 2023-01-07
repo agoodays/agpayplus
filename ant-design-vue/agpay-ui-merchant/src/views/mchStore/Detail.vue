@@ -111,7 +111,7 @@
 </template>
 
 <script>
-  import { API_URL_MCH_STORE, API_URL_MCH_LIST, req } from '@/api/manage'
+  import { API_URL_MCH_STORE, req } from '@/api/manage'
   export default {
 
     props: {
@@ -139,14 +139,6 @@
         that.recordId = recordId
         req.getById(API_URL_MCH_STORE, recordId).then(res => {
           that.detailData = res
-        })
-        req.list(API_URL_MCH_LIST, { 'pageSize': null }).then(res => { // 商户下拉选择列表
-          that.mchList = res.records
-          for (let i = 0; i < that.mchList.length; i++) {
-            if (that.detailData.mchNo === that.mchList[i].mchNo) {
-              that.mchName = that.mchList[i].mchName
-            }
-          }
         })
         this.visible = true
       },
