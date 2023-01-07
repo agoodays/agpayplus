@@ -30,6 +30,12 @@
             public const string ENT_UR_USER = "ENT_UR_USER";
             public const string ENT_UR_ROLE_ENT = "ENT_UR_ROLE_ENT";
             public const string ENT_UR_ROLE = "ENT_UR_ROLE";
+            public const string ENT_UR_TEAM = "ENT_UR_TEAM";
+            public const string ENT_UR_TEAM_VIEW = "ENT_UR_TEAM_VIEW";
+            public const string ENT_UR_TEAM_LIST = "ENT_UR_TEAM_LIST";
+            public const string ENT_UR_TEAM_ADD = "ENT_UR_TEAM_ADD";
+            public const string ENT_UR_TEAM_EDIT = "ENT_UR_TEAM_EDIT";
+            public const string ENT_UR_TEAM_DEL = "ENT_UR_TEAM_DEL";
             public const string ENT_TRANSFER_ORDER_LIST = "ENT_TRANSFER_ORDER_LIST";
             public const string ENT_TRANSFER_ORDER_VIEW = "ENT_TRANSFER_ORDER_VIEW";
             public const string ENT_SYS_LOG_VIEW = "ENT_SYS_LOG_VIEW";

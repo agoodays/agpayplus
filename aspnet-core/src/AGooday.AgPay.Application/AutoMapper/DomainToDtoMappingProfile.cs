@@ -58,6 +58,8 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysUser, SysUserDto>();
             CreateMap<SysUser, SysUserCreatedEvent>();
 
+            CreateMap<SysUserTeam, SysUserTeamDto>();
+
             CreateMap<TransferOrder, TransferOrderDto>();
         }
     }
