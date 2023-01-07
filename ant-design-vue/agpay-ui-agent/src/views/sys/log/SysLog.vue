@@ -49,8 +49,8 @@
       >
         <template slot="userNameSlot" slot-scope="{record}"><b>{{ record.userName }}</b></template> <!-- 自定义插槽 -->
         <template slot="sysTypeSlot" slot-scope="{record}">
-          <a-tag :key="record.sysType" :color="record.sysType === 'MGR'?'green':record.sysType === 'MCH'?'geekblue':'loser'">
-            {{ record.sysType === 'MGR'?'运营平台':record.sysType === 'MCH'?'商户系统':'其他' }}
+          <a-tag :key="record.sysType" :color="record.sysType === 'MGR'?'green':record.sysType === 'AGENT'?'cyan':record.sysType === 'MCH'?'geekblue':'loser'">
+            {{ record.sysType === 'MGR'?'运营平台':record.sysType === 'AGENT'?'代理商系统':record.sysType === 'MCH'?'商户系统':'其他' }}
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
@@ -97,8 +97,8 @@
           <a-col :sm="12">
             <a-descriptions>
               <a-descriptions-item label="所属系统">
-                <a-tag :key="detailData.sysType" :color="detailData.sysType === 'MGR'?'green':detailData.sysType === 'MCH'?'geekblue':'loser'">
-                  {{ detailData.sysType === 'MGR'?'运营平台':detailData.sysType === 'MCH'?'商户系统':'其他' }}
+                <a-tag :key="detailData.sysType" :color="detailData.sysType === 'MGR'?'green':detailData.sysType === 'AGENT'?'cyan':detailData.sysType === 'MCH'?'geekblue':'loser'">
+                  {{ detailData.sysType === 'MGR'?'运营平台':detailData.sysType === 'AGENT'?'代理商系统':detailData.sysType === 'MCH'?'商户系统':'其他' }}
                 </a-tag>
               </a-descriptions-item>
             </a-descriptions>

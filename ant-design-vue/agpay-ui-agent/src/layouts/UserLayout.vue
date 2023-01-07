@@ -13,7 +13,7 @@
           </div>
           <div class="desc">
             <img src="~@/assets/svg/operate.svg" class="logo" alt="logo">
-            <span>运营平台</span>
+            <span>代理商系统</span>
           </div>
         </div>
 
