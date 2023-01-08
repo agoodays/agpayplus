@@ -147,6 +147,12 @@
             public const string ENT_UR_USER = "ENT_UR_USER";
             //public const string ENT_UR_ROLE_ENT = "ENT_UR_ROLE_ENT";
             public const string ENT_UR_ROLE = "ENT_UR_ROLE";
+            public const string ENT_UR_TEAM = "ENT_UR_TEAM";
+            public const string ENT_UR_TEAM_VIEW = "ENT_UR_TEAM_VIEW";
+            public const string ENT_UR_TEAM_LIST = "ENT_UR_TEAM_LIST";
+            public const string ENT_UR_TEAM_ADD = "ENT_UR_TEAM_ADD";
+            public const string ENT_UR_TEAM_EDIT = "ENT_UR_TEAM_EDIT";
+            public const string ENT_UR_TEAM_DEL = "ENT_UR_TEAM_DEL";
             //public const string ENT_TRANSFER_ORDER_LIST = "ENT_TRANSFER_ORDER_LIST";
             //public const string ENT_TRANSFER_ORDER_VIEW = "ENT_TRANSFER_ORDER_VIEW";
             //public const string ENT_SYS_LOG_VIEW = "ENT_SYS_LOG_VIEW";
@@ -202,6 +208,12 @@
             public const string ENT_MCH_APP_ADD = "ENT_MCH_APP_ADD";
             public const string ENT_MCH_INFO = "ENT_MCH_INFO";
             public const string ENT_MCH_APP = "ENT_MCH_APP";
+            public const string ENT_MCH_STORE = "ENT_MCH_STORE";
+            public const string ENT_MCH_STORE_VIEW = "ENT_MCH_STORE_VIEW";
+            public const string ENT_MCH_STORE_LIST = "ENT_MCH_STORE_LIST";
+            public const string ENT_MCH_STORE_ADD = "ENT_MCH_STORE_ADD";
+            public const string ENT_MCH_STORE_EDIT = "ENT_MCH_STORE_EDIT";
+            public const string ENT_MCH_STORE_DEL = "ENT_MCH_STORE_DEL";
             public const string ENT_AGENT_INFO = "ENT_AGENT_INFO";
             public const string ENT_AGENT_LIST = "ENT_AGENT_LIST";
             public const string ENT_AGENT_INFO_VIEW = "ENT_AGENT_INFO_VIEW";

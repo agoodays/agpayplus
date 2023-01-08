@@ -22,6 +22,7 @@ export const asyncRouteDefine = {
 
   'MainPage': { defaultPath: '/main', component: () => import('@/views/dashboard/Analysis') },
   'SysUserPage': { defaultPath: '/users', component: () => import('@/views/sysuser/SysUserPage') },
+  'SysUserTeamPage': { defaultPath: '/teams', component: () => import('@/views/sysUserTeam/TeamList') },
   'RolePage': { defaultPath: '/roles', component: () => import('@/views/role/RolePage') },
   'EntPage': { defaultPath: '/ents', component: () => import('@/views/ent/EntPage') },
   'PayWayPage': { defaultPath: '/payways', component: () => import('@/views/payconfig/payWay/List') },

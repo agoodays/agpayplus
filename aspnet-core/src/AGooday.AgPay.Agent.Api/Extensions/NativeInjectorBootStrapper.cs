@@ -57,6 +57,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<ISysUserAuthService, SysUserAuthService>();
             services.AddScoped<ISysUserRoleRelaService, SysUserRoleRelaService>();
             services.AddScoped<ISysUserService, SysUserService>();
+            services.AddScoped<ISysUserTeamService, SysUserTeamService>();
             services.AddScoped<ITransferOrderService, TransferOrderService>();
 
             // 命令总线Domain Bus (Mediator) 中介总线接口
@@ -118,6 +119,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<ISysUserAuthRepository, SysUserAuthRepository>();
             services.AddScoped<ISysUserRoleRelaRepository, SysUserRoleRelaRepository>();
             services.AddScoped<ISysUserRepository, SysUserRepository>();
+            services.AddScoped<ISysUserTeamRepository, SysUserTeamRepository>();
             services.AddScoped<ITransferOrderRepository, TransferOrderRepository>();
         }
     }

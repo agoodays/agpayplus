@@ -69,6 +69,7 @@ export const API_URL_ENT_LIST = '/api/sysEnts'
 export const API_URL_ROLE_LIST = '/api/sysRoles'
 export const API_URL_ROLE_ENT_RELA_LIST = '/api/sysRoleEntRelas'
 export const API_URL_SYS_USER_LIST = '/api/sysUsers'
+export const API_URL_UR_TEAM_LIST = '/api/userTeams'
 export const API_URL_USER_ROLE_RELA_LIST = '/api/sysUserRoleRelas'
 
 /** 服务商、代理商、商户管理 **/

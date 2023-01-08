@@ -3,29 +3,28 @@ using AGooday.AgPay.Agent.Api.Authorization;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
+namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
 {
     /// <summary>
-    /// 商户门店管理类
+    /// 用户团队管理类
     /// </summary>
-    [Route("/api/mchStore")]
+    [Route("/api/userTeams")]
     [ApiController, Authorize]
-    public class MchStoreController : CommonController
+    public class SysUserTeamController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<MchStoreController> _logger;
-        private readonly IMchStoreService _mchStoreService;
-        private readonly IMchInfoService _mchInfoService;
+        private readonly ILogger<SysUserTeamController> _logger;
+        private readonly ISysUserTeamService _mchStoreService;
 
-        public MchStoreController(IMQSender mqSender, ILogger<MchStoreController> logger,
-            IMchStoreService mchStoreService,
-            IMchInfoService mchInfoService, RedisUtil client,
+        public SysUserTeamController(IMQSender mqSender, ILogger<SysUserTeamController> logger,
+            ISysUserTeamService mchStoreService, RedisUtil client,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
@@ -34,38 +33,34 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             this.mqSender = mqSender;
             _logger = logger;
             _mchStoreService = mchStoreService;
-            _mchInfoService = mchInfoService;
         }
 
         /// <summary>
-        /// 门店列表
+        /// 团队列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
-        [PermissionAuth(PermCode.AGENT.ENT_MCH_STORE_LIST)]
-        public ApiRes List([FromQuery] MchStoreQueryDto dto)
+        [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_LIST)]
+        public ApiRes List([FromQuery] SysUserTeamQueryDto dto)
         {
-            var data = _mchStoreService.GetPaginatedData(dto, GetCurrentAgentNo());
+            dto.SysType = CS.SYS_TYPE.AGENT;
+            dto.BelongInfoId = GetCurrentAgentNo();
+            var data = _mchStoreService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
         /// <summary>
-        /// 新建门店
+        /// 新建团队
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodLog("新建门店")]
-        [PermissionAuth(PermCode.AGENT.ENT_MCH_STORE_ADD)]
-        public ApiRes Add(MchStoreDto dto)
+        [HttpPost, Route(""), MethodLog("新建团队")]
+        [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_ADD)]
+        public ApiRes Add(SysUserTeamDto dto)
         {
-            if (!_mchInfoService.IsExistMchNo(dto.MchNo))
-            {
-                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
-            }
-            var mchInfo = _mchInfoService.GetByMchNo(dto.MchNo);
-            dto.AgentNo = mchInfo.AgentNo;
-            dto.IsvNo = mchInfo.IsvNo;
+            dto.SysType = CS.SYS_TYPE.AGENT;
+            dto.BelongInfoId = GetCurrentAgentNo();
             var result = _mchStoreService.Add(dto);
             if (!result)
             {
@@ -75,50 +70,43 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         }
 
         /// <summary>
-        /// 删除门店
+        /// 删除团队
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}"), MethodLog("删除门店")]
-        [PermissionAuth(PermCode.AGENT.ENT_MCH_STORE_VIEW, PermCode.AGENT.ENT_MCH_STORE_EDIT)]
+        [HttpDelete, Route("{recordId}"), MethodLog("删除团队")]
+        [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_VIEW, PermCode.AGENT.ENT_UR_TEAM_EDIT)]
         public ApiRes Delete(long recordId)
         {
             var mchStore = _mchStoreService.GetById(recordId);
             _mchStoreService.Remove(recordId);
-
-            //// 推送mq到目前节点进行更新数据
-            //mqSender.Send(ResetIsvMchStoreInfoConfigMQ.Build(ResetIsvMchStoreInfoConfigMQ.RESET_TYPE_MCH_STORE, null, mchStore.MchNo, recordId));
-
             return ApiRes.Ok();
         }
 
         /// <summary>
-        /// 更新门店信息
+        /// 更新团队信息
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}"), MethodLog("更新门店信息")]
-        [PermissionAuth(PermCode.AGENT.ENT_MCH_STORE_EDIT)]
-        public ApiRes Update(long recordId, MchStoreDto dto)
+        [HttpPut, Route("{recordId}"), MethodLog("更新团队信息")]
+        [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_EDIT)]
+        public ApiRes Update(long recordId, SysUserTeamDto dto)
         {
             var result = _mchStoreService.Update(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
             }
-            //// 推送修改门店消息
-            //mqSender.Send(ResetIsvMchStoreInfoConfigMQ.Build(ResetIsvMchStoreInfoConfigMQ.RESET_TYPE_MCH_STORE, null, dto.MchNo, dto.AppId));
-
             return ApiRes.Ok();
         }
 
         /// <summary>
-        /// 门店详情
+        /// 团队详情
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
-        [PermissionAuth(PermCode.AGENT.ENT_MCH_STORE_DEL)]
+        [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_DEL)]
         public ApiRes Detail(long recordId)
         {
             var mchStore = _mchStoreService.GetById(recordId);

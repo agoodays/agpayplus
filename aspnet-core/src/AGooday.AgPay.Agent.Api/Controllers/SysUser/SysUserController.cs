@@ -49,6 +49,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         public ApiRes List([FromQuery] SysUserQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
+            dto.BelongInfoId = GetCurrentAgentNo();
             var data = _sysUserService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
