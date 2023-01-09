@@ -24,5 +24,10 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
         /// </summary>
         public string SysType { get; set; }
+
+        /// <summary>
+        /// 用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员
+        /// </summary>
+        public byte UserType { get; set; }
     }
 }

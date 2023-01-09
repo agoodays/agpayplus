@@ -55,6 +55,27 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string SysType { get; set; }
 
         /// <summary>
+        /// 用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员
+        /// </summary>
+        public byte UserType { get; set; }
+
+        /// <summary>
+        /// 邀请码
+        /// </summary>
+        [BindNever]
+        public string InviteCode { get; set; }
+
+        /// <summary>
+        /// 团队ID
+        /// </summary>
+        public long? TeamId { get; set; }
+
+        /// <summary>
+        /// 是否队长:  0-否 1-是
+        /// </summary>
+        public byte? IsTeamLeader { get; set; }
+
+        /// <summary>
         /// 所属商户ID / 0(平台)
         /// </summary>
         [BindNever]
@@ -71,5 +92,20 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// </summary>
         [BindNever]
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// 密码类型
+        /// </summary>
+        public string PasswordType { get; set; }
+
+        /// <summary>
+        /// 登录密码
+        /// </summary>
+        public string LoginPassword { get; set; }
+
+        /// <summary>
+        /// 是否发送开通提醒
+        /// </summary>
+        public byte IsNotify { get; set; }
     }
 }

@@ -83,6 +83,34 @@ namespace AGooday.AgPay.Domain.Models
         public string SysType { get; set; }
 
         /// <summary>
+        /// 用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员
+        /// </summary>
+        [Comment("用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员")]
+        [Required, Column("user_type", TypeName = "tinyint(6)")]
+        public byte UserType { get; set; }
+
+        /// <summary>
+        /// 邀请码
+        /// </summary>
+        [Comment("邀请码")]
+        [Column("invite_code", TypeName = "varchar(20)")]
+        public string InviteCode { get; set; }
+
+        /// <summary>
+        /// 团队ID
+        /// </summary>
+        [Comment("团队ID")]
+        [Column("team_id", TypeName = "bigint")]
+        public long? TeamId { get; set; }
+
+        /// <summary>
+        /// 是否队长:  0-否 1-是
+        /// </summary>
+        [Comment("是否队长:  0-否 1-是")]
+        [Column("is_team_leader", TypeName = "tinyint(6)")]
+        public byte? IsTeamLeader { get; set; }
+
+        /// <summary>
         /// 所属商户ID / 所属代理商ID / 0(平台)
         /// </summary>
         [Comment("所属商户ID / 所属代理商ID / 0(平台)")]

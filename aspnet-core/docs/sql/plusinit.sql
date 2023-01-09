@@ -233,11 +233,11 @@ ALTER TABLE `t_sys_user`
   CHANGE `sex` `sex` TINYINT DEFAULT 0 NOT NULL COMMENT '性别: 0-未知, 1-男, 2-女',
   CHANGE `is_admin` `is_admin` TINYINT DEFAULT 0 NOT NULL COMMENT '是否超管（超管拥有全部权限）: 0-否 1-是',
   CHANGE `sys_type` `sys_type` VARCHAR(8) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
-  ADD COLUMN `user_type` TINYINT NULL COMMENT '1-超级管理员, 2-普通操作员, 3-商户拓展员' AFTER `sys_type`,
+  ADD COLUMN `user_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员' AFTER `sys_type`,
   ADD COLUMN `invite_code` VARCHAR(20) NULL COMMENT '邀请码' AFTER `user_type`,
   ADD COLUMN `team_id` BIGINT NULL COMMENT '团队ID' AFTER `invite_code`,
-  ADD COLUMN `team_name` VARCHAR(32) NULL COMMENT '团队名称' AFTER `team_id`,
-  ADD COLUMN `is_team_leader` TINYINT NULL COMMENT '是否队长:  0-否 1-是' AFTER `team_name`;
+--   ADD COLUMN `team_name` VARCHAR(32) NULL COMMENT '团队名称' AFTER `team_id`,
+  ADD COLUMN `is_team_leader` TINYINT NULL COMMENT '是否队长:  0-否 1-是' AFTER `team_id`;
   
 ALTER TABLE `t_pay_interface_define`
   ADD COLUMN `is_support_applyment` TINYINT DEFAULT 1 NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持' AFTER `config_page_type`;

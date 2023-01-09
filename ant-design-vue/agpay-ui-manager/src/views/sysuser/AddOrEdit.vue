@@ -69,12 +69,81 @@
             </a-radio-group>
           </a-form-model-item>
         </a-col>
+
+        <a-col :span="10">
+          <a-form-model-item label="用户类型：" prop="userType">
+            <a-select v-model="saveObject.userType" placeholder="请选择用户类型">
+              <a-select-option v-for="d in userTypeOptions" :value="d.userType" :key="d.userType">
+                {{ d.userTypeName }}
+              </a-select-option>
+            </a-select>
+          </a-form-model-item>
+        </a-col>
+
+        <a-col :span="10" v-if="saveObject.userType===3">
+          <a-form-model-item label="选择团队：" prop="teamId">
+            <a-select v-model="saveObject.teamId" placeholder="请选择用户类型">
+              <a-select-option v-for="d in teamList" :value="d.teamId" :key="d.teamId">
+                {{ d.teamName }}
+              </a-select-option>
+            </a-select>
+          </a-form-model-item>
+        </a-col>
+
+        <a-col :span="10" v-if="saveObject.userType===3">
+          <a-form-model-item label="是否队长：" prop="isTeamLeader">
+            <a-radio-group v-model="saveObject.isTeamLeader">
+              <a-radio :value="1">是</a-radio>
+              <a-radio :value="0">否</a-radio>
+            </a-radio-group>
+          </a-form-model-item>
+        </a-col>
       </a-row>
-      <a-divider orientation="left" v-if="resetIsShow">
+
+      <a-divider orientation="left">
         <a-tag color="#FF4B33">
           账户安全
         </a-tag>
       </a-divider>
+
+      <div>
+        <a-row justify="space-between" type="flex" v-if="this.isAdd">
+          <a-col :span="10">
+            <a-form-model-item label="是否发送开通提醒" prop="isNotify">
+              <a-radio-group v-model="saveObject.isNotify">
+                <a-radio :value='0'>
+                  否
+                </a-radio>
+                <a-radio :value='1'>
+                  是
+                </a-radio>
+              </a-radio-group>
+            </a-form-model-item>
+          </a-col>
+        </a-row>
+        <a-row justify="space-between" type="flex" v-if="this.isAdd">
+          <a-col :span="10">
+            <a-form-model-item label="密码设置" prop="passwordType">
+              <a-radio-group v-model="saveObject.passwordType">
+                <a-radio value='default'>
+                  默认密码
+                </a-radio>
+                <a-radio value='custom'>
+                  自定义密码
+                </a-radio>
+              </a-radio-group>
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="10" v-if="saveObject.passwordType === 'custom'">
+            <a-form-model-item label="登录密码" prop="loginPassword">
+              <a-input placeholder="请输入登录密码" v-model="saveObject.loginPassword"/>
+            </a-form-model-item>
+            <a-button icon="file-sync" :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }" @click="genRandomPassword" style="margin-right:8px">
+              随机生成密码
+            </a-button>
+          </a-col>
+        </a-row>
+      </div>
 
       <div style="display:flex;flex-direction:row;">
         <a-row justify="space-between" type="flex" style="width:100%">
@@ -125,7 +194,7 @@
 </template>
 
 <script>
-import { req, API_URL_SYS_USER_LIST } from '@/api/manage'
+import { req, API_URL_SYS_USER_LIST, API_URL_UR_TEAM_LIST } from '@/api/manage'
 import { Base64 } from 'js-base64'
 export default {
 
@@ -134,6 +203,12 @@ export default {
   },
 
   data () {
+    const checkUserType = (rule, value, callback) => { // 是否选择了用户类型
+      if (this.isAdd && !value) {
+        callback(new Error('请选择用户类型'))
+      }
+      callback()
+    }
     return {
       newPwd: '', //  新密码
       resetIsShow: false, // 重置密码是否展现
@@ -147,10 +222,18 @@ export default {
       confirmLoading: false, // 显示确定按钮loading图标
       isAdd: true, // 新增 or 修改页面标识
       isShow: false, // 是否显示弹层/抽屉
+      userTypeOptions: [
+        { userTypeName: '超级管理员', userType: '1' },
+        { userTypeName: '普通操作员', userType: '2' },
+        { userTypeName: '商户拓展员', userType: '3' }// ,
+        // { userTypeName: '店长', userType: '11' },
+        // { userTypeName: '店员', userType: '12' }
+      ],
       saveObject: {}, // 数据对象
       recordId: null, // 更新对象ID
       rules: {
         realname: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }],
+        userType: [{ required: true, validator: checkUserType, trigger: 'blur' }],
         telphone: [{ required: true, pattern: /^[1][0-9]{10}$/, message: '请输入正确的手机号码', trigger: 'blur' }],
         userNo: [{ required: true, message: '请输入编号', trigger: 'blur' }],
         loginUsername: [],
@@ -189,7 +272,12 @@ export default {
       this.saveObject = {
         isAdmin: 1,
         state: 1,
-        sex: 1
+        sex: 1,
+        userType: 1,
+        isTeamLeader: 0,
+        isNotify: 0,
+        passwordType: 'default',
+        loginPassword: ''
       }
       this.rules.loginUsername = []
       this.confirmLoading = false // 关闭loading
@@ -204,6 +292,9 @@ export default {
       }
 
       const that = this
+      req.list(API_URL_UR_TEAM_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 用户团队下拉选择列表
+        that.teamList = res.records
+      })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.resetIsShow = true // 展示重置密码板块
         that.recordId = recordId
@@ -212,6 +303,21 @@ export default {
       } else {
         that.isShow = true // 立马展示弹层信息
       }
+    },
+    // 随机生成六位数密码
+    genRandomPassword: function () {
+      if (!this.passwordLength) return
+
+      let password = ''
+      let characters = 'abcdefghijklmnopqrstuvwxyz'
+      if (this.includeUpperCase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+      if (this.includeNumber) characters += '0123456789'
+      if (this.includeSymbol) characters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+      for (let i = 0; i < this.passwordLength; i++) {
+        password += characters.charAt(Math.floor(Math.random() * characters.length))
+      }
+
+      this.saveObject.loginPassword = password
     },
     handleOkFunc: function () { // 点击【确认】按钮事件
       const that = this

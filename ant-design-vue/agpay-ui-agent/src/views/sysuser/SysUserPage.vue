@@ -4,17 +4,16 @@
       <div v-if="$access('ENT_UR_USER_SEARCH')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="MGR">运营平台</a-select-option>
-                <a-select-option value="AGENT">代理商</a-select-option>
-                <a-select-option value="MCH">商户</a-select-option>
-              </a-select>
-            </a-form-item>
             <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />
             <ag-text-up :placeholder="'用户ID'" :msg="searchData.sysUserId" v-model="searchData.sysUserId" />
             <ag-text-up :placeholder="'用户姓名'" :msg="searchData.realname" v-model="searchData.realname" />
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="searchData.userType" placeholder="请选择用户类型">
+                <a-select-option v-for="d in userTypeOptions" :value="d.userType" :key="d.userType">
+                  {{ d.userTypeName }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -40,6 +39,14 @@
 
         <template slot="avatarSlot" slot-scope="{record}">
           <a-avatar size="default" :src="record.avatarUrl" />
+        </template>
+
+        <template slot="userTypeSlot" slot-scope="{record}">
+          <span>{{ record.userType }}</span>
+        </template>
+
+        <template slot="inviteCodeSlot" slot-scope="{record}">
+          <copy>{{ record.inviteCode }}</copy>
         </template>
 
         <template slot="stateSlot" slot-scope="{record}">
@@ -82,6 +89,9 @@ const tableColumns = [
   { title: '编号', width: 120, dataIndex: 'userNo' },
   { title: '手机号', width: 160, dataIndex: 'telphone' },
   { title: '超管', width: 60, dataIndex: 'isAdmin', customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
+  { title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
+  { title: '团队', width: 160, dataIndex: 'teamName' },
+  { title: '邀请码', width: 120, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
   { title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
   { title: '创建时间', width: 200, dataIndex: 'createdAt' },
   { title: '修改时间', width: 200, dataIndex: 'updatedAt' },
@@ -103,6 +113,13 @@ export default {
       searchData: {
         sysType: 'MGR'
       },
+      userTypeOptions: [
+        { userTypeName: '超级管理员', userType: 1 },
+        { userTypeName: '普通操作员', userType: 2 },
+        { userTypeName: '商户拓展员', userType: 3 }// ,
+        // { userTypeName: '店长', userType: '11' },
+        // { userTypeName: '店员', userType: '12' }
+      ],
       btnLoading: false
     }
   },
