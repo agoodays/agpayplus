@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Application.Interfaces
         SysUserDto GetById(long recordId, string belongInfoId);
         IEnumerable<SysUserDto> GetAll();
         IEnumerable<SysUserDto> GetAll(List<long> recordIds);
-        PaginatedList<SysUserDto> GetPaginatedData(SysUserQueryDto dto);
+        PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto);
         Task<IEnumerable<SysUserDto>> ListAsync();
     }
 }

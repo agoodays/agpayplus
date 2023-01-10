@@ -15,6 +15,13 @@
             <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />
             <ag-text-up :placeholder="'用户ID'" :msg="searchData.sysUserId" v-model="searchData.sysUserId" />
             <ag-text-up :placeholder="'用户姓名'" :msg="searchData.realname" v-model="searchData.realname" />
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="searchData.userType" placeholder="请选择用户类型">
+                <a-select-option v-for="d in userTypeOptions" :value="d.userType" :key="d.userType">
+                  {{ d.userTypeName }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -40,6 +47,17 @@
 
         <template slot="avatarSlot" slot-scope="{record}">
           <a-avatar size="default" :src="record.avatarUrl" />
+        </template>
+
+        <template slot="userTypeSlot" slot-scope="{record}">
+          <span>{{ getUserTypeName(record.userType) }}</span>
+        </template>
+
+        <template slot="inviteCodeSlot" slot-scope="{record}">
+          <a @click="copyFunc(record.inviteCode)" style="padding: 0 7px;">{{ record.inviteCode }}</a>
+          <span>
+            <a-icon type="info-circle" @click="inviteCodeFunc()" style="cursor: pointer;"/>
+          </span>
         </template>
 
         <template slot="stateSlot" slot-scope="{record}">
@@ -82,6 +100,9 @@ const tableColumns = [
   { title: '编号', width: 120, dataIndex: 'userNo' },
   { title: '手机号', width: 160, dataIndex: 'telphone' },
   { title: '超管', width: 60, dataIndex: 'isAdmin', customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
+  { title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
+  { title: '团队', width: 160, dataIndex: 'teamName' },
+  { title: '邀请码', width: 120, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
   { title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
   { title: '创建时间', width: 200, dataIndex: 'createdAt' },
   { title: '修改时间', width: 200, dataIndex: 'updatedAt' },
@@ -95,6 +116,14 @@ const tableColumns = [
   }
 ]
 
+const userTypeList = [
+  { userTypeName: '超级管理员', userType: 1 },
+  { userTypeName: '普通操作员', userType: 2 },
+  { userTypeName: '商户拓展员', userType: 3 }// ,
+  // { userTypeName: '店长', userType: '11' },
+  // { userTypeName: '店员', userType: '12' }
+]
+
 export default {
   components: { AgTable, AgTableColumns, InfoAddOrEdit, RoleDist, AgTableColState, AgTextUp },
   data () {
@@ -103,13 +132,35 @@ export default {
       searchData: {
         sysType: 'MGR'
       },
+      userTypeOptions: userTypeList,
       btnLoading: false
     }
   },
   mounted () {
   },
   methods: {
-
+    copyFunc (text) {
+      // text是复制文本
+      // 创建input元素
+      const el = document.createElement('input')
+      // 给input元素赋值需要复制的文本
+      el.setAttribute('value', text)
+      // 将input元素插入页面
+      document.body.appendChild(el)
+      // 选中input元素的文本
+      el.select()
+      // 复制内容到剪贴板
+      document.execCommand('copy')
+      // 删除input元素
+      document.body.removeChild(el)
+      this.$message.success('邀请码已复制')
+    },
+    inviteCodeFunc: function () {
+      this.$refs.infoAddOrEdit.show()
+    },
+    getUserTypeName: (userType) => {
+      return userTypeList.find(f => f.userType === userType).userTypeName
+    },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_SYS_USER_LIST, params)

@@ -85,7 +85,7 @@
 <script>
 import MyDialog from "@/views/dialog/dialog";// 添加备注弹出的对话框
 import Keyboard from "@/views/keyboard/keyboard";// 手写键盘
-import {getPayPackage}from '@/api/api'
+import { getPayPackage }from '@/api/api'
 import config from "@/config";
 export default {
   // 注册备注对话框，和 手写键盘组件，由于这里是直接掉起支付事件，所以目前不应用

@@ -14,17 +14,20 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ISysUserRepository _sysUserRepository;
+        private readonly ISysUserTeamRepository _sysUserTeamRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
         public SysUserService(IMapper mapper, IMediatorHandler bus, IConfiguration configuration,
-            ISysUserRepository sysUserRepository)
+            ISysUserRepository sysUserRepository,
+            ISysUserTeamRepository sysUserTeamRepository)
         {
             _mapper = mapper;
             Bus = bus;
             _sysUserRepository = sysUserRepository;
+            _sysUserTeamRepository = sysUserTeamRepository;
         }
 
         public void Dispose()
@@ -127,15 +130,23 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
 
-        public PaginatedList<SysUserDto> GetPaginatedData(SysUserQueryDto dto)
+        public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto)
         {
             var sysUsers = _sysUserRepository.GetAll()
-                .Where(w => w.SysType == dto.SysType
-                && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Contains(dto.BelongInfoId))
-                && (string.IsNullOrWhiteSpace(dto.Realname) || w.Realname.Contains(dto.Realname))
-                && (dto.SysUserId.Equals(0) || w.SysUserId.Equals(dto.SysUserId))
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysUser>.Create<SysUserDto>(sysUsers.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+                .Join(_sysUserTeamRepository.GetAll(),
+                u => u.TeamId, ut => ut.TeamId,
+                (u, ut) => new { u, ut })
+                .Where(w => w.u.SysType == dto.SysType
+                && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.u.BelongInfoId.Contains(dto.BelongInfoId))
+                && (string.IsNullOrWhiteSpace(dto.Realname) || w.u.Realname.Contains(dto.Realname))
+                && (dto.SysUserId.Equals(0) || w.u.SysUserId.Equals(dto.SysUserId))
+                ).AsNoTracking().ToList().Select(s =>
+                {
+                    var item = _mapper.Map<SysUserListDto>(s.u);
+                    item.TeamName = s.ut.TeamName;
+                    return item;
+                }).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<SysUserListDto>.Create(sysUsers, dto.PageNumber, dto.PageSize);
             return records;
         }
 

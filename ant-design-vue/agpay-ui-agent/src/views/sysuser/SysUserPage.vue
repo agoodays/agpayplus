@@ -42,11 +42,14 @@
         </template>
 
         <template slot="userTypeSlot" slot-scope="{record}">
-          <span>{{ record.userType }}</span>
+          <span>{{ getUserTypeName(record.userType) }}</span>
         </template>
 
         <template slot="inviteCodeSlot" slot-scope="{record}">
-          <copy>{{ record.inviteCode }}</copy>
+          <a @click="copyFunc(record.inviteCode)" style="padding: 0 7px;">{{ record.inviteCode }}</a>
+          <span>
+            <a-icon type="info-circle" @click="inviteCodeFunc()" style="cursor: pointer;"/>
+          </span>
         </template>
 
         <template slot="stateSlot" slot-scope="{record}">
@@ -105,6 +108,14 @@ const tableColumns = [
   }
 ]
 
+const userTypeList = [
+  { userTypeName: '超级管理员', userType: 1 },
+  { userTypeName: '普通操作员', userType: 2 },
+  { userTypeName: '商户拓展员', userType: 3 }// ,
+  // { userTypeName: '店长', userType: '11' },
+  // { userTypeName: '店员', userType: '12' }
+]
+
 export default {
   components: { AgTable, AgTableColumns, InfoAddOrEdit, RoleDist, AgTableColState, AgTextUp },
   data () {
@@ -113,20 +124,35 @@ export default {
       searchData: {
         sysType: 'MGR'
       },
-      userTypeOptions: [
-        { userTypeName: '超级管理员', userType: 1 },
-        { userTypeName: '普通操作员', userType: 2 },
-        { userTypeName: '商户拓展员', userType: 3 }// ,
-        // { userTypeName: '店长', userType: '11' },
-        // { userTypeName: '店员', userType: '12' }
-      ],
+      userTypeOptions: userTypeList,
       btnLoading: false
     }
   },
   mounted () {
   },
   methods: {
-
+    copyFunc (text) {
+      // text是复制文本
+      // 创建input元素
+      const el = document.createElement('input')
+      // 给input元素赋值需要复制的文本
+      el.setAttribute('value', text)
+      // 将input元素插入页面
+      document.body.appendChild(el)
+      // 选中input元素的文本
+      el.select()
+      // 复制内容到剪贴板
+      document.execCommand('copy')
+      // 删除input元素
+      document.body.removeChild(el)
+      this.$message.success('邀请码已复制')
+    },
+    inviteCodeFunc: function () {
+      this.$refs.infoAddOrEdit.show()
+    },
+    getUserTypeName: (userType) => {
+      return userTypeList.find(f => f.userType === userType).userTypeName
+    },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_SYS_USER_LIST, params)
