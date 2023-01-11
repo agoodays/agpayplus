@@ -46,9 +46,9 @@
         </template>
 
         <template slot="inviteCodeSlot" slot-scope="{record}">
-          <a @click="copyFunc(record.inviteCode)" style="padding: 0 7px;">{{ record.inviteCode }}</a>
+          <a @click="copyFunc(record.inviteCode)" class="a-copy">{{ record.inviteCode }}</a>
           <span>
-            <a-icon type="info-circle" @click="inviteCodeFunc()" style="cursor: pointer;"/>
+            <a-icon type="info-circle" @click="inviteCodeFunc(record.inviteCode, record.sysType)" style="cursor: pointer;"/>
           </span>
         </template>
 
@@ -69,6 +69,9 @@
     <!-- 新增 / 修改 页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
 
+    <!-- 邀请码窗口  -->
+    <InviteCode ref="inviteCode"/>
+
     <!-- 分配角色 页面组件  -->
     <RoleDist ref="roleDist"/>
 
@@ -81,6 +84,7 @@ import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgTableColState from '@/components/AgTable/AgTableColState'
 import { API_URL_SYS_USER_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
+import InviteCode from './InviteCode'
 import RoleDist from './RoleDist'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
@@ -112,12 +116,12 @@ const userTypeList = [
   { userTypeName: '超级管理员', userType: 1 },
   { userTypeName: '普通操作员', userType: 2 },
   { userTypeName: '商户拓展员', userType: 3 }// ,
-  // { userTypeName: '店长', userType: '11' },
-  // { userTypeName: '店员', userType: '12' }
+  // { userTypeName: '店长', userType: 11 },
+  // { userTypeName: '店员', userType: 12 }
 ]
 
 export default {
-  components: { AgTable, AgTableColumns, InfoAddOrEdit, RoleDist, AgTableColState, AgTextUp },
+  components: { AgTable, AgTableColumns, InfoAddOrEdit, InviteCode, RoleDist, AgTableColState, AgTextUp },
   data () {
     return {
       tableColumns: tableColumns,
@@ -147,8 +151,8 @@ export default {
       document.body.removeChild(el)
       this.$message.success('邀请码已复制')
     },
-    inviteCodeFunc: function () {
-      this.$refs.infoAddOrEdit.show()
+    inviteCodeFunc: function (inviteCode, sysType) {
+      this.$refs.inviteCode.show(inviteCode, sysType)
     },
     getUserTypeName: (userType) => {
       return userTypeList.find(f => f.userType === userType).userTypeName
@@ -204,3 +208,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.a-copy{
+  padding: 0 7px;
+}
+</style>

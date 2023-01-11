@@ -48,8 +48,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_LIST)]
         public ApiRes List([FromQuery] SysUserQueryDto dto)
         {
-            dto.SysType = CS.SYS_TYPE.MGR;
-            var data = _sysUserService.GetPaginatedData(dto);
+            var data = _sysUserService.GetPaginatedData(dto, GetCurrentUserId());
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 

@@ -19,31 +19,31 @@
     >
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
-          <a-form-model-item label="用户登录名:" prop="loginUsername">
+          <a-form-model-item label="用户登录名" prop="loginUsername">
             <a-input v-model="saveObject.loginUsername" :disabled="!isAdd" />
           </a-form-model-item>
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="用户姓名：" prop="realname">
+          <a-form-model-item label="用户姓名" prop="realname">
             <a-input v-model="saveObject.realname" />
           </a-form-model-item>
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="手机号：" prop="telphone">
+          <a-form-model-item label="手机号" prop="telphone">
             <a-input v-model="saveObject.telphone" />
           </a-form-model-item>
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="编号：" prop="userNo">
+          <a-form-model-item label="编号" prop="userNo">
             <a-input v-model="saveObject.userNo" />
           </a-form-model-item>
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="请选择性别：" prop="sex">
+          <a-form-model-item label="请选择性别" prop="sex">
             <a-radio-group v-model="saveObject.sex">
               <a-radio :value="1">男</a-radio>
               <a-radio :value="2">女</a-radio>
@@ -52,19 +52,69 @@
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="状态：" prop="state">
+          <a-form-model-item label="状态" prop="state">
             <a-radio-group v-model="saveObject.state">
               <a-radio :value="1">启用</a-radio>
               <a-radio :value="0">停用</a-radio>
             </a-radio-group>
           </a-form-model-item>
         </a-col>
+
+        <a-col :span="10">
+          <a-form-model-item label="用户类型" prop="userType">
+            <a-select v-model="saveObject.userType" placeholder="请选择用户类型">
+              <a-select-option v-for="d in userTypeOptions" :value="d.userType" :key="d.userType">
+                {{ d.userTypeName }}
+              </a-select-option>
+            </a-select>
+          </a-form-model-item>
+        </a-col>
       </a-row>
-      <a-divider orientation="left" v-if="resetIsShow">
+
+      <a-divider orientation="left">
         <a-tag color="#FF4B33">
           账户安全
         </a-tag>
       </a-divider>
+
+      <div>
+        <a-row justify="space-between" type="flex" v-if="this.isAdd">
+          <a-col :span="10">
+            <a-form-model-item label="是否发送开通提醒" prop="isNotify">
+              <a-radio-group v-model="saveObject.isNotify">
+                <a-radio :value='0'>
+                  否
+                </a-radio>
+                <a-radio :value='1'>
+                  是
+                </a-radio>
+              </a-radio-group>
+            </a-form-model-item>
+          </a-col>
+        </a-row>
+        <a-row justify="space-between" type="flex" v-if="this.isAdd">
+          <a-col :span="10">
+            <a-form-model-item label="密码设置" prop="passwordType">
+              <a-radio-group v-model="saveObject.passwordType">
+                <a-radio value='default'>
+                  默认密码
+                </a-radio>
+                <a-radio value='custom'>
+                  自定义密码
+                </a-radio>
+              </a-radio-group>
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="10" v-if="saveObject.passwordType === 'custom'">
+            <a-form-model-item label="登录密码" prop="loginPassword">
+              <a-input placeholder="请输入登录密码" v-model="saveObject.loginPassword"/>
+            </a-form-model-item>
+            <a-button icon="file-sync" :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }" @click="genRandomPassword" style="margin-right:8px">
+              随机生成密码
+            </a-button>
+          </a-col>
+        </a-row>
+      </div>
 
       <div style="display:flex;flex-direction:row;">
         <a-row justify="space-between" type="flex" style="width:100%">
@@ -85,7 +135,7 @@
         <div v-show="!this.sysPassword.defaultPass">
           <a-row justify="space-between" type="flex">
             <a-col :span="10">
-              <a-form-model-item label="新密码：" prop="newPwd">
+              <a-form-model-item label="新密码" prop="newPwd">
                 <a-input-password
                   autocomplete="new-password"
                   v-model="newPwd"
@@ -93,7 +143,7 @@
               </a-form-model-item>
             </a-col>
             <a-col :span="10">
-              <a-form-model-item label="确认新密码：" prop="confirmPwd">
+              <a-form-model-item label="确认新密码" prop="confirmPwd">
                 <a-input-password
                   autocomplete="new-password"
                   v-model="sysPassword.confirmPwd"
@@ -114,10 +164,7 @@
 </template>
 
 <script>
-	import {
-		req,
-		API_URL_SYS_USER_LIST
-	} from '@/api/manage'
+	import { req, API_URL_SYS_USER_LIST	} from '@/api/manage'
 	import { Base64 } from 'js-base64'
 
 	export default {
@@ -131,6 +178,10 @@
 
 		data () {
 			return {
+        passwordLength: 6, // 密码长度
+        includeUpperCase: true, // 包含大写字母
+        includeNumber: false, // 包含数字
+        includeSymbol: false, // 包含符号
 				newPwd: '', //  新密码
 				resetIsShow: false, // 重置密码是否展现
 				sysPassword: {
@@ -143,6 +194,13 @@
 				confirmLoading: false, // 显示确定按钮loading图标
 				isAdd: true, // 新增 or 修改页面标识
 				isShow: false, // 是否显示弹层/抽屉
+        userTypeOptions: [
+          { userTypeName: '超级管理员', userType: 1 },
+          { userTypeName: '普通操作员', userType: 2 },
+          // { userTypeName: '商户拓展员', userType: 3 },
+          { userTypeName: '店长', userType: 11 },
+          { userTypeName: '店员', userType: 12 }
+        ],
 				saveObject: {}, // 数据对象
 				recordId: null, // 更新对象ID
 				rules: {
@@ -204,7 +262,11 @@
 				// 数据恢复为默认数据
 				this.saveObject = {
 					state: 1,
-					sex: 1
+					sex: 1,
+          userType: 1,
+          isNotify: 0,
+          passwordType: 'default',
+          loginPassword: ''
 				}
 				this.rules.loginUsername = []
 				this.confirmLoading = false // 关闭loading
@@ -230,6 +292,21 @@
 					that.isShow = true // 立马展示弹层信息
 				}
 			},
+      // 随机生成六位数密码
+      genRandomPassword: function () {
+        if (!this.passwordLength) return
+
+        let password = ''
+        let characters = 'abcdefghijklmnopqrstuvwxyz'
+        if (this.includeUpperCase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        if (this.includeNumber) characters += '0123456789'
+        if (this.includeSymbol) characters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+        for (let i = 0; i < this.passwordLength; i++) {
+          password += characters.charAt(Math.floor(Math.random() * characters.length))
+        }
+
+        this.saveObject.loginPassword = password
+      },
 			handleOkFunc: function () { // 点击【确认】按钮事件
 				const that = this
 				this.$refs.infoFormModel.validate(valid => {

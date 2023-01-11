@@ -20,31 +20,31 @@
 
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
-          <a-form-model-item label="用户登录名:" prop="loginUsername">
+          <a-form-model-item label="用户登录名" prop="loginUsername">
             <a-input v-model="saveObject.loginUsername" :disabled="!isAdd" />
           </a-form-model-item>
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="用户姓名：" prop="realname">
+          <a-form-model-item label="用户姓名" prop="realname">
             <a-input v-model="saveObject.realname" />
           </a-form-model-item>
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="手机号：" prop="telphone">
+          <a-form-model-item label="手机号" prop="telphone">
             <a-input v-model="saveObject.telphone" />
           </a-form-model-item>
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="编号：" prop="userNo">
+          <a-form-model-item label="编号" prop="userNo">
             <a-input v-model="saveObject.userNo" />
           </a-form-model-item>
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="请选择性别：" prop="sex">
+          <a-form-model-item label="请选择性别" prop="sex">
             <a-radio-group v-model="saveObject.sex">
               <a-radio :value="1">男</a-radio>
               <a-radio :value="2">女</a-radio>
@@ -53,7 +53,7 @@
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="是否为超级管理员：" prop="isAdmin">
+          <a-form-model-item label="是否为超级管理员" prop="isAdmin">
             <a-radio-group v-model="saveObject.isAdmin">
               <a-radio :value="1">是</a-radio>
               <a-radio :value="0">否</a-radio>
@@ -62,7 +62,7 @@
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="状态：" prop="state">
+          <a-form-model-item label="状态" prop="state">
             <a-radio-group v-model="saveObject.state">
               <a-radio :value="1">启用</a-radio>
               <a-radio :value="0">停用</a-radio>
@@ -71,7 +71,7 @@
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="用户类型：" prop="userType">
+          <a-form-model-item label="用户类型" prop="userType">
             <a-select v-model="saveObject.userType" placeholder="请选择用户类型">
               <a-select-option v-for="d in userTypeOptions" :value="d.userType" :key="d.userType">
                 {{ d.userTypeName }}
@@ -81,7 +81,7 @@
         </a-col>
 
         <a-col :span="10" v-if="saveObject.userType===3">
-          <a-form-model-item label="选择团队：" prop="teamId">
+          <a-form-model-item label="选择团队" prop="teamId">
             <a-select v-model="saveObject.teamId" placeholder="请选择用户类型">
               <a-select-option v-for="d in teamList" :value="d.teamId" :key="d.teamId">
                 {{ d.teamName }}
@@ -91,7 +91,7 @@
         </a-col>
 
         <a-col :span="10" v-if="saveObject.userType===3">
-          <a-form-model-item label="是否队长：" prop="isTeamLeader">
+          <a-form-model-item label="是否队长" prop="isTeamLeader">
             <a-radio-group v-model="saveObject.isTeamLeader">
               <a-radio :value="1">是</a-radio>
               <a-radio :value="0">否</a-radio>
@@ -164,7 +164,7 @@
         <div v-show="!this.sysPassword.defaultPass">
           <a-row justify="space-between" type="flex">
             <a-col :span="10">
-              <a-form-model-item label="新密码：" prop="newPwd">
+              <a-form-model-item label="新密码" prop="newPwd">
                 <a-input-password
                   autocomplete="new-password"
                   v-model="newPwd"
@@ -172,7 +172,7 @@
               </a-form-model-item>
             </a-col>
             <a-col :span="10">
-              <a-form-model-item label="确认新密码：" prop="confirmPwd">
+              <a-form-model-item label="确认新密码" prop="confirmPwd">
                 <a-input-password
                   autocomplete="new-password"
                   v-model="sysPassword.confirmPwd"
@@ -210,6 +210,10 @@ export default {
       callback()
     }
     return {
+      passwordLength: 6, // 密码长度
+      includeUpperCase: true, // 包含大写字母
+      includeNumber: false, // 包含数字
+      includeSymbol: false, // 包含符号
       newPwd: '', //  新密码
       resetIsShow: false, // 重置密码是否展现
       sysPassword: {
@@ -223,11 +227,11 @@ export default {
       isAdd: true, // 新增 or 修改页面标识
       isShow: false, // 是否显示弹层/抽屉
       userTypeOptions: [
-        { userTypeName: '超级管理员', userType: '1' },
-        { userTypeName: '普通操作员', userType: '2' },
-        { userTypeName: '商户拓展员', userType: '3' }// ,
-        // { userTypeName: '店长', userType: '11' },
-        // { userTypeName: '店员', userType: '12' }
+        { userTypeName: '超级管理员', userType: 1 },
+        { userTypeName: '普通操作员', userType: 2 },
+        { userTypeName: '商户拓展员', userType: 3 }// ,
+        // { userTypeName: '店长', userType: 11 },
+        // { userTypeName: '店员', userType: 12 }
       ],
       saveObject: {}, // 数据对象
       recordId: null, // 更新对象ID

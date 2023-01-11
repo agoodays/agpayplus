@@ -51,6 +51,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         }
 
         /// <summary>
+        /// 获取当前用户ID
+        /// </summary>
+        /// <returns></returns>
+        protected long GetCurrentUserId()
+        {
+            return GetCurrentUser().SysUser.SysUserId;
+        }
+
+        /// <summary>
         /// 根据用户ID 删除用户缓存信息
         /// </summary>
         /// <param name="sysUserIdList"></param>

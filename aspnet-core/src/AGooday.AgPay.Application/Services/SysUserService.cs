@@ -130,22 +130,24 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
 
-        public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto)
+        public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long currentUserId)
         {
-            var sysUsers = _sysUserRepository.GetAll()
-                .Join(_sysUserTeamRepository.GetAll(),
-                u => u.TeamId, ut => ut.TeamId,
-                (u, ut) => new { u, ut })
-                .Where(w => w.u.SysType == dto.SysType
-                && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.u.BelongInfoId.Contains(dto.BelongInfoId))
-                && (string.IsNullOrWhiteSpace(dto.Realname) || w.u.Realname.Contains(dto.Realname))
-                && (dto.SysUserId.Equals(0) || w.u.SysUserId.Equals(dto.SysUserId))
-                ).AsNoTracking().ToList().Select(s =>
-                {
-                    var item = _mapper.Map<SysUserListDto>(s.u);
-                    item.TeamName = s.ut.TeamName;
-                    return item;
-                }).OrderByDescending(o => o.CreatedAt);
+            var sysUsers = (from u in _sysUserRepository.GetAll()
+                            join ut in _sysUserTeamRepository.GetAll() on u.TeamId equals ut.TeamId into temp
+                            from team in temp.DefaultIfEmpty()
+                            where (string.IsNullOrWhiteSpace(dto.SysType) || u.SysType.Equals(dto.SysType))
+                            && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || u.BelongInfoId.Contains(dto.BelongInfoId))
+                            && (string.IsNullOrWhiteSpace(dto.Realname) || u.Realname.Contains(dto.Realname))
+                            && (dto.UserType.Equals(0) || u.UserType.Equals(dto.UserType))
+                            && (dto.SysUserId.Equals(0) || u.SysUserId.Equals(dto.SysUserId))
+                            && !u.SysUserId.Equals(currentUserId)
+                            select new { u, team }).AsNoTracking().ToList().Select(s =>
+                            {
+                                var item = _mapper.Map<SysUserListDto>(s.u);
+                                item.TeamName = s.team?.TeamName;
+                                return item;
+                            }).OrderByDescending(o => o.CreatedAt);
+
             var records = PaginatedList<SysUserListDto>.Create(sysUsers, dto.PageNumber, dto.PageSize);
             return records;
         }

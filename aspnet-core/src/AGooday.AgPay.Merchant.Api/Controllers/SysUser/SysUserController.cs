@@ -49,7 +49,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         public ApiRes List([FromQuery] SysUserQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
-            var data = _sysUserService.GetPaginatedData(dto);
+            dto.BelongInfoId = GetCurrentMchNo();
+            var data = _sysUserService.GetPaginatedData(dto, GetCurrentUserId());
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 

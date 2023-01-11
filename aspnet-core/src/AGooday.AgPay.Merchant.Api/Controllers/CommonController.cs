@@ -51,6 +51,15 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         }
 
         /// <summary>
+        /// 获取当前用户ID
+        /// </summary>
+        /// <returns></returns>
+        protected long GetCurrentUserId()
+        {
+            return GetCurrentUser().SysUser.SysUserId;
+        }
+
+        /// <summary>
         /// 获取当前商户ID
         /// </summary>
         /// <returns></returns>

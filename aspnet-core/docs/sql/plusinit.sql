@@ -238,7 +238,10 @@ ALTER TABLE `t_sys_user`
   ADD COLUMN `team_id` BIGINT NULL COMMENT '团队ID' AFTER `invite_code`,
 --   ADD COLUMN `team_name` VARCHAR(32) NULL COMMENT '团队名称' AFTER `team_id`,
   ADD COLUMN `is_team_leader` TINYINT NULL COMMENT '是否队长:  0-否 1-是' AFTER `team_id`;
-  
+
+ALTER TABLE `t_sys_user`   
+  ADD  UNIQUE INDEX `invite_code` (`invite_code`);
+
 ALTER TABLE `t_pay_interface_define`
   ADD COLUMN `is_support_applyment` TINYINT DEFAULT 1 NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持' AFTER `config_page_type`;
 
