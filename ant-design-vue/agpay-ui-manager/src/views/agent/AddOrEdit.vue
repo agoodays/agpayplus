@@ -651,7 +651,7 @@ export default {
         this.$refs.infoFormModel.resetFields()
       }
       const that = this
-      req.list(API_URL_AGENT_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 服务商下拉选择列表
+      req.list(API_URL_AGENT_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 代理商下拉选择列表
         that.agentList = res.records
       })
       req.list(API_URL_ISV_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 服务商下拉选择列表

@@ -1,16 +1,15 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Authorization;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Core.Notifications;
-using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Application.Services;
-using AGooday.AgPay.Common.Utils;
 
 namespace AGooday.AgPay.Agent.Api.Controllers.Agent
 {
@@ -62,6 +61,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_INFO_ADD)]
         public ApiRes Add(AgentInfoCreateDto dto)
         {
+            var agentNo = GetCurrentAgentNo();
+            var agentInfo = _agentInfoService.GetByAgentNo(agentNo);
+            dto.AgentNo = agentInfo.AgentNo;
+            dto.IsvNo = agentInfo.IsvNo;
             _agentInfoService.Create(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

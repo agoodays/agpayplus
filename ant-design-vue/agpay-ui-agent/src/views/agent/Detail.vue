@@ -44,20 +44,6 @@
       </a-col>
       <a-col :sm="12">
         <a-descriptions>
-          <a-descriptions-item label="服务商号">
-            {{ detailData.isvNo }}
-          </a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-      <a-col :sm="12">
-        <a-descriptions>
-          <a-descriptions-item label="服务商名称">
-            {{ this.isvName }}
-          </a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-      <a-col :sm="12">
-        <a-descriptions>
           <a-descriptions-item label="联系人姓名">
             {{ detailData.contactName }}
           </a-descriptions-item>
@@ -288,7 +274,7 @@
 </template>
 
 <script>
-import { API_URL_AGENT_LIST, API_URL_ISV_LIST, req } from '@/api/manage'
+import { API_URL_AGENT_LIST, req } from '@/api/manage'
 export default {
   name: 'Detail',
   props: {
@@ -300,8 +286,6 @@ export default {
       detailData: {}, // 数据对象
       recordId: null, // 更新对象ID
       visible: false, // 是否显示弹层/抽屉
-      isvList: null, // 服务商下拉列表
-      isvName: '', // 服务商名称
       imgLabel: '联系人'
     }
   },
@@ -339,14 +323,6 @@ export default {
           this.imgLabel = '法人'
         } else {
           this.imgLabel = '联系人'
-        }
-      })
-      req.list(API_URL_ISV_LIST, { 'pageSize': null }).then(res => { // 服务商下拉选择列表
-        that.isvList = res.records
-        for (let i = 0; i < that.isvList.length; i++) {
-          if (that.detailData.isvNo === that.isvList[i].isvNo) {
-            that.isvName = that.isvList[i].isvName
-          }
         }
       })
       this.visible = true

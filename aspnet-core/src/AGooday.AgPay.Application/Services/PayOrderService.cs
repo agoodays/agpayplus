@@ -10,7 +10,6 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Data;
-using System.Linq;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -19,6 +18,7 @@ namespace AGooday.AgPay.Application.Services
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IPayOrderRepository _payOrderRepository;
         private readonly IMchInfoRepository _mchInfoRepository;
+        private readonly IAgentInfoRepository _agentInfoRepository;
         private readonly IIsvInfoRepository _isvInfoRepository;
         private readonly IPayWayRepository _payWayRepository;
         private readonly IPayOrderDivisionRecordRepository _payOrderDivisionRecordRepository;
@@ -29,6 +29,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PayOrderService(IPayOrderRepository payOrderRepository,
             IMchInfoRepository mchInfoRepository,
+            IAgentInfoRepository agentInfoRepository,
             IIsvInfoRepository isvInfoRepository,
             IPayWayRepository payWayRepository,
             IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository,
@@ -36,6 +37,7 @@ namespace AGooday.AgPay.Application.Services
         {
             _payOrderRepository = payOrderRepository;
             _mchInfoRepository = mchInfoRepository;
+            _agentInfoRepository = agentInfoRepository;
             _isvInfoRepository = isvInfoRepository;
             _payWayRepository = payWayRepository;
             _payOrderDivisionRecordRepository = payOrderDivisionRecordRepository;
@@ -389,19 +391,63 @@ namespace AGooday.AgPay.Application.Services
         {
             JObject json = new JObject();
             // 商户总数
-            var mchInfos = _mchInfoRepository.GetAll();
+            var mchInfos = _mchInfoRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
+                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo)));
+            int isvSubMchCount = mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_ISVSUB)).Count();
+            int normalMchCount = mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_NORMAL)).Count();
             int mchCount = mchInfos.Count();
+
+            int agentCount = 0;
+
+            if (string.IsNullOrWhiteSpace(agentNo))
+            {
+                // 代理商总数
+                var agentInfos = _agentInfoRepository.GetAll()
+                    .Where(w => (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo)));
+                agentCount = agentInfos.Count();
+            }
+            else
+            {
+                var subAgentInfos = GetSons(_agentInfoRepository.GetAll(), agentNo);
+                agentCount = subAgentInfos.Count();
+            }
+
             // 服务商总数
             var isvInfos = _isvInfoRepository.GetAll();
             int isvCount = isvInfos.Count();
             // 总交易金额
             var payCountMap = PayCount(mchNo, agentNo, (byte)PayOrderState.STATE_SUCCESS, null, null, null);
-            json.Add("totalMch", mchCount);
-            json.Add("totalIsv", isvCount);
+            if (string.IsNullOrWhiteSpace(mchNo))
+            {
+                json.Add("isvSubMchCount", isvSubMchCount);
+                json.Add("normalMchCount", normalMchCount);
+                json.Add("totalMch", mchCount);
+                json.Add("totalAgent", agentCount);
+                if (string.IsNullOrWhiteSpace(agentNo))
+                {
+                    json.Add("totalIsv", isvCount);
+                }
+            }
             json.Add("totalAmount", payCountMap.PayAmount);
             json.Add("totalCount", payCountMap.PayCount);
             return json;
         }
+
+        #region 获取所有下级代理商
+        private IEnumerable<AgentInfo> GetSons(IQueryable<AgentInfo> list, string pid)
+        {
+            var query = list.Where(p => p.AgentNo == pid).ToList();
+            var list2 = query.Concat(GetSonList(list, pid));
+            return list2;
+        }
+
+        private IEnumerable<AgentInfo> GetSonList(IQueryable<AgentInfo> list, string pid)
+        {
+            var query = list.Where(p => p.Pid == pid).ToList();
+            return query.ToList().Concat(query.ToList().SelectMany(t => GetSonList(list, t.AgentNo)));
+        }
+        #endregion
 
         /// <summary>
         /// 首页支付统计

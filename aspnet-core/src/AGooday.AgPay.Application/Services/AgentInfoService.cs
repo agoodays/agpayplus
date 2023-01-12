@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Application.Services
         public PaginatedList<AgentInfoDto> GetPaginatedData(string agentNo, AgentInfoQueryDto dto)
         {
             IOrderedQueryable<AgentInfo> agentInfos = GetAgentInfos(dto);
-            var subAgentInfos = GetSons(agentInfos.AsNoTracking(), agentNo);
+            var subAgentInfos = GetSons(agentInfos.AsNoTracking(), agentNo).Where(w => w.AgentNo != agentNo);
             var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(subAgentInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }

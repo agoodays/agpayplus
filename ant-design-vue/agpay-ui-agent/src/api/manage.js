@@ -65,15 +65,13 @@ export const reqLoad = {
 }
 
 /** 角色管理页面 **/
-export const API_URL_ENT_LIST = '/api/sysEnts'
 export const API_URL_ROLE_LIST = '/api/sysRoles'
 export const API_URL_ROLE_ENT_RELA_LIST = '/api/sysRoleEntRelas'
 export const API_URL_SYS_USER_LIST = '/api/sysUsers'
 export const API_URL_UR_TEAM_LIST = '/api/userTeams'
 export const API_URL_USER_ROLE_RELA_LIST = '/api/sysUserRoleRelas'
 
-/** 服务商、代理商、商户管理 **/
-export const API_URL_ISV_LIST = '/api/isvInfo'
+/** 代理商、商户管理 **/
 export const API_URL_AGENT_LIST = '/api/agentInfo'
 export const API_URL_MCH_LIST = '/api/mchInfo'
 /** 商户App管理 **/
@@ -86,8 +84,6 @@ export const API_URL_PAY_ORDER_LIST = '/api/payOrder'
 export const API_URL_REFUND_ORDER_LIST = '/api/refundOrder'
 /** 商户通知管理 **/
 export const API_URL_MCH_NOTIFY_LIST = '/api/mchNotify'
-/** 系统日志 **/
-export const API_URL_SYS_LOG = 'api/sysLog'
 /** 系统配置 **/
 export const API_URL_SYS_CONFIG = 'api/sysConfigs'
 /** 首页统计 **/
@@ -96,8 +92,7 @@ export const API_URL_MAIN_STATISTIC = 'api/mainChart'
 /** 支付接口定义页面 **/
 export const API_URL_IFDEFINES_LIST = '/api/payIfDefines'
 export const API_URL_PAYWAYS_LIST = '/api/payWays'
-/** 服务商、代理商、商户支付参数配置 **/
-export const API_URL_ISV_PAYCONFIGS_LIST = '/api/isv/payConfigs'
+/** 代理商、商户支付参数配置 **/
 export const API_URL_AGENT_PAYCONFIGS_LIST = '/api/agent/payConfigs'
 export const API_URL_MCH_PAYCONFIGS_LIST = '/api/mch/payConfigs'
 /** 商户支付通道配置 **/
@@ -125,8 +120,8 @@ const api = {
 export default api
 
 /** 获取权限树状结构图 **/
-export function getEntTree (sysType) {
-  return request.request({ url: '/api/sysEnts/showTree?sysType=' + sysType, method: 'GET' })
+export function getEntTree () {
+  return request.request({ url: '/api/sysEnts/showTree', method: 'GET' })
 }
 
 /** 退款接口 */
@@ -194,13 +189,6 @@ export function saveSub (sub) {
     url: '/sub',
     method: sub.id === 0 ? 'post' : 'put',
     data: sub
-  })
-}
-
-export function getIsvPayConfigUnique (infoId, ifCode) {
-  return request.request({
-    url: '/api/isv/payConfigs/' + infoId + '/' + ifCode,
-    method: 'get'
   })
 }
 
@@ -282,14 +270,6 @@ export function getConfigs (parameter) {
   return request.request({
     url: API_URL_SYS_CONFIG + '/' + parameter,
     method: 'GET'
-  })
-}
-
-export function getEntBySysType (entId, sysType) {
-  return request.request({
-    url: '/api/sysEnts/bySysType',
-    method: 'GET',
-    params: { entId: entId, sysType: sysType }
   })
 }
 

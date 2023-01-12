@@ -99,60 +99,6 @@
           </div>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="退款方式" prop="refundMode">
-            <!-- 退款方式 气泡弹窗 -->
-            <a-checkbox-group v-model="saveObject.refundMode" :options="refundModeOptions" @change="refundModeChange" />
-          </a-form-model-item>
-          <div class="components-popover-demo-placement">
-            <div
-                class="typePopover"
-            >
-              <!-- title可省略，就不显示 -->
-              <a-popover placement="top">
-                <template slot="content">
-                  <p>平台退款方式必须包含接口退款。</p>
-                </template>
-                <template slot="title">
-                  <span>退款方式说明</span>
-                </template>
-                <a-icon type="question-circle" />
-              </a-popover>
-            </div>
-          </div>
-        </a-col>
-      </a-row>
-      <a-row justify="space-between" type="flex">
-        <a-col :span="10" style="position:relative">
-          <a-form-model-item label="商户类型" prop="type">
-            <!-- 商户类型 气泡弹窗 -->
-            <a-radio-group v-model="saveObject.type" :disabled="!this.isAdd">
-              <a-radio :value="1">
-                普通商户
-              </a-radio>
-              <a-radio :value="2">
-                特约商户
-              </a-radio>
-            </a-radio-group>
-          </a-form-model-item>
-          <div class="components-popover-demo-placement">
-            <div
-              class="typePopover"
-            >
-              <!-- title可省略，就不显示 -->
-              <a-popover placement="top">
-                <template slot="content">
-                  <p>普通商户是指商户自行申请入驻微信或支付宝，无服务商协助，单独调接口。</p>
-                  <p>特约商户是指由微信或支付宝的服务商协助商户完成入驻，商户下单走的是服务商接口。</p>
-                </template>
-                <template slot="title">
-                  <span>商户类型</span>
-                </template>
-                <a-icon type="question-circle" />
-              </a-popover>
-            </div>
-          </div>
-        </a-col>
-        <a-col :span="10">
           <a-form-model-item label="状态" prop="state">
             <a-radio-group v-model="saveObject.state">
               <a-radio :value="1">
@@ -162,25 +108,6 @@
                 禁用
               </a-radio>
             </a-radio-group>
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="10" v-if="saveObject.type == 2">
-          <a-form-model-item label="代理商号" prop="agentNo">
-            <a-select v-model="saveObject.agentNo" placeholder="请选择代理商" @change="agentNoChange" :disabled="!isAdd">
-              <a-select-option value="" key="">请选择代理商</a-select-option>
-              <a-select-option v-for="d in agentList" :value="d.agentNo" :key="d.agentNo">
-                {{ d.agentName + " [ ID: " + d.agentNo + " ]" }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="10" v-if="saveObject.type == 2">
-          <a-form-model-item label="服务商号" prop="isvNo">
-            <a-select v-model="saveObject.isvNo" placeholder="请选择服务商" :disabled="!isAdd || saveObject.agentNo?.length>0">
-              <a-select-option v-for="d in isvList" :value="d.isvNo" :key="d.isvNo">
-                {{ d.isvName + " [ ID: " + d.isvNo + " ]" }}
-              </a-select-option>
-            </a-select>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -291,7 +218,7 @@
 </template>
 
 <script>
-import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req } from '@/api/manage'
+import { API_URL_MCH_LIST, req } from '@/api/manage'
 import { Base64 } from 'js-base64'
 export default {
 
@@ -323,12 +250,6 @@ export default {
       saveObject: {}, // 数据对象
       recordId: null, // 更新对象ID
       visible: false, // 是否显示弹层/抽屉
-      agentList: null, // 代理商下拉列表
-      isvList: null, // 服务商下拉列表
-      refundModeOptions: [
-        { label: '平台退款', value: 'plat' },
-        { label: '接口退款', value: 'api' }
-      ],
       rules: {
         mchName: [{ required: true, message: '请输入商户名称', trigger: 'blur' }],
         loginUsername: [{ required: true, pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/, message: '请输入字母开头，长度为6-18位的登录名', trigger: 'blur' }],
@@ -379,12 +300,6 @@ export default {
         this.$refs.infoFormModel.resetFields()
       }
       const that = this
-      req.list(API_URL_AGENT_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 服务商下拉选择列表
-        that.agentList = res.records
-      })
-      req.list(API_URL_ISV_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 服务商下拉选择列表
-        that.isvList = res.records
-      })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         console.log(555)
         that.resetIsShow = true // 展示重置密码板块

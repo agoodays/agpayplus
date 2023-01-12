@@ -57,16 +57,16 @@
             <div class="chart-data">
               <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 1 }">
                 <div class="analy-title">
-                  <span>服务商数量</span>
+                  <span>代理商数量</span>
                   <a-tooltip>
                     <template slot="title">
-                      {{ mainTips.totalIsvTip }}
+                      {{ mainTips.totalAgentTip }}
                     </template>
                     <a-icon type="question-circle" />
                   </a-tooltip>
                 </div>
                 <a-card :bordered="false">
-                  <a-statistic style="margin-top: 10px" :value="this.mainChart.totalIsv" />
+                  <a-statistic style="margin-top: 10px" :value="this.mainChart.totalAgent" />
                 </a-card>
               </a-skeleton>
             </div>
@@ -330,7 +330,7 @@
           todayAmountTip: '今日成功交易金额及笔数', // 今日交易提示文字
           totalAmountTip: '成功交易总金额', // 交易总金额提示文字
           totalPayCountTip: '成功交易总笔数', // 交易总笔数提示文字
-          totalIsvTip: '服务商数量', // 服务商数量提示文字
+          totalAgentTip: '代理商数量', // 代理商数量提示文字
           totalMchTip: '商户数量', // 商户数量提示文字
           helloTitle: ''
         },
@@ -344,7 +344,7 @@
           payWeek: 0.00, // 近7天总交易金额
           totalPayCount: 0, // 交易总笔数
           totalAmount: 0.00, // 交易总金额
-          totalIsv: 0, // 当前服务商总数
+          totalAgent: 0, // 当前代理商总数
           totalMch: 0 // 当前商户总数
         },
         tinyArea: {},

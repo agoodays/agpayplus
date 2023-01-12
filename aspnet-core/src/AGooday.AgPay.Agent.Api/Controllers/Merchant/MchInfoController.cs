@@ -1,15 +1,16 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Authorization;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Core.Notifications;
-using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Common.Utils;
 
 namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
 {
@@ -23,11 +24,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         private readonly IMQSender mqSender;
         private readonly ILogger<MchInfoController> _logger;
         private readonly IMchInfoService _mchInfoService;
+        private readonly IAgentInfoService _agentInfoService;
 
         private readonly DomainNotificationHandler _notifications;
 
         public MchInfoController(IMQSender mqSender, ILogger<MchInfoController> logger, INotificationHandler<DomainNotification> notifications,
-            IMchInfoService mchInfoService, RedisUtil client,
+            IMchInfoService mchInfoService, IAgentInfoService agentInfoService, RedisUtil client,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
@@ -36,6 +38,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             this.mqSender = mqSender;
             _logger = logger;
             _mchInfoService = mchInfoService;
+            _agentInfoService = agentInfoService;
             _notifications = (DomainNotificationHandler)notifications;
         }
 
@@ -62,6 +65,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_INFO_ADD)]
         public ApiRes Add(MchInfoCreateDto dto)
         {
+            var agentNo = GetCurrentAgentNo();
+            var agentInfo = _agentInfoService.GetByAgentNo(agentNo);
+            dto.RefundMode = "[\"plat\", \"api\"]";
+            dto.Type = CS.MCH_TYPE_ISVSUB;
+            dto.AgentNo = agentInfo.AgentNo;
+            dto.IsvNo = agentInfo.IsvNo;
             _mchInfoService.Create(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

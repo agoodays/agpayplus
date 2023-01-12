@@ -69,25 +69,6 @@
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
-          <a-form-model-item label="上级代理商号" prop="pid">
-            <a-select v-model="saveObject.pid" placeholder="请选择上级代理商" @change="pidChange" :disabled="!isAdd">
-              <a-select-option value="" key="">请选择代理商</a-select-option>
-              <a-select-option v-for="d in agentList" :value="d.agentNo" :key="d.agentNo">
-                {{ d.agentName + " [ ID: " + d.agentNo + " ]" }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="10">
-          <a-form-model-item label="服务商号" prop="isvNo">
-            <a-select v-model="saveObject.isvNo" placeholder="请选择服务商" :disabled="!isAdd || saveObject.pid?.length>0">
-              <a-select-option v-for="d in isvList" :value="d.isvNo" :key="d.isvNo">
-                {{ d.isvName + " [ ID: " + d.isvNo + " ]" }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="10">
           <a-form-model-item label="是否允许发展下级" prop="addAgentFlag">
             <a-radio-group v-model="saveObject.addAgentFlag">
               <a-radio :value="1">
@@ -534,7 +515,7 @@
 </template>
 
 <script>
-import { API_URL_AGENT_LIST, API_URL_ISV_LIST, req, upload } from '@/api/manage'
+import { API_URL_AGENT_LIST, req, upload } from '@/api/manage'
 import { Base64 } from 'js-base64'
 export default {
   name: 'AddOrEdit',
@@ -599,8 +580,6 @@ export default {
       },
       imgLabel: '联系人',
       settAccountNoLabel: '个人微信号',
-      agentList: null, // 代理商下拉列表
-      isvList: null, // 服务商下拉列表
       rules: {
         agentName: [{ required: true, message: '请输入代理商名称', trigger: 'blur' }],
         loginUsername: [{ required: true, pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/, message: '请输入字母开头，长度为6-18位的登录名', trigger: 'blur' }],
@@ -651,12 +630,6 @@ export default {
         this.$refs.infoFormModel.resetFields()
       }
       const that = this
-      req.list(API_URL_AGENT_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 服务商下拉选择列表
-        that.agentList = res.records
-      })
-      req.list(API_URL_ISV_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 服务商下拉选择列表
-        that.isvList = res.records
-      })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.resetIsShow = true // 展示重置密码板块
         that.recordId = recordId
