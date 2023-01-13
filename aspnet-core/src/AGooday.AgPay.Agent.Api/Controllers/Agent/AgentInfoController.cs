@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         {
             var agentNo = GetCurrentAgentNo();
             var agentInfo = _agentInfoService.GetByAgentNo(agentNo);
-            dto.AgentNo = agentInfo.AgentNo;
+            dto.Pid = agentInfo.AgentNo;
             dto.IsvNo = agentInfo.IsvNo;
             _agentInfoService.Create(dto);
             // 是否存在消息通知

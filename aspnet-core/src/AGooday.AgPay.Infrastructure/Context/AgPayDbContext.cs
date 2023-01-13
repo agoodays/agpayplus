@@ -31,6 +31,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         public DbSet<PayOrderDivisionRecord> PayOrderDivisionRecord { get; set; }
         public DbSet<PayWay> PayWay { get; set; }
         public DbSet<RefundOrder> RefundOrder { get; set; }
+        public DbSet<SysArticle> SysArticle { get; set; }
         public DbSet<SysConfig> SysConfig { get; set; }
         public DbSet<SysEntitlement> SysEntitlement { get; set; }
         public DbSet<SysLog> SysLog { get; set; }
@@ -182,6 +183,9 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<RefundOrder>().Property(c => c.State).HasDefaultValue(0);
             modelBuilder.Entity<RefundOrder>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<RefundOrder>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<SysArticle>().Property(c => c.ArticleType).HasDefaultValue(1);
+            modelBuilder.Entity<SysArticle>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<SysArticle>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<SysConfig>().Property(c => c.Type).HasDefaultValue("text");
             modelBuilder.Entity<SysConfig>().Property(c => c.SortNum).HasDefaultValue(0);
             modelBuilder.Entity<SysConfig>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");

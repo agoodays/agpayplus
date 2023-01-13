@@ -48,6 +48,8 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<PayOrderDto, PayOrder>();
             CreateMap<PayWayDto, PayWay>();
             CreateMap<RefundOrderDto, RefundOrder>();
+            CreateMap<SysArticleDto, SysArticle>()
+                .ForMember(d => d.ArticleRange, o => o.MapFrom(s => JsonConvert.SerializeObject(s.ArticleRange)));
             CreateMap<SysConfigDto, SysConfig>();
             CreateMap<SysEntitlementDto, SysEntitlement>();
             CreateMap<SysEntModifyDto, SysEntitlement>();

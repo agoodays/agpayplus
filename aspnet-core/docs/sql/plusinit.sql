@@ -136,7 +136,7 @@ CREATE TABLE `t_sys_user_team` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (team_id)
-);
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='团队信息表';
 
 INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM', '团队管理', 'team', '/teams', 'SysUserTeamPage', 'ML', 0, 1, 'ENT_UR', 15, 'MGR', NOW(), NOW());
 	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_LIST', '页面：团队列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
@@ -151,6 +151,32 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM', '团队管理', 'team', '/t
 	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
 	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
 	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_DEL', '按钮： 删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
+
+-- 公告信息表
+CREATE TABLE `t_sys_article`(  
+  `article_id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '公告ID',
+  `title` VARCHAR(64) NOT NULL COMMENT '公告标题',
+  `subtitle` VARCHAR(64) NOT NULL COMMENT '公告副标题',
+  `article_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '公告类型',
+  `article_range` JSON NOT NULL COMMENT '公告范围',
+  `content` TEXT COMMENT '公告内容',
+  `publisher` VARCHAR(32) NOT NULL COMMENT '发布人',
+  `publish_time` TIMESTAMP(6) COMMENT '发布时间',
+  `created_uid` BIGINT(20) COMMENT '创建者用户ID',
+  `created_by` VARCHAR(64) COMMENT '创建者姓名',
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (`article_id`)
+) ENGINE=INNODB CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+AUTO_INCREMENT=1001 COMMENT='公告信息表';
+
+-- 公告管理
+INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE', '公告管理', 'message', '/notices', 'NoticeListPage', 'ML', 0, 1,  'ENT_SYS_CONFIG', '30', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_LIST', '页面：公告列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ARTICLE', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ARTICLE', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ARTICLE', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ARTICLE', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ARTICLE', '0', 'MGR', NOW(), NOW());
 
 -- 费率信息表
 DROP TABLE IF EXISTS `t_pay_rate_config`;

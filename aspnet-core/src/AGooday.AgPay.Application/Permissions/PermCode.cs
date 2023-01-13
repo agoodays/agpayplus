@@ -117,6 +117,12 @@
             public const string ENT_C_MAIN_PAY_COUNT = "ENT_C_MAIN_PAY_COUNT";
             public const string ENT_C_MAIN_PAY_AMOUNT_WEEK = "ENT_C_MAIN_PAY_AMOUNT_WEEK";
             public const string ENT_C_MAIN_NUMBER_COUNT = "ENT_C_MAIN_NUMBER_COUNT";
+            public const string ENT_ARTICLE = "ENT_ARTICLE";
+            public const string ENT_ARTICLE_VIEW = "ENT_ARTICLE_VIEW";
+            public const string ENT_ARTICLE_LIST = "ENT_ARTICLE_LIST";
+            public const string ENT_ARTICLE_ADD = "ENT_ARTICLE_ADD";
+            public const string ENT_ARTICLE_EDIT = "ENT_ARTICLE_EDIT";
+            public const string ENT_ARTICLE_DEL = "ENT_ARTICLE_DEL";
         }
 
         public static class AGENT

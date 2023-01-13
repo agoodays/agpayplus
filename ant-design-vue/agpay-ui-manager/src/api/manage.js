@@ -90,6 +90,8 @@ export const API_URL_MCH_NOTIFY_LIST = '/api/mchNotify'
 export const API_URL_SYS_LOG = 'api/sysLog'
 /** 系统配置 **/
 export const API_URL_SYS_CONFIG = 'api/sysConfigs'
+/** 公告管理 **/
+export const API_URL_ARTICLE_LIST = 'api/sysArticles'
 /** 首页统计 **/
 export const API_URL_MAIN_STATISTIC = 'api/mainChart'
 
