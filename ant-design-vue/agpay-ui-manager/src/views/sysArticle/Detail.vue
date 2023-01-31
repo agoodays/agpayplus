@@ -55,36 +55,36 @@
     max-width: 100%;
     width: 800px;
     margin: 0 auto;
-    padding: 26px 6px 6px
-  }
+    padding: 26px 6px 6px;
 
-  .title {
-    height: 50px;
-    line-height: 1.75;
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    margin-bottom: 15px
-  }
+    .title {
+      height: 50px;
+      line-height: 1.75;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      margin-bottom: 15px
+    };
 
-  .subtitle {
-    box-sizing: border-box;
-    width: 400px;
-    font-size: 15px
-  }
+    .subtitle {
+      box-sizing: border-box;
+      width: 400px;
+      font-size: 15px
+    };
 
-  .author {
-    width: 400px;
-    color: #969696;
-    margin-bottom: 15px
-  }
+    .author {
+      width: 400px;
+      color: #969696;
+      margin-bottom: 15px
+    };
 
-  .author .auther-text {
-    margin-right: 20px
-  }
+    .author .auther-text {
+      margin-right: 20px
+    };
 
-  .content {
-    margin: 45px auto 0;
-    line-height: 1.5
+    .content {
+      margin: 45px auto 0;
+      line-height: 1.5
+    }
   }
 </style>

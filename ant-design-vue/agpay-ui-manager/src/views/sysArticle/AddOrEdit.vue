@@ -5,7 +5,7 @@
     :title=" isAdd ? '新增公告' : '修改公告' "
     @close="onClose"
     :body-style="{ paddingBottom: '80px' }"
-    width="40%"
+    width="60%"
     class="drawer-width"
   >
     <a-form-model v-if="visible" ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
@@ -40,8 +40,8 @@
           </a-form-model-item>
         </a-col>
         <a-col :span="24">
-          <a-form-model-item label="公告内容" prop="remark">
-            <a-input v-model="saveObject.content" placeholder="请输入公告内容" type="textarea" rows="24" />
+          <a-form-model-item label="公告内容" prop="content">
+            <AgEditor :valueHtml="saveObject.content"></AgEditor>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -59,12 +59,13 @@
 </template>
 
 <script>
+import AgEditor from '@/components/AgEditor/AgEditor'
 import { API_URL_ARTICLE_LIST, req } from '@/api/manage'
 export default {
   props: {
     callbackFunc: { type: Function }
   },
-
+  components: { AgEditor },
   data () {
     const checkArticleRange = (rule, value, callback) => { // 是否选择了公告范围
       if (!value.length) {
