@@ -7,8 +7,9 @@
         :mode="mode"
     />
     <Editor
-        style="height: 438px; overflow-y: hidden;"
-        v-model="valueHtml"
+        :style="{ 'height': height + 'px' }"
+        style="overflow-y: hidden;"
+        :value="valueHtml"
         :defaultConfig="editorConfig"
         :mode="mode"
         @onCreated="handleCreated"
@@ -17,6 +18,7 @@
 </template>
 
 <script>
+import { upload } from '@/api/manage'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 // import { onBeforeUnmount, ref, shallowRef, onMounted } from 'vue'
 import { onBeforeUnmount, shallowRef } from 'vue'
@@ -25,6 +27,43 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 export default {
   name: 'AgEditor',
   props: {
+    toolbarConfig: { type: Object, default: () => ({}) },
+    editorConfig: {
+      type: Object,
+      default: () => ({
+        placeholder: '请输入内容...',
+        MENU_CONF: {
+          // 自定义插入图片
+          uploadImage: {
+            server: upload.form,
+            fieldName: 'file',
+            customInsert: (res, insertFn) => {
+              // res 即服务端的返回结果
+              // 从 res 中找到 url alt href ，然后插入图片
+              insertFn(
+                  res.data, // 图片 src ，必须
+                  res.data, // 图片描述文字，非必须
+                  res.data // 图片的链接，非必须
+              )
+            }
+          },
+          uploadVideo: {
+            server: upload.form,
+            fieldName: 'file',
+            // 自定义插入视频
+            customInsert: (res, insertFn) => {
+              // res 即服务端的返回结果
+              // 从 res 中找到 url poster ，然后插入视频
+              insertFn(
+                  res.data // 视频 src ，必须
+                  , res.data // 视频封面图片 url ，可选
+              )
+            }
+          }
+        }
+      })
+    },
+    height: { type: Number, default: 500 },
     valueHtml: { type: String, default: '' }
   },
   components: { Editor, Toolbar },
@@ -42,8 +81,8 @@ export default {
     //   }, 1500)
     // })
 
-    const toolbarConfig = {}
-    const editorConfig = { placeholder: '请输入内容...' }
+    // const toolbarConfig = {}
+    // const editorConfig = { placeholder: '请输入内容...' }
 
     // 组件销毁时，也及时销毁编辑器
     onBeforeUnmount(() => {
@@ -58,9 +97,10 @@ export default {
 
     return {
       editorRef,
+      // valueHtml,
       mode: 'default', // 或 'simple'
-      toolbarConfig,
-      editorConfig,
+      // toolbarConfig,
+      // editorConfig,
       handleCreated
     }
   }
