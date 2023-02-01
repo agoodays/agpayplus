@@ -41,7 +41,7 @@
         </a-col>
         <a-col :span="24">
           <a-form-model-item label="公告内容" prop="content">
-            <AgEditor :height="438" :valueHtml="saveObject.content" v-model="saveObject.content"></AgEditor>
+            <AgEditor :height="438" v-model="saveObject.content"></AgEditor>
           </a-form-model-item>
         </a-col>
       </a-row>
