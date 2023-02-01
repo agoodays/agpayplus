@@ -1,22 +1,22 @@
 <template>
-  <div style="border: 1px solid #ccc;z-index: 10;">
+  <div class="ag-editor">
     <Toolbar
-        style="border-bottom: 1px solid #ccc;"
+        class="ag-editor-toolbar"
         :editor="editorRef"
         :defaultConfig="toolbarConfig"
         :mode="mode"
     />
     <Editor
+        class="ag-editor-box"
         :style="{ 'height': height + 'px' }"
-        style="overflow-y: hidden;"
         v-model="valueHtml"
         :defaultConfig="editorConfig"
         :mode="mode"
         @onCreated="handleCreated"
     />
 <!--    <Editor
+        class="ag-editor-box"
         :style="{ 'height': height + 'px' }"
-        style="overflow-y: hidden;"
         v-model="valueHtml"
         :defaultConfig="editorConfig"
         :mode="mode"

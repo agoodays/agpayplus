@@ -94,6 +94,26 @@ body,
   background-color: @ag-external-link; //外部链接
 }
 
+.ag-editor {
+  border: 1px solid #ccc;
+  z-index: 10;
+  border-radius: 4px;
+}
+
+.ag-editor-toolbar {
+  border-bottom: 1px solid #ccc;
+  border-radius: 4px 4px 0px 0px;
+
+  .w-e-toolbar {
+    border-radius: 4px 4px 0px 0px;
+  }
+}
+
+.ag-editor-box {
+  overflow-y: hidden;
+  border-radius: 0px 0px 4px 4px;
+}
+
 .colorWeak {
   filter: invert(80%);
 }
