@@ -41,8 +41,11 @@
         </a-col>
         <a-col :span="24">
           <a-form-model-item label="公告内容" prop="content">
-<!--            <AgEditor :height="438" v-model="saveObject.content"></AgEditor>-->
-            <AgEditor :height="438" :modelValue="saveObject.content" @update:modelValue="saveObject.content = $event"></AgEditor>
+            <AgEditor :height="438" v-model="saveObject.content"></AgEditor>
+<!--            vue2父组件的v-model，相当于-->
+<!--            <AgEditor :value="saveObject.content" @input="saveObject.content = $event"></AgEditor>-->
+<!--            vue3父组件的v-model，相当于-->
+<!--            <AgEditor :height="438" :modelValue="saveObject.content" @update:modelValue="saveObject.content = $event"></AgEditor>-->
           </a-form-model-item>
         </a-col>
       </a-row>

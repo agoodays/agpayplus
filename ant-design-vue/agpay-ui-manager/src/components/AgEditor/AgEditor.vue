@@ -9,11 +9,20 @@
     <Editor
         class="ag-editor-box"
         :style="{ 'height': height + 'px' }"
-        v-model="valueHtml"
+        :value="value"
+        @input="$emit('input', $event)"
         :defaultConfig="editorConfig"
         :mode="mode"
         @onCreated="handleCreated"
     />
+<!--    <Editor
+        class="ag-editor-box"
+        :style="{ 'height': height + 'px' }"
+        v-model="valueHtml"
+        :defaultConfig="editorConfig"
+        :mode="mode"
+        @onCreated="handleCreated"
+    />-->
 <!--    <Editor
         class="ag-editor-box"
         :style="{ 'height': height + 'px' }"
@@ -30,7 +39,8 @@
 import { upload } from '@/api/manage'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 // import { onBeforeUnmount, ref, shallowRef, onMounted } from 'vue'
-import { onBeforeUnmount, computed, shallowRef } from 'vue'
+import { onBeforeUnmount, shallowRef } from 'vue'
+// import { onBeforeUnmount, computed, shallowRef } from 'vue'
 // import { onBeforeUnmount, ref, watch, shallowRef } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 
@@ -74,11 +84,14 @@ export default {
       })
     },
     height: { type: Number, default: 500 },
-    modelValue: { type: String, default: '' }
+    value: { type: String, default: '' }
+    // modelValue: { type: String, default: '' }
   },
-  emits: ['update:modelValue'],
+  // emits: ['update:modelValue'],// 定义自定义事件，可省略
   components: { Editor, Toolbar },
   setup (props, { emit }) {
+    // console.log(props)
+
     // 编辑器实例，必须用 shallowRef
     const editorRef = shallowRef()
 
@@ -92,13 +105,13 @@ export default {
     //   }, 1500)
     // })
 
-    const valueHtml = computed({
-      get: () => props.modelValue,
-      set: (nv) => {
-        // console.log(nv)
-        emit('update:modelValue', nv)
-      }
-    })
+    // const valueHtml = computed({
+    //   get: () => props.modelValue,
+    //   set: (nv) => {
+    //     // console.log(nv)
+    //     emit('update:modelValue', nv)
+    //   }
+    // })
 
     // // 初始化
     // const valueHtml = ref(props.modelValue)
@@ -128,7 +141,7 @@ export default {
 
     return {
       editorRef,
-      valueHtml,
+      // valueHtml,
       // valChange,
       mode: 'default', // 或 'simple'
       // toolbarConfig,
