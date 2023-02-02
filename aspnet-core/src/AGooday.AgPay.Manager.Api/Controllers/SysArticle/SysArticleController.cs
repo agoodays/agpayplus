@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
 {
     /// <summary>
-    /// 文章列表
+    /// 文章
     /// </summary>
     [Route("api/sysArticles")]
     [ApiController, Authorize]
@@ -47,11 +47,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 新建文章
+        /// 新建公告
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodLog("新建文章")]
+        [HttpPost, Route(""), MethodLog("新建公告")]
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_ADD)]
         public ApiRes AddNotice(SysArticleDto dto)
         {
@@ -68,11 +68,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 删除文章
+        /// 删除公告
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}"), MethodLog("删除文章")]
+        [HttpDelete, Route("{recordId}"), MethodLog("删除公告")]
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_VIEW, PermCode.MGR.ENT_NOTICE_EDIT)]
         public ApiRes DeleteNotice(long recordId)
         {
@@ -83,11 +83,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 更新文章信息
+        /// 更新公告信息
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}"), MethodLog("更新文章信息")]
+        [HttpPut, Route("{recordId}"), MethodLog("更新公告信息")]
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_EDIT)]
         public ApiRes UpdateNotice(long recordId, SysArticleDto dto)
         {
@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 文章详情
+        /// 公告详情
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
