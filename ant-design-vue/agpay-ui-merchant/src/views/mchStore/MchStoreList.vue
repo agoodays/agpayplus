@@ -67,7 +67,7 @@ const tableColumns = [
 ]
 
 export default {
-  name: 'MchStoreListPage',
+  name: 'MchStorePage',
   components: { AgTable, AgTextUp, AgTableColumns, InfoAddOrEdit, InfoDetail },
   data () {
     return {

@@ -25,7 +25,7 @@ export const asyncRouteDefine = {
   'RolePage': { defaultPath: '/roles', component: () => import('@/views/role/RolePage') },
 
   'MchAppPage': { defaultPath: '/apps', component: () => import ('@/views/mchApp/List') }, // 商户应用列表
-  'MchStoreListPage': { defaultPath: '/store', component: () => import ('@/views/mchStore/MchStoreList') }, // 商户门店列表
+  'MchStorePage': { defaultPath: '/store', component: () => import ('@/views/mchStore/MchStoreList') }, // 商户门店列表
   'PayTestPage': { defaultPath: '/paytest', component: () => import ('@/views/payTest/PayTest') }, // 支付测试
   'MchTransferPage': { defaultPath: '/doTransfer', component: () => import ('@/views/transfer/MchTransferPage') }, // 转账
 

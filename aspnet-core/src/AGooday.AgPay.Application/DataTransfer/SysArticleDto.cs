@@ -3,37 +3,37 @@
 namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
-    /// 公告信息表
+    /// 文章信息表
     /// </summary>
     public class SysArticleDto
     {
         /// <summary>
-        /// 公告ID
+        /// 文章ID
         /// </summary>
         public long ArticleId { get; set; }
 
         /// <summary>
-        /// 公告标题
+        /// 文章标题
         /// </summary>
         public string Title { get; set; }
 
         /// <summary>
-        /// 公告副标题
+        /// 文章副标题
         /// </summary>
         public string Subtitle { get; set; }
 
         /// <summary>
-        /// 公告类型
+        /// 文章类型: 1-公告
         /// </summary>
         public byte ArticleType { get; set; }
 
         /// <summary>
-        /// 公告范围 ["MCH", "AGENT"]
+        /// 文章范围 ["MCH", "AGENT"]
         /// </summary>
         public JArray ArticleRange { get; set; }
 
         /// <summary>
-        /// 公告内容
+        /// 文章内容
         /// </summary>
         public string Content { get; set; }
 

@@ -5,52 +5,52 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AGooday.AgPay.Domain.Models
 {
     /// <summary>
-    /// 公告信息表
+    /// 文章信息表
     /// </summary>
-    [Comment("公告信息表")]
+    [Comment("文章信息表")]
     [Table("t_sys_article")]
     public class SysArticle
     {
         /// <summary>
-        /// 公告ID
+        /// 文章ID
         /// </summary>
-        [Comment("公告ID")]
+        [Comment("文章ID")]
         [Key, Required, Column("article_id", TypeName = "bigint")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long ArticleId { get; set; }
 
         /// <summary>
-        /// 公告标题
+        /// 文章标题
         /// </summary>
-        [Comment("公告标题")]
+        [Comment("文章标题")]
         [Required, Column("title", TypeName = "varchar(64)")]
         public string Title { get; set; }
 
         /// <summary>
-        /// 公告副标题
+        /// 文章副标题
         /// </summary>
-        [Comment("公告副标题")]
+        [Comment("文章副标题")]
         [Required, Column("subtitle", TypeName = "varchar(64)")]
         public string Subtitle { get; set; }
 
         /// <summary>
-        /// 公告类型
+        /// 文章类型: 1-公告
         /// </summary>
-        [Comment("公告类型")]
+        [Comment("文章类型: 1-公告")]
         [Required, Column("article_type", TypeName = "tinyint(6)")]
         public byte ArticleType { get; set; }
 
         /// <summary>
-        /// 公告范围 ["MCH", "AGENT"]
+        /// 文章范围 ["MCH", "AGENT"]
         /// </summary>
-        [Comment("公告范围 [\"MCH\", \"AGENT\"]")]
+        [Comment("文章范围 [\"MCH\", \"AGENT\"]")]
         [Required, Column("article_range", TypeName = "json")]
         public string ArticleRange { get; set; }
 
         /// <summary>
-        /// 公告内容
+        /// 文章内容
         /// </summary>
-        [Comment("公告内容")]
+        [Comment("文章内容")]
         [Column("content", TypeName = "text")]
         public string Content { get; set; }
 

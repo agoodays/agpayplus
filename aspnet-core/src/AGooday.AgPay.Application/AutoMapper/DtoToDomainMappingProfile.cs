@@ -18,7 +18,6 @@ namespace AGooday.AgPay.Application.AutoMapper
         /// </summary>
         public DtoToDomainMappingProfile()
         {
-
             CreateMap<AgentInfoDto, AgentInfo>();
             CreateMap<AgentInfoCreateDto, CreateAgentInfoCommand>();
             CreateMap<CreateAgentInfoCommand, AgentInfo>();

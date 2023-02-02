@@ -31,7 +31,7 @@
           </div>
         </a-form>
         <div>
-          <a-button v-if="$access('ENT_ARTICLE_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          <a-button v-if="$access('ENT_NOTICE_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
         </div>
       </div>
 
@@ -47,9 +47,9 @@
       >
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a-button type="link" v-if="$access('ENT_ARTICLE_EDIT')" @click="editFunc(record.articleId)">修改</a-button>
-            <a-button type="link" v-if="$access('ENT_ARTICLE_VIEW')" @click="detailFunc(record.articleId)">详情</a-button>
-            <a-button type="link" v-if="$access('ENT_ARTICLE_DEL')" style="color: red" @click="delFunc(record.articleId)">删除</a-button>
+            <a-button type="link" v-if="$access('ENT_NOTICE_EDIT')" @click="editFunc(record.articleId)">修改</a-button>
+            <a-button type="link" v-if="$access('ENT_NOTICE_VIEW')" @click="detailFunc(record.articleId)">详情</a-button>
+            <a-button type="link" v-if="$access('ENT_NOTICE_DEL')" style="color: red" @click="delFunc(record.articleId)">删除</a-button>
           </AgTableColumns>
         </template>
       </AgTable>
@@ -80,13 +80,15 @@ const tableColumns = [
 ]
 
 export default {
-  name: 'SysUserTeamPage',
+  name: 'NoticePage',
   components: { AgTable, AgTextUp, AgTableColumns, InfoAddOrEdit, InfoDetail },
   data () {
     return {
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {}
+      searchData: {
+        articleType: 1 // 文章类型: 1-公告
+      }
     }
   },
   mounted () {

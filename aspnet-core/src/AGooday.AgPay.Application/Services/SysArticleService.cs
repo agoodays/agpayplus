@@ -69,6 +69,7 @@ namespace AGooday.AgPay.Application.Services
             var sysLogs = _sysArticleRepository.GetAll()
                 .Where(w => (dto.ArticleId.Equals(0) || w.ArticleId.Equals(dto.ArticleId))
                 && (string.IsNullOrWhiteSpace(dto.Title) || w.Title.Contains(dto.Title) || w.Subtitle.Contains(dto.Title))
+                && (dto.ArticleType.Equals(0) || w.ArticleType.Equals(dto.ArticleType))
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);

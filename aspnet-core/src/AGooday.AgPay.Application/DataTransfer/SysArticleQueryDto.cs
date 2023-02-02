@@ -3,19 +3,24 @@
 namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
-    /// 公告信息表
+    /// 文章信息表
     /// </summary>
     public class SysArticleQueryDto : PageQuery
     {
         /// <summary>
-        /// 公告ID
+        /// 文章ID
         /// </summary>
         public long ArticleId { get; set; }
 
         /// <summary>
-        /// 公告标题
+        /// 文章标题
         /// </summary>
         public string Title { get; set; }
+
+        /// <summary>
+        /// 文章类型: 1-公告
+        /// </summary>
+        public byte ArticleType { get; set; }
 
         /// <summary>
         /// 开始时间

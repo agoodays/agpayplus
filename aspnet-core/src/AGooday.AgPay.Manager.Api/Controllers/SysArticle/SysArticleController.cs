@@ -1,10 +1,10 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
 {
     /// <summary>
-    /// 公告列表
+    /// 文章列表
     /// </summary>
     [Route("api/sysArticles")]
     [ApiController, Authorize]
@@ -34,12 +34,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 公告列表
+        /// 文章列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_ARTICLE_LIST)]
+        [PermissionAuth(PermCode.MGR.ENT_NOTICE_LIST)]
         public ApiRes List([FromQuery] SysArticleQueryDto dto)
         {
             var data = _sysArticleService.GetPaginatedData(dto);
@@ -47,15 +47,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 新建公告
+        /// 新建文章
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodLog("新建公告")]
-        [PermissionAuth(PermCode.MGR.ENT_ARTICLE_ADD)]
-        public ApiRes Add(SysArticleDto dto)
+        [HttpPost, Route(""), MethodLog("新建文章")]
+        [PermissionAuth(PermCode.MGR.ENT_NOTICE_ADD)]
+        public ApiRes AddNotice(SysArticleDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
+            dto.ArticleType = (byte)ArticleType.NOTICE;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             var result = _sysArticleService.Add(dto);
@@ -67,13 +68,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 删除公告
+        /// 删除文章
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}"), MethodLog("删除公告")]
-        [PermissionAuth(PermCode.MGR.ENT_ARTICLE_VIEW, PermCode.MGR.ENT_ARTICLE_EDIT)]
-        public ApiRes Delete(long recordId)
+        [HttpDelete, Route("{recordId}"), MethodLog("删除文章")]
+        [PermissionAuth(PermCode.MGR.ENT_NOTICE_VIEW, PermCode.MGR.ENT_NOTICE_EDIT)]
+        public ApiRes DeleteNotice(long recordId)
         {
             var sysArticle = _sysArticleService.GetById(recordId);
             _sysArticleService.Remove(recordId);
@@ -82,13 +83,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 更新公告信息
+        /// 更新文章信息
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}"), MethodLog("更新公告信息")]
-        [PermissionAuth(PermCode.MGR.ENT_ARTICLE_EDIT)]
-        public ApiRes Update(long recordId, SysArticleDto dto)
+        [HttpPut, Route("{recordId}"), MethodLog("更新文章信息")]
+        [PermissionAuth(PermCode.MGR.ENT_NOTICE_EDIT)]
+        public ApiRes UpdateNotice(long recordId, SysArticleDto dto)
         {
             var result = _sysArticleService.Update(dto);
             if (!result)
@@ -100,13 +101,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 公告详情
+        /// 文章详情
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_ARTICLE_DEL)]
-        public ApiRes Detail(long recordId)
+        [PermissionAuth(PermCode.MGR.ENT_NOTICE_DEL)]
+        public ApiRes NoticeDetail(long recordId)
         {
             var sysArticle = _sysArticleService.GetById(recordId);
             if (sysArticle == null)

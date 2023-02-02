@@ -31,12 +31,12 @@ export const asyncRouteDefine = {
   'AgentListPage': { defaultPath: '/agent', component: () => import('@/views/agent/AgentList') }, // 代理商列表
   'MchListPage': { defaultPath: '/mch', component: () => import('@/views/mch/MchList') }, // 商户列表
   'MchAppPage': { defaultPath: '/apps', component: () => import ('@/views/mchApp/List') }, // 商户应用列表
-  'MchStoreListPage': { defaultPath: '/store', component: () => import ('@/views/mchStore/MchStoreList') }, // 商户门店列表
+  'MchStorePage': { defaultPath: '/store', component: () => import ('@/views/mchStore/MchStoreList') }, // 商户门店列表
   'PayOrderListPage': { defaultPath: '/payOrder', component: () => import('@/views/order/pay/PayOrderList') }, // 支付订单列表
   'RefundOrderListPage': { defaultPath: '/refundOrder', component: () => import('@/views/order/refund/RefundOrderList') }, // 退款订单列表
   'TransferOrderListPage': { defaultPath: '/transferOrder', component: () => import('@/views/order/transfer/TransferOrderList') }, // 转账订单
   'MchNotifyListPage': { defaultPath: '/notify', component: () => import('@/views/order/notify/MchNotifyList') }, // 商户通知列表
   'SysConfigPage': { defaultPath: '/config', component: () => import('@/views/sys/config/SysConfig') }, // 系统配置
-  'NoticeListPage': { defaultPath: '/notices', component: () => import('@/views/sysArticle/SysArticleList') }, // 系统配置
+  'NoticeInfoPage': { defaultPath: '/notices', component: () => import('@/views/notice/NoticeList') }, // 系统配置
   'SysLogPage': { defaultPath: '/log', component: () => import('@/views/sys/log/SysLog') } // 系统日志
 }

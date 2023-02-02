@@ -53,15 +53,15 @@ import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import InfoAddOrEdit from './AddOrEdit'
 
 const tableColumns = [
-  { title: '资源权限ID', width: 260, dataIndex: 'entId' }, // key为必填项，用于标志该列的唯一
-  { title: '资源名称', dataIndex: 'entName' },
+  { title: '资源权限ID', width: 320, dataIndex: 'entId' }, // key为必填项，用于标志该列的唯一
+  { title: '资源名称', width: 200, dataIndex: 'entName' },
   { title: '图标', dataIndex: 'menuIcon' },
   { title: '路径', dataIndex: 'menuUri' },
   { title: '组件名称', dataIndex: 'componentName' },
-  { title: '类型', dataIndex: 'entType' },
+  { title: '类型', width: 60, dataIndex: 'entType' },
   { title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
-  { title: '排序', dataIndex: 'entSort' },
-  { title: '修改时间', dataIndex: 'updatedAt' },
+  { title: '排序', width: 60, dataIndex: 'entSort' },
+  { title: '修改时间', width: 200, dataIndex: 'updatedAt' },
   { title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
