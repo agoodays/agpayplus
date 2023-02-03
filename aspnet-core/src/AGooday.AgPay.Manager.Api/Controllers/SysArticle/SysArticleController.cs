@@ -47,13 +47,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 新建公告
+        /// 新建文章
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodLog("新建公告")]
+        [HttpPost, Route(""), MethodLog("新建文章")]
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_ADD)]
-        public ApiRes AddNotice(SysArticleDto dto)
+        public ApiRes Add(SysArticleDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.ArticleType = (byte)ArticleType.NOTICE;
@@ -68,13 +68,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 删除公告
+        /// 删除文章
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}"), MethodLog("删除公告")]
-        [PermissionAuth(PermCode.MGR.ENT_NOTICE_VIEW, PermCode.MGR.ENT_NOTICE_EDIT)]
-        public ApiRes DeleteNotice(long recordId)
+        [HttpDelete, Route("{recordId}"), MethodLog("删除文章")]
+        [PermissionAuth(PermCode.MGR.ENT_NOTICE_DEL)]
+        public ApiRes Delete(long recordId)
         {
             var sysArticle = _sysArticleService.GetById(recordId);
             _sysArticleService.Remove(recordId);
@@ -83,13 +83,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 更新公告信息
+        /// 更新文章信息
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}"), MethodLog("更新公告信息")]
+        [HttpPut, Route("{recordId}"), MethodLog("更新文章信息")]
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_EDIT)]
-        public ApiRes UpdateNotice(long recordId, SysArticleDto dto)
+        public ApiRes Update(long recordId, SysArticleDto dto)
         {
             var result = _sysArticleService.Update(dto);
             if (!result)
@@ -101,13 +101,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         }
 
         /// <summary>
-        /// 公告详情
+        /// 文章详情
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_NOTICE_DEL)]
-        public ApiRes NoticeDetail(long recordId)
+        [PermissionAuth(PermCode.MGR.ENT_NOTICE_VIEW, PermCode.MGR.ENT_NOTICE_EDIT)]
+        public ApiRes Detail(long recordId)
         {
             var sysArticle = _sysArticleService.GetById(recordId);
             if (sysArticle == null)

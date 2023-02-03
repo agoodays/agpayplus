@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <param name="recordId"></param>
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除团队")]
-        [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_VIEW, PermCode.AGENT.ENT_UR_TEAM_EDIT)]
+        [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_DEL)]
         public ApiRes Delete(long recordId)
         {
             var mchStore = _mchStoreService.GetById(recordId);
@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <param name="recordId"></param>
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
-        [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_DEL)]
+        [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_VIEW, PermCode.AGENT.ENT_UR_TEAM_EDIT)]
         public ApiRes Detail(long recordId)
         {
             var mchStore = _mchStoreService.GetById(recordId);

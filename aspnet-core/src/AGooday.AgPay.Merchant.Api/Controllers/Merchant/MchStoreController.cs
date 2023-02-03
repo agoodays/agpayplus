@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="recordId"></param>
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除门店")]
-        [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_VIEW, PermCode.MGR.ENT_MCH_STORE_EDIT)]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_DEL)]
         public ApiRes Delete(long recordId)
         {
             var mchStore = _mchStoreService.GetById(recordId);
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="recordId"></param>
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_DEL)]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_VIEW, PermCode.MGR.ENT_MCH_STORE_EDIT)]
         public ApiRes Detail(long recordId)
         {
             var mchStore = _mchStoreService.GetById(recordId);

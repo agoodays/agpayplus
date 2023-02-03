@@ -53,7 +53,7 @@ import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import InfoAddOrEdit from './AddOrEdit'
 
 const tableColumns = [
-  { title: '资源权限ID', width: 320, dataIndex: 'entId' }, // key为必填项，用于标志该列的唯一
+  { title: '资源权限ID', width: 360, dataIndex: 'entId' }, // key为必填项，用于标志该列的唯一
   { title: '资源名称', width: 200, dataIndex: 'entName' },
   { title: '图标', dataIndex: 'menuIcon' },
   { title: '路径', dataIndex: 'menuUri' },

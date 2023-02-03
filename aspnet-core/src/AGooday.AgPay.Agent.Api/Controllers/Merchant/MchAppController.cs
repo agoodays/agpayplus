@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <param name="appId"></param>
         /// <returns></returns>
         [HttpDelete, Route("{appId}"), MethodLog("删除应用")]
-        [PermissionAuth(PermCode.AGENT.ENT_MCH_APP_VIEW, PermCode.AGENT.ENT_MCH_APP_EDIT)]
+        [PermissionAuth(PermCode.AGENT.ENT_MCH_APP_DEL)]
         public ApiRes Delete(string appId)
         {
             var mchApp = _mchAppService.GetById(appId);
@@ -118,7 +118,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <param name="appId"></param>
         /// <returns></returns>
         [HttpGet, Route("{appId}"), NoLog]
-        [PermissionAuth(PermCode.AGENT.ENT_MCH_APP_DEL)]
+        [PermissionAuth(PermCode.AGENT.ENT_MCH_APP_VIEW, PermCode.AGENT.ENT_MCH_APP_EDIT)]
         public ApiRes Detail(string appId)
         {
             var mchApp = _mchAppService.GetById(appId);
