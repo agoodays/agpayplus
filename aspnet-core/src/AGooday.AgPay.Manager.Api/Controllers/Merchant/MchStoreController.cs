@@ -133,8 +133,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [HttpGet, Route("mapConfig"), AllowAnonymous, NoLog]
         public ApiRes MapConfig()
         {
-            var apiMapWebKey = "4056aa1b76794cdb8df1d5ee0000bdb8";
-            //var apiMapWebKey = "6cebea39ba50a4c9bc565baaf57d1c8b";
+            //var apiMapWebKey = "4056aa1b76794cdb8df1d5ee0000bdb8
+            //var apiMapWebKey = "73c97ee762590de79509117207e170ab";
+            //var apiMapWebSecret = "7fec782d86662766f46d8d92e4651154";
+            var apiMapWebKey = "6cebea39ba50a4c9bc565baaf57d1c8b";
             var apiMapWebSecret = "dccbb5a56d2a1850eda2b6e67f8f2f13";
             var apiMapWebServiceKey = "1e558c3dc1ce7ab2a0b332d78fcd4c16";
             return ApiRes.Ok(new { apiMapWebKey, apiMapWebSecret, apiMapWebServiceKey });

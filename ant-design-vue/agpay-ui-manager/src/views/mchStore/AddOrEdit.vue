@@ -198,6 +198,7 @@ export default {
       recordId: null, // 更新对象ID
       visible: false, // 是否显示弹层/抽屉
       mchList: null, // 商户下拉列表
+      polygons: [],
       areasOptions: [
         {
           value: '110000',
@@ -207,6 +208,11 @@ export default {
               value: '110100',
               label: '北京市',
               children: [
+                {
+                  value: '110101',
+                  label: '东城区',
+                  code: 110101
+                },
                 {
                   value: '110105',
                   label: '朝阳区',
@@ -260,6 +266,8 @@ export default {
   methods: {
     show: function (recordId) { // 弹层打开事件
       this.isAdd = !recordId
+      this.areas = []
+      this.lnglat = null
       this.saveObject = {}
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
@@ -274,10 +282,6 @@ export default {
         req.getById(API_URL_MCH_STORE, recordId).then(res => {
           that.saveObject = res
           that.initAMap()
-          that.areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.areaCode]
-          if (that.saveObject.lng?.length || that.saveObject.lat?.length) {
-            that.lnglat = that.saveObject.lng + ',' + that.saveObject.lat
-          }
           Object.keys(that.imgDefaultFileList).forEach((field) => {
             const url = that.saveObject[field]
             if (!url) {
@@ -303,9 +307,8 @@ export default {
     // DOM初始化完成进行地图初始化
     initAMap: function () {
       const that = this
-
       getMapConfig().then(res => {
-        console.log(res)
+        // console.log(res)
         that.mapConfig = res
 
         AMapLoader.load({
@@ -341,13 +344,12 @@ export default {
           // })
           // 注册监听，当选中某条记录时会触发
           auto.on('select', function (e) {
-            console.log(e)
+            // console.log(e)
             // placeSearch.setCity(e.poi.adcode)
             // placeSearch.search(e.poi.name) // 关键字查询查询
             const lnglat = { lng: e.poi.location.lng, lat: e.poi.location.lat }
-            that.aMapMarker(that, lnglat, e.poi.name)
+            that.aMapGeocode(that, lnglat, e.poi.name)
           })
-          // that.map.addControl(auto)
 
           // 工具条
           const toolBar = new AMap.ToolBar({ // toolBar
@@ -380,80 +382,159 @@ export default {
           })
           that.map.addControl(geolocation)
 
-          if (that.saveObject.lng?.length && that.saveObject.lat?.length) {
-            // 创建一个 Marker 实例：
-            that.marker = new that.amap.Marker({
-              position: new that.amap.LngLat(that.saveObject.lng.length, that.saveObject.lat), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
-              title: that.saveObject.address
-            })
-            // 将创建的点标记添加到已有的地图实例：
-            that.map.add(that.marker)
-          }
-
           that.map.on('click', function (ev) {
-            // // 触发事件的对象
-            // const target = ev.target
-            // console.log(target)
+            // console.log(ev)
             // 触发事件的地理坐标，AMap.LngLat 类型
             const lnglat = ev.lnglat
-            // console.log(lnglat)
-            // console.log(lnglat.lng)
-            // console.log(lnglat.lat)
-            // // 触发事件的像素坐标，AMap.Pixel 类型
-            // const pixel = ev.pixel
-            // console.log(pixel)
-            // // 触发事件类型
-            // const type = ev.type
-            // console.log(type)
-
-            // that.$jsonp('https://restapi.amap.com/v3/geocode/regeo?platform=JS&s=rsv3&logversion=2.0&key=6cebea39ba50a4c9bc565baaf57d1c8b&sdkversion=2.0.5.14&appname=https://mgr.s.jeepay.com/store&csid=93D8C382-D595-412A-8612-FE3A08DEE2C0&jscode=dccbb5a56d2a1850eda2b6e67f8f2f13&key=6cebea39ba50a4c9bc565baaf57d1c8b&s=rsv3&language=zh_cn&location=116.448763,39.955928')
-            //     .then(res => {
-            //       console.log(res)
-            //     })
-
-            that.$jsonp('https://restapi.amap.com/v3/geocode/regeo', {
-              platform: 'JS',
-              key: that.mapConfig.apiMapWebKey,
-              // jscode: 'dccbb5a56d2a1850eda2b6e67f8f2f13',
-              language: 'zh_cn',
-              location: lnglat.toString(),
-              s: 'rsv3'
-            }).then(res => {
-              console.log(res)
-              that.aMapMarker(that, lnglat, res.regeocode.formatted_address)
-            })
+            that.aMapGeocode(that, lnglat)
           })
 
           // 行政区划查询
           const opts = {
-            subdistrict: 1, // 返回下一级行政区
-            showbiz: false // 最后一级返回街道信息
+            level: 'country', // 关键字对应的行政区级别，country表示国家
+            subdistrict: 3, // 显示下级行政区级数（行政区级别包括：国家、省/直辖市、市、区/县4个级别），商圈为区/县下一 级，可选值：0、1、2、3，默认值：1 0：不返回下级行政区 1：返回下一级行政区 2：返回下两级行政区 3：返回下三级行政区
+            showbiz: false, // 是否显示商圈，默认值true
+            extensions: 'base' // 是否返回行政区边界坐标点，默认值：base
           }
-          const district = new AMap.DistrictSearch(opts) // 注意：需要使用插件同步下发功能才能这样直接使用
-          district.search('中国', function (status, result) {
+          that.district = new AMap.DistrictSearch(opts) // 注意：需要使用插件同步下发功能才能这样直接使用
+          that.district.search('中国', function (status, result) {
+            // console.log(status)
+            // console.log(result)
             if (status === 'complete') {
-              console.log(result.districtList[0])
+              that.setAreasData(result.districtList[0])
             }
           })
 
-          if (!this.isAdd) {
+          if (!this.isAdd && that.saveObject.lng?.length && that.saveObject.lat?.length) {
             const lnglat = { lng: that.saveObject.lng, lat: that.saveObject.lat }
-            that.aMapMarker(that, lnglat, that.saveObject.address)
+            const areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.areaCode]
+            that.aMapMarker(that, lnglat, that.saveObject.address, areas)
           }
         }).catch(e => {
           console.log(e)
         })
       })
     },
-    aMapMarker: function (that, lnglat, address) {
-      console.log(lnglat)
+    setAreasData: function (data, level) {
+      const that = this
+      that.areasOptions = []
+      // const bounds = data.boundaries
+      // const AMap = that.amap
+      // if (bounds) {
+      //   for (let i = 0, l = bounds.length; i < l; i++) {
+      //     const polygon = new AMap.Polygon({
+      //       map: that.map,
+      //       strokeWeight: 1,
+      //       strokeColor: '#0091ea',
+      //       fillColor: '#80d8ff',
+      //       fillOpacity: 0.2,
+      //       path: bounds[i]
+      //     })
+      //     that.polygons.push(polygon)
+      //   }
+      //   that.map.setFitView() // 地图自适应
+      // }
+
+      const subList = data.districtList
+      if (subList) {
+        // console.log(subList)
+        for (const provinceIndex in subList?.sort((a, b) => a.adcode - b.adcode)) {
+          const provinceItem = subList[provinceIndex]
+          // console.log(provinceItem)
+          const provinceOption = {
+            value: provinceItem.adcode,
+            label: provinceItem.name,
+            level: provinceItem.level,
+            children: []
+          }
+          for (const cityIndex in provinceItem.districtList?.sort((a, b) => a.adcode - b.adcode)) {
+            const cityItem = provinceItem.districtList[cityIndex]
+            // console.log(cityItem)
+            const cityOption = {
+              value: cityItem.adcode,
+              label: cityItem.name,
+              level: cityItem.level,
+              children: []
+            }
+            for (const areaIndex in cityItem.districtList?.sort((a, b) => a.adcode - b.adcode)) {
+              const areaItem = cityItem.districtList[areaIndex]
+              // console.log(areaItem)
+              const areaOption = {
+                value: areaItem.adcode,
+                label: areaItem.name,
+                level: areaItem.level,
+                citycode: areaItem.citycode
+              }
+              cityOption.children.push(areaOption)
+            }
+            provinceOption.children.push(cityOption)
+          }
+          that.areasOptions.push(provinceOption)
+        }
+      }
+    },
+    getParentIds: function (treeData, id) {
+      const that = this
+      let str = ''
+      const joinStr = ','
+
+      for (const i in treeData) {
+        const item = treeData[i]
+        if (item.value === id) {
+          return item.value
+        }
+        if (item.children) {
+          str = item.value + joinStr + that.getParentIds(item.children, id)
+          if (str === item.value + joinStr) {
+            str = ''
+          } else {
+            return str
+          }
+        }
+      }
+      return str
+    },
+    aMapGeocode: function (that, lnglat, address) {
+      that.$jsonp('https://restapi.amap.com/v3/geocode/regeo', {
+        platform: 'JS',
+        key: that.mapConfig.apiMapWebKey,
+        jscode: that.mapConfig.apiMapWebSecret,
+        language: 'zh_cn',
+        location: lnglat.lng + ',' + lnglat.lat,
+        s: 'rsv3'
+      }).then(res => {
+        // console.log(res)
+        address = address?.length ? address : res.regeocode.formatted_address
+        const areas = that.getParentIds(that.areasOptions, res.regeocode.addressComponent.adcode)
+        // console.log(areas.split(','))
+        that.aMapMarker(that, lnglat, address, areas.split(','))
+
+        // that.$jsonp('https://restapi.amap.com/v3/config/district', {
+        //   // platform: 'JS',
+        //   key: that.mapConfig.apiMapWebKey,
+        //   jscode: that.mapConfig.apiMapWebSecret,
+        //   language: 'zh_cn',
+        //   keywords: res.regeocode.addressComponent.adcode,
+        //   s: 'rsv3'
+        // }).then(res => {
+        //   console.log(res)
+        //   const areas = that.getParentIds(that.areasOptions,res.regeocode.addressComponent.adcode)
+        //   that.aMapMarker(that, lnglat, address, areas)
+        // })
+      })
+    },
+    aMapMarker: function (that, lnglat, address, areas) {
       if (that.marker) {
         that.map.remove(that.marker)
       }
+      that.saveObject.provinceCode = areas[0]
+      that.saveObject.cityCode = areas[1]
+      that.saveObject.areaCode = areas[2]
       that.saveObject.address = address
       that.saveObject.lng = lnglat.lng
       that.saveObject.lat = lnglat.lat
       that.lnglat = that.saveObject.lng + ',' + that.saveObject.lat
+      that.areas = areas
 
       const AMap = that.amap
 
@@ -464,6 +545,8 @@ export default {
       })
       // 将创建的点标记添加到已有的地图实例：
       that.map.add(that.marker)
+
+      that.map.setFitView() // 地图自适应
     },
     onSubmit: function () { // 点击【保存】按钮事件
       const that = this
@@ -525,31 +608,59 @@ export default {
         fileinfo.url = res.data
         fileinfo.thumbUrl = res.data
       } else if (info.file.status === 'error') {
-        console.log(info)
         this.$message.error(`上传失败`)
       } else if (info.file.status === 'removed') {
         this.imgDefaultFileList[name] = null
       }
     },
     areasChange (value, selectedOptions) {
-      console.log(value)
-      console.log(selectedOptions)
+      // console.log(value)
+      // console.log(selectedOptions)
+      const that = this
+      // 清除地图上所有覆盖物
+      for (let i = 0, l = that.polygons.length; i < l; i++) {
+        that.polygons[i].setMap(null)
+      }
       if (value.length > 2) {
-        this.saveObject.provinceCode = value[0]
-        this.saveObject.cityCode = value[1]
-        this.saveObject.areaCode = value[2]
+        that.saveObject.provinceCode = value[0]
+        that.saveObject.cityCode = value[1]
+        that.saveObject.areaCode = value[2]
+        const areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.areaCode]
+        that.areas = areas
+
+        that.district.setLevel('district') // 行政区级别
+        that.district.setExtensions('all')
+        // 行政区查询
+        // 按照adcode进行查询可以保证数据返回的唯一性
+        that.district.search(that.saveObject.areaCode, function (status, result) {
+          if (status) {
+            const bounds = result.districtList[0].boundaries
+            const AMap = that.amap
+            if (bounds) {
+              for (let i = 0, l = bounds.length; i < l; i++) {
+                const polygon = new AMap.Polygon({
+                  map: that.map,
+                  strokeWeight: 1,
+                  strokeColor: '#0091ea',
+                  fillColor: '#80d8ff',
+                  fillOpacity: 0.2,
+                  path: bounds[i]
+                })
+                that.polygons.push(polygon)
+              }
+              that.map.setFitView() // 地图自适应
+            }
+          }
+        })
       } else {
         this.saveObject.provinceCode = ''
         this.saveObject.cityCode = ''
         this.saveObject.areaCode = ''
+        that.areas = []
       }
-      console.log(this.saveObject.provinceCode)
-      console.log(this.saveObject.cityCode)
-      console.log(this.saveObject.areaCode)
     },
     lngLatChange (e) {
-      console.log(this.saveObject)
-      console.log(e)
+      // console.log(e)
       const lngAndLat = e.target.value.split(',')
       if (lngAndLat.length > 1) {
         this.saveObject.lng = lngAndLat[0]
