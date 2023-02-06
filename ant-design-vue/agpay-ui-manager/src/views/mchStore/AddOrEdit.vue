@@ -610,13 +610,14 @@ export default {
         that.saveObject.cityCode = value[1]
         that.saveObject.areaCode = value[2]
         that.areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.areaCode]
-
-        that.district.setLevel('district') // 行政区级别
+        const level = selectedOptions[selectedOptions.length - 1].level
+        that.district.setLevel(level) // 行政区级别
         that.district.setExtensions('all')
         // 行政区查询
         // 按照adcode进行查询可以保证数据返回的唯一性
         that.district.search(that.saveObject.areaCode, function (status, result) {
           if (status) {
+            // 获取区域的边界信息
             const bounds = result.districtList[0].boundaries
             const AMap = that.amap
             if (bounds) {
@@ -628,6 +629,11 @@ export default {
                   fillColor: '#80d8ff',
                   fillOpacity: 0.2,
                   path: bounds[i]
+                })
+                polygon.on('click', function (ev) {
+                  console.log(ev)
+                  const lnglat = ev.lnglat
+                  that.aMapGeocode(that, lnglat)
                 })
                 that.polygons.push(polygon)
               }
