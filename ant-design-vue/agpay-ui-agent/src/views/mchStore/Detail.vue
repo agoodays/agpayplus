@@ -65,8 +65,7 @@
                 :default-file-list="getDefaultFileList(detailData.storeLogo)"
                 list-type="picture"
                 class="detail-upload-list-inline"
-            >
-            </a-upload>
+            />
           </div>
         </a-form-model-item>
       </a-col>
@@ -77,8 +76,7 @@
                 :default-file-list="getDefaultFileList(detailData.storeOuterImg)"
                 list-type="picture"
                 class="detail-upload-list-inline"
-            >
-            </a-upload>
+            />
           </div>
         </a-form-model-item>
       </a-col>
@@ -89,8 +87,7 @@
                 :default-file-list="getDefaultFileList(detailData.storeInnerImg)"
                 list-type="picture"
                 class="detail-upload-list-inline"
-            >
-            </a-upload>
+            />
           </div>
         </a-form-model-item>
       </a-col>

@@ -113,10 +113,10 @@
       <a-col :sm="24">
         <a-form-model-item label="备注">
           <a-input
-              type="textarea"
-              disabled="disabled"
-              style="height: 50px"
-              v-model="detailData.remark"
+            type="textarea"
+            disabled="disabled"
+            style="height: 50px"
+            v-model="detailData.remark"
           />
         </a-form-model-item>
       </a-col>
@@ -126,9 +126,7 @@
     <a-row justify="space-between" type="flex">
       <a-col :sm="24">
         <a-divider orientation="left">
-          <a-tag color="#FF4B33">
-            账户信息
-          </a-tag>
+          <a-tag color="#FF4B33">账户信息</a-tag>
         </a-divider>
       </a-col>
     </a-row>
@@ -185,9 +183,7 @@
     <a-row justify="space-between" type="flex">
       <a-col :span="24">
         <a-divider orientation="left">
-          <a-tag color="#FF4B33">
-            资料信息
-          </a-tag>
+          <a-tag color="#FF4B33">资料信息</a-tag>
         </a-divider>
       </a-col>
     </a-row>
@@ -198,11 +194,10 @@
           <a-form-model-item label="营业执照照片" prop="licenseImg">
             <div v-if="detailData.licenseImg">
               <a-upload
-                  :default-file-list="getDefaultFileList(detailData.licenseImg)"
-                  list-type="picture"
-                  class="detail-upload-list-inline"
-              >
-              </a-upload>
+                :default-file-list="getDefaultFileList(detailData.licenseImg)"
+                list-type="picture"
+                class="detail-upload-list-inline"
+              />
             </div>
           </a-form-model-item>
         </a-col>
@@ -211,11 +206,10 @@
           <a-form-model-item label="开户许可证照片" prop="permitImg">
             <div v-if="detailData.permitImg">
               <a-upload
-                  :default-file-list="getDefaultFileList(detailData.permitImg)"
-                  list-type="picture"
-                  class="detail-upload-list-inline"
-              >
-              </a-upload>
+                :default-file-list="getDefaultFileList(detailData.permitImg)"
+                list-type="picture"
+                class="detail-upload-list-inline"
+              />
             </div>
           </a-form-model-item>
         </a-col>
@@ -223,11 +217,10 @@
           <a-form-model-item :label='"["+this.imgLabel+"]身份证人像面照片"' prop="idcard1Img">
             <div v-if="detailData.idcard1Img">
               <a-upload
-                  :default-file-list="getDefaultFileList(detailData.idcard1Img)"
-                  list-type="picture"
-                  class="detail-upload-list-inline"
-              >
-              </a-upload>
+                :default-file-list="getDefaultFileList(detailData.idcard1Img)"
+                list-type="picture"
+                class="detail-upload-list-inline"
+              />
             </div>
           </a-form-model-item>
         </a-col>
@@ -235,11 +228,10 @@
           <a-form-model-item :label='"["+this.imgLabel+"]身份证国徽面照片"' prop="idcard2Img">
             <div v-if="detailData.idcard2Img">
               <a-upload
-                  :default-file-list="getDefaultFileList(detailData.idcard2Img)"
-                  list-type="picture"
-                  class="detail-upload-list-inline"
-              >
-              </a-upload>
+                :default-file-list="getDefaultFileList(detailData.idcard2Img)"
+                list-type="picture"
+                class="detail-upload-list-inline"
+              />
             </div>
           </a-form-model-item>
         </a-col>
@@ -247,11 +239,10 @@
           <a-form-model-item label="[联系人]手持身份证照片" prop="idcardInHandImg">
             <div v-if="detailData.idcardInHandImg">
               <a-upload
-                  :default-file-list="getDefaultFileList(detailData.idcardInHandImg)"
-                  list-type="picture"
-                  class="detail-upload-list-inline"
-              >
-              </a-upload>
+                :default-file-list="getDefaultFileList(detailData.idcardInHandImg)"
+                list-type="picture"
+                class="detail-upload-list-inline"
+              />
             </div>
           </a-form-model-item>
         </a-col>
@@ -260,11 +251,10 @@
           <a-form-model-item :label='"["+this.imgLabel+"]银行卡照片"' prop="bankCardImg">
             <div v-if="detailData.bankCardImg">
               <a-upload
-                  :default-file-list="getDefaultFileList(detailData.bankCardImg)"
-                  list-type="picture"
-                  class="detail-upload-list-inline"
-              >
-              </a-upload>
+                :default-file-list="getDefaultFileList(detailData.bankCardImg)"
+                list-type="picture"
+                class="detail-upload-list-inline"
+              />
             </div>
           </a-form-model-item>
         </a-col>

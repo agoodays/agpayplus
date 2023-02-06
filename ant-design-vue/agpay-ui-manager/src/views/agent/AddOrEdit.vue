@@ -1,68 +1,47 @@
 <template>
   <a-drawer
-      :maskClosable="false"
-      :visible="visible"
-      :title=" isAdd ? '新增代理商' : '修改代理商' "
-      @close="onClose"
-      :body-style="{ paddingBottom: '80px' }"
-      width="40%"
-      class="drawer-width"
+    :maskClosable="false"
+    :visible="visible"
+    :title=" isAdd ? '新增代理商' : '修改代理商' "
+    @close="onClose"
+    :body-style="{ paddingBottom: '80px' }"
+    width="40%"
+    class="drawer-width"
   >
     <a-form-model v-if="visible" ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-model-item label="代理商名称" prop="agentName">
-            <a-input
-                placeholder="请输入代理商名称"
-                v-model="saveObject.agentName"
-            />
+            <a-input placeholder="请输入代理商名称" v-model="saveObject.agentName"/>
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="登录名" prop="loginUsername">
-            <a-input
-                placeholder="请输入代理商登录名"
-                v-model="saveObject.loginUsername"
-                :disabled="!this.isAdd"
-            />
+            <a-input placeholder="请输入代理商登录名" v-model="saveObject.loginUsername" :disabled="!this.isAdd"/>
           </a-form-model-item>
         </a-col>
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-model-item label="代理商简称" prop="agentShortName">
-            <a-input
-                placeholder="请输入代理商简称"
-                v-model="saveObject.agentShortName"
-            />
+            <a-input placeholder="请输入代理商简称" v-model="saveObject.agentShortName"/>
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="联系人姓名" prop="contactName">
-            <a-input
-                placeholder="请输入联系人姓名"
-                v-model="saveObject.contactName"
-            />
+            <a-input placeholder="请输入联系人姓名" v-model="saveObject.contactName"/>
           </a-form-model-item>
         </a-col>
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-model-item label="联系人邮箱" prop="contactEmail">
-            <a-input
-                placeholder="请输入联系人邮箱"
-                v-model="saveObject.contactEmail"
-            >
-            </a-input>
+            <a-input placeholder="请输入联系人邮箱" v-model="saveObject.contactEmail"/>
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="联系人手机号" prop="contactTel">
-            <a-input
-                placeholder="请输入联系人手机号"
-                v-model="saveObject.contactTel"
-            >
-            </a-input>
+            <a-input placeholder="请输入联系人手机号" v-model="saveObject.contactTel"/>
             <p class="agpay-tip-text">(同步更改登录手机号)</p>
           </a-form-model-item>
         </a-col>
@@ -90,24 +69,16 @@
         <a-col :span="10">
           <a-form-model-item label="是否允许发展下级" prop="addAgentFlag">
             <a-radio-group v-model="saveObject.addAgentFlag">
-              <a-radio :value="1">
-                是
-              </a-radio>
-              <a-radio :value="0">
-                否
-              </a-radio>
+              <a-radio :value="1">是</a-radio>
+              <a-radio :value="0">否</a-radio>
             </a-radio-group>
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="状态" prop="state">
             <a-radio-group v-model="saveObject.state">
-              <a-radio :value="1">
-                启用
-              </a-radio>
-              <a-radio :value="0">
-                禁用
-              </a-radio>
+              <a-radio :value="1">启用</a-radio>
+              <a-radio :value="0">禁用</a-radio>
             </a-radio-group>
           </a-form-model-item>
         </a-col>
@@ -124,9 +95,7 @@
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
           <a-divider orientation="left">
-            <a-tag color="#FF4B33">
-              账户安全
-            </a-tag>
+            <a-tag color="#FF4B33">账户安全</a-tag>
           </a-divider>
         </a-col>
       </a-row>
@@ -136,12 +105,8 @@
           <a-col :span="10">
             <a-form-model-item label="是否发送开通提醒" prop="isNotify">
               <a-radio-group v-model="saveObject.isNotify">
-                <a-radio :value='0'>
-                  否
-                </a-radio>
-                <a-radio :value='1'>
-                  是
-                </a-radio>
+                <a-radio :value='0'>否</a-radio>
+                <a-radio :value='1'>是</a-radio>
               </a-radio-group>
             </a-form-model-item>
           </a-col>
@@ -150,12 +115,8 @@
           <a-col :span="10">
             <a-form-model-item label="密码设置" prop="passwordType">
               <a-radio-group v-model="saveObject.passwordType">
-                <a-radio value='default'>
-                  默认密码
-                </a-radio>
-                <a-radio value='custom'>
-                  自定义密码
-                </a-radio>
+                <a-radio value='default'>默认密码</a-radio>
+                <a-radio value='custom'>自定义密码</a-radio>
               </a-radio-group>
             </a-form-model-item>
           </a-col>
@@ -163,7 +124,11 @@
             <a-form-model-item label="登录密码" prop="loginPassword">
               <a-input placeholder="请输入登录密码" v-model="saveObject.loginPassword"/>
             </a-form-model-item>
-            <a-button icon="file-sync" :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }" @click="genRandomPassword" style="margin-right:8px">
+            <a-button
+              icon="file-sync"
+              :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }"
+              @click="genRandomPassword"
+              style="margin-right:8px">
               随机生成密码
             </a-button>
           </a-col>
@@ -215,9 +180,7 @@
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
           <a-divider orientation="left">
-            <a-tag color="#FF4B33">
-              账户信息
-            </a-tag>
+            <a-tag color="#FF4B33">账户信息</a-tag>
           </a-divider>
         </a-col>
       </a-row>
@@ -245,34 +208,22 @@
         <a-row justify="space-between" type="flex">
           <a-col :span="10" v-if="saveObject.settAccountType==='BANK_PUBLIC'">
             <a-form-model-item label="对公账户名称" prop="settAccountName">
-              <a-input
-                  v-model="saveObject.settAccountName"
-              >
-              </a-input>
+              <a-input v-model="saveObject.settAccountName"/>
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
             <a-form-model-item :label='this.settAccountNoLabel' prop="settAccountNo">
-              <a-input
-                  v-model="saveObject.settAccountNo"
-              >
-              </a-input>
+              <a-input v-model="saveObject.settAccountNo"/>
             </a-form-model-item>
           </a-col>
           <a-col :span="10" v-if="saveObject.settAccountType==='BANK_PUBLIC'">
             <a-form-model-item label="开户银行名称" prop="settAccountBank">
-              <a-input
-                  v-model="saveObject.settAccountBank"
-              >
-              </a-input>
+              <a-input v-model="saveObject.settAccountBank"/>
             </a-form-model-item>
           </a-col>
           <a-col :span="10" v-if="saveObject.settAccountType==='BANK_PUBLIC'">
             <a-form-model-item label="开户行支行名称" prop="settAccountSubBank">
-              <a-input
-                  v-model="saveObject.settAccountSubBank"
-              >
-              </a-input>
+              <a-input v-model="saveObject.settAccountSubBank"/>
             </a-form-model-item>
           </a-col>
         </a-row>
@@ -282,9 +233,7 @@
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
           <a-divider orientation="left">
-            <a-tag color="#FF4B33">
-              手续费信息
-            </a-tag>
+            <a-tag color="#FF4B33">手续费信息</a-tag>
           </a-divider>
         </a-col>
       </a-row>
@@ -296,12 +245,8 @@
           <a-col :span="24">
             <a-form-model-item class="cashout-fee" label="配置类型：" prop="cashoutFeeRuleType">
               <a-radio-group v-model="saveObject.cashoutFeeRuleType">
-                <a-radio :value='1'>
-                  使用系统默认
-                </a-radio>
-                <a-radio :value='2'>
-                  自定义
-                </a-radio>
+                <a-radio :value='1'>使用系统默认</a-radio>
+                <a-radio :value='2'>自定义</a-radio>
               </a-radio-group>
             </a-form-model-item>
           </a-col>
@@ -357,9 +302,7 @@
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
           <a-divider orientation="left">
-            <a-tag color="#FF4B33">
-              资料信息
-            </a-tag>
+            <a-tag color="#FF4B33">资料信息</a-tag>
           </a-divider>
         </a-col>
       </a-row>
@@ -370,23 +313,21 @@
             <a-form-model-item label="营业执照照片" prop="licenseImg">
               <div v-if="this.imgDefaultFileList.licenseImg">
                 <a-upload
-                    :file-list="this.imgDefaultFileList.licenseImg"
-                    list-type="picture"
-                    class="default-upload-list-inline"
-                    @change="handleChange($event, 'licenseImg')"
+                  :file-list="this.imgDefaultFileList.licenseImg"
+                  list-type="picture"
+                  class="default-upload-list-inline"
+                  @change="handleChange($event, 'licenseImg')"
                 >
                 </a-upload>
               </div>
               <div v-else>
                 <a-upload
-                    :action="action"
-                    list-type="picture"
-                    class="upload-list-inline"
-                    @change="handleChange($event, 'licenseImg')"
+                  :action="action"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'licenseImg')"
                 >
-                  <a-button icon="upload" v-if="this.imgIsShow.licenseImg">
-                    上传
-                  </a-button>
+                  <a-button icon="upload" v-if="this.imgIsShow.licenseImg">上传</a-button>
                 </a-upload>
               </div>
             </a-form-model-item>
@@ -396,23 +337,21 @@
             <a-form-model-item label="开户许可证照片" prop="permitImg">
               <div v-if="this.imgDefaultFileList.permitImg">
                 <a-upload
-                    :file-list="this.imgDefaultFileList.permitImg"
-                    list-type="picture"
-                    class="default-upload-list-inline"
-                    @change="handleChange($event, 'permitImg')"
+                  :file-list="this.imgDefaultFileList.permitImg"
+                  list-type="picture"
+                  class="default-upload-list-inline"
+                  @change="handleChange($event, 'permitImg')"
                 >
                 </a-upload>
               </div>
               <div v-else>
                 <a-upload
-                    :action="action"
-                    list-type="picture"
-                    class="upload-list-inline"
-                    @change="handleChange($event, 'permitImg')"
+                  :action="action"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'permitImg')"
                 >
-                  <a-button icon="upload" v-if="this.imgIsShow.permitImg">
-                    上传
-                  </a-button>
+                  <a-button icon="upload" v-if="this.imgIsShow.permitImg">上传</a-button>
                 </a-upload>
               </div>
             </a-form-model-item>
@@ -421,23 +360,21 @@
             <a-form-model-item :label='"["+this.imgLabel+"]身份证人像面照片"' prop="idcard1Img">
               <div v-if="this.imgDefaultFileList.idcard1Img">
                 <a-upload
-                    :file-list="this.imgDefaultFileList.idcard1Img"
-                    list-type="picture"
-                    class="default-upload-list-inline"
-                    @change="handleChange($event, 'idcard1Img')"
+                  :file-list="this.imgDefaultFileList.idcard1Img"
+                  list-type="picture"
+                  class="default-upload-list-inline"
+                  @change="handleChange($event, 'idcard1Img')"
                 >
                 </a-upload>
               </div>
               <div v-else>
                 <a-upload
-                    :action="action"
-                    list-type="picture"
-                    class="upload-list-inline"
-                    @change="handleChange($event, 'idcard1Img')"
+                  :action="action"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'idcard1Img')"
                 >
-                  <a-button icon="upload" v-if="this.imgIsShow.idcard1Img">
-                    上传
-                  </a-button>
+                  <a-button icon="upload" v-if="this.imgIsShow.idcard1Img">上传</a-button>
                 </a-upload>
               </div>
             </a-form-model-item>
@@ -446,23 +383,21 @@
             <a-form-model-item :label='"["+this.imgLabel+"]身份证国徽面照片"' prop="idcard2Img">
               <div v-if="this.imgDefaultFileList.idcard2Img">
                 <a-upload
-                    :file-list="this.imgDefaultFileList.idcard2Img"
-                    list-type="picture"
-                    class="default-upload-list-inline"
-                    @change="handleChange($event, 'idcard2Img')"
+                  :file-list="this.imgDefaultFileList.idcard2Img"
+                  list-type="picture"
+                  class="default-upload-list-inline"
+                  @change="handleChange($event, 'idcard2Img')"
                 >
                 </a-upload>
               </div>
               <div v-else>
                 <a-upload
-                    :action="action"
-                    list-type="picture"
-                    class="upload-list-inline"
-                    @change="handleChange($event, 'idcard2Img')"
+                  :action="action"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'idcard2Img')"
                 >
-                  <a-button icon="upload" v-if="this.imgIsShow.idcard2Img">
-                    上传
-                  </a-button>
+                  <a-button icon="upload" v-if="this.imgIsShow.idcard2Img">上传</a-button>
                 </a-upload>
               </div>
             </a-form-model-item>
@@ -471,23 +406,21 @@
             <a-form-model-item label="[联系人]手持身份证照片" prop="idcardInHandImg">
               <div v-if="this.imgDefaultFileList.idcardInHandImg">
                 <a-upload
-                    :file-list="this.imgDefaultFileList.idcardInHandImg"
-                    list-type="picture"
-                    class="default-upload-list-inline"
-                    @change="handleChange($event, 'idcardInHandImg')"
+                  :file-list="this.imgDefaultFileList.idcardInHandImg"
+                  list-type="picture"
+                  class="default-upload-list-inline"
+                  @change="handleChange($event, 'idcardInHandImg')"
                 >
                 </a-upload>
               </div>
               <div v-else>
                 <a-upload
-                    :action="action"
-                    list-type="picture"
-                    class="upload-list-inline"
-                    @change="handleChange($event, 'idcardInHandImg')"
+                  :action="action"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'idcardInHandImg')"
                 >
-                  <a-button icon="upload" v-if="this.imgIsShow.idcardInHandImg">
-                    上传
-                  </a-button>
+                  <a-button icon="upload" v-if="this.imgIsShow.idcardInHandImg">上传</a-button>
                 </a-upload>
               </div>
             </a-form-model-item>
@@ -497,23 +430,21 @@
             <a-form-model-item :label='"["+this.imgLabel+"]银行卡照片"' prop="bankCardImg">
               <div v-if="this.imgDefaultFileList.bankCardImg">
                 <a-upload
-                    :file-list="this.imgDefaultFileList.bankCardImg"
-                    list-type="picture"
-                    class="default-upload-list-inline"
-                    @change="handleChange($event, 'bankCardImg')"
+                  :file-list="this.imgDefaultFileList.bankCardImg"
+                  list-type="picture"
+                  class="default-upload-list-inline"
+                  @change="handleChange($event, 'bankCardImg')"
                 >
                 </a-upload>
               </div>
               <div v-else>
                 <a-upload
-                    :action="action"
-                    list-type="picture"
-                    class="upload-list-inline"
-                    @change="handleChange($event, 'bankCardImg')"
+                  :action="action"
+                  list-type="picture"
+                  class="upload-list-inline"
+                  @change="handleChange($event, 'bankCardImg')"
                 >
-                  <a-button icon="upload" v-if="this.imgIsShow.bankCardImg">
-                    上传
-                  </a-button>
+                  <a-button icon="upload" v-if="this.imgIsShow.bankCardImg">上传</a-button>
                 </a-upload>
               </div>
             </a-form-model-item>

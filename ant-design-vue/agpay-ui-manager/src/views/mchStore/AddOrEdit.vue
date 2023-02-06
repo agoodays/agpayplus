@@ -24,18 +24,12 @@
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-model-item label="门店名称" prop="storeName">
-            <a-input
-                placeholder="请输入门店名称"
-                v-model="saveObject.storeName"
-            />
+            <a-input placeholder="请输入门店名称" v-model="saveObject.storeName"/>
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="联系人电话" prop="contactPhone">
-            <a-input
-                placeholder="请输入联系人电话"
-                v-model="saveObject.contactPhone"
-            />
+            <a-input placeholder="请输入联系人电话" v-model="saveObject.contactPhone"/>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -45,23 +39,20 @@
           <a-form-model-item label="门店LOGO" prop="storeLogo">
             <div v-if="this.imgDefaultFileList.storeLogo">
               <a-upload
-                  :file-list="this.imgDefaultFileList.storeLogo"
-                  list-type="picture"
-                  class="default-upload-list-inline"
-                  @change="handleChange($event, 'storeLogo')"
-              >
-              </a-upload>
+                :file-list="this.imgDefaultFileList.storeLogo"
+                list-type="picture"
+                class="default-upload-list-inline"
+                @change="handleChange($event, 'storeLogo')"
+              />
             </div>
             <div v-else>
               <a-upload
-                  :action="action"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'storeLogo')"
+                :action="action"
+                list-type="picture"
+                class="upload-list-inline"
+                @change="handleChange($event, 'storeLogo')"
               >
-                <a-button icon="upload" v-if="this.imgIsShow.storeLogo">
-                  上传
-                </a-button>
+                <a-button icon="upload" v-if="this.imgIsShow.storeLogo">上传</a-button>
               </a-upload>
             </div>
           </a-form-model-item>
@@ -70,23 +61,20 @@
           <a-form-model-item label="门头照" prop="storeOuterImg">
             <div v-if="this.imgDefaultFileList.storeOuterImg">
               <a-upload
-                  :file-list="this.imgDefaultFileList.storeOuterImg"
-                  list-type="picture"
-                  class="default-upload-list-inline"
-                  @change="handleChange($event, 'storeOuterImg')"
-              >
-              </a-upload>
+                :file-list="this.imgDefaultFileList.storeOuterImg"
+                list-type="picture"
+                class="default-upload-list-inline"
+                @change="handleChange($event, 'storeOuterImg')"
+              />
             </div>
             <div v-else>
               <a-upload
-                  :action="action"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'storeOuterImg')"
+                :action="action"
+                list-type="picture"
+                class="upload-list-inline"
+                @change="handleChange($event, 'storeOuterImg')"
               >
-                <a-button icon="upload" v-if="this.imgIsShow.storeOuterImg">
-                  上传
-                </a-button>
+                <a-button icon="upload" v-if="this.imgIsShow.storeOuterImg">上传</a-button>
               </a-upload>
             </div>
           </a-form-model-item>
@@ -95,23 +83,20 @@
           <a-form-model-item label="门店内景照" prop="storeInnerImg">
             <div v-if="this.imgDefaultFileList.storeInnerImg">
               <a-upload
-                  :file-list="this.imgDefaultFileList.storeInnerImg"
-                  list-type="picture"
-                  class="default-upload-list-inline"
-                  @change="handleChange($event, 'storeInnerImg')"
-              >
-              </a-upload>
+                :file-list="this.imgDefaultFileList.storeInnerImg"
+                list-type="picture"
+                class="default-upload-list-inline"
+                @change="handleChange($event, 'storeInnerImg')"
+              />
             </div>
             <div v-else>
               <a-upload
-                  :action="action"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'storeInnerImg')"
+                :action="action"
+                list-type="picture"
+                class="upload-list-inline"
+                @change="handleChange($event, 'storeInnerImg')"
               >
-                <a-button icon="upload" v-if="this.imgIsShow.storeInnerImg">
-                  上传
-                </a-button>
+                <a-button icon="upload" v-if="this.imgIsShow.storeInnerImg">上传</a-button>
               </a-upload>
             </div>
           </a-form-model-item>
@@ -122,7 +107,7 @@
           </a-form-model-item>
         </a-col>
       </a-row>
-<!--      <a-row justify="space-between" type="flex">
+      <!--<a-row justify="space-between" type="flex">
         <a-col :span="24">
           <a-form-model-item label="备注" prop="remark">
             <a-input v-model="saveObject.remark" placeholder="请输入备注" type="textarea" />
@@ -138,7 +123,7 @@
         <a-col :span="10">
           <a-form-model-item label="选址省/市/区" prop="areas">
             <a-cascader placeholder="请选择省市区" :options="areasOptions" v-model="areas" @change="areasChange" />
-<!--            <a-cascader placeholder="请选择省市区" :options="areasOptions" :value="[saveObject.provinceCode, saveObject.cityCode, saveObject.areaCode]" @change="areasChange" />-->
+            <!--<a-cascader placeholder="请选择省市区" :options="areasOptions" :value="[saveObject.provinceCode, saveObject.cityCode, saveObject.areaCode]" @change="areasChange" />-->
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
@@ -149,7 +134,7 @@
         <a-col :span="10">
           <a-form-model-item label="经纬度" prop="lngLat">
             <a-input v-model="lnglat" @change="lngLatChange" disabled="disabled" />
-<!--            <a-input :value="saveObject.lng?.length || saveObject.lat?.length ? saveObject.lng + ',' + saveObject.lat : ''" @change="lngLatChange" />-->
+            <!--<a-input :value="saveObject.lng?.length || saveObject.lat?.length ? saveObject.lng + ',' + saveObject.lat : ''" @change="lngLatChange" />-->
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -162,7 +147,6 @@
           </a-collapse>
         </a-col>
       </a-row>
-
     </a-form-model>
     <div class="drawer-btn-center" >
       <a-button icon="close" :style="{ marginRight: '8px' }" @click="onClose" style="margin-right:8px">
@@ -625,8 +609,7 @@ export default {
         that.saveObject.provinceCode = value[0]
         that.saveObject.cityCode = value[1]
         that.saveObject.areaCode = value[2]
-        const areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.areaCode]
-        that.areas = areas
+        that.areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.areaCode]
 
         that.district.setLevel('district') // 行政区级别
         that.district.setExtensions('all')
@@ -676,8 +659,8 @@ export default {
 
 <style lang="less">
   #amap-container {
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
     width: 100%;
     height: 600px;
     position: relative;

@@ -1,12 +1,12 @@
 <template>
   <a-modal v-model="isShow" title="邀请码" footer="">
     <div>
-      <span>邀请码：{{inviteCode}}</span>
+      <span>邀请码：{{ inviteCode }}</span>
       <a @click="copyFunc(inviteCode)" class="a-copy">复制</a>
     </div>
     <div>
       <div>
-        <span>商户注册链接：{{mchRegisterUrl}}</span>
+        <span>商户注册链接：{{ mchRegisterUrl }}</span>
         <a @click="copyFunc(mchRegisterUrl)" class="a-copy">复制</a>
       </div>
       <div>
@@ -18,7 +18,7 @@
     </div>
     <div v-if="sysType!=='MCH'">
       <div>
-        <span>代理商注册链接：{{agentRegisterUrl}}</span>
+        <span>代理商注册链接：{{ agentRegisterUrl }}</span>
         <a @click="copyFunc(agentRegisterUrl)" class="a-copy">复制</a>
       </div>
       <div>

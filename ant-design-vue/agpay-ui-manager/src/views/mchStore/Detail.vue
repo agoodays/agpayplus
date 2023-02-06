@@ -62,11 +62,10 @@
         <a-form-model-item label="门店LOGO" prop="storeLogo">
           <div v-if="detailData.storeLogo">
             <a-upload
-                :default-file-list="getDefaultFileList(detailData.storeLogo)"
-                list-type="picture"
-                class="detail-upload-list-inline"
-            >
-            </a-upload>
+              :default-file-list="getDefaultFileList(detailData.storeLogo)"
+              list-type="picture"
+              class="detail-upload-list-inline"
+            />
           </div>
         </a-form-model-item>
       </a-col>
@@ -74,11 +73,10 @@
         <a-form-model-item label="门头照" prop="storeOuterImg">
           <div v-if="detailData.storeOuterImg">
             <a-upload
-                :default-file-list="getDefaultFileList(detailData.storeOuterImg)"
-                list-type="picture"
-                class="detail-upload-list-inline"
-            >
-            </a-upload>
+              :default-file-list="getDefaultFileList(detailData.storeOuterImg)"
+              list-type="picture"
+              class="detail-upload-list-inline"
+            />
           </div>
         </a-form-model-item>
       </a-col>
@@ -86,11 +84,10 @@
         <a-form-model-item label="门店内景照" prop="storeInnerImg">
           <div v-if="detailData.storeInnerImg">
             <a-upload
-                :default-file-list="getDefaultFileList(detailData.storeInnerImg)"
-                list-type="picture"
-                class="detail-upload-list-inline"
-            >
-            </a-upload>
+              :default-file-list="getDefaultFileList(detailData.storeInnerImg)"
+              list-type="picture"
+              class="detail-upload-list-inline"
+            />
           </div>
         </a-form-model-item>
       </a-col>
@@ -113,7 +110,6 @@
 <script>
   import { API_URL_MCH_STORE, API_URL_MCH_LIST, req } from '@/api/manage'
   export default {
-
     props: {
       callbackFunc: { type: Function }
     },
@@ -170,7 +166,7 @@
 </script>
 
 <style lang="less">
-.detail-upload-list-inline .ant-upload-list-item-card-actions.picture {
-  display: none;
-}
+  .detail-upload-list-inline .ant-upload-list-item-card-actions.picture {
+    display: none;
+  }
 </style>
