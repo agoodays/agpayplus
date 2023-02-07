@@ -359,6 +359,52 @@ export default {
         })
       })
     },
+    setCode: function (code) {
+      const that = this
+      const node = that.getNodeById(that.areasOptions, code)
+      switch (node.level) {
+        case 'province':
+          that.saveObject.provinceCode = node.value
+          break
+        case 'city':
+          that.saveObject.cityCode = node.value
+          break
+        case 'district':
+          that.saveObject.areaCode = node.value
+          break
+      }
+    },
+    setAreas: function (value) {
+      const that = this
+      that.areas = value
+      that.saveObject.provinceCode = null
+      that.saveObject.cityCode = null
+      that.saveObject.areaCode = null
+      for (const i in value) {
+        if (value[i]?.length) {
+          that.setCode(value[i])
+        }
+      }
+      // if (value?.length > 0) {
+      //   that.saveObject.provinceCode = value[0]
+      // } else {
+      //   that.saveObject.provinceCode = null
+      // }
+      // if (value?.length > 1) {
+      //   that.saveObject.cityCode = value[1]
+      // } else {
+      //   that.saveObject.cityCode = null
+      // }
+      // if (value?.length > 2) {
+      //   that.saveObject.areaCode = value[2]
+      // } else {
+      //   that.saveObject.areaCode = null
+      // }
+      const code = value[value.length - 1]
+      const node = that.getNodeById(that.areasOptions, code)
+      // console.log(node)
+      return node
+    },
     setAreasData: function (data) {
       const that = this
       that.areasOptions = []
@@ -431,17 +477,12 @@ export default {
     },
     // 根据ID获取该节点的对象
     getNodeById: function (list, id) {
-      // const that = this
-      for (const i in list) {
-        if (list[i].value === id) {
-          return [list[i]]
+      const that = this
+      const nodes = that.getAllParentBySubId(list, id)
+      for (const i in nodes) {
+        if (nodes[i].value === id) {
+          return nodes[i]
         }
-        // if (list[i].children) {
-        //   const node = that.getAllParentBySubId(list[i].children, id)
-        //   if (node !== undefined) {
-        //     return node
-        //   }
-        // }
       }
     },
     // 根据ID获取所有子节点的对象
@@ -472,42 +513,40 @@ export default {
       })
     },
     aMapMarker: function (that, lnglat, address, areas) {
-      if (that.marker) {
-        that.map.remove(that.marker)
+      if (areas?.filter(d => d)?.length) {
+        if (that.marker) {
+          that.map.remove(that.marker)
+        }
+        that.saveObject.address = address
+        that.saveObject.lng = lnglat.lng
+        that.saveObject.lat = lnglat.lat
+        that.lnglat = that.saveObject.lng + ',' + that.saveObject.lat
+
+        const AMap = that.amap
+
+        // 创建一个 Marker 实例：
+        that.marker = new AMap.Marker({
+          position: new AMap.LngLat(lnglat.lng, lnglat.lat), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+          title: address
+        })
+        // 将创建的点标记添加到已有的地图实例：
+        that.map.add(that.marker)
+        that.aMapPolygon(areas, lnglat)
+        // console.log([this.saveObject.provinceCode, this.saveObject.cityCode, this.saveObject.areaCode])
       }
-      that.saveObject.provinceCode = areas[0]
-      that.saveObject.cityCode = areas[1]
-      that.saveObject.areaCode = areas[2]
-      that.saveObject.address = address
-      that.saveObject.lng = lnglat.lng
-      that.saveObject.lat = lnglat.lat
-      that.lnglat = that.saveObject.lng + ',' + that.saveObject.lat
-      that.areas = areas
-
-      const AMap = that.amap
-
-      // 创建一个 Marker 实例：
-      that.marker = new AMap.Marker({
-        position: new AMap.LngLat(lnglat.lng, lnglat.lat), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
-        title: address
-      })
-      // 将创建的点标记添加到已有的地图实例：
-      that.map.add(that.marker)
-      // const area = that.getNodeById(that.areasOptions, that.saveObject.areaCode)
-      // console.log(area)
-      that.aMapPolygon(that.saveObject.areaCode, 'district', lnglat)
     },
-    aMapPolygon: function (areaCode, level, lnglat) {
+    aMapPolygon: function (areas, lnglat) {
       const that = this
       // 清除地图上所有覆盖物
       for (let i = 0, l = that.polygons.length; i < l; i++) {
         that.polygons[i].setMap(null)
       }
-      that.district.setLevel(level) // 行政区级别
+      const node = that.setAreas(areas)
+      that.district.setLevel(node.level) // 行政区级别
       that.district.setExtensions('all')
       // 行政区查询
       // 按照adcode进行查询可以保证数据返回的唯一性
-      that.district.search(areaCode, function (status, result) {
+      that.district.search(node.value, function (status, result) {
         if (status) {
           // 获取区域的边界信息
           const bounds = result.districtList[0].boundaries
@@ -613,24 +652,19 @@ export default {
       if (that.marker) {
         that.map.remove(that.marker)
       }
-      if (value.length > 2) {
-        that.saveObject.provinceCode = value[0]
-        that.saveObject.cityCode = value[1]
-        that.saveObject.areaCode = value[2]
-        that.areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.areaCode]
-        const level = selectedOptions[selectedOptions.length - 1].level
-        that.aMapPolygon(that.saveObject.areaCode, level)
+      if (value?.length) {
+        that.aMapPolygon(value)
       } else {
-        this.saveObject.provinceCode = ''
-        this.saveObject.cityCode = ''
-        this.saveObject.areaCode = ''
-        that.areas = []
+        this.saveObject.provinceCode = null
+        this.saveObject.cityCode = null
+        this.saveObject.areaCode = null
 
         // 清除地图上所有覆盖物
         for (let i = 0, l = that.polygons.length; i < l; i++) {
           that.polygons[i].setMap(null)
         }
       }
+      // console.log([this.saveObject.provinceCode, this.saveObject.cityCode, this.saveObject.areaCode])
     },
     lngLatChange (e) {
       // console.log(e)
