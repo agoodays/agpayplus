@@ -345,6 +345,7 @@ export default {
             // console.log(status)
             // console.log(result)
             if (status === 'complete') {
+              // console.log(that.genDistrictList(result.districtList, null))
               that.setAreasData(result.districtList[0])
             }
           })
@@ -414,6 +415,27 @@ export default {
         that.areasOptions = that.genAreasOption(subList)
         // console.log(that.areasOptions)
       }
+    },
+    genDistrictList: function (data, pcode) {
+      let options = []
+      for (const i in data?.sort((a, b) => a.adcode - b.adcode)) {
+        const item = data[i]
+        // console.log(item)
+        const optionItem = {
+          code: item.adcode,
+          name: item.name,
+          level: item.level,
+          lng: item.center.lng,
+          lat: item.center.lat,
+          city_code: item.citycode,
+          parent_code: pcode
+        }
+        options.push(optionItem)
+        const subOptions = this.genDistrictList(item.districtList, item.adcode)
+        options = options.concat(subOptions)
+      }
+      // console.log(options)
+      return options
     },
     genAreasOption: function (data) {
       const options = []
