@@ -183,47 +183,7 @@ export default {
       visible: false, // 是否显示弹层/抽屉
       mchList: null, // 商户下拉列表
       polygons: [],
-      areasOptions: [
-        {
-          value: '110000',
-          label: '北京市',
-          children: [
-            {
-              value: '110100',
-              label: '北京市',
-              children: [
-                {
-                  value: '110101',
-                  label: '东城区',
-                  code: 110101
-                },
-                {
-                  value: '110105',
-                  label: '朝阳区',
-                  code: 110105
-                }
-              ]
-            }
-          ]
-        },
-        {
-          value: '120000',
-          label: '天津市',
-          children: [
-            {
-              value: '120100',
-              label: '天津市',
-              children: [
-                {
-                  value: '120101',
-                  label: '和平区',
-                  code: 120101
-                }
-              ]
-            }
-          ]
-        }
-      ],
+      areasOptions: [],
       areas: [],
       lnglat: null,
       action: upload.form, // 上传文件地址
@@ -399,63 +359,38 @@ export default {
         })
       })
     },
-    setAreasData: function (data, level) {
+    setAreasData: function (data) {
       const that = this
       that.areasOptions = []
-      // const bounds = data.boundaries
-      // const AMap = that.amap
-      // if (bounds) {
-      //   for (let i = 0, l = bounds.length; i < l; i++) {
-      //     const polygon = new AMap.Polygon({
-      //       map: that.map,
-      //       strokeWeight: 1,
-      //       strokeColor: '#0091ea',
-      //       fillColor: '#80d8ff',
-      //       fillOpacity: 0.2,
-      //       path: bounds[i]
-      //     })
-      //     that.polygons.push(polygon)
-      //   }
-      //   that.map.setFitView() // 地图自适应
-      // }
-
       const subList = data.districtList
       if (subList) {
         // console.log(subList)
-        for (const provinceIndex in subList?.sort((a, b) => a.adcode - b.adcode)) {
-          const provinceItem = subList[provinceIndex]
-          // console.log(provinceItem)
-          const provinceOption = {
-            value: provinceItem.adcode,
-            label: provinceItem.name,
-            level: provinceItem.level,
-            children: []
-          }
-          for (const cityIndex in provinceItem.districtList?.sort((a, b) => a.adcode - b.adcode)) {
-            const cityItem = provinceItem.districtList[cityIndex]
-            // console.log(cityItem)
-            const cityOption = {
-              value: cityItem.adcode,
-              label: cityItem.name,
-              level: cityItem.level,
-              children: []
-            }
-            for (const areaIndex in cityItem.districtList?.sort((a, b) => a.adcode - b.adcode)) {
-              const areaItem = cityItem.districtList[areaIndex]
-              // console.log(areaItem)
-              const areaOption = {
-                value: areaItem.adcode,
-                label: areaItem.name,
-                level: areaItem.level,
-                citycode: areaItem.citycode
-              }
-              cityOption.children.push(areaOption)
-            }
-            provinceOption.children.push(cityOption)
-          }
-          that.areasOptions.push(provinceOption)
+        that.areasOptions = that.genAreasOption(subList)
+        // console.log(that.areasOptions)
+      }
+    },
+    genAreasOption: function (data) {
+      const options = []
+      for (const i in data?.sort((a, b) => a.adcode - b.adcode)) {
+        const item = data[i]
+        // console.log(item)
+        const optionItem = {
+          value: item.adcode,
+          label: item.name,
+          level: item.level,
+          citycode: item.citycode
+        }
+        if (item?.districtList?.length && (item.level === 'province' || item.level === 'city')) {
+          const subOptions = this.genAreasOption(item.districtList)
+          // console.log(subOptions)
+          optionItem.children = subOptions
+        }
+        if (item.level === 'province' || item.level === 'city' || item.level === 'district') {
+          options.push(optionItem)
         }
       }
+      // console.log(options)
+      return options
     },
     getParentIds: function (treeData, id) {
       const that = this
@@ -478,6 +413,48 @@ export default {
       }
       return str
     },
+    // https://www.cnblogs.com/wangliko/p/14271202.html
+    // 根据ID获取该节点的所有父节点的对象
+    getAllParentBySubId: function (list, id) {
+      const that = this
+      for (const i in list) {
+        if (list[i].value === id) {
+          return [list[i]]
+        }
+        if (list[i].children) {
+          const node = that.getAllParentBySubId(list[i].children, id)
+          if (node !== undefined) {
+            return node.concat(list[i])
+          }
+        }
+      }
+    },
+    // 根据ID获取该节点的对象
+    getNodeById: function (list, id) {
+      // const that = this
+      for (const i in list) {
+        if (list[i].value === id) {
+          return [list[i]]
+        }
+        // if (list[i].children) {
+        //   const node = that.getAllParentBySubId(list[i].children, id)
+        //   if (node !== undefined) {
+        //     return node
+        //   }
+        // }
+      }
+    },
+    // 根据ID获取所有子节点的对象
+    getAllNodeById: function (list, newNodeId = []) {
+      const that = this
+      for (const i in list) {
+        newNodeId.push(list[i])
+        if (list[i].children) {
+          that.getAllNodeById(list[i].children, newNodeId)
+        }
+      }
+      return newNodeId
+    },
     aMapGeocode: function (that, lnglat, address) {
       that.$jsonp('https://restapi.amap.com/v3/geocode/regeo', {
         platform: 'JS',
@@ -492,19 +469,6 @@ export default {
         const areas = that.getParentIds(that.areasOptions, res.regeocode.addressComponent.adcode)
         // console.log(areas.split(','))
         that.aMapMarker(that, lnglat, address, areas.split(','))
-
-        // that.$jsonp('https://restapi.amap.com/v3/config/district', {
-        //   // platform: 'JS',
-        //   key: that.mapConfig.apiMapWebKey,
-        //   jscode: that.mapConfig.apiMapWebSecret,
-        //   language: 'zh_cn',
-        //   keywords: res.regeocode.addressComponent.adcode,
-        //   s: 'rsv3'
-        // }).then(res => {
-        //   console.log(res)
-        //   const areas = that.getParentIds(that.areasOptions,res.regeocode.addressComponent.adcode)
-        //   that.aMapMarker(that, lnglat, address, areas)
-        // })
       })
     },
     aMapMarker: function (that, lnglat, address, areas) {
@@ -529,8 +493,51 @@ export default {
       })
       // 将创建的点标记添加到已有的地图实例：
       that.map.add(that.marker)
-
-      that.map.setFitView() // 地图自适应
+      // const area = that.getNodeById(that.areasOptions, that.saveObject.areaCode)
+      // console.log(area)
+      that.aMapPolygon(that.saveObject.areaCode, 'district', lnglat)
+    },
+    aMapPolygon: function (areaCode, level, lnglat) {
+      const that = this
+      // 清除地图上所有覆盖物
+      for (let i = 0, l = that.polygons.length; i < l; i++) {
+        that.polygons[i].setMap(null)
+      }
+      that.district.setLevel(level) // 行政区级别
+      that.district.setExtensions('all')
+      // 行政区查询
+      // 按照adcode进行查询可以保证数据返回的唯一性
+      that.district.search(areaCode, function (status, result) {
+        if (status) {
+          // 获取区域的边界信息
+          const bounds = result.districtList[0].boundaries
+          const AMap = that.amap
+          if (bounds) {
+            for (let i = 0, l = bounds.length; i < l; i++) {
+              const polygon = new AMap.Polygon({
+                map: that.map,
+                strokeWeight: 1,
+                strokeColor: '#0091ea',
+                fillColor: '#80d8ff',
+                fillOpacity: 0.2,
+                path: bounds[i]
+              })
+              polygon.on('click', function (ev) {
+                // console.log(ev)
+                that.aMapGeocode(that, ev.lnglat)
+              })
+              that.polygons.push(polygon)
+            }
+            if (lnglat) {
+              // 更新地图中心点位置
+              that.map.setZoomAndCenter(14, [lnglat.lng, lnglat.lat])
+            } else {
+              // 地图自适应
+              that.map.setFitView()
+            }
+          }
+        }
+      })
     },
     onSubmit: function () { // 点击【保存】按钮事件
       const that = this
@@ -601,9 +608,10 @@ export default {
       // console.log(value)
       // console.log(selectedOptions)
       const that = this
-      // 清除地图上所有覆盖物
-      for (let i = 0, l = that.polygons.length; i < l; i++) {
-        that.polygons[i].setMap(null)
+      that.saveObject.address = null
+      that.lnglat = null
+      if (that.marker) {
+        that.map.remove(that.marker)
       }
       if (value.length > 2) {
         that.saveObject.provinceCode = value[0]
@@ -611,41 +619,17 @@ export default {
         that.saveObject.areaCode = value[2]
         that.areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.areaCode]
         const level = selectedOptions[selectedOptions.length - 1].level
-        that.district.setLevel(level) // 行政区级别
-        that.district.setExtensions('all')
-        // 行政区查询
-        // 按照adcode进行查询可以保证数据返回的唯一性
-        that.district.search(that.saveObject.areaCode, function (status, result) {
-          if (status) {
-            // 获取区域的边界信息
-            const bounds = result.districtList[0].boundaries
-            const AMap = that.amap
-            if (bounds) {
-              for (let i = 0, l = bounds.length; i < l; i++) {
-                const polygon = new AMap.Polygon({
-                  map: that.map,
-                  strokeWeight: 1,
-                  strokeColor: '#0091ea',
-                  fillColor: '#80d8ff',
-                  fillOpacity: 0.2,
-                  path: bounds[i]
-                })
-                polygon.on('click', function (ev) {
-                  console.log(ev)
-                  const lnglat = ev.lnglat
-                  that.aMapGeocode(that, lnglat)
-                })
-                that.polygons.push(polygon)
-              }
-              that.map.setFitView() // 地图自适应
-            }
-          }
-        })
+        that.aMapPolygon(that.saveObject.areaCode, level)
       } else {
         this.saveObject.provinceCode = ''
         this.saveObject.cityCode = ''
         this.saveObject.areaCode = ''
         that.areas = []
+
+        // 清除地图上所有覆盖物
+        for (let i = 0, l = that.polygons.length; i < l; i++) {
+          that.polygons[i].setMap(null)
+        }
       }
     },
     lngLatChange (e) {
