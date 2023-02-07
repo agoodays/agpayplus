@@ -386,21 +386,6 @@ export default {
           that.setCode(value[i])
         }
       }
-      // if (value?.length > 0) {
-      //   that.saveObject.provinceCode = value[0]
-      // } else {
-      //   that.saveObject.provinceCode = null
-      // }
-      // if (value?.length > 1) {
-      //   that.saveObject.cityCode = value[1]
-      // } else {
-      //   that.saveObject.cityCode = null
-      // }
-      // if (value?.length > 2) {
-      //   that.saveObject.areaCode = value[2]
-      // } else {
-      //   that.saveObject.areaCode = null
-      // }
       const code = value[value.length - 1]
       const node = that.getNodeById(that.areasOptions, code)
       // console.log(node)
