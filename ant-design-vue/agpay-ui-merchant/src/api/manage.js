@@ -312,3 +312,8 @@ export function resendDivision (recordId) {
 export function getSysRSA2PublicKey () {
   return request.request({ url: '/api/mchApps/sysRSA2PublicKey', method: 'GET' })
 }
+
+/** 获取地图配置 **/
+export function getMapConfig () {
+  return request.request({ url: '/api/mchStore/mapConfig', method: 'GET' })
+}

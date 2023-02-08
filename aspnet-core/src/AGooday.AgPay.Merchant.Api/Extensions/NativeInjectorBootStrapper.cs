@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Domain.CommandHandlers;
+using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
@@ -89,6 +90,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions
             services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
             services.AddScoped<IMchStoreRepository, MchStoreRepository>();

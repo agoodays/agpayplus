@@ -48,12 +48,19 @@ import {
   Pagination,
   message,
   notification,
-  Tree
+  Tree,
+  Collapse,
+  Cascader
 } from 'ant-design-vue'
+
+// viser library
 import Viser from 'viser-vue'
 
 // ext library
 import VueCropper from 'vue-cropper'
+
+// jsonp library
+import { VueJsonp } from 'vue-jsonp'
 
 Vue.use(ConfigProvider)
 Vue.use(Layout)
@@ -100,6 +107,8 @@ Vue.use(Descriptions)
 Vue.use(Space)
 Vue.use(Pagination)
 Vue.use(Tree)
+Vue.use(Collapse)
+Vue.use(Cascader)
 
 Vue.prototype.$confirm = Modal.confirm
 Vue.prototype.$message = message
@@ -111,5 +120,6 @@ Vue.prototype.$warning = Modal.warning
 
 Vue.use(Viser)
 Vue.use(VueCropper)
+Vue.use(VueJsonp)
 
 process.env.NODE_ENV !== 'production' && console.warn('[antd-pro] NOTICE: Antd use lazy-load.')
