@@ -62,6 +62,9 @@ import VueCropper from 'vue-cropper'
 // jsonp library
 import { VueJsonp } from 'vue-jsonp'
 
+// viewer library
+import VueViewer, { api as viewerApi } from 'v-viewer'
+
 Vue.use(ConfigProvider)
 Vue.use(Layout)
 Vue.use(Input)
@@ -118,8 +121,11 @@ Vue.prototype.$success = Modal.success
 Vue.prototype.$error = Modal.error
 Vue.prototype.$warning = Modal.warning
 
+Vue.prototype.$viewerApi = viewerApi
+
 Vue.use(Viser)
 Vue.use(VueCropper)
 Vue.use(VueJsonp)
+Vue.use(VueViewer)
 
 process.env.NODE_ENV !== 'production' && console.warn('[antd-pro] NOTICE: Antd use lazy-load.')

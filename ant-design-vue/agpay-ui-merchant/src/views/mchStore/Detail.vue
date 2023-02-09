@@ -65,8 +65,8 @@
                 :default-file-list="getDefaultFileList(detailData.storeLogo)"
                 list-type="picture"
                 class="detail-upload-list-inline"
-            >
-            </a-upload>
+                @preview="imgPreview($event)"
+            />
           </div>
         </a-form-model-item>
       </a-col>
@@ -77,8 +77,8 @@
                 :default-file-list="getDefaultFileList(detailData.storeOuterImg)"
                 list-type="picture"
                 class="detail-upload-list-inline"
-            >
-            </a-upload>
+                @preview="imgPreview($event)"
+            />
           </div>
         </a-form-model-item>
       </a-col>
@@ -89,8 +89,8 @@
                 :default-file-list="getDefaultFileList(detailData.storeInnerImg)"
                 list-type="picture"
                 class="detail-upload-list-inline"
-            >
-            </a-upload>
+                @preview="imgPreview($event)"
+            />
           </div>
         </a-form-model-item>
       </a-col>
@@ -112,12 +112,11 @@
 
 <script>
   import { API_URL_MCH_STORE, req } from '@/api/manage'
+  import 'viewerjs/dist/viewer.css'
   export default {
-
     props: {
       callbackFunc: { type: Function }
     },
-
     data () {
       return {
         btnLoading: false,
@@ -144,6 +143,15 @@
       },
       onClose () {
         this.visible = false
+      },
+      imgPreview (info) {
+        // console.log(info)
+        this.$viewerApi({
+          images: [info.url],
+          options: {
+            initialViewIndex: 0
+          }
+        })
       },
       getDefaultFileList (url) {
         if (!url) {

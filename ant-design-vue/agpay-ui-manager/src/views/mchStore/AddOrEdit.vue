@@ -220,6 +220,16 @@ export default {
       this.areas = []
       this.lnglat = null
       this.saveObject = {}
+      this.imgDefaultFileList = {
+        storeLogo: null,
+        storeOuterImg: null,
+        storeInnerImg: null
+      }
+      this.imgIsShow = {
+        storeLogo: true,
+        storeOuterImg: true,
+        storeInnerImg: true
+      }
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
       }

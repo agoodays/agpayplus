@@ -31,6 +31,7 @@
                   list-type="picture"
                   class="default-upload-list-inline"
                   @change="handleChange($event, 'storeLogo')"
+                  @preview="imgPreview($event)"
               />
             </div>
             <div v-else>
@@ -39,6 +40,7 @@
                   list-type="picture"
                   class="upload-list-inline"
                   @change="handleChange($event, 'storeLogo')"
+                  @preview="imgPreview($event)"
               >
                 <a-button icon="upload" v-if="this.imgIsShow.storeLogo">上传</a-button>
               </a-upload>
@@ -53,6 +55,7 @@
                   list-type="picture"
                   class="default-upload-list-inline"
                   @change="handleChange($event, 'storeOuterImg')"
+                  @preview="imgPreview($event)"
               />
             </div>
             <div v-else>
@@ -61,6 +64,7 @@
                   list-type="picture"
                   class="upload-list-inline"
                   @change="handleChange($event, 'storeOuterImg')"
+                  @preview="imgPreview($event)"
               >
                 <a-button icon="upload" v-if="this.imgIsShow.storeOuterImg">上传</a-button>
               </a-upload>
@@ -75,6 +79,7 @@
                   list-type="picture"
                   class="default-upload-list-inline"
                   @change="handleChange($event, 'storeInnerImg')"
+                  @preview="imgPreview($event)"
               />
             </div>
             <div v-else>
@@ -83,6 +88,7 @@
                   list-type="picture"
                   class="upload-list-inline"
                   @change="handleChange($event, 'storeInnerImg')"
+                  @preview="imgPreview($event)"
               >
                 <a-button icon="upload" v-if="this.imgIsShow.storeInnerImg">上传</a-button>
               </a-upload>
@@ -151,6 +157,7 @@
 <script>
 import { API_URL_MCH_STORE, req, upload, getMapConfig } from '@/api/manage'
 import AMapLoader from '@amap/amap-jsapi-loader'
+import 'viewerjs/dist/viewer.css'
 export default {
   props: {
     callbackFunc: { type: Function }
@@ -194,6 +201,16 @@ export default {
       this.areas = []
       this.lnglat = null
       this.saveObject = {}
+      this.imgDefaultFileList = {
+        storeLogo: null,
+        storeOuterImg: null,
+        storeInnerImg: null
+      }
+      this.imgIsShow = {
+        storeLogo: true,
+        storeOuterImg: true,
+        storeInnerImg: true
+      }
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
       }
@@ -627,6 +644,15 @@ export default {
       } else if (info.file.status === 'removed') {
         this.imgDefaultFileList[name] = null
       }
+    },
+    imgPreview (info) {
+      // console.log(info)
+      this.$viewerApi({
+        images: [info.url],
+        options: {
+          initialViewIndex: 0
+        }
+      })
     },
     areasChange (value, selectedOptions) {
       // console.log(value)
