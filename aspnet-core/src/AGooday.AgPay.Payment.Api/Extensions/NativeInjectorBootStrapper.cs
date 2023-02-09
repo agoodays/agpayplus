@@ -88,6 +88,7 @@ namespace AGooday.AgPay.Payment.Api.Extensions
             services.AddTransient<AgPayDbContext>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IRepository, Repository>();
+            services.AddTransient<IAgentInfoRepository, AgentInfoRepository>();
             services.AddTransient<IIsvInfoRepository, IsvInfoRepository>();
             services.AddTransient<IMchAppRepository, MchAppRepository>();
             services.AddTransient<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();

@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Domain.CommandHandlers;
-using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
