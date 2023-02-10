@@ -174,7 +174,6 @@ export default {
   props: {
     callbackFunc: { type: Function }
   },
-
   data () {
     const checkMchNo = (rule, value, callback) => { // 是否选择了商户
       if (this.isAdd && !value) {

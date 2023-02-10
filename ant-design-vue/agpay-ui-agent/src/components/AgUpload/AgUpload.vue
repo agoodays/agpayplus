@@ -9,6 +9,7 @@
       :multiple="true"
       :before-upload="beforeUpload"
       @change="handleChange"
+      @preview="imgPreview($event)"
     >
       <slot name="uploadSlot" :loading="loading"></slot>
       <!-- <img v-if="fileUrl && type === 'image'" :src="fileUrl" />
@@ -21,6 +22,7 @@
 <script>
 import appConfig from '@/config/appConfig'
 import storage from '@/utils/agpayStorageWrapper'
+import 'viewerjs/dist/viewer.css'
 
 function getHeaders () {
   const headers = {}
@@ -72,6 +74,15 @@ export default {
         console.log(info)
         this.$message.error(`上传失败`)
       }
+    },
+    imgPreview (info) {
+      // console.log(info)
+      this.$viewerApi({
+        images: [info.url],
+        options: {
+          initialViewIndex: 0
+        }
+      })
     },
     // 上传图片前的校验
     beforeUpload (file) {

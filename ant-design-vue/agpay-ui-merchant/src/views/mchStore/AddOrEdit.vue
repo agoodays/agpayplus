@@ -27,20 +27,20 @@
           <a-form-model-item label="门店LOGO" prop="storeLogo">
             <div v-if="this.imgDefaultFileList.storeLogo">
               <a-upload
-                  :file-list="this.imgDefaultFileList.storeLogo"
-                  list-type="picture"
-                  class="default-upload-list-inline"
-                  @change="handleChange($event, 'storeLogo')"
-                  @preview="imgPreview($event)"
+                :file-list="this.imgDefaultFileList.storeLogo"
+                list-type="picture"
+                class="default-upload-list-inline"
+                @change="handleChange($event, 'storeLogo')"
+                @preview="imgPreview($event)"
               />
             </div>
             <div v-else>
               <a-upload
-                  :action="action"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'storeLogo')"
-                  @preview="imgPreview($event)"
+                :action="action"
+                list-type="picture"
+                class="upload-list-inline"
+                @change="handleChange($event, 'storeLogo')"
+                @preview="imgPreview($event)"
               >
                 <a-button icon="upload" v-if="this.imgIsShow.storeLogo">上传</a-button>
               </a-upload>
@@ -51,20 +51,20 @@
           <a-form-model-item label="门头照" prop="storeOuterImg">
             <div v-if="this.imgDefaultFileList.storeOuterImg">
               <a-upload
-                  :file-list="this.imgDefaultFileList.storeOuterImg"
-                  list-type="picture"
-                  class="default-upload-list-inline"
-                  @change="handleChange($event, 'storeOuterImg')"
-                  @preview="imgPreview($event)"
+                :file-list="this.imgDefaultFileList.storeOuterImg"
+                list-type="picture"
+                class="default-upload-list-inline"
+                @change="handleChange($event, 'storeOuterImg')"
+                @preview="imgPreview($event)"
               />
             </div>
             <div v-else>
               <a-upload
-                  :action="action"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'storeOuterImg')"
-                  @preview="imgPreview($event)"
+                :action="action"
+                list-type="picture"
+                class="upload-list-inline"
+                @change="handleChange($event, 'storeOuterImg')"
+                @preview="imgPreview($event)"
               >
                 <a-button icon="upload" v-if="this.imgIsShow.storeOuterImg">上传</a-button>
               </a-upload>
@@ -75,20 +75,20 @@
           <a-form-model-item label="门店内景照" prop="storeInnerImg">
             <div v-if="this.imgDefaultFileList.storeInnerImg">
               <a-upload
-                  :file-list="this.imgDefaultFileList.storeInnerImg"
-                  list-type="picture"
-                  class="default-upload-list-inline"
-                  @change="handleChange($event, 'storeInnerImg')"
-                  @preview="imgPreview($event)"
+                :file-list="this.imgDefaultFileList.storeInnerImg"
+                list-type="picture"
+                class="default-upload-list-inline"
+                @change="handleChange($event, 'storeInnerImg')"
+                @preview="imgPreview($event)"
               />
             </div>
             <div v-else>
               <a-upload
-                  :action="action"
-                  list-type="picture"
-                  class="upload-list-inline"
-                  @change="handleChange($event, 'storeInnerImg')"
-                  @preview="imgPreview($event)"
+                :action="action"
+                list-type="picture"
+                class="upload-list-inline"
+                @change="handleChange($event, 'storeInnerImg')"
+                @preview="imgPreview($event)"
               >
                 <a-button icon="upload" v-if="this.imgIsShow.storeInnerImg">上传</a-button>
               </a-upload>

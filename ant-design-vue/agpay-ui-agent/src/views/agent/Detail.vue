@@ -197,6 +197,7 @@
                 :default-file-list="getDefaultFileList(detailData.licenseImg)"
                 list-type="picture"
                 class="detail-upload-list-inline"
+                @preview="imgPreview($event)"
               />
             </div>
           </a-form-model-item>
@@ -209,6 +210,7 @@
                 :default-file-list="getDefaultFileList(detailData.permitImg)"
                 list-type="picture"
                 class="detail-upload-list-inline"
+                @preview="imgPreview($event)"
               />
             </div>
           </a-form-model-item>
@@ -220,6 +222,7 @@
                 :default-file-list="getDefaultFileList(detailData.idcard1Img)"
                 list-type="picture"
                 class="detail-upload-list-inline"
+                @preview="imgPreview($event)"
               />
             </div>
           </a-form-model-item>
@@ -231,6 +234,7 @@
                 :default-file-list="getDefaultFileList(detailData.idcard2Img)"
                 list-type="picture"
                 class="detail-upload-list-inline"
+                @preview="imgPreview($event)"
               />
             </div>
           </a-form-model-item>
@@ -242,6 +246,7 @@
                 :default-file-list="getDefaultFileList(detailData.idcardInHandImg)"
                 list-type="picture"
                 class="detail-upload-list-inline"
+                @preview="imgPreview($event)"
               />
             </div>
           </a-form-model-item>
@@ -254,6 +259,7 @@
                 :default-file-list="getDefaultFileList(detailData.bankCardImg)"
                 list-type="picture"
                 class="detail-upload-list-inline"
+                @preview="imgPreview($event)"
               />
             </div>
           </a-form-model-item>
@@ -265,6 +271,7 @@
 
 <script>
 import { API_URL_AGENT_LIST, req } from '@/api/manage'
+import 'viewerjs/dist/viewer.css'
 export default {
   name: 'Detail',
   props: {
@@ -319,6 +326,15 @@ export default {
     },
     onClose () {
       this.visible = false
+    },
+    imgPreview (info) {
+      // console.log(info)
+      this.$viewerApi({
+        images: [info.url],
+        options: {
+          initialViewIndex: 0
+        }
+      })
     },
     getDefaultFileList (url) {
       if (!url) {

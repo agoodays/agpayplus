@@ -124,11 +124,7 @@
             <a-form-model-item label="登录密码" prop="loginPassword">
               <a-input placeholder="请输入登录密码" v-model="saveObject.loginPassword"/>
             </a-form-model-item>
-            <a-button
-              icon="file-sync"
-              :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }"
-              @click="genRandomPassword"
-              style="margin-right:8px">
+            <a-button icon="file-sync" :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }" @click="genRandomPassword">
               随机生成密码
             </a-button>
           </a-col>
@@ -317,8 +313,8 @@
                   list-type="picture"
                   class="default-upload-list-inline"
                   @change="handleChange($event, 'licenseImg')"
-                >
-                </a-upload>
+                  @preview="imgPreview($event)"
+                />
               </div>
               <div v-else>
                 <a-upload
@@ -326,6 +322,7 @@
                   list-type="picture"
                   class="upload-list-inline"
                   @change="handleChange($event, 'licenseImg')"
+                  @preview="imgPreview($event)"
                 >
                   <a-button icon="upload" v-if="this.imgIsShow.licenseImg">上传</a-button>
                 </a-upload>
@@ -341,8 +338,8 @@
                   list-type="picture"
                   class="default-upload-list-inline"
                   @change="handleChange($event, 'permitImg')"
-                >
-                </a-upload>
+                  @preview="imgPreview($event)"
+                />
               </div>
               <div v-else>
                 <a-upload
@@ -350,6 +347,7 @@
                   list-type="picture"
                   class="upload-list-inline"
                   @change="handleChange($event, 'permitImg')"
+                  @preview="imgPreview($event)"
                 >
                   <a-button icon="upload" v-if="this.imgIsShow.permitImg">上传</a-button>
                 </a-upload>
@@ -364,8 +362,8 @@
                   list-type="picture"
                   class="default-upload-list-inline"
                   @change="handleChange($event, 'idcard1Img')"
-                >
-                </a-upload>
+                  @preview="imgPreview($event)"
+                />
               </div>
               <div v-else>
                 <a-upload
@@ -373,6 +371,7 @@
                   list-type="picture"
                   class="upload-list-inline"
                   @change="handleChange($event, 'idcard1Img')"
+                  @preview="imgPreview($event)"
                 >
                   <a-button icon="upload" v-if="this.imgIsShow.idcard1Img">上传</a-button>
                 </a-upload>
@@ -387,8 +386,8 @@
                   list-type="picture"
                   class="default-upload-list-inline"
                   @change="handleChange($event, 'idcard2Img')"
-                >
-                </a-upload>
+                  @preview="imgPreview($event)"
+                />
               </div>
               <div v-else>
                 <a-upload
@@ -396,6 +395,7 @@
                   list-type="picture"
                   class="upload-list-inline"
                   @change="handleChange($event, 'idcard2Img')"
+                  @preview="imgPreview($event)"
                 >
                   <a-button icon="upload" v-if="this.imgIsShow.idcard2Img">上传</a-button>
                 </a-upload>
@@ -410,8 +410,8 @@
                   list-type="picture"
                   class="default-upload-list-inline"
                   @change="handleChange($event, 'idcardInHandImg')"
-                >
-                </a-upload>
+                  @preview="imgPreview($event)"
+                />
               </div>
               <div v-else>
                 <a-upload
@@ -419,6 +419,7 @@
                   list-type="picture"
                   class="upload-list-inline"
                   @change="handleChange($event, 'idcardInHandImg')"
+                  @preview="imgPreview($event)"
                 >
                   <a-button icon="upload" v-if="this.imgIsShow.idcardInHandImg">上传</a-button>
                 </a-upload>
@@ -434,8 +435,8 @@
                   list-type="picture"
                   class="default-upload-list-inline"
                   @change="handleChange($event, 'bankCardImg')"
-                >
-                </a-upload>
+                  @preview="imgPreview($event)"
+                />
               </div>
               <div v-else>
                 <a-upload
@@ -443,6 +444,7 @@
                   list-type="picture"
                   class="upload-list-inline"
                   @change="handleChange($event, 'bankCardImg')"
+                  @preview="imgPreview($event)"
                 >
                   <a-button icon="upload" v-if="this.imgIsShow.bankCardImg">上传</a-button>
                 </a-upload>
@@ -467,6 +469,7 @@
 <script>
 import { API_URL_AGENT_LIST, API_URL_ISV_LIST, req, upload } from '@/api/manage'
 import { Base64 } from 'js-base64'
+import 'viewerjs/dist/viewer.css'
 export default {
   name: 'AddOrEdit',
   props: {
@@ -778,6 +781,15 @@ export default {
       } else if (info.file.status === 'removed') {
         this.imgDefaultFileList[name] = null
       }
+    },
+    imgPreview (info) {
+      // console.log(info)
+      this.$viewerApi({
+        images: [info.url],
+        options: {
+          initialViewIndex: 0
+        }
+      })
     },
     // 上传图片前的校验
     beforeUpload (file) {

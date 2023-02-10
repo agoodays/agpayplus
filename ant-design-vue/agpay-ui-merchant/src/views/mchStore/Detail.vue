@@ -62,10 +62,10 @@
         <a-form-model-item label="门店LOGO" prop="storeLogo">
           <div v-if="detailData.storeLogo">
             <a-upload
-                :default-file-list="getDefaultFileList(detailData.storeLogo)"
-                list-type="picture"
-                class="detail-upload-list-inline"
-                @preview="imgPreview($event)"
+              :default-file-list="getDefaultFileList(detailData.storeLogo)"
+              list-type="picture"
+              class="detail-upload-list-inline"
+              @preview="imgPreview($event)"
             />
           </div>
         </a-form-model-item>
@@ -74,10 +74,10 @@
         <a-form-model-item label="门头照" prop="storeOuterImg">
           <div v-if="detailData.storeOuterImg">
             <a-upload
-                :default-file-list="getDefaultFileList(detailData.storeOuterImg)"
-                list-type="picture"
-                class="detail-upload-list-inline"
-                @preview="imgPreview($event)"
+              :default-file-list="getDefaultFileList(detailData.storeOuterImg)"
+              list-type="picture"
+              class="detail-upload-list-inline"
+              @preview="imgPreview($event)"
             />
           </div>
         </a-form-model-item>
@@ -86,10 +86,10 @@
         <a-form-model-item label="门店内景照" prop="storeInnerImg">
           <div v-if="detailData.storeInnerImg">
             <a-upload
-                :default-file-list="getDefaultFileList(detailData.storeInnerImg)"
-                list-type="picture"
-                class="detail-upload-list-inline"
-                @preview="imgPreview($event)"
+              :default-file-list="getDefaultFileList(detailData.storeInnerImg)"
+              list-type="picture"
+              class="detail-upload-list-inline"
+              @preview="imgPreview($event)"
             />
           </div>
         </a-form-model-item>

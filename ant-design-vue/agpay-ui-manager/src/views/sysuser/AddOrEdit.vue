@@ -138,7 +138,7 @@
             <a-form-model-item label="登录密码" prop="loginPassword">
               <a-input placeholder="请输入登录密码" v-model="saveObject.loginPassword"/>
             </a-form-model-item>
-            <a-button icon="file-sync" :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }" @click="genRandomPassword" style="margin-right:8px">
+            <a-button icon="file-sync" :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }" @click="genRandomPassword">
               随机生成密码
             </a-button>
           </a-col>

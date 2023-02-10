@@ -31,7 +31,12 @@
     <br>
     <a-row>
       <a-col :lg="2" :md="2">
-        <a-upload name="file" :beforeUpload="beforeUpload" :showUploadList="false">
+        <a-upload
+          name="file"
+          :beforeUpload="beforeUpload"
+          :showUploadList="false"
+          @preview="imgPreview($event)"
+        >
           <a-button icon="upload">选择图片</a-button>
         </a-upload>
       </a-col>
@@ -57,6 +62,7 @@
 </template>
 <script>
 import { upload, updateUserInfo } from '@/api/manage'
+import 'viewerjs/dist/viewer.css'
 
 import store from '@/store'
 export default {
@@ -115,6 +121,15 @@ export default {
       // reader.readAsArrayBuffer(file)
 
       return false
+    },
+    imgPreview (info) {
+      // console.log(info)
+      this.$viewerApi({
+        images: [info.url],
+        options: {
+          initialViewIndex: 0
+        }
+      })
     },
 
     // 上传图片（点击上传按钮）
