@@ -413,9 +413,8 @@ export default {
     content: "";
     width: 0;
     height: 0;
-    border: 10px;
-    border-style: solid;
-    border-color: transparent transparent #ffeed8 transparent;
+    border: 10px solid transparent;
+    border-bottom-color: #ffeed8;
     position: absolute;
     top: -20px;
     left: 30px;

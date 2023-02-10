@@ -6,7 +6,7 @@
           <!-- 骨架屏与图表有冲突，故不使用内嵌方式。 因为内边距的原因，采取v-if的方式 -->
           <a-skeleton active :loading="true" v-if="skeletonIsShow" style="padding:20px" :paragraph="{ rows: 6 }" />
           <div v-show="!skeletonIsShow">
-            <div class="analy-title" style="padding:20px;box-sizing:border-box;padding-bottom:10px">
+            <div class="analy-title" style="box-sizing:border-box;padding: 20px 20px 10px;">
               <span>今日交易金额</span>
               <a-tooltip>
                 <template slot="title">

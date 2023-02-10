@@ -73,7 +73,6 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto, string agentNo = null)
         {
-
             var mchApps = _mchAppRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
