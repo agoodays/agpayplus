@@ -254,6 +254,9 @@ ALTER TABLE `t_mch_app`
   ADD COLUMN `app_sign_type` JSON NOT NULL COMMENT '支持的签名方式 [\"MD5\", \"RSA2\"]' AFTER `default_flag`,
   CHANGE `app_secret` `app_secret` VARCHAR(128) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '应用MD5私钥',
   ADD COLUMN `app_rsa2_public_key` VARCHAR(448) NULL COMMENT 'RSA2应用公钥' AFTER `app_secret`;
+
+-- select * from `t_mch_app` WHERE JSON_TYPE(app_sign_type) = 'NULL'
+UPDATE `t_mch_app` SET `app_sign_type` = '["MD5"]' WHERE JSON_TYPE(app_sign_type) = 'NULL'
   
 ALTER TABLE `t_sys_user`   
   CHANGE `sex` `sex` TINYINT DEFAULT 0 NOT NULL COMMENT '性别: 0-未知, 1-男, 2-女',
