@@ -270,7 +270,7 @@ export default {
       getMapConfig().then(res => {
         // console.log(res)
         that.mapConfig = res
-
+        window._AMapSecurityConfig.securityJsCode = that.mapConfig.apiMapWebSecret
         AMapLoader.load({
           key: that.mapConfig.apiMapWebKey, // 申请好的Web端开发者Key，首次调用 load 时必填
           language: 'zh_cn',

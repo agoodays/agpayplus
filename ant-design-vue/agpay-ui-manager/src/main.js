@@ -37,7 +37,6 @@ Vue.prototype.$access = (entId) => {
 Vue.prototype.$infoBox = infoBox
 
 window._AMapSecurityConfig = {
-  // securityJsCode: '7fec782d86662766f46d8d92e4651154'
   securityJsCode: 'dccbb5a56d2a1850eda2b6e67f8f2f13'
 }
 

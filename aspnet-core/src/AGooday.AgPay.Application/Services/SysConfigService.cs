@@ -58,8 +58,12 @@ namespace AGooday.AgPay.Application.Services
             }
         }
 
-        /** 根据分组查询，并返回JSON对象格式的数据 **/
-        public string SelectByGroupKey(string groupKey)
+        /// <summary>
+        /// 根据分组查询，并返回键值对
+        /// </summary>
+        /// <param name="groupKey"></param>
+        /// <returns></returns>
+        public Dictionary<string, string> GetKeyValueByGroupKey(string groupKey)
         {
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
             _sysConfigRepository.GetAll().Where(w => w.GroupKey.Equals(groupKey))
@@ -67,10 +71,23 @@ namespace AGooday.AgPay.Application.Services
                 {
                     keyValuePairs.Add(c.ConfigKey, c.ConfigVal);
                 });
-            return JsonConvert.SerializeObject(keyValuePairs);
+            return keyValuePairs;
         }
 
-        /** 获取实际的数据 **/
+        /// <summary>
+        /// 根据分组查询，并返回JSON对象格式的数据
+        /// </summary>
+        /// <param name="groupKey"></param>
+        /// <returns></returns>
+        public string SelectByGroupKey(string groupKey)
+        {
+            return JsonConvert.SerializeObject(GetKeyValueByGroupKey(groupKey));
+        }
+
+        /// <summary>
+        /// 获取实际的数据
+        /// </summary>
+        /// <returns></returns>
         public DBApplicationConfig GetDBApplicationConfig()
         {
             // 查询DB

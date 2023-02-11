@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
@@ -22,15 +23,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly ILogger<MchStoreController> _logger;
         private readonly IMchStoreService _mchStoreService;
         private readonly IMchInfoService _mchInfoService;
+        private readonly ISysConfigService _sysConfigService;
 
         public MchStoreController(IMQSender mqSender, ILogger<MchStoreController> logger,
             IMchStoreService mchStoreService,
-            IMchInfoService mchInfoService)
+            IMchInfoService mchInfoService, 
+            ISysConfigService sysConfigService)
         {
             this.mqSender = mqSender;
             _logger = logger;
             _mchStoreService = mchStoreService;
             _mchInfoService = mchInfoService;
+            _sysConfigService = sysConfigService;
         }
 
         /// <summary>
@@ -136,10 +140,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             //var apiMapWebKey = "4056aa1b76794cdb8df1d5ee0000bdb8
             //var apiMapWebKey = "73c97ee762590de79509117207e170ab";
             //var apiMapWebSecret = "7fec782d86662766f46d8d92e4651154";
-            var apiMapWebKey = "6cebea39ba50a4c9bc565baaf57d1c8b";
-            var apiMapWebSecret = "dccbb5a56d2a1850eda2b6e67f8f2f13";
-            var apiMapWebServiceKey = "1e558c3dc1ce7ab2a0b332d78fcd4c16";
-            return ApiRes.Ok(new { apiMapWebKey, apiMapWebSecret, apiMapWebServiceKey });
+
+            var configList = _sysConfigService.GetKeyValueByGroupKey("apiMapConfig");
+            return ApiRes.Ok(configList);
         }
     }
 }

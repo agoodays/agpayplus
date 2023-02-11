@@ -131,6 +131,7 @@ export default {
     // 组件销毁时，也及时销毁编辑器
     onBeforeUnmount(() => {
       const editor = editorRef.value
+      // console.log(editor)
       if (editor == null) return
       editor.destroy()
     })

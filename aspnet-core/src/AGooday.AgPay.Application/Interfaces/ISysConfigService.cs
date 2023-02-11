@@ -12,6 +12,7 @@ namespace AGooday.AgPay.Application.Interfaces
         bool SaveOrUpdate(SysConfigDto dto);
         SysConfigDto GetById(string recordId);
         IEnumerable<SysConfigDto> GetAll();
+        Dictionary<string, string> GetKeyValueByGroupKey(string groupKey);
         void InitDBConfig(string groupKey);
     }
 }
