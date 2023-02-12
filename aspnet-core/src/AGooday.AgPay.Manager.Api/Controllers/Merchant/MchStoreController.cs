@@ -130,9 +130,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         }
 
         /// <summary>
-        /// 获取支付网关系统公钥
+        /// 获取地图配置
         /// </summary>
-        /// <param name="appId"></param>
         /// <returns></returns>
         [HttpGet, Route("mapConfig"), AllowAnonymous, NoLog]
         public ApiRes MapConfig()

@@ -121,6 +121,15 @@
         {
             return string.Format(CACHE_KEY_IMG_CODE, imgToken);
         }
+
+        /// <summary>
+        /// 短信验证码 缓存key
+        /// </summary>
+        private const string CACHE_KEY_SMS_CODE = "SmsCode:sms_code_{0}";
+        public static string GetCacheKeySmsCode(string smsToken)
+        {
+            return string.Format(CACHE_KEY_SMS_CODE, smsToken);
+        }
         #endregion
 
         /// <summary>

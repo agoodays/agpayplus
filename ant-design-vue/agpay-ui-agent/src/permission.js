@@ -9,7 +9,7 @@ import appConfig from '@/config/appConfig'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const allowList = ['login', 'register', 'registerResult'] // no redirect allowList
+const allowList = ['login', 'forget', 'register', 'registerResult'] // no redirect allowList
 const loginRoutePath = '/user/login'
 
 // 路由守卫
