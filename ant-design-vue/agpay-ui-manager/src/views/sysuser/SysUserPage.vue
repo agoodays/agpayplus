@@ -61,7 +61,7 @@
 
         <template slot="inviteCodeSlot" slot-scope="{record}">
           <a @click="copyFunc(record.inviteCode)" class="a-copy">{{ record.inviteCode }}</a>
-          <span>
+          <span v-if="record.inviteCode">
             <a-icon type="info-circle" @click="inviteCodeFunc(record.inviteCode, record.sysType)" style="cursor: pointer;"/>
           </span>
         </template>
