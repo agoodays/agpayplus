@@ -81,7 +81,7 @@
             <a-tab-pane key="ossConfig" tab="存储配置">
               <div class="account-settings-info-view" v-if="['ossConfig'].indexOf(groupKey)>=0">
                 <a-form-model
-                    ref="configFormModel"
+                  ref="configFormModel"
                 >
                   <a-row>
                     <a-col :span="16">
@@ -175,7 +175,7 @@
             <a-tab-pane key="apiMapConfig" tab="地图配置">
               <div class="account-settings-info-view" v-if="['apiMapConfig'].indexOf(groupKey)>=0">
                 <a-form-model
-                    ref="configFormModel"
+                  ref="configFormModel"
                 >
                   <a-row :key="config" v-for="(item, config) in configData">
                     <a-col :span="8">

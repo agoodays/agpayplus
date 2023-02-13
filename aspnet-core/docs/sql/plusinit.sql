@@ -433,7 +433,7 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_CONFIG', '系统管理', 'setting
 
 #####  ↓↓↓↓↓↓↓↓↓↓  系统配置初始化DML  ↓↓↓↓↓↓↓↓↓↓  #####
 
-UPDATE `t_sys_config` SET `group_key` = 'ossConfig' WHERE `config_key` = 'ossPublicSiteUrl' AND `group_key` = 'applicationConfig'
+UPDATE `t_sys_config` SET `group_key` = 'ossConfig' WHERE `config_key` = 'ossPublicSiteUrl' AND `group_key` = 'applicationConfig';
 INSERT INTO `t_sys_config` VALUES ('apiMapWebKey', '[高德地图商户端web配置]Key', '高德地图Key', 'apiMapConfig', '高德地图商户端web配置', '6cebea39ba50a4c9bc565baaf57d1c8b', 'text', 0, '2023-02-11 18:30:00');
 INSERT INTO `t_sys_config` VALUES ('apiMapWebSecret', '[高德地图商户端web配置]秘钥', '高德地图Key', 'apiMapConfig', '高德地图商户端web配置', 'dccbb5a56d2a1850eda2b6e67f8f2f13', 'text', 0, '2023-02-11 18:30:00');
 INSERT INTO `t_sys_config` VALUES ('apiMapWebServiceKey', '[高德地图商户端web服务]Key', '商户端web服务key', 'apiMapConfig', '高德地图商户端web配置', '1e558c3dc1ce7ab2a0b332d78fcd4c16', 'text', 0, '2023-02-11 18:30:00');

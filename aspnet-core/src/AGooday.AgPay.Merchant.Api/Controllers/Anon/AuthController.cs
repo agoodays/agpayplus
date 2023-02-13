@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
     /// 认证接口
     /// </summary>
     [ApiController, AllowAnonymous]
-    [Route("api/anon/auth")]
+    [Route("api/anon")]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
@@ -29,6 +29,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
+        private readonly ISysConfigService _sysConfigService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         // 将领域通知处理程序注入Controller
@@ -38,7 +39,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             INotificationHandler<DomainNotification> notifications,
             ISysUserAuthService sysUserAuthService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
+            ISysUserRoleRelaService sysUserRoleRelaService, 
+            ISysConfigService sysConfigService)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
@@ -48,6 +50,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             _notifications = (DomainNotificationHandler)notifications;
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
+            _sysConfigService = sysConfigService;
         }
 
         /// <summary>
@@ -56,7 +59,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route("validate"), MethodLog("登录认证")]
+        [HttpPost, Route("auth/validate"), MethodLog("登录认证")]
         public ApiRes Validate(Validate model)
         {
             string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理
@@ -143,7 +146,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         /// 图片验证码
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("vercode"), NoLog]
+        [HttpGet, Route("auth/vercode"), NoLog]
         public ApiRes Vercode()
         {
             //定义图形验证码的长和宽 // 4位验证码
@@ -163,6 +166,79 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             _redis.StringSet(CS.GetCacheKeyImgCode(vercodeToken), code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
 
             return ApiRes.Ok(new { imageBase64Data, vercodeToken, expireTime = CS.VERCODE_CACHE_TIME });
+        }
+
+        /// <summary>
+        /// 注册
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <returns></returns>
+        [HttpPost, Route("register/mchRegister"), NoLog]
+        public ApiRes Register(Register model)
+        {
+            string phone = Base64Util.DecodeBase64(model.phone);
+            string code = Base64Util.DecodeBase64(model.code);
+            string confirmPwd = Base64Util.DecodeBase64(model.confirmPwd);
+
+#if !DEBUG
+            string cacheCode = _redis.StringGet(CS.GetCacheKeySmsCode($"{phone}_register"));
+            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(code))
+            {
+                throw new BizException("验证码已过期，请重新点击发送验证码！");
+            }
+#endif
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 获取条约
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <returns></returns>
+        [HttpGet, Route("treaty"), NoLog]
+        public ApiRes Treaty()
+        {
+            var configList = _sysConfigService.GetKeyValueByGroupKey("mchTreatyConfig");
+            return ApiRes.Ok(configList);
+        }
+
+        /// <summary>
+        /// 发送短信验证码
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <returns></returns>
+        [HttpPost, Route("sms/code"), NoLog]
+        public ApiRes SendCode(SmsCode model)
+        {
+            var code = VerificationCodeUtil.RandomVerificationCode(6);
+
+            //redis
+            string vercodeToken = $"{model.phone}_{model.smsType}";
+            _redis.StringSet(CS.GetCacheKeySmsCode(vercodeToken), code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
+
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 找回密码
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <returns></returns>
+        [HttpPost, Route("cipher/retrieve"), NoLog]
+        public ApiRes Retrieve(Retrieve model)
+        {
+            string phone = Base64Util.DecodeBase64(model.phone);
+            string code = Base64Util.DecodeBase64(model.code);
+            string newPwd = Base64Util.DecodeBase64(model.newPwd);
+
+#if !DEBUG
+            string cacheCode = _redis.StringGet(CS.GetCacheKeySmsCode($"{phone}_retrieve"));
+            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(code))
+            {
+                throw new BizException("验证码已过期，请重新点击发送验证码！");
+            }
+#endif
+            return ApiRes.Ok();
         }
     }
 }
