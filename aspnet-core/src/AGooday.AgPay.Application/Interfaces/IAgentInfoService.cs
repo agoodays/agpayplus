@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
         bool Update(AgentInfoDto dto);
         void Modify(AgentInfoModifyDto dto);
         AgentInfoDto GetById(string recordId);
-        AgentInfoDetailDto GetByAgentNo(string mchNo);
+        AgentInfoDetailDto GetByAgentNo(string agentNo);
         IEnumerable<AgentInfoDto> GetAll();
         PaginatedList<AgentInfoDto> GetPaginatedData(AgentInfoQueryDto dto);
         PaginatedList<AgentInfoDto> GetPaginatedData(string agentNo, AgentInfoQueryDto dto);

@@ -178,6 +178,8 @@ INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_NOTICEINFO', '公告管理', '
     INSERT INTO t_sys_entitlement VALUES('ENT_NOTICE_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ARTICLE_NOTICEINFO', '0', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_NOTICE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ARTICLE_NOTICEINFO', '0', 'MGR', NOW(), NOW());
 
+INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_NOTICEINFO', '公告管理', 'message', '/notices', 'NoticeInfoPage', 'MO', 0, 1,  'ENT_COMMONS', '-1', 'AGENT', NOW(), NOW());
+
 -- 费率信息表
 DROP TABLE IF EXISTS `t_pay_rate_config`;
 CREATE TABLE `t_pay_rate_config` (

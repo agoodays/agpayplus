@@ -74,8 +74,10 @@ namespace AGooday.AgPay.Application.Services
                 //&& (string.IsNullOrWhiteSpace(dto.ArticleRange) || EF.Functions.JsonContains(w.ArticleRange, new string[] { dto.ArticleRange }))// w.ArticleRange.Contains(dto.ArticleRange))
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd))
+                .AsNoTracking().ToList()
+                .Where(w => string.IsNullOrWhiteSpace(dto.ArticleRange) || w.ArticleRange.Contains(dto.ArticleRange))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysArticle>.Create<SysArticleDto>(sysLogs.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysArticle>.Create<SysArticleDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

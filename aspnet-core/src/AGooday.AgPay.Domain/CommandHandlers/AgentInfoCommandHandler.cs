@@ -140,6 +140,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             #endregion
 
             _sysUserRepository.Add(sysUser);
+            _sysUserRepository.SaveChanges();
 
             #region 添加默认用户认证表
             string salt = StringUtil.GetUUID(6); //6位随机数

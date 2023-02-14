@@ -26,7 +26,7 @@
             <ag-text-up :placeholder="'公告标题'" :msg="searchData.title" v-model="searchData.title"/>
             <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
               <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
+              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = { articleType: 1 }">重置</a-button>
             </span>
           </div>
         </a-form>
