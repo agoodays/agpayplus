@@ -113,8 +113,17 @@
         </div>
       </div>
 
-      <div class="chart-item top-right">
-        <div class="chart-data user-greet">
+      <div class="chart-item top-right" style="display: flex;">
+        <div class="chart-data user-greet" style="margin-right: 12px;">
+          <a-skeleton active avatar :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
+            <a-card title="最新公告">
+              <template #extra><a href="#">更多</a></template>
+              <p>已通过聚合支付备案 2022-08-07</p>
+              <p> 计全付正式上线 2022-07-15 </p>
+            </a-card>
+          </a-skeleton>
+        </div>
+        <div class="chart-data user-greet" style="margin-left: 12px;">
           <a-skeleton active avatar :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
             <div class="user-greet-title">
               <div class="user-greet-all">

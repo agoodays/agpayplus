@@ -226,6 +226,7 @@
             public const string ENT_C_MAIN_PAY_COUNT = "ENT_C_MAIN_PAY_COUNT";
             public const string ENT_C_MAIN_PAY_AMOUNT_WEEK = "ENT_C_MAIN_PAY_AMOUNT_WEEK";
             public const string ENT_C_MAIN_NUMBER_COUNT = "ENT_C_MAIN_NUMBER_COUNT";
+            public const string ENT_ARTICLE_NOTICEINFO = "ENT_ARTICLE_NOTICEINFO";
         }
 
         public static class MCH

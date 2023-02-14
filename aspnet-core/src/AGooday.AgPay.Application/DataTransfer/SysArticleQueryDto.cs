@@ -23,6 +23,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public byte ArticleType { get; set; }
 
         /// <summary>
+        /// 文章范围
+        /// </summary>
+        public string ArticleRange { get; set; }
+
+        /// <summary>
         /// 开始时间
         /// </summary>
         public DateTime? CreatedStart { get; set; }

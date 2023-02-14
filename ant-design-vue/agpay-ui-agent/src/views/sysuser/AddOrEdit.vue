@@ -20,7 +20,7 @@
 
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
-          <a-form-model-item label="用户登录名 prop="loginUsername">
+          <a-form-model-item label="用户登录名" prop="loginUsername">
             <a-input v-model="saveObject.loginUsername" :disabled="!isAdd" />
           </a-form-model-item>
         </a-col>

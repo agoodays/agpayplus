@@ -86,6 +86,8 @@ export const API_URL_REFUND_ORDER_LIST = '/api/refundOrder'
 export const API_URL_MCH_NOTIFY_LIST = '/api/mchNotify'
 /** 系统配置 **/
 export const API_URL_SYS_CONFIG = 'api/sysConfigs'
+/** 公告管理 **/
+export const API_URL_ARTICLE_LIST = 'api/sysArticles'
 /** 首页统计 **/
 export const API_URL_MAIN_STATISTIC = 'api/mainChart'
 
