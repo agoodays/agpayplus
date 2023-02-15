@@ -36,7 +36,7 @@ export function register ({ agentName, code, confirmPwd, phone }) {
   }, true, true, true)
 }
 
-// 获取图形验证码信息接口
+// 获取条约接口
 export function treaty () {
   return request.request({ url: '/api/anon/treaty', method: 'get' }, true, true, true)
 }
@@ -50,7 +50,7 @@ export function forget (data) {
   }, true, true, true)
 }
 
-// 获取图形验证码信息接口
+// 发送短信验证码信息接口
 export function sendcode (data) {
   return request.request({
     url: '/api/anon/sms/code',
