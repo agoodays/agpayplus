@@ -91,6 +91,9 @@ export const API_URL_MCH_PAYPASSAGE_LIST = '/api/mch/payPassages'
 /** 转账订单管理 **/
 export const API_URL_TRANSFER_ORDER_LIST = '/api/transferOrders'
 
+/** 公告管理 **/
+export const API_URL_ARTICLE_LIST = 'api/sysArticles'
+
 /** 分账组管理 **/
 export const API_URL_DIVISION_RECEIVER_GROUP = '/api/divisionReceiverGroups'
 

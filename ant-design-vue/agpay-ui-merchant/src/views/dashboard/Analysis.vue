@@ -77,7 +77,29 @@
         </div>
       </div>
 
-      <div class="chart-item top-right">
+      <div class="chart-item top-right" style="display: flex;">
+        <div class="chart-data notice-data">
+          <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
+            <div class="notice-data-header">
+              <span class="notice-data-title">最新公告</span>
+              <span class="notice-data-action"><a @click="moreNotice">更多></a></span>
+            </div>
+            <template>
+              <a-list :data-source="noticeData" size="small">
+                <template #renderItem="item">
+                  <a-list-item>
+                    <a-list-item-meta :description="item.subtitle">
+                      <template #title>
+                        <a @click="noticeDetailShow(item.articleId)">{{ item.title }}</a>
+                        <a @click="noticeDetailShow(item.articleId)" style="float: right;">{{ moment(item.createdAt).format('YYYY-MM-DD') }}></a>
+                      </template>
+                    </a-list-item-meta>
+                  </a-list-item>
+                </template>
+              </a-list>
+            </template>
+          </a-skeleton>
+        </div>
         <div class="chart-data user-greet">
           <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
             <div class="user-greet-title">
@@ -266,18 +288,21 @@
           </a-row>
         </a-drawer>
       </div>
+
+      <!-- 详细页面组件  -->
+      <NoticeDetail ref="noticeDetail"/>
     </template>
   </div>
 </template>
 
 <script>
-
-  import { TinyArea, Column, Pie, measureTextWidth } from '@antv/g2plot'
-  import { getMainUserInfo, getPayAmountWeek, getNumCount, getPayCount, getPayType } from '@/api/manage'
-  import moment from 'moment'
-  import store from '@/store'
-  import { timeFix } from '@/utils/util'
-  import empty from './empty' // 空数据展示的组件，首页自用
+import { TinyArea, Column, Pie, measureTextWidth } from '@antv/g2plot'
+import { getMainUserInfo, getPayAmountWeek, getNumCount, getPayCount, getPayType, API_URL_ARTICLE_LIST, req } from '@/api/manage'
+import NoticeDetail from '../notice/Detail'
+import moment from 'moment'
+import store from '@/store'
+import { timeFix } from '@/utils/util'
+import empty from './empty' // 空数据展示的组件，首页自用
 
   export default {
     mounted () {
@@ -368,7 +393,7 @@
       this.$refs.agRange.$refs.picker.$el.firstChild.style.border = 'none'
       this.$refs.agRangePie.$refs.picker.$el.firstChild.style.border = 'none'
     },
-    components: { empty },
+    components: { empty, NoticeDetail },
     data () {
       return {
         skeletonIsShow: true, // 骨架屏是否显示
@@ -403,6 +428,7 @@
           totalPayCount: 0, // 交易总笔数
           totalAmount: 0.00 // 交易总金额
         },
+        noticeData: [],
         tinyArea: {},
         columnPlot: null, // 柱状图数据
         piePlot: null // 环图数据
@@ -507,6 +533,21 @@
           // 初始化用户信息
           that.getUserInfo()
         }
+        if (this.$access('ENT_ARTICLE_NOTICEINFO')) {
+          // 最新公告
+          req.list(API_URL_ARTICLE_LIST, { pageNumber: 1, pageSize: 3, articleType: 1 }).then(res => {
+            // console.log('最新公告', res)
+            that.noticeData = res.records
+            that.skeletonClose(that)
+          }).catch((err) => {
+            console.error(err)
+            this.noticeData = []
+            that.skeletonClose(that)
+          })
+        } else {
+          this.noticeData = []
+          that.skeletonClose(that)
+        }
       },
       getUserInfo () {
         const that = this
@@ -546,6 +587,12 @@
       },
       onClose () {
         this.visible = false
+      },
+      moreNotice () {
+        this.$router.push({ path: '/notices' })
+      },
+      noticeDetailShow: function (recordId) { // 公告详情页
+        this.$refs.noticeDetail.show(recordId)
       },
       payOnChange (date, dateString) {
         this.searchData.createdStart = dateString[0] // 开始时间
@@ -607,7 +654,26 @@
 
 <style lang="less" scoped>
   @import './index.less'; // 响应式布局
+  .notice-data {
+    margin-right: 12px;
+
+    .notice-data-header {
+      border-bottom: 1px solid #e8e8e8;
+      padding-bottom: 10px;
+
+      .notice-data-title {
+        font-weight: 700;
+        font-size: 14px;
+        color: #000;
+      }
+
+      .notice-data-action {
+        float: right;
+      }
+    }
+  }
   .user-greet {
+    margin-left: 12px;
     font-size: 19px;
     font-weight: 500;
 

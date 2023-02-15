@@ -35,6 +35,8 @@ export const asyncRouteDefine = {
 
   'DivisionReceiverGroupPage': { defaultPath: '/divisionReceiverGroup', component: () => import('@/views/division/group/DivisionReceiverGroupPage') }, // 分账账号组管理
   'DivisionReceiverPage': { defaultPath: '/divisionReceiver', component: () => import('@/views/division/receiver/DivisionReceiverPage') }, // 分账账号管理
-  'DivisionRecordPage': { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/DivisionRecordPage') } // 分账记录
+  'DivisionRecordPage': { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/DivisionRecordPage') }, // 分账记录
+
+  'NoticeInfoPage': { defaultPath: '/notices', component: () => import('@/views/notice/NoticeList') } // 公告管理
 
 }

@@ -304,6 +304,7 @@
             public const string ENT_DIVISION_RECEIVER_GROUP = "ENT_DIVISION_RECEIVER_GROUP";
             public const string ENT_DIVISION_RECEIVER = "ENT_DIVISION_RECEIVER";
             public const string ENT_C_USERINFO = "ENT_C_USERINFO";
+            public const string ENT_ARTICLE_NOTICEINFO = "ENT_ARTICLE_NOTICEINFO";
         }
     }
 }

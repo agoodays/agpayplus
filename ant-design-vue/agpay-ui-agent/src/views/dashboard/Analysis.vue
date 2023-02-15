@@ -22,7 +22,7 @@
                 </span>
                 <span>共{{ mainChart.todayPayCount }}笔</span>
               </div>
-              <div id="payAmount" style="height:60px"></div>
+              <div id="payAmount" style="height:80px"></div>
             </div>
             <div class="payAmountSpan" v-show="ispayAmount">
               <span>昨日交易金额：￥{{ this.mainChart.yesterdayAmount }}</span>
@@ -114,27 +114,29 @@
       </div>
 
       <div class="chart-item top-right" style="display: flex;">
-        <div class="chart-data" style="margin-right: 12px;">
+        <div class="chart-data notice-data">
           <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
-            <a-card title="最新公告">
-              <template #extra><a @click="moreNotice">更多</a></template>
-              <template>
-                <a-list :data-source="noticeData" size="small">
-                  <template #renderItem="item">
-                    <a-list-item>
-                      <a-list-item-meta :description="item.subtitle">
-                        <template #title>
-                          <a @click="noticeDetailShow(item.articleId)">{{ item.title }}</a>
-                        </template>
-                      </a-list-item-meta>
-                    </a-list-item>
-                  </template>
-                </a-list>
-              </template>
-            </a-card>
+            <div class="notice-data-header">
+              <span class="notice-data-title">最新公告</span>
+              <span class="notice-data-action"><a @click="moreNotice">更多></a></span>
+            </div>
+            <template>
+              <a-list :data-source="noticeData" size="small">
+                <template #renderItem="item">
+                  <a-list-item>
+                    <a-list-item-meta :description="item.subtitle">
+                      <template #title>
+                        <a @click="noticeDetailShow(item.articleId)">{{ item.title }}</a>
+                        <a @click="noticeDetailShow(item.articleId)" style="float: right;">{{ moment(item.createdAt).format('YYYY-MM-DD') }}></a>
+                      </template>
+                    </a-list-item-meta>
+                  </a-list-item>
+                </template>
+              </a-list>
+            </template>
           </a-skeleton>
         </div>
-        <div class="chart-data user-greet" style="margin-left: 12px;">
+        <div class="chart-data user-greet">
           <a-skeleton active avatar :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
             <div class="user-greet-title">
               <div class="user-greet-all">
@@ -448,9 +450,10 @@ export default {
       } else {
         this.isPayType = false
         that.skeletonClose(that)
-      }if (this.$access('ENT_ARTICLE_NOTICEINFO')) {
+      }
+      if (this.$access('ENT_ARTICLE_NOTICEINFO')) {
         // 最新公告
-        req.list(API_URL_ARTICLE_LIST, { pageNumber: 1, pageSize: 2, articleType: 1 }).then(res => {
+        req.list(API_URL_ARTICLE_LIST, { pageNumber: 1, pageSize: 3, articleType: 1 }).then(res => {
           // console.log('最新公告', res)
           that.noticeData = res.records
           that.skeletonClose(that)
@@ -490,14 +493,14 @@ export default {
     showDrawer () {
       this.visible = true
     },
-    noticeDetailShow: function (recordId) { // 公告详情页
-      this.$refs.noticeDetail.show(recordId)
-    },
     onClose () {
       this.visible = false
     },
     moreNotice () {
       this.$router.push({path: '/notices'})
+    },
+    noticeDetailShow: function (recordId) { // 公告详情页
+      this.$refs.noticeDetail.show(recordId)
     },
     payOnChange (date, dateString) {
       this.searchData.createdStart = dateString[0] // 开始时间
@@ -665,7 +668,26 @@ export default {
 
 <style lang="less" scoped>
   @import './index.less'; // 响应式布局
+  .notice-data {
+    margin-right: 12px;
+
+    .notice-data-header {
+      border-bottom: 1px solid #e8e8e8;
+      padding-bottom: 10px;
+
+      .notice-data-title {
+        font-weight: 700;
+        font-size: 14px;
+        color: #000;
+      }
+
+      .notice-data-action {
+        float: right;
+      }
+    }
+  }
   .user-greet {
+    margin-left: 12px;
     font-size: 19px;
     font-weight: 500;
 
