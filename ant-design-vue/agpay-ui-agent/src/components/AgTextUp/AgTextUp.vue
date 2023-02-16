@@ -23,16 +23,16 @@ export default {
   position: relative;
 
   input {
-
     outline: 0;
     text-indent: 60px;
     transition: all .3s ease-in-out;
-
   }
+
   input::-webkit-input-placeholder {
     color: #BFBFBF;
     text-indent: 0;
   }
+
   input + label {
     pointer-events: none;
     position: absolute;
@@ -51,6 +51,7 @@ export default {
     justify-content: center;
     align-items: center;
   }
+
   // 三角形
   input + label:after {
     position: absolute;
@@ -64,12 +65,14 @@ export default {
     border-right: 3px solid transparent;
     transition: all .3s ease-in-out;
   }
+
   input:focus,
   input:active,
   input:valid + label {
     text-indent: 0;
     background: #fff;
   }
+
   input:focus + label,
   input:active + label,
   input:valid + label {
@@ -77,6 +80,7 @@ export default {
     background: @ag-theme;
     transform: translateY(-33px);
   }
+
   input:focus + label:after,
   input:active + label:after {
     border-top: 4px solid @ag-theme;
@@ -85,14 +89,74 @@ export default {
   input:valid {
     text-indent: 0; //文字不下移
   }
-  input:valid + label{
+
+  input:valid + label {
     background: #dadada; // 更换背景色
   }
 
-  input:valid + label:after{ // 更换背景色
+  input:valid + label:after { // 更换背景色
     border-top: 4px solid #dadada;
   }
 }
+
+//// 文字上移 效果(上浮)
+//.ag-text-up {
+//  position: relative;
+//
+//  input {
+//    outline: 0;
+//    text-indent: 60px;
+//    transition: all .3s ease-in-out;
+//  }
+//
+//  input::-webkit-input-placeholder {
+//    color: #BFBFBF;
+//    text-indent: 0;
+//  }
+//
+//  input + label {
+//    pointer-events: none;
+//    position: absolute;
+//    left: 0;
+//    bottom: 6px;
+//    margin: 2px 8px;
+//    padding: 0 3px;
+//    color: #BFBFBF;
+//    font-size: 13px;
+//    text-transform: uppercase;
+//    transition: all .3s ease-in-out;
+//    border-radius: 3px;
+//    background: rgba(122, 184, 147, 0);
+//    height: 18px;
+//    line-height: 18px;
+//    display: flex;
+//    justify-content: center;
+//    align-items: center;
+//  }
+//
+//  input:focus,
+//  input:active,
+//  input:valid + label {
+//    text-indent: 0;
+//    background: #fff;
+//  }
+//
+//  input:focus + label,
+//  input:active + label,
+//  input:valid + label {
+//    //color: @ag-theme;
+//    background: #fff;
+//    transform: translateY(-17px);
+//  }
+//
+//  input:valid {
+//    text-indent: 0; //文字不下移
+//  }
+//
+//  input:focus + label {
+//    color: @ag-theme; // 更换背景色
+//  }
+//}
 
 // 文字上移效果 初版
 // .ag-text-up {
