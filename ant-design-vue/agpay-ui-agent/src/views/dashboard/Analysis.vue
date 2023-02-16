@@ -406,6 +406,7 @@ export default {
         getNumCount().then(res => {
           // console.log('数据统计', res)
           that.mainChart.totalMch = res.totalMch
+          that.mainChart.totalAgent = res.totalAgent
           that.mainChart.totalIsv = res.totalIsv
           that.mainChart.totalAmount = res.totalAmount
           that.mainChart.totalPayCount = res.totalCount

@@ -330,6 +330,7 @@
           todayAmountTip: '今日成功交易金额及笔数', // 今日交易提示文字
           totalAmountTip: '成功交易总金额', // 交易总金额提示文字
           totalPayCountTip: '成功交易总笔数', // 交易总笔数提示文字
+          totalAgentTip: '代理商数量', // 代理商数量提示文字
           totalIsvTip: '服务商数量', // 服务商数量提示文字
           totalMchTip: '商户数量', // 商户数量提示文字
           helloTitle: ''
