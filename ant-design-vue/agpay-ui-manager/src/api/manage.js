@@ -234,6 +234,13 @@ export function getNumCount () {
   })
 }
 
+export function getPayDayCount (parameter) {
+  return request.request({
+    url: API_URL_MAIN_STATISTIC + '/payDayCount?queryDateRange=' + parameter,
+    method: 'GET'
+  })
+}
+
 export function getPayCount (parameter) {
   return request.request({
     url: API_URL_MAIN_STATISTIC + '/payCount',

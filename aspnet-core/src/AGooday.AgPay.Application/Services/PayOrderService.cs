@@ -17,6 +17,7 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IPayOrderRepository _payOrderRepository;
+        private readonly IRefundOrderRepository _refundOrderRepository;
         private readonly IMchInfoRepository _mchInfoRepository;
         private readonly IAgentInfoRepository _agentInfoRepository;
         private readonly IIsvInfoRepository _isvInfoRepository;
@@ -27,7 +28,8 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public PayOrderService(IPayOrderRepository payOrderRepository,
+        public PayOrderService(IPayOrderRepository payOrderRepository, 
+            IRefundOrderRepository refundOrderRepository,
             IMchInfoRepository mchInfoRepository,
             IAgentInfoRepository agentInfoRepository,
             IIsvInfoRepository isvInfoRepository,
@@ -36,6 +38,7 @@ namespace AGooday.AgPay.Application.Services
             IMapper mapper, IMediatorHandler bus)
         {
             _payOrderRepository = payOrderRepository;
+            _refundOrderRepository = refundOrderRepository;
             _mchInfoRepository = mchInfoRepository;
             _agentInfoRepository = agentInfoRepository;
             _isvInfoRepository = isvInfoRepository;
@@ -431,6 +434,51 @@ namespace AGooday.AgPay.Application.Services
             }
             json.Add("totalAmount", payCountMap.PayAmount);
             json.Add("totalCount", payCountMap.PayCount);
+            return json;
+        }
+
+        /// <summary>
+        /// 今日/昨日交易统计
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="agentNo"></param>
+        /// <returns></returns>
+        public JObject MainPagePayDayCount(string mchNo, string agentNo, DateTime? day)
+        {
+            DateTime? dayStart = day;
+            DateTime? dayEnd = day?.AddDays(1);
+            JObject json = new JObject();
+            int allCount = 0;
+            var payorders = _payOrderRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
+                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
+                //&& w.State.Equals((byte)PayOrderState.STATE_SUCCESS)
+                && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable();
+            allCount += payorders.Count();
+            payorders = payorders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable();
+            var payAmount = payorders.Sum(s => s.Amount);
+            var payCount = payorders.Count();
+
+            var refundOrder = _refundOrderRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
+                //&& (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
+                //&& w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)
+                && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable();
+            allCount += refundOrder.Count();
+            refundOrder = refundOrder.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable();
+            var refundAmount = refundOrder.Sum(s => s.RefundAmount);
+            var refundCount = refundOrder.Count();
+
+            json.Add("dayCount", JObject.FromObject(new
+            {
+                allCount = 0,
+                payAmount = Decimal.Round(payAmount / 100, 0, MidpointRounding.AwayFromZero),
+                payCount,
+                refundAmount = Decimal.Round(refundAmount / 100, 0, MidpointRounding.AwayFromZero),
+                refundCount
+            }));
             return json;
         }
 

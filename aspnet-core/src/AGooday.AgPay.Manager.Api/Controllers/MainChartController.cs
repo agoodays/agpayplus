@@ -47,6 +47,48 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         }
 
         /// <summary>
+        /// 今日/昨日交易统计
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("payDayCount")]
+        [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_DAY_COUNT)]
+        public ApiRes PayDayCount(string queryDateRange)
+        {
+            DateTime? day = DateTime.Today;
+            switch (queryDateRange)
+            {
+                case "yesterday":
+                    day?.AddDays(1); break;
+                case "today":
+                default:
+                    break;
+            }
+            return ApiRes.Ok(_payOrderService.MainPagePayDayCount(null, null, day));
+        }
+
+        /// <summary>
+        /// 趋势图统计
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("payTrendCount")]
+        [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_TREND_COUNT)]
+        public ApiRes PayTrendCount()
+        {
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 服务商/商户统计
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("isvAndMchCount")]
+        [PermissionAuth(PermCode.MGR.ENT_C_MAIN_ISV_MCH_COUNT)]
+        public ApiRes IsvAndMchCount()
+        {
+            return ApiRes.Ok(_payOrderService.MainPageNumCount(null, null));
+        }
+
+        /// <summary>
         /// 交易统计
         /// </summary>
         /// <returns></returns>

@@ -25,6 +25,7 @@ namespace AGooday.AgPay.Application.Interfaces
         long CalMchIncomeAmount(PayOrderDto payOrder);
         JObject MainPageWeekCount(string mchNo, string agentNo);
         JObject MainPageNumCount(string mchNo, string agentNo);
+        JObject MainPagePayDayCount(string mchNo, string agentNo, DateTime? day);
         List<Dictionary<string, object>> MainPagePayCount(string mchNo, string agentNo, string createdStart, string createdEnd);
         List<PayTypeCountDto> MainPagePayTypeCount(string mchNo, string agentNo, string createdStart, string createdEnd);
     }

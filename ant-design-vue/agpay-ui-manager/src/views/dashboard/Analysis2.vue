@@ -11,19 +11,19 @@
             <div :class="{ 'amount-date-active': todayOrYesterday === 'yesterday' }" @click="getPayDayCount('yesterday')">昨日交易</div>
           </div>
           <p>交易金额(元)</p>
-          <p style="font-size: 50px; margin-bottom: 35px; color: rgb(255, 255, 255);">{{ mainChart.todayAmount.toFixed(2) }}</p>
+          <p style="font-size: 50px; margin-bottom: 35px; color: rgb(255, 255, 255);">{{ mainChart.dayCount.payAmount.toFixed(2) }}</p>
           <div class="amount-list">
             <div>
               <p>交易笔数(笔)</p>
-              <span>{{ mainChart.todayPayCount }}</span>
+              <span>{{ mainChart.dayCount.payCount }}</span>
             </div>
             <div>
               <p>退款金额(元)</p>
-              <span>0.00</span>
+              <span>{{ mainChart.dayCount.refundAmount.toFixed(2) }}</span>
             </div>
             <div>
               <p>退款笔数(笔)</p>
-              <span>0</span>
+              <span>{{ mainChart.dayCount.refundCount }}</span>
             </div>
           </div>
         </div>
@@ -41,7 +41,10 @@
                 <a-icon type="question-circle" />
               </a-tooltip>
             </div>
-            <!--a-select-->
+            <a-select v-model="recentDay" placeholder="" default-value=30 style="width: 215px">
+              <a-select-option :value=30>近30天</a-select-option>
+              <a-select-option :value=7>近7天</a-select-option>
+            </a-select>
           </div>
           <div id="payAmount" style="height: 280px"></div>
           <empty v-show="!ispayAmount" style="color: #fff;"/>
@@ -78,17 +81,24 @@
           <div class="quantity-contrast">
             <div class="contrast-text">
               <span class="especially">
-                <span style="margin-right: 5px; display: none;">特约商户</span>
+                <span style="margin-right: 5px;" v-if="isvSubMchTipIsShow">特约商户</span>
                 <span>{{ mainChart.isvSubMchCount }}</span>
               </span>
               <span class="ordinary">
-                <span style="margin-right: 5px; display: none;">普通商户</span>
+                <span style="margin-right: 5px;" v-if="normalMchTipIsShow">普通商户</span>
                 <span>{{ mainChart.normalMchCount }}</span>
               </span>
             </div>
             <div class="contrast-chart" style="background: rgb(255, 128, 102);">
-              <div style="background: rgb(255, 208, 128); cursor: pointer;" :style="{ 'width': 55 + '%' }"></div>
-              <div style="flex-grow: 1; cursor: pointer;"></div>
+              <div
+                @mouseover="()=>{ isvSubMchTipIsShow = true }"
+                @mouseout="()=>{ isvSubMchTipIsShow = false }"
+                style="background: rgb(255, 208, 128); cursor: pointer;"
+                :style="{ 'width': (mainChart.totalMch !== 0 ? mainChart.isvSubMchCount / mainChart.totalMch : 0) * 100 + '%' }"/>
+              <div
+                @mouseover="()=>{ normalMchTipIsShow = true }"
+                @mouseout="()=>{ normalMchTipIsShow = false }"
+                style="flex-grow: 1; cursor: pointer;"/>
             </div>
           </div>
         </a-skeleton>
@@ -135,16 +145,16 @@
           <b>支付方式</b>
           <div class="chart-padding">
             <a-range-picker
-                style="width:100%"
-                ref="agRangePie"
-                :ranges="{ '最近一个月': [moment().subtract(1, 'months'),moment()] }"
-                :default-value="[moment().subtract(7, 'days'),moment()]"
-                @change="payOnChange"
-                show-time
-                format="YYYY-MM-DD"
-                :disabled-date="disabledDate"
-                @ok="payTypeOk"
-                :allowClear="false"
+              style="width:100%"
+              ref="agRangePie"
+              :ranges="{ '最近一个月': [moment().subtract(1, 'months'),moment()] }"
+              :default-value="[moment().subtract(7, 'days'),moment()]"
+              @change="payOnChange"
+              show-time
+              format="YYYY-MM-DD"
+              :disabled-date="disabledDate"
+              @ok="payTypeOk"
+              :allowClear="false"
             >
               <div class="change-date-layout">
                 {{ agDatePie ? agDatePie : '最近七天' }}
@@ -168,16 +178,16 @@
           <b>交易统计</b>
           <div class="chart-padding" >
             <a-range-picker
-                ref="agRange"
-                style="width:100%"
-                :ranges="{ '最近一个月': [moment().subtract(1, 'months'),moment()] }"
-                :default-value="[moment().subtract(7, 'days'),moment()]"
-                show-time
-                format="YYYY-MM-DD"
-                @change="transactionChange"
-                :disabled-date="disabledDate"
-                @ok="payCountOk"
-                :allowClear="false"
+              ref="agRange"
+              style="width:100%"
+              :ranges="{ '最近一个月': [moment().subtract(1, 'months'),moment()] }"
+              :default-value="[moment().subtract(7, 'days'),moment()]"
+              show-time
+              format="YYYY-MM-DD"
+              @change="transactionChange"
+              :disabled-date="disabledDate"
+              @ok="payCountOk"
+              :allowClear="false"
             >
               <div class="change-date-layout">
                 {{ agDate ? agDate : '最近七天' }}
@@ -204,26 +214,28 @@
 
 <script>
   import { TinyArea, Column, Pie, measureTextWidth } from '@antv/g2plot'
-  import { getPayAmountWeek, getNumCount, getPayCount, getPayType } from '@/api/manage'
+  import { getPayDayCount, getPayAmountWeek, getNumCount, getPayCount, getPayType } from '@/api/manage'
   import moment from 'moment'
   import store from '@/store'
   import { timeFix } from '@/utils/util'
   import empty from './empty' // 空数据展示的组件，首页自用
 
- export default {
+  export default {
    data() {
      return {
        skeletonIsShow: true, // 骨架屏是否显示
+       isvSubMchTipIsShow: false, // 骨架屏是否显示
+       normalMchTipIsShow: false, // 骨架屏是否显示
        skeletonReqNum: 0, // 当所有数据请求完毕后关闭骨架屏（共四个请求）
        todayOrYesterday: 'today',
+       recentDay: 30,
        lastSevenDays: true, // 最近七天是否显示
        pieDays: false, // 饼状图的关闭按钮是否展示
        visible: false,
        recordId: store.state.user.userId,
        searchData: {}, // 时间选择条件
-
        greetImg: store.state.user.avatarImgPath, // 头像图片地址
-       safeWord: store.state.user.safeWord, // 头像图片地址
+       safeWord: store.state.user.safeWord, // 安全词
        isPayType: true, // 支付方式是否存在数据
        isPayCount: true, // 交易统计是否存在数据
        ispayAmount: true, // 今日交易金额是否存在数据
@@ -244,6 +256,13 @@
          payAmountData: [], // 近七天交易图表
          payCount: [], // 交易统计图表
          payType: [], // 支付方式统计图表
+         dayCount: {
+           allCount: 0,
+           payCount: 0,
+           refundCount: 0,
+           payAmount: 0.00,
+           refundAmount: 0.00
+         },
          todayAmount: 0.00, // 今日交易金额
          todayPayCount: 0, // 今日交易笔数
          yesterdayAmount: 0.00, // 昨日交易金额
@@ -265,6 +284,19 @@
    methods: {
      init() {
        const that = this
+       if (this.$access('ENT_C_MAIN_PAY_DAY_COUNT')) {
+         // 今日/昨日交易统计
+         getPayDayCount(that.todayOrYesterday).then(res => {
+           console.log('今日/昨日交易统计', res)
+           that.mainChart.dayCount = res.dayCount
+           that.skeletonClose(that)
+         }).catch((err) => {
+           console.error(err)
+           that.skeletonClose(that)
+         })
+       } else {
+         that.skeletonClose(that)
+       }
        if (this.$access('ENT_C_MAIN_PAY_AMOUNT_WEEK')) {
          // 周总交易金额
          getPayAmountWeek().then(res => {
@@ -369,8 +401,16 @@
      onClose() {
        this.visible = false
      },
-     getPayDayCount(tab) {
-       this.todayOrYesterday = tab
+     getPayDayCount(parameter) {
+       const that = this
+       that.todayOrYesterday = parameter
+       // 今日/昨日交易统计
+       getPayDayCount(that.todayOrYesterday).then(res => {
+         console.log('今日/昨日交易统计', res)
+         that.mainChart.dayCount = res.dayCount
+       }).catch((err) => {
+         console.error(err)
+       })
      },
      payOnChange(date, dateString) {
        this.searchData.createdStart = dateString[0] // 开始时间
@@ -422,7 +462,7 @@
      skeletonClose(that) {
        // 每次请求成功，skeletonReqNum + 1,当大于等于4时， 取消骨架屏展示
        that.skeletonReqNum++
-       that.skeletonReqNum >= 4 ? that.skeletonIsShow = false : that.skeletonIsShow = true
+       that.skeletonReqNum >= 5 ? that.skeletonIsShow = false : that.skeletonIsShow = true
      }
    },
    computed: {

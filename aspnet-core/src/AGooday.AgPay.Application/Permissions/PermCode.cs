@@ -113,10 +113,13 @@
             public const string ENT_ISV_INFO_ADD = "ENT_ISV_INFO_ADD";
             public const string ENT_ISV_INFO = "ENT_ISV_INFO";
             public const string ENT_C_USERINFO = "ENT_C_USERINFO";
+            public const string ENT_C_MAIN_ISV_MCH_COUNT = "ENT_C_MAIN_ISV_MCH_COUNT";
             public const string ENT_C_MAIN_PAY_TYPE_COUNT = "ENT_C_MAIN_PAY_TYPE_COUNT";
             public const string ENT_C_MAIN_PAY_COUNT = "ENT_C_MAIN_PAY_COUNT";
             public const string ENT_C_MAIN_PAY_AMOUNT_WEEK = "ENT_C_MAIN_PAY_AMOUNT_WEEK";
             public const string ENT_C_MAIN_NUMBER_COUNT = "ENT_C_MAIN_NUMBER_COUNT";
+            public const string ENT_C_MAIN_PAY_DAY_COUNT = "ENT_C_MAIN_PAY_DAY_COUNT";
+            public const string ENT_C_MAIN_PAY_TREND_COUNT = "ENT_C_MAIN_PAY_TREND_COUNT";
             public const string ENT_ARTICLE_NOTICEINFO = "ENT_ARTICLE_NOTICEINFO";
             public const string ENT_NOTICE_ADD = "ENT_NOTICE_ADD";
             public const string ENT_NOTICE_DEL = "ENT_NOTICE_DEL";
