@@ -4,8 +4,8 @@
     <div class="amount">
       <div>
         <!-- 骨架屏与图表有冲突，故不使用内嵌方式。 因为内边距的原因，采取v-if的方式 -->
-        <a-skeleton active :loading="true" v-if="skeletonIsShow" style="padding:20px" :paragraph="{ rows: 6 }" />
-        <div v-show="!skeletonIsShow" class="amount-top">
+        <div class="amount-top">
+          <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
           <div class="amount-date">
             <div :class="{ 'amount-date-active': todayOrYesterday === 'today' }" @click="getPayDayCount('today')">今日交易</div>
             <div :class="{ 'amount-date-active': todayOrYesterday === 'yesterday' }" @click="getPayDayCount('yesterday')">昨日交易</div>
@@ -26,11 +26,11 @@
               <span>{{ mainChart.dayCount.refundCount }}</span>
             </div>
           </div>
+          </a-skeleton>
         </div>
         <div class="amount-line"></div>
-        <!-- 骨架屏与图表有冲突，故不使用内嵌方式。 因为内边距的原因，采取v-if的方式 -->
-        <a-skeleton active :loading="true" v-if="skeletonIsShow" style="padding:20px" :paragraph="{ rows: 6 }" />
-        <div v-show="!skeletonIsShow" class="amount-bottom">
+        <div class="amount-bottom">
+          <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
           <div class="echart-title">
             <div style="display: flex;justify-content: center;align-items: center;">
               <b style="color: rgb(255, 255, 255);">趋势</b>
@@ -46,14 +46,15 @@
               <a-select-option :value=7>近7天</a-select-option>
             </a-select>
           </div>
-          <div id="payAmount" style="height: 280px"></div>
+          </a-skeleton>
+          <div id="pay-amount" ref="payAmount"></div>
           <empty v-show="!ispayAmount" style="color: #fff;"/>
         </div>
       </div>
     </div>
     <div class="quantity">
       <div class="quantity-top">
-        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 2 }">
+        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 1 }">
           <div class="quantity-title">
             <span>代理商数量</span>
             <a-tooltip>
@@ -67,7 +68,7 @@
         </a-skeleton>
       </div>
       <div class="quantity-bottom">
-        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 3 }">
+        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 1 }">
           <div class="quantity-title">
             <span>商户数量</span>
             <a-tooltip>
@@ -81,30 +82,30 @@
           <div class="quantity-contrast">
             <div class="contrast-text">
               <span class="especially">
-                <span style="margin-right: 5px;" v-if="isvSubMchTipIsShow">特约商户</span>
+                <span style="margin-right: 5px;" v-if="mainTips.isvSubMchTipIsShow">特约商户</span>
                 <span>{{ mainChart.isvSubMchCount }}</span>
               </span>
               <span class="ordinary">
-                <span style="margin-right: 5px;" v-if="normalMchTipIsShow">普通商户</span>
+                <span style="margin-right: 5px;" v-if="mainTips.normalMchTipIsShow">普通商户</span>
                 <span>{{ mainChart.normalMchCount }}</span>
               </span>
             </div>
             <div class="contrast-chart" style="background: rgb(255, 128, 102);">
               <div
-                @mouseover="()=>{ isvSubMchTipIsShow = true }"
-                @mouseout="()=>{ isvSubMchTipIsShow = false }"
+                @mouseover="()=>{ mainTips.isvSubMchTipIsShow = true }"
+                @mouseout="()=>{ mainTips.isvSubMchTipIsShow = false }"
                 style="background: rgb(255, 208, 128); cursor: pointer;"
                 :style="{ 'width': (mainChart.totalMch !== 0 ? mainChart.isvSubMchCount / mainChart.totalMch : 0) * 100 + '%' }"/>
               <div
-                @mouseover="()=>{ normalMchTipIsShow = true }"
-                @mouseout="()=>{ normalMchTipIsShow = false }"
+                @mouseover="()=>{ mainTips.normalMchTipIsShow = true }"
+                @mouseout="()=>{ mainTips.normalMchTipIsShow = false }"
                 style="flex-grow: 1; cursor: pointer;"/>
             </div>
           </div>
         </a-skeleton>
       </div>
     </div>
-    <div class="personal">
+    <div  class="personal">
       <div>
         <a-skeleton active avatar :loading="skeletonIsShow" :paragraph="{ rows: 1 }">
           <div class="personal-title">
@@ -117,7 +118,7 @@
           </div>
         </a-skeleton>
         <div class="personal-line"></div>
-        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 1 }">
+        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 0 }">
           <div class="msg">
             <span>预留信息： <a style="color: rgb(38, 145, 255); margin-right: 5px;">{{ safeWord }}</a>
               <a-tooltip placement="right">
@@ -130,7 +131,7 @@
           </div>
         </a-skeleton>
         <div class="personal-line"></div>
-        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 2 }">
+        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 0 }">
           <div class="quick-start">
             <p>快速开始</p>
             <ul></ul>
@@ -139,9 +140,9 @@
       </div>
     </div>
     <div class="method">
-      <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 12 }"/>
-      <div v-show="!skeletonIsShow">
-        <div class="echart-title">
+      <div>
+        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 12 }"/>
+        <div v-show="!skeletonIsShow" class="echart-title">
           <b>支付方式</b>
           <div class="chart-padding">
             <a-range-picker
@@ -167,14 +168,14 @@
           </div>
         </div>
         <!-- 如果没数据就展示一个图标 -->
-        <div v-show="isPayType" id="payType" style="height:300px"></div>
+        <div id="pay-type" ref="payType" style="height: 100%;"></div>
         <empty v-show="!isPayType" />
       </div>
     </div>
     <div class="pay-statistics">
-      <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 12 }"/>
-      <div v-show="!skeletonIsShow">
-        <div class="echart-title">
+      <div>
+        <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 12 }"/>
+        <div v-show="!skeletonIsShow" class="echart-title">
           <b>交易统计</b>
           <div class="chart-padding" >
             <a-range-picker
@@ -199,21 +200,15 @@
             </a-range-picker>
           </div>
         </div>
-        <div style="position: relative;">
-          <div v-show="isPayCount">
-            <div id="payCount">
-            </div>
-            <span style="right: 0px; position: absolute;top: 0;">单位（元）</span>
-          </div>
-          <empty v-show="!isPayCount"/>
-        </div>
+        <!-- 如果没数据就展示一个图标 -->
+        <div id="pay-count" ref="payCount" style="height: 100%;padding: 10px 0 30px;"></div>
+        <empty v-show="!isPayCount" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { TinyArea, Column, Pie, measureTextWidth } from '@antv/g2plot'
   import { getPayDayCount, getPayAmountWeek, getNumCount, getPayCount, getPayType } from '@/api/manage'
   import moment from 'moment'
   import store from '@/store'
@@ -221,359 +216,663 @@
   import empty from './empty' // 空数据展示的组件，首页自用
 
   export default {
-   data() {
-     return {
-       skeletonIsShow: true, // 骨架屏是否显示
-       isvSubMchTipIsShow: false, // 骨架屏是否显示
-       normalMchTipIsShow: false, // 骨架屏是否显示
-       skeletonReqNum: 0, // 当所有数据请求完毕后关闭骨架屏（共四个请求）
-       todayOrYesterday: 'today',
-       recentDay: 30,
-       lastSevenDays: true, // 最近七天是否显示
-       pieDays: false, // 饼状图的关闭按钮是否展示
-       visible: false,
-       recordId: store.state.user.userId,
-       searchData: {}, // 时间选择条件
-       greetImg: store.state.user.avatarImgPath, // 头像图片地址
-       safeWord: store.state.user.safeWord, // 安全词
-       isPayType: true, // 支付方式是否存在数据
-       isPayCount: true, // 交易统计是否存在数据
-       ispayAmount: true, // 今日交易金额是否存在数据
-       agDate: undefined, // 自定义日期选择框所用状态
-       agDatePie: undefined, // 自定义日期选择框所用状态-支付方式
-       isAdmin: store.state.user.isAdmin, // 是否为超级管理员
-       mainTips: { // 主页提示
-         todayAmountTip: '今日成功交易金额及笔数', // 今日交易提示文字
-         recentAmountTip: '近期交易金额', // 今日交易提示文字
-         totalAmountTip: '成功交易总金额', // 交易总金额提示文字
-         totalPayCountTip: '成功交易总笔数', // 交易总笔数提示文字
-         totalAgentTip: '代理商数量', // 代理商数量提示文字
-         totalIsvTip: '服务商数量', // 服务商数量提示文字
-         totalMchTip: '商户数量', // 商户数量提示文字
-         helloTitle: ''
-       },
-       mainChart: { // 主页统计数据
-         payAmountData: [], // 近七天交易图表
-         payCount: [], // 交易统计图表
-         payType: [], // 支付方式统计图表
-         dayCount: {
-           allCount: 0,
-           payCount: 0,
-           refundCount: 0,
-           payAmount: 0.00,
-           refundAmount: 0.00
-         },
-         todayAmount: 0.00, // 今日交易金额
-         todayPayCount: 0, // 今日交易笔数
-         yesterdayAmount: 0.00, // 昨日交易金额
-         payWeek: 0.00, // 近7天总交易金额
-         totalPayCount: 0, // 交易总笔数
-         totalAmount: 0.00, // 交易总金额
-         totalIsv: 0, // 当前服务商总数
-         totalAgent: 0, // 当前代理商总数
-         totalMch: 0, // 当前商户总数
-         isvSubMchCount: 0, // 特约商户数
-         normalMchCount: 0 // 普通商户数
-       },
-       tinyArea: {},
-       columnPlot: null, // 柱状图数据
-       piePlot: null // 环图数据
-     }
-   },
-   components: { empty },
-   methods: {
-     init() {
-       const that = this
-       if (this.$access('ENT_C_MAIN_PAY_DAY_COUNT')) {
-         // 今日/昨日交易统计
-         getPayDayCount(that.todayOrYesterday).then(res => {
-           console.log('今日/昨日交易统计', res)
-           that.mainChart.dayCount = res.dayCount
-           that.skeletonClose(that)
-         }).catch((err) => {
-           console.error(err)
-           that.skeletonClose(that)
-         })
-       } else {
-         that.skeletonClose(that)
-       }
-       if (this.$access('ENT_C_MAIN_PAY_AMOUNT_WEEK')) {
-         // 周总交易金额
-         getPayAmountWeek().then(res => {
-           // console.log('周总交易金额', res)
-           that.mainChart.payAmountData = res.dataArray
-           res.dataArray.length === 0 ? this.ispayAmount = false : this.ispayAmount = true
-           that.mainChart.todayPayCount = res.todayPayCount
-           that.mainChart.todayAmount = res.todayAmount
-           that.mainChart.payWeek = res.payWeek
-           that.mainChart.yesterdayAmount = (res.yesterdayAmount)
-           that.initPayAmount()
-           that.skeletonClose(that)
-         }).catch((err) => {
-           console.error(err)
-           that.skeletonClose(that)
-           this.ispayAmount = false
-         })
-       } else {
-         this.ispayAmount = false
-         that.skeletonClose(that)
-       }
-       if (this.$access('ENT_C_MAIN_NUMBER_COUNT')) {
-         // 数据统计
-         getNumCount().then(res => {
-           // console.log('数据统计', res)
-           that.mainChart.totalMch = res.totalMch
-           that.mainChart.isvSubMchCount = res.isvSubMchCount
-           that.mainChart.normalMchCount = res.normalMchCount
-           that.mainChart.totalAgent = res.totalAgent
-           that.mainChart.totalIsv = res.totalIsv
-           that.mainChart.totalAmount = res.totalAmount
-           that.mainChart.totalPayCount = res.totalCount
-           that.skeletonClose(that)
-         }).catch((err) => {
-           console.error(err)
-           that.skeletonClose(that)
-         })
-       } else {
-         that.skeletonClose(that)
-       }
-       // 交易统计
-       if (this.$access('ENT_C_MAIN_PAY_COUNT')) {
-         getPayCount(that.searchData).then(res => {
-           // console.log('交易统计', res)
-           that.mainChart.payCount = res
-           res.length === 0 ? this.isPayCount = false : this.isPayCount = true
-           that.initPayCount()
-           that.skeletonClose(that)
-         }).catch((err) => {
-           console.error(err)
-           this.isPayCount = false
-           that.skeletonClose(that)
-         })
-       } else {
-         this.isPayCount = false
-         that.skeletonClose(that)
-       }
-       if (this.$access('ENT_C_MAIN_PAY_TYPE_COUNT')) {
-         // 支付类型统计
-         getPayType(that.searchData).then(res => {
-           // console.log('支付类型统计', res)
-           that.mainChart.payType = res
-           res.length === 0 ? this.isPayType = false : this.isPayType = true
-           that.initPayType()
-           that.skeletonClose(that)
-         }).catch((err) => {
-           console.error(err)
-           this.isPayType = false
-           that.skeletonClose(that)
-         })
-       } else {
-         this.isPayType = false
-         that.skeletonClose(that)
-       }
-     },
-     initPayAmount() {
-       this.tinyArea.render()
-       this.tinyArea.changeData(this.mainChart.payAmountData)
-     },
-     initPayCount() {
-       this.columnPlot.render()
-       this.columnPlot.changeData(this.mainChart.payCount)
-     },
-     initPayType() {
-       this.piePlot.render()
-       this.piePlot.changeData(this.mainChart.payType)
-     },
-     renderStatistic: function (containerWidth, text, style) {
-       const {width: textWidth, height: textHeight} = measureTextWidth(text, style)
-       const R = containerWidth / 2
-       // r^2 = (w / 2)^2 + (h - offsetY)^2
-       let scale = 0.7
-       if (containerWidth < textWidth) {
-         scale = Math.min(Math.sqrt(Math.abs(Math.pow(R, 2) / (Math.pow(textWidth / 2, 2) + Math.pow(textHeight, 2)))), 1)
-       }
-       const textStyleStr = `width:${containerWidth}px`
-       return `<div style="${textStyleStr};font-size:${scale}em;line-height:${scale < 1 ? 1 : 'inherit'};">${text}</div>`
-     },
-     showDrawer() {
-       this.visible = true
-     },
-     onClose() {
-       this.visible = false
-     },
-     getPayDayCount(parameter) {
-       const that = this
-       that.todayOrYesterday = parameter
-       // 今日/昨日交易统计
-       getPayDayCount(that.todayOrYesterday).then(res => {
-         console.log('今日/昨日交易统计', res)
-         that.mainChart.dayCount = res.dayCount
-       }).catch((err) => {
-         console.error(err)
-       })
-     },
-     payOnChange(date, dateString) {
-       this.searchData.createdStart = dateString[0] // 开始时间
-       this.searchData.createdEnd = dateString[1] // 结束时间
-       this.pieDays = true
-       this.agDatePie = dateString[0] + ' ~ ' + dateString[1]
-     },
-     // 交易统计，日期选择器，关闭按钮点击事件
-     iconClick(dates) {
-       this.searchData.createdStart = moment().subtract(7, 'days').format('YYYY-MM-DD') // 开始时间
-       this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
-       this.payCountOk()
-       this.agDate = '最近七天'
-       this.lastSevenDays = true
-     },
-     // 支付方式，日期选择器，关闭按钮点击事件
-     iconPieClick() {
-       this.searchData.createdStart = moment().subtract(7, 'days').format('YYYY-MM-DD') // 开始时间
-       this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
-       this.payTypeOk()
-       this.agDatePie = '最近七天'
-       this.pieDays = false
-     },
-     moment,
-     disabledDate(current) {
-       // 当天之前的三十天，可选。 当天也可选
-       return current < moment().subtract(32, 'days') || current > moment().endOf('day')
-     },
-     transactionChange(dates, dateStrings) {
-       this.searchData.createdStart = dateStrings[0] // 开始时间
-       this.searchData.createdEnd = dateStrings[1] // 结束时间
-       this.agDate = dateStrings[0] + ' ~ ' + dateStrings[1]
-       this.lastSevenDays = false
-     },
-     payCountOk() {
-       const that = this
-       getPayCount(that.searchData).then(res => {
-         res.length === 0 ? this.isPayCount = false : this.isPayCount = true
-         that.columnPlot.changeData(res)
-       })
-     },
-     payTypeOk() {
-       const that = this
-       getPayType(that.searchData).then(res => {
-         res[0].length === 0 ? that.isPayType = false : that.isPayType = true
-         that.piePlot.changeData(res[0])
-       })
-     },
-     skeletonClose(that) {
-       // 每次请求成功，skeletonReqNum + 1,当大于等于4时， 取消骨架屏展示
-       that.skeletonReqNum++
-       that.skeletonReqNum >= 5 ? that.skeletonIsShow = false : that.skeletonIsShow = true
-     }
-   },
-   computed: {
-     // 快速菜单集合
-     quickMenuList: function () {
-       const result = []
+    data() {
+      return {
+        skeletonIsShow: true, // 骨架屏是否显示
+        skeletonReqNum: 0, // 当所有数据请求完毕后关闭骨架屏（共四个请求）
+        todayOrYesterday: 'today',
+        recentDay: 30,
+        lastSevenDays: true, // 最近七天是否显示
+        pieDays: false, // 饼状图的关闭按钮是否展示
+        visible: false,
+        recordId: store.state.user.userId,
+        searchData: {}, // 时间选择条件
+        greetImg: store.state.user.avatarImgPath, // 头像图片地址
+        safeWord: store.state.user.safeWord, // 安全词
+        isPayType: true, // 支付方式是否存在数据
+        isPayCount: true, // 交易统计是否存在数据
+        ispayAmount: true, // 今日交易金额是否存在数据
+        agDate: undefined, // 自定义日期选择框所用状态
+        agDatePie: undefined, // 自定义日期选择框所用状态-支付方式
+        isAdmin: store.state.user.isAdmin, // 是否为超级管理员
+        mainTips: { // 主页提示
+          isvSubMchTipIsShow: false,
+          normalMchTipIsShow: false,
+          recentAmountTip: '近期交易金额', // 今日交易提示文字
+          totalAmountTip: '成功交易总金额', // 交易总金额提示文字
+          totalPayCountTip: '成功交易总笔数', // 交易总笔数提示文字
+          totalAgentTip: '代理商数量', // 代理商数量提示文字
+          totalIsvTip: '服务商数量', // 服务商数量提示文字
+          totalMchTip: '商户数量', // 商户数量提示文字
+          helloTitle: ''
+        },
+        mainChart: { // 主页统计数据
+          payAmountChart: {
+            chart: null
+          },
+          payTypeChart: {
+            chart: null
+          },
+          payCountChart: {
+            chart: null
+          },
+          payAmountData: [], // 近七天交易图表
+          payCount: [], // 交易统计图表
+          payType: [], // 支付方式统计图表
+          dayCount: {
+            allCount: 0,
+            payCount: 0,
+            refundCount: 0,
+            payAmount: 0.00,
+            refundAmount: 0.00
+          },
+          totalPayCount: 0, // 交易总笔数
+          totalAmount: 0.00, // 交易总金额
+          totalIsv: 0, // 当前服务商总数
+          totalAgent: 0, // 当前代理商总数
+          totalMch: 0, // 当前商户总数
+          isvSubMchCount: 0, // 特约商户数
+          normalMchCount: 0 // 普通商户数
+        }
+      }
+    },
+    mounted() {
+      // 用户名信息以及时间问候语句。由于退出登陆才让他更改成功，所以这里的数据先从 vuex中获取
+      this.mainTips.helloTitle = `${timeFix()}，` + this.$store.state.user.userName
+      this.init()
+      // // 去掉交易统计 日期选择框，原生的边框
+      // this.$refs.agRange.$refs.picker.$el.firstChild.style.border = 'none'
+      // this.$refs.agRangePie.$refs.picker.$el.firstChild.style.border = 'none'
 
-       const putResult = function (item) {
-         for (let i = 0; i < item.length; i++) {
-           if (item[i].menuUri && item[i].quickJump === 1) {
-             result.push(item[i])
-           }
-           if (item[i].children) {
-             putResult(item[i].children)
-           }
-         }
-       }
+      window.addEventListener("resize", () => {
+        // 第六步，执行echarts自带的resize方法，即可做到让echarts图表自适应
+        this.mainChart.payAmountChart.chart.resize()
+        this.mainChart.payTypeChart.chart.resize()
+        this.mainChart.payCountChart.chart.resize()
+        // 如果有多个echarts，就在这里执行多个echarts实例的resize方法,不过一般要做组件化开发，即一个.vue文件只会放置一个echarts实例
+        /*
+        this.myChart2.resize();
+        this.myChart3.resize();
+        ......
+        */
+      })
+    },
+    components: {empty},
+    computed: {
+      // 快速菜单集合
+      quickMenuList: function () {
+        const result = []
 
-       putResult(this.$store.state.user.allMenuRouteTree)
-       return result
-     }
-   },
-   mounted() {
-     this.tinyArea = new TinyArea('payAmount', {
-       autoFit: true,
-       data: this.mainChart.payAmountData,
-       smooth: true
-     })
+        const putResult = function (item) {
+          for (let i = 0; i < item.length; i++) {
+            if (item[i].menuUri && item[i].quickJump === 1) {
+              result.push(item[i])
+            }
+            if (item[i].children) {
+              putResult(item[i].children)
+            }
+          }
+        }
 
-     this.columnPlot = new Column('payCount', {
-       data: this.mainChart.payCount,
-       xField: 'date',
-       yField: 'payAmount',
-       seriesField: 'type',
-       isGroup: 'true',
-       marginRatio: 0,
-       // height: 300,
-       // appendPadding: 16,
-       appendPadding: [0, 0, 0, 10], // 增加额外的边距，防止左侧的辅助文字被遮挡
-       theme: {
-         colors10: ['#FFB238', '#F55536']
-       },
-       label: {
-         // 可配置附加的布局方法
-         layout: [],
-         style: {
-           fillOpacity: 0
-         }
-       }
-     })
+        putResult(this.$store.state.user.allMenuRouteTree)
+        return result
+      }
+    },
+    methods: {
+      init() {
+        const that = this
+        if (this.$access('ENT_C_MAIN_PAY_DAY_COUNT')) {
+          // 今日/昨日交易统计
+          getPayDayCount(that.todayOrYesterday).then(res => {
+            // console.log('今日/昨日交易统计', res)
+            that.mainChart.dayCount = res.dayCount
+            that.skeletonClose(that)
+          }).catch((err) => {
+            console.error(err)
+            that.skeletonClose(that)
+          })
+        } else {
+          that.skeletonClose(that)
+        }
+        if (this.$access('ENT_C_MAIN_PAY_AMOUNT_WEEK')) {
+          // 周总交易金额
+          getPayAmountWeek().then(res => {
+            // console.log('周总交易金额', res)
+            res.dataArray.length === 0 ? this.ispayAmount = false : this.ispayAmount = true
+            that.initPayAmount()
+            that.skeletonClose(that)
+          }).catch((err) => {
+            console.error(err)
+            that.skeletonClose(that)
+            this.ispayAmount = false
+          })
+        } else {
+          this.ispayAmount = false
+          that.skeletonClose(that)
+        }
+        if (this.$access('ENT_C_MAIN_NUMBER_COUNT')) {
+          // 数据统计
+          getNumCount().then(res => {
+            // console.log('数据统计', res)
+            that.mainChart.totalMch = res.totalMch
+            that.mainChart.isvSubMchCount = res.isvSubMchCount
+            that.mainChart.normalMchCount = res.normalMchCount
+            that.mainChart.totalAgent = res.totalAgent
+            that.mainChart.totalIsv = res.totalIsv
+            that.mainChart.totalAmount = res.totalAmount
+            that.mainChart.totalPayCount = res.totalCount
+            that.skeletonClose(that)
+          }).catch((err) => {
+            console.error(err)
+            that.skeletonClose(that)
+          })
+        } else {
+          that.skeletonClose(that)
+        }
+        if (this.$access('ENT_C_MAIN_PAY_TYPE_COUNT')) {
+          // 支付类型统计
+          getPayType(that.searchData).then(res => {
+            // console.log('支付类型统计', res)
+            that.mainChart.payType = res
+            this.isPayType = true
+            // res.length === 0 ? this.isPayType = false : this.isPayType = true
+            that.initPayType()
+            that.skeletonClose(that)
+          }).catch((err) => {
+            console.error(err)
+            this.isPayType = false
+            that.skeletonClose(that)
+          })
+        } else {
+          this.isPayType = false
+          that.skeletonClose(that)
+        }
+        // 交易统计
+        if (this.$access('ENT_C_MAIN_PAY_COUNT')) {
+          getPayCount(that.searchData).then(res => {
+            // console.log('交易统计', res)
+            that.mainChart.payCount = res
+            res.length === 0 ? this.isPayCount = false : this.isPayCount = true
+            that.initPayCount()
+            that.skeletonClose(that)
+          }).catch((err) => {
+            console.error(err)
+            this.isPayCount = false
+            that.skeletonClose(that)
+          })
+        } else {
+          this.isPayCount = false
+          that.skeletonClose(that)
+        }
+      },
+      initPayAmount(data) {
+        // const chartDom = document.getElementById('pay-amount') // this.$refs.payAmount
+        // this.$refs.payAmount.style.width = '100%'
+        this.mainChart.payAmountChart.chart = this.$echarts.init(this.$refs.payAmount)
+        const option = {
+          grid: {
+            left: 0,
+            right: 0,
+            bottom: 0,
+            top: 20,
+            containLabel: true,
+          },
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'line'
+            }
+          },
+          xAxis: {
+            type: 'category',
+            splitLine: {
+              show: false
+            },
+            axisTick: {
+              show: false // 隐藏刻度
+            },
+            axisLine: {
+              show: false // 隐藏线条
+            },
+            data: ['01-19', '01-20', '01-21', '01-22', '01-23', '01-24', '01-25']
+          },
+          yAxis: {
+            splitLine: {
+              show: false
+            },
+            axisLabel: {
+              show: false
+            },
+            type: 'value'
+          },
+          series: [
+            {
+              data: ['1', '0.81', '7.1', '6', '5.1', '9', '9.9'],
+              backgroundColor: '', // 设置无背景色
+              showSymbol: false, // 隐藏圆点
+              itemStyle: {
+                normal: {
+                  color: '#e7bd72',
+                  lineStyle: {
+                    color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                      {
+                        offset: 0,
+                        color: '#ffeecf'
+                      },
+                      {
+                        offset: 1,
+                        color: '#ffcc75'
+                      }
+                    ]), // 线条渐变色
+                    width: 10 // 设置线条粗细
+                  }
+                }
+              },
+              type: 'line',
+              smooth: true
+            }
+          ]
+        }
 
-     this.piePlot = new Pie('payType', {
-       width: '100%',
-       appendPadding: [10, 16, 10, 10], // 增加额外的边距，防止左侧的辅助文字被遮挡
-       data: this.mainChart.payType,
-       angleField: 'typeAmount', // 金额  // 笔数 typeCount
-       colorField: 'typeName',
-       radius: 1,
-       innerRadius: 0.64,
-       autoFit: true,
-       color: ['#FF6B3B', '#626681', '#FFC100', '#9FB40F', '#76523B', '#DAD5B5', '#0E8E89', '#E19348', '#F383A2', '#247FEA', '#2BCB95', '#B1ABF4', '#1D42C2', '#1D9ED1', '#D64BC0', '#255634', '#8C8C47', '#8CDAE5', '#8E283B', '#791DC9'],
-       meta: {
-         value: {
-           formatter: (v) => `${v} ¥`
-         }
-       },
-       label: {
-         type: 'inner',
-         offset: '-50%',
-         style: {
-           textAlign: 'center'
-         },
-         autoRotate: false,
-         content: '{value}'
-       },
-       statistic: {
-         title: {
-           offsetY: -4,
-           customHtml: (container, view, datum) => {
-             const {width, height} = container.getBoundingClientRect()
-             const d = Math.sqrt(Math.pow(width / 2, 2) + Math.pow(height / 2, 2))
-             const text = datum ? datum.typeName : '总计'
-             return this.renderStatistic(d, text, {fontSize: 28})
-           }
-         },
-         content: {
-           offsetY: 4,
-           style: {
-             fontSize: '32px'
-           },
-           customHtml: (container, view, datum, data) => {
-             const {width} = container.getBoundingClientRect()
-             // 在这里保留小数点后两位
-             const fixedTwo = data.reduce((r, d) => r + d.typeAmount, 0).toFixed(2)
-             const text = datum ? `¥ ${datum.typeAmount}` : `¥ ${fixedTwo}`
-             return this.renderStatistic(width, text, {fontSize: 32})
-           }
-         }
-       },
-       // 添加 中心统计文本 交互
-       interactions: [{type: 'element-selected'}, {type: 'element-active'}, {type: 'pie-statistic-active'}]
-     })
+        option && this.mainChart.payAmountChart.chart.setOption(option)
 
-     // 用户名信息以及时间问候语句。由于退出登陆才让他更改成功，所以这里的数据先从 vuex中获取
-     this.mainTips.helloTitle = `${timeFix()}，` + this.$store.state.user.userName
-     this.init()
-     // 去掉交易统计 日期选择框，原生的边框
-     this.$refs.agRange.$refs.picker.$el.firstChild.style.border = 'none'
-     this.$refs.agRangePie.$refs.picker.$el.firstChild.style.border = 'none'
-   }
- }
+        // this.mainChart.payAmountChart.chart.resize(); // 调用此API更新echarts的宽高才能生效
+
+        // setTimeout(() => {
+        //   this.mainChart.payAmountChart.chart.resize(); // 调用此API更新echarts的宽高才能生效
+        // }, 1)
+      },
+      initPayType() {
+        console.log(this.$refs.payType.style.width)
+        this.mainChart.payTypeChart.chart = this.$echarts.init(this.$refs.payType)
+        const option = {
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            bottom: "0%"
+          },
+          series: [
+            {
+              name: '支付方式',
+              type: 'pie',
+              radius: ['40%', '70%'],
+              avoidLabelOverlap: false,
+              itemStyle: {
+                borderRadius: 10,
+                borderColor: '#fff',
+                borderWidth: 2
+              },
+              label: {
+                show: false,
+                position: 'center'
+              },
+              emphasis: {
+                label: {
+                  show: true,
+                  fontSize: 40,
+                  fontWeight: 'bold'
+                }
+              },
+              labelLine: {
+                show: false
+              },
+              data: [
+                { value: 1048, name: '微信' },
+                { value: 735, name: '支付宝' },
+                { value: 580, name: '云闪付' },
+                { value: 484, name: '数字人民' },
+                { value: 300, name: '刷卡' }
+              ]
+            }
+          ]
+        }
+
+        option && this.mainChart.payTypeChart.chart.setOption(option)
+
+        setTimeout(() => {
+          this.mainChart.payTypeChart.chart.resize(); // 调用此API更新echarts的宽高才能生效
+        }, 100)
+      },
+      initPayCount() {
+        this.mainChart.payCountChart.chart = this.$echarts.init(this.$refs.payCount)
+        const option = {
+          grid: {
+            left: 0,
+            right: 0,
+            bottom: '12%',
+            top: '12%',
+            containLabel: true,
+          },
+          color: ['#80FFA5', '#00DDFF', '#37A2FF'],
+          title: {
+            //text: 'Gradient Stacked Area Chart'
+          },
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'line'
+            }
+          },
+          legend: {
+            data: ['交易金额', '支付(成功)笔数', '退款金额']
+          },
+          xAxis: [
+            {
+              type: 'category',
+              boundaryGap: false,
+              data: [
+                '2023-01-20',
+                '2023-01-21',
+                '2023-01-22',
+                '2023-01-23',
+                '2023-01-24',
+                '2023-01-25',
+                '2023-01-26',
+                '2023-01-27',
+                '2023-01-28',
+                '2023-01-29',
+                '2023-01-30',
+                '2023-01-31',
+                '2023-02-01',
+                '2023-02-02',
+                '2023-02-03',
+                '2023-02-04',
+                '2023-02-05',
+                '2023-02-06',
+                '2023-02-07',
+                '2023-02-08',
+                '2023-02-09',
+                '2023-02-10',
+                '2023-02-11',
+                '2023-02-12',
+                '2023-02-13',
+                '2023-02-14',
+                '2023-02-15',
+                '2023-02-16',
+                '2023-02-17',
+                '2023-02-18'
+              ]
+            }
+          ],
+          yAxis: [
+            {
+              type: 'value'
+            }
+          ],
+          dataZoom: [
+            {
+              type: 'inside',
+              bottom: "12%",
+              start: 0,
+              end: 100
+            },
+            {
+              start: 0,
+              end: 100
+            }
+          ],
+          series: [
+            {
+              name: '交易金额',
+              type: 'line',
+              stack: 'Total',
+              smooth: true,
+              lineStyle: {
+                width: 0
+              },
+              showSymbol: false,
+              areaStyle: {
+                opacity: 0.8,
+                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  {
+                    offset: 0,
+                    color: 'rgb(128, 255, 165)'
+                  },
+                  {
+                    offset: 1,
+                    color: 'rgb(1, 191, 236)'
+                  }
+                ])
+              },
+              emphasis: {
+                focus: 'series'
+              },
+              data: [
+                "0",
+                "0",
+                "20",
+                "40",
+                "50",
+                "6",
+                "0",
+                "0",
+                "19",
+                "0",
+                "0",
+                "8",
+                "0",
+                "18",
+                "0",
+                "0",
+                "0",
+                "81",
+                "1",
+                "0",
+                "1",
+                "0",
+                "0",
+                "76",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0"
+              ]
+            },
+            {
+              name: '支付(成功)笔数',
+              type: 'line',
+              stack: 'Total',
+              smooth: true,
+              lineStyle: {
+                width: 0
+              },
+              showSymbol: false,
+              areaStyle: {
+                opacity: 0.8,
+                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  {
+                    offset: 0,
+                    color: 'rgb(0, 221, 255)'
+                  },
+                  {
+                    offset: 1,
+                    color: 'rgb(77, 119, 255)'
+                  }
+                ])
+              },
+              emphasis: {
+                focus: 'series'
+              },
+              data: [
+                "0",
+                "20",
+                "0",
+                "0",
+                "0",
+                "10",
+                "0",
+                "0",
+                "0",
+                "30",
+                "0",
+                "0",
+                "0",
+                "4",
+                "0",
+                "0",
+                "0",
+                "0",
+                "2",
+                "1",
+                "0",
+                "1",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "7",
+                "0",
+                "0"
+              ]
+            },
+            {
+              name: '退款金额',
+              type: 'line',
+              stack: 'Total',
+              smooth: true,
+              lineStyle: {
+                width: 0
+              },
+              showSymbol: false,
+              areaStyle: {
+                opacity: 0.8,
+                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  {
+                    offset: 0,
+                    color: 'rgb(55, 162, 255)'
+                  },
+                  {
+                    offset: 1,
+                    color: 'rgb(116, 21, 219)'
+                  }
+                ])
+              },
+              emphasis: {
+                focus: 'series'
+              },
+              data: [
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "47",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0"
+              ]
+            }
+          ]
+        }
+
+        option && this.mainChart.payCountChart.chart.setOption(option)
+
+        // setTimeout(() => {
+        //   this.mainChart.payCountChart.chart.resize(); // 调用此API更新echarts的宽高才能生效
+        // }, 100)
+      },
+      showDrawer() {
+        this.visible = true
+      },
+      onClose() {
+        this.visible = false
+      },
+      getPayDayCount(parameter) {
+        const that = this
+        that.todayOrYesterday = parameter
+        // 今日/昨日交易统计
+        getPayDayCount(that.todayOrYesterday).then(res => {
+          console.log('今日/昨日交易统计', res)
+          that.mainChart.dayCount = res.dayCount
+        }).catch((err) => {
+          console.error(err)
+        })
+      },
+      payOnChange(date, dateString) {
+        this.searchData.createdStart = dateString[0] // 开始时间
+        this.searchData.createdEnd = dateString[1] // 结束时间
+        this.pieDays = true
+        this.agDatePie = dateString[0] + ' ~ ' + dateString[1]
+      },
+      // 交易统计，日期选择器，关闭按钮点击事件
+      iconClick(dates) {
+        this.searchData.createdStart = moment().subtract(7, 'days').format('YYYY-MM-DD') // 开始时间
+        this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
+        this.payCountOk()
+        this.agDate = '最近七天'
+        this.lastSevenDays = true
+      },
+      // 支付方式，日期选择器，关闭按钮点击事件
+      iconPieClick() {
+        this.searchData.createdStart = moment().subtract(7, 'days').format('YYYY-MM-DD') // 开始时间
+        this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
+        this.payTypeOk()
+        this.agDatePie = '最近七天'
+        this.pieDays = false
+      },
+      moment,
+      disabledDate(current) {
+        // 当天之前的三十天，可选。 当天也可选
+        return current < moment().subtract(32, 'days') || current > moment().endOf('day')
+      },
+      transactionChange(dates, dateStrings) {
+        this.searchData.createdStart = dateStrings[0] // 开始时间
+        this.searchData.createdEnd = dateStrings[1] // 结束时间
+        this.agDate = dateStrings[0] + ' ~ ' + dateStrings[1]
+        this.lastSevenDays = false
+      },
+      payCountOk() {
+        const that = this
+        getPayCount(that.searchData).then(res => {
+          res.length === 0 ? this.isPayCount = false : this.isPayCount = true
+        })
+      },
+      payTypeOk() {
+        const that = this
+        getPayType(that.searchData).then(res => {
+          res[0].length === 0 ? that.isPayType = false : that.isPayType = true
+        })
+      },
+      skeletonClose(that) {
+        // 每次请求成功，skeletonReqNum + 1,当大于等于4时， 取消骨架屏展示
+        that.skeletonReqNum++
+        that.skeletonReqNum >= 5 ? that.skeletonIsShow = false : that.skeletonIsShow = true
+      },
+      beforeDestroy() {
+        /* 页面组件销毁的时候，别忘了移除绑定的监听resize事件，否则的话，多渲染几次
+       容易导致内存泄漏和额外CPU或GPU占用哦*/
+        window.removeEventListener("resize", () => {
+          this.mainChart.payAmountChart.chart.resize()
+          this.mainChart.payTypeChart.chart.resize()
+          this.mainChart.payCountChart.chart.resize()
+        })
+      }
+    }
+  }
 </script>
 
 <style lang="less" scoped>
@@ -583,10 +882,10 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
-    max-width:330px;
-    min-width:260px;
+    max-width: 235px;
+    min-width: 235px;
     flex-grow: 1;
-    flex-shrink:1;
+    flex-shrink: 1;
     //margin-bottom: 20px;
   }
   .change-date-layout {
