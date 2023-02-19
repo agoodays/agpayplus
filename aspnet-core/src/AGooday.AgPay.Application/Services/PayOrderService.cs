@@ -438,6 +438,58 @@ namespace AGooday.AgPay.Application.Services
         }
 
         /// <summary>
+        /// 服务商/代理商/商户统计
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="agentNo"></param>
+        /// <returns></returns>
+        public JObject MainPageIsvAndMchCount(string mchNo, string agentNo)
+        {
+            JObject json = new JObject();
+            // 商户总数
+            var mchInfos = _mchInfoRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
+                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo)));
+            int isvSubMchCount = mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_ISVSUB)).Count();
+            int normalMchCount = mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_NORMAL)).Count();
+            int mchCount = mchInfos.Count();
+
+            int agentCount = 0;
+
+            if (string.IsNullOrWhiteSpace(agentNo))
+            {
+                // 代理商总数
+                var agentInfos = _agentInfoRepository.GetAll()
+                    .Where(w => (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo)));
+                agentCount = agentInfos.Count();
+            }
+            else
+            {
+                var subAgentInfos = GetSons(_agentInfoRepository.GetAll(), agentNo);
+                agentCount = subAgentInfos.Count();
+            }
+
+            // 服务商总数
+            var isvInfos = _isvInfoRepository.GetAll();
+            int isvCount = isvInfos.Count();
+            if (string.IsNullOrWhiteSpace(mchNo))
+            {
+                isvSubMchCount = isvSubMchCount < 10 ? Random.Shared.Next(0, 500) : isvSubMchCount;
+                normalMchCount = normalMchCount < 10 ? Random.Shared.Next(0, 500) : normalMchCount;
+                mchCount = isvSubMchCount + normalMchCount;
+                json.Add("isvSubMchCount", isvSubMchCount);
+                json.Add("normalMchCount", normalMchCount);
+                json.Add("totalMch", mchCount);
+                json.Add("totalAgent", agentCount < 10 ? Random.Shared.Next(0, 500) : isvSubMchCount);
+                if (string.IsNullOrWhiteSpace(agentNo))
+                {
+                    json.Add("totalIsv", isvCount < 10 ? Random.Shared.Next(0, 500) : isvCount);
+                }
+            }
+            return json;
+        }
+
+        /// <summary>
         /// 今日/昨日交易统计
         /// </summary>
         /// <param name="mchNo"></param>
@@ -473,11 +525,11 @@ namespace AGooday.AgPay.Application.Services
 
             json.Add("dayCount", JObject.FromObject(new
             {
-                allCount = 0,
-                payAmount = Decimal.Round(payAmount / 100, 0, MidpointRounding.AwayFromZero),
-                payCount,
-                refundAmount = Decimal.Round(refundAmount / 100, 0, MidpointRounding.AwayFromZero),
-                refundCount
+                allCount = allCount <= 0 ? Random.Shared.Next(0, 1000) : allCount,
+                payAmount = payAmount <= 0 ? Random.Shared.Next(0, 10000) : Decimal.Round(payAmount / 100, 0, MidpointRounding.AwayFromZero),
+                payCount = payCount <= 0 ? Random.Shared.Next(0, 1000) : payCount,
+                refundAmount = refundAmount <= 0 ? Random.Shared.Next(0, 5000) : Decimal.Round(refundAmount / 100, 0, MidpointRounding.AwayFromZero),
+                refundCount = refundCount <= 0 ? Random.Shared.Next(0, 500) : refundCount,
             }));
             return json;
         }
@@ -557,6 +609,7 @@ namespace AGooday.AgPay.Application.Services
 
             // 得到所有支付方式
             var payWayList = _payWayRepository.GetAll();
+
             // 支付方式名称标注
             foreach (var payCount in payCountMap)
             {
@@ -570,6 +623,23 @@ namespace AGooday.AgPay.Application.Services
                     payCount.TypeName = payCount.WayCode;
                 }
             }
+
+            // 生成虚拟数据
+            if (payCountMap?.Count <= 0)
+            {
+                payCountMap = new List<PayTypeCountDto>();
+                foreach (var payWay in payWayList)
+                {
+                    payCountMap.Add(new PayTypeCountDto()
+                    {
+                        WayCode = payWay.WayCode,
+                        TypeName = payWay.WayName,
+                        TypeCount = Random.Shared.Next(0, 100),
+                        TypeAmount = Random.Shared.Next(0, 1000),
+                    });
+                }
+            }
+
             // 返回数据列
             return payCountMap;
         }

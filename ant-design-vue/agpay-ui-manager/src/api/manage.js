@@ -220,9 +220,23 @@ export function getAvailablePayInterfaceList (mchNo, wayCode) {
   })
 }
 
+export function getPayTrendCount (parameter) {
+  return request.request({
+    url: API_URL_MAIN_STATISTIC + '/payTrendCount?recentDay=' + parameter,
+    method: 'GET'
+  })
+}
+
 export function getPayAmountWeek () {
   return request.request({
     url: API_URL_MAIN_STATISTIC + '/payAmountWeek',
+    method: 'GET'
+  })
+}
+
+export function getIsvAndMchCount () {
+  return request.request({
+    url: API_URL_MAIN_STATISTIC + '/isvAndMchCount',
     method: 'GET'
   })
 }

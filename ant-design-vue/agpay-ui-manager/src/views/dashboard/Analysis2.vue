@@ -3,49 +3,48 @@
   <div id="chart-card">
     <div class="amount">
       <div>
-        <!-- 骨架屏与图表有冲突，故不使用内嵌方式。 因为内边距的原因，采取v-if的方式 -->
         <div class="amount-top">
           <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
-          <div class="amount-date">
-            <div :class="{ 'amount-date-active': todayOrYesterday === 'today' }" @click="getPayDayCount('today')">今日交易</div>
-            <div :class="{ 'amount-date-active': todayOrYesterday === 'yesterday' }" @click="getPayDayCount('yesterday')">昨日交易</div>
-          </div>
-          <p>交易金额(元)</p>
-          <p style="font-size: 50px; margin-bottom: 35px; color: rgb(255, 255, 255);">{{ mainChart.dayCount.payAmount.toFixed(2) }}</p>
-          <div class="amount-list">
-            <div>
-              <p>交易笔数(笔)</p>
-              <span>{{ mainChart.dayCount.payCount }}</span>
+            <div class="amount-date">
+              <div :class="{ 'amount-date-active': todayOrYesterday === 'today' }" @click="getPayDayCount('today')">今日交易</div>
+              <div :class="{ 'amount-date-active': todayOrYesterday === 'yesterday' }" @click="getPayDayCount('yesterday')">昨日交易</div>
             </div>
-            <div>
-              <p>退款金额(元)</p>
-              <span>{{ mainChart.dayCount.refundAmount.toFixed(2) }}</span>
+            <p>交易金额(元)</p>
+            <p style="font-size: 50px; margin-bottom: 35px; color: rgb(255, 255, 255);">{{ mainChart.dayCount.payAmount.toFixed(2) }}</p>
+            <div class="amount-list">
+              <div>
+                <p>交易笔数(笔)</p>
+                <span>{{ mainChart.dayCount.payCount }}</span>
+              </div>
+              <div>
+                <p>退款金额(元)</p>
+                <span>{{ mainChart.dayCount.refundAmount.toFixed(2) }}</span>
+              </div>
+              <div>
+                <p>退款笔数(笔)</p>
+                <span>{{ mainChart.dayCount.refundCount }}</span>
+              </div>
             </div>
-            <div>
-              <p>退款笔数(笔)</p>
-              <span>{{ mainChart.dayCount.refundCount }}</span>
-            </div>
-          </div>
           </a-skeleton>
         </div>
         <div class="amount-line"></div>
         <div class="amount-bottom">
           <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 6 }">
-          <div class="echart-title">
-            <div style="display: flex;justify-content: center;align-items: center;">
-              <b style="color: rgb(255, 255, 255);">趋势</b>
-              <a-tooltip>
-                <template slot="title">
-                  {{ mainTips.recentAmountTip }}
-                </template>
-                <a-icon type="question-circle" />
-              </a-tooltip>
+            <div class="echart-title">
+              <div style="display: flex;justify-content: center;align-items: center;">
+                <b style="color: rgb(255, 255, 255);">趋势</b>
+                <a-tooltip>
+                  <template slot="title">
+                    {{ mainTips.recentAmountTip }}
+                  </template>
+                  <a-icon type="question-circle" />
+                </a-tooltip>
+              </div>
+              <a-select v-model="recentDay" placeholder="" default-value=30 style="width: 215px" @change="recentDayChange">
+                <a-select-option :value=30>近30天</a-select-option>
+                <a-select-option :value=7>近7天</a-select-option>
+              </a-select>
             </div>
-            <a-select v-model="recentDay" placeholder="" default-value=30 style="width: 215px">
-              <a-select-option :value=30>近30天</a-select-option>
-              <a-select-option :value=7>近7天</a-select-option>
-            </a-select>
-          </div>
           </a-skeleton>
           <div id="pay-amount" ref="payAmount"></div>
           <empty v-show="!ispayAmount" style="color: #fff;"/>
@@ -148,8 +147,15 @@
             <a-range-picker
               style="width:100%"
               ref="agRangePie"
-              :ranges="{ '最近一个月': [moment().subtract(1, 'months'),moment()] }"
-              :default-value="[moment().subtract(7, 'days'),moment()]"
+              :ranges="{
+                今天: [moment().startOf('day'), moment()],
+                昨天: [moment().startOf('day').subtract(1,'days'), moment().endOf('day').subtract(1, 'days')],
+                最近三天: [moment().startOf('day').subtract(2, 'days'), moment().endOf('day')],
+                最近一周: [moment().startOf('day').subtract(1, 'weeks'), moment()],
+                本月: [moment().startOf('month'), moment()],
+                本年: [moment().startOf('year'), moment()]
+              }"
+              :default-value="[moment().subtract(30, 'days'),moment()]"
               @change="payOnChange"
               show-time
               format="YYYY-MM-DD"
@@ -158,7 +164,7 @@
               :allowClear="false"
             >
               <div class="change-date-layout">
-                {{ agDatePie ? agDatePie : '最近七天' }}
+                {{ agDatePie ? agDatePie : '最近30天' }}
                 <div class="pay-icon">
                   <div v-if="!pieDays" class="change-date-icon"><a-icon type="down" /></div>
                   <div v-else @click.stop="iconPieClick" class="change-date-icon" ><a-icon type="close-circle" /></div>
@@ -181,8 +187,15 @@
             <a-range-picker
               ref="agRange"
               style="width:100%"
-              :ranges="{ '最近一个月': [moment().subtract(1, 'months'),moment()] }"
-              :default-value="[moment().subtract(7, 'days'),moment()]"
+              :ranges="{
+                今天: [moment().startOf('day'), moment()],
+                昨天: [moment().startOf('day').subtract(1,'days'), moment().endOf('day').subtract(1, 'days')],
+                最近三天: [moment().startOf('day').subtract(2, 'days'), moment().endOf('day')],
+                最近一周: [moment().startOf('day').subtract(1, 'weeks'), moment()],
+                本月: [moment().startOf('month'), moment()],
+                本年: [moment().startOf('year'), moment()]
+              }"
+              :default-value="[moment().subtract(30, 'days'),moment()]"
               show-time
               format="YYYY-MM-DD"
               @change="transactionChange"
@@ -191,7 +204,7 @@
               :allowClear="false"
             >
               <div class="change-date-layout">
-                {{ agDate ? agDate : '最近七天' }}
+                {{ agDate ? agDate : '最近30天' }}
                 <div class="pay-icon">
                   <div v-if="lastSevenDays" class="change-date-icon"><a-icon type="down" /></div>
                   <div v-else @click.stop="iconClick" class="change-date-icon" ><a-icon type="close-circle" /></div>
@@ -209,7 +222,7 @@
 </template>
 
 <script>
-  import { getPayDayCount, getPayAmountWeek, getNumCount, getPayCount, getPayType } from '@/api/manage'
+  import { getPayDayCount, getPayTrendCount, getIsvAndMchCount, getPayCount, getPayType } from '@/api/manage'
   import moment from 'moment'
   import store from '@/store'
   import { timeFix } from '@/utils/util'
@@ -239,8 +252,6 @@
           isvSubMchTipIsShow: false,
           normalMchTipIsShow: false,
           recentAmountTip: '近期交易金额', // 今日交易提示文字
-          totalAmountTip: '成功交易总金额', // 交易总金额提示文字
-          totalPayCountTip: '成功交易总笔数', // 交易总笔数提示文字
           totalAgentTip: '代理商数量', // 代理商数量提示文字
           totalIsvTip: '服务商数量', // 服务商数量提示文字
           totalMchTip: '商户数量', // 商户数量提示文字
@@ -266,8 +277,6 @@
             payAmount: 0.00,
             refundAmount: 0.00
           },
-          totalPayCount: 0, // 交易总笔数
-          totalAmount: 0.00, // 交易总金额
           totalIsv: 0, // 当前服务商总数
           totalAgent: 0, // 当前代理商总数
           totalMch: 0, // 当前商户总数
@@ -321,6 +330,9 @@
     methods: {
       init() {
         const that = this
+        that.initPayType()
+        that.initPayAmount()
+        that.initPayCount()
         if (this.$access('ENT_C_MAIN_PAY_DAY_COUNT')) {
           // 今日/昨日交易统计
           getPayDayCount(that.todayOrYesterday).then(res => {
@@ -334,12 +346,13 @@
         } else {
           that.skeletonClose(that)
         }
-        if (this.$access('ENT_C_MAIN_PAY_AMOUNT_WEEK')) {
-          // 周总交易金额
-          getPayAmountWeek().then(res => {
-            // console.log('周总交易金额', res)
-            res.dataArray.length === 0 ? this.ispayAmount = false : this.ispayAmount = true
-            that.initPayAmount()
+        if (this.$access('ENT_C_MAIN_PAY_TREND_COUNT')) {
+          // 近期交易金额
+          getPayTrendCount(that.recentDay).then(res => {
+            // console.log('近期交易金额', res)
+            // res.length === 0 ? this.ispayAmount = false : this.ispayAmount = true
+            that.ispayAmount = true
+            that.loadPayAmount(res)
             that.skeletonClose(that)
           }).catch((err) => {
             console.error(err)
@@ -350,17 +363,15 @@
           this.ispayAmount = false
           that.skeletonClose(that)
         }
-        if (this.$access('ENT_C_MAIN_NUMBER_COUNT')) {
+        if (this.$access('ENT_C_MAIN_ISV_MCH_COUNT')) {
           // 数据统计
-          getNumCount().then(res => {
+          getIsvAndMchCount().then(res => {
             // console.log('数据统计', res)
             that.mainChart.totalMch = res.totalMch
             that.mainChart.isvSubMchCount = res.isvSubMchCount
             that.mainChart.normalMchCount = res.normalMchCount
             that.mainChart.totalAgent = res.totalAgent
             that.mainChart.totalIsv = res.totalIsv
-            that.mainChart.totalAmount = res.totalAmount
-            that.mainChart.totalPayCount = res.totalCount
             that.skeletonClose(that)
           }).catch((err) => {
             console.error(err)
@@ -376,7 +387,11 @@
             that.mainChart.payType = res
             this.isPayType = true
             // res.length === 0 ? this.isPayType = false : this.isPayType = true
-            that.initPayType()
+            const data = []
+            for (const item of res) {
+              data.push({ name: item.typeName, value: item.typeAmount})
+            }
+            that.loadPayType(data)
             that.skeletonClose(that)
           }).catch((err) => {
             console.error(err)
@@ -392,8 +407,9 @@
           getPayCount(that.searchData).then(res => {
             // console.log('交易统计', res)
             that.mainChart.payCount = res
-            res.length === 0 ? this.isPayCount = false : this.isPayCount = true
-            that.initPayCount()
+            // res.length === 0 ? this.isPayCount = false : this.isPayCount = true
+            that.isPayCount = true
+            that.loadPayCount(res)
             that.skeletonClose(that)
           }).catch((err) => {
             console.error(err)
@@ -405,7 +421,7 @@
           that.skeletonClose(that)
         }
       },
-      initPayAmount(data) {
+      initPayAmount() {
         // const chartDom = document.getElementById('pay-amount') // this.$refs.payAmount
         // this.$refs.payAmount.style.width = '100%'
         this.mainChart.payAmountChart.chart = this.$echarts.init(this.$refs.payAmount)
@@ -434,7 +450,7 @@
             axisLine: {
               show: false // 隐藏线条
             },
-            data: ['01-19', '01-20', '01-21', '01-22', '01-23', '01-24', '01-25']
+            data: []
           },
           yAxis: {
             splitLine: {
@@ -447,7 +463,7 @@
           },
           series: [
             {
-              data: ['1', '0.81', '7.1', '6', '5.1', '9', '9.9'],
+              data: [],
               backgroundColor: '', // 设置无背景色
               showSymbol: false, // 隐藏圆点
               itemStyle: {
@@ -481,6 +497,19 @@
         // setTimeout(() => {
         //   this.mainChart.payAmountChart.chart.resize(); // 调用此API更新echarts的宽高才能生效
         // }, 1)
+      },
+      loadPayAmount(data) {
+        // 填入数据
+        this.mainChart.payAmountChart.chart.setOption({
+          xAxis: {
+            data: data.dateList
+          },
+          series: [
+            {
+              data: data.payAmountList
+            }
+          ]
+        })
       },
       initPayType() {
         console.log(this.$refs.payType.style.width)
@@ -517,18 +546,22 @@
               labelLine: {
                 show: false
               },
-              data: [
-                { value: 1048, name: '微信' },
-                { value: 735, name: '支付宝' },
-                { value: 580, name: '云闪付' },
-                { value: 484, name: '数字人民' },
-                { value: 300, name: '刷卡' }
-              ]
+              data: []
             }
           ]
         }
 
         option && this.mainChart.payTypeChart.chart.setOption(option)
+      },
+      loadPayType(data) {
+        // 填入数据
+        this.mainChart.payTypeChart.chart.setOption({
+          series: [
+            {
+              data: data
+            }
+          ]
+        })
 
         setTimeout(() => {
           this.mainChart.payTypeChart.chart.resize(); // 调用此API更新echarts的宽高才能生效
@@ -561,38 +594,7 @@
             {
               type: 'category',
               boundaryGap: false,
-              data: [
-                '2023-01-20',
-                '2023-01-21',
-                '2023-01-22',
-                '2023-01-23',
-                '2023-01-24',
-                '2023-01-25',
-                '2023-01-26',
-                '2023-01-27',
-                '2023-01-28',
-                '2023-01-29',
-                '2023-01-30',
-                '2023-01-31',
-                '2023-02-01',
-                '2023-02-02',
-                '2023-02-03',
-                '2023-02-04',
-                '2023-02-05',
-                '2023-02-06',
-                '2023-02-07',
-                '2023-02-08',
-                '2023-02-09',
-                '2023-02-10',
-                '2023-02-11',
-                '2023-02-12',
-                '2023-02-13',
-                '2023-02-14',
-                '2023-02-15',
-                '2023-02-16',
-                '2023-02-17',
-                '2023-02-18'
-              ]
+              data: []
             }
           ],
           yAxis: [
@@ -638,37 +640,7 @@
               emphasis: {
                 focus: 'series'
               },
-              data: [
-                "0",
-                "0",
-                "20",
-                "40",
-                "50",
-                "6",
-                "0",
-                "0",
-                "19",
-                "0",
-                "0",
-                "8",
-                "0",
-                "18",
-                "0",
-                "0",
-                "0",
-                "81",
-                "1",
-                "0",
-                "1",
-                "0",
-                "0",
-                "76",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0"
-              ]
+              data: []
             },
             {
               name: '支付(成功)笔数',
@@ -695,38 +667,7 @@
               emphasis: {
                 focus: 'series'
               },
-              data: [
-                "0",
-                "20",
-                "0",
-                "0",
-                "0",
-                "10",
-                "0",
-                "0",
-                "0",
-                "30",
-                "0",
-                "0",
-                "0",
-                "4",
-                "0",
-                "0",
-                "0",
-                "0",
-                "2",
-                "1",
-                "0",
-                "1",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "7",
-                "0",
-                "0"
-              ]
+              data: []
             },
             {
               name: '退款金额',
@@ -753,38 +694,7 @@
               emphasis: {
                 focus: 'series'
               },
-              data: [
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "47",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0"
-              ]
+              data: []
             }
           ]
         }
@@ -795,6 +705,34 @@
         //   this.mainChart.payCountChart.chart.resize(); // 调用此API更新echarts的宽高才能生效
         // }, 100)
       },
+      loadPayCount(data) {
+        // 填入数据
+        this.mainChart.payCountChart.chart.setOption({
+          xAxis: [
+            {
+              data: data.resDateArr
+            }
+          ],
+          series: [
+            {
+              name: '交易金额',
+              data: data.resPayAmountArr
+            },
+            {
+              name: '支付(成功)笔数',
+              data: data.resPayCountArr
+            },
+            {
+              name: '退款金额',
+              data: data.resRefAmountArr
+            }
+          ]
+        })
+
+        setTimeout(() => {
+          this.mainChart.payTypeChart.chart.resize(); // 调用此API更新echarts的宽高才能生效
+        }, 100)
+      },
       showDrawer() {
         this.visible = true
       },
@@ -804,19 +742,55 @@
       getPayDayCount(parameter) {
         const that = this
         that.todayOrYesterday = parameter
-        // 今日/昨日交易统计
-        getPayDayCount(that.todayOrYesterday).then(res => {
-          console.log('今日/昨日交易统计', res)
-          that.mainChart.dayCount = res.dayCount
-        }).catch((err) => {
-          console.error(err)
-        })
+        if (this.$access('ENT_C_MAIN_PAY_DAY_COUNT')) {
+          // 今日/昨日交易统计
+          getPayDayCount(that.todayOrYesterday).then(res => {
+            // console.log('今日/昨日交易统计', res)
+            that.mainChart.dayCount = res.dayCount
+          }).catch((err) => {
+            console.error(err)
+          })
+        }
+      },
+      recentDayChange() {
+        const that = this
+        if (this.$access('ENT_C_MAIN_PAY_TREND_COUNT')) {
+          // 近期交易金额
+          getPayTrendCount(that.recentDay).then(res => {
+            // console.log('近期交易金额', res)
+            that.loadPayAmount(res)
+          }).catch((err) => {
+            console.error(err)
+          })
+        } else {
+          this.ispayAmount = false
+        }
       },
       payOnChange(date, dateString) {
         this.searchData.createdStart = dateString[0] // 开始时间
         this.searchData.createdEnd = dateString[1] // 结束时间
         this.pieDays = true
         this.agDatePie = dateString[0] + ' ~ ' + dateString[1]
+
+        const that = this
+        if (this.$access('ENT_C_MAIN_PAY_TYPE_COUNT')) {
+          // 支付类型统计
+          getPayType(that.searchData).then(res => {
+            // console.log('支付类型统计', res)
+            that.mainChart.payType = res
+            this.isPayType = true
+            const data = []
+            for (const item of res) {
+              data.push({ name: item.typeName, value: item.typeAmount})
+            }
+            that.loadPayType(data)
+          }).catch((err) => {
+            console.error(err)
+            this.isPayType = false
+          })
+        } else {
+          this.isPayType = false
+        }
       },
       // 交易统计，日期选择器，关闭按钮点击事件
       iconClick(dates) {
@@ -844,6 +818,21 @@
         this.searchData.createdEnd = dateStrings[1] // 结束时间
         this.agDate = dateStrings[0] + ' ~ ' + dateStrings[1]
         this.lastSevenDays = false
+        const that = this
+        // 交易统计
+        if (this.$access('ENT_C_MAIN_PAY_COUNT')) {
+          getPayCount(that.searchData).then(res => {
+            // console.log('交易统计', res)
+            that.mainChart.payCount = res
+            that.isPayCount = true
+            that.loadPayCount(res)
+          }).catch((err) => {
+            console.error(err)
+            this.isPayCount = false
+          })
+        } else {
+          this.isPayCount = false
+        }
       },
       payCountOk() {
         const that = this

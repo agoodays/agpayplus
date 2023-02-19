@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             switch (queryDateRange)
             {
                 case "yesterday":
-                    day?.AddDays(1); break;
+                    day?.AddDays(-1); break;
                 case "today":
                 default:
                     break;
@@ -72,20 +72,27 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// <returns></returns>
         [HttpGet, Route("payTrendCount")]
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_TREND_COUNT)]
-        public ApiRes PayTrendCount()
+        public ApiRes PayTrendCount(int recentDay)
         {
-            return ApiRes.Ok();
+            List<string> dateList = new List<string>();
+            List<string> payAmountList = new List<string>();
+            for (int i = recentDay - 1; i >= 0; i--)
+            {
+                dateList.Add(DateTime.Now.AddDays(-i).ToString("MM-dd"));
+                payAmountList.Add(Random.Shared.Next(0, 10000).ToString());
+            }
+            return ApiRes.Ok(new { dateList, payAmountList });
         }
 
         /// <summary>
-        /// 服务商/商户统计
+        /// 服务商/代理商/商户统计
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("isvAndMchCount")]
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_ISV_MCH_COUNT)]
         public ApiRes IsvAndMchCount()
         {
-            return ApiRes.Ok(_payOrderService.MainPageNumCount(null, null));
+            return ApiRes.Ok(_payOrderService.MainPageIsvAndMchCount(null, null));
         }
 
         /// <summary>
@@ -96,7 +103,25 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_COUNT)]
         public ApiRes PayCount(string createdStart, string createdEnd)
         {
-            return ApiRes.Ok(_payOrderService.MainPagePayCount(null, null, createdStart, createdEnd));
+            if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
+            {
+                createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd");
+                createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
+            }
+            List<string> resDateArr = new List<string>();
+            List<string> resPayAmountArr = new List<string>();
+            List<string> resPayCountArr = new List<string>();
+            List<string> resRefAmountArr = new List<string>();
+
+            for (DateTime dt = Convert.ToDateTime(createdStart); dt < Convert.ToDateTime(createdEnd).AddDays(1); dt = dt.AddDays(1))
+            {
+                resDateArr.Add(dt.ToString("yyyy-MM-dd"));
+                resPayAmountArr.Add(Random.Shared.Next(0, 10000).ToString());
+                resPayCountArr.Add(Random.Shared.Next(0, 1000).ToString());
+                resRefAmountArr.Add(Random.Shared.Next(0, 5000).ToString());
+            }
+            return ApiRes.Ok(new { resDateArr, resPayAmountArr, resPayCountArr, resRefAmountArr });
+            //return ApiRes.Ok(_payOrderService.MainPagePayCount(null, null, createdStart, createdEnd));
         }
 
         /// <summary>
@@ -107,7 +132,37 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_TYPE_COUNT)]
         public ApiRes PayWayCount(string createdStart, string createdEnd)
         {
+            if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
+            {
+                createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd");
+                createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
+            }
             return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(null, null, createdStart, createdEnd));
+        }
+
+        private static void GetDateRange(string queryDateRange, ref string createdStart, ref string createdEnd)
+        {
+            if (queryDateRange.Equals("today"))
+            {
+                createdStart = DateTime.Today.ToString("yyyy-MM-dd");
+                createdEnd = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
+            }
+            if (queryDateRange.Equals("yesterday"))
+            {
+                createdStart = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
+                createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
+            }
+            if (queryDateRange.Contains("near2now"))
+            {
+                int day = Convert.ToInt32(queryDateRange.Split("_")[1]);
+                createdStart = DateTime.Today.AddDays(-day).ToString("yyyy-MM-dd");
+                createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
+            }
+            if (queryDateRange.Contains("customDateTime"))
+            {
+                createdStart = Convert.ToDateTime(queryDateRange.Split("_")[0]).ToString("yyyy-MM-dd");
+                createdEnd = Convert.ToDateTime(queryDateRange.Split("_")[1]).AddDays(1).ToString("yyyy-MM-dd");
+            }
         }
     }
 }
