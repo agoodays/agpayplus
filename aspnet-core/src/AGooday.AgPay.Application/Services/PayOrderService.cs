@@ -279,7 +279,7 @@ namespace AGooday.AgPay.Application.Services
             var amount = payorders.Sum(s => s.Amount);
             var refundAmount = payorders.Sum(s => s.RefundAmount);
             var payCount = payorders.Count();
-            return (Decimal.Round((amount - refundAmount) / 100, 0, MidpointRounding.AwayFromZero), payCount);
+            return (Decimal.Round((amount - refundAmount) / 100M, 2, MidpointRounding.AwayFromZero), payCount);
         }
         /// <summary>
         /// 支付方式统计
@@ -305,7 +305,7 @@ namespace AGooday.AgPay.Application.Services
                 {
                     WayCode = s.WayCode,
                     TypeCount = s.Items.Count(),
-                    TypeAmount = Decimal.Round((s.Items.Sum(s => s.Amount) - s.Items.Sum(s => s.RefundAmount)) / 100, 0, MidpointRounding.AwayFromZero)
+                    TypeAmount = Decimal.Round((s.Items.Sum(s => s.Amount) - s.Items.Sum(s => s.RefundAmount)) / 100M, 2, MidpointRounding.AwayFromZero)
                 }).ToList();
             return result;
         }
@@ -332,7 +332,7 @@ namespace AGooday.AgPay.Application.Services
                     PayAmount = (s.Items.Sum(s => s.Amount) - s.Items.Sum(s => s.RefundAmount)),
                     RefundAmount = s.Items.Sum(s => s.RefundAmount)
                 }).ToList();
-            var result = ordercounts.Select(s => (s.GroupDate, Decimal.Round(s.PayAmount / 100, 0, MidpointRounding.AwayFromZero), Decimal.Round(s.RefundAmount / 100, 0, MidpointRounding.AwayFromZero)))
+            var result = ordercounts.Select(s => (s.GroupDate, Decimal.Round(s.PayAmount / 100M, 2, MidpointRounding.AwayFromZero), Decimal.Round(s.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero)))
                 .ToList();
             return result;
         }
@@ -514,7 +514,7 @@ namespace AGooday.AgPay.Application.Services
 
             var refundOrder = _refundOrderRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
-                //&& (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
+                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 //&& w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)
                 && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable();
@@ -523,13 +523,20 @@ namespace AGooday.AgPay.Application.Services
             var refundAmount = refundOrder.Sum(s => s.RefundAmount);
             var refundCount = refundOrder.Count();
 
+            // 生成虚拟数据
+            payAmount = payAmount <= 0 ? Random.Shared.Next(0, 1000000) : payAmount;
+            payCount = payCount <= 0 ? Random.Shared.Next(0, 1000) : payCount;
+            refundAmount = refundAmount <= 0 ? Random.Shared.Next(0, 500000) : refundAmount;
+            refundCount = refundCount <= 0 ? Random.Shared.Next(0, 500) : refundCount;
+            allCount = payCount + refundCount;
+
             json.Add("dayCount", JObject.FromObject(new
             {
-                allCount = allCount <= 0 ? Random.Shared.Next(0, 1000) : allCount,
-                payAmount = payAmount <= 0 ? Random.Shared.Next(0, 10000) : Decimal.Round(payAmount / 100, 0, MidpointRounding.AwayFromZero),
-                payCount = payCount <= 0 ? Random.Shared.Next(0, 1000) : payCount,
-                refundAmount = refundAmount <= 0 ? Random.Shared.Next(0, 5000) : Decimal.Round(refundAmount / 100, 0, MidpointRounding.AwayFromZero),
-                refundCount = refundCount <= 0 ? Random.Shared.Next(0, 500) : refundCount,
+                allCount = allCount,
+                payAmount = Decimal.Round(payAmount / 100M, 2, MidpointRounding.AwayFromZero),
+                payCount = payCount,
+                refundAmount = Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero),
+                refundCount = refundCount,
             }));
             return json;
         }
@@ -635,7 +642,7 @@ namespace AGooday.AgPay.Application.Services
                         WayCode = payWay.WayCode,
                         TypeName = payWay.WayName,
                         TypeCount = Random.Shared.Next(0, 100),
-                        TypeAmount = Random.Shared.Next(0, 1000),
+                        TypeAmount = Decimal.Round(Random.Shared.Next(10000, 100000) / 100M, 2, MidpointRounding.AwayFromZero),
                     });
                 }
             }

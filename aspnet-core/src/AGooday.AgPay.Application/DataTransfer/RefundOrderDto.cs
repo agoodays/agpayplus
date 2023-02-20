@@ -26,19 +26,54 @@
         public string MchNo { get; set; }
 
         /// <summary>
+        /// 商户名称
+        /// </summary>
+        public string MchName { get; set; }
+
+        /// <summary>
+        /// 商户简称
+        /// </summary>
+        public string MchShortName { get; set; }
+
+        /// <summary>
+        /// 代理商号
+        /// </summary>
+        public string AgentNo { get; set; }
+
+        /// <summary>
+        /// 代理商名称
+        /// </summary>
+        public string AgentName { get; set; }
+
+        /// <summary>
+        /// 代理商简称
+        /// </summary>
+        public string AgentShortName { get; set; }
+
+        /// <summary>
         /// 服务商号
         /// </summary>
         public string IsvNo { get; set; }
 
         /// <summary>
-        /// 应用Id
+        /// 服务商名称
+        /// </summary>
+        public string IsvName { get; set; }
+
+        /// <summary>
+        /// 服务商简称
+        /// </summary>
+        public string IsvShortName { get; set; }
+
+        /// <summary>
+        /// 应用ID
         /// </summary>
         public string AppId { get; set; }
 
         /// <summary>
-        /// 商户名称
+        /// 应用名称
         /// </summary>
-        public string MchName { get; set; }
+        public string AppName { get; set; }
 
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)

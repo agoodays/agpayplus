@@ -300,7 +300,21 @@ ALTER TABLE `t_pay_order`
   CHANGE `mch_short_name` `mch_short_name` VARCHAR(32) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '商户简称'  AFTER `mch_name`,
   ADD COLUMN `agent_name` VARCHAR(64) NULL COMMENT '代理商名称' AFTER `agent_no`,
   ADD COLUMN `agent_short_name` VARCHAR(32) NULL COMMENT '代理商简称' AFTER `agent_name`;
-  
+
+ALTER TABLE `t_refund_order`   
+  CHANGE `mch_name` `mch_name` VARCHAR(64) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
+  ADD COLUMN `mch_short_name` VARCHAR(32) NULL COMMENT '商户简称' AFTER `mch_name`,
+  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_short_name`,
+  ADD COLUMN `agent_name` VARCHAR(64) NULL COMMENT '代理商名称' AFTER `agent_no`,
+  ADD COLUMN `agent_short_name` VARCHAR(32) NULL COMMENT '代理商简称' AFTER `agent_name`,
+  CHANGE `isv_no` `isv_no` VARCHAR(64) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '服务商号'  AFTER `agent_short_name`,
+  ADD COLUMN `isv_name` VARCHAR(64) NULL COMMENT '服务商名称' AFTER `isv_no`,
+  ADD COLUMN `isv_short_name` VARCHAR(32) NULL COMMENT '服务商简称' AFTER `isv_name`,
+  CHANGE `app_id` `app_id` VARCHAR(64) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '应用ID'  AFTER `isv_short_name`,
+  ADD COLUMN `app_name` VARCHAR(64) NULL COMMENT '应用名称' AFTER `app_id`,
+  ADD COLUMN `store_id` VARCHAR(64) NULL COMMENT '门店ID' AFTER `app_name`,
+  ADD COLUMN `store_name` VARCHAR(64) NULL COMMENT '门店名称' AFTER `store_id`;
+
 -- 代理商管理
 INSERT INTO t_sys_entitlement VALUES('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '35', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1,  'ENT_AGENT', '10', 'MGR', NOW(), NOW());

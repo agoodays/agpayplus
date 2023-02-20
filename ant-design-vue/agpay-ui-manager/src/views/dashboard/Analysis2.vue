@@ -206,7 +206,7 @@
               <div class="change-date-layout">
                 {{ agDate ? agDate : '最近30天' }}
                 <div class="pay-icon">
-                  <div v-if="lastSevenDays" class="change-date-icon"><a-icon type="down" /></div>
+                  <div v-if="last30Days" class="change-date-icon"><a-icon type="down" /></div>
                   <div v-else @click.stop="iconClick" class="change-date-icon" ><a-icon type="close-circle" /></div>
                 </div>
               </div>
@@ -235,7 +235,7 @@
         skeletonReqNum: 0, // 当所有数据请求完毕后关闭骨架屏（共四个请求）
         todayOrYesterday: 'today',
         recentDay: 30,
-        lastSevenDays: true, // 最近七天是否显示
+        last30Days: true, // 最近30天是否显示
         pieDays: false, // 饼状图的关闭按钮是否展示
         visible: false,
         recordId: store.state.user.userId,
@@ -794,18 +794,18 @@
       },
       // 交易统计，日期选择器，关闭按钮点击事件
       iconClick(dates) {
-        this.searchData.createdStart = moment().subtract(7, 'days').format('YYYY-MM-DD') // 开始时间
+        this.searchData.createdStart = moment().subtract(30, 'days').format('YYYY-MM-DD') // 开始时间
         this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
         this.payCountOk()
-        this.agDate = '最近七天'
-        this.lastSevenDays = true
+        this.agDate = '最近30天'
+        this.last30Days = true
       },
       // 支付方式，日期选择器，关闭按钮点击事件
       iconPieClick() {
-        this.searchData.createdStart = moment().subtract(7, 'days').format('YYYY-MM-DD') // 开始时间
+        this.searchData.createdStart = moment().subtract(30, 'days').format('YYYY-MM-DD') // 开始时间
         this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
         this.payTypeOk()
-        this.agDatePie = '最近七天'
+        this.agDatePie = '最近30天'
         this.pieDays = false
       },
       moment,
@@ -817,7 +817,7 @@
         this.searchData.createdStart = dateStrings[0] // 开始时间
         this.searchData.createdEnd = dateStrings[1] // 结束时间
         this.agDate = dateStrings[0] + ' ~ ' + dateStrings[1]
-        this.lastSevenDays = false
+        this.last30Days = false
         const that = this
         // 交易统计
         if (this.$access('ENT_C_MAIN_PAY_COUNT')) {

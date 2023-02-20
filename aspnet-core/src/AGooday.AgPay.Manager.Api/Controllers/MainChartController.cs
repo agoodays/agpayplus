@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             for (int i = recentDay - 1; i >= 0; i--)
             {
                 dateList.Add(DateTime.Now.AddDays(-i).ToString("MM-dd"));
-                payAmountList.Add(Random.Shared.Next(0, 10000).ToString());
+                payAmountList.Add((Random.Shared.Next(10000, 1000000) / 100.00).ToString("0.00"));
             }
             return ApiRes.Ok(new { dateList, payAmountList });
         }
@@ -116,9 +116,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             for (DateTime dt = Convert.ToDateTime(createdStart); dt < Convert.ToDateTime(createdEnd).AddDays(1); dt = dt.AddDays(1))
             {
                 resDateArr.Add(dt.ToString("yyyy-MM-dd"));
-                resPayAmountArr.Add(Random.Shared.Next(0, 10000).ToString());
-                resPayCountArr.Add(Random.Shared.Next(0, 1000).ToString());
-                resRefAmountArr.Add(Random.Shared.Next(0, 5000).ToString());
+                resPayAmountArr.Add((Random.Shared.Next(10000, 1000000) / 100.00).ToString("0.00"));
+                resPayCountArr.Add(Random.Shared.Next(100, 1000).ToString());
+                resRefAmountArr.Add((Random.Shared.Next(5000, 500000) / 100.00).ToString("0.00"));
             }
             return ApiRes.Ok(new { resDateArr, resPayAmountArr, resPayCountArr, resRefAmountArr });
             //return ApiRes.Ok(_payOrderService.MainPagePayCount(null, null, createdStart, createdEnd));
