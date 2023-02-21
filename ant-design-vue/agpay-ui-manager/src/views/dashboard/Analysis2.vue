@@ -144,7 +144,8 @@
         <div v-show="!skeletonIsShow" class="echart-title">
           <b>支付方式</b>
           <div class="chart-padding">
-            <a-range-picker
+            <AgDateRangePicker :value="searchData.queryDateRange" @input="$emit('input', $event)"/>
+<!--            <a-range-picker
               style="width:100%"
               ref="agRangePie"
               :ranges="{
@@ -170,7 +171,7 @@
                   <div v-else @click.stop="iconPieClick" class="change-date-icon" ><a-icon type="close-circle" /></div>
                 </div>
               </div>
-            </a-range-picker>
+            </a-range-picker>-->
           </div>
         </div>
         <!-- 如果没数据就展示一个图标 -->
@@ -222,6 +223,7 @@
 </template>
 
 <script>
+  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import { getPayDayCount, getPayTrendCount, getIsvAndMchCount, getPayCount, getPayType } from '@/api/manage'
   import moment from 'moment'
   import store from '@/store'
@@ -306,7 +308,7 @@
         */
       })
     },
-    components: {empty},
+    components: { empty, AgDateRangePicker },
     computed: {
       // 快速菜单集合
       quickMenuList: function () {
