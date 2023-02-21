@@ -55,31 +55,20 @@ export default {
     }
   },
   methods: {
-    optionChange (e) {
-      console.log(e)
+    optionChange () {
       if (this.optionValue !== 'customDateTime') {
         this.optionOriginValue = this.optionValue
+        this.$emit('change', this.optionValue)
       }
-      const value = this.optionValue
-      // this.$emit('update:value', value)
-      console.log(value)
     },
     onChange (date, dateString) {
       const start = dateString[0] // 开始时间
       const end = dateString[1] // 结束时间
-      const value = `${this.optionValue}_${start} 00:00:00_${end} 23:59:59`
-      this.$emit('update-optionValue', value)
-      // this.$emit('update:value', value)
-      console.log(value)
+      this.$emit('change', `${this.optionValue}_${start} 00:00:00_${end} 23:59:59`)
     },
-    onClick (e) {
-      console.log(e)
-      this.$emit('update-optionValue', this.optionOriginValue)
+    onClick () {
       this.optionValue = this.optionOriginValue
-      const value = this.optionValue
-      console.log(this.$refs.dateSelect)
-      // this.$emit('update:value', value)
-      console.log(value)
+      this.$emit('change', this.optionValue)
     }
   }
 }

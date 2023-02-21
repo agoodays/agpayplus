@@ -144,7 +144,7 @@
         <div v-show="!skeletonIsShow" class="echart-title">
           <b>支付方式</b>
           <div class="chart-padding">
-            <AgDateRangePicker :value="searchData.queryDateRange" @input="$emit('input', $event)"/>
+            <AgDateRangePicker :value="searchData.queryDateRange" @change="queryDateChange"/>
 <!--            <a-range-picker
               style="width:100%"
               ref="agRangePie"
@@ -767,6 +767,10 @@
         } else {
           this.ispayAmount = false
         }
+      },
+      queryDateChange (v) {
+        this.searchData.queryDateRange = v
+        console.log(this.searchData.queryDateRange)
       },
       payOnChange(date, dateString) {
         this.searchData.createdStart = dateString[0] // 开始时间
