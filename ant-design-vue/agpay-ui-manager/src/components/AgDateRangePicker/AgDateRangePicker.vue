@@ -1,33 +1,38 @@
 <template>
   <div>
     <a-select
-      v-if="optionValue!=='customDateTime'"
-      v-model="optionValue"
-      placeholder=""
-      @change="optionChange"
-      style="width: 100%"
-      ref="dateSelect"
+        v-if="optionValue!=='customDateTime'"
+        v-model="optionValue"
+        placeholder=""
+        @change="optionChange"
+        style="width: 100%"
+        ref="dateSelect"
     >
       <a-select-option v-for="o in options" :value="o.value" :key="o.value">
         {{ o.name }}
       </a-select-option>
     </a-select>
-    <a-range-picker
-      v-if="optionValue==='customDateTime'"
-      @change="onChange"
-      style="width: 100%"
-      ref="dateRangePicker"
-    >
-      <a-icon slot="suffixIcon" type="sync"/>
-      <template #renderExtraFooter>
-        <span style="cursor: pointer;" @click="onClick">
-          <span role="img" aria-label="left-circle" class="anticon anticon-left-circle">
-            <a-icon type="left-circle" />
-          </span>
-          返回日期下拉框
-        </span>
+    <a-popover placement="bottom" trigger="hover">
+      <template #content>
+        <span>{{ dateRangeTip }}</span>
       </template>
-    </a-range-picker>
+      <a-range-picker
+        v-if="optionValue==='customDateTime'"
+        @change="onChange"
+        style="width: 100%"
+        ref="dateRangePicker"
+      >
+        <a-icon slot="suffixIcon" type="sync"/>
+        <template #renderExtraFooter>
+          <span style="cursor: pointer;" @click="onClick">
+            <span role="img" aria-label="left-circle" class="anticon anticon-left-circle">
+              <a-icon type="left-circle" />
+            </span>
+            返回日期下拉框
+          </span>
+        </template>
+      </a-range-picker>
+    </a-popover>
   </div>
 </template>
 
@@ -51,7 +56,8 @@ export default {
   data () {
     return {
       optionValue: this.value,
-      optionOriginValue: ''
+      optionOriginValue: this.value,
+      dateRangeTip: ''
     }
   },
   methods: {
@@ -64,7 +70,12 @@ export default {
     onChange (date, dateString) {
       const start = dateString[0] // 开始时间
       const end = dateString[1] // 结束时间
-      this.$emit('change', `${this.optionValue}_${start} 00:00:00_${end} 23:59:59`)
+      if (start.length && end.length) {
+        this.dateRangeTip = `搜索时间： ${start} 00:00:00 ~ ${end} 23:59:59`
+        this.$emit('change', `${this.optionValue}_${start} 00:00:00_${end} 23:59:59`)
+      } else {
+        this.dateRangeTip = ''
+      }
     },
     onClick () {
       this.optionValue = this.optionOriginValue

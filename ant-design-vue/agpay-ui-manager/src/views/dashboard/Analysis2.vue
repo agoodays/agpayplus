@@ -144,34 +144,16 @@
         <div v-show="!skeletonIsShow" class="echart-title">
           <b>支付方式</b>
           <div class="chart-padding">
-            <AgDateRangePicker :value="searchData.queryDateRange" @change="queryDateChange"/>
-<!--            <a-range-picker
-              style="width:100%"
-              ref="agRangePie"
-              :ranges="{
-                今天: [moment().startOf('day'), moment()],
-                昨天: [moment().startOf('day').subtract(1,'days'), moment().endOf('day').subtract(1, 'days')],
-                最近三天: [moment().startOf('day').subtract(2, 'days'), moment().endOf('day')],
-                最近一周: [moment().startOf('day').subtract(1, 'weeks'), moment()],
-                本月: [moment().startOf('month'), moment()],
-                本年: [moment().startOf('year'), moment()]
-              }"
-              :default-value="[moment().subtract(30, 'days'),moment()]"
-              @change="payOnChange"
-              show-time
-              format="YYYY-MM-DD"
-              :disabled-date="disabledDate"
-              @ok="payTypeOk"
-              :allowClear="false"
-            >
-              <div class="change-date-layout">
-                {{ agDatePie ? agDatePie : '最近30天' }}
-                <div class="pay-icon">
-                  <div v-if="!pieDays" class="change-date-icon"><a-icon type="down" /></div>
-                  <div v-else @click.stop="iconPieClick" class="change-date-icon" ><a-icon type="close-circle" /></div>
-                </div>
-              </div>
-            </a-range-picker>-->
+            <AgDateRangePicker
+              :value="searchData.payTypeQueryDateRange"
+              :options="[
+                { name: '今天', value: 'today' },
+                { name: '昨天', value: 'yesterday' },
+                { name: '近7天', value: 'near2now_7' },
+                { name: '近30天', value: 'near2now_30' },
+                { name: '自定义时间', value: 'customDateTime' }
+              ]"
+              @change="payTypeQueryDateChange"/>
           </div>
         </div>
         <!-- 如果没数据就展示一个图标 -->
@@ -185,33 +167,14 @@
         <div v-show="!skeletonIsShow" class="echart-title">
           <b>交易统计</b>
           <div class="chart-padding" >
-            <a-range-picker
-              ref="agRange"
-              style="width:100%"
-              :ranges="{
-                今天: [moment().startOf('day'), moment()],
-                昨天: [moment().startOf('day').subtract(1,'days'), moment().endOf('day').subtract(1, 'days')],
-                最近三天: [moment().startOf('day').subtract(2, 'days'), moment().endOf('day')],
-                最近一周: [moment().startOf('day').subtract(1, 'weeks'), moment()],
-                本月: [moment().startOf('month'), moment()],
-                本年: [moment().startOf('year'), moment()]
-              }"
-              :default-value="[moment().subtract(30, 'days'),moment()]"
-              show-time
-              format="YYYY-MM-DD"
-              @change="transactionChange"
-              :disabled-date="disabledDate"
-              @ok="payCountOk"
-              :allowClear="false"
-            >
-              <div class="change-date-layout">
-                {{ agDate ? agDate : '最近30天' }}
-                <div class="pay-icon">
-                  <div v-if="last30Days" class="change-date-icon"><a-icon type="down" /></div>
-                  <div v-else @click.stop="iconClick" class="change-date-icon" ><a-icon type="close-circle" /></div>
-                </div>
-              </div>
-            </a-range-picker>
+            <AgDateRangePicker
+                :value="searchData.payCountQueryDateRange"
+                :options="[
+                { name: '近7天', value: 'near2now_7' },
+                { name: '近30天', value: 'near2now_30' },
+                { name: '自定义时间', value: 'customDateTime' }
+              ]"
+                @change="payCountQueryDateChange"/>
           </div>
         </div>
         <!-- 如果没数据就展示一个图标 -->
@@ -225,7 +188,6 @@
 <script>
   import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import { getPayDayCount, getPayTrendCount, getIsvAndMchCount, getPayCount, getPayType } from '@/api/manage'
-  import moment from 'moment'
   import store from '@/store'
   import { timeFix } from '@/utils/util'
   import empty from './empty' // 空数据展示的组件，首页自用
@@ -241,7 +203,10 @@
         pieDays: false, // 饼状图的关闭按钮是否展示
         visible: false,
         recordId: store.state.user.userId,
-        searchData: {}, // 时间选择条件
+        searchData: {
+          payTypeQueryDateRange: 'near2now_30',
+          payCountQueryDateRange: 'near2now_30'
+        }, // 时间选择条件
         greetImg: store.state.user.avatarImgPath, // 头像图片地址
         safeWord: store.state.user.safeWord, // 安全词
         isPayType: true, // 支付方式是否存在数据
@@ -384,7 +349,7 @@
         }
         if (this.$access('ENT_C_MAIN_PAY_TYPE_COUNT')) {
           // 支付类型统计
-          getPayType(that.searchData).then(res => {
+          getPayType({ queryDateRange: this.searchData.payTypeQueryDateRange }).then(res => {
             // console.log('支付类型统计', res)
             that.mainChart.payType = res
             this.isPayType = true
@@ -406,7 +371,7 @@
         }
         // 交易统计
         if (this.$access('ENT_C_MAIN_PAY_COUNT')) {
-          getPayCount(that.searchData).then(res => {
+          getPayCount({ queryDateRange: this.searchData.payCountQueryDateRange }).then(res => {
             // console.log('交易统计', res)
             that.mainChart.payCount = res
             // res.length === 0 ? this.isPayCount = false : this.isPayCount = true
@@ -768,20 +733,13 @@
           this.ispayAmount = false
         }
       },
-      queryDateChange (v) {
-        this.searchData.queryDateRange = v
-        console.log(this.searchData.queryDateRange)
-      },
-      payOnChange(date, dateString) {
-        this.searchData.createdStart = dateString[0] // 开始时间
-        this.searchData.createdEnd = dateString[1] // 结束时间
-        this.pieDays = true
-        this.agDatePie = dateString[0] + ' ~ ' + dateString[1]
-
+      payTypeQueryDateChange (e) {
+        this.searchData.payTypeQueryDateRange = e
+        // console.log(this.searchData.payTypeQueryDateRange)
         const that = this
         if (this.$access('ENT_C_MAIN_PAY_TYPE_COUNT')) {
           // 支付类型统计
-          getPayType(that.searchData).then(res => {
+          getPayType({ queryDateRange: this.searchData.payTypeQueryDateRange }).then(res => {
             // console.log('支付类型统计', res)
             that.mainChart.payType = res
             this.isPayType = true
@@ -798,36 +756,13 @@
           this.isPayType = false
         }
       },
-      // 交易统计，日期选择器，关闭按钮点击事件
-      iconClick(dates) {
-        this.searchData.createdStart = moment().subtract(30, 'days').format('YYYY-MM-DD') // 开始时间
-        this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
-        this.payCountOk()
-        this.agDate = '最近30天'
-        this.last30Days = true
-      },
-      // 支付方式，日期选择器，关闭按钮点击事件
-      iconPieClick() {
-        this.searchData.createdStart = moment().subtract(30, 'days').format('YYYY-MM-DD') // 开始时间
-        this.searchData.createdEnd = moment().format('YYYY-MM-DD') // 结束时间
-        this.payTypeOk()
-        this.agDatePie = '最近30天'
-        this.pieDays = false
-      },
-      moment,
-      disabledDate(current) {
-        // 当天之前的三十天，可选。 当天也可选
-        return current < moment().subtract(32, 'days') || current > moment().endOf('day')
-      },
-      transactionChange(dates, dateStrings) {
-        this.searchData.createdStart = dateStrings[0] // 开始时间
-        this.searchData.createdEnd = dateStrings[1] // 结束时间
-        this.agDate = dateStrings[0] + ' ~ ' + dateStrings[1]
-        this.last30Days = false
+      payCountQueryDateChange(e) {
+        this.searchData.payCountQueryDateRange = e
+        // console.log(this.searchData.payCountQueryDateRange)
         const that = this
         // 交易统计
         if (this.$access('ENT_C_MAIN_PAY_COUNT')) {
-          getPayCount(that.searchData).then(res => {
+          getPayCount({ queryDateRange: this.searchData.payCountQueryDateRange }).then(res => {
             // console.log('交易统计', res)
             that.mainChart.payCount = res
             that.isPayCount = true
@@ -839,18 +774,6 @@
         } else {
           this.isPayCount = false
         }
-      },
-      payCountOk() {
-        const that = this
-        getPayCount(that.searchData).then(res => {
-          res.length === 0 ? this.isPayCount = false : this.isPayCount = true
-        })
-      },
-      payTypeOk() {
-        const that = this
-        getPayType(that.searchData).then(res => {
-          res[0].length === 0 ? that.isPayType = false : that.isPayType = true
-        })
       },
       skeletonClose(that) {
         // 每次请求成功，skeletonReqNum + 1,当大于等于4时， 取消骨架屏展示
@@ -874,7 +797,7 @@
   @import './index2.less'; // 响应式布局
 
   .chart-padding {
-    border: 1px solid #ddd;
+    //border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
     max-width: 235px;

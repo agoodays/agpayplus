@@ -101,8 +101,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// <returns></returns>
         [HttpGet, Route("payCount")]
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_COUNT)]
-        public ApiRes PayCount(string createdStart, string createdEnd)
+        public ApiRes PayCount(string queryDateRange)
         {
+            GetDateRange(queryDateRange, out string createdStart, out string createdEnd);
             if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
             {
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd");
@@ -130,8 +131,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// <returns></returns>
         [HttpGet, Route("payTypeCount")]
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_TYPE_COUNT)]
-        public ApiRes PayWayCount(string createdStart, string createdEnd)
+        public ApiRes PayWayCount(string queryDateRange)
         {
+            GetDateRange(queryDateRange, out string createdStart, out string createdEnd);
             if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
             {
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd");
@@ -140,8 +142,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(null, null, createdStart, createdEnd));
         }
 
-        private static void GetDateRange(string queryDateRange, ref string createdStart, ref string createdEnd)
+        private static void GetDateRange(string queryDateRange, out string createdStart, out string createdEnd)
         {
+            createdStart = null; createdEnd = null;
             if (queryDateRange.Equals("today"))
             {
                 createdStart = DateTime.Today.ToString("yyyy-MM-dd");
@@ -160,8 +163,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             }
             if (queryDateRange.Contains("customDateTime"))
             {
-                createdStart = Convert.ToDateTime(queryDateRange.Split("_")[0]).ToString("yyyy-MM-dd");
-                createdEnd = Convert.ToDateTime(queryDateRange.Split("_")[1]).AddDays(1).ToString("yyyy-MM-dd");
+                createdStart = Convert.ToDateTime(queryDateRange.Split("_")[1]).ToString("yyyy-MM-dd");
+                createdEnd = Convert.ToDateTime(queryDateRange.Split("_")[2]).AddDays(1).ToString("yyyy-MM-dd");
             }
         }
     }
