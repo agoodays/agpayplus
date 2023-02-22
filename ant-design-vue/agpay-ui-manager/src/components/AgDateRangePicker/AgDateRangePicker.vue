@@ -15,7 +15,6 @@
     <a-popover
       placement="bottom"
       trigger="hover"
-      :visible="dateRangeTipIsShow"
     >
       <template #content>
         <span style="white-space:nowrap;">{{ dateRangeTip }}</span>
