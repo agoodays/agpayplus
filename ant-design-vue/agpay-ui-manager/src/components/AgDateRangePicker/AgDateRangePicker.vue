@@ -12,13 +12,19 @@
         {{ o.name }}
       </a-select-option>
     </a-select>
-    <a-popover placement="bottom" trigger="hover">
+    <a-popover
+      placement="bottom"
+      trigger="hover"
+      :visible="dateRangeTipIsShow"
+    >
       <template #content>
-        <span>{{ dateRangeTip }}</span>
+        <span style="white-space:nowrap;">{{ dateRangeTip }}</span>
       </template>
       <a-range-picker
         v-if="optionValue==='customDateTime'"
         @change="onChange"
+        @mouseenter="onMouseenter"
+        @mouseleave="onMouseleave"
         style="width: 100%"
         ref="dateRangePicker"
       >
@@ -57,6 +63,7 @@ export default {
     return {
       optionValue: this.value,
       optionOriginValue: this.value,
+      dateRangeTipIsShow: false,
       dateRangeTip: ''
     }
   },
@@ -76,6 +83,12 @@ export default {
       } else {
         this.dateRangeTip = ''
       }
+    },
+    onMouseenter () {
+      this.dateRangeTipIsShow = this.dateRangeTip.length && true
+    },
+    onMouseleave () {
+      this.dateRangeTipIsShow = false
     },
     onClick () {
       this.optionValue = this.optionOriginValue
