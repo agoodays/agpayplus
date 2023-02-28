@@ -273,6 +273,9 @@ ALTER TABLE `t_sys_user`
 
 ALTER TABLE `t_sys_user`   
   ADD  UNIQUE INDEX `invite_code` (`invite_code`);
+  
+ALTER TABLE `t_sys_user`   
+  ADD COLUMN `safe_word` VARCHAR(32) NULL COMMENT '预留信息' AFTER `realname`;
 
 ALTER TABLE `t_pay_interface_define`
   ADD COLUMN `is_support_applyment` TINYINT DEFAULT 1 NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持' AFTER `config_page_type`;

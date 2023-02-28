@@ -200,7 +200,7 @@ export default {
         this.updateObject.originalPwd = ''
         this.updateObject.newPwd = ''
         this.updateObject.confirmPwd = ''
-        console.log(this.updateObject)
+        // console.log(this.updateObject)
     },
     // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
     uploadSuccess (value, name) {
