@@ -80,6 +80,8 @@ namespace AGooday.AgPay.Application.Services
                 user.AvatarUrl = dto.AvatarUrl;
             if (!string.IsNullOrWhiteSpace(dto.Realname))
                 user.Realname = dto.Realname;
+            if (!string.IsNullOrWhiteSpace(dto.SafeWord))
+                user.SafeWord = dto.SafeWord;
             if (dto.Sex > 0)
                 user.Sex = dto.Sex;
             user.UpdatedAt = DateTime.Now;

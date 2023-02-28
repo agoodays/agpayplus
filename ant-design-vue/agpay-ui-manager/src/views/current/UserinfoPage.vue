@@ -58,24 +58,46 @@
       </a-tab-pane>
       <a-tab-pane key="2" tab="安全信息">
         <div class="account-settings-info-view">
-          <a-row :gutter="16">
-            <a-col :md="16" :lg="16">
-              <a-form-model ref="pwdFormModel" :model="updateObject" :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
-                <a-form-model-item label="原密码：" prop="originalPwd">
-                  <a-input-password autocomplete="new-password" v-model="updateObject.originalPwd" placeholder="请输入原密码" />
-                </a-form-model-item>
-                <a-form-model-item label="新密码：" prop="newPwd">
-                  <a-input-password autocomplete="new-password" v-model="updateObject.newPwd" placeholder="请输入新密码" />
-                </a-form-model-item>
-                <a-form-model-item label="确认新密码：" prop="confirmPwd">
-                  <a-input-password autocomplete="new-password" v-model="updateObject.confirmPwd" placeholder="确认新密码" />
-                </a-form-model-item>
-              </a-form-model>
-              <a-form-item style="display:flex;justify-content:center">
-                <a-button type="primary" icon="safety-certificate" @click="confirm" :loading="btnLoading">更新密码</a-button>
-              </a-form-item>
-            </a-col>
-          </a-row>
+          <a-tabs tab-position="left">
+            <a-tab-pane key="1" tab="修改密码">
+              <div class="account-settings-info-view">
+                <a-row :gutter="16">
+                  <a-col :md="16" :lg="16">
+                    <a-form-model ref="pwdFormModel" :model="updateObject" :label-col="{span: 9}" :wrapper-col="{span: 10}">
+                      <a-form-model-item label="原密码：" prop="originalPwd">
+                        <a-input-password autocomplete="new-password" v-model="updateObject.originalPwd" placeholder="请输入原密码" />
+                      </a-form-model-item>
+                      <a-form-model-item label="新密码：" prop="newPwd">
+                        <a-input-password autocomplete="new-password" v-model="updateObject.newPwd" placeholder="请输入新密码" />
+                      </a-form-model-item>
+                      <a-form-model-item label="确认新密码：" prop="confirmPwd">
+                        <a-input-password autocomplete="new-password" v-model="updateObject.confirmPwd" placeholder="确认新密码" />
+                      </a-form-model-item>
+                    </a-form-model>
+                    <a-form-item style="display:flex;justify-content:center">
+                      <a-button type="primary" icon="safety-certificate" @click="confirm" :loading="btnLoading">更新密码</a-button>
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+              </div>
+            </a-tab-pane>
+            <a-tab-pane key="2" tab="预留信息">
+              <div class="account-settings-info-view">
+                <a-row :gutter="16">
+                  <a-col :md="16" :lg="16">
+                    <a-form-model :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
+                      <a-form-model-item label="预留信息：" prop="safeWord">
+                        <a-input v-model="safeWord" placeholder="请输入新的预留信息" />
+                      </a-form-model-item>
+                    </a-form-model>
+                    <a-form-item style="display:flex;justify-content:center">
+                      <a-button type="primary" icon="check-circle" @click="changeSafeWordInfo" :loading="btnLoading">确认更新</a-button>
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+              </div>
+            </a-tab-pane>
+          </a-tabs>
         </div>
       </a-tab-pane>
     </a-tabs>
@@ -110,6 +132,7 @@ export default {
         newPwd: '', //  新密码
         confirmPwd: '' //  确认密码
       },
+      safeWord: '',
       recordId: store.state.user.userId, // 拿到ID
       rules: {
         realname: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }]
@@ -141,6 +164,21 @@ export default {
       getUserInfo().then(res => {
         that.saveObject = res
         console.log(res)
+      })
+    },
+    changeSafeWordInfo () { // 更新基本信息事件
+      const that = this
+      if (that.safeWord.length <= 0) {
+        that.$message.error('信息内容不可为空')
+        return
+      }
+      that.btnLoading = true // 打开按钮上的 loading
+      that.confirmLoading = true // 显示loading
+      updateUserInfo({ safeWord: that.safeWord }).then(res => {
+        that.$message.success('修改成功')
+        that.btnLoading = false // 关闭按钮刷新
+      }).catch(res => {
+        that.btnLoading = false
       })
     },
     changeInfo () { // 更新基本信息事件
@@ -200,7 +238,7 @@ export default {
         this.updateObject.originalPwd = ''
         this.updateObject.newPwd = ''
         this.updateObject.confirmPwd = ''
-        console.log(this.updateObject)
+        // console.log(this.updateObject)
     },
     // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
     uploadSuccess (value, name) {

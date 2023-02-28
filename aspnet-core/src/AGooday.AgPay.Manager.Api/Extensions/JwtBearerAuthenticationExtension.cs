@@ -147,6 +147,10 @@ namespace AGooday.AgPay.Manager.Api.Extensions
         /// </summary>
         public string Realname { get; set; }
         /// <summary>
+        /// 预留信息
+        /// </summary>
+        public string SafeWord { get; set; }
+        /// <summary>
         /// 登录用户名
         /// </summary>
         public string LoginUsername { get; set; }

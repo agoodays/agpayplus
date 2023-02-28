@@ -34,6 +34,13 @@ namespace AGooday.AgPay.Domain.Models
         public string Realname { get; set; }
 
         /// <summary>
+        /// 预留信息
+        /// </summary>
+        [Comment("预留信息")]
+        [Column("safe_word", TypeName = "varchar(32)")]
+        public string SafeWord { get; set; }
+
+        /// <summary>
         /// 手机号
         /// </summary>
         [Comment("手机号")]

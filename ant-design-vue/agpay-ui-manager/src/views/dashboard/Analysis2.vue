@@ -119,7 +119,7 @@
         <div class="personal-line"></div>
         <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 0 }">
           <div class="msg">
-            <span>预留信息： <a style="color: rgb(38, 145, 255); margin-right: 5px;">{{ safeWord }}</a>
+            <span>预留信息： <a style="color: rgb(38, 145, 255); margin-right: 5px;" @click="handleToSettings">{{ safeWord }}</a>
               <a-tooltip placement="right">
                 <template slot="title">
                   此信息为你在本站预留的个性信息，用以鉴别假冒、钓鱼网站。如未看到此信息，请立即停止访问并修改密码。如需修改内容请前往个人中心
@@ -779,6 +779,9 @@
         // 每次请求成功，skeletonReqNum + 1,当大于等于4时， 取消骨架屏展示
         that.skeletonReqNum++
         that.skeletonReqNum >= 5 ? that.skeletonIsShow = false : that.skeletonIsShow = true
+      },
+      handleToSettings () {
+        this.$router.push({ name: 'ENT_C_USERINFO' })
       },
       beforeDestroy() {
         /* 页面组件销毁的时候，别忘了移除绑定的监听resize事件，否则的话，多渲染几次

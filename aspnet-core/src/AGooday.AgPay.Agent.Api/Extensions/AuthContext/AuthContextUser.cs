@@ -21,6 +21,11 @@
         public string Realname { get; set; }
 
         /// <summary>
+        /// 预留信息
+        /// </summary>
+        public string SafeWord { get; set; }
+
+        /// <summary>
         /// 手机号
         /// </summary>
         public string Telphone { get; set; }
