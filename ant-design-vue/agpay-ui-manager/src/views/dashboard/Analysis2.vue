@@ -484,7 +484,7 @@
         })
       },
       initPayType() {
-        console.log(this.$refs.payType.style.width)
+        // console.log(this.$refs.payType.style.width)
         this.mainChart.payTypeChart.chart = this.$echarts.init(this.$refs.payType)
         const option = {
           tooltip: {
@@ -786,7 +786,7 @@
         that.skeletonReqNum >= 5 ? that.skeletonIsShow = false : that.skeletonIsShow = true
       },
       handleToSettings () {
-        this.$router.push({ name: 'ENT_C_USERINFO' })
+        this.$router.push({ name: 'ENT_C_USERINFO', params: { parentKey: '1', childKey: '1' } })
       },
       beforeDestroy() {
         /* 页面组件销毁的时候，别忘了移除绑定的监听resize事件，否则的话，多渲染几次

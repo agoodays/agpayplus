@@ -1,7 +1,7 @@
 <template>
   <div style="background: #fff;border-radius:10px">
-    <a-tabs @change="selectTabs">
-      <a-tab-pane key="1" tab="基本信息">
+    <a-tabs v-model="parentKey" @change="selectParentTabs">
+      <a-tab-pane key="0" tab="基本信息">
         <div class="account-settings-info-view">
           <a-row :gutter="16">
             <a-col :md="16" :lg="16">
@@ -56,10 +56,10 @@
           <!-- 图片裁剪组件 <avatar-modal ref="modal" @ok="setavatar"/> -->
         </div>
       </a-tab-pane>
-      <a-tab-pane key="2" tab="安全信息">
+      <a-tab-pane key="1" tab="安全信息">
         <div class="account-settings-info-view">
-          <a-tabs tab-position="left">
-            <a-tab-pane key="1" tab="修改密码">
+          <a-tabs v-model="childKey" tab-position="left" @change="selectChildTabs">
+            <a-tab-pane key="0" tab="修改密码">
               <div class="account-settings-info-view">
                 <a-row :gutter="16">
                   <a-col :md="16" :lg="16">
@@ -81,7 +81,7 @@
                 </a-row>
               </div>
             </a-tab-pane>
-            <a-tab-pane key="2" tab="预留信息">
+            <a-tab-pane key="1" tab="预留信息">
               <div class="account-settings-info-view">
                 <a-row :gutter="16">
                   <a-col :md="16" :lg="16">
@@ -119,6 +119,8 @@ export default {
     return {
       action: upload.avatar, // 上传图标地址
       btnLoading: false,
+      parentKey: this.$route.params.parentKey ?? '0',
+      childKey: this.$route.params.childKey ?? '0',
       saveObject: {
         loginUsername: '', // 登录名
         realname: '', //  真实姓名
@@ -238,11 +240,18 @@ export default {
         }
       })
     },
-    selectTabs () { // 清空必填提示
-        this.updateObject.originalPwd = ''
-        this.updateObject.newPwd = ''
-        this.updateObject.confirmPwd = ''
-        // console.log(this.updateObject)
+    selectParentTabs (key) {
+      this.parentKey = key
+      this.$route.params.parentKey = key
+      // 清空必填提示
+      this.updateObject.originalPwd = ''
+      this.updateObject.newPwd = ''
+      this.updateObject.confirmPwd = ''
+      // console.log(this.updateObject)
+    },
+    selectChildTabs (key) {
+      this.childKey = key
+      this.$route.params.childKey = key
     },
     // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
     uploadSuccess (value, name) {
