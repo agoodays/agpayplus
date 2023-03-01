@@ -133,7 +133,7 @@
         <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 0 }">
           <div class="quick-start">
             <p>快速开始</p>
-            <ul>
+            <ul class="quick-start-ul">
               <template v-for="menu in quickMenuList">
                 <li :key="menu.entId">
                   <router-link :to="menu.menuUri" tag="span">{{ menu.entName }}</router-link>
@@ -287,7 +287,6 @@
 
         const putResult = function (item) {
           for (let i = 0; i < item.length; i++) {
-            console.log(item[i].quickJump)
             if (item[i].menuUri && item[i].quickJump === 1) {
               result.push(item[i])
             }
@@ -296,7 +295,6 @@
             }
           }
         }
-        console.log(this.$store.state.user.allMenuRouteTree)
         putResult(this.$store.state.user.allMenuRouteTree)
         return result
       }
@@ -828,6 +826,29 @@
       display:flex;
       align-items:center;
       justify-content:center;
+    }
+  }
+
+  .quick-start-ul {
+    font-size: 13px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 0;
+    margin-bottom:0;
+
+    li {
+      margin-right: 20px;
+      margin-top: 10px;
+      text-align: left;
+
+      :hover {
+        color: @ag-inside-link
+      }
+    }
+    li:hover {
+      cursor:pointer;
     }
   }
 </style>
