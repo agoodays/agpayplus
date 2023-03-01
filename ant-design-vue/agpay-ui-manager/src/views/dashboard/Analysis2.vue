@@ -133,7 +133,13 @@
         <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 0 }">
           <div class="quick-start">
             <p>快速开始</p>
-            <ul></ul>
+            <ul>
+              <template v-for="menu in quickMenuList">
+                <li :key="menu.entId">
+                  <router-link :to="menu.menuUri" tag="span">{{ menu.entName }}</router-link>
+                </li>
+              </template>
+            </ul>
           </div>
         </a-skeleton>
       </div>
@@ -168,13 +174,13 @@
           <b>交易统计</b>
           <div class="chart-padding" >
             <AgDateRangePicker
-                :value="searchData.payCountQueryDateRange"
-                :options="[
+              :value="searchData.payCountQueryDateRange"
+              :options="[
                 { name: '近7天', value: 'near2now_7' },
                 { name: '近30天', value: 'near2now_30' },
                 { name: '自定义时间', value: 'customDateTime' }
               ]"
-                @change="payCountQueryDateChange"/>
+              @change="payCountQueryDateChange"/>
           </div>
         </div>
         <!-- 如果没数据就展示一个图标 -->
@@ -281,6 +287,7 @@
 
         const putResult = function (item) {
           for (let i = 0; i < item.length; i++) {
+            console.log(item[i].quickJump)
             if (item[i].menuUri && item[i].quickJump === 1) {
               result.push(item[i])
             }
@@ -289,7 +296,7 @@
             }
           }
         }
-
+        console.log(this.$store.state.user.allMenuRouteTree)
         putResult(this.$store.state.user.allMenuRouteTree)
         return result
       }

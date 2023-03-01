@@ -132,7 +132,7 @@ export default {
         newPwd: '', //  新密码
         confirmPwd: '' //  确认密码
       },
-      safeWord: '',
+      safeWord: store.state.user.safeWord,
       recordId: store.state.user.userId, // 拿到ID
       rules: {
         realname: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }]
@@ -146,7 +146,6 @@ export default {
           }
         }]
       }
-
     }
   },
   computed: {
@@ -163,7 +162,7 @@ export default {
       const that = this
       getUserInfo().then(res => {
         that.saveObject = res
-        console.log(res)
+        // console.log(res)
       })
     },
     changeSafeWordInfo () { // 更新基本信息事件
@@ -175,8 +174,13 @@ export default {
       that.btnLoading = true // 打开按钮上的 loading
       that.confirmLoading = true // 显示loading
       updateUserInfo({ safeWord: that.safeWord }).then(res => {
-        that.$message.success('修改成功')
         that.btnLoading = false // 关闭按钮刷新
+        return getInfo()
+      }).then(bizData => {
+        // console.log(bizData)
+        bizData.safeWord = that.safeWord
+        store.commit('SET_USER_INFO', bizData) // 调用vuex设置用户基本信息
+        that.$message.success('修改成功')
       }).catch(res => {
         that.btnLoading = false
       })
