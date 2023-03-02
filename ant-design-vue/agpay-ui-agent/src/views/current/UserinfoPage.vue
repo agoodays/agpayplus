@@ -1,7 +1,7 @@
 <template>
   <div style="background: #fff;border-radius:10px">
-    <a-tabs @change="selectTabs">
-      <a-tab-pane key="1" tab="基本信息">
+    <a-tabs v-model="parentKey" @change="selectParentTabs">
+      <a-tab-pane key="0" tab="基本信息">
         <div class="account-settings-info-view">
           <a-row :gutter="16">
             <a-col :md="16" :lg="16">
@@ -56,26 +56,48 @@
           <!-- 图片裁剪组件 <avatar-modal ref="modal" @ok="setavatar"/> -->
         </div>
       </a-tab-pane>
-      <a-tab-pane key="2" tab="安全信息">
+      <a-tab-pane key="1" tab="安全信息">
         <div class="account-settings-info-view">
-          <a-row :gutter="16">
-            <a-col :md="16" :lg="16">
-              <a-form-model ref="pwdFormModel" :model="updateObject" :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
-                <a-form-model-item label="原密码：" prop="originalPwd">
-                  <a-input-password autocomplete="new-password" v-model="updateObject.originalPwd" placeholder="请输入原密码" />
-                </a-form-model-item>
-                <a-form-model-item label="新密码：" prop="newPwd">
-                  <a-input-password autocomplete="new-password" v-model="updateObject.newPwd" placeholder="请输入新密码" />
-                </a-form-model-item>
-                <a-form-model-item label="确认新密码：" prop="confirmPwd">
-                  <a-input-password autocomplete="new-password" v-model="updateObject.confirmPwd" placeholder="确认新密码" />
-                </a-form-model-item>
-              </a-form-model>
-              <a-form-item style="display:flex;justify-content:center">
-                <a-button type="primary" icon="safety-certificate" @click="confirm" :loading="btnLoading">更新密码</a-button>
-              </a-form-item>
-            </a-col>
-          </a-row>
+          <a-tabs v-model="childKey" tab-position="left" @change="selectChildTabs">
+            <a-tab-pane key="0" tab="修改密码">
+              <div class="account-settings-info-view">
+                <a-row :gutter="16">
+                  <a-col :md="16" :lg="16">
+                    <a-form-model ref="pwdFormModel" :model="updateObject" :label-col="{span: 9}" :wrapper-col="{span: 10}">
+                      <a-form-model-item label="原密码：" prop="originalPwd">
+                        <a-input-password autocomplete="new-password" v-model="updateObject.originalPwd" placeholder="请输入原密码" />
+                      </a-form-model-item>
+                      <a-form-model-item label="新密码：" prop="newPwd">
+                        <a-input-password autocomplete="new-password" v-model="updateObject.newPwd" placeholder="请输入新密码" />
+                      </a-form-model-item>
+                      <a-form-model-item label="确认新密码：" prop="confirmPwd">
+                        <a-input-password autocomplete="new-password" v-model="updateObject.confirmPwd" placeholder="确认新密码" />
+                      </a-form-model-item>
+                    </a-form-model>
+                    <a-form-item style="display:flex;justify-content:center">
+                      <a-button type="primary" icon="safety-certificate" @click="confirm" :loading="btnLoading">更新密码</a-button>
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+              </div>
+            </a-tab-pane>
+            <a-tab-pane key="1" tab="预留信息">
+              <div class="account-settings-info-view">
+                <a-row :gutter="16">
+                  <a-col :md="16" :lg="16">
+                    <a-form-model :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
+                      <a-form-model-item label="预留信息：" prop="safeWord">
+                        <a-input v-model="safeWord" placeholder="请输入新的预留信息" />
+                      </a-form-model-item>
+                    </a-form-model>
+                    <a-form-item style="display:flex;justify-content:center">
+                      <a-button type="primary" icon="check-circle" @click="changeSafeWordInfo" :loading="btnLoading">确认更新</a-button>
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+              </div>
+            </a-tab-pane>
+          </a-tabs>
         </div>
       </a-tab-pane>
     </a-tabs>
@@ -97,6 +119,8 @@ export default {
     return {
       action: upload.avatar, // 上传图标地址
       btnLoading: false,
+      parentKey: this.$route.params.parentKey ?? '0',
+      childKey: this.$route.params.childKey ?? '0',
       saveObject: {
         loginUsername: '', // 登录名
         realname: '', //  真实姓名
@@ -110,6 +134,7 @@ export default {
         newPwd: '', //  新密码
         confirmPwd: '' //  确认密码
       },
+      safeWord: store.state.user.safeWord,
       recordId: store.state.user.userId, // 拿到ID
       rules: {
         realname: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }]
@@ -123,7 +148,6 @@ export default {
           }
         }]
       }
-
     }
   },
   computed: {
@@ -140,7 +164,27 @@ export default {
       const that = this
       getUserInfo().then(res => {
         that.saveObject = res
-        console.log(res)
+        // console.log(res)
+      })
+    },
+    changeSafeWordInfo () { // 更新基本信息事件
+      const that = this
+      if (that.safeWord.length <= 0) {
+        that.$message.error('信息内容不可为空')
+        return
+      }
+      that.btnLoading = true // 打开按钮上的 loading
+      that.confirmLoading = true // 显示loading
+      updateUserInfo({ safeWord: that.safeWord }).then(res => {
+        that.btnLoading = false // 关闭按钮刷新
+        return getInfo()
+      }).then(bizData => {
+        // console.log(bizData)
+        bizData.safeWord = that.safeWord
+        store.commit('SET_USER_INFO', bizData) // 调用vuex设置用户基本信息
+        that.$message.success('修改成功')
+      }).catch(res => {
+        that.btnLoading = false
       })
     },
     changeInfo () { // 更新基本信息事件
@@ -196,11 +240,18 @@ export default {
         }
       })
     },
-    selectTabs () { // 清空必填提示
-        this.updateObject.originalPwd = ''
-        this.updateObject.newPwd = ''
-        this.updateObject.confirmPwd = ''
-        console.log(this.updateObject)
+    selectParentTabs (key) {
+      this.parentKey = key
+      this.$route.params.parentKey = key
+      // 清空必填提示
+      this.updateObject.originalPwd = ''
+      this.updateObject.newPwd = ''
+      this.updateObject.confirmPwd = ''
+      // console.log(this.updateObject)
+    },
+    selectChildTabs (key) {
+      this.childKey = key
+      this.$route.params.childKey = key
     },
     // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
     uploadSuccess (value, name) {

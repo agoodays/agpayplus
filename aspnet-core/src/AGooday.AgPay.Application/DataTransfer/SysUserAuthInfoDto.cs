@@ -23,6 +23,11 @@
         public string SafeWord { get; set; }
 
         /// <summary>
+        /// 简称
+        /// </summary>
+        public string ShortName { get; set; }
+
+        /// <summary>
         /// 手机号
         /// </summary>
         public string Telphone { get; set; }

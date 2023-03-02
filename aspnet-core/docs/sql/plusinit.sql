@@ -469,3 +469,11 @@ INSERT INTO `t_sys_config` VALUES ('agentServiceAgreement', '用户服务协议'
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_ISV_MCH_COUNT', '服务商/商户统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_DAY_COUNT', '今日/昨日交易统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TREND_COUNT', '趋势图统计	', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());
+
+INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_ISV_MCH_COUNT', '服务商/商户统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'AGENT', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_DAY_COUNT', '今日/昨日交易统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'AGENT', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TREND_COUNT', '趋势图统计	', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'AGENT', NOW(), NOW());
+
+
+
+

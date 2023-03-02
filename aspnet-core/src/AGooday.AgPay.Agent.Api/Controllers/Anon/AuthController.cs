@@ -31,6 +31,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly ISysConfigService _sysConfigService;
+        private readonly IAgentInfoService _agentInfoService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         // 将领域通知处理程序注入Controller
@@ -41,7 +42,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             ISysUserAuthService sysUserAuthService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService,
-            ISysConfigService sysConfigService)
+            ISysConfigService sysConfigService, 
+            IAgentInfoService agentInfoService)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
@@ -52,6 +54,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
             _sysConfigService = sysConfigService;
+            _agentInfoService = agentInfoService;
         }
 
         /// <summary>
@@ -106,6 +109,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             {
                 throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
             }
+
+            var agent = _agentInfoService.GetById(auth.BelongInfoId);
+            auth.ShortName = agent.AgentShortName;
 
             //生成token
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());

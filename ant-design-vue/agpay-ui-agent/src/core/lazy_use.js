@@ -65,6 +65,9 @@ import { VueJsonp } from 'vue-jsonp'
 // viewer library
 import VueViewer, { api as viewerApi } from 'v-viewer'
 
+// echarts library
+import * as echarts from 'echarts'
+
 Vue.use(ConfigProvider)
 Vue.use(Layout)
 Vue.use(Input)
@@ -120,6 +123,8 @@ Vue.prototype.$info = Modal.info
 Vue.prototype.$success = Modal.success
 Vue.prototype.$error = Modal.error
 Vue.prototype.$warning = Modal.warning
+
+Vue.prototype.$echarts = echarts
 
 Vue.prototype.$viewerApi = viewerApi
 
