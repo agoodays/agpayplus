@@ -310,6 +310,10 @@
             public const string ENT_DIVISION_RECEIVER_GROUP = "ENT_DIVISION_RECEIVER_GROUP";
             public const string ENT_DIVISION_RECEIVER = "ENT_DIVISION_RECEIVER";
             public const string ENT_C_USERINFO = "ENT_C_USERINFO";
+            public const string ENT_C_MAIN_PAY_TYPE_COUNT = "ENT_C_MAIN_PAY_TYPE_COUNT";
+            public const string ENT_C_MAIN_PAY_COUNT = "ENT_C_MAIN_PAY_COUNT";
+            public const string ENT_C_MAIN_PAY_DAY_COUNT = "ENT_C_MAIN_PAY_DAY_COUNT";
+            public const string ENT_C_MAIN_PAY_TREND_COUNT = "ENT_C_MAIN_PAY_TREND_COUNT";
             public const string ENT_ARTICLE_NOTICEINFO = "ENT_ARTICLE_NOTICEINFO";
         }
     }

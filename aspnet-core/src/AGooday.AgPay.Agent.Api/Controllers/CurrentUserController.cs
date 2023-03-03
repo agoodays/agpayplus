@@ -91,6 +91,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
         {
             var currentUser = GetCurrentUser();
+            dto.SysUserId = currentUser.SysUser.SysUserId;
             _sysUserService.ModifyCurrentUserInfo(dto);
             var userinfo = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             currentUser.SysUser = userinfo;

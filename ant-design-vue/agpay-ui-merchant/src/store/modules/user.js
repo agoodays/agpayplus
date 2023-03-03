@@ -6,6 +6,8 @@ const user = {
   state: {
     token: '',
     userName: '', // 用户名
+    safeWord: '', // 预留信息
+    shortName: '', // 简称
     userId: '', // 用户ID
     avatarImgPath: '', // 头像
     allMenuRouteTree: [], // 全部动态 router
@@ -29,6 +31,8 @@ const user = {
     SET_USER_INFO: (state, userInfo) => {
       state.userId = userInfo.sysUserId // 用户ID
       state.userName = userInfo.realname // 昵称
+      state.safeWord = userInfo.safeWord // 预留信息
+      state.shortName = userInfo.shortName // 预留信息
       state.avatarImgPath = userInfo.avatarUrl // 头像
       state.accessList = userInfo.entIdList // 权限集合
       state.allMenuRouteTree = userInfo.allMenuRouteTree // 全部路由集合

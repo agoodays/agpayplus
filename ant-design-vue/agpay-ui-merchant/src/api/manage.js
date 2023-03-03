@@ -175,6 +175,13 @@ export function getAvailablePayInterfaceList (appId, wayCode) {
   })
 }
 
+export function getPayTrendCount (parameter) {
+  return request.request({
+    url: API_URL_MAIN_STATISTIC + '/payTrendCount?recentDay=' + parameter,
+    method: 'GET'
+  })
+}
+
 export function getPayAmountWeek () {
   return request.request({
     url: API_URL_MAIN_STATISTIC + '/payAmountWeek',
@@ -185,6 +192,13 @@ export function getPayAmountWeek () {
 export function getNumCount () {
   return request.request({
     url: API_URL_MAIN_STATISTIC + '/numCount',
+    method: 'GET'
+  })
+}
+
+export function getPayDayCount (parameter) {
+  return request.request({
+    url: API_URL_MAIN_STATISTIC + '/payDayCount?queryDateRange=' + parameter,
     method: 'GET'
   })
 }

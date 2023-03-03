@@ -30,6 +30,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly ISysConfigService _sysConfigService;
+        private readonly IMchInfoService _mchInfoService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         // 将领域通知处理程序注入Controller
@@ -39,8 +40,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             INotificationHandler<DomainNotification> notifications,
             ISysUserAuthService sysUserAuthService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService, 
-            ISysConfigService sysConfigService)
+            ISysUserRoleRelaService sysUserRoleRelaService,
+            ISysConfigService sysConfigService, 
+            IMchInfoService mchInfoService)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
@@ -51,6 +53,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
             _sysConfigService = sysConfigService;
+            _mchInfoService = mchInfoService;
         }
 
         /// <summary>
@@ -104,6 +107,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             {
                 throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
             }
+
+            var mch = _mchInfoService.GetById(auth.BelongInfoId);
+            auth.ShortName = mch.MchShortName;
 
             //生成token
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());
