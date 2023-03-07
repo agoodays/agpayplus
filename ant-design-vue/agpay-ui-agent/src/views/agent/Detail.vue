@@ -195,6 +195,7 @@
             <div v-if="detailData.licenseImg">
               <a-upload
                 :default-file-list="getDefaultFileList(detailData.licenseImg)"
+                :showUploadList="{ showPreviewIcon:false, showRemoveIcon:false, showDownloadIcon:false }"
                 list-type="picture"
                 class="detail-upload-list-inline"
                 @preview="imgPreview($event)"
@@ -208,6 +209,7 @@
             <div v-if="detailData.permitImg">
               <a-upload
                 :default-file-list="getDefaultFileList(detailData.permitImg)"
+                :showUploadList="{ showPreviewIcon:false, showRemoveIcon:false, showDownloadIcon:false }"
                 list-type="picture"
                 class="detail-upload-list-inline"
                 @preview="imgPreview($event)"
@@ -220,6 +222,7 @@
             <div v-if="detailData.idcard1Img">
               <a-upload
                 :default-file-list="getDefaultFileList(detailData.idcard1Img)"
+                :showUploadList="{ showPreviewIcon:false, showRemoveIcon:false, showDownloadIcon:false }"
                 list-type="picture"
                 class="detail-upload-list-inline"
                 @preview="imgPreview($event)"
@@ -232,6 +235,7 @@
             <div v-if="detailData.idcard2Img">
               <a-upload
                 :default-file-list="getDefaultFileList(detailData.idcard2Img)"
+                :showUploadList="{ showPreviewIcon:false, showRemoveIcon:false, showDownloadIcon:false }"
                 list-type="picture"
                 class="detail-upload-list-inline"
                 @preview="imgPreview($event)"
@@ -244,6 +248,7 @@
             <div v-if="detailData.idcardInHandImg">
               <a-upload
                 :default-file-list="getDefaultFileList(detailData.idcardInHandImg)"
+                :showUploadList="{ showPreviewIcon:false, showRemoveIcon:false, showDownloadIcon:false }"
                 list-type="picture"
                 class="detail-upload-list-inline"
                 @preview="imgPreview($event)"
@@ -257,6 +262,7 @@
             <div v-if="detailData.bankCardImg">
               <a-upload
                 :default-file-list="getDefaultFileList(detailData.bankCardImg)"
+                :showUploadList="{ showPreviewIcon:false, showRemoveIcon:false, showDownloadIcon:false }"
                 list-type="picture"
                 class="detail-upload-list-inline"
                 @preview="imgPreview($event)"
@@ -353,7 +359,7 @@ export default {
 </script>
 
 <style lang="less">
-  .detail-upload-list-inline .ant-upload-list-item-card-actions.picture {
-    display: none;
-  }
+  //.detail-upload-list-inline .ant-upload-list-item-card-actions.picture {
+  //  display: none;
+  //}
 </style>
