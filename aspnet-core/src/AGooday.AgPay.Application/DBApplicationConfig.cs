@@ -21,11 +21,6 @@ namespace AGooday.AgPay.Application
         public string PaySiteUrl { get; set; }
 
         /// <summary>
-        /// oss公共读文件地址
-        /// </summary>
-        public string OssPublicSiteUrl { get; set; }
-
-        /// <summary>
         /// 生成  【jsapi统一收银台跳转地址】
         /// </summary>
         /// <param name="payOrderId"></param>

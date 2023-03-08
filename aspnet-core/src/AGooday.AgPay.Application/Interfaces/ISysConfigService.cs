@@ -5,6 +5,7 @@ namespace AGooday.AgPay.Application.Interfaces
     public interface ISysConfigService : IDisposable
     {
         DBApplicationConfig GetDBApplicationConfig();
+        DBOssConfig GetDBOssConfig();
         int UpdateByConfigKey(Dictionary<string, string> configs);
         void Add(SysConfigDto dto);
         void Remove(string recordId);

@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Components.OSS.Services
                 return saveDirAndFileName;
             }
 
-            return $"{sysConfigService.GetDBApplicationConfig().OssPublicSiteUrl}/{saveDirAndFileName.Replace(@"\", "/")}";
+            return $"{sysConfigService.GetDBOssConfig().OssPublicSiteUrl}/{saveDirAndFileName.Replace(@"\", "/")}";
         }
 
         public bool DownloadFile(OssSavePlaceEnum ossSavePlaceEnum, string source, string target)

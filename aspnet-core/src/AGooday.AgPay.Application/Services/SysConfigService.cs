@@ -40,7 +40,11 @@ namespace AGooday.AgPay.Application.Services
         /// 数据库application配置参数
         /// </summary>
         private static Dictionary<string, DBApplicationConfig> APPLICATION_CONFIG = new Dictionary<string, DBApplicationConfig> {
-            {"applicationConfig", null }
+            { "applicationConfig", null }
+        };
+
+        private static Dictionary<string, DBOssConfig> OSS_CONFIG = new Dictionary<string, DBOssConfig> {
+            { "ossConfig", null }
         };
 
         public void InitDBConfig(string groupKey)
@@ -55,6 +59,12 @@ namespace AGooday.AgPay.Application.Services
             {
                 var dbConfig = JsonConvert.DeserializeObject<DBApplicationConfig>(SelectByGroupKey(groupKey));
                 APPLICATION_CONFIG[APPLICATION_CONFIG.First().Key] = dbConfig;
+            }
+
+            if (OSS_CONFIG.First().Key.Equals(groupKey))
+            {
+                var dbConfig = JsonConvert.DeserializeObject<DBOssConfig>(SelectByGroupKey(groupKey));
+                OSS_CONFIG[OSS_CONFIG.First().Key] = dbConfig;
             }
         }
 
@@ -102,6 +112,26 @@ namespace AGooday.AgPay.Application.Services
                 InitDBConfig(APPLICATION_CONFIG.First().Key);
             }
             return APPLICATION_CONFIG.First().Value;
+        }
+
+        /// <summary>
+        /// 获取实际的数据
+        /// </summary>
+        /// <returns></returns>
+        public DBOssConfig GetDBOssConfig()
+        {
+            // 查询DB
+            if (!IS_USE_CACHE)
+            {
+                return JsonConvert.DeserializeObject<DBOssConfig>(SelectByGroupKey(OSS_CONFIG.First().Key));
+            }
+
+            // 缓存数据
+            if (OSS_CONFIG.First().Value == null)
+            {
+                InitDBConfig(OSS_CONFIG.First().Key);
+            }
+            return OSS_CONFIG.First().Value;
         }
 
         public int UpdateByConfigKey(Dictionary<string, string> configs)

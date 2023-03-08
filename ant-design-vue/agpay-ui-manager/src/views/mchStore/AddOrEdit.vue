@@ -37,7 +37,17 @@
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-model-item label="门店LOGO" prop="storeLogo">
-            <div v-if="this.imgDefaultFileList.storeLogo">
+            <AgUpload
+              bind-name="storeLogo"
+              :action="action"
+              :urls="this.imgDefaultFileList.storeLogo"
+              @uploadSuccess="uploadSuccess"
+            >
+              <template slot="uploadSlot" slot-scope="{loading}">
+                <a-button style="height: 66px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+              </template>
+            </AgUpload>
+<!--            <div v-if="this.imgDefaultFileList.storeLogo">
               <a-upload
                 :file-list="this.imgDefaultFileList.storeLogo"
                 list-type="picture"
@@ -56,7 +66,7 @@
               >
                 <a-button icon="upload" v-if="this.imgIsShow.storeLogo">上传</a-button>
               </a-upload>
-            </div>
+            </div>-->
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
@@ -168,11 +178,16 @@
 
 <script>
 import { API_URL_MCH_STORE, API_URL_MCH_LIST, req, upload, getMapConfig } from '@/api/manage'
+import AgUpload from '@/components/AgUpload/AgUpload'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import 'viewerjs/dist/viewer.css'
+
 export default {
   props: {
     callbackFunc: { type: Function }
+  },
+  components: {
+    AgUpload
   },
   data () {
     const checkMchNo = (rule, value, callback) => { // 是否选择了商户
@@ -194,7 +209,7 @@ export default {
       lnglat: null,
       action: upload.form, // 上传文件地址
       imgDefaultFileList: {
-        storeLogo: null,
+        storeLogo: [],
         storeOuterImg: null,
         storeInnerImg: null
       },
@@ -220,7 +235,7 @@ export default {
       this.lnglat = null
       this.saveObject = {}
       this.imgDefaultFileList = {
-        storeLogo: null,
+        storeLogo: [],
         storeOuterImg: null,
         storeInnerImg: null
       }
@@ -257,6 +272,9 @@ export default {
               thumbUrl: url
             }]
           })
+
+          that.imgDefaultFileList.storeLogo = [that.saveObject.storeLogo]
+          console.log(that.imgDefaultFileList.storeLogo)
         })
         this.visible = true
       } else {
@@ -665,6 +683,15 @@ export default {
       } else if (info.file.status === 'removed') {
         this.imgDefaultFileList[name] = null
       }
+    },
+    // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
+    uploadSuccess (name, fileList) {
+      console.log({ name, fileList })
+      const [firstItem] = fileList
+      this.saveObject[name] = firstItem?.url
+      this.imgDefaultFileList[name] = fileList.map(({ url }) => url)
+      console.log({ a: this.saveObject[name], b: this.imgDefaultFileList[name] })
+      this.$forceUpdate()
     },
     imgPreview (info) {
       // console.log(info)
