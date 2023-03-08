@@ -36,18 +36,23 @@
                 </div> -->
                 <img
                   :src="saveObject.avatarUrl"
-                  style="border: 1px solid rgba(0,0,0,0.08)"/>
-                <AgUpload
-                  style="
-                  margin-top:10px"
-                  :action="action"
-                  accept=".jpg, .jpeg, .png"
-                  @uploadSuccess="uploadSuccess($event, '')"
-                >
-                  <template slot="uploadSlot" slot-scope="{loading}">
+                  style="border: 1px solid rgba(0,0,0,0.08);cursor: pointer;"
+                  @click="imgPreview({ url:saveObject.avatarUrl })"
+                />
+                <div style="margin-top:10px">
+                  <a-upload
+                    name="file"
+                    :headers="headers"
+                    :action="action"
+                    :accept="accept"
+                    :showUploadList="false"
+                    :before-upload="beforeUpload"
+                    @change="handleChange"
+                    @preview="imgPreview($event)"
+                  >
                     <a-button style="marginLeft:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '更换头像' }} </a-button>
-                  </template>
-                </AgUpload>
+                  </a-upload>
+                </div>
               </div>
 
             </a-col>
@@ -110,6 +115,16 @@ import AvatarModal from './AvatarModal'
 import store from '@/store'
 import { getInfo } from '@/api/login'
 import { Base64 } from 'js-base64'
+import appConfig from '@/config/appConfig'
+import storage from '@/utils/agpayStorageWrapper'
+import 'viewerjs/dist/viewer.css'
+
+function getHeaders () {
+  const headers = {}
+  headers[appConfig.ACCESS_TOKEN_NAME] = storage.getToken() // token
+  return headers
+}
+
 export default {
   components: {
     AvatarModal,
@@ -117,7 +132,11 @@ export default {
   },
   data () {
     return {
+      loading: false, // 上传状态
+      size: 10, // 文件大小限制
       action: upload.avatar, // 上传图标地址
+      headers: getHeaders(), // 放入token
+      accept: '.jpg, .jpeg, .png',
       btnLoading: false,
       parentKey: this.$route.params.parentKey ?? '0',
       childKey: this.$route.params.childKey ?? '0',
@@ -253,8 +272,52 @@ export default {
       this.childKey = key
       this.$route.params.childKey = key
     },
+    // 上传回调
+    handleChange (info) {
+      // 限制文件数量
+      /* let fileList = [...info.fileList]
+      fileList = fileList.length > this.num ? fileList.splice(0 - this.num) : fileList // 取最新加入的元素
+      fileList = fileList.map(file => {
+        if (file.response) {
+          file.url = file.response.data
+        }
+        return file
+      }) */
+      const res = info.file.response
+
+      if (info.file.status === 'uploading') {
+        this.loading = true
+      }
+      if (info.file.status === 'done') {
+        if (res.code !== 0) {
+          this.$message.error(res.msg)
+        }
+        this.loading = false
+        this.uploadSuccess(res.data)
+      } else if (info.file.status === 'error') {
+        console.log(info)
+        this.$message.error(`上传失败`)
+      }
+    },
+    imgPreview (info) {
+      // console.log(info)
+      this.$viewerApi({
+        images: [info.url],
+        options: {
+          initialViewIndex: 0
+        }
+      })
+    },
+    // 上传图片前的校验
+    beforeUpload (file) {
+      const validate = file.size / 1024 / 1024 < this.size
+      if (!validate) {
+        this.$message.error('文件应小于' + this.size + 'M!')
+      }
+      return validate
+    },
     // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
-    uploadSuccess (value, name) {
+    uploadSuccess (value) {
       this.saveObject.avatarUrl = value
       this.$forceUpdate()
     }
