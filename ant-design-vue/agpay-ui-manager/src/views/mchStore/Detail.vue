@@ -65,7 +65,6 @@
               :default-file-list="getDefaultFileList(detailData.storeLogo)"
               :showUploadList="{ showPreviewIcon:false, showRemoveIcon:false, showDownloadIcon:false }"
               list-type="picture"
-              class="detail-upload-list-inline"
               @preview="imgPreview($event)"
             />
           </div>
@@ -78,7 +77,6 @@
               :default-file-list="getDefaultFileList(detailData.storeOuterImg)"
               :showUploadList="{ showPreviewIcon:false, showRemoveIcon:false, showDownloadIcon:false }"
               list-type="picture"
-              class="detail-upload-list-inline"
               @preview="imgPreview($event)"
             />
           </div>
@@ -91,7 +89,6 @@
               :default-file-list="getDefaultFileList(detailData.storeInnerImg)"
               :showUploadList="{ showPreviewIcon:false, showRemoveIcon:false, showDownloadIcon:false }"
               list-type="picture"
-              class="detail-upload-list-inline"
               @preview="imgPreview($event)"
             />
           </div>
@@ -181,7 +178,4 @@
 </script>
 
 <style lang="less">
-  //.detail-upload-list-inline .ant-upload-list-item-card-actions.picture {
-  //  display: none;
-  //}
 </style>

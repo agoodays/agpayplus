@@ -86,28 +86,30 @@
         </a-col>
         <a-col span="24">
           <a-form-model-item label="API证书(apiclient_cert.p12)" prop="cert">
-            <a-input v-model="ifParams.cert" disabled="disabled" />
             <AgUpload
+              bind-name="cert"
               :action="action"
-              :fileUrl="ifParams.cert"
-              @uploadSuccess="uploadSuccess($event, 'cert')"
+              :urls="[ifParams.cert]"
+              listType="text"
+              @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
         </a-col>
         <a-col span="24">
           <a-form-model-item label="证书文件(apiclient_cert.pem)" prop="apiClientCert">
-            <a-input v-model="ifParams.apiClientCert" disabled="disabled" />
             <AgUpload
+              bind-name="apiClientCert"
               :action="action"
-              :fileUrl="ifParams.apiClientCert"
-              @uploadSuccess="uploadSuccess($event, 'apiClientCert')"
+              :urls="[ifParams.apiClientCert]"
+              listType="text"
+              @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
@@ -332,4 +334,7 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+  .ag-upload-btn {
+    // height: 66px;
+  }
 </style>
