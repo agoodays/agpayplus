@@ -1,8 +1,13 @@
+using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
+using AGooday.AgPay.Components.OSS.Config;
+using AGooday.AgPay.Components.OSS.Constants;
+using AGooday.AgPay.Components.OSS.Controllers;
+using AGooday.AgPay.Components.OSS.Services;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Extensions;
 using AGooday.AgPay.Merchant.Api.Extensions.AuthContext;
@@ -66,6 +71,11 @@ var mqconfiguration = builder.Configuration.GetSection("MQ:RabbitMQ");
 services.Configure<RabbitMQConfiguration>(mqconfiguration);
 #endregion
 
+#region OSS
+builder.Configuration.GetSection("OSS").Bind(LocalOssConfig.Oss);
+builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
+#endregion
+
 var cors = builder.Configuration.GetSection("Cors").Value;
 services.AddCors(o =>
     o.AddPolicy("CorsPolicy",
@@ -95,6 +105,7 @@ services.AddControllersWithViews(options =>
     //日志过滤器
     options.Filters.Add<LogActionFilter>();
 })
+    .AddApplicationPart(typeof(OssFileController).Assembly)
     //.AddNewtonsoftJson();
     .AddNewtonsoftJson(options =>
     {
@@ -149,6 +160,13 @@ services.AddScoped<CleanMchLoginAuthCacheMQ.IMQReceiver, CleanMchLoginAuthCacheM
 services.AddScoped<CleanAgentLoginAuthCacheMQ.IMQReceiver, CleanAgentLoginAuthCacheMQReceiver>();
 services.AddScoped<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
 services.AddHostedService<RabbitListener>();
+#endregion
+
+#region OSS
+if (OssServiceTypeEnum.LOCAL.GetDescription().Equals(LocalOssConfig.Oss.ServiceType))
+{
+    services.AddScoped<IOssService, LocalFileService>();
+}
 #endregion
 
 //加入 WebSocket 处理服务

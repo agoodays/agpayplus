@@ -310,8 +310,9 @@ export default {
     border-radius: 4px;
 
     /deep/ .colorBtn {
-      height: 64px;
-      width: 100%;
+      height: 48px;
+      width: calc(100% - 16px);
+      margin: 8px;
       border-radius: 4px;
     }
 

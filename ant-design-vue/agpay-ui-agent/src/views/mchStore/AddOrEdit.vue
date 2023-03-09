@@ -37,74 +37,44 @@
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-model-item label="门店LOGO" prop="storeLogo">
-            <div v-if="this.imgDefaultFileList.storeLogo">
-              <a-upload
-                :file-list="this.imgDefaultFileList.storeLogo"
-                list-type="picture"
-                class="default-upload-list-inline"
-                @change="handleChange($event, 'storeLogo')"
-                @preview="imgPreview($event)"
-              />
-            </div>
-            <div v-else>
-              <a-upload
-                :action="action"
-                list-type="picture"
-                class="upload-list-inline"
-                @change="handleChange($event, 'storeLogo')"
-                @preview="imgPreview($event)"
-              >
-                <a-button icon="upload" v-if="this.imgIsShow.storeLogo">上传</a-button>
-              </a-upload>
-            </div>
+            <AgUpload
+              :action="action"
+              bind-name="storeLogo"
+              :urls="this.imgDefaultFileList.storeLogo"
+              @uploadSuccess="uploadSuccess"
+            >
+              <template slot="uploadSlot" slot-scope="{loading}">
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+              </template>
+            </AgUpload>
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="门头照" prop="storeOuterImg">
-            <div v-if="this.imgDefaultFileList.storeOuterImg">
-              <a-upload
-                :file-list="this.imgDefaultFileList.storeOuterImg"
-                list-type="picture"
-                class="default-upload-list-inline"
-                @change="handleChange($event, 'storeOuterImg')"
-                @preview="imgPreview($event)"
-              />
-            </div>
-            <div v-else>
-              <a-upload
-                :action="action"
-                list-type="picture"
-                class="upload-list-inline"
-                @change="handleChange($event, 'storeOuterImg')"
-                @preview="imgPreview($event)"
-              >
-                <a-button icon="upload" v-if="this.imgIsShow.storeOuterImg">上传</a-button>
-              </a-upload>
-            </div>
+            <AgUpload
+              :action="action"
+              bind-name="storeOuterImg"
+              :urls="this.imgDefaultFileList.storeOuterImg"
+              @uploadSuccess="uploadSuccess"
+            >
+              <template slot="uploadSlot" slot-scope="{loading}">
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+              </template>
+            </AgUpload>
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="门店内景照" prop="storeInnerImg">
-            <div v-if="this.imgDefaultFileList.storeInnerImg">
-              <a-upload
-                :file-list="this.imgDefaultFileList.storeInnerImg"
-                list-type="picture"
-                class="default-upload-list-inline"
-                @change="handleChange($event, 'storeInnerImg')"
-                @preview="imgPreview($event)"
-              />
-            </div>
-            <div v-else>
-              <a-upload
-                :action="action"
-                list-type="picture"
-                class="upload-list-inline"
-                @change="handleChange($event, 'storeInnerImg')"
-                @preview="imgPreview($event)"
-              >
-                <a-button icon="upload" v-if="this.imgIsShow.storeInnerImg">上传</a-button>
-              </a-upload>
-            </div>
+            <AgUpload
+              :action="action"
+              bind-name="storeInnerImg"
+              :urls="this.imgDefaultFileList.storeInnerImg"
+              @uploadSuccess="uploadSuccess"
+            >
+              <template slot="uploadSlot" slot-scope="{loading}">
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+              </template>
+            </AgUpload>
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
@@ -168,13 +138,16 @@
 
 <script>
 import { API_URL_MCH_STORE, API_URL_MCH_LIST, req, upload, getMapConfig } from '@/api/manage'
+import AgUpload from '@/components/AgUpload/AgUpload'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import 'viewerjs/dist/viewer.css'
 export default {
   props: {
     callbackFunc: { type: Function }
   },
-
+  components: {
+    AgUpload
+  },
   data () {
     const checkMchNo = (rule, value, callback) => { // 是否选择了商户
       if (this.isAdd && !value) {
@@ -195,14 +168,9 @@ export default {
       lnglat: null,
       action: upload.form, // 上传文件地址
       imgDefaultFileList: {
-        storeLogo: null,
-        storeOuterImg: null,
-        storeInnerImg: null
-      },
-      imgIsShow: {
-        storeLogo: true,
-        storeOuterImg: true,
-        storeInnerImg: true
+        storeLogo: [],
+        storeOuterImg: [],
+        storeInnerImg: []
       },
       rules: {
         storeName: [{ required: true, message: '请输入门店名称', trigger: 'blur' }],
@@ -221,14 +189,9 @@ export default {
       this.lnglat = null
       this.saveObject = {}
       this.imgDefaultFileList = {
-        storeLogo: null,
-        storeOuterImg: null,
-        storeInnerImg: null
-      }
-      this.imgIsShow = {
-        storeLogo: true,
-        storeOuterImg: true,
-        storeInnerImg: true
+        storeLogo: [],
+        storeOuterImg: [],
+        storeInnerImg: []
       }
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
@@ -246,17 +209,9 @@ export default {
           Object.keys(that.imgDefaultFileList).forEach((field) => {
             const url = that.saveObject[field]
             if (!url) {
-              this.imgIsShow[field] = true
               return null
             }
-            this.imgIsShow[field] = false
-            that.imgDefaultFileList[field] = [{
-              uid: '-1',
-              name: url.split('/').pop(),
-              status: 'done',
-              url: url,
-              thumbUrl: url
-            }]
+            that.imgDefaultFileList[field] = [that.saveObject[field]]
           })
         })
         this.visible = true
@@ -633,48 +588,14 @@ export default {
     onClose () {
       this.visible = false
     },
-    // 上传回调
-    handleChange (info, name) {
-      console.log(info)
-      if (info.fileList.length) {
-        this.imgIsShow[name] = false
-      } else {
-        this.imgIsShow[name] = true
-        this.saveObject[name] = ''
-      }
-
-      const res = info.file.response
-
-      if (info.file.status === 'uploading') {
-        this.loading = true
-      }
-      if (info.file.status === 'done') {
-        if (res.code !== 0) {
-          this.$message.error(res.msg)
-        }
-        this.loading = false
-        this.saveObject[name] = res.data
-        info.file.name = res.data.split('/').pop()
-        info.file.url = res.data
-        info.file.thumbUrl = res.data
-        const fileinfo = info.fileList.find(f => f.lastModified === info.file.lastModified)
-        fileinfo.name = res.data.split('/').pop()
-        fileinfo.url = res.data
-        fileinfo.thumbUrl = res.data
-      } else if (info.file.status === 'error') {
-        this.$message.error(`上传失败`)
-      } else if (info.file.status === 'removed') {
-        this.imgDefaultFileList[name] = null
-      }
-    },
-    imgPreview (info) {
-      // console.log(info)
-      this.$viewerApi({
-        images: [info.url],
-        options: {
-          initialViewIndex: 0
-        }
-      })
+    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
+    uploadSuccess (name, fileList) {
+      console.log({ name, fileList })
+      const [firstItem] = fileList
+      this.saveObject[name] = firstItem?.url
+      this.imgDefaultFileList[name] = fileList.map(({ url }) => url)
+      console.log({ a: this.saveObject[name], b: this.imgDefaultFileList[name] })
+      this.$forceUpdate()
     },
     areasChange (value, selectedOptions) {
       // console.log(value)
@@ -715,15 +636,15 @@ export default {
 </script>
 
 <style lang="less">
-#amap-container {
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  height: 600px;
-  position: relative;
-}
+  #amap-container {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 600px;
+    position: relative;
+  }
 
-.upload-list-inline .ant-btn {
-  height: 66px;
-}
+  .ag-upload-btn {
+    height: 66px;
+  }
 </style>
