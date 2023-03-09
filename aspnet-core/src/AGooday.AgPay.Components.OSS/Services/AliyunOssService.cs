@@ -5,6 +5,7 @@ using Aliyun.OSS;
 using Aliyun.OSS.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Components.OSS.Services
 {
@@ -19,6 +20,7 @@ namespace AGooday.AgPay.Components.OSS.Services
         {
             this.logger = logger;
             this.sysConfigService = sysConfigService;
+            AliyunOssConfig.Oss = JsonConvert.DeserializeObject<AliyunOssConfig.OssConfig>(sysConfigService.GetDBOssConfig().AliyunOssConfig);
             this.ossClient = new OssClient(AliyunOssConfig.Oss.Endpoint, AliyunOssConfig.Oss.AccessKeyId, AliyunOssConfig.Oss.AccessKeySecret);
         }
 

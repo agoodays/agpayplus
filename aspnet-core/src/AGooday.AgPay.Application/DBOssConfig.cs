@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Application
         public string AliyunOssConfig { get; set; }
 
         /// <summary>
-        /// 支付网关地址
+        /// 文件上传服务类型
         /// </summary>
         public string OssUseType { get; set; }
 
