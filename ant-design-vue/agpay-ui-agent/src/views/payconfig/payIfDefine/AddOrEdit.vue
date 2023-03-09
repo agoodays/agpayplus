@@ -5,11 +5,10 @@
     width="40%"
     :maskClosable="false"
     @close="onClose">
+
     <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
+
       <a-row :gutter="16">
-        <a-col :span="24">
-          <p class="jee-drawer-title">基本配置</p>
-        </a-col>
         <a-col :span="12">
           <a-form-model-item label="接口代码" prop="ifCode">
             <a-input v-model="saveObject.ifCode" placeholder="请输入" :disabled="!isAdd" />
@@ -88,50 +87,28 @@
             <a-input v-model="saveObject.remark" placeholder="请输入" />
           </a-form-model-item>
         </a-col>
-      </a-row>
-      <a-row justify="space-between" type="flex">
-        <a-col :span="24">
-          <a-divider orientation="left"/>
-        </a-col>
-        <a-col :span="24">
-          <p class="jee-drawer-title">支付方式</p>
-        </a-col>
-      </a-row>
-      <a-row :gutter="16">
         <a-col :span="24">
           <a-form-model-item label="支持的支付方式" prop="checkedList">
             <a-checkbox-group v-model="checkedList" :options="wayCodesOptions" @change="onWayCodesChange" />
           </a-form-model-item>
         </a-col>
-      </a-row>
-      <a-row justify="space-between" type="flex">
-        <a-col :span="24">
-          <a-divider orientation="left"/>
-        </a-col>
-        <a-col :span="24">
-          <p class="jee-drawer-title">页面展示</p>
-        </a-col>
-      </a-row>
-      <a-row :gutter="16">
         <a-col :span="12">
-          <a-form-model-item label="卡片icon" prop="icon">
+          <a-form-model-item label="页面展示：卡片icon" prop="icon">
             <AgUpload
               :action="action"
               accept=".jpg, .jpeg, .png"
-              bind-name="icon"
-              :urls="[saveObject.icon]"
-              @uploadSuccess="uploadSuccess"
+              @uploadSuccess="uploadSuccess($event, '')"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <img :src="saveObject.icon" style="width:80px" />
+                <a-button style="marginLeft:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
         </a-col>
         <a-col :span="12">
-          <a-form-model-item label="卡片背景色" prop="bgColor">
-<!--            <a-input style="height: 66px; margin-top: 8px;" v-model="saveObject.bgColor" placeholder="请输入" />-->
-            <colorPicker v-model="saveObject.bgColor" style="height: 66px; margin-top: 8px;"/>
+          <a-form-model-item label="页面展示：卡片背景色" prop="bgColor">
+            <a-input v-model="saveObject.bgColor" placeholder="请输入" />
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -194,7 +171,7 @@ export default {
         normalMchParams: [{ validator: validateNormalMchParams, trigger: 'blur' }],
         isvParams: [{ validator: validateIsvParams, trigger: 'blur' }],
         isvsubMchParams: [{ validator: validateIsvsubMchParams, trigger: 'blur' }],
-        checkedList: [{ required: true, validator: validateWayCodes, trigger: 'blur' }]
+        checkedList: [{ validator: validateWayCodes, trigger: 'blur' }]
       },
       wayCodesOptions: [], // 支付方式多选框选项列表
       checkedList: [] // 选中的数据
@@ -212,8 +189,7 @@ export default {
         'isMchMode': 1,
         'isIsvMode': 1,
         'state': 1,
-        'configPageType': 1,
-        'bgColor': '#ff0000'
+        'configPageType': 1
       }
 
       if (this.$refs.infoFormModel !== undefined) {
@@ -276,10 +252,9 @@ export default {
         })
       })
     },
-    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
-    uploadSuccess (name, fileList) {
-      const [firstItem] = fileList
-      this.saveObject[name] = firstItem?.url
+    // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
+    uploadSuccess (value, name) {
+      this.saveObject.icon = value
       this.$forceUpdate()
     },
     onWayCodesChange (checkedValues) {
@@ -290,33 +265,4 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .jee-drawer-title {
-    font-size: 16px;
-    font-weight: 600;
-    width: 100%;
-    margin-bottom: 15px;
-  }
-
-  .ag-upload-btn {
-    height: 66px;
-    margin-top: 8px;
-  }
-
-  .m-colorPicker {
-    height: 66px;
-    width: 100%;
-    margin-top: 8px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-
-    /deep/ .colorBtn {
-      height: 64px;
-      width: 100%;
-      border-radius: 4px;
-    }
-
-    /deep/ .box.open {
-      z-index: 3;
-    }
-  }
 </style>

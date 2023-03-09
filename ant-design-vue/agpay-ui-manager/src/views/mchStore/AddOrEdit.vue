@@ -598,6 +598,15 @@ export default {
       console.log({ a: this.saveObject[name], b: this.imgDefaultFileList[name] })
       this.$forceUpdate()
     },
+    imgPreview (info) {
+      // console.log(info)
+      this.$viewerApi({
+        images: [info.url],
+        options: {
+          initialViewIndex: 0
+        }
+      })
+    },
     areasChange (value, selectedOptions) {
       // console.log(value)
       // console.log(selectedOptions)

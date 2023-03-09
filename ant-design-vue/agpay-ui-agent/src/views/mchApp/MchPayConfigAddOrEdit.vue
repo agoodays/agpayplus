@@ -51,13 +51,11 @@
             <a-input v-model="ifParams[item.name]" disabled="disabled" />
             <AgUpload
               :action="action"
-              :bind-name="item.name"
-              :urls="[ifParams[item.name]]"
-              listType="text"
-              @uploadSuccess="uploadSuccess"
+              :fileUrl="ifParams[item.name]"
+              @uploadSuccess="uploadSuccess($event, item.name)"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
@@ -218,10 +216,9 @@ export default {
         })
       })
     },
-    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
-    uploadSuccess (name, fileList) {
-      const [firstItem] = fileList
-      this.ifParams[name] = firstItem?.url
+    // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
+    uploadSuccess (value, name) {
+      this.ifParams[name] = value
       this.$forceUpdate()
     },
     // 动态生成支付参数表单检验规则
