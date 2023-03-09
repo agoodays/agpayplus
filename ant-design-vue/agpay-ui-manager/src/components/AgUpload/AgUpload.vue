@@ -46,8 +46,8 @@ function getDefaultFileList (urls) {
   const fileItems = []
   for (const i in urls) {
     const url = urls[i]
-    if (!url) {
-      return
+    if (!url || url?.length <= 0) {
+      continue
     }
     fileItems.push({
       uid: i,
@@ -85,6 +85,7 @@ export default {
     })
 
     const handleChange = (info) => {
+      console.log(info)
       // // 限制文件数量
       // let fileList = [...info.fileList]
       // fileList = fileList.length > this.num ? fileList.splice(0 - this.num) : fileList // 取最新加入的元素
@@ -125,14 +126,35 @@ export default {
   created () {
   },
   methods: {
+    isAssetTypeAnImage (fileName, fileType) {
+      if (fileType) {
+        return fileType.startsWith('image')
+      }
+      // 后缀获取
+      let suffix = ''
+      // 获取类型结果
+      let result = ''
+      const fileArr = fileName.split('.')
+      suffix = fileArr[fileArr.length - 1]
+      if (suffix !== '') {
+        suffix = suffix.toLocaleLowerCase()
+        // 图片格式
+        const imglist = ['png', 'jpg', 'jpeg', 'bmp', 'gif']
+        // 进行图片匹配
+        result = imglist.find(item => item === suffix)
+      }
+      return result
+    },
     handlePreview (info) {
       // console.log(info)
-      this.$viewerApi({
-        images: [info.url],
-        options: {
-          initialViewIndex: 0
-        }
-      })
+      if (this.isAssetTypeAnImage(info.url, info.type)) {
+        this.$viewerApi({
+          images: [info.url],
+          options: {
+            initialViewIndex: 0
+          }
+        })
+      }
     },
     // 上传图片前的校验
     beforeUpload (file) {

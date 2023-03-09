@@ -38,8 +38,8 @@
         <a-col :span="10">
           <a-form-model-item label="门店LOGO" prop="storeLogo">
             <AgUpload
-              bind-name="storeLogo"
               :action="action"
+              bind-name="storeLogo"
               :urls="this.imgDefaultFileList.storeLogo"
               @uploadSuccess="uploadSuccess"
             >
@@ -52,8 +52,8 @@
         <a-col :span="10">
           <a-form-model-item label="门头照" prop="storeOuterImg">
             <AgUpload
-              bind-name="storeOuterImg"
               :action="action"
+              bind-name="storeOuterImg"
               :urls="this.imgDefaultFileList.storeOuterImg"
               @uploadSuccess="uploadSuccess"
             >
@@ -66,8 +66,8 @@
         <a-col :span="10">
           <a-form-model-item label="门店内景照" prop="storeInnerImg">
             <AgUpload
-              bind-name="storeInnerImg"
               :action="action"
+              bind-name="storeInnerImg"
               :urls="this.imgDefaultFileList.storeInnerImg"
               @uploadSuccess="uploadSuccess"
             >

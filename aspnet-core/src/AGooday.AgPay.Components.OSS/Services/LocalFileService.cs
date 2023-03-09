@@ -58,13 +58,15 @@ namespace AGooday.AgPay.Components.OSS.Services
                 logger.LogError(e.Message, e);
             }
 
+            saveDirAndFileName = saveDirAndFileName.Replace(@"\", "/");
+
             // 私有文件 不返回预览文件地址
             if (ossSavePlaceEnum == OssSavePlaceEnum.PRIVATE)
             {
                 return saveDirAndFileName;
             }
 
-            return $"{sysConfigService.GetDBOssConfig().OssPublicSiteUrl}/{saveDirAndFileName.Replace(@"\", "/")}";
+            return $"{sysConfigService.GetDBOssConfig().OssPublicSiteUrl}/{saveDirAndFileName}";
         }
 
         public bool DownloadFile(OssSavePlaceEnum ossSavePlaceEnum, string source, string target)

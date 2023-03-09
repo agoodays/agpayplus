@@ -87,8 +87,9 @@
         <a-col span="24">
           <a-form-model-item label="API证书(apiclient_cert.p12)" prop="cert">
             <AgUpload
-              bind-name="cert"
               :action="action"
+              accept=".p12"
+              bind-name="cert"
               :urls="[ifParams.cert]"
               listType="text"
               @uploadSuccess="uploadSuccess"
@@ -102,8 +103,9 @@
         <a-col span="24">
           <a-form-model-item label="证书文件(apiclient_cert.pem)" prop="apiClientCert">
             <AgUpload
-              bind-name="apiClientCert"
               :action="action"
+              accept=".pem"
+              bind-name="apiClientCert"
               :urls="[ifParams.apiClientCert]"
               listType="text"
               @uploadSuccess="uploadSuccess"
@@ -116,14 +118,16 @@
         </a-col>
         <a-col span="24">
           <a-form-model-item label="私钥文件(apiclient_key.pem)" prop="apiClientKey">
-            <a-input v-model="ifParams.apiClientKey" disabled="disabled" />
             <AgUpload
               :action="action"
-              :fileUrl="ifParams.apiClientKey"
-              @uploadSuccess="uploadSuccess($event, 'apiClientKey')"
+              accept=".pem"
+              bind-name="apiClientKey"
+              :urls="[ifParams.apiClientKey]"
+              listType="text"
+              @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
@@ -322,9 +326,10 @@ export default {
       }
       this.ifParams[key + '_ph'] = undefined
     },
-    // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
-    uploadSuccess (value, name) {
-      this.ifParams[name] = value
+    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
+    uploadSuccess (name, fileList) {
+      const [firstItem] = fileList
+      this.ifParams[name] = firstItem?.url
       this.$forceUpdate()
     },
     onClose () {

@@ -7,7 +7,6 @@
     :body-style="{ paddingBottom: '80px' }"
     :drawer-style="{ backgroundColor: '#f0f2f5' }"
     width="80%"
-
   >
     <AgCard
       ref="infoCard"
@@ -90,14 +89,15 @@
               </a-radio-group>
             </a-form-model-item>
             <a-form-model-item :label="item.desc" :prop="item.name" v-else-if="item.type === 'file'">
-              <a-input v-model="ifParams[item.name]" disabled="disabled" />
               <AgUpload
                 :action="action"
-                :fileUrl="ifParams[item.name]"
-                @uploadSuccess="uploadSuccess($event, item.name)"
+                :bind-name="item.name"
+                :urls="[ifParams[item.name]]"
+                listType="text"
+                @uploadSuccess="uploadSuccess"
               >
                 <template slot="uploadSlot" slot-scope="{loading}">
-                  <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                  <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
                 </template>
               </AgUpload>
             </a-form-model-item>
@@ -305,9 +305,10 @@ export default {
         })
       })
     },
-    // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
-    uploadSuccess (value, name) {
-      this.ifParams[name] = value
+    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
+    uploadSuccess (name, fileList) {
+      const [firstItem] = fileList
+      this.ifParams[name] = firstItem?.url
       this.$forceUpdate()
     },
     // 抽屉关闭
