@@ -306,10 +306,13 @@ export default {
     height: 66px;
     width: 100%;
     margin-top: 8px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
 
     /deep/ .colorBtn {
-      height: 66px;
+      height: 64px;
       width: 100%;
+      border-radius: 4px;
     }
 
     /deep/ .box.open {
