@@ -130,7 +130,8 @@
         </a-col>
         <a-col :span="12">
           <a-form-model-item label="卡片背景色" prop="bgColor">
-            <a-input style="height: 66px; margin-top: 8px;" v-model="saveObject.bgColor" placeholder="请输入" />
+<!--            <a-input style="height: 66px; margin-top: 8px;" v-model="saveObject.bgColor" placeholder="请输入" />-->
+            <colorPicker v-model="saveObject.bgColor" style="height: 66px; margin-top: 8px;"/>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -211,7 +212,8 @@ export default {
         'isMchMode': 1,
         'isIsvMode': 1,
         'state': 1,
-        'configPageType': 1
+        'configPageType': 1,
+        'bgColor': '#ff0000'
       }
 
       if (this.$refs.infoFormModel !== undefined) {
@@ -294,8 +296,24 @@ export default {
     width: 100%;
     margin-bottom: 15px;
   }
+
   .ag-upload-btn {
     height: 66px;
     margin-top: 8px;
+  }
+
+  .m-colorPicker {
+    height: 66px;
+    width: 100%;
+    margin-top: 8px;
+
+    /deep/ .colorBtn {
+      height: 66px;
+      width: 100%;
+    }
+
+    /deep/ .box.open {
+      z-index: 3;
+    }
   }
 </style>

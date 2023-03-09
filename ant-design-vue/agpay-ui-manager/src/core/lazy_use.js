@@ -68,6 +68,9 @@ import VueViewer, { api as viewerApi } from 'v-viewer'
 // echarts library
 import * as echarts from 'echarts'
 
+// vcolorpicker library
+import vcolorpicker from 'vcolorpicker'
+
 Vue.use(ConfigProvider)
 Vue.use(Layout)
 Vue.use(Input)
@@ -132,5 +135,6 @@ Vue.use(Viser)
 Vue.use(VueCropper)
 Vue.use(VueJsonp)
 Vue.use(VueViewer)
+Vue.use(vcolorpicker)
 
 process.env.NODE_ENV !== 'production' && console.warn('[antd-pro] NOTICE: Antd use lazy-load.')
