@@ -106,7 +106,8 @@ export const API_URL_PAY_ORDER_DIVISION_RECORD_LIST = '/api/division/records'
 /** 上传图片/文件地址 **/
 export const upload = {
   avatar: request.baseUrl + '/api/ossFiles/avatar',
-  cert: request.baseUrl + '/api/ossFiles/cert'
+  cert: request.baseUrl + '/api/ossFiles/cert',
+  form: request.baseUrl + '/api/ossFiles/form'
 }
 
 const api = {

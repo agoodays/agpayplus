@@ -80,11 +80,14 @@
             <a-input v-model="ifParams.appPublicCert" disabled="disabled" />
             <AgUpload
               :action="action"
-              :fileUrl="ifParams.appPublicCert"
-              @uploadSuccess="uploadSuccess($event, 'appPublicCert')"
+              accept=".crt"
+              bind-name="appPublicCert"
+              :urls="[ifParams.appPublicCert]"
+              listType="text"
+              @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
@@ -94,11 +97,14 @@
             <a-input v-model="ifParams.alipayPublicCert" disabled="disabled" />
             <AgUpload
               :action="action"
-              :fileUrl="ifParams.alipayPublicCert"
-              @uploadSuccess="uploadSuccess($event, 'alipayPublicCert')"
+              accept=".crt"
+              bind-name="alipayPublicCert"
+              :urls="[ifParams.alipayPublicCert]"
+              listType="text"
+              @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
@@ -108,11 +114,14 @@
             <a-input v-model="ifParams.alipayRootCert" disabled="disabled" />
             <AgUpload
               :action="action"
-              :fileUrl="ifParams.alipayRootCert"
-              @uploadSuccess="uploadSuccess($event, 'alipayRootCert')"
+              accept=".crt"
+              bind-name="alipayRootCert"
+              :urls="[ifParams.alipayRootCert]"
+              listType="text"
+              @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button style="marginTop:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
@@ -313,9 +322,10 @@ export default {
       }
       this.ifParams[key + '_ph'] = undefined
     },
-    // 上传文件成功回调方法，参数value为文件地址，name是自定义参数
-    uploadSuccess (value, name) {
-      this.ifParams[name] = value
+    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
+    uploadSuccess (name, fileList) {
+      const [firstItem] = fileList
+      this.ifParams[name] = firstItem?.url
       this.$forceUpdate()
     },
     onClose () {

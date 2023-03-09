@@ -26,7 +26,7 @@ import 'viewerjs/dist/viewer.css'
 
 function getHeaders () {
   const headers = {}
-  headers[appConfig.ACCESS_TOKEN_NAME] = storage.getToken() // token
+  headers[appConfig.ACCESS_TOKEN_NAME] = `Bearer ${storage.getToken()}` // token
   return headers
 }
 

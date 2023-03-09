@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AGooday.AgPay.Components.OSS.Controllers
 {
-    [ApiController, AllowAnonymous]
+    [ApiController, Authorize]
     [Route("api/ossFiles")]
     public class OssFileController : ControllerBase
     {

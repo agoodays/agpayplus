@@ -402,22 +402,22 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_ORDER', '订单管理', 'transaction'
 -- 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
 -- 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_RESEND', '按钮：重发通知', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
 
--- 支付配置菜单
-INSERT INTO t_sys_entitlement VALUES ('ENT_PC', '支付配置', 'file-done', '', 'RouteView', 'ML', 0, 1, 'ROOT', 60, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE', '支付接口', 'interaction', '/ifdefines', 'IfDefinePage', 'ML', 0, 1, 'ENT_PC', 10, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_LIST', '页面：支付接口定义列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY', '支付方式', 'appstore', '/payways', 'PayWayPage', 'ML', 0, 1, 'ENT_PC', 20, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_LIST', '页面：支付方式列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+-- -- 支付配置菜单
+-- INSERT INTO t_sys_entitlement VALUES ('ENT_PC', '支付配置', 'file-done', '', 'RouteView', 'ML', 0, 1, 'ROOT', 60, 'AGENT', NOW(), NOW());
+-- 	INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE', '支付接口', 'interaction', '/ifdefines', 'IfDefinePage', 'ML', 0, 1, 'ENT_PC', 10, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_LIST', '页面：支付接口定义列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+-- 	INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY', '支付方式', 'appstore', '/payways', 'PayWayPage', 'ML', 0, 1, 'ENT_PC', 20, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_LIST', '页面：支付方式列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+-- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
 
 -- 系统管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_CONFIG', '系统管理', 'setting', '', 'RouteView', 'ML', 0, 1, 'ROOT', 200, 'AGENT', NOW(), NOW());
