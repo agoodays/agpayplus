@@ -40,7 +40,7 @@
             <AgUpload
               :action="action"
               bind-name="storeLogo"
-              :urls="this.imgDefaultFileList.storeLogo"
+              :urls="[this.saveObject.storeLogo]"
               @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
@@ -54,7 +54,7 @@
             <AgUpload
               :action="action"
               bind-name="storeOuterImg"
-              :urls="this.imgDefaultFileList.storeOuterImg"
+              :urls="[this.saveObject.storeOuterImg]"
               @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
@@ -68,7 +68,7 @@
             <AgUpload
               :action="action"
               bind-name="storeInnerImg"
-              :urls="this.imgDefaultFileList.storeInnerImg"
+              :urls="[this.saveObject.storeInnerImg]"
               @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
@@ -167,11 +167,6 @@ export default {
       areas: [],
       lnglat: null,
       action: upload.form, // 上传文件地址
-      imgDefaultFileList: {
-        storeLogo: [],
-        storeOuterImg: [],
-        storeInnerImg: []
-      },
       rules: {
         storeName: [{ required: true, message: '请输入门店名称', trigger: 'blur' }],
         mchNo: [{ validator: checkMchNo, trigger: 'blur' }],
@@ -188,11 +183,6 @@ export default {
       this.areas = []
       this.lnglat = null
       this.saveObject = {}
-      this.imgDefaultFileList = {
-        storeLogo: [],
-        storeOuterImg: [],
-        storeInnerImg: []
-      }
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
       }
@@ -206,13 +196,6 @@ export default {
         req.getById(API_URL_MCH_STORE, recordId).then(res => {
           that.saveObject = res
           that.initAMap()
-          Object.keys(that.imgDefaultFileList).forEach((field) => {
-            const url = that.saveObject[field]
-            if (!url) {
-              return null
-            }
-            that.imgDefaultFileList[field] = [that.saveObject[field]]
-          })
         })
         this.visible = true
       } else {
@@ -593,8 +576,6 @@ export default {
       console.log({ name, fileList })
       const [firstItem] = fileList
       this.saveObject[name] = firstItem?.url
-      this.imgDefaultFileList[name] = fileList.map(({ url }) => url)
-      console.log({ a: this.saveObject[name], b: this.imgDefaultFileList[name] })
       this.$forceUpdate()
     },
     areasChange (value, selectedOptions) {

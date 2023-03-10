@@ -310,7 +310,7 @@
               <AgUpload
                 :action="action"
                 bind-name="licenseImg"
-                :urls="this.imgDefaultFileList.licenseImg"
+                :urls="[this.saveObject.licenseImg]"
                 @uploadSuccess="uploadSuccess"
               >
                 <template slot="uploadSlot" slot-scope="{loading}">
@@ -325,7 +325,7 @@
               <AgUpload
                 :action="action"
                 bind-name="permitImg"
-                :urls="this.imgDefaultFileList.permitImg"
+                :urls="[this.saveObject.permitImg]"
                 @uploadSuccess="uploadSuccess"
               >
                 <template slot="uploadSlot" slot-scope="{loading}">
@@ -339,7 +339,7 @@
               <AgUpload
                 :action="action"
                 bind-name="idcard1Img"
-                :urls="this.imgDefaultFileList.idcard1Img"
+                :urls="[this.saveObject.idcard1Img]"
                 @uploadSuccess="uploadSuccess"
               >
                 <template slot="uploadSlot" slot-scope="{loading}">
@@ -353,7 +353,7 @@
               <AgUpload
                 :action="action"
                 bind-name="idcard2Img"
-                :urls="this.imgDefaultFileList.idcard2Img"
+                :urls="[this.saveObject.idcard2Img]"
                 @uploadSuccess="uploadSuccess"
               >
                 <template slot="uploadSlot" slot-scope="{loading}">
@@ -367,7 +367,7 @@
               <AgUpload
                 :action="action"
                 bind-name="idcardInHandImg"
-                :urls="this.imgDefaultFileList.idcardInHandImg"
+                :urls="[this.saveObject.idcardInHandImg]"
                 @uploadSuccess="uploadSuccess"
               >
                 <template slot="uploadSlot" slot-scope="{loading}">
@@ -382,7 +382,7 @@
               <AgUpload
                 :action="action"
                 bind-name="bankCardImg"
-                :urls="this.imgDefaultFileList.bankCardImg"
+                :urls="[this.saveObject.bankCardImg]"
                 @uploadSuccess="uploadSuccess"
               >
                 <template slot="uploadSlot" slot-scope="{loading}">
@@ -459,14 +459,6 @@ export default {
         // ,{ settAccountType: 'BANK_PUBLIC', settAccountTypeName: '对公账户' }
       ],
       action: upload.form, // 上传文件地址
-      imgDefaultFileList: {
-        licenseImg: [],
-        permitImg: [],
-        idcard1Img: [],
-        idcard2Img: [],
-        idcardInHandImg: [],
-        bankCardImg: []
-      },
       imgLabel: '联系人',
       settAccountNoLabel: '个人微信号',
       agentList: null, // 代理商下拉列表
@@ -526,14 +518,6 @@ export default {
         'passwordType': 'default',
         'loginPassword': ''
       } // 数据清空
-      this.imgDefaultFileList = {
-        licenseImg: [],
-        permitImg: [],
-        idcard1Img: [],
-        idcard2Img: [],
-        idcardInHandImg: [],
-        bankCardImg: []
-      }
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
       }
@@ -549,13 +533,6 @@ export default {
         that.recordId = recordId
         req.getById(API_URL_AGENT_LIST, recordId).then(res => {
           that.saveObject = res
-          Object.keys(that.imgDefaultFileList).forEach((field) => {
-            const url = that.saveObject[field]
-            if (!url) {
-              return null
-            }
-            that.imgDefaultFileList[field] = [that.saveObject[field]]
-          })
         })
         this.visible = true
       } else {
@@ -682,8 +659,6 @@ export default {
       console.log({ name, fileList })
       const [firstItem] = fileList
       this.saveObject[name] = firstItem?.url
-      this.imgDefaultFileList[name] = fileList.map(({ url }) => url)
-      console.log({ a: this.saveObject[name], b: this.imgDefaultFileList[name] })
       this.$forceUpdate()
     }
   }
