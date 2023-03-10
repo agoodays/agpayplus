@@ -7,7 +7,21 @@
 -->
 <template>
   <div>
+    <div class="ag-table-top-row">
+      <div class="ag-table-top-left">
+        <slot name="topLeftSlot"></slot>
+      </div>
+      <div class="operation-icons">
+        <span class="pd-0-20">
+          <span style="margin-right: 10px; color: rgb(169, 179, 177);">自动刷新：
+            <span style="margin-right: 5px; color: rgb(0, 0, 0);">178s</span>
+          </span>
+          <a-switch :checked="initData" />
+        </span>
+      </div>
+    </div>
     <a-table
+      bordered="true"
       :columns="tableColumns"
       :data-source="apiResData.records"
       :pagination="pagination"
@@ -125,22 +139,52 @@ export default {
 }
 </script>
 <style lang="less">
-
-// 调整antdv 的table默认padding高度
-.ant-table-fixed{
-  tr{
-    th{
-      padding: 8px 8px !important;
-    }
-    th:first-child{ // 第一个表格 左填充16， 其他为8
-      padding-left: 16px !important;
-    }
-    td{
-      padding: 8px 8px !important;
-    }
-    td:first-child{
-      padding-left: 16px !important;
+  // 调整antdv 的table默认padding高度
+  .ant-table-fixed{
+    tr{
+      th{
+        padding: 8px 8px !important;
+      }
+      th:first-child{ // 第一个表格 左填充16， 其他为8
+        padding-left: 16px !important;
+      }
+      td{
+        padding: 8px 8px !important;
+      }
+      td:first-child{
+        padding-left: 16px !important;
+      }
     }
   }
-}
+
+  .ant-table-wrapper {
+    margin: 0 30px 15px;
+  }
+
+  .ag-table-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 30px 10px
+  }
+
+  .ag-table-top-row .ag-table-top-left {
+    display: flex;
+    align-items: center
+  }
+
+  .ag-table-top-row .ant-btn {
+    margin-right: 10px;
+    margin-bottom: 10px
+  }
+
+  .ag-table-top-row .operation-icons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+  }
+
+  .ag-table-top-row .operation-icons .pd-0-20 {
+    padding: 0 10px
+  }
 </style>

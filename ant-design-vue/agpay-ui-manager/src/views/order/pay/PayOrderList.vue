@@ -28,7 +28,7 @@
             <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
             <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
             <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <a-form-item v-if="$access('ENT_PAY_ORDER_SEARCH_PAY_WAY')" label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore && $access('ENT_PAY_ORDER_SEARCH_PAY_WAY')" label="" class="table-head-layout">
               <a-select v-model="searchData.wayCode" placeholder="支付方式" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option :key="item.wayCode" v-for="item in payWayList" :value="item.wayCode">
@@ -36,7 +36,7 @@
                 </a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="支付状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">订单生成</a-select-option>
@@ -48,14 +48,14 @@
                 <a-select-option value="6">订单关闭</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.notifyState" placeholder="回调状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">未发送</a-select-option>
                 <a-select-option value="1">已发送</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.divisionState" placeholder="分账状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">未发生分账</a-select-option>
@@ -71,7 +71,13 @@
           </div>
         </a-form>
       </div>
-
+      <div class="split-line">
+        <div class="btns" @click="isShowMore = !isShowMore">
+          <div>
+            {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
+          </div>
+        </div>
+      </div>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -440,6 +446,7 @@ export default {
   components: { AgTable, AgTableColumns, AgTextUp, RefundModal },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
       searchData: {},
@@ -509,24 +516,75 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.order-list {
-  -webkit-text-size-adjust:none;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
+  .order-list {
+    -webkit-text-size-adjust:none;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
 
-  p {
-    white-space:nowrap;
-    span {
-      display: inline-block;
-      font-weight: 800;
-      height: 16px;
-      line-height: 16px;
-      width: 35px;
-      border-radius: 5px;
-      text-align: center;
-      margin-right: 2px;
+    p {
+      white-space:nowrap;
+      span {
+        display: inline-block;
+        font-weight: 800;
+        height: 16px;
+        line-height: 16px;
+        width: 35px;
+        border-radius: 5px;
+        text-align: center;
+        margin-right: 2px;
+      }
     }
   }
-}
+
+  .split-line {
+    border-bottom: 1px solid #ebeff2;
+    position: relative;
+    -webkit-touch-callout: none;
+    user-select: none
+  }
+
+  .btns {
+    width: 100px;
+    height: 34px;
+    cursor: pointer;
+    border: 1px solid #ebeff2;
+    border-radius: 5px;
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+    top: 50%;
+    margin-top: -17px;
+    background-color: #fff;
+    font-size: 12px
+  }
+
+  .btns div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    color: #79807e
+  }
+
+  .btns:before {
+    content: "";
+    position: absolute;
+    width: calc(100% + 2px);
+    height: 50%;
+    background-color: #fff;
+    top: -1px;
+    left: -1px;
+    z-index: 1
+  }
+
+  i {
+    display: inline-block;
+    margin-left: 5px
+  }
 </style>

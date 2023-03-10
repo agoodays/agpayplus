@@ -23,21 +23,23 @@
               </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_AGENT_INFO_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
-          @btnLoadClose="btnLoading=false"
-          ref="infoTable"
-          :initData="true"
-          :reqTableDataFunc="reqTableDataFunc"
-          :tableColumns="tableColumns"
-          :searchData="searchData"
-          rowKey="agentNo"
+        @btnLoadClose="btnLoading=false"
+        ref="infoTable"
+        :initData="true"
+        :reqTableDataFunc="reqTableDataFunc"
+        :tableColumns="tableColumns"
+        :searchData="searchData"
+        rowKey="agentNo"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_AGENT_INFO_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="agentNameSlot" slot-scope="{record}">
           <b v-if="!$access('ENT_AGENT_INFO_VIEW')">{{ record.agentName }}</b>
           <a v-if="$access('ENT_AGENT_INFO_VIEW')" @click="detailFunc(record.agentNo)"><b>{{ record.agentName }}</b></a>
@@ -133,5 +135,10 @@ export default {
 </script>
 
 <style scoped>
-
+  .split-line {
+    border-bottom: 1px solid #ebeff2;
+    position: relative;
+    -webkit-touch-callout: none;
+    user-select: none
+  }
 </style>
