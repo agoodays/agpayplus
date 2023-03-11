@@ -93,14 +93,22 @@
         :tableRowCrossColor="true"
       >
         <template slot="dataStatisticsSlot">
-          <a-row>
-            <a-col :span="12">
-              <a-statistic title="Active Users" :value="112893" style="margin-right: 50px" />
-            </a-col>
-            <a-col :span="12">
-              <a-statistic title="Account Balance (CNY)" :precision="2" :value="112893" />
-            </a-col>
-          </a-row>
+          <div class="data-statistics" style="background: rgb(250, 250, 250);">
+            <a-row type="flex" justify="center">
+              <a-col :span="5">
+                <a-statistic title="实际收款金额" :value="112893" style="margin-right: 50px" />
+              </a-col>
+              <a-col :span="5">
+                <a-statistic title="成交订单" :precision="2" :value="112893" />
+              </a-col>
+              <a-col :span="5">
+                <a-statistic title="手续费金额" :precision="2" :value="112893" />
+              </a-col>
+              <a-col :span="5">
+                <a-statistic title="退款订单" :precision="2" :value="112893" />
+              </a-col>
+            </a-row>
+          </div>
         </template>
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.amount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundAmountSlot" slot-scope="{record}">￥{{ record.refundAmount/100 }}</template> <!-- 自定义插槽 -->
@@ -599,5 +607,13 @@ export default {
   i {
     display: inline-block;
     margin-left: 5px
+  }
+
+  .data-statistics {
+    margin: 0 30px 10px;
+    padding: 28px 0 32px;
+    border-radius: 3px;
+    border: 1px solid #ebebeb;
+    transform: translateY(-10px)
   }
 </style>

@@ -9,7 +9,9 @@
   <div>
     <div class="ag-table-top-row">
       <div class="ag-table-top-left">
-        <a-button icon="area-chart" class="statistics" v-if="isEnableDataStatistics" @click="isShowDataStatistics = !isShowDataStatistics">{{ isShowDataStatistics ? "关闭" : "数据"}}统计</a-button>
+        <a-button icon="area-chart" class="statistics" v-if="isEnableDataStatistics" @click="isShowDataStatistics = !isShowDataStatistics">
+          {{ isShowDataStatistics ? "关闭" : "数据"}}统计
+        </a-button>
         <slot name="topLeftSlot"></slot>
       </div>
       <div class="operation-icons">
@@ -61,9 +63,7 @@
         </a-dropdown>
       </div>
     </div>
-    <div class="data-statistics" style="background: rgb(250, 250, 250);" v-if="isShowDataStatistics">
-      <slot name="dataStatisticsSlot"></slot>
-    </div>
+    <slot name="dataStatisticsSlot" v-if="isShowDataStatistics"></slot>
     <a-table
       :bordered="true"
       :columns="displayedColumns"
@@ -269,14 +269,6 @@ export default {
     background: #2691ff26!important;
     border: none;
     color: var(--ant-primary-color)
-  }
-
-  .data-statistics {
-    margin: 0 30px 10px;
-    padding: 28px 0 32px;
-    border-radius: 3px;
-    border: 1px solid #ebebeb;
-    transform: translateY(-10px)
   }
 
   .bi {
