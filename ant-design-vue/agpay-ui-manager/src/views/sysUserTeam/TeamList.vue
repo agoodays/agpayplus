@@ -13,11 +13,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_UR_TEAM_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -28,6 +25,11 @@
         :searchData="searchData"
         rowKey="teamId"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_UR_TEAM_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="statRangeTypeSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <span>{{ record.statRangeType==='year'?'年':record.statRangeType==='quarter'?'季度':record.statRangeType==='month'?'月':record.statRangeType==='week'?'周':'' }}</span>
         </template>

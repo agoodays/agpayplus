@@ -30,11 +30,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_NOTICE_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -45,6 +42,11 @@
         :searchData="searchData"
         rowKey="articleId"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_NOTICE_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_NOTICE_EDIT')" @click="editFunc(record.articleId)">修改</a-button>

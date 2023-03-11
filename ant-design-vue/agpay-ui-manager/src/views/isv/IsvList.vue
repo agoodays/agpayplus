@@ -19,11 +19,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button icon="plus" v-if="$access('ENT_ISV_INFO_ADD')" type="primary" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -34,6 +31,11 @@
         :searchData="searchData"
         rowKey="isvNo"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button icon="plus" v-if="$access('ENT_ISV_INFO_ADD')" type="primary" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="isvNameSlot" slot-scope="{record}"><b>{{ record.isvName }}</b></template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />

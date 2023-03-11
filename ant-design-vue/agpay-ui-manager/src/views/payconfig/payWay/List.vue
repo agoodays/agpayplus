@@ -12,9 +12,8 @@
             </span>
           </div>
         </a-form>
-        <a-button v-if="$access('ENT_PC_WAY_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -25,6 +24,11 @@
         :searchData="searchData"
         rowKey="wayCode"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_PC_WAY_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="wayCodeSlot" slot-scope="{record}"><b>{{ record.wayCode }}</b></template> <!-- 自定义插槽 -->
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>

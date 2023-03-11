@@ -21,11 +21,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_MCH_APP_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -36,6 +33,11 @@
         :searchData="searchData"
         rowKey="appId"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_MCH_APP_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="appIdSlot" slot-scope="{record}">
           <b>{{ record.appId }}</b>
         </template> <!-- 自定义插槽 -->

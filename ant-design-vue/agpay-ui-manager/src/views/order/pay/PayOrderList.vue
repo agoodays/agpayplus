@@ -83,12 +83,25 @@
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
+        :isShowAutoRefresh="true"
+        :isShowDownload="true"
+        :isEnableDataStatistics="true"
         :reqTableDataFunc="reqTableDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
         rowKey="payOrderId"
         :tableRowCrossColor="true"
       >
+        <template slot="dataStatisticsSlot">
+          <a-row>
+            <a-col :span="12">
+              <a-statistic title="Active Users" :value="112893" style="margin-right: 50px" />
+            </a-col>
+            <a-col :span="12">
+              <a-statistic title="Account Balance (CNY)" :precision="2" :value="112893" />
+            </a-col>
+          </a-row>
+        </template>
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.amount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundAmountSlot" slot-scope="{record}">￥{{ record.refundAmount/100 }}</template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
@@ -426,7 +439,7 @@ import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 210, fixed: 'left' },
+  { key: 'orderNo', title: '订单号', show: true, scopedSlots: { customRender: 'orderSlot' }, width: 210, fixed: 'left' },
   { key: 'amount', title: '支付金额', ellipsis: true, width: 108, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'refundAmount', title: '退款金额', width: 108, scopedSlots: { customRender: 'refundAmountSlot' } },
   { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', customRender: (text) => '￥' + (text / 100).toFixed(2), width: 100 },

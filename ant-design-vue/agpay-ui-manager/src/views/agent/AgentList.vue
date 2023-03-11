@@ -135,10 +135,4 @@ export default {
 </script>
 
 <style scoped>
-  .split-line {
-    border-bottom: 1px solid #ebeff2;
-    position: relative;
-    -webkit-touch-callout: none;
-    user-select: none
-  }
 </style>

@@ -9,20 +9,65 @@
   <div>
     <div class="ag-table-top-row">
       <div class="ag-table-top-left">
+        <a-button icon="area-chart" class="statistics" v-if="isEnableDataStatistics" @click="isShowDataStatistics = !isShowDataStatistics">{{ isShowDataStatistics ? "关闭" : "数据"}}统计</a-button>
         <slot name="topLeftSlot"></slot>
       </div>
       <div class="operation-icons">
-        <span class="pd-0-20">
+        <span class="pd-0-20" v-if="isShowAutoRefresh">
           <span style="margin-right: 10px; color: rgb(169, 179, 177);">自动刷新：
-            <span style="margin-right: 5px; color: rgb(0, 0, 0);">178s</span>
+            <span style="margin-right: 5px; color: rgb(0, 0, 0);">{{ countdown }}s</span>
           </span>
-          <a-switch :checked="initData" />
+          <a-switch v-model="autoRefresh" />
         </span>
+        <span v-if="isShowDownload" class="anticon anticon-download pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"><a-icon type="download" /></span>
+<!--        <span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"><a-icon type="column-height" /></span>-->
+        <a-dropdown :trigger="['click']">
+          <a-tooltip placement="top">
+            <template #title>
+              <span>表格密度</span>
+            </template>
+            <i class="bi bi-distribute-vertical pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;" @click.prevent/>
+          </a-tooltip>
+          <template v-slot:overlay>
+            <a-menu class="ant-pro-drop-down menu">
+              <a-menu-item :key="0" @click="size='default'">
+                默认
+              </a-menu-item>
+              <a-menu-item :key="1" @click="size='middle'">
+                宽松
+              </a-menu-item>
+              <a-menu-item :key="2" @click="size='small'">
+                紧促
+              </a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+        <a-dropdown :trigger="['click']">
+          <a-tooltip placement="top">
+            <template #title>
+              <span>列设置</span>
+            </template>
+            <i class="bi bi-layout-sidebar-inset-reverse ant-dropdown-trigger pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"/>
+          </a-tooltip>
+          <template v-slot:overlay>
+            <a-menu class="ant-pro-drop-down menu">
+              <a-checkbox-group v-model="visibleColumns">
+                <a-menu-item v-for="column in allColumns" :key="column.key">
+                  <a-checkbox :value="column.key" :key="column.key">{{ column.title }}</a-checkbox>
+                </a-menu-item>
+              </a-checkbox-group>
+            </a-menu>
+          </template>
+        </a-dropdown>
       </div>
     </div>
+    <div class="data-statistics" style="background: rgb(250, 250, 250);" v-if="isShowDataStatistics">
+      <slot name="dataStatisticsSlot"></slot>
+    </div>
     <a-table
-      bordered="true"
-      :columns="tableColumns"
+      :bordered="true"
+      :columns="displayedColumns"
+      :size="size"
       :data-source="apiResData.records"
       :pagination="pagination"
       :loading="showLoading"
@@ -48,11 +93,15 @@
 <script>
 
 export default {
-
   name: 'AgTable', // 定义组件名称
 
   // 传递数据参数 ( 父-->子 参数 )
   props: {
+    countdown: { type: Number, default: 180 },
+    autoRefresh: { type: Boolean, default: false }, // 自动刷新， 默认false
+    isShowAutoRefresh: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
+    isShowDownload: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
+    isEnableDataStatistics: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
     initData: { type: Boolean, default: true }, // 初始化列表数据， 默认true
     tableColumns: Array, // 表格数组列
     reqTableDataFunc: { type: Function }, // 请求列表数据
@@ -67,24 +116,48 @@ export default {
 
   data () {
     return {
+      allColumns: this.tableColumns,
+      visibleColumns: this.tableColumns.map(column => column.key),
       apiResData: { total: 0, records: [] }, // 接口返回数据
       iPage: { pageNumber: 1, pageSize: this.pageSize }, // 默认table 分页/排序请求后端格式
       pagination: { total: 0, current: 1, pageSize: this.pageSize, showSizeChanger: true, showTotal: total => `共${total}条` }, // ATable 分页配置项
-      showLoading: false
+      isShowDataStatistics: false,
+      showLoading: false,
+      size: 'default'
     }
   },
   // 计算属性
   computed: {
     columnsCustomSlots () { // 自定义列插槽  1. 过滤器仅获取到包含slot属性的元素， 2. 返回slot数组
       return this.tableColumns.filter(item => item.scopedSlots).map(item => item.scopedSlots)
+    },
+    displayedColumns () {
+      return this.allColumns.filter(column => this.visibleColumns.includes(column.key))
     }
   },
   mounted () {
     if (this.initData) { // 是否自动加载数据
       this.refTable(true)
     }
+    this.startCountdown()
   },
   methods: {
+    startCountdown () {
+      const that = this
+      const defaultCountdown = that.countdown
+      // const timer =
+      setInterval(() => {
+        if (this.autoRefresh) { // 判断是否启用自动刷新
+          that.countdown--
+          if (this.countdown === 0) {
+            that.countdown = defaultCountdown
+            // clearInterval(timer)
+            that.refTable(false)
+          }
+        }
+      }, 1000)
+    },
+
     handleTableChange (pagination, filters, sorter) { // 分页、排序、筛选变化时触发
       this.pagination = pagination
       this.iPage = {
@@ -186,5 +259,56 @@ export default {
 
   .ag-table-top-row .operation-icons .pd-0-20 {
     padding: 0 10px
+  }
+
+  .statistics {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1px;
+    background: #2691ff26!important;
+    border: none;
+    color: var(--ant-primary-color)
+  }
+
+  .data-statistics {
+    margin: 0 30px 10px;
+    padding: 28px 0 32px;
+    border-radius: 3px;
+    border: 1px solid #ebebeb;
+    transform: translateY(-10px)
+  }
+
+  .bi {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: .3s ease;
+  }
+
+  @font-face {
+    font-family: bootstrap-icons;
+    src: url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.c874e14c.woff2?524846017b983fc8ded9325d94ed40f3) format("woff2"),url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.92f8082b.woff?524846017b983fc8ded9325d94ed40f3) format("woff")
+  }
+
+  .bi-distribute-vertical:before {
+    content: "\f304"
+  }
+
+  .bi-layout-sidebar-inset-reverse:before {
+    content: "\f45c";
+  }
+
+  .bi:before,[class^=bi-]:before,[class*=" bi-"]:before {
+    display: inline-block;
+    font-family: bootstrap-icons !important;
+    font-style: normal;
+    font-weight: 400 !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: -.125em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale
   }
 </style>

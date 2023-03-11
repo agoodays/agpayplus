@@ -31,11 +31,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button icon="delete" v-if="$access('ENT_SYS_LOG_DEL')" type="danger" @click="delFunc" class="mg-b-30">删除</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -47,6 +44,11 @@
         :rowSelection="rowSelection"
         rowKey="sysLogId"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button icon="delete" v-if="$access('ENT_SYS_LOG_DEL')" type="danger" @click="delFunc" class="mg-b-30">删除</a-button>
+          </div>
+        </template>
         <template slot="userNameSlot" slot-scope="{record}"><b>{{ record.userName }}</b></template> <!-- 自定义插槽 -->
         <template slot="sysTypeSlot" slot-scope="{record}">
           <a-tag :key="record.sysType" :color="record.sysType === 'MGR'?'green':record.sysType === 'AGENT'?'cyan':record.sysType === 'MCH'?'geekblue':'loser'">
