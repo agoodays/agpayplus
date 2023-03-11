@@ -19,7 +19,7 @@
           <span style="margin-right: 10px; color: rgb(169, 179, 177);">自动刷新：
             <span style="margin-right: 5px; color: rgb(0, 0, 0);">{{ countdown }}s</span>
           </span>
-          <a-switch v-model="autoRefresh" />
+          <a-switch v-model="enableAutoRefresh" />
         </span>
         <span v-if="isShowDownload" class="anticon anticon-download pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"><a-icon type="download" /></span>
 <!--        <span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"><a-icon type="column-height" /></span>-->
@@ -51,11 +51,18 @@
             </template>
             <i class="bi bi-layout-sidebar-inset-reverse ant-dropdown-trigger pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"/>
           </a-tooltip>
+<!--          <a-menu slot="overlay">
+            <a-checkbox-group v-model="visibleColumns">
+              <a-menu-item v-for="column in allColumns" :key="column.key">
+                <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title }}</a-checkbox>
+              </a-menu-item>
+            </a-checkbox-group>
+          </a-menu>-->
           <template v-slot:overlay>
             <a-menu class="ant-pro-drop-down menu">
               <a-checkbox-group v-model="visibleColumns">
                 <a-menu-item v-for="column in allColumns" :key="column.key">
-                  <a-checkbox :value="column.key" :key="column.key">{{ column.title }}</a-checkbox>
+                  <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title }}</a-checkbox>
                 </a-menu-item>
               </a-checkbox-group>
             </a-menu>
@@ -65,7 +72,6 @@
     </div>
     <slot name="dataStatisticsSlot" v-if="isShowDataStatistics"></slot>
     <a-table
-      :bordered="true"
       :columns="displayedColumns"
       :size="size"
       :data-source="apiResData.records"
@@ -97,7 +103,7 @@ export default {
 
   // 传递数据参数 ( 父-->子 参数 )
   props: {
-    countdown: { type: Number, default: 180 },
+    defaultCountdown: { type: Number, default: 180 },
     autoRefresh: { type: Boolean, default: false }, // 自动刷新， 默认false
     isShowAutoRefresh: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
     isShowDownload: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
@@ -121,6 +127,8 @@ export default {
       apiResData: { total: 0, records: [] }, // 接口返回数据
       iPage: { pageNumber: 1, pageSize: this.pageSize }, // 默认table 分页/排序请求后端格式
       pagination: { total: 0, current: 1, pageSize: this.pageSize, showSizeChanger: true, showTotal: total => `共${total}条` }, // ATable 分页配置项
+      countdown: this.defaultCountdown,
+      enableAutoRefresh: this.autoRefresh,
       isShowDataStatistics: false,
       showLoading: false,
       size: 'default'
@@ -144,13 +152,12 @@ export default {
   methods: {
     startCountdown () {
       const that = this
-      const defaultCountdown = that.countdown
       // const timer =
       setInterval(() => {
-        if (this.autoRefresh) { // 判断是否启用自动刷新
+        if (this.enableAutoRefresh) { // 判断是否启用自动刷新
           that.countdown--
           if (this.countdown === 0) {
-            that.countdown = defaultCountdown
+            that.countdown = that.defaultCountdown
             // clearInterval(timer)
             that.refTable(false)
           }
@@ -261,6 +268,33 @@ export default {
     padding: 0 10px
   }
 
+  .ant-dropdown-menu {
+    padding: 10px 10px 5px!important;
+    box-sizing: border-box;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 10px 30px #35414d26!important
+  }
+
+  .ant-dropdown-menu-item, .undefined-item {
+    padding: 0 12px!important;
+    line-height: 40px!important;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    border-radius: 3px;
+    background: #2691ff26!important;
+  }
+
+  .undefined-item:hover {
+    border-radius: 3px;
+    background: #2691ff26!important;
+  }
+
+  @font-face {
+    font-family: bootstrap-icons;
+    src: url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.c874e14c.woff2?524846017b983fc8ded9325d94ed40f3) format("woff2"),url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.92f8082b.woff?524846017b983fc8ded9325d94ed40f3) format("woff")
+  }
+
   .statistics {
     display: inline-flex;
     justify-content: center;
@@ -268,7 +302,7 @@ export default {
     margin-top: 1px;
     background: #2691ff26!important;
     border: none;
-    color: var(--ant-primary-color)
+    color: rgb(26, 102, 255)
   }
 
   .bi {
@@ -276,11 +310,6 @@ export default {
     justify-content: center;
     align-items: center;
     transition: .3s ease;
-  }
-
-  @font-face {
-    font-family: bootstrap-icons;
-    src: url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.c874e14c.woff2?524846017b983fc8ded9325d94ed40f3) format("woff2"),url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.92f8082b.woff?524846017b983fc8ded9325d94ed40f3) format("woff")
   }
 
   .bi-distribute-vertical:before {

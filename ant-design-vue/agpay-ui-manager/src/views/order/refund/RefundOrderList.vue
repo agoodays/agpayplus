@@ -29,7 +29,7 @@
             <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
             <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
             <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="退款状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">订单生成</a-select-option>
@@ -38,7 +38,7 @@
                 <a-select-option value="3">退款失败</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.mchType" placeholder="商户类型" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="1">普通商户</a-select-option>
@@ -53,7 +53,13 @@
           </div>
         </a-form>
       </div>
-      <div class="split-line"/>
+      <div class="split-line">
+        <div class="btns" @click="isShowMore = !isShowMore">
+          <div>
+            {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
+          </div>
+        </div>
+      </div>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -350,6 +356,7 @@
     components: { AgTable, AgTableColumns, AgTextUp },
     data () {
       return {
+        isShowMore: false,
         btnLoading: false,
         tableColumns: tableColumns,
         searchData: {},
@@ -402,24 +409,24 @@
   }
 </script>
 <style lang="less" scoped>
-.order-list {
-  -webkit-text-size-adjust:none;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
+  .order-list {
+    -webkit-text-size-adjust:none;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
 
-  p {
-    white-space:nowrap;
-    span {
-      display: inline-block;
-      font-weight: 800;
-      height: 16px;
-      line-height: 16px;
-      width: 35px;
-      border-radius: 5px;
-      text-align: center;
-      margin-right: 2px;
+    p {
+      white-space:nowrap;
+      span {
+        display: inline-block;
+        font-weight: 800;
+        height: 16px;
+        line-height: 16px;
+        width: 35px;
+        border-radius: 5px;
+        text-align: center;
+        margin-right: 2px;
+      }
     }
   }
-}
 </style>

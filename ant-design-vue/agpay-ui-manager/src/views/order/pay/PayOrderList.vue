@@ -94,20 +94,51 @@
       >
         <template slot="dataStatisticsSlot">
           <div class="data-statistics" style="background: rgb(250, 250, 250);">
-            <a-row type="flex" justify="center">
-              <a-col :span="5">
-                <a-statistic title="实际收款金额" :value="112893" style="margin-right: 50px" />
-              </a-col>
-              <a-col :span="5">
-                <a-statistic title="成交订单" :precision="2" :value="112893" />
-              </a-col>
-              <a-col :span="5">
-                <a-statistic title="手续费金额" :precision="2" :value="112893" />
-              </a-col>
-              <a-col :span="5">
-                <a-statistic title="退款订单" :precision="2" :value="112893" />
-              </a-col>
-            </a-row>
+            <div class="statistics-list">
+              <div class="item">
+                <div class="title">实际收款金额</div>
+                <div class="amount" style="color: rgb(26, 102, 255);">
+                  <span class="amount-num">0.03</span>元
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">成交订单</div>
+                <div class="amount">
+                  <span class="amount-num">0.03</span>元
+                </div>
+                <div class="detail">
+                  <span>3笔</span>
+                  <span class="detail-text">明细</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">手续费金额</div>
+                <div class="amount">
+                  <span class="amount-num">0.00</span>元
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">退款订单</div>
+                <div class="amount" style="color: rgb(250, 173, 20);">
+                  <span class="amount-num">0.00</span>元
+                </div>
+                <div class="detail">
+                  <span>0笔</span>
+                </div>
+              </div>
+            </div>
           </div>
         </template>
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.amount/100 }}</b></template> <!-- 自定义插槽 -->
@@ -447,7 +478,7 @@ import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'orderNo', title: '订单号', show: true, scopedSlots: { customRender: 'orderSlot' }, width: 210, fixed: 'left' },
+  { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 210, fixed: 'left' },
   { key: 'amount', title: '支付金额', ellipsis: true, width: 108, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'refundAmount', title: '退款金额', width: 108, scopedSlots: { customRender: 'refundAmountSlot' } },
   { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', customRender: (text) => '￥' + (text / 100).toFixed(2), width: 100 },
@@ -558,62 +589,48 @@ export default {
     }
   }
 
-  .split-line {
-    border-bottom: 1px solid #ebeff2;
-    position: relative;
-    -webkit-touch-callout: none;
-    user-select: none
-  }
-
-  .btns {
-    width: 100px;
-    height: 34px;
-    cursor: pointer;
-    border: 1px solid #ebeff2;
-    border-radius: 5px;
-    position: absolute;
-    left: 50%;
-    margin-left: -50px;
-    top: 50%;
-    margin-top: -17px;
-    background-color: #fff;
-    font-size: 12px
-  }
-
-  .btns div {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    color: #79807e
-  }
-
-  .btns:before {
-    content: "";
-    position: absolute;
-    width: calc(100% + 2px);
-    height: 50%;
-    background-color: #fff;
-    top: -1px;
-    left: -1px;
-    z-index: 1
-  }
-
-  i {
-    display: inline-block;
-    margin-left: 5px
-  }
-
   .data-statistics {
     margin: 0 30px 10px;
     padding: 28px 0 32px;
     border-radius: 3px;
     border: 1px solid #ebebeb;
     transform: translateY(-10px)
+  }
+
+  .statistics-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around
+  }
+
+  .statistics-list .item .title {
+    color: gray;
+    margin-bottom: 10px
+  }
+
+  .statistics-list .item .amount {
+    margin-bottom: 10px
+  }
+
+  .statistics-list .item .amount .amount-num {
+    padding-right: 3px;
+    font-weight: 600;
+    font-size: 20px
+  }
+
+  .statistics-list .item .symbol {
+    padding-right: 3px
+  }
+
+  .statistics-list .item .detail-text {
+    color: rgb(26, 102, 255);
+    padding-left: 5px;
+    cursor: pointer
+  }
+
+  .statistics-list .line {
+    width: 1px;
+    height: 100%;
+    border-right: 1px solid #efefef
   }
 </style>

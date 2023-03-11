@@ -19,7 +19,7 @@
             <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
             <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
             <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="通知状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="1">通知中</a-select-option>
@@ -27,7 +27,7 @@
                 <a-select-option value="3">通知失败</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.orderType" placeholder="订单类型" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="1">支付</a-select-option>
@@ -43,7 +43,13 @@
           </div>
         </a-form>
       </div>
-      <div class="split-line"/>
+      <div class="split-line">
+        <div class="btns" @click="isShowMore = !isShowMore">
+          <div>
+            {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
+          </div>
+        </div>
+      </div>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -221,6 +227,7 @@
     components: { AgTable, AgTableColumns, AgTextUp },
     data () {
       return {
+        isShowMore: false,
         btnLoading: true,
         tableColumns: tableColumns,
         searchData: {},
