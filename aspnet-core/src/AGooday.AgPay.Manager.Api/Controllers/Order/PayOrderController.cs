@@ -52,6 +52,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
         public ApiRes List([FromQuery] PayOrderQueryDto dto)
         {
+            dto.BindDateRange();
             var payOrders = _payOrderService.GetPaginatedData(dto);
             // 得到所有支付方式
             Dictionary<string, string> payWayNameMap = new Dictionary<string, string>();
@@ -66,6 +67,30 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 payOrder.WayName = payWayNameMap.ContainsKey(payOrder.WayCode) ? payWayNameMap[payOrder.WayCode] : payOrder.WayCode;
             }
             return ApiRes.Ok(new { Records = payOrders.ToList(), Total = payOrders.TotalCount, Current = payOrders.PageIndex, HasNext = payOrders.HasNext });
+        }
+
+        /// <summary>
+        /// 订单信息列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet, Route("count"), NoLog]
+        [PermissionAuth(PermCode.MCH.ENT_ORDER_LIST)]
+        public ApiRes Count([FromQuery] PayOrderQueryDto dto)
+        {
+            dto.BindDateRange();
+            return ApiRes.Ok(new
+            {
+                allPayAmount = 590766239 / 100.00,
+                allPayCount = 1871,
+                failPayAmount = 590714131 / 100.00,
+                failPayCount = 1691,
+                mchFeeAmount = 6097 / 100.00,
+                payAmount = 52108 / 100.00,
+                payCount = 180,
+                refundAmount = 16635 / 100.00,
+                refundCount = 45
+            });
         }
 
         /// <summary>

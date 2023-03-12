@@ -23,6 +23,7 @@
       </template>
       <a-range-picker
         v-if="optionValue==='customDateTime'"
+        v-model="dateRangeValue"
         @change="onChange"
         style="width: 100%"
         ref="dateRangePicker"
@@ -70,10 +71,47 @@ export default {
     }
   },
   data () {
-    const dateRangeTip = ''
+    const dateRangeValue = ref([])
+    const dateRangeTip = ref('')
+    const setDateRangeValue = (value, start, end) => {
+      console.log({ value, start, end })
+      switch (value) {
+        case 'today':
+          start = moment().startOf('day')
+          end = moment()
+          break
+        case 'yesterday':
+          start = moment().startOf('day').subtract(1, 'days')
+          end = moment().endOf('day').subtract(1, 'days')
+          break
+        case 'near2now_7':
+          start = moment().startOf('day').subtract(7, 'days')
+          end = moment().endOf('day').subtract(1, 'days')
+          break
+        case 'near2now_30':
+          start = moment().startOf('day').subtract(30, 'days')
+          end = moment().endOf('day').subtract(1, 'days')
+          break
+        default:
+          if (start?.length > 0 && end?.length > 0) {
+            start = moment(start)
+            end = moment(end)
+          }
+          break
+      }
+      if (start && end) {
+        dateRangeValue.value = [start, end]
+        dateRangeTip.value = `搜索时间： ${start.format('YYYY-MM-DD')} 00:00:00 ~ ${end.format('YYYY-MM-DD')} 23:59:59`
+      } else {
+        dateRangeValue.value = []
+        dateRangeTip.value = ''
+      }
+      console.log(dateRangeValue.value)
+    }
+    setDateRangeValue(this.value)
     const dateRangeTipIsShow = ref(false)
     const handleHoverChange = visible => {
-      if (this.dateRangeTip.length > 0) {
+      if (dateRangeTip.value.length > 0) {
         dateRangeTipIsShow.value = visible
       } else {
         dateRangeTipIsShow.value = false
@@ -86,6 +124,8 @@ export default {
     return {
       optionValue: this.value,
       optionOriginValue: this.value,
+      dateRangeValue,
+      setDateRangeValue,
       dateRangeTip,
       dateRangeTipIsShow,
       handleHoverChange,
@@ -97,6 +137,7 @@ export default {
     optionChange () {
       if (this.optionValue !== 'customDateTime') {
         this.optionOriginValue = this.optionValue
+        this.setDateRangeValue(this.optionValue)
         this.$emit('change', this.optionValue)
       } else {
         this.handleDateRangeOpenChange(true)
@@ -104,20 +145,21 @@ export default {
     },
     moment,
     onChange (date, dateString) {
+      console.log(dateString)
       const start = dateString[0] // 开始时间
       const end = dateString[1] // 结束时间
       if (start.length && end.length) {
-        this.dateRangeTip = `搜索时间： ${start} 00:00:00 ~ ${end} 23:59:59`
         this.$emit('change', `${this.optionValue}_${start} 00:00:00_${end} 23:59:59`)
       } else {
-        this.dateRangeTip = ''
+        this.$emit('change', '')
         this.handleHoverChange(false)
       }
+      this.setDateRangeValue(null, start, end)
     },
     onClick () {
-      this.dateRangeTip = ''
       this.handleHoverChange(false)
       this.optionValue = this.optionOriginValue
+      this.setDateRangeValue(this.optionValue)
       this.$emit('change', this.optionValue)
     }
   }

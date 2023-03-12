@@ -219,23 +219,23 @@ export default {
 }
 </script>
 <style lang="less">
-  // 调整antdv 的table默认padding高度
-  .ant-table-fixed{
-    tr{
-      th{
-        padding: 8px 8px !important;
-      }
-      th:first-child{ // 第一个表格 左填充16， 其他为8
-        padding-left: 16px !important;
-      }
-      td{
-        padding: 8px 8px !important;
-      }
-      td:first-child{
-        padding-left: 16px !important;
-      }
-    }
-  }
+  //// 调整antdv 的table默认padding高度
+  //.ant-table-fixed{
+  //  tr{
+  //    th{
+  //      padding: 8px 8px !important;
+  //    }
+  //    th:first-child{ // 第一个表格 左填充16， 其他为8
+  //      padding-left: 16px !important;
+  //    }
+  //    td{
+  //      padding: 8px 8px !important;
+  //    }
+  //    td:first-child{
+  //      padding-left: 16px !important;
+  //    }
+  //  }
+  //}
 
   .ant-table-wrapper {
     margin: 0 30px 15px;
@@ -290,11 +290,6 @@ export default {
     background: #2691ff26!important;
   }
 
-  @font-face {
-    font-family: bootstrap-icons;
-    src: url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.c874e14c.woff2?524846017b983fc8ded9325d94ed40f3) format("woff2"),url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.92f8082b.woff?524846017b983fc8ded9325d94ed40f3) format("woff")
-  }
-
   .statistics {
     display: inline-flex;
     justify-content: center;
@@ -303,6 +298,11 @@ export default {
     background: #2691ff26!important;
     border: none;
     color: rgb(26, 102, 255)
+  }
+
+  @font-face {
+    font-family: bootstrap-icons;
+    src: url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.c874e14c.woff2?524846017b983fc8ded9325d94ed40f3) format("woff2"),url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.92f8082b.woff?524846017b983fc8ded9325d94ed40f3) format("woff")
   }
 
   .bi {
