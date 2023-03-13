@@ -18,8 +18,11 @@ class HttpRequest {
     this.queue = {} // 发送队列, 格式为: {请求url: true}, 可以做一些验证之类
   }
   // 基础配置信息
-  baseConfig () {
-    const headers = {}
+  baseConfig (headers) {
+    console.log(headers)
+    if (!headers) {
+      headers = {}
+    }
     headers[appConfig.ACCESS_TOKEN_NAME] = `Bearer ${storage.getToken()}`
     return {
       baseURL: this.baseUrl,
@@ -36,6 +39,11 @@ class HttpRequest {
       if (!Object.keys(this.queue).length && showLoading) {
           store.commit('showLoading') // 加载中显示loading组件
       }
+      console.log(config)
+      if (config.headers.responseType) {
+        config.responseType = 'blob'
+      }
+
       this.queue[url] = true
       return config
     }, error => {
@@ -50,8 +58,13 @@ class HttpRequest {
       if (showLoading) {
         store.commit('hideLoading') // 报错关闭loading组件
       }
-
+      console.log(res)
       const resData = res.data // 接口实际返回数据 格式为：{code: '', msg: '', data: ''}， res.data 是axios封装对象的返回数据；
+
+      console.log(res.config)
+      if (res.config.headers.responseType) {
+        return resData
+      }
 
       if (resData.code !== 0) { // 相应结果不为0， 说明异常
         if (showErrorMsg) {
@@ -106,7 +119,8 @@ class HttpRequest {
   // showLoading 发送请求前后显示全局loading
   request (options, interceptorsFlag = true, showErrorMsg = true, showLoading = false) {
     const instance = axios.create()
-    options = Object.assign(this.baseConfig(), options)
+    options = Object.assign(this.baseConfig(options.headers), options)
+    console.log(options)
     if (interceptorsFlag) { // 注入 req, respo 拦截器
       this.interceptors(instance, options.url, showErrorMsg, showLoading)
     }

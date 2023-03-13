@@ -14,6 +14,9 @@ using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Net;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Order
 {
@@ -75,7 +78,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("count"), NoLog]
-        [PermissionAuth(PermCode.MCH.ENT_ORDER_LIST)]
+        [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
         public ApiRes Count([FromQuery] PayOrderQueryDto dto)
         {
             dto.BindDateRange();
@@ -98,17 +101,67 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("{bizType}"), NoLog]
-        [PermissionAuth(PermCode.MCH.ENT_ORDER_LIST)]
-        public IActionResult Export([FromQuery] PayOrderQueryDto dto, string bizType)
+        [HttpGet, Route("export/{bizType}"), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
+        public IActionResult Export(string bizType, [FromQuery] PayOrderQueryDto dto)
         {
             dto.BindDateRange();
+            // 从数据库中检索需要导出的数据
             var payOrders = _payOrderService.GetPaginatedData(dto);
+
             string fileName = $"订单列表.xlsx";
-            //store in memory rather than pysical directory
-            var stream = new MemoryStream();
-            stream.Position = 0;
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            // 5.0之后的epplus需要指定 商业证书 或者非商业证书。低版本不需要此行代码
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // 创建新的 Excel 文件
+            using (var package = new ExcelPackage())
+            {
+                // 添加工作表，并设置标题行
+                var worksheet = package.Workbook.Worksheets.Add("订单列表");
+                worksheet.Cells["A1"].Value = $"订单列表";
+                // 设置单元格样式，例如居中对齐和加粗字体
+                worksheet.Cells["A1:O1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells["A1:O1"].Style.Font.Bold = true;
+                worksheet.Cells["A2"].Value = $"支付订单号";
+                worksheet.Cells["B2"].Value = $"商户订单号";
+                worksheet.Cells["C2"].Value = $"商户号";
+                worksheet.Cells["D2"].Value = $"商户名称";
+                worksheet.Cells["E2"].Value = $"门店ID";
+                worksheet.Cells["F2"].Value = $"门店名称";
+                worksheet.Cells["G2"].Value = $"支付状态";
+                worksheet.Cells["H2"].Value = $"退款状态";
+                worksheet.Cells["I2"].Value = $"服务商号";
+                worksheet.Cells["J2"].Value = $"支付方式";
+                worksheet.Cells["K2"].Value = $"支付金额";
+                worksheet.Cells["L2"].Value = $"退款金额";
+                worksheet.Cells["M2"].Value = $"手续费";
+                worksheet.Cells["N2"].Value = $"创建时间";
+                worksheet.Cells["O2"].Value = $"支付成功时间";
+                // 将每个订单添加到工作表中
+                for (int i = 0; i < payOrders.Count(); i++)
+                {
+                    var order = payOrders[i];
+                    worksheet.Cells[$"A{i + 3}"].Value = order.PayOrderId;
+                    worksheet.Cells[$"B{i + 3}"].Value = order.MchOrderNo;
+                    worksheet.Cells[$"C{i + 3}"].Value = order.MchNo;
+                    worksheet.Cells[$"D{i + 3}"].Value = order.MchName;
+                    worksheet.Cells[$"E{i + 3}"].Value = order.StoreId;
+                    worksheet.Cells[$"F{i + 3}"].Value = order.StoreName;
+                    worksheet.Cells[$"G{i + 3}"].Value = order.State;
+                    worksheet.Cells[$"H{i + 3}"].Value = order.RefundState;
+                    worksheet.Cells[$"I{i + 3}"].Value = order.IsvNo;
+                    worksheet.Cells[$"J{i + 3}"].Value = order.WayName;
+                    worksheet.Cells[$"K{i + 3}"].Value = order.Amount / 100.00;
+                    worksheet.Cells[$"L{i + 3}"].Value = order.RefundAmount / 100.00;
+                    worksheet.Cells[$"M{i + 3}"].Value = order.MchFeeAmount / 100.00;
+                    worksheet.Cells[$"N{i + 3}"].Value = order.CreatedAt;
+                    worksheet.Cells[$"O{i + 3}"].Value = order.SuccessTime;
+                }
+                // 设置响应头，指示将要下载的文件类型为 Excel 文件
+                Response.Headers.Add("Content-Disposition", $"attachment;filename=\"{WebUtility.UrlEncode(fileName)}\"");
+                Response.ContentType = "application/vnd.ms-excel;charset=UTF-8";
+                // 将 Excel 文件写入 HTTP 响应流中，并返回给客户端
+                return File(package.GetAsByteArray(), Response.ContentType, fileName);
+            }
         }
 
         /// <summary>

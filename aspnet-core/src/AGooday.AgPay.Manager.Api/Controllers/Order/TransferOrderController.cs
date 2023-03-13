@@ -45,8 +45,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("{bizType}"), NoLog]
-        [PermissionAuth(PermCode.MCH.ENT_REFUND_LIST)]
+        [HttpGet, Route("export/{bizType}"), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_REFUND_LIST)]
         public IActionResult Export([FromQuery] TransferOrderQueryDto dto, string bizType)
         {
             dto.BindDateRange();

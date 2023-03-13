@@ -389,7 +389,7 @@
         return req.list(API_URL_REFUND_ORDER_LIST, params)
       },
       reqDownloadDataFunc: (params) => {
-        return req.exportExcel(API_URL_REFUND_ORDER_LIST, params)
+        req.export(API_URL_REFUND_ORDER_LIST, 'excel', params)
       },
       searchFunc: function () { // 点击【查询】按钮点击事件
         this.$refs.infoTable.refTable(true)

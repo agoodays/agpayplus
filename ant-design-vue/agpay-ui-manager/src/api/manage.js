@@ -20,8 +20,8 @@ export const req = {
   },
 
   // 通用列表数据导出接口
-  exportExcel: (url, params) => {
-    return request.request({ url: url + '/exportExcel', method: 'GET', params: params }, true, true, false)
+  export: (url, bizType, params) => {
+    return request.request({ url: url + '/export/' + bizType, method: 'GET', params: params, headers: { responseType: 'blob' } }, true, true, false)
   },
 
   // 通用新增接口
