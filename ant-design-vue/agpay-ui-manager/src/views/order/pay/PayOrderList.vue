@@ -601,7 +601,22 @@ export default {
     },
     reqDownloadDataFunc: (params) => {
       req.export(API_URL_PAY_ORDER_LIST, 'excel', params).then(response => {
-        console.log(response)
+        const blob = new Blob([response])
+        const fileName = '订单列表.xlsx' // 要保存的文件名称
+        if ('download' in document.createElement('a')) {
+          // 非IE下载
+          const elink = document.createElement('a')
+          elink.download = fileName
+          elink.style.display = 'none'
+          elink.href = URL.createObjectURL(blob)
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href) // 释放URL 对象
+          document.body.removeChild(elink)
+        } else {
+          // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
       })
     },
     searchFunc: function () { // 点击【查询】按钮点击事件

@@ -21,7 +21,7 @@ export const req = {
 
   // 通用列表数据导出接口
   export: (url, bizType, params) => {
-    return request.request({ url: url + '/export/' + bizType, method: 'GET', params: params, headers: { responseType: 'blob' } }, true, true, false)
+    return request.request({ url: url + '/export/' + bizType, method: 'GET', params: params, responseType: 'blob' }, true, true, false)
   },
 
   // 通用新增接口

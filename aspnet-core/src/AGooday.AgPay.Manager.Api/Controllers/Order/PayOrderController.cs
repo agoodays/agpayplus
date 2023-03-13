@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using System.Net;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Order
 {
@@ -118,23 +117,35 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 // 添加工作表，并设置标题行
                 var worksheet = package.Workbook.Worksheets.Add("订单列表");
                 worksheet.Cells["A1"].Value = $"订单列表";
-                // 设置单元格样式，例如居中对齐和加粗字体
-                worksheet.Cells["A1:O1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells["A1:O1"].Style.Font.Bold = true;
+                worksheet.Column(1).Width = 30d;
                 worksheet.Cells["A2"].Value = $"支付订单号";
+                worksheet.Column(2).Width = 26d;
                 worksheet.Cells["B2"].Value = $"商户订单号";
+                worksheet.Column(3).Width = 25d;
                 worksheet.Cells["C2"].Value = $"商户号";
+                worksheet.Column(4).Width = 25d;
                 worksheet.Cells["D2"].Value = $"商户名称";
+                worksheet.Column(5).Width = 15d;
                 worksheet.Cells["E2"].Value = $"门店ID";
+                worksheet.Column(6).Width = 22d;
                 worksheet.Cells["F2"].Value = $"门店名称";
+                worksheet.Column(7).Width = 10d;
                 worksheet.Cells["G2"].Value = $"支付状态";
+                worksheet.Column(8).Width = 10d;
                 worksheet.Cells["H2"].Value = $"退款状态";
+                worksheet.Column(9).Width = 25d;
                 worksheet.Cells["I2"].Value = $"服务商号";
+                worksheet.Column(10).Width = 12d;
                 worksheet.Cells["J2"].Value = $"支付方式";
+                worksheet.Column(11).Width = 10d;
                 worksheet.Cells["K2"].Value = $"支付金额";
+                worksheet.Column(12).Width = 10d;
                 worksheet.Cells["L2"].Value = $"退款金额";
+                worksheet.Column(13).Width = 10d;
                 worksheet.Cells["M2"].Value = $"手续费";
+                worksheet.Column(14).Width = 23d;
                 worksheet.Cells["N2"].Value = $"创建时间";
+                worksheet.Column(15).Width = 23d;
                 worksheet.Cells["O2"].Value = $"支付成功时间";
                 // 将每个订单添加到工作表中
                 for (int i = 0; i < payOrders.Count(); i++)
@@ -146,21 +157,42 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                     worksheet.Cells[$"D{i + 3}"].Value = order.MchName;
                     worksheet.Cells[$"E{i + 3}"].Value = order.StoreId;
                     worksheet.Cells[$"F{i + 3}"].Value = order.StoreName;
-                    worksheet.Cells[$"G{i + 3}"].Value = order.State;
-                    worksheet.Cells[$"H{i + 3}"].Value = order.RefundState;
+                    worksheet.Cells[$"G{i + 3}"].Value = order.State == 0 ? "订单生成" : order.State == 1 ? "支付中" : order.State == 2 ? "支付成功" : order.State == 3 ? "支付失败" : order.State == 4 ? "已撤销" : order.State == 5 ? "已退款" : order.State == 6 ? "订单关闭" : "未知";
+                    worksheet.Cells[$"H{i + 3}"].Value = order.RefundState == 0 ? "未退款" : order.RefundState == 1 ? "部分退款" : order.RefundState == 2 ? "全额退款" : "未知";
                     worksheet.Cells[$"I{i + 3}"].Value = order.IsvNo;
                     worksheet.Cells[$"J{i + 3}"].Value = order.WayName;
                     worksheet.Cells[$"K{i + 3}"].Value = order.Amount / 100.00;
                     worksheet.Cells[$"L{i + 3}"].Value = order.RefundAmount / 100.00;
                     worksheet.Cells[$"M{i + 3}"].Value = order.MchFeeAmount / 100.00;
-                    worksheet.Cells[$"N{i + 3}"].Value = order.CreatedAt;
-                    worksheet.Cells[$"O{i + 3}"].Value = order.SuccessTime;
+                    worksheet.Cells[$"N{i + 3}"].Value = order.CreatedAt?.ToString("yyyy-MM-dd HH:mm:ss");
+                    worksheet.Cells[$"O{i + 3}"].Value = order.SuccessTime?.ToString("yyyy-MM-dd HH:mm:ss");
                 }
-                // 设置响应头，指示将要下载的文件类型为 Excel 文件
-                Response.Headers.Add("Content-Disposition", $"attachment;filename=\"{WebUtility.UrlEncode(fileName)}\"");
-                Response.ContentType = "application/vnd.ms-excel;charset=UTF-8";
+                //// 全局样式
+                //worksheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;// 水平居中
+                //worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;// 垂直居中
+                //worksheet.Cells.AutoFitColumns();
+                //worksheet.Cells.Style.WrapText = true;// 自动换行
+                //worksheet.Cells.Style.Font.Name = "宋体";
+                //worksheet.Rows.Height = 25;
+
+                // 设置单元格样式，例如居中对齐和加粗字体
+                var rows = payOrders.Count() + 3;
+                for (int i = 1; i < rows; i++)
+                {
+                    worksheet.Row(i).Height = 25;
+                }
+                worksheet.Cells["A1:O1"].Style.Font.Bold = true;
+                worksheet.Cells["A1:O1"].Merge = true;
+                worksheet.Cells[$"A1:O{rows}"].Style.WrapText = true;// 自动换行
+                worksheet.Cells[$"A1:O{rows}"].Style.Font.Name = "等线";
+                worksheet.Cells[$"A1:O{rows}"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheet.Cells[$"A1:O{rows}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                //// 设置响应头，指示将要下载的文件类型为 Excel 文件
+                //Response.Headers.Add("Content-Disposition", $"attachment;filename=\"{WebUtility.UrlEncode(fileName)}\"");
+                //Response.ContentType = "application/vnd.ms-excel;charset=UTF-8";
                 // 将 Excel 文件写入 HTTP 响应流中，并返回给客户端
-                return File(package.GetAsByteArray(), Response.ContentType, fileName);
+                //return File(package.GetAsByteArray(), Response.ContentType, fileName);
+                return File(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
         }
 
