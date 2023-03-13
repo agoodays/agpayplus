@@ -600,15 +600,17 @@ export default {
       return req.list(API_URL_PAY_ORDER_LIST, params)
     },
     reqDownloadDataFunc: (params) => {
-      req.export(API_URL_PAY_ORDER_LIST, 'excel', params).then(response => {
-        const blob = new Blob([response])
+      req.export(API_URL_PAY_ORDER_LIST, 'excel', params).then(res => {
+        // 将响应体中的二进制数据转换为Blob对象
+        const blob = new Blob([res])
         const fileName = '订单列表.xlsx' // 要保存的文件名称
         if ('download' in document.createElement('a')) {
           // 非IE下载
+          // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
           const elink = document.createElement('a')
           elink.download = fileName
           elink.style.display = 'none'
-          elink.href = URL.createObjectURL(blob)
+          elink.href = URL.createObjectURL(blob) // 创建URL.createObjectURL(blob) URL，并将其赋值给a标签的href属性
           document.body.appendChild(elink)
           elink.click()
           URL.revokeObjectURL(elink.href) // 释放URL 对象
@@ -617,6 +619,8 @@ export default {
           // IE10+下载
           navigator.msSaveBlob(blob, fileName)
         }
+      }).catch((error) => {
+        console.error(error)
       })
     },
     searchFunc: function () { // 点击【查询】按钮点击事件
