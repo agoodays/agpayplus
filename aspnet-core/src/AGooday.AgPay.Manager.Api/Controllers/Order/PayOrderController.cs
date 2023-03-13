@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         }
 
         /// <summary>
-        /// 订单信息列表
+        /// 订单信息统计
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -94,6 +94,24 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         }
 
         /// <summary>
+        /// 订单信息导出
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet, Route("{bizType}"), NoLog]
+        [PermissionAuth(PermCode.MCH.ENT_ORDER_LIST)]
+        public IActionResult Export([FromQuery] PayOrderQueryDto dto, string bizType)
+        {
+            dto.BindDateRange();
+            var payOrders = _payOrderService.GetPaginatedData(dto);
+            string fileName = $"订单列表.xlsx";
+            //store in memory rather than pysical directory
+            var stream = new MemoryStream();
+            stream.Position = 0;
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        /// <summary>
         /// 支付订单信息
         /// </summary>
         /// <param name="payOrderId"></param>
@@ -114,8 +132,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// 发起订单退款
         /// </summary>
         /// <param name="payOrderId"></param>
-        /// <param name="refundAmount"></param>
-        /// <param name="refundReason"></param>
+        /// <param name="refundOrder"></param>
         /// <returns></returns>
         [HttpPost, Route("refunds/{payOrderId}"), MethodLog("发起订单退款")]
         [PermissionAuth(PermCode.MGR.ENT_PAY_ORDER_REFUND)]

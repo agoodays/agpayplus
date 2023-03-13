@@ -5,7 +5,7 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// <summary>
     /// 商户通知记录表
     /// </summary>
-    public class MchNotifyQueryDto : PageQuery
+    public class MchNotifyQueryDto : DatePageQuery
     {
         /// <summary>
         /// 订单ID

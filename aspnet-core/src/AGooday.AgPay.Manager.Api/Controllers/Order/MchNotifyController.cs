@@ -40,6 +40,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         [PermissionAuth(PermCode.MGR.ENT_NOTIFY_LIST)]
         public ApiRes List([FromQuery] MchNotifyQueryDto dto)
         {
+            dto.BindDateRange();
             var data = _mchNotifyService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }

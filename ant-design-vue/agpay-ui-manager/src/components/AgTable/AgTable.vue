@@ -21,7 +21,14 @@
           </span>
           <a-switch v-model="enableAutoRefresh" />
         </span>
-        <span v-if="isShowDownload" class="anticon anticon-download pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"><a-icon type="download" /></span>
+        <a-tooltip placement="top">
+          <template #title>
+            <span>数据导出</span>
+          </template>
+          <span v-if="isShowDownload" @click="downloadData" class="anticon anticon-download pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
+            <a-icon type="download" />
+          </span>
+        </a-tooltip>
 <!--        <span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"><a-icon type="column-height" /></span>-->
         <a-dropdown :trigger="['click']">
           <a-tooltip placement="top">
@@ -111,6 +118,7 @@ export default {
     initData: { type: Boolean, default: true }, // 初始化列表数据， 默认true
     tableColumns: Array, // 表格数组列
     reqTableDataFunc: { type: Function }, // 请求列表数据
+    reqDownloadDataFunc: { type: Function }, // 请求列表数据
     currentChange: { type: Function, default: (v1, v2) => {} }, // 更新当前选择行事件， 默认空函数
     searchData: Object, // 搜索条件参数
     pageSize: { type: Number, default: 10 }, // 默认每页条数
@@ -214,6 +222,13 @@ export default {
         this.showLoading = false
         that.$emit('btnLoadClose')
       }) // 关闭loading
+    },
+
+    // 下载数据
+    downloadData () {
+      this.iPage.pageNumber = 1
+      this.iPage.pageSize = -1
+      this.reqDownloadDataFunc(Object.assign({}, this.iPage, this.searchData))
     }
   }
 }

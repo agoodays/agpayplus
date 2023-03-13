@@ -4,8 +4,9 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
+            <a-form-item label="" class="table-head-layout">
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+<!--              <a-range-picker
                 @change="onChange"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
@@ -20,7 +21,7 @@
                 }"
               >
                 <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
 <!--            <ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
@@ -65,7 +66,11 @@
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
+        :autoRefresh="true"
+        :isShowAutoRefresh="true"
+        :isShowDownload="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
         rowKey="refundOrderId"
@@ -333,6 +338,7 @@
 </template>
 <script>
   import AgTable from '@/components/AgTable/AgTable'
+  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
   import AgTableColumns from '@/components/AgTable/AgTableColumns'
   import { API_URL_REFUND_ORDER_LIST, req } from '@/api/manage'
@@ -353,13 +359,15 @@
 
   export default {
     name: 'IsvListPage',
-    components: { AgTable, AgTableColumns, AgTextUp },
+    components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
     data () {
       return {
         isShowMore: false,
         btnLoading: false,
         tableColumns: tableColumns,
-        searchData: {},
+        searchData: {
+          queryDateRange: 'today'
+        },
         selectedIds: [], // 选中的数据
         createdStart: '', // 选择开始时间
         createdEnd: '', // 选择结束时间
@@ -379,6 +387,9 @@
       // 请求table接口数据
       reqTableDataFunc: (params) => {
         return req.list(API_URL_REFUND_ORDER_LIST, params)
+      },
+      reqDownloadDataFunc: (params) => {
+        return req.exportExcel(API_URL_REFUND_ORDER_LIST, params)
       },
       searchFunc: function () { // 点击【查询】按钮点击事件
         this.$refs.infoTable.refTable(true)

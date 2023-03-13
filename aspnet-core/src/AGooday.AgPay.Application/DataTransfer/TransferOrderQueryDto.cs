@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// <summary>
     /// 转账订单表
     /// </summary>
-    public class TransferOrderQueryDto : PageQuery
+    public class TransferOrderQueryDto : DatePageQuery
     {
         /// <summary>
         /// 转账订单号

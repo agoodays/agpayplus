@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// <summary>
     /// 退款订单表
     /// </summary>
-    public class RefundOrderQueryDto : PageQuery
+    public class RefundOrderQueryDto : DatePageQuery
     {
         /// <summary>
         /// 退款订单号（支付系统生成订单号）
@@ -164,15 +164,5 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// </summary>
         [BindNever]
         public DateTime UpdatedAt { get; set; }
-
-        /// <summary>
-        /// 开始时间
-        /// </summary>
-        public DateTime? CreatedStart { get; set; }
-
-        /// <summary>
-        /// 结束时间
-        /// </summary>
-        public DateTime? CreatedEnd { get; set; }
     }
 }

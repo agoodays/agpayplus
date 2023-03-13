@@ -89,6 +89,7 @@
         :isShowDownload="true"
         :isEnableDataStatistics="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
         rowKey="payOrderId"
@@ -558,7 +559,9 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {},
+      searchData: {
+        queryDateRange: 'today'
+      },
       countData: {
         mchFeeAmount: 0.00,
         failPayAmount: 0.00,
@@ -595,6 +598,9 @@ export default {
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_PAY_ORDER_LIST, params)
+    },
+    reqDownloadDataFunc: (params) => {
+      return req.exportExcel(API_URL_PAY_ORDER_LIST, params)
     },
     searchFunc: function () { // 点击【查询】按钮点击事件
       this.countFunc()

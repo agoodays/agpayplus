@@ -74,7 +74,6 @@ export default {
     const dateRangeValue = ref([])
     const dateRangeTip = ref('')
     const setDateRangeValue = (value, start, end) => {
-      console.log({ value, start, end })
       switch (value) {
         case 'today':
           start = moment().startOf('day')
@@ -106,7 +105,6 @@ export default {
         dateRangeValue.value = []
         dateRangeTip.value = ''
       }
-      console.log(dateRangeValue.value)
     }
     setDateRangeValue(this.value)
     const dateRangeTipIsShow = ref(false)
@@ -145,7 +143,6 @@ export default {
     },
     moment,
     onChange (date, dateString) {
-      console.log(dateString)
       const start = dateString[0] // 开始时间
       const end = dateString[1] // 结束时间
       if (start.length && end.length) {

@@ -4,8 +4,9 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
+            <a-form-item label="" class="table-head-layout">
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+<!--              <a-range-picker
                 @change="onChange"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
@@ -20,7 +21,7 @@
                 }"
               >
                 <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'转账/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
 <!--            <ag-text-up :placeholder="'转账订单号'" :msg="searchData.transferId" v-model="searchData.transferId" />-->
@@ -50,7 +51,11 @@
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
+        :autoRefresh="true"
+        :isShowAutoRefresh="true"
+        :isShowDownload="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
         rowKey="transferId"
@@ -105,6 +110,7 @@
 </template>
 <script>
   import AgTable from '@/components/AgTable/AgTable'
+  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
   import AgTableColumns from '@/components/AgTable/AgTableColumns'
   import TransferOrderDetail from './TransferOrderDetail'
@@ -113,26 +119,28 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 260, fixed: 'left' },
-    { title: '转账金额', scopedSlots: { customRender: 'transferAmountSlot' }, width: 110 },
-    { title: '商户名称', dataIndex: 'mchName', width: 130 },
-    // { title: '渠道订单号', dataIndex: 'channelOrderNo' },
-    { title: '收款账号', dataIndex: 'accountNo', width: 200 },
-    { title: '收款人姓名', dataIndex: 'accountName', width: 120 },
-    { title: '转账备注', dataIndex: 'transferDesc', width: 150 },
-    { title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
-    { title: '创建日期', dataIndex: 'createdAt', width: 200 },
-    { title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+    { key: 'transferId', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 260, fixed: 'left' },
+    { key: 'amount', title: '转账金额', scopedSlots: { customRender: 'transferAmountSlot' }, width: 110 },
+    { key: 'mchName', title: '商户名称', dataIndex: 'mchName', width: 130 },
+    // { key: 'channelOrderNo', title: '渠道订单号', dataIndex: 'channelOrderNo' },
+    { key: 'accountNo', title: '收款账号', dataIndex: 'accountNo', width: 200 },
+    { key: 'accountName', title: '收款人姓名', dataIndex: 'accountName', width: 120 },
+    { key: 'transferDesc', title: '转账备注', dataIndex: 'transferDesc', width: 150 },
+    { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
+    { key: 'createdAt', title: '创建日期', dataIndex: 'createdAt', width: 200 },
+    { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
   ]
 
   export default {
     name: 'IsvListPage',
-    components: { AgTable, AgTableColumns, AgTextUp, TransferOrderDetail },
+    components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, TransferOrderDetail },
     data () {
       return {
         btnLoading: false,
         tableColumns: tableColumns,
-        searchData: {},
+        searchData: {
+          queryDateRange: 'today'
+        },
         createdStart: '', // 选择开始时间
         createdEnd: '' // 选择结束时间
       }
@@ -145,6 +153,9 @@
       // 请求table接口数据
       reqTableDataFunc: (params) => {
         return req.list(API_URL_TRANSFER_ORDER_LIST, params)
+      },
+      reqDownloadDataFunc: (params) => {
+        return req.exportExcel(API_URL_TRANSFER_ORDER_LIST, params)
       },
       searchFunc: function () { // 点击【查询】按钮点击事件
         this.$refs.infoTable.refTable(true)

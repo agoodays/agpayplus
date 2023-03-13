@@ -4,21 +4,22 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
+            <a-form-item label="" class="table-head-layout">
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+<!--              <a-range-picker
                 @change="onChange"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
                 :disabled-date="disabledDate"
               >
                 <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'订单ID'" :msg="searchData.orderId" v-model="searchData.orderId" />
             <ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />
             <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
             <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
-            <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+            <ag-text-up v-if="isShowMore" :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
             <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="通知状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -207,6 +208,7 @@
 </template>
 <script>
   import AgTable from '@/components/AgTable/AgTable'
+  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
   import AgTableColumns from '@/components/AgTable/AgTableColumns'
   import { API_URL_MCH_NOTIFY_LIST, req, mchNotifyResend } from '@/api/manage'
@@ -224,13 +226,15 @@
 
   export default {
     name: 'IsvListPage',
-    components: { AgTable, AgTableColumns, AgTextUp },
+    components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
     data () {
       return {
         isShowMore: false,
         btnLoading: true,
         tableColumns: tableColumns,
-        searchData: {},
+        searchData: {
+          queryDateRange: 'today'
+        },
         selectedIds: [], // 选中的数据
         createdStart: '', // 选择开始时间
         createdEnd: '', // 选择结束时间

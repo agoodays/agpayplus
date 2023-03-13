@@ -19,6 +19,11 @@ export const req = {
     return request.request({ url: url + '/count', method: 'GET', params: params }, true, true, false)
   },
 
+  // 通用列表数据导出接口
+  exportExcel: (url, params) => {
+    return request.request({ url: url + '/exportExcel', method: 'GET', params: params }, true, true, false)
+  },
+
   // 通用新增接口
   add: (url, data) => {
     return request.request({ url: url, method: 'POST', data: data }, true, true, false)

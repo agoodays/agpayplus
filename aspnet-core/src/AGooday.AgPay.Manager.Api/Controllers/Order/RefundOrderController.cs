@@ -35,8 +35,27 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         [PermissionAuth(PermCode.MGR.ENT_REFUND_LIST)]
         public ApiRes List([FromQuery] RefundOrderQueryDto dto)
         {
+            dto.BindDateRange();
             var refundOrders = _refundOrderService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = refundOrders.ToList(), Total = refundOrders.TotalCount, Current = refundOrders.PageIndex, HasNext = refundOrders.HasNext });
+        }
+
+        /// <summary>
+        /// 订单信息导出
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet, Route("{bizType}"), NoLog]
+        [PermissionAuth(PermCode.MCH.ENT_REFUND_LIST)]
+        public IActionResult Export([FromQuery] RefundOrderQueryDto dto, string bizType)
+        {
+            dto.BindDateRange();
+            var refundOrders = _refundOrderService.GetPaginatedData(dto);
+            string fileName = $"退款订单.xlsx";
+            //store in memory rather than pysical directory
+            var stream = new MemoryStream();
+            stream.Position = 0;
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         /// <summary>
