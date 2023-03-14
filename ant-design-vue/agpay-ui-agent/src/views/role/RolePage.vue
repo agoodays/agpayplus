@@ -12,11 +12,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_UR_ROLE_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         ref="infoTable"
@@ -27,6 +24,11 @@
         @btnLoadClose="btnLoading=false"
         rowKey="roleName"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_UR_ROLE_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="roleIdSlot" slot-scope="{record}"><b>{{ record.roleId }}</b></template> <!-- 自定义插槽 -->
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>

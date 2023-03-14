@@ -27,11 +27,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_MCH_INFO_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -42,6 +39,11 @@
         :searchData="searchData"
         rowKey="mchNo"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_MCH_INFO_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="mchNameSlot" slot-scope="{record}">
           <b v-if="!$access('ENT_MCH_INFO_VIEW')">{{ record.mchName }}</b>
           <a v-if="$access('ENT_MCH_INFO_VIEW')" @click="detailFunc(record.mchNo)"><b>{{ record.mchName }}</b></a>

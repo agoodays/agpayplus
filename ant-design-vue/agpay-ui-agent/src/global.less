@@ -140,6 +140,14 @@ ul, ol {
 ::-webkit-scrollbar-thumb:active {
   background: #8C8C8C;
 }
+
+// 添加外边框
+.ant-table {
+  border: 1px solid #e8e8e8;
+  border-bottom: 0;
+  border-radius: 4px;
+}
+
 // 结合 表格组件中的 :scroll ，让表格在收缩时，展示滚动条
 .ant-table-body{
   overflow-x: auto !important;
@@ -196,9 +204,8 @@ ul, ol {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   padding: 30px 30px 0;
-  border-bottom: 1px solid #e8e8e8;
-  // background: #fff;
-  background: #fafafa;
+  //border-bottom: 1px solid #e8e8e8;
+  //background: #fafafa;
 
   .ant-form-inline {
     .ant-form-item {
@@ -265,7 +272,7 @@ ul, ol {
 }
 // 增加内容区域的边框圆角
 .ant-card {
-  border-radius: 10px;
+  border-radius: 10px!important;
   overflow: hidden;
 }
 
@@ -333,6 +340,7 @@ ul, ol {
   display: flex;
   justify-content: start;
   flex-wrap: wrap;
+
   .table-layer {
    display: flex;
     flex-wrap: wrap;
@@ -340,6 +348,7 @@ ul, ol {
     flex-shrink: 1;
   }
 }
+
 .table-head-layout {
   min-width: 220px;
   max-width: 240px;
@@ -348,7 +357,6 @@ ul, ol {
   margin-bottom: 30px !important;
   margin-right: 16px !important;
 }
-
 
 // 404 500 403
 .result-err {
@@ -359,6 +367,7 @@ ul, ol {
   height: 100vh;
   width: 100%;
   overflow: auto;
+
   div {
     margin: 20px 0;
     text-align:center;
@@ -368,5 +377,55 @@ ul, ol {
       font-weight: 700;
     }
   }
+}
 
+.split-line {
+  border-bottom: 1px solid #ebeff2;
+  position: relative;
+  -webkit-touch-callout: none;
+  user-select: none;
+
+  .btns {
+    width: 100px;
+    height: 34px;
+    cursor: pointer;
+    border: 1px solid #ebeff2;
+    border-radius: 5px;
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+    top: 50%;
+    margin-top: -17px;
+    background-color: #fff;
+    font-size: 12px;
+
+    div {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      color: #79807e;
+
+      i {
+        display: inline-block;
+        margin-left: 5px
+      }
+    }
+  }
+
+  .btns:before {
+    content: "";
+    position: absolute;
+    width: calc(100% + 2px);
+    height: 50%;
+    background-color: #fff;
+    top: -1px;
+    left: -1px;
+    z-index: 1
+  }
 }

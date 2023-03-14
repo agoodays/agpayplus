@@ -34,6 +34,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string MchNo { get; set; }
 
         /// <summary>
+        /// 代理商号
+        /// </summary>
+        public string AgentNo { get; set; }
+
+        /// <summary>
         /// 服务商号
         /// </summary>
         public string IsvNo { get; set; }

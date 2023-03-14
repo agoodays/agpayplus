@@ -114,7 +114,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                                 value = Convert.ToString(value);
                                 break;
                         }
-                        worksheet.Cells[i + 3, Col: j + 1].Value = value;
+                        worksheet.Cells[i + 3, j + 1].Value = value;
                     }
                 }
                 //// 全局样式

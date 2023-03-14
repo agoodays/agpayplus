@@ -14,6 +14,16 @@ export const req = {
     return request.request({ url: url, method: 'GET', params: params }, true, true, false)
   },
 
+  // 通用列表查询统计接口
+  count: (url, params) => {
+    return request.request({ url: url + '/count', method: 'GET', params: params }, true, true, false)
+  },
+
+  // 通用列表数据导出接口
+  export: (url, bizType, params) => {
+    return request.request({ url: url + '/export/' + bizType, method: 'GET', params: params, responseType: 'blob' }, true, true, false)
+  },
+
   // 通用新增接口
   add: (url, data) => {
     return request.request({ url: url, method: 'POST', data: data }, true, true, false)

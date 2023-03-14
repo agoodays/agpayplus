@@ -4,8 +4,9 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
+            <a-form-item label="" class="table-head-layout">
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+<!--              <a-range-picker
                 @change="onChange"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
@@ -20,7 +21,7 @@
                 }"
               >
                 <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
 <!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
@@ -28,7 +29,7 @@
             <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
             <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
             <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <a-form-item v-if="$access('ENT_PAY_ORDER_SEARCH_PAY_WAY')" label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore && $access('ENT_PAY_ORDER_SEARCH_PAY_WAY')" label="" class="table-head-layout">
               <a-select v-model="searchData.wayCode" placeholder="支付方式" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option :key="item.wayCode" v-for="item in payWayList" :value="item.wayCode">
@@ -36,7 +37,7 @@
                 </a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="支付状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">订单生成</a-select-option>
@@ -48,14 +49,14 @@
                 <a-select-option value="6">订单关闭</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.notifyState" placeholder="回调状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">未发送</a-select-option>
                 <a-select-option value="1">已发送</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.divisionState" placeholder="分账状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">未发生分账</a-select-option>
@@ -71,18 +72,78 @@
           </div>
         </a-form>
       </div>
-
+      <div class="split-line">
+        <div class="btns" @click="isShowMore = !isShowMore">
+          <div>
+            {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
+          </div>
+        </div>
+      </div>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
+        :autoRefresh="true"
+        :isShowAutoRefresh="true"
+        :isShowDownload="true"
+        :isEnableDataStatistics="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
         rowKey="payOrderId"
         :tableRowCrossColor="true"
       >
+        <template slot="dataStatisticsSlot">
+          <div class="data-statistics" style="background: rgb(250, 250, 250);">
+            <div class="statistics-list">
+              <div class="item">
+                <div class="title">实际收款金额</div>
+                <div class="amount" style="color: rgb(26, 102, 255);">
+                  <span class="amount-num">{{ (countData.payAmount-countData.mchFeeAmount).toFixed(2) }}</span>元
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">成交订单</div>
+                <div class="amount">
+                  <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>元
+                </div>
+                <div class="detail">
+                  <span>{{ countData.payCount }}笔</span>
+                  <span class="detail-text" @click="detailVisible = true">明细</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">手续费金额</div>
+                <div class="amount">
+                  <span class="amount-num">{{ countData.mchFeeAmount.toFixed(2) }}</span>元
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">退款订单</div>
+                <div class="amount" style="color: rgb(250, 173, 20);">
+                  <span class="amount-num">{{ countData.refundAmount.toFixed(2) }}</span>元
+                </div>
+                <div class="detail">
+                  <span>{{ countData.refundCount }}笔</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.amount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundAmountSlot" slot-scope="{record}">￥{{ record.refundAmount/100 }}</template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
@@ -138,6 +199,60 @@
     </a-card>
     <!-- 退款弹出框 -->
     <refund-modal ref="refundModalInfo" :callbackFunc="searchFunc"></refund-modal>
+    <!-- 成交订单详细 -->
+    <a-modal :visible="detailVisible" footer="" @cancel="detailVisible = false">
+      <div class="modal-title">成交订单详细</div>
+      <div class="modal-describe">创建订单金额/笔数 = 成交订单金额/笔数 + 未付款订单金额/笔数</div>
+      <div class="statistics-list" style="padding-bottom: 55px;">
+        <div class="item">
+          <div class="title">创建订单</div>
+          <div class="amount">
+            <span>
+              <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
+              <span>元</span>
+            </span>
+          </div>
+          <div class="detail">
+            <span>{{ countData.allPayCount }}笔</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="line"></div>
+          <div class="title"></div>
+        </div>
+        <div class="item">
+          <div class="title">成交订单</div>
+          <div class="amount">
+            <span>
+              <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
+              <span>元</span>
+            </span>
+          </div>
+          <div class="detail">
+            <span>{{ countData.payCount }}笔</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="line"></div>
+          <div class="title"></div>
+        </div>
+        <div class="item">
+          <div class="title">未付款订单</div>
+          <div class="amount">
+            <span>
+              <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
+              <span>元</span>
+            </span>
+          </div>
+          <div class="detail">
+            <span>{{ countData.failPayCount }}笔</span>
+          </div>
+        </div>
+      </div>
+      <div class="close">
+        <a-button type="primary" @click="detailVisible = false">知道了</a-button>
+      </div>
+    </a-modal>
     <!-- 日志详情抽屉 -->
     <template>
       <a-drawer
@@ -412,6 +527,7 @@
 </template>
 <script>
 import RefundModal from './RefundModal' // 退款弹出框
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
@@ -437,15 +553,30 @@ const tableColumns = [
 
 export default {
   name: 'IsvListPage',
-  components: { AgTable, AgTableColumns, AgTextUp, RefundModal },
+  components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, RefundModal },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {},
+      searchData: {
+        queryDateRange: 'today'
+      },
+      countData: {
+        mchFeeAmount: 0.00,
+        failPayAmount: 0.00,
+        failPayCount: 0,
+        refundCount: 0,
+        allPayAmount: 0.00,
+        allPayCount: 0,
+        payAmount: 0.00,
+        payCount: 0,
+        refundAmount: 0.00
+      },
       createdStart: '', // 选择开始时间
       createdEnd: '', // 选择结束时间
       visible: false,
+      detailVisible: false,
       detailData: {},
       payWayList: []
     }
@@ -456,20 +587,51 @@ export default {
     if (this.$access('ENT_PAY_ORDER_SEARCH_PAY_WAY')) {
       this.initPayWay()
     }
+    this.countFunc()
   },
   methods: {
     queryFunc () {
       this.btnLoading = true
+      this.countFunc()
       this.$refs.infoTable.refTable(true)
     },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_PAY_ORDER_LIST, params)
     },
+    reqDownloadDataFunc: (params) => {
+      req.export(API_URL_PAY_ORDER_LIST, 'excel', params).then(res => {
+        // 将响应体中的二进制数据转换为Blob对象
+        const blob = new Blob([res])
+        const fileName = '订单列表.xlsx' // 要保存的文件名称
+        if ('download' in document.createElement('a')) {
+          // 非IE下载
+          // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
+          const elink = document.createElement('a')
+          elink.download = fileName
+          elink.style.display = 'none'
+          elink.href = URL.createObjectURL(blob) // 创建URL.createObjectURL(blob) URL，并将其赋值给a标签的href属性
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href) // 释放URL 对象
+          document.body.removeChild(elink)
+        } else {
+          // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
+      }).catch((error) => {
+        console.error(error)
+      })
+    },
     searchFunc: function () { // 点击【查询】按钮点击事件
       this.$refs.infoTable.refTable(true)
     },
-
+    countFunc: function () {
+      const that = this
+      req.count(API_URL_PAY_ORDER_LIST, this.searchData).then(res => {
+        that.countData = res
+      })
+    },
     // 打开退款弹出框
     openFunc (record, recordId) {
       if (record.refundState === 2) {
@@ -509,24 +671,93 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.order-list {
-  -webkit-text-size-adjust:none;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
+  .order-list {
+    -webkit-text-size-adjust:none;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
 
-  p {
-    white-space:nowrap;
-    span {
-      display: inline-block;
-      font-weight: 800;
-      height: 16px;
-      line-height: 16px;
-      width: 35px;
-      border-radius: 5px;
-      text-align: center;
-      margin-right: 2px;
+    p {
+      white-space:nowrap;
+      span {
+        display: inline-block;
+        font-weight: 800;
+        height: 16px;
+        line-height: 16px;
+        width: 35px;
+        border-radius: 5px;
+        text-align: center;
+        margin-right: 2px;
+      }
     }
   }
-}
+
+  .modal-title,.modal-describe {
+    text-align: center;
+    margin-bottom: 15px
+  }
+
+  .modal-title {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600
+  }
+
+  .close {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #EFEFEF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0
+  }
+
+  .data-statistics {
+    margin: 0 30px 10px;
+    padding: 28px 0 32px;
+    border-radius: 3px;
+    border: 1px solid #ebebeb;
+    transform: translateY(-10px)
+  }
+
+  .statistics-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around
+  }
+
+  .statistics-list .item .title {
+    color: gray;
+    margin-bottom: 10px
+  }
+
+  .statistics-list .item .amount {
+    margin-bottom: 10px
+  }
+
+  .statistics-list .item .amount .amount-num {
+    padding-right: 3px;
+    font-weight: 600;
+    font-size: 20px
+  }
+
+  .statistics-list .item .symbol {
+    padding-right: 3px
+  }
+
+  .statistics-list .item .detail-text {
+    color: rgb(26, 102, 255);
+    padding-left: 5px;
+    cursor: pointer
+  }
+
+  .statistics-list .line {
+    width: 1px;
+    height: 100%;
+    border-right: 1px solid #efefef
+  }
 </style>

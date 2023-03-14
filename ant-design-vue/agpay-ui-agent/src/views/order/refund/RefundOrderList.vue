@@ -4,8 +4,9 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
+            <a-form-item label="" class="table-head-layout">
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+<!--              <a-range-picker
                 @change="onChange"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
@@ -20,7 +21,7 @@
                 }"
               >
                 <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
 <!--            <ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
@@ -29,7 +30,7 @@
             <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
             <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
             <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="退款状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">订单生成</a-select-option>
@@ -38,7 +39,7 @@
                 <a-select-option value="3">退款失败</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="" class="table-head-layout">
+            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
               <a-select v-model="searchData.mchType" placeholder="商户类型" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="1">普通商户</a-select-option>
@@ -53,13 +54,23 @@
           </div>
         </a-form>
       </div>
-
+      <div class="split-line">
+        <div class="btns" @click="isShowMore = !isShowMore">
+          <div>
+            {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
+          </div>
+        </div>
+      </div>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
+        :autoRefresh="true"
+        :isShowAutoRefresh="true"
+        :isShowDownload="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
         rowKey="refundOrderId"
@@ -327,6 +338,7 @@
 </template>
 <script>
   import AgTable from '@/components/AgTable/AgTable'
+  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
   import AgTableColumns from '@/components/AgTable/AgTableColumns'
   import { API_URL_REFUND_ORDER_LIST, req } from '@/api/manage'
@@ -347,12 +359,15 @@
 
   export default {
     name: 'IsvListPage',
-    components: { AgTable, AgTableColumns, AgTextUp },
+    components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
     data () {
       return {
+        isShowMore: false,
         btnLoading: false,
         tableColumns: tableColumns,
-        searchData: {},
+        searchData: {
+          queryDateRange: 'today'
+        },
         selectedIds: [], // 选中的数据
         createdStart: '', // 选择开始时间
         createdEnd: '', // 选择结束时间
@@ -372,6 +387,30 @@
       // 请求table接口数据
       reqTableDataFunc: (params) => {
         return req.list(API_URL_REFUND_ORDER_LIST, params)
+      },
+      reqDownloadDataFunc: (params) => {
+        req.export(API_URL_REFUND_ORDER_LIST, 'excel', params).then(res => {
+          // 将响应体中的二进制数据转换为Blob对象
+          const blob = new Blob([res])
+          const fileName = '退款订单.xlsx' // 要保存的文件名称
+          if ('download' in document.createElement('a')) {
+            // 非IE下载
+            // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
+            const elink = document.createElement('a')
+            elink.download = fileName
+            elink.style.display = 'none'
+            elink.href = URL.createObjectURL(blob) // 创建URL.createObjectURL(blob) URL，并将其赋值给a标签的href属性
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href) // 释放URL 对象
+            document.body.removeChild(elink)
+          } else {
+            // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        }).catch((error) => {
+          console.error(error)
+        })
       },
       searchFunc: function () { // 点击【查询】按钮点击事件
         this.$refs.infoTable.refTable(true)

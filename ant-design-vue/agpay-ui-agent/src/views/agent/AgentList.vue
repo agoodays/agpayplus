@@ -23,11 +23,8 @@
               </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_AGENT_INFO_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
           @btnLoadClose="btnLoading=false"
@@ -38,6 +35,11 @@
           :searchData="searchData"
           rowKey="agentNo"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_AGENT_INFO_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="agentNameSlot" slot-scope="{record}">
           <b v-if="!$access('ENT_AGENT_INFO_VIEW')">{{ record.agentName }}</b>
           <a v-if="$access('ENT_AGENT_INFO_VIEW')" @click="detailFunc(record.agentNo)"><b>{{ record.agentName }}</b></a>

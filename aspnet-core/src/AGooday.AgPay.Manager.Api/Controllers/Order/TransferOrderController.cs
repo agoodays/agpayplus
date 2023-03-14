@@ -90,7 +90,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 // 固定前两行，第一列，`FreezePanes()`方法的第一个参数设置为3，表示从第三行开始向下滚动时会被冻结，第二个参数设置为3，表示从第二行开始向右滚动时会被冻结
                 worksheet.View.FreezePanes(3, 2);
                 // 将每个订单添加到工作表中
-                // 将每个订单添加到工作表中
                 for (int i = 0; i < transferOrders.Count(); i++)
                 {
                     var transferOrder = transferOrders[i];
@@ -111,7 +110,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                                 value = Convert.ToString(value);
                                 break;
                         }
-                        worksheet.Cells[i + 3, Col: j + 1].Value = value;
+                        worksheet.Cells[i + 3, j + 1].Value = value;
                     }
                 }
                 //// 全局样式
