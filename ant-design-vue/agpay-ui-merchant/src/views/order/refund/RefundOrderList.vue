@@ -5,7 +5,8 @@
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
             <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+<!--              <a-range-picker
                 @change="onChange"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
@@ -20,7 +21,7 @@
                 }"
               >
                 <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
 <!--            <ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
@@ -45,16 +46,25 @@
           </div>
         </a-form>
       </div>
-
+      <div class="split-line">
+<!--        <div class="btns" @click="isShowMore = !isShowMore">
+          <div>
+            {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
+          </div>
+        </div>-->
+      </div>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
         :initData="true"
-        :closable="true"
-        :searchData="searchData"
+        :autoRefresh="true"
+        :isShowAutoRefresh="true"
+        :isShowDownload="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
+        :searchData="searchData"
         rowKey="refundOrderId"
         :tableRowCrossColor="true"
       >
@@ -320,6 +330,7 @@
   </page-header-wrapper>
 </template>
 <script>
+  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
   import AgTable from '@/components/AgTable/AgTable'
   import AgTableColumns from '@/components/AgTable/AgTableColumns'
@@ -332,10 +343,10 @@
     { key: 'refundAmount', title: '退款金额', scopedSlots: { customRender: 'refundAmountSlot' } },
     { key: 'pay', title: '退款订单号', scopedSlots: { customRender: 'refundOrderSlot' }, width: '260px' },
     { key: 'refund', title: '支付订单号', scopedSlots: { customRender: 'payOrderSlot' }, width: '260px' },
-    // { key: 'refundOrderId', title: '退款订单号', dataIndex: 'refundOrderId' },
-    // { key: 'mchRefundNo', title: '商户退款单号', dataIndex: 'mchRefundNo' },
-    // { key: 'payOrderId', title: '支付订单号', dataIndex: 'payOrderId' },
-    // { key: 'channelPayOrderNo', title: '渠道订单号', dataIndex: 'channelPayOrderNo' },
+    // { key: 'refundOrderId', dataIndex: 'refundOrderId', title: '退款订单号' },
+    // { key: 'mchRefundNo', dataIndex: 'mchRefundNo', title: '商户退款单号' },
+    // { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
+    // { key: 'channelPayOrderNo', dataIndex: 'channelPayOrderNo', title: '渠道订单号' },
     { key: 'state', title: '支付状态', scopedSlots: { customRender: 'stateSlot' } },
     { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
     { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
@@ -343,12 +354,15 @@
 
   export default {
     name: 'IsvListPage',
-    components: { AgTable, AgTableColumns, AgTextUp },
+    components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
     data () {
       return {
+        isShowMore: false,
         btnLoading: false,
         tableColumns: tableColumns,
-        searchData: {},
+        searchData: {
+          queryDateRange: 'today'
+        },
         createdStart: '', // 选择开始时间
         createdEnd: '', // 选择结束时间
         visible: false,
@@ -367,6 +381,30 @@
       // 请求table接口数据
       reqTableDataFunc: (params) => {
         return req.list(API_URL_REFUND_ORDER_LIST, params)
+      },
+      reqDownloadDataFunc: (params) => {
+        req.export(API_URL_REFUND_ORDER_LIST, 'excel', params).then(res => {
+          // 将响应体中的二进制数据转换为Blob对象
+          const blob = new Blob([res])
+          const fileName = '退款订单.xlsx' // 要保存的文件名称
+          if ('download' in document.createElement('a')) {
+            // 非IE下载
+            // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
+            const elink = document.createElement('a')
+            elink.download = fileName
+            elink.style.display = 'none'
+            elink.href = URL.createObjectURL(blob) // 创建URL.createObjectURL(blob) URL，并将其赋值给a标签的href属性
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href) // 释放URL 对象
+            document.body.removeChild(elink)
+          } else {
+            // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        }).catch((error) => {
+          console.error(error)
+        })
       },
       searchFunc: function () { // 点击【查询】按钮点击事件
         this.$refs.infoTable.refTable(true)

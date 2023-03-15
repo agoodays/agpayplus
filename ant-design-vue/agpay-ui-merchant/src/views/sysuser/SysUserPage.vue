@@ -3,7 +3,6 @@
     <a-card>
       <div v-if="$access('ENT_UR_USER_SEARCH')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
-
           <div class="table-layer">
             <ag-text-up :placeholder="'用户ID'" :msg="searchData.sysUserId" v-model="searchData.sysUserId" />
             <ag-text-up :placeholder="'用户姓名'" :msg="searchData.realname" v-model="searchData.realname" />
@@ -20,14 +19,9 @@
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
             </span>
           </div>
-
         </a-form>
-
-        <div>
-          <a-button v-if="$access('ENT_UR_USER_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -38,6 +32,11 @@
         :searchData="searchData"
         rowKey="sysUserId"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_UR_USER_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
 
         <template slot="avatarSlot" slot-scope="{record}">
           <a-avatar size="default" :src="record.avatarUrl" />
@@ -91,26 +90,19 @@ import InviteCode from './InviteCode'
 import RoleDist from './RoleDist'
 
 const tableColumns = [
-  { title: '头像', fixed: 'left', width: 60, scopedSlots: { customRender: 'avatarSlot' } },
-  { title: '姓名', fixed: 'left', width: 120, dataIndex: 'realname' },
-  { title: '用户ID', fixed: 'left', width: 120, dataIndex: 'sysUserId' },
-  { title: '性别', dataIndex: 'sex', customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
-  { title: '编号', dataIndex: 'userNo' },
-  { title: '手机号', dataIndex: 'telphone' },
-  { title: '超管', dataIndex: 'isAdmin', customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
-  { title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
-  { title: '邀请码', width: 120, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
-  { title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
-  { title: '创建时间', dataIndex: 'createdAt' },
-  { title: '修改时间', dataIndex: 'updatedAt' },
-  {
-    key: 'op',
-    title: '操作',
-    width: '200px',
-    fixed: 'right',
-    align: 'center',
-    scopedSlots: { customRender: 'opSlot' }
-  }
+  { key: 'avatar', title: '头像', fixed: 'left', width: 65, scopedSlots: { customRender: 'avatarSlot' } },
+  { key: 'realname', dataIndex: 'realname', title: '姓名', fixed: 'left', width: 120 },
+  { key: 'sysUserId', dataIndex: 'sysUserId', title: '用户ID', fixed: 'left', width: 120 },
+  { key: 'sex', dataIndex: 'sex', title: '性别', width: 65, customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
+  { key: 'userNo', dataIndex: 'userNo', title: '编号', width: 120 },
+  { key: 'telphone', dataIndex: 'telphone', title: '手机号', width: 160 },
+  { key: 'isAdmin', dataIndex: 'isAdmin', title: '超管', width: 65, customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
+  { key: 'userType', title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
+  { key: 'inviteCode', title: '邀请码', width: 120, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
+  { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
+  { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
+  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 const userTypeList = [

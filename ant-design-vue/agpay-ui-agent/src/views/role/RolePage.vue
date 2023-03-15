@@ -63,8 +63,8 @@ const tableColumns = [
   },
   {
     key: 'roleName',
-    title: '角色名称',
     dataIndex: 'roleName',
+    title: '角色名称',
     sorter: true
   },
   {

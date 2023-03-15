@@ -12,11 +12,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_MCH_STORE_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -27,6 +24,11 @@
         :searchData="searchData"
         rowKey="storeId"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_MCH_STORE_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="storeNameSlot" slot-scope="{record}">
           <b v-if="!$access('ENT_MCH_STORE_VIEW')">{{ record.storeName }}</b>
           <a v-if="$access('ENT_MCH_STORE_VIEW')" @click="detailFunc(record.storeId)"><b>{{ record.storeName }}</b></a>
@@ -59,9 +61,9 @@ import InfoDetail from './Detail'
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'storeName', fixed: 'left', width: '200px', title: '门店名称', scopedSlots: { customRender: 'storeNameSlot' } },
-  { key: 'storeId', title: '门店编号', width: '140px', dataIndex: 'storeId' },
+  { key: 'storeId', dataIndex: 'storeId', title: '门店编号', width: '140px' },
   { key: 'defaultFlag', title: '默认', width: '80px', scopedSlots: { customRender: 'defaultFlagSlot' } },
-  { key: 'bindAppId', title: 'AppId', width: '320px', dataIndex: 'bindAppId' },
+  { key: 'bindAppId', dataIndex: 'bindAppId', title: 'AppId', width: '320px' },
   { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]

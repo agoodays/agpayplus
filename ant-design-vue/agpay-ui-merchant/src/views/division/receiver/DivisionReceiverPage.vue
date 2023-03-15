@@ -32,11 +32,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_DIVISION_RECEIVER_ADD')" type="danger" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         ref="infoTable"
@@ -47,7 +44,11 @@
         @btnLoadClose="btnLoading=false"
         rowKey="receiverId"
       >
-
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_DIVISION_RECEIVER_ADD')" type="danger" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <!-- 渠道类型 -->
         <template slot="ifCodeSlot" slot-scope="{record}">
           <template v-if="record.ifCode === 'wxpay'" ><span style="color: green"><a-icon type="wechat" /> 微信</span></template>
@@ -96,7 +97,7 @@ const tableColumns = [
   { key: 'accNo', dataIndex: 'accNo', title: '分账接收账号' },
   { key: 'accName', dataIndex: 'accName', title: '分账接收账号名称' },
   { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '分账关系类型' },
-  { title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'state', dataIndex: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
   { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间' },
   { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
   { key: 'op', title: '操作', width: '200px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }

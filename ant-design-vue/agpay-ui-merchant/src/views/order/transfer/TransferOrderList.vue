@@ -4,8 +4,9 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
+            <a-form-item label="" class="table-head-layout">
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+<!--              <a-range-picker
                 @change="onChange"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
@@ -20,7 +21,7 @@
                 }"
               >
                 <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'转账/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
 <!--            <ag-text-up :placeholder="'转账订单号'" :msg="searchData.transferId" v-model="searchData.transferId" />-->
@@ -43,7 +44,7 @@
           </div>
         </a-form>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -104,6 +105,7 @@
 </template>
 <script>
   import AgTable from '@/components/AgTable/AgTable'
+  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
   import AgTableColumns from '@/components/AgTable/AgTableColumns'
   import TransferOrderDetail from './TransferOrderDetail'
@@ -112,27 +114,29 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { title: '转账金额', scopedSlots: { customRender: 'transferAmountSlot' } },
+    { key: 'amount', title: '转账金额', scopedSlots: { customRender: 'transferAmountSlot' } },
     { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 260 },
-    // { title: '转账订单号', dataIndex: 'transferId' },
-    // { title: '商户转账单号', dataIndex: 'mchOrderNo' },
-    // { title: '渠道订单号', dataIndex: 'channelOrderNo' },
-    { title: '收款账号', dataIndex: 'accountNo', width: 200 },
-    { title: '收款人姓名', dataIndex: 'accountName' },
-    { title: '转账备注', dataIndex: 'transferDesc' },
-    { title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
-    { title: '创建日期', dataIndex: 'createdAt' },
-    { title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+    // { key: 'transferId', dataIndex: 'transferId', title: '转账订单号' },
+    // { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户转账单号' },
+    // { key: 'channelOrderNo', dataIndex: 'channelOrderNo', title: '渠道订单号' },
+    { key: 'accountNo', dataIndex: 'accountNo', title: '收款账号', width: 200 },
+    { key: 'accountName', dataIndex: 'accountName', title: '收款人姓名' },
+    { key: 'transferDesc', dataIndex: 'transferDesc', title: '转账备注' },
+    { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
+    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
+    { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
   ]
 
   export default {
     name: 'IsvListPage',
-    components: { AgTable, AgTableColumns, AgTextUp, TransferOrderDetail },
+    components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, TransferOrderDetail },
     data () {
       return {
         btnLoading: false,
         tableColumns: tableColumns,
-        searchData: {},
+        searchData: {
+          queryDateRange: 'today'
+        },
         createdStart: '', // 选择开始时间
         createdEnd: '' // 选择结束时间
       }
@@ -145,6 +149,30 @@
       // 请求table接口数据
       reqTableDataFunc: (params) => {
         return req.list(API_URL_TRANSFER_ORDER_LIST, params)
+      },
+      reqDownloadDataFunc: (params) => {
+        req.export(API_URL_TRANSFER_ORDER_LIST, 'excel', params).then(res => {
+          // 将响应体中的二进制数据转换为Blob对象
+          const blob = new Blob([res])
+          const fileName = '转账订单.xlsx' // 要保存的文件名称
+          if ('download' in document.createElement('a')) {
+            // 非IE下载
+            // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
+            const elink = document.createElement('a')
+            elink.download = fileName
+            elink.style.display = 'none'
+            elink.href = URL.createObjectURL(blob) // 创建URL.createObjectURL(blob) URL，并将其赋值给a标签的href属性
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href) // 释放URL 对象
+            document.body.removeChild(elink)
+          } else {
+            // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        }).catch((error) => {
+          console.error(error)
+        })
       },
       searchFunc: function () { // 点击【查询】按钮点击事件
         this.$refs.infoTable.refTable(true)

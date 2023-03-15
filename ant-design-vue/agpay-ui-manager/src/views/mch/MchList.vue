@@ -82,10 +82,10 @@ import InfoDetail from './Detail'
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'mchName', fixed: 'left', width: '200px', title: '商户名称', scopedSlots: { customRender: 'mchNameSlot' } },
-  { key: 'mchNo', title: '商户号', width: '140px', dataIndex: 'mchNo' },
-  { key: 'contactTel', title: '手机号', width: '140px', dataIndex: 'contactTel' },
-  { key: 'agentNo', title: '代理商号', width: '140px', dataIndex: 'agentNo' },
-  { key: 'isvNo', title: '服务商号', width: '140px', dataIndex: 'isvNo' },
+  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: '140px' },
+  { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: '140px' },
+  { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: '140px' },
+  { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: '140px' },
   { key: 'state', title: '状态', width: '80px', scopedSlots: { customRender: 'stateSlot' } },
   { key: 'type', title: '商户类型', width: '100px', scopedSlots: { customRender: 'typeSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },

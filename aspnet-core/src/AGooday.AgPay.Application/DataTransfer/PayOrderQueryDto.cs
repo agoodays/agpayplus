@@ -40,6 +40,16 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string AppId { get; set; }
 
         /// <summary>
+        /// 门店ID
+        /// </summary>
+        public string StoreId { get; set; }
+
+        /// <summary>
+        /// 门店名称
+        /// </summary>
+        public string StoreName { get; set; }
+
+        /// <summary>
         /// 商户名称
         /// </summary>
         [BindNever]

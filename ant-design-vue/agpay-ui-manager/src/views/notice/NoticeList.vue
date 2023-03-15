@@ -73,10 +73,10 @@ import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'articleId', fixed: 'left', width: '80px', title: '公告ID', dataIndex: 'articleId' },
-  { key: 'title', title: '公告标题', width: '200px', dataIndex: 'title' },
-  { key: 'subtitle', title: '公告副标题', width: '200px', dataIndex: 'subtitle' },
-  { key: 'publisher', title: '发布人', width: '120px', dataIndex: 'publisher' },
+  { key: 'articleId', dataIndex: 'articleId', fixed: 'left', width: '80px', title: '公告ID' },
+  { key: 'title', dataIndex: 'title', title: '公告标题', width: '200px' },
+  { key: 'subtitle', dataIndex: 'subtitle', title: '公告副标题', width: '200px' },
+  { key: 'publisher', dataIndex: 'publisher', title: '发布人', width: '120px' },
   { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]

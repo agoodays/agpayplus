@@ -60,8 +60,8 @@ const tableColumns = [
   },
   {
     key: 'wayName',
-    title: '支付方式名称',
-    dataIndex: 'wayName'
+    dataIndex: 'wayName',
+    title: '支付方式名称'
   },
   {
     key: 'op',

@@ -3,9 +3,7 @@
     <a-card>
       <div v-if="$access('ENT_DIVISION_RECEIVER_GROUP_LIST')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
-          <div
-              class="table-layer"
-          >
+          <div class="table-layer">
             <ag-text-up :placeholder="'组ID'" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
             <ag-text-up :placeholder="'组名称'" :msg="searchData.receiverGroupName" v-model="searchData.receiverGroupName" />
             <span class="table-page-search-submitButtons">
@@ -14,21 +12,23 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_DIVISION_RECEIVER_GROUP_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
-          ref="infoTable"
-          :initData="true"
-          :reqTableDataFunc="reqTableDataFunc"
-          :tableColumns="tableColumns"
-          :searchData="searchData"
-          @btnLoadClose="btnLoading=false"
-          rowKey="receiverGroupId"
+        ref="infoTable"
+        :initData="true"
+        :reqTableDataFunc="reqTableDataFunc"
+        :tableColumns="tableColumns"
+        :searchData="searchData"
+        @btnLoadClose="btnLoading=false"
+        rowKey="receiverGroupId"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_DIVISION_RECEIVER_GROUP_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a v-if="$access('ENT_DIVISION_RECEIVER_GROUP_EDIT')" @click="editFunc(record.receiverGroupId)">修改</a>

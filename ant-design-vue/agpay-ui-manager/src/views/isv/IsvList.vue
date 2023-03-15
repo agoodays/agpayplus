@@ -66,7 +66,7 @@ import IsvPayIfConfigList from './IsvPayIfConfigList'
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'isvName', width: '200px', title: '服务商名称', fixed: 'left', scopedSlots: { customRender: 'isvNameSlot' } },
-  { key: 'isvNo', title: '服务商号', width: '140px', dataIndex: 'isvNo' },
+  { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: '140px' },
   { key: 'state', title: '服务商状态', width: '140px', scopedSlots: { customRender: 'stateSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }

@@ -121,13 +121,13 @@
   const tableColumns = [
     { key: 'transferId', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 260, fixed: 'left' },
     { key: 'amount', title: '转账金额', scopedSlots: { customRender: 'transferAmountSlot' }, width: 110 },
-    { key: 'mchName', title: '商户名称', dataIndex: 'mchName', width: 130 },
-    // { key: 'channelOrderNo', title: '渠道订单号', dataIndex: 'channelOrderNo' },
-    { key: 'accountNo', title: '收款账号', dataIndex: 'accountNo', width: 200 },
-    { key: 'accountName', title: '收款人姓名', dataIndex: 'accountName', width: 120 },
-    { key: 'transferDesc', title: '转账备注', dataIndex: 'transferDesc', width: 150 },
+    { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 130 },
+    // { key: 'channelOrderNo', dataIndex: 'channelOrderNo', title: '渠道订单号' },
+    { key: 'accountNo', dataIndex: 'accountNo', title: '收款账号', width: 200 },
+    { key: 'accountName', dataIndex: 'accountName', title: '收款人姓名', width: 120 },
+    { key: 'transferDesc', dataIndex: 'transferDesc', title: '转账备注', width: 150 },
     { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
-    { key: 'createdAt', title: '创建日期', dataIndex: 'createdAt', width: 200 },
+    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
     { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
   ]
 

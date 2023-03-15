@@ -20,11 +20,8 @@
             </span>
           </div>
         </a-form>
-        <div>
-          <a-button v-if="$access('ENT_MCH_APP_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-        </div>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -35,6 +32,11 @@
         :searchData="searchData"
         rowKey="appId"
       >
+        <template slot="topLeftSlot">
+          <div>
+            <a-button v-if="$access('ENT_MCH_APP_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+          </div>
+        </template>
         <template slot="appIdSlot" slot-scope="{record}">
           <b>{{ record.appId }}</b>
         </template> <!-- 自定义插槽 -->
@@ -81,7 +83,7 @@ import MchPayIfConfigList from './MchPayIfConfigList'
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'appId', fixed: 'left', width: '320px', title: '应用AppId', scopedSlots: { customRender: 'appIdSlot' } },
-  { key: 'appName', title: '应用名称', dataIndex: 'appName' },
+  { key: 'appName', dataIndex: 'appName', title: '应用名称' },
   { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' } },
   { key: 'defaultFlag', title: '默认', width: '80px', scopedSlots: { customRender: 'defaultFlagSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },

@@ -73,9 +73,9 @@
 
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a v-if="$access('ENT_UR_USER_UPD_ROLE')" @click="roleDist(record.sysUserId)" >变更角色</a>
-            <a v-if="$access('ENT_UR_USER_EDIT')" @click="editFunc(record.sysUserId)">修改</a>
-            <a v-if="$access('ENT_UR_USER_DELETE')" style="color: red" @click="delFunc(record.sysUserId)">删除</a>
+            <a v-if="record.sysType === 'MGR' && $access('ENT_UR_USER_UPD_ROLE')" @click="roleDist(record.sysUserId)" >变更角色</a>
+            <a v-if="record.sysType === 'MGR' && $access('ENT_UR_USER_EDIT')" @click="editFunc(record.sysUserId)">修改</a>
+            <a v-if="record.sysType === 'MGR' && $access('ENT_UR_USER_DELETE')" style="color: red" @click="delFunc(record.sysUserId)">删除</a>
           </AgTableColumns>
         </template>
       </AgTable>
@@ -104,28 +104,21 @@ import RoleDist from './RoleDist'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 const tableColumns = [
-  { title: '头像', fixed: 'left', width: 60, scopedSlots: { customRender: 'avatarSlot' } },
-  { title: '姓名', fixed: 'left', width: 120, dataIndex: 'realname' },
-  { title: '用户ID', fixed: 'left', width: 120, dataIndex: 'sysUserId' },
-  { title: '性别', width: 60, dataIndex: 'sex', customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
-  { title: '编号', width: 120, dataIndex: 'userNo' },
-  { title: '手机号', width: 160, dataIndex: 'telphone' },
-  { title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
-  { title: '超管', width: 60, dataIndex: 'isAdmin', customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
-  { title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
-  { title: '团队', width: 160, dataIndex: 'teamName' },
-  { title: '邀请码', width: 120, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
-  { title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
-  { title: '创建时间', width: 200, dataIndex: 'createdAt' },
-  { title: '修改时间', width: 200, dataIndex: 'updatedAt' },
-  {
-    key: 'op',
-    title: '操作',
-    width: 200,
-    fixed: 'right',
-    align: 'center',
-    scopedSlots: { customRender: 'opSlot' }
-  }
+  { key: 'avatar', title: '头像', fixed: 'left', width: 65, scopedSlots: { customRender: 'avatarSlot' } },
+  { key: 'realname', dataIndex: 'realname', title: '姓名', fixed: 'left', width: 120 },
+  { key: 'sysUserId', dataIndex: 'sysUserId', title: '用户ID', fixed: 'left', width: 120 },
+  { key: 'sex', dataIndex: 'sex', title: '性别', width: 65, customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
+  { key: 'userNo', dataIndex: 'userNo', title: '编号', width: 120 },
+  { key: 'telphone', dataIndex: 'telphone', title: '手机号', width: 160 },
+  { key: 'sysType', title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
+  { key: 'isAdmin', dataIndex: 'isAdmin', title: '超管', width: 65, customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
+  { key: 'userType', title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
+  { key: 'teamName', dataIndex: 'teamName', title: '团队', width: 160 },
+  { key: 'inviteCode', title: '邀请码', width: 120, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
+  { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
+  { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
+  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 const userTypeList = [

@@ -73,16 +73,16 @@ import InfoDetail from './Detail'
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'agentName', fixed: 'left', width: '200px', title: '代理商名称', scopedSlots: { customRender: 'agentNameSlot' } },
-  { key: 'agentNo', width: '140px', title: '代理商号', dataIndex: 'agentNo' },
-  { key: 'contactTel', width: '140px', title: '手机号', dataIndex: 'contactTel' },
-  { key: 'level', width: '70px', title: '等级', dataIndex: 'level' },
-  { key: 'pid', width: '140px', title: '上级代理', dataIndex: 'pid' },
-  { key: 'isvNo', width: '140px', title: '服务商号', dataIndex: 'isvNo' },
-  { key: 'auditProfitAmount', width: '100px', title: '在途佣金', dataIndex: 'auditProfitAmount' },
-  { key: 'balanceAmount', width: '100px', title: '钱包余额', dataIndex: 'balanceAmount' },
-  { key: 'unAmount', width: '110px', title: '不可用金额', dataIndex: 'unAmount' },
+  { key: 'agentNo', dataIndex: 'agentNo', width: '140px', title: '代理商号' },
+  { key: 'contactTel', dataIndex: 'contactTel', width: '140px', title: '手机号' },
+  { key: 'level', dataIndex: 'level', width: '70px', title: '等级' },
+  { key: 'pid', dataIndex: 'pid', width: '140px', title: '上级代理' },
+  { key: 'isvNo', dataIndex: 'isvNo', width: '140px', title: '服务商号' },
+  { key: 'auditProfitAmount', dataIndex: 'auditProfitAmount', width: '100px', title: '在途佣金' },
+  { key: 'balanceAmount', dataIndex: 'balanceAmount', width: '100px', title: '钱包余额' },
+  { key: 'unAmount', dataIndex: 'unAmount', width: '110px', title: '不可用金额' },
   { key: 'state', title: '状态', width: '100px', scopedSlots: { customRender: 'stateSlot' } },
-  { key: 'createdAt', width: '200px', dataIndex: 'createdAt', title: '创建日期' },
+  { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 

@@ -53,16 +53,16 @@ import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import InfoAddOrEdit from './AddOrEdit'
 
 const tableColumns = [
-  { title: '资源权限ID', width: 360, dataIndex: 'entId' }, // key为必填项，用于标志该列的唯一
-  { title: '资源名称', width: 200, dataIndex: 'entName' },
-  { title: '图标', dataIndex: 'menuIcon' },
-  { title: '路径', dataIndex: 'menuUri' },
-  { title: '组件名称', dataIndex: 'componentName' },
-  { title: '类型', width: 60, dataIndex: 'entType' },
-  { title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
-  { title: '排序', width: 60, dataIndex: 'entSort' },
-  { title: '修改时间', width: 200, dataIndex: 'updatedAt' },
-  { title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'entId', dataIndex: 'entId', title: '资源权限ID', width: 360 }, // key为必填项，用于标志该列的唯一
+  { key: 'entName', dataIndex: 'entName', title: '资源名称', width: 200 },
+  { key: 'menuIcon', dataIndex: 'menuIcon', title: '图标' },
+  { key: 'menuUri', dataIndex: 'menuUri', title: '路径' },
+  { key: 'componentName', dataIndex: 'componentName', title: '组件名称' },
+  { key: 'entType', dataIndex: 'entType', title: '类型', width: 60 },
+  { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'entSort', dataIndex: 'entSort', title: '排序', width: 60 },
+  { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
+  { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

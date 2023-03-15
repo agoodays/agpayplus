@@ -36,7 +36,7 @@
           </div>
         </a-form>
       </div>
-
+      <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -80,15 +80,15 @@ import Detail from './Detail'
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'calDivisionAmount', title: '分账金额', scopedSlots: { customRender: 'amountSlot' } },
-  { key: 'batchOrderId', title: '分账批次号', dataIndex: 'batchOrderId' },
-  { key: 'payOrderId', title: '支付订单号', dataIndex: 'payOrderId' },
-  { key: 'ifCode', title: '接口代码', dataIndex: 'ifCode' },
+  { key: 'batchOrderId', dataIndex: 'batchOrderId', title: '分账批次号' },
+  { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
+  { key: 'ifCode', dataIndex: 'ifCode', title: '接口代码' },
   { key: 'payOrderAmount', dataIndex: 'payOrderAmount', title: '订单金额', customRender: (text) => (text / 100).toFixed(2) },
   { key: 'payOrderDivisionAmount', dataIndex: 'payOrderDivisionAmount', title: '分账基数', customRender: (text) => (text / 100).toFixed(2) },
-  { key: 'receiverAlias', title: '账号别名', dataIndex: 'receiverAlias' },
-  { key: 'accNo', title: '接收账号', dataIndex: 'accNo' },
-  { key: 'accName', title: '账号姓名', dataIndex: 'accName' },
-  { key: 'relationTypeName', title: '分账关系类型', dataIndex: 'relationTypeName' },
+  { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名' },
+  { key: 'accNo', dataIndex: 'accNo', title: '接收账号' },
+  { key: 'accName', dataIndex: 'accName', title: '账号姓名' },
+  { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '分账关系类型' },
   { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '分账比例', customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
   { key: 'state', title: '分账状态', scopedSlots: { customRender: 'stateSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },

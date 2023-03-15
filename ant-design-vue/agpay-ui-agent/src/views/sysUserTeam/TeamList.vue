@@ -57,9 +57,9 @@ import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'teamId', fixed: 'left', width: '80px', title: '团队ID', dataIndex: 'teamId' },
-  { key: 'teamName', title: '团队名称', width: '200px', dataIndex: 'teamName' },
-  { key: 'teamNo', title: '团队编号', width: '140px', dataIndex: 'teamNo' },
+  { key: 'teamId', dataIndex: 'teamId', fixed: 'left', width: '80px', title: '团队ID' },
+  { key: 'teamName', dataIndex: 'teamName', title: '团队名称', width: '200px' },
+  { key: 'teamNo', dataIndex: 'teamNo', title: '团队编号', width: '140px' },
   { key: 'statRangeType', title: '统计周期', width: '120px', scopedSlots: { customRender: 'statRangeTypeSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }

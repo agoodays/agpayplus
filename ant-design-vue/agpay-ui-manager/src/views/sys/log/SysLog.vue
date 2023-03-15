@@ -169,11 +169,11 @@ import { message, Modal } from 'ant-design-vue'
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'userName', width: 120, title: '用户名', fixed: 'left', scopedSlots: { customRender: 'userNameSlot' } },
-  { key: 'userId', width: 120, title: '用户ID', dataIndex: 'userId' },
-  { key: 'userIp', width: 120, title: '用户IP', dataIndex: 'userIp' },
+  { key: 'userId', dataIndex: 'userId', width: 120, title: '用户ID' },
+  { key: 'userIp', dataIndex: 'userIp', width: 120, title: '用户IP' },
   { key: 'sysType', width: 120, title: '所属系统', scopedSlots: { customRender: 'sysTypeSlot' } },
-  { key: 'methodRemark', width: 200, title: '操作描述', ellipsis: true, dataIndex: 'methodRemark' },
-  { key: 'createdAt', width: 200, dataIndex: 'createdAt', title: '创建日期' },
+  { key: 'methodRemark', dataIndex: 'methodRemark', width: 200, title: '操作描述', ellipsis: true },
+  { key: 'createdAt', dataIndex: 'createdAt', width: 200, title: '创建日期' },
   { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 

@@ -52,6 +52,10 @@ class HttpRequest {
 
       const resData = res.data // 接口实际返回数据 格式为：{code: '', msg: '', data: ''}， res.data 是axios封装对象的返回数据；
 
+      if (res.config.responseType) {
+        return resData
+      }
+
       if (resData.code !== 0) { // 相应结果不为0， 说明异常
         if (showErrorMsg) {
           Vue.prototype.$message.error(resData.msg) // 显示异常信息
