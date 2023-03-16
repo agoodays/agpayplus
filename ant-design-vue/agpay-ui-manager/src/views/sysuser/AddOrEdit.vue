@@ -228,8 +228,8 @@ export default {
       isShow: false, // 是否显示弹层/抽屉
       userTypeOptions: [
         { userTypeName: '超级管理员', userType: 1 },
-        { userTypeName: '普通操作员', userType: 2 },
-        { userTypeName: '商户拓展员', userType: 3 }// ,
+        { userTypeName: '普通操作员', userType: 2 } // ,
+        // { userTypeName: '商户拓展员', userType: 3 } // ,
         // { userTypeName: '店长', userType: 11 },
         // { userTypeName: '店员', userType: 12 }
       ],
@@ -272,6 +272,20 @@ export default {
       }
 
       this.isAdd = !recordId
+      sysType = sysType?.length > 0 ? sysType : 'MGR'
+      this.userTypeOptions = [
+        { userTypeName: '超级管理员', userType: 1 },
+        { userTypeName: '普通操作员', userType: 2 }
+      ]
+      if (sysType === 'MGR' || sysType === 'AGENT') {
+        this.userTypeOptions.push({ userTypeName: '商户拓展员', userType: 3 })
+      }
+
+      if (sysType === 'MCH') {
+        this.userTypeOptions.push({ userTypeName: '店长', userType: 11 })
+        this.userTypeOptions.push({ userTypeName: '店员', userType: 12 })
+      }
+
       // 数据恢复为默认数据
       this.saveObject = {
         isAdmin: 1,
@@ -295,7 +309,6 @@ export default {
         })
       }
 
-      sysType = sysType?.length > 0 ? sysType : 'MGR'
       const that = this
       req.list(API_URL_UR_TEAM_LIST, { pageSize: -1, sysType: sysType, belongInfoId: belongInfoId }).then(res => { // 用户团队下拉选择列表
         that.teamList = res.records
