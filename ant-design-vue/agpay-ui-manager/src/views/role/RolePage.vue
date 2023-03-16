@@ -4,6 +4,15 @@
       <div v-if="$access('ENT_UR_ROLE_SEARCH')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="MGR">运营平台</a-select-option>
+                <a-select-option value="AGENT">代理商</a-select-option>
+                <a-select-option value="MCH">商户</a-select-option>
+              </a-select>
+            </a-form-item>
+            <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />
             <ag-text-up :placeholder="'角色ID'" :msg="searchData.roleId" v-model="searchData.roleId" />
             <ag-text-up :placeholder="'角色名称'" :msg="searchData.roleName" v-model="searchData.roleName" />
             <span class="table-page-search-submitButtons">
@@ -30,9 +39,14 @@
           </div>
         </template>
         <template slot="roleIdSlot" slot-scope="{record}"><b>{{ record.roleId }}</b></template> <!-- 自定义插槽 -->
+        <template slot="sysTypeSlot" slot-scope="{record}">
+          <a-tag :key="record.sysType" :color="record.sysType === 'MGR'?'green':record.sysType === 'AGENT'?'cyan':record.sysType === 'MCH'?'geekblue':'loser'">
+            {{ record.sysType === 'MGR'?'运营平台':record.sysType === 'AGENT'?'代理商系统':record.sysType === 'MCH'?'商户系统':'其他' }}
+          </a-tag>
+        </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a v-if="$access('ENT_UR_ROLE_EDIT')" @click="editFunc(record.roleId)">修改</a>
+            <a v-if="$access('ENT_UR_ROLE_EDIT')" @click="editFunc(record.roleId, record.sysType)">修改</a>
             <a style="color: red" v-if="$access('ENT_UR_ROLE_DEL')" @click="delFunc(record.roleId)">删除</a>
           </AgTableColumns>
         </template>
@@ -68,6 +82,16 @@ const tableColumns = [
     sorter: true
   },
   {
+    key: 'sysType',
+    title: '所属系统',
+    scopedSlots: { customRender: 'sysTypeSlot' }
+  },
+  {
+    key: 'belongInfoId',
+    dataIndex: 'belongInfoId',
+    title: '所属代理商/商户'
+  },
+  {
     key: 'op',
     title: '操作',
     width: '200px',
@@ -83,7 +107,9 @@ export default {
   data () {
     return {
       tableColumns: tableColumns,
-      searchData: {},
+      searchData: {
+        sysType: 'MGR'
+      },
       btnLoading: false
     }
   },
@@ -105,8 +131,8 @@ export default {
       this.$refs.infoAddOrEdit.show()
     },
 
-    editFunc: function (recordId) { // 业务通用【修改】 函数
-      this.$refs.infoAddOrEdit.show(recordId)
+    editFunc: function (recordId, sysType) { // 业务通用【修改】 函数
+      this.$refs.infoAddOrEdit.show(recordId, sysType)
     },
 
     delFunc: function (recordId) { // 业务通用【删除】 函数

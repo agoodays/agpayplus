@@ -40,6 +40,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_LIST)]
         public ApiRes List([FromQuery] SysUserTeamQueryDto dto)
         {
+            dto.BelongInfoId = string.IsNullOrWhiteSpace(dto.BelongInfoId) ? (dto.SysType ?? string.Empty).Equals(CS.SYS_TYPE.MGR) ? "0" : dto.BelongInfoId : dto.BelongInfoId;
             var data = _mchStoreService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }

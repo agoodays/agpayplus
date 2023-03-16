@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Application.Services
         public PaginatedList<SysUserTeamDto> GetPaginatedData(SysUserTeamQueryDto dto)
         {
             var sysUsers = _sysUserTeamRepository.GetAll()
-                .Where(w => w.SysType == dto.SysType
+                .Where(w => (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Contains(dto.SysType))
                 && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Contains(dto.BelongInfoId))
                 && (string.IsNullOrWhiteSpace(dto.TeamName) || w.TeamName.Contains(dto.TeamName))
                 && (string.IsNullOrWhiteSpace(dto.TeamNo) || w.TeamNo.Contains(dto.TeamNo))

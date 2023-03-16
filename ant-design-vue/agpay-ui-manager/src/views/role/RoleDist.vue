@@ -22,7 +22,7 @@ export default {
   },
   methods: {
 
-    initTree: function (recordId) { // 弹层打开事件
+    initTree: function (recordId, sysType) { // 弹层打开事件
       const that = this
 
       // 判断是否有权限访问
@@ -36,8 +36,10 @@ export default {
       that.allEntList = {}
 
       that.recordId = recordId
+
+      sysType = sysType?.length > 0 ? sysType : 'MGR'
       // 获取全部权限的树状结构
-      getEntTree('MGR').then(res => {
+      getEntTree(sysType).then(res => {
         that.treeData = res
 
         // 存储所有的菜单权限集合

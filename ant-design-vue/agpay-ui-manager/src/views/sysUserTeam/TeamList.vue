@@ -4,6 +4,15 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="MGR">运营平台</a-select-option>
+                <a-select-option value="AGENT">代理商</a-select-option>
+<!--                <a-select-option value="MCH">商户</a-select-option>-->
+              </a-select>
+            </a-form-item>
+            <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />
             <ag-text-up :placeholder="'团队ID'" :msg="searchData.teamId" v-model="searchData.teamId"/>
             <ag-text-up :placeholder="'团队编号'" :msg="searchData.teamNo" v-model="searchData.teamNo"/>
             <ag-text-up :placeholder="'团队名称'" :msg="searchData.teamName" v-model="searchData.teamName"/>
@@ -33,6 +42,11 @@
         <template slot="statRangeTypeSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <span>{{ record.statRangeType==='year'?'年':record.statRangeType==='quarter'?'季度':record.statRangeType==='month'?'月':record.statRangeType==='week'?'周':'' }}</span>
         </template>
+        <template slot="sysTypeSlot" slot-scope="{record}">
+          <a-tag :key="record.sysType" :color="record.sysType === 'MGR'?'green':record.sysType === 'AGENT'?'cyan':record.sysType === 'MCH'?'geekblue':'loser'">
+            {{ record.sysType === 'MGR'?'运营平台':record.sysType === 'AGENT'?'代理商系统':record.sysType === 'MCH'?'商户系统':'其他' }}
+          </a-tag>
+        </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_UR_TEAM_EDIT')" @click="editFunc(record.teamId)">修改</a-button>
@@ -61,6 +75,8 @@ const tableColumns = [
   { key: 'teamName', dataIndex: 'teamName', title: '团队名称', width: '200px' },
   { key: 'teamNo', dataIndex: 'teamNo', title: '团队编号', width: '140px' },
   { key: 'statRangeType', title: '统计周期', width: '120px', scopedSlots: { customRender: 'statRangeTypeSlot' } },
+  { key: 'sysType', title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
+  { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户', width: 140 },
   { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
@@ -72,7 +88,9 @@ export default {
     return {
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {},
+      searchData: {
+        sysType: 'MGR'
+      },
       value: "''"
     }
   },

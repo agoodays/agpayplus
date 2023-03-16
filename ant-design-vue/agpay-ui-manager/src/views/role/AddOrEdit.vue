@@ -49,7 +49,7 @@ export default {
   created () {
   },
   methods: {
-    show: function (recordId) { // 弹层打开事件
+    show: function (recordId, sysType) { // 弹层打开事件
       this.isAdd = !recordId
       this.saveObject = {} // 数据清空
       this.confirmLoading = false // 关闭loading
@@ -61,7 +61,7 @@ export default {
       const that = this
 
       // 初始化角色权限分配功能
-      this.$nextTick(() => that.$refs.roleDist.initTree(recordId))
+      this.$nextTick(() => that.$refs.roleDist.initTree(recordId, sysType))
 
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.recordId = recordId

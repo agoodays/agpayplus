@@ -73,9 +73,9 @@
 
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a v-if="record.sysType === 'MGR' && $access('ENT_UR_USER_UPD_ROLE')" @click="roleDist(record.sysUserId)" >变更角色</a>
-            <a v-if="record.sysType === 'MGR' && $access('ENT_UR_USER_EDIT')" @click="editFunc(record.sysUserId)">修改</a>
-            <a v-if="record.sysType === 'MGR' && $access('ENT_UR_USER_DELETE')" style="color: red" @click="delFunc(record.sysUserId)">删除</a>
+            <a v-if="$access('ENT_UR_USER_UPD_ROLE')" @click="roleDist(record.sysUserId, record.sysType, record.belongInfoId)" >变更角色</a>
+            <a v-if="$access('ENT_UR_USER_EDIT')" @click="editFunc(record.sysUserId, record.sysType, record.belongInfoId)">修改</a>
+            <a v-if="$access('ENT_UR_USER_DELETE')" style="color: red" @click="delFunc(record.sysUserId)">删除</a>
           </AgTableColumns>
         </template>
       </AgTable>
@@ -111,6 +111,7 @@ const tableColumns = [
   { key: 'userNo', dataIndex: 'userNo', title: '编号', width: 120 },
   { key: 'telphone', dataIndex: 'telphone', title: '手机号', width: 160 },
   { key: 'sysType', title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
+  { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户', width: 140 },
   { key: 'isAdmin', dataIndex: 'isAdmin', title: '超管', width: 65, customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
   { key: 'userType', title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
   { key: 'teamName', dataIndex: 'teamName', title: '团队', width: 160 },
@@ -182,8 +183,8 @@ export default {
       this.$refs.infoAddOrEdit.show()
     },
 
-    editFunc: function (recordId) { // 业务通用【修改】 函数
-      this.$refs.infoAddOrEdit.show(recordId)
+    editFunc: function (recordId, sysType, belongInfoId) { // 业务通用【修改】 函数
+      this.$refs.infoAddOrEdit.show(recordId, sysType, belongInfoId)
     },
 
     delFunc: function (recordId) { // 业务通用【删除】 函数
@@ -196,8 +197,8 @@ export default {
       })
     },
 
-    roleDist: function (recordId) { // 【分配权限】 按钮点击事件
-      this.$refs.roleDist.show(recordId)
+    roleDist: function (recordId, sysType, belongInfoId) { // 【分配权限】 按钮点击事件
+      this.$refs.roleDist.show(recordId, sysType, belongInfoId)
     },
     updateState: function (recordId, state) { // 【更新状态】
       const that = this

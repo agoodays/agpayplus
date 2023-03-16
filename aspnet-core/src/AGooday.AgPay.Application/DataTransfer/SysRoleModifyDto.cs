@@ -20,13 +20,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
         /// </summary>
-        [BindNever]
         public string SysType { get; set; }
 
         /// <summary>
         /// 所属商户ID / 0(平台)
         /// </summary>
-        [BindNever]
         public string BelongInfoId { get; set; }
 
         /// <summary>

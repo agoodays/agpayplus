@@ -2,7 +2,7 @@
   <a-drawer :visible="isShow" title="分配角色" width="30%" :maskClosable="true" @close="isShow = false">
 
     <div>
-      <div :style="{ borderBottom: '1px solid #E9E9E9' }">
+      <div :style="{ paddingBottom: '20px', borderBottom: '1px solid #E9E9E9' }">
         <a-checkbox
           :indeterminate="checkedVal.length != 0 && allRoleList.length != checkedVal.length"
           :checked="checkedVal.length != 0 && allRoleList.length === checkedVal.length"
@@ -35,6 +35,8 @@ export default {
       confirmLoading: false, // 显示确定按钮loading图标
       isShow: false, // 是否显示弹层/抽屉
       recordId: null, // 更新对象ID
+      sysType: null, // 所属系统
+      belongInfoId: null, // 所属商户ID / 代理商ID / 0(平台)
 
       allRoleList: [], // 全部的角色集合 {label: '', value: ''}
       checkedVal: [] // 已选择的数据集合
@@ -44,7 +46,7 @@ export default {
   },
   methods: {
 
-    show: function (recordId) { // 弹层打开事件
+    show: function (recordId, sysType, belongInfoId) { // 弹层打开事件
       const that = this
 
       // 重置数据
@@ -52,9 +54,11 @@ export default {
       that.checkedVal = []
       that.confirmLoading = false // 关闭loading
       that.recordId = recordId
+      that.sysType = sysType
+      that.belongInfoId = belongInfoId
 
       // 查询所有角色列表
-      reqLoad.list(API_URL_ROLE_LIST, { pageSize: -1 }).then(res => {
+      reqLoad.list(API_URL_ROLE_LIST, { pageSize: -1, sysType: that.sysType, belongInfoId: that.belongInfoId }).then(res => {
         if (res.total <= 0) {
           return this.$message.error(`当前暂无角色，请先行添加`)
         }

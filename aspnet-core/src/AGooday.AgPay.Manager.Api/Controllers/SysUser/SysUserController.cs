@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         {
             //_cache.Remove("ErrorData");
             dto.IsAdmin = CS.NO;
-            dto.SysType = CS.SYS_TYPE.MGR;
+            dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = "0";
             _sysUserService.Create(dto);
             //var errorData = _cache.Get("ErrorData");
@@ -85,7 +85,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         public ApiRes Delete(long recordId)
         {
             var currentUserId = 0;
-            _sysUserService.Remove(recordId, currentUserId, CS.SYS_TYPE.MGR);
+            _sysUserService.Remove(recordId, currentUserId, string.Empty);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
             {
@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
         public ApiRes Update(long recordId, SysUserModifyDto dto)
         {
-            dto.SysType = CS.SYS_TYPE.MGR;
+            //dto.SysType = CS.SYS_TYPE.MGR;
             dto.SysUserId = dto.SysUserId > 0 ? dto.SysUserId : recordId;
             _sysUserService.Modify(dto);
             // 是否存在消息通知

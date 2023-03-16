@@ -266,7 +266,7 @@ export default {
   created () {
   },
   methods: {
-    show (recordId) { // 弹层打开事件
+    show (recordId, sysType, belongInfoId) { // 弹层打开事件
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
       }
@@ -295,8 +295,9 @@ export default {
         })
       }
 
+      sysType = sysType?.length > 0 ? sysType : 'MGR'
       const that = this
-      req.list(API_URL_UR_TEAM_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 用户团队下拉选择列表
+      req.list(API_URL_UR_TEAM_LIST, { pageSize: -1, sysType: sysType, belongInfoId: belongInfoId }).then(res => { // 用户团队下拉选择列表
         that.teamList = res.records
       })
       if (!this.isAdd) { // 修改信息 延迟展示弹层

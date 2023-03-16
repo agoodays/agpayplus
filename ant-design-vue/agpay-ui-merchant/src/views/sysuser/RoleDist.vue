@@ -2,7 +2,7 @@
   <a-drawer :visible="isShow" title="分配角色" width="30%" :maskClosable="false" @close="isShow = false">
 
     <div>
-      <div :style="{ borderBottom: '1px solid #E9E9E9' }">
+      <div :style="{ paddingBottom: '20px', borderBottom: '1px solid #E9E9E9' }">
         <a-checkbox
           :indeterminate="checkedVal.length != 0 && allRoleList.length != checkedVal.length"
           :checked="checkedVal.length != 0 && allRoleList.length === checkedVal.length"

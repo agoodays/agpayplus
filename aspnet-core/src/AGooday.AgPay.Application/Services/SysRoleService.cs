@@ -83,9 +83,10 @@ namespace AGooday.AgPay.Application.Services
         public PaginatedList<SysRoleDto> GetPaginatedData(SysRoleQueryDto dto)
         {
             var sysRoles = _sysRoleRepository.GetAll()
-                .Where(w => w.SysType.Equals(dto.SysType) && w.BelongInfoId.Equals(dto.BelongInfoId)
-                && (string.IsNullOrWhiteSpace(dto.RoleName) || w.RoleName.Contains(dto.RoleName))
+                .Where(w => (string.IsNullOrWhiteSpace(dto.RoleName) || w.RoleName.Contains(dto.RoleName))
                 && (string.IsNullOrWhiteSpace(dto.RoleId) || w.RoleId.Equals(dto.RoleId))
+                && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
+                && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Equals(dto.BelongInfoId))
                 ).OrderByDescending(o => o.UpdatedAt);
             var records = PaginatedList<SysRole>.Create<SysRoleDto>(sysRoles.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;

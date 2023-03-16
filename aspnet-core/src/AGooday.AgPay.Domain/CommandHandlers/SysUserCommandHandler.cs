@@ -151,7 +151,15 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return Task.FromResult(new Unit());
             }
             //查询该操作员信息
-            var sysUser = _sysUserRepository.GetByUserId(request.SysUserId, request.SysType);
+            SysUser sysUser;
+            if (string.IsNullOrWhiteSpace(request.SysType))
+            {
+                sysUser = _sysUserRepository.GetByUserId(request.SysUserId);
+            }
+            else
+            {
+                sysUser = _sysUserRepository.GetByUserId(request.SysUserId, request.SysType);
+            }
             if (sysUser is null)
             {
                 // 引发错误事件
