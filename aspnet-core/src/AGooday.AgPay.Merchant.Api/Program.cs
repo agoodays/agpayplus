@@ -153,12 +153,12 @@ NativeInjectorBootStrapper.RegisterServices(services);
 
 #region RabbitMQ
 services.AddSingleton<IMQSender, RabbitMQSender>();
-services.AddScoped<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
-services.AddScoped<IMQMsgReceiver, CleanMchLoginAuthCacheRabbitMQReceiver>();
-services.AddScoped<IMQMsgReceiver, CleanAgentLoginAuthCacheRabbitMQReceiver>();
-services.AddScoped<CleanMchLoginAuthCacheMQ.IMQReceiver, CleanMchLoginAuthCacheMQReceiver>();
-services.AddScoped<CleanAgentLoginAuthCacheMQ.IMQReceiver, CleanAgentLoginAuthCacheMQReceiver>();
-services.AddScoped<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
+services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
+services.AddSingleton<IMQMsgReceiver, CleanMchLoginAuthCacheRabbitMQReceiver>();
+services.AddSingleton<IMQMsgReceiver, CleanAgentLoginAuthCacheRabbitMQReceiver>();
+services.AddSingleton<CleanMchLoginAuthCacheMQ.IMQReceiver, CleanMchLoginAuthCacheMQReceiver>();
+services.AddSingleton<CleanAgentLoginAuthCacheMQ.IMQReceiver, CleanAgentLoginAuthCacheMQReceiver>();
+services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
 services.AddHostedService<RabbitListener>();
 #endregion
 

@@ -11,19 +11,23 @@ namespace AGooday.AgPay.Merchant.Api.MQ
     public class ResetAppConfigMQReceiver : ResetAppConfigMQ.IMQReceiver
     {
         private readonly ILogger<ResetAppConfigMQReceiver> log;
-        private ISysConfigService sysConfigService;
+        private IServiceProvider provider;
 
-        public ResetAppConfigMQReceiver(ILogger<ResetAppConfigMQReceiver> log, ISysConfigService sysConfigService)
+        public ResetAppConfigMQReceiver(ILogger<ResetAppConfigMQReceiver> log, IServiceProvider provider)
         {
             this.log = log;
-            this.sysConfigService = sysConfigService;
+            this.provider = provider;
         }
 
         public void Receive(ResetAppConfigMQ.MsgPayload payload)
         {
-            log.LogInformation($"成功接收更新系统配置的订阅通知, msg={JsonConvert.SerializeObject(payload)}");
-            sysConfigService.InitDBConfig(payload.GroupKey);
-            log.LogInformation("系统配置静态属性已重置");
+            using (var scope = provider.CreateScope())
+            {
+                log.LogInformation($"成功接收更新系统配置的订阅通知, msg={JsonConvert.SerializeObject(payload)}");
+                var sysConfigService = scope.ServiceProvider.GetRequiredService<ISysConfigService>();
+                sysConfigService.InitDBConfig(payload.GroupKey);
+                log.LogInformation("系统配置静态属性已重置");
+            }
         }
     }
 }
