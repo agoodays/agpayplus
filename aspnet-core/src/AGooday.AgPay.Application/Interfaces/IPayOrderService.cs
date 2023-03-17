@@ -12,6 +12,7 @@ namespace AGooday.AgPay.Application.Interfaces
         IEnumerable<PayOrderDto> GetAll();
         PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo);
         PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto);
+        JObject Statistics(PayOrderQueryDto dto);
         bool IsExistOrderUseIfCode(string ifCode);
         bool IsExistOrderUseWayCode(string wayCode);
         bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo);

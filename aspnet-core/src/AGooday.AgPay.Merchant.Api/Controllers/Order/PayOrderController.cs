@@ -87,19 +87,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         public ApiRes Count([FromQuery] PayOrderQueryDto dto)
         {
             dto.BindDateRange();
-            dto.AgentNo = GetCurrentMchNo();
-            return ApiRes.Ok(new
-            {
-                allPayAmount = 590766239 / 100.00,
-                allPayCount = 1871,
-                failPayAmount = 590714131 / 100.00,
-                failPayCount = 1691,
-                mchFeeAmount = 6097 / 100.00,
-                payAmount = 52108 / 100.00,
-                payCount = 180,
-                refundAmount = 16635 / 100.00,
-                refundCount = 45
-            });
+            dto.MchNo = GetCurrentMchNo();
+            var statistics = _payOrderService.Statistics(dto);
+            return ApiRes.Ok(statistics);
         }
 
         /// <summary>
