@@ -186,7 +186,7 @@ DROP TABLE IF EXISTS `t_pay_rate_config`;
 CREATE TABLE `t_pay_rate_config` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, agentSubagent-子代理商 ,mgrMch-商户 ,agentMch-商户',
-  `config_type` VARCHAR(20) NOT NULL COMMENT '配置类型: ISVCOST-服务商低价, AGENTRATE-代理商费率, AGENTDEF-代理商默认费率 ,MCHAPPLYDEF-商户默认费率',
+  `config_type` VARCHAR(20) NOT NULL COMMENT '配置类型: ISVCOST-服务商低价, AGENTRATE-代理商费率, AGENTDEF-代理商默认费率 ,MCHAPPLYDEF-商户进件默认费率',
   `info_type` TINYINT NOT NULL COMMENT '账号类型:1-服务商 2-商户 3-商户应用',
   `info_id` VARCHAR(64) NOT NULL COMMENT '服务商号/商户号/应用ID',
   `if_code` VARCHAR(20) NOT NULL COMMENT '支付接口',
@@ -278,7 +278,12 @@ ALTER TABLE `t_sys_user`
   ADD COLUMN `safe_word` VARCHAR(32) NULL COMMENT '预留信息' AFTER `realname`;
 
 ALTER TABLE `t_pay_interface_define`
-  ADD COLUMN `is_support_applyment` TINYINT DEFAULT 1 NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持' AFTER `config_page_type`;
+  ADD COLUMN `is_support_applyment` TINYINT DEFAULT 0 NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持' AFTER `config_page_type`,
+  ADD COLUMN `is_open_applyment` TINYINT DEFAULT 0 NOT NULL COMMENT '是否开启进件: 0-关闭, 1-开启' AFTER `is_support_applyment`,
+  ADD COLUMN `is_support_check_bill` TINYINT DEFAULT 0 NOT NULL COMMENT '是否支持对账: 0-不支持, 1-支持' AFTER `is_open_applyment`,
+  ADD COLUMN `is_open_check_bill` TINYINT DEFAULT 0 NOT NULL COMMENT '是否开启对账: 0-关闭, 1-开启' AFTER `is_support_check_bill`,
+  ADD COLUMN `is_support_cashout` TINYINT DEFAULT 0 NOT NULL COMMENT '是否支持提现: 0-不支持, 1-支持' AFTER `is_open_check_bill`,
+  ADD COLUMN `is_open_cashout` TINYINT DEFAULT 0 NOT NULL COMMENT '是否开启提现: 0-关闭, 1-开启' AFTER `is_support_cashout`;
 
 ALTER TABLE `t_pay_interface_config`   
   ADD COLUMN `sett_hold_day` TINYINT DEFAULT 0 NOT NULL COMMENT '结算周期（自然日）' AFTER `if_params`;
