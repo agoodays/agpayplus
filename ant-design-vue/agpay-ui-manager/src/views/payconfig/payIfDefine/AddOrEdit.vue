@@ -172,7 +172,15 @@
       <a-row :gutter="16">
         <a-col :span="24">
           <a-form-model-item label="支持的支付方式" prop="checkedList">
-            <a-checkbox-group v-model="checkedList" :options="wayCodesOptions" @change="onWayCodesChange" />
+<!--            <a-checkbox-group v-model="checkedList" :options="wayCodesOptions" @change="onWayCodesChange" />-->
+            <a-checkbox-group v-model="checkedList">
+              <a-row v-for="(group, index) in groupedWays" :key="index">
+                <h3>{{ group.name }}</h3>
+                <a-col :span="6" v-for="(way, i) in group.ways" :key="i">
+                  <a-checkbox :value='way.wayCode'>{{ way.wayName }}</a-checkbox>
+                </a-col>
+              </a-row>
+            </a-checkbox-group>
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -269,6 +277,7 @@ export default {
         checkedList: [{ required: true, validator: validateWayCodes, trigger: 'blur' }]
       },
       wayCodesOptions: [], // 支付方式多选框选项列表
+      groupedWays: [], // 支付方式多选框选项列表
       checkedList: [] // 选中的数据
     }
   },
@@ -342,10 +351,65 @@ export default {
         }
       })
     },
+    groupBy (list, key) {
+      return list.reduce((acc, item) => {
+        (acc[item[key]] = acc[item[key]] || []).push(item)
+        return acc
+      }, {})
+    },
+    getGroupName (wayType) {
+      switch (wayType) {
+        case 'YSFPAY':
+          return '云闪付'
+        case 'WECHAT':
+          return '微信'
+        case 'UNIONPAY':
+          return '银联'
+        case 'ALIPAY':
+          return '支付宝'
+        default:
+          return '其他'
+      }
+    },
     // 支付方式列表
     payWayList () {
       const that = this
       req.list(API_URL_PAYWAYS_LIST, { 'pageSize': '-1' }).then(res => {
+        const ways = res.records
+
+        // const groupByWayType = (ways) =>
+        //     ways.reduce((result, way) => {
+        //       const { wayType } = way
+        //       if (!result[wayType]) result[wayType] = []
+        //       result[wayType].push({ wayCode: way.wayCode, wayName: way.wayName })
+        //       return result
+        //     }, {})
+        //
+        // const groupedWays = groupByWayType(ways)
+        //
+        // for (const wayType in groupedWays) {
+        //   console.log(`${wayType}:`)
+        //   for (const way of groupedWays[wayType]) {
+        //     console.log(`- ${way.wayCode} ${way.wayName}`)
+        //   }
+        // }
+
+        const groupedWays = that.groupBy(ways, 'wayType')
+
+        for (const wayType in groupedWays) {
+          console.log(`${wayType}:`)
+          const group = {
+            name: that.getGroupName(wayType),
+            ways: []
+          }
+          for (const way of groupedWays[wayType]) {
+            console.log(`- ${way.wayCode} ${way.wayName}`)
+            group.ways.push({ wayCode: way.wayCode, wayName: way.wayName })
+          }
+          that.groupedWays.push(group)
+        }
+        console.log(that.groupedWays)
+
         res.records.forEach(item => {
           that.wayCodesOptions.push({
             label: item.wayName,
