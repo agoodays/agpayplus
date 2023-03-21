@@ -6,6 +6,16 @@
           <div class="table-layer">
             <ag-text-up :placeholder="'支付方式代码'" :msg="searchData.wayCode" v-model="searchData.wayCode" />
             <ag-text-up :placeholder="'支付方式名称'" :msg="searchData.wayName" v-model="searchData.wayName" />
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="searchData.wayType" placeholder="支付类型" default-value="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="WECHAT">微信</a-select-option>
+                <a-select-option value="ALIPAY">支付宝</a-select-option>
+                <a-select-option value="YSFPAY">云闪付</a-select-option>
+                <a-select-option value="UNIONPAY">银联</a-select-option>
+                <a-select-option value="OTHER">其他</a-select-option>
+              </a-select>
+            </a-form-item>
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc(true)" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -30,6 +40,19 @@
           </div>
         </template>
         <template slot="wayCodeSlot" slot-scope="{record}"><b>{{ record.wayCode }}</b></template> <!-- 自定义插槽 -->
+        <template slot="wayTypeSlot" slot-scope="{record}">
+          <a-tag
+            :key="record.wayType"
+            :color="record.wayType === 'WECHAT' ? 'rgb(4, 190, 2)' :
+              record.wayType === 'ALIPAY' ? 'rgb(23, 121, 255)' :
+              record.wayType === 'YSFPAY' ? '#f5222d' :
+              record.wayType === 'UNIONPAY' ? '#142B8C' : '#fa8c16'">
+            {{ record.wayType === 'WECHAT' ? '微信' :
+              record.wayType === 'ALIPAY' ? '支付宝' :
+              record.wayType === 'YSFPAY' ? '云闪付' :
+              record.wayType === 'UNIONPAY' ? '银联' : '其他' }}
+          </a-tag>
+        </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a v-if="$access('ENT_PC_WAY_EDIT')" @click="editFunc(record.wayCode)">修改</a>
@@ -62,6 +85,12 @@ const tableColumns = [
     key: 'wayName',
     dataIndex: 'wayName',
     title: '支付方式名称'
+  },
+  {
+    key: 'wayType',
+    title: '支付类型',
+    align: 'center',
+    scopedSlots: { customRender: 'wayTypeSlot' }
   },
   {
     key: 'op',

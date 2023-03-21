@@ -56,6 +56,78 @@
             </a-radio-group>
           </a-form-model-item>
         </a-col>
+        <a-col :span="12">
+          <a-form-model-item label="是否支持进件" prop="isSupportApplyment">
+            <a-radio-group v-model="saveObject.isSupportApplyment">
+              <a-radio :value="1">
+                支持
+              </a-radio>
+              <a-radio :value="0">
+                不支持
+              </a-radio>
+            </a-radio-group>
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-model-item label="是否开启进件" prop="isOpenApplyment">
+            <a-radio-group v-model="saveObject.isOpenApplyment">
+              <a-radio :value="1">
+                开启
+              </a-radio>
+              <a-radio :value="0">
+                关闭
+              </a-radio>
+            </a-radio-group>
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-model-item label="是否支持对账" prop="isSupportCheckBill">
+            <a-radio-group v-model="saveObject.isSupportCheckBill">
+              <a-radio :value="1">
+                支持
+              </a-radio>
+              <a-radio :value="0">
+                不支持
+              </a-radio>
+            </a-radio-group>
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-model-item label="是否开启对账" prop="isOpenCheckBill">
+            <a-radio-group v-model="saveObject.isOpenCheckBill">
+              <a-radio :value="1">
+                开启
+              </a-radio>
+              <a-radio :value="0">
+                关闭
+              </a-radio>
+            </a-radio-group>
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-model-item label="是否支持提现" prop="isSupportCashout">
+            <a-radio-group v-model="saveObject.isSupportCashout">
+              <a-radio :value="1">
+                支持
+              </a-radio>
+              <a-radio :value="0">
+                不支持
+              </a-radio>
+            </a-radio-group>
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-model-item label="是否开启提现" prop="isOpenCashout">
+            <a-radio-group v-model="saveObject.isOpenCashout">
+              <a-radio :value="1">
+                开启
+              </a-radio>
+              <a-radio :value="0">
+                关闭
+              </a-radio>
+            </a-radio-group>
+          </a-form-model-item>
+        </a-col>
         <a-col :span="24" v-if="saveObject.isIsvMode == 1 && this.saveObject.configPageType === 1">
           <a-form-model-item label="服务商接口配置定义描述" prop="isvParams">
             <a-input v-model="saveObject.isvParams" placeholder="请输入" type="textarea" />
@@ -209,11 +281,17 @@ export default {
       this.isAdd = !ifCode
        // 数据清空
       this.saveObject = {
-        'isMchMode': 1,
-        'isIsvMode': 1,
-        'state': 1,
-        'configPageType': 1,
-        'bgColor': '#ff0000'
+        isMchMode: 1,
+        isIsvMode: 1,
+        state: 1,
+        configPageType: 1,
+        isSupportApplyment: 0,
+        isOpenApplyment: 0,
+        isSupportCheckBill: 0,
+        isOpenCheckBill: 0,
+        isSupportCashout: 0,
+        isOpenCashout: 0,
+        bgColor: '#ff0000'
       }
 
       if (this.$refs.infoFormModel !== undefined) {

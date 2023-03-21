@@ -7,6 +7,15 @@
       <a-form-model-item label="支付方式名称：" prop="wayName">
         <a-input v-model="saveObject.wayName" />
       </a-form-model-item>
+      <a-form-model-item label="支付类型：" prop="wayType">
+        <a-radio-group v-model="saveObject.wayType" size="small" button-style="solid">
+          <a-radio-button value="WECHAT">微信</a-radio-button>
+          <a-radio-button value="ALIPAY">支付宝</a-radio-button>
+          <a-radio-button value="YSFPAY">云闪付</a-radio-button>
+          <a-radio-button value="UNIONPAY">银联</a-radio-button>
+          <a-radio-button value="OTHER">其他</a-radio-button>
+        </a-radio-group>
+      </a-form-model-item>
     </a-form-model>
   </a-modal>
 </template>
@@ -29,6 +38,9 @@ export default {
         ],
         wayName: [
           { required: true, message: '请输入支付方式名称', trigger: 'blur' }
+        ],
+        wayType: [
+          { required: true, message: '请选择支付类型', trigger: 'blur' }
         ]
       }
     }

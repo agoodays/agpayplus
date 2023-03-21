@@ -278,12 +278,12 @@ ALTER TABLE `t_sys_user`
   ADD COLUMN `safe_word` VARCHAR(32) NULL COMMENT '预留信息' AFTER `realname`;
 
 ALTER TABLE `t_pay_interface_define`
-  ADD COLUMN `is_support_applyment` TINYINT DEFAULT 0 NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持' AFTER `config_page_type`,
-  ADD COLUMN `is_open_applyment` TINYINT DEFAULT 0 NOT NULL COMMENT '是否开启进件: 0-关闭, 1-开启' AFTER `is_support_applyment`,
-  ADD COLUMN `is_support_check_bill` TINYINT DEFAULT 0 NOT NULL COMMENT '是否支持对账: 0-不支持, 1-支持' AFTER `is_open_applyment`,
-  ADD COLUMN `is_open_check_bill` TINYINT DEFAULT 0 NOT NULL COMMENT '是否开启对账: 0-关闭, 1-开启' AFTER `is_support_check_bill`,
-  ADD COLUMN `is_support_cashout` TINYINT DEFAULT 0 NOT NULL COMMENT '是否支持提现: 0-不支持, 1-支持' AFTER `is_open_check_bill`,
-  ADD COLUMN `is_open_cashout` TINYINT DEFAULT 0 NOT NULL COMMENT '是否开启提现: 0-关闭, 1-开启' AFTER `is_support_cashout`;
+  ADD COLUMN `is_support_applyment` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持' AFTER `config_page_type`,
+  ADD COLUMN `is_open_applyment` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启进件: 0-关闭, 1-开启' AFTER `is_support_applyment`,
+  ADD COLUMN `is_support_check_bill` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否支持对账: 0-不支持, 1-支持' AFTER `is_open_applyment`,
+  ADD COLUMN `is_open_check_bill` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启对账: 0-关闭, 1-开启' AFTER `is_support_check_bill`,
+  ADD COLUMN `is_support_cashout` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否支持提现: 0-不支持, 1-支持' AFTER `is_open_check_bill`,
+  ADD COLUMN `is_open_cashout` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启提现: 0-关闭, 1-开启' AFTER `is_support_cashout`;
 
 ALTER TABLE `t_pay_interface_config`   
   ADD COLUMN `sett_hold_day` TINYINT DEFAULT 0 NOT NULL COMMENT '结算周期（自然日）' AFTER `if_params`;

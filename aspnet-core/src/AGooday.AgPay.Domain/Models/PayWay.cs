@@ -26,6 +26,13 @@ namespace AGooday.AgPay.Domain.Models
         public string WayName { get; set; }
 
         /// <summary>
+        /// 支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他
+        /// </summary>
+        [Comment("支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他")]
+        [Required, Column("way_type", TypeName = "varchar(20)")]
+        public string WayType { get; set; }
+
+        /// <summary>
         /// 创建时间
         /// </summary>
         [Comment("创建时间")]

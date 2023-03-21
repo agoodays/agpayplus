@@ -47,6 +47,48 @@ namespace AGooday.AgPay.Domain.Models
         public byte ConfigPageType { get; set; }
 
         /// <summary>
+        /// 是否支持进件: 0-不支持, 1-支持
+        /// </summary>
+        [Comment("是否支持进件: 0-不支持, 1-支持")]
+        [Required, Column("is_support_applyment", TypeName = "tinyint(6)")]
+        public byte IsSupportApplyment { get; set; }
+
+        /// <summary>
+        /// 是否开启进件: 0-关闭, 1-开启
+        /// </summary>
+        [Comment("是否开启进件: 0-关闭, 1-开启")]
+        [Required, Column("is_open_applyment", TypeName = "tinyint(6)")]
+        public byte IsOpenApplyment { get; set; }
+
+        /// <summary>
+        /// 是否支持对账: 0-不支持, 1-支持
+        /// </summary>
+        [Comment("是否支持对账: 0-不支持, 1-支持")]
+        [Required, Column("is_support_check_bill", TypeName = "tinyint(6)")]
+        public byte IsSupportCheckBill { get; set; }
+
+        /// <summary>
+        /// 是否开启对账: 0-关闭, 1-开启
+        /// </summary>
+        [Comment("是否开启对账: 0-关闭, 1-开启")]
+        [Required, Column("is_open_check_bill", TypeName = "tinyint(6)")]
+        public byte IsOpenCheckBill { get; set; }
+
+        /// <summary>
+        /// 是否支持提现: 0-不支持, 1-支持
+        /// </summary>
+        [Comment("是否支持提现: 0-不支持, 1-支持")]
+        [Required, Column("is_support_cashout", TypeName = "tinyint(6)")]
+        public byte IsSupportCashout { get; set; }
+
+        /// <summary>
+        /// 是否开启提现: 0-关闭, 1-开启
+        /// </summary>
+        [Comment("是否开启提现: 0-关闭, 1-开启")]
+        [Required, Column("is_open_cashout", TypeName = "tinyint(6)")]
+        public byte IsOpenCashout { get; set; }
+
+        /// <summary>
         /// ISV接口配置定义描述,json字符串
         /// </summary>
         [Comment("ISV接口配置定义描述,json字符串")]

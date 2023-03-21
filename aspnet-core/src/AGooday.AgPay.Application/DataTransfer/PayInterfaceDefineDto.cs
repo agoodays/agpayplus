@@ -33,6 +33,36 @@ namespace AGooday.AgPay.Application.DataTransfer
         public byte ConfigPageType { get; set; }
 
         /// <summary>
+        /// 是否支持进件: 0-不支持, 1-支持
+        /// </summary>
+        public byte IsSupportApplyment { get; set; }
+
+        /// <summary>
+        /// 是否开启进件: 0-关闭, 1-开启
+        /// </summary>
+        public byte IsOpenApplyment { get; set; }
+
+        /// <summary>
+        /// 是否支持对账: 0-不支持, 1-支持
+        /// </summary>
+        public byte IsSupportCheckBill { get; set; }
+
+        /// <summary>
+        /// 是否开启对账: 0-关闭, 1-开启
+        /// </summary>
+        public byte IsOpenCheckBill { get; set; }
+
+        /// <summary>
+        /// 是否支持提现: 0-不支持, 1-支持
+        /// </summary>
+        public byte IsSupportCashout { get; set; }
+
+        /// <summary>
+        /// 是否开启提现: 0-关闭, 1-开启
+        /// </summary>
+        public byte IsOpenCashout { get; set; }
+
+        /// <summary>
         /// ISV接口配置定义描述,json字符串
         /// </summary>
         public string IsvParams { get; set; }

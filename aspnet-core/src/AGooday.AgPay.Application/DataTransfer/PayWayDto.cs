@@ -16,6 +16,11 @@
         public string WayName { get; set; }
 
         /// <summary>
+        /// 支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他
+        /// </summary>
+        public string WayType { get; set; }
+
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedAt { get; set; }
