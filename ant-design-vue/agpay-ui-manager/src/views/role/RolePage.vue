@@ -40,8 +40,14 @@
         </template>
         <template slot="roleIdSlot" slot-scope="{record}"><b>{{ record.roleId }}</b></template> <!-- 自定义插槽 -->
         <template slot="sysTypeSlot" slot-scope="{record}">
-          <a-tag :key="record.sysType" :color="record.sysType === 'MGR'?'green':record.sysType === 'AGENT'?'cyan':record.sysType === 'MCH'?'geekblue':'loser'">
-            {{ record.sysType === 'MGR'?'运营平台':record.sysType === 'AGENT'?'代理商系统':record.sysType === 'MCH'?'商户系统':'其他' }}
+          <a-tag
+            :key="record.sysType"
+            :color="record.sysType === 'MGR' ? 'green' :
+              record.sysType === 'AGENT' ? 'cyan' :
+              record.sysType === 'MCH' ? 'geekblue' : 'loser'">
+            {{ record.sysType === 'MGR' ? '运营平台' :
+              record.sysType === 'AGENT' ? '代理商系统' :
+              record.sysType === 'MCH' ? '商户系统' : '其他' }}
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->

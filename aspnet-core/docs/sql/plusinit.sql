@@ -272,7 +272,7 @@ ALTER TABLE `t_sys_user`
   ADD COLUMN `is_team_leader` TINYINT NULL COMMENT '是否队长:  0-否 1-是' AFTER `team_id`;
 
 ALTER TABLE `t_sys_user`   
-  ADD  UNIQUE INDEX `invite_code` (`invite_code`);
+  ADD UNIQUE INDEX `invite_code` (`invite_code`);
   
 ALTER TABLE `t_sys_user`   
   ADD COLUMN `safe_word` VARCHAR(32) NULL COMMENT '预留信息' AFTER `realname`;
@@ -285,11 +285,21 @@ ALTER TABLE `t_pay_interface_define`
   ADD COLUMN `is_support_cashout` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否支持提现: 0-不支持, 1-支持' AFTER `is_open_check_bill`,
   ADD COLUMN `is_open_cashout` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启提现: 0-关闭, 1-开启' AFTER `is_support_cashout`;
 
-ALTER TABLE `t_pay_interface_config`   
+ALTER TABLE `t_pay_interface_config`
   ADD COLUMN `sett_hold_day` TINYINT DEFAULT 0 NOT NULL COMMENT '结算周期（自然日）' AFTER `if_params`;
 
-ALTER TABLE `t_pay_way`   
+ALTER TABLE `t_pay_way`
   ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他' AFTER `way_name`;
+
+SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'WX_%';
+SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'ALI_%';
+SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'YSF_%';
+SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'PP_%';
+
+UPDATE `t_pay_way` SET `way_type` = 'WECHAT' WHERE `way_code` LIKE 'WX_%';
+UPDATE `t_pay_way` SET `way_type` = 'ALIPAY' WHERE `way_code` LIKE 'ALI_%';
+UPDATE `t_pay_way` SET `way_type` = 'YSFPAY' WHERE `way_code` LIKE 'YSF_%';
+UPDATE `t_pay_way` SET `way_type` = 'OTHER' WHERE `way_code` LIKE 'PP_%';
 
 ALTER TABLE `t_pay_order`   
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_no`,

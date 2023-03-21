@@ -51,8 +51,14 @@
         </template>
 
         <template slot="sysTypeSlot" slot-scope="{record}">
-          <a-tag :key="record.sysType" :color="record.sysType === 'MGR'?'green':record.sysType === 'AGENT'?'cyan':record.sysType === 'MCH'?'geekblue':'loser'">
-            {{ record.sysType === 'MGR'?'运营平台':record.sysType === 'AGENT'?'代理商系统':record.sysType === 'MCH'?'商户系统':'其他' }}
+          <a-tag
+            :key="record.sysType"
+            :color="record.sysType === 'MGR' ? 'green' :
+              record.sysType === 'AGENT' ? 'cyan' :
+              record.sysType === 'MCH' ? 'geekblue' : 'loser'">
+            {{ record.sysType === 'MGR' ? '运营平台' :
+              record.sysType === 'AGENT' ? '代理商系统' :
+              record.sysType === 'MCH' ? '商户系统' : '其他' }}
           </a-tag>
         </template>
 

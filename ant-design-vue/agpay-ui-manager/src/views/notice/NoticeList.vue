@@ -4,8 +4,9 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
+            <a-form-item label="" class="table-head-layout">
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+<!--              <a-range-picker
                   @change="onChange"
                   :show-time="{ format: 'HH:mm:ss' }"
                   format="YYYY-MM-DD HH:mm:ss"
@@ -20,7 +21,7 @@
                 }"
               >
                 <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'公告ID'" :msg="searchData.articleId" v-model="searchData.articleId"/>
             <ag-text-up :placeholder="'公告标题'" :msg="searchData.title" v-model="searchData.title"/>
@@ -64,6 +65,7 @@
 </template>
 <script>
 import AgTable from '@/components/AgTable/AgTable'
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_ARTICLE_LIST, req, reqLoad } from '@/api/manage'
@@ -83,7 +85,7 @@ const tableColumns = [
 
 export default {
   name: 'NoticePage',
-  components: { AgTable, AgTextUp, AgTableColumns, InfoAddOrEdit, InfoDetail },
+  components: { AgTable, AgDateRangePicker, AgTextUp, AgTableColumns, InfoAddOrEdit, InfoDetail },
   data () {
     return {
       btnLoading: false,

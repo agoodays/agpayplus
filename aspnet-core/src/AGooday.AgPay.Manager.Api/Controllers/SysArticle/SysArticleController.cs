@@ -42,6 +42,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_LIST)]
         public ApiRes List([FromQuery] SysArticleQueryDto dto)
         {
+            dto.BindDateRange();
             var data = _sysArticleService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }

@@ -34,6 +34,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_LOG_LIST)]
         public ApiRes List([FromQuery] SysLogQueryDto dto)
         {
+            dto.BindDateRange();
             var data = _sysLogService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }

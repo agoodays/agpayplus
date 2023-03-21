@@ -4,15 +4,16 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
+            <a-form-item label="" class="table-head-layout">
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+<!--              <a-range-picker
                 @change="onChange"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
                 :disabled-date="disabledDate"
               >
                 <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'用户ID'" :msg="searchData.userId" v-model="searchData.userId" />
             <ag-text-up :placeholder="'用户名'" :msg="searchData.userName" v-model="searchData.userName" />
@@ -51,8 +52,14 @@
         </template>
         <template slot="userNameSlot" slot-scope="{record}"><b>{{ record.userName }}</b></template> <!-- 自定义插槽 -->
         <template slot="sysTypeSlot" slot-scope="{record}">
-          <a-tag :key="record.sysType" :color="record.sysType === 'MGR'?'green':record.sysType === 'AGENT'?'cyan':record.sysType === 'MCH'?'geekblue':'loser'">
-            {{ record.sysType === 'MGR'?'运营平台':record.sysType === 'AGENT'?'代理商系统':record.sysType === 'MCH'?'商户系统':'其他' }}
+          <a-tag
+            :key="record.sysType"
+            :color="record.sysType === 'MGR' ? 'green' :
+              record.sysType === 'AGENT' ? 'cyan' :
+              record.sysType === 'MCH' ? 'geekblue' : 'loser'">
+            {{ record.sysType === 'MGR' ? '运营平台' :
+              record.sysType === 'AGENT' ? '代理商系统' :
+              record.sysType === 'MCH' ? '商户系统' : '其他' }}
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
@@ -99,8 +106,14 @@
           <a-col :sm="12">
             <a-descriptions>
               <a-descriptions-item label="所属系统">
-                <a-tag :key="detailData.sysType" :color="detailData.sysType === 'MGR'?'green':detailData.sysType === 'AGENT'?'cyan':detailData.sysType === 'MCH'?'geekblue':'loser'">
-                  {{ detailData.sysType === 'MGR'?'运营平台':detailData.sysType === 'AGENT'?'代理商系统':detailData.sysType === 'MCH'?'商户系统':'其他' }}
+                <a-tag
+                  :key="detailData.sysType"
+                  :color="detailData.sysType === 'MGR' ? 'green' :
+                    detailData.sysType === 'AGENT' ? 'cyan' :
+                    detailData.sysType === 'MCH' ? 'geekblue' : 'loser'">
+                  {{ detailData.sysType === 'MGR' ? '运营平台' :
+                    detailData.sysType === 'AGENT' ? '代理商系统' :
+                    detailData.sysType === 'MCH' ? '商户系统' : '其他' }}
                 </a-tag>
               </a-descriptions-item>
             </a-descriptions>
@@ -160,6 +173,7 @@
 </template>
 <script>
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_SYS_LOG, req } from '@/api/manage'
@@ -179,7 +193,7 @@ const tableColumns = [
 
 export default {
   name: 'IsvListPage',
-  components: { AgTable, AgTableColumns, AgTextUp },
+  components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
   data () {
     return {
       tableColumns: tableColumns,

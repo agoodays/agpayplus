@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// <summary>
     /// 系统操作日志表
     /// </summary>
-    public class SysLogQueryDto : PageQuery
+    public class SysLogQueryDto : DatePageQuery
     {
         /// <summary>
         /// 系统用户ID
@@ -58,15 +58,5 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// </summary>
         [BindNever]
         public string OptResInfo { get; set; }
-
-        /// <summary>
-        /// 开始时间
-        /// </summary>
-        public DateTime? CreatedStart { get; set; }
-
-        /// <summary>
-        /// 结束时间
-        /// </summary>
-        public DateTime? CreatedEnd { get; set; }
     }
 }

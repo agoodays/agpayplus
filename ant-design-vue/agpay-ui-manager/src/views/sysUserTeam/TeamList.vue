@@ -40,11 +40,22 @@
           </div>
         </template>
         <template slot="statRangeTypeSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <span>{{ record.statRangeType==='year'?'年':record.statRangeType==='quarter'?'季度':record.statRangeType==='month'?'月':record.statRangeType==='week'?'周':'' }}</span>
+          <span>
+            {{ record.statRangeType === 'year' ? '年' :
+              record.statRangeType === 'quarter' ? '季度' :
+              record.statRangeType === 'month' ? '月' :
+              record.statRangeType === 'week'? '周' : '' }}
+          </span>
         </template>
         <template slot="sysTypeSlot" slot-scope="{record}">
-          <a-tag :key="record.sysType" :color="record.sysType === 'MGR'?'green':record.sysType === 'AGENT'?'cyan':record.sysType === 'MCH'?'geekblue':'loser'">
-            {{ record.sysType === 'MGR'?'运营平台':record.sysType === 'AGENT'?'代理商系统':record.sysType === 'MCH'?'商户系统':'其他' }}
+          <a-tag
+            :key="record.sysType"
+            :color="record.sysType === 'MGR' ? 'green' :
+              record.sysType === 'AGENT' ? 'cyan' :
+              record.sysType === 'MCH' ? 'geekblue' : 'loser'">
+            {{ record.sysType === 'MGR' ? '运营平台' :
+              record.sysType === 'AGENT' ? '代理商系统' :
+              record.sysType === 'MCH' ? '商户系统' : '其他' }}
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
