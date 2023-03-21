@@ -276,7 +276,7 @@ export default {
         isvsubMchParams: [{ validator: validateIsvsubMchParams, trigger: 'blur' }],
         checkedList: [{ required: true, validator: validateWayCodes, trigger: 'blur' }]
       },
-      wayCodesOptions: [], // 支付方式多选框选项列表
+      // wayCodesOptions: [], // 支付方式多选框选项列表
       groupedWays: [], // 支付方式多选框选项列表
       checkedList: [] // 选中的数据
     }
@@ -377,45 +377,36 @@ export default {
       req.list(API_URL_PAYWAYS_LIST, { 'pageSize': '-1' }).then(res => {
         const ways = res.records
 
-        // const groupByWayType = (ways) =>
-        //     ways.reduce((result, way) => {
-        //       const { wayType } = way
-        //       if (!result[wayType]) result[wayType] = []
-        //       result[wayType].push({ wayCode: way.wayCode, wayName: way.wayName })
-        //       return result
-        //     }, {})
-        //
-        // const groupedWays = groupByWayType(ways)
-        //
-        // for (const wayType in groupedWays) {
-        //   console.log(`${wayType}:`)
-        //   for (const way of groupedWays[wayType]) {
-        //     console.log(`- ${way.wayCode} ${way.wayName}`)
-        //   }
-        // }
-
         const groupedWays = that.groupBy(ways, 'wayType')
 
-        for (const wayType in groupedWays) {
-          console.log(`${wayType}:`)
+        // 指定顺序排序
+        const order = ['WECHAT', 'ALIPAY', 'YSFPAY', 'UNIONPAY', 'OTHER']
+        const sortedGroupedWays = Object.fromEntries(
+            Object.entries(groupedWays)
+                .sort(([keyA], [keyB]) => {
+                  const indexA = order.indexOf(keyA)
+                  const indexB = order.indexOf(keyB)
+                  return indexA - indexB
+                })
+        )
+
+        for (const wayType in sortedGroupedWays) {
           const group = {
             name: that.getGroupName(wayType),
             ways: []
           }
-          for (const way of groupedWays[wayType]) {
-            console.log(`- ${way.wayCode} ${way.wayName}`)
+          for (const way of sortedGroupedWays[wayType]) {
             group.ways.push({ wayCode: way.wayCode, wayName: way.wayName })
           }
           that.groupedWays.push(group)
         }
-        console.log(that.groupedWays)
 
-        res.records.forEach(item => {
-          that.wayCodesOptions.push({
-            label: item.wayName,
-            value: item.wayCode
-          })
-        })
+        // res.records.forEach(item => {
+        //   that.wayCodesOptions.push({
+        //     label: item.wayName,
+        //     value: item.wayCode
+        //   })
+        // })
       })
     },
     // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
