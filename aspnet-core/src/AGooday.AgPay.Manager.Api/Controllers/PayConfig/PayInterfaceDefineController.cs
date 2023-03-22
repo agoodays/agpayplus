@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 value.Add("wayCode", wayCode);
                 jsonArray.Add(value);
             }
-            dto.WayCodes = JArray.FromObject(wayCodes);
+            dto.WayCodes = jsonArray;
             var result = _payIfDefineService.Add(dto);
             if (!result)
             {

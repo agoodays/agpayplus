@@ -185,7 +185,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_NOTICEINFO', '公告管理', '
 DROP TABLE IF EXISTS `t_pay_rate_config`;
 CREATE TABLE `t_pay_rate_config` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, agentSubagent-子代理商 ,mgrMch-商户 ,agentMch-商户',
+  `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, agentSubagent-子代理商, mgrMch-商户, agentMch-代理商商户',
   `config_type` VARCHAR(20) NOT NULL COMMENT '配置类型: ISVCOST-服务商低价, AGENTRATE-代理商费率, AGENTDEF-代理商默认费率 ,MCHAPPLYDEF-商户进件默认费率',
   `info_type` TINYINT NOT NULL COMMENT '账号类型:1-服务商 2-商户 3-商户应用',
   `info_id` VARCHAR(64) NOT NULL COMMENT '服务商号/商户号/应用ID',
@@ -286,9 +286,11 @@ ALTER TABLE `t_pay_interface_define`
   ADD COLUMN `is_open_cashout` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启提现: 0-关闭, 1-开启' AFTER `is_support_cashout`;
 
 ALTER TABLE `t_pay_interface_config`
+  CHANGE `info_type` `info_type` VARCHAR(20) NOT NULL COMMENT '账号类型:ISV-服务商, ISV_OAUTH2-服务商oauth2, AGENT-代理商, MCH_APP-商户应用, MCH_APP_OAUTH2-商户应用oauth2',
+  ADD COLUMN `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, mgrMch-商户, agentSubagent-子代理商, agentMch-代理商商户, mchSelfApp1-小程序支付配置, mchSelfApp2-支付配置' AFTER `info_id`,
   ADD COLUMN `sett_hold_day` TINYINT DEFAULT 0 NOT NULL COMMENT '结算周期（自然日）' AFTER `if_params`;
 
-ALTER TABLE `t_pay_way`
+ALTER TABLE `t_pay_way`   
   ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他' AFTER `way_name`;
 
 SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'WX_%';

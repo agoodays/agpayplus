@@ -46,7 +46,7 @@
             :color="record.wayType === 'WECHAT' ? 'rgb(4, 190, 2)' :
               record.wayType === 'ALIPAY' ? 'rgb(23, 121, 255)' :
               record.wayType === 'YSFPAY' ? '#f5222d' :
-              record.wayType === 'UNIONPAY' ? '#142B8C' : '#fa8c16'">
+              record.wayType === 'UNIONPAY' ? '#00508e' : '#fa8c16'">
             {{ record.wayType === 'WECHAT' ? '微信' :
               record.wayType === 'ALIPAY' ? '支付宝' :
               record.wayType === 'YSFPAY' ? '云闪付' :
