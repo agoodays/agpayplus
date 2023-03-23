@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             //_cache.Remove("ErrorData");
             dto.IsAdmin = CS.NO;
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
-            dto.BelongInfoId = "0";
+            dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             _sysUserService.Create(dto);
             //var errorData = _cache.Get("ErrorData");
             //if (errorData == null)

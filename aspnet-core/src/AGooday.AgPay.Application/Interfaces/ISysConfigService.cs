@@ -1,21 +1,21 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Common.Constants;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
     public interface ISysConfigService : IDisposable
     {
+        void InitDBConfig(string groupKey);
         DBApplicationConfig GetDBApplicationConfig();
         DBOssConfig GetDBOssConfig();
-        int UpdateByConfigKey(Dictionary<string, string> configs);
+        int UpdateByConfigKey(Dictionary<string, string> configs, string groupKey, string sysType, string belongInfoId);
+        IEnumerable<SysConfigDto> GetByGroupKey(string groupKey, string sysType, string belongInfoId);
+        Dictionary<string, string> GetKeyValueByGroupKey(string groupKey, string sysType, string belongInfoId);
         void Add(SysConfigDto dto);
         void Remove(string recordId);
         void Update(SysConfigDto dto);
         bool SaveOrUpdate(SysConfigDto dto);
         SysConfigDto GetById(string recordId);
+        SysConfigDto GetByKey(string configKey, string sysType, string belongInfoId);
         IEnumerable<SysConfigDto> GetAll();
-        IEnumerable<SysConfigDto> GetByKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0");
-        Dictionary<string, string> GetKeyValueByGroupKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0");
-        void InitDBConfig(string groupKey);
     }
 }

@@ -206,7 +206,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         [HttpGet, Route("treaty"), NoLog]
         public ApiRes Treaty()
         {
-            var configList = _sysConfigService.GetKeyValueByGroupKey("agentTreatyConfig");
+            var configList = _sysConfigService.GetKeyValueByGroupKey("agentTreatyConfig", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
             return ApiRes.Ok(configList);
         }
 

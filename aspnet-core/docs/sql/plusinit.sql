@@ -304,10 +304,10 @@ UPDATE `t_pay_way` SET `way_type` = 'YSFPAY' WHERE `way_code` LIKE 'YSF_%';
 UPDATE `t_pay_way` SET `way_type` = 'OTHER' WHERE `way_code` LIKE 'PP_%';
 
 ALTER TABLE `t_sys_config`   
-  ADD COLUMN `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心' AFTER `type`
+  ADD COLUMN `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心' AFTER `type`,
   ADD COLUMN `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 0(平台)' AFTER `sys_type`;
 
-SELECT GROUP_CONCAT(CONCAT('''',group_key,'''')) FROM `t_sys_config`
+-- SELECT GROUP_CONCAT(CONCAT('''',group_key,'''')) FROM `t_sys_config`;
 UPDATE `t_sys_config` SET `sys_type` = 'MGR', belong_info_id = 0 WHERE `group_key` IN ('agentTreatyConfig','agentTreatyConfig','applicationConfig','ossConfig','apiMapConfig','apiMapConfig','apiMapConfig','mchTreatyConfig','mchTreatyConfig','applicationConfig','applicationConfig','ossConfig','ossConfig','applicationConfig')
 
 ALTER TABLE `t_sys_config`   

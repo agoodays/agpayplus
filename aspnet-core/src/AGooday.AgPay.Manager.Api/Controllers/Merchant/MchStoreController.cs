@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Application.Services;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
@@ -140,7 +141,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             //var apiMapWebKey = "73c97ee762590de79509117207e170ab";
             //var apiMapWebSecret = "7fec782d86662766f46d8d92e4651154";
 
-            var configList = _sysConfigService.GetKeyValueByGroupKey("apiMapConfig");
+            var configList = _sysConfigService.GetKeyValueByGroupKey("apiMapConfig", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
             return ApiRes.Ok(configList);
         }
     }

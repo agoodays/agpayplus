@@ -18,6 +18,13 @@
             public const string MGR = "MGR";
         }
 
+        public interface BASE_BELONG_INFO_ID
+        {
+            public const string MGR = "0";
+            public const string AGENT = "A0000000000";
+            public const string MCH = "M0000000000";
+        }
+
         /** yes or no **/
         public const byte NO = 0;
         public const byte YES = 1;

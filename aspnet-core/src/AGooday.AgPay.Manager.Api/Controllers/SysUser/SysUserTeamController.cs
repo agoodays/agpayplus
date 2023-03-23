@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_LIST)]
         public ApiRes List([FromQuery] SysUserTeamQueryDto dto)
         {
-            dto.BelongInfoId = string.IsNullOrWhiteSpace(dto.BelongInfoId) ? (dto.SysType ?? string.Empty).Equals(CS.SYS_TYPE.MGR) ? "0" : dto.BelongInfoId : dto.BelongInfoId;
+            dto.BelongInfoId = string.IsNullOrWhiteSpace(dto.BelongInfoId) ? (dto.SysType ?? string.Empty).Equals(CS.SYS_TYPE.MGR) ? CS.BASE_BELONG_INFO_ID.MGR : dto.BelongInfoId : dto.BelongInfoId;
             var data = _mchStoreService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         public ApiRes Add(SysUserTeamDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MGR;
-            dto.BelongInfoId = "0";
+            dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             var result = _mchStoreService.Add(dto);
             if (!result)
             {

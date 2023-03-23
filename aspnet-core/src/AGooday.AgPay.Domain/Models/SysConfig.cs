@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 配置KEY
         /// </summary>
         [Comment("配置KEY")]
-        [Key, Required, Column("config_key", TypeName = "varchar(50)")]
+        [Required, Column("config_key", TypeName = "varchar(50)")]
         public string ConfigKey { get; set; }
 
         /// <summary>

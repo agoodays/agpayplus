@@ -45,7 +45,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_LIST, PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
         public ApiRes List([FromQuery] SysRoleQueryDto dto)
         {
-            dto.BelongInfoId = string.IsNullOrWhiteSpace(dto.BelongInfoId) ? (dto.SysType ?? string.Empty).Equals(CS.SYS_TYPE.MGR) ? "0" : dto.BelongInfoId : dto.BelongInfoId;
+            dto.BelongInfoId = string.IsNullOrWhiteSpace(dto.BelongInfoId) ? (dto.SysType ?? string.Empty).Equals(CS.SYS_TYPE.MGR) ? CS.BASE_BELONG_INFO_ID.MGR : dto.BelongInfoId : dto.BelongInfoId;
             var data = _sysRoleService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         {
             dto.RoleId = $"ROLE_{StringUtil.GetUUID(6)}";
             dto.SysType = CS.SYS_TYPE.MGR;
-            dto.BelongInfoId = "0";
+            dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             _sysRoleService.Add(dto);
 
             //如果包含： 可分配权限的权限 && EntIds 不为空

@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
@@ -36,7 +37,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_INFO)]
         public ApiRes GetConfigs(string groupKey)
         {
-            var configList = _sysConfigService.GetByKey(groupKey);
+            var configList = _sysConfigService.GetByGroupKey(groupKey, CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
             return ApiRes.Ok(configList);
         }
 
@@ -54,7 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
             //{
             //    _sysConfigService.SaveOrUpdate(new SysConfigDto() { ConfigKey = config.Key, ConfigVal = config.Value });
             //}
-            int update = _sysConfigService.UpdateByConfigKey(configs);
+            int update = _sysConfigService.UpdateByConfigKey(configs, groupKey, CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
             if (update <= 0)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");

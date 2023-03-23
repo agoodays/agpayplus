@@ -16,5 +16,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.AsNoTracking().Any(c => c.ConfigKey == configKey);
         }
+
+        public SysConfig GetByKey(string configKey, string sysType, string belongInfoId)
+        {
+            var sysConfig = DbSet
+                .Where(w => w.ConfigKey.Equals(configKey) && w.SysType.Equals(sysType) && w.BelongInfoId.Equals(belongInfoId))
+                .FirstOrDefault();
+
+            return sysConfig;
+        }
     }
 }

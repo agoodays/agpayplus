@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="groupKey"></param>
         /// <returns></returns>
-        public Dictionary<string, string> GetKeyValueByGroupKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0")
+        public Dictionary<string, string> GetKeyValueByGroupKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = CS.BASE_BELONG_INFO_ID.MGR)
         {
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
 
@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="groupKey"></param>
         /// <returns></returns>
-        public string SelectByGroupKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0")
+        public string SelectByGroupKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = CS.BASE_BELONG_INFO_ID.MGR)
         {
             return JsonConvert.SerializeObject(GetKeyValueByGroupKey(groupKey, sysType, belongInfoId));
         }
@@ -137,20 +137,78 @@ namespace AGooday.AgPay.Application.Services
             return OSS_CONFIG.First().Value;
         }
 
-        public int UpdateByConfigKey(Dictionary<string, string> configs)
+        public int UpdateByConfigKey(Dictionary<string, string> configs, string groupKey, string sysType, string belongInfoId)
         {
             foreach (KeyValuePair<string, string> config in configs)
             {
-                var sysConfig = _sysConfigRepository.GetById(config.Key);
+                var sysConfig = _sysConfigRepository.GetByKey(config.Key, sysType, belongInfoId);
                 if (sysConfig == null)
                 {
-                    sysConfig = new SysConfig();
+                    switch (sysType)
+                    {
+                        case CS.SYS_TYPE.MCH:
+                            sysConfig = _sysConfigRepository.GetByKey(config.Key, sysType, CS.BASE_BELONG_INFO_ID.MCH);
+                            break;
+                        case CS.SYS_TYPE.AGENT:
+                            sysConfig = _sysConfigRepository.GetByKey(config.Key, sysType, CS.BASE_BELONG_INFO_ID.AGENT);
+                            break;
+                        case CS.SYS_TYPE.MGR:
+                        default:
+                            break;
+                    }
+
+                    sysConfig = sysConfig ?? new SysConfig()
+                    {
+                        SysType = sysType,
+                        BelongInfoId = belongInfoId,
+                        ConfigKey = config.Key,
+                        ConfigVal = config.Value,
+                        GroupKey = groupKey,
+                    };
+                    sysConfig.BelongInfoId = belongInfoId;
+                    _sysConfigRepository.Add(sysConfig);
                 }
-                sysConfig.ConfigKey = config.Key;
-                sysConfig.ConfigVal = config.Value;
-                _sysConfigRepository.SaveOrUpdate(sysConfig, sysConfig.ConfigKey);
+                else
+                {
+                    sysConfig.ConfigKey = config.Key;
+                    sysConfig.ConfigVal = config.Value;
+                    _sysConfigRepository.Update(sysConfig);
+                }
             }
             return _sysConfigRepository.SaveChanges();
+        }
+
+        public IEnumerable<SysConfigDto> GetByGroupKey(string groupKey, string sysType, string belongInfoId)
+        {
+            var sysConfigs = _sysConfigRepository.GetAll()
+                .Where(w => w.GroupKey.Equals(groupKey) && w.SysType.Equals(sysType) && w.BelongInfoId.Equals(belongInfoId))
+                .OrderBy(o => o.SortNum);
+            List<SysConfig> mergedList = new List<SysConfig>(sysConfigs);
+            switch (sysType)
+            {
+                case CS.SYS_TYPE.MCH:
+                    MergedSysConfig(groupKey, sysType, sysConfigs, mergedList, CS.BASE_BELONG_INFO_ID.MCH);
+                    break;
+                case CS.SYS_TYPE.AGENT:
+                    MergedSysConfig(groupKey, sysType, sysConfigs, mergedList, CS.BASE_BELONG_INFO_ID.AGENT);
+                    break;
+                case CS.SYS_TYPE.MGR:
+                default:
+                    break;
+            }
+            return _mapper.Map<IEnumerable<SysConfigDto>>(mergedList);
+        }
+
+        private void MergedSysConfig(string groupKey, string sysType, IOrderedQueryable<SysConfig> sysConfigs, List<SysConfig> mergedList, string belongInfoId)
+        {
+            var sysConfigsTemp = _sysConfigRepository.GetAll()
+                .Where(w => w.GroupKey.Equals(groupKey) && w.SysType.Equals(sysType) && w.BelongInfoId.Equals(belongInfoId))
+                .OrderBy(o => o.SortNum);
+            var mergingList = sysConfigsTemp
+                .Where(sc => !sysConfigs.Any(temp => temp.ConfigKey == sc.ConfigKey))
+                .Select(sc => sc)
+                .ToList();
+            mergedList.AddRange(mergingList);
         }
 
         public void Add(SysConfigDto dto)
@@ -187,17 +245,16 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public SysConfigDto GetByKey(string configKey, string sysType, string belongInfoId)
+        {
+            var entity = _sysConfigRepository.GetByKey(configKey, sysType, belongInfoId);
+            var dto = _mapper.Map<SysConfigDto>(entity);
+            return dto;
+        }
+
         public IEnumerable<SysConfigDto> GetAll()
         {
             var sysConfigs = _sysConfigRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysConfigDto>>(sysConfigs);
-        }
-
-        public IEnumerable<SysConfigDto> GetByKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0")
-        {
-            var sysConfigs = _sysConfigRepository.GetAll()
-                .Where(w => w.GroupKey.Equals(groupKey) && w.SysType.Equals(sysType) && w.BelongInfoId.Equals(belongInfoId))
-                .OrderBy(o => o.SortNum);
             return _mapper.Map<IEnumerable<SysConfigDto>>(sysConfigs);
         }
     }
