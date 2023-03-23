@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
@@ -73,14 +74,16 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="groupKey"></param>
         /// <returns></returns>
-        public Dictionary<string, string> GetKeyValueByGroupKey(string groupKey)
+        public Dictionary<string, string> GetKeyValueByGroupKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0")
         {
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-            _sysConfigRepository.GetAll().Where(w => w.GroupKey.Equals(groupKey))
-                .Select(s => new { s.ConfigKey, s.ConfigVal }).ToList().ForEach((c) =>
-                {
-                    keyValuePairs.Add(c.ConfigKey, c.ConfigVal);
-                });
+
+            var sysConfigs = _sysConfigRepository.GetAll()
+                .Where(w => w.GroupKey.Equals(groupKey) && w.SysType.Equals(sysType) && w.BelongInfoId.Equals(belongInfoId));
+            sysConfigs.Select(s => new { s.ConfigKey, s.ConfigVal }).ToList().ForEach((c) =>
+            {
+                keyValuePairs.Add(c.ConfigKey, c.ConfigVal);
+            });
             return keyValuePairs;
         }
 
@@ -89,9 +92,9 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="groupKey"></param>
         /// <returns></returns>
-        public string SelectByGroupKey(string groupKey)
+        public string SelectByGroupKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0")
         {
-            return JsonConvert.SerializeObject(GetKeyValueByGroupKey(groupKey));
+            return JsonConvert.SerializeObject(GetKeyValueByGroupKey(groupKey, sysType, belongInfoId));
         }
 
         /// <summary>
@@ -187,6 +190,14 @@ namespace AGooday.AgPay.Application.Services
         public IEnumerable<SysConfigDto> GetAll()
         {
             var sysConfigs = _sysConfigRepository.GetAll();
+            return _mapper.Map<IEnumerable<SysConfigDto>>(sysConfigs);
+        }
+
+        public IEnumerable<SysConfigDto> GetByKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0")
+        {
+            var sysConfigs = _sysConfigRepository.GetAll()
+                .Where(w => w.GroupKey.Equals(groupKey) && w.SysType.Equals(sysType) && w.BelongInfoId.Equals(belongInfoId))
+                .OrderBy(o => o.SortNum);
             return _mapper.Map<IEnumerable<SysConfigDto>>(sysConfigs);
         }
     }

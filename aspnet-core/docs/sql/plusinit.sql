@@ -303,6 +303,17 @@ UPDATE `t_pay_way` SET `way_type` = 'ALIPAY' WHERE `way_code` LIKE 'ALI_%';
 UPDATE `t_pay_way` SET `way_type` = 'YSFPAY' WHERE `way_code` LIKE 'YSF_%';
 UPDATE `t_pay_way` SET `way_type` = 'OTHER' WHERE `way_code` LIKE 'PP_%';
 
+ALTER TABLE `t_sys_config`   
+  ADD COLUMN `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心' AFTER `type`
+  ADD COLUMN `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 0(平台)' AFTER `sys_type`;
+
+SELECT GROUP_CONCAT(CONCAT('''',group_key,'''')) FROM `t_sys_config`
+UPDATE `t_sys_config` SET `sys_type` = 'MGR', belong_info_id = 0 WHERE `group_key` IN ('agentTreatyConfig','agentTreatyConfig','applicationConfig','ossConfig','apiMapConfig','apiMapConfig','apiMapConfig','mchTreatyConfig','mchTreatyConfig','applicationConfig','applicationConfig','ossConfig','ossConfig','applicationConfig')
+
+ALTER TABLE `t_sys_config`   
+  DROP PRIMARY KEY,
+  ADD PRIMARY KEY (`config_key`, `sys_type`, `belong_info_id`);
+
 ALTER TABLE `t_pay_order`   
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_no`,
   ADD COLUMN `isv_name` VARCHAR(64) NULL COMMENT '服务商名称' AFTER `isv_no`,

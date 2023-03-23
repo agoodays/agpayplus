@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Common.Constants;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
@@ -13,7 +14,8 @@ namespace AGooday.AgPay.Application.Interfaces
         bool SaveOrUpdate(SysConfigDto dto);
         SysConfigDto GetById(string recordId);
         IEnumerable<SysConfigDto> GetAll();
-        Dictionary<string, string> GetKeyValueByGroupKey(string groupKey);
+        IEnumerable<SysConfigDto> GetByKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0");
+        Dictionary<string, string> GetKeyValueByGroupKey(string groupKey, string sysType = CS.SYS_TYPE.MGR, string belongInfoId = "0");
         void InitDBConfig(string groupKey);
     }
 }

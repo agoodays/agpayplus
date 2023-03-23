@@ -36,9 +36,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_INFO)]
         public ApiRes GetConfigs(string groupKey)
         {
-            var configList = _sysConfigService.GetAll()
-                .Where(w => string.IsNullOrWhiteSpace(groupKey) || w.GroupKey.Equals(groupKey))
-                .OrderBy(o => o.SortNum);
+            var configList = _sysConfigService.GetByKey(groupKey);
             return ApiRes.Ok(configList);
         }
 

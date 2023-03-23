@@ -48,7 +48,9 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<RefundOrder, RefundOrderDto>();
             CreateMap<SysArticle, SysArticleDto>()
                 .ForMember(d => d.ArticleRange, o => o.MapFrom(s => JArray.Parse(s.ArticleRange)));
-            CreateMap<SysConfig, SysConfigDto>();
+            CreateMap<SysConfig, SysConfigDto>()
+                .ForMember(dest => dest.SysType, opt => opt.Ignore())
+                .ForMember(dest => dest.BelongInfoId, opt => opt.Ignore());
             CreateMap<SysEntitlement, SysEntitlementDto>();
             CreateMap<SysLog, SysLogDto>();
             CreateMap<SysRole, SysRoleDto>();
