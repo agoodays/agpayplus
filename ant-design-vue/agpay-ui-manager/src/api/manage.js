@@ -114,6 +114,8 @@ export const API_URL_AGENT_PAYCONFIGS_LIST = '/api/agent/payConfigs'
 export const API_URL_MCH_PAYCONFIGS_LIST = '/api/mch/payConfigs'
 /** 商户支付通道配置 **/
 export const API_URL_MCH_PAYPASSAGE_LIST = '/api/mch/payPassages'
+/** 商户高级配置 **/
+export const API_URL_MCH_CONFIG = 'api/mchConfig'
 /** 转账订单管理 **/
 export const API_URL_TRANSFER_ORDER_LIST = '/api/transferOrders'
 
@@ -314,6 +316,13 @@ export function getUserInfo () {
 export function getConfigs (parameter) {
   return request.request({
     url: API_URL_SYS_CONFIG + '/' + parameter,
+    method: 'GET'
+  })
+}
+
+export function getMchConfigs (parameter) {
+  return request.request({
+    url: API_URL_MCH_CONFIG + '/' + parameter,
     method: 'GET'
   })
 }

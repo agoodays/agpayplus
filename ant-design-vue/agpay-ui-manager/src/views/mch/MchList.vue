@@ -60,6 +60,7 @@
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_INFO_EDIT')" @click="editFunc(record.mchNo)">修改</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_APP_CONFIG')" @click="mchAppConfig(record.mchNo)">应用配置</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_APP_CONFIG')" @click="mchConfigFunc(record.mchNo)">高级功能配置</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_INFO_DEL')" style="color: red" @click="delFunc(record.mchNo)">删除</a-button>
           </AgTableColumns>
         </template>
@@ -69,6 +70,8 @@
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
     <!-- 新增页面组件  -->
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
+    <!-- 新增页面组件  -->
+    <MchConfig ref="mchConfig" :callbackFunc="searchFunc"/>
   </page-header-wrapper>
 </template>
 <script>
@@ -78,6 +81,7 @@ import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_MCH_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import InfoDetail from './Detail'
+import MchConfig from './MchConfig'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
@@ -94,7 +98,7 @@ const tableColumns = [
 
 export default {
   name: 'MchListPage',
-  components: { AgTable, AgTableColumns, InfoAddOrEdit, InfoDetail, AgTextUp },
+  components: { AgTable, AgTableColumns, InfoAddOrEdit, InfoDetail, MchConfig, AgTextUp },
   data () {
     return {
       btnLoading: false,
@@ -125,6 +129,9 @@ export default {
     },
     detailFunc: function (recordId) { // 商户详情页
       this.$refs.infoDetail.show(recordId)
+    },
+    mchConfigFunc: function (recordId) { // 商户配置页
+      this.$refs.mchConfig.show(recordId)
     },
     // 删除商户
     delFunc: function (recordId) {

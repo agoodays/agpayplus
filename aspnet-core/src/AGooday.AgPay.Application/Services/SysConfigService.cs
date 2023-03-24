@@ -164,14 +164,17 @@ namespace AGooday.AgPay.Application.Services
                         ConfigKey = config.Key,
                         ConfigVal = config.Value,
                         GroupKey = groupKey,
+                        UpdatedAt = DateTime.Now,
                     };
                     sysConfig.BelongInfoId = belongInfoId;
+                    sysConfig.UpdatedAt = DateTime.Now;
                     _sysConfigRepository.Add(sysConfig);
                 }
                 else
                 {
                     sysConfig.ConfigKey = config.Key;
                     sysConfig.ConfigVal = config.Value;
+                    sysConfig.UpdatedAt = DateTime.Now;
                     _sysConfigRepository.Update(sysConfig);
                 }
             }
