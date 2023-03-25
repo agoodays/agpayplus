@@ -497,6 +497,15 @@ ALTER TABLE `t_sys_config`
 INSERT INTO `t_sys_config` VALUES ('appVoice', '是否启用app订单语音播报', '是否启用app订单语音播报', 'orderConfig', '系统配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-03-23 23:30:00');
 INSERT INTO `t_sys_config` VALUES ('qrcEscaping', '是否启用码牌防逃单功能', '是否启用码牌防逃单功能', 'orderConfig', '系统配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-03-23 23:30:00');
 
+INSERT INTO `t_sys_config` VALUES ('mchPayNotifyUrl', 'POS支付回调地址', 'POS支付回调地址', 'payOrderNotifyConfig', '回调和查单参数', '', 'text', 'MCH', 'M0000000000', 10, '2023-03-24 23:30:00');
+INSERT INTO `t_sys_config` VALUES ('mchRefundNotifyUrl', 'POS退款回调地址', 'POS退款回调地址', 'payOrderNotifyConfig', '回调和查单参数', '', 'text', 'MCH', 'M0000000000', 20, '2023-03-24 23:30:00');
+INSERT INTO `t_sys_config` VALUES ('mchNotifyPostType', '商户接收通知方式', '商户接收通知方式', 'payOrderNotifyConfig', '回调和查单参数', 'POST_JSON', 'radio', 'MCH', 'M0000000000', 30, '2023-03-24 23:30:00');
+INSERT INTO `t_sys_config` VALUES ('payOrderNotifyExtParams', '支付订单回调和查单参数', '支付订单回调和查单参数', 'payOrderNotifyConfig', '回调和查单参数', '[]', 'text', 'MCH', 'M0000000000', 40, '2023-03-24 23:30:00');
+
+INSERT INTO `t_sys_config` VALUES ('divisionConfig', '分账管理', '分账管理', 'divisionManage', '分账管理', '{"overrideAutoFlag":0,"autoDivisionRules":{"amountLimit":0,"delayTime":120},"mchDivisionEntFlag":1}', 'text', 'MCH', 'M0000000000', 0, '2023-03-25 13:30:00');
+
+INSERT INTO `t_sys_config` VALUES ('mchApiEntList', '商户接口权限集合', '商户接口权限集合', 'mchApiEnt', '商户接口权限集合', '[]', 'text', 'MCH', 'M0000000000', 0, '2023-03-25 22:30:00');
+
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_ISV_MCH_COUNT', '服务商/商户统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_DAY_COUNT', '今日/昨日交易统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TREND_COUNT', '趋势图统计	', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());

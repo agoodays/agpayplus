@@ -320,10 +320,11 @@ export function getConfigs (parameter) {
   })
 }
 
-export function getMchConfigs (parameter) {
+export function getMchConfigs (parameter, data) {
   return request.request({
     url: API_URL_MCH_CONFIG + '/' + parameter,
-    method: 'GET'
+    method: 'GET',
+    params: data
   })
 }
 
