@@ -521,5 +521,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TREND_COUNT', '趋势图统
 
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG_PAGE', '应用配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
 
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG', '系统配置', 'setting', '/config', 'MchConfigPage', 'ML', 0, 1,  'ENT_SYS_CONFIG', '30', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG_EDIT', '按钮：修改系统配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_CONFIG', '0', 'MCH', NOW(), NOW());
 
 

@@ -113,6 +113,9 @@ export const API_URL_DIVISION_RECEIVER = '/api/divisionReceivers'
 /** 分账记录管理 **/
 export const API_URL_PAY_ORDER_DIVISION_RECORD_LIST = '/api/division/records'
 
+/** 商户配置 **/
+export const API_URL_MCH_CONFIG = 'api/mchConfig'
+
 /** 上传图片/文件地址 **/
 export const upload = {
   avatar: request.baseUrl + '/api/ossFiles/avatar',
@@ -150,6 +153,14 @@ export function getRoleList (parameter) {
     url: '/api/sysRoles',
     method: 'get',
     params: parameter
+  })
+}
+
+export function getMchConfigs (parameter, data) {
+  return request.request({
+    url: API_URL_MCH_CONFIG + '/' + parameter,
+    method: 'GET',
+    params: data
   })
 }
 

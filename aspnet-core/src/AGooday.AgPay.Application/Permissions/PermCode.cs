@@ -226,6 +226,8 @@
             public const string ENT_COMMONS = "ENT_COMMONS";
             public const string ENT_DIVISION = "ENT_DIVISION";
             public const string ENT_SYS_CONFIG = "ENT_SYS_CONFIG";
+            public const string ENT_MCH_CONFIG = "ENT_MCH_CONFIG";
+            public const string ENT_MCH_CONFIG_EDIT = "ENT_MCH_CONFIG_EDIT";
             public const string ENT_ORDER = "ENT_ORDER";
             public const string ENT_MCH_CENTER = "ENT_MCH_CENTER";
             public const string ENT_MCH_MAIN = "ENT_MCH_MAIN";
