@@ -185,7 +185,7 @@
         <div class="account-settings-info-view" v-if="['mchApiEnt'].indexOf(groupKey)>=0">
           <a-form-model ref="configFormModel">
             <a-row>
-              <a-col :span="22" :offset="1">
+              <a-col :span="24">
                 <div v-if="isShowMchApiEnt">
                   <a-table
                     size="small"
@@ -198,7 +198,7 @@
               </a-col>
             </a-row>
             <a-row>
-              <a-col :span="19">
+              <a-col :span="24">
                 <a-form-item style="display:flex;justify-content:center">
                   <a-button type="primary" icon="check-circle" @click="confirm($event, '商户的接口权限')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>

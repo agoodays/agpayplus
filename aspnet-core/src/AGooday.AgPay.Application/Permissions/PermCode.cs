@@ -82,6 +82,7 @@
             public const string ENT_MCH_INFO_DEL = "ENT_MCH_INFO_DEL";
             public const string ENT_MCH_INFO_ADD = "ENT_MCH_INFO_ADD";
             public const string ENT_MCH_APP_CONFIG = "ENT_MCH_APP_CONFIG";
+            public const string ENT_MCH_CONFIG_PAGE = "ENT_MCH_CONFIG_PAGE";
             public const string ENT_MCH_PAY_CONFIG_LIST = "ENT_MCH_PAY_CONFIG_LIST";
             public const string ENT_MCH_APP_VIEW = "ENT_MCH_APP_VIEW";
             public const string ENT_MCH_APP_LIST = "ENT_MCH_APP_LIST";

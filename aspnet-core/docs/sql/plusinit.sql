@@ -519,6 +519,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TYPE_COUNT', '主页交易�
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_DAY_COUNT', '今日/昨日交易统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MCH', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TREND_COUNT', '趋势图统计	', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MCH', NOW(), NOW());
 
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG_PAGE', '应用配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
 
 
 

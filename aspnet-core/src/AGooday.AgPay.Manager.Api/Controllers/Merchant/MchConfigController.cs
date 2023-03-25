@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="groupKey"></param>
         /// <returns></returns>
         [HttpGet, Route("{groupKey}"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_INFO)]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_CONFIG_PAGE)]
         public ApiRes GetConfigs(string groupKey, string mchNo)
         {
             var configList = _sysConfigService.GetByGroupKey(groupKey, CS.SYS_TYPE.MCH, mchNo);
@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="configs"></param>
         /// <returns></returns>
         [HttpPut, Route("{groupKey}"), MethodLog("更新商户配置信息")]
-        [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_EDIT)]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_CONFIG_PAGE)]
         public ApiRes Update(string groupKey, MchConfigRequest request)
         {
             int update = _sysConfigService.UpdateByConfigKey(request.Configs, groupKey, CS.SYS_TYPE.MCH, request.MchNo);
