@@ -202,9 +202,9 @@ export default {
     },
     changeInfo () { // 更新基本信息事件
       const that = this
-        this.$refs.infoFormModel.validate(valid => {
-          if (valid) { // 验证通过
-            this.$infoBox.confirmPrimary('确认更新信息吗？', '', () => {
+      this.$refs.infoFormModel.validate(valid => {
+        if (valid) { // 验证通过
+          this.$infoBox.confirmPrimary('确认更新信息吗？', '', () => {
             // 请求接口
             that.btnLoading = true // 打开按钮上的 loading
               updateUserInfo(that.saveObject).then(res => {
@@ -223,22 +223,22 @@ export default {
                 that.btnLoading = false // 打开按钮上的 loading
               })
             })
-          }
-        })
+        }
+      })
     },
     confirm (e) { // 确认更新密码
       const that = this
-        this.$refs.pwdFormModel.validate(valid => {
-          if (valid) { // 验证通过
-            this.$infoBox.confirmPrimary('确认更新密码吗？', '', () => {
+      this.$refs.pwdFormModel.validate(valid => {
+        if (valid) { // 验证通过
+          this.$infoBox.confirmPrimary('确认更新密码吗？', '', () => {
               // 请求接口
               that.btnLoading = true // 打开按钮上的 loading
               that.confirmLoading = true // 显示loading
-              that.updateObject.recordId = that.recordId // 用户ID
-              that.updateObject.originalPwd = Base64.encode(that.updateObject.originalPwd)
-              that.updateObject.confirmPwd = Base64.encode(that.updateObject.confirmPwd)
+              const recordId = that.recordId // 用户ID
+              const originalPwd = Base64.encode(that.updateObject.originalPwd)
+              const confirmPwd = Base64.encode(that.updateObject.confirmPwd)
               this.$delete(this.updateObject, 'newPwd')
-              updateUserPass(that.updateObject).then(res => {
+              updateUserPass({ recordId, originalPwd, confirmPwd }).then(res => {
                 that.$message.success('修改成功')
                 // 退出登录
                 this.$store.dispatch('Logout').then(() => {
@@ -249,12 +249,12 @@ export default {
                 that.btnLoading = false
               })
             })
-          }
-        })
+        }
+      })
     },
     selectParentTabs (key) { // 清空必填提示
-        this.parentKey = key
-        this.$route.params.parentKey = key
+      this.parentKey = key
+      this.$route.params.parentKey = key
       if (this.$refs.pwdFormModel !== undefined) {
         this.$refs.pwdFormModel.resetFields()
       }

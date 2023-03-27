@@ -180,6 +180,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             // 插入商户基本信息
             // 存入商户默认用户ID
+            mchInfo.Sipw = BCrypt.Net.BCrypt.HashPassword(CS.DEFAULT_SIPW);
             mchInfo.InitUserId = sysUser.SysUserId;
             _mchInfoRepository.Add(mchInfo);
 

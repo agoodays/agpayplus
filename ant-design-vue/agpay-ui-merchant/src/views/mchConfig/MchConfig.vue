@@ -203,13 +203,13 @@
             <a-col :md="16" :lg="16">
               <a-form-model ref="pwdFormModel" :model="updateObject" :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
                 <a-form-model-item label="原支付密码：" prop="originalPwd">
-                  <a-input-password v-model="updateObject.originalPwd" placeholder="请输入原支付密码" />
+                  <a-input-password :maxlength="6" v-model="updateObject.originalPwd" placeholder="请输入原支付密码" />
                 </a-form-model-item>
                 <a-form-model-item label="新支付密码：" prop="newPwd">
-                  <a-input-password v-model="updateObject.newPwd" placeholder="请输入新支付密码" />
+                  <a-input-password :maxlength="6" v-model="updateObject.newPwd" placeholder="请输入新支付密码"/>
                 </a-form-model-item>
                 <a-form-model-item label="确认新支付密码：" prop="confirmPwd">
-                  <a-input-password v-model="updateObject.confirmPwd" placeholder="确认新支付密码" />
+                  <a-input-password :maxlength="6" v-model="updateObject.confirmPwd" placeholder="确认新支付密码"/>
                 </a-form-model-item>
               </a-form-model>
               <a-form-item style="display:flex;justify-content:center">
@@ -294,13 +294,22 @@ export default {
         confirmPwd: '' //  确认密码
       },
       rulesPass: {
-        originalPwd: [{ required: true, message: '请输入原支付密码(6位数字格式)', trigger: 'blur' }],
-        newPwd: [{ min: 6, max: 12, required: true, message: '请输入新支付密码(6位数字格式)', trigger: 'blur' }],
-        confirmPwd: [{ required: true, message: '请输入确认新支付密码', trigger: 'blur' }, {
-          validator: (rule, value, callBack) => {
-            this.updateObject.newPwd === value ? callBack() : callBack('新密码与确认密码不一致')
+        originalPwd: [
+          { min: 6, max: 6, required: true, message: '请输入原支付密码(6位数字格式)', trigger: 'blur' },
+          { pattern: /^\d{6}$/, message: '请输入原支付密码(6位数字格式)', trigger: 'blur' }
+        ],
+        newPwd: [
+          { min: 6, max: 6, required: true, message: '请输入新支付密码(6位数字格式)', trigger: 'blur' },
+          { pattern: /^\d{6}$/, message: '请输入新支付密码(6位数字格式)', trigger: 'blur' }
+        ],
+        confirmPwd: [
+          { min: 6, max: 6, required: true, message: '请输入确认新支付密码', trigger: 'blur' },
+          {
+            validator: (rule, value, callBack) => {
+              this.updateObject.newPwd === value ? callBack() : callBack('新密码与确认密码不一致')
+            }
           }
-        }]
+        ]
       }
     }
   },
@@ -394,14 +403,21 @@ export default {
     },
     setMchSipw (e, title, content) {
       const that = this
-      that.updateObject.originalPwd = Base64.encode(that.updateObject.originalPwd)
-      that.updateObject.confirmPwd = Base64.encode(that.updateObject.confirmPwd)
-      this.$delete(this.updateObject, 'newPwd')
-      req.updateById(API_URL_MCH_CONFIG, 'mchSipw', that.updateObject).then(res => {
-        that.$infoBox.modalWarning(title, content)
-        that.btnLoading = false
-      }).catch(res => {
-        that.btnLoading = false
+      this.$refs.pwdFormModel.validate(valid => {
+        if (valid) { // 验证通过
+          this.$infoBox.confirmPrimary('确认更新支付密码吗？', '', () => {
+            // 请求接口
+            that.btnLoading = true // 打开按钮上的 loading
+            const originalPwd = Base64.encode(that.updateObject.originalPwd)
+            const confirmPwd = Base64.encode(that.updateObject.confirmPwd)
+            req.updateById(API_URL_MCH_CONFIG, 'mchSipw', { originalPwd, confirmPwd }).then(res => {
+              that.$infoBox.modalWarning(title, content)
+              that.btnLoading = false
+            }).catch(res => {
+              that.btnLoading = false
+            })
+          })
+        }
       })
     }
   }

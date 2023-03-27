@@ -98,6 +98,11 @@
         public const string DEFAULT_PWD = "agpay666";
 
         /// <summary>
+        /// 默认支付密码
+        /// </summary>
+        public const string DEFAULT_SIPW = "888666";
+
+        /// <summary>
         /// 允许上传的的图片文件格式，需要与 WebSecurityConfig对应
         /// </summary>
         public static List<string> ALLOW_UPLOAD_IMG_SUFFIX = new List<string>() { "jpg" ,"png" ,"jpeg" ,"gif" ,"mp4" };
