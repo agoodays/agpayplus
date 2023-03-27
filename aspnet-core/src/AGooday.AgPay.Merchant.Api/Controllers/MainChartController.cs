@@ -36,6 +36,22 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         }
 
         /// <summary>
+        /// 商户基本信息、用户基本信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_INFO)]
+        public ApiRes MchInfo()
+        {
+            var sysUser = _sysUserService.GetById(GetCurrentUser().SysUser.SysUserId);
+            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
+            var jobj = JObject.FromObject(mchInfo);
+            jobj.Add("loginUsername", sysUser.LoginUsername);
+            jobj.Add("realname", sysUser.Realname);
+            return ApiRes.Ok(jobj);
+        }
+
+        /// <summary>
         /// 周交易总金额
         /// </summary>
         /// <returns></returns>
@@ -138,21 +154,6 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
             }
             return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(GetCurrentMchNo(), null, createdStart, createdEnd));
-        }
-
-        /// <summary>
-        /// 商户基本信息、用户基本信息
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet, Route("")]
-        public ApiRes UserDetail()
-        {
-            var sysUser = _sysUserService.GetById(GetCurrentUser().SysUser.SysUserId);
-            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
-            var jobj = JObject.FromObject(mchInfo);
-            jobj.Add("loginUsername", sysUser.LoginUsername);
-            jobj.Add("realname", sysUser.Realname);
-            return ApiRes.Ok(jobj);
         }
 
         private static void GetDateRange(string queryDateRange, out string createdStart, out string createdEnd)

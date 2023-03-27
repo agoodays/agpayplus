@@ -272,6 +272,7 @@
             public const string ENT_MCH_MAIN_PAY_TYPE_COUNT = "ENT_MCH_MAIN_PAY_TYPE_COUNT";
             public const string ENT_MCH_MAIN_USER_INFO = "ENT_MCH_MAIN_USER_INFO";
             public const string ENT_MCH_MAIN_PAY_AMOUNT_WEEK = "ENT_MCH_MAIN_PAY_AMOUNT_WEEK";
+            public const string ENT_MCH_INFO = "ENT_MCH_INFO";
             public const string ENT_MCH_APP = "ENT_MCH_APP";
             public const string ENT_MCH_PAY_TEST = "ENT_MCH_PAY_TEST";
             public const string ENT_MCH_TRANSFER = "ENT_MCH_TRANSFER";

@@ -1,5 +1,5 @@
 <template>
-  <div style="background: #fff">
+  <div style="background: #fff;border-radius:10px">
     <a-tabs @change="selectTabs" :animated="false">
       <a-tab-pane key="applicationConfig" tab="域名管理">
         <div class="account-settings-info-view" v-if="['applicationConfig'].indexOf(groupKey)>=0">

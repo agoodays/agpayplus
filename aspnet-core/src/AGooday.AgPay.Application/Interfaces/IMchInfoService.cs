@@ -9,6 +9,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Create(MchInfoCreateDto dto);
         void Remove(string recordId);
         bool Update(MchInfoDto dto);
+        bool UpdateById(MchInfoUpdateDto dto);
         void Modify(MchInfoModifyDto dto);
         MchInfoDto GetById(string recordId);
         MchInfoDetailDto GetByMchNo(string mchNo);

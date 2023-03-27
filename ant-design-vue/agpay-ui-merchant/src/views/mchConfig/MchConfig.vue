@@ -1,5 +1,5 @@
 <template>
-  <div style="background: #fff">
+  <div style="background: #fff;border-radius:10px">
     <a-tabs v-model="groupKey" @change="selectTabs" :animated="false">
       <a-tab-pane key="orderConfig" tab="系统配置">
         <div class="account-settings-info-view" v-if="['orderConfig'].indexOf(groupKey)>=0">
@@ -18,6 +18,44 @@
               <a-col :span="19">
                 <a-form-item style="display:flex;justify-content:center">
                   <a-button type="primary" icon="check-circle" @click="confirm($event, '系统配置')" :loading="btnLoading">确认更新</a-button>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form-model>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane key="mchLevel" tab="功能配置">
+        <div class="account-settings-info-view">
+          <a-form-model ref="configFormModel">
+            <a-row>
+              <a-col :span="8" :offset="1">
+                <a-form-model-item label="商户等级切换">
+                  <a-radio-group v-model="mchLevel">
+                    <a-radio value="M0">M0</a-radio>
+                    <a-radio value="M1">M1</a-radio>
+                  </a-radio-group>
+                </a-form-model-item>
+                <div class="components-popover-demo-placement">
+                  <div class="mchLevelPopover">
+                    <!-- title可省略，就不显示 -->
+                    <a-popover placement="top">
+                      <template slot="content">
+                        <p>M0商户：简单模式（页面简洁，仅基础收款功能）</p>
+                        <p>M1商户：高级模式（支持api调用， 支持配置应用及分账、转账功能）</p>
+                      </template>
+                      <template slot="title">
+                        <span>商户级别</span>
+                      </template>
+                      <a-icon type="question-circle" />
+                    </a-popover>
+                  </div>
+                </div>
+              </a-col>
+            </a-row>
+            <a-row>
+              <a-col :span="19">
+                <a-form-item style="display:flex;justify-content:center">
+                  <a-button type="primary" icon="check-circle" @click="setMchLevel($event, '提示', '更新成功，重新登录后将切换功能模式！')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -142,19 +180,43 @@
                 </div>
               </a-col>
               <a-col v-else>
-                <a-divider orientation="left">
-                  <a-icon type="info-circle" /> 全局自动分账规则
-                </a-divider>
+                <div style="height: 200px">
+                  <a-divider orientation="left">
+                    <a-icon type="info-circle" /> 当前没有可配置的选项
+                  </a-divider>
+                </div>
               </a-col>
             </a-row>
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" icon="check-circle" @click="confirm($event, '分账设置')" :loading="btnLoading">确认更新</a-button>
+                  <a-button v-if="divisionConfig.mchDivisionEntFlag" type="primary" icon="check-circle" @click="confirm($event, '分账设置')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
           </a-form-model>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane key="1" tab="安全管理">
+        <div class="account-settings-info-view">
+          <a-row :gutter="16">
+            <a-col :md="16" :lg="16">
+              <a-form-model ref="pwdFormModel" :model="updateObject" :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
+                <a-form-model-item label="原支付密码：" prop="originalPwd">
+                  <a-input-password v-model="updateObject.originalPwd" placeholder="请输入原支付密码" />
+                </a-form-model-item>
+                <a-form-model-item label="新支付密码：" prop="newPwd">
+                  <a-input-password v-model="updateObject.newPwd" placeholder="请输入新支付密码" />
+                </a-form-model-item>
+                <a-form-model-item label="确认新支付密码：" prop="confirmPwd">
+                  <a-input-password v-model="updateObject.confirmPwd" placeholder="确认新支付密码" />
+                </a-form-model-item>
+              </a-form-model>
+              <a-form-item style="display:flex;justify-content:center">
+                <a-button type="primary" icon="safety-certificate" @click="setMchSipw($event, '提示', '更新成功！')" :loading="btnLoading">确认更改</a-button>
+              </a-form-item>
+            </a-col>
+          </a-row>
         </div>
       </a-tab-pane>
     </a-tabs>
@@ -162,7 +224,8 @@
 </template>
 
 <script>
-import { API_URL_MCH_CONFIG, req, getMchConfigs } from '@/api/manage'
+import { API_URL_MCH_CONFIG, req, getMchConfigs, getMainUserInfo } from '@/api/manage'
+import { Base64 } from 'js-base64'
 const orderNotifyParamsColumns = [
   {
     title: '参数KEY',
@@ -223,6 +286,21 @@ export default {
           delayTime: 120
         },
         mchDivisionEntFlag: 1
+      },
+      mchLevel: 'M0',
+      updateObject: {
+        originalPwd: '', // 原密码
+        newPwd: '', //  新密码
+        confirmPwd: '' //  确认密码
+      },
+      rulesPass: {
+        originalPwd: [{ required: true, message: '请输入原支付密码(6位数字格式)', trigger: 'blur' }],
+        newPwd: [{ min: 6, max: 12, required: true, message: '请输入新支付密码(6位数字格式)', trigger: 'blur' }],
+        confirmPwd: [{ required: true, message: '请输入确认新支付密码', trigger: 'blur' }, {
+          validator: (rule, value, callBack) => {
+            this.updateObject.newPwd === value ? callBack() : callBack('新密码与确认密码不一致')
+          }
+        }]
       }
     }
   },
@@ -266,6 +344,13 @@ export default {
       })
     },
     selectTabs (key) { // 清空必填提示
+      const that = this
+      if (key === 'mchLevel') {
+        getMainUserInfo().then(res => {
+          that.mchLevel = res.mchLevel
+        })
+        return
+      }
       if (key) {
         this.groupKey = key
         this.detail()
@@ -297,46 +382,67 @@ export default {
           that.btnLoading = false
         })
       })
+    },
+    setMchLevel (e, title, content) {
+      const that = this
+      req.updateById(API_URL_MCH_CONFIG, 'mchLevel', { mchLevel: that.mchLevel }).then(res => {
+        that.$infoBox.modalWarning(title, content)
+        that.btnLoading = false
+      }).catch(res => {
+        that.btnLoading = false
+      })
+    },
+    setMchSipw (e, title, content) {
+      const that = this
+      that.updateObject.originalPwd = Base64.encode(that.updateObject.originalPwd)
+      that.updateObject.confirmPwd = Base64.encode(that.updateObject.confirmPwd)
+      this.$delete(this.updateObject, 'newPwd')
+      req.updateById(API_URL_MCH_CONFIG, 'mchSipw', that.updateObject).then(res => {
+        that.$infoBox.modalWarning(title, content)
+        that.btnLoading = false
+      }).catch(res => {
+        that.btnLoading = false
+      })
     }
   }
 }
 </script>
 <style lang="less">
-.autoFlagPopover {
-  position: absolute;
-  top: 10px;
-  left: 100px;
-}
-.typePopover {
-  position: absolute;
-  top: 10px;
-  left: 128px;
-}
-.agpay-tip-text:before {
-  content: "";
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-  border-bottom-color: #ffeed8;
-  position: absolute;
-  top: -20px;
-  left: 30px;
-}
-.agpay-tip-text {
-  font-size: 10px !important;
-  border-radius: 5px;
-  background: #ffeed8;
-  color: #c57000 !important;
-  padding: 5px 10px;
-  display: inline-block;
-  max-width: 100%;
-  position: relative;
-  margin-top: 15px;
-}
-.division-rule-label > label::after {
-  content: '';
-}
-.division-rule-label-tail {
-  margin-left: 10px;
-}
+  .autoFlagPopover,.mchLevelPopover {
+    position: absolute;
+    top: 10px;
+    left: 100px;
+  }
+  .typePopover {
+    position: absolute;
+    top: 10px;
+    left: 128px;
+  }
+  .agpay-tip-text:before {
+    content: "";
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-bottom-color: #ffeed8;
+    position: absolute;
+    top: -20px;
+    left: 30px;
+  }
+  .agpay-tip-text {
+    font-size: 10px !important;
+    border-radius: 5px;
+    background: #ffeed8;
+    color: #c57000 !important;
+    padding: 5px 10px;
+    display: inline-block;
+    max-width: 100%;
+    position: relative;
+    margin-top: 15px;
+  }
+  .division-rule-label > label::after {
+    content: '';
+  }
+  .division-rule-label-tail {
+    margin-left: 10px;
+  }
 </style>

@@ -252,6 +252,9 @@ ALTER TABLE `t_mch_info`
   ADD COLUMN `refund_mode` JSON NULL COMMENT '退款方式[\"plat\", \"api\"],平台退款、接口退款，平台退款方式必须包含接口退款。' AFTER `mch_level`,
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `refund_mode`;
 
+ALTER TABLE `t_mch_info`   
+  ADD COLUMN `sipw` VARCHAR(128) NOT NULL COMMENT '支付密码' AFTER `refund_mode`;
+
 ALTER TABLE `t_mch_app`   
   ADD COLUMN `default_flag` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否默认: 0-否, 1-是' AFTER `state`,
   ADD COLUMN `app_sign_type` JSON NOT NULL COMMENT '支持的签名方式 [\"MD5\", \"RSA2\"]' AFTER `default_flag`,
@@ -520,6 +523,8 @@ INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_DAY_COUNT', '今日/昨日�
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TREND_COUNT', '趋势图统计	', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MCH', NOW(), NOW());
 
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG_PAGE', '应用配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
+
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_INFO', '商户信息', 'user', '/info', 'MchInfoPage', 'ML', 0, 1,  'ENT_MCH_CENTER', '0', 'MCH', NOW(), NOW());
 
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG', '系统配置', 'setting', '/config', 'MchConfigPage', 'ML', 0, 1,  'ENT_SYS_CONFIG', '30', 'MCH', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG_EDIT', '按钮：修改系统配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_CONFIG', '0', 'MCH', NOW(), NOW());

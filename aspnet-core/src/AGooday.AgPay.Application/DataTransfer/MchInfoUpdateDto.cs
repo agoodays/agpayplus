@@ -3,7 +3,7 @@
     /// <summary>
     /// 商户信息表
     /// </summary>
-    public class MchInfoDto
+    public class MchInfoUpdateDto
     {
         /// <summary>
         /// 商户号
@@ -74,30 +74,5 @@
         /// 商户备注
         /// </summary>
         public string Remark { get; set; }
-
-        /// <summary>
-        /// 初始用户ID（创建商户时，允许商户登录的用户）
-        /// </summary>
-        public long? InitUserId { get; set; }
-
-        /// <summary>
-        /// 创建者用户ID
-        /// </summary>
-        public long? CreatedUid { get; set; }
-
-        /// <summary>
-        /// 创建者姓名
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdatedAt { get; set; }
     }
 }
