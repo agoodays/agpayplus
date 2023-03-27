@@ -54,6 +54,13 @@ namespace AGooday.AgPay.Domain.Models
         public string RefundMode { get; set; }
 
         /// <summary>
+        /// 支付密码
+        /// </summary>
+        [Comment("支付密码")]
+        [Column("sipw", TypeName = "varchar(128)")]
+        public string Sipw { get; set; }
+
+        /// <summary>
         /// 代理商号
         /// </summary>
         [Comment("代理商号")]

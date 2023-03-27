@@ -66,7 +66,7 @@
               </span>
             </p>
             <span>商户简称：</span>
-            <span>{{ shortName }}</span>
+            <span><a style="color: rgb(38, 145, 255); margin-right: 5px;" @click="handleToMchInfo">{{ shortName }}</a></span>
           </div>
         </a-skeleton>
         <div class="personal-line"></div>
@@ -761,6 +761,9 @@
       },
       handleToSettings () {
         this.$router.push({ name: 'ENT_C_USERINFO', params: { parentKey: '1', childKey: '1' } })
+      },
+      handleToMchInfo () {
+        this.$router.push({ name: 'ENT_MCH_INFO' })
       },
       beforeDestroy() {
         /* 页面组件销毁的时候，别忘了移除绑定的监听resize事件，否则的话，多渲染几次

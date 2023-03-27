@@ -67,6 +67,18 @@ namespace AGooday.AgPay.Application.Services
             return _mchInfoRepository.SaveChanges(out int _);
         }
 
+        public bool UpdateById(MchInfoUpdateDto dto)
+        {
+            var entity = _mchInfoRepository.GetById(dto.MchNo);
+            if (!string.IsNullOrWhiteSpace(dto.MchLevel))
+                entity.MchLevel = dto.MchLevel;
+            if (!string.IsNullOrWhiteSpace(dto.Sipw))
+                entity.Sipw = dto.Sipw;
+            entity.UpdatedAt = DateTime.Now;
+            _mchInfoRepository.Update(entity);
+            return _mchInfoRepository.SaveChanges(out int _);
+        }
+
         public async void Modify(MchInfoModifyDto dto)
         {
             var command = _mapper.Map<ModifyMchInfoCommand>(dto);

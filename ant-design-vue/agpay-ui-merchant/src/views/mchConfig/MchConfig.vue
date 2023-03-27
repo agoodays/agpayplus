@@ -1,11 +1,5 @@
 <template>
-  <a-drawer
-    :visible="visible"
-    :title=" true ? '商户高级配置' : '' "
-    @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
-    width="60%"
-  >
+  <div style="background: #fff;border-radius:10px">
     <a-tabs v-model="groupKey" @change="selectTabs" :animated="false">
       <a-tab-pane key="orderConfig" tab="系统配置">
         <div class="account-settings-info-view" v-if="['orderConfig'].indexOf(groupKey)>=0">
@@ -24,6 +18,44 @@
               <a-col :span="19">
                 <a-form-item style="display:flex;justify-content:center">
                   <a-button type="primary" icon="check-circle" @click="confirm($event, '系统配置')" :loading="btnLoading">确认更新</a-button>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form-model>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane key="mchLevel" tab="功能配置">
+        <div class="account-settings-info-view">
+          <a-form-model ref="configFormModel">
+            <a-row>
+              <a-col :span="8" :offset="1">
+                <a-form-model-item label="商户等级切换">
+                  <a-radio-group v-model="mchLevel">
+                    <a-radio value="M0">M0</a-radio>
+                    <a-radio value="M1">M1</a-radio>
+                  </a-radio-group>
+                </a-form-model-item>
+                <div class="components-popover-demo-placement">
+                  <div class="mchLevelPopover">
+                    <!-- title可省略，就不显示 -->
+                    <a-popover placement="top">
+                      <template slot="content">
+                        <p>M0商户：简单模式（页面简洁，仅基础收款功能）</p>
+                        <p>M1商户：高级模式（支持api调用， 支持配置应用及分账、转账功能）</p>
+                      </template>
+                      <template slot="title">
+                        <span>商户级别</span>
+                      </template>
+                      <a-icon type="question-circle" />
+                    </a-popover>
+                  </div>
+                </div>
+              </a-col>
+            </a-row>
+            <a-row>
+              <a-col :span="19">
+                <a-form-item style="display:flex;justify-content:center">
+                  <a-button type="primary" icon="check-circle" @click="setMchLevel($event, '提示', '更新成功，重新登录后将切换功能模式！')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -69,12 +101,12 @@
                 </div>
                 <div v-else>
                   <a-table
-                    size="small"
-                    :title="()=>'回调参数配置'"
-                    :row-selection="rowSelection"
-                    :columns="orderNotifyParamsColumns"
-                    :data-source="orderNotifyParamsData"
-                    :pagination="false"/>
+                      size="small"
+                      :title="()=>'回调参数配置'"
+                      :row-selection="rowSelection"
+                      :columns="orderNotifyParamsColumns"
+                      :data-source="orderNotifyParamsData"
+                      :pagination="false"/>
                 </div>
               </a-col>
             </a-row>
@@ -92,7 +124,7 @@
         <div class="account-settings-info-view" v-if="['divisionManage'].indexOf(groupKey)>=0">
           <a-form-model ref="configFormModel">
             <a-row>
-              <a-col :span="22" :offset="1">
+              <a-col :span="22" :offset="1" v-if="divisionConfig.mchDivisionEntFlag">
                 <a-form-model-item label="全局自动分账" style="margin-bottom: 0px;">
                   <a-radio-group v-model="divisionConfig.overrideAutoFlag">
                     <a-radio :value="1">开启</a-radio>
@@ -116,9 +148,9 @@
                     <label>订单支付成功</label>
                   </div>
                   <a-select
-                    ref="select"
-                    v-model="divisionConfig.autoDivisionRules.delayTime"
-                    style="width: 90px"
+                      ref="select"
+                      v-model="divisionConfig.autoDivisionRules.delayTime"
+                      style="width: 90px"
                   >
                     <a-select-option :value="2*60">2分钟</a-select-option>
                     <a-select-option :value="5*60">5分钟</a-select-option>
@@ -147,71 +179,53 @@
                   </div>
                 </div>
               </a-col>
-              <a-col :span="22" :offset="1">
-                <a-form-model-item label="商户管理功能限制">
-                  <a-radio-group v-model="divisionConfig.mchDivisionEntFlag">
-                    <a-radio :value="1">允许管理</a-radio>
-                    <a-radio :value="0">不允许管理</a-radio>
-                  </a-radio-group>
-                </a-form-model-item>
-                <div class="components-popover-demo-placement">
-                  <div class="typePopover">
-                    <!-- title可省略，就不显示 -->
-                    <a-popover placement="top">
-                      <template slot="content">
-                        <p>允许管理：商户可查看到所有的分账接收者账号和分账配置项并支持更改。</p>
-                        <p>不允许管理：屏蔽商户的分账管理功能和菜单， 当运营平台维护分账时建议屏蔽商户管理功能。</p>
-                      </template>
-                      <template slot="title">
-                        <span>商户管理功能限制</span>
-                      </template>
-                      <a-icon type="question-circle" />
-                    </a-popover>
-                  </div>
+              <a-col v-else>
+                <div style="height: 200px">
+                  <a-divider orientation="left">
+                    <a-icon type="info-circle" /> 当前没有可配置的选项
+                  </a-divider>
                 </div>
               </a-col>
             </a-row>
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" icon="check-circle" @click="confirm($event, '分账设置')" :loading="btnLoading">确认更新</a-button>
+                  <a-button v-if="divisionConfig.mchDivisionEntFlag" type="primary" icon="check-circle" @click="confirm($event, '分账设置')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
           </a-form-model>
         </div>
       </a-tab-pane>
-      <a-tab-pane key="mchApiEnt" tab="接口权限">
-        <div class="account-settings-info-view" v-if="['mchApiEnt'].indexOf(groupKey)>=0">
-          <a-form-model ref="configFormModel">
-            <a-row>
-              <a-col :span="24">
-                <div v-if="isShowMchApiEnt">
-                  <a-table
-                    size="small"
-                    :title="()=>'商户可自调用接口'"
-                    :row-selection="mchApiEntRowSelection"
-                    :columns="mchApiEntColumns"
-                    :data-source="mchApiEntData"
-                    :pagination="false"/>
-                </div>
-              </a-col>
-            </a-row>
-            <a-row>
-              <a-col :span="24">
-                <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" icon="check-circle" @click="confirm($event, '商户的接口权限')" :loading="btnLoading">确认更新</a-button>
-                </a-form-item>
-              </a-col>
-            </a-row>
-          </a-form-model>
+      <a-tab-pane key="1" tab="安全管理">
+        <div class="account-settings-info-view">
+          <a-row :gutter="16">
+            <a-col :md="16" :lg="16">
+              <a-form-model ref="pwdFormModel" :model="updateObject" :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
+                <a-form-model-item label="原支付密码：" prop="originalPwd">
+                  <a-input-password v-model="updateObject.originalPwd" placeholder="请输入原支付密码" />
+                </a-form-model-item>
+                <a-form-model-item label="新支付密码：" prop="newPwd">
+                  <a-input-password v-model="updateObject.newPwd" placeholder="请输入新支付密码" />
+                </a-form-model-item>
+                <a-form-model-item label="确认新支付密码：" prop="confirmPwd">
+                  <a-input-password v-model="updateObject.confirmPwd" placeholder="确认新支付密码" />
+                </a-form-model-item>
+              </a-form-model>
+              <a-form-item style="display:flex;justify-content:center">
+                <a-button type="primary" icon="safety-certificate" @click="setMchSipw($event, '提示', '更新成功！')" :loading="btnLoading">确认更改</a-button>
+              </a-form-item>
+            </a-col>
+          </a-row>
         </div>
       </a-tab-pane>
     </a-tabs>
-  </a-drawer>
+  </div>
 </template>
+
 <script>
-import { API_URL_MCH_CONFIG, req, getMchConfigs } from '@/api/manage'
+import { API_URL_MCH_CONFIG, req, getMchConfigs, getMainUserInfo } from '@/api/manage'
+import { Base64 } from 'js-base64'
 const orderNotifyParamsColumns = [
   {
     title: '参数KEY',
@@ -255,50 +269,15 @@ const orderNotifyParamsData = [
   { key: 'sellerRemark', name: '卖家备注' },
   { key: 'expiredTime', name: '订单失效时间' }
 ]
-const mchApiEntColumns = [
-  {
-    title: '名称',
-    dataIndex: 'name'
-  },
-  {
-    title: 'KEY',
-    dataIndex: 'key'
-  },
-  {
-    title: '路径',
-    dataIndex: 'path'
-  }
-]
-const mchApiEntData = [
-  { name: '统一下单', key: 'API_PAY_ORDER', path: '/api/pay/unifiedOrder' },
-  { name: '查询支付订单', key: 'API_PAY_ORDER_QUERY', path: '/api/pay/query' },
-  { name: '支付订单关闭', key: 'API_PAY_ORDER_CLOSE', path: '/api/pay/close' },
-  { name: '获取渠道用户ID', key: 'API_CHANNEL_USER', path: '/api/channelUserId/jump' },
-  { name: '发起支付退款', key: 'API_REFUND_ORDER', path: '/api/refund/refundOrder' },
-  { name: '查询退款订单', key: 'API_REFUND_ORDER_QUERY', path: '/api/refund/query' },
-  { name: '发起转账订单', key: 'API_TRANS_ORDER', path: '/api/transferOrder' },
-  { name: '查询转账订单', key: 'API_TRANS_ORDER_QUERY', path: '/api/transfer/query' },
-  { name: '绑定分账用户', key: 'API_DIVISION_BIND', path: '/api/division/receiver/bind' },
-  { name: '发起订单分账', key: 'API_DIVISION_EXEC', path: '/api/division/exec' },
-  { name: '查询分账用户可用余额', key: 'API_DIVISION_CHANNEL_BALANCE', path: '/api/division/receiver/channelBalanceQuery' },
-  { name: '对分账用户的渠道余额发起提现', key: 'API_DIVISION_CHANNEL_CASHOUT', path: '/api/division/receiver/channelBalanceCashout' }
-]
 export default {
   components: {},
   data () {
     return {
-      recordId: null, // 更新对象ID
-      visible: false, // 是否显示弹层/抽屉
       btnLoading: false,
       orderNotifyParamsData,
       orderNotifyParamsColumns,
-      payOrderNotifyDefParams: [], // ['payOrderId', 'mchNo', 'appId', 'mchOrderNo', 'ifCode', 'wayCode', 'amount', 'currency', 'state', 'clientIp', 'subject', 'body', 'channelOrderNo', 'errCode', 'errMsg', 'extParam', 'successTime', 'createdAt', 'sign'],
       payOrderNotifyExtParams: [], // 选中的数据
-      mchApiEntColumns,
-      mchApiEntData,
-      isShowMchApiEnt: false,
-      mchApiEnts: [], // 选中的数据
-      groupKey: null,
+      groupKey: 'orderConfig',
       configData: [],
       divisionConfig: {
         overrideAutoFlag: 0,
@@ -307,10 +286,26 @@ export default {
           delayTime: 120
         },
         mchDivisionEntFlag: 1
+      },
+      mchLevel: 'M0',
+      updateObject: {
+        originalPwd: '', // 原密码
+        newPwd: '', //  新密码
+        confirmPwd: '' //  确认密码
+      },
+      rulesPass: {
+        originalPwd: [{ required: true, message: '请输入原支付密码(6位数字格式)', trigger: 'blur' }],
+        newPwd: [{ min: 6, max: 12, required: true, message: '请输入新支付密码(6位数字格式)', trigger: 'blur' }],
+        confirmPwd: [{ required: true, message: '请输入确认新支付密码', trigger: 'blur' }, {
+          validator: (rule, value, callBack) => {
+            this.updateObject.newPwd === value ? callBack() : callBack('新密码与确认密码不一致')
+          }
+        }]
       }
     }
   },
   created () {
+    this.detail()
   },
   computed: {
     rowSelection () {
@@ -331,43 +326,13 @@ export default {
           }
         })
       }
-    },
-    mchApiEntRowSelection () {
-      const that = this
-      return {
-        onChange: (selectedRowKeys, selectedRows) => {
-          that.mchApiEnts = [] // 清空选中数组
-          selectedRows.forEach(function (record) { // 赋值选中参数
-            that.mchApiEnts.push(record.key)
-          })
-        },
-        getCheckboxProps: record => ({
-          props: {
-            defaultChecked: that.mchApiEnts.includes(record.key)
-          }
-        })
-      }
     }
   },
   methods: {
-    show: function (recordId) { // 弹层打开事件
-      const that = this
-      that.recordId = recordId
-      that.groupKey = 'orderConfig'
-      that.payOrderNotifyDefParams = that.orderNotifyParamsData.filter(({ disabled }) => disabled === true)
-      that.payOrderNotifyExtParams = []
-      that.isShowMchApiEnt = false
-      that.mchApiEnts = []
-      that.detail()
-      this.visible = true
-    },
-    onClose () {
-      this.visible = false
-    },
     detail () { // 获取基本信息
       const that = this
       that.configData = []
-      getMchConfigs(that.groupKey, { mchNo: that.recordId }).then(res => {
+      getMchConfigs(that.groupKey).then(res => {
         // console.log(res)
         that.configData = res
         if (that.groupKey === 'payOrderNotifyConfig') {
@@ -376,16 +341,18 @@ export default {
         if (that.groupKey === 'divisionManage') {
           that.divisionConfig = JSON.parse(res.filter(({ configKey }) => configKey === 'divisionConfig')[0].configVal)
         }
-        if (that.groupKey === 'mchApiEnt') {
-          that.mchApiEnts = JSON.parse(res.filter(({ configKey }) => configKey === 'mchApiEntList')[0].configVal)
-          that.isShowMchApiEnt = true
-        }
       })
     },
     selectTabs (key) { // 清空必填提示
+      const that = this
+      if (key === 'mchLevel') {
+        getMainUserInfo().then(res => {
+          that.mchLevel = res.mchLevel
+        })
+        return
+      }
       if (key) {
         this.groupKey = key
-        this.isShowMchApiEnt = false
         this.detail()
       }
     },
@@ -403,27 +370,45 @@ export default {
             case 'divisionManage':
               jsonObject[that.configData[i].configKey] = JSON.stringify(that.divisionConfig)
               break
-            case 'mchApiEntList':
-              jsonObject[that.configData[i].configKey] = JSON.stringify(that.mchApiEnts)
-              break
             default:
               jsonObject[that.configData[i].configKey] = that.configData[i].configVal
               break
           }
         }
-        req.updateById(API_URL_MCH_CONFIG, that.groupKey, { mchNo: that.recordId, configs: jsonObject }).then(res => {
+        req.updateById(API_URL_MCH_CONFIG, that.groupKey, jsonObject).then(res => {
           that.$message.success('修改成功')
           that.btnLoading = false
         }).catch(res => {
           that.btnLoading = false
         })
       })
+    },
+    setMchLevel (e, title, content) {
+      const that = this
+      req.updateById(API_URL_MCH_CONFIG, 'mchLevel', { mchLevel: that.mchLevel }).then(res => {
+        that.$infoBox.modalWarning(title, content)
+        that.btnLoading = false
+      }).catch(res => {
+        that.btnLoading = false
+      })
+    },
+    setMchSipw (e, title, content) {
+      const that = this
+      that.updateObject.originalPwd = Base64.encode(that.updateObject.originalPwd)
+      that.updateObject.confirmPwd = Base64.encode(that.updateObject.confirmPwd)
+      this.$delete(this.updateObject, 'newPwd')
+      req.updateById(API_URL_MCH_CONFIG, 'mchSipw', that.updateObject).then(res => {
+        that.$infoBox.modalWarning(title, content)
+        that.btnLoading = false
+      }).catch(res => {
+        that.btnLoading = false
+      })
     }
   }
 }
 </script>
 <style lang="less">
-  .autoFlagPopover {
+  .autoFlagPopover,.mchLevelPopover {
     position: absolute;
     top: 10px;
     left: 100px;

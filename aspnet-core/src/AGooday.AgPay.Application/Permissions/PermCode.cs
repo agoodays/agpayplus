@@ -82,6 +82,7 @@
             public const string ENT_MCH_INFO_DEL = "ENT_MCH_INFO_DEL";
             public const string ENT_MCH_INFO_ADD = "ENT_MCH_INFO_ADD";
             public const string ENT_MCH_APP_CONFIG = "ENT_MCH_APP_CONFIG";
+            public const string ENT_MCH_CONFIG_PAGE = "ENT_MCH_CONFIG_PAGE";
             public const string ENT_MCH_PAY_CONFIG_LIST = "ENT_MCH_PAY_CONFIG_LIST";
             public const string ENT_MCH_APP_VIEW = "ENT_MCH_APP_VIEW";
             public const string ENT_MCH_APP_LIST = "ENT_MCH_APP_LIST";
@@ -225,6 +226,8 @@
             public const string ENT_COMMONS = "ENT_COMMONS";
             public const string ENT_DIVISION = "ENT_DIVISION";
             public const string ENT_SYS_CONFIG = "ENT_SYS_CONFIG";
+            public const string ENT_MCH_CONFIG = "ENT_MCH_CONFIG";
+            public const string ENT_MCH_CONFIG_EDIT = "ENT_MCH_CONFIG_EDIT";
             public const string ENT_ORDER = "ENT_ORDER";
             public const string ENT_MCH_CENTER = "ENT_MCH_CENTER";
             public const string ENT_MCH_MAIN = "ENT_MCH_MAIN";
@@ -269,6 +272,7 @@
             public const string ENT_MCH_MAIN_PAY_TYPE_COUNT = "ENT_MCH_MAIN_PAY_TYPE_COUNT";
             public const string ENT_MCH_MAIN_USER_INFO = "ENT_MCH_MAIN_USER_INFO";
             public const string ENT_MCH_MAIN_PAY_AMOUNT_WEEK = "ENT_MCH_MAIN_PAY_AMOUNT_WEEK";
+            public const string ENT_MCH_INFO = "ENT_MCH_INFO";
             public const string ENT_MCH_APP = "ENT_MCH_APP";
             public const string ENT_MCH_PAY_TEST = "ENT_MCH_PAY_TEST";
             public const string ENT_MCH_TRANSFER = "ENT_MCH_TRANSFER";

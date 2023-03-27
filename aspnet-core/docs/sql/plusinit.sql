@@ -252,6 +252,9 @@ ALTER TABLE `t_mch_info`
   ADD COLUMN `refund_mode` JSON NULL COMMENT '退款方式[\"plat\", \"api\"],平台退款、接口退款，平台退款方式必须包含接口退款。' AFTER `mch_level`,
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `refund_mode`;
 
+ALTER TABLE `t_mch_info`   
+  ADD COLUMN `sipw` VARCHAR(128) NOT NULL COMMENT '支付密码' AFTER `refund_mode`;
+
 ALTER TABLE `t_mch_app`   
   ADD COLUMN `default_flag` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否默认: 0-否, 1-是' AFTER `state`,
   ADD COLUMN `app_sign_type` JSON NOT NULL COMMENT '支持的签名方式 [\"MD5\", \"RSA2\"]' AFTER `default_flag`,
@@ -497,6 +500,15 @@ ALTER TABLE `t_sys_config`
 INSERT INTO `t_sys_config` VALUES ('appVoice', '是否启用app订单语音播报', '是否启用app订单语音播报', 'orderConfig', '系统配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-03-23 23:30:00');
 INSERT INTO `t_sys_config` VALUES ('qrcEscaping', '是否启用码牌防逃单功能', '是否启用码牌防逃单功能', 'orderConfig', '系统配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-03-23 23:30:00');
 
+INSERT INTO `t_sys_config` VALUES ('mchPayNotifyUrl', 'POS支付回调地址', 'POS支付回调地址', 'payOrderNotifyConfig', '回调和查单参数', '', 'text', 'MCH', 'M0000000000', 10, '2023-03-24 23:30:00');
+INSERT INTO `t_sys_config` VALUES ('mchRefundNotifyUrl', 'POS退款回调地址', 'POS退款回调地址', 'payOrderNotifyConfig', '回调和查单参数', '', 'text', 'MCH', 'M0000000000', 20, '2023-03-24 23:30:00');
+INSERT INTO `t_sys_config` VALUES ('mchNotifyPostType', '商户接收通知方式', '商户接收通知方式', 'payOrderNotifyConfig', '回调和查单参数', 'POST_JSON', 'radio', 'MCH', 'M0000000000', 30, '2023-03-24 23:30:00');
+INSERT INTO `t_sys_config` VALUES ('payOrderNotifyExtParams', '支付订单回调和查单参数', '支付订单回调和查单参数', 'payOrderNotifyConfig', '回调和查单参数', '[]', 'text', 'MCH', 'M0000000000', 40, '2023-03-24 23:30:00');
+
+INSERT INTO `t_sys_config` VALUES ('divisionConfig', '分账管理', '分账管理', 'divisionManage', '分账管理', '{"overrideAutoFlag":0,"autoDivisionRules":{"amountLimit":0,"delayTime":120},"mchDivisionEntFlag":1}', 'text', 'MCH', 'M0000000000', 0, '2023-03-25 13:30:00');
+
+INSERT INTO `t_sys_config` VALUES ('mchApiEntList', '商户接口权限集合', '商户接口权限集合', 'mchApiEnt', '商户接口权限集合', '[]', 'text', 'MCH', 'M0000000000', 0, '2023-03-25 22:30:00');
+
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_ISV_MCH_COUNT', '服务商/商户统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_DAY_COUNT', '今日/昨日交易统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TREND_COUNT', '趋势图统计	', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());
@@ -510,6 +522,11 @@ INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TYPE_COUNT', '主页交易�
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_DAY_COUNT', '今日/昨日交易统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MCH', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TREND_COUNT', '趋势图统计	', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MCH', NOW(), NOW());
 
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG_PAGE', '应用配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
 
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_INFO', '商户信息', 'user', '/info', 'MchInfoPage', 'ML', 0, 1,  'ENT_MCH_CENTER', '0', 'MCH', NOW(), NOW());
+
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG', '系统配置', 'setting', '/config', 'MchConfigPage', 'ML', 0, 1,  'ENT_SYS_CONFIG', '30', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG_EDIT', '按钮：修改系统配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_CONFIG', '0', 'MCH', NOW(), NOW());
 
 

@@ -23,7 +23,9 @@ export const asyncRouteDefine = {
   'MainPage': { defaultPath: '/main', component: () => import('@/views/dashboard/Analysis2') },
   'SysUserPage': { defaultPath: '/users', component: () => import('@/views/sysuser/SysUserPage') },
   'RolePage': { defaultPath: '/roles', component: () => import('@/views/role/RolePage') },
+  'MchConfigPage': { defaultPath: '/config', component: () => import('@/views/mchConfig/MchConfig') }, // 系统配置
 
+  'MchInfoPage': { defaultPath: '/info', component: () => import ('@/views/mch/MchInfoPage') }, // 商户信息
   'MchAppPage': { defaultPath: '/apps', component: () => import ('@/views/mchApp/List') }, // 商户应用列表
   'MchStorePage': { defaultPath: '/store', component: () => import ('@/views/mchStore/MchStoreList') }, // 商户门店列表
   'PayTestPage': { defaultPath: '/paytest', component: () => import ('@/views/payTest/PayTest') }, // 支付测试
