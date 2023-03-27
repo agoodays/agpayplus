@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="groupKey"></param>
         /// <param name="configs"></param>
         /// <returns></returns>
-        [HttpPut, Route("mchSipw"), MethodLog("更改支付密码\t")]
+        [HttpPut, Route("mchSipw"), MethodLog("更改支付密码")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_CONFIG_EDIT)]
         public ApiRes SetMchSipw(ModifyMchSipw model)
         {
