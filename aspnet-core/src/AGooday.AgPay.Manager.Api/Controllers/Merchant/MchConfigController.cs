@@ -6,7 +6,6 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
-using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -51,9 +50,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{groupKey}"), MethodLog("更新商户配置信息")]
         [PermissionAuth(PermCode.MGR.ENT_SYS_CONFIG_EDIT)]
-        public ApiRes Update(string groupKey, [FromBody] MchConfigRequest request)
+        public ApiRes Update(string groupKey, string mchNo, Dictionary<string, string> configs)
         {
-            int update = _sysConfigService.UpdateByConfigKey(request.Configs, groupKey, CS.SYS_TYPE.MCH, request.MchNo);
+            int update = _sysConfigService.UpdateByConfigKey(configs, groupKey, CS.SYS_TYPE.MCH, mchNo);
             if (update <= 0)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");
