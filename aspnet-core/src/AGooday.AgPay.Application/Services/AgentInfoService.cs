@@ -5,6 +5,7 @@ using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,6 +66,16 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<AgentInfo>(dto);
             _agentInfoRepository.Update(m);
+            return _agentInfoRepository.SaveChanges(out int _);
+        }
+
+        public bool UpdateById(AgentInfoUpdateDto dto)
+        {
+            var entity = _agentInfoRepository.GetById(dto.AgentNo);
+            if (!string.IsNullOrWhiteSpace(dto.Sipw))
+                entity.Sipw = dto.Sipw;
+            entity.UpdatedAt = DateTime.Now;
+            _agentInfoRepository.Update(entity);
             return _agentInfoRepository.SaveChanges(out int _);
         }
 

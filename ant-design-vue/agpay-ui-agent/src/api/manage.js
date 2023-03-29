@@ -95,7 +95,7 @@ export const API_URL_REFUND_ORDER_LIST = '/api/refundOrder'
 /** 商户通知管理 **/
 export const API_URL_MCH_NOTIFY_LIST = '/api/mchNotify'
 /** 系统配置 **/
-export const API_URL_SYS_CONFIG = 'api/sysConfigs'
+export const API_URL_AGENT_CONFIG = 'api/agentConfig'
 /** 公告管理 **/
 export const API_URL_ARTICLE_LIST = 'api/sysArticles'
 /** 首页统计 **/
@@ -296,13 +296,6 @@ export function getUserInfo () {
   return request.request({
     url: '/api/current/user',
     method: 'get'
-  })
-}
-
-export function getConfigs (parameter) {
-  return request.request({
-    url: API_URL_SYS_CONFIG + '/' + parameter,
-    method: 'GET'
   })
 }
 

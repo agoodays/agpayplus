@@ -9,6 +9,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Create(AgentInfoCreateDto dto);
         void Remove(string recordId);
         bool Update(AgentInfoDto dto);
+        bool UpdateById(AgentInfoUpdateDto dto);
         void Modify(AgentInfoModifyDto dto);
         AgentInfoDto GetById(string recordId);
         AgentInfoDetailDto GetByAgentNo(string agentNo);

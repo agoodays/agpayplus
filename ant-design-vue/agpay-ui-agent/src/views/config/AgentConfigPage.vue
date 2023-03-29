@@ -36,7 +36,6 @@ export default {
     return {
       btnLoading: false,
       groupKey: '1',
-      mchLevel: 'M0',
       updateObject: {
         originalPwd: '', // 原密码
         newPwd: '', //  新密码

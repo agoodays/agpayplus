@@ -93,6 +93,16 @@
         #endregion
 
         /// <summary>
+        /// 默认男头像地址
+        /// </summary>
+        public const string DEFAULT_MALE_AVATAR_URL = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_m.png";
+
+        /// <summary>
+        /// 默认女头像地址
+        /// </summary>
+        public const string DEFAULT_FEMALE_AVATAR_URL = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_f.png";
+
+        /// <summary>
         /// 默认密码
         /// </summary>
         public const string DEFAULT_PWD = "agpay666";

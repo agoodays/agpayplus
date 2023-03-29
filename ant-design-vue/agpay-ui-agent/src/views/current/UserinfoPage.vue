@@ -241,11 +241,11 @@ export default {
             // 请求接口
             that.btnLoading = true // 打开按钮上的 loading
             that.confirmLoading = true // 显示loading
-            that.updateObject.recordId = that.recordId // 用户ID
-            that.updateObject.originalPwd = Base64.encode(that.updateObject.originalPwd)
-            that.updateObject.confirmPwd = Base64.encode(that.updateObject.confirmPwd)
-            this.$delete(this.updateObject, 'newPwd')
-            updateUserPass(that.updateObject).then(res => {
+            const recordId = that.recordId // 用户ID
+            const originalPwd = Base64.encode(that.updateObject.originalPwd)
+            const confirmPwd = Base64.encode(that.updateObject.confirmPwd)
+            // this.$delete(this.updateObject, 'newPwd')
+            updateUserPass({ recordId, originalPwd, confirmPwd }).then(res => {
               that.$message.success('修改成功')
               // 退出登录
               this.$store.dispatch('Logout').then(() => {

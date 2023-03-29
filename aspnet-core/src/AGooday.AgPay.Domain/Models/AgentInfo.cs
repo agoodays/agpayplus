@@ -96,6 +96,13 @@ namespace AGooday.AgPay.Domain.Models
         public byte State { get; set; }
 
         /// <summary>
+        /// 支付密码
+        /// </summary>
+        [Comment("支付密码")]
+        [Column("sipw", TypeName = "varchar(128)")]
+        public string Sipw { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         [Comment("备注")]

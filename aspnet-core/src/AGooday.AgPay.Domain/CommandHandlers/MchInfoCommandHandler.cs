@@ -104,7 +104,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             sysUser.BelongInfoId = mchInfo.MchNo;
             sysUser.SysType = CS.SYS_TYPE.MCH;
             sysUser.Sex = CS.SEX_MALE;
-            sysUser.AvatarUrl = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_m.png";//默认头像
+            sysUser.AvatarUrl = CS.DEFAULT_MALE_AVATAR_URL;//默认头像
             sysUser.IsAdmin = CS.YES;
             sysUser.State = mchInfo.State;
 

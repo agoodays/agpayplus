@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             sysUser.BelongInfoId = agentInfo.AgentNo;
             sysUser.SysType = CS.SYS_TYPE.AGENT;
             sysUser.Sex = CS.SEX_MALE;
-            sysUser.AvatarUrl = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_m.png";//默认头像
+            sysUser.AvatarUrl = CS.DEFAULT_MALE_AVATAR_URL;//默认头像
             sysUser.IsAdmin = CS.YES;
             sysUser.State = agentInfo.State;
 
@@ -174,6 +174,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             // 插入代理商基本信息
             // 存入代理商默认用户ID
+            agentInfo.Sipw = BCrypt.Net.BCrypt.HashPassword(CS.DEFAULT_SIPW);
             agentInfo.InitUserId = sysUser.SysUserId;
             _agentInfoRepository.Add(agentInfo);
 

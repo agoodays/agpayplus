@@ -237,7 +237,7 @@ export default {
               const recordId = that.recordId // 用户ID
               const originalPwd = Base64.encode(that.updateObject.originalPwd)
               const confirmPwd = Base64.encode(that.updateObject.confirmPwd)
-              this.$delete(this.updateObject, 'newPwd')
+              // this.$delete(this.updateObject, 'newPwd')
               updateUserPass({ recordId, originalPwd, confirmPwd }).then(res => {
                 that.$message.success('修改成功')
                 // 退出登录

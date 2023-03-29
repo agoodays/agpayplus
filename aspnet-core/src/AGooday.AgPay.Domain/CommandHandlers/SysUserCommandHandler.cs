@@ -87,10 +87,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             switch (sysUser.Sex)
             {
                 case CS.SEX_MALE:
-                    sysUser.AvatarUrl = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_m.png";
+                    sysUser.AvatarUrl = CS.DEFAULT_MALE_AVATAR_URL;
                     break;
                 case CS.SEX_FEMALE:
-                    sysUser.AvatarUrl = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_f.png";
+                    sysUser.AvatarUrl = CS.DEFAULT_FEMALE_AVATAR_URL;
                     break;
             }
 

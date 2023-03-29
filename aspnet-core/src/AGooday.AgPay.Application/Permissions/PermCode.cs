@@ -137,6 +137,8 @@
             public const string ENT_MCH = "ENT_MCH";
             public const string ENT_AGENT = "ENT_AGENT";
             public const string ENT_SYS_CONFIG = "ENT_SYS_CONFIG";
+            public const string ENT_AGENT_CONFIG = "ENT_AGENT_CONFIG";
+            public const string ENT_AGENT_CONFIG_EDIT = "ENT_AGENT_CONFIG_EDIT";
             public const string ENT_ORDER = "ENT_ORDER";
             public const string ENT_UR_USER_ADD = "ENT_UR_USER_ADD";
             public const string ENT_UR_USER_SEARCH = "ENT_UR_USER_SEARCH";
