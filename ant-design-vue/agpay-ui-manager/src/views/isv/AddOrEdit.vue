@@ -94,7 +94,7 @@ import { API_URL_ISV_LIST, req } from '@/api/manage'
 export default {
 
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
 
   data () {

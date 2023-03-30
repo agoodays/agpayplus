@@ -40,7 +40,7 @@ import { API_URL_ENT_LIST, req, getEntBySysType } from '@/api/manage'
 export default {
 
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
 
   data () {

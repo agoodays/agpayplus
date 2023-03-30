@@ -1,19 +1,19 @@
 <template>
   <div class="ag-editor">
     <Toolbar
-        class="ag-editor-toolbar"
-        :editor="editorRef"
-        :defaultConfig="toolbarConfig"
-        :mode="mode"
+      class="ag-editor-toolbar"
+      :editor="editorRef"
+      :defaultConfig="toolbarConfig"
+      :mode="mode"
     />
     <Editor
-        class="ag-editor-box"
-        :style="{ 'height': height + 'px' }"
-        :value="value"
-        @input="$emit('input', $event)"
-        :defaultConfig="editorConfig"
-        :mode="mode"
-        @onCreated="handleCreated"
+      class="ag-editor-box"
+      :style="{ 'height': height + 'px' }"
+      :value="value"
+      @input="$emit('input', $event)"
+      :defaultConfig="editorConfig"
+      :mode="mode"
+      @onCreated="handleCreated"
     />
 <!--    <Editor
         class="ag-editor-box"

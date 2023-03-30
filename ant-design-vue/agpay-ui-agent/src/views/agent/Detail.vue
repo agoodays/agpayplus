@@ -1,10 +1,10 @@
 <template>
   <a-drawer
-      :visible="visible"
-      :title=" true ? '代理商详情' : '' "
-      @close="onClose"
-      :body-style="{ paddingBottom: '80px' }"
-      width="40%"
+    :visible="visible"
+    :title="true ? '代理商详情' : ''"
+    @close="onClose"
+    :body-style="{ paddingBottom: '80px' }"
+    width="40%"
   >
     <a-row justify="space-between" type="flex">
       <a-col :sm="12">
@@ -157,7 +157,7 @@
         </a-col>
         <a-col :sm="12">
           <a-descriptions>
-            <a-descriptions-item :label='detailData.settAccountNoLabel'>
+            <a-descriptions-item :label="detailData.settAccountNoLabel">
               {{ detailData.settAccountNo }}
             </a-descriptions-item>
           </a-descriptions>
@@ -218,7 +218,7 @@
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item :label='"["+this.imgLabel+"]身份证人像面照片"' prop="idcard1Img">
+          <a-form-model-item :label="'['+this.imgLabel+']身份证人像面照片'" prop="idcard1Img">
             <div v-if="detailData.idcard1Img">
               <a-upload
                 :default-file-list="getDefaultFileList(detailData.idcard1Img)"
@@ -231,7 +231,7 @@
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item :label='"["+this.imgLabel+"]身份证国徽面照片"' prop="idcard2Img">
+          <a-form-model-item :label="'['+this.imgLabel+']身份证国徽面照片'" prop="idcard2Img">
             <div v-if="detailData.idcard2Img">
               <a-upload
                 :default-file-list="getDefaultFileList(detailData.idcard2Img)"
@@ -258,7 +258,7 @@
         </a-col>
         <!-- 个人对私/企业对私 -->
         <a-col :span="10" v-if="detailData.settAccountType === 'BANK_PRIVATE'">
-          <a-form-model-item :label='"["+this.imgLabel+"]银行卡照片"' prop="bankCardImg">
+          <a-form-model-item :label="'['+this.imgLabel+']银行卡照片'" prop="bankCardImg">
             <div v-if="detailData.bankCardImg">
               <a-upload
                 :default-file-list="getDefaultFileList(detailData.bankCardImg)"
@@ -281,7 +281,7 @@ import 'viewerjs/dist/viewer.css'
 export default {
   name: 'Detail',
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
   data () {
     return {

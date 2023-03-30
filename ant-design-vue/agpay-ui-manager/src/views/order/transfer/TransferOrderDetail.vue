@@ -1,12 +1,12 @@
 <!-- 订单详情抽屉 -->
 <template>
   <a-drawer
-      width="50%"
-      placement="right"
-      :closable="true"
-      :visible="isShow"
-      title="转账订单详情"
-      @close="isShow = false"
+    width="50%"
+    placement="right"
+    :closable="true"
+    :visible="isShow"
+    title="转账订单详情"
+    @close="isShow = false"
   >
     <a-row justify="space-between" type="flex">
       <a-col :sm="12">
@@ -150,10 +150,10 @@
     <a-col :sm="24">
       <a-form-model-item label="渠道额外参数">
         <a-input
-            type="textarea"
-            disabled="disabled"
-            style="height: 100px;color: black"
-            v-model="detailData.channelExtra"
+          type="textarea"
+          disabled="disabled"
+          style="height: 100px;color: black"
+          v-model="detailData.channelExtra"
         />
       </a-form-model-item>
     </a-col>
@@ -161,10 +161,10 @@
     <a-col :sm="24">
       <a-form-model-item label="扩展参数">
         <a-input
-            type="textarea"
-            disabled="disabled"
-            style="height: 100px;color: black"
-            v-model="detailData.extParam"
+          type="textarea"
+          disabled="disabled"
+          style="height: 100px;color: black"
+          v-model="detailData.extParam"
         />
       </a-form-model-item>
     </a-col>

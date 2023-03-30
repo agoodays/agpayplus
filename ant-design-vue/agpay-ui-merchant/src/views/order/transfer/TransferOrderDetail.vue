@@ -128,10 +128,10 @@
     <a-col :sm="24">
       <a-form-model-item label="渠道额外参数">
         <a-input
-            type="textarea"
-            disabled="disabled"
-            style="height: 100px;color: black"
-            v-model="detailData.channelExtra"
+          type="textarea"
+          disabled="disabled"
+          style="height: 100px;color: black"
+          v-model="detailData.channelExtra"
         />
       </a-form-model-item>
     </a-col>
@@ -139,10 +139,10 @@
     <a-col :sm="24">
       <a-form-model-item label="扩展参数">
         <a-input
-            type="textarea"
-            disabled="disabled"
-            style="height: 100px;color: black"
-            v-model="detailData.extParam"
+          type="textarea"
+          disabled="disabled"
+          style="height: 100px;color: black"
+          v-model="detailData.extParam"
         />
       </a-form-model-item>
     </a-col>

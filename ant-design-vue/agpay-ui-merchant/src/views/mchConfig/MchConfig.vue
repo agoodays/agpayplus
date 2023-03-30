@@ -101,12 +101,12 @@
                 </div>
                 <div v-else>
                   <a-table
-                      size="small"
-                      :title="()=>'回调参数配置'"
-                      :row-selection="rowSelection"
-                      :columns="orderNotifyParamsColumns"
-                      :data-source="orderNotifyParamsData"
-                      :pagination="false"/>
+                    size="small"
+                    :title="()=>'回调参数配置'"
+                    :row-selection="rowSelection"
+                    :columns="orderNotifyParamsColumns"
+                    :data-source="orderNotifyParamsData"
+                    :pagination="false"/>
                 </div>
               </a-col>
             </a-row>
@@ -131,7 +131,7 @@
                     <a-radio :value="0">关闭</a-radio>
                   </a-radio-group>
                 </a-form-model-item>
-                <a-form-model-item v-if="divisionConfig.overrideAutoFlag" class="division" :title='"金额限制"' prop="amountLimit">
+                <a-form-model-item v-if="divisionConfig.overrideAutoFlag" class="division" title="金额限制" prop="amountLimit">
                   <a-divider orientation="left">全局自动分账规则</a-divider>
                   <div class="ant-col ant-form-item-label division-rule-label">
                     <label class="division-rule-label-head">金额限制:</label>
@@ -142,15 +142,15 @@
                     <label class="division-rule-label-tail">时自动分账</label>
                   </div>
                 </a-form-model-item>
-                <a-form-model-item v-if="divisionConfig.overrideAutoFlag" class="division" :title='"自动分账时间"' prop="delayTime">
+                <a-form-model-item v-if="divisionConfig.overrideAutoFlag" class="division" title="自动分账时间" prop="delayTime">
                   <div class="ant-col ant-form-item-label division-rule-label">
                     <label class="division-rule-label-head">自动分账时间:</label>
                     <label>订单支付成功</label>
                   </div>
                   <a-select
-                      ref="select"
-                      v-model="divisionConfig.autoDivisionRules.delayTime"
-                      style="width: 90px"
+                    ref="select"
+                    v-model="divisionConfig.autoDivisionRules.delayTime"
+                    style="width: 90px"
                   >
                     <a-select-option :value="2*60">2分钟</a-select-option>
                     <a-select-option :value="5*60">5分钟</a-select-option>

@@ -21,7 +21,7 @@
   import { API_URL_ARTICLE_LIST, req } from '@/api/manage'
   export default {
     props: {
-      callbackFunc: { type: Function }
+      callbackFunc: { type: Function, default: () => () => ({}) }
     },
 
     data () {

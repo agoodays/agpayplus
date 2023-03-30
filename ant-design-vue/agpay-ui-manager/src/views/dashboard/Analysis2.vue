@@ -40,9 +40,9 @@
                   <a-icon type="question-circle" />
                 </a-tooltip>
               </div>
-              <a-select v-model="recentDay" placeholder="" default-value=30 style="width: 215px" @change="recentDayChange">
-                <a-select-option :value=30>近30天</a-select-option>
-                <a-select-option :value=7>近7天</a-select-option>
+              <a-select v-model="recentDay" placeholder="" :default-value="30" style="width: 215px" @change="recentDayChange">
+                <a-select-option :value="30">近30天</a-select-option>
+                <a-select-option :value="30">近7天</a-select-option>
               </a-select>
             </div>
           </a-skeleton>
@@ -104,7 +104,7 @@
         </a-skeleton>
       </div>
     </div>
-    <div  class="personal">
+    <div class="personal">
       <div>
         <a-skeleton active avatar :loading="skeletonIsShow" :paragraph="{ rows: 1 }">
           <div class="personal-title">

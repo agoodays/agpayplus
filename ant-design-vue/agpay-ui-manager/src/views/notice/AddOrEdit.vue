@@ -13,16 +13,16 @@
         <a-col :span="10">
           <a-form-model-item label="公告标题" prop="title">
             <a-input
-                placeholder="请输入公告标题"
-                v-model="saveObject.title"
+              placeholder="请输入公告标题"
+              v-model="saveObject.title"
             />
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="公告副标题" prop="subtitle">
             <a-input
-                placeholder="请输入公告副标题"
-                v-model="saveObject.subtitle"
+              placeholder="请输入公告副标题"
+              v-model="saveObject.subtitle"
             />
           </a-form-model-item>
         </a-col>
@@ -34,8 +34,8 @@
         <a-col :span="10">
           <a-form-model-item label="发布人" prop="publisher">
             <a-input
-                placeholder="请输入发布人"
-                v-model="saveObject.publisher"
+              placeholder="请输入发布人"
+              v-model="saveObject.publisher"
             />
           </a-form-model-item>
         </a-col>
@@ -67,7 +67,7 @@ import AgEditor from '@/components/AgEditor/AgEditor'
 import { API_URL_ARTICLE_LIST, req } from '@/api/manage'
 export default {
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
   components: { AgEditor },
   data () {

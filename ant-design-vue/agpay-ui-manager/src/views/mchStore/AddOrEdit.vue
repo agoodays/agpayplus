@@ -144,7 +144,7 @@ import 'viewerjs/dist/viewer.css'
 
 export default {
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
   components: {
     AgUpload

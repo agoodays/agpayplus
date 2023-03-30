@@ -82,10 +82,10 @@
           <a-col :span="10">
             <a-form-model-item label="是否发送开通提醒" prop="isNotify">
               <a-radio-group v-model="saveObject.isNotify">
-                <a-radio :value='0'>
+                <a-radio :value="0">
                   否
                 </a-radio>
-                <a-radio :value='1'>
+                <a-radio :value="1">
                   是
                 </a-radio>
               </a-radio-group>
@@ -96,10 +96,10 @@
           <a-col :span="10">
             <a-form-model-item label="密码设置" prop="passwordType">
               <a-radio-group v-model="saveObject.passwordType">
-                <a-radio value='default'>
+                <a-radio value="default">
                   默认密码
                 </a-radio>
-                <a-radio value='custom'>
+                <a-radio value="custom">
                   自定义密码
                 </a-radio>
               </a-radio-group>

@@ -26,7 +26,7 @@ import { API_URL_DIVISION_RECEIVER_GROUP, req } from '@/api/manage'
 export default {
 
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
 
   data () {

@@ -6,14 +6,6 @@
           <div class="table-layer">
             <a-form-item label="" class="table-head-layout">
               <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
-<!--              <a-range-picker
-                @change="onChange"
-                :show-time="{ format: 'HH:mm:ss' }"
-                format="YYYY-MM-DD HH:mm:ss"
-                :disabled-date="disabledDate"
-              >
-                <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'用户ID'" :msg="searchData.userId" v-model="searchData.userId" />
             <ag-text-up :placeholder="'用户名'" :msg="searchData.userName" v-model="searchData.userName" />

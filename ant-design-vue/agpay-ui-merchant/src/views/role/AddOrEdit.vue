@@ -29,7 +29,7 @@ export default {
   components: { RoleDist },
 
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
 
   data () {

@@ -21,7 +21,7 @@ import { queryAlipayIsvsubMchAuthUrl } from '@/api/manage'
 export default {
 
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
 
   data () {

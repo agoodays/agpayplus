@@ -17,7 +17,7 @@
 import { API_URL_ROLE_LIST, req } from '@/api/manage'
 export default {
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
 
   data () {

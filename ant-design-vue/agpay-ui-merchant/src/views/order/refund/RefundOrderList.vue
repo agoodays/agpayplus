@@ -6,22 +6,6 @@
           <div class="table-layer">
             <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
               <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
-<!--              <a-range-picker
-                @change="onChange"
-                :show-time="{ format: 'HH:mm:ss' }"
-                format="YYYY-MM-DD HH:mm:ss"
-                :disabled-date="disabledDate"
-                :ranges="{
-                  今天: [moment().startOf('day'), moment()],
-                  昨天: [moment().startOf('day').subtract(1,'days'), moment().endOf('day').subtract(1, 'days')],
-                  最近三天: [moment().startOf('day').subtract(2, 'days'), moment().endOf('day')],
-                  最近一周: [moment().startOf('day').subtract(1, 'weeks'), moment()],
-                  本月: [moment().startOf('month'), moment()],
-                  本年: [moment().startOf('year'), moment()]
-                }"
-              >
-                <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>-->
             </a-form-item>
             <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
 <!--            <ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->

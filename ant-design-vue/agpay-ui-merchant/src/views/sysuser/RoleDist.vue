@@ -27,7 +27,7 @@ import { uSysUserRoleRela, req, reqLoad, API_URL_ROLE_LIST, API_URL_USER_ROLE_RE
 export default {
 
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
 
   data () {

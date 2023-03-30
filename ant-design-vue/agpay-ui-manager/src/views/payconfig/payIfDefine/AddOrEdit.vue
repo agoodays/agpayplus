@@ -177,7 +177,7 @@
               <a-row v-for="(group, index) in groupedWays" :key="index">
                 <h3>{{ group.name }}</h3>
                 <a-col :span="6" v-for="(way, i) in group.ways" :key="i">
-                  <a-checkbox :value='way.wayCode'>{{ way.wayName }}</a-checkbox>
+                  <a-checkbox :value="way.wayCode">{{ way.wayName }}</a-checkbox>
                 </a-col>
               </a-row>
             </a-checkbox-group>

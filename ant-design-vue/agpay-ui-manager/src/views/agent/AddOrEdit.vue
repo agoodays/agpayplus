@@ -105,8 +105,8 @@
           <a-col :span="10">
             <a-form-model-item label="是否发送开通提醒" prop="isNotify">
               <a-radio-group v-model="saveObject.isNotify">
-                <a-radio :value='0'>否</a-radio>
-                <a-radio :value='1'>是</a-radio>
+                <a-radio :value="0">否</a-radio>
+                <a-radio :value="1">是</a-radio>
               </a-radio-group>
             </a-form-model-item>
           </a-col>
@@ -115,8 +115,8 @@
           <a-col :span="10">
             <a-form-model-item label="密码设置" prop="passwordType">
               <a-radio-group v-model="saveObject.passwordType">
-                <a-radio value='default'>默认密码</a-radio>
-                <a-radio value='custom'>自定义密码</a-radio>
+                <a-radio value="default">默认密码</a-radio>
+                <a-radio value="custom">自定义密码</a-radio>
               </a-radio-group>
             </a-form-model-item>
           </a-col>
@@ -208,7 +208,7 @@
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
-            <a-form-model-item :label='this.settAccountNoLabel' prop="settAccountNo">
+            <a-form-model-item :label="this.settAccountNoLabel" prop="settAccountNo">
               <a-input v-model="saveObject.settAccountNo"/>
             </a-form-model-item>
           </a-col>
@@ -236,27 +236,27 @@
       <div>
         <a-row justify="space-between" type="flex">
           <a-col :span="24">
-            <div class="ant-col ant-form-item-label"><label title="设置提现手续费规则" class="">设置提现手续费规则</label></div>
+            <div class="ant-col ant-form-item-label"><label title="设置提现手续费规则">设置提现手续费规则</label></div>
           </a-col>
           <a-col :span="24">
             <a-form-model-item class="cashout-fee" label="配置类型：" prop="cashoutFeeRuleType">
               <a-radio-group v-model="saveObject.cashoutFeeRuleType">
-                <a-radio :value='1'>使用系统默认</a-radio>
-                <a-radio :value='2'>自定义</a-radio>
+                <a-radio :value="1">使用系统默认</a-radio>
+                <a-radio :value="2">自定义</a-radio>
               </a-radio-group>
             </a-form-model-item>
           </a-col>
         </a-row>
         <a-row justify="space-between" type="flex" v-if="this.saveObject.cashoutFeeRuleType === 2">
           <a-col :span="24">
-            <a-form-model-item class="cashout-fee" :title='"额度：设置最低"+this.cashoutFeeRule.applyLimit+"元可发起提现"' prop="applyLimit">
+            <a-form-model-item class="cashout-fee" :title="'额度：设置最低'+this.cashoutFeeRule.applyLimit+'元可发起提现'" prop="applyLimit">
               <div class="ant-col ant-form-item-label cashout-fee-label"><label>额度：设置最低</label></div>
               <a-input-number v-model="cashoutFeeRule.applyLimit"/>
               <div class="ant-col ant-form-item-label cashout-fee-label"><label>元可发起提现</label></div>
             </a-form-model-item>
           </a-col>
           <a-col :span="24">
-            <a-form-model-item class="cashout-fee" :title='"规则：提现"+this.cashoutFeeRule.freeLimit+"元以内免收手续费"' prop="freeLimit">
+            <a-form-model-item class="cashout-fee" :title="'规则：提现'+this.cashoutFeeRule.freeLimit+'元以内免收手续费'" prop="freeLimit">
               <div class="ant-col ant-form-item-label cashout-fee-label"><label>规则：提现</label></div>
               <a-input-number v-model="cashoutFeeRule.freeLimit"/>
               <div class="ant-col ant-form-item-label cashout-fee-label"><label>元以内免收手续费</label></div>
@@ -265,21 +265,21 @@
           <a-col :span="24">
             <a-form-model-item class="cashout-fee-type" label="手续费计算模式：" prop="feeType">
               <a-radio-group v-model="cashoutFeeRule.feeType">
-                <a-radio value='FIX'>
+                <a-radio value="FIX">
                   单笔固定
                   <div v-if="cashoutFeeRule.feeType === 'FIX'" style="display: contents;">
                     <a-input-number v-model="cashoutFeeRule.fixFee"/>
                     元
                   </div>
                 </a-radio>
-                <a-radio value='SINGLE'>
+                <a-radio value="SINGLE">
                   单笔费率
                   <div v-if="cashoutFeeRule.feeType === 'SINGLE'" style="display: contents;">
                     <a-input-number v-model="cashoutFeeRule.feeRate"/>
                     %
                   </div>
                 </a-radio>
-                <a-radio value='FIXANDRATE'>
+                <a-radio value="FIXANDRATE">
                   固定+费率
                   <div v-if="cashoutFeeRule.feeType === 'FIXANDRATE'" style="display: contents;">
                     <a-input-number v-model="cashoutFeeRule.fixFee"/>
@@ -335,7 +335,7 @@
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
-            <a-form-model-item :label='"["+this.imgLabel+"]身份证人像面照片"' prop="idcard1Img">
+            <a-form-model-item :label="'['+this.imgLabel+']身份证人像面照片'" prop="idcard1Img">
               <AgUpload
                 :action="action"
                 bind-name="idcard1Img"
@@ -349,7 +349,7 @@
             </a-form-model-item>
           </a-col>
           <a-col :span="10">
-            <a-form-model-item :label='"["+this.imgLabel+"]身份证国徽面照片"' prop="idcard2Img">
+            <a-form-model-item :label="'['+this.imgLabel+']身份证国徽面照片'" prop="idcard2Img">
               <AgUpload
                 :action="action"
                 bind-name="idcard2Img"
@@ -378,7 +378,7 @@
           </a-col>
           <!-- 个人对私/企业对私 -->
           <a-col :span="10" v-if="this.saveObject.settAccountType === 'BANK_PRIVATE'">
-            <a-form-model-item :label='"["+this.imgLabel+"]银行卡照片"' prop="bankCardImg">
+            <a-form-model-item :label="'['+this.imgLabel+']银行卡照片'" prop="bankCardImg">
               <AgUpload
                 :action="action"
                 bind-name="bankCardImg"
@@ -414,7 +414,7 @@ import 'viewerjs/dist/viewer.css'
 export default {
   name: 'AddOrEdit',
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
   components: {
     AgUpload

@@ -10,7 +10,7 @@
     <div class="ag-table-top-row">
       <div class="ag-table-top-left">
         <a-button icon="area-chart" class="statistics" v-if="isEnableDataStatistics" @click="isShowDataStatistics = !isShowDataStatistics">
-          {{ isShowDataStatistics ? "关闭" : "数据"}}统计
+          {{ isShowDataStatistics ? "关闭" : "数据" }}统计
         </a-button>
         <slot name="topLeftSlot"></slot>
       </div>
@@ -90,8 +90,8 @@
       :scroll="{ x: scrollX }"
       :customRow="(record, index) => {
         if(!tableRowCrossColor){
-            return {};
-         }
+          return {};
+        }
         return { style: { 'background-color': index % 2 == 0 ? '#FCFCFC' : '#FFFFFF'} }
       }"
     >
@@ -116,14 +116,14 @@ export default {
     isShowDownload: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
     isEnableDataStatistics: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
     initData: { type: Boolean, default: true }, // 初始化列表数据， 默认true
-    tableColumns: Array, // 表格数组列
-    reqTableDataFunc: { type: Function }, // 请求列表数据
-    reqDownloadDataFunc: { type: Function }, // 请求列表数据
+    tableColumns: { type: Array, default: null }, // 表格数组列
+    reqTableDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
+    reqDownloadDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
     currentChange: { type: Function, default: (v1, v2) => {} }, // 更新当前选择行事件， 默认空函数
-    searchData: Object, // 搜索条件参数
+    searchData: { type: Object, default: null }, // 搜索条件参数
     pageSize: { type: Number, default: 10 }, // 默认每页条数
-    rowSelection: Object, // checkbox选择
-    rowKey: { type: [String, Function] }, // 定义rowKey 如果不定义将会出现（树状结构出问题， checkbox不消失等）
+    rowSelection: { type: Object, default: null }, // checkbox选择
+    rowKey: { type: [String, Function], default: 'id' }, // 定义rowKey 如果不定义将会出现（树状结构出问题， checkbox不消失等）
     scrollX: { type: Number, default: 800 }, // 定义表格的最小宽度，在小就会出现横向的滚动条
     tableRowCrossColor: { type: Boolean, default: false } // 是隔行换色
   },

@@ -54,7 +54,7 @@
 import { API_URL_UR_TEAM_LIST, req } from '@/api/manage'
 export default {
   props: {
-    callbackFunc: { type: Function }
+    callbackFunc: { type: Function, default: () => () => ({}) }
   },
 
   data () {

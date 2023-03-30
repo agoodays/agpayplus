@@ -18,22 +18,22 @@
               </a-select>
             </a-form-item>
             <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
-                <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
-                <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-              </span>
+              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
+              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
+            </span>
           </div>
         </a-form>
       </div>
       <div class="split-line"/>
       <!-- 列表渲染 -->
       <AgTable
-          @btnLoadClose="btnLoading=false"
-          ref="infoTable"
-          :initData="true"
-          :reqTableDataFunc="reqTableDataFunc"
-          :tableColumns="tableColumns"
-          :searchData="searchData"
-          rowKey="agentNo"
+        @btnLoadClose="btnLoading=false"
+        ref="infoTable"
+        :initData="true"
+        :reqTableDataFunc="reqTableDataFunc"
+        :tableColumns="tableColumns"
+        :searchData="searchData"
+        rowKey="agentNo"
       >
         <template slot="topLeftSlot">
           <div>
