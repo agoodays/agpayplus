@@ -3,8 +3,8 @@
     :visible="visible"
     @close="onClose"
     :closable="true"
-    :body-style="{ paddingBottom: '80px' }"
-    :drawer-style="{ backgroundColor: '#f0f2f5' }"
+    :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="80%"
   >
     <template slot="title">

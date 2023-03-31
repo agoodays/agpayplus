@@ -1,10 +1,12 @@
 <template>
   <a-drawer
     :visible="visible"
-    :title=" isAdd ? '新增应用' : '修改应用'"
-    width="40%"
+    :title="isAdd ? '新增应用' : '修改应用'"
     :maskClosable="false"
-    @close="onClose">
+    @close="onClose"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+    width="40%">
 
     <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">

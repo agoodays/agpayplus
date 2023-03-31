@@ -1,6 +1,6 @@
 <template>
   <a-drawer
-    :title=" isAdd ? '新增操作员' : '修改操作员' "
+    :title="isAdd ? '新增操作员' : '修改操作员'"
     placement="right"
     :closable="true"
     @ok="handleOkFunc"
@@ -8,6 +8,8 @@
     width="600"
     @close="onClose"
     :maskClosable="false"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
   >
     <!-- <a-modal :confirmLoading="confirmLoading"> -->
 

@@ -1,9 +1,10 @@
 <template>
   <a-drawer
     :visible="visible"
-    :title=" true ? '团队详情' : '' "
+    :title="true ? '团队详情' : ''"
     @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="40%"
   >
     <a-row justify="space-between" type="flex">

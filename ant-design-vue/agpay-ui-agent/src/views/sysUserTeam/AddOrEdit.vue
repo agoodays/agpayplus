@@ -2,9 +2,10 @@
   <a-drawer
     :maskClosable="false"
     :visible="visible"
-    :title=" isAdd ? '新增团队' : '修改团队' "
+    :title="isAdd ? '新增团队' : '修改团队'"
     @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="40%"
     class="drawer-width"
   >

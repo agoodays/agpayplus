@@ -1,5 +1,12 @@
 <template>
-  <a-drawer :visible="isShow" :title=" isAdd ? '新增角色' : '修改角色' " width="600" :maskClosable="false" @close="isShow = false">
+  <a-drawer
+    :visible="isShow"
+    :title="isAdd ? '新增角色' : '修改角色'"
+    width="600"
+    :maskClosable="false"
+    @close="isShow = false"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }">
 
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 4}" :rules="rules">
 

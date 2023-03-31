@@ -1,5 +1,12 @@
 <template>
-  <a-drawer :visible="isShow" title="分配角色" width="30%" :maskClosable="true" @close="isShow = false">
+  <a-drawer
+    :visible="isShow"
+    title="分配角色"
+    width="30%"
+    :maskClosable="true"
+    @close="isShow = false"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }">
 
     <div>
       <div :style="{ paddingBottom: '20px', borderBottom: '1px solid #E9E9E9' }">
