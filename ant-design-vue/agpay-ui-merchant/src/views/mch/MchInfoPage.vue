@@ -25,7 +25,7 @@
         <span class="label">商户类型</span>
         <span class="desc">{{ saveObject.type === 1 ? '普通商户': '特约商户' }}</span>
       </div>
-      <div class="item">
+      <div class="item" v-if="saveObject.isvNo">
         <span class="label">服务商号</span>
         <span class="desc">{{ saveObject.isvNo }}</span>
       </div>

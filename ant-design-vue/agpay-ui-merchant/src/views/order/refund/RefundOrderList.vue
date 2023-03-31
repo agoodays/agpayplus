@@ -111,6 +111,8 @@
         :visible="visible"
         :title="visible === true? '退款订单详情':''"
         @close="onClose"
+        :drawer-style="{ overflow: 'hidden' }"
+        :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
       >
         <a-row justify="space-between" type="flex">
           <a-col :sm="12">

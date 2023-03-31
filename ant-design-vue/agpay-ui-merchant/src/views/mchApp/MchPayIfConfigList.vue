@@ -1,11 +1,11 @@
 <template>
   <a-drawer
+    width="80%"
     :visible="visible"
     @close="onClose"
     :closable="true"
-    :body-style="{ paddingBottom: '80px' }"
-    :drawer-style="{ backgroundColor: '#f0f2f5' }"
-    width="80%"
+    :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
   >
     <template slot="title">
       <a-steps :current="currentStep" type="navigation" style="width:80%">

@@ -7,6 +7,8 @@
     :visible="isShow"
     title="转账订单详情"
     @close="isShow = false"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
   >
     <a-row justify="space-between" type="flex">
       <a-col :sm="12">

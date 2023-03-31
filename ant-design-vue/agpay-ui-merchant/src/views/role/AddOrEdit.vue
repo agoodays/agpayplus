@@ -1,12 +1,16 @@
 <template>
-  <a-drawer :visible="isShow" :title=" isAdd ? '新增角色' : '修改角色' " width="30%" :maskClosable="false" @close="isShow = false">
-
+  <a-drawer
+    :visible="isShow"
+    :title="isAdd ? '新增角色' : '修改角色'"
+    width="30%"
+    :maskClosable="false"
+    @close="isShow = false"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }">
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 4}" :wrapper-col="{span: 15}" :rules="rules">
-
       <a-form-model-item label="角色名称：" prop="roleName">
         <a-input v-model="saveObject.roleName" />
       </a-form-model-item>
-
     </a-form-model>
 
     <!-- 角色权限分配 -->
@@ -16,9 +20,7 @@
       <a-button :style="{ marginRight: '8px' }" @click="isShow = false" icon="close">取消</a-button>
       <a-button type="primary" @click="handleOkFunc" :loading="confirmLoading" icon="check">保存</a-button>
     </div>
-
   </a-drawer>
-
 </template>
 
 <script>

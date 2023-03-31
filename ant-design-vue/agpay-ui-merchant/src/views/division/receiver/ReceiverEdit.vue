@@ -1,5 +1,12 @@
 <template>
-  <a-drawer :visible="isShow" title="修改分账用户信息" width="30%" :maskClosable="false" @close="isShow = false">
+  <a-drawer
+    :visible="isShow"
+    title="修改分账用户信息"
+    width="30%"
+    :maskClosable="false"
+    @close="isShow = false"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }">
 
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 6}" :wrapper-col="{span: 15}" :rules="rules">
 

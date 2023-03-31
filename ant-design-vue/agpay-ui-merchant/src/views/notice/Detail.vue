@@ -1,9 +1,10 @@
 <template>
   <a-drawer
     :visible="visible"
-    :title=" true ? '公告详情' : '' "
+    :title="true ? '公告详情' : ''"
     @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="60%"
   >
     <div class="article-container">

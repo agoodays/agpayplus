@@ -6,6 +6,8 @@
     :visible="visible"
     title="记录详情"
     @close="visible = false"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
   >
     <a-row justify="space-between" type="flex">
       <a-col :sm="12"><a-descriptions><a-descriptions-item label="分账记录ID">{{ detailData.recordId }}</a-descriptions-item></a-descriptions></a-col>
