@@ -25,6 +25,7 @@
 	border: solid 1px #e2e2e2;
 	margin-right: 10px;
 	cursor: pointer;
+	border-radius: 5px;
 }
 .paydemo .paydemo-type-h5 {
 	padding: 12px;
@@ -102,7 +103,7 @@
 }
 
 .paydemo #paydemo-amount {
-  display: flex; 
+  display: flex;
   align-items: inherit;
 }
 .paydemo #paydemo-amount .layui-unselect{
