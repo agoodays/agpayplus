@@ -7,7 +7,6 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.MQ.Vender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,9 +18,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
     {
         private readonly IAgentInfoService _agentInfoService;
 
-        public AgentConfigController(IMQSender mqSender,
-            ILogger<AgentConfigController> logger,
-            IAgentInfoService agentInfoService,RedisUtil client,
+        public AgentConfigController(IAgentInfoService agentInfoService,
+            ILogger<AgentConfigController> logger, RedisUtil client,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
