@@ -4,8 +4,8 @@
     title="支付参数列表"
     @close="onClose"
     :closable="true"
-    :body-style="{ paddingBottom: '80px' }"
-    :drawer-style="{ backgroundColor: '#f0f2f5' }"
+    :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="80%"
   >
     <AgCard
@@ -39,7 +39,8 @@
       width="40%"
       :closable="true"
       :visible="childrenVisible"
-      :body-style="{ paddingBottom: '80px' }"
+      :drawer-style="{ overflow: 'hidden' }"
+      :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
       @close="onChildrenDrawerClose"
       :maskClosable="false"
     >

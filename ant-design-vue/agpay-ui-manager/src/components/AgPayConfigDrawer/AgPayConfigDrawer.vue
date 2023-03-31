@@ -3,7 +3,8 @@
     :visible="visible"
     :title="true ? '支付配置' : ''"
     @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ padding: '0px 0px 80px', overflow: 'auto' }"
     width="80%">
     <a-tabs v-model="activeKey">
       <a-tab-pane :key="1" tab="参数及费率的填写">
@@ -29,7 +30,7 @@
         </div>
         <div class="tab-wrapper" v-if="selectedIfCode">
           <div class="tab-content">
-            <div class="tab-item" :class="{ 'tab-selected' : selectedTab === 'param' }" @click="selectedTab = 'param'">参数配置</div>
+            <div class="tab-item" :class="{ 'tab-selected' : selectedTab === 'params' }" @click="selectedTab = 'params'">参数配置</div>
             <div class="tab-item" :class="{ 'tab-selected' : selectedTab === 'rate' }" @click="selectedTab = 'rate'">费率配置</div>
           </div>
           <div class="open-close" @click="isShowMore = !isShowMore">
@@ -47,6 +48,14 @@
         </div>
       </a-tab-pane>
     </a-tabs>
+    <div class="drawer-btn-center" v-if="selectedIfCode">
+      <a-button icon="close" :style="{ marginRight: '8px' }" @click="onClose" style="margin-right:8px">
+        取消
+      </a-button>
+      <a-button type="primary" icon="check" @click="handleOkFunc" :loading="btnLoading">
+        保存
+      </a-button>
+    </div>
   </a-drawer>
 </template>
 
@@ -1175,7 +1184,7 @@ export default {
       isShowMore: true,
       activeKey: 1,
       selectedIfCode: null,
-      selectedTab: 'param',
+      selectedTab: 'params',
       payList,
       searchData: {}
     }
@@ -1183,28 +1192,37 @@ export default {
   methods: {
     show: function (recordId) { // 弹层打开事件
       this.recordId = recordId
+      this.reset()
+      this.visible = true
+    },
+    reset: function () {
       this.btnLoading = false
       this.isShowMore = true
       this.activeKey = 1
       this.selectedIfCode = null
       this.selectedTab = 'param'
-
-      this.visible = true
     },
     onClose () {
       this.visible = false
     },
     searchFunc () {
-
+      console.log(this.searchData)
+      this.reset()
     },
     paySelected (code) {
       this.selectedIfCode = code
+    },
+    handleOkFunc () {
     }
   }
 }
 </script>
 
 <style scoped>
+  >>> .ant-tabs-top-bar {
+    padding-left: 35vw;
+  }
+
   .table-box {
     display: flex
   }

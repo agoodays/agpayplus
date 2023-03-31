@@ -4,9 +4,10 @@
     :visible="visible"
     :title=" isAdd ? '新增团队' : '修改团队' "
     @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
-    width="40%"
     class="drawer-width"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+    width="40%"
   >
     <a-form-model v-if="visible" ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">

@@ -3,7 +3,8 @@
     :visible="visible"
     :title=" true ? '商户高级配置' : '' "
     @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="60%"
   >
     <a-tabs v-model="groupKey" @change="selectTabs" :animated="false">

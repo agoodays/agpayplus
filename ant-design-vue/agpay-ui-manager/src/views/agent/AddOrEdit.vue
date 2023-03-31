@@ -4,7 +4,8 @@
     :visible="visible"
     :title=" isAdd ? '新增代理商' : '修改代理商' "
     @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="40%"
     class="drawer-width"
   >

@@ -1,12 +1,14 @@
 <!-- 订单详情抽屉 -->
 <template>
   <a-drawer
-    width="50%"
     placement="right"
     :closable="true"
     :visible="isShow"
     title="转账订单详情"
     @close="isShow = false"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+    width="50%"
   >
     <a-row justify="space-between" type="flex">
       <a-col :sm="12">

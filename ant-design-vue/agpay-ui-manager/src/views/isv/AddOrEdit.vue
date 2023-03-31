@@ -4,7 +4,8 @@
     :visible="visible"
     :title=" isAdd ? '新增服务商' : '修改服务商' "
     @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="40%"
   >
     <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">

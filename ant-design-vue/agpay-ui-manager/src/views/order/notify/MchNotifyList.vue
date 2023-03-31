@@ -82,12 +82,14 @@
     <!-- 日志详情抽屉 -->
     <template>
       <a-drawer
-        width="40%"
         placement="right"
         :closable="true"
         :visible="visible"
         :title="visible === true? '商户通知详情':''"
         @close="onClose"
+        :drawer-style="{ overflow: 'hidden' }"
+        :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+        width="40%"
       >
         <a-row justify="space-between" type="flex">
           <a-col :sm="12">

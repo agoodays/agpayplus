@@ -239,6 +239,8 @@
           :closable="true"
           :visible="visible"
           @close="onClose"
+          :drawer-style="{ overflow: 'hidden' }"
+          :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
         >
           <a-row>
             <a-col :span="24">

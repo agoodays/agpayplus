@@ -5,7 +5,8 @@
     :closable="true"
     :maskClosable="false"
     :visible="visible"
-    :body-style="{ paddingBottom: '80px' }"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     @close="onClose"
   >
     <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">

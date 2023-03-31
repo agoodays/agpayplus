@@ -4,7 +4,8 @@
     :visible="visible"
     :title=" isAdd ? '新增门店' : '修改门店' "
     @close="onClose"
-    :body-style="{ paddingBottom: '80px' }"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="60%"
     class="drawer-width"
   >

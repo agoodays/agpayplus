@@ -8,9 +8,10 @@
     width="600"
     @close="onClose"
     :maskClosable="false"
+    :drawer-style="{ overflow: 'hidden' }"
+    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
   >
     <!-- <a-modal :confirmLoading="confirmLoading"> -->
-
     <a-form-model
       ref="infoFormModel"
       :model="saveObject"
