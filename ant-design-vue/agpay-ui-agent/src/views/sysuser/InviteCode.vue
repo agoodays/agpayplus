@@ -78,7 +78,7 @@ export default {
 
 <style scoped>
   .ant-modal-body div{
-    padding: 2px 0px;
+    padding: 2px 0;
   }
   .a-copy{
     padding: 0 7px;

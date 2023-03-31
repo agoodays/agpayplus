@@ -1,12 +1,12 @@
 <template>
   <a-drawer
-      :maskClosable="false"
-      :visible="visible"
-      :title=" isAdd ? '新增门店' : '修改门店' "
-      @close="onClose"
-      :body-style="{ paddingBottom: '80px' }"
-      width="60%"
-      class="drawer-width"
+    :maskClosable="false"
+    :visible="visible"
+    :title=" isAdd ? '新增门店' : '修改门店' "
+    @close="onClose"
+    :body-style="{ paddingBottom: '80px' }"
+    width="60%"
+    class="drawer-width"
   >
     <a-form-model v-if="visible" ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">

@@ -13,16 +13,16 @@
         <a-col :span="10">
           <a-form-model-item label="团队名称" prop="teamName">
             <a-input
-                placeholder="请输入团队名称"
-                v-model="saveObject.teamName"
+              placeholder="请输入团队名称"
+              v-model="saveObject.teamName"
             />
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="团队编号" prop="teamNo">
             <a-input
-                placeholder="请输入团队编号"
-                v-model="saveObject.teamNo"
+              placeholder="请输入团队编号"
+              v-model="saveObject.teamNo"
             />
           </a-form-model-item>
         </a-col>

@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     :visible="visible"
-    :title=" true ? '公告详情' : '' "
+    :title="true ? '公告详情' : ''"
     @close="onClose"
     :body-style="{ paddingBottom: '80px' }"
     width="60%"

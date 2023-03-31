@@ -1,10 +1,10 @@
 <template>
   <a-drawer
-      :visible="visible"
-      :title=" isAdd ? '新增应用' : '修改应用'"
-      width="40%"
-      :maskClosable="false"
-      @close="onClose">
+    :visible="visible"
+    :title=" isAdd ? '新增应用' : '修改应用'"
+    width="40%"
+    :maskClosable="false"
+    @close="onClose">
 
     <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">
@@ -223,8 +223,8 @@ export default {
       if (randomFlag) {
         range = Math.round(Math.random() * (max - min)) + min
       }
-      for (var i = 0; i < range; i++) {
-        var pos = Math.round(Math.random() * (arr.length - 1))
+      for (let i = 0; i < range; i++) {
+        const pos = Math.round(Math.random() * (arr.length - 1))
         str += arr[ pos ]
       }
       this.saveObject.appSecret = str

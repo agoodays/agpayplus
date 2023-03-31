@@ -708,7 +708,7 @@ export default {
     margin-bottom: 18px;
   }
   .cashout-fee-type .ant-radio-group .ant-radio-wrapper:last-child {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
   .cashout-fee .ant-form-item-children {
     display: flex;

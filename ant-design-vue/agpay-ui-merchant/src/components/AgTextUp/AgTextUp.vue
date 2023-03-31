@@ -11,8 +11,8 @@ export default {
   name: 'AgTextUp',
   // props: ['msg', 'placeholder']
   props: {
-    msg: { type: String },
-    placeholder: { type: String }
+    msg: { type: String, default: null },
+    placeholder: { type: String, default: null }
   }
 }
 </script>

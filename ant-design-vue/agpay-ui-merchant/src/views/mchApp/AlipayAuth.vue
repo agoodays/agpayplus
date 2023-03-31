@@ -3,7 +3,7 @@
 
     <div style="text-align: center">
       <p>方式1： <br/>  使用商家账号登录【支付宝】APP, 扫描如下二维码, 按提示授权： </p>
-      <img style="margin-bottom: 10px" :src="apiResData.authQrImgUrl">
+      <img style="margin-bottom: 10px" :src="apiResData.authQrImgUrl" alt="授权码">
       <hr/>
 
       <p style="margin-top: 10px">

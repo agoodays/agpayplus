@@ -245,7 +245,7 @@ body {
 }
 .xian {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   right: 0;
   width: calc(100% - 103px);
   height: 1px;

@@ -1,12 +1,12 @@
 <!-- 订单详情抽屉 -->
 <template>
   <a-drawer
-      width="50%"
-      placement="right"
-      :closable="true"
-      :visible="isShow"
-      title="转账订单详情"
-      @close="isShow = false"
+    width="50%"
+    placement="right"
+    :closable="true"
+    :visible="isShow"
+    title="转账订单详情"
+    @close="isShow = false"
   >
     <a-row justify="space-between" type="flex">
       <a-col :sm="12">

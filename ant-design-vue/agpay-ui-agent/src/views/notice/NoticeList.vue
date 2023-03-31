@@ -6,11 +6,11 @@
           <div class="table-layer">
             <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
               <a-range-picker
-                  @change="onChange"
-                  :show-time="{ format: 'HH:mm:ss' }"
-                  format="YYYY-MM-DD HH:mm:ss"
-                  :disabled-date="disabledDate"
-                  :ranges="{
+                @change="onChange"
+                :show-time="{ format: 'HH:mm:ss' }"
+                format="YYYY-MM-DD HH:mm:ss"
+                :disabled-date="disabledDate"
+                :ranges="{
                   今天: [moment().startOf('day'), moment()],
                   昨天: [moment().startOf('day').subtract(1,'days'), moment().endOf('day').subtract(1, 'days')],
                   最近三天: [moment().startOf('day').subtract(2, 'days'), moment().endOf('day')],

@@ -93,7 +93,7 @@
           <a-form-model ref="configFormModel">
             <a-row>
               <a-col :span="22" :offset="1">
-                <a-form-model-item label="全局自动分账" style="margin-bottom: 0px;">
+                <a-form-model-item label="全局自动分账" style="margin-bottom: 0;">
                   <a-radio-group v-model="divisionConfig.overrideAutoFlag">
                     <a-radio :value="1">开启</a-radio>
                     <a-radio :value="0">关闭</a-radio>

@@ -51,7 +51,7 @@
         </div>
       </div>
     </div>
-    <div  class="personal">
+    <div class="personal">
       <div>
         <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 0 }">
           <div class="before-msg">
