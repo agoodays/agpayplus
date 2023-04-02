@@ -137,6 +137,27 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
+        public List<PayInterfaceDefineDto> PayIfConfigList(byte infoType, string configMode, string infoId, string ifName, string ifCode)
+        {
+            // 支付定义列表
+            var defineList = _payInterfaceDefineRepository.GetAll()
+                .Where(w => w.IsIsvMode.Equals(CS.YES) && w.State.Equals(CS.YES)
+                && (string.IsNullOrWhiteSpace(ifName) || w.IfName.Contains(ifName))
+                && (string.IsNullOrWhiteSpace(ifCode) || w.IfCode.Equals(ifCode))
+                );
+            // 支付参数列表
+            var configList = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoType.Equals(infoType) && w.InfoId.Equals(infoId));
+
+            var result = defineList.ToList().Select(s =>
+            {
+                var entity = _mapper.Map<PayInterfaceDefineDto>(s);
+                entity.IfConfigState = configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
+                return entity;
+            }).ToList();
+
+            return result;
+        }
+
         public List<PayInterfaceDefineDto> SelectAllPayIfConfigListByAppId(string appId)
         {
             MchApp mchApp = _mchAppRepository.GetById(appId);

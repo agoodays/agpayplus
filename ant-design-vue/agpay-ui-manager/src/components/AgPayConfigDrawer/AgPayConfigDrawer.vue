@@ -4,19 +4,19 @@
     :title="true ? '支付配置' : ''"
     @close="onClose"
     :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ padding: '0px 0px 80px', overflow: 'auto' }"
+    :body-style="{ padding: '0px 0px 80px', overflowY: 'auto' }"
     width="80%">
     <a-tabs v-model="activeKey">
       <a-tab-pane :key="1" tab="参数及费率的填写">
         <div class="search">
-          <a-input class="rate-input" placeholder="搜索渠道名称" v-model="searchData.ifName"/>
-          <a-input class="rate-input" placeholder="搜索渠道代码" v-model="searchData.ifCode"/>
+          <a-input class="if-input" placeholder="搜索渠道名称" v-model="ifCodeListSearchData.ifName"/>
+          <a-input class="if-input" placeholder="搜索渠道代码" v-model="ifCodeListSearchData.ifCode"/>
           <a-button type="primary" icon="search" @click="searchFunc">查询</a-button>
-          <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
+          <a-button style="margin-left: 8px" icon="reload" @click="() => this.ifCodeListSearchData = {}">重置</a-button>
         </div>
         <div class="pay-list-wrapper" :style="{ 'height': isShowMore ? 'auto' : '110px' }">
-          <div class="pay-item-wrapper" v-for="(item, key) in payList" :key="key">
-            <div class="pay-content" :class="{ 'pay-selected' : selectedIfCode === item.ifCode }" @click="selectedIfCode = item.ifCode">
+          <div class="pay-item-wrapper" v-for="(item, key) in ifCodeList" :key="key">
+            <div class="pay-content" :class="{ 'pay-selected' : currentIfCode === item.ifCode }" @click="ifCodeSelected(item.ifCode)">
               <div class="pay-img" :style="{ backgroundColor: item.bgColor }">
                 <img :src="item.icon" alt="">
                 <div class="pay-state-dot" :style="{ backgroundColor: item.state ? '#29CC96FF' : '#D9D9D9FF' }"></div>
@@ -28,38 +28,60 @@
             </div>
           </div>
         </div>
-        <div class="tab-wrapper" v-if="selectedIfCode">
+        <div class="tab-wrapper" v-if="currentIfCode">
           <div class="tab-content">
-            <div class="tab-item" :class="{ 'tab-selected' : selectedTab === 'params' }" @click="selectedTab = 'params'">参数配置</div>
-            <div class="tab-item" :class="{ 'tab-selected' : selectedTab === 'rate' }" @click="selectedTab = 'rate'">费率配置</div>
+            <div
+              class="tab-item"
+              v-for="(item, key) in tabData"
+              :key="key"
+              :class="{ 'tab-selected' : paramsAndRateTabVal === item.code }"
+              @click="tabSelected(item.code)">{{ item.name }}</div>
           </div>
           <div class="open-close" @click="isShowMore = !isShowMore">
             {{ isShowMore ? '收起' : '展开' }}
             <a-icon :type="isShowMore ? 'up' : 'down'" />
           </div>
         </div>
-        <div class="content-box" v-if="selectedIfCode">
-          <div v-if="selectedTab === 'param'">
-            {{ selectedIfCode }} —— 参数配置
+        <div class="content-box" v-if="currentIfCode">
+          <div v-if="paramsAndRateTabVal === 'paramsTab'">
+            <AgPayConfigPanel ref="payConfig" />
+            <!-- 支付参数配置页面组件  -->
+            <WxpayPayConfig ref="wxpayPayConfig" />
+            <!-- 支付参数配置页面组件  -->
+            <AlipayPayConfig ref="alipayPayConfig" />
+            <div>
+              {{ currentIfCode }} —— 参数配置
+            </div>
+            <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
+              <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
+              <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
+            </div>
           </div>
           <div v-else>
-            {{ selectedIfCode }} —— 费率配置
+            <div>
+              {{ currentIfCode }} —— 费率配置
+            </div>
+            <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
+              <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
+              <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
+            </div>
           </div>
         </div>
       </a-tab-pane>
     </a-tabs>
-    <div class="drawer-btn-center" v-if="selectedIfCode">
-      <a-button icon="close" :style="{ marginRight: '8px' }" @click="onClose" style="margin-right:8px">
-        取消
-      </a-button>
-      <a-button type="primary" icon="check" @click="handleOkFunc" :loading="btnLoading">
-        保存
-      </a-button>
-    </div>
+<!--    <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
+      <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
+      <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
+    </div>-->
   </a-drawer>
 </template>
 
 <script>
+import AgUpload from '@/components/AgUpload/AgUpload'
+import AgPayConfigPanel from './AgPayConfigPanel'
+import WxpayPayConfig from './Custom/WxpayPayConfig'
+import AlipayPayConfig from './Custom/AlipayPayConfig'
+import { API_URL_PAYCONFIGS_LIST, req } from '@/api/manage'
 const payList = [
   {
     ifCode: 'wxpay',
@@ -1176,43 +1198,101 @@ const payList = [
 
 export default {
   name: 'AgPayConfigDrawer',
+  components: {
+    AgUpload,
+    AgPayConfigPanel,
+    WxpayPayConfig,
+    AlipayPayConfig
+  },
   data () {
     return {
       visible: false, // 是否显示弹层/抽屉
-      recordId: null, // 更新对象ID
+      infoId: null, // 更新对象ID
+      configMode: null, // 更新对象ID
       btnLoading: false,
       isShowMore: true,
       activeKey: 1,
-      selectedIfCode: null,
-      selectedTab: 'params',
-      payList,
-      searchData: {}
+      currentIfCode: null,
+      selectIfCode: null,
+      ifCodeList: [],
+      ifCodeListSearchData: {},
+      paramsAndRateTabVal: 'paramsTab',
+      tabData: [
+        { code: 'paramsTab', name: '参数配置' },
+        { code: 'rateTab', name: '费率配置' }
+      ],
+      saveObject: {} // 保存的对象
     }
   },
   methods: {
-    show: function (recordId) { // 弹层打开事件
-      this.recordId = recordId
+    show: function (infoId) { // 弹层打开事件
+      this.infoId = infoId
       this.reset()
+      this.ifCodeListSearchData = {}
+      this.ifCodeListSearchData.infoId = this.infoId
+      this.ifCodeList = payList
+      this.refIfCodeList()
       this.visible = true
     },
     reset: function () {
       this.btnLoading = false
       this.isShowMore = true
       this.activeKey = 1
-      this.selectedIfCode = null
-      this.selectedTab = 'param'
+      this.currentIfCode = null
+      this.paramsAndRateTabVal = 'paramsTab'
     },
     onClose () {
       this.visible = false
     },
     searchFunc () {
-      console.log(this.searchData)
+      console.log(this.ifCodeListSearchData)
+      this.refIfCodeList()
       this.reset()
     },
-    paySelected (code) {
-      this.selectedIfCode = code
+    // 刷新card列表
+    refIfCodeList () {
+      const that = this
+      const params = Object.assign({}, { configMode: that.configMode, infoId: that.infoId }, that.ifCodeListSearchData)
+      req.list(API_URL_PAYCONFIGS_LIST + '/ifCodes', params).then(resData => {
+        that.ifCodeList = resData
+      })
     },
-    handleOkFunc () {
+    getParamsConfig (code) {
+      const that = this
+      const params = Object.assign({}, { configMode: that.configMode, infoId: that.infoId }, that.ifCodeListSearchData)
+      req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(resData => {
+        console.log(resData)
+      })
+    },
+    getRateConfig (code) {
+      const that = this
+      req.get(API_URL_PAYCONFIGS_LIST + '/savedMapData', { configMode: '', infoId: that.infoId, ifCode: that.currentIfCode }).then(resData => {
+        console.log(resData)
+      })
+    },
+    getConfig (code) {
+      switch (code) {
+        case 'paramsTab':
+          this.getParamsConfig(code)
+          break
+        case 'rateTab':
+          this.getRateConfig(code)
+          break
+      }
+    },
+    ifCodeSelected (code) {
+      const that = this
+      if (that.currentIfCode !== code) {
+        that.currentIfCode = code
+      }
+    },
+    tabSelected (code) {
+      const that = this
+      if (that.paramsAndRateTabVal !== code) {
+        that.paramsAndRateTabVal = code
+      }
+    },
+    onSubmit () {
     }
   }
 }
@@ -1221,6 +1301,11 @@ export default {
 <style scoped>
   >>> .ant-tabs-top-bar {
     padding-left: 35vw;
+  }
+
+  .drawer-btn-center {
+    position: fixed;
+    width: 80%;
   }
 
   .table-box {
@@ -1261,7 +1346,7 @@ export default {
     margin-left: 50px
   }
 
-  .search .rate-input {
+  .search .if-input {
     width: 200px;
     margin-right: 10px
   }

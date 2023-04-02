@@ -43,13 +43,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="infoId"></param>
         /// <param name="configMode"></param
-        /// <param name="ifName"></param>
+        /// <param name="ifName"></param
+        /// <param name="ifCode"></param>
         /// <returns></returns>
         [HttpGet, Route("ifCodes"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiRes List(string infoId, string configMode, string ifName)
+        public ApiRes List(string configMode, string infoId, string ifName, string ifCode)
         {
-            var data = _payIfConfigService.SelectAllPayIfConfigListByIsvNo(CS.INFO_TYPE_ISV, infoId);
+            var data = _payIfConfigService.PayIfConfigList(CS.INFO_TYPE_ISV, configMode, infoId, ifName, ifCode);
             return ApiRes.Ok(data);
         }
 
@@ -61,7 +62,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("interfaceSavedConfigs"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_VIEW, PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
-        public ApiRes GetByInfoId(string infoId, string ifCode, string configMode)
+        public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
         {
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_ISV, infoId, ifCode);
             if (payInterfaceConfig != null)
