@@ -53,6 +53,10 @@
         /// 商户应用
         /// </summary>
         public const byte INFO_TYPE_MCH_APP = 3;
+        /// <summary>
+        /// 代理商
+        /// </summary>
+        public const byte INFO_TYPE_AGENT = 4;
         #endregion
 
         #region 商户类型:1-普通商户 2-特约商户

@@ -50,7 +50,27 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes List(string configMode, string infoId, string ifName, string ifCode)
         {
-            var data = _payIfConfigService.PayIfConfigList(CS.INFO_TYPE_ISV, configMode, infoId, ifName, ifCode);
+            byte infoType = 0;
+            switch (configMode)
+            {
+                case "mgrIsv":
+                    infoType = CS.INFO_TYPE_ISV;
+                    break;
+                case "mgrAgent":
+                case "agentSubagent":
+                    infoType = CS.INFO_TYPE_AGENT;
+                    break;
+                case "mgrMch":
+                case "agentMch":
+                case "agentSelf":
+                case "mchSelfApp1":
+                case "mchSelfApp2":
+                    infoType = CS.INFO_TYPE_MCH_APP;
+                    break;
+                default:
+                    break;
+            }
+            var data = _payIfConfigService.PayIfConfigList(infoType, configMode, infoId, ifName, ifCode);
             return ApiRes.Ok(data);
         }
 
@@ -64,7 +84,27 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_VIEW, PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
         public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
         {
-            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_ISV, infoId, ifCode);
+            byte infoType = 0;
+            switch (configMode)
+            {
+                case "mgrIsv":
+                    infoType = CS.INFO_TYPE_ISV;
+                    break;
+                case "mgrAgent":
+                case "agentSubagent":
+                    infoType = CS.INFO_TYPE_AGENT;
+                    break;
+                case "mgrMch":
+                case "agentMch":
+                case "agentSelf":
+                case "mchSelfApp1":
+                case "mchSelfApp2":
+                    infoType = CS.INFO_TYPE_MCH_APP;
+                    break;
+                default:
+                    break;
+            }
+            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
             if (payInterfaceConfig != null)
             {
                 // 费率转换为百分比数值
@@ -90,7 +130,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD, PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
-            dto.InfoType = CS.INFO_TYPE_ISV;
             dto.IfRate = dto.IfRate / 100;// 存入真实费率
             //添加更新者信息
             long userId = GetCurrentUser().SysUser.SysUserId;
@@ -100,7 +139,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             dto.UpdatedAt = DateTime.Now;
 
             //根据 服务商号、接口类型 获取商户参数配置
-            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_ISV, dto.InfoId, dto.IfCode);
+            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(dto.InfoType, dto.InfoId, dto.IfCode);
             //若配置存在，为saveOrUpdate添加ID，第一次配置添加创建者
             if (dbRecoed != null)
             {

@@ -61,11 +61,8 @@
         </a-col>
       </a-row>
     </a-form-model>
-    <div class="drawer-btn-center" v-if="selectedIfCode">
-      <a-button icon="close" :style="{ marginRight: '8px' }" @click="onClose" style="margin-right:8px">
-        取消
-      </a-button>
-      <a-button type="primary" icon="check" @click="handleOkFunc" :loading="btnLoading">
+    <div class="drawer-btn-center">
+      <a-button type="primary" icon="check" @click="onSubmit" :loading="btnLoading">
         保存
       </a-button>
     </div>
@@ -74,16 +71,21 @@
 
 <script>
 import AgUpload from '@/components/AgUpload/AgUpload'
-import { upload } from '@/api/manage'
+import { API_URL_PAYCONFIGS_LIST, req, upload } from '@/api/manage'
 
 export default {
+  name: 'AgPayConfigPanel',
   components: {
     AgUpload
+  },
+  props: {
+    configMode: { type: String, default: null },
+    callbackFunc: { type: Function, default: () => ({}) }
   },
   data () {
     return {
       btnLoading: false,
-      infoId: null,
+      infoId: null, // 更新对象ID
       action: upload.cert, // 上传文件地址
       visible: false, // 一级抽屉开关
       ifDefineArray: {}, // 支付接口定义描述
@@ -99,7 +101,153 @@ export default {
   },
   methods: {
     show: function (infoId, record) {
+      this.infoId = infoId
+      if (this.$refs.infoFormModel !== undefined) {
+        this.$refs.infoFormModel.resetFields()
+      }
+      if (this.$refs.paramFormModel !== undefined) {
+        this.$refs.paramFormModel.resetFields()
+      }
+      this.ifParams = {} // 参数配置对象
+      this.ifDefineArray = {} // 支付接口定义描述
+
+      // 数据初始化
+      this.saveObject = {
+        infoId: infoId,
+        ifCode: record.ifCode,
+        state: record.ifConfigState === 0 ? 0 : 1
+      }
+      this.getParamsConfig(record)
       this.visible = true
+    },
+    hide () {
+      this.visible = false
+    },
+    generateRules () {
+      const rules = {}
+      let newItems = []
+      this.ifDefineArray.forEach(item => {
+        newItems = []
+        if (item.verify === 'required' && item.star !== '1') {
+          newItems.push({
+            required: true,
+            message: '请输入' + item.desc,
+            trigger: 'blur'
+          })
+          rules[item.name] = newItems
+        }
+      })
+      this.ifParamsRules = rules
+    },
+    getParamsConfig (record) {
+      const that = this
+      const params = Object.assign({}, { configMode: that.$props.configMode, infoId: that.infoId, ifCode: record.ifCode })
+      req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(res => {
+        if (res && res.ifParams) {
+          this.saveObject = res
+          this.ifParams = JSON.parse(res.ifParams)
+        }
+
+        const newItems = [] // 重新加载支付接口配置定义描述json
+        JSON.parse(record.isvParams).forEach(item => {
+          const radioItems = [] // 存放单选框value title
+          if (item.type === 'radio') {
+            const valueItems = item.values.split(',')
+            const titleItems = item.titles.split(',')
+
+            for (const i in valueItems) {
+              // 检查参数是否为数字类型 然后赋值给radio值
+              let radioVal = valueItems[i]
+              if (!isNaN((radioVal))) { radioVal = Number(radioVal) }
+
+              radioItems.push({
+                value: radioVal,
+                title: titleItems[i]
+              })
+            }
+          }
+
+          if (item.star === '1') {
+            that.ifParams[item.name + '_ph'] = that.ifParams[item.name] ? that.ifParams[item.name] : '请输入'
+            if (that.ifParams[item.name]) {
+              that.ifParams[item.name] = ''
+            }
+          }
+
+          newItems.push({
+            name: item.name,
+            desc: item.desc,
+            type: item.type,
+            verify: item.verify,
+            values: radioItems,
+            star: item.star // 脱敏标识 1-是
+          })
+        })
+        that.ifDefineArray = newItems // 重新赋值接口定义描述
+        that.generateRules()
+        that.$forceUpdate()
+      })
+    },
+    // 表单提交
+    onSubmit () {
+      const that = this
+      this.$refs.infoFormModel.validate(valid => {
+        this.$refs.paramFormModel.validate(valid2 => {
+          if (valid && valid2) { // 验证通过
+            that.btnLoading = true
+            const reqParams = {}
+            reqParams.infoId = that.saveObject.infoId
+            reqParams.ifCode = that.saveObject.ifCode
+            reqParams.ifRate = that.saveObject.ifRate
+            reqParams.state = that.saveObject.state
+            reqParams.remark = that.saveObject.remark
+
+            switch (that.$props.configMode) {
+              case 'mgrIsv':
+                reqParams.infoType = 1
+                break
+              case 'mgrAgent':
+              case 'agentSubagent':
+                reqParams.infoType = 4
+                break
+              case 'mgrMch':
+              case 'agentMch':
+              case 'agentSelf':
+              case 'mchSelfApp1':
+              case 'mchSelfApp2':
+                reqParams.infoType = 3
+                break
+            }
+
+            // 支付参数配置不能为空
+            if (Object.keys(that.ifParams).length === 0) {
+              this.$message.error('参数不能为空！')
+              return
+            }
+            // 脱敏数据为空时，删除该key
+            this.ifDefineArray.forEach(item => {
+              if (item.star === '1' && that.ifParams[item.name] === '') {
+                that.ifParams[item.name] = undefined
+              }
+              that.ifParams[item.name + '_ph'] = undefined
+            })
+            reqParams.ifParams = JSON.stringify(that.ifParams)
+            // 请求接口
+            req.add(API_URL_PAYCONFIGS_LIST + '/interfaceParams', reqParams).then(res => {
+              that.$message.success('保存成功')
+              that.childrenVisible = false
+              that.callbackFunc()
+              that.btnLoading = false
+            })
+          }
+        })
+      })
+    },
+    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
+    uploadSuccess (name, fileList) {
+      const [firstItem] = fileList
+      this.ifParams[name] = firstItem?.url
+      this.$forceUpdate()
     }
   }
 }

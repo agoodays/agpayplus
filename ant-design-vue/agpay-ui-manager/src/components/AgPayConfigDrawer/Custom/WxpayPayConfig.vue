@@ -31,7 +31,7 @@
         {{ saveObject.ifCode }} 服务商参数配置
       </a-tag>
     </a-divider>
-    <a-form-model ref="isvParamFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
+    <a-form-model ref="paramFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
       <a-row :gutter="16">
         <a-col span="12">
           <a-form-model-item label="微信支付商户号" prop="mchId">
@@ -135,21 +135,22 @@
 <script>
 import AgCard from '@/components/AgCard/AgCard'
 import AgUpload from '@/components/AgUpload/AgUpload'
-import { API_URL_ISV_PAYCONFIGS_LIST, req, getIsvPayConfigUnique, upload } from '@/api/manage'
+import { API_URL_PAYCONFIGS_LIST, req, upload } from '@/api/manage'
 export default {
   components: {
       AgCard,
       AgUpload
   },
   props: {
+    configMode: { type: String, default: null },
     callbackFunc: { type: Function, default: () => ({}) }
   },
-
   data () {
     return {
       btnLoading: false,
       visible: false,
       isAdd: true,
+      infoId: null, // 更新对象ID
       action: upload.cert, // 上传文件地址
       saveObject: {}, // 保存的对象
       ifParams: { apiVersion: 'V2' }, // 参数配置对象
@@ -212,13 +213,14 @@ export default {
     }
   },
   methods: {
-    // 弹层打开事件
+    // 显示事件
     show: function (infoId, record) {
+      this.infoId = infoId
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
       }
-      if (this.$refs.isvParamFormModel !== undefined) {
-        this.$refs.isvParamFormModel.resetFields()
+      if (this.$refs.paramFormModel !== undefined) {
+        this.$refs.paramFormModel.resetFields()
       }
 
       // 数据初始化
@@ -241,13 +243,17 @@ export default {
         serialNo_ph: '请输入'
       }
       this.visible = true
-      this.getIsvPayConfig()
+      this.getPayConfig()
+    },
+    hide () {
+      this.visible = false
     },
     // 支付参数配置
-    getIsvPayConfig () {
+    getPayConfig () {
       const that = this
       // 获取支付参数
-      getIsvPayConfigUnique(that.saveObject.infoId, that.saveObject.ifCode).then(res => {
+      const params = Object.assign({}, { configMode: that.$props.configMode, infoId: that.saveObject.infoId, ifCode: that.saveObject.ifCode })
+      req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(res => {
         if (res && res.ifParams) {
           that.saveObject = res
           that.ifParams = JSON.parse(res.ifParams)
@@ -274,7 +280,7 @@ export default {
     onSubmit () {
       const that = this
       this.$refs.infoFormModel.validate(valid => {
-        this.$refs.isvParamFormModel.validate(valid2 => {
+        this.$refs.paramFormModel.validate(valid2 => {
           if (valid && valid2) { // 验证通过
             that.btnLoading = true
             const reqParams = {}
@@ -283,6 +289,24 @@ export default {
             reqParams.ifRate = that.saveObject.ifRate
             reqParams.state = that.saveObject.state
             reqParams.remark = that.saveObject.remark
+
+            switch (that.$props.configMode) {
+              case 'mgrIsv':
+                reqParams.infoType = 1
+                break
+              case 'mgrAgent':
+              case 'agentSubagent':
+                reqParams.infoType = 4
+                break
+              case 'mgrMch':
+              case 'agentMch':
+              case 'agentSelf':
+              case 'mchSelfApp1':
+              case 'mchSelfApp2':
+                reqParams.infoType = 3
+                break
+            }
+
             // 支付参数配置不能为空
             if (Object.keys(that.ifParams).length === 0) {
               this.$message.error('参数不能为空！')
@@ -299,7 +323,7 @@ export default {
               this.$message.error('参数不能为空！')
               return
             }
-            req.add(API_URL_ISV_PAYCONFIGS_LIST, reqParams).then(res => {
+            req.add(API_URL_PAYCONFIGS_LIST + '/interfaceParams', reqParams).then(res => {
               that.$message.success('保存成功')
               that.visible = false
               that.btnLoading = false
@@ -321,9 +345,6 @@ export default {
       const [firstItem] = fileList
       this.ifParams[name] = firstItem?.url
       this.$forceUpdate()
-    },
-    onClose () {
-      this.visible = false
     }
   }
 }
