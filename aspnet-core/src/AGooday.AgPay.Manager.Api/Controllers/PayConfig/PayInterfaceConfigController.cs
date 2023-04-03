@@ -42,8 +42,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// 查询支付接口配置列表
         /// </summary>
         /// <param name="infoId"></param>
-        /// <param name="configMode"></param
-        /// <param name="ifName"></param
+        /// <param name="configMode"></param>
+        /// <param name="ifName"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
         [HttpGet, Route("ifCodes"), NoLog]
