@@ -4,7 +4,7 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-model-item label="支付接口费率" prop="ifRate">
-            <a-input v-model="saveObject.ifRate" placeholder="请输入" suffix="%" />
+            <a-input v-model="saveObject.ifRate" type="number" :step="0.01" placeholder="请输入" suffix="%" />
           </a-form-model-item>
         </a-col>
         <a-col :span="12">
@@ -235,7 +235,6 @@ export default {
             // 请求接口
             req.add(API_URL_PAYCONFIGS_LIST + '/interfaceParams', reqParams).then(res => {
               that.$message.success('保存成功')
-              that.childrenVisible = false
               that.callbackFunc()
               that.btnLoading = false
             })
