@@ -138,9 +138,9 @@ export default {
       this.restConfig()
     },
     searchFunc () {
-      console.log(this.ifCodeListSearchData)
       this.refIfCodeList()
       this.reset()
+      this.restConfig()
     },
     // 刷新card列表
     refIfCodeList () {

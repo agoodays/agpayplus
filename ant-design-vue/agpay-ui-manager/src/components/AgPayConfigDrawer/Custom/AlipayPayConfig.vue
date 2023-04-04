@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible">
-    <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
+<!--    <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-model-item label="支付接口费率" prop="ifRate">
@@ -25,10 +25,11 @@
           </a-form-model-item>
         </a-col>
       </a-row>
-    </a-form-model>
+    </a-form-model>-->
+    <AgPayConfigBase ref="infoFormModel" :form-data="saveObject" @update-form-data="handleUpdateFormData"/>
     <a-divider orientation="left">
       <a-tag color="#FF4B33">
-        {{ saveObject.ifCode }} 服务商参数配置
+        {{ saveObject.ifCode }} 参数配置
       </a-tag>
     </a-divider>
     <a-form-model ref="paramFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
@@ -136,11 +137,13 @@
 <script>
 import AgCard from '@/components/AgCard/AgCard'
 import AgUpload from '@/components/AgUpload/AgUpload'
+import AgPayConfigBase from '../AgPayConfigBase'
 import { API_URL_PAYCONFIGS_LIST, req, upload } from '@/api/manage'
 export default {
   components: {
-      AgCard,
-      AgUpload
+    AgCard,
+    AgUpload,
+    AgPayConfigBase
   },
   props: {
     configMode: { type: String, default: null },
@@ -315,6 +318,9 @@ export default {
         this.ifParams[key] = undefined
       }
       this.ifParams[key + '_ph'] = undefined
+    },
+    handleUpdateFormData (formData) {
+      this.saveObject = formData
     },
     // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
     uploadSuccess (name, fileList) {
