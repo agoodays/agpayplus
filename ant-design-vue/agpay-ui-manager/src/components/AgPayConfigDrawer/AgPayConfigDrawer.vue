@@ -129,7 +129,7 @@ export default {
     reset: function () {
       this.btnLoading = false
       this.isShowMore = true
-      this.activeKey = 1
+      this.topTabsVal = 'paramsAndRateTab'
       this.currentIfCode = null
       this.paramsAndRateTabVal = 'paramsTab'
     },
