@@ -6,8 +6,8 @@
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ padding: '0px 0px 80px', overflowY: 'auto' }"
     width="80%">
-    <a-tabs v-model="activeKey">
-      <a-tab-pane :key="1" tab="参数及费率的填写">
+    <a-tabs v-model="topTabsVal">
+      <a-tab-pane :key="'paramsAndRateTab'" tab="参数及费率的填写">
         <div class="search">
           <a-input class="if-input" placeholder="搜索渠道名称" v-model="ifCodeListSearchData.ifName"/>
           <a-input class="if-input" placeholder="搜索渠道代码" v-model="ifCodeListSearchData.ifCode"/>
@@ -104,7 +104,7 @@ export default {
       infoId: null, // 更新对象ID
       btnLoading: false,
       isShowMore: true,
-      activeKey: 1,
+      topTabsVal: 'paramsAndRateTab',
       currentIfCode: null,
       selectIfCode: null,
       ifCodeList: [],
