@@ -44,11 +44,18 @@
         </div>
         <div class="content-box">
           <div>
-            <AgPayConfigPanel ref="payConfig" :config-mode="configMode" :callbackFunc="refIfCodeList"/>
-            <!-- 支付参数配置页面组件  -->
+            <component
+              ref="configComponentRef"
+              :is="configComponent"
+              :infoId="infoId"
+              :record="record"
+              :config-mode="configMode"
+              :callbackFunc="refIfCodeList"/>
+<!--            <AgPayConfigPanel ref="payConfig" :config-mode="configMode" :callbackFunc="refIfCodeList"/>
+            &lt;!&ndash; 支付参数配置页面组件  &ndash;&gt;
             <WxpayPayConfig ref="wxpayPayConfig" :config-mode="configMode" :callbackFunc="refIfCodeList"/>
-            <!-- 支付参数配置页面组件  -->
-            <AlipayPayConfig ref="alipayPayConfig" :config-mode="configMode" :callbackFunc="refIfCodeList"/>
+            &lt;!&ndash; 支付参数配置页面组件  &ndash;&gt;
+            <AlipayPayConfig ref="alipayPayConfig" :config-mode="configMode" :callbackFunc="refIfCodeList"/>-->
 <!--            <div v-if="paramsAndRateTabVal === 'paramsTab'">
               <div>
                 {{ currentIfCode }} —— 参数配置
@@ -102,11 +109,13 @@ export default {
     return {
       visible: false, // 是否显示弹层/抽屉
       infoId: null, // 更新对象ID
+      record: null,
       btnLoading: false,
       isShowMore: true,
       topTabsVal: 'paramsAndRateTab',
       currentIfCode: null,
       selectIfCode: null,
+      configComponent: null,
       ifCodeList: [],
       ifCodeListSearchData: {},
       paramsAndRateTabVal: 'paramsTab',
@@ -156,6 +165,16 @@ export default {
         console.log(resData)
       })
     },
+    getConfigComponent () {
+      switch (this.currentIfCode) {
+        case 'alipay':
+          return import('./diy/alipay/IsvPage.vue')
+        case 'wxpay':
+          return import('./diy/wxpay/IsvPage.vue')
+        default:
+          break
+      }
+    },
     getConfig (code) {
       const that = this
       if (that.currentIfCode) {
@@ -163,10 +182,18 @@ export default {
         switch (code) {
           case 'paramsTab':
             const record = that.ifCodeList.find(f => f.ifCode === that.currentIfCode)
+            that.record = record
             if (record.configPageType === 1) { // JSON渲染页面
-              that.$refs.payConfig.show(that.infoId, record)
+              import('./AgPayConfigPanel.vue').then(module => {
+                that.configComponent = module.default || module
+                that.$refs.configComponentRef.show(that.infoId, record)
+              })
+              // that.$refs.payConfig.show(that.infoId, record)
             } else if (record.configPageType === 2) { // 自定义配置页面，页面放在custom目录下，配置模块命名规则：if_code + PayConfig
-              that.$refs[record.ifCode + 'PayConfig'].show(that.infoId, record)
+              that.getConfigComponent().then(module => {
+                that.configComponent = module.default || module
+              })
+              // that.$refs[record.ifCode + 'PayConfig'].show(that.infoId, record)
             }
             break
           case 'rateTab':
@@ -177,9 +204,10 @@ export default {
     },
     restConfig () {
       const that = this
-      that.$refs.payConfig.hide()
-      that.$refs.wxpayPayConfig.hide()
-      that.$refs.alipayPayConfig.hide()
+      // that.$refs.payConfig.hide()
+      // that.$refs.wxpayPayConfig.hide()
+      // that.$refs.alipayPayConfig.hide()
+      that.configComponent = null
     },
     ifCodeSelected (code) {
       const that = this
