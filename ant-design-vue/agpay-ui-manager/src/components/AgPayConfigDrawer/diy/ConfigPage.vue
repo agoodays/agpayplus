@@ -1,33 +1,7 @@
 <template>
-  <div v-if="visible">
-<!--    <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
-      <a-row :gutter="16">
-        <a-col :span="12">
-          <a-form-model-item label="支付接口费率" prop="ifRate">
-            <a-input v-model="saveObject.ifRate" type="number" :step="0.01" placeholder="请输入" suffix="%" />
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-model-item label="状态" prop="state">
-            <a-radio-group v-model="saveObject.state">
-              <a-radio :value="1">
-                启用
-              </a-radio>
-              <a-radio :value="0">
-                停用
-              </a-radio>
-            </a-radio-group>
-          </a-form-model-item>
-        </a-col>
-        <a-col :span="24">
-          <a-form-model-item label="备注" prop="remark">
-            <a-input v-model="saveObject.remark" placeholder="请输入" type="textarea" />
-          </a-form-model-item>
-        </a-col>
-      </a-row>
-    </a-form-model>-->
-    <AgPayConfigBase ref="infoFormModel" :form-data="saveObject" @update-form-data="handleUpdateFormData"/>
-    <a-divider orientation="left">
+  <div>
+    <BasePage ref="infoFormModel" :form-data="saveObject" @update-form-data="handleUpdateFormData"/>
+    <a-divider orientation="left" v-if="ifDefineArray?.length">
       <a-tag color="#FF4B33">
         {{ saveObject.ifCode }} 参数配置
       </a-tag>
@@ -72,27 +46,31 @@
 
 <script>
 import AgUpload from '@/components/AgUpload/AgUpload'
-import AgPayConfigBase from './AgPayConfigBase'
+import BasePage from './BasePage'
 import { API_URL_PAYCONFIGS_LIST, req, upload } from '@/api/manage'
 
 export default {
-  name: 'AgPayConfigPanel',
+  name: 'ConfigPage',
   components: {
     AgUpload,
-    AgPayConfigBase
+    BasePage
   },
   props: {
+    infoId: { type: String, default: null },
+    ifDefine: { type: Object, default: null },
     configMode: { type: String, default: null },
     callbackFunc: { type: Function, default: () => ({}) }
   },
   data () {
     return {
-      btnLoading: false,
-      infoId: null, // 更新对象ID
       action: upload.cert, // 上传文件地址
-      visible: false, // 一级抽屉开关
+      btnLoading: false,
+      saveObject: {
+        infoId: this.infoId,
+        ifCode: this.ifDefine.ifCode,
+        state: this.ifDefine.ifConfigState === 0 ? 0 : 1
+      }, // 保存的对象
       ifDefineArray: {}, // 支付接口定义描述
-      saveObject: {}, // 保存的对象
       ifParams: {}, // 参数配置对象
       rules: {
         infoId: [{ required: true, trigger: 'blur' }],
@@ -102,49 +80,13 @@ export default {
       ifParamsRules: {}
     }
   },
+  mounted () {
+    this.getPayConfig()
+  },
   methods: {
-    show: function (infoId, record) {
-      this.infoId = infoId
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
-      if (this.$refs.paramFormModel !== undefined) {
-        this.$refs.paramFormModel.resetFields()
-      }
-      this.ifParams = {} // 参数配置对象
-      this.ifDefineArray = {} // 支付接口定义描述
-
-      // 数据初始化
-      this.saveObject = {
-        infoId: infoId,
-        ifCode: record.ifCode,
-        state: record.ifConfigState === 0 ? 0 : 1
-      }
-      this.getParamsConfig(record)
-      this.visible = true
-    },
-    hide () {
-      this.visible = false
-    },
-    generateRules () {
-      const rules = {}
-      let newItems = []
-      this.ifDefineArray.forEach(item => {
-        newItems = []
-        if (item.verify === 'required' && item.star !== '1') {
-          newItems.push({
-            required: true,
-            message: '请输入' + item.desc,
-            trigger: 'blur'
-          })
-          rules[item.name] = newItems
-        }
-      })
-      this.ifParamsRules = rules
-    },
-    getParamsConfig (record) {
+    getPayConfig () {
       const that = this
-      const params = Object.assign({}, { configMode: that.$props.configMode, infoId: that.infoId, ifCode: record.ifCode })
+      const params = Object.assign({}, { configMode: that.configMode, infoId: that.saveObject.infoId, ifCode: that.saveObject.ifCode })
       req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(res => {
         if (res && res.ifParams) {
           this.saveObject = res
@@ -152,7 +94,7 @@ export default {
         }
 
         const newItems = [] // 重新加载支付接口配置定义描述json
-        JSON.parse(record.isvParams).forEach(item => {
+        JSON.parse(that.ifDefine.isvParams).forEach(item => {
           const radioItems = [] // 存放单选框value title
           if (item.type === 'radio') {
             const valueItems = item.values.split(',')
@@ -190,6 +132,22 @@ export default {
         that.generateRules()
         that.$forceUpdate()
       })
+    },
+    generateRules () {
+      const rules = {}
+      let newItems = []
+      this.ifDefineArray.forEach(item => {
+        newItems = []
+        if (item.verify === 'required' && item.star !== '1') {
+          newItems.push({
+            required: true,
+            message: '请输入' + item.desc,
+            trigger: 'blur'
+          })
+          rules[item.name] = newItems
+        }
+      })
+      this.ifParamsRules = rules
     },
     // 表单提交
     onSubmit () {

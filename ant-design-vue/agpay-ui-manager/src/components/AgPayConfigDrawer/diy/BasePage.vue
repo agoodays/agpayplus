@@ -37,7 +37,7 @@
 
 <script>
 export default {
-  name: 'AgPayConfigBase',
+  name: 'BasePage',
   props: {
     formData: { type: Object, default: null }
   },

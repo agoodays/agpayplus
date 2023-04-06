@@ -43,38 +43,31 @@
           </div>
         </div>
         <div class="content-box">
-          <div>
-            <component
-              ref="configComponentRef"
-              :is="configComponent"
-              :infoId="infoId"
-              :record="record"
-              :config-mode="configMode"
-              :callbackFunc="refIfCodeList"/>
-<!--            <AgPayConfigPanel ref="payConfig" :config-mode="configMode" :callbackFunc="refIfCodeList"/>
-            &lt;!&ndash; 支付参数配置页面组件  &ndash;&gt;
-            <WxpayPayConfig ref="wxpayPayConfig" :config-mode="configMode" :callbackFunc="refIfCodeList"/>
-            &lt;!&ndash; 支付参数配置页面组件  &ndash;&gt;
-            <AlipayPayConfig ref="alipayPayConfig" :config-mode="configMode" :callbackFunc="refIfCodeList"/>-->
-<!--            <div v-if="paramsAndRateTabVal === 'paramsTab'">
-              <div>
-                {{ currentIfCode }} —— 参数配置
-              </div>
-              <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
-                <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
-                <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
-              </div>
-            </div>-->
-          </div>
-          <div>
-            <div v-if="paramsAndRateTabVal === 'rateTab'">
-              <div>
-                {{ currentIfCode }} —— 费率配置
-              </div>
-              <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
-                <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
-                <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
-              </div>
+          <component
+            ref="configComponentRef"
+            :is="configComponent"
+            :infoId="infoId"
+            :ifDefine="ifDefine"
+            :config-mode="configMode"
+            :callbackFunc="refIfCodeList"
+            v-if="paramsAndRateTabVal === 'paramsTab'"
+          />
+<!--          <div v-if="paramsAndRateTabVal === 'paramsTab'">
+            <div>
+              {{ currentIfCode }} —— 参数配置
+            </div>
+            <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
+              <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
+              <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
+            </div>
+          </div>-->
+          <div v-if="paramsAndRateTabVal === 'rateTab'">
+            <div>
+              {{ currentIfCode }} —— 费率配置
+            </div>
+            <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
+              <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
+              <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
             </div>
           </div>
         </div>
@@ -89,9 +82,6 @@
 
 <script>
 import AgUpload from '@/components/AgUpload/AgUpload'
-import AgPayConfigPanel from './AgPayConfigPanel'
-import WxpayPayConfig from './Custom/WxpayPayConfig'
-import AlipayPayConfig from './Custom/AlipayPayConfig'
 import { API_URL_PAYCONFIGS_LIST, req } from '@/api/manage'
 
 export default {
@@ -100,16 +90,13 @@ export default {
     configMode: { type: String, default: '' }
   },
   components: {
-    AgUpload,
-    AgPayConfigPanel,
-    WxpayPayConfig,
-    AlipayPayConfig
+    AgUpload
   },
   data () {
     return {
       visible: false, // 是否显示弹层/抽屉
       infoId: null, // 更新对象ID
-      record: null,
+      ifDefine: null,
       btnLoading: false,
       isShowMore: true,
       topTabsVal: 'paramsAndRateTab',
@@ -141,15 +128,14 @@ export default {
       this.topTabsVal = 'paramsAndRateTab'
       this.currentIfCode = null
       this.paramsAndRateTabVal = 'paramsTab'
+      this.restConfig()
     },
     onClose () {
       this.visible = false
-      this.restConfig()
     },
     searchFunc () {
       this.refIfCodeList()
       this.reset()
-      this.restConfig()
     },
     // 刷新card列表
     refIfCodeList () {
@@ -172,28 +158,25 @@ export default {
         case 'wxpay':
           return import('./diy/wxpay/IsvPage.vue')
         default:
-          break
+          return import('./diy/ConfigPage.vue')
       }
     },
     getConfig (code) {
       const that = this
       if (that.currentIfCode) {
-        that.restConfig()
         switch (code) {
           case 'paramsTab':
+            that.restConfig()
             const record = that.ifCodeList.find(f => f.ifCode === that.currentIfCode)
-            that.record = record
+            that.ifDefine = record
             if (record.configPageType === 1) { // JSON渲染页面
-              import('./AgPayConfigPanel.vue').then(module => {
+              import('./diy/ConfigPage.vue').then(module => {
                 that.configComponent = module.default || module
-                that.$refs.configComponentRef.show(that.infoId, record)
               })
-              // that.$refs.payConfig.show(that.infoId, record)
-            } else if (record.configPageType === 2) { // 自定义配置页面，页面放在custom目录下，配置模块命名规则：if_code + PayConfig
+            } else if (record.configPageType === 2) { // 自定义配置页面，页面放在diy目录下，动态导入
               that.getConfigComponent().then(module => {
                 that.configComponent = module.default || module
               })
-              // that.$refs[record.ifCode + 'PayConfig'].show(that.infoId, record)
             }
             break
           case 'rateTab':
@@ -204,9 +187,6 @@ export default {
     },
     restConfig () {
       const that = this
-      // that.$refs.payConfig.hide()
-      // that.$refs.wxpayPayConfig.hide()
-      // that.$refs.alipayPayConfig.hide()
       that.configComponent = null
     },
     ifCodeSelected (code) {
