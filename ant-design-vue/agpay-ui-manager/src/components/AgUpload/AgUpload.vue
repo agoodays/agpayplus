@@ -139,7 +139,7 @@ export default {
       if (suffix !== '') {
         suffix = suffix.toLocaleLowerCase()
         // 图片格式
-        const imglist = ['png', 'jpg', 'jpeg', 'bmp', 'gif']
+        const imglist = ['png', 'jpg', 'jpeg', 'bmp', 'gif', 'svg']
         // 进行图片匹配
         result = imglist.find(item => item === suffix)
       }

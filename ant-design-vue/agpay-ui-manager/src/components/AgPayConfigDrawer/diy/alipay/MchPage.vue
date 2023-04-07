@@ -3,22 +3,17 @@
     <BasePage ref="infoFormModel" :form-data="saveObject" :if-define="ifDefine" @update-form-data="handleUpdateFormData"/>
     <a-divider orientation="left">
       <a-tag color="#FF4B33">
-        {{ saveObject.ifCode }} 服务商参数配置
+        {{ saveObject.ifCode }} 商户参数配置
       </a-tag>
     </a-divider>
-    <a-form-model ref="paramFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
-      <a-row :gutter="16">
-        <a-col span="24">
+    <a-form-model ref="mchParamFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
+      <a-row :gutter="16" v-if="mchType === 1">
+        <a-col span="12">
           <a-form-model-item label="环境配置" prop="sandbox">
             <a-radio-group v-model="ifParams.sandbox">
               <a-radio :value="1">沙箱环境</a-radio>
               <a-radio :value="0">生产环境</a-radio>
             </a-radio-group>
-          </a-form-model-item>
-        </a-col>
-        <a-col span="12">
-          <a-form-model-item label="合作伙伴身份（PID）" prop="pid">
-            <a-input v-model="ifParams.pid" placeholder="请输入" />
           </a-form-model-item>
         </a-col>
         <a-col span="12">
@@ -101,6 +96,13 @@
           </a-form-model-item>
         </a-col>
       </a-row>
+      <a-row :gutter="16" v-else-if="mchType === 2">
+        <a-col span="12">
+          <a-form-model-item label="子商户app_auth_token" prop="appAuthToken">
+            <a-input v-model="ifParams.appAuthToken" placeholder="请输入子商户app_auth_token" />
+          </a-form-model-item>
+        </a-col>
+      </a-row>
     </a-form-model>
     <div class="drawer-btn-center" v-if="$access(permCode)">
       <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
@@ -114,7 +116,7 @@ import BasePage from '../BasePage'
 import { API_URL_PAYCONFIGS_LIST, req, upload } from '@/api/manage'
 
 export default {
-  name: 'IsvPage',
+  name: 'MchPage',
   components: {
     AgUpload,
     BasePage
@@ -131,6 +133,7 @@ export default {
       action: upload.cert, // 上传文件地址
       btnLoading: false,
       isAdd: true,
+      mchType: this.ifDefine.mchType,
       saveObject: {
         infoId: this.infoId,
         ifCode: this.ifDefine.ifCode,
@@ -143,46 +146,61 @@ export default {
         privateKey: '',
         privateKey_ph: '请输入',
         alipayPublicKey: '',
-        alipayPublicKey_ph: '请输入'
+        alipayPublicKey_ph: '请输入',
+        appPublicCert: '',
+        alipayPublicCert: '',
+        alipayRootCert: ''
       }, // 参数配置对象，数据初始化
       rules: {
-        ifRate: [{ required: false, pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/, message: '请输入0-100之间的数字，最多四位小数', trigger: 'blur' }]
+        // ifRate: [{ required: false, pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/, message: '请输入0-100之间的数字，最多四位小数', trigger: 'blur' }]
       },
       ifParamsRules: {
-        pid: [{ required: true, message: '请输入合作伙伴身份（PID）', trigger: 'blur' }],
-        appId: [{ required: true, message: '请输入应用AppID', trigger: 'blur' }],
+        appId: [{ trigger: 'blur',
+          validator: (rule, value, callback) => {
+            if (this.mchType === 1 && !value) {
+              callback(new Error('请输入应用AppID'))
+            }
+            callback()
+          } }],
         privateKey: [{ trigger: 'blur',
           validator: (rule, value, callback) => {
-            if (this.isAdd && !value) {
+            if (this.mchType === 1 && this.isAdd && !value) {
               callback(new Error('请输入应用私钥'))
             }
             callback()
           } }],
         alipayPublicKey: [{ trigger: 'blur',
           validator: (rule, value, callback) => {
-            if (this.ifParams.useCert === 0 && this.isAdd && !value) {
+            if (this.mchType === 1 && this.isAdd && this.ifParams.useCert === 0 && !value) {
               callback(new Error('请输入支付宝公钥'))
             }
             callback()
           } }],
         appPublicCert: [{ trigger: 'blur',
           validator: (rule, value, callback) => {
-            if (this.ifParams.useCert === 1 && !this.ifParams.appPublicCert) {
+            if (this.mchType === 1 && this.ifParams.useCert === 1 && !this.ifParams.appPublicCert) {
               callback(new Error('请上传应用公钥证书（.crt格式）'))
             }
             callback()
           } }],
         alipayPublicCert: [{ trigger: 'blur',
           validator: (rule, value, callback) => {
-            if (this.ifParams.useCert === 1 && !this.ifParams.alipayPublicCert) {
+            if (this.mchType === 1 && this.ifParams.useCert === 1 && !this.ifParams.alipayPublicCert) {
               callback(new Error('请上传支付宝公钥证书（.crt格式）'))
             }
             callback()
           } }],
         alipayRootCert: [{ trigger: 'blur',
           validator: (rule, value, callback) => {
-            if (this.ifParams.useCert === 1 && !this.ifParams.alipayRootCert) {
+            if (this.mchType === 1 && this.ifParams.useCert === 1 && !this.ifParams.alipayRootCert) {
               callback(new Error('请上传支付宝根证书（.crt格式）'))
+            }
+            callback()
+          } }],
+        appAuthToken: [{ trigger: 'blur',
+          validator: (rule, value, callback) => {
+            if (this.mchType === 2 && !value) {
+              callback(new Error('请输入子商户app_auth_token'))
             }
             callback()
           } }]
@@ -190,11 +208,11 @@ export default {
     }
   },
   mounted () {
-    this.getPayConfig()
+    this.getMchPayConfig()
   },
   methods: {
     // 支付参数配置
-    getPayConfig () {
+    getMchPayConfig () {
       const that = this
       // 获取支付参数
       const params = Object.assign({}, { configMode: that.configMode, infoId: that.saveObject.infoId, ifCode: that.saveObject.ifCode })
@@ -219,33 +237,15 @@ export default {
     onSubmit () {
       const that = this
       this.$refs.infoFormModel.validate(valid => {
-        this.$refs.paramFormModel.validate(valid2 => {
+        this.$refs.mchParamFormModel.validate(valid2 => {
           if (valid && valid2) { // 验证通过
             that.btnLoading = true
             const reqParams = {}
             reqParams.infoId = that.saveObject.infoId
             reqParams.ifCode = that.saveObject.ifCode
-            reqParams.ifRate = that.saveObject.ifRate
+            // reqParams.ifRate = that.saveObject.ifRate
             reqParams.state = that.saveObject.state
             reqParams.remark = that.saveObject.remark
-
-            switch (that.$props.configMode) {
-              case 'mgrIsv':
-                reqParams.infoType = 1
-                break
-              case 'mgrAgent':
-              case 'agentSubagent':
-                reqParams.infoType = 4
-                break
-              case 'mgrMch':
-              case 'agentMch':
-              case 'agentSelf':
-              case 'mchSelfApp1':
-              case 'mchSelfApp2':
-                reqParams.infoType = 3
-                break
-            }
-
             // 支付参数配置不能为空
             if (Object.keys(that.ifParams).length === 0) {
               this.$message.error('参数不能为空！')
@@ -262,6 +262,7 @@ export default {
             }
             req.add(API_URL_PAYCONFIGS_LIST + '/interfaceParams', reqParams).then(res => {
               that.$message.success('保存成功')
+              that.visible = false
               that.btnLoading = false
               that.callbackFunc()
             })

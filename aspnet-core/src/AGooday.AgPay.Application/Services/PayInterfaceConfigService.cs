@@ -185,7 +185,7 @@ namespace AGooday.AgPay.Application.Services
                             isvPayConfigMap.Add(config.IfCode, config);
                         }
                     }
-                    var results = defineList.ToList().Where(w => isvPayConfigMap.TryGetValue(w.IfCode, out _))
+                    var results = defineList.ToList().Where(w => mchInfo.Type != CS.MCH_TYPE_ISVSUB || (mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.TryGetValue(w.IfCode, out _)))
                         .Select(define =>
                         {
                             var entity = _mapper.Map<PayInterfaceDefineDto>(define);

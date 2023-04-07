@@ -153,12 +153,16 @@ export default {
         console.log(resData)
       })
     },
-    getConfigComponent () {
-      switch (this.currentIfCode) {
-        case 'alipay':
+    getConfigComponent (code) {
+      switch (this.currentIfCode + code) {
+        case 'alipay' + 'Isv':
           return import('./diy/alipay/IsvPage.vue')
-        case 'wxpay':
+        case 'alipay' + 'Mch':
+          return import('./diy/alipay/MchPage.vue')
+        case 'wxpay' + 'Isv':
           return import('./diy/wxpay/IsvPage.vue')
+        case 'wxpay' + 'Mch':
+          return import('./diy/wxpay/MchPage.vue')
         default:
           return import('./diy/ConfigPage.vue')
       }
@@ -176,7 +180,11 @@ export default {
                 that.configComponent = module.default || module
               })
             } else if (record.configPageType === 2) { // 自定义配置页面，页面放在diy目录下，动态导入
-              that.getConfigComponent().then(module => {
+              let pageCode = 'Isv'
+              if (that.configMode === 'mgrMch' || that.configMode === 'agentMch' || that.configMode === 'mchSelfApp1') {
+                pageCode = 'Mch'
+              }
+              that.getConfigComponent(pageCode).then(module => {
                 that.configComponent = module.default || module
               })
             }

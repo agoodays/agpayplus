@@ -1,9 +1,9 @@
 <template>
   <div>
-    <BasePage ref="infoFormModel" :form-data="saveObject" @update-form-data="handleUpdateFormData"/>
+    <BasePage ref="infoFormModel" :form-data="saveObject" :if-define="ifDefine" @update-form-data="handleUpdateFormData"/>
     <a-divider orientation="left">
       <a-tag color="#FF4B33">
-        {{ saveObject.ifCode }} 参数配置
+        {{ saveObject.ifCode }} 服务商参数配置
       </a-tag>
     </a-divider>
     <a-form-model ref="paramFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">

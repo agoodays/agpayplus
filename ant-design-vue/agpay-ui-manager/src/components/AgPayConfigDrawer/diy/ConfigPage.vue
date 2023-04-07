@@ -1,9 +1,9 @@
 <template>
   <div>
-    <BasePage ref="infoFormModel" :form-data="saveObject" @update-form-data="handleUpdateFormData"/>
+    <BasePage ref="infoFormModel" :form-data="saveObject" :if-define="ifDefine" @update-form-data="handleUpdateFormData"/>
     <a-divider orientation="left" v-if="ifDefineArray?.length">
       <a-tag color="#FF4B33">
-        {{ saveObject.ifCode }} 参数配置
+        {{ saveObject.ifCode }} {{ ifDefine.mchType ? '商户' : '服务商' }}参数配置
       </a-tag>
     </a-divider>
     <a-form-model ref="paramFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
@@ -89,11 +89,14 @@ export default {
       req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(res => {
         if (res && res.ifParams) {
           this.saveObject = res
-          this.ifParams = JSON.parse(res.ifParams)
+          this.ifParams = JSON.parse(res.ifParams || '{}')
         }
 
         const newItems = [] // 重新加载支付接口配置定义描述json
-        JSON.parse(that.ifDefine.isvParams).forEach(item => {
+        const params = that.ifDefine.mchType ? (
+            this.ifDefine.mchType === 1 ? that.ifDefine.normalMchParams : that.ifDefine.isvsubMchParams // 根据商户类型获取接口定义描述
+        ) : that.ifDefine.isvParams
+        JSON.parse(params || '[]').forEach(item => {
           const radioItems = [] // 存放单选框value title
           if (item.type === 'radio') {
             const valueItems = item.values.split(',')
