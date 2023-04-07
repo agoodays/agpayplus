@@ -101,7 +101,7 @@
         </a-col>
       </a-row>
     </a-form-model>
-    <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
+    <div class="drawer-btn-center" v-if="$access(permCode)">
       <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
     </div>
   </div>
@@ -121,6 +121,7 @@ export default {
   props: {
     infoId: { type: String, default: null },
     ifDefine: { type: Object, default: null },
+    permCode: { type: String, default: '' },
     configMode: { type: String, default: null },
     callbackFunc: { type: Function, default: () => ({}) }
   },

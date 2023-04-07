@@ -48,6 +48,7 @@
             :is="configComponent"
             :infoId="infoId"
             :ifDefine="ifDefine"
+            :perm-code="permCode"
             :config-mode="configMode"
             :callbackFunc="refIfCodeList"
             v-if="paramsAndRateTabVal === 'paramsTab'"
@@ -56,7 +57,7 @@
             <div>
               {{ currentIfCode }} —— 参数配置
             </div>
-            <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
+            <div class="drawer-btn-center" v-if="$access(permCode)">
               <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
               <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
             </div>
@@ -65,7 +66,7 @@
             <div>
               {{ currentIfCode }} —— 费率配置
             </div>
-            <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
+            <div class="drawer-btn-center" v-if="$access(permCode)">
               <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
               <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
             </div>
@@ -73,7 +74,7 @@
         </div>
       </a-tab-pane>
     </a-tabs>
-<!--    <div class="drawer-btn-center" v-if="$access('ENT_MCH_PAY_CONFIG_ADD')">
+<!--    <div class="drawer-btn-center" v-if="$access(permCode)">
       <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
       <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
     </div>-->
@@ -87,6 +88,7 @@ import { API_URL_PAYCONFIGS_LIST, req } from '@/api/manage'
 export default {
   name: 'AgPayConfigDrawer',
   props: {
+    permCode: { type: String, default: '' },
     configMode: { type: String, default: '' }
   },
   components: {

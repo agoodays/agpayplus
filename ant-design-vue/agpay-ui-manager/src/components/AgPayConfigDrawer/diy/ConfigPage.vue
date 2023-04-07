@@ -36,10 +36,8 @@
         </a-col>
       </a-row>
     </a-form-model>
-    <div class="drawer-btn-center">
-      <a-button type="primary" icon="check" @click="onSubmit" :loading="btnLoading">
-        保存
-      </a-button>
+    <div class="drawer-btn-center" v-if="$access(permCode)">
+      <a-button type="primary" icon="check" @click="onSubmit" :loading="btnLoading">保存</a-button>
     </div>
   </div>
 </template>
@@ -58,6 +56,7 @@ export default {
   props: {
     infoId: { type: String, default: null },
     ifDefine: { type: Object, default: null },
+    permCode: { type: String, default: '' },
     configMode: { type: String, default: null },
     callbackFunc: { type: Function, default: () => ({}) }
   },

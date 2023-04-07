@@ -23,9 +23,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<PayInterfaceConfigController> _logger;
+        private readonly IMchInfoService _mchInfoService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
-        public PayInterfaceConfigController(IMQSender mqSender, IPayInterfaceConfigService payIfConfigService,
+        public PayInterfaceConfigController(IMQSender mqSender, 
+            IMchInfoService mchInfoService, 
+            IPayInterfaceConfigService payIfConfigService,
             ILogger<PayInterfaceConfigController> logger,
             RedisUtil client,
             ISysUserService sysUserService,
@@ -36,6 +39,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             this.mqSender = mqSender;
             _logger = logger;
             _payIfConfigService = payIfConfigService;
+            _mchInfoService = mchInfoService;
         }
 
         /// <summary>

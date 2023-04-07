@@ -141,13 +141,65 @@ namespace AGooday.AgPay.Application.Services
         {
             // 支付定义列表
             var defineList = _payInterfaceDefineRepository.GetAll()
-                .Where(w => w.IsIsvMode.Equals(CS.YES) && w.State.Equals(CS.YES)
+                .Where(w => w.State.Equals(CS.YES)
                 && (string.IsNullOrWhiteSpace(ifName) || w.IfName.Contains(ifName))
                 && (string.IsNullOrWhiteSpace(ifCode) || w.IfCode.Equals(ifCode))
                 );
+
             // 支付参数列表
             var configList = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoType.Equals(infoType) && w.InfoId.Equals(infoId));
 
+            switch (infoType)
+            {
+                case 1:
+                    defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES));
+                    break;
+                case 2:
+                case 3:
+                    MchApp mchApp = _mchAppRepository.GetById(infoId);
+                    if (mchApp == null || mchApp.State != CS.YES)
+                    {
+                        throw new BizException("商户应用不存在");
+                    }
+                    MchInfo mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
+                    if (mchInfo == null || mchInfo.State != CS.YES)
+                    {
+                        throw new BizException("商户不存在");
+                    }
+                    defineList = defineList.Where(w => ((mchInfo.Type.Equals(CS.MCH_TYPE_NORMAL) && w.IsMchMode.Equals(CS.YES))// 支持普通商户模式
+                    || (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB) && w.IsIsvMode.Equals(CS.YES)))// 支持服务商模式
+                    );
+
+                    var isvPayConfigMap = new Dictionary<string, PayInterfaceConfigDto>();// 服务商支付参数配置集合
+                    if (mchInfo.Type == CS.MCH_TYPE_ISVSUB)
+                    {
+                        // 商户类型为特约商户，服务商应已经配置支付参数
+                        var isvConfigList = _payInterfaceConfigRepository.GetAll().Where(w => w.State.Equals(CS.YES)
+                        && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE_ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
+                        );
+
+                        foreach (var isvConfig in isvConfigList)
+                        {
+                            var config = _mapper.Map<PayInterfaceConfigDto>(isvConfig);
+                            config.MchType = mchInfo.Type;
+                            isvPayConfigMap.Add(config.IfCode, config);
+                        }
+                    }
+                    var results = defineList.ToList().Where(w => isvPayConfigMap.TryGetValue(w.IfCode, out _))
+                        .Select(define =>
+                        {
+                            var entity = _mapper.Map<PayInterfaceDefineDto>(define);
+                            entity.MchType = mchInfo.Type;// 所属商户类型
+                            entity.IfConfigState = configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
+                            return entity;
+                        }).ToList();
+                    return results;
+                case 4:
+                    defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES));
+                    break;
+                default:
+                    break;
+            }
             var result = defineList.ToList().Select(s =>
             {
                 var entity = _mapper.Map<PayInterfaceDefineDto>(s);

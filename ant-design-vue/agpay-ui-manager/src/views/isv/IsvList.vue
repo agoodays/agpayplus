@@ -53,7 +53,7 @@
     <!-- 新增页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
-    <AgPayConfigDrawer ref="payConfig" :config-mode="'mgrIsv'" />
+    <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" />
     <!-- 支付参数配置页面组件  -->
     <IsvPayIfConfigList ref="isvPayIfConfigList" />
   </page-header-wrapper>
