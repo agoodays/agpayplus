@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoType"></param>
         /// <param name="mchType"></param>
         /// <returns></returns>
-        public IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, byte infoType, byte mchType)
+        public IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType)
         {
             //var result = _payInterfaceDefineRepository.GetAll()
             //    .Join(_payInterfaceDefineRepository.GetAll<PayInterfaceConfig>(),

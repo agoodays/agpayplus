@@ -11,9 +11,9 @@
         public long? Id { get; set; }
 
         /// <summary>
-        /// 账号类型:1-服务商 2-商户
+        /// 账号类型:ISV-服务商, ISV_OAUTH2-服务商oauth2, AGENT-代理商, MCH_APP-商户应用, MCH_APP_OAUTH2-商户应用oauth2
         /// </summary>
-        public byte InfoType { get; set; }
+        public string InfoType { get; set; }
 
         /// <summary>
         /// 服务商或商户No

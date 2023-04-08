@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public IEnumerable<T> SelectAvailablePayInterfaceList<T>(string wayCode, string appId, byte infoType, byte mchType)
+        public IEnumerable<T> SelectAvailablePayInterfaceList<T>(string wayCode, string appId, string infoType, byte mchType)
         {
             string sql = $@"select pid.if_code IfCode, pid.if_name IfName, pid.config_page_type ConfigPageType, pid.bg_color BgColor, pid.icon Icon, pic.if_params IfParams, pic.if_rate IfRate from t_pay_interface_define pid
                             inner join t_pay_interface_config pic on pid.if_code = pic.if_code

@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ namespace AGooday.AgPay.Application.Services
         private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
         private readonly IMchAppRepository _mchAppRepository;
         private readonly IMchInfoRepository _mchInfoRepository;
+        private readonly IAgentInfoRepository _agentInfoRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
@@ -24,9 +26,10 @@ namespace AGooday.AgPay.Application.Services
 
         public PayInterfaceConfigService(IMapper mapper, IMediatorHandler bus,
             IPayInterfaceConfigRepository payInterfaceConfigRepository,
-            IPayInterfaceDefineRepository payInterfaceDefineRepository, 
-            IMchAppRepository mchAppRepository, 
-            IMchInfoRepository mchInfoRepository)
+            IPayInterfaceDefineRepository payInterfaceDefineRepository,
+            IMchAppRepository mchAppRepository,
+            IMchInfoRepository mchInfoRepository, 
+            IAgentInfoRepository agentInfoRepository)
         {
             _mapper = mapper;
             Bus = bus;
@@ -34,6 +37,7 @@ namespace AGooday.AgPay.Application.Services
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
             _mchAppRepository = mchAppRepository;
             _mchInfoRepository = mchInfoRepository;
+            _agentInfoRepository = agentInfoRepository;
         }
 
         public void Dispose()
@@ -93,7 +97,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoId">账户号</param>
         /// <param name="ifCode">接口类型</param>
         /// <returns></returns>
-        public PayInterfaceConfigDto GetByInfoIdAndIfCode(byte infoType, string infoId, string ifCode)
+        public PayInterfaceConfigDto GetByInfoIdAndIfCode(string infoType, string infoId, string ifCode)
         {
             // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
             var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().AsNoTracking().Where(w => w.InfoId.Equals(infoId)
@@ -107,7 +111,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoType">账户类型</param>
         /// <param name="infoId">账户号</param>
         /// <returns></returns>
-        public IEnumerable<PayInterfaceConfigDto> GetByInfoId(byte infoType, string infoId)
+        public IEnumerable<PayInterfaceConfigDto> GetByInfoId(string infoType, string infoId)
         {
             var payInterfaceConfigs = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.Equals(infoId)
             && w.InfoType.Equals(infoType) && w.State.Equals(CS.PUB_USABLE));
@@ -120,7 +124,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoType"></param>
         /// <param name="infoId"></param>
         /// <returns></returns>
-        public List<PayInterfaceDefineDto> SelectAllPayIfConfigListByIsvNo(byte infoType, string infoId)
+        public List<PayInterfaceDefineDto> SelectAllPayIfConfigListByIsvNo(string infoType, string infoId)
         {
             // 支付定义列表
             var defineList = _payInterfaceDefineRepository.GetAll().Where(w => w.IsIsvMode.Equals(CS.YES) && w.State.Equals(CS.YES));
@@ -137,7 +141,7 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public List<PayInterfaceDefineDto> PayIfConfigList(byte infoType, string configMode, string infoId, string ifName, string ifCode)
+        public List<PayInterfaceDefineDto> PayIfConfigList(string infoType, string configMode, string infoId, string ifName, string ifCode)
         {
             // 支付定义列表
             var defineList = _payInterfaceDefineRepository.GetAll()
@@ -151,11 +155,11 @@ namespace AGooday.AgPay.Application.Services
 
             switch (infoType)
             {
-                case 1:
+                case CS.INFO_TYPE_ISV:
                     defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES));
                     break;
-                case 2:
-                case 3:
+                case CS.INFO_TYPE_MCH:
+                case CS.INFO_TYPE_MCH_APP:
                     MchApp mchApp = _mchAppRepository.GetById(infoId);
                     if (mchApp == null || mchApp.State != CS.YES)
                     {
@@ -185,7 +189,8 @@ namespace AGooday.AgPay.Application.Services
                             isvPayConfigMap.Add(config.IfCode, config);
                         }
                     }
-                    var results = defineList.ToList().Where(w => mchInfo.Type != CS.MCH_TYPE_ISVSUB || (mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.TryGetValue(w.IfCode, out _)))
+                    var results = defineList.ToList()
+                        .Where(w => mchInfo.Type != CS.MCH_TYPE_ISVSUB || (mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.TryGetValue(w.IfCode, out _)))
                         .Select(define =>
                         {
                             var entity = _mapper.Map<PayInterfaceDefineDto>(define);
@@ -194,8 +199,16 @@ namespace AGooday.AgPay.Application.Services
                             return entity;
                         }).ToList();
                     return results;
-                case 4:
-                    defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES));
+                case CS.INFO_TYPE_AGENT:
+                    AgentInfo agentInfo = _agentInfoRepository.GetById(infoId);
+                    if (agentInfo == null || agentInfo.State != CS.YES)
+                    {
+                        throw new BizException("代理商不存在");
+                    }
+                    // 商户类型为特约商户，服务商应已经配置支付参数
+                    var isvConfigs = _payInterfaceConfigRepository.GetAll()
+                        .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(agentInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE_ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
+                    defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES) && isvConfigs.Select(s => s.IfCode).Contains(w.IfCode));
                     break;
                 default:
                     break;

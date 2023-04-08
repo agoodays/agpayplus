@@ -47,6 +47,7 @@
             ref="configComponentRef"
             :is="configComponent"
             :infoId="infoId"
+            :infoType="infoType"
             :ifDefine="ifDefine"
             :perm-code="permCode"
             :config-mode="configMode"
@@ -98,6 +99,7 @@ export default {
     return {
       visible: false, // 是否显示弹层/抽屉
       infoId: null, // 更新对象ID
+      infoType: null,
       ifDefine: null,
       btnLoading: false,
       isShowMore: true,
@@ -118,6 +120,14 @@ export default {
   methods: {
     show: function (infoId) { // 弹层打开事件
       this.infoId = infoId
+      let infoType = 'ISV'
+      if (this.configMode === 'mgrAgent' || this.configMode === 'agentSubagent') {
+        infoType = 'AGENT'
+      }
+      if (this.configMode === 'mgrMch' || this.configMode === 'agentMch' || this.configMode === 'mchSelfApp1') {
+        infoType = 'MCH_APP'
+      }
+      this.infoType = infoType
       this.reset()
       this.ifCodeListSearchData = {}
       this.ifCodeListSearchData.infoId = this.infoId

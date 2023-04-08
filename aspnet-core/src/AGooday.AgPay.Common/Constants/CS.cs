@@ -44,19 +44,19 @@
         /// <summary>
         /// 服务商
         /// </summary>
-        public const byte INFO_TYPE_ISV = 1;
+        public const string INFO_TYPE_ISV = "ISV";
         /// <summary>
         /// 商户
         /// </summary>
-        public const byte INFO_TYPE_MCH = 2;
+        public const string INFO_TYPE_MCH = "MCH";
         /// <summary>
         /// 商户应用
         /// </summary>
-        public const byte INFO_TYPE_MCH_APP = 3;
+        public const string INFO_TYPE_MCH_APP = "MCH_APP";
         /// <summary>
         /// 代理商
         /// </summary>
-        public const byte INFO_TYPE_AGENT = 4;
+        public const string INFO_TYPE_AGENT = "AGENT";
         #endregion
 
         #region 商户类型:1-普通商户 2-特约商户

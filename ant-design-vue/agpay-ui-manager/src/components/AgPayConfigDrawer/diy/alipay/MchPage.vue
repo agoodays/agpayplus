@@ -1,12 +1,12 @@
 <template>
   <div>
-    <BasePage ref="infoFormModel" :form-data="saveObject" :if-define="ifDefine" @update-form-data="handleUpdateFormData"/>
-    <a-divider orientation="left">
+    <BasePage ref="infoFormModel" :form-data="saveObject" @update-form-data="handleUpdateFormData"/>
+    <a-divider orientation="left" v-if="saveObject.infoType != 'AGENT'">
       <a-tag color="#FF4B33">
         {{ saveObject.ifCode }} 商户参数配置
       </a-tag>
     </a-divider>
-    <a-form-model ref="mchParamFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
+    <a-form-model v-if="saveObject.infoType != 'AGENT'" ref="mchParamFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
       <a-row :gutter="16" v-if="mchType === 1">
         <a-col span="12">
           <a-form-model-item label="环境配置" prop="sandbox">
@@ -123,6 +123,7 @@ export default {
   },
   props: {
     infoId: { type: String, default: null },
+    infoType: { type: String, default: null },
     ifDefine: { type: Object, default: null },
     permCode: { type: String, default: '' },
     configMode: { type: String, default: null },
@@ -136,6 +137,7 @@ export default {
       mchType: this.ifDefine.mchType,
       saveObject: {
         infoId: this.infoId,
+        infoType: this.infoType,
         ifCode: this.ifDefine.ifCode,
         state: this.ifDefine.ifConfigState === 0 ? 0 : 1
       }, // 保存的对象
@@ -242,6 +244,7 @@ export default {
             that.btnLoading = true
             const reqParams = {}
             reqParams.infoId = that.saveObject.infoId
+            reqParams.infoType = that.saveObject.infoType
             reqParams.ifCode = that.saveObject.ifCode
             // reqParams.ifRate = that.saveObject.ifRate
             reqParams.state = that.saveObject.state

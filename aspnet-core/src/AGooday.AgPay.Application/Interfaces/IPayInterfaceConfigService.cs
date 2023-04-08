@@ -17,9 +17,9 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="infoType"></param>
         /// <param name="infoId"></param>
         /// <returns></returns>
-        List<PayInterfaceDefineDto> SelectAllPayIfConfigListByIsvNo(byte infoType, string infoId);
+        List<PayInterfaceDefineDto> SelectAllPayIfConfigListByIsvNo(string infoType, string infoId);
         List<PayInterfaceDefineDto> SelectAllPayIfConfigListByAppId(string appId);
-        List<PayInterfaceDefineDto> PayIfConfigList(byte infoType, string configMode, string infoId, string ifName, string ifCode);
+        List<PayInterfaceDefineDto> PayIfConfigList(string infoType, string configMode, string infoId, string ifName, string ifCode);
         /// <summary>
         /// 根据 账户类型、账户号、接口类型 获取支付参数配置
         /// </summary>
@@ -27,8 +27,8 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="infoId">账户号</param>
         /// <param name="ifCode">接口类型</param>
         /// <returns></returns>
-        PayInterfaceConfigDto GetByInfoIdAndIfCode(byte infoType, string infoId, string ifCode);
-        IEnumerable<PayInterfaceConfigDto> GetByInfoId(byte infoType, string infoId);
+        PayInterfaceConfigDto GetByInfoIdAndIfCode(string infoType, string infoId, string ifCode);
+        IEnumerable<PayInterfaceConfigDto> GetByInfoId(string infoType, string infoId);
         /// <summary>
         /// 查询商户app使用已正确配置了通道信息
         /// </summary>

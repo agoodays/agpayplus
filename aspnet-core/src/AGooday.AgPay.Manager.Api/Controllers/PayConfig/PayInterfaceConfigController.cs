@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes List(string configMode, string infoId, string ifName, string ifCode)
         {
-            byte infoType = 0;
+            string infoType = string.Empty;
             switch (configMode)
             {
                 case "mgrIsv":
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_VIEW, PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
         public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
         {
-            byte infoType = 0;
+            string infoType = string.Empty;
             switch (configMode)
             {
                 case "mgrIsv":

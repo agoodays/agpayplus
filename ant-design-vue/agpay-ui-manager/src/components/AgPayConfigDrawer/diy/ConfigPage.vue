@@ -1,12 +1,13 @@
 <template>
   <div>
-    <BasePage ref="infoFormModel" :form-data="saveObject" :if-define="ifDefine" @update-form-data="handleUpdateFormData"/>
-    <a-divider orientation="left" v-if="ifDefineArray?.length">
+    <BasePage ref="infoFormModel" :form-data="saveObject" @update-form-data="handleUpdateFormData"/>
+    <a-divider orientation="left" v-if="ifDefineArray?.length && saveObject.infoType != 'AGENT'">
       <a-tag color="#FF4B33">
-        {{ saveObject.ifCode }} {{ ifDefine.mchType ? '商户' : '服务商' }}参数配置
+        {{ saveObject.ifCode }} {{ saveObject.infoType === 'ISV' ? '服务商'
+          : saveObject.infoType === 'MCH_APP' ? '商户' : saveObject.infoType === 'AGENT' ? '代理商' : '' }}参数配置
       </a-tag>
     </a-divider>
-    <a-form-model ref="paramFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
+    <a-form-model v-if="saveObject.infoType != 'AGENT'" ref="paramFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
       <a-row :gutter="16">
         <a-col v-for="(item, key) in ifDefineArray" :key="key" :span="item.type === 'text' ? 12 : 24">
           <a-form-model-item :label="item.desc" :prop="item.name" v-if="item.type === 'text' || item.type === 'textarea'">
@@ -55,6 +56,7 @@ export default {
   },
   props: {
     infoId: { type: String, default: null },
+    infoType: { type: String, default: null },
     ifDefine: { type: Object, default: null },
     permCode: { type: String, default: '' },
     configMode: { type: String, default: null },
@@ -66,6 +68,7 @@ export default {
       btnLoading: false,
       saveObject: {
         infoId: this.infoId,
+        infoType: this.infoType,
         ifCode: this.ifDefine.ifCode,
         state: this.ifDefine.ifConfigState === 0 ? 0 : 1
       }, // 保存的对象
@@ -160,27 +163,11 @@ export default {
             that.btnLoading = true
             const reqParams = {}
             reqParams.infoId = that.saveObject.infoId
+            reqParams.infoType = that.saveObject.infoType
             reqParams.ifCode = that.saveObject.ifCode
             reqParams.ifRate = that.saveObject.ifRate
             reqParams.state = that.saveObject.state
             reqParams.remark = that.saveObject.remark
-
-            switch (that.$props.configMode) {
-              case 'mgrIsv':
-                reqParams.infoType = 1
-                break
-              case 'mgrAgent':
-              case 'agentSubagent':
-                reqParams.infoType = 4
-                break
-              case 'mgrMch':
-              case 'agentMch':
-              case 'agentSelf':
-              case 'mchSelfApp1':
-              case 'mchSelfApp2':
-                reqParams.infoType = 3
-                break
-            }
 
             // 支付参数配置不能为空
             if (Object.keys(that.ifParams).length === 0) {

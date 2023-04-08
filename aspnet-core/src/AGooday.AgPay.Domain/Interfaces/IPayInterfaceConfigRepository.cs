@@ -6,6 +6,6 @@ namespace AGooday.AgPay.Domain.Interfaces
     {
         bool IsExistUseIfCode(string ifCode);
         bool MchAppHasAvailableIfCode(string appId, string ifCode);
-        void RemoveByInfoIds(List<string> infoIds, byte infoType);
+        void RemoveByInfoIds(List<string> infoIds, string infoType);
     }
 }

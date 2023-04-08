@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="infoType"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, byte infoType, byte type);
+        IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte type);
         void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo);
         MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode);
         bool IsExistMchPayPassageUseWayCode(string wayCode);

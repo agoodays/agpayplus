@@ -1,7 +1,7 @@
 <template>
   <a-form-model ref="infoFormModel" :model="formData" layout="vertical" :rules="rules">
     <a-row :gutter="16">
-      <a-col :span="12" v-if="!ifDefine.mchType">
+      <a-col :span="12" v-if="formData.infoType === 'ISV'">
         <a-form-model-item label="支付接口费率" prop="ifRate">
           <a-input
             v-model="formData.ifRate"
@@ -39,8 +39,7 @@
 export default {
   name: 'BasePage',
   props: {
-    formData: { type: Object, default: null },
-    ifDefine: { type: Object, default: null }
+    formData: { type: Object, default: null }
   },
   data () {
     return {
