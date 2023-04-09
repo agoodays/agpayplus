@@ -84,6 +84,28 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 
+        public PaginatedList<AvailablePayInterfaceDto> AvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize)
+        {
+            var result = _payInterfaceDefineRepository.SelectAvailablePayInterfaceList<AvailablePayInterfaceDto>(wayCode, appId, infoType, mchType);
+
+            if (result != null)
+            {
+                var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
+                foreach (var item in result)
+                {
+                    var payPassage = mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).FirstOrDefault();
+                    if (payPassage != null)
+                    {
+                        item.PassageId = payPassage.Id;
+                        item.State = (sbyte)payPassage.State;
+                        item.Rate = payPassage.Rate * 100;
+                    }
+                }
+            }
+            var records = PaginatedList<AvailablePayInterfaceDto>.Create(result, pageNumber, pageSize);
+            return records;
+        }
+
         /// <summary>
         /// 根据支付方式查询可用的支付接口列表
         /// </summary>

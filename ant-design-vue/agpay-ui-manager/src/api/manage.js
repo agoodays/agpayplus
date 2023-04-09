@@ -238,6 +238,13 @@ export function getAvailablePayInterfaceList (mchNo, wayCode) {
   })
 }
 
+export function getNewAvailablePayInterfaceList (mchNo, wayCode) {
+  return request.request({
+    url: '/api/mch/payPassages/newAvailablePayInterface/' + mchNo + '/' + wayCode,
+    method: 'GET'
+  })
+}
+
 export function getPayTrendCount (parameter) {
   return request.request({
     url: API_URL_MAIN_STATISTIC + '/payTrendCount?recentDay=' + parameter,

@@ -11,7 +11,7 @@
         <div class="search">
           <a-input class="if-input" placeholder="搜索渠道名称" v-model="ifCodeListSearchData.ifName"/>
           <a-input class="if-input" placeholder="搜索渠道代码" v-model="ifCodeListSearchData.ifCode"/>
-          <a-button type="primary" icon="search" @click="searchFunc">查询</a-button>
+          <a-button type="primary" icon="search" @click="searchIfCodeFunc">查询</a-button>
           <a-button style="margin-left: 8px" icon="reload" @click="() => this.ifCodeListSearchData = {}">重置</a-button>
         </div>
         <div class="pay-list-wrapper" :style="{ 'height': isShowMore ? 'auto' : '110px' }">
@@ -72,6 +72,84 @@
               <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
             </div>
           </div>
+          <div v-if="paramsAndRateTabVal === 'channelConfigTab'">
+            <div>
+              {{ currentIfCode }} —— 渠道配置
+            </div>
+            <div class="drawer-btn-center" v-if="$access(permCode)">
+              <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
+              <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
+            </div>
+          </div>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane v-if="infoType==='MCH_APP'" :key="'mchPassageTab'" tab="支付渠道的选择">
+        <div class="content-box">
+          <div class="table-page-search-wrapper">
+            <a-form layout="inline">
+              <a-row :gutter="10">
+                <a-col :md="4">
+                  <a-form-item label="">
+                    <a-input placeholder="支付方式代码" v-model="searchData.wayCode"/>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="4">
+                  <a-form-item label="">
+                    <a-input placeholder="支付方式名称" v-model="searchData.wayName"/>
+                  </a-form-item>
+                </a-col>
+                <a-col :sm="6">
+                  <span class="table-page-search-submitButtons">
+                    <a-button type="primary" icon="search" @click="searchFunc(true)">查询</a-button>
+                    <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
+                  </span>
+                </a-col>
+              </a-row>
+            </a-form>
+          </div>
+          <div class="table-box">
+            <div class="table-item">
+              <!-- 列表渲染 -->
+              <AgTable
+                ref="infoTable"
+                :initData="true"
+                :isShowTableTop="false"
+                :reqTableDataFunc="reqTableDataFunc"
+                :tableColumns="tableColumns"
+                :searchData="searchData"
+                :rowSelection="rowSelection"
+                rowKey="wayCode"
+              >
+                <template slot="stateSlot" slot-scope="{record}">
+                  <a-badge :status="record.passageState === 0?'error':'processing'" :text="record.passageState === 0?'禁用':'启用'" />
+                </template>
+              </AgTable>
+            </div>
+            <div class="table-item">
+              <!-- 列表渲染 -->
+              <AgTable
+                ref="passageInfoTable"
+                :initData="false"
+                :isShowTableTop="false"
+                :reqTableDataFunc="reqPassageTableDataFunc"
+                :tableColumns="passageTableColumns"
+                :searchData="passageSearchData"
+                rowKey="ifCode"
+              >
+                <template slot="ifNameSlot" slot-scope="{record}">
+                  <div class="if-name">
+                    <div class="back" :style="{ backgroundColor: record.bgColor }">
+                      <img :src="record.icon" alt="">
+                    </div>
+                    <div>{{ record.ifName }}</div>
+                  </div>
+                </template>
+                <template slot="stateSlot" slot-scope="{record}">
+                  <AgTableColState :state="record.state" :showSwitchType="$access('ENT_UR_USER_EDIT')" :onChange="(state) => { return updateState(record.ifCode, state)}"/>
+                </template>
+              </AgTable>
+            </div>
+          </div>
         </div>
       </a-tab-pane>
     </a-tabs>
@@ -84,7 +162,21 @@
 
 <script>
 import AgUpload from '@/components/AgUpload/AgUpload'
-import { API_URL_PAYCONFIGS_LIST, req } from '@/api/manage'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import AgTableColState from '@/components/AgTable/AgTableColState'
+import { API_URL_PAYCONFIGS_LIST, API_URL_MCH_PAYPASSAGE_LIST, getNewAvailablePayInterfaceList, req } from '@/api/manage'
+
+const tableColumns = [
+  { key: 'wayCode', dataIndex: 'wayCode', title: '支付方式代码' },
+  { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称' },
+  { key: 'passageState', title: '状态', scopedSlots: { customRender: 'stateSlot' } }
+]
+const passageTableColumns = [
+  { key: 'ifName', title: '通道名称', scopedSlots: { customRender: 'ifNameSlot' } },
+  { key: 'rate', dataIndex: 'rate', title: '费率' },
+  { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' } }
+]
 
 export default {
   name: 'AgPayConfigDrawer',
@@ -93,7 +185,10 @@ export default {
     configMode: { type: String, default: '' }
   },
   components: {
-    AgUpload
+    AgUpload,
+    AgTable,
+    AgTableColumns,
+    AgTableColState
   },
   data () {
     return {
@@ -109,12 +204,30 @@ export default {
       configComponent: null,
       ifCodeList: [],
       ifCodeListSearchData: {},
+      searchData: {},
+      tableColumns: tableColumns,
+      passageTableColumns: passageTableColumns,
+      passageSearchData: {},
+      selectWayCode: null,
       paramsAndRateTabVal: 'paramsTab',
       tabData: [
         { code: 'paramsTab', name: '参数配置' },
         { code: 'rateTab', name: '费率配置' }
       ],
       saveObject: {} // 保存的对象
+    }
+  },
+  computed: {
+    rowSelection () {
+      const that = this
+      return {
+        type: 'radio', // 设置选择方式为单选按钮
+        onChange: (selectedRowKeys, selectedRows) => {
+          console.log(selectedRowKeys, selectedRows)
+          that.selectWayCode = selectedRowKeys
+          that.searchPassageFunc(true)
+        }
+      }
     }
   },
   methods: {
@@ -126,6 +239,7 @@ export default {
       }
       if (this.configMode === 'mgrMch' || this.configMode === 'agentMch' || this.configMode === 'mchSelfApp1') {
         infoType = 'MCH_APP'
+        this.tabData.push({ code: 'channelConfigTab', name: '渠道配置' })
       }
       this.infoType = infoType
       this.reset()
@@ -145,7 +259,27 @@ export default {
     onClose () {
       this.visible = false
     },
-    searchFunc () {
+    // 请求支付通道数据
+    reqTableDataFunc (params) {
+      const that = this
+      return req.list(API_URL_MCH_PAYPASSAGE_LIST, Object.assign(params, { appId: that.infoId }))
+    },
+    searchFunc (isToFirst = false) { // 点击【查询】按钮点击事件
+      this.$refs.infoTable.refTable(isToFirst)
+    },
+    reqPassageTableDataFunc () {
+      const that = this
+      console.log(that.selectWayCode)
+      return getNewAvailablePayInterfaceList(that.infoId, that.selectWayCode)
+    },
+    searchPassageFunc (isToFirst = false) { // 点击【查询】按钮点击事件
+      this.$refs.passageInfoTable.refTable(isToFirst)
+    },
+    updateState: function (recordId, state) { // 【更新状态】
+      console.log(recordId, state)
+      return new Promise()
+    },
+    searchIfCodeFunc () {
       this.refIfCodeList()
       this.reset()
     },
@@ -232,6 +366,14 @@ export default {
 <style scoped>
   >>> .ant-tabs-top-bar {
     padding-left: 35vw;
+  }
+
+  >>> .table-page-search-wrapper{
+    padding: 0;
+  }
+
+  >>> .ant-table-wrapper{
+    margin: 0;
   }
 
   .drawer-btn-center {
