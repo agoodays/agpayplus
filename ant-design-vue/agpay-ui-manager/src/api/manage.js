@@ -231,17 +231,11 @@ export function getMchPayConfigUnique (infoId, ifCode) {
   })
 }
 
-export function getAvailablePayInterfaceList (mchNo, wayCode) {
+export function getAvailablePayInterfaceList (mchNo, wayCode, data) {
   return request.request({
     url: '/api/mch/payPassages/availablePayInterface/' + mchNo + '/' + wayCode,
-    method: 'GET'
-  })
-}
-
-export function getNewAvailablePayInterfaceList (mchNo, wayCode) {
-  return request.request({
-    url: '/api/mch/payPassages/newAvailablePayInterface/' + mchNo + '/' + wayCode,
-    method: 'GET'
+    method: 'GET',
+    params: data
   })
 }
 

@@ -125,7 +125,7 @@
                 </template>
               </AgTable>
             </div>
-            <div class="table-item">
+            <div class="table-item" style="margin-left: 10px;">
               <!-- 列表渲染 -->
               <AgTable
                 ref="passageInfoTable"
@@ -145,7 +145,7 @@
                   </div>
                 </template>
                 <template slot="stateSlot" slot-scope="{record}">
-                  <AgTableColState :state="record.state" :showSwitchType="$access('ENT_UR_USER_EDIT')" :onChange="(state) => { return updateState(record.ifCode, state)}"/>
+                  <AgTableColState :state="record.state" :showSwitchType="$access('ENT_MCH_PAY_PASSAGE_ADD')" :onChange="(state) => { return updateState(record, state)}"/>
                 </template>
               </AgTable>
             </div>
@@ -165,7 +165,7 @@ import AgUpload from '@/components/AgUpload/AgUpload'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgTableColState from '@/components/AgTable/AgTableColState'
-import { API_URL_PAYCONFIGS_LIST, API_URL_MCH_PAYPASSAGE_LIST, getNewAvailablePayInterfaceList, req } from '@/api/manage'
+import { API_URL_PAYCONFIGS_LIST, API_URL_MCH_PAYPASSAGE_LIST, getAvailablePayInterfaceList, req } from '@/api/manage'
 
 const tableColumns = [
   { key: 'wayCode', dataIndex: 'wayCode', title: '支付方式代码' },
@@ -208,7 +208,7 @@ export default {
       tableColumns: tableColumns,
       passageTableColumns: passageTableColumns,
       passageSearchData: {},
-      selectWayCode: null,
+      currentWayCode: null,
       paramsAndRateTabVal: 'paramsTab',
       tabData: [
         { code: 'paramsTab', name: '参数配置' },
@@ -223,8 +223,7 @@ export default {
       return {
         type: 'radio', // 设置选择方式为单选按钮
         onChange: (selectedRowKeys, selectedRows) => {
-          console.log(selectedRowKeys, selectedRows)
-          that.selectWayCode = selectedRowKeys
+          that.currentWayCode = selectedRowKeys
           that.searchPassageFunc(true)
         }
       }
@@ -267,17 +266,40 @@ export default {
     searchFunc (isToFirst = false) { // 点击【查询】按钮点击事件
       this.$refs.infoTable.refTable(isToFirst)
     },
-    reqPassageTableDataFunc () {
+    reqPassageTableDataFunc (params) {
       const that = this
-      console.log(that.selectWayCode)
-      return getNewAvailablePayInterfaceList(that.infoId, that.selectWayCode)
+      return getAvailablePayInterfaceList(that.infoId, that.currentWayCode, params)
     },
     searchPassageFunc (isToFirst = false) { // 点击【查询】按钮点击事件
       this.$refs.passageInfoTable.refTable(isToFirst)
     },
-    updateState: function (recordId, state) { // 【更新状态】
-      console.log(recordId, state)
-      return new Promise()
+    updateState: function (record, state) { // 【更新状态】
+      const that = this
+      const title = state === 1 ? '确认[启用]该通道？' : '确认[停用]该通道？'
+      const content = state === 1 ? '启用后将会将其他通道关闭' : '停用后将无法正常支付'
+
+      return new Promise((resolve, reject) => {
+        that.$infoBox.confirmDanger(title, content, () => {
+          console.log(record)
+          const reqParams = []
+          reqParams.push({
+            id: record.passageId,
+            appId: that.appId,
+            wayCode: that.wayCode,
+            ifCode: record.ifCode,
+            rate: record.rate,
+            state: record.state ? 1 : 0
+          })
+          // 请求接口
+          req.add(API_URL_MCH_PAYPASSAGE_LIST, { 'reqParams': JSON.stringify(reqParams) }).then(res => {
+            that.$message.success('已配置')
+            that.visible = false
+            that.searchFunc()
+          })
+        }, () => {
+          reject(new Error())
+        })
+      })
     },
     searchIfCodeFunc () {
       this.refIfCodeList()
@@ -368,12 +390,16 @@ export default {
     padding-left: 35vw;
   }
 
-  >>> .table-page-search-wrapper{
+  >>> .table-page-search-wrapper {
     padding: 0;
   }
 
-  >>> .ant-table-wrapper{
+  >>> .ant-table-wrapper {
     margin: 0;
+  }
+
+  >>> .ant-table-thead > tr > th, >>> .ant-table-tbody > tr > td {
+    padding: 8px 8px;
   }
 
   .drawer-btn-center {

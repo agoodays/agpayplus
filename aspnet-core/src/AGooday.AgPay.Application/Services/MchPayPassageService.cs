@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 
-        public PaginatedList<AvailablePayInterfaceDto> AvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize)
+        public PaginatedList<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize)
         {
             var result = _payInterfaceDefineRepository.SelectAvailablePayInterfaceList<AvailablePayInterfaceDto>(wayCode, appId, infoType, mchType);
 

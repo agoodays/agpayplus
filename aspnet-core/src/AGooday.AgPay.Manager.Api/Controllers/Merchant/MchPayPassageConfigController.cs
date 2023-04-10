@@ -80,34 +80,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <param name="isvNo"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet, Route("newAvailablePayInterface/{appId}/{wayCode}"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_CONFIG)]
-        public ApiRes NewAvailablePayInterface(string appId, string wayCode, int pageNumber, int pageSize)
-        {
-            var mchApp = _mchAppService.GetById(appId);
-            if (mchApp == null || mchApp.State != CS.YES)
-            {
-                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
-            }
-            var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
-            if (mchInfo == null || mchInfo.State != CS.YES)
-            {
-                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
-            }
-            // 根据支付方式查询可用支付接口列表
-            var result = _mchPayPassageService.AvailablePayInterfaceList(wayCode, appId, CS.INFO_TYPE_MCH_APP, mchInfo.Type, pageNumber, pageSize);
-            return ApiRes.Ok(new { Records = result.ToList(), Total = result.TotalCount, Current = result.PageIndex, HasNext = result.HasNext });
-        }
-
-        /// <summary>
-        /// 根据appId、支付方式查询可用的支付接口列表
-        /// </summary>
-        /// <param name="isvNo"></param>
-        /// <param name="ifCode"></param>
-        /// <returns></returns>
         [HttpGet, Route("availablePayInterface/{appId}/{wayCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_CONFIG)]
-        public ApiRes AvailablePayInterface(string appId, string wayCode)
+        public ApiRes AvailablePayInterface(string appId, string wayCode, int pageNumber, int pageSize)
         {
             var mchApp = _mchAppService.GetById(appId);
             if (mchApp == null || mchApp.State != CS.YES)
@@ -120,8 +95,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             // 根据支付方式查询可用支付接口列表
-            var result = _mchPayPassageService.SelectAvailablePayInterfaceList(wayCode, appId, CS.INFO_TYPE_MCH_APP, mchInfo.Type);
-            return ApiRes.Ok(result);
+            var result = _mchPayPassageService.SelectAvailablePayInterfaceList(wayCode, appId, CS.INFO_TYPE_MCH_APP, mchInfo.Type, pageNumber, pageSize);
+            return ApiRes.Ok(new { Records = result.ToList(), Total = result.TotalCount, Current = result.PageIndex, HasNext = result.HasNext });
         }
 
         /// <summary>
