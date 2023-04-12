@@ -186,13 +186,30 @@ INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_NOTICEINFO', '公告管理', '
 DROP TABLE IF EXISTS `t_pay_rate_config`;
 CREATE TABLE `t_pay_rate_config` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, agentSubagent-子代理商, mgrMch-商户, agentMch-代理商商户',
-  `config_type` VARCHAR(20) NOT NULL COMMENT '配置类型: ISVCOST-服务商低价, AGENTRATE-代理商费率, AGENTDEF-代理商默认费率 ,MCHAPPLYDEF-商户进件默认费率',
-  `info_type` TINYINT NOT NULL COMMENT '账号类型:1-服务商 2-商户 3-商户应用',
+--   `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, agentSubagent-子代理商, mgrMch-商户, agentMch-代理商商户',
+  `config_type` VARCHAR(20) NOT NULL COMMENT '配置类型: ISVCOST-服务商低价, AGENTRATE-代理商费率, AGENTDEF-代理商默认费率, MCHAPPLYDEF-商户进件默认费率, MCHRATE-商户费率',
+  `info_type` VARCHAR(20) NOT NULL COMMENT '账号类型:ISV-服务商, AGENT-代理商, MCH_APP-商户应用',
   `info_id` VARCHAR(64) NOT NULL COMMENT '服务商号/商户号/应用ID',
   `if_code` VARCHAR(20) NOT NULL COMMENT '支付接口',
   `way_code` VARCHAR(20) NOT NULL COMMENT '支付方式',
   `fee_type` TINYINT NOT NULL COMMENT '费率类型:SINGLE-单笔费率, LEVEL-阶梯费率',
+  `level_mode` VARCHAR(20) NULL COMMENT '阶梯模式: 模式: NORMAL-普通模式, UNIONPAY-银联模式',
+  `fee_rate` DECIMAL(20,6) NOT NULL COMMENT '支付方式费率',
+  `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Uni_InfoId_WayCode` (`config_type`,`info_type`,`info_id`,`if_code`,`way_code`)
+) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='支付费率配置表'
+
+-- 阶梯费率信息表
+DROP TABLE IF EXISTS `t_level_rate_config`;
+CREATE TABLE `t_level_rate_config` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `rate_config_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '支付费率配置ID',
+  `bank_card_type` VARCHAR(20) NULL COMMENT '银行卡类型: DEBIT-借记卡（储蓄卡）, CREDIT-贷记卡（信用卡）',
+  `min_amount` INT NOT NULL DEFAULT '0' COMMENT '最小金额: 计算时大于此值', 
+  `max_amount` INT NOT NULL DEFAULT '0' COMMENT '最大金额: 计算时小于或等于此值', 
   `min_fee` INT NOT NULL DEFAULT '0' COMMENT '保底费用', 
   `max_fee` INT NOT NULL DEFAULT '0' COMMENT '封顶费用', 
   `fee_rate` DECIMAL(20,6) NOT NULL COMMENT '支付方式费率',
@@ -200,26 +217,7 @@ CREATE TABLE `t_pay_rate_config` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `Uni_AppId_WayCode` (`info_type`,`info_id`,`if_code`,`way_code`)
-) ENGINE=INNODB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='支付费率配置表'
-
--- 阶梯费率信息表
-DROP TABLE IF EXISTS `t_level_rate_config`;
-CREATE TABLE `t_level_rate_config` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  -- 模式：普通模式 银联模式
-  -- 支付方式：所有 借记卡（储蓄卡） 贷记卡（信用卡）
-  `rate_config_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '支付费率配置ID',
-  `min_amount` INT NOT NULL DEFAULT '0' COMMENT '最小金额: 计算时大于此值', 
-  `max_amount` INT NOT NULL DEFAULT '0' COMMENT '最大金额: 计算时小于或等于此值', 
-  -- 保底费用
-  -- 封顶费用
-  `fee_rate` DECIMAL(20,6) NOT NULL COMMENT '支付方式费率',
-  `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
-  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
-  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-) ENGINE=INNODB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='阶梯费率表'
+) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='阶梯费率表'
 
 -- 码牌信息表
 DROP TABLE IF EXISTS `t_mch_qrcodes`;
@@ -291,7 +289,7 @@ ALTER TABLE `t_pay_interface_define`
 
 ALTER TABLE `t_pay_interface_config`
   CHANGE `info_type` `info_type` VARCHAR(20) NOT NULL COMMENT '账号类型:ISV-服务商, ISV_OAUTH2-服务商oauth2, AGENT-代理商, MCH_APP-商户应用, MCH_APP_OAUTH2-商户应用oauth2',
-  ADD COLUMN `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, mgrMch-商户, agentSubagent-子代理商, agentMch-代理商商户, mchSelfApp1-小程序支付配置, mchSelfApp2-支付配置' AFTER `info_id`,
+--   ADD COLUMN `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, mgrMch-商户, agentSubagent-子代理商, agentMch-代理商商户, mchSelfApp1-小程序支付配置, mchSelfApp2-支付配置' AFTER `info_id`,
   ADD COLUMN `sett_hold_day` TINYINT DEFAULT 0 NOT NULL COMMENT '结算周期（自然日）' AFTER `if_params`;
 
 ALTER TABLE `t_pay_way`   
