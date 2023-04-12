@@ -10,7 +10,7 @@
             :min="0"
             :max="100"
             :step="0.01"
-            suffix="%"
+            addon-after="%"
             placeholder="请输入"/>
         </a-form-model-item>
       </a-col>

@@ -64,13 +64,14 @@
             </div>
           </div>-->
           <div v-if="paramsAndRateTabVal === 'rateTab'">
-            <div>
+            <AgPayPaywayRatePanel/>
+<!--            <div>
               {{ currentIfCode }} —— 费率配置
             </div>
             <div class="drawer-btn-center" v-if="$access(permCode)">
               <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
               <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
-            </div>
+            </div>-->
           </div>
           <div v-if="paramsAndRateTabVal === 'channelConfigTab'">
             <div>
@@ -166,6 +167,7 @@ import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgTableColState from '@/components/AgTable/AgTableColState'
 import { API_URL_PAYCONFIGS_LIST, API_URL_MCH_PAYPASSAGE_LIST, getAvailablePayInterfaceList, req } from '@/api/manage'
+import AgPayPaywayRatePanel from './AgPayPaywayRatePanel'
 
 const tableColumns = [
   { key: 'wayCode', dataIndex: 'wayCode', title: '支付方式代码' },
@@ -188,7 +190,8 @@ export default {
     AgUpload,
     AgTable,
     AgTableColumns,
-    AgTableColState
+    AgTableColState,
+    AgPayPaywayRatePanel
   },
   data () {
     return {
