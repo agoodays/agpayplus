@@ -12,101 +12,155 @@
           <div class="h-left">微信条码 (WX_BAR)</div>
           <div class="h-right h-right2" style="display: flex;">
             <div class="h-right2-div">
-              是否开通：<a-switch v-model="saveObject.noCheckRuleFlag" />
+              是否开通：
+              <a-switch
+                @change="onChangeState('WX_BAR', $event)"
+                :checked="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').state===1" />
             </div>
             <div class="h-right2-div">
-              是否可进件：<a-switch v-model="saveObject.noCheckRuleFlag" />
+              是否可进件：
+              <a-switch
+                @change="onChangeApplymentSupport('WX_BAR', $event)"
+                :checked="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').applymentSupport===1" />
             </div>
             <div class="h-right2-div">
-              阶梯费率：<a-switch v-model="saveObject.noCheckRuleFlag" />
+              阶梯费率：
+              <a-switch
+                @change="onChangeFeeType('WX_BAR', $event)"
+                :checked="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeType==='LEVEL'" />
             </div>
             <div class="h-right2-div">
-              银联模式：<a-switch v-model="saveObject.noCheckRuleFlag" />
+              银联模式：
+              <a-switch
+                @change="onChangeLevelMode('WX_BAR', $event)"
+                :disabled="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeType!='LEVEL'"
+                :checked="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeType==='LEVEL'
+                  && saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode==='UNIONPAY'" />
             </div>
           </div>
         </div>
-        <div class="rate-card-content">
-          <div class="weChat-pay-list">
-            <div class="w-pay-item">
-              <div class="w-pay-title">价格区间：</div>
-              <a-input v-model="saveObject.noCheckRuleFlag" style="width: 50%;min-width: 100px;" type="number" addon-after="~"/>
-              <a-input v-model="saveObject.noCheckRuleFlag" style="width: 50%;min-width: 100px;" type="number" addon-after="元"/>
+        <div class="rate-card-content" v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').state===1">
+          <div v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeType==='LEVEL'">
+            <a-divider orientation="left" v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode==='UNIONPAY'">
+              {{ saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
+                [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode]
+                .find(f => f.bankCardType==='DEBIT').levelList[0].bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
+            </a-divider>
+            <div class="weChat-pay-list">
+              <div class="w-pay-item" v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeType==='LEVEL'">
+                <div class="w-pay-title">价格区间：</div>
+                <div v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode==='UNIONPAY'">
+                  <div style="height: 32px; line-height: 32px;">
+                    金额 <= {{ saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')[saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].maxAmount }}元：
+                  </div>
+                </div>
+                <div v-else>
+                  <a-input
+                    style="width: 50%;min-width: 100px;"
+                    type="number"
+                    addon-after="~"
+                    v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
+                      [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].minAmount" />
+                  <a-input
+                    style="width: 50%;min-width: 100px;"
+                    type="number"
+                    addon-after="元"
+                    v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
+                      [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].maxAmount"/>
+                </div>
+              </div>
+              <div class="w-pay-item">
+                <div class="w-pay-title">服务商底价费率：</div>
+                <a-input
+                  type="number"
+                  addon-after="%"
+                  v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
+                    [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].feeRate"/>
+              </div>
+              <div class="w-pay-item">
+                <div class="w-pay-title">代理商默认费率：</div>
+                <a-input
+                  type="number"
+                  addon-after="%"
+                  v-model="saveObject['AGENTDEF'].find(f => f.wayCode === 'WX_BAR')
+                    [saveObject['AGENTDEF'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].feeRate"/>
+              </div>
+              <div class="w-pay-item">
+                <div class="w-pay-title">商户进件默认费率：</div>
+                <a-input
+                  type="number"
+                  addon-after="%"
+                  v-model="saveObject['MCHAPPLYDEF'].find(f => f.wayCode === 'WX_BAR')
+                    [saveObject['MCHAPPLYDEF'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].feeRate"/>
+              </div>
+              <div class="w-pay-item">
+                <div class="w-pay-title" style="height: 21px;"><span></span></div>
+                <a-button type="link" danger>删除</a-button>
+              </div>
             </div>
+            <div style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
+              <a-button type="dashed">新增阶梯</a-button>
+            </div>
+            <a-collapse>
+              <a-collapse-panel header="高级配置">
+                <div class="weChat-pay-list">
+                  <div class="w-pay-item">
+                    <div class="w-pay-title">价格类型：</div>
+                    <div style="height: 30px; line-height: 30px;">保底费用：</div>
+                  </div>
+                  <div class="w-pay-item">
+                    <div class="w-pay-title">服务商底价费用:</div>
+                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                  </div>
+                  <div class="w-pay-item">
+                    <div class="w-pay-title">代理商默认费用：</div>
+                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                  </div>
+                  <div class="w-pay-item">
+                    <div class="w-pay-title">商户进件默认费用：</div>
+                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                  </div>
+                </div>
+                <div class="weChat-pay-list" style="margin-top: 15px;">
+                  <div class="w-pay-item">
+                    <div style="height: 30px; line-height: 30px;">封顶费用：</div>
+                  </div>
+                  <div class="w-pay-item">
+                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                  </div>
+                  <div class="w-pay-item">
+                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                  </div>
+                  <div class="w-pay-item">
+                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                  </div>
+                </div>
+              </a-collapse-panel>
+            </a-collapse>
+          </div>
+          <div class="weChat-pay-list" v-else>
             <div class="w-pay-item">
               <div class="w-pay-title">服务商底价费率：</div>
-              <a-input v-model="saveObject.noCheckRuleFlag" type="number" addon-after="%"/>
+              <a-input v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeRate" type="number" addon-after="%"/>
             </div>
             <div class="w-pay-item">
               <div class="w-pay-title">代理商默认费率：</div>
-              <a-input v-model="saveObject.noCheckRuleFlag" type="number" addon-after="%"/>
+              <a-input v-model="saveObject['AGENTDEF'].find(f => f.wayCode === 'WX_BAR').feeRate" type="number" addon-after="%"/>
             </div>
             <div class="w-pay-item">
               <div class="w-pay-title">商户进件默认费率：</div>
-              <a-input v-model="saveObject.noCheckRuleFlag" type="number" addon-after="%"/>
-            </div>
-            <div class="w-pay-item">
-              <div class="w-pay-title" style="height: 21px;"><span></span></div>
-              <a-button type="link" danger>删除</a-button>
+              <a-input v-model="saveObject['MCHAPPLYDEF'].find(f => f.wayCode === 'WX_BAR').feeRate" type="number" addon-after="%"/>
             </div>
           </div>
-          <div class="weChat-pay-list" style="margin-top: 15px;">
-            <div class="w-pay-item">
-              <a-input v-model="saveObject.noCheckRuleFlag" style="width: 50%;min-width: 100px;" type="number" addon-after="~"/>
-              <a-input v-model="saveObject.noCheckRuleFlag" style="width: 50%;min-width: 100px;" type="number" addon-after="元"/>
-            </div>
-            <div class="w-pay-item">
-              <a-input v-model="saveObject.noCheckRuleFlag" type="number" addon-after="%"/>
-            </div>
-            <div class="w-pay-item">
-              <a-input v-model="saveObject.noCheckRuleFlag" type="number" addon-after="%"/>
-            </div>
-            <div class="w-pay-item">
-              <a-input v-model="saveObject.noCheckRuleFlag" type="number" addon-after="%"/>
-            </div>
-            <div class="w-pay-item">
-              <a-button type="link" danger>删除</a-button>
-            </div>
-          </div>
-          <div style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
-            <a-button type="dashed">新增阶梯</a-button>
-          </div>
-          <a-collapse :activeKey="1">
-            <a-collapse-panel key="1" header="高级配置">
-              <div class="weChat-pay-list">
-                <div class="w-pay-item">
-                  <div class="w-pay-title">价格类型：</div>
-                  <div style="height: 30px; line-height: 30px;">保底费用：</div>
-                </div>
-                <div class="w-pay-item">
-                  <div class="w-pay-title">服务商底价费用:</div>
-                  <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                </div>
-                <div class="w-pay-item">
-                  <div class="w-pay-title">代理商默认费用：</div>
-                  <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                </div>
-                <div class="w-pay-item">
-                  <div class="w-pay-title">商户进件默认费用：</div>
-                  <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                </div>
-              </div>
-              <div class="weChat-pay-list" style="margin-top: 15px;">
-                <div class="w-pay-item">
-                  <div style="height: 30px; line-height: 30px;">封顶费用：</div>
-                </div>
-                <div class="w-pay-item">
-                  <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                </div>
-                <div class="w-pay-item">
-                  <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                </div>
-                <div class="w-pay-item">
-                  <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                </div>
-              </div>
-            </a-collapse-panel>
-          </a-collapse>
         </div>
+      </div>
+      <a-collapse>
+        <a-collapse-panel header="【保存】高级配置项">
+          <a-checkbox v-model="saveObject.noCheckRuleFlag">不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox>
+        </a-collapse-panel>
+      </a-collapse>
+      <div class="drawer-btn-center">
+        <a-button type="primary" icon="check" @click="onSubmit" :loading="btnLoading">保存</a-button>
       </div>
     </div>
   </div>
@@ -124,6 +178,8 @@ export default {
   },
   data () {
     return {
+      btnLoading: false,
+      configTypes: ['ISVCOST', 'AGENTDEF', 'MCHAPPLYDEF'],
       saveObject: {
         infoId: this.infoId,
         ifCode: this.ifCode,
@@ -132,226 +188,365 @@ export default {
         ISVCOST: [
           {
             wayCode: 'WX_BAR',
+            state: 1,
             feeType: 'LEVEL',
             levelMode: 'UNIONPAY',
-            state: 1,
-            applymentSupport: 1,
-            levelList: [
+            applymentSupport: 0,
+            UNIONPAY: [
               {
-                bankCardType: 'DEBIT',
-                minAmount: 0,
-                maxAmount: 100000,
-                minFee: 0,
-                maxFee: 2000,
-                feeRate: 0.01
-              },
-              {
-                bankCardType: 'DEBIT',
-                minAmount: 100000,
-                maxAmount: 99999999,
-                minFee: 0,
-                maxFee: 2000,
-                feeRate: 0.02
-              },
-              {
-                bankCardType: 'CREDIT',
-                minAmount: 100000,
-                maxAmount: 99999999,
                 minFee: 0,
                 maxFee: 2500,
-                feeRate: 0.03
+                bankCardType: 'DEBIT',
+                levelList: [
+                  {
+                    id: 1,
+                    minAmount: 0,
+                    maxAmount: 100000,
+                    feeRate: 0.03
+                  },
+                  {
+                    id: 2,
+                    minAmount: 100000,
+                    maxAmount: 99999999,
+                    feeRate: 0.04
+                  }
+                ]
               },
               {
-                bankCardType: 'CREDIT',
-                minAmount: 100000,
-                maxAmount: 99999999,
                 minFee: 0,
                 maxFee: 2500,
-                feeRate: 0.04
-              }
-            ]
-          },
-          {
-            wayCode: 'WX_JSAPI',
-            feeType: 'LEVEL',
-            levelMode: 'NORMAL',
-            state: 1,
-            applymentSupport: 1,
-            levelList: [
-              {
-                minAmount: 0,
-                maxAmount: 100000,
-                minFee: 0,
-                maxFee: 2100,
-                feeRate: 0.04
-              },
-              {
-                minAmount: 100000,
-                maxAmount: 99999999,
-                minFee: 0,
-                maxFee: 2100,
-                feeRate: 0.05
+                bankCardType: 'CREDIT',
+                levelList: [
+                  {
+                    id: 1,
+                    minAmount: 0,
+                    maxAmount: 100000,
+                    feeRate: 0.03
+                  },
+                  {
+                    id: 2,
+                    minAmount: 100000,
+                    maxAmount: 99999999,
+                    feeRate: 0.04
+                  }
+                ]
               }
             ]
           },
           {
             wayCode: 'WX_LITE',
-            feeType: 'SINGLE',
             state: 1,
-            applymentSupport: 1,
+            feeType: 'SINGLE',
+            applymentSupport: 0,
             feeRate: 0.06
+          },
+          {
+            wayCode: 'WX_JSAPI',
+            state: 1,
+            feeType: 'LEVEL',
+            levelMode: 'NORMAL',
+            applymentSupport: 0,
+            NORMAL: [
+              {
+                minFee: 0,
+                maxFee: 2000,
+                levelList: [
+                  {
+                    id: 1,
+                    minAmount: 0,
+                    maxAmount: 100000,
+                    feeRate: 0.04
+                  },
+                  {
+                    id: 2,
+                    minAmount: 100000,
+                    maxAmount: 99999999,
+                    feeRate: 0.05
+                  }
+                ]
+              }
+            ]
           }
         ],
         AGENTDEF: [
           {
             wayCode: 'WX_BAR',
+            state: 1,
             feeType: 'LEVEL',
             levelMode: 'UNIONPAY',
-            state: 1,
-            applymentSupport: 1,
-            levelList: [
+            applymentSupport: 0,
+            UNIONPAY: [
               {
-                bankCardType: 'DEBIT',
-                minAmount: 0,
-                maxAmount: 100000,
-                minFee: 0,
-                maxFee: 2000,
-                feeRate: 0.01
-              },
-              {
-                bankCardType: 'DEBIT',
-                minAmount: 100000,
-                maxAmount: 99999999,
-                minFee: 0,
-                maxFee: 2000,
-                feeRate: 0.02
-              },
-              {
-                bankCardType: 'CREDIT',
-                minAmount: 100000,
-                maxAmount: 99999999,
                 minFee: 0,
                 maxFee: 2500,
-                feeRate: 0.03
+                bankCardType: 'DEBIT',
+                levelList: [
+                  {
+                    id: 1,
+                    minAmount: 0,
+                    maxAmount: 100000,
+                    feeRate: 0.03
+                  },
+                  {
+                    id: 2,
+                    minAmount: 100000,
+                    maxAmount: 99999999,
+                    feeRate: 0.04
+                  }
+                ]
               },
               {
-                bankCardType: 'CREDIT',
-                minAmount: 100000,
-                maxAmount: 99999999,
                 minFee: 0,
                 maxFee: 2500,
-                feeRate: 0.04
-              }
-            ]
-          },
-          {
-            wayCode: 'WX_JSAPI',
-            feeType: 'LEVEL',
-            levelMode: 'NORMAL',
-            state: 1,
-            applymentSupport: 1,
-            levelList: [
-              {
-                minAmount: 0,
-                maxAmount: 100000,
-                minFee: 0,
-                maxFee: 2100,
-                feeRate: 0.04
-              },
-              {
-                minAmount: 100000,
-                maxAmount: 99999999,
-                minFee: 0,
-                maxFee: 2100,
-                feeRate: 0.05
+                bankCardType: 'CREDIT',
+                levelList: [
+                  {
+                    id: 1,
+                    minAmount: 0,
+                    maxAmount: 100000,
+                    feeRate: 0.03
+                  },
+                  {
+                    id: 2,
+                    minAmount: 100000,
+                    maxAmount: 99999999,
+                    feeRate: 0.04
+                  }
+                ]
               }
             ]
           },
           {
             wayCode: 'WX_LITE',
-            feeType: 'SINGLE',
             state: 1,
-            applymentSupport: 1,
+            feeType: 'SINGLE',
+            applymentSupport: 0,
             feeRate: 0.06
+          },
+          {
+            wayCode: 'WX_JSAPI',
+            state: 1,
+            feeType: 'LEVEL',
+            levelMode: 'NORMAL',
+            applymentSupport: 0,
+            NORMAL: [
+              {
+                maxFee: 2000,
+                minFee: 0,
+                levelList: [
+                  {
+                    id: 1,
+                    minAmount: 0,
+                    maxAmount: 100000,
+                    feeRate: 0.04
+                  },
+                  {
+                    id: 2,
+                    minAmount: 100000,
+                    maxAmount: 99999999,
+                    feeRate: 0.05
+                  }
+                ]
+              }
+            ]
           }
         ],
         MCHAPPLYDEF: [
           {
             wayCode: 'WX_BAR',
+            state: 1,
             feeType: 'LEVEL',
             levelMode: 'UNIONPAY',
-            state: 1,
-            applymentSupport: 1,
-            levelList: [
+            applymentSupport: 0,
+            UNIONPAY: [
               {
-                bankCardType: 'DEBIT',
-                minAmount: 0,
-                maxAmount: 100000,
-                minFee: 0,
-                maxFee: 2000,
-                feeRate: 0.01
-              },
-              {
-                bankCardType: 'DEBIT',
-                minAmount: 100000,
-                maxAmount: 99999999,
-                minFee: 0,
-                maxFee: 2000,
-                feeRate: 0.02
-              },
-              {
-                bankCardType: 'CREDIT',
-                minAmount: 100000,
-                maxAmount: 99999999,
                 minFee: 0,
                 maxFee: 2500,
-                feeRate: 0.03
+                bankCardType: 'DEBIT',
+                levelList: [
+                  {
+                    id: 1,
+                    minAmount: 0,
+                    maxAmount: 100000,
+                    feeRate: 0.03
+                  },
+                  {
+                    id: 2,
+                    minAmount: 100000,
+                    maxAmount: 99999999,
+                    feeRate: 0.04
+                  }
+                ]
               },
               {
-                bankCardType: 'CREDIT',
-                minAmount: 100000,
-                maxAmount: 99999999,
                 minFee: 0,
                 maxFee: 2500,
-                feeRate: 0.04
-              }
-            ]
-          },
-          {
-            wayCode: 'WX_JSAPI',
-            feeType: 'LEVEL',
-            levelMode: 'NORMAL',
-            state: 1,
-            applymentSupport: 1,
-            levelList: [
-              {
-                minAmount: 0,
-                maxAmount: 100000,
-                minFee: 0,
-                maxFee: 2100,
-                feeRate: 0.04
-              },
-              {
-                minAmount: 100000,
-                maxAmount: 99999999,
-                minFee: 0,
-                maxFee: 2100,
-                feeRate: 0.05
+                bankCardType: 'CREDIT',
+                levelList: [
+                  {
+                    id: 1,
+                    minAmount: 0,
+                    maxAmount: 100000,
+                    feeRate: 0.03
+                  },
+                  {
+                    id: 2,
+                    minAmount: 100000,
+                    maxAmount: 99999999,
+                    feeRate: 0.04
+                  }
+                ]
               }
             ]
           },
           {
             wayCode: 'WX_LITE',
-            feeType: 'SINGLE',
             state: 1,
-            applymentSupport: 1,
+            feeType: 'SINGLE',
+            applymentSupport: 0,
             feeRate: 0.06
+          },
+          {
+            wayCode: 'WX_JSAPI',
+            state: 1,
+            feeType: 'LEVEL',
+            levelMode: 'NORMAL',
+            applymentSupport: 0,
+            NORMAL: [
+              {
+                maxFee: 2000,
+                minFee: 0,
+                levelList: [
+                  {
+                    id: 1,
+                    minAmount: 0,
+                    maxAmount: 100000,
+                    feeRate: 0.04
+                  },
+                  {
+                    id: 2,
+                    minAmount: 100000,
+                    maxAmount: 99999999,
+                    feeRate: 0.05
+                  }
+                ]
+              }
+            ]
           }
         ]
       } // 保存的对象
     }
   },
   methods: {
+    onChangeState (wayCode, checked) {
+      const that = this
+      that.configTypes.map(configType => {
+        console.log(configType, checked)
+        if (checked && !that.saveObject[configType].find(f => f.wayCode === wayCode)) {
+          that.saveObject[configType].push({
+            wayCode: wayCode,
+            state: 1,
+            feeType: 'SINGLE'
+          })
+        } else {
+          that.saveObject[configType].find(f => f.wayCode === wayCode).state = checked ? 1 : 0
+        }
+      })
+      this.$forceUpdate()
+    },
+    onChangeApplymentSupport (wayCode, checked) {
+      const that = this
+      that.configTypes.map(configType => {
+        console.log(configType, checked)
+        that.saveObject[configType].find(f => f.wayCode === wayCode).applymentSupport = checked ? 1 : 0
+      })
+      this.$forceUpdate()
+    },
+    onChangeFeeType (wayCode, checked) {
+      const that = this
+      that.configTypes.map(configType => {
+        console.log(configType, checked)
+        if (checked) {
+          that.saveObject[configType].find(f => f.wayCode === wayCode).feeType = 'LEVEL'
+          that.saveObject[configType].find(f => f.wayCode === wayCode).levelMode = 'NORMAL'
+          if (!that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL']) {
+            that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'] = [{
+              minFee: 0,
+              maxFee: 99999,
+              bankCardType: 'DEBIT',
+              levelList: [
+                {
+                  id: 1,
+                  minAmount: 0,
+                  maxAmount: 1000,
+                  feeRate: null
+                },
+                {
+                  id: 2,
+                  minAmount: 1000,
+                  maxAmount: 999999.99,
+                  feeRate: null
+                }
+              ]
+            }]
+          }
+        } else {
+          that.saveObject[configType].find(f => f.wayCode === wayCode).feeType = 'SINGLE'
+          that.$delete(that.saveObject[configType].find(f => f.wayCode === wayCode), 'levelMode')
+        }
+      })
+      this.$forceUpdate()
+    },
+    onChangeLevelMode (wayCode, checked) {
+      const that = this
+      that.configTypes.map(configType => {
+        console.log(configType, checked)
+        that.saveObject[configType].find(f => f.wayCode === wayCode).levelMode = checked ? 'UNIONPAY' : 'NORMAL'
+        if (!that.saveObject[configType].find(f => f.wayCode === wayCode)['UNIONPAY']) {
+          that.saveObject[configType].find(f => f.wayCode === wayCode)['UNIONPAY'] = [
+            {
+              minFee: 0,
+              maxFee: 99999,
+              bankCardType: 'DEBIT',
+              levelList: [
+                {
+                  id: 1,
+                  minAmount: 0,
+                  maxAmount: 1000,
+                  feeRate: null
+                },
+                {
+                  id: 2,
+                  minAmount: 1000,
+                  maxAmount: 999999.99,
+                  feeRate: null
+                }
+              ]
+            },
+            {
+              minFee: 0,
+              maxFee: 99999,
+              bankCardType: 'CREDIT',
+              levelList: [
+                {
+                  id: 1,
+                  minAmount: 0,
+                  maxAmount: 1000,
+                  feeRate: null
+                },
+                {
+                  id: 2,
+                  minAmount: 1000,
+                  maxAmount: 999999.99,
+                  feeRate: null
+                }
+              ]
+            }
+          ]
+        }
+      })
+      this.$forceUpdate()
+    },
     addLevelFee () {
       this.saveObject[''].levelList.push({
         id: new Date().getTime(),
@@ -364,9 +559,14 @@ export default {
       this.$infoBox.confirmPrimary({
         title: '确定要删除该阶梯费率吗？',
         onOk: () => {
-          this.merchantFeeForm.levelList = this.merchantFeeForm.levelList.filter(item => item.id !== id)
+          console.log('ss')
+          // this.merchantFeeForm.levelList = this.merchantFeeForm.levelList.filter(item => item.id !== id)
         }
       })
+    },
+    // 表单提交
+    onSubmit () {
+      console.log(this.saveObject)
     }
   }
 }
@@ -606,6 +806,11 @@ export default {
     background: #fff;
     border-radius: 10px;
     padding: 30px 30px 0
+  }
+
+  .drawer-btn-center {
+    position: fixed;
+    width: 80%;
   }
 
   .drawer-btn-center-payfee {
