@@ -238,13 +238,13 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style scoped>
+  >>> .ant-divider-inner-text {
+    color: rgb(26, 102, 255);
+  }
   .typePopover {
     position: absolute;
     top: 0;
     left: 105px;
-  }
-  .ant-divider-inner-text {
-    color: rgb(26, 102, 255);
   }
 </style>
