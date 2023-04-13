@@ -41,104 +41,136 @@
         </div>
         <div class="rate-card-content" v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').state===1">
           <div v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeType==='LEVEL'">
-            <a-divider orientation="left" v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode==='UNIONPAY'">
-              {{ saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
-                [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode]
-                .find(f => f.bankCardType==='DEBIT').levelList[0].bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
-            </a-divider>
-            <div class="weChat-pay-list">
-              <div class="w-pay-item" v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeType==='LEVEL'">
-                <div class="w-pay-title">价格区间：</div>
-                <div v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode==='UNIONPAY'">
-                  <div style="height: 32px; line-height: 32px;">
-                    金额 <= {{ saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')[saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].maxAmount }}元：
+            <div v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode==='UNIONPAY'">
+              <a-divider orientation="left">
+                {{ saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')["UNIONPAY"][0].bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
+              </a-divider>
+              <div class="weChat-pay-list">
+                <div class="w-pay-item" v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeType==='LEVEL'">
+                  <div class="w-pay-title">价格区间：</div>
+                  <div v-if="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode==='UNIONPAY'">
+                    <div style="height: 32px; line-height: 32px;">
+                      金额 <= {{ saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')[saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].maxAmount }}元：
+                    </div>
+                  </div>
+                  <div v-else>
+                    <a-input
+                      style="width: 50%;min-width: 100px;"
+                      type="number"
+                      addon-after="~"
+                      v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
+                        [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].minAmount" />
+                    <a-input
+                      style="width: 50%;min-width: 100px;"
+                      type="number"
+                      addon-after="元"
+                      v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
+                        [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].maxAmount"/>
                   </div>
                 </div>
-                <div v-else>
+                <div class="w-pay-item">
+                  <div class="w-pay-title">服务商底价费率：</div>
                   <a-input
-                    style="width: 50%;min-width: 100px;"
                     type="number"
-                    addon-after="~"
+                    addon-after="%"
                     v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
-                      [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].minAmount" />
-                  <a-input
-                    style="width: 50%;min-width: 100px;"
-                    type="number"
-                    addon-after="元"
-                    v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
-                      [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].maxAmount"/>
+                      [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].feeRate"/>
                 </div>
-              </div>
-              <div class="w-pay-item">
-                <div class="w-pay-title">服务商底价费率：</div>
-                <a-input
-                  type="number"
-                  addon-after="%"
-                  v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')
-                    [saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].feeRate"/>
-              </div>
-              <div class="w-pay-item">
-                <div class="w-pay-title">代理商默认费率：</div>
-                <a-input
-                  type="number"
-                  addon-after="%"
-                  v-model="saveObject['AGENTDEF'].find(f => f.wayCode === 'WX_BAR')
-                    [saveObject['AGENTDEF'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].feeRate"/>
-              </div>
-              <div class="w-pay-item">
-                <div class="w-pay-title">商户进件默认费率：</div>
-                <a-input
-                  type="number"
-                  addon-after="%"
-                  v-model="saveObject['MCHAPPLYDEF'].find(f => f.wayCode === 'WX_BAR')
-                    [saveObject['MCHAPPLYDEF'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].feeRate"/>
-              </div>
-              <div class="w-pay-item">
-                <div class="w-pay-title" style="height: 21px;"><span></span></div>
-                <a-button type="link" danger>删除</a-button>
+                <div class="w-pay-item">
+                  <div class="w-pay-title">代理商默认费率：</div>
+                  <a-input
+                    type="number"
+                    addon-after="%"
+                    v-model="saveObject['AGENTDEF'].find(f => f.wayCode === 'WX_BAR')
+                      [saveObject['AGENTDEF'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].feeRate"/>
+                </div>
+                <div class="w-pay-item">
+                  <div class="w-pay-title">商户进件默认费率：</div>
+                  <a-input
+                    type="number"
+                    addon-after="%"
+                    v-model="saveObject['MCHAPPLYDEF'].find(f => f.wayCode === 'WX_BAR')
+                      [saveObject['MCHAPPLYDEF'].find(f => f.wayCode === 'WX_BAR').levelMode].find(f => f.bankCardType==='DEBIT').levelList[0].feeRate"/>
+                </div>
               </div>
             </div>
-            <div style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
-              <a-button type="dashed">新增阶梯</a-button>
+            <div v-else>
+              <div class="weChat-pay-list" v-for="(itemlevel, keylevel) in saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR')['NORMAL'][0].levelList" :key="keylevel" :style="{ marginTop: keylevel > 0 ? '15px': 0 }">
+                <div class="w-pay-item">
+                  <div class="w-pay-title" v-if="keylevel===0">价格区间：</div>
+                  <div>
+                    <a-input
+                      style="width: 50%;min-width: 100px;"
+                      type="number"
+                      addon-after="~"
+                      @change="inputChangeAmount('WX_BAR', 'min', itemlevel.id, $event)"
+                      v-model="itemlevel.minAmount" />
+                    <a-input
+                      style="width: 50%;min-width: 100px;"
+                      type="number"
+                      addon-after="元"
+                      @change="inputChangeAmount('WX_BAR', 'max', itemlevel.id, $event)"
+                      v-model="itemlevel.maxAmount"/>
+                  </div>
+                </div>
+                <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
+                  <div class="w-pay-title" v-if="keylevel===0">{{ getPayTitle(item) }}费率：</div>
+                  <a-input
+                    type="number"
+                    addon-after="%"
+                    @change="inputChange"
+                    v-model="saveObject[item].find(f => f.wayCode === 'WX_BAR')['NORMAL'][0].levelList[keylevel].feeRate"/>
+                </div>
+                <div class="w-pay-item">
+                  <div class="w-pay-title" v-if="keylevel===0" style="height: 21px;"><span></span></div>
+                  <a-button
+                    type="link"
+                    danger
+                    @click="deleteLevelFee('WX_BAR', itemlevel.id)">删除</a-button>
+                </div>
+              </div>
+              <div style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
+                <a-button type="dashed" @click="addLevelFee('WX_BAR')">新增阶梯</a-button>
+              </div>
+              <a-collapse>
+                <a-collapse-panel header="高级配置">
+                  <div class="weChat-pay-list">
+                    <div class="w-pay-item">
+                      <div class="w-pay-title">价格类型：</div>
+                      <div style="height: 30px; line-height: 30px;">保底费用：</div>
+                    </div>
+                    <div class="w-pay-item">
+                      <div class="w-pay-title">服务商底价费用:</div>
+                      <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                    </div>
+                    <div class="w-pay-item">
+                      <div class="w-pay-title">代理商默认费用：</div>
+                      <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                    </div>
+                    <div class="w-pay-item">
+                      <div class="w-pay-title">商户进件默认费用：</div>
+                      <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                    </div>
+                  </div>
+                  <div class="weChat-pay-list" style="margin-top: 15px;">
+                    <div class="w-pay-item">
+                      <div style="height: 30px; line-height: 30px;">封顶费用：</div>
+                    </div>
+                    <div class="w-pay-item">
+                      <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                    </div>
+                    <div class="w-pay-item">
+                      <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                    </div>
+                    <div class="w-pay-item">
+                      <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
+                    </div>
+                  </div>
+                </a-collapse-panel>
+              </a-collapse>
             </div>
-            <a-collapse>
-              <a-collapse-panel header="高级配置">
-                <div class="weChat-pay-list">
-                  <div class="w-pay-item">
-                    <div class="w-pay-title">价格类型：</div>
-                    <div style="height: 30px; line-height: 30px;">保底费用：</div>
-                  </div>
-                  <div class="w-pay-item">
-                    <div class="w-pay-title">服务商底价费用:</div>
-                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                  </div>
-                  <div class="w-pay-item">
-                    <div class="w-pay-title">代理商默认费用：</div>
-                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                  </div>
-                  <div class="w-pay-item">
-                    <div class="w-pay-title">商户进件默认费用：</div>
-                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                  </div>
-                </div>
-                <div class="weChat-pay-list" style="margin-top: 15px;">
-                  <div class="w-pay-item">
-                    <div style="height: 30px; line-height: 30px;">封顶费用：</div>
-                  </div>
-                  <div class="w-pay-item">
-                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                  </div>
-                  <div class="w-pay-item">
-                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                  </div>
-                  <div class="w-pay-item">
-                    <a-input v-model="saveObject.noCheckRuleFlag" addon-before="保底：" addon-after="元"/>
-                  </div>
-                </div>
-              </a-collapse-panel>
-            </a-collapse>
           </div>
-          <div class="weChat-pay-list" v-else>
+          <div v-else class="weChat-pay-list">
             <div class="w-pay-item">
               <div class="w-pay-title">服务商底价费率：</div>
               <a-input v-model="saveObject['ISVCOST'].find(f => f.wayCode === 'WX_BAR').feeRate" type="number" addon-after="%"/>
@@ -473,16 +505,15 @@ export default {
             that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'] = [{
               minFee: 0,
               maxFee: 99999,
-              bankCardType: 'DEBIT',
               levelList: [
                 {
-                  id: 1,
+                  id: new Date().getTime(),
                   minAmount: 0,
                   maxAmount: 1000,
                   feeRate: null
                 },
                 {
-                  id: 2,
+                  id: new Date().getTime(),
                   minAmount: 1000,
                   maxAmount: 999999.99,
                   feeRate: null
@@ -510,13 +541,13 @@ export default {
               bankCardType: 'DEBIT',
               levelList: [
                 {
-                  id: 1,
+                  id: new Date().getTime(),
                   minAmount: 0,
                   maxAmount: 1000,
                   feeRate: null
                 },
                 {
-                  id: 2,
+                  id: new Date().getTime(),
                   minAmount: 1000,
                   maxAmount: 999999.99,
                   feeRate: null
@@ -529,13 +560,13 @@ export default {
               bankCardType: 'CREDIT',
               levelList: [
                 {
-                  id: 1,
+                  id: new Date().getTime(),
                   minAmount: 0,
                   maxAmount: 1000,
                   feeRate: null
                 },
                 {
-                  id: 2,
+                  id: new Date().getTime(),
                   minAmount: 1000,
                   maxAmount: 999999.99,
                   feeRate: null
@@ -544,25 +575,69 @@ export default {
             }
           ]
         }
+        if (!that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL']) {
+          that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'] = [{
+            minFee: 0,
+            maxFee: 99999,
+            levelList: [
+              {
+                id: new Date().getTime(),
+                minAmount: 0,
+                maxAmount: 1000,
+                feeRate: null
+              },
+              {
+                id: new Date().getTime(),
+                minAmount: 1000,
+                maxAmount: 999999.99,
+                feeRate: null
+              }
+            ]
+          }]
+        }
       })
       this.$forceUpdate()
     },
-    addLevelFee () {
-      this.saveObject[''].levelList.push({
-        id: new Date().getTime(),
-        startAmount: null,
-        endAmount: null,
-        fee: null
-      })
+    getPayTitle (configType) {
+      switch (configType) {
+        case 'ISVCOST': return '服务商底价'
+        case 'AGENTDEF': return '代理商默认'
+        case 'MCHAPPLYDEF': return '商户进件默认'
+      }
     },
-    deleteLevelFee (id) {
-      this.$infoBox.confirmPrimary({
-        title: '确定要删除该阶梯费率吗？',
-        onOk: () => {
-          console.log('ss')
-          // this.merchantFeeForm.levelList = this.merchantFeeForm.levelList.filter(item => item.id !== id)
-        }
+    inputChangeAmount (wayCode, flag, id, event) {
+      const that = this
+      const amount = event.target.value
+      that.configTypes.map(configType => {
+        that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'][0].levelList.find(f => f.id === id)[flag + 'Amount'] = amount
       })
+      this.$forceUpdate()
+    },
+    inputChange () {
+      this.$forceUpdate()
+    },
+    addLevelFee (wayCode) {
+      const that = this
+      const id = new Date().getTime()
+      that.configTypes.map(configType => {
+        that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'][0].levelList.push({
+          id: id,
+          startAmount: null,
+          endAmount: null,
+          fee: null
+        })
+      })
+      this.$forceUpdate()
+    },
+    deleteLevelFee (wayCode, id) {
+      const that = this
+      that.$infoBox.confirmPrimary('确定要删除该阶梯费率吗？', '', () => {
+          that.configTypes.map(configType => {
+            that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'][0].levelList =
+                that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'][0].levelList.filter(item => item.id !== id)
+          })
+          this.$forceUpdate()
+        })
     },
     // 表单提交
     onSubmit () {
