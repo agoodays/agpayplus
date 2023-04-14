@@ -65,12 +65,14 @@
                     <div v-else>
                       <a-input
                         style="width: 50%;min-width: 100px;"
+                        :min="0"
                         type="number"
                         addon-after="~"
                         @change="inputChangeAmount(itempayway.wayCode, 'min', itemlevel.id, $event)"
                         v-model="itemlevel.minAmount" />
                       <a-input
                         style="width: 50%;min-width: 100px;"
+                        :min="0"
                         type="number"
                         addon-after="元"
                         @change="inputChangeAmount(itempayway.wayCode, 'max', itemlevel.id, $event)"
@@ -80,6 +82,8 @@
                   <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
                     <div class="w-pay-title" v-if="keylevel===0">{{ getPayTitle(item) }}费率：</div>
                     <a-input
+                      :min="0"
+                      :step="0.01"
                       type="number"
                       addon-after="%"
                       @change="inputChange"
@@ -90,6 +94,7 @@
                     <div class="w-pay-title" v-if="keylevel===0" style="height: 21px;"><span></span></div>
                     <a-button
                       type="link"
+                      icon="delete"
                       danger
                       @click="deleteLevelFee(itempayway.wayCode, itemlevel.id)">删除</a-button>
                   </div>
@@ -115,10 +120,12 @@
                         <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
                           <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
                           <a-input
+                            :min="0"
                             type="number"
                             addon-before="保底："
                             addon-after="元"
-                            v-model="saveObject[item].find(f => f.wayCode === itempayway.wayCode)[itempayway.levelMode][0].minFee"/>
+                            @change="inputChange"
+                            v-model="saveObject[item].find(f => f.wayCode === itempayway.wayCode)[itempayway.levelMode][keylevelmode].minFee"/>
                         </div>
                       </div>
                       <div class="weChat-pay-list" style="margin-top: 15px;">
@@ -127,10 +134,12 @@
                         </div>
                         <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
                           <a-input
+                            :min="0"
                             type="number"
                             addon-before="封顶："
                             addon-after="元"
-                            v-model="saveObject[item].find(f => f.wayCode === itempayway.wayCode)[itempayway.levelMode][0].maxFee"/>
+                            @change="inputChange"
+                            v-model="saveObject[item].find(f => f.wayCode === itempayway.wayCode)[itempayway.levelMode][keylevelmode].maxFee"/>
                         </div>
                       </div>
                     </div>
