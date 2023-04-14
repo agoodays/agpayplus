@@ -1,7 +1,7 @@
 <template>
   <div class="drawer">
     <div>
-      <div v-for="(itempayway, keypayway) in wayCodes" :key="keypayway">
+      <div v-for="(itempayway, keypayway) in saveObject['ISVCOST']" :key="keypayway">
         <div class="rate-header" v-if="keypayway===0">
           <div class="rate-title">微信线下产品费率</div>
           <div class="rate-header-right">
@@ -10,130 +10,70 @@
         </div>
         <div class="rate-card-wrapper">
           <div class="card-header">
-            <div class="h-left">微信 ({{ itempayway }})</div>
+            <div class="h-left">微信 ({{ itempayway.wayCode }})</div>
             <div class="h-right h-right2" style="display: flex;">
               <div class="h-right2-div">
                 是否开通：
                 <a-switch
-                  @change="onChangeState(itempayway, $event)"
-                  :checked="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).state===1" />
+                  @change="onChangeState(itempayway.wayCode, $event)"
+                  :checked="itempayway.state===1" />
               </div>
-              <div class="h-right2-div" v-if="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).state===1">
+              <div class="h-right2-div" v-if="itempayway.state===1">
                 是否可进件：
                 <a-switch
-                  @change="onChangeApplymentSupport(itempayway, $event)"
-                  :checked="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).applymentSupport===1" />
+                  @change="onChangeApplymentSupport(itempayway.wayCode, $event)"
+                  :checked="itempayway.applymentSupport===1" />
               </div>
-              <div class="h-right2-div" v-if="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).state===1">
+              <div class="h-right2-div" v-if="itempayway.state===1">
                 阶梯费率：
                 <a-switch
-                  @change="onChangeFeeType(itempayway, $event)"
-                  :checked="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).feeType==='LEVEL'" />
+                  @change="onChangeFeeType(itempayway.wayCode, $event)"
+                  :checked="itempayway.feeType==='LEVEL'" />
               </div>
-              <div class="h-right2-div" v-if="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).state===1">
+              <div class="h-right2-div" v-if="itempayway.state===1">
                 银联模式：
                 <a-switch
-                  @change="onChangeLevelMode(itempayway, $event)"
-                  :disabled="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).feeType!='LEVEL'"
-                  :checked="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).feeType==='LEVEL'
-                    && saveObject['ISVCOST'].find(f => f.wayCode === itempayway).levelMode==='UNIONPAY'" />
+                  @change="onChangeLevelMode(itempayway.wayCode, $event)"
+                  :disabled="itempayway.feeType!='LEVEL'"
+                  :checked="itempayway.feeType==='LEVEL'
+                    && itempayway.levelMode==='UNIONPAY'" />
               </div>
             </div>
           </div>
-          <div class="rate-card-content" v-if="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).state===1">
-            <div v-if="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).feeType==='LEVEL'">
-              <div v-if="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).levelMode==='UNIONPAY'">
-                <div
-                  v-for="(itemlevelmode, keylevelmode) in saveObject['ISVCOST'].find(f => f.wayCode === itempayway)['UNIONPAY']"
-                  :key="keylevelmode">
-                  <a-divider orientation="left">
-                    {{ itemlevelmode.bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
-                  </a-divider>
-                  <div
-                    :style="{ marginTop: keylevel > 0 ? '15px': 0 }"
-                    class="weChat-pay-list"
-                    v-for="(itemlevel, keylevel) in itemlevelmode.levelList"
-                    :key="keylevel">
-                    <div
-                      class="w-pay-item"
-                      style="width: 138px;"
-                      v-if="saveObject['ISVCOST'].find(f => f.wayCode === itempayway).feeType==='LEVEL'">
-                      <div class="w-pay-title" v-if="keylevel===0">价格区间：</div>
-                      <div style="height: 32px; line-height: 32px;">
-                        金额 {{ itemlevel.minAmount > 0 ? `> ${itemlevel.minAmount}` : `<= ${itemlevel.maxAmount}` }} 元：
-                      </div>
-                    </div>
-                    <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
-                      <div class="w-pay-title" v-if="keylevel===0">{{ getPayTitle(item) }}费率：</div>
-                      <a-input
-                        type="number"
-                        addon-after="%"
-                        @change="inputChange"
-                        v-model="saveObject[item].find(f => f.wayCode === itempayway)['UNIONPAY']
-                          .find(f => f.bankCardType===itemlevelmode.bankCardType).levelList[keylevel].feeRate"/>
-                    </div>
-                  </div>
-                </div>
-                <div style="margin-top: 15px;">
-                  <a-collapse>
-                    <a-collapse-panel header="高级配置">
-                      <div
-                        v-for="(itemlevelmode, keylevelmode) in saveObject['ISVCOST'].find(f => f.wayCode === itempayway)['UNIONPAY']"
-                        :key="keylevelmode">
-                        <a-divider orientation="left">
-                          {{ itemlevelmode.bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
-                        </a-divider>
-                        <div class="weChat-pay-list">
-                          <div class="w-pay-item">
-                            <div class="w-pay-title">价格类型：</div>
-                            <div style="height: 30px; line-height: 30px;">保底费用：</div>
-                          </div>
-                          <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
-                            <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
-                            <a-input
-                              type="number"
-                              addon-before="保底："
-                              addon-after="元"
-                              v-model="saveObject[item].find(f => f.wayCode === itempayway)['UNIONPAY'][0].minFee"/>
-                          </div>
-                        </div>
-                        <div class="weChat-pay-list" style="margin-top: 15px;">
-                          <div class="w-pay-item">
-                            <div style="height: 30px; line-height: 30px;">封顶费用：</div>
-                          </div>
-                          <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
-                            <a-input
-                              type="number"
-                              addon-before="封顶："
-                              addon-after="元"
-                              v-model="saveObject[item].find(f => f.wayCode === itempayway)['UNIONPAY'][0].maxFee"/>
-                          </div>
-                        </div>
-                      </div>
-                    </a-collapse-panel>
-                  </a-collapse>
-                </div>
-              </div>
-              <div v-else>
+          <div class="rate-card-content" v-if="itempayway.state===1">
+            <div v-if="itempayway.feeType==='LEVEL'">
+              <div
+                v-for="(itemlevelmode, keylevelmode) in itempayway[itempayway.levelMode]"
+                :key="keylevelmode">
+                <a-divider orientation="left" v-if="itempayway.levelMode==='UNIONPAY'">
+                  {{ itemlevelmode.bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
+                </a-divider>
                 <div
                   :style="{ marginTop: keylevel > 0 ? '15px': 0 }"
                   class="weChat-pay-list"
-                  v-for="(itemlevel, keylevel) in saveObject['ISVCOST'].find(f => f.wayCode === itempayway)['NORMAL'][0].levelList"
+                  v-for="(itemlevel, keylevel) in itemlevelmode.levelList"
                   :key="keylevel">
-                  <div class="w-pay-item">
+                  <div
+                    class="w-pay-item"
+                    style="min-width: 138px;">
                     <div class="w-pay-title" v-if="keylevel===0">价格区间：</div>
-                    <div>
+                    <div
+                      v-if="itempayway.levelMode==='UNIONPAY'"
+                      style="height: 32px; line-height: 32px;">
+                      金额 {{ itemlevel.minAmount > 0 ? `> ${itemlevel.minAmount}` : `<= ${itemlevel.maxAmount}` }} 元：
+                    </div>
+                    <div v-else>
                       <a-input
                         style="width: 50%;min-width: 100px;"
                         type="number"
                         addon-after="~"
-                        @change="inputChangeAmount(itempayway, 'min', itemlevel.id, $event)"
+                        @change="inputChangeAmount(itempayway.wayCode, 'min', itemlevel.id, $event)"
                         v-model="itemlevel.minAmount" />
                       <a-input
                         style="width: 50%;min-width: 100px;"
                         type="number"
                         addon-after="元"
-                        @change="inputChangeAmount(itempayway, 'max', itemlevel.id, $event)"
+                        @change="inputChangeAmount(itempayway.wayCode, 'max', itemlevel.id, $event)"
                         v-model="itemlevel.maxAmount"/>
                     </div>
                   </div>
@@ -143,37 +83,55 @@
                       type="number"
                       addon-after="%"
                       @change="inputChange"
-                      v-model="saveObject[item].find(f => f.wayCode === itempayway)['NORMAL'][0].levelList[keylevel].feeRate"/>
+                      v-model="saveObject[item].find(f => f.wayCode === itempayway.wayCode)[itempayway.levelMode]
+                        .find(f => f.bankCardType===itemlevelmode.bankCardType).levelList[keylevel].feeRate"/>
                   </div>
-                  <div class="w-pay-item">
+                  <div v-if="itempayway.levelMode==='NORMAL'" class="w-pay-item">
                     <div class="w-pay-title" v-if="keylevel===0" style="height: 21px;"><span></span></div>
                     <a-button
                       type="link"
                       danger
-                      @click="deleteLevelFee(itempayway, itemlevel.id)">删除</a-button>
+                      @click="deleteLevelFee(itempayway.wayCode, itemlevel.id)">删除</a-button>
                   </div>
                 </div>
-                <div style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
-                  <a-button type="dashed" @click="addLevelFee(itempayway)">新增阶梯</a-button>
+                <div v-if="itempayway.levelMode==='NORMAL'" style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
+                  <a-button type="dashed" @click="addLevelFee(itempayway.wayCode)">新增阶梯</a-button>
                 </div>
+              </div>
+              <div :style="{ marginTop: itempayway.levelMode==='UNIONPAY' ? '15px' : 0 }">
                 <a-collapse>
                   <a-collapse-panel header="高级配置">
-                    <div class="weChat-pay-list">
-                      <div class="w-pay-item">
-                        <div class="w-pay-title">价格类型：</div>
-                        <div style="height: 30px; line-height: 30px;">保底费用：</div>
+                    <div
+                      v-for="(itemlevelmode, keylevelmode) in itempayway[itempayway.levelMode]"
+                      :key="keylevelmode">
+                      <a-divider orientation="left" v-if="itempayway.levelMode==='UNIONPAY'">
+                        {{ itemlevelmode.bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
+                      </a-divider>
+                      <div class="weChat-pay-list">
+                        <div class="w-pay-item">
+                          <div class="w-pay-title">价格类型：</div>
+                          <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
+                        </div>
+                        <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
+                          <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
+                          <a-input
+                            type="number"
+                            addon-before="保底："
+                            addon-after="元"
+                            v-model="saveObject[item].find(f => f.wayCode === itempayway.wayCode)[itempayway.levelMode][0].minFee"/>
+                        </div>
                       </div>
-                      <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
-                        <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
-                        <a-input v-model="saveObject[item].find(f => f.wayCode === itempayway)['NORMAL'][0].minFee" addon-before="保底：" addon-after="元"/>
-                      </div>
-                    </div>
-                    <div class="weChat-pay-list" style="margin-top: 15px;">
-                      <div class="w-pay-item">
-                        <div style="height: 30px; line-height: 30px;">封顶费用：</div>
-                      </div>
-                      <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
-                        <a-input v-model="saveObject[item].find(f => f.wayCode === itempayway)['NORMAL'][0].maxFee" addon-before="保底：" addon-after="元"/>
+                      <div class="weChat-pay-list" style="margin-top: 15px;">
+                        <div class="w-pay-item">
+                          <div style="height: 30px; line-height: 30px;min-width: 75px;">封顶费用：</div>
+                        </div>
+                        <div class="w-pay-item" v-for="(item, key) in configTypes" :key="key">
+                          <a-input
+                            type="number"
+                            addon-before="封顶："
+                            addon-after="元"
+                            v-model="saveObject[item].find(f => f.wayCode === itempayway.wayCode)[itempayway.levelMode][0].maxFee"/>
+                        </div>
                       </div>
                     </div>
                   </a-collapse-panel>
@@ -187,7 +145,7 @@
                   type="number"
                   addon-after="%"
                   @change="inputChange"
-                  v-model="saveObject[item].find(f => f.wayCode === itempayway).feeRate"/>
+                  v-model="saveObject[item].find(f => f.wayCode === itempayway.wayCode).feeRate"/>
               </div>
             </div>
           </div>
@@ -195,7 +153,7 @@
       </div>
       <a-collapse>
         <a-collapse-panel header="【保存】高级配置项">
-          <a-checkbox v-model="saveObject.noCheckRuleFlag">不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox>
+          <a-checkbox :checked="saveObject.noCheckRuleFlag===1"@change="onChangeCheckRuleFla">不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox>
         </a-collapse-panel>
       </a-collapse>
       <div class="drawer-btn-center">
@@ -614,6 +572,9 @@ export default {
         }
       })
       this.$forceUpdate()
+    },
+    onChangeCheckRuleFla (event) {
+      this.saveObject.noCheckRuleFlag = event.target.checked ? 1 : 0
     },
     getPayTitle (configType) {
       switch (configType) {
