@@ -92,11 +92,14 @@
                   </div>
                   <div v-if="itempayway.levelMode==='NORMAL'" class="w-pay-item">
                     <div class="w-pay-title" v-if="keylevel===0" style="height: 21px;"><span></span></div>
-                    <a-button
-                      type="link"
-                      icon="delete"
-                      danger
-                      @click="deleteLevelFee(itempayway.wayCode, itemlevel.id)">删除</a-button>
+                    <a-popconfirm
+                      title="确定要删除该阶梯费率吗？"
+                      ok-text="确定"
+                      cancel-text="取消"
+                      @confirm="deleteLevelFee(itempayway.wayCode, itemlevel.id)"
+                    >
+                      <a-button type="link" icon="delete" danger>删除</a-button>
+                    </a-popconfirm>
                   </div>
                 </div>
                 <div v-if="itempayway.levelMode==='NORMAL'" style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
@@ -188,6 +191,78 @@ export default {
       configTypes: ['ISVCOST', 'AGENTDEF', 'MCHAPPLYDEF'],
       wayCodes: ['WX_BAR', 'WX_LITE', 'WX_JSAPI'],
       bankCardTypes: ['DEBIT', 'CREDIT'],
+      mergeFeeList: [
+        {
+          key: 'WECHAT1',
+          name: '微信线下',
+          mainFee: {},
+          agentdefFee: {},
+          mchapplydefFee: {},
+          isMergeMode: !1,
+          selectedWayCodeList: [],
+          filter: f => f.wayType === 'WECHAT' && ['WX_BAR', 'WX_JSAPI', 'WX_LITE'].indexOf(f.wayCode) >= 0
+        },
+        {
+          key: 'WECHAT2',
+          name: '微信线上',
+          mainFee: {},
+          agentdefFee: {},
+          mchapplydefFee: {},
+          isMergeMode: !1,
+          selectedWayCodeList: [],
+          filter: f => f.wayType === 'WECHAT' && ['WX_BAR', 'WX_JSAPI', 'WX_LITE'].indexOf(f.wayCode) < 0
+        },
+        {
+          key: 'ALIPAY1',
+          name: '支付宝线下',
+          mainFee: {},
+          agentdefFee: {},
+          mchapplydefFee: {},
+          isMergeMode: !1,
+          selectedWayCodeList: [],
+          filter: f => f.wayType === 'ALIPAY' && ['ALI_BAR', 'ALI_JSAPI', 'ALI_LITE', 'ALI_QR'].indexOf(f.wayCode) >= 0
+        },
+        {
+          key: 'ALIPAY2',
+          name: '支付宝线上',
+          mainFee: {},
+          agentdefFee: {},
+          mchapplydefFee: {},
+          isMergeMode: !1,
+          selectedWayCodeList: [],
+          filter: f => f.wayType === 'ALIPAY' && ['ALI_BAR', 'ALI_JSAPI', 'ALI_LITE', 'ALI_QR'].indexOf(f.wayCode) < 0
+        },
+        {
+          key: 'YSFPAY',
+          name: '云闪付',
+          mainFee: {},
+          agentdefFee: {},
+          mchapplydefFee: {},
+          isMergeMode: !1,
+          selectedWayCodeList: [],
+          filter: f => f.wayType === 'YSFPAY'
+        },
+        {
+          key: 'UNIONPAY',
+          name: '银联',
+          mainFee: {},
+          agentdefFee: {},
+          mchapplydefFee: {},
+          isMergeMode: !1,
+          selectedWayCodeList: [],
+          filter: f => f.wayType === 'UNIONPAY'
+        },
+        {
+          key: 'OTHER',
+          name: '其他',
+          mainFee: {},
+          agentdefFee: {},
+          mchapplydefFee: {},
+          isMergeMode: !1,
+          selectedWayCodeList: [],
+          filter: f => f.wayType === 'OTHER'
+        }
+      ],
       saveObject: {
         infoId: this.infoId,
         ifCode: this.ifCode,
@@ -445,7 +520,22 @@ export default {
       } // 保存的对象
     }
   },
+  mounted () {
+    this.getRateConfig()
+  },
   methods: {
+    initRateConfig (wayCode) {
+      const k = {
+        wayCode: wayCode,
+        state: 0,
+        applymentSupport: 0,
+        feeType: 'SINGLE'
+      }
+      return JSON.parse(JSON.stringify(k))
+    },
+    getRateConfig () {
+      console.log('')
+    },
     onChangeState (wayCode, checked) {
       const that = this
       that.configTypes.map(configType => {
@@ -619,13 +709,12 @@ export default {
     deleteLevelFee (wayCode, id) {
       const that = this
       console.log(wayCode, id)
-      that.$infoBox.confirmPrimary('确定要删除该阶梯费率吗？', '', () => {
-          that.configTypes.map(configType => {
-            that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'][0].levelList =
-                that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'][0].levelList.filter(item => item.id !== id)
-          })
-          this.$forceUpdate()
-        })
+      // that.$infoBox.confirmPrimary('确定要删除该阶梯费率吗？', '', () => {})
+      that.configTypes.map(configType => {
+        that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'][0].levelList =
+            that.saveObject[configType].find(f => f.wayCode === wayCode)['NORMAL'][0].levelList.filter(item => item.id !== id)
+      })
+      this.$forceUpdate()
     },
     // 表单提交
     onSubmit () {
