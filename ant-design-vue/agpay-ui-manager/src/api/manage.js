@@ -115,6 +115,7 @@ export const API_URL_IFDEFINES_LIST = '/api/payIfDefines'
 export const API_URL_PAYWAYS_LIST = '/api/payWays'
 /** 服务商、代理商、商户支付参数配置 **/
 export const API_URL_PAYCONFIGS_LIST = '/api/payConfig'
+export const API_URL_RATECONFIGS_LIST = '/api/rateConfig'
 export const API_URL_ISV_PAYCONFIGS_LIST = '/api/isv/payConfigs'
 export const API_URL_AGENT_PAYCONFIGS_LIST = '/api/agent/payConfigs'
 export const API_URL_MCH_PAYCONFIGS_LIST = '/api/mch/payConfigs'
