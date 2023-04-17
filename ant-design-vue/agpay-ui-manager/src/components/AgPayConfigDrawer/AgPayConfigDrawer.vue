@@ -63,21 +63,23 @@
               <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
             </div>
           </div>-->
-          <div v-if="paramsAndRateTabVal === 'rateTab'">
-            <AgPayPaywayRatePanel
-              :info-id="infoId"
-              :info-type="infoType"
-              :if-code="currentIfCode"
-              :config-mode="configMode"
-              :callbackFunc="refIfCodeList"/>
-<!--            <div>
+          <AgPayPaywayRatePanel
+            ref="rateConfigComponentRef"
+            :info-id="infoId"
+            :info-type="infoType"
+            :if-code="currentIfCode"
+            :config-mode="configMode"
+            :callbackFunc="refIfCodeList"
+            v-if="paramsAndRateTabVal === 'rateTab'"/>
+<!--          <div v-if="paramsAndRateTabVal === 'rateTab'">
+            <div>
               {{ currentIfCode }} —— 费率配置
             </div>
             <div class="drawer-btn-center" v-if="$access(permCode)">
               <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
               <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
-            </div>-->
-          </div>
+            </div>
+          </div>-->
           <div v-if="paramsAndRateTabVal === 'channelConfigTab'">
             <div>
               {{ currentIfCode }} —— 渠道配置
@@ -321,12 +323,12 @@ export default {
         that.ifCodeList = resData
       })
     },
-    getRateConfig (code) {
-      const that = this
-      req.get(API_URL_PAYCONFIGS_LIST + '/savedMapData', { configMode: that.$props.configMode, infoId: that.infoId, ifCode: that.currentIfCode }).then(resData => {
-        console.log(resData)
-      })
-    },
+    // getRateConfig (code) {
+    //   const that = this
+    //   req.get(API_URL_PAYCONFIGS_LIST + '/savedMapData', { configMode: that.$props.configMode, infoId: that.infoId, ifCode: that.currentIfCode }).then(resData => {
+    //     console.log(resData)
+    //   })
+    // },
     getConfigComponent (code) {
       switch (this.currentIfCode + code) {
         case 'alipay' + 'Isv':
@@ -365,6 +367,9 @@ export default {
             break
           case 'rateTab':
             // this.getRateConfig(code)
+            if (that.$refs.rateConfigComponentRef) {
+              that.$refs.rateConfigComponentRef.getRateConfig(that.currentIfCode)
+            }
             break
         }
       }

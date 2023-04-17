@@ -1,5 +1,6 @@
 <template>
   <div class="drawer">
+    <a-alert message="注意：代理商费率不得低于服务商费率，下及代理商费率不得低于上级代理商费率，商家费率不得低于所属代理商费率" type="info"/>
     <div>
       <div v-for="(mergeFeeItem, mergeFeeKey) in mergeFeeList" :key="mergeFeeKey" v-if="mergeFeeItem.selectedWayCodeList.length>0">
         <div class="rate-header">
@@ -166,6 +167,8 @@
                 <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                   <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
                   <a-input
+                    :min="0"
+                    :step="0.01"
                     type="number"
                     addon-after="%"
                     @change="inputChange"
@@ -326,6 +329,8 @@
               <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                 <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
                 <a-input
+                  :min="0"
+                  :step="0.01"
                   type="number"
                   addon-after="%"
                   @change="inputChange"
@@ -361,6 +366,7 @@ export default {
   data () {
     return {
       btnLoading: false,
+      currentIfCode: this.ifCode,
       configTypes: ['ISVCOST', 'AGENTDEF', 'MCHAPPLYDEF'],
       configTypeMaps: ['mainFee', 'agentdefFee', 'mchapplydefFee'],
       allPaywayList: [],
@@ -450,7 +456,7 @@ export default {
       ],
       saveObject: {
         infoId: this.infoId,
-        ifCode: this.ifCode,
+        ifCode: this.currentIfCode,
         configMode: this.configMode,
         noCheckRuleFlag: 0,
         ISVCOST: [
@@ -706,6 +712,7 @@ export default {
     }
   },
   mounted () {
+    console.log(this.currentIfCode)
     this.getRateConfig()
   },
   methods: {
@@ -788,7 +795,12 @@ export default {
         fee: null
       }
     },
-    async getRateConfig () {
+    async getRateConfig (currentIfCode) {
+      console.log(currentIfCode)
+      console.log(this.ifCode)
+      if (currentIfCode) {
+        this.currentIfCode = currentIfCode
+      }
       const that = this
       that.allPaywayList = []
       that.allPaywayMap = {}
@@ -804,7 +816,7 @@ export default {
       that.mergeFeeList.forEach(item => {
         item.selectedWayCodeList = []
       })
-      const params = Object.assign({}, { configMode: that.$props.configMode, infoId: that.infoId, ifCode: that.ifCode })
+      const params = Object.assign({}, { configMode: that.$props.configMode, infoId: that.infoId, ifCode: that.currentIfCode })
       await req.list(API_URL_RATECONFIGS_LIST + '/payways', params).then(res => {
         res.records.forEach(payWay => {
           payWay.checked = false
@@ -1109,7 +1121,8 @@ export default {
     },
     // 表单提交
     onSubmit () {
-      console.log(this)
+      const that = this
+      console.log(that)
     }
   }
 }
@@ -1348,7 +1361,7 @@ export default {
   .drawer,.drawer {
     background: #fff;
     border-radius: 10px;
-    padding: 30px 30px 0
+    padding: 0 30px
   }
 
   .drawer-btn-center {
