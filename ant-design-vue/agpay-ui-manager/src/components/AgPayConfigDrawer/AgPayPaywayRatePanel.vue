@@ -1,9 +1,9 @@
 <template>
   <div class="drawer">
     <div>
-      <div v-for="(mergeFeeItem, mergeFeeKey) in mergeFeeList" :key="mergeFeeKey">
+      <div v-for="(mergeFeeItem, mergeFeeKey) in mergeFeeList" :key="mergeFeeKey" v-if="mergeFeeItem.selectedWayCodeList.length>0">
         <div class="rate-header">
-          <div class="rate-title">{{ mergeFeeItem.name }}</div>
+          <div class="rate-title">{{ mergeFeeItem.name }}产品费率</div>
           <div class="rate-header-right">
             <a-checkbox
               v-if="mergeFeeItem.isMergeMode"
@@ -12,7 +12,9 @@
               v-model="payWayItem.checked"
               @change="onChangeWayCode(payWayItem.wayCode, $event, mergeFeeItem)"
             >{{ payWayItem.wayName }}</a-checkbox>
-            <a-button type="primary" @click="mergeFeeItem.isMergeMode = !mergeFeeItem.isMergeMode">{{ mergeFeeItem.isMergeMode ? '拆分配置' : '合并配置' }}</a-button>
+            <a-button type="primary" @click="mergeFeeItem.isMergeMode = !mergeFeeItem.isMergeMode">
+              {{ mergeFeeItem.isMergeMode ? '拆分配置' : '合并配置' }}
+            </a-button>
           </div>
         </div>
         <div v-if="!mergeFeeItem.isMergeMode">
@@ -54,7 +56,7 @@
                   v-for="(levelModeItem, levelModeKey) in rateConfig.mainFee[payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode]"
                   :key="levelModeKey">
                   <a-divider orientation="left" v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode==='UNIONPAY'">
-                    {{ levelModeItem.bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
+                    {{ levelModeItem.bankCardType==='DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                   </a-divider>
                   <div
                     :style="{ marginTop: levelKey > 0 ? '15px': 0 }"
@@ -123,7 +125,7 @@
                         v-for="(levelModeItem, levelModeKey) in rateConfig.mainFee[payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode]"
                         :key="levelModeKey">
                         <a-divider orientation="left" v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode==='UNIONPAY'">
-                          {{ levelModeItem.bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
+                          {{ levelModeItem.bankCardType==='DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                         </a-divider>
                         <div class="weChat-pay-list">
                           <div class="w-pay-item">
@@ -175,7 +177,10 @@
         </div>
         <div v-else class="rate-card-wrapper">
           <div class="card-header">
-            <div class="h-left">合并配置</div>
+            <div class="h-left">
+              合并配置
+              <a-alert v-if="mergeFeeItem.selectedWayCodeList.filter(f => f.checked === true).length<=0" message="未勾选任何产品" banner />
+            </div>
             <div class="h-right h-right2" style="display: flex;">
               <div class="h-right2-div">
                 是否开通：
@@ -186,19 +191,19 @@
               <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee.state">
                 是否可进件：
                 <a-switch
-                  @change="onChangeApplymentSupport(mergeFeeItem.mainFee.wayCode, $event)"
+                  @change="onChangeApplymentSupport(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
                   :checked="!!mergeFeeItem.mainFee.applymentSupport" />
               </div>
               <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee.state">
                 阶梯费率：
                 <a-switch
-                  @change="onChangeFeeType(mergeFeeItem.mainFee.wayCode, $event)"
+                  @change="onChangeFeeType(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
                   :checked="mergeFeeItem.mainFee.feeType==='LEVEL'" />
               </div>
               <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee.state">
                 银联模式：
                 <a-switch
-                  @change="onChangeLevelMode(mergeFeeItem.mainFee.wayCode, $event)"
+                  @change="onChangeLevelMode(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
                   :disabled="mergeFeeItem.mainFee.feeType!='LEVEL'"
                   :checked="mergeFeeItem.mainFee.feeType==='LEVEL'
                     && mergeFeeItem.mainFee.levelMode==='UNIONPAY'" />
@@ -211,7 +216,7 @@
                 v-for="(levelModeItem, levelModeKey) in mergeFeeItem.mainFee[mergeFeeItem.mainFee.levelMode]"
                 :key="levelModeKey">
                 <a-divider orientation="left" v-if="mergeFeeItem.mainFee.levelMode==='UNIONPAY'">
-                  {{ levelModeItem.bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
+                  {{ levelModeItem.bankCardType==='DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                 </a-divider>
                 <div
                   :style="{ marginTop: levelKey > 0 ? '15px': 0 }"
@@ -233,14 +238,14 @@
                         :min="0"
                         type="number"
                         addon-after="~"
-                        @change="inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'min', levelItem.id, $event)"
+                        @change="inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'min', levelItem.id, $event, mergeFeeItem)"
                         v-model="levelItem.minAmount" />
                       <a-input
                         style="width: 50%;min-width: 100px;"
                         :min="0"
                         type="number"
                         addon-after="元"
-                        @change="inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'max', levelItem.id, $event)"
+                        @change="inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'max', levelItem.id, $event, mergeFeeItem)"
                         v-model="levelItem.maxAmount"/>
                     </div>
                   </div>
@@ -261,14 +266,16 @@
                       title="确定要删除该阶梯费率吗？"
                       ok-text="确定"
                       cancel-text="取消"
-                      @confirm="deleteLevelFee(mergeFeeItem.mainFee.wayCode, levelItem.id)"
+                      @confirm="deleteLevelFee(mergeFeeItem.mainFee.wayCode, levelItem.id, mergeFeeItem)"
                     >
                       <a-button type="link" icon="delete" danger>删除</a-button>
                     </a-popconfirm>
                   </div>
                 </div>
-                <div v-if="mergeFeeItem.mainFee.levelMode==='NORMAL'" style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
-                  <a-button type="dashed" @click="addLevelFee(mergeFeeItem.mainFee.wayCode)">新增阶梯</a-button>
+                <div
+                  v-if="mergeFeeItem.mainFee.levelMode==='NORMAL'"
+                  style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
+                  <a-button type="dashed" @click="addLevelFee(mergeFeeItem.mainFee.wayCode, mergeFeeItem)">新增阶梯</a-button>
                 </div>
               </div>
               <div :style="{ marginTop: mergeFeeItem.mainFee.levelMode==='UNIONPAY' ? '15px' : 0 }">
@@ -278,7 +285,7 @@
                       v-for="(levelModeItem, levelModeKey) in mergeFeeItem.mainFee[mergeFeeItem.mainFee.levelMode]"
                       :key="levelModeKey">
                       <a-divider orientation="left" v-if="mergeFeeItem.mainFee.levelMode==='UNIONPAY'">
-                        {{ levelModeItem.bankCardType==='DEBIT'? '借记卡' : '贷记卡' }}
+                        {{ levelModeItem.bankCardType==='DEBIT'? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                       </a-divider>
                       <div class="weChat-pay-list">
                         <div class="w-pay-item">
@@ -330,7 +337,7 @@
       </div>
       <a-collapse>
         <a-collapse-panel header="【保存】高级配置项">
-          <a-checkbox :checked="!!noCheckRuleFlag"@change="onChangeCheckRuleFla">不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox>
+          <a-checkbox :checked="!!noCheckRuleFlag" @change="noCheckRuleFlag = +!noCheckRuleFlag">不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox>
         </a-collapse-panel>
       </a-collapse>
       <div class="drawer-btn-center">
@@ -356,8 +363,6 @@ export default {
       btnLoading: false,
       configTypes: ['ISVCOST', 'AGENTDEF', 'MCHAPPLYDEF'],
       configTypeMaps: ['mainFee', 'agentdefFee', 'mchapplydefFee'],
-      wayCodes: ['WX_BAR', 'WX_LITE', 'WX_JSAPI'],
-      bankCardTypes: ['DEBIT', 'CREDIT'],
       allPaywayList: [],
       allPaywayMap: {},
       savedMapDataHasReadonlyIsvCostRateMap: !1,
@@ -375,24 +380,9 @@ export default {
         {
           key: 'WECHAT1',
           name: '微信线下',
-          mainFee: {
-            wayCode: null,
-            state: 0,
-            applymentSupport: 0,
-            feeType: 'SINGLE'
-          },
-          agentdefFee: {
-            wayCode: null,
-            state: 0,
-            applymentSupport: 0,
-            feeType: 'SINGLE'
-          },
-          mchapplydefFee: {
-            wayCode: null,
-            state: 0,
-            applymentSupport: 0,
-            feeType: 'SINGLE'
-          },
+          mainFee: {},
+          agentdefFee: {},
+          mchapplydefFee: {},
           isMergeMode: false,
           selectedWayCodeList: [],
           filter: f => f.wayType === 'WECHAT' && ['WX_BAR', 'WX_JSAPI', 'WX_LITE'].indexOf(f.wayCode) >= 0
@@ -728,6 +718,76 @@ export default {
       }
       return JSON.parse(JSON.stringify(k))
     },
+    initNormal (id1, id2) {
+      return [{
+        minFee: 0,
+        maxFee: 99999,
+        levelList: [
+          {
+            id: id1,
+            minAmount: 0,
+            maxAmount: 1000,
+            feeRate: null
+          },
+          {
+            id: id2,
+            minAmount: 1000,
+            maxAmount: 999999.99,
+            feeRate: null
+          }
+        ]
+      }]
+    },
+    initUnionpay (id1, id2) {
+      return [
+        {
+          minFee: 0,
+          maxFee: 99999,
+          bankCardType: 'DEBIT',
+          levelList: [
+            {
+              id: id1,
+              minAmount: 0,
+              maxAmount: 1000,
+              feeRate: null
+            },
+            {
+              id: id2,
+              minAmount: 1000,
+              maxAmount: 999999.99,
+              feeRate: null
+            }
+          ]
+        },
+        {
+          minFee: 0,
+          maxFee: 99999,
+          bankCardType: 'CREDIT',
+          levelList: [
+            {
+              id: id1,
+              minAmount: 0,
+              maxAmount: 1000,
+              feeRate: null
+            },
+            {
+              id: id2,
+              minAmount: 1000,
+              maxAmount: 999999.99,
+              feeRate: null
+            }
+          ]
+        }
+      ]
+    },
+    initLevel (id) {
+      return {
+        id: id,
+        startAmount: null,
+        endAmount: null,
+        fee: null
+      }
+    },
     async getRateConfig () {
       const that = this
       that.allPaywayList = []
@@ -772,11 +832,31 @@ export default {
           })
         })
       })
-      console.log(this)
     },
     onChangeWayCode (wayCode, event, mergeFeeItem) {
       console.log(wayCode, event.target.checked)
-      this.onChangeState(wayCode, event.target.checked, mergeFeeItem)
+      // const that = this
+      // that.configTypeMaps.map(item => {
+      //   if (event.target.checked && mergeFeeItem[item].state) {
+      //     mergeFeeItem.selectedWayCodeList.filter(f => f.checked === true).map(payWay => {
+      //       if (payWay.checked && !that.rateConfig[item][payWay.wayCode]) {
+      //         that.rateConfig[item][payWay.wayCode] = that.initRateConfig(payWay.wayCode)
+      //       } else {
+      //         that.rateConfig[item][payWay.wayCode].state = +payWay.checked
+      //       }
+      //     })
+      //   } else {
+      //     that.rateConfig[item][wayCode].state = +event.target.checked
+      //   }
+      //
+      //   mergeFeeItem.selectedWayCodeList.map(payWay => {
+      //     if (payWay.checked && that.rateConfig[item][payWay.wayCode]) {
+      //       that.rateConfig[item][payWay.wayCode].applymentSupport = mergeFeeItem[item].applymentSupport
+      //     } else {
+      //       that.rateConfig[item][payWay.wayCode].applymentSupport = 0
+      //     }
+      //   })
+      // })
     },
     onChangeState (wayCode, checked, mergeFeeItem) {
       const that = this
@@ -784,170 +864,133 @@ export default {
         that.configTypeMaps.map(item => {
           console.log(item, checked)
           if (checked && !that.rateConfig[item][wayCode]) {
-            that.rateConfig[item][wayCode] = {
-              wayCode: wayCode,
-              state: 1,
-              feeType: 'SINGLE'
-            }
+            that.rateConfig[item][wayCode] = that.initRateConfig(wayCode)
           } else {
             that.rateConfig[item][wayCode].state = +checked
           }
         })
       }
-
-      if (mergeFeeItem) {
+      if (!wayCode && mergeFeeItem) {
         that.configTypeMaps.map(item => {
           console.log(item, checked)
-          if (checked && !that.rateConfig[item]) {
-            mergeFeeItem[item] = {
-              wayCode: null,
-              state: mergeFeeItem.filter(f => f.wayCode === wayCode).checked,
-              applymentSupport: 0,
-              feeType: 'SINGLE'
-            }
+          if (checked && !mergeFeeItem[item]) {
+            mergeFeeItem[item] = that.initRateConfig(wayCode)
           } else {
-            if (!wayCode) {
-              mergeFeeItem.mainFee.state = +checked
-            }
-            mergeFeeItem[item].state = mergeFeeItem.filter(f => f.wayCode === wayCode).checked
+            mergeFeeItem[item].state = +checked
           }
-          mergeFeeItem.selectedWayCodeList.filter(f => f.checked === true).map(payWay => {
-            if (checked && !that.rateConfig[item][payWay.wayCode]) {
-              that.rateConfig[item][payWay.wayCode] = {
-                wayCode: payWay.wayCode,
-                state: 1,
-                feeType: 'SINGLE'
-              }
-            } else {
-              that.rateConfig[item][payWay.wayCode].state = +checked
-            }
-          })
+          // if (checked) {
+          //   mergeFeeItem.selectedWayCodeList.filter(f => f.checked === true).map(payWay => {
+          //     if (payWay.checked && !that.rateConfig[item][payWay.wayCode]) {
+          //       that.rateConfig[item][payWay.wayCode] = that.initRateConfig(payWay.wayCode)
+          //     } else {
+          //       that.rateConfig[item][payWay.wayCode].state = +payWay.checked
+          //     }
+          //   })
+          // } else {
+          //   mergeFeeItem.selectedWayCodeList.map(payWay => {
+          //     if (that.rateConfig[item][payWay.wayCode]) {
+          //       that.rateConfig[item][payWay.wayCode].state = +checked
+          //     }
+          //   })
+          // }
         })
       }
       this.$forceUpdate()
     },
-    onChangeApplymentSupport (wayCode, checked) {
+    onChangeApplymentSupport (wayCode, checked, mergeFeeItem) {
       const that = this
-      that.configTypeMaps.map(item => {
-        console.log(item, checked)
-        that.rateConfig[item][wayCode].applymentSupport = checked ? 1 : 0
-      })
-      this.$forceUpdate()
-    },
-    onChangeFeeType (wayCode, checked) {
-      const that = this
-      const currentTime = new Date()
-      const id1 = currentTime.getTime()
-      currentTime.setSeconds(currentTime.getSeconds() + 1)
-      const id2 = currentTime.getTime()
-      that.configTypeMaps.map(item => {
-        console.log(item, checked)
-        if (checked) {
-          that.rateConfig[item][wayCode].feeType = 'LEVEL'
-          that.rateConfig[item][wayCode].levelMode = 'NORMAL'
-          if (!that.rateConfig[item][wayCode]['NORMAL']) {
-            that.rateConfig[item][wayCode]['NORMAL'] = [{
-              minFee: 0,
-              maxFee: 99999,
-              levelList: [
-                {
-                  id: id1,
-                  minAmount: 0,
-                  maxAmount: 1000,
-                  feeRate: null
-                },
-                {
-                  id: id2,
-                  minAmount: 1000,
-                  maxAmount: 999999.99,
-                  feeRate: null
-                }
-              ]
-            }]
+      if (wayCode) {
+        that.configTypeMaps.map(item => {
+          console.log(item, checked)
+          that.rateConfig[item][wayCode].applymentSupport = +checked
+        })
+      }
+      if (!wayCode && mergeFeeItem) {
+        that.configTypeMaps.map(item => {
+          console.log(item, checked)
+          if (mergeFeeItem[item]) {
+            mergeFeeItem[item].applymentSupport = +checked
           }
-        } else {
-          that.rateConfig[item][wayCode].feeType = 'SINGLE'
-          that.$delete(that.rateConfig[item][wayCode], 'levelMode')
-        }
-      })
+          // mergeFeeItem.selectedWayCodeList.map(payWay => {
+          //   if (payWay.checked && that.rateConfig[item][payWay.wayCode]) {
+          //     that.rateConfig[item][payWay.wayCode].applymentSupport = +checked
+          //   } else {
+          //     that.rateConfig[item][payWay.wayCode].applymentSupport = 0
+          //   }
+          // })
+        })
+      }
       this.$forceUpdate()
     },
-    onChangeLevelMode (wayCode, checked) {
+    onChangeFeeType (wayCode, checked, mergeFeeItem) {
       const that = this
       const currentTime = new Date()
       const id1 = currentTime.getTime()
       currentTime.setSeconds(currentTime.getSeconds() + 1)
       const id2 = currentTime.getTime()
-      that.configTypeMaps.map(item => {
-        console.log(item, checked)
-        that.rateConfig[item][wayCode].levelMode = checked ? 'UNIONPAY' : 'NORMAL'
-        if (!that.rateConfig[item][wayCode]['UNIONPAY']) {
-          that.rateConfig[item][wayCode]['UNIONPAY'] = [
-            {
-              minFee: 0,
-              maxFee: 99999,
-              bankCardType: 'DEBIT',
-              levelList: [
-                {
-                  id: id1,
-                  minAmount: 0,
-                  maxAmount: 1000,
-                  feeRate: null
-                },
-                {
-                  id: id2,
-                  minAmount: 1000,
-                  maxAmount: 999999.99,
-                  feeRate: null
-                }
-              ]
-            },
-            {
-              minFee: 0,
-              maxFee: 99999,
-              bankCardType: 'CREDIT',
-              levelList: [
-                {
-                  id: id1,
-                  minAmount: 0,
-                  maxAmount: 1000,
-                  feeRate: null
-                },
-                {
-                  id: id2,
-                  minAmount: 1000,
-                  maxAmount: 999999.99,
-                  feeRate: null
-                }
-              ]
+      if (wayCode) {
+        that.configTypeMaps.map(item => {
+          console.log(item, checked)
+          if (checked) {
+            that.rateConfig[item][wayCode].feeType = 'LEVEL'
+            that.rateConfig[item][wayCode].levelMode = 'NORMAL'
+            if (!that.rateConfig[item][wayCode]['NORMAL']) {
+              that.rateConfig[item][wayCode]['NORMAL'] = that.initNormal(id1, id2)
             }
-          ]
-        }
-        if (!that.rateConfig[item][wayCode]['NORMAL']) {
-          that.rateConfig[item][wayCode]['NORMAL'] = [{
-            minFee: 0,
-            maxFee: 99999,
-            levelList: [
-              {
-                id: id1,
-                minAmount: 0,
-                maxAmount: 1000,
-                feeRate: null
-              },
-              {
-                id: id2,
-                minAmount: 1000,
-                maxAmount: 999999.99,
-                feeRate: null
-              }
-            ]
-          }]
-        }
-      })
+          } else {
+            that.rateConfig[item][wayCode].feeType = 'SINGLE'
+            that.$delete(that.rateConfig[item][wayCode], 'levelMode')
+          }
+        })
+      }
+      if (!wayCode && mergeFeeItem) {
+        that.configTypeMaps.map(item => {
+          console.log(item, checked)
+          if (checked) {
+            mergeFeeItem[item].feeType = 'LEVEL'
+            mergeFeeItem[item].levelMode = 'NORMAL'
+            if (!mergeFeeItem[item]['NORMAL']) {
+              mergeFeeItem[item]['NORMAL'] = that.initNormal(id1, id2)
+            }
+          } else {
+            mergeFeeItem[item].feeType = 'SINGLE'
+            that.$delete(mergeFeeItem[item], 'levelMode')
+          }
+        })
+      }
       this.$forceUpdate()
     },
-    onChangeCheckRuleFla (event) {
-      this.noCheckRuleFlag = event.target.checked ? 1 : 0
+    onChangeLevelMode (wayCode, checked, mergeFeeItem) {
+      const that = this
+      const currentTime = new Date()
+      const id1 = currentTime.getTime()
+      currentTime.setSeconds(currentTime.getSeconds() + 1)
+      const id2 = currentTime.getTime()
+      if (wayCode) {
+        that.configTypeMaps.map(item => {
+          console.log(item, checked)
+          that.rateConfig[item][wayCode].levelMode = checked ? 'UNIONPAY' : 'NORMAL'
+          if (checked && !that.rateConfig[item][wayCode]['UNIONPAY']) {
+            that.rateConfig[item][wayCode]['UNIONPAY'] = that.initUnionpay(id1, id2)
+          }
+          if (!checked && !that.rateConfig[item][wayCode]['NORMAL']) {
+            that.rateConfig[item][wayCode]['NORMAL'] = that.initNormal(id1, id2)
+          }
+        })
+      }
+      if (!wayCode && mergeFeeItem) {
+        that.configTypeMaps.map(item => {
+          console.log(item, checked)
+          mergeFeeItem[item].levelMode = checked ? 'UNIONPAY' : 'NORMAL'
+          if (checked && !mergeFeeItem[item]['UNIONPAY']) {
+            mergeFeeItem[item]['UNIONPAY'] = that.initUnionpay(id1, id2)
+          }
+          if (!checked && !mergeFeeItem[item]['NORMAL']) {
+            mergeFeeItem[item]['NORMAL'] = that.initNormal(id1, id2)
+          }
+        })
+      }
+      this.$forceUpdate()
     },
     getPayTitle (f) {
       const that = this
@@ -1013,38 +1056,55 @@ export default {
     //     case 'MCHAPPLYDEF': return '商户进件默认'
     //   }
     // },
-    inputChangeAmount (wayCode, flag, id, event) {
+    inputChangeAmount (wayCode, flag, id, event, mergeFeeItem) {
       const that = this
       const amount = event.target.value
-      that.configTypeMaps.map(item => {
-        that.rateConfig[item][wayCode]['NORMAL'][0].levelList.find(f => f.id === id)[flag + 'Amount'] = amount
-      })
+      if (wayCode) {
+        that.configTypeMaps.map(item => {
+          that.rateConfig[item][wayCode]['NORMAL'][0].levelList.find(f => f.id === id)[flag + 'Amount'] = amount
+        })
+      }
+      if (!wayCode && mergeFeeItem) {
+        that.configTypeMaps.map(item => {
+          mergeFeeItem[item]['NORMAL'][0].levelList.find(f => f.id === id)[flag + 'Amount'] = amount
+        })
+      }
       this.$forceUpdate()
     },
     inputChange () {
       this.$forceUpdate()
     },
-    addLevelFee (wayCode) {
+    addLevelFee (wayCode, mergeFeeItem) {
       const that = this
       const id = new Date().getTime()
-      that.configTypeMaps.map(item => {
-        that.rateConfig[item][wayCode]['NORMAL'][0].levelList.push({
-          id: id,
-          startAmount: null,
-          endAmount: null,
-          fee: null
+      if (wayCode) {
+        that.configTypeMaps.map(item => {
+          that.rateConfig[item][wayCode]['NORMAL'][0].levelList.push(that.initLevel(id))
         })
-      })
+      }
+      if (!wayCode && mergeFeeItem) {
+        that.configTypeMaps.map(item => {
+          mergeFeeItem[item]['NORMAL'][0].levelList.push(that.initLevel(id))
+        })
+      }
       this.$forceUpdate()
     },
-    deleteLevelFee (wayCode, id) {
+    deleteLevelFee (wayCode, id, mergeFeeItem) {
       const that = this
       console.log(wayCode, id)
       // that.$infoBox.confirmPrimary('确定要删除该阶梯费率吗？', '', () => {})
-      that.configTypeMaps.map(item => {
-        that.rateConfig[item][wayCode]['NORMAL'][0].levelList =
-            that.rateConfig[item][wayCode]['NORMAL'][0].levelList.filter(item => item.id !== id)
-      })
+      if (wayCode) {
+        that.configTypeMaps.map(item => {
+          that.rateConfig[item][wayCode]['NORMAL'][0].levelList =
+              that.rateConfig[item][wayCode]['NORMAL'][0].levelList.filter(item => item.id !== id)
+        })
+      }
+      if (!wayCode && mergeFeeItem) {
+        that.configTypeMaps.map(item => {
+          mergeFeeItem[item]['NORMAL'][0].levelList =
+              mergeFeeItem[item]['NORMAL'][0].levelList.filter(item => item.id !== id)
+        })
+      }
       this.$forceUpdate()
     },
     // 表单提交

@@ -46,9 +46,9 @@
           <component
             ref="configComponentRef"
             :is="configComponent"
-            :infoId="infoId"
-            :infoType="infoType"
-            :ifDefine="ifDefine"
+            :info-id="infoId"
+            :info-type="infoType"
+            :if-define="ifDefine"
             :perm-code="permCode"
             :config-mode="configMode"
             :callbackFunc="refIfCodeList"
@@ -64,7 +64,12 @@
             </div>
           </div>-->
           <div v-if="paramsAndRateTabVal === 'rateTab'">
-            <AgPayPaywayRatePanel/>
+            <AgPayPaywayRatePanel
+              :info-id="infoId"
+              :info-type="infoType"
+              :if-code="currentIfCode"
+              :config-mode="configMode"
+              :callbackFunc="refIfCodeList"/>
 <!--            <div>
               {{ currentIfCode }} —— 费率配置
             </div>
