@@ -1119,9 +1119,63 @@ export default {
       }
       this.$forceUpdate()
     },
+    getMergeFee (wayCode) {
+      const that = this
+      that.mergeFeeList.map(item => {
+        item.selectedWayCodeList.map(payWay => {
+          if (payWay.wayCode === wayCode) {
+            return [item, payWay.checked]
+          }
+        })
+      })
+      return [null, false]
+    },
+    $ (key, rateConfigs, flag) {
+      const that = this
+      const a = []
+      for (const index in rateConfigs) {
+        let rateConfig = rateConfigs[index]
+        const wayCode = rateConfig.wayCode
+        const mergeFee = that.getMergeFee(wayCode)
+        const v = mergeFee[0]
+        const C = mergeFee[1]
+        if (v == null || (v.isMergeMode === 1 && v.mainFee.state !== 1) || (v.isMergeMode === 1 && !C)) {
+          continue
+        }
+        if (v.isMergeMode) {
+          console.log('合并模式 isMergeMode= true， 合并的数据： ', v[key])
+          rateConfig = JSON.parse(JSON.stringify(v[key]))
+          rateConfig.wayCode = wayCode
+        }
+
+        const U = {}
+        U.wayCode = rateConfig.wayCode
+        U.feeType = rateConfig.feeType
+        U.state = rateConfig.state
+        U.applymentSupport = rateConfig.applymentSupport
+        if (rateConfig.feeType === 'SINGLE') {
+          if (typeof rateConfig.feeRate !== 'number' || rateConfig.feeRate < 0) {
+            console.log('费率值不可小于0', rateConfig)
+            that.$message.error('费率值不可小于0')
+            return
+          }
+          U.feeRate = Number.parseFloat((rateConfig.feeRate / 100).toFixed(6))
+        }
+        a.push(U)
+      }
+      console.log(a)
+      return a
+    },
     // 表单提交
     onSubmit () {
       const that = this
+      that.mergeFeeList.map(item => {
+        if (item.isMergeMode && item.selectedWayCodeList.length > 0 && item.selectedWayCodeList.filter(f => f.checked).length <= 0 && item.mainFee.state === 1) {
+          that.$message.error(`【${item.name}】合并模式为开通状态但没有选择任何产品， 请点击关闭或勾选产品！`)
+          return false
+        }
+      })
+
       console.log(that)
     }
   }
