@@ -1119,7 +1119,51 @@ export default {
       }
       this.$forceUpdate()
     },
-    getMergeFee (wayCode) {
+    levelValidate (fee, rateConfig) {
+      const that = this
+      const levelFees = rateConfig[rateConfig.levelMode]
+      for (const i in levelFees) {
+        const levelFee = levelFees[i]
+        if (typeof levelFee.minFee !== 'number') {
+          that.$message.error('阶梯费率请填入保底费用')
+          return false
+        }
+        if (typeof levelFee.maxFee !== 'number') {
+          that.$message.error('阶梯费率请填入封顶费用')
+          return false
+        }
+        levelFees[i].minFee = Number.parseInt(levelFee.minFee * 100 + '')
+        levelFees[i].maxFee = Number.parseInt(levelFee.maxFee * 100 + '')
+
+        if (levelFee.levelList.length <= 0) {
+          that.$message.error('阶梯费率请至少包含一个价格区间')
+          return false
+        }
+
+        for (const k in levelFee.levelList) {
+          const levelItem = levelFee.levelList[k]
+          if (typeof levelItem.feeRate !== 'number' || levelItem.feeRate <= 0) {
+            console.log('请录入阶梯费率报错element: ', k)
+            that.$message.error('请录入阶梯费率')
+            return false
+          }
+          if (typeof levelItem.minAmount !== 'number' || typeof levelItem.maxAmount !== 'number') {
+            that.$message.error('阶梯费率请填入金额区间值')
+            return false
+          }
+          if (levelItem.minAmount > levelItem.maxAmount) {
+            that.$message.error('阶梯费率请填入正确的金额区间值')
+            return false
+          }
+          levelFees[i].levelList[k].feeRate = Number.parseFloat((levelItem.feeRate / 100).toFixed(6))
+          levelFees[i].levelList[k].minAmount = Number.parseInt(levelItem.minAmount * 100 + '')
+          levelFees[i].levelList[k].maxAmount = Number.parseInt(levelItem.maxAmount * 100 + '')
+        }
+      }
+      fee[rateConfig.levelMode] = levelFees
+      return true
+    },
+    getMergeFeeItem (wayCode) {
       const that = this
       that.mergeFeeList.map(item => {
         item.selectedWayCodeList.map(payWay => {
@@ -1130,41 +1174,46 @@ export default {
       })
       return [null, false]
     },
-    $ (key, rateConfigs, flag) {
+    getFees (key, rateConfigs, flag = false) {
+      console.log('getReqPaywayFeeListByList: ', key, JSON.stringify(rateConfigs), flag)
       const that = this
-      const a = []
-      for (const index in rateConfigs) {
-        let rateConfig = rateConfigs[index]
+      const fees = []
+      for (const i in rateConfigs) {
+        let rateConfig = rateConfigs[i]
         const wayCode = rateConfig.wayCode
-        const mergeFee = that.getMergeFee(wayCode)
-        const v = mergeFee[0]
-        const C = mergeFee[1]
-        if (v == null || (v.isMergeMode === 1 && v.mainFee.state !== 1) || (v.isMergeMode === 1 && !C)) {
+        const mergeFeeItem = that.getMergeFeeItem(wayCode)
+        const mergeFee = mergeFeeItem[0]
+        const checked = mergeFeeItem[1]
+        if (mergeFee == null || (mergeFee.isMergeMode === 1 && mergeFee.mainFee.state !== 1) || (mergeFee.isMergeMode === 1 && !checked)) {
           continue
         }
-        if (v.isMergeMode) {
-          console.log('合并模式 isMergeMode= true， 合并的数据： ', v[key])
-          rateConfig = JSON.parse(JSON.stringify(v[key]))
+        if (mergeFee.isMergeMode) {
+          console.log('合并模式 isMergeMode= true， 合并的数据： ', mergeFee[key])
+          rateConfig = JSON.parse(JSON.stringify(mergeFee[key]))
           rateConfig.wayCode = wayCode
         }
 
-        const U = {}
-        U.wayCode = rateConfig.wayCode
-        U.feeType = rateConfig.feeType
-        U.state = rateConfig.state
-        U.applymentSupport = rateConfig.applymentSupport
+        const fee = {}
+        fee.wayCode = rateConfig.wayCode
+        fee.feeType = rateConfig.feeType
+        fee.state = rateConfig.state
+        fee.applymentSupport = rateConfig.applymentSupport
         if (rateConfig.feeType === 'SINGLE') {
           if (typeof rateConfig.feeRate !== 'number' || rateConfig.feeRate < 0) {
             console.log('费率值不可小于0', rateConfig)
             that.$message.error('费率值不可小于0')
-            return
+            return false
           }
-          U.feeRate = Number.parseFloat((rateConfig.feeRate / 100).toFixed(6))
+          fee.feeRate = Number.parseFloat((rateConfig.feeRate / 100).toFixed(6))
+        } else {
+          if (that.levelValidate(fee, rateConfig) !== true) {
+            return false
+          }
         }
-        a.push(U)
+        fees.push(fee)
       }
-      console.log(a)
-      return a
+      console.log(fees)
+      return fees
     },
     // 表单提交
     onSubmit () {
@@ -1175,7 +1224,58 @@ export default {
           return false
         }
       })
-
+      const mainFee = that.getFees('mainFee', Object.values(that.rateConfig.mainFee))
+      console.log(mainFee)
+      if (typeof mainFee !== 'object') {
+        return false
+      }
+      let agentFee = null
+      let mchFee = null
+      if (that.configMode === 'mgrIsv' || that.configMode === 'mgrAgent' || that.configMode === 'agentSelf') {
+        agentFee = that.getFees('agentdefFee', Object.values(that.rateConfig.agentdefFee))
+        if (typeof agentFee !== 'object') {
+          return false
+        }
+        mchFee = that.getFees('mchapplydefFee', Object.values(that.rateConfig.mchapplydefFee), true)
+        if (typeof mchFee !== 'object') {
+          return false
+        }
+      }
+      if (that.configMode === 'mgrIsv') {
+        return {
+          ISVCOST: mainFee,
+          AGENTDEF: agentFee,
+          MCHAPPLYDEF: mchFee
+        }
+      }
+      if (that.configMode === 'mgrAgent') {
+        return {
+          AGENTRATE: mainFee,
+          AGENTDEF: agentFee,
+          MCHAPPLYDEF: mchFee
+        }
+      }
+      if (that.configMode === 'mgrMch' || that.configMode === 'agentMch' || that.configMode === 'mgrApplyment' || that.configMode === 'mchApplyment' || that.configMode === 'agentApplyment') {
+        return {
+          MCHRATE: mainFee
+        }
+      }
+      if (that.configMode === 'agentSubagent') {
+        return {
+          AGENTRATE: mainFee
+        }
+      }
+      if (that.configMode === 'agentSelf') {
+        return {
+          AGENTDEF: agentFee,
+          MCHAPPLYDEF: mchFee
+        }
+      }
+      if (that.configMode === 'mchSelfApp1') {
+        return {
+          MCHRATE: mainFee
+        }
+      }
       console.log(that)
     }
   }
