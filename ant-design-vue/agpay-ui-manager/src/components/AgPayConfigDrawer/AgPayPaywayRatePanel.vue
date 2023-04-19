@@ -360,7 +360,7 @@ export default {
     infoId: { type: String, default: null },
     infoType: { type: String, default: null },
     ifCode: { type: String, default: '' },
-    configMode: { type: String, default: 'mgrIsv' },
+    configMode: { type: String, default: '' },
     callbackFunc: { type: Function, default: () => ({}) }
   },
   data () {
@@ -828,11 +828,11 @@ export default {
           that.rateConfig.mainFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.rateConfig.agentdefFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.rateConfig.mchapplydefFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
-          // that.mergeFeeList.forEach(item => {
-          //   item.mainFee = that.initRateConfig(null)
-          //   item.agentdefFee = that.initRateConfig(null)
-          //   item.mchapplydefFee = that.initRateConfig(null)
-          // })
+          that.mergeFeeList.forEach(item => {
+            item.mainFee = that.initRateConfig(null)
+            item.agentdefFee = that.initRateConfig(null)
+            item.mchapplydefFee = that.initRateConfig(null)
+          })
         })
       })
       that.mergeFeeList.forEach(item => {
@@ -1124,16 +1124,16 @@ export default {
       const levelFees = rateConfig[rateConfig.levelMode]
       for (const i in levelFees) {
         const levelFee = levelFees[i]
-        if (typeof levelFee.minFee !== 'number') {
+        if (isNaN(+levelFee.minFee) || levelFee.minFee === '') {
           that.$message.error('阶梯费率请填入保底费用')
           return false
         }
-        if (typeof levelFee.maxFee !== 'number') {
+        if (isNaN(+levelFee.maxFee) || levelFee.maxFee === '') {
           that.$message.error('阶梯费率请填入封顶费用')
           return false
         }
-        levelFees[i].minFee = Number.parseInt(levelFee.minFee * 100 + '')
-        levelFees[i].maxFee = Number.parseInt(levelFee.maxFee * 100 + '')
+        levelFees[i].minFee = Number.parseInt(+levelFee.minFee * 100 + '')
+        levelFees[i].maxFee = Number.parseInt(+levelFee.maxFee * 100 + '')
 
         if (levelFee.levelList.length <= 0) {
           that.$message.error('阶梯费率请至少包含一个价格区间')
@@ -1142,36 +1142,40 @@ export default {
 
         for (const k in levelFee.levelList) {
           const levelItem = levelFee.levelList[k]
-          if (typeof levelItem.feeRate !== 'number' || levelItem.feeRate <= 0) {
+          if (isNaN(+levelItem.feeRate) || levelFee.feeRate === '' || +levelItem.feeRate <= 0) {
             console.log('请录入阶梯费率报错element: ', k)
             that.$message.error('请录入阶梯费率')
             return false
           }
-          if (typeof levelItem.minAmount !== 'number' || typeof levelItem.maxAmount !== 'number') {
+          if (isNaN(+levelItem.minAmount) || levelFee.minAmount === '' ||
+              isNaN(+levelItem.maxAmount) || levelFee.maxAmount === '') {
             that.$message.error('阶梯费率请填入金额区间值')
             return false
           }
-          if (levelItem.minAmount > levelItem.maxAmount) {
+          if (+levelItem.minAmount > +levelItem.maxAmount) {
             that.$message.error('阶梯费率请填入正确的金额区间值')
             return false
           }
-          levelFees[i].levelList[k].feeRate = Number.parseFloat((levelItem.feeRate / 100).toFixed(6))
-          levelFees[i].levelList[k].minAmount = Number.parseInt(levelItem.minAmount * 100 + '')
-          levelFees[i].levelList[k].maxAmount = Number.parseInt(levelItem.maxAmount * 100 + '')
+          levelFees[i].levelList[k].feeRate = Number.parseFloat((+levelItem.feeRate / 100).toFixed(6))
+          levelFees[i].levelList[k].minAmount = Number.parseInt(+levelItem.minAmount * 100 + '')
+          levelFees[i].levelList[k].maxAmount = Number.parseInt(+levelItem.maxAmount * 100 + '')
         }
       }
+      fee.levelMode = rateConfig.levelMode
       fee[rateConfig.levelMode] = levelFees
       return true
     },
     getMergeFeeItem (wayCode) {
       const that = this
-      that.mergeFeeList.map(item => {
-        item.selectedWayCodeList.map(payWay => {
+      for (const i in that.mergeFeeList) {
+        const mergeFeeItem = that.mergeFeeList[i]
+        for (const k in mergeFeeItem.selectedWayCodeList) {
+          const payWay = mergeFeeItem.selectedWayCodeList[k]
           if (payWay.wayCode === wayCode) {
-            return [item, payWay.checked]
+            return [mergeFeeItem, payWay.checked]
           }
-        })
-      })
+        }
+      }
       return [null, false]
     },
     getFees (key, rateConfigs, flag = false) {
@@ -1184,11 +1188,15 @@ export default {
         const mergeFeeItem = that.getMergeFeeItem(wayCode)
         const mergeFee = mergeFeeItem[0]
         const checked = mergeFeeItem[1]
-        if (mergeFee == null || (mergeFee.isMergeMode === 1 && mergeFee.mainFee.state !== 1) || (mergeFee.isMergeMode === 1 && !checked)) {
+        if (mergeFee == null ||
+            (mergeFee.isMergeMode && mergeFee.mainFee.state !== 1) ||
+            (mergeFee.isMergeMode && !checked) ||
+            (!mergeFee.isMergeMode && rateConfig.state !== 1)
+        ) {
           continue
         }
         if (mergeFee.isMergeMode) {
-          console.log('合并模式 isMergeMode= true， 合并的数据： ', mergeFee[key])
+          console.log('合并模式 isMergeMode = true， 合并的数据： ', mergeFee[key])
           rateConfig = JSON.parse(JSON.stringify(mergeFee[key]))
           rateConfig.wayCode = wayCode
         }
@@ -1199,12 +1207,12 @@ export default {
         fee.state = rateConfig.state
         fee.applymentSupport = rateConfig.applymentSupport
         if (rateConfig.feeType === 'SINGLE') {
-          if (typeof rateConfig.feeRate !== 'number' || rateConfig.feeRate < 0) {
+          if (isNaN(+rateConfig.feeRate) || rateConfig.feeRate === '' || +rateConfig.feeRate < 0) {
             console.log('费率值不可小于0', rateConfig)
             that.$message.error('费率值不可小于0')
             return false
           }
-          fee.feeRate = Number.parseFloat((rateConfig.feeRate / 100).toFixed(6))
+          fee.feeRate = Number.parseFloat((+rateConfig.feeRate / 100).toFixed(6))
         } else {
           if (that.levelValidate(fee, rateConfig) !== true) {
             return false
@@ -1215,44 +1223,44 @@ export default {
       console.log(fees)
       return fees
     },
-    // 表单提交
-    onSubmit () {
+    getFeeRateConfig () {
       const that = this
-      that.mergeFeeList.map(item => {
-        if (item.isMergeMode && item.selectedWayCodeList.length > 0 && item.selectedWayCodeList.filter(f => f.checked).length <= 0 && item.mainFee.state === 1) {
-          that.$message.error(`【${item.name}】合并模式为开通状态但没有选择任何产品， 请点击关闭或勾选产品！`)
+      for (const i in that.mergeFeeList) {
+        const mergeFeeItem = that.mergeFeeList[i]
+        if (mergeFeeItem.isMergeMode && mergeFeeItem.selectedWayCodeList.length > 0 &&
+            mergeFeeItem.selectedWayCodeList.filter(f => f.checked).length <= 0 && mergeFeeItem.mainFee.state === 1) {
+          that.$message.error(`【${mergeFeeItem.name}】合并模式为开通状态但没有选择任何产品， 请点击关闭或勾选产品！`)
           return false
         }
-      })
+      }
       const mainFee = that.getFees('mainFee', Object.values(that.rateConfig.mainFee))
-      console.log(mainFee)
       if (typeof mainFee !== 'object') {
         return false
       }
-      let agentFee = null
-      let mchFee = null
+      let agentdefFee = null
+      let mchapplydefFee = null
       if (that.configMode === 'mgrIsv' || that.configMode === 'mgrAgent' || that.configMode === 'agentSelf') {
-        agentFee = that.getFees('agentdefFee', Object.values(that.rateConfig.agentdefFee))
-        if (typeof agentFee !== 'object') {
+        agentdefFee = that.getFees('agentdefFee', Object.values(that.rateConfig.agentdefFee))
+        if (typeof agentdefFee !== 'object') {
           return false
         }
-        mchFee = that.getFees('mchapplydefFee', Object.values(that.rateConfig.mchapplydefFee), true)
-        if (typeof mchFee !== 'object') {
+        mchapplydefFee = that.getFees('mchapplydefFee', Object.values(that.rateConfig.mchapplydefFee), true)
+        if (typeof mchapplydefFee !== 'object') {
           return false
         }
       }
       if (that.configMode === 'mgrIsv') {
         return {
           ISVCOST: mainFee,
-          AGENTDEF: agentFee,
-          MCHAPPLYDEF: mchFee
+          AGENTDEF: agentdefFee,
+          MCHAPPLYDEF: mchapplydefFee
         }
       }
       if (that.configMode === 'mgrAgent') {
         return {
           AGENTRATE: mainFee,
-          AGENTDEF: agentFee,
-          MCHAPPLYDEF: mchFee
+          AGENTDEF: agentdefFee,
+          MCHAPPLYDEF: mchapplydefFee
         }
       }
       if (that.configMode === 'mgrMch' || that.configMode === 'agentMch' || that.configMode === 'mgrApplyment' || that.configMode === 'mchApplyment' || that.configMode === 'agentApplyment') {
@@ -1267,8 +1275,8 @@ export default {
       }
       if (that.configMode === 'agentSelf') {
         return {
-          AGENTDEF: agentFee,
-          MCHAPPLYDEF: mchFee
+          AGENTDEF: agentdefFee,
+          MCHAPPLYDEF: mchapplydefFee
         }
       }
       if (that.configMode === 'mchSelfApp1') {
@@ -1276,6 +1284,12 @@ export default {
           MCHRATE: mainFee
         }
       }
+    },
+    // 表单提交
+    onSubmit () {
+      const that = this
+      const feeRateConfig = that.getFeeRateConfig()
+      console.log(feeRateConfig)
       console.log(that)
     }
   }
