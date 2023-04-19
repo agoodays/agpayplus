@@ -795,9 +795,25 @@ export default {
         fee: null
       }
     },
+    isMergeMode (rateConfigs) {
+      let rateConfigTemp = null
+      for (const i in rateConfigs) {
+        const rateConfig = JSON.parse(JSON.stringify(rateConfigs[i]))
+        if (rateConfig.state === 1) {
+          rateConfig.wayCode = null
+          if (rateConfigTemp === null) {
+            rateConfigTemp = rateConfig
+            continue
+          }
+          if (!Object.is(rateConfigTemp, rateConfig)) {
+            console.log('判断为false: ', rateConfig, rateConfigTemp)
+            return false
+          }
+        }
+      }
+      return rateConfigTemp
+    },
     async getRateConfig (currentIfCode) {
-      console.log(currentIfCode)
-      console.log(this.ifCode)
       if (currentIfCode) {
         this.currentIfCode = currentIfCode
       }
@@ -816,7 +832,7 @@ export default {
       that.mergeFeeList.forEach(item => {
         item.selectedWayCodeList = []
       })
-      const params = Object.assign({}, { configMode: that.$props.configMode, infoId: that.infoId, ifCode: that.currentIfCode })
+      const params = Object.assign({}, { configMode: that.configMode, infoId: that.infoId, ifCode: that.currentIfCode })
       await req.list(API_URL_RATECONFIGS_LIST + '/payways', params).then(res => {
         res.records.forEach(payWay => {
           payWay.checked = false
