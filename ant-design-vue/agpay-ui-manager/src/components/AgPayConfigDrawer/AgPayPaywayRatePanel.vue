@@ -8,7 +8,9 @@
     <div>
       <div v-for="(mergeFeeItem, mergeFeeKey) in mergeFeeList" :key="mergeFeeKey" v-if="mergeFeeItem.selectedWayCodeList.length>0">
         <div class="rate-header">
-          <div class="rate-title">{{ mergeFeeItem.name }}产品费率</div>
+          <div class="rate-title">
+            {{ mergeFeeItem.name }}产品费率
+          </div>
           <div class="rate-header-right">
             <a-checkbox
               v-if="mergeFeeItem.isMergeMode"
@@ -25,7 +27,15 @@
         <div v-if="!mergeFeeItem.isMergeMode">
           <div class="rate-card-wrapper" v-for="(payWayItem, payWayKey) in mergeFeeItem.selectedWayCodeList" :key="payWayKey">
             <div class="card-header">
-              <div class="h-left">{{ payWayItem.wayName }} ({{ payWayItem.wayCode }})</div>
+              <div class="h-left">
+                {{ payWayItem.wayName }} ({{ payWayItem.wayCode }})
+                <a-popover placement="top">
+                  <template #content>
+                    <p>自动读取上级设置的费率值并填充至输入框， 优先级： 默认费率 --> 上级费率</p>
+                  </template>
+                  <a-button style="margin-left: 8px;" size="small" shape="round" icon="bulb">读取默认费率</a-button>
+                </a-popover>
+              </div>
               <div class="h-right h-right2" style="display: flex;">
                 <div class="h-right2-div">
                   是否开通：
@@ -199,6 +209,12 @@
                   <span style="color: #faad14">未勾选任何产品</span>
                 </template>
               </a-alert>
+              <a-popover placement="top">
+                <template #content>
+                  <p>自动读取上级设置的费率值并填充至输入框， 优先级： 默认费率 --> 上级费率</p>
+                </template>
+                <a-button style="margin-left: 8px;" size="small" shape="round" icon="bulb">读取默认费率</a-button>
+              </a-popover>
             </div>
             <div class="h-right h-right2" style="display: flex;">
               <div class="h-right2-div">
