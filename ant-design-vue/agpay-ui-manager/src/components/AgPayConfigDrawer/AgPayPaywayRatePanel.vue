@@ -71,7 +71,15 @@
                     <div
                       class="w-pay-item"
                       style="min-width: 138px;">
-                      <div class="w-pay-title" v-if="levelKey===0">价格区间：</div>
+                      <div class="w-pay-title" v-if="levelKey===0">
+                        <a-popover placement="top">
+                          <template #content>
+                            <span>范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span>
+                          </template>
+                          <a-icon type="question-circle" />
+                        </a-popover>
+                        <span style="margin-left: 4px;">价格区间：</span>
+                      </div>
                       <div
                         v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode==='UNIONPAY'"
                         style="height: 32px; line-height: 32px;">
@@ -237,7 +245,15 @@
                   <div
                     class="w-pay-item"
                     style="min-width: 138px;">
-                    <div class="w-pay-title" v-if="levelKey===0">价格区间：</div>
+                    <div class="w-pay-title" v-if="levelKey===0">
+                      <a-popover placement="top">
+                        <template #content>
+                          <span>范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span>
+                        </template>
+                        <a-icon type="question-circle" />
+                      </a-popover>
+                      <span style="margin-left: 4px;">价格区间：</span>
+                    </div>
                     <div
                       v-if="mergeFeeItem.mainFee.levelMode==='UNIONPAY'"
                       style="height: 32px; line-height: 32px;">
