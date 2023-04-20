@@ -1,6 +1,10 @@
 <template>
   <div class="drawer">
-    <a-alert message="注意：代理商费率不得低于服务商费率，下及代理商费率不得低于上级代理商费率，商家费率不得低于所属代理商费率" type="info"/>
+    <a-alert type="info" show-icon>
+      <template #message>
+        <span style="color: #1890ff">注意：代理商费率不得低于服务商费率，下及代理商费率不得低于上级代理商费率，商家费率不得低于所属代理商费率</span>
+      </template>
+    </a-alert>
     <div>
       <div v-for="(mergeFeeItem, mergeFeeKey) in mergeFeeList" :key="mergeFeeKey" v-if="mergeFeeItem.selectedWayCodeList.length>0">
         <div class="rate-header">
@@ -182,7 +186,11 @@
           <div class="card-header">
             <div class="h-left">
               合并配置
-              <a-alert v-if="mergeFeeItem.selectedWayCodeList.filter(f => f.checked === true).length<=0" message="未勾选任何产品" banner />
+              <a-alert v-if="!!mergeFeeItem.mainFee.state && mergeFeeItem.selectedWayCodeList.filter(f => f.checked === true).length<=0" banner >
+                <template #message>
+                  <span style="color: #faad14">未勾选任何产品</span>
+                </template>
+              </a-alert>
             </div>
             <div class="h-right h-right2" style="display: flex;">
               <div class="h-right2-div">
@@ -813,6 +821,29 @@ export default {
       }
       return rateConfigTemp
     },
+    toRateConfig (key, feeRateConfig) {
+      Object.values(this.rateConfig[key]).forEach(a => {
+        a.feeType = 'SINGLE'
+        delete a.feeRate
+        delete a.minFee
+        delete a.maxFee
+        a.levelList = []
+        const d = feeRateConfig[a.wayCode] || {}
+        Object.assign(a, d)
+        a.checked = !1
+        a.state = feeRateConfig[a.wayCode] ? 1 : 0
+        feeRateConfig[a.wayCode] && feeRateConfig[a.wayCode].state === 0 && (a.state = 0)
+        typeof a.feeRate === 'number' && (a.feeRate = Number.parseFloat((a.feeRate * 100).toFixed(6)))
+        typeof a.maxFee === 'number' && (a.maxFee = Number.parseFloat((a.maxFee / 100).toFixed(2)))
+        typeof a.minFee === 'number' && (a.minFee = Number.parseFloat((a.minFee / 100).toFixed(2)))
+        a.levelList && a.levelList.forEach(s => {
+              typeof s.feeRate === 'number' && (s.feeRate = Number.parseFloat((s.feeRate * 100).toFixed(6)))
+              typeof s.maxAmount === 'number' && (s.maxAmount = Number.parseFloat((s.maxAmount / 100).toFixed(2)))
+              typeof s.minAmount === 'number' && (s.minAmount = Number.parseFloat((s.minAmount / 100).toFixed(2)))
+            }
+        )
+      })
+    },
     async getRateConfig (currentIfCode) {
       if (currentIfCode) {
         this.currentIfCode = currentIfCode
@@ -850,15 +881,40 @@ export default {
             item.mchapplydefFee = that.initRateConfig(null)
           })
         })
-      })
-      that.mergeFeeList.forEach(item => {
-        that.allPaywayList.filter(item.filter).forEach(payWay => {
-          item.selectedWayCodeList.push({
-            wayCode: payWay.wayCode,
-            wayName: payWay.wayName,
-            checked: false
+        that.mergeFeeList.forEach(item => {
+          that.allPaywayList.filter(item.filter).forEach(payWay => {
+            item.selectedWayCodeList.push({
+              wayCode: payWay.wayCode,
+              wayName: payWay.wayName,
+              checked: false
+            })
           })
         })
+      })
+
+      that.mergeFeeList.forEach(item => {
+        item.isMergeMode = false
+        const payWays = []
+        item.selectedWayCodeList.forEach(C => payWays.push(C.wayCode))
+        const mainFee = that.isMergeMode(Object.values(that.rateConfig.mainFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
+        const agentdefFee = that.isMergeMode(Object.values(that.rateConfig.agentdefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
+        const mchapplydefFee = that.isMergeMode(Object.values(that.rateConfig.mchapplydefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
+        console.log('判断合并模式： ', item.key, mainFee, agentdefFee, mchapplydefFee)
+        if (typeof mainFee === 'object' && typeof agentdefFee === 'object' && typeof mchapplydefFee === 'object') {
+          if (mainFee) {
+            item.mainFee = mainFee
+          }
+          if (agentdefFee) {
+            item.agentdefFee = agentdefFee
+          }
+          if (mchapplydefFee) {
+            item.mchapplydefFee = mchapplydefFee
+          }
+          item.selectedWayCodeList.forEach(C => {
+            C.checked = that.rateConfig.mainFee[C.wayCode] != null && !!that.rateConfig.mainFee[C.wayCode].state
+          })
+          item.isMergeMode = true
+        }
       })
     },
     onChangeWayCode (wayCode, event, mergeFeeItem) {
@@ -1135,6 +1191,23 @@ export default {
       }
       this.$forceUpdate()
     },
+    checkOverlap (limits) {
+      // 遍历 limits 数组中的每个元素
+      for (let i = 0; i < limits.length; i++) {
+        const { minAmount: min1, maxAmount: max1 } = limits[i]
+
+        // 将当前元素的区间范围与其他元素的区间范围进行比较
+        for (let j = i + 1; j < limits.length; j++) {
+          const { minAmount: min2, maxAmount: max2 } = limits[j]
+          if (min1 <= max2 && min2 <= max1) {
+            // 如果存在重叠区间，返回 true
+            return true
+          }
+        }
+      }
+      // 如果不存在重叠区间，返回 false
+      return false
+    },
     levelValidate (fee, rateConfig) {
       const that = this
       const levelFees = rateConfig[rateConfig.levelMode]
@@ -1153,6 +1226,11 @@ export default {
 
         if (levelFee.levelList.length <= 0) {
           that.$message.error('阶梯费率请至少包含一个价格区间')
+          return false
+        }
+
+        if (that.checkOverlap(levelFee.levelList)) {
+          that.$message.error('阶梯费率请填入正确的金额区间值，存在重叠区间')
           return false
         }
 
@@ -1195,7 +1273,7 @@ export default {
       return [null, false]
     },
     getFees (key, rateConfigs, flag = false) {
-      console.log('getReqPaywayFeeListByList: ', key, JSON.stringify(rateConfigs), flag)
+      console.log('getReqPaywayFeeListByList: ', key, rateConfigs, flag)
       const that = this
       const fees = []
       for (const i in rateConfigs) {
