@@ -1,8 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
@@ -16,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 {
     /// <summary>
-    /// 支付接口管理类
+    /// 支付费率接口管理类
     /// </summary>
     [Route("/api/rateConfig")]
     [ApiController, Authorize]
@@ -54,9 +52,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="ifName"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        [HttpGet, Route("ifCodes"), NoLog]
+        [HttpGet, Route("savedMapData"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiRes List(string configMode, string infoId, string ifName, string ifCode)
+        public ApiRes List(string configMode, string infoId, string ifCode)
         {
             string infoType = string.Empty;
             switch (configMode)
@@ -78,8 +76,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 default:
                     break;
             }
-            var data = _payIfConfigService.PayIfConfigList(infoType, configMode, infoId, ifName, ifCode);
-            return ApiRes.Ok(data);
+            return ApiRes.Ok();
         }
 
         /// <summary>

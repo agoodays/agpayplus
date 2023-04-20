@@ -822,26 +822,28 @@ export default {
       return rateConfigTemp
     },
     toRateConfig (key, feeRateConfig) {
-      Object.values(this.rateConfig[key]).forEach(a => {
-        a.feeType = 'SINGLE'
-        delete a.feeRate
-        delete a.minFee
-        delete a.maxFee
-        a.levelList = []
-        const d = feeRateConfig[a.wayCode] || {}
-        Object.assign(a, d)
-        a.checked = !1
-        a.state = feeRateConfig[a.wayCode] ? 1 : 0
-        feeRateConfig[a.wayCode] && feeRateConfig[a.wayCode].state === 0 && (a.state = 0)
-        typeof a.feeRate === 'number' && (a.feeRate = Number.parseFloat((a.feeRate * 100).toFixed(6)))
-        typeof a.maxFee === 'number' && (a.maxFee = Number.parseFloat((a.maxFee / 100).toFixed(2)))
-        typeof a.minFee === 'number' && (a.minFee = Number.parseFloat((a.minFee / 100).toFixed(2)))
-        a.levelList && a.levelList.forEach(s => {
+      Object.values(this.rateConfig[key]).forEach(item => {
+        item.feeType = 'SINGLE'
+        delete item.feeRate
+        delete item.minFee
+        delete item.maxFee
+        const payWayConfig = feeRateConfig[item.wayCode] || {}
+        Object.assign(item, payWayConfig)
+        item.state = feeRateConfig[item.wayCode] ? 1 : 0
+        feeRateConfig[item.wayCode] && feeRateConfig[item.wayCode].state === 0 && (item.state = 0)
+        typeof item.feeRate === 'number' && (item.feeRate = Number.parseFloat((item.feeRate * 100).toFixed(6)))
+        if (item.levelMode && item[item.levelMode]) {
+          for (const i in item[item.levelMode]) {
+            typeof item[item.levelMode][i].maxFee === 'number' && (item[item.levelMode][i].maxFee = Number.parseFloat((item[item.levelMode][i].maxFee / 100).toFixed(2)))
+            typeof item[item.levelMode][i].minFee === 'number' && (item[item.levelMode][i].minFee = Number.parseFloat((item[item.levelMode][i].minFee / 100).toFixed(2)))
+            item[item.levelMode][i].levelList && item[item.levelMode][i].levelList.forEach(s => {
               typeof s.feeRate === 'number' && (s.feeRate = Number.parseFloat((s.feeRate * 100).toFixed(6)))
               typeof s.maxAmount === 'number' && (s.maxAmount = Number.parseFloat((s.maxAmount / 100).toFixed(2)))
               typeof s.minAmount === 'number' && (s.minAmount = Number.parseFloat((s.minAmount / 100).toFixed(2)))
-            }
-        )
+            })
+          }
+        }
+        console.log(item)
       })
     },
     async getRateConfig (currentIfCode) {
@@ -864,6 +866,10 @@ export default {
         item.selectedWayCodeList = []
       })
       const params = Object.assign({}, { configMode: that.configMode, infoId: that.infoId, ifCode: that.currentIfCode })
+      let mapData = {}
+      await req.list(API_URL_RATECONFIGS_LIST + '/savedMapData', params).then(res => {
+        mapData = res
+      })
       await req.list(API_URL_RATECONFIGS_LIST + '/payways', params).then(res => {
         res.records.forEach(payWay => {
           payWay.checked = false
@@ -881,6 +887,7 @@ export default {
             item.mchapplydefFee = that.initRateConfig(null)
           })
         })
+
         that.mergeFeeList.forEach(item => {
           that.allPaywayList.filter(item.filter).forEach(payWay => {
             item.selectedWayCodeList.push({
@@ -890,6 +897,24 @@ export default {
             })
           })
         })
+
+        if (mapData && mapData.ISVCOST) {
+          that.toRateConfig('mainFee', mapData.ISVCOST)
+          that.originSavedList = JSON.parse(JSON.stringify(Object.keys(mapData.ISVCOST)))
+        }
+        if (mapData && mapData.AGENTRATE) {
+          that.originSavedList = JSON.parse(JSON.stringify(Object.keys(mapData.AGENTRATE)))
+          that.toRateConfig('mainFee', mapData.AGENTRATE)
+        }
+        mapData && mapData.MCHRATE && that.toRateConfig('mainFee', mapData.MCHRATE)
+        mapData && mapData.AGENTDEF && that.toRateConfig('agentdefFee', mapData.AGENTDEF)
+        mapData && mapData.MCHAPPLYDEF && that.toRateConfig('mchapplydefFee', mapData.MCHAPPLYDEF)
+        if (mapData && mapData.READONLYISVCOST) {
+          that.savedMapDataHasReadonlyIsvCostRateMap = !0
+          that.toRateConfig('readonlyIsvCostRateMap', mapData.READONLYISVCOST)
+        }
+        mapData && mapData.READONLYPARENTAGENT && that.toRateConfig('readonlyParentAgentRateMap', mapData.READONLYPARENTAGENT)
+        mapData && mapData.READONLYPARENTDEFRATE && that.toRateConfig('readonlyParentDefRateRateMap', mapData.READONLYPARENTDEFRATE)
       })
 
       that.mergeFeeList.forEach(item => {
