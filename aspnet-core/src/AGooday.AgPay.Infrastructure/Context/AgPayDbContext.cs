@@ -17,6 +17,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         #region DbSets
         public DbSet<AgentInfo> AgentInfo { get; set; }
         public DbSet<IsvInfo> IsvInfo { get; set; }
+        public DbSet<LevelRateConfig> LevelRateConfig { get; set; }
         public DbSet<MchApp> MchApp { get; set; }
         public DbSet<MchDivisionReceiver> MchDivisionReceiver { get; set; }
         public DbSet<MchDivisionReceiverGroup> MchDivisionReceiverGroup { get; set; }
@@ -29,6 +30,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         public DbSet<PayInterfaceDefine> PayInterfaceDefine { get; set; }
         public DbSet<PayOrder> PayOrder { get; set; }
         public DbSet<PayOrderDivisionRecord> PayOrderDivisionRecord { get; set; }
+        public DbSet<PayRateConfig> PayRateConfig { get; set; }
         public DbSet<PayWay> PayWay { get; set; }
         public DbSet<RefundOrder> RefundOrder { get; set; }
         public DbSet<SysArticle> SysArticle { get; set; }
@@ -127,6 +129,13 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<IsvInfo>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<IsvInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<IsvInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<LevelRateConfig>().Property(c => c.MinAmount).HasDefaultValue(0);
+            modelBuilder.Entity<LevelRateConfig>().Property(c => c.MaxAmount).HasDefaultValue(0);
+            modelBuilder.Entity<LevelRateConfig>().Property(c => c.MinFee).HasDefaultValue(0);
+            modelBuilder.Entity<LevelRateConfig>().Property(c => c.MaxFee).HasDefaultValue(0);
+            modelBuilder.Entity<LevelRateConfig>().Property(c => c.State).HasDefaultValue(0);
+            modelBuilder.Entity<LevelRateConfig>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<LevelRateConfig>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<MchApp>().Property(c => c.AppName).HasDefaultValue("");
             modelBuilder.Entity<MchApp>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<MchApp>().Property(c => c.DefaultFlag).HasDefaultValue(0);
@@ -177,6 +186,9 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<PayOrderDivisionRecord>().Property(c => c.AccName).HasDefaultValue("");
             modelBuilder.Entity<PayOrderDivisionRecord>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayOrderDivisionRecord>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<PayRateConfig>().Property(c => c.State).HasDefaultValue(0);
+            modelBuilder.Entity<PayRateConfig>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<PayRateConfig>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayWay>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayWay>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<RefundOrder>().Property(c => c.Currency).HasDefaultValue("cny");
