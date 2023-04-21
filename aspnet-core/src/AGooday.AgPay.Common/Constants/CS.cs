@@ -59,6 +59,29 @@
         public const string INFO_TYPE_AGENT = "AGENT";
         #endregion
 
+        #region 配置类型:ISVCOST-服务商低价, AGENTRATE-代理商费率, AGENTDEF-代理商默认费率, MCHAPPLYDEF-商户进件默认费率, MCHRATE-商户费率
+        /// <summary>
+        /// 服务商低价
+        /// </summary>
+        public const string CONFIG_TYPE_ISVCOST = "ISVCOST";
+        /// <summary>
+        /// 代理商费率
+        /// </summary>
+        public const string CONFIG_TYPE_AGENTRATE = "AGENTRATE";
+        /// <summary>
+        /// 代理商默认费率
+        /// </summary>
+        public const string CONFIG_TYPE_AGENTDEF = "AGENTDEF";
+        /// <summary>
+        /// 商户进件默认费率
+        /// </summary>
+        public const string CONFIG_TYPE_MCHAPPLYDEF = "MCHAPPLYDEF";
+        /// <summary>
+        /// 商户费率
+        /// </summary>
+        public const string CONFIG_TYPE_MCHRATE = "MCHRATE";
+        #endregion
+
         #region 商户类型:1-普通商户 2-特约商户
         /// <summary>
         /// 普通商户
@@ -68,6 +91,16 @@
         /// 特约商户
         /// </summary>
         public const byte MCH_TYPE_ISVSUB = 2;
+        #endregion
+
+        #region 费率类型:SINGLE-单笔费率, LEVEL-阶梯费率
+        public const string FEE_TYPE_SINGLE = "SINGLE";
+        public const string FEE_TYPE_LEVEL = "LEVEL";
+        #endregion
+
+        #region 阶梯模式: 模式: NORMAL-普通模式, UNIONPAY-银联模式
+        public const string LEVEL_MODE_NORMAL = "NORMAL";
+        public const string LEVEL_MODE_UNIONPAY = "UNIONPAY";
         #endregion
 
         #region 代理商类型:1-普通商户 2-特约商户

@@ -23,6 +23,7 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<AgentInfo, AgentInfoCreatedEvent>();
 
             CreateMap<IsvInfo, IsvInfoDto>();
+            CreateMap<LevelRateConfig, LevelRateConfigDto>();
             CreateMap<MchApp, MchAppDto>()
                 .ForMember(d => d.AppSignType, o => o.MapFrom(s => JArray.Parse(s.AppSignType)));
             CreateMap<MchStore, MchStoreDto>();
@@ -41,6 +42,7 @@ namespace AGooday.AgPay.Application.AutoMapper
                 .ForMember(d => d.WayCodes, o => o.MapFrom(s => JArray.Parse(s.WayCodes)));
             CreateMap<PayOrderDivisionRecord, PayOrderDivisionRecordDto>();
             CreateMap<PayOrder, PayOrderDto>();
+            CreateMap<PayRateConfig, PayRateConfigDto>();
 
             CreateMap<PayWay, PayWayDto>();
             CreateMap<PayWay, MchPayPassagePayWayDto>();
