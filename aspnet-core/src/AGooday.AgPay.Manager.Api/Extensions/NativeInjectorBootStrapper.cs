@@ -47,6 +47,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IPayInterfaceDefineService, PayInterfaceDefineService>();
             services.AddScoped<IPayOrderDivisionRecordService, PayOrderDivisionRecordService>();
             services.AddScoped<IPayOrderService, PayOrderService>();
+            services.AddScoped<IPayRateConfigService, PayRateConfigService>();
             services.AddScoped<IPayWayService, PayWayService>();
             services.AddScoped<IRefundOrderService, RefundOrderService>();
             services.AddScoped<ISysArticleService, SysArticleService>();
@@ -99,6 +100,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
+            services.AddScoped<ILevelRateConfigRepository, LevelRateConfigRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
             services.AddScoped<IMchStoreRepository, MchStoreRepository>();
             services.AddScoped<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();
@@ -110,6 +112,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IPayInterfaceDefineRepository, PayInterfaceDefineRepository>();
             services.AddScoped<IPayOrderDivisionRecordRepository, PayOrderDivisionRecordRepository>();
             services.AddScoped<IPayOrderRepository, PayOrderRepository>();
+            services.AddScoped<IPayRateConfigRepository, PayRateConfigRepository>();
             services.AddScoped<IPayWayRepository, PayWayRepository>();
             services.AddScoped<IRefundOrderRepository, RefundOrderRepository>();
             services.AddScoped<ISysArticleRepository, SysArticleRepository>();

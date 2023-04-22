@@ -76,6 +76,13 @@ namespace AGooday.AgPay.Domain.Models
         public decimal? FeeRate { get; set; }
 
         /// <summary>
+        /// 是否支持进件: 0-不支持, 1-支持
+        /// </summary>
+        [Comment("是否支持进件: 0-不支持, 1-支持")]
+        [Required, Column("applyment_support", TypeName = "tinyint(6)")]
+        public byte ApplymentSupport { get; set; }
+
+        /// <summary>
         /// 状态: 0-停用, 1-启用
         /// </summary>
         [Comment("状态: 0-停用, 1-启用")]

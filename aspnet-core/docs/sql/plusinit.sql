@@ -195,6 +195,7 @@ CREATE TABLE `t_pay_rate_config` (
   `fee_type` VARCHAR(20) NOT NULL COMMENT '费率类型:SINGLE-单笔费率, LEVEL-阶梯费率',
   `level_mode` VARCHAR(20) NULL COMMENT '阶梯模式: 模式: NORMAL-普通模式, UNIONPAY-银联模式',
   `fee_rate` DECIMAL(20,6) NOT NULL COMMENT '支付方式费率',
+  `applyment_support` TINYINT NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持',
   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
@@ -206,7 +207,7 @@ CREATE TABLE `t_pay_rate_config` (
 DROP TABLE IF EXISTS `t_level_rate_config`;
 CREATE TABLE `t_level_rate_config` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `rate_config_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '支付费率配置ID',
+  `rate_config_id` BIGINT NOT NULL COMMENT '支付费率配置ID',
   `bank_card_type` VARCHAR(20) NULL COMMENT '银行卡类型: DEBIT-借记卡（储蓄卡）, CREDIT-贷记卡（信用卡）',
   `min_amount` INT NOT NULL DEFAULT '0' COMMENT '最小金额: 计算时大于此值', 
   `max_amount` INT NOT NULL DEFAULT '0' COMMENT '最大金额: 计算时小于或等于此值', 
@@ -216,7 +217,7 @@ CREATE TABLE `t_level_rate_config` (
   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`)
 ) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='阶梯费率表'
 
 -- 码牌信息表

@@ -22,12 +22,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<PayInterfaceConfigController> _logger;
-        private readonly IMchInfoService _mchInfoService;
+        private readonly IPayRateConfigService _payRateConfigService;
         private readonly IPayWayService _payWayService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
         public PayRateConfigController(IMQSender mqSender,
-            IMchInfoService mchInfoService,
+            IPayRateConfigService payRateConfigService,
             IPayWayService payWayService,
             IPayInterfaceConfigService payIfConfigService,
             ILogger<PayInterfaceConfigController> logger,
@@ -39,9 +39,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         {
             this.mqSender = mqSender;
             _logger = logger;
-            _mchInfoService = mchInfoService;
             _payWayService = payWayService;
             _payIfConfigService = payIfConfigService;
+            _payRateConfigService = payRateConfigService;
         }
 
         /// <summary>
@@ -56,27 +56,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes List(string configMode, string infoId, string ifCode)
         {
-            string infoType = string.Empty;
-            switch (configMode)
-            {
-                case "mgrIsv":
-                    infoType = CS.INFO_TYPE_ISV;
-                    break;
-                case "mgrAgent":
-                case "agentSubagent":
-                    infoType = CS.INFO_TYPE_AGENT;
-                    break;
-                case "mgrMch":
-                case "agentMch":
-                case "agentSelf":
-                case "mchSelfApp1":
-                case "mchSelfApp2":
-                    infoType = CS.INFO_TYPE_MCH_APP;
-                    break;
-                default:
-                    break;
-            }
-            return ApiRes.Ok();
+            return ApiRes.Ok(_payRateConfigService.GetByInfoIdAndIfCodeJson(configMode, infoId, ifCode));
         }
 
         /// <summary>
