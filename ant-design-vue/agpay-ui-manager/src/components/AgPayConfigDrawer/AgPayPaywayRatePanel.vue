@@ -411,10 +411,6 @@ export default {
       configTypeMaps: ['mainFee', 'agentdefFee', 'mchapplydefFee'],
       allPaywayList: [],
       allPaywayMap: {},
-      savedMapDataHasReadonlyIsvCostRateMap: !1,
-      readonlyIsvCostRateMap: {},
-      readonlyParentAgentRateMap: {},
-      readonlyParentDefRateRateMap: {},
       noCheckRuleFlag: 0,
       originSavedList: [],
       rateConfig: {
@@ -890,9 +886,6 @@ export default {
         agentdefFee: {},
         mchapplydefFee: {}
       }
-      that.readonlyIsvCostRateMap = {}
-      that.readonlyParentAgentRateMap = {}
-      that.readonlyParentDefRateRateMap = {}
       that.originSavedList = []
       that.mergeFeeList.forEach(item => {
         item.selectedWayCodeList = []
@@ -907,9 +900,6 @@ export default {
           payWay.checked = false
           that.allPaywayList.push(payWay)
           that.allPaywayMap[payWay.wayCode] = payWay
-          that.readonlyIsvCostRateMap[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
-          that.readonlyParentAgentRateMap[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
-          that.readonlyParentDefRateRateMap[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.rateConfig.mainFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.rateConfig.agentdefFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.rateConfig.mchapplydefFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
@@ -942,11 +932,10 @@ export default {
         mapData && mapData.AGENTDEF && that.toRateConfig('agentdefFee', mapData.AGENTDEF)
         mapData && mapData.MCHAPPLYDEF && that.toRateConfig('mchapplydefFee', mapData.MCHAPPLYDEF)
         if (mapData && mapData.READONLYISVCOST) {
-          that.savedMapDataHasReadonlyIsvCostRateMap = !0
-          that.toRateConfig('readonlyIsvCostRateMap', mapData.READONLYISVCOST)
+          that.toRateConfig('readonlyIsvCost', mapData.READONLYISVCOST)
         }
-        mapData && mapData.READONLYPARENTAGENT && that.toRateConfig('readonlyParentAgentRateMap', mapData.READONLYPARENTAGENT)
-        mapData && mapData.READONLYPARENTDEFRATE && that.toRateConfig('readonlyParentDefRateRateMap', mapData.READONLYPARENTDEFRATE)
+        mapData && mapData.READONLYPARENTAGENT && that.toRateConfig('readonlyParentAgent', mapData.READONLYPARENTAGENT)
+        mapData && mapData.READONLYPARENTDEFRATE && that.toRateConfig('readonlyParentDefRate', mapData.READONLYPARENTDEFRATE)
       })
 
       that.mergeFeeList.forEach(item => {
