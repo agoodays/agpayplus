@@ -492,7 +492,7 @@ export default {
       ],
       saveObject: {
         infoId: this.infoId,
-        ifCode: this.currentIfCode,
+        ifCode: this.ifCode,
         configMode: this.configMode,
         noCheckRuleFlag: 0,
         ISVCOST: [
@@ -1429,8 +1429,19 @@ export default {
     onSubmit () {
       const that = this
       const feeRateConfig = that.getFeeRateConfig()
+      feeRateConfig.InfoId = that.InfoId
+      feeRateConfig.IfCode = that.IfCode
+      feeRateConfig.ConfigMode = that.ConfigMode
+      feeRateConfig.NoCheckRuleFlag = that.NoCheckRuleFlag
       console.log(feeRateConfig)
       console.log(that)
+      // req.add(API_URL_RATECONFIGS_LIST, feeRateConfig).then(res => {
+      //   that.$message.success('新增成功')
+      //   // that.callbackFunc() // 刷新列表
+      //   that.btnLoading = false
+      // }).catch(res => {
+      //   that.btnLoading = false
+      // })
     }
   }
 }

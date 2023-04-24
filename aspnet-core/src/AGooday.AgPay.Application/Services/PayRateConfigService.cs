@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
+using AGooday.AgPay.Domain.Models;
 using AutoMapper;
 using Newtonsoft.Json.Linq;
 
@@ -217,6 +218,96 @@ namespace AGooday.AgPay.Application.Services
             }
 
             return result;
+        }
+
+        public bool SaveOrUpdate(PayRateConfigSaveDto dto)
+        {
+            switch (dto.ConfigMode)
+            {
+                case "mgrIsv":
+                    string infoId = dto.InfoId;
+                    var ifCode = dto.IfCode;
+                    var infoType = "ISV";
+                    var configType = "ISVCOST";
+                    var items = dto.ISVCOST;
+                    SaveOrUpdate(infoId, ifCode, configType, infoType, items);
+                    configType = "AGENTDEF";
+                    items = dto.AGENTDEF;
+                    SaveOrUpdate(infoId, ifCode, configType, infoType, items);
+                    configType = "MCHAPPLYDEF";
+                    items = dto.MCHAPPLYDEF;
+                    SaveOrUpdate(infoId, ifCode, configType, infoType, items);
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
+        }
+
+        private void SaveOrUpdate(string infoId, string ifCode, string configType, string infoType, List<PayRateConfigSaveDto.PayRateConfigItem> items)
+        {
+            var now = DateTime.Now;
+            foreach (var item in items)
+            {
+                var entity =  _payRateConfigRepository.GetByUniqueKey(configType, infoType, infoId, ifCode, item.WayCode);
+                if (entity == null)
+                {
+                    entity = new PayRateConfig
+                    {
+                        ConfigType = configType,
+                        InfoType = infoType,
+                        InfoId = infoId,
+                        IfCode = ifCode,
+                        WayCode = item.WayCode,
+                        FeeType = item.FeeType,
+                        LevelMode = item.LevelMode,
+                        FeeRate = item.FeeRate,
+                        ApplymentSupport = item.ApplymentSupport,
+                        State = item.State,
+                        CreatedAt = now,
+                        UpdatedAt = now,
+                    };
+                    _payRateConfigRepository.Add(entity);
+                }
+                else
+                {
+                    var levelRateConfigs = _levelRateConfigRepository.GetByRateConfigId(entity.Id);
+                    foreach (var levelRateConfig in levelRateConfigs)
+                    {
+                        _levelRateConfigRepository.Remove(levelRateConfig.Id);
+                    }
+
+                    entity.FeeType = item.FeeType;
+                    entity.LevelMode = item.LevelMode;
+                    entity.FeeRate = item.FeeRate;
+                    entity.ApplymentSupport = item.ApplymentSupport;
+                    entity.State = item.State;
+                    entity.UpdatedAt = now;
+                    _payRateConfigRepository.Update(entity);
+                }
+
+                foreach (var level in item.UNIONPAY)
+                {
+                    foreach (var levelitem in level.LevelList)
+                    {
+                        var levelRateConfig = new LevelRateConfig
+                        {
+                            RateConfigId = entity.Id,
+                            BankCardType = level.BankCardType,
+                            MinFee = level.MinFee,
+                            MaxFee = level.MaxFee,
+                            MinAmount = levelitem.MinAmount,
+                            MaxAmount = levelitem.MaxAmount,
+                            FeeRate = levelitem.FeeRate,
+                            State = item.State,
+                            CreatedAt = now,
+                            UpdatedAt = now,
+                        };
+                        _levelRateConfigRepository.Add(levelRateConfig);
+                    }
+                }
+            }
         }
     }
 }
