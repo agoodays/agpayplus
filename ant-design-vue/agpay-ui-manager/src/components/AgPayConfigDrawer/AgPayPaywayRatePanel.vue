@@ -1245,7 +1245,7 @@ export default {
         // 将当前元素的区间范围与其他元素的区间范围进行比较
         for (let j = i + 1; j < limits.length; j++) {
           const { minAmount: min2, maxAmount: max2 } = limits[j]
-          if (min1 <= max2 && min2 <= max1) {
+          if (min1 < max2 && min2 <= max1) {
             // 如果存在重叠区间，返回 true
             return true
           }
@@ -1429,19 +1429,19 @@ export default {
     onSubmit () {
       const that = this
       const feeRateConfig = that.getFeeRateConfig()
-      feeRateConfig.InfoId = that.InfoId
-      feeRateConfig.IfCode = that.IfCode
-      feeRateConfig.ConfigMode = that.ConfigMode
-      feeRateConfig.NoCheckRuleFlag = that.NoCheckRuleFlag
+      feeRateConfig.infoId = that.infoId
+      feeRateConfig.ifCode = that.ifCode
+      feeRateConfig.configMode = that.configMode
+      feeRateConfig.noCheckRuleFlag = that.noCheckRuleFlag
       console.log(feeRateConfig)
       console.log(that)
-      // req.add(API_URL_RATECONFIGS_LIST, feeRateConfig).then(res => {
-      //   that.$message.success('新增成功')
-      //   // that.callbackFunc() // 刷新列表
-      //   that.btnLoading = false
-      // }).catch(res => {
-      //   that.btnLoading = false
-      // })
+      req.add(API_URL_RATECONFIGS_LIST, feeRateConfig).then(res => {
+        that.$message.success('新增成功')
+        // that.callbackFunc() // 刷新列表
+        that.btnLoading = false
+      }).catch(res => {
+        that.btnLoading = false
+      })
     }
   }
 }

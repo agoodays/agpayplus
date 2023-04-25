@@ -22,7 +22,7 @@
             public string FeeType { get; set; }
             public string LevelMode { get; set; }
             public byte ApplymentSupport { get; set; }
-            public int? FeeRate { get; set; }
+            public decimal? FeeRate { get; set; }
             public List<Levels> UNIONPAY { get; set; }
             public List<Levels> NORMAL { get; set; }
         }
@@ -37,10 +37,10 @@
 
         public class LevelList
         {
-            public int Id { get; set; }
+            public long Id { get; set; }
             public int MinAmount { get; set; }
             public int MaxAmount { get; set; }
-            public int FeeRate { get; set; }
+            public decimal? FeeRate { get; set; }
         }
     }
 }

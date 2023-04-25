@@ -286,27 +286,33 @@ namespace AGooday.AgPay.Application.Services
                     entity.UpdatedAt = now;
                     _payRateConfigRepository.Update(entity);
                 }
+                _payRateConfigRepository.SaveChanges();
 
-                foreach (var level in item.UNIONPAY)
+                if (item.FeeType.Equals(CS.FEE_TYPE_LEVEL))
                 {
-                    foreach (var levelitem in level.LevelList)
+                    foreach (var level in (item.LevelMode.Equals(CS.LEVEL_MODE_NORMAL) ? item.NORMAL : item.UNIONPAY))
                     {
-                        var levelRateConfig = new LevelRateConfig
+                        foreach (var levelitem in level.LevelList)
                         {
-                            RateConfigId = entity.Id,
-                            BankCardType = level.BankCardType,
-                            MinFee = level.MinFee,
-                            MaxFee = level.MaxFee,
-                            MinAmount = levelitem.MinAmount,
-                            MaxAmount = levelitem.MaxAmount,
-                            FeeRate = levelitem.FeeRate,
-                            State = item.State,
-                            CreatedAt = now,
-                            UpdatedAt = now,
-                        };
-                        _levelRateConfigRepository.Add(levelRateConfig);
+                            var levelRateConfig = new LevelRateConfig
+                            {
+                                RateConfigId = entity.Id,
+                                BankCardType = level.BankCardType,
+                                MinFee = level.MinFee,
+                                MaxFee = level.MaxFee,
+                                MinAmount = levelitem.MinAmount,
+                                MaxAmount = levelitem.MaxAmount,
+                                FeeRate = levelitem.FeeRate,
+                                State = item.State,
+                                CreatedAt = now,
+                                UpdatedAt = now,
+                            };
+                            _levelRateConfigRepository.Add(levelRateConfig);
+                        }
                     }
                 }
+
+                _levelRateConfigRepository.SaveChanges();
             }
         }
     }
