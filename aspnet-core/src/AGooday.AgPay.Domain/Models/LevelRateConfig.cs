@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 银行卡类型: DEBIT-借记卡（储蓄卡）, CREDIT-贷记卡（信用卡）
         /// </summary>
         [Comment("银行卡类型: DEBIT-借记卡（储蓄卡）, CREDIT-贷记卡（信用卡）")]
-        [Required, Column("bank_card_type", TypeName = "varchar(20)")]
+        [Column("bank_card_type", TypeName = "varchar(20)")]
         public string BankCardType { get; set; }
 
         /// <summary>

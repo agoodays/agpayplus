@@ -864,10 +864,13 @@ export default {
           for (const i in item[item.levelMode]) {
             typeof item[item.levelMode][i].maxFee === 'number' && (item[item.levelMode][i].maxFee = Number.parseFloat((item[item.levelMode][i].maxFee / 100).toFixed(2)))
             typeof item[item.levelMode][i].minFee === 'number' && (item[item.levelMode][i].minFee = Number.parseFloat((item[item.levelMode][i].minFee / 100).toFixed(2)))
+            let id = 1
             item[item.levelMode][i].levelList && item[item.levelMode][i].levelList.forEach(s => {
+              s.id = id
               typeof s.feeRate === 'number' && (s.feeRate = Number.parseFloat((s.feeRate * 100).toFixed(6)))
               typeof s.maxAmount === 'number' && (s.maxAmount = Number.parseFloat((s.maxAmount / 100).toFixed(2)))
               typeof s.minAmount === 'number' && (s.minAmount = Number.parseFloat((s.minAmount / 100).toFixed(2)))
+              id++
             })
           }
         }
@@ -962,6 +965,8 @@ export default {
           item.isMergeMode = true
         }
       })
+      console.log(that.mergeFeeList)
+      console.log(that.rateConfig)
     },
     onChangeWayCode (wayCode, event, mergeFeeItem) {
       console.log(wayCode, event.target.checked)
@@ -1245,7 +1250,10 @@ export default {
         // 将当前元素的区间范围与其他元素的区间范围进行比较
         for (let j = i + 1; j < limits.length; j++) {
           const { minAmount: min2, maxAmount: max2 } = limits[j]
-          if (min1 < max2 && min2 <= max1) {
+          // 检测区间 (0, 5)
+          // if (min1 <= max2 && min2 <= max1) {
+          // 检测区间 (0, 5]
+          if (min1 <= max2 && min2 < max1) {
             // 如果存在重叠区间，返回 true
             return true
           }

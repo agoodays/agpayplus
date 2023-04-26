@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 阶梯模式: 模式: NORMAL-普通模式, UNIONPAY-银联模式
         /// </summary>
         [Comment("阶梯模式: 模式: NORMAL-普通模式, UNIONPAY-银联模式")]
-        [Required, Column("level_mode", TypeName = "varchar(20)")]
+        [Column("level_mode", TypeName = "varchar(20)")]
         public string LevelMode { get; set; }
 
         /// <summary>

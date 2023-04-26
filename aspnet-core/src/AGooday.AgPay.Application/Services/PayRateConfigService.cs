@@ -181,6 +181,10 @@ namespace AGooday.AgPay.Application.Services
                 payRateConfig.Add("feeType", item.FeeType);
                 payRateConfig.Add("levelMode", item.LevelMode);
                 payRateConfig.Add("applymentSupport", item.ApplymentSupport);
+                if (item.FeeType.Equals(CS.FEE_TYPE_SINGLE))
+                {
+                    payRateConfig.Add("feeRate", item.FeeRate);
+                }
                 if (item.FeeType.Equals(CS.FEE_TYPE_LEVEL))
                 {
                     JArray array = new JArray();
@@ -199,6 +203,7 @@ namespace AGooday.AgPay.Application.Services
                             maxAmount = s.MaxAmount,
                             feeRate = s.FeeRate
                         })));
+                        array.Add(levelRateConfig);
                     }
                     payRateConfig.Add(item.LevelMode, array);
                 }

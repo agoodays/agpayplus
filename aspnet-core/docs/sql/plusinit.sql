@@ -194,7 +194,7 @@ CREATE TABLE `t_pay_rate_config` (
   `way_code` VARCHAR(20) NOT NULL COMMENT '支付方式',
   `fee_type` VARCHAR(20) NOT NULL COMMENT '费率类型:SINGLE-单笔费率, LEVEL-阶梯费率',
   `level_mode` VARCHAR(20) NULL COMMENT '阶梯模式: 模式: NORMAL-普通模式, UNIONPAY-银联模式',
-  `fee_rate` DECIMAL(20,6) NOT NULL COMMENT '支付方式费率',
+  `fee_rate` DECIMAL(20,6) NULL COMMENT '支付方式费率',
   `applyment_support` TINYINT NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持',
   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
