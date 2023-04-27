@@ -5,6 +5,8 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Services
@@ -15,6 +17,8 @@ namespace AGooday.AgPay.Application.Services
         private readonly IIsvInfoRepository _isvInfoRepository;
         private readonly IAgentInfoRepository _agentInfoRepository;
         private readonly IMchInfoRepository _mchInfoRepository;
+        private readonly IPayWayRepository _payWayRepository;
+        private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
         private readonly IPayRateConfigRepository _payRateConfigRepository;
         private readonly ILevelRateConfigRepository _levelRateConfigRepository;
         // 用来进行DTO
@@ -27,7 +31,9 @@ namespace AGooday.AgPay.Application.Services
             ILevelRateConfigRepository levelRateConfigRepository,
             IIsvInfoRepository isvInfoRepository,
             IAgentInfoRepository agentInfoRepository,
-            IMchInfoRepository mchInfoRepository)
+            IMchInfoRepository mchInfoRepository,
+            IPayWayRepository payWayRepository, 
+            IPayInterfaceDefineRepository payInterfaceDefineRepository)
         {
             _mapper = mapper;
             Bus = bus;
@@ -36,6 +42,58 @@ namespace AGooday.AgPay.Application.Services
             _isvInfoRepository = isvInfoRepository;
             _agentInfoRepository = agentInfoRepository;
             _mchInfoRepository = mchInfoRepository;
+            _payWayRepository = payWayRepository;
+            _payInterfaceDefineRepository = payInterfaceDefineRepository;
+        }
+
+        public PaginatedList<PayWayDto> GetPayWaysByInfoId(PayWayUsableQueryDto dto)
+        {
+            string infoType = string.Empty;
+            var wayCodes = new List<string>();
+            switch (dto.ConfigMode)
+            {
+                case "mgrIsv":
+                    infoType = CS.INFO_TYPE_ISV;
+                    var payIfDefine = _payInterfaceDefineRepository.GetById(dto.IfCode);
+                    wayCodes = JsonConvert.DeserializeObject<object[]>(payIfDefine.WayCodes).Select(obj => (string)((dynamic)obj).wayCode).ToList();
+                    break;
+                case "mgrAgent":
+                case "agentSubagent":
+                    infoType = CS.INFO_TYPE_AGENT;
+                    var agent = _agentInfoRepository.GetById(dto.InfoId);
+                    wayCodes = GetPayWayCodes(dto.IfCode, agent.IsvNo, agent.Pid).ToList();
+                    break;
+                case "mgrMch":
+                case "agentMch":
+                case "agentSelf":
+                case "mchSelfApp1":
+                case "mchSelfApp2":
+                    infoType = CS.INFO_TYPE_MCH_APP;
+                    var mchInfo = _mchInfoRepository.GetById(dto.InfoId);
+                    wayCodes = GetPayWayCodes(dto.IfCode, mchInfo.IsvNo, mchInfo.AgentNo).ToList();
+                    break;
+                default:
+                    break;
+            }
+            var payWays = _payWayRepository.GetAll().Where(w => wayCodes.Contains(w.WayCode))
+                .OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
+            var records = PaginatedList<PayWay>.Create<PayWayDto>(payWays.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            return records;
+        }
+
+        private IQueryable<string> GetPayWayCodes(string ifCode, string isvNo, string agentNo)
+        {
+            // 服务商开通支付方式
+            var isvWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCode(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, isvNo, ifCode)
+                .Select(s => s.WayCode).Distinct();
+            if (!string.IsNullOrWhiteSpace(agentNo))
+            {
+                // 代理商开通支付方式
+                var agentWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCode(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, agentNo, ifCode)
+                    .Where(w => isvWayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct();
+                return agentWayCodes;
+            }
+            return isvWayCodes;
         }
 
         public Dictionary<string, Dictionary<string, PayRateConfigDto>> GetByInfoIdAndIfCode(string configMode, string infoId, string ifCode)
@@ -232,16 +290,17 @@ namespace AGooday.AgPay.Application.Services
                 case "mgrIsv":
                     string infoId = dto.InfoId;
                     var ifCode = dto.IfCode;
+                    var delPayWayCodes = dto.DelPayWayCodes;
                     var infoType = "ISV";
                     var configType = "ISVCOST";
                     var items = dto.ISVCOST;
-                    SaveOrUpdate(infoId, ifCode, configType, infoType, items);
+                    SaveOrUpdate(infoId, ifCode, configType, infoType, delPayWayCodes, items);
                     configType = "AGENTDEF";
                     items = dto.AGENTDEF;
-                    SaveOrUpdate(infoId, ifCode, configType, infoType, items);
+                    SaveOrUpdate(infoId, ifCode, configType, infoType, delPayWayCodes, items);
                     configType = "MCHAPPLYDEF";
                     items = dto.MCHAPPLYDEF;
-                    SaveOrUpdate(infoId, ifCode, configType, infoType, items);
+                    SaveOrUpdate(infoId, ifCode, configType, infoType, delPayWayCodes, items);
                     break;
                 default:
                     break;
@@ -250,12 +309,13 @@ namespace AGooday.AgPay.Application.Services
             return true;
         }
 
-        private void SaveOrUpdate(string infoId, string ifCode, string configType, string infoType, List<PayRateConfigSaveDto.PayRateConfigItem> items)
+        private void SaveOrUpdate(string infoId, string ifCode, string configType, string infoType, List<string> delPayWayCodes, List<PayRateConfigSaveDto.PayRateConfigItem> items)
         {
             var now = DateTime.Now;
+            DelPayWayCodeRateConfig(configType, infoType, infoId, ifCode, delPayWayCodes);
             foreach (var item in items)
             {
-                var entity =  _payRateConfigRepository.GetByUniqueKey(configType, infoType, infoId, ifCode, item.WayCode);
+                var entity = _payRateConfigRepository.GetByUniqueKey(configType, infoType, infoId, ifCode, item.WayCode);
                 if (entity == null)
                 {
                     entity = new PayRateConfig
@@ -318,6 +378,28 @@ namespace AGooday.AgPay.Application.Services
                 }
 
                 _levelRateConfigRepository.SaveChanges();
+            }
+        }
+
+        private void DelPayWayCodeRateConfig(string infoId, string ifCode, string configType, string infoType, List<string> delPayWayCodes)
+        {
+            foreach (var wayCode in delPayWayCodes)
+            {
+                var entity = _payRateConfigRepository.GetByUniqueKey(configType, infoType, infoId, ifCode, wayCode);
+                if (entity != null)
+                {
+                    _payRateConfigRepository.Remove(entity.Id);
+
+                    _levelRateConfigRepository.SaveChanges();
+
+                    var levelRateConfigs = _levelRateConfigRepository.GetByRateConfigId(entity.Id);
+                    foreach (var levelRateConfig in levelRateConfigs)
+                    {
+                        _levelRateConfigRepository.Remove(levelRateConfig.Id);
+                    }
+
+                    _levelRateConfigRepository.SaveChanges();
+                }
             }
         }
     }

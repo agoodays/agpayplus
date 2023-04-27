@@ -9,6 +9,7 @@
         public string IfCode { get; set; }
         public string ConfigMode { get; set; }
         public byte NoCheckRuleFlag { get; set; }
+        public List<string> DelPayWayCodes { get; set; }
         public List<PayRateConfigItem> ISVCOST { get; set; }
         public List<PayRateConfigItem> AGENTDEF { get; set; }
         public List<PayRateConfigItem> MCHAPPLYDEF { get; set; }

@@ -841,7 +841,7 @@ export default {
             rateConfigTemp = rateConfig
             continue
           }
-          if (!Object.is(rateConfigTemp, rateConfig)) {
+          if (JSON.stringify(rateConfigTemp) !== JSON.stringify(rateConfig)) {
             console.log('判断为false: ', rateConfig, rateConfigTemp)
             return false
           }
@@ -1437,18 +1437,62 @@ export default {
     onSubmit () {
       const that = this
       const feeRateConfig = that.getFeeRateConfig()
-      feeRateConfig.infoId = that.infoId
-      feeRateConfig.ifCode = that.ifCode
-      feeRateConfig.configMode = that.configMode
-      feeRateConfig.noCheckRuleFlag = that.noCheckRuleFlag
-      console.log(feeRateConfig)
+      if (!feeRateConfig) {
+        return false
+      }
+      const getDelWayCodes = (s) => {
+        const wayCodes = []
+        that.originSavedList.forEach(wayCode => {
+          s.filter(f => f.wayCode === wayCode).length <= 0 && wayCodes.push(wayCode)
+        })
+        return wayCodes
+      }
+      let delPayWayCodes = []
+      let originSavedList = null
+      if (that.configMode === 'mgrIsv') {
+        delPayWayCodes = getDelWayCodes(feeRateConfig.ISVCOST)
+        originSavedList = []
+        feeRateConfig.ISVCOST.forEach(s => {
+          originSavedList.push(s.wayCode)
+        })
+      } else {
+        if (that.configMode === 'mgrAgent' || that.configMode === 'agentSubagent') {
+          delPayWayCodes = getDelWayCodes(feeRateConfig.AGENTRATE)
+          originSavedList = []
+          feeRateConfig.AGENTRATE.forEach(s => {
+            originSavedList.push(s.wayCode)
+          })
+        }
+      }
+      let content = ''
+      if (delPayWayCodes.length > 0) {
+        content = '系统检测到关闭了' + delPayWayCodes.length + '个支付产品：【'
+        delPayWayCodes.forEach(wayCode => {
+          that.allPaywayMap[wayCode] ? content += `${that.allPaywayMap[wayCode].wayName}(${wayCode});` : content += `${wayCode}(已禁用);`
+        })
+        content += '】，点击确定将同时关闭操作对象的下级代理商和商户的配置！'
+      }
+
       console.log(that)
-      req.add(API_URL_RATECONFIGS_LIST, feeRateConfig).then(res => {
-        that.$message.success('新增成功')
-        // that.callbackFunc() // 刷新列表
-        that.btnLoading = false
-      }).catch(res => {
-        that.btnLoading = false
+      that.$infoBox.confirmPrimary('确认操作？', content, () => {
+        const params = {
+          infoId: that.infoId,
+          ifCode: that.ifCode,
+          configMode: that.configMode,
+          noCheckRuleFlag: that.noCheckRuleFlag,
+          delPayWayCodes: delPayWayCodes
+        }
+        Object.assign(params, feeRateConfig)
+        console.log(params)
+        req.add(API_URL_RATECONFIGS_LIST, params).then(res => {
+          that.$message.success('新增成功')
+          typeof originSavedList === 'object' && console.log('重置的原始list', originSavedList)
+          typeof originSavedList === 'object' && (that.originSavedList = originSavedList)
+          // that.callbackFunc() // 刷新列表
+          that.btnLoading = false
+        }).catch(res => {
+          that.btnLoading = false
+        })
       })
     }
   }

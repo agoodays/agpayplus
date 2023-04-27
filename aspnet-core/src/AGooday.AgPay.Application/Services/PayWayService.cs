@@ -70,12 +70,12 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<T> GetPaginatedData<T>(PayWayQueryDto dto)
         {
-            var sysLogs = _payWayRepository.GetAll()
+            var payWays = _payWayRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
                 && (string.IsNullOrWhiteSpace(dto.WayName) || w.WayName.Contains(dto.WayName))
                 && (string.IsNullOrWhiteSpace(dto.WayType) || w.WayType.Equals(dto.WayType))
                 ).OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayWay>.Create<T>(sysLogs.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<PayWay>.Create<T>(payWays.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

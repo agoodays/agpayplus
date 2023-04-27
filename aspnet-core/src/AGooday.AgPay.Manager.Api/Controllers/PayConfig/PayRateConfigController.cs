@@ -1,10 +1,8 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
@@ -23,13 +21,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         private readonly IMQSender mqSender;
         private readonly ILogger<PayInterfaceConfigController> _logger;
         private readonly IPayRateConfigService _payRateConfigService;
-        private readonly IPayWayService _payWayService;
-        private readonly IPayInterfaceConfigService _payIfConfigService;
 
         public PayRateConfigController(IMQSender mqSender,
             IPayRateConfigService payRateConfigService,
-            IPayWayService payWayService,
-            IPayInterfaceConfigService payIfConfigService,
             ILogger<PayInterfaceConfigController> logger,
             RedisUtil client,
             ISysUserService sysUserService,
@@ -39,8 +33,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         {
             this.mqSender = mqSender;
             _logger = logger;
-            _payWayService = payWayService;
-            _payIfConfigService = payIfConfigService;
             _payRateConfigService = payRateConfigService;
         }
 
@@ -67,29 +59,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("payways"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiRes GetPayWaysByInfoId(string configMode, string infoId, string ifCode)
+        public ApiRes GetPayWaysByInfoId([FromQuery] PayWayUsableQueryDto dto)
         {
-            string infoType = string.Empty;
-            switch (configMode)
-            {
-                case "mgrIsv":
-                    infoType = CS.INFO_TYPE_ISV;
-                    break;
-                case "mgrAgent":
-                case "agentSubagent":
-                    infoType = CS.INFO_TYPE_AGENT;
-                    break;
-                case "mgrMch":
-                case "agentMch":
-                case "agentSelf":
-                case "mchSelfApp1":
-                case "mchSelfApp2":
-                    infoType = CS.INFO_TYPE_MCH_APP;
-                    break;
-                default:
-                    break;
-            }
-            var data = _payWayService.GetPaginatedData<PayWayDto>(new PayWayQueryDto());
+            var data = _payRateConfigService.GetPayWaysByInfoId(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 

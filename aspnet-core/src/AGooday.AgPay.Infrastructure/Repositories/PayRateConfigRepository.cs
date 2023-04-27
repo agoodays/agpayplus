@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Domain.Interfaces;
+﻿using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
 
@@ -13,7 +14,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public PayRateConfig GetByUniqueKey(string configType, string infoType, string infoId, string ifCode, string wayCode)
         {
-            return DbSet.Where(w => w.ConfigType.Equals(configType)
+            return DbSet.Where(w => w.State.Equals(CS.YES)
+            && w.ConfigType.Equals(configType)
             && w.InfoType.Equals(infoType)
             && w.InfoId.Equals(infoId)
             && w.IfCode.Equals(ifCode)
@@ -22,7 +24,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public IQueryable<PayRateConfig> GetByInfoIdAndIfCode(string configType, string infoType, string infoId, string ifCode)
         {
-            return DbSet.Where(w => w.ConfigType.Equals(configType)
+            return DbSet.Where(w => w.State.Equals(CS.YES)
+            && w.ConfigType.Equals(configType)
             && w.InfoType.Equals(infoType)
             && w.InfoId.Equals(infoId)
             && w.IfCode.Equals(ifCode));
