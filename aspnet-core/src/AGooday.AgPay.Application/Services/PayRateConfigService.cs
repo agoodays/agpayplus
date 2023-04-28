@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Application.Services
             IIsvInfoRepository isvInfoRepository,
             IAgentInfoRepository agentInfoRepository,
             IMchInfoRepository mchInfoRepository,
-            IPayWayRepository payWayRepository, 
+            IPayWayRepository payWayRepository,
             IPayInterfaceDefineRepository payInterfaceDefineRepository)
         {
             _mapper = mapper;
@@ -52,22 +52,22 @@ namespace AGooday.AgPay.Application.Services
             var wayCodes = new List<string>();
             switch (dto.ConfigMode)
             {
-                case "mgrIsv":
+                case CS.CONFIG_MODE_MGR_ISV:
                     infoType = CS.INFO_TYPE_ISV;
                     var payIfDefine = _payInterfaceDefineRepository.GetById(dto.IfCode);
                     wayCodes = JsonConvert.DeserializeObject<object[]>(payIfDefine.WayCodes).Select(obj => (string)((dynamic)obj).wayCode).ToList();
                     break;
-                case "mgrAgent":
-                case "agentSubagent":
+                case CS.CONFIG_MODE_MGR_AGENT:
+                case CS.CONFIG_MODE_AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE_AGENT;
                     var agent = _agentInfoRepository.GetById(dto.InfoId);
                     wayCodes = GetPayWayCodes(dto.IfCode, agent.IsvNo, agent.Pid).ToList();
                     break;
-                case "mgrMch":
-                case "agentMch":
-                case "agentSelf":
-                case "mchSelfApp1":
-                case "mchSelfApp2":
+                case CS.CONFIG_MODE_MGR_MCH:
+                case CS.CONFIG_MODE_AGENT_MCH:
+                case CS.CONFIG_MODE_AGENT_SELF:
+                case CS.CONFIG_MODE_MCH_SELF_APP1:
+                case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
                     var mchInfo = _mchInfoRepository.GetById(dto.InfoId);
                     wayCodes = GetPayWayCodes(dto.IfCode, mchInfo.IsvNo, mchInfo.AgentNo).ToList();
@@ -102,14 +102,14 @@ namespace AGooday.AgPay.Application.Services
             Dictionary<string, Dictionary<string, PayRateConfigDto>> rateConfig = new Dictionary<string, Dictionary<string, PayRateConfigDto>>();
             switch (configMode)
             {
-                case "mgrIsv":
+                case CS.CONFIG_MODE_MGR_ISV:
                     infoType = CS.INFO_TYPE_ISV;
                     rateConfig.Add(CS.CONFIG_TYPE_ISVCOST, GetPayRateConfig(CS.CONFIG_TYPE_ISVCOST, infoType, infoId, ifCode));
                     rateConfig.Add(CS.CONFIG_TYPE_AGENTDEF, GetPayRateConfig(CS.CONFIG_TYPE_AGENTDEF, infoType, infoId, ifCode));
                     rateConfig.Add(CS.CONFIG_TYPE_MCHAPPLYDEF, GetPayRateConfig(CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, infoId, ifCode));
                     break;
-                case "mgrAgent":
-                case "agentSubagent":
+                case CS.CONFIG_MODE_MGR_AGENT:
+                case CS.CONFIG_MODE_AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE_AGENT;
                     var agent = _agentInfoRepository.GetById(infoId);
                     rateConfig.Add(CS.CONFIG_TYPE_AGENTDEF, GetPayRateConfig(CS.CONFIG_TYPE_AGENTDEF, infoType, infoId, ifCode));
@@ -117,11 +117,11 @@ namespace AGooday.AgPay.Application.Services
                     rateConfig.Add(CS.CONFIG_TYPE_MCHAPPLYDEF, GetPayRateConfig(CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, infoId, ifCode));
                     GetReadOnlyRate(ifCode, rateConfig, agent.IsvNo, agent.Pid);
                     break;
-                case "mgrMch":
-                case "agentMch":
-                case "agentSelf":
-                case "mchSelfApp1":
-                case "mchSelfApp2":
+                case CS.CONFIG_MODE_MGR_MCH:
+                case CS.CONFIG_MODE_AGENT_MCH:
+                case CS.CONFIG_MODE_AGENT_SELF:
+                case CS.CONFIG_MODE_MCH_SELF_APP1:
+                case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
                     var mchInfo = _mchInfoRepository.GetById(infoId);
                     rateConfig.Add(CS.CONFIG_TYPE_MCHRATE, GetPayRateConfig(CS.CONFIG_TYPE_MCHRATE, infoType, infoId, ifCode));
@@ -136,27 +136,27 @@ namespace AGooday.AgPay.Application.Services
         private void GetReadOnlyRate(string ifCode, Dictionary<string, Dictionary<string, PayRateConfigDto>> rateConfig, string isvNo, string agentNo)
         {
             // 服务商底价
-            rateConfig.Add("READONLYISVCOST", GetPayRateConfig(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, isvNo, ifCode));
+            rateConfig.Add(CS.CONFIG_TYPE_READONLYISVCOST, GetPayRateConfig(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, isvNo, ifCode));
 
             // 上级代理商费率
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
-                rateConfig.Add("READONLYPARENTAGENT", GetPayRateConfig(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, agentNo, ifCode));
+                rateConfig.Add(CS.CONFIG_TYPE_READONLYPARENTAGENT, GetPayRateConfig(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, agentNo, ifCode));
 
                 var parentAgent = _agentInfoRepository.GetById(agentNo);
                 // 上级默认费率
                 if (!string.IsNullOrWhiteSpace(parentAgent.Pid))
                 {
-                    rateConfig.Add("READONLYPARENTDEFRATE", GetPayRateConfig(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_AGENT, parentAgent.Pid, ifCode));
+                    rateConfig.Add(CS.CONFIG_TYPE_READONLYPARENTDEFRATE, GetPayRateConfig(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_AGENT, parentAgent.Pid, ifCode));
                 }
                 else
                 {
-                    rateConfig.Add("READONLYPARENTDEFRATE", GetPayRateConfig(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_ISV, parentAgent.IsvNo, ifCode));
+                    rateConfig.Add(CS.CONFIG_TYPE_READONLYPARENTDEFRATE, GetPayRateConfig(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_ISV, parentAgent.IsvNo, ifCode));
                 }
             }
         }
 
-        public Dictionary<string, PayRateConfigDto> GetPayRateConfig(string configType, string infoType, string infoId, string ifCode)
+        private Dictionary<string, PayRateConfigDto> GetPayRateConfig(string configType, string infoType, string infoId, string ifCode)
         {
             Dictionary<string, PayRateConfigDto> keyValues = new Dictionary<string, PayRateConfigDto>();
             var payRateConfigs = GetPayRateConfigs(configType, infoType, infoId, ifCode);
@@ -173,14 +173,14 @@ namespace AGooday.AgPay.Application.Services
             string infoType = string.Empty;
             switch (configMode)
             {
-                case "mgrIsv":
+                case CS.CONFIG_MODE_MGR_ISV:
                     infoType = CS.INFO_TYPE_ISV;
                     result.Add(CS.CONFIG_TYPE_ISVCOST, GetPayRateConfigJson(CS.CONFIG_TYPE_ISVCOST, infoType, infoId, ifCode));
                     result.Add(CS.CONFIG_TYPE_AGENTDEF, GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTDEF, infoType, infoId, ifCode));
                     result.Add(CS.CONFIG_TYPE_MCHAPPLYDEF, GetPayRateConfigJson(CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, infoId, ifCode));
                     break;
-                case "mgrAgent":
-                case "agentSubagent":
+                case CS.CONFIG_MODE_MGR_AGENT:
+                case CS.CONFIG_MODE_AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE_AGENT;
                     var agent = _agentInfoRepository.GetById(infoId);
                     result.Add(CS.CONFIG_TYPE_AGENTDEF, GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTDEF, infoType, infoId, ifCode));
@@ -188,11 +188,11 @@ namespace AGooday.AgPay.Application.Services
                     result.Add(CS.CONFIG_TYPE_MCHAPPLYDEF, GetPayRateConfigJson(CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, infoId, ifCode));
                     GetReadOnlyRateJson(ifCode, result, agent.IsvNo, agent.Pid);
                     break;
-                case "mgrMch":
-                case "agentMch":
-                case "agentSelf":
-                case "mchSelfApp1":
-                case "mchSelfApp2":
+                case CS.CONFIG_MODE_MGR_MCH:
+                case CS.CONFIG_MODE_AGENT_MCH:
+                case CS.CONFIG_MODE_AGENT_SELF:
+                case CS.CONFIG_MODE_MCH_SELF_APP1:
+                case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
                     var mchInfo = _mchInfoRepository.GetById(infoId);
                     result.Add(CS.CONFIG_TYPE_MCHRATE, GetPayRateConfigJson(CS.CONFIG_TYPE_MCHRATE, infoType, infoId, ifCode));
@@ -207,22 +207,22 @@ namespace AGooday.AgPay.Application.Services
         private void GetReadOnlyRateJson(string ifCode, JObject result, string isvNo, string agentNo)
         {
             // 服务商底价
-            result.Add("READONLYISVCOST", GetPayRateConfigJson(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, isvNo, ifCode));
+            result.Add(CS.CONFIG_TYPE_READONLYISVCOST, GetPayRateConfigJson(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, isvNo, ifCode));
 
             // 上级代理商费率
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
-                result.Add("READONLYPARENTAGENT", GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, agentNo, ifCode));
+                result.Add(CS.CONFIG_TYPE_READONLYPARENTAGENT, GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, agentNo, ifCode));
 
                 var parentAgent = _agentInfoRepository.GetById(agentNo);
                 // 上级默认费率
                 if (!string.IsNullOrWhiteSpace(parentAgent.Pid))
                 {
-                    result.Add("READONLYPARENTDEFRATE", GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_AGENT, parentAgent.Pid, ifCode));
+                    result.Add(CS.CONFIG_TYPE_READONLYPARENTDEFRATE, GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_AGENT, parentAgent.Pid, ifCode));
                 }
                 else
                 {
-                    result.Add("READONLYPARENTDEFRATE", GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_ISV, parentAgent.IsvNo, ifCode));
+                    result.Add(CS.CONFIG_TYPE_READONLYPARENTDEFRATE, GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_ISV, parentAgent.IsvNo, ifCode));
                 }
             }
         }
@@ -287,18 +287,18 @@ namespace AGooday.AgPay.Application.Services
         {
             switch (dto.ConfigMode)
             {
-                case "mgrIsv":
+                case CS.CONFIG_MODE_MGR_ISV:
                     string infoId = dto.InfoId;
                     var ifCode = dto.IfCode;
                     var delPayWayCodes = dto.DelPayWayCodes;
-                    var infoType = "ISV";
-                    var configType = "ISVCOST";
+                    var infoType = CS.INFO_TYPE_ISV;
+                    var configType = CS.CONFIG_TYPE_ISVCOST;
                     var items = dto.ISVCOST;
                     SaveOrUpdate(infoId, ifCode, configType, infoType, delPayWayCodes, items);
-                    configType = "AGENTDEF";
+                    configType = CS.CONFIG_TYPE_AGENTDEF;
                     items = dto.AGENTDEF;
                     SaveOrUpdate(infoId, ifCode, configType, infoType, delPayWayCodes, items);
-                    configType = "MCHAPPLYDEF";
+                    configType = CS.CONFIG_TYPE_MCHAPPLYDEF;
                     items = dto.MCHAPPLYDEF;
                     SaveOrUpdate(infoId, ifCode, configType, infoType, delPayWayCodes, items);
                     break;

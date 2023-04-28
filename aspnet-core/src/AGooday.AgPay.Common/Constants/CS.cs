@@ -80,6 +80,66 @@
         /// 商户费率
         /// </summary>
         public const string CONFIG_TYPE_MCHRATE = "MCHRATE";
+
+        /// <summary>
+        /// 只读服务商底价
+        /// </summary>
+        public const string CONFIG_TYPE_READONLYISVCOST = "READONLYISVCOST";
+        /// <summary>
+        /// 只读上级代理商费率
+        /// </summary>
+        public const string CONFIG_TYPE_READONLYPARENTAGENT = "READONLYPARENTAGENT";
+        /// <summary>
+        /// 只读上级默认费率
+        /// </summary>
+        public const string CONFIG_TYPE_READONLYPARENTDEFRATE = "READONLYPARENTDEFRATE";
+        #endregion
+
+        #region 配置模式
+        /// <summary>
+        /// 运营平台-服务商
+        /// </summary>
+        public const string CONFIG_MODE_MGR_ISV = "mgrIsv";
+        /// <summary>
+        /// 运营平台-代理商
+        /// </summary>
+        public const string CONFIG_MODE_MGR_AGENT = "mgrAgent";
+        /// <summary>
+        /// 运营平台-商户
+        /// </summary>
+        public const string CONFIG_MODE_MGR_MCH = "mgrMch";
+        /// <summary>
+        /// 运营平台-进件
+        /// </summary>
+        public const string CONFIG_MODE_MGR_APPLYMENT = "mgrApplyment";
+        /// <summary>
+        /// 代理商系统-子代理商
+        /// </summary>
+        public const string CONFIG_MODE_AGENT_SUBAGENT = "agentSubagent";
+        /// <summary>
+        /// 代理商系统-商户
+        /// </summary>
+        public const string CONFIG_MODE_AGENT_MCH = "agentMch";
+        /// <summary>
+        /// 代理商系统-Self
+        /// </summary>
+        public const string CONFIG_MODE_AGENT_SELF = "agentSelf";
+        /// <summary>
+        /// 代理商系统-进件
+        /// </summary>
+        public const string CONFIG_MODE_AGENT_APPLYMENT = "agentApplyment";
+        /// <summary>
+        /// 商户系统-SelfApp1
+        /// </summary>
+        public const string CONFIG_MODE_MCH_SELF_APP1 = "mchSelfApp1";
+        /// <summary>
+        /// 商户系统-SelfApp2
+        /// </summary>
+        public const string CONFIG_MODE_MCH_SELF_APP2 = "mchSelfApp2";
+        /// <summary>
+        /// 商户系统-进件
+        /// </summary>
+        public const string CONFIG_MODE_MCH_APPLYMENT = "mchApplyment";
         #endregion
 
         #region 商户类型:1-普通商户 2-特约商户

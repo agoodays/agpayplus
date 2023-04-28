@@ -893,11 +893,13 @@ export default {
       that.mergeFeeList.forEach(item => {
         item.selectedWayCodeList = []
       })
-      const params = Object.assign({}, { configMode: that.configMode, infoId: that.infoId, ifCode: that.currentIfCode })
+      const params = {}
+      Object.assign(params, { configMode: that.configMode, infoId: that.infoId, ifCode: that.currentIfCode })
       let mapData = {}
       await req.list(API_URL_RATECONFIGS_LIST + '/savedMapData', params).then(res => {
         mapData = res
       })
+      Object.assign(params, { pageSize: -1 })
       await req.list(API_URL_RATECONFIGS_LIST + '/payways', params).then(res => {
         res.records.forEach(payWay => {
           payWay.checked = false

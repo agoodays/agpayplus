@@ -5,7 +5,7 @@
     @close="onClose"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ padding: '0px 0px 80px', overflowY: 'auto' }"
-    width="80%">
+    width="90%">
     <a-tabs v-model="topTabsVal">
       <a-tab-pane :key="'paramsAndRateTab'" tab="参数及费率的填写">
         <div class="search">
@@ -554,6 +554,7 @@ export default {
 
   .tab-wrapper {
     position: relative;
+    min-width: 718px;
     height: 50px
   }
 
