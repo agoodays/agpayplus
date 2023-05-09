@@ -68,6 +68,7 @@
             :info-id="infoId"
             :info-type="infoType"
             :if-code="currentIfCode"
+            :perm-code="permCode"
             :config-mode="configMode"
             :callbackFunc="refIfCodeList"
             v-if="paramsAndRateTabVal === 'rateTab'"/>

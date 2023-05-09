@@ -385,7 +385,7 @@
           <a-checkbox :checked="!!noCheckRuleFlag" @change="noCheckRuleFlag = +!noCheckRuleFlag">不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox>
         </a-collapse-panel>
       </a-collapse>
-      <div class="drawer-btn-center">
+      <div class="drawer-btn-center" v-if="$access(permCode)">
         <a-button type="primary" icon="check" @click="onSubmit" :loading="btnLoading">保存</a-button>
       </div>
     </div>
@@ -400,6 +400,7 @@ export default {
     infoId: { type: String, default: null },
     infoType: { type: String, default: null },
     ifCode: { type: String, default: '' },
+    permCode: { type: String, default: '' },
     configMode: { type: String, default: '' },
     callbackFunc: { type: Function, default: () => ({}) }
   },

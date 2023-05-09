@@ -61,7 +61,7 @@
     <!-- 新增页面组件  -->
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
-    <AgPayConfigDrawer ref="payConfig" :config-mode="'mgrAgent'" />
+    <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'mgrAgent'" />
   </page-header-wrapper>
 </template>
 
