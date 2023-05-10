@@ -13,6 +13,9 @@ using System.Data;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 支付订单表 服务实现类
+    /// </summary>
     public class PayOrderService : IPayOrderService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
@@ -88,9 +91,8 @@ namespace AGooday.AgPay.Application.Services
 
         public PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo)
         {
-            var entity = _payOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && (
-            w.PayOrderId.Equals(payOrderId) || w.MchOrderNo.Equals(mchOrderNo)
-            )).FirstOrDefault();
+            var entity = _payOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo)
+            && (w.PayOrderId.Equals(payOrderId) || w.MchOrderNo.Equals(mchOrderNo))).FirstOrDefault();
             return _mapper.Map<PayOrderDto>(entity);
         }
 
@@ -172,6 +174,12 @@ namespace AGooday.AgPay.Application.Services
         {
             return _payOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchOrderNo);
         }
+        /// <summary>
+        /// 更新订单状态 【订单生成】 --》 【支付中】
+        /// </summary>
+        /// <param name="payOrderId"></param>
+        /// <param name="payOrder"></param>
+        /// <returns></returns>
         public bool UpdateInit2Ing(string payOrderId, PayOrderDto payOrder)
         {
             var updateRecord = _payOrderRepository.GetById(payOrderId);
@@ -192,7 +200,7 @@ namespace AGooday.AgPay.Application.Services
             return _payOrderRepository.SaveChanges(out int _);
         }
         /// <summary>
-        /// 更新订单状态  【支付中】 --》 【支付成功】
+        /// 更新订单状态 【支付中】 --》 【支付成功】
         /// </summary>
         /// <param name="payOrderId"></param>
         /// <param name="channelOrderNo"></param>
@@ -213,7 +221,7 @@ namespace AGooday.AgPay.Application.Services
             return _payOrderRepository.SaveChanges(out int _);
         }
         /// <summary>
-        /// 更新订单状态  【支付中】 --》 【支付成功】
+        /// 更新订单状态 【支付中】 --》 【支付失败】
         /// </summary>
         /// <param name="payOrderId"></param>
         /// <param name="channelOrderNo"></param>
@@ -236,18 +244,16 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
         }
-        public int UpdateOrderExpired()
-        {
-            var updateRecords = _payOrderRepository.GetAll().Where(
-                w => (new List<byte>() { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }).Contains(w.State)
-                && w.ExpiredTime < DateTime.Now);
-            foreach (var payOrder in updateRecords)
-            {
-                payOrder.State = (byte)PayOrderState.STATE_CLOSED;
-                _payOrderRepository.Update(payOrder);
-            }
-            return _payOrderRepository.SaveChanges();
-        }
+        /// <summary>
+        /// 更新订单状态 【支付中】 --》 【支付成功/支付失败】
+        /// </summary>
+        /// <param name="payOrderId"></param>
+        /// <param name="updateState"></param>
+        /// <param name="channelOrderNo"></param>
+        /// <param name="channelUserId"></param>
+        /// <param name="channelErrCode"></param>
+        /// <param name="channelErrMsg"></param>
+        /// <returns></returns>
         public bool UpdateIng2SuccessOrFail(string payOrderId, byte updateState, string channelOrderNo, string channelUserId, string channelErrCode, string channelErrMsg)
         {
             if (updateState == (byte)PayOrderState.STATE_ING)
@@ -264,6 +270,39 @@ namespace AGooday.AgPay.Application.Services
             }
             return false;
         }
+        /// <summary>
+        /// 更新订单为 超时状态
+        /// </summary>
+        /// <returns></returns>
+        public int UpdateOrderExpired()
+        {
+            var updateRecords = _payOrderRepository.GetAll().Where(
+                w => (new List<byte>() { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }).Contains(w.State)
+                && w.ExpiredTime < DateTime.Now);
+            foreach (var payOrder in updateRecords)
+            {
+                payOrder.State = (byte)PayOrderState.STATE_CLOSED;
+                _payOrderRepository.Update(payOrder);
+            }
+            return _payOrderRepository.SaveChanges();
+        }
+        /// <summary>
+        /// 更新订单 通知状态 --> 已发送
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public bool UpdateNotifySent(string orderId)
+        {
+            var updateRecord = _payOrderRepository.GetById(orderId);
+            updateRecord.NotifyState = CS.YES;
+            _payOrderRepository.Update(updateRecord);
+            return _payOrderRepository.SaveChanges(out int _);
+        }
+        /// <summary>
+        /// 更新订单表分账状态为： 等待分账任务处理
+        /// </summary>
+        /// <param name="payOrder"></param>
+        /// <returns></returns>
         public bool UpdateDivisionState(PayOrderDto payOrder)
         {
             var updateRecord = _payOrderRepository.GetById(payOrder.PayOrderId);
@@ -272,13 +311,6 @@ namespace AGooday.AgPay.Application.Services
                 return false;
             }
             updateRecord.DivisionState = (byte)PayOrderDivision.DIVISION_STATE_WAIT_TASK;
-            _payOrderRepository.Update(updateRecord);
-            return _payOrderRepository.SaveChanges(out int _);
-        }
-        public bool UpdateNotifySent(string orderId)
-        {
-            var updateRecord = _payOrderRepository.GetById(orderId);
-            updateRecord.NotifyState = CS.YES;
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
         }

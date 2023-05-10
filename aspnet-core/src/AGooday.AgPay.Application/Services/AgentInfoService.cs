@@ -41,6 +41,11 @@ namespace AGooday.AgPay.Application.Services
             return _agentInfoRepository.IsExistAgentNo(mchNo);
         }
 
+        public bool IsExistAgent(string isvNo)
+        {
+            return _agentInfoRepository.IsExistAgent(isvNo);
+        }
+
         public bool Add(AgentInfoDto dto)
         {
             var m = _mapper.Map<AgentInfo>(dto);

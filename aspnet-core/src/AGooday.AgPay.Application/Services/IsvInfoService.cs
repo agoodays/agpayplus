@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 服务商信息表 服务实现类
+    /// </summary>
     public class IsvInfoService : IIsvInfoService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

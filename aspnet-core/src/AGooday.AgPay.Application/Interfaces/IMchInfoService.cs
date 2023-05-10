@@ -5,6 +5,8 @@ namespace AGooday.AgPay.Application.Interfaces
     public interface IMchInfoService : IDisposable
     {
         bool IsExistMchNo(string mchNo);
+        bool IsExistMchByIsvNo(string isvNo);
+        bool IsExistMchByAgentNo(string agentNo);
         bool Add(MchInfoDto dto);
         void Create(MchInfoCreateDto dto);
         void Remove(string recordId);

@@ -1,6 +1,8 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
@@ -22,10 +24,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         private readonly IMQSender mqSender;
         private readonly ILogger<IsvInfoController> _logger;
         private readonly IIsvInfoService _isvInfoService;
+        private readonly IMchInfoService _mchInfoService;
+        private readonly IAgentInfoService _agentInfoService;
+        private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
         public IsvInfoController(IMQSender mqSender, ILogger<IsvInfoController> logger, RedisUtil client,
             IIsvInfoService isvInfoService,
+            IMchInfoService mchInfoService, 
+            IAgentInfoService agentInfoService,
             ISysUserService sysUserService,
+            IPayInterfaceConfigService payInterfaceConfigService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
@@ -33,6 +41,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             this.mqSender = mqSender;
             _logger = logger;
             _isvInfoService = isvInfoService;
+            _mchInfoService = mchInfoService;
+            _payInterfaceConfigService = payInterfaceConfigService;
+            _agentInfoService = agentInfoService;
         }
 
         /// <summary>
@@ -76,7 +87,34 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_DEL)]
         public ApiRes Delete(string isvNo)
         {
-            _isvInfoService.Remove(isvNo);
+            // 0.当前服务商是否存在
+            var isvInfo = _isvInfoService.GetById(isvNo);
+            if (isvInfo == null)
+            {
+                throw new BizException("该服务商不存在");
+            }
+
+            // 1.查询当前服务商下是否存在商户
+            if (_mchInfoService.IsExistMchByIsvNo(isvInfo.IsvNo))
+            {
+                throw new BizException("该服务商下存在商户，不可删除");
+            }
+
+            // 2.查询当前服务商下是否存在代理商
+            if (_agentInfoService.IsExistAgent(isvInfo.IsvNo))
+            {
+                throw new BizException("该服务商下存在代理商，不可删除");
+            }
+
+            // 3.删除当前服务商支付接口配置参数
+            _payInterfaceConfigService.Remove(CS.INFO_TYPE_ISV, isvInfo.IsvNo);
+
+            // 4.删除该服务商
+            var remove = _isvInfoService.Remove(isvNo);
+            if (!remove)
+            {
+                throw new BizException("删除服务商失败");
+            }
 
             // 推送mq到目前节点进行更新数据
             mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, isvNo, null, null));

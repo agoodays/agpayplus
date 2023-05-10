@@ -22,6 +22,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         // 注入仓储接口
         private readonly IAgentInfoRepository _agentInfoRepository;
         private readonly IIsvInfoRepository _isvInfoRepository;
+        private readonly IMchInfoRepository _mchInfoRepository;
         private readonly ISysUserRepository _sysUserRepository;
         private readonly ISysUserAuthRepository _sysUserAuthRepository;
 
@@ -35,7 +36,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
         public AgentInfoCommandHandler(IUnitOfWork uow, IMediatorHandler bus, IMapper mapper, IMQSender mqSender, IMemoryCache cache,
             IAgentInfoRepository agentInfoRepository,
-            IIsvInfoRepository isvInfoRepository,
+            IIsvInfoRepository isvInfoRepository, 
+            IMchInfoRepository mchInfoRepository,
             ISysUserRepository sysUserRepository,
             ISysUserAuthRepository sysUserAuthRepository)
             : base(uow, bus, cache)
@@ -48,6 +50,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _agentInfoRepository = agentInfoRepository;
             _isvInfoRepository = isvInfoRepository;
             _sysUserAuthRepository = sysUserAuthRepository;
+            _mchInfoRepository = mchInfoRepository;
         }
 
         public Task<Unit> Handle(CreateAgentInfoCommand request, CancellationToken cancellationToken)
@@ -282,6 +285,13 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return Task.FromResult(new Unit());
             }
 
+            // 1.查询当前服务商下是否存在商户
+            if (_mchInfoRepository.IsExistMchByAgentNo(request.AgentNo))
+            {
+                Bus.RaiseEvent(new DomainNotification("", "该代理商下存在商户，不可删除"));
+                return Task.FromResult(new Unit());
+            }
+
             var sysUsers = _sysUserRepository.GetAll().Where(w => w.BelongInfoId.Equals(request.AgentNo) && w.SysType.Equals(CS.SYS_TYPE.AGENT));
             foreach (var sysUser in sysUsers)
             {
@@ -295,14 +305,18 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 _sysUserRepository.Remove(sysUser.SysUserId);
             }
 
-            // 1.删除当前代理商应用信息
+            // 2.删除当前代理商信息
             _agentInfoRepository.Remove(agentInfo.AgentNo);
+
+            if (!Commit())
+            {
+                Bus.RaiseEvent(new DomainNotification("", "删除当前代理商失败"));
+                return Task.FromResult(new Unit());
+            }
 
             // 推送mq删除redis用户缓存
             var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
             mqSender.Send(CleanAgentLoginAuthCacheMQ.Build(userIdList));
-
-            Commit();
 
             return Task.FromResult(new Unit());
         }

@@ -11,6 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
         PayInterfaceConfigDto GetById(long recordId);
         IEnumerable<PayInterfaceConfigDto> GetAll();
         bool IsExistUseIfCode(string ifCode);
+        bool Remove(string infoType, string infoId);
         /// <summary>
         /// 根据 账户类型、账户号 获取支付参数配置列表
         /// </summary>

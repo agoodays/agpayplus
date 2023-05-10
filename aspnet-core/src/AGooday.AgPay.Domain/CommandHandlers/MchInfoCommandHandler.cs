@@ -261,10 +261,14 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             // 更新商户信息
             _mchInfoRepository.Update(mchInfo);
 
+            if (!Commit())
+            {
+                Bus.RaiseEvent(new DomainNotification("", "修改当前商户失败"));
+                return Task.FromResult(new Unit());
+            }
+
             // 推送mq到目前节点进行更新数据
             mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, mchInfo.MchNo, null));
-
-            Commit();
 
             return Task.FromResult(new Unit());
         }
@@ -302,6 +306,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             // 3.删除当前商户支付接口配置参数
             var appIds = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(request.MchNo)).Select(s => s.AppId).ToList();
             _payInterfaceConfigRepository.RemoveByInfoIds(appIds, CS.INFO_TYPE_MCH_APP);
+
+            // 4.删除当前商户应用信息
             foreach (var appId in appIds)
             {
                 _mchAppRepository.Remove(appId);
@@ -311,17 +317,23 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             foreach (var sysUser in sysUsers)
             {
                 var sysUserAuths = _sysUserAuthRepository.GetAll().Where(w => w.UserId.Equals(sysUser.SysUserId));
-                // 删除当前商户用户认证信息
+                // 5.删除当前商户用户认证信息
                 foreach (var sysUserAuth in sysUserAuths)
                 {
                     _sysUserAuthRepository.Remove(sysUserAuth.AuthId);
                 }
-                // 删除当前商户的登录用户
+                // 6.删除当前商户的登录用户
                 _sysUserRepository.Remove(sysUser.SysUserId);
             }
 
-            // 4.删除当前商户应用信息
+            // 7.删除当前商户
             _mchInfoRepository.Remove(mchInfo.MchNo);
+
+            if (!Commit())
+            {
+                Bus.RaiseEvent(new DomainNotification("", "删除当前商户失败"));
+                return Task.FromResult(new Unit());
+            }
 
             // 推送mq删除redis用户缓存
             var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
@@ -329,8 +341,6 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             // 推送mq到目前节点进行更新数据
             mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, request.MchNo, null));
-
-            Commit();
 
             return Task.FromResult(new Unit());
         }

@@ -5,7 +5,6 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -88,6 +87,14 @@ namespace AGooday.AgPay.Application.Services
         public bool IsExistUseIfCode(string ifCode)
         {
             return _payInterfaceConfigRepository.IsExistUseIfCode(ifCode);
+        }
+
+        public bool Remove(string infoType, string infoId)
+        {
+            var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().AsNoTracking()
+                .Where(w => w.InfoId.Equals(infoId) && w.InfoType.Equals(infoType)).FirstOrDefault();
+            _payInterfaceConfigRepository.Remove(payInterfaceConfig.Id);
+            return _payInterfaceConfigRepository.SaveChanges(out int _);
         }
 
         /// <summary>
