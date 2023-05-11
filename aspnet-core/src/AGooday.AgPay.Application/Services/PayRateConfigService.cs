@@ -17,10 +17,11 @@ namespace AGooday.AgPay.Application.Services
         private readonly IIsvInfoRepository _isvInfoRepository;
         private readonly IAgentInfoRepository _agentInfoRepository;
         private readonly IMchInfoRepository _mchInfoRepository;
+        private readonly IMchAppRepository _mchAppRepository;
         private readonly IPayWayRepository _payWayRepository;
         private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
         private readonly IPayRateConfigRepository _payRateConfigRepository;
-        private readonly ILevelRateConfigRepository _levelRateConfigRepository;
+        private readonly IPayRateLevelConfigRepository _payRateLevelConfigRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
@@ -28,20 +29,22 @@ namespace AGooday.AgPay.Application.Services
 
         public PayRateConfigService(IMapper mapper, IMediatorHandler bus,
             IPayRateConfigRepository payRateConfigRepository,
-            ILevelRateConfigRepository levelRateConfigRepository,
+            IPayRateLevelConfigRepository payRateLevelConfigRepository,
             IIsvInfoRepository isvInfoRepository,
             IAgentInfoRepository agentInfoRepository,
-            IMchInfoRepository mchInfoRepository,
+            IMchInfoRepository mchInfoRepository, 
+            IMchAppRepository mchAppRepository,
             IPayWayRepository payWayRepository,
             IPayInterfaceDefineRepository payInterfaceDefineRepository)
         {
             _mapper = mapper;
             Bus = bus;
             _payRateConfigRepository = payRateConfigRepository;
-            _levelRateConfigRepository = levelRateConfigRepository;
+            _payRateLevelConfigRepository = payRateLevelConfigRepository;
             _isvInfoRepository = isvInfoRepository;
             _agentInfoRepository = agentInfoRepository;
             _mchInfoRepository = mchInfoRepository;
+            _mchAppRepository = mchAppRepository;
             _payWayRepository = payWayRepository;
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
         }
@@ -69,7 +72,8 @@ namespace AGooday.AgPay.Application.Services
                 case CS.CONFIG_MODE_MCH_SELF_APP1:
                 case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
-                    var mchInfo = _mchInfoRepository.GetById(dto.InfoId);
+                    var mchApp = _mchAppRepository.GetById(dto.InfoId);
+                    var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
                     wayCodes = GetPayWayCodes(dto.IfCode, mchInfo.IsvNo, mchInfo.AgentNo).ToList();
                     break;
                 default:
@@ -123,7 +127,8 @@ namespace AGooday.AgPay.Application.Services
                 case CS.CONFIG_MODE_MCH_SELF_APP1:
                 case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
-                    var mchInfo = _mchInfoRepository.GetById(infoId);
+                    var mchApp = _mchAppRepository.GetById(infoId);
+                    var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
                     rateConfig.Add(CS.CONFIG_TYPE_MCHRATE, GetPayRateConfig(CS.CONFIG_TYPE_MCHRATE, infoType, infoId, ifCode));
                     GetReadOnlyRate(ifCode, rateConfig, mchInfo.IsvNo, mchInfo.AgentNo);
                     break;
@@ -194,7 +199,8 @@ namespace AGooday.AgPay.Application.Services
                 case CS.CONFIG_MODE_MCH_SELF_APP1:
                 case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
-                    var mchInfo = _mchInfoRepository.GetById(infoId);
+                    var mchApp = _mchAppRepository.GetById(infoId);
+                    var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
                     result.Add(CS.CONFIG_TYPE_MCHRATE, GetPayRateConfigJson(CS.CONFIG_TYPE_MCHRATE, infoType, infoId, ifCode));
                     GetReadOnlyRateJson(ifCode, result, mchInfo.IsvNo, mchInfo.AgentNo);
                     break;
@@ -246,22 +252,22 @@ namespace AGooday.AgPay.Application.Services
                 if (item.FeeType.Equals(CS.FEE_TYPE_LEVEL))
                 {
                     JArray array = new JArray();
-                    foreach (var levelitem in item.LevelRateConfigs.GroupBy(g => g.BankCardType))
+                    foreach (var levelitem in item.PayRateLevelConfigs.GroupBy(g => g.BankCardType))
                     {
-                        JObject levelRateConfig = new JObject();
-                        levelRateConfig.Add("minFee", levelitem.Min(m => m.MinFee));
-                        levelRateConfig.Add("maxFee", levelitem.Max(m => m.MaxFee));
+                        JObject payRateLevelConfig = new JObject();
+                        payRateLevelConfig.Add("minFee", levelitem.Min(m => m.MinFee));
+                        payRateLevelConfig.Add("maxFee", levelitem.Max(m => m.MaxFee));
                         if (string.IsNullOrWhiteSpace(levelitem.Key))
                         {
-                            levelRateConfig.Add("bankCardType", levelitem.Key);
+                            payRateLevelConfig.Add("bankCardType", levelitem.Key);
                         }
-                        levelRateConfig.Add("levelList", JArray.FromObject(levelitem.Select(s => new
+                        payRateLevelConfig.Add("levelList", JArray.FromObject(levelitem.Select(s => new
                         {
                             minAmount = s.MinAmount,
                             maxAmount = s.MaxAmount,
                             feeRate = s.FeeRate
                         })));
-                        array.Add(levelRateConfig);
+                        array.Add(payRateLevelConfig);
                     }
                     payRateConfig.Add(item.LevelMode, array);
                 }
@@ -276,8 +282,8 @@ namespace AGooday.AgPay.Application.Services
             var result = _mapper.Map<List<PayRateConfigDto>>(payRateConfigs);
             foreach (var item in result)
             {
-                var levelRateConfigs = _levelRateConfigRepository.GetByRateConfigId(item.Id);
-                item.LevelRateConfigs = _mapper.Map<List<LevelRateConfigDto>>(levelRateConfigs);
+                var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(item.Id);
+                item.PayRateLevelConfigs = _mapper.Map<List<PayRateLevelConfigDto>>(payRateLevelConfigs);
             }
 
             return result;
@@ -337,10 +343,10 @@ namespace AGooday.AgPay.Application.Services
                 }
                 else
                 {
-                    var levelRateConfigs = _levelRateConfigRepository.GetByRateConfigId(entity.Id);
-                    foreach (var levelRateConfig in levelRateConfigs)
+                    var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(entity.Id);
+                    foreach (var payRateLevelConfig in payRateLevelConfigs)
                     {
-                        _levelRateConfigRepository.Remove(levelRateConfig.Id);
+                        _payRateLevelConfigRepository.Remove(payRateLevelConfig.Id);
                     }
 
                     entity.FeeType = item.FeeType;
@@ -359,7 +365,7 @@ namespace AGooday.AgPay.Application.Services
                     {
                         foreach (var levelitem in level.LevelList)
                         {
-                            var levelRateConfig = new LevelRateConfig
+                            var payRateLevelConfig = new PayRateLevelConfig
                             {
                                 RateConfigId = entity.Id,
                                 BankCardType = level.BankCardType,
@@ -372,12 +378,12 @@ namespace AGooday.AgPay.Application.Services
                                 CreatedAt = now,
                                 UpdatedAt = now,
                             };
-                            _levelRateConfigRepository.Add(levelRateConfig);
+                            _payRateLevelConfigRepository.Add(payRateLevelConfig);
                         }
                     }
                 }
 
-                _levelRateConfigRepository.SaveChanges();
+                _payRateLevelConfigRepository.SaveChanges();
             }
         }
 
@@ -390,15 +396,15 @@ namespace AGooday.AgPay.Application.Services
                 {
                     _payRateConfigRepository.Remove(entity.Id);
 
-                    _levelRateConfigRepository.SaveChanges();
+                    _payRateLevelConfigRepository.SaveChanges();
 
-                    var levelRateConfigs = _levelRateConfigRepository.GetByRateConfigId(entity.Id);
-                    foreach (var levelRateConfig in levelRateConfigs)
+                    var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(entity.Id);
+                    foreach (var payRateLevelConfig in payRateLevelConfigs)
                     {
-                        _levelRateConfigRepository.Remove(levelRateConfig.Id);
+                        _payRateLevelConfigRepository.Remove(payRateLevelConfig.Id);
                     }
 
-                    _levelRateConfigRepository.SaveChanges();
+                    _payRateLevelConfigRepository.SaveChanges();
                 }
             }
         }

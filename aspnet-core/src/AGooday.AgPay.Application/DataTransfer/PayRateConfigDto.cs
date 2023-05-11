@@ -1,7 +1,7 @@
 ﻿namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
-    /// 支付费率信息表
+    /// 支付费率配置表
     /// </summary>
     public class PayRateConfigDto
     {
@@ -70,6 +70,6 @@
         /// </summary>
         public DateTime UpdatedAt { get; set; }
 
-        public List<LevelRateConfigDto> LevelRateConfigs { get; set; }
+        public List<PayRateLevelConfigDto> PayRateLevelConfigs { get; set; }
     }
 }

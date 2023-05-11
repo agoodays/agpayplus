@@ -888,7 +888,9 @@ export default {
       that.rateConfig = {
         mainFee: {},
         agentdefFee: {},
-        mchapplydefFee: {}
+        mchapplydefFee: {},
+        readonlyIsvCost: {},
+        readonlyParentAgent: {}
       }
       that.originSavedList = []
       that.mergeFeeList.forEach(item => {
@@ -937,9 +939,7 @@ export default {
         mapData && mapData.MCHRATE && that.toRateConfig('mainFee', mapData.MCHRATE)
         mapData && mapData.AGENTDEF && that.toRateConfig('agentdefFee', mapData.AGENTDEF)
         mapData && mapData.MCHAPPLYDEF && that.toRateConfig('mchapplydefFee', mapData.MCHAPPLYDEF)
-        if (mapData && mapData.READONLYISVCOST) {
-          that.toRateConfig('readonlyIsvCost', mapData.READONLYISVCOST)
-        }
+        mapData && mapData.READONLYISVCOST && that.toRateConfig('readonlyIsvCost', mapData.READONLYISVCOST)
         mapData && mapData.READONLYPARENTAGENT && that.toRateConfig('readonlyParentAgent', mapData.READONLYPARENTAGENT)
         mapData && mapData.READONLYPARENTDEFRATE && that.toRateConfig('readonlyParentDefRate', mapData.READONLYPARENTDEFRATE)
       })
@@ -951,7 +951,9 @@ export default {
         const mainFee = that.isMergeMode(Object.values(that.rateConfig.mainFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
         const agentdefFee = that.isMergeMode(Object.values(that.rateConfig.agentdefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
         const mchapplydefFee = that.isMergeMode(Object.values(that.rateConfig.mchapplydefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
-        console.log('判断合并模式： ', item.key, mainFee, agentdefFee, mchapplydefFee)
+        const readonlyIsvCost = that.isMergeMode(Object.values(that.rateConfig.readonlyIsvCost).filter(f => payWays.indexOf(f.wayCode) >= 0))
+        const readonlyParentAgent = that.isMergeMode(Object.values(that.rateConfig.readonlyParentAgent).filter(f => payWays.indexOf(f.wayCode) >= 0))
+        console.log('判断合并模式： ', item.key, mainFee, agentdefFee, mchapplydefFee, readonlyIsvCost, readonlyParentAgent)
         if (typeof mainFee === 'object' && typeof agentdefFee === 'object' && typeof mchapplydefFee === 'object') {
           if (mainFee) {
             item.mainFee = mainFee
@@ -1187,13 +1189,6 @@ export default {
       //                 : that.configMode === 'mchApplyment' && f === 'mainFee' ? '进件'
       //                     : ''
     },
-    // getPayTitle (configType) {
-    //   switch (configType) {
-    //     case 'ISVCOST': return '服务商底价'
-    //     case 'AGENTDEF': return '代理商默认'
-    //     case 'MCHAPPLYDEF': return '商户进件默认'
-    //   }
-    // },
     inputChangeAmount (wayCode, flag, id, event, mergeFeeItem) {
       const that = this
       const amount = event.target.value

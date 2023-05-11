@@ -4,14 +4,14 @@ using AGooday.AgPay.Infrastructure.Context;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class LevelRateConfigRepository : Repository<LevelRateConfig, long>, ILevelRateConfigRepository
+    public class PayRateLevelConfigRepository : Repository<PayRateLevelConfig, long>, IPayRateLevelConfigRepository
     {
-        public LevelRateConfigRepository(AgPayDbContext context)
+        public PayRateLevelConfigRepository(AgPayDbContext context)
             : base(context)
         {
         }
 
-        public IQueryable<LevelRateConfig> GetByRateConfigId(long id)
+        public IQueryable<PayRateLevelConfig> GetByRateConfigId(long id)
         {
             return DbSet.Where(w => w.RateConfigId.Equals(id));
         }

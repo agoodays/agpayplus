@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<ModifyAgentInfoCommand, AgentInfo>();
 
             CreateMap<IsvInfoDto, IsvInfo>();
-            CreateMap<LevelRateConfigDto, LevelRateConfig>();
+            CreateMap<PayRateLevelConfigDto, PayRateLevelConfig>();
             CreateMap<MchAppDto, MchApp>()
                 .ForMember(d => d.AppSignType, o => o.MapFrom(s => JsonConvert.SerializeObject(s.AppSignType)));
             CreateMap<MchStoreDto, MchStore>();

@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AGooday.AgPay.Domain.Models
 {
     /// <summary>
-    /// 支付费率信息表
+    /// 支付费率配置表
     /// </summary>
-    [Comment("支付费率信息表")]
+    [Comment("支付费率配置表")]
     [Table("t_pay_rate_config")]
     public class PayRateConfig
     {

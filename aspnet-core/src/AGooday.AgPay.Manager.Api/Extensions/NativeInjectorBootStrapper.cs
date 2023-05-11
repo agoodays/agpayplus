@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
-            services.AddScoped<ILevelRateConfigRepository, LevelRateConfigRepository>();
+            services.AddScoped<IPayRateLevelConfigRepository, PayRateLevelConfigRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
             services.AddScoped<IMchStoreRepository, MchStoreRepository>();
             services.AddScoped<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();

@@ -5,11 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AGooday.AgPay.Domain.Models
 {
     /// <summary>
-    /// 阶梯费率信息表
+    /// 支付费率阶梯配置表
     /// </summary>
-    [Comment("阶梯费率信息表")]
-    [Table("t_level_rate_config")]
-    public class LevelRateConfig
+    [Comment("支付费率阶梯配置表")]
+    [Table("t_pay_rate_level_config")]
+    public class PayRateLevelConfig
     {
         /// <summary>
         /// ID

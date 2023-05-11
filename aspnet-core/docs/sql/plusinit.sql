@@ -182,7 +182,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_NOTICEINFO', '公告管理', '
 INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_NOTICEINFO', '公告管理', 'message', '/notices', 'NoticeInfoPage', 'MO', 0, 1,  'ENT_COMMONS', '-1', 'AGENT', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_NOTICEINFO', '公告管理', 'message', '/notices', 'NoticeInfoPage', 'MO', 0, 1,  'ENT_COMMONS', '-1', 'MCH', NOW(), NOW());
 
--- 费率信息表
+-- 支付费率配置表
 DROP TABLE IF EXISTS `t_pay_rate_config`;
 CREATE TABLE `t_pay_rate_config` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
@@ -203,9 +203,9 @@ CREATE TABLE `t_pay_rate_config` (
   UNIQUE KEY `Uni_InfoId_WayCode` (`config_type`,`info_type`,`info_id`,`if_code`,`way_code`)
 ) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='支付费率配置表';
 
--- 阶梯费率信息表
-DROP TABLE IF EXISTS `t_level_rate_config`;
-CREATE TABLE `t_level_rate_config` (
+-- 支付费率阶梯配置表
+DROP TABLE IF EXISTS `t_pay_rate_level_config`;
+CREATE TABLE `t_pay_rate_level_config` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `rate_config_id` BIGINT NOT NULL COMMENT '支付费率配置ID',
   `bank_card_type` VARCHAR(20) NULL COMMENT '银行卡类型: DEBIT-借记卡（储蓄卡）, CREDIT-贷记卡（信用卡）',
@@ -218,7 +218,7 @@ CREATE TABLE `t_level_rate_config` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='阶梯费率表';
+) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='支付费率阶梯配置表';
 
 -- 码牌信息表
 DROP TABLE IF EXISTS `t_mch_qrcodes`;

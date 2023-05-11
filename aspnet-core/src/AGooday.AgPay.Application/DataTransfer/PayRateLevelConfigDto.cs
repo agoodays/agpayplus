@@ -1,9 +1,9 @@
 ﻿namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
-    /// 阶梯费率信息表
+    /// 支付费率阶梯配置表
     /// </summary>
-    public class LevelRateConfigDto
+    public class PayRateLevelConfigDto
     {
         /// <summary>
         /// ID
