@@ -339,14 +339,16 @@ ALTER TABLE `t_refund_order`
   ADD COLUMN `store_name` VARCHAR(64) NULL COMMENT '门店名称' AFTER `store_id`;
 
 -- 代理商管理
-INSERT INTO t_sys_entitlement VALUES('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '35', 'MGR', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1,  'ENT_AGENT', '10', 'MGR', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_RATE_CONFIG', '按钮：费率配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES('ENT_AGENT_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '35', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1,  'ENT_AGENT', '10', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
+ 	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_LIST', '代理商支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'MGR', NOW(), NOW());
+ 	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_VIEW', '代理商支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_PAY_CONFIG_LIST', 0, 'MGR', NOW(), NOW());
+ 	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_ADD', '代理商支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_PAY_CONFIG_LIST', 0, 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
 
 #####  ↓↓↓↓↓↓↓↓↓↓  代理商管理初始化DML  ↓↓↓↓↓↓↓↓↓↓  #####
 

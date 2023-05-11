@@ -50,7 +50,7 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_AGENT_INFO_EDIT')" @click="editFunc(record.agentNo)">修改</a-button>
-            <a-button type="link" v-if="$access('ENT_AGENT_RATE_CONFIG')" @click="payConfigFunc(record.agentNo)">费率配置</a-button>
+            <a-button type="link" v-if="$access('ENT_AGENT_PAY_CONFIG_LIST')" @click="payConfigFunc(record.agentNo)">费率配置</a-button>
             <a-button type="link" v-if="$access('ENT_AGENT_INFO_DEL')" style="color: red" @click="delFunc(record.agentNo)">删除</a-button>
           </AgTableColumns>
         </template>
