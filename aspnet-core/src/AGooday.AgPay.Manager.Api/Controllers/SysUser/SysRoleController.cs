@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             _sysRoleService.Add(dto);
 
             //如果包含： 可分配权限的权限 && EntIds 不为空
-            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST) && dto.EntIds?.Count > 0)
+            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST))
             {
                 _sysRoleEntRelaService.ResetRela(dto.RoleId, dto.EntIds);
             }
@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         {
             _sysRoleService.Update(dto);
             //如果包含： 可分配权限的权限 && EntIds 不为空
-            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST) && dto.EntIds?.Count > 0)
+            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST))
             {
                 _sysRoleEntRelaService.ResetRela(dto.RoleId, dto.EntIds);
 
