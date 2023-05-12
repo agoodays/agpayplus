@@ -120,6 +120,7 @@
                         type="number"
                         addon-after="%"
                         @change="inputChange"
+                        :disabled="item.startsWith('readonly')"
                         v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode]
                           .find(f => f.bankCardType === levelModeItem.bankCardType).levelList[levelKey].feeRate"/>
                     </div>
@@ -163,6 +164,7 @@
                               addon-before="保底："
                               addon-after="元"
                               @change="inputChange"
+                              :disabled="item.startsWith('readonly')"
                               v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][levelModeKey].minFee"/>
                           </div>
                         </div>
@@ -177,6 +179,7 @@
                               addon-before="封顶："
                               addon-after="元"
                               @change="inputChange"
+                              :disabled="item.startsWith('readonly')"
                               v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][levelModeKey].maxFee"/>
                           </div>
                         </div>
@@ -194,6 +197,7 @@
                     type="number"
                     addon-after="%"
                     @change="inputChange"
+                    :disabled="item.startsWith('readonly')"
                     v-model="rateConfig[item][payWayItem.wayCode].feeRate"/>
                 </div>
               </div>
@@ -300,6 +304,7 @@
                       type="number"
                       addon-after="%"
                       @change="inputChange"
+                      :disabled="item.startsWith('readonly')"
                       v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode]
                         .find(f => f.bankCardType===levelModeItem.bankCardType).levelList[levelKey].feeRate"/>
                   </div>
@@ -343,6 +348,7 @@
                             addon-before="保底："
                             addon-after="元"
                             @change="inputChange"
+                            :disabled="item.startsWith('readonly')"
                             v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].minFee"/>
                         </div>
                       </div>
@@ -357,6 +363,7 @@
                             addon-before="封顶："
                             addon-after="元"
                             @change="inputChange"
+                            :disabled="item.startsWith('readonly')"
                             v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].maxFee"/>
                         </div>
                       </div>
@@ -374,6 +381,7 @@
                   type="number"
                   addon-after="%"
                   @change="inputChange"
+                  :disabled="item.startsWith('readonly')"
                   v-model="mergeFeeItem[item].feeRate"/>
               </div>
             </div>
@@ -408,8 +416,7 @@ export default {
     return {
       btnLoading: false,
       currentIfCode: this.ifCode,
-      configTypes: ['ISVCOST', 'AGENTDEF', 'MCHAPPLYDEF'],
-      configTypeMaps: ['mainFee', 'agentdefFee', 'mchapplydefFee'],
+      configTypeMaps: [],
       allPaywayList: [],
       allPaywayMap: {},
       noCheckRuleFlag: 0,
@@ -883,6 +890,7 @@ export default {
         this.currentIfCode = currentIfCode
       }
       const that = this
+      that.configTypeMaps = []
       that.allPaywayList = []
       that.allPaywayMap = {}
       that.rateConfig = {
@@ -890,7 +898,8 @@ export default {
         agentdefFee: {},
         mchapplydefFee: {},
         readonlyIsvCost: {},
-        readonlyParentAgent: {}
+        readonlyParentAgent: {},
+        readonlyParentDefRate: {}
       }
       that.originSavedList = []
       that.mergeFeeList.forEach(item => {
@@ -942,6 +951,13 @@ export default {
         mapData && mapData.READONLYISVCOST && that.toRateConfig('readonlyIsvCost', mapData.READONLYISVCOST)
         mapData && mapData.READONLYPARENTAGENT && that.toRateConfig('readonlyParentAgent', mapData.READONLYPARENTAGENT)
         mapData && mapData.READONLYPARENTDEFRATE && that.toRateConfig('readonlyParentDefRate', mapData.READONLYPARENTDEFRATE)
+
+        mapData && mapData.READONLYISVCOST && that.configTypeMaps.push('readonlyIsvCost')
+        mapData && mapData.READONLYPARENTAGENT && that.configTypeMaps.push('readonlyParentAgent')
+        // mapData && mapData.READONLYPARENTDEFRATE && that.configTypeMaps.push('readonlyParentDefRate')
+        mapData && (mapData.ISVCOST || mapData.AGENTRATE || mapData.MCHRATE) && that.configTypeMaps.push('mainFee')
+        mapData && mapData.AGENTDEF && that.configTypeMaps.push('agentdefFee')
+        mapData && mapData.MCHAPPLYDEF && that.configTypeMaps.push('mchapplydefFee')
       })
 
       that.mergeFeeList.forEach(item => {
@@ -1155,6 +1171,13 @@ export default {
         if (f === 'mchapplydefFee') {
           return '代理商子商户进件默认'
         }
+
+        if (f === 'readonlyIsvCost') {
+          return '服务商底价'
+        }
+        if (f === 'readonlyParentAgent') {
+          return '上级代理商'
+        }
       }
       if (that.configMode === 'agentSelf') {
         if (f === 'mainFee') {
@@ -1165,6 +1188,13 @@ export default {
         }
         if (f === 'mchapplydefFee') {
           return '商户进件默认'
+        }
+
+        if (f === 'readonlyIsvCost') {
+          return '服务商底价'
+        }
+        if (f === 'readonlyParentAgent') {
+          return '上级代理商'
         }
       }
 
