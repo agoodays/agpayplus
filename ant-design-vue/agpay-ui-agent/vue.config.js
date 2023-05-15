@@ -38,7 +38,7 @@ const vueConfig = {
 
   chainWebpack: (config) => {
     config.resolve.alias
-      .set('@$', resolve('src'))
+      .set('@', resolve('src'))
 
     const svgRule = config.module.rule('svg')
     svgRule.uses.clear()
