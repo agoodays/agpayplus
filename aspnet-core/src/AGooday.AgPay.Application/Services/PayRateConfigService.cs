@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Application.Services
                 case CS.CONFIG_MODE_AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE_AGENT;
                     var agent = _agentInfoRepository.GetById(dto.InfoId);
-                    wayCodes = GetPayWayCodes(dto.IfCode, agent.IsvNo, agent.Pid).ToList();
+                    wayCodes = GetPayWayCodes(dto.IfCode, agent.IsvNo, agent.Pid);
                     break;
                 case CS.CONFIG_MODE_MGR_MCH:
                 case CS.CONFIG_MODE_AGENT_MCH:
@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Application.Services
                     infoType = CS.INFO_TYPE_MCH_APP;
                     var mchApp = _mchAppRepository.GetById(dto.InfoId);
                     var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
-                    wayCodes = GetPayWayCodes(dto.IfCode, mchInfo.IsvNo, mchInfo.AgentNo).ToList();
+                    wayCodes = GetPayWayCodes(dto.IfCode, mchInfo.IsvNo, mchInfo.AgentNo);
                     break;
                 default:
                     break;
@@ -85,19 +85,35 @@ namespace AGooday.AgPay.Application.Services
             return records;
         }
 
-        private IQueryable<string> GetPayWayCodes(string ifCode, string isvNo, string agentNo)
+        private List<string> GetPayWayCodes(string ifCode, string isvNo, string agentNo)
         {
+            var payIfDefine = _payInterfaceDefineRepository.GetById(ifCode);
+            var wayCodes = JsonConvert.DeserializeObject<object[]>(payIfDefine.WayCodes).Select(obj => (string)((dynamic)obj).wayCode).ToList();
+
             // 服务商开通支付方式
             var isvWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCode(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, isvNo, ifCode)
-                .Select(s => s.WayCode).Distinct();
+                .Where(w => wayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct().ToList();
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
-                // 代理商开通支付方式
-                var agentWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCode(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, agentNo, ifCode)
-                    .Where(w => isvWayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct();
-                return agentWayCodes;
+                return GetAgentPayWayCodes(ifCode, isvWayCodes, agentNo);
             }
             return isvWayCodes;
+        }
+
+        private List<string> GetAgentPayWayCodes(string ifCode, List<string> wayCodes, string agentNo)
+        {
+            // 代理商开通支付方式
+            var agentWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCode(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, agentNo, ifCode)
+                .Where(w => wayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct().ToList();
+            var agent = _agentInfoRepository.GetById(agentNo);
+            if (!string.IsNullOrWhiteSpace(agent.Pid))
+            {
+                return GetAgentPayWayCodes(ifCode, agentWayCodes, agent.Pid);
+            }
+            else
+            {
+                return agentWayCodes;
+            }
         }
 
         public Dictionary<string, Dictionary<string, PayRateConfigDto>> GetByInfoIdAndIfCode(string configMode, string infoId, string ifCode)
