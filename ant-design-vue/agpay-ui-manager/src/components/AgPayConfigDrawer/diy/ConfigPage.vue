@@ -158,17 +158,11 @@ export default {
     onSubmit () {
       const that = this
       this.$refs.infoFormModel.validate(valid => {
-        this.$refs.paramFormModel.validate(valid2 => {
-          if (valid && valid2) { // 验证通过
-            that.btnLoading = true
-            const reqParams = {}
-            reqParams.infoId = that.saveObject.infoId
-            reqParams.infoType = that.saveObject.infoType
-            reqParams.ifCode = that.saveObject.ifCode
-            reqParams.ifRate = that.saveObject.ifRate
-            reqParams.state = that.saveObject.state
-            reqParams.remark = that.saveObject.remark
-
+        if (!valid) return
+        if (this.$refs.paramFormModel) {
+          this.$refs.paramFormModel.validate(valid => {
+            if (!valid) return
+            // 验证通过
             // 支付参数配置不能为空
             if (Object.keys(that.ifParams).length === 0) {
               this.$message.error('参数不能为空！')
@@ -181,15 +175,39 @@ export default {
               }
               that.ifParams[item.name + '_ph'] = undefined
             })
-            reqParams.ifParams = JSON.stringify(that.ifParams)
-            // 请求接口
-            req.add(API_URL_PAYCONFIGS_LIST + '/interfaceParams', reqParams).then(res => {
-              that.$message.success('保存成功')
-              that.callbackFunc()
-              that.btnLoading = false
-            })
-          }
-        })
+            const ifParams = JSON.stringify(that.ifParams)
+
+            that.submitRequest(ifParams)
+          })
+        } else {
+          that.submitRequest()
+        }
+      })
+    },
+    submitRequest (ifParams = '') {
+      const that = this
+      that.btnLoading = true
+      const reqParams = {
+        infoId: this.saveObject.infoId,
+        infoType: this.saveObject.infoType,
+        ifCode: this.saveObject.ifCode,
+        ifRate: this.saveObject.ifRate,
+        state: this.saveObject.state,
+        remark: this.saveObject.remark,
+        ifParams: ifParams
+      }
+
+      // 请求接口
+      if (Object.keys(reqParams).length === 0) {
+        this.$message.error('参数不能为空！')
+        return
+      }
+
+      req.add(API_URL_PAYCONFIGS_LIST + '/interfaceParams', reqParams).then(res => {
+        that.$message.success('保存成功')
+        that.visible = false
+        that.btnLoading = false
+        that.callbackFunc()
       })
     },
     handleUpdateFormData (formData) {
