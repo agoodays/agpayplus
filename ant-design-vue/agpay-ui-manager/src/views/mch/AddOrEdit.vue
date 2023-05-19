@@ -252,24 +252,20 @@
             </a-form-model-item>
           </a-col>
         </a-row>
-      </div>
-      <div v-if="sysPassword.resetPass">
-        <!-- <div v-else> -->
-        <div v-show="!this.sysPassword.defaultPass">
-          <a-row justify="space-between" type="flex">
-            <a-col :span="10">
-              <a-form-model-item label="新密码：" prop="newPwd">
-                <a-input-password autocomplete="new-password" v-model="newPwd" :disabled="sysPassword.defaultPass"/>
-              </a-form-model-item>
-            </a-col>
 
-            <a-col :span="10">
-              <a-form-model-item label="确认新密码：" prop="confirmPwd">
-                <a-input-password autocomplete="new-password" v-model="sysPassword.confirmPwd" :disabled="sysPassword.defaultPass"/>
-              </a-form-model-item>
-            </a-col>
-          </a-row>
-        </div>
+        <a-row justify="space-between" type="flex" v-if="sysPassword.resetPass && !this.sysPassword.defaultPass">
+          <a-col :span="10">
+            <a-form-model-item label="新密码：" prop="newPwd">
+              <a-input-password autocomplete="new-password" v-model="newPwd" :disabled="sysPassword.defaultPass"/>
+            </a-form-model-item>
+          </a-col>
+
+          <a-col :span="10">
+            <a-form-model-item label="确认新密码：" prop="confirmPwd">
+              <a-input-password autocomplete="new-password" v-model="sysPassword.confirmPwd" :disabled="sysPassword.defaultPass"/>
+            </a-form-model-item>
+          </a-col>
+        </a-row>
       </div>
 
     </a-form-model>
