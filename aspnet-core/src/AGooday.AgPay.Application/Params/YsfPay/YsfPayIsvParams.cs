@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using AGooday.AgPay.Common.Extensions;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Params.YsfPay
@@ -42,11 +42,11 @@ namespace AGooday.AgPay.Application.Params.YsfPay
         {
             if (!string.IsNullOrWhiteSpace(IsvPrivateCertPwd))
             {
-                IsvPrivateCertPwd = StringUtil.Str2Star(IsvPrivateCertPwd, 0, 3, 6);
+                IsvPrivateCertPwd = IsvPrivateCertPwd.Mask();
             }
             if (!string.IsNullOrWhiteSpace(YsfpayPublicKey))
             {
-                YsfpayPublicKey = StringUtil.Str2Star(YsfpayPublicKey, 6, 6, 6);
+                YsfpayPublicKey = YsfpayPublicKey.Mask();
             }
             return JsonConvert.SerializeObject(this);
         }

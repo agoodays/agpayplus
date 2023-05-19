@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using AGooday.AgPay.Common.Extensions;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Params.WxPay
@@ -62,19 +62,19 @@ namespace AGooday.AgPay.Application.Params.WxPay
         {
             if (!string.IsNullOrWhiteSpace(AppSecret))
             {
-                AppSecret = StringUtil.Str2Star(AppSecret, 4, 4, 6);
+                AppSecret = AppSecret.Mask();
             }
             if (!string.IsNullOrWhiteSpace(Key))
             {
-                Key = StringUtil.Str2Star(Key, 4, 4, 6);
+                Key = Key.Mask();
             }
             if (!string.IsNullOrWhiteSpace(ApiV3Key))
             {
-                ApiV3Key = StringUtil.Str2Star(ApiV3Key, 4, 4, 6);
+                ApiV3Key = ApiV3Key.Mask();
             }
             if (!string.IsNullOrWhiteSpace(SerialNo))
             {
-                SerialNo = StringUtil.Str2Star(SerialNo, 4, 4, 6);
+                SerialNo = SerialNo.Mask();
             }
             return JsonConvert.SerializeObject(this);
         }

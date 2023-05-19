@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using AGooday.AgPay.Common.Extensions;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Params.AliPay
@@ -57,11 +57,11 @@ namespace AGooday.AgPay.Application.Params.AliPay
         {
             if (!string.IsNullOrWhiteSpace(PrivateKey))
             {
-                PrivateKey = StringUtil.Str2Star(PrivateKey, 4, 4, 6);
+                PrivateKey = PrivateKey.Mask();
             }
             if (!string.IsNullOrWhiteSpace(AlipayPublicKey))
             {
-                AlipayPublicKey = StringUtil.Str2Star(AlipayPublicKey, 6, 6, 6);
+                AlipayPublicKey = AlipayPublicKey.Mask();
             }
             return JsonConvert.SerializeObject(this);
         }

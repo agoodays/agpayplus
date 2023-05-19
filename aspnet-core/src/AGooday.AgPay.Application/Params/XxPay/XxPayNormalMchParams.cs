@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using AGooday.AgPay.Common.Extensions;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Params.XxPay
@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Application.Params.XxPay
         {
             if (!string.IsNullOrWhiteSpace(Key))
             {
-                Key = StringUtil.Str2Star(Key, 4, 4, 6);
+                Key = Key.Mask();
             }
             return JsonConvert.SerializeObject(this);
         }

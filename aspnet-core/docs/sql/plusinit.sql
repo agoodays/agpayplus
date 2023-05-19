@@ -338,6 +338,10 @@ ALTER TABLE `t_refund_order`
   ADD COLUMN `store_id` VARCHAR(64) NULL COMMENT '门店ID' AFTER `app_name`,
   ADD COLUMN `store_name` VARCHAR(64) NULL COMMENT '门店名称' AFTER `store_id`;
 
+ALTER TABLE `t_mch_notify_record`   
+  ADD COLUMN `req_method` VARCHAR(10) NOT NULL COMMENT '通知请求方法' AFTER `notify_url`,
+  ADD COLUMN `req_body` TEXT NULL COMMENT '通知请求正文' AFTER `req_method`;
+
 -- 代理商管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '35', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1,  'ENT_AGENT', '10', 'MGR', NOW(), NOW());

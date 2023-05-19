@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using AGooday.AgPay.Common.Extensions;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Params.PpPay
@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Application.Params.PpPay
         {
             if (!string.IsNullOrWhiteSpace(Secret))
             {
-                Secret = StringUtil.Str2Star(Secret, 6, 6, 6);
+                Secret = Secret.Mask();
             }
             return JsonConvert.SerializeObject(this);
         }

@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
@@ -122,7 +123,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            mchApp.AppSecret = StringUtil.Str2Star(mchApp.AppSecret, 0, 3, 6);
+            mchApp.AppSecret = mchApp.AppSecret.Mask();
             return ApiRes.Ok(mchApp);
         }
 
