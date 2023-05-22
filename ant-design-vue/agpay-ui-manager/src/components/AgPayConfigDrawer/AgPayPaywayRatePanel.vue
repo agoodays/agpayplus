@@ -112,6 +112,18 @@
                           v-model="levelItem.maxAmount"/>
                       </div>
                     </div>
+                    <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
+                      <div class="w-pay-title" v-if="levelKey===0">{{ getPayTitle(item) }}费率：</div>
+                      <a-input
+                        :min="0"
+                        :step="0.01"
+                        type="number"
+                        addon-after="%"
+                        @change="inputChange"
+                        :disabled="item.startsWith('readonly')"
+                        v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode]
+                          .find(f => f.bankCardType === levelModeItem.bankCardType).levelList[levelKey].feeRate"/>
+                    </div>
                     <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                       <div class="w-pay-title" v-if="levelKey===0">{{ getPayTitle(item) }}费率：</div>
                       <a-input
@@ -156,6 +168,17 @@
                             <div class="w-pay-title">价格类型：</div>
                             <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
                           </div>
+                          <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
+                            <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
+                            <a-input
+                              :min="0"
+                              type="number"
+                              addon-before="保底："
+                              addon-after="元"
+                              @change="inputChange"
+                              :disabled="item.startsWith('readonly')"
+                              v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][levelModeKey].minFee"/>
+                          </div>
                           <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                             <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
                             <a-input
@@ -171,6 +194,16 @@
                         <div class="weChat-pay-list" style="margin-top: 15px;">
                           <div class="w-pay-item">
                             <div style="height: 30px; line-height: 30px;min-width: 75px;">封顶费用：</div>
+                          </div>
+                          <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
+                            <a-input
+                              :min="0"
+                              type="number"
+                              addon-before="封顶："
+                              addon-after="元"
+                              @change="inputChange"
+                              :disabled="item.startsWith('readonly')"
+                              v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][levelModeKey].maxFee"/>
                           </div>
                           <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                             <a-input
@@ -189,6 +222,17 @@
                 </div>
               </div>
               <div v-else class="weChat-pay-list">
+                <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
+                  <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
+                  <a-input
+                    :min="0"
+                    :step="0.01"
+                    type="number"
+                    addon-after="%"
+                    @change="inputChange"
+                    :disabled="item.startsWith('readonly')"
+                    v-model="rateConfig[item][payWayItem.wayCode].feeRate"/>
+                </div>
                 <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                   <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
                   <a-input
@@ -296,6 +340,18 @@
                         v-model="levelItem.maxAmount"/>
                     </div>
                   </div>
+                  <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
+                    <div class="w-pay-title" v-if="levelKey===0">{{ getPayTitle(item) }}费率：</div>
+                    <a-input
+                      :min="0"
+                      :step="0.01"
+                      type="number"
+                      addon-after="%"
+                      @change="inputChange"
+                      :disabled="item.startsWith('readonly')"
+                      v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode]
+                        .find(f => f.bankCardType===levelModeItem.bankCardType).levelList[levelKey].feeRate"/>
+                  </div>
                   <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                     <div class="w-pay-title" v-if="levelKey===0">{{ getPayTitle(item) }}费率：</div>
                     <a-input
@@ -340,6 +396,17 @@
                           <div class="w-pay-title">价格类型：</div>
                           <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
                         </div>
+                        <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
+                          <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
+                          <a-input
+                            :min="0"
+                            type="number"
+                            addon-before="保底："
+                            addon-after="元"
+                            @change="inputChange"
+                            :disabled="item.startsWith('readonly')"
+                            v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].minFee"/>
+                        </div>
                         <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                           <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
                           <a-input
@@ -355,6 +422,16 @@
                       <div class="weChat-pay-list" style="margin-top: 15px;">
                         <div class="w-pay-item">
                           <div style="height: 30px; line-height: 30px;min-width: 75px;">封顶费用：</div>
+                        </div>
+                        <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
+                          <a-input
+                            :min="0"
+                            type="number"
+                            addon-before="封顶："
+                            addon-after="元"
+                            @change="inputChange"
+                            :disabled="item.startsWith('readonly')"
+                            v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].maxFee"/>
                         </div>
                         <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                           <a-input
@@ -373,6 +450,17 @@
               </div>
             </div>
             <div v-else class="weChat-pay-list">
+              <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
+                <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
+                <a-input
+                  :min="0"
+                  :step="0.01"
+                  type="number"
+                  addon-after="%"
+                  @change="inputChange"
+                  :disabled="item.startsWith('readonly')"
+                  v-model="mergeFeeItem[item].feeRate"/>
+              </div>
               <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
                 <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
                 <a-input
@@ -416,6 +504,7 @@ export default {
     return {
       btnLoading: false,
       currentIfCode: this.ifCode,
+      configTypeReadonlyMaps: [],
       configTypeMaps: [],
       allPaywayList: [],
       allPaywayMap: {},
@@ -890,7 +979,9 @@ export default {
         this.currentIfCode = currentIfCode
       }
       const that = this
+      that.configTypeReadonlyMaps = []
       that.configTypeMaps = []
+      that.configTypeReadonlyMaps = []
       that.allPaywayList = []
       that.allPaywayMap = {}
       that.rateConfig = {
@@ -920,10 +1011,16 @@ export default {
           that.rateConfig.mainFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.rateConfig.agentdefFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.rateConfig.mchapplydefFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
+          that.rateConfig.readonlyIsvCost[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
+          that.rateConfig.readonlyParentAgent[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
+          that.rateConfig.readonlyParentDefRate[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.mergeFeeList.forEach(item => {
             item.mainFee = that.initRateConfig(null)
             item.agentdefFee = that.initRateConfig(null)
             item.mchapplydefFee = that.initRateConfig(null)
+            item.readonlyIsvCost = that.initRateConfig(null)
+            item.readonlyParentAgent = that.initRateConfig(null)
+            item.readonlyParentDefRate = that.initRateConfig(null)
           })
         })
 
@@ -952,9 +1049,9 @@ export default {
         mapData && mapData.READONLYPARENTAGENT && that.toRateConfig('readonlyParentAgent', mapData.READONLYPARENTAGENT)
         mapData && mapData.READONLYPARENTDEFRATE && that.toRateConfig('readonlyParentDefRate', mapData.READONLYPARENTDEFRATE)
 
-        mapData && mapData.READONLYISVCOST && that.configTypeMaps.push('readonlyIsvCost')
-        mapData && mapData.READONLYPARENTAGENT && that.configTypeMaps.push('readonlyParentAgent')
-        // mapData && mapData.READONLYPARENTDEFRATE && that.configTypeMaps.push('readonlyParentDefRate')
+        mapData && mapData.READONLYISVCOST && that.configTypeReadonlyMaps.push('readonlyIsvCost')
+        mapData && mapData.READONLYPARENTAGENT && that.configTypeReadonlyMaps.push('readonlyParentAgent')
+        // mapData && mapData.READONLYPARENTDEFRATE && that.configTypeReadonlyMaps.push('readonlyParentDefRate')
         mapData && (mapData.ISVCOST || mapData.AGENTRATE || mapData.MCHRATE) && that.configTypeMaps.push('mainFee')
         mapData && mapData.AGENTDEF && that.configTypeMaps.push('agentdefFee')
         mapData && mapData.MCHAPPLYDEF && that.configTypeMaps.push('mchapplydefFee')
@@ -979,6 +1076,12 @@ export default {
           }
           if (mchapplydefFee) {
             item.mchapplydefFee = mchapplydefFee
+          }
+          if (readonlyIsvCost) {
+            item.readonlyIsvCost = readonlyIsvCost
+          }
+          if (readonlyParentAgent) {
+            item.readonlyParentAgent = readonlyParentAgent
           }
           item.selectedWayCodeList.forEach(C => {
             C.checked = that.rateConfig.mainFee[C.wayCode] != null && !!that.rateConfig.mainFee[C.wayCode].state
@@ -1114,6 +1217,9 @@ export default {
           }
         })
       }
+
+      console.log(that.mergeFeeList)
+      console.log(that.rateConfig)
       this.$forceUpdate()
     },
     onChangeLevelMode (wayCode, checked, mergeFeeItem) {
