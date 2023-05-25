@@ -70,7 +70,23 @@
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="10" style="position:relative">
-          <a-form-model-item label="商户级别" prop="mchLevel">
+          <a-form-model-item prop="mchLevel">
+            <template slot="label">
+              <div>
+                <label title="商户级别" style="margin-right: 4px">商户级别</label>
+                <!-- 商户级别 气泡弹窗 -->
+                <a-popover placement="top">
+                  <template slot="content">
+                    <p>M0商户：简单模式（页面简洁，仅基础收款功能）</p>
+                    <p>M1商户：高级模式（支持api调用， 支持配置应用及分账、转账功能）</p>
+                  </template>
+                  <template slot="title">
+                    <span>商户级别</span>
+                  </template>
+                  <a-icon type="question-circle" />
+                </a-popover>
+              </div>
+            </template>
             <!-- 商户级别 气泡弹窗 -->
             <a-radio-group v-model="saveObject.mchLevel">
               <a-radio value="M0">
@@ -81,21 +97,6 @@
               </a-radio>
             </a-radio-group>
           </a-form-model-item>
-          <div class="components-popover-demo-placement">
-            <div class="typePopover">
-              <!-- title可省略，就不显示 -->
-              <a-popover placement="top">
-                <template slot="content">
-                  <p>M0商户：简单模式（页面简洁，仅基础收款功能）</p>
-                  <p>M1商户：高级模式（支持api调用， 支持配置应用及分账、转账功能）</p>
-                </template>
-                <template slot="title">
-                  <span>商户级别</span>
-                </template>
-                <a-icon type="question-circle" />
-              </a-popover>
-            </div>
-          </div>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="状态" prop="state">

@@ -19,7 +19,7 @@
               v-model="payWayItem.checked"
               @change="onChangeWayCode(payWayItem.wayCode, $event, mergeFeeItem)"
             >{{ payWayItem.wayName }}</a-checkbox>
-            <a-button type="primary" @click="mergeFeeItem.isMergeMode = !mergeFeeItem.isMergeMode">
+            <a-button type="primary" :disabled="!!configTypeReadonlyMaps.length" @click="mergeFeeItem.isMergeMode = !mergeFeeItem.isMergeMode">
               {{ mergeFeeItem.isMergeMode ? '拆分配置' : '合并配置' }}
             </a-button>
           </div>
@@ -33,7 +33,7 @@
                   <template #content>
                     <p>自动读取上级设置的费率值并填充至输入框， 优先级： 默认费率 --> 上级费率</p>
                   </template>
-                  <a-button style="margin-left: 8px;" size="small" shape="round" icon="bulb">读取默认费率</a-button>
+                  <a-button v-if="!!configTypeReadonlyMaps.length" style="margin-left: 8px;" size="small" shape="round" icon="bulb">读取默认费率</a-button>
                 </a-popover>
               </div>
               <div class="h-right h-right2" style="display: flex;">
@@ -47,19 +47,21 @@
                   是否可进件：
                   <a-switch
                     @change="onChangeApplymentSupport(payWayItem.wayCode, $event)"
-                    :checked="!!rateConfig.mainFee[payWayItem.wayCode].applymentSupport" />
+                    :checked="!!rateConfig.mainFee[payWayItem.wayCode].applymentSupport"
+                    :disabled="!!configTypeReadonlyMaps.length"/>
                 </div>
                 <div class="h-right2-div" v-if="!!rateConfig.mainFee[payWayItem.wayCode].state">
                   阶梯费率：
                   <a-switch
                     @change="onChangeFeeType(payWayItem.wayCode, $event)"
-                    :checked="rateConfig.mainFee[payWayItem.wayCode].feeType==='LEVEL'" />
+                    :checked="rateConfig.mainFee[payWayItem.wayCode].feeType==='LEVEL'"
+                    :disabled="!!configTypeReadonlyMaps.length"/>
                 </div>
                 <div class="h-right2-div" v-if="!!rateConfig.mainFee[payWayItem.wayCode].state">
                   银联模式：
                   <a-switch
                     @change="onChangeLevelMode(payWayItem.wayCode, $event)"
-                    :disabled="rateConfig.mainFee[payWayItem.wayCode].feeType!='LEVEL'"
+                    :disabled="rateConfig.mainFee[payWayItem.wayCode].feeType!='LEVEL' || !!configTypeReadonlyMaps.length"
                     :checked="rateConfig.mainFee[payWayItem.wayCode].feeType==='LEVEL'
                       && rateConfig.mainFee[payWayItem.wayCode].levelMode==='UNIONPAY'" />
                 </div>
@@ -82,13 +84,15 @@
                       class="w-pay-item"
                       style="min-width: 138px;">
                       <div class="w-pay-title" v-if="levelKey===0">
-                        <a-popover placement="top">
-                          <template #content>
-                            <span>范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span>
-                          </template>
-                          <a-icon type="question-circle" />
-                        </a-popover>
-                        <span style="margin-left: 4px;">价格区间：</span>
+                        <div>
+                          <span>价格区间：</span>
+                          <a-popover placement="top">
+                            <template #content>
+                              <span>范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span>
+                            </template>
+                            <a-icon type="question-circle" />
+                          </a-popover>
+                        </div>
                       </div>
                       <div
                         v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode==='UNIONPAY'"
@@ -102,29 +106,19 @@
                           type="number"
                           addon-after="~"
                           @change="inputChangeAmount(payWayItem.wayCode, 'min', levelItem.id, $event)"
-                          v-model="levelItem.minAmount" />
+                          v-model="levelItem.minAmount"
+                          :disabled="!!configTypeReadonlyMaps.length"/>
                         <a-input
                           style="width: 50%;min-width: 100px;"
                           :min="0"
                           type="number"
                           addon-after="元"
                           @change="inputChangeAmount(payWayItem.wayCode, 'max', levelItem.id, $event)"
-                          v-model="levelItem.maxAmount"/>
+                          v-model="levelItem.maxAmount"
+                          :disabled="!!configTypeReadonlyMaps.length"/>
                       </div>
                     </div>
-                    <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
-                      <div class="w-pay-title" v-if="levelKey===0">{{ getPayTitle(item) }}费率：</div>
-                      <a-input
-                        :min="0"
-                        :step="0.01"
-                        type="number"
-                        addon-after="%"
-                        @change="inputChange"
-                        :disabled="item.startsWith('readonly')"
-                        v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode]
-                          .find(f => f.bankCardType === levelModeItem.bankCardType).levelList[levelKey].feeRate"/>
-                    </div>
-                    <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
+                    <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                       <div class="w-pay-title" v-if="levelKey===0">{{ getPayTitle(item) }}费率：</div>
                       <a-input
                         :min="0"
@@ -144,17 +138,17 @@
                         cancel-text="取消"
                         @confirm="deleteLevelFee(payWayItem.wayCode, levelItem.id)"
                       >
-                        <a-button type="link" icon="delete" danger>删除</a-button>
+                        <a-button v-if="!configTypeReadonlyMaps.length" type="link" icon="delete" danger>删除</a-button>
                       </a-popconfirm>
                     </div>
                   </div>
                   <div
-                    v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode==='NORMAL'"
-                    style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
+                    v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode==='NORMAL' && !configTypeReadonlyMaps.length"
+                    style="margin-top: 30px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
                     <a-button type="dashed" @click="addLevelFee(payWayItem.wayCode)">新增阶梯</a-button>
                   </div>
                 </div>
-                <div :style="{ marginTop: rateConfig.mainFee[payWayItem.wayCode].levelMode==='UNIONPAY' ? '15px' : 0 }">
+                <div :style="{ marginTop: '20px' }">
                   <a-collapse>
                     <a-collapse-panel header="高级配置">
                       <div
@@ -168,18 +162,7 @@
                             <div class="w-pay-title">价格类型：</div>
                             <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
                           </div>
-                          <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
-                            <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
-                            <a-input
-                              :min="0"
-                              type="number"
-                              addon-before="保底："
-                              addon-after="元"
-                              @change="inputChange"
-                              :disabled="item.startsWith('readonly')"
-                              v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][levelModeKey].minFee"/>
-                          </div>
-                          <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
+                          <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                             <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
                             <a-input
                               :min="0"
@@ -195,17 +178,7 @@
                           <div class="w-pay-item">
                             <div style="height: 30px; line-height: 30px;min-width: 75px;">封顶费用：</div>
                           </div>
-                          <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
-                            <a-input
-                              :min="0"
-                              type="number"
-                              addon-before="封顶："
-                              addon-after="元"
-                              @change="inputChange"
-                              :disabled="item.startsWith('readonly')"
-                              v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][levelModeKey].maxFee"/>
-                          </div>
-                          <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
+                          <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                             <a-input
                               :min="0"
                               type="number"
@@ -222,18 +195,7 @@
                 </div>
               </div>
               <div v-else class="weChat-pay-list">
-                <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
-                  <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
-                  <a-input
-                    :min="0"
-                    :step="0.01"
-                    type="number"
-                    addon-after="%"
-                    @change="inputChange"
-                    :disabled="item.startsWith('readonly')"
-                    v-model="rateConfig[item][payWayItem.wayCode].feeRate"/>
-                </div>
-                <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
+                <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                   <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
                   <a-input
                     :min="0"
@@ -261,7 +223,7 @@
                 <template #content>
                   <p>自动读取上级设置的费率值并填充至输入框， 优先级： 默认费率 --> 上级费率</p>
                 </template>
-                <a-button style="margin-left: 8px;" size="small" shape="round" icon="bulb">读取默认费率</a-button>
+                <a-button v-if="!!configTypeReadonlyMaps.length" style="margin-left: 8px;" size="small" shape="round" icon="bulb">读取默认费率</a-button>
               </a-popover>
             </div>
             <div class="h-right h-right2" style="display: flex;">
@@ -275,19 +237,21 @@
                 是否可进件：
                 <a-switch
                   @change="onChangeApplymentSupport(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                  :checked="!!mergeFeeItem.mainFee.applymentSupport" />
+                  :checked="!!mergeFeeItem.mainFee.applymentSupport"
+                  :disabled="!!configTypeReadonlyMaps.length"/>
               </div>
               <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee.state">
                 阶梯费率：
                 <a-switch
                   @change="onChangeFeeType(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                  :checked="mergeFeeItem.mainFee.feeType==='LEVEL'" />
+                  :checked="mergeFeeItem.mainFee.feeType==='LEVEL'"
+                  :disabled="!!configTypeReadonlyMaps.length"/>
               </div>
               <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee.state">
                 银联模式：
                 <a-switch
                   @change="onChangeLevelMode(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                  :disabled="mergeFeeItem.mainFee.feeType!='LEVEL'"
+                  :disabled="mergeFeeItem.mainFee.feeType!='LEVEL' || !!configTypeReadonlyMaps.length"
                   :checked="mergeFeeItem.mainFee.feeType==='LEVEL'
                     && mergeFeeItem.mainFee.levelMode==='UNIONPAY'" />
               </div>
@@ -310,13 +274,15 @@
                     class="w-pay-item"
                     style="min-width: 138px;">
                     <div class="w-pay-title" v-if="levelKey===0">
-                      <a-popover placement="top">
-                        <template #content>
-                          <span>范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span>
-                        </template>
-                        <a-icon type="question-circle" />
-                      </a-popover>
-                      <span style="margin-left: 4px;">价格区间：</span>
+                      <div>
+                        <span>价格区间：</span>
+                        <a-popover placement="top">
+                          <template #content>
+                            <span>范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span>
+                          </template>
+                          <a-icon type="question-circle" />
+                        </a-popover>
+                      </div>
                     </div>
                     <div
                       v-if="mergeFeeItem.mainFee.levelMode==='UNIONPAY'"
@@ -330,29 +296,19 @@
                         type="number"
                         addon-after="~"
                         @change="inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'min', levelItem.id, $event, mergeFeeItem)"
-                        v-model="levelItem.minAmount" />
+                        v-model="levelItem.minAmount"
+                        :disabled="!!configTypeReadonlyMaps.length"/>
                       <a-input
                         style="width: 50%;min-width: 100px;"
                         :min="0"
                         type="number"
                         addon-after="元"
                         @change="inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'max', levelItem.id, $event, mergeFeeItem)"
-                        v-model="levelItem.maxAmount"/>
+                        v-model="levelItem.maxAmount"
+                        :disabled="!!configTypeReadonlyMaps.length"/>
                     </div>
                   </div>
-                  <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
-                    <div class="w-pay-title" v-if="levelKey===0">{{ getPayTitle(item) }}费率：</div>
-                    <a-input
-                      :min="0"
-                      :step="0.01"
-                      type="number"
-                      addon-after="%"
-                      @change="inputChange"
-                      :disabled="item.startsWith('readonly')"
-                      v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode]
-                        .find(f => f.bankCardType===levelModeItem.bankCardType).levelList[levelKey].feeRate"/>
-                  </div>
-                  <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
+                  <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                     <div class="w-pay-title" v-if="levelKey===0">{{ getPayTitle(item) }}费率：</div>
                     <a-input
                       :min="0"
@@ -372,17 +328,17 @@
                       cancel-text="取消"
                       @confirm="deleteLevelFee(mergeFeeItem.mainFee.wayCode, levelItem.id, mergeFeeItem)"
                     >
-                      <a-button type="link" icon="delete" danger>删除</a-button>
+                      <a-button v-if="!configTypeReadonlyMaps.length" type="link" icon="delete" danger>删除</a-button>
                     </a-popconfirm>
                   </div>
                 </div>
                 <div
-                  v-if="mergeFeeItem.mainFee.levelMode==='NORMAL'"
-                  style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
+                  v-if="mergeFeeItem.mainFee.levelMode==='NORMAL' && !configTypeReadonlyMaps.length"
+                  style="margin-top: 30px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
                   <a-button type="dashed" @click="addLevelFee(mergeFeeItem.mainFee.wayCode, mergeFeeItem)">新增阶梯</a-button>
                 </div>
               </div>
-              <div :style="{ marginTop: mergeFeeItem.mainFee.levelMode==='UNIONPAY' ? '15px' : 0 }">
+              <div :style="{ marginTop: '20px' }">
                 <a-collapse>
                   <a-collapse-panel header="高级配置">
                     <div
@@ -396,18 +352,7 @@
                           <div class="w-pay-title">价格类型：</div>
                           <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
                         </div>
-                        <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
-                          <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
-                          <a-input
-                            :min="0"
-                            type="number"
-                            addon-before="保底："
-                            addon-after="元"
-                            @change="inputChange"
-                            :disabled="item.startsWith('readonly')"
-                            v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].minFee"/>
-                        </div>
-                        <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
+                        <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                           <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
                           <a-input
                             :min="0"
@@ -423,17 +368,7 @@
                         <div class="w-pay-item">
                           <div style="height: 30px; line-height: 30px;min-width: 75px;">封顶费用：</div>
                         </div>
-                        <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
-                          <a-input
-                            :min="0"
-                            type="number"
-                            addon-before="封顶："
-                            addon-after="元"
-                            @change="inputChange"
-                            :disabled="item.startsWith('readonly')"
-                            v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].maxFee"/>
-                        </div>
-                        <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
+                        <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                           <a-input
                             :min="0"
                             type="number"
@@ -450,18 +385,7 @@
               </div>
             </div>
             <div v-else class="weChat-pay-list">
-              <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps" :key="key">
-                <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
-                <a-input
-                  :min="0"
-                  :step="0.01"
-                  type="number"
-                  addon-after="%"
-                  @change="inputChange"
-                  :disabled="item.startsWith('readonly')"
-                  v-model="mergeFeeItem[item].feeRate"/>
-              </div>
-              <div class="w-pay-item" v-for="(item, key) in configTypeMaps" :key="key">
+              <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                 <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
                 <a-input
                   :min="0"
@@ -971,7 +895,7 @@ export default {
             })
           }
         }
-        console.log(item)
+        // console.log(item)
       })
     },
     async getRateConfig (currentIfCode) {
@@ -1060,7 +984,7 @@ export default {
       that.mergeFeeList.forEach(item => {
         item.isMergeMode = false
         const payWays = []
-        item.selectedWayCodeList.forEach(C => payWays.push(C.wayCode))
+        item.selectedWayCodeList.forEach(c => payWays.push(c.wayCode))
         const mainFee = that.isMergeMode(Object.values(that.rateConfig.mainFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
         const agentdefFee = that.isMergeMode(Object.values(that.rateConfig.agentdefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
         const mchapplydefFee = that.isMergeMode(Object.values(that.rateConfig.mchapplydefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
@@ -1079,18 +1003,51 @@ export default {
           }
           if (readonlyIsvCost) {
             item.readonlyIsvCost = readonlyIsvCost
+            const { state, feeRate, ...readonlyIsvCostWithoutFeeRate } = readonlyIsvCost
+            item.mainFee = that.onFeeWithoutFeeRateAndState(item.mainFee, readonlyIsvCostWithoutFeeRate)
+            item.agentdefFee = that.onFeeWithoutFeeRateAndState(item.agentdefFee, readonlyIsvCostWithoutFeeRate)
+            item.mchapplydefFee = that.onFeeWithoutFeeRateAndState(item.mchapplydefFee, readonlyIsvCostWithoutFeeRate)
           }
           if (readonlyParentAgent) {
             item.readonlyParentAgent = readonlyParentAgent
+            const { state, feeRate, ...readonlyParentAgentWithoutFeeRate } = readonlyParentAgent
+            item.mainFee = that.onFeeWithoutFeeRateAndState(item.mainFee, readonlyParentAgentWithoutFeeRate)
+            item.agentdefFee = that.onFeeWithoutFeeRateAndState(item.agentdefFee, readonlyParentAgentWithoutFeeRate)
+            item.mchapplydefFee = that.onFeeWithoutFeeRateAndState(item.mchapplydefFee, readonlyParentAgentWithoutFeeRate)
           }
-          item.selectedWayCodeList.forEach(C => {
-            C.checked = that.rateConfig.mainFee[C.wayCode] != null && !!that.rateConfig.mainFee[C.wayCode].state
+          item.selectedWayCodeList.forEach(c => {
+            c.checked = that.rateConfig.mainFee[c.wayCode] != null && !!that.rateConfig.mainFee[c.wayCode].state
           })
           item.isMergeMode = true
         }
       })
       console.log(that.mergeFeeList)
       console.log(that.rateConfig)
+    },
+    onFeeWithoutFeeRateAndState (fee, readonlyFee) {
+      const { state, feeRate, ...readonlyFeeWithoutFeeRate } = readonlyFee
+      if (readonlyFee.feeType !== 'SINGLE') {
+        const updatedItems = readonlyFeeWithoutFeeRate[readonlyFee.levelMode].map((item) => {
+          const updatedItem = {
+            ...item,
+            levelList: item.levelList.map((levelItem) => {
+              return {
+                ...levelItem,
+                feeRate: null
+              }
+            })
+          }
+          return updatedItem
+        })
+
+        if (readonlyFee.levelMode === 'NORMAL') {
+          return { ...readonlyFeeWithoutFeeRate, NORMAL: updatedItems }
+        }
+        if (readonlyFee.levelMode === 'UNIONPAY') {
+          return { ...readonlyFeeWithoutFeeRate, UNIONPAY: updatedItems }
+        }
+      }
+      return Object.assign(fee, readonlyFeeWithoutFeeRate)
     },
     onChangeWayCode (wayCode, event, mergeFeeItem) {
       console.log(wayCode, event.target.checked)
@@ -1619,7 +1576,7 @@ export default {
         Object.assign(params, feeRateConfig)
         console.log(params)
         req.add(API_URL_RATECONFIGS_LIST, params).then(res => {
-          that.$message.success('新增成功')
+          that.$message.success('保存成功')
           typeof originSavedList === 'object' && console.log('重置的原始list', originSavedList)
           typeof originSavedList === 'object' && (that.originSavedList = originSavedList)
           // that.callbackFunc() // 刷新列表

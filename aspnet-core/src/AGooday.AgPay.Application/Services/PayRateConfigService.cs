@@ -334,7 +334,7 @@ namespace AGooday.AgPay.Application.Services
         private void SaveOrUpdate(string infoId, string ifCode, string configType, string infoType, List<string> delPayWayCodes, List<PayRateConfigSaveDto.PayRateConfigItem> items)
         {
             var now = DateTime.Now;
-            DelPayWayCodeRateConfig(configType, infoType, infoId, ifCode, delPayWayCodes);
+            DelPayWayCodeRateConfig(infoId, ifCode, configType, infoType, delPayWayCodes);
             foreach (var item in items)
             {
                 var entity = _payRateConfigRepository.GetByUniqueKey(configType, infoType, infoId, ifCode, item.WayCode);
@@ -412,7 +412,7 @@ namespace AGooday.AgPay.Application.Services
                 {
                     _payRateConfigRepository.Remove(entity.Id);
 
-                    _payRateLevelConfigRepository.SaveChanges();
+                    _payRateConfigRepository.SaveChanges();
 
                     var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(entity.Id);
                     foreach (var payRateLevelConfig in payRateLevelConfigs)

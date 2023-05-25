@@ -70,24 +70,25 @@
       <div>
         <a-row justify="space-between" type="flex">
           <a-col :span="24">
-            <a-form-model-item label="支持的签名方式" prop="appSignType">
-              <!-- 支持的签名方式 气泡弹窗 -->
+            <a-form-model-item prop="appSignType">
+              <template slot="label">
+                <div>
+                  <label title="支持的签名方式" style="margin-right: 4px">支持的签名方式</label>
+                  <!-- 支持的签名方式 气泡弹窗 -->
+                  <!-- title可省略，就不显示 -->
+                  <a-popover placement="top">
+                    <template slot="content">
+                      <p>若需要使用系统测试或者商户通APP则必须支持MD5， 若仅通过API调用则根据需求进行选择。</p>
+                    </template>
+                    <template slot="title">
+                      <span>签名方式</span>
+                    </template>
+                    <a-icon type="question-circle" />
+                  </a-popover>
+                </div>
+              </template>
               <a-checkbox-group v-model="saveObject.appSignType" :options="appSignTypeOptions" />
             </a-form-model-item>
-            <div class="components-popover-demo-placement">
-              <div class="typePopover">
-                <!-- title可省略，就不显示 -->
-                <a-popover placement="top">
-                  <template slot="content">
-                    <p>若需要使用系统测试或者商户通APP则必须支持MD5， 若仅通过API调用则根据需求进行选择。</p>
-                  </template>
-                  <template slot="title">
-                    <span>签名方式</span>
-                  </template>
-                  <a-icon type="question-circle" />
-                </a-popover>
-              </div>
-            </div>
           </a-col>
         </a-row>
         <a-row justify="space-between" type="flex" v-if="this.saveObject.appSignType?.includes('MD5')">
@@ -241,10 +242,5 @@ export default {
 <style scoped>
   >>> .ant-divider-inner-text {
     color: rgb(26, 102, 255);
-  }
-  .typePopover {
-    position: absolute;
-    top: 0;
-    left: 105px;
   }
 </style>

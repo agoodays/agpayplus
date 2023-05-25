@@ -70,8 +70,23 @@
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="10" style="position:relative">
-          <a-form-model-item label="商户级别" prop="mchLevel">
-            <!-- 商户级别 气泡弹窗 -->
+          <a-form-model-item prop="mchLevel">
+            <template slot="label">
+              <div>
+                <label title="商户级别" style="margin-right: 4px">商户级别</label>
+                <!-- 商户级别 气泡弹窗 -->
+                <a-popover placement="top">
+                  <template slot="content">
+                    <p>M0商户：简单模式（页面简洁，仅基础收款功能）</p>
+                    <p>M1商户：高级模式（支持api调用， 支持配置应用及分账、转账功能）</p>
+                  </template>
+                  <template slot="title">
+                    <span>商户级别</span>
+                  </template>
+                  <a-icon type="question-circle" />
+                </a-popover>
+              </div>
+            </template>
             <a-radio-group v-model="saveObject.mchLevel">
               <a-radio value="M0">
                 M0
@@ -81,47 +96,49 @@
               </a-radio>
             </a-radio-group>
           </a-form-model-item>
-          <div class="components-popover-demo-placement">
-            <div class="typePopover">
-              <!-- title可省略，就不显示 -->
-              <a-popover placement="top">
-                <template slot="content">
-                  <p>M0商户：简单模式（页面简洁，仅基础收款功能）</p>
-                  <p>M1商户：高级模式（支持api调用， 支持配置应用及分账、转账功能）</p>
-                </template>
-                <template slot="title">
-                  <span>商户级别</span>
-                </template>
-                <a-icon type="question-circle" />
-              </a-popover>
-            </div>
-          </div>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="退款方式" prop="refundMode">
-            <!-- 退款方式 气泡弹窗 -->
+          <a-form-model-item prop="refundMode">
+            <template slot="label">
+              <div>
+                <label title="退款方式" style="margin-right: 4px">退款方式</label>
+                <!-- 退款方式 气泡弹窗 -->
+                <!-- title可省略，就不显示 -->
+                <a-popover placement="top">
+                  <template slot="content">
+                    <p>平台退款方式必须包含接口退款。</p>
+                  </template>
+                  <template slot="title">
+                    <span>退款方式说明</span>
+                  </template>
+                  <a-icon type="question-circle" />
+                </a-popover>
+              </div>
+            </template>
             <a-checkbox-group v-model="saveObject.refundMode" :options="refundModeOptions" @change="refundModeChange" />
           </a-form-model-item>
-          <div class="components-popover-demo-placement">
-            <div class="typePopover">
-              <!-- title可省略，就不显示 -->
-              <a-popover placement="top">
-                <template slot="content">
-                  <p>平台退款方式必须包含接口退款。</p>
-                </template>
-                <template slot="title">
-                  <span>退款方式说明</span>
-                </template>
-                <a-icon type="question-circle" />
-              </a-popover>
-            </div>
-          </div>
         </a-col>
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="10" style="position:relative">
-          <a-form-model-item label="商户类型" prop="type">
-            <!-- 商户类型 气泡弹窗 -->
+          <a-form-model-item prop="type">
+            <template slot="label">
+              <div>
+                <label title="商户类型" style="margin-right: 4px">商户类型</label>
+                <!-- 商户类型 气泡弹窗 -->
+                <!-- title可省略，就不显示 -->
+                <a-popover placement="top">
+                  <template slot="content">
+                    <p>普通商户是指商户自行申请入驻微信或支付宝，无服务商协助，单独调接口。</p>
+                    <p>特约商户是指由微信或支付宝的服务商协助商户完成入驻，商户下单走的是服务商接口。</p>
+                  </template>
+                  <template slot="title">
+                    <span>商户类型</span>
+                  </template>
+                  <a-icon type="question-circle" />
+                </a-popover>
+              </div>
+            </template>
             <a-radio-group v-model="saveObject.type" :disabled="!this.isAdd">
               <a-radio :value="1">
                 普通商户
@@ -131,21 +148,6 @@
               </a-radio>
             </a-radio-group>
           </a-form-model-item>
-          <div class="components-popover-demo-placement">
-            <div class="typePopover">
-              <!-- title可省略，就不显示 -->
-              <a-popover placement="top">
-                <template slot="content">
-                  <p>普通商户是指商户自行申请入驻微信或支付宝，无服务商协助，单独调接口。</p>
-                  <p>特约商户是指由微信或支付宝的服务商协助商户完成入驻，商户下单走的是服务商接口。</p>
-                </template>
-                <template slot="title">
-                  <span>商户类型</span>
-                </template>
-                <a-icon type="question-circle" />
-              </a-popover>
-            </div>
-          </div>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="状态" prop="state">
@@ -480,11 +482,6 @@ export default {
 }
 </script>
 <style lang="less">
-  .typePopover {
-    position: absolute;
-    top: 0;
-    left: 62px;
-  }
   .agpay-tip-text:before {
     content: "";
     width: 0;
