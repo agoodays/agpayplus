@@ -29,15 +29,10 @@
           <a-form-model ref="configFormModel">
             <a-row>
               <a-col :span="8" :offset="1">
-                <a-form-model-item label="商户等级切换">
-                  <a-radio-group v-model="mchLevel">
-                    <a-radio value="M0">M0</a-radio>
-                    <a-radio value="M1">M1</a-radio>
-                  </a-radio-group>
-                </a-form-model-item>
-                <div class="components-popover-demo-placement">
-                  <div class="mchLevelPopover">
-                    <!-- title可省略，就不显示 -->
+                <a-form-model-item>
+                  <template slot="label">
+                    <span title="商户等级切换" style="margin-right: 4px">商户等级切换</span>
+                    <!-- 商户级别 气泡弹窗 -->
                     <a-popover placement="top">
                       <template slot="content">
                         <p>M0商户：简单模式（页面简洁，仅基础收款功能）</p>
@@ -46,10 +41,14 @@
                       <template slot="title">
                         <span>商户级别</span>
                       </template>
-                      <a-icon type="question-circle" />
+                      <span><a-icon type="question-circle" /></span>
                     </a-popover>
-                  </div>
-                </div>
+                  </template>
+                  <a-radio-group v-model="mchLevel">
+                    <a-radio value="M0">M0</a-radio>
+                    <a-radio value="M1">M1</a-radio>
+                  </a-radio-group>
+                </a-form-model-item>
               </a-col>
             </a-row>
             <a-row>
@@ -64,7 +63,7 @@
       </a-tab-pane>
       <a-tab-pane key="payOrderNotifyConfig" tab="回调和查单参数">
         <div class="account-settings-info-view" v-if="['payOrderNotifyConfig'].indexOf(groupKey)>=0">
-          <a-form-model ref="configFormModel">
+          <a-form-model ref="configFormModel" layout="vertical">
             <a-row>
               <a-col :span="22" :offset="1" :key="config" v-for="(item, config) in configData">
                 <div v-if="item.configKey !== 'payOrderNotifyExtParams'">
@@ -74,17 +73,11 @@
                       智能POS收款、退款等场景下，需要配置商户回调地址，接口下单以下单传参为准
                     </div>
                   </a-form-model-item>
-                  <a-form-model-item :label="item.configName" v-if="item.type==='radio'">
-                    <a-radio-group v-model="item.configVal">
-                      <a-radio value="POST_JSON">POST(JSON 形式)</a-radio>
-                      <a-radio value="POST_BODY">POST(Body 形式)</a-radio>
-                      <a-radio value="POST_QUERYSTRING">POST(QueryString 形式)</a-radio>
-                    </a-radio-group>
-                  </a-form-model-item>
-                  <div class="components-popover-demo-placement" v-if="item.configKey === 'mchNotifyPostType'">
-                    <div class="typePopover">
-                      <!-- title可省略，就不显示 -->
-                      <a-popover placement="top">
+                  <a-form-model-item v-if="item.type==='radio'">
+                    <template slot="label">
+                      <span :title="item.configName" style="margin-right: 4px">{{ item.configName }}</span>
+                      <!-- 商户级别 气泡弹窗 -->
+                      <a-popover placement="top" v-if="item.configKey === 'mchNotifyPostType'">
                         <template slot="content">
                           <p>设置后该商户接收支付网关所有的通知（支付、退款等回调）将全部以此方式发送。</p>
                           <p>POST(Body形式)： method: POST; Content-Type: application/x-www-form-urlencoded; 回调参数（ 例如a=1&b=2 ）放置在Body 发送。</p>
@@ -94,10 +87,15 @@
                         <template slot="title">
                           <span>回调方式</span>
                         </template>
-                        <a-icon type="question-circle" />
+                        <span><a-icon type="question-circle" /></span>
                       </a-popover>
-                    </div>
-                  </div>
+                    </template>
+                    <a-radio-group v-model="item.configVal">
+                      <a-radio value="POST_JSON">POST(JSON 形式)</a-radio>
+                      <a-radio value="POST_BODY">POST(Body 形式)</a-radio>
+                      <a-radio value="POST_QUERYSTRING">POST(QueryString 形式)</a-radio>
+                    </a-radio-group>
+                  </a-form-model-item>
                 </div>
                 <div v-else>
                   <a-table
@@ -125,7 +123,21 @@
           <a-form-model ref="configFormModel">
             <a-row>
               <a-col :span="22" :offset="1" v-if="divisionConfig.mchDivisionEntFlag">
-                <a-form-model-item label="全局自动分账" style="margin-bottom: 0;">
+                <a-form-model-item style="margin-bottom: 0;">
+                  <template slot="label">
+                    <span title="全局自动分账" style="margin-right: 4px">全局自动分账</span>
+                    <!-- 全局自动分账 气泡弹窗 -->
+                    <a-popover placement="top">
+                      <template slot="content">
+                        <p>开启：将根据[全局自动分账规则]进行自动分账处理（屏蔽下单API的分账参数， 订单标识都是自动分账模式）</p>
+                        <p>关闭：以API传参为准</p>
+                      </template>
+                      <template slot="title">
+                        <span>全局自动分账</span>
+                      </template>
+                      <span><a-icon type="question-circle" /></span>
+                    </a-popover>
+                  </template>
                   <a-radio-group v-model="divisionConfig.overrideAutoFlag">
                     <a-radio :value="1">开启</a-radio>
                     <a-radio :value="0">关闭</a-radio>
@@ -163,21 +175,6 @@
                     <label class="division-rule-label-tail">后</label>
                   </div>
                 </a-form-model-item>
-                <div class="components-popover-demo-placement">
-                  <div class="autoFlagPopover">
-                    <!-- title可省略，就不显示 -->
-                    <a-popover placement="top">
-                      <template slot="content">
-                        <p>开启：将根据[全局自动分账规则]进行自动分账处理（屏蔽下单API的分账参数， 订单标识都是自动分账模式）</p>
-                        <p>关闭：以API传参为准</p>
-                      </template>
-                      <template slot="title">
-                        <span>全局自动分账</span>
-                      </template>
-                      <a-icon type="question-circle" />
-                    </a-popover>
-                  </div>
-                </div>
               </a-col>
               <a-col v-else>
                 <div style="height: 200px">
@@ -424,16 +421,6 @@ export default {
 }
 </script>
 <style lang="less">
-  .autoFlagPopover,.mchLevelPopover {
-    position: absolute;
-    top: 10px;
-    left: 100px;
-  }
-  .typePopover {
-    position: absolute;
-    top: 10px;
-    left: 128px;
-  }
   .agpay-tip-text:before {
     content: "";
     width: 0;

@@ -243,9 +243,4 @@ export default {
   >>> .ant-divider-inner-text {
     color: rgb(26, 102, 255);
   }
-  .typePopover {
-    position: absolute;
-    top: 0;
-    left: 105px;
-  }
 </style>

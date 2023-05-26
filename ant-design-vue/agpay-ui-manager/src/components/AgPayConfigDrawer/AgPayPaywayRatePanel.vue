@@ -1,6 +1,6 @@
 <template>
   <div class="drawer">
-    <a-alert type="info" show-icon>
+    <a-alert type="info" style="margin-bottom: 20px;" show-icon>
       <template #message>
         <span style="color: #1890ff">注意：代理商费率不得低于服务商费率，下及代理商费率不得低于上级代理商费率，商家费率不得低于所属代理商费率</span>
       </template>

@@ -637,11 +637,6 @@ export default {
 </script>
 
 <style lang="less">
-  .typePopover {
-    position: absolute;
-    top: 0;
-    left: 75px;
-  }
   .agpay-tip-text:before {
     content: "";
     width: 0;
