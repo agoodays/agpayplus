@@ -33,7 +33,13 @@
                   <template #content>
                     <p>自动读取上级设置的费率值并填充至输入框， 优先级： 默认费率 --> 上级费率</p>
                   </template>
-                  <a-button v-if="!!configTypeReadonlyMaps.length" style="margin-left: 8px;" size="small" shape="round" icon="bulb">读取默认费率</a-button>
+                  <a-button
+                    v-if="!!configTypeReadonlyMaps.length"
+                    @click="onReadDefaultFeeRate(mergeFeeItem.isMergeMode, payWayItem.wayCode)"
+                    style="margin-left: 8px;"
+                    size="small"
+                    shape="round"
+                    icon="bulb">读取默认费率</a-button>
                 </a-popover>
               </div>
               <div class="h-right h-right2" style="display: flex;">
@@ -61,7 +67,7 @@
                   银联模式：
                   <a-switch
                     @change="onChangeLevelMode(payWayItem.wayCode, $event)"
-                    :disabled="rateConfig.mainFee[payWayItem.wayCode].feeType!='LEVEL' || !!configTypeReadonlyMaps.length"
+                    :disabled="rateConfig.mainFee[payWayItem.wayCode].feeType!=='LEVEL' || !!configTypeReadonlyMaps.length"
                     :checked="rateConfig.mainFee[payWayItem.wayCode].feeType==='LEVEL'
                       && rateConfig.mainFee[payWayItem.wayCode].levelMode==='UNIONPAY'" />
                 </div>
@@ -214,7 +220,7 @@
           <div class="card-header">
             <div class="h-left">
               合并配置
-              <a-alert v-if="!!mergeFeeItem.mainFee.state && mergeFeeItem.selectedWayCodeList.filter(f => f.checked === true).length<=0" banner >
+              <a-alert v-if="!!mergeFeeItem.mainFee.state && mergeFeeItem.selectedWayCodeList.filter(f => f.checked === true).length<=0" banner>
                 <template #message>
                   <span style="color: #faad14">未勾选任何产品</span>
                 </template>
@@ -223,7 +229,13 @@
                 <template #content>
                   <p>自动读取上级设置的费率值并填充至输入框， 优先级： 默认费率 --> 上级费率</p>
                 </template>
-                <a-button v-if="!!configTypeReadonlyMaps.length" style="margin-left: 8px;" size="small" shape="round" icon="bulb">读取默认费率</a-button>
+                <a-button
+                  v-if="!!configTypeReadonlyMaps.length"
+                  @click="onReadDefaultFeeRate(mergeFeeItem.isMergeMode, mergeFeeKey)"
+                  style="margin-left: 8px;"
+                  size="small"
+                  shape="round"
+                  icon="bulb">读取默认费率</a-button>
               </a-popover>
             </div>
             <div class="h-right h-right2" style="display: flex;">
@@ -251,7 +263,7 @@
                 银联模式：
                 <a-switch
                   @change="onChangeLevelMode(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                  :disabled="mergeFeeItem.mainFee.feeType!='LEVEL' || !!configTypeReadonlyMaps.length"
+                  :disabled="mergeFeeItem.mainFee.feeType!=='LEVEL' || !!configTypeReadonlyMaps.length"
                   :checked="mergeFeeItem.mainFee.feeType==='LEVEL'
                     && mergeFeeItem.mainFee.levelMode==='UNIONPAY'" />
               </div>
@@ -903,7 +915,6 @@ export default {
         this.currentIfCode = currentIfCode
       }
       const that = this
-      that.configTypeReadonlyMaps = []
       that.configTypeMaps = []
       that.configTypeReadonlyMaps = []
       that.allPaywayList = []
@@ -935,16 +946,16 @@ export default {
           that.rateConfig.mainFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.rateConfig.agentdefFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
           that.rateConfig.mchapplydefFee[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
-          that.rateConfig.readonlyIsvCost[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
-          that.rateConfig.readonlyParentAgent[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
-          that.rateConfig.readonlyParentDefRate[payWay.wayCode] = that.initRateConfig(payWay.wayCode)
+          that.rateConfig.readonlyIsvCost[payWay.wayCode] = mapData && mapData.READONLYISVCOST ? that.initRateConfig(payWay.wayCode) : null
+          that.rateConfig.readonlyParentAgent[payWay.wayCode] = mapData && mapData.READONLYPARENTAGENT ? that.initRateConfig(payWay.wayCode) : null
+          that.rateConfig.readonlyParentDefRate[payWay.wayCode] = mapData && mapData.READONLYPARENTDEFRATE ? that.initRateConfig(payWay.wayCode) : null
           that.mergeFeeList.forEach(item => {
             item.mainFee = that.initRateConfig(null)
             item.agentdefFee = that.initRateConfig(null)
             item.mchapplydefFee = that.initRateConfig(null)
-            item.readonlyIsvCost = that.initRateConfig(null)
-            item.readonlyParentAgent = that.initRateConfig(null)
-            item.readonlyParentDefRate = that.initRateConfig(null)
+            item.readonlyIsvCost = mapData && mapData.READONLYISVCOST ? that.initRateConfig(payWay.wayCode) : null
+            item.readonlyParentAgent = mapData && mapData.READONLYPARENTAGENT ? that.initRateConfig(payWay.wayCode) : null
+            item.readonlyParentDefRate = mapData && mapData.READONLYPARENTDEFRATE ? that.initRateConfig(payWay.wayCode) : null
           })
         })
 
@@ -969,13 +980,20 @@ export default {
         mapData && mapData.MCHRATE && that.toRateConfig('mainFee', mapData.MCHRATE)
         mapData && mapData.AGENTDEF && that.toRateConfig('agentdefFee', mapData.AGENTDEF)
         mapData && mapData.MCHAPPLYDEF && that.toRateConfig('mchapplydefFee', mapData.MCHAPPLYDEF)
-        mapData && mapData.READONLYISVCOST && that.toRateConfig('readonlyIsvCost', mapData.READONLYISVCOST)
-        mapData && mapData.READONLYPARENTAGENT && that.toRateConfig('readonlyParentAgent', mapData.READONLYPARENTAGENT)
-        mapData && mapData.READONLYPARENTDEFRATE && that.toRateConfig('readonlyParentDefRate', mapData.READONLYPARENTDEFRATE)
 
-        mapData && mapData.READONLYISVCOST && that.configTypeReadonlyMaps.push('readonlyIsvCost')
-        mapData && mapData.READONLYPARENTAGENT && that.configTypeReadonlyMaps.push('readonlyParentAgent')
-        // mapData && mapData.READONLYPARENTDEFRATE && that.configTypeReadonlyMaps.push('readonlyParentDefRate')
+        if (mapData && mapData.READONLYISVCOST) {
+          that.configTypeReadonlyMaps.push('readonlyIsvCost')
+          that.toRateConfig('readonlyIsvCost', mapData.READONLYISVCOST)
+        }
+        if (mapData && mapData.READONLYPARENTAGENT) {
+          that.configTypeReadonlyMaps.push('readonlyParentAgent')
+          that.toRateConfig('readonlyParentAgent', mapData.READONLYPARENTAGENT)
+        }
+        if (mapData && mapData.READONLYPARENTDEFRATE) {
+          // that.configTypeReadonlyMaps.push('readonlyParentDefRate')
+          that.toRateConfig('readonlyParentDefRate', mapData.READONLYPARENTDEFRATE)
+        }
+
         mapData && (mapData.ISVCOST || mapData.AGENTRATE || mapData.MCHRATE) && that.configTypeMaps.push('mainFee')
         mapData && mapData.AGENTDEF && that.configTypeMaps.push('agentdefFee')
         mapData && mapData.MCHAPPLYDEF && that.configTypeMaps.push('mchapplydefFee')
@@ -988,9 +1006,10 @@ export default {
         const mainFee = that.isMergeMode(Object.values(that.rateConfig.mainFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
         const agentdefFee = that.isMergeMode(Object.values(that.rateConfig.agentdefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
         const mchapplydefFee = that.isMergeMode(Object.values(that.rateConfig.mchapplydefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
-        const readonlyIsvCost = that.isMergeMode(Object.values(that.rateConfig.readonlyIsvCost).filter(f => payWays.indexOf(f.wayCode) >= 0))
-        const readonlyParentAgent = that.isMergeMode(Object.values(that.rateConfig.readonlyParentAgent).filter(f => payWays.indexOf(f.wayCode) >= 0))
-        console.log('判断合并模式： ', item.key, mainFee, agentdefFee, mchapplydefFee, readonlyIsvCost, readonlyParentAgent)
+        const readonlyIsvCost = mapData && mapData.READONLYISVCOST ? that.isMergeMode(Object.values(that.rateConfig.readonlyIsvCost).filter(f => payWays.indexOf(f.wayCode) >= 0)) : null
+        const readonlyParentAgent = mapData && mapData.READONLYPARENTAGENT ? that.isMergeMode(Object.values(that.rateConfig.readonlyParentAgent).filter(f => payWays.indexOf(f.wayCode) >= 0)) : null
+        const readonlyParentDefRate = mapData && mapData.READONLYPARENTDEFRATE ? that.isMergeMode(Object.values(that.rateConfig.readonlyParentDefRate).filter(f => payWays.indexOf(f.wayCode) >= 0)) : null
+        console.log('判断合并模式： ', item.key, mainFee, agentdefFee, mchapplydefFee, readonlyIsvCost, readonlyParentAgent, readonlyParentDefRate)
         if (typeof mainFee === 'object' && typeof agentdefFee === 'object' && typeof mchapplydefFee === 'object') {
           if (mainFee) {
             item.mainFee = mainFee
@@ -1003,17 +1022,24 @@ export default {
           }
           if (readonlyIsvCost) {
             item.readonlyIsvCost = readonlyIsvCost
-            const { state, feeRate, ...readonlyIsvCostWithoutFeeRate } = readonlyIsvCost
-            item.mainFee = that.onFeeWithoutFeeRateAndState(item.mainFee, readonlyIsvCostWithoutFeeRate)
-            item.agentdefFee = that.onFeeWithoutFeeRateAndState(item.agentdefFee, readonlyIsvCostWithoutFeeRate)
-            item.mchapplydefFee = that.onFeeWithoutFeeRateAndState(item.mchapplydefFee, readonlyIsvCostWithoutFeeRate)
+            const { state, feeRate, ...readonlyFeeWithoutFeeRateAndState } = readonlyIsvCost
+            item.mainFee = that.onFeeWithoutFeeRateAndState(item.mainFee, readonlyFeeWithoutFeeRateAndState)
+            item.agentdefFee = that.onFeeWithoutFeeRateAndState(item.agentdefFee, readonlyFeeWithoutFeeRateAndState)
+            item.mchapplydefFee = that.onFeeWithoutFeeRateAndState(item.mchapplydefFee, readonlyFeeWithoutFeeRateAndState)
           }
           if (readonlyParentAgent) {
             item.readonlyParentAgent = readonlyParentAgent
-            const { state, feeRate, ...readonlyParentAgentWithoutFeeRate } = readonlyParentAgent
-            item.mainFee = that.onFeeWithoutFeeRateAndState(item.mainFee, readonlyParentAgentWithoutFeeRate)
-            item.agentdefFee = that.onFeeWithoutFeeRateAndState(item.agentdefFee, readonlyParentAgentWithoutFeeRate)
-            item.mchapplydefFee = that.onFeeWithoutFeeRateAndState(item.mchapplydefFee, readonlyParentAgentWithoutFeeRate)
+            const { state, feeRate, ...readonlyFeeWithoutFeeRateAndState } = readonlyParentAgent
+            item.mainFee = that.onFeeWithoutFeeRateAndState(item.mainFee, readonlyFeeWithoutFeeRateAndState)
+            item.agentdefFee = that.onFeeWithoutFeeRateAndState(item.agentdefFee, readonlyFeeWithoutFeeRateAndState)
+            item.mchapplydefFee = that.onFeeWithoutFeeRateAndState(item.mchapplydefFee, readonlyFeeWithoutFeeRateAndState)
+          }
+          if (readonlyParentDefRate) {
+            item.readonlyParentDefRate = readonlyParentDefRate
+            // const { state, feeRate, ...readonlyFeeWithoutFeeRateAndState } = readonlyParentDefRate
+            // item.mainFee = that.onFeeWithoutFeeRateAndState(item.mainFee, readonlyFeeWithoutFeeRateAndState)
+            // item.agentdefFee = that.onFeeWithoutFeeRateAndState(item.agentdefFee, readonlyFeeWithoutFeeRateAndState)
+            // item.mchapplydefFee = that.onFeeWithoutFeeRateAndState(item.mchapplydefFee, readonlyFeeWithoutFeeRateAndState)
           }
           item.selectedWayCodeList.forEach(c => {
             c.checked = that.rateConfig.mainFee[c.wayCode] != null && !!that.rateConfig.mainFee[c.wayCode].state
@@ -1021,10 +1047,31 @@ export default {
           item.isMergeMode = true
         }
       })
-      console.log(that.mergeFeeList)
       console.log(that.rateConfig)
+      console.log(that.mergeFeeList)
+    },
+    onReadDefaultFeeRate (isMergeMode, key) {
+      console.log(isMergeMode, key)
+      const that = this
+      if (!isMergeMode) {
+        const mainFee = that.mergeFeeList[key].mainFee
+        const readonlyFee = that.rateConfig.readonlyParentDefRate[key] || that.rateConfig.readonlyParentAgent[key] || that.rateConfig.readonlyIsvCost[key]
+        console.log(mainFee, readonlyFee)
+        const { state, ...readonlyFeeWithoutState } = readonlyFee
+        that.rateConfig.mainFee[key] = Object.assign(mainFee, readonlyFeeWithoutState)
+      } else {
+        const mainFee = that.mergeFeeList[key].mainFee
+        const readonlyFee = that.mergeFeeList[key].readonlyParentDefRate || that.mergeFeeList[key].readonlyParentAgent || that.mergeFeeList[key].readonlyIsvCost
+        console.log(mainFee, readonlyFee)
+        const { state, ...readonlyFeeWithoutState } = readonlyFee
+        that.mergeFeeList[key].mainFee = Object.assign(mainFee, readonlyFeeWithoutState)
+      }
+      this.$forceUpdate()
     },
     onFeeWithoutFeeRateAndState (fee, readonlyFee) {
+      if (fee.feeType === readonlyFee.feeType) {
+        return fee
+      }
       const { state, feeRate, ...readonlyFeeWithoutFeeRate } = readonlyFee
       if (readonlyFee.feeType !== 'SINGLE') {
         const updatedItems = readonlyFeeWithoutFeeRate[readonlyFee.levelMode].map((item) => {
@@ -1041,10 +1088,10 @@ export default {
         })
 
         if (readonlyFee.levelMode === 'NORMAL') {
-          return { ...readonlyFeeWithoutFeeRate, NORMAL: updatedItems }
+          return Object.assign(fee, { ...readonlyFeeWithoutFeeRate, NORMAL: updatedItems })
         }
         if (readonlyFee.levelMode === 'UNIONPAY') {
-          return { ...readonlyFeeWithoutFeeRate, UNIONPAY: updatedItems }
+          return Object.assign(fee, { ...readonlyFeeWithoutFeeRate, UNIONPAY: updatedItems })
         }
       }
       return Object.assign(fee, readonlyFeeWithoutFeeRate)

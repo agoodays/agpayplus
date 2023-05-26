@@ -53,18 +53,21 @@ namespace AGooday.AgPay.Application.Services
         {
             string infoType = string.Empty;
             var wayCodes = new List<string>();
+
+            var payIfDefine = _payInterfaceDefineRepository.GetById(dto.IfCode);
+            var payIfWayCodes = JsonConvert.DeserializeObject<object[]>(payIfDefine.WayCodes).Select(obj => (string)((dynamic)obj).wayCode).ToList();
+
             switch (dto.ConfigMode)
             {
                 case CS.CONFIG_MODE_MGR_ISV:
                     infoType = CS.INFO_TYPE_ISV;
-                    var payIfDefine = _payInterfaceDefineRepository.GetById(dto.IfCode);
-                    wayCodes = JsonConvert.DeserializeObject<object[]>(payIfDefine.WayCodes).Select(obj => (string)((dynamic)obj).wayCode).ToList();
+                    wayCodes = payIfWayCodes;
                     break;
                 case CS.CONFIG_MODE_MGR_AGENT:
                 case CS.CONFIG_MODE_AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE_AGENT;
                     var agent = _agentInfoRepository.GetById(dto.InfoId);
-                    wayCodes = GetPayWayCodes(dto.IfCode, agent.IsvNo, agent.Pid);
+                    wayCodes = GetPayWayCodes(dto.IfCode, agent.IsvNo, agent.Pid, payIfWayCodes);
                     break;
                 case CS.CONFIG_MODE_MGR_MCH:
                 case CS.CONFIG_MODE_AGENT_MCH:
@@ -74,7 +77,11 @@ namespace AGooday.AgPay.Application.Services
                     infoType = CS.INFO_TYPE_MCH_APP;
                     var mchApp = _mchAppRepository.GetById(dto.InfoId);
                     var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
-                    wayCodes = GetPayWayCodes(dto.IfCode, mchInfo.IsvNo, mchInfo.AgentNo);
+                    wayCodes = payIfWayCodes;
+                    if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
+                    {
+                        wayCodes = GetPayWayCodes(dto.IfCode, mchInfo.IsvNo, mchInfo.AgentNo, payIfWayCodes);
+                    }
                     break;
                 default:
                     break;
@@ -85,11 +92,8 @@ namespace AGooday.AgPay.Application.Services
             return records;
         }
 
-        private List<string> GetPayWayCodes(string ifCode, string isvNo, string agentNo)
+        private List<string> GetPayWayCodes(string ifCode, string isvNo, string agentNo, List<string> wayCodes)
         {
-            var payIfDefine = _payInterfaceDefineRepository.GetById(ifCode);
-            var wayCodes = JsonConvert.DeserializeObject<object[]>(payIfDefine.WayCodes).Select(obj => (string)((dynamic)obj).wayCode).ToList();
-
             // 服务商开通支付方式
             var isvWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCode(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, isvNo, ifCode)
                 .Where(w => wayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct().ToList();
@@ -218,7 +222,10 @@ namespace AGooday.AgPay.Application.Services
                     var mchApp = _mchAppRepository.GetById(infoId);
                     var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
                     result.Add(CS.CONFIG_TYPE_MCHRATE, GetPayRateConfigJson(CS.CONFIG_TYPE_MCHRATE, infoType, infoId, ifCode));
-                    GetReadOnlyRateJson(ifCode, result, mchInfo.IsvNo, mchInfo.AgentNo);
+                    if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
+                    {
+                        GetReadOnlyRateJson(ifCode, result, mchInfo.IsvNo, mchInfo.AgentNo);
+                    }
                     break;
                 default:
                     break;
@@ -246,6 +253,10 @@ namespace AGooday.AgPay.Application.Services
                 {
                     result.Add(CS.CONFIG_TYPE_READONLYPARENTDEFRATE, GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_ISV, parentAgent.IsvNo, ifCode));
                 }
+            }
+            else
+            {
+                result.Add(CS.CONFIG_TYPE_READONLYPARENTDEFRATE, GetPayRateConfigJson(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_ISV, isvNo, ifCode));
             }
         }
 
@@ -307,22 +318,28 @@ namespace AGooday.AgPay.Application.Services
 
         public bool SaveOrUpdate(PayRateConfigSaveDto dto)
         {
+            string infoId = dto.InfoId;
+            var ifCode = dto.IfCode;
+            var delPayWayCodes = dto.DelPayWayCodes;
+            string infoType = string.Empty;
+            List<PayRateConfigSaveDto.PayRateConfigItem> items;
             switch (dto.ConfigMode)
             {
                 case CS.CONFIG_MODE_MGR_ISV:
-                    string infoId = dto.InfoId;
-                    var ifCode = dto.IfCode;
-                    var delPayWayCodes = dto.DelPayWayCodes;
-                    var infoType = CS.INFO_TYPE_ISV;
-                    var configType = CS.CONFIG_TYPE_ISVCOST;
-                    var items = dto.ISVCOST;
-                    SaveOrUpdate(infoId, ifCode, configType, infoType, delPayWayCodes, items);
-                    configType = CS.CONFIG_TYPE_AGENTDEF;
-                    items = dto.AGENTDEF;
-                    SaveOrUpdate(infoId, ifCode, configType, infoType, delPayWayCodes, items);
-                    configType = CS.CONFIG_TYPE_MCHAPPLYDEF;
-                    items = dto.MCHAPPLYDEF;
-                    SaveOrUpdate(infoId, ifCode, configType, infoType, delPayWayCodes, items);
+                    infoType = CS.INFO_TYPE_ISV;
+                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_ISVCOST, infoType, delPayWayCodes, dto.ISVCOST);
+                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
+                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
+                    break;
+                case CS.CONFIG_MODE_MGR_AGENT:
+                    infoType = CS.INFO_TYPE_AGENT;
+                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_AGENTRATE, infoType, delPayWayCodes, dto.AGENTRATE);
+                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
+                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
+                    break;
+                case CS.CONFIG_MODE_MGR_MCH:
+                    infoType = CS.INFO_TYPE_MCH_APP;
+                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_AGENTRATE, infoType, delPayWayCodes, dto.MCHRATE);
                     break;
                 default:
                     break;
