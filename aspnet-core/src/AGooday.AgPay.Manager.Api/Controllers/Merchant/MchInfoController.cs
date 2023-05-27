@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -17,7 +18,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     /// </summary>
     [Route("/api/mchInfo")]
     [ApiController, Authorize]
-    public class MchInfoController : ControllerBase
+    public class MchInfoController : CommonController
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<MchInfoController> _logger;
@@ -26,7 +27,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly DomainNotificationHandler _notifications;
 
         public MchInfoController(IMQSender mqSender, ILogger<MchInfoController> logger, INotificationHandler<DomainNotification> notifications,
-            IMchInfoService mchInfoService)
+            IMchInfoService mchInfoService, RedisUtil client,
+            ISysUserService sysUserService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             this.mqSender = mqSender;
             _logger = logger;
@@ -56,6 +61,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_ADD)]
         public ApiRes Add(MchInfoCreateDto dto)
         {
+            var sysUser = GetCurrentUser().SysUser;
+            dto.CreatedBy = sysUser.Realname;
+            dto.CreatedUid = sysUser.SysUserId;
             _mchInfoService.Create(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

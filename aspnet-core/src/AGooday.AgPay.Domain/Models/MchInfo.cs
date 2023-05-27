@@ -50,14 +50,14 @@ namespace AGooday.AgPay.Domain.Models
         /// 退款方式["plat", "api"],平台退款、接口退款，平台退款方式必须包含接口退款。
         /// </summary>
         [Comment("退款方式[\"plat\", \"api\"],平台退款、接口退款，平台退款方式必须包含接口退款。")]
-        [ Column("refund_mode", TypeName = "json")]
+        [Column("refund_mode", TypeName = "json")]
         public string RefundMode { get; set; }
 
         /// <summary>
         /// 支付密码
         /// </summary>
         [Comment("支付密码")]
-        [Column("sipw", TypeName = "varchar(128)")]
+        [Required, Column("sipw", TypeName = "varchar(128)")]
         public string Sipw { get; set; }
 
         /// <summary>

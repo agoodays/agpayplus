@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 支持的签名方式 ["MD5", "RSA2"]
         /// </summary>
         [Comment("支持的签名方式 [\"MD5\", \"RSA2\"]")]
-        [Required, Column("app_sign_type", TypeName = "json")]
+        [Column("app_sign_type", TypeName = "json")]
         public string AppSignType { get; set; }
 
         /// <summary>

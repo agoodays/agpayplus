@@ -31,9 +31,12 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<MchDivisionReceiverGroup, MchDivisionReceiverGroupDto>();
             CreateMap<MchDivisionReceiver, MchDivisionReceiverDto>();
 
-            CreateMap<MchInfo, MchInfoDto>();
-            CreateMap<MchInfo, MchInfoDetailDto>();
-            CreateMap<MchInfo, MchInfoCreatedEvent>();
+            CreateMap<MchInfo, MchInfoDto>()
+                .ForMember(d => d.RefundMode, o => o.MapFrom(s => JArray.Parse(s.RefundMode)));
+            CreateMap<MchInfo, MchInfoDetailDto>()
+                .ForMember(d => d.RefundMode, o => o.MapFrom(s => JArray.Parse(s.RefundMode)));
+            CreateMap<MchInfo, MchInfoCreatedEvent>()
+                .ForMember(d => d.RefundMode, o => o.MapFrom(s => JArray.Parse(s.RefundMode)));
 
             CreateMap<MchNotifyRecord, MchNotifyRecordDto>();
             CreateMap<MchPayPassage, MchPayPassageDto>();

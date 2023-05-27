@@ -169,7 +169,7 @@
                             <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
                           </div>
                           <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
-                            <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
+                            <div class="w-pay-title">{{ getPayTitle(item) }}费用：</div>
                             <a-input
                               :min="0"
                               type="number"
@@ -365,7 +365,7 @@
                           <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
                         </div>
                         <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
-                          <div class="w-pay-title">{{ getPayTitle(item) }}费用:</div>
+                          <div class="w-pay-title">{{ getPayTitle(item) }}费用：</div>
                           <a-input
                             :min="0"
                             type="number"
@@ -1271,6 +1271,14 @@ export default {
           return '商户进件默认'
         }
       }
+      if (that.configMode === 'mgrMch') {
+        if (f === 'readonlyIsvCost') {
+          return '服务商底价'
+        }
+        if (f === 'readonlyParentAgent') {
+          return '上级代理商'
+        }
+      }
       if (that.configMode === 'mgrAgent') {
         if (f === 'mainFee') {
           return '当前代理商'
@@ -1875,7 +1883,7 @@ export default {
 
   .drawer-btn-center {
     position: fixed;
-    width: 80%;
+    width: 90%;
   }
 
   .drawer-btn-center-payfee {

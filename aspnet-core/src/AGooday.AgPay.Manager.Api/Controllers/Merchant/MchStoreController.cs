@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     /// </summary>
     [Route("/api/mchStore")]
     [ApiController, Authorize]
-    public class MchStoreController : ControllerBase
+    public class MchStoreController : CommonController
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<MchStoreController> _logger;
@@ -29,7 +29,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         public MchStoreController(IMQSender mqSender, ILogger<MchStoreController> logger,
             IMchStoreService mchStoreService,
             IMchInfoService mchInfoService, 
-            ISysConfigService sysConfigService)
+            ISysConfigService sysConfigService, RedisUtil client,
+            ISysUserService sysUserService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             this.mqSender = mqSender;
             _logger = logger;
@@ -65,6 +69,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             var mchInfo = _mchInfoService.GetByMchNo(dto.MchNo);
+            var sysUser = GetCurrentUser().SysUser;
+            dto.CreatedBy = sysUser.Realname;
+            dto.CreatedUid = sysUser.SysUserId;
             dto.AgentNo = mchInfo.AgentNo;
             dto.IsvNo = mchInfo.IsvNo;
             var result = _mchStoreService.Add(dto);

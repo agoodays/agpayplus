@@ -66,9 +66,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_ADD)]
         public ApiRes Add(MchDivisionReceiverGroupDto record)
         {
-            record.MchNo = GetCurrentMchNo();
-            record.CreatedUid = GetCurrentUser().SysUser.SysUserId;
-            record.CreatedBy = GetCurrentUser().SysUser.Realname;
+            var sysUser = GetCurrentUser().SysUser;
+            record.MchNo = sysUser.BelongInfoId;
+            record.CreatedBy = sysUser.Realname;
+            record.CreatedUid = sysUser.SysUserId;
 
             var result = _mchDivisionReceiverGroupService.Add(record);
             if (result)

@@ -337,8 +337,8 @@ export default {
 </script>
 
 <style scoped>
-.drawer-btn-center {
-  position: fixed;
-  width: 80%;
-}
+  .drawer-btn-center {
+    position: fixed;
+    width: 90%;
+  }
 </style>

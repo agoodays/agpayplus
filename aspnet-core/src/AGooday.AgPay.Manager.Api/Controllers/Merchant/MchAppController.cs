@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
@@ -18,7 +19,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     /// </summary>
     [Route("/api/mchApps")]
     [ApiController, Authorize]
-    public class MchAppController : ControllerBase
+    public class MchAppController : CommonController
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<MchAppController> _logger;
@@ -27,7 +28,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 
         public MchAppController(IMQSender mqSender, ILogger<MchAppController> logger,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService)
+            IMchInfoService mchInfoService, RedisUtil client,
+            ISysUserService sysUserService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             this.mqSender = mqSender;
             _logger = logger;
@@ -62,6 +67,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
+            var sysUser = GetCurrentUser().SysUser;
+            dto.CreatedBy = sysUser.Realname;
+            dto.CreatedUid = sysUser.SysUserId;
 
             var result = _mchAppService.Add(dto);
             if (!result)

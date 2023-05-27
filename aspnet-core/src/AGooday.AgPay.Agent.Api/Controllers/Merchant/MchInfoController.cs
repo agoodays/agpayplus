@@ -11,6 +11,7 @@ using AGooday.AgPay.Domain.Core.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
 {
@@ -65,9 +66,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_INFO_ADD)]
         public ApiRes Add(MchInfoCreateDto dto)
         {
-            var agentNo = GetCurrentAgentNo();
+            var sysUser = GetCurrentUser().SysUser;
+            dto.CreatedBy = sysUser.Realname;
+            dto.CreatedUid = sysUser.SysUserId;
+            var agentNo = sysUser.BelongInfoId;
             var agentInfo = _agentInfoService.GetByAgentNo(agentNo);
-            dto.RefundMode = "[\"plat\", \"api\"]";
+            dto.RefundMode = JArray.Parse("[\"plat\", \"api\"]");
             dto.Type = CS.MCH_TYPE_ISVSUB;
             dto.AgentNo = agentInfo.AgentNo;
             dto.IsvNo = agentInfo.IsvNo;

@@ -62,8 +62,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_ADD)]
         public ApiRes Add(MchAppDto dto)
         {
-            dto.MchNo = GetCurrentMchNo();
+            var sysUser = GetCurrentUser().SysUser;
+            dto.MchNo = sysUser.BelongInfoId;
             dto.AppId = Guid.NewGuid().ToString("N").Substring(0, 24);
+            dto.CreatedBy = sysUser.Realname;
+            dto.CreatedUid = sysUser.SysUserId;
             if (!_mchInfoService.IsExistMchNo(dto.MchNo))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

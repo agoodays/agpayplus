@@ -1,4 +1,6 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using Newtonsoft.Json.Linq;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 商户信息表
@@ -33,7 +35,7 @@
         /// <summary>
         /// 退款方式["plat", "api"],平台退款、接口退款，平台退款方式必须包含接口退款。
         /// </summary>
-        public string RefundMode { get; set; }
+        public JArray RefundMode { get; set; }
 
         /// <summary>
         /// 支付密码

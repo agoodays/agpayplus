@@ -17,14 +17,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     /// </summary>
     [Route("/api/userTeams")]
     [ApiController, Authorize]
-    public class SysUserTeamController : ControllerBase
+    public class SysUserTeamController : CommonController
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<SysUserTeamController> _logger;
         private readonly ISysUserTeamService _mchStoreService;
 
         public SysUserTeamController(IMQSender mqSender, ILogger<SysUserTeamController> logger,
-            ISysUserTeamService mchStoreService)
+            ISysUserTeamService mchStoreService, RedisUtil client,
+            ISysUserService sysUserService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             this.mqSender = mqSender;
             _logger = logger;
@@ -54,6 +58,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_ADD)]
         public ApiRes Add(SysUserTeamDto dto)
         {
+            var sysUser = GetCurrentUser().SysUser;
+            dto.CreatedBy = sysUser.Realname;
+            dto.CreatedUid = sysUser.SysUserId;
             dto.SysType = CS.SYS_TYPE.MGR;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             var result = _mchStoreService.Add(dto);

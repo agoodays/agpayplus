@@ -61,6 +61,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_APP_ADD)]
         public ApiRes Add(MchAppDto dto)
         {
+            var sysUser = GetCurrentUser().SysUser;
+            dto.CreatedBy = sysUser.Realname;
+            dto.CreatedUid = sysUser.SysUserId;
             dto.AppId = SeqUtil.GenAppId();
             if (!_mchInfoService.IsExistMchNo(dto.MchNo))
             {

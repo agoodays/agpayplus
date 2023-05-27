@@ -59,8 +59,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_ADD)]
         public ApiRes Add(SysUserTeamDto dto)
         {
+            var sysUser = GetCurrentUser().SysUser;
+            dto.CreatedBy = sysUser.Realname;
+            dto.CreatedUid = sysUser.SysUserId;
             dto.SysType = CS.SYS_TYPE.AGENT;
-            dto.BelongInfoId = GetCurrentAgentNo();
+            dto.BelongInfoId = sysUser.BelongInfoId;
             var result = _mchStoreService.Add(dto);
             if (!result)
             {

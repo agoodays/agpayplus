@@ -315,6 +315,6 @@ export default {
 <style scoped>
   .drawer-btn-center {
     position: fixed;
-    width: 80%;
+    width: 90%;
   }
 </style>

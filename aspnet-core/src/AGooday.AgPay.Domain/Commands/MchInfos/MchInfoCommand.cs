@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Domain.Core.Commands;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Domain.Commands.MchInfos
 {
@@ -32,7 +33,12 @@ namespace AGooday.AgPay.Domain.Commands.MchInfos
         /// <summary>
         /// 退款方式["plat", "api"],平台退款、接口退款，平台退款方式必须包含接口退款。
         /// </summary>
-        public string RefundMode { get; set; }
+        public JArray RefundMode { get; set; }
+
+        /// <summary>
+        /// 支付密码
+        /// </summary>
+        public string Sipw { get; set; }
 
         /// <summary>
         /// 代理商号

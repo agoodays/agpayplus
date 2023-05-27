@@ -243,6 +243,10 @@ export default {
   methods: {
     show: function (infoId) { // 弹层打开事件
       this.infoId = infoId
+      this.tabData = [
+        { code: 'paramsTab', name: '参数配置' },
+        { code: 'rateTab', name: '费率配置' }
+      ]
       let infoType = 'ISV'
       if (this.configMode === 'mgrAgent' || this.configMode === 'agentSubagent') {
         infoType = 'AGENT'
@@ -268,6 +272,7 @@ export default {
     },
     onClose () {
       this.visible = false
+      this.reset()
     },
     // 请求支付通道数据
     reqTableDataFunc (params) {
@@ -418,7 +423,7 @@ export default {
 
   .drawer-btn-center {
     position: fixed;
-    width: 80%;
+    width: 90%;
   }
 
   .table-box {
