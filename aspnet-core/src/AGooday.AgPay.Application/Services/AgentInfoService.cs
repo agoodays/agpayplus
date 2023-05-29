@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 代理商信息表 服务实现类
+    /// </summary>
     public class AgentInfoService : IAgentInfoService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

@@ -261,7 +261,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             refundOrder.ErrCode = channelRetMsg.ChannelErrCode;
             refundOrder.ErrMsg = channelRetMsg.ChannelErrMsg;
 
-            bool isSuccess = _refundOrderService.UpdateInit2Ing(refundOrder.RefundOrderId);
+            bool isSuccess = _refundOrderService.UpdateInit2Ing(refundOrder.RefundOrderId, channelRetMsg.ChannelOrderId);
             if (!isSuccess)
             {
                 throw new BizException("更新退款单异常!");

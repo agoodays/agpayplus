@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 分账账号组 服务实现类
+    /// </summary>
     public class MchDivisionReceiverGroupService : IMchDivisionReceiverGroupService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

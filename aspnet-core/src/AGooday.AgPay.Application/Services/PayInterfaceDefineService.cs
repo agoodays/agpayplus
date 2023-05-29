@@ -7,6 +7,9 @@ using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 支付接口定义表 服务实现类
+    /// </summary>
     public class PayInterfaceDefineService : IPayInterfaceDefineService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

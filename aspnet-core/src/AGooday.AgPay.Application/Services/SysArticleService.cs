@@ -5,10 +5,12 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 公告信息表 服务实现类
+    /// </summary>
     public class SysArticleService : ISysArticleService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

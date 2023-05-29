@@ -10,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 支付接口配置参数表 服务实现类
+    /// </summary>
     public class PayInterfaceConfigService : IPayInterfaceConfigService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

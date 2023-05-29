@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 操作员<->角色 关联表 服务实现类
+    /// </summary>
     public class SysUserRoleRelaService : ISysUserRoleRelaService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

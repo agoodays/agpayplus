@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 商户分账接收者账号绑定关系表 服务实现类
+    /// </summary>
     public class MchDivisionReceiverService : IMchDivisionReceiverService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

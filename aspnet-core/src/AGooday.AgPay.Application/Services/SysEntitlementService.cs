@@ -8,6 +8,9 @@ using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 系统权限表 服务实现类
+    /// </summary>
     public class SysEntitlementService : ISysEntitlementService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

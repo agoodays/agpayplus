@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
@@ -10,18 +11,23 @@ using System.Data;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 退款订单表 服务实现类
+    /// </summary>
     public class RefundOrderService : IRefundOrderService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IRefundOrderRepository _refundOrderRepository;
+        private readonly IPayOrderRepository _payOrderRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public RefundOrderService(IRefundOrderRepository refundOrderRepository, IMapper mapper, IMediatorHandler bus)
+        public RefundOrderService(IRefundOrderRepository refundOrderRepository, IPayOrderRepository payOrderRepository, IMapper mapper, IMediatorHandler bus)
         {
             _refundOrderRepository = refundOrderRepository;
+            _payOrderRepository = payOrderRepository;
             _mapper = mapper;
             Bus = bus;
         }
@@ -57,7 +63,13 @@ namespace AGooday.AgPay.Application.Services
             var dto = _mapper.Map<RefundOrderDto>(entity);
             return dto;
         }
-
+        /// <summary>
+        /// 查询商户订单
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="mchRefundNo"></param>
+        /// <param name="refundOrderId"></param>
+        /// <returns></returns>
         public RefundOrderDto QueryMchOrder(string mchNo, string mchRefundNo, string refundOrderId)
         {
             if (string.IsNullOrEmpty(refundOrderId))
@@ -95,7 +107,7 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId)
                 || w.RefundOrderId.Equals(dto.UnionOrderId) || w.MchRefundNo.Equals(dto.UnionOrderId)
-                || w.ChannelPayOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
+                || w.ChannelPayOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))// 三合一订单
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
@@ -106,7 +118,13 @@ namespace AGooday.AgPay.Application.Services
         {
             return _refundOrderRepository.GetAll().Where(w => w.PayOrderId.Equals(payOrderId) && w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).Sum(s => s.RefundAmount);
         }
-        public bool UpdateInit2Ing(string refundOrderId)
+        /// <summary>
+        /// 更新退款单状态 【退款单生成】 --》 【退款中】
+        /// </summary>
+        /// <param name="refundOrderId"></param>
+        /// <param name="channelOrderNo"></param>
+        /// <returns></returns>
+        public bool UpdateInit2Ing(string refundOrderId, string channelOrderNo)
         {
             var updateRecord = _refundOrderRepository.GetById(refundOrderId);
             if (updateRecord.State != (byte)RefundOrderState.STATE_INIT)
@@ -115,9 +133,16 @@ namespace AGooday.AgPay.Application.Services
             }
 
             updateRecord.State = (byte)RefundOrderState.STATE_ING;
+            updateRecord.ChannelOrderNo = channelOrderNo;
             _refundOrderRepository.Update(updateRecord);
             return _refundOrderRepository.SaveChanges(out int _);
         }
+        /// <summary>
+        /// 更新退款单状态 【退款中】 --》 【退款成功】
+        /// </summary>
+        /// <param name="refundOrderId"></param>
+        /// <param name="channelOrderNo"></param>
+        /// <returns></returns>
         public bool UpdateIng2Success(string refundOrderId, string channelOrderNo)
         {
             var updateRecord = _refundOrderRepository.GetById(refundOrderId);
@@ -126,12 +151,36 @@ namespace AGooday.AgPay.Application.Services
                 return false;
             }
 
+            //1. 更新退款订单表数据
             updateRecord.State = (byte)RefundOrderState.STATE_SUCCESS;
             updateRecord.ChannelOrderNo = channelOrderNo;
             updateRecord.SuccessTime = DateTime.Now;
             _refundOrderRepository.Update(updateRecord);
-            return _refundOrderRepository.SaveChanges(out int _);
+            if (!_refundOrderRepository.SaveChanges(out int _))
+            {
+                return false;
+            }
+            //2. 更新订单表数据（更新退款次数,退款状态,如全额退款更新支付状态为已退款）
+            var payOrder = _payOrderRepository.GetById(updateRecord.PayOrderId);
+            payOrder.RefundTimes = ++payOrder.RefundTimes; // 退款次数 +1
+            payOrder.RefundAmount = payOrder.RefundAmount + updateRecord.RefundAmount; // 退款金额累加
+            payOrder.RefundState = (byte)(payOrder.RefundAmount + updateRecord.RefundAmount >= payOrder.Amount ? PayOrderRefund.REFUND_STATE_ALL : PayOrderRefund.REFUND_STATE_SUB); // 更新是否已全额退款。 此更新需在refund_amount更新之前，否则需要去掉累加逻辑
+            payOrder.State = payOrder.RefundState.Equals(PayOrderRefund.REFUND_STATE_ALL) ? (byte)PayOrderState.STATE_REFUND : payOrder.State;
+            _payOrderRepository.Update(payOrder);
+            if (!_payOrderRepository.SaveChanges(out int _))
+            {
+                throw new BizException("更新订单数据异常");
+            }
+            return true;
         }
+        /// <summary>
+        /// 更新退款单状态 【退款中】 --》 【退款失败】
+        /// </summary>
+        /// <param name="refundOrderId"></param>
+        /// <param name="channelOrderNo"></param>
+        /// <param name="channelErrCode"></param>
+        /// <param name="channelErrMsg"></param>
+        /// <returns></returns>
         public bool UpdateIng2Fail(string refundOrderId, string channelOrderNo, string channelErrCode, string channelErrMsg)
         {
             var updateRecord = _refundOrderRepository.GetById(refundOrderId);
@@ -147,6 +196,15 @@ namespace AGooday.AgPay.Application.Services
             _refundOrderRepository.Update(updateRecord);
             return _refundOrderRepository.SaveChanges(out int _);
         }
+        /// <summary>
+        /// 更新退款单状态 【退款中】 --》 【退款成功/退款失败】
+        /// </summary>
+        /// <param name="refundOrderId"></param>
+        /// <param name="updateState"></param>
+        /// <param name="channelOrderNo"></param>
+        /// <param name="channelErrCode"></param>
+        /// <param name="channelErrMsg"></param>
+        /// <returns></returns>
         public bool UpdateIng2SuccessOrFail(string refundOrderId, byte updateState, string channelOrderNo, string channelErrCode, string channelErrMsg)
         {
             if (updateState == (byte)RefundOrderState.STATE_ING)
@@ -164,6 +222,10 @@ namespace AGooday.AgPay.Application.Services
             return false;
 
         }
+        /// <summary>
+        /// 更新退款单为 关闭状态
+        /// </summary>
+        /// <returns></returns>
         public int UpdateOrderExpired()
         {
             var updateRecords = _refundOrderRepository.GetAll().Where(

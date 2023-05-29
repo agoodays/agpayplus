@@ -9,6 +9,9 @@ using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 系统配置表 服务实现类
+    /// </summary>
     public class SysConfigService : ISysConfigService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

@@ -13,6 +13,9 @@ using static AGooday.AgPay.Application.DataTransfer.PayRateConfigSaveDto;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 支付费率配置记录表 服务实现类
+    /// </summary>
     public class PayRateConfigService : IPayRateConfigService
     {
         // 注意这里是要IoC依赖注入的，还没有实现

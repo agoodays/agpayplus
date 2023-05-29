@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
+    /// <summary>
+    /// 转账订单表 服务实现类
+    /// </summary>
     public class TransferOrderService : ITransferOrderService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
