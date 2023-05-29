@@ -66,6 +66,7 @@ namespace AGooday.AgPay.Application.Services
                     wayCodes = payIfWayCodes;
                     break;
                 case CS.CONFIG_MODE_MGR_AGENT:
+                case CS.CONFIG_MODE_AGENT_SELF:
                 case CS.CONFIG_MODE_AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE_AGENT;
                     var agent = _agentInfoRepository.GetById(dto.InfoId);
@@ -73,7 +74,6 @@ namespace AGooday.AgPay.Application.Services
                     break;
                 case CS.CONFIG_MODE_MGR_MCH:
                 case CS.CONFIG_MODE_AGENT_MCH:
-                case CS.CONFIG_MODE_AGENT_SELF:
                 case CS.CONFIG_MODE_MCH_SELF_APP1:
                 case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
@@ -135,6 +135,7 @@ namespace AGooday.AgPay.Application.Services
                     rateConfig.Add(CS.CONFIG_TYPE_MCHAPPLYDEF, GetPayRateConfig(CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, infoId, ifCode));
                     break;
                 case CS.CONFIG_MODE_MGR_AGENT:
+                case CS.CONFIG_MODE_AGENT_SELF:
                 case CS.CONFIG_MODE_AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE_AGENT;
                     var agent = _agentInfoRepository.GetById(infoId);
@@ -145,7 +146,6 @@ namespace AGooday.AgPay.Application.Services
                     break;
                 case CS.CONFIG_MODE_MGR_MCH:
                 case CS.CONFIG_MODE_AGENT_MCH:
-                case CS.CONFIG_MODE_AGENT_SELF:
                 case CS.CONFIG_MODE_MCH_SELF_APP1:
                 case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
@@ -206,6 +206,7 @@ namespace AGooday.AgPay.Application.Services
                     result.Add(CS.CONFIG_TYPE_MCHAPPLYDEF, GetPayRateConfigJson(CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, infoId, ifCode));
                     break;
                 case CS.CONFIG_MODE_MGR_AGENT:
+                case CS.CONFIG_MODE_AGENT_SELF:
                 case CS.CONFIG_MODE_AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE_AGENT;
                     var agent = _agentInfoRepository.GetById(infoId);
@@ -216,7 +217,6 @@ namespace AGooday.AgPay.Application.Services
                     break;
                 case CS.CONFIG_MODE_MGR_MCH:
                 case CS.CONFIG_MODE_AGENT_MCH:
-                case CS.CONFIG_MODE_AGENT_SELF:
                 case CS.CONFIG_MODE_MCH_SELF_APP1:
                 case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
@@ -364,12 +364,17 @@ namespace AGooday.AgPay.Application.Services
                     SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
                     break;
                 case CS.CONFIG_MODE_MGR_AGENT:
+                case CS.CONFIG_MODE_AGENT_SELF:
+                case CS.CONFIG_MODE_AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE_AGENT;
                     SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_AGENTRATE, infoType, delPayWayCodes, dto.AGENTRATE);
                     SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
                     SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
                     break;
                 case CS.CONFIG_MODE_MGR_MCH:
+                case CS.CONFIG_MODE_AGENT_MCH:
+                case CS.CONFIG_MODE_MCH_SELF_APP1:
+                case CS.CONFIG_MODE_MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE_MCH_APP;
                     SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE_MCHRATE, infoType, delPayWayCodes, dto.MCHRATE);
                     break;
@@ -480,7 +485,7 @@ namespace AGooday.AgPay.Application.Services
             {
                 string infoId = dto.InfoId;
                 var ifCode = dto.IfCode;
-                List<PayRateConfigItem> ISVCOST = null, AGENTDEF = null, MCHAPPLYDEF = null, AGENTRATE = null, MCHRATE = null, READONLYPARENTAGENT = null, READONLYPARENTDEFRATE = null, PARENTRATE = null;
+                List<PayRateConfigItem> ISVCOST = null, AGENTDEF = null, MCHAPPLYDEF = null, AGENTRATE = null, MCHRATE = null, PARENTRATE = null;
                 switch (dto.ConfigMode)
                 {
                     case CS.CONFIG_MODE_MGR_ISV:
@@ -498,11 +503,13 @@ namespace AGooday.AgPay.Application.Services
                                 var mchApplyDefFeeRate = GetFeeRate(MCHAPPLYDEF, i);
                                 if (agentDefFeeRate < isvCostFeeRate)
                                 {
-                                    return (false, $"代理商默认费率异常： [{wayCode}]设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【服务商底价费率】的配置值：{{{(isvCostFeeRate * 100)}%}}");
+                                    //return (false, $"代理商默认费率异常： [{wayCode}]设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【服务商底价费率】的配置值：{{{(isvCostFeeRate * 100)}%}}");
+                                    return (false, GetFeeRateErrorMessage("代理商默认费率", "服务商底价费率", wayCode, agentDefFeeRate.Value, isvCostFeeRate.Value));
                                 }
                                 if (mchApplyDefFeeRate < agentDefFeeRate)
                                 {
-                                    return (false, $"商户进件默认费率异常： [{wayCode}]的设置费率{{{(mchApplyDefFeeRate * 100)}%}} 需要【大于等于】【代理商默认费率】的配置值：{{{(agentDefFeeRate * 100)}%}}");
+                                    //return (false, $"商户进件默认费率异常： [{wayCode}]的设置费率{{{(mchApplyDefFeeRate * 100)}%}} 需要【大于等于】【代理商默认费率】的配置值：{{{(agentDefFeeRate * 100)}%}}");
+                                    return (false, GetFeeRateErrorMessage("商户进件默认费率", "代理商默认费率", wayCode, mchApplyDefFeeRate.Value, agentDefFeeRate.Value));
                                 }
                             }
                             if (mainFee.FeeType.Equals(CS.FEE_TYPE_LEVEL))
@@ -511,40 +518,35 @@ namespace AGooday.AgPay.Application.Services
                                 for (int j = 0; j < levels.Count; j++)
                                 {
                                     var level = levels[j];
-                                    var isvCostFeeRate = mainFee.FeeRate;
-                                    var agentDefFeeRate = GetFeeRate(AGENTDEF, i, j);
-                                    var mchApplyDefFeeRate = GetFeeRate(MCHAPPLYDEF, j);
-                                    if (agentDefFeeRate < isvCostFeeRate)
+                                    for (int k = 0; k < level.LevelList.Count; k++)
                                     {
-                                        return (false, $"代理商默认费率异常： [{wayCode}]的第[{j}]阶梯设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【服务商底价费率】的阶梯配置值：{{{(isvCostFeeRate * 100)}%}}");
-                                    }
-                                    if (mchApplyDefFeeRate < agentDefFeeRate)
-                                    {
-                                        return (false, $"商户进件默认费率异常： [{wayCode}]的第[{j}]阶梯设置费率{{{(mchApplyDefFeeRate * 100)}%}} 需要【大于等于】【代理商默认费率】的阶梯配置值：{{{(agentDefFeeRate * 100)}%}}");
+                                        var isvCostFeeRate = level.LevelList[k].FeeRate;
+                                        var agentDefFeeRate = GetFeeRate(AGENTDEF, i, j, k);
+                                        var mchApplyDefFeeRate = GetFeeRate(MCHAPPLYDEF, j, k);
+                                        var modeName = (mainFee.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY) ? (level.BankCardType.Equals(CS.BANK_CARD_TYPE_DEBIT) ? "借记卡" : (level.BankCardType.Equals(CS.BANK_CARD_TYPE_CREDIT) ? "贷记卡" : "")) : "");
+                                        if (agentDefFeeRate < isvCostFeeRate)
+                                        {
+                                            //return (false, $"代理商默认费率异常： [{wayCode}]{modeName}的第[{k}]阶梯设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【服务商底价费率】的阶梯配置值：{{{(isvCostFeeRate * 100)}%}}");
+                                            return (false, GetFeeRateErrorMessage("代理商默认费率", "服务商底价费率", wayCode, agentDefFeeRate.Value, isvCostFeeRate.Value, modeName, k));
+                                        }
+                                        if (mchApplyDefFeeRate < agentDefFeeRate)
+                                        {
+                                            //return (false, $"商户进件默认费率异常： [{wayCode}]{modeName}的第[{k}]阶梯设置费率{{{(mchApplyDefFeeRate * 100)}%}} 需要【大于等于】【代理商默认费率】的阶梯配置值：{{{(agentDefFeeRate * 100)}%}}");
+                                            return (false, GetFeeRateErrorMessage("商户进件默认费率", "代理商默认费率", wayCode, mchApplyDefFeeRate.Value, agentDefFeeRate.Value, modeName, k));
+                                        }
                                     }
                                 }
                             }
                         }
                         break;
                     case CS.CONFIG_MODE_MGR_AGENT:
+                    case CS.CONFIG_MODE_AGENT_SELF:
+                    case CS.CONFIG_MODE_AGENT_SUBAGENT:
                         var agent = _agentInfoRepository.GetById(infoId);
                         AGENTRATE = dto.AGENTRATE; // 当前代理商费率
                         AGENTDEF = dto.AGENTDEF; // 下级代理商默认费率
                         MCHAPPLYDEF = dto.MCHAPPLYDEF; // 代理商子商户进件默认
-                        // 服务商底价
-                        ISVCOST = GetPayRateConfigItems(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, agent.IsvNo, ifCode);
-                        if (!string.IsNullOrWhiteSpace(agent.Pid))
-                        {
-                            // 上级代理商费率
-                            READONLYPARENTAGENT = GetPayRateConfigItems(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, agent.Pid, ifCode);
-                            // 上级默认费率
-                            READONLYPARENTDEFRATE = GetPayRateConfigItems(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_AGENT, agent.Pid, ifCode);
-                        }
-                        else
-                        {
-                            READONLYPARENTDEFRATE = GetPayRateConfigItems(CS.CONFIG_TYPE_AGENTDEF, CS.INFO_TYPE_ISV, agent.IsvNo, ifCode);
-                        }
-                        PARENTRATE = READONLYPARENTDEFRATE == null ? (READONLYPARENTAGENT == null ? (ISVCOST == null ? null : ISVCOST) : READONLYPARENTAGENT) : READONLYPARENTDEFRATE;
+                        PARENTRATE = GetParentRate(ifCode, agent.IsvNo, agent.Pid, CS.CONFIG_TYPE_AGENTDEF);
                         for (int i = 0; i < AGENTRATE.Count; i++)
                         {
                             var mainFee = AGENTRATE[i];
@@ -557,15 +559,19 @@ namespace AGooday.AgPay.Application.Services
                                 var mchApplyDefFeeRate = GetFeeRate(MCHAPPLYDEF, i);
                                 if (agentRateFeeRate < parentFeeRate)
                                 {
-                                    return (false, $"代理商费率异常： [{wayCode}]设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【上级底价费率】的配置值：{{{(parentFeeRate * 100)}%}}");
+                                    // return (false, $"代理商费率异常： [{wayCode}]设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【{(string.IsNullOrWhiteSpace(agent.Pid) ? "服务商底价" : "上级代理商费率")}费率】的配置值：{{{(parentFeeRate * 100)}%}}");
+                                    var thanName = string.IsNullOrWhiteSpace(agent.Pid) ? "服务商底价" : "上级代理商费率";
+                                    return (false, GetFeeRateErrorMessage("代理商费率", thanName, wayCode, agentRateFeeRate.Value, parentFeeRate.Value));
                                 }
                                 if (agentDefFeeRate < agentRateFeeRate)
                                 {
-                                    return (false, $"代理商默认费率异常： [{wayCode}]设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【服务商底价费率】的配置值：{{{(agentRateFeeRate * 100)}%}}");
+                                    //return (false, $"代理商默认费率异常： [{wayCode}]设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【代理商费率】的配置值：{{{(agentRateFeeRate * 100)}%}}");
+                                    return (false, GetFeeRateErrorMessage("代理商默认费率", "代理商费率", wayCode, agentDefFeeRate.Value, agentRateFeeRate.Value));
                                 }
                                 if (mchApplyDefFeeRate < agentDefFeeRate)
                                 {
-                                    return (false, $"商户进件默认费率异常： [{wayCode}]的设置费率{{{(mchApplyDefFeeRate * 100)}%}} 需要【大于等于】【代理商默认费率】的配置值：{{{(agentDefFeeRate * 100)}%}}");
+                                    //return (false, $"商户进件默认费率异常： [{wayCode}]的设置费率{{{(mchApplyDefFeeRate * 100)}%}} 需要【大于等于】【代理商默认费率】的配置值：{{{(agentDefFeeRate * 100)}%}}");
+                                    return (false, GetFeeRateErrorMessage("商户进件默认费率", "代理商默认费率", wayCode, mchApplyDefFeeRate.Value, agentDefFeeRate.Value));
                                 }
                             }
                             if (mainFee.FeeType.Equals(CS.FEE_TYPE_LEVEL))
@@ -574,71 +580,76 @@ namespace AGooday.AgPay.Application.Services
                                 for (int j = 0; j < levels.Count; j++)
                                 {
                                     var level = levels[j];
-                                    var parentFeeRate = GetFeeRate(PARENTRATE, i, j);
-                                    var agentRateFeeRate = mainFee.FeeRate;
-                                    var agentDefFeeRate = GetFeeRate(AGENTDEF, i, j);
-                                    var mchApplyDefFeeRate = GetFeeRate(AGENTDEF, j);
-                                    if (agentRateFeeRate < parentFeeRate)
+                                    for (int k = 0; k < level.LevelList.Count; k++)
                                     {
-                                        return (false, $"代理商费率异常： [{wayCode}]的第[{j}]阶梯设置费率{{{(agentRateFeeRate * 100)}%}} 需要【大于等于】【上级底价费率】的阶梯配置值：{{{(parentFeeRate * 100)}%}}");
-                                    }
-                                    if (agentDefFeeRate < agentRateFeeRate)
-                                    {
-                                        return (false, $"代理商默认费率异常： [{wayCode}]的第[{j}]阶梯设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【服务商底价费率】的阶梯配置值：{{{(agentRateFeeRate * 100)}%}}");
-                                    }
-                                    if (mchApplyDefFeeRate < agentDefFeeRate)
-                                    {
-                                        return (false, $"商户进件默认费率异常： [{wayCode}]的第[{j}]阶梯的设置费率{{{(mchApplyDefFeeRate * 100)}%}} 需要【大于等于】【代理商默认费率】的阶梯配置值：{{{(agentDefFeeRate * 100)}%}}");
+                                        var parentFeeRate = GetFeeRate(PARENTRATE, i, j, k);
+                                        var agentRateFeeRate = level.LevelList[k].FeeRate;
+                                        var agentDefFeeRate = GetFeeRate(AGENTDEF, i, j, k);
+                                        var mchApplyDefFeeRate = GetFeeRate(AGENTDEF, j);
+                                        var modeName = (mainFee.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY) ? (level.BankCardType.Equals(CS.BANK_CARD_TYPE_DEBIT) ? "借记卡" : (level.BankCardType.Equals(CS.BANK_CARD_TYPE_CREDIT) ? "贷记卡" : "")) : "");
+                                        if (agentRateFeeRate < parentFeeRate)
+                                        {
+                                            //return (false, $"代理商费率异常： [{wayCode}]{modeName}的第[{k}]阶梯设置费率{{{(agentRateFeeRate * 100)}%}} 需要【大于等于】【{(string.IsNullOrWhiteSpace(agent.Pid) ? "服务商底价" : "上级代理商费率")}】的阶梯配置值：{{{(parentFeeRate * 100)}%}}");
+                                            var thanName = string.IsNullOrWhiteSpace(agent.Pid) ? "服务商底价" : "上级代理商费率";
+                                            return (false, GetFeeRateErrorMessage("代理商费率", thanName, wayCode, agentRateFeeRate.Value, parentFeeRate.Value, modeName, k));
+                                        }
+                                        if (agentDefFeeRate < agentRateFeeRate)
+                                        {
+                                            //return (false, $"代理商默认费率异常： [{wayCode}]{modeName}的第[{k}]阶梯设置费率{{{(agentDefFeeRate * 100)}%}} 需要【大于等于】【代理商费率】的阶梯配置值：{{{(agentRateFeeRate * 100)}%}}");
+                                            return (false, GetFeeRateErrorMessage("代理商默认费率", "代理商费率", wayCode, agentDefFeeRate.Value, agentRateFeeRate.Value, modeName, k));
+                                        }
+                                        if (mchApplyDefFeeRate < agentDefFeeRate)
+                                        {
+                                            //return (false, $"商户进件默认费率异常： [{wayCode}]{modeName}的第[{k}]阶梯的设置费率{{{(mchApplyDefFeeRate * 100)}%}} 需要【大于等于】【代理商默认费率】的阶梯配置值：{{{(agentDefFeeRate * 100)}%}}");
+                                            return (false, GetFeeRateErrorMessage("商户进件默认费率", "代理商默认费率", wayCode, mchApplyDefFeeRate.Value, agentDefFeeRate.Value, modeName, k));
+                                        }
                                     }
                                 }
                             }
                         }
                         break;
                     case CS.CONFIG_MODE_MGR_MCH:
+                    case CS.CONFIG_MODE_AGENT_MCH:
+                    case CS.CONFIG_MODE_MCH_SELF_APP1:
+                    case CS.CONFIG_MODE_MCH_SELF_APP2:
                         var mchApp = _mchAppRepository.GetById(infoId);
                         var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
                         MCHRATE = dto.MCHRATE; // 商户费率
                         if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
                         {
-                            // 服务商底价
-                            ISVCOST = GetPayRateConfigItems(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, mchInfo.IsvNo, ifCode);
-                            if (!string.IsNullOrWhiteSpace(mchInfo.AgentNo))
+                            PARENTRATE = GetParentRate(ifCode, mchInfo.IsvNo, mchInfo.AgentNo, CS.CONFIG_TYPE_MCHAPPLYDEF);
+                            for (int i = 0; i < MCHRATE.Count; i++)
                             {
-                                // 上级代理商费率
-                                READONLYPARENTAGENT = GetPayRateConfigItems(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, mchInfo.AgentNo, ifCode);
-                                // 上级默认费率
-                                READONLYPARENTDEFRATE = GetPayRateConfigItems(CS.CONFIG_TYPE_MCHAPPLYDEF, CS.INFO_TYPE_AGENT, mchInfo.AgentNo, ifCode);
-                            }
-                            else
-                            {
-                                READONLYPARENTDEFRATE = GetPayRateConfigItems(CS.CONFIG_TYPE_MCHAPPLYDEF, CS.INFO_TYPE_ISV, mchInfo.IsvNo, ifCode);
-                            }
-                        }
-                        PARENTRATE = READONLYPARENTDEFRATE == null ? (READONLYPARENTAGENT == null ? (ISVCOST == null ? null : ISVCOST) : READONLYPARENTAGENT) : READONLYPARENTDEFRATE;
-                        for (int i = 0; i < MCHRATE.Count; i++)
-                        {
-                            var mainFee = MCHRATE[i];
-                            var wayCode = mainFee.WayCode;
-                            if (mainFee.FeeType.Equals(CS.FEE_TYPE_SINGLE))
-                            {
-                                var parentFeeRate = GetFeeRate(PARENTRATE, i);
-                                var mchRateFeeRate = mainFee.FeeRate;
-                                if (mchRateFeeRate < parentFeeRate)
+                                var mainFee = MCHRATE[i];
+                                var wayCode = mainFee.WayCode;
+                                if (mainFee.FeeType.Equals(CS.FEE_TYPE_SINGLE))
                                 {
-                                    return (false, $"商家费率异常： [{wayCode}]设置费率{{{(mchRateFeeRate * 100)}%}} 需要【大于等于】【上级底价费率】的配置值：{{{(parentFeeRate * 100)}%}}");
-                                }
-                            }
-                            if (mainFee.FeeType.Equals(CS.FEE_TYPE_LEVEL))
-                            {
-                                var levels = (mainFee.LevelMode.Equals(CS.LEVEL_MODE_NORMAL) ? mainFee.NORMAL : mainFee.UNIONPAY);
-                                for (int j = 0; j < levels.Count; j++)
-                                {
-                                    var level = levels[j];
-                                    var parentFeeRate = GetFeeRate(PARENTRATE, i, j);
+                                    var parentFeeRate = GetFeeRate(PARENTRATE, i);
                                     var mchRateFeeRate = mainFee.FeeRate;
                                     if (mchRateFeeRate < parentFeeRate)
                                     {
-                                        return (false, $"代理商费率异常： [{wayCode}]的第[{j}]阶梯设置费率{{{(mchRateFeeRate * 100)}%}} 需要【大于等于】【上级底价费率】的阶梯配置值：{{{(parentFeeRate * 100)}%}}");
+                                        //return (false, $"商家费率异常： [{wayCode}]设置费率{{{(mchRateFeeRate * 100)}%}} 需要【大于等于】【{(string.IsNullOrWhiteSpace(mchInfo.AgentNo) ? "服务商底价" : "上级代理商费率")}】的配置值：{{{(parentFeeRate * 100)}%}}");
+                                        var thanName = string.IsNullOrWhiteSpace(mchInfo.AgentNo) ? "服务商底价" : "上级代理商费率";
+                                        return (false, GetFeeRateErrorMessage("商家费率", thanName, wayCode, mchRateFeeRate.Value, parentFeeRate.Value));
+                                    }
+                                }
+                                if (mainFee.FeeType.Equals(CS.FEE_TYPE_LEVEL))
+                                {
+                                    var levels = (mainFee.LevelMode.Equals(CS.LEVEL_MODE_NORMAL) ? mainFee.NORMAL : mainFee.UNIONPAY);
+                                    for (int j = 0; j < levels.Count; j++)
+                                    {
+                                        var level = levels[j];
+                                        var modeName = (mainFee.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY) ? (level.BankCardType.Equals(CS.BANK_CARD_TYPE_DEBIT) ? "借记卡" : (level.BankCardType.Equals(CS.BANK_CARD_TYPE_CREDIT) ? "贷记卡" : "")) : "");
+                                        for (int k = 0; k < level.LevelList.Count; k++)
+                                        {
+                                            var parentFeeRate = GetFeeRate(PARENTRATE, i, j, k);
+                                            var mchRateFeeRate = level.LevelList[k].FeeRate;
+                                            if (mchRateFeeRate < parentFeeRate)
+                                            {
+                                                //return (false, $"代理商费率异常： [{wayCode}]{modeName}的第[{k}]阶梯设置费率{{{(mchRateFeeRate * 100)}%}} 需要【大于等于】【上级底价费率】的阶梯配置值：{{{(parentFeeRate * 100)}%}}");
+                                                return (false, GetFeeRateErrorMessage("代理商费率", "上级底价费率", wayCode, mchRateFeeRate.Value, parentFeeRate.Value, modeName, k));
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -651,7 +662,34 @@ namespace AGooday.AgPay.Application.Services
             return (true, string.Empty);
         }
 
-        private decimal? GetFeeRate(List<PayRateConfigItem> configItem, int configItemIndex, int? levelIndex = null)
+        private string GetFeeRateErrorMessage(string name, string thanName, string wayCode, decimal feeRate, decimal thanFeeRate, string modeName = "", int? levelIndex = null)
+        {
+            return $"{name}异常： [{wayCode}]{(levelIndex == null ? "" : $"{modeName}的第[{++levelIndex}]阶梯")}设置费率{{{(feeRate * 100)}%}} 需要【大于等于】【{thanName}】的{(levelIndex == null ? "" : "阶梯")}配置值：{{{(thanFeeRate * 100)}%}}";
+        }
+
+        private List<PayRateConfigItem> GetParentRate(string ifCode, string isvNo, string agentNo, string configType)
+        {
+            List<PayRateConfigItem> ISVCOST = null, READONLYPARENTAGENT = null, READONLYPARENTDEFRATE = null, PARENTRATE = null;
+
+            // 服务商底价
+            ISVCOST = GetPayRateConfigItems(CS.CONFIG_TYPE_ISVCOST, CS.INFO_TYPE_ISV, isvNo, ifCode);
+            if (!string.IsNullOrWhiteSpace(agentNo))
+            {
+                // 上级代理商费率
+                READONLYPARENTAGENT = GetPayRateConfigItems(CS.CONFIG_TYPE_AGENTRATE, CS.INFO_TYPE_AGENT, agentNo, ifCode);
+                // 上级默认费率
+                READONLYPARENTDEFRATE = GetPayRateConfigItems(configType, CS.INFO_TYPE_AGENT, agentNo, ifCode);
+            }
+            else
+            {
+                READONLYPARENTDEFRATE = GetPayRateConfigItems(configType, CS.INFO_TYPE_ISV, isvNo, ifCode);
+            }
+            PARENTRATE = READONLYPARENTDEFRATE == null ? (READONLYPARENTAGENT == null ? (ISVCOST == null ? null : ISVCOST) : READONLYPARENTAGENT) : READONLYPARENTDEFRATE;
+
+            return PARENTRATE;
+        }
+
+        private decimal? GetFeeRate(List<PayRateConfigItem> configItem, int configItemIndex, int? levelModeIndex = null, int? levelIndex = null)
         {
             decimal? feeRate = null;
             var isvcost = configItem[configItemIndex];
@@ -659,11 +697,11 @@ namespace AGooday.AgPay.Application.Services
             {
                 feeRate = isvcost.FeeRate;
             }
-            if (isvcost.FeeType.Equals(CS.FEE_TYPE_LEVEL) && levelIndex != null)
+            if (isvcost.FeeType.Equals(CS.FEE_TYPE_LEVEL) && levelModeIndex != null && levelIndex != null)
             {
                 var levels = (isvcost.LevelMode.Equals(CS.LEVEL_MODE_NORMAL) ? isvcost.NORMAL : isvcost.UNIONPAY);
-                var level = levels[levelIndex.Value];
-                feeRate = isvcost.FeeRate;
+                var level = levels[levelModeIndex.Value];
+                feeRate = level.LevelList[levelIndex.Value].FeeRate;
             }
             return feeRate;
         }

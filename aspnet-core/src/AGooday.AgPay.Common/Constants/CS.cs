@@ -153,7 +153,7 @@
         public const byte MCH_TYPE_ISVSUB = 2;
         #endregion
 
-        #region 费率类型:SINGLE-单笔费率, LEVEL-阶梯费率
+        #region 费率类型: SINGLE-单笔费率, LEVEL-阶梯费率
         public const string FEE_TYPE_SINGLE = "SINGLE";
         public const string FEE_TYPE_LEVEL = "LEVEL";
         #endregion
@@ -161,6 +161,11 @@
         #region 阶梯模式: 模式: NORMAL-普通模式, UNIONPAY-银联模式
         public const string LEVEL_MODE_NORMAL = "NORMAL";
         public const string LEVEL_MODE_UNIONPAY = "UNIONPAY";
+        #endregion
+
+        #region 银行卡类型: DEBIT-借记卡（储蓄卡）, CREDIT-贷记卡（信用卡）
+        public const string BANK_CARD_TYPE_DEBIT = "DEBIT";
+        public const string BANK_CARD_TYPE_CREDIT = "CREDIT";
         #endregion
 
         #region 代理商类型:1-普通商户 2-特约商户

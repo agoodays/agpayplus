@@ -859,8 +859,8 @@ export default {
     initLevel (id) {
       return {
         id: id,
-        startAmount: null,
-        endAmount: null,
+        minAmount: null,
+        maxAmount: null,
         fee: null
       }
     },
