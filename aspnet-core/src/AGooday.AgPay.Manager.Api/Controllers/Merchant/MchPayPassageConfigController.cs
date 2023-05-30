@@ -61,11 +61,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 foreach (var payWay in payWays)
                 {
                     payWay.PassageState = CS.NO;
+                    payWay.IsConfig = CS.NO;
                     foreach (var mchPayPassage in mchPayPassages)
                     {
                         if (payWay.WayCode.Equals(mchPayPassage.WayCode) && mchPayPassage.State == CS.YES)
                         {
                             payWay.PassageState = CS.YES;
+                            payWay.IsConfig = CS.YES;
                             break;
                         }
                     }

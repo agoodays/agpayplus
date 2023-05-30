@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,24 +16,31 @@ namespace AGooday.AgPay.Application.Services
     public class MchPayPassageService : IMchPayPassageService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
+        private readonly IPayRateConfigService _payRateConfigService;
+
         private readonly IMchPayPassageRepository _mchPayPassageRepository;
         private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
         private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
+        private readonly IPayRateConfigRepository _payRateConfigRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
         public MchPayPassageService(IMapper mapper, IMediatorHandler bus,
+            IPayRateConfigService payRateConfigService,
             IMchPayPassageRepository mchPayPassageRepository,
             IPayInterfaceDefineRepository payInterfaceDefineRepository,
-            IPayInterfaceConfigRepository payInterfaceConfigRepository)
+            IPayInterfaceConfigRepository payInterfaceConfigRepository, 
+            IPayRateConfigRepository payRateConfigRepository)
         {
             _mapper = mapper;
             Bus = bus;
+            _payRateConfigService = payRateConfigService;
             _mchPayPassageRepository = mchPayPassageRepository;
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
             _payInterfaceConfigRepository = payInterfaceConfigRepository;
+            _payRateConfigRepository = payRateConfigRepository;
         }
 
         public void Dispose()
@@ -89,22 +97,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize)
         {
-            var result = _payInterfaceDefineRepository.SelectAvailablePayInterfaceList<AvailablePayInterfaceDto>(wayCode, appId, infoType, mchType);
-
-            if (result != null)
-            {
-                var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
-                foreach (var item in result)
-                {
-                    var payPassage = mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).FirstOrDefault();
-                    if (payPassage != null)
-                    {
-                        item.PassageId = payPassage.Id;
-                        item.State = (sbyte)payPassage.State;
-                        item.Rate = payPassage.Rate * 100;
-                    }
-                }
-            }
+            var result = SelectAvailablePayInterfaceList(wayCode, appId, infoType, mchType);
             var records = PaginatedList<AvailablePayInterfaceDto>.Create(result, pageNumber, pageSize);
             return records;
         }
@@ -138,13 +131,19 @@ namespace AGooday.AgPay.Application.Services
             //        IfParams = s.pic.IfParams,
             //        IfRate = s.pic.IfRate * 100,
             //    });
-            var result = _payInterfaceDefineRepository.SelectAvailablePayInterfaceList<AvailablePayInterfaceDto>(wayCode, appId, infoType, mchType);
+            var configType = CS.CONFIG_TYPE_MCHRATE;
+            var payRateConfigs = _payRateConfigRepository.GetByInfoId(configType, infoType, appId);
+            var ifCodes = payRateConfigs.Where(w => w.WayCode.Equals(wayCode)).Select(s => s.IfCode).Distinct().ToList();
+            var result = _payInterfaceDefineRepository.SelectAvailablePayInterfaceList<AvailablePayInterfaceDto>(wayCode, appId, infoType, mchType)
+                .Where(w => ifCodes.Contains(w.IfCode));
 
             if (result != null)
             {
                 var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
                 foreach (var item in result)
                 {
+                    item.IfRate = item.IfRate ?? item.IfRate * 100; 
+                    item.PayWayFee = _payRateConfigService.GetPayRateConfigItem(configType, infoType, appId, item.IfCode, wayCode);
                     var payPassage = mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).FirstOrDefault();
                     if (payPassage != null)
                     {

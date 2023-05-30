@@ -312,22 +312,34 @@ namespace AGooday.AgPay.Application.Services
                     ApplymentSupport = item.ApplymentSupport,
                     FeeRate = item.FeeRate,
                 };
-                r.NORMAL = item.PayRateLevelConfigs.Where(w => string.IsNullOrEmpty(w.BankCardType)).GroupBy(g => g.BankCardType)
-               .Select(s =>
-                   new Levels()
-                   {
-                       MinFee = s.Min(m => m.MinFee),
-                       MaxFee = s.Min(m => m.MaxFee)
-                   }
-               ).ToList();
-                r.UNIONPAY = item.PayRateLevelConfigs.Where(w => !string.IsNullOrEmpty(w.BankCardType)).GroupBy(g => g.BankCardType)
-               .Select(s =>
-                   new Levels()
-                   {
-                       MinFee = s.Min(m => m.MinFee),
-                       MaxFee = s.Min(m => m.MaxFee)
-                   }
-                   ).ToList();
+                r.NORMAL = item.PayRateLevelConfigs.Where(w => string.IsNullOrEmpty(w.BankCardType)).ToList()
+                .GroupBy(g => g.BankCardType)
+                .Select(s => new Levels()
+                {
+                    MinFee = s.Min(m => m.MinFee),
+                    MaxFee = s.Min(m => m.MaxFee),
+                    BankCardType = s.Key,
+                    LevelList = s.Select(l => new LevelList
+                    {
+                        MinAmount = l.MinAmount,
+                        MaxAmount = l.MaxAmount,
+                        FeeRate = l.FeeRate
+                    }).ToList()
+                }).ToList();
+                r.UNIONPAY = item.PayRateLevelConfigs.Where(w => !string.IsNullOrEmpty(w.BankCardType)).ToList()
+                .GroupBy(g => g.BankCardType)
+                .Select(s => new Levels()
+                {
+                    MinFee = s.Min(m => m.MinFee),
+                    MaxFee = s.Min(m => m.MaxFee),
+                    BankCardType = s.Key,
+                    LevelList = s.Select(l => new LevelList
+                    {
+                        MinAmount = l.MinAmount,
+                        MaxAmount = l.MaxAmount,
+                        FeeRate = l.FeeRate
+                    }).ToList()
+                }).ToList();
                 return r;
             }).ToList();
 
@@ -344,6 +356,52 @@ namespace AGooday.AgPay.Application.Services
                 item.PayRateLevelConfigs = _mapper.Map<List<PayRateLevelConfigDto>>(payRateLevelConfigs);
             }
 
+            return result;
+        }
+
+        public PayRateConfigItem GetPayRateConfigItem(string configType, string infoType, string infoId, string ifCode, string wayCode)
+        {
+            var payRateConfig = _payRateConfigRepository.GetByUniqueKey(configType, infoType, infoId, ifCode, wayCode);
+
+            var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(payRateConfig.Id);
+
+            var result = new PayRateConfigItem()
+            {
+                WayCode = payRateConfig.WayCode,
+                State = payRateConfig.State,
+                FeeType = payRateConfig.FeeType,
+                LevelMode = payRateConfig.LevelMode,
+                ApplymentSupport = payRateConfig.ApplymentSupport,
+                FeeRate = payRateConfig.FeeRate,
+            };
+            result.NORMAL = payRateLevelConfigs.Where(w => string.IsNullOrEmpty(w.BankCardType)).ToList()
+                .GroupBy(g => g.BankCardType)
+                .Select(s => new Levels()
+                {
+                    MinFee = s.Min(m => m.MinFee),
+                    MaxFee = s.Min(m => m.MaxFee),
+                    BankCardType = s.Key,
+                    LevelList = s.Select(l => new LevelList
+                    {
+                        MinAmount = l.MinAmount,
+                        MaxAmount = l.MaxAmount,
+                        FeeRate = l.FeeRate
+                    }).ToList()
+                }).ToList();
+            result.UNIONPAY = payRateLevelConfigs.Where(w => !string.IsNullOrEmpty(w.BankCardType)).ToList()
+                .GroupBy(g => g.BankCardType)
+                .Select(s => new Levels()
+                {
+                    MinFee = s.Min(m => m.MinFee),
+                    MaxFee = s.Min(m => m.MaxFee),
+                    BankCardType = s.Key,
+                    LevelList = s.Select(l => new LevelList
+                    {
+                        MinAmount = l.MinAmount,
+                        MaxAmount = l.MaxAmount,
+                        FeeRate = l.FeeRate
+                    }).ToList()
+                }).ToList();
             return result;
         }
 

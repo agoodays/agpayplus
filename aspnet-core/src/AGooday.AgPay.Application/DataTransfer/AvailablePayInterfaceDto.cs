@@ -1,4 +1,6 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using static AGooday.AgPay.Application.DataTransfer.PayRateConfigSaveDto;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     public class AvailablePayInterfaceDto
     {
@@ -51,5 +53,10 @@
         /// 通道状态: 0-停用, 1-启用
         /// </summary>
         public sbyte? State { get; set; }
+
+        /// <summary>
+        /// 支付方式费率
+        /// </summary>
+        public PayRateConfigItem PayWayFee { get; set; }
     }
 }

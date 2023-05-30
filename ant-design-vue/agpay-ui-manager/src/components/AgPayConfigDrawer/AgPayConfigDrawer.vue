@@ -130,7 +130,7 @@
                 rowKey="wayCode"
               >
                 <template slot="stateSlot" slot-scope="{record}">
-                  <a-badge :status="record.passageState === 0?'error':'processing'" :text="record.passageState === 0?'禁用':'启用'" />
+                  <a-badge :status="record.isConfig === 0?'error':'processing'" :text="record.isConfig === 0?'未配置':'已配置'" />
                 </template>
               </AgTable>
             </div>
@@ -151,6 +151,23 @@
                       <img :src="record.icon" alt="">
                     </div>
                     <div>{{ record.ifName }}</div>
+                  </div>
+                </template>
+                <template slot="rateSlot" slot-scope="{record}">
+                  <div v-if="record.payWayFee.feeType==='SINGLE'">
+                    单笔费率：{{ typeof record.payWayFee.feeRate === 'number' && Number.parseFloat((record.payWayFee.feeRate * 100).toFixed(2)) }}%
+                  </div>
+                  <div
+                    v-for="(item, index) in record.payWayFee.feeType==='LEVEL' && record.payWayFee[record.payWayFee.levelMode.toLowerCase()]"
+                    :key="index">
+                    <p style="margin-bottom: 0;">{{ item.bankCardType ? (item.bankCardType==='DEBIT'?'【借记卡（储蓄卡）】':(item.bankCardType==='CREDIT'?'【贷记卡（信用卡）】':'')):'阶梯' }}费率：[
+                      保底费用：{{ typeof item.minFee === 'number' && Number.parseFloat((item.minFee / 100).toFixed(2)) }}元，封顶费用：{{ typeof item.maxFee === 'number' && Number.parseFloat((item.maxFee / 100).toFixed(2)) }}元 ]
+                    </p>
+                    <p style="margin-bottom: 0;" v-for="(level, lindex) in item.levelList" :key="lindex">
+                      {{ typeof level.minAmount === 'number' && Number.parseFloat((level.minAmount / 100).toFixed(2)) }}元 ~
+                      {{ typeof level.maxAmount === 'number' && Number.parseFloat((level.maxAmount / 100).toFixed(2)) }}元，费率：{{ typeof level.feeRate === 'number' && Number.parseFloat((level.feeRate * 100).toFixed(2)) }}%
+                    </p>
+                    <hr v-if="index < record.payWayFee[record.payWayFee.levelMode.toLowerCase()].length-1" />
                   </div>
                 </template>
                 <template slot="stateSlot" slot-scope="{record}">
@@ -180,11 +197,11 @@ import AgPayPaywayRatePanel from './AgPayPaywayRatePanel'
 const tableColumns = [
   { key: 'wayCode', dataIndex: 'wayCode', title: '支付方式代码' },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称' },
-  { key: 'passageState', title: '状态', scopedSlots: { customRender: 'stateSlot' } }
+  { key: 'isConfig', title: '状态', scopedSlots: { customRender: 'stateSlot' } }
 ]
 const passageTableColumns = [
   { key: 'ifName', title: '通道名称', scopedSlots: { customRender: 'ifNameSlot' } },
-  { key: 'rate', dataIndex: 'rate', title: '费率' },
+  { key: 'rate', title: '费率', scopedSlots: { customRender: 'rateSlot' } },
   { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' } }
 ]
 

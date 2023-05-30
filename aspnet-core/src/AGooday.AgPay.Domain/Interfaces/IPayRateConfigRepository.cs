@@ -6,5 +6,6 @@ namespace AGooday.AgPay.Domain.Interfaces
     {
         PayRateConfig GetByUniqueKey(string configType, string infoType, string infoId, string ifCode, string wayCode);
         IQueryable<PayRateConfig> GetByInfoIdAndIfCode(string configType, string infoType, string infoId, string ifCode);
+        IQueryable<PayRateConfig> GetByInfoId(string configType, string infoType, string infoId);
     }
 }

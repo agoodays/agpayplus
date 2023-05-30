@@ -30,5 +30,13 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             && w.InfoId.Equals(infoId)
             && w.IfCode.Equals(ifCode));
         }
+
+        public IQueryable<PayRateConfig> GetByInfoId(string configType, string infoType, string infoId)
+        {
+            return DbSet.Where(w => w.State.Equals(CS.YES)
+            && w.ConfigType.Equals(configType)
+            && w.InfoType.Equals(infoType)
+            && w.InfoId.Equals(infoId));
+        }
     }
 }
