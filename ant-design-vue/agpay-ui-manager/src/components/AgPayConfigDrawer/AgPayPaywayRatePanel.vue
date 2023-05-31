@@ -412,7 +412,7 @@
           </div>
         </div>
       </div>
-      <a-collapse>
+      <a-collapse v-if="configMode==='mgrIsv'">
         <a-collapse-panel header="【保存】高级配置项">
           <a-checkbox :checked="!!noCheckRuleFlag" @change="noCheckRuleFlag = +!noCheckRuleFlag">不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox>
         </a-collapse-panel>

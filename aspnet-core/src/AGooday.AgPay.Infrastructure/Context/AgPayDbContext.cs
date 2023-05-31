@@ -157,6 +157,9 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<MchNotifyRecord>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<MchNotifyRecord>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<MchNotifyRecord>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<MchPayPassage>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<MchPayPassage>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<MchStore>().Property(c => c.StoreName).HasDefaultValue("");
             modelBuilder.Entity<MchStore>().Property(c => c.DefaultFlag).HasDefaultValue(0);
             modelBuilder.Entity<MchStore>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<MchStore>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
@@ -236,6 +239,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<PayInterfaceConfig>().HasIndex(c => new { c.InfoType, c.InfoId, c.IfCode }, "Uni_InfoType_InfoId_IfCode").IsUnique(true);
             modelBuilder.Entity<PayOrder>().HasIndex(c => new { c.MchNo, c.MchOrderNo }, "Uni_MchNo_MchOrderNo").IsUnique(true);
             modelBuilder.Entity<PayOrder>().HasIndex(c => new { c.CreatedAt }, "Idx_CreatedAt");
+            modelBuilder.Entity<PayRateConfig>().HasIndex(c => new { c.ConfigType, c.InfoType, c.InfoId, c.IfCode, c.WayCode }, "Uni_InfoId_WayCode").IsUnique(true);
             modelBuilder.Entity<RefundOrder>().HasIndex(c => new { c.MchNo, c.MchRefundNo }, "Uni_MchNo_MchRefundNo").IsUnique(true);
             modelBuilder.Entity<RefundOrder>().HasIndex(c => new { c.CreatedAt }, "Idx_CreatedAt");
             modelBuilder.Entity<SysUser>().HasIndex(c => new { c.SysType, c.LoginUsername }, "Uni_SysType_LoginUsername").IsUnique(true);
