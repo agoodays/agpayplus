@@ -156,6 +156,38 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
+        public void SetMchPassage(string mchNo, string appId, string wayCode, string ifCode, byte state)
+        {
+            var mchPayPassages = _mchPayPassageRepository.GetAll()
+                .Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
+            var mchPayPassage = mchPayPassages.FirstOrDefault(w => w.IfCode.Equals(ifCode));
+            if (mchPayPassage == null)
+            {
+                mchPayPassage = new MchPayPassage()
+                {
+                    MchNo = mchNo,
+                    AppId = appId,
+                    IfCode = ifCode,
+                    WayCode = wayCode,
+                    Rate = 0,
+                    State = state,
+                    CreatedAt = DateTime.Now,
+                };
+                _mchPayPassageRepository.Add(mchPayPassage);
+            }
+            else
+            {
+                mchPayPassage.State = state;
+                _mchPayPassageRepository.Update(mchPayPassage);
+            }
+            foreach (var item in mchPayPassages.Where(w => !w.IfCode.Equals(ifCode)))
+            {
+                item.State = state;
+                _mchPayPassageRepository.Update(mchPayPassage);
+            }
+            _mchPayPassageRepository.SaveChanges();
+        }
+
         public void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo)
         {
             var _smchPayPassages = _mchPayPassageRepository.GetAll().AsNoTracking()

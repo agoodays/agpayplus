@@ -101,6 +101,32 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             return ApiRes.Ok(new { Records = result.ToList(), Total = result.TotalCount, Current = result.PageIndex, HasNext = result.HasNext });
         }
 
+
+        /// <summary>
+        /// 应用支付通道配置
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost, Route("mchPassage"), MethodLog("更新商户支付通道")]
+        [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_ADD)]
+        public ApiRes SetMchPassage(string appId, string wayCode, string ifCode, byte state)
+        {
+            try
+            {
+                var mchApp = _mchAppService.GetById(appId);
+                if (mchApp == null || mchApp.State != CS.YES)
+                {
+                    return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+                }
+                _mchPayPassageService.SetMchPassage(mchApp.MchNo, appId, wayCode, ifCode, state);
+                return ApiRes.Ok();
+            }
+            catch (Exception e)
+            {
+                return ApiRes.Fail(ApiCode.SYSTEM_ERROR, e.Message);
+            }
+        }
+
         /// <summary>
         /// 应用支付通道配置
         /// </summary>

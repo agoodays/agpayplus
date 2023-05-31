@@ -314,19 +314,19 @@ export default {
       return new Promise((resolve, reject) => {
         that.$infoBox.confirmDanger(title, content, () => {
           console.log(record)
-          const reqParams = []
-          reqParams.push({
-            id: record.passageId,
-            appId: that.appId,
-            wayCode: that.wayCode,
+          const params = {
+            appId: that.infoId,
+            wayCode: that.currentWayCode,
             ifCode: record.ifCode,
-            rate: record.rate,
-            state: record.state ? 1 : 0
-          })
+            state: state
+          }
+          const queryString = Object.keys(params)
+              .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+              .join('&')
+          console.log(API_URL_MCH_PAYPASSAGE_LIST + '/mchPassage?' + queryString)
           // 请求接口
-          req.add(API_URL_MCH_PAYPASSAGE_LIST, { 'reqParams': JSON.stringify(reqParams) }).then(res => {
+          req.add(API_URL_MCH_PAYPASSAGE_LIST + '/mchPassage?' + queryString).then(res => {
             that.$message.success('已配置')
-            that.visible = false
             that.searchFunc()
           })
         }, () => {
