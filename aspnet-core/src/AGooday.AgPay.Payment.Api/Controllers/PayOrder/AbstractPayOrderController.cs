@@ -163,7 +163,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 // 根据支付方式， 查询出 该商户 可用的支付接口
-                var mchPayPassage = _mchPayPassageService.FindMchPayPassage(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, wayCode);
+                var mchPayPassage = _mchPayPassageService.FindMchPayPassage(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, wayCode, bizRQ.Amount);
                 if (mchPayPassage == null)
                 {
                     throw new BizException("商户应用不支持该支付方式");

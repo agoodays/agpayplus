@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Application.Interfaces
         IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte type);
         void SetMchPassage(string mchNo, string appId, string wayCode, string ifCode, byte state);
         void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo);
-        MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode);
+        MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode, long amount, string bankCardType = null);
         bool IsExistMchPayPassageUseWayCode(string wayCode);
     }
 }

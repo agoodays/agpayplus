@@ -2,6 +2,10 @@
 
 namespace AGooday.AgPay.Payment.Api.Models
 {
+    /// <summary>
+    /// 商户配置信息
+    /// 放置到内存， 避免多次查询操作
+    /// </summary>
     public class MchInfoConfigContext
     {
         #region 商户信息缓存

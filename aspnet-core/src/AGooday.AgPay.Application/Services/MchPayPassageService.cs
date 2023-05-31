@@ -4,7 +4,6 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +21,7 @@ namespace AGooday.AgPay.Application.Services
         private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
         private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
         private readonly IPayRateConfigRepository _payRateConfigRepository;
+        private readonly IPayRateLevelConfigRepository _payRateLevelConfigRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
@@ -31,8 +31,9 @@ namespace AGooday.AgPay.Application.Services
             IPayRateConfigService payRateConfigService,
             IMchPayPassageRepository mchPayPassageRepository,
             IPayInterfaceDefineRepository payInterfaceDefineRepository,
-            IPayInterfaceConfigRepository payInterfaceConfigRepository, 
-            IPayRateConfigRepository payRateConfigRepository)
+            IPayInterfaceConfigRepository payInterfaceConfigRepository,
+            IPayRateConfigRepository payRateConfigRepository, 
+            IPayRateLevelConfigRepository payRateLevelConfigRepository)
         {
             _mapper = mapper;
             Bus = bus;
@@ -41,6 +42,7 @@ namespace AGooday.AgPay.Application.Services
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
             _payInterfaceConfigRepository = payInterfaceConfigRepository;
             _payRateConfigRepository = payRateConfigRepository;
+            _payRateLevelConfigRepository = payRateLevelConfigRepository;
         }
 
         public void Dispose()
@@ -220,12 +222,52 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="appId"></param>
         /// <param name="wayCode"></param>
         /// <returns></returns>
-        public MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode)
+        public MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode, long amount, string bankCardType = null)
         {
+            var configType = CS.CONFIG_TYPE_MCHRATE;
+            var infoType = CS.INFO_TYPE_MCH_APP;
+            var payRateConfigs = _payRateConfigRepository.GetByInfoId(configType, infoType, appId);
+            var ifCodes = payRateConfigs.Where(w => w.WayCode.Equals(wayCode)).Select(s => s.IfCode).Distinct().ToList();
+
             var entity = _mchPayPassageRepository.GetAll().Where(w => w.State.Equals(CS.YES)
             && w.MchNo.Equals(mchNo)
             && w.AppId.Equals(appId)
+            && ifCodes.Contains(w.IfCode)
             && w.WayCode.Equals(wayCode)).FirstOrDefault();
+
+            if (entity == null)
+            {
+                return null;
+            }
+
+            var payRateConfig = payRateConfigs.FirstOrDefault(w => w.IfCode.Equals(entity.IfCode) && w.WayCode.Equals(wayCode));
+            if (payRateConfig.FeeRate.Equals(CS.FEE_TYPE_SINGLE))
+            {
+                entity.Rate = payRateConfig.FeeRate.Value;
+            }
+            if (payRateConfig.FeeType.Equals(CS.FEE_TYPE_LEVEL))
+            {
+                var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(payRateConfig.Id);
+                if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_NORMAL))
+                {
+                    var payRateLevelConfig = payRateLevelConfigs.FirstOrDefault(w => string.IsNullOrEmpty(w.BankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
+                    if (payRateLevelConfig == null)
+                    {
+                        return null;
+                    }
+                    entity.Rate = payRateLevelConfig.FeeRate.Value;
+                }
+
+                if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY))
+                {
+                    var payRateLevelConfig = payRateLevelConfigs.FirstOrDefault(w => w.BankCardType.Equals(bankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
+                    if (payRateLevelConfig == null)
+                    {
+                        return null;
+                    }
+                    entity.Rate = payRateLevelConfig.FeeRate.Value;
+                }
+            }
             var dto = _mapper.Map<MchPayPassageDto>(entity);
             return dto;
         }

@@ -4,6 +4,10 @@ using AGooday.AgPay.Common.Enumerator;
 
 namespace AGooday.AgPay.Payment.Api.Models
 {
+    /// <summary>
+    /// 商户应用支付参数信息
+    /// 放置到内存， 避免多次查询操作
+    /// </summary>
     public class MchAppConfigContext
     {
         #region 商户信息缓存

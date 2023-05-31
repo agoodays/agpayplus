@@ -9,9 +9,12 @@ using log4net;
 
 namespace AGooday.AgPay.Payment.Api.Models
 {
+    /// <summary>
+    /// 支付宝Client 包装类
+    /// </summary>
     public class AliPayClientWrapper
     {
-        private readonly ILog logger = LogManager.GetLogger(typeof(YsfPayRefundService));
+        private readonly ILog logger = LogManager.GetLogger(typeof(AliPayClientWrapper));
 
         /// <summary>
         /// 默认为 不使用证书方式

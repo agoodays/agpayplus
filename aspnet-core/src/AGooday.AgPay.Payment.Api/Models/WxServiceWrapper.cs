@@ -12,6 +12,10 @@ namespace AGooday.AgPay.Payment.Api.Models
     using WechatTenpayClientOptionsV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClientOptions;
     using WechatTenpayClientV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClient;
     using WechatTenpayClientOptionsV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClientOptions;
+
+    /// <summary>
+    /// wxService 包装类
+    /// </summary>
     public class WxServiceWrapper
     {
         public WxPayConfig Config { get; private set; }

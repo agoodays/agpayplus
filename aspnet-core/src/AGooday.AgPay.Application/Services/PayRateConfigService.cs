@@ -540,7 +540,7 @@ namespace AGooday.AgPay.Application.Services
             }
         }
 
-        private void DelPayWayCodeRateConfig(IQueryable<PayRateConfig> payRateConfigs)
+        private void DelPayWayCodeRateConfig(List<PayRateConfig> payRateConfigs)
         {
             foreach (var entity in payRateConfigs)
             {
@@ -583,11 +583,23 @@ namespace AGooday.AgPay.Application.Services
                         {
                             if (dto.NoCheckRuleFlag.Equals(CS.YES))
                             {
-                                DelPayWayCodeRateConfig(agentRateConfigs);
+                                DelPayWayCodeRateConfig(agentRateConfigs.ToList());
                             }
                             else
                             {
                                 return (false, $"[{wayCode}]的费率计算方式与[代理费率]的配置不一致");
+                            }
+                        }
+                        var mchRateConfigs = GetMchRateConfigByIsvNo(infoId, ifCode, wayCode);
+                        if (mchRateConfigs.Any() && !mchRateConfigs.Any(a => a.FeeType.Equals(mainFee.FeeType)))
+                        {
+                            if (dto.NoCheckRuleFlag.Equals(CS.YES))
+                            {
+                                DelPayWayCodeRateConfig(mchRateConfigs.ToList());
+                            }
+                            else
+                            {
+                                return (false, $"[{wayCode}]的费率计算方式与[商户费率]的配置不一致");
                             }
                         }
                         if (dto.NoCheckRuleFlag.Equals(CS.YES))
@@ -821,6 +833,15 @@ namespace AGooday.AgPay.Application.Services
             && w.InfoType.Equals(CS.INFO_TYPE_AGENT) && w.IfCode.Equals(ifCode) && w.WayCode.Equals(wayCode));
 
             return payRateConfigs.Join(agentInfos, r => r.InfoId, a => a.AgentNo, (r, a) => r);
+        }
+
+        private IQueryable<PayRateConfig> GetMchRateConfigByIsvNo(string isvNo, string ifCode, string wayCode)
+        {
+            var mchInfos = _mchInfoRepository.GetAll().Where(w => w.IsvNo.Equals(isvNo));
+            var payRateConfigs = _payRateConfigRepository.GetAll().Where(w => w.ConfigType.Equals(CS.CONFIG_TYPE_AGENTRATE)
+            && w.InfoType.Equals(CS.INFO_TYPE_AGENT) && w.IfCode.Equals(ifCode) && w.WayCode.Equals(wayCode));
+
+            return payRateConfigs.Join(mchInfos, r => r.InfoId, a => a.MchNo, (r, a) => r);
         }
 
         private string GetFeeRateErrorMessage(string name, string thanName, string wayCode, decimal feeRate, decimal thanFeeRate, string modeName = "", int? levelIndex = null)

@@ -328,6 +328,7 @@ export default {
           req.add(API_URL_MCH_PAYPASSAGE_LIST + '/mchPassage?' + queryString).then(res => {
             that.$message.success('已配置')
             that.searchFunc()
+            that.searchPassageFunc()
           })
         }, () => {
           reject(new Error())

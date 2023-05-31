@@ -4,7 +4,8 @@ using AGooday.AgPay.Application.Params;
 namespace AGooday.AgPay.Payment.Api.Models
 {
     /// <summary>
-    /// Isv支付参数信息 放置到内存， 避免多次查询操作
+    /// Isv支付参数信息
+    /// 放置到内存， 避免多次查询操作
     /// </summary>
     public class IsvConfigContext
     {

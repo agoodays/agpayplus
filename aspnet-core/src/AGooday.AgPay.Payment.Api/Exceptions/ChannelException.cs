@@ -2,6 +2,10 @@
 
 namespace AGooday.AgPay.Payment.Api.Exceptions
 {
+    /// <summary>
+    /// 请求渠道侧异常 exception
+    /// 抛出此异常： 仅支持：  未知状态（需查单） 和 系统内异常
+    /// </summary>
     public class ChannelException : Exception
     {
         public ChannelRetMsg ChannelRetMsg { get; private set; }
