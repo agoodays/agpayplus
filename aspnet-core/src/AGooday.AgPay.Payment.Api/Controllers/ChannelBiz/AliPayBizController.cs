@@ -109,7 +109,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
                     ifParams.Add("refreshToken", resp.AppRefreshToken);
                     ifParams.Add("expireTimestamp", resp.ExpiresIn);
 
-                    PayInterfaceConfigDto dbRecord = payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_MCH_APP, mchAppId, CS.IF_CODE.ALIPAY);
+                    PayInterfaceConfigDto dbRecord = payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP, mchAppId, CS.IF_CODE.ALIPAY);
 
                     if (dbRecord != null)
                     {
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
                     else
                     {
                         dbRecord = new PayInterfaceConfigDto();
-                        dbRecord.InfoType = CS.INFO_TYPE_MCH_APP;
+                        dbRecord.InfoType = CS.INFO_TYPE.MCH_APP;
                         dbRecord.InfoId = mchAppId;
                         dbRecord.IfCode = CS.IF_CODE.ALIPAY;
                         dbRecord.IfParams = ifParams.ToString();

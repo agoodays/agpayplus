@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
         [PermissionAuth(PermCode.MCH.ENT_MCH_TRANSFER_IF_CODE_LIST)]
         public ApiRes IfCodeList(string appId)
         {
-            var ifCodes = _payIfConfigService.GetByInfoId(CS.INFO_TYPE_MCH_APP, appId)
+            var ifCodes = _payIfConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP, appId)
                 .Select(s => s.IfCode);
             if (ifCodes is null)
                 return ApiRes.Ok(ifCodes);

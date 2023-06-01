@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
         public ApiRes GetByAppId(string appId, string ifCode)
         {
-            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_MCH_APP, appId, ifCode);
+            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP, appId, ifCode);
             if (payInterfaceConfig != null)
             {
                 // 费率转换为百分比数值
@@ -109,7 +109,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            dto.InfoType = CS.INFO_TYPE_MCH_APP;
+            dto.InfoType = CS.INFO_TYPE.MCH_APP;
             dto.IfRate = dto.IfRate / 100;// 存入真实费率
             //添加更新者信息
             long userId = GetCurrentUser().SysUser.SysUserId;
@@ -119,7 +119,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             dto.UpdatedAt = DateTime.Now;
 
             //根据 商户号、接口类型 获取商户参数配置
-            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_MCH_APP, dto.InfoId, dto.IfCode);
+            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP, dto.InfoId, dto.IfCode);
             //若配置存在，为saveOrUpdate添加ID，第一次配置添加创建者
             if (dbRecoed != null)
             {

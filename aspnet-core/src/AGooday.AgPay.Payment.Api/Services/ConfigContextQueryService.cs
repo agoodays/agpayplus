@@ -76,7 +76,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
 
             // 查询商户的所有支持的参数配置
-            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_MCH_APP, mchAppId, ifCode);
+            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP, mchAppId, ifCode);
 
             if (payInterfaceConfig == null || payInterfaceConfig.State != CS.YES)
             {
@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
 
             // 查询商户的所有支持的参数配置
-            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_MCH_APP, mchAppId, ifCode);
+            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP, mchAppId, ifCode);
 
             if (payInterfaceConfig == null || payInterfaceConfig.State != CS.YES)
             {
@@ -113,7 +113,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
 
             // 查询商户的所有支持的参数配置
-            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_ISV, isvNo, ifCode);
+            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, isvNo, ifCode);
 
             if (payInterfaceConfig == null || payInterfaceConfig.State != CS.YES)
             {

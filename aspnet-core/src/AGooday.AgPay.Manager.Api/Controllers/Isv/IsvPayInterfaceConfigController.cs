@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST)]
         public ApiRes List(string isvNo)
         {
-            var data = _payIfConfigService.SelectAllPayIfConfigListByIsvNo(CS.INFO_TYPE_ISV, isvNo);
+            var data = _payIfConfigService.SelectAllPayIfConfigListByIsvNo(CS.INFO_TYPE.ISV, isvNo);
             return ApiRes.Ok(data);
         }
 
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_VIEW)]
         public ApiRes GetByIsvNo(string isvNo, string ifCode)
         {
-            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_ISV, isvNo, ifCode);
+            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, isvNo, ifCode);
             if (payInterfaceConfig != null)
             {
                 // 费率转换为百分比数值
@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
-            dto.InfoType = CS.INFO_TYPE_ISV;
+            dto.InfoType = CS.INFO_TYPE.ISV;
             dto.IfRate = dto.IfRate / 100;// 存入真实费率
             //添加更新者信息
             long userId = GetCurrentUser().SysUser.SysUserId;
@@ -96,7 +96,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             dto.UpdatedAt = DateTime.Now;
 
             //根据 服务商号、接口类型 获取商户参数配置
-            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE_ISV, dto.InfoId, dto.IfCode);
+            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, dto.InfoId, dto.IfCode);
             //若配置存在，为saveOrUpdate添加ID，第一次配置添加创建者
             if (dbRecoed != null)
             {
