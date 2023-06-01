@@ -1,31 +1,30 @@
 using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Common.Extensions;
+using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
+using AGooday.AgPay.Components.OSS.Config;
+using AGooday.AgPay.Components.OSS.Extensions;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
-using AGooday.AgPay.Payment.Api.Channel.WxPay;
 using AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay;
+using AGooday.AgPay.Payment.Api.Channel.WxPay;
+using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay;
 using AGooday.AgPay.Payment.Api.Extensions;
 using AGooday.AgPay.Payment.Api.FilterAttributes;
-using AGooday.AgPay.Payment.Api.Utils;
-using AGooday.AgPay.Payment.Api.MQ;
 using AGooday.AgPay.Payment.Api.Jobs;
+using AGooday.AgPay.Payment.Api.MQ;
 using AGooday.AgPay.Payment.Api.Services;
-using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
-using AGooday.AgPay.Components.MQ.Models;
-using AGooday.AgPay.Components.OSS.Config;
-using AGooday.AgPay.Components.OSS.Constants;
-using AGooday.AgPay.Components.OSS.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
-using Quartz;
 
 #region PayWay
 #region AliPay
@@ -53,7 +52,6 @@ using YsfAliJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliJsapi;
 
 using YsfWxBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxBar;
 using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi;
-using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
 #endregion
 #endregion
 
@@ -215,13 +213,14 @@ services.AddHostedService<QuartzHostedService>();
 #endregion
 
 #region OSS
-if (OssServiceTypeEnum.LOCAL.GetDescription().Equals(LocalOssConfig.Oss.ServiceType))
-{
-    services.AddScoped<IOssService, LocalFileService>();
-}
+OSSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
-services.AddSingleton<ChannelCertConfigKit>();
+services.AddSingleton<ChannelCertConfigKit>(serviceProvider =>
+{
+    var ossServiceFactory = serviceProvider.GetService<IOssServiceFactory>();
+    return new ChannelCertConfigKit(ossServiceFactory);
+});
 
 //var provider = services.BuildServiceProvider();
 //var mchAppService = (IMchAppService)provider.GetService(typeof(IMchAppService));
@@ -406,7 +405,6 @@ services.AddSingleton(provider =>
 services.AddSingleton<IQRCodeService, QRCodeService>();
 
 var serviceProvider = services.BuildServiceProvider();
-ChannelCertConfigKit.ServiceProvider = serviceProvider;
 PayWayUtil.ServiceProvider = serviceProvider;
 AliPayKit.ServiceProvider = serviceProvider;
 WxPayKit.ServiceProvider = serviceProvider;

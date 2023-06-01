@@ -7,6 +7,7 @@ using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Components.OSS.Controllers;
+using AGooday.AgPay.Components.OSS.Extensions;
 using AGooday.AgPay.Components.OSS.Services;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Extensions;
@@ -178,10 +179,7 @@ services.AddHostedService<RabbitListener>();
 #endregion
 
 #region OSS
-if (OssServiceTypeEnum.LOCAL.GetDescription().Equals(LocalOssConfig.Oss.ServiceType))
-{
-    services.AddScoped<IOssService, LocalFileService>();
-}
+OSSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
 var app = builder.Build();

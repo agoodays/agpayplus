@@ -5,12 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AGooday.AgPay.Components.OSS.Extensions
 {
-    public class NativeInjectorBootStrapper
+    public class OSSNativeInjectorBootStrapper
     {
         public static void RegisterServices(IServiceCollection services)
         {
-            services.AddScoped<IOssService, AliyunOssService>();
-            services.AddScoped<IOssService, LocalFileService>(); 
+            services.AddScoped<LocalFileService>();
+            services.AddScoped<AliyunOssService>();
             services.AddScoped<IOssServiceFactory, OssServiceFactory>();
         }
     }
@@ -18,6 +18,7 @@ namespace AGooday.AgPay.Components.OSS.Extensions
     public interface IOssServiceFactory
     {
         IOssService GetService();
+        string GetOssUseType();
     }
 
     public class OssServiceFactory : IOssServiceFactory
@@ -33,16 +34,21 @@ namespace AGooday.AgPay.Components.OSS.Extensions
 
         public IOssService GetService()
         {
-            var ossUseType = _sysConfigService.GetDBOssConfig().OssUseType;
+            var ossUseType = GetOssUseType();
             switch (ossUseType)
             {
-                case OssUseType.LOCAL_FILE:
-                    return _serviceProvider.GetService<AliyunOssService>();
-                case OssUseType.ALIYUN_OSS:
+                case OssUseTypeCS.LOCAL_FILE:
                     return _serviceProvider.GetService<LocalFileService>();
+                case OssUseTypeCS.ALIYUN_OSS:
+                    return _serviceProvider.GetService<AliyunOssService>();
                 default:
                     throw new Exception($"Invalid service: {ossUseType}");
             }
+        }
+
+        public string GetOssUseType()
+        {
+            return _sysConfigService.GetDBOssConfig().OssUseType;
         }
     }
 }

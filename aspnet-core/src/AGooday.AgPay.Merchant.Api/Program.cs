@@ -1,13 +1,11 @@
-using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
-using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Components.OSS.Controllers;
-using AGooday.AgPay.Components.OSS.Services;
+using AGooday.AgPay.Components.OSS.Extensions;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Extensions;
 using AGooday.AgPay.Merchant.Api.Extensions.AuthContext;
@@ -163,10 +161,7 @@ services.AddHostedService<RabbitListener>();
 #endregion
 
 #region OSS
-if (OssServiceTypeEnum.LOCAL.GetDescription().Equals(LocalOssConfig.Oss.ServiceType))
-{
-    services.AddScoped<IOssService, LocalFileService>();
-}
+OSSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
 //加入 WebSocket 处理服务

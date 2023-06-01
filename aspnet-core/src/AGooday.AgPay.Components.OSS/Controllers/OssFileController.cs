@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.OSS.Extensions;
 using AGooday.AgPay.Components.OSS.Models;
 using AGooday.AgPay.Components.OSS.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -15,12 +16,12 @@ namespace AGooday.AgPay.Components.OSS.Controllers
     public class OssFileController : ControllerBase
     {
         private readonly ILogger<OssFileController> logger;
-        private IOssService ossService;
+        private readonly IOssService ossService;
 
-        public OssFileController(ILogger<OssFileController> logger, IOssService ossService)
+        public OssFileController(ILogger<OssFileController> logger, IOssServiceFactory ossServiceFactory)
         {
             this.logger = logger;
-            this.ossService = ossService;
+            this.ossService = ossServiceFactory.GetService();
         }
 
         /** 上传文件 （单文件上传） */

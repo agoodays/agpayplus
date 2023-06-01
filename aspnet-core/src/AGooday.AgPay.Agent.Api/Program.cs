@@ -6,16 +6,14 @@ using AGooday.AgPay.Agent.Api.Logs;
 using AGooday.AgPay.Agent.Api.Middlewares;
 using AGooday.AgPay.Agent.Api.Models;
 using AGooday.AgPay.Agent.Api.MQ;
-using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
-using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Components.OSS.Controllers;
-using AGooday.AgPay.Components.OSS.Services;
+using AGooday.AgPay.Components.OSS.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -176,10 +174,7 @@ services.AddHostedService<RabbitListener>();
 #endregion
 
 #region OSS
-if (OssServiceTypeEnum.LOCAL.GetDescription().Equals(LocalOssConfig.Oss.ServiceType))
-{
-    services.AddScoped<IOssService, LocalFileService>();
-}
+OSSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
 var app = builder.Build();

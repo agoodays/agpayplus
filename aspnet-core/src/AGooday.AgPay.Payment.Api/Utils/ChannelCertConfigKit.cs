@@ -1,6 +1,6 @@
-﻿using AGooday.AgPay.Common.Extensions;
-using AGooday.AgPay.Components.OSS.Config;
+﻿using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Constants;
+using AGooday.AgPay.Components.OSS.Extensions;
 using AGooday.AgPay.Components.OSS.Services;
 
 namespace AGooday.AgPay.Payment.Api.Utils
@@ -10,12 +10,13 @@ namespace AGooday.AgPay.Payment.Api.Utils
     /// </summary>
     public class ChannelCertConfigKit
     {
+        public static string OssUseType { get; set; }
         private static IOssService OssService { get; set; }
-        public static IServiceProvider ServiceProvider { get; set; }
 
-        public ChannelCertConfigKit()
+        public ChannelCertConfigKit(IOssServiceFactory ossServiceFactory)
         {
-            OssService = ServiceProvider.GetService<IOssService>();
+            OssService = ossServiceFactory.GetService();
+            OssUseType = ossServiceFactory.GetOssUseType();
         }
 
         public static string GetCertFilePath(string certFilePath)
@@ -36,7 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
             // 以下为 文件不存在的处理方式
 
             // 是否本地存储
-            bool isLocalSave = OssServiceTypeEnum.LOCAL.GetDescription().Equals(LocalOssConfig.Oss.ServiceType);
+            bool isLocalSave = OssUseType.Equals(OssUseTypeCS.LOCAL_FILE);
 
             // 本地存储 & 文件不存在
             if (isLocalSave)
