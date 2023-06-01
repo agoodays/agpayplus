@@ -305,7 +305,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             // 3.删除当前商户支付接口配置参数
             var appIds = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(request.MchNo)).Select(s => s.AppId).ToList();
-            _payInterfaceConfigRepository.RemoveByInfoIds(appIds, CS.INFO_TYPE_MCH_APP);
+            _payInterfaceConfigRepository.RemoveByInfoIds(appIds, CS.INFO_TYPE.MCH_APP);
 
             // 4.删除当前商户应用信息
             foreach (var appId in appIds)

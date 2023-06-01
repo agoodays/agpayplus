@@ -58,18 +58,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             switch (configMode)
             {
                 case "mgrIsv":
-                    infoType = CS.INFO_TYPE_ISV;
+                    infoType = CS.INFO_TYPE.ISV;
                     break;
                 case "mgrAgent":
                 case "agentSubagent":
-                    infoType = CS.INFO_TYPE_AGENT;
+                    infoType = CS.INFO_TYPE.AGENT;
                     break;
                 case "mgrMch":
                 case "agentMch":
                 case "agentSelf":
                 case "mchSelfApp1":
                 case "mchSelfApp2":
-                    infoType = CS.INFO_TYPE_MCH_APP;
+                    infoType = CS.INFO_TYPE.MCH_APP;
                     break;
                 default:
                     break;
@@ -92,18 +92,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             switch (configMode)
             {
                 case "mgrIsv":
-                    infoType = CS.INFO_TYPE_ISV;
+                    infoType = CS.INFO_TYPE.ISV;
                     break;
                 case "mgrAgent":
                 case "agentSubagent":
-                    infoType = CS.INFO_TYPE_AGENT;
+                    infoType = CS.INFO_TYPE.AGENT;
                     break;
                 case "mgrMch":
                 case "agentMch":
                 case "agentSelf":
                 case "mchSelfApp1":
                 case "mchSelfApp2":
-                    infoType = CS.INFO_TYPE_MCH_APP;
+                    infoType = CS.INFO_TYPE.MCH_APP;
                     break;
                 default:
                     break;

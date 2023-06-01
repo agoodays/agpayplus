@@ -133,7 +133,7 @@ namespace AGooday.AgPay.Application.Services
             //        IfParams = s.pic.IfParams,
             //        IfRate = s.pic.IfRate * 100,
             //    });
-            var configType = CS.CONFIG_TYPE_MCHRATE;
+            var configType = CS.CONFIG_TYPE.MCHRATE;
             var payRateConfigs = _payRateConfigRepository.GetByInfoId(configType, infoType, appId);
             var ifCodes = payRateConfigs.Where(w => w.WayCode.Equals(wayCode)).Select(s => s.IfCode).Distinct().ToList();
             var result = _payInterfaceDefineRepository.SelectAvailablePayInterfaceList<AvailablePayInterfaceDto>(wayCode, appId, infoType, mchType)
@@ -224,8 +224,8 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode, long amount, string bankCardType = null)
         {
-            var configType = CS.CONFIG_TYPE_MCHRATE;
-            var infoType = CS.INFO_TYPE_MCH_APP;
+            var configType = CS.CONFIG_TYPE.MCHRATE;
+            var infoType = CS.INFO_TYPE.MCH_APP;
             var payRateConfigs = _payRateConfigRepository.GetByInfoId(configType, infoType, appId);
             var ifCodes = payRateConfigs.Where(w => w.WayCode.Equals(wayCode)).Select(s => s.IfCode).Distinct().ToList();
 

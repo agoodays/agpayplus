@@ -165,11 +165,11 @@ namespace AGooday.AgPay.Application.Services
 
             switch (infoType)
             {
-                case CS.INFO_TYPE_ISV:
+                case CS.INFO_TYPE.ISV:
                     defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES));
                     break;
-                case CS.INFO_TYPE_MCH:
-                case CS.INFO_TYPE_MCH_APP:
+                case CS.INFO_TYPE.MCH:
+                case CS.INFO_TYPE.MCH_APP:
                     MchApp mchApp = _mchAppRepository.GetById(infoId);
                     if (mchApp == null || mchApp.State != CS.YES)
                     {
@@ -189,7 +189,7 @@ namespace AGooday.AgPay.Application.Services
                     {
                         // 商户类型为特约商户，服务商应已经配置支付参数
                         var isvConfigList = _payInterfaceConfigRepository.GetAll().Where(w => w.State.Equals(CS.YES)
-                        && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE_ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
+                        && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
                         );
 
                         foreach (var isvConfig in isvConfigList)
@@ -209,7 +209,7 @@ namespace AGooday.AgPay.Application.Services
                             return entity;
                         }).ToList();
                     return results;
-                case CS.INFO_TYPE_AGENT:
+                case CS.INFO_TYPE.AGENT:
                     AgentInfo agentInfo = _agentInfoRepository.GetById(infoId);
                     if (agentInfo == null || agentInfo.State != CS.YES)
                     {
@@ -217,7 +217,7 @@ namespace AGooday.AgPay.Application.Services
                     }
                     // 商户类型为特约商户，服务商应已经配置支付参数
                     var isvConfigs = _payInterfaceConfigRepository.GetAll()
-                        .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(agentInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE_ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
+                        .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(agentInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
                     defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES) && isvConfigs.Select(s => s.IfCode).Contains(w.IfCode));
                     break;
                 default:
@@ -255,7 +255,7 @@ namespace AGooday.AgPay.Application.Services
             {
                 // 商户类型为特约商户，服务商应已经配置支付参数
                 var isvConfigList = _payInterfaceConfigRepository.GetAll().Where(w => w.State.Equals(CS.YES)
-                && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE_ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
+                && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
                 );
 
                 foreach (var isvConfig in isvConfigList)
@@ -268,7 +268,7 @@ namespace AGooday.AgPay.Application.Services
 
             // 支付参数列表
             var configList = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.Equals(appId)
-            && w.InfoType.Equals(CS.INFO_TYPE_MCH_APP));
+            && w.InfoType.Equals(CS.INFO_TYPE.MCH_APP));
 
             var result = defineList.ToList().Select(define =>
             {

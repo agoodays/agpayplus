@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public bool MchAppHasAvailableIfCode(string appId, string ifCode)
         {
             return DbSet.AsNoTracking().Any(c => c.IfCode.Equals(ifCode)
-            && c.InfoId.Equals(appId) && c.State.Equals(CS.PUB_USABLE) && c.InfoType.Equals(CS.INFO_TYPE_MCH_APP));
+            && c.InfoId.Equals(appId) && c.State.Equals(CS.PUB_USABLE) && c.InfoType.Equals(CS.INFO_TYPE.MCH_APP));
         }
 
         public void RemoveByInfoIds(List<string> infoIds, string infoType)

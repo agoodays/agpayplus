@@ -205,7 +205,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             mchAppConfigContext.MchApp = dbMchApp;
 
             // 查询商户的所有支持的参数配置
-            var allConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE_MCH_APP, appId);
+            var allConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP, appId);
 
             // 普通商户
             if (mchInfo.Type == CS.MCH_TYPE_NORMAL)
@@ -303,7 +303,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             isvConfigContext.IsvInfo = isvInfo;
 
             // 查询商户的所有支持的参数配置
-            var allConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE_ISV, isvNo);
+            var allConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE.ISV, isvNo);
 
             foreach (var payInterfaceConfig in allConfigList)
             {

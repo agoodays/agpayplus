@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             }
 
             // 3.删除当前服务商支付接口配置参数
-            _payInterfaceConfigService.Remove(CS.INFO_TYPE_ISV, isvInfo.IsvNo);
+            _payInterfaceConfigService.Remove(CS.INFO_TYPE.ISV, isvInfo.IsvNo);
 
             // 4.删除该服务商
             var remove = _isvInfoService.Remove(isvNo);
