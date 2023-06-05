@@ -60,8 +60,12 @@ CREATE TABLE `t_mch_apply` (
   `if_code` VARCHAR(20) NOT NULL COMMENT '接口代码 全小写  wxpay alipay ',
   `apply_page_type` VARCHAR(20) NOT NULL COMMENT '来源: PLATFORM_WEB-运营平台(WEB) AGENT_WEB-代理商(WEB) MCH_WEB-商户(WEB) AGENT_LITE-代理商(小程序) MCH_LITE-商户(小程序)',
   `apply_detail_info` VARCHAR(255) NOT NULL COMMENT '申请详细信息', 
-  `apply_error_info` VARCHAR(255) NOT NULL COMMENT '申请错误信息', 
-  `state` TINYINT NOT NULL DEFAULT '0' COMMENT '状态: 0-草稿, 1-审核中, 2-进件成功, 3-驳回待修改, 4-待验证, 5-待签约', 
+  `apply_error_info` VARCHAR(255) NOT NULL COMMENT '申请错误信息(响应提示信息)', 
+  `channel_apply_no` VARCHAR(64) NOT NULL COMMENT '渠道申请单号', 
+  `succ_res_parameter` VARCHAR(255) NOT NULL COMMENT '成功响应参数(渠道响应参数)', 
+  `channel_var1` VARCHAR(255) NOT NULL COMMENT '渠道拓展参数1', 
+  `channel_var2` VARCHAR(255) NOT NULL COMMENT '渠道拓展参数2', 
+  `state` TINYINT NOT NULL DEFAULT '0' COMMENT '状态: 0-草稿, 1-审核中, 2-进件成功, 3-驳回待修改, 4-待验证, 5-待签约, 7-等待预审, 8-预审拒绝', 
   `is_temp_data` BOOLEAN NOT NULL COMMENT '是否临时数据', 
   `mch_full_name` VARCHAR(64) NOT NULL COMMENT '商户名称全称', 
   `mch_short_name` VARCHAR(32) NOT NULL COMMENT '进件商户简称', 
@@ -73,9 +77,11 @@ CREATE TABLE `t_mch_apply` (
   `city_code` VARCHAR(32) NOT NULL COMMENT '市代码',
   `area_code` VARCHAR(32) NOT NULL COMMENT '区代码',
   `address` VARCHAR(128) NOT NULL COMMENT '商户详细地址',
+  `ep_user_id` BIGINT DEFAULT NULL COMMENT '商户拓展员ID',
   `created_uid` BIGINT DEFAULT NULL COMMENT '创建者用户ID',
   `created_by` VARCHAR(64) DEFAULT NULL COMMENT '创建者姓名',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `last_apply_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '上次进件时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (apply_id)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='商户进件申请表';
@@ -220,31 +226,48 @@ CREATE TABLE `t_pay_rate_level_config` (
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='支付费率阶梯配置表';
 
--- 码牌信息表
-DROP TABLE IF EXISTS `t_mch_qrcodes`;
-CREATE TABLE `t_mch_qrcodes` (
+-- 码牌模板信息表
+DROP TABLE IF EXISTS `t_qr_code_shell`;
+CREATE TABLE `t_qr_code_shell` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `qrc_id` VARCHAR(64) NOT NULL COMMENT '码牌ID',
-  `agent_no` VARCHAR(64) NOT NULL COMMENT '代理商号',
-  `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
-  `mch_name` VARCHAR(30) NOT NULL COMMENT '商户名称',
-  `entry_page` VARCHAR(20) NOT NULL COMMENT '选择页面类型: default-默认(未指定，取决于二维码是否绑定到微信侧), h5-固定H5页面, lite-固定小程序页面', 
-  `batch_id` VARCHAR(64) NOT NULL COMMENT '批次号',
-  `store_id` VARCHAR(64) NOT NULL COMMENT '门店ID',
-  `qrc_alias` VARCHAR(255) COMMENT '码牌别名', 
-  `app_id` VARCHAR(64) NOT NULL COMMENT '应用ID',
-  `qrc_belong_type` INT, 
-  `alipay_way_code` VARCHAR(20) NOT NULL COMMENT '支付宝支付方式(仅H5呈现时生效)', 
-  `fixed_flag` TINYINT NOT NULL COMMENT '是否固定金额: 0-任意金额, 1-固定金额', 
-  `fixed_pay_amount` INT NOT NULL DEFAULT '0' COMMENT '固定金额',
-  `qrc_shell_id` INT, 
-  `qrc_belong_type` INT NOT NULL DEFAULT '1' COMMENT '1-自制, 2-下发',
-  `bind_state` TINYINT NOT NULL COMMENT '码牌绑定状态: 0-未绑定, 1-已绑定', 
-  `qrc_state` INT, 
-  -- `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
+  `style_code` VARCHAR(20) NOT NULL COMMENT '样式代码: shellA, shellB', 
+  `shell_alias` VARCHAR(20) NOT NULL COMMENT '模板别名',
+  `config_info` VARCHAR(4096) NOT NULL COMMENT '模板配置信息,json字符串',
+  `shell_img_view_url` VARCHAR(255) COMMENT '模板预览图Url',
+  `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
+  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (id)
+);
+
+-- 码牌信息表
+DROP TABLE IF EXISTS `t_qr_code`;
+CREATE TABLE `t_qr_code` (
+  -- `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `qrc_id` VARCHAR(64) NOT NULL COMMENT '码牌ID',
+  `qrc_shell_id` INT COMMENT '模板ID', 
+  `batch_id` VARCHAR(64) NULL COMMENT '批次号',
+  `fixed_flag` TINYINT NOT NULL COMMENT '是否固定金额: 0-任意金额, 1-固定金额', 
+  `fixed_pay_amount` INT NOT NULL DEFAULT '0' COMMENT '固定金额',
+  `entry_page` VARCHAR(20) NOT NULL COMMENT '选择页面类型: default-默认(未指定，取决于二维码是否绑定到微信侧), h5-固定H5页面, lite-固定小程序页面', 
+  `alipay_way_code` VARCHAR(20) NOT NULL COMMENT '支付宝支付方式(仅H5呈现时生效)', 
+  `qrc_alias` VARCHAR(20) COMMENT '码牌别名',
+  `bind_state` TINYINT NOT NULL COMMENT '码牌绑定状态: 0-未绑定, 1-已绑定',  
+  `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
+  -- `mch_name` VARCHAR(30) NOT NULL COMMENT '商户名称',
+  `app_id` VARCHAR(64) NOT NULL COMMENT '应用ID',
+  `store_id` VARCHAR(64) NOT NULL COMMENT '门店ID',
+  `qr_url` VARCHAR(255) NOT NULL COMMENT '二维码Url', 
+  -- `qrc_state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用', 
+  `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
+  -- `qrc_belong_type` INT NOT NULL DEFAULT '1' COMMENT '获取方式: 1-自制, 2-下发',
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
+  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (qrc_id)
 );
 
 ALTER TABLE `t_mch_info`   
