@@ -17,6 +17,19 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             _env = env;
         }
 
+        [HttpGet, Route("shell/nostyle.png")]
+        public IActionResult NoStyle()
+        {
+            // 创建二维码对象
+            Bitmap qrCodeImage = GenerateQRCode();
+
+            // 将位图对象转换为 PNG 格式并输出到响应流
+            MemoryStream ms = new MemoryStream();
+            qrCodeImage.Save(ms, ImageFormat.Png);
+            qrCodeImage.Dispose();
+            return File(ms.ToArray(), "image/png");
+        }
+
         [HttpGet, Route("shell/stylea.png")]
         public IActionResult StyleA()
         {
@@ -33,7 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             // 创建画布对象
             Graphics g = Graphics.FromImage(bmp);
 
-            Color color = ColorTranslator.FromHtml("#ff0000"); 
+            Color color = ColorTranslator.FromHtml("#ff0000");
             g.Clear(color);
 
             //// 绘制大标题文本
@@ -47,8 +60,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             // 加载logo图片
             Image logo = Image.FromFile(logoPath);
             // 计算logo的位置和大小
-            int logoWidth = logo.Width;
-            int logoHeight = logo.Height;
+            int logoWidth = logo.Width > (width - (width * 0.1)) ? (int)(width - (width * 0.1)) : logo.Width;
+            int logoHeight = logo.Height > (topMargin - (topMargin * 0.1)) ? (int)(topMargin - (topMargin * 0.1)) : logo.Height;
             int logoLeft = (width - logoWidth) / 2;
             int logoTop = (topMargin - logoHeight) / 2;
 
@@ -152,29 +165,32 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 
             g.FillPath(brush, bottomPath);
 
+            // 在画布上绘制二维码
+            Bitmap qrCode = GenerateQRCode("http://www.example.com/");
             // 计算二维码位置和大小
-            int qrSize = 900;
+            int qrSize = width - (leftMargin * 2) - cornerRadius;
             int qrLeft = (width - qrSize) / 2;
-            int qrTop = topMargin + (width - leftMargin * 2 - qrSize) / 2;
+            int qrTop = topRect.Top + (topRect.Height - qrSize) / 2;
+            g.DrawImage(qrCode, qrLeft, qrTop, qrSize, qrSize);
 
-            // 创建二维码对象
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode($"https://www.example.com", QRCodeGenerator.ECCLevel.Q);
-            QRCode qrCode = new QRCode(qrCodeData);
+            //// 创建二维码对象
+            //QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            //QRCodeData qrCodeData = qrGenerator.CreateQrCode($"https://www.example.com", QRCodeGenerator.ECCLevel.Q);
+            //QRCode qrCode = new QRCode(qrCodeData);
 
-            // 将二维码绘制到画布上
-            int qrModuleSize = qrSize / qrCodeData.ModuleMatrix.Count;
-            for (int x = 0; x < qrCodeData.ModuleMatrix.Count; x++)
-            {
-                for (int y = 0; y < qrCodeData.ModuleMatrix.Count; y++)
-                {
-                    if (qrCodeData.ModuleMatrix[x][y])
-                    {
-                        Rectangle qrRect = new Rectangle(qrLeft + x * qrModuleSize, qrTop + y * qrModuleSize, qrModuleSize, qrModuleSize);
-                        g.FillRectangle(Brushes.Black, qrRect);
-                    }
-                }
-            }
+            //// 将二维码绘制到画布上
+            //int qrModuleSize = qrSize / qrCodeData.ModuleMatrix.Count;
+            //for (int x = 0; x < qrCodeData.ModuleMatrix.Count; x++)
+            //{
+            //    for (int y = 0; y < qrCodeData.ModuleMatrix.Count; y++)
+            //    {
+            //        if (qrCodeData.ModuleMatrix[x][y])
+            //        {
+            //            Rectangle qrRect = new Rectangle(qrLeft + x * qrModuleSize, qrTop + y * qrModuleSize, qrModuleSize, qrModuleSize);
+            //            g.FillRectangle(Brushes.Black, qrRect);
+            //        }
+            //    }
+            //}
 
             // 在画布上绘制文字
             string text = "No.220101000001";
@@ -193,7 +209,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             int payLogoWidth = (int)(width * 0.1);
             int payLogoHeight = (int)(width * 0.1);
             int payTypeCount = payTypes.Count;
-            int padding = ((width - leftMargin * 2) - (int)(payTypeCount * (1190 * 0.1))) / (payTypeCount + 1); // 每个LOGO之间间距
+            int padding = ((width - leftMargin * 2) - (int)(payTypeCount * (width * 0.1))) / (payTypeCount + 1); // 每个LOGO之间间距
             int index = 0;
             foreach (var item in payTypes)
             {
@@ -296,18 +312,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             // 填充上下两部分的背景
             g.FillPath(Brushes.LightPink, bottomPath);
 
+            // 在画布上绘制二维码
+            Bitmap qrCode = GenerateQRCode("http://www.example.com/");
             // 计算二维码位置和大小
-            int qrSize = 700;
+            int qrSize = width - (leftMargin * 2) - cornerRadius;
             int qrLeft = (width - qrSize) / 2;
             int qrTop = topRect.Top + (topRect.Height - qrSize) / 2;
-
-            // 在画布上绘制二维码
-            Bitmap qrCode = GenerateQRCode("http://www.example.com/", qrSize);
             g.DrawImage(qrCode, qrLeft, qrTop, qrSize, qrSize);
 
             // 释放二维码资源
             qrCode.Dispose();
-            
+
             // 在画布上绘制文字
             string text = "No.220101000001";
             SizeF textSize = g.MeasureString(text, new Font("Arial", 36));
@@ -453,16 +468,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             return p;
         }
 
-        private Bitmap GenerateQRCode(string content, int size)
+        private Bitmap GenerateQRCode(string content = "https://www.example.com")
         {
-            // TODO: 使用第三方二维码库或微信支付官方接口生成二维码
-            // 这里使用纯黑色填充一个正方形作为示例
-            Bitmap bmp = new Bitmap(size, size);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(Color.White);
-            g.FillRectangle(Brushes.Black, new Rectangle(0, 0, size, size));
-            g.Dispose();
-            return bmp;
+            // 创建二维码对象
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
+            QRCode qrCode = new QRCode(qrCodeData);
+
+            Bitmap qrCodeImage = qrCode.GetGraphic(30, Color.Black, Color.White, new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")));
+            return qrCodeImage;
         }
     }
 
