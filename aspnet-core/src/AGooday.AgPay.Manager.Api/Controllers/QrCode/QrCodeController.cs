@@ -33,8 +33,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             // 创建画布对象
             Graphics g = Graphics.FromImage(bmp);
 
-            // 设置画布背景色为红色
-            g.Clear(Color.Red);
+            Color color = ColorTranslator.FromHtml("#ff0000"); 
+            g.Clear(color);
 
             //// 绘制大标题文本
             //string title = "这里是大标题";
@@ -146,7 +146,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             bottomPath.AddArc(arcRect, 90, 90); // 左下角
 
             bottomPath.CloseFigure();
-            g.FillPath(Brushes.LightPink, bottomPath);
+
+            Color newColor = LightenColor(color, 0);
+            SolidBrush brush = new SolidBrush(newColor);
+
+            g.FillPath(brush, bottomPath);
 
             // 计算二维码位置和大小
             int qrSize = 900;
@@ -186,32 +190,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                 new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
             };
 
-            int payTypeWidth = 100; // 每个大小
-            int padding = 50; // 每个LOGO之间间距
+            int payLogoWidth = (int)(width * 0.1);
+            int payLogoHeight = (int)(width * 0.1);
             int payTypeCount = payTypes.Count;
-            int freeWidth = (int)bottomPath.GetBounds().Width - (payTypeWidth + padding) * (payTypeCount - 1);
+            int padding = ((width - leftMargin * 2) - (int)(payTypeCount * (1190 * 0.1))) / (payTypeCount + 1); // 每个LOGO之间间距
             int index = 0;
             foreach (var item in payTypes)
             {
-                logoPath = item.ImgUrl;
-                logo = Image.FromFile(logoPath);
+                string payLogoPath = item.ImgUrl;
+                Image payLogo = Image.FromFile(payLogoPath);
 
-                logoWidth = logo.Width;
-                logoHeight = logo.Height;
+                int payLogoLeft = (leftMargin + padding) + (payLogoWidth + padding) * index;
 
-                // 计算每个LOGO的位置
-                if (index == 0)
-                {
-                    logoLeft = (freeWidth - logoWidth) / 2;
-                }
-                else
-                {
-                    logoLeft = (int)(bottomPath.GetBounds().Width - (payTypeWidth + padding) * (payTypeCount - index - 1) - logoWidth) / 2 + (payTypeWidth + padding) * index;
-                }
+                int payLogoTop = (int)(topMargin + topPath.GetBounds().Height) + (int)(height - (topMargin + topPath.GetBounds().Height + bottomMargin) - payLogoHeight) / 2;
 
-                logoTop = (int)(bottomPath.GetBounds().Y - logoHeight) / 2;
-
-                g.DrawImage(logo, logoLeft, logoTop + 780, logoWidth, logoHeight);
+                g.DrawImage(payLogo, payLogoLeft, payLogoTop, payLogoWidth, payLogoHeight);
 
                 index++;
             }
@@ -356,6 +349,108 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             //bitmap.Save(ms, ImageFormat.Png);
 
             return File(ms.GetBuffer(), "image/png");
+        }
+
+        public static Color LightenColor(Color color, float hueShift)
+        {
+            // 将给定颜色转换为 HSL 颜色模型
+            float hue, saturation, lightness;
+            ColorToHSL(color, out hue, out saturation, out lightness);
+
+            // 降低色相
+            hue -= hueShift;
+            if (hue < 0)
+            {
+                hue += 360;
+            }
+
+            // 提高亮度
+            lightness = Math.Min(lightness + 0.45f, 1.0f);
+
+            // 将 HSL 颜色模型转换回 RGB 颜色模型
+            Color newColor = HSLToColor(hue, saturation, lightness);
+
+            return newColor;
+        }
+
+        // 将 RGB 颜色模型转换为 HSL 颜色模型
+        public static void ColorToHSL(Color color, out float hue, out float saturation, out float lightness)
+        {
+            float r = color.R / 255f;
+            float g = color.G / 255f;
+            float b = color.B / 255f;
+
+            // 找出 RGB 三原色中的最大值和最小值
+            float max = Math.Max(r, Math.Max(g, b));
+            float min = Math.Min(r, Math.Min(g, b));
+
+            // 计算亮度
+            hue = 0;
+            saturation = 0;
+            lightness = (max + min) / 2;
+
+            // 如果最大值和最小值相等，表示颜色为灰色
+            if (max == min)
+            {
+                hue = 0;
+                saturation = 0;
+            }
+            else
+            {
+                // 计算饱和度
+                float d = max - min;
+                saturation = lightness > 0.5f ? d / (2 - max - min) : d / (max + min);
+
+                // 计算色相
+                switch (max)
+                {
+                    case var _ when max == r:
+                        hue = (g - b) / d + (g < b ? 6 : 0);
+                        break;
+
+                    case var _ when max == g:
+                        hue = (b - r) / d + 2;
+                        break;
+
+                    case var _ when max == b:
+                        hue = (r - g) / d + 4;
+                        break;
+                }
+                hue /= 6;
+            }
+        }
+
+        // 将 HSL 颜色模型转换为 RGB 颜色模型
+        public static Color HSLToColor(float hue, float saturation, float lightness)
+        {
+            float r, g, b;
+
+            // 如果饱和度为 0，颜色为灰色
+            if (saturation == 0)
+            {
+                r = g = b = lightness;
+            }
+            else
+            {
+                float q = lightness < 0.5f ? lightness * (1 + saturation) : lightness + saturation - lightness * saturation;
+                float p = 2 * lightness - q;
+                r = HueToRGB(p, q, hue + 1f / 3f);
+                g = HueToRGB(p, q, hue);
+                b = HueToRGB(p, q, hue - 1f / 3f);
+            }
+
+            return Color.FromArgb((int)(r * 255), (int)(g * 255), (int)(b * 255));
+        }
+
+        // 辅助函数，将色相值转换为 RGB 颜色模型中的值
+        private static float HueToRGB(float p, float q, float t)
+        {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1f / 6f) return p + (q - p) * 6f * t;
+            if (t < 1f / 2f) return q;
+            if (t < 2f / 3f) return p + (q - p) * (2f / 3f - t) * 6f;
+            return p;
         }
 
         private Bitmap GenerateQRCode(string content, int size)
