@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         public IActionResult NoStyle()
         {
             // 创建二维码对象
-            Bitmap qrCodeImage = GenerateQRCode();
+            Bitmap qrCodeImage = QrCodeBuilder.Generate(icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")));
 
             // 将位图对象转换为 PNG 格式并输出到响应流
             MemoryStream ms = new MemoryStream();
@@ -68,6 +68,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             // 在画布上绘制logo
             g.DrawImage(logo, logoLeft, logoTop, logoWidth, logoHeight);
 
+            g.SmoothingMode = SmoothingMode.AntiAlias;
             // 创建白色圆角矩形路径
             GraphicsPath path = new GraphicsPath();
             Rectangle rect = new Rectangle(leftMargin, topMargin, width - leftMargin * 2, height - topMargin - bottomMargin);
@@ -160,13 +161,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 
             bottomPath.CloseFigure();
 
-            Color newColor = LightenColor(color, 0);
+            Color newColor = ColorAdjuster.LightenColor(color, 0);
             SolidBrush brush = new SolidBrush(newColor);
 
             g.FillPath(brush, bottomPath);
 
             // 在画布上绘制二维码
-            Bitmap qrCode = GenerateQRCode("http://www.example.com/");
+            Bitmap qrCode = QrCodeBuilder.Generate(icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")));
             // 计算二维码位置和大小
             int qrSize = width - (leftMargin * 2) - cornerRadius;
             int qrLeft = (width - qrSize) / 2;
@@ -259,8 +260,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             Font font = new Font("Arial", 48, FontStyle.Bold);
             SizeF titleSize = g.MeasureString(title, font);
             PointF textPos = new PointF(width / 2 - titleSize.Width / 2, topMargin / 2 - titleSize.Height / 2);
-            g.DrawString(title, font, Brushes.Black, textPos);
+            g.DrawString(title, font, Brushes.White, textPos);
 
+            g.SmoothingMode = SmoothingMode.AntiAlias;
             // 创建白色圆角矩形路径
             GraphicsPath path = new GraphicsPath();
             Rectangle rect = new Rectangle(leftMargin, topMargin, width - leftMargin * 2, height - topMargin - bottomMargin);
@@ -313,7 +315,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             g.FillPath(Brushes.LightPink, bottomPath);
 
             // 在画布上绘制二维码
-            Bitmap qrCode = GenerateQRCode("http://www.example.com/");
+            Bitmap qrCode = QrCodeBuilder.Generate(icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")));
             // 计算二维码位置和大小
             int qrSize = width - (leftMargin * 2) - cornerRadius;
             int qrLeft = (width - qrSize) / 2;
@@ -356,16 +358,33 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             g.Dispose();
             bmp.Dispose();
 
-            //Color backgroundColor = Color.Red;
-            //int cornerRadius = 50;
-
-            //var bitmap = QrDraw.GenerateImage(1190, 1684, backgroundColor, cornerRadius);
-            //var ms = new MemoryStream();
-            //bitmap.Save(ms, ImageFormat.Png);
-
             return File(ms.GetBuffer(), "image/png");
         }
 
+        [HttpGet, Route("shell/stylec.png")]
+        public IActionResult StyleC()
+        {
+            Color backgroundColor = Color.Red;
+            int cornerRadius = 50;
+            var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay.png");
+
+            var payTypes = new List<PayType>() {
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "unionpay.png"), Alias = "银联", Name="unionpay"  },
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), Alias = "云闪付", Name="ysfpay" },
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "wxpay.png"), Alias = "微信", Name="wxpay"  },
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
+            };
+
+            var bitmap = DrawQrCode.GenerateImage(1190, 1684, backgroundColor, cornerRadius, logoPath, icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")), payTypes: payTypes);
+            var ms = new MemoryStream();
+            bitmap.Save(ms, ImageFormat.Png);
+            bitmap.Dispose();
+            return File(ms.GetBuffer(), "image/png");
+        }
+    }
+
+    public static class ColorAdjuster
+    {
         public static Color LightenColor(Color color, float hueShift)
         {
             // 将给定颜色转换为 HSL 颜色模型
@@ -467,15 +486,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             if (t < 2f / 3f) return p + (q - p) * (2f / 3f - t) * 6f;
             return p;
         }
+    }
 
-        private Bitmap GenerateQRCode(string content = "https://www.example.com")
+    public static class QrCodeBuilder
+    {
+        public static Bitmap Generate(string content = "https://www.example.com", Bitmap icon = null)
         {
             // 创建二维码对象
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
             QRCodeData qrCodeData = qrGenerator.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
             QRCode qrCode = new QRCode(qrCodeData);
 
-            Bitmap qrCodeImage = qrCode.GetGraphic(30, Color.Black, Color.White, new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")));
+            Bitmap qrCodeImage = qrCode.GetGraphic(30, Color.Black, Color.White, icon);
             return qrCodeImage;
         }
     }
@@ -487,10 +509,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         public string Alias { get; set; }
     }
 
-    public static class QrDraw
+    public static class DrawQrCode
     {
-        public static Bitmap GenerateImage(int width, int height, Color backgroundColor, int cornerRadius)
+        public static Bitmap GenerateImage(int width, int height, Color backgroundColor, int cornerRadius, string logoPath = null, string title = null, Bitmap icon = null, string text = "No.220101000001", List<PayType> payTypes = null)
         {
+            int leftMargin = (int)(width * 0.1);
+            int topMargin = (int)(width * 0.3);
+            int bottomMargin = (int)(width * 0.1);
+
             // Create the image
             Bitmap image = new Bitmap(width, height);
 
@@ -498,37 +524,118 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             Graphics graphics = Graphics.FromImage(image);
             graphics.Clear(backgroundColor);
 
+            if (string.IsNullOrWhiteSpace(logoPath) && !string.IsNullOrWhiteSpace(title))
+            {
+                graphics.DrawTitleText(width, title, topMargin);
+            }
 
-            // Create the rectangle for the white rounded rectangle in the middle
-            int middleWidth = width - 238;
-            int middleHeight = height - 238;
-            int middleX = (width - middleWidth) / 2;
-            int middleY = (height - middleHeight) / 2 + 238;
-            Rectangle middleRectangle = new Rectangle(x: middleX, middleY, middleWidth, middleHeight - 238);
+            if (!string.IsNullOrWhiteSpace(logoPath))
+            {
+                graphics.DrawMainLogo(width, logoPath, topMargin);
+            }
 
-            // Draw the white rounded rectangle in the middle
+            // 创建中间的白色圆角矩形
+            int middleWidth = width - leftMargin * 2;
+            int middleHeight = height - topMargin - bottomMargin;
+            int middleX = leftMargin;
+            int middleY = topMargin;
+            Rectangle middleRectangle = new Rectangle(x: middleX, middleY, middleWidth, middleHeight);
+            // 绘制中间白色圆角矩形
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             graphics.FillRoundedRectangle(Brushes.White, middleRectangle, cornerRadius);
-            graphics.DrawRoundedRectangle(Pens.White, middleRectangle, cornerRadius);
+            //graphics.DrawRoundedRectangle(Pens.White, middleRectangle, cornerRadius);
 
-            // Save the image to a file
+            // 在画布上绘制二维码
+            Bitmap qrCode = QrCodeBuilder.Generate(icon: icon);
+            // 计算二维码位置和大小
+            int qrSize = width - (leftMargin * 2) - cornerRadius;
+            int qrLeft = (width - qrSize) / 2;
+            int qrTop = middleRectangle.Top + (middleRectangle.Width - qrSize) / 2;
+            graphics.DrawImage(qrCode, qrLeft, qrTop, qrSize, qrSize);
+
+            Rectangle bottomRect = new Rectangle(leftMargin, (topMargin + middleRectangle.Width), width - leftMargin * 2, height - (topMargin + middleRectangle.Width) - bottomMargin);
+            GraphicsPath bottomPath = new GraphicsPath();
+            int diameter = cornerRadius * 2;
+            Rectangle arcRect = new Rectangle(bottomRect.X, bottomRect.Y, diameter, diameter);
+            bottomPath.AddLine(bottomRect.Left, bottomRect.Top, bottomRect.Right, bottomRect.Top); // 直线段
+            arcRect.X = bottomRect.Right - diameter;
+            bottomPath.AddLine(bottomRect.Right, bottomRect.Top, bottomRect.Right, bottomRect.Bottom); // 直线段 
+            arcRect.Y = bottomRect.Bottom - diameter;
+            bottomPath.AddArc(arcRect, 0, 90); // 右下角
+            arcRect.X = bottomRect.X;
+            bottomPath.AddArc(arcRect, 90, 90); // 左下角
+            bottomPath.CloseFigure();
+            Color color = ColorAdjuster.LightenColor(backgroundColor, 0);
+            SolidBrush brush = new SolidBrush(color);
+            graphics.FillPath(brush, bottomPath);
+
+            // 在画布上绘制文字
+            SizeF textSize = graphics.MeasureString(text, new Font("Arial", 36));
+            int textLeft = (int)((bottomPath.GetBounds().Width - textSize.Width) / 2 + bottomPath.GetBounds().X);
+            int textTop = (int)(bottomPath.GetBounds().Bottom + (middleRectangle.Width - bottomPath.GetBounds().Bottom - textSize.Height) / 2);
+            graphics.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
+
+            int payLogoWidth = (int)(width * 0.1);
+            int payLogoHeight = (int)(width * 0.1);
+            int payTypeCount = payTypes.Count;
+            int padding = ((width - leftMargin * 2) - (int)(payTypeCount * (width * 0.1))) / (payTypeCount + 1); // 每个LOGO之间间距
+            int index = 0;
+            foreach (var item in payTypes)
+            {
+                string payLogoPath = item.ImgUrl;
+                Image payLogo = Image.FromFile(payLogoPath);
+
+                int payLogoLeft = (leftMargin + padding) + (payLogoWidth + padding) * index;
+
+                int payLogoTop = (int)(topMargin + middleRectangle.Width) + (int)(height - (topMargin + middleRectangle.Width + bottomMargin) - payLogoHeight) / 2;
+
+                graphics.DrawImage(payLogo, payLogoLeft, payLogoTop, payLogoWidth, payLogoHeight);
+
+                index++;
+            }
+
+            graphics.Dispose();
+
+            // 将图像保存到文件
             //image.Save(outputPath, ImageFormat.Png);
             return image;
         }
 
-        public static void FillRoundedRectangle(this Graphics graphics, Brush brush, Rectangle rectangle, int cornerRadius)
+        private static void DrawTitleText(this Graphics graphics, int width, string title, int topMargin)
+        {
+            // 绘制大标题文本
+            Font font = new Font("Arial", 48, FontStyle.Bold);
+            SizeF titleSize = graphics.MeasureString(title, font);
+            PointF textPos = new PointF(width / 2 - titleSize.Width / 2, topMargin / 2 - titleSize.Height / 2);
+            graphics.DrawString(title, font, Brushes.White, textPos);
+        }
+
+        private static void DrawMainLogo(this Graphics graphics, int width, string logoPath, int topMargin)
+        {
+            // 加载logo图片
+            Image logo = Image.FromFile(logoPath);
+            // 计算logo的位置和大小
+            int logoWidth = logo.Width > (width - (width * 0.1)) ? (int)(width - (width * 0.1)) : logo.Width;
+            int logoHeight = logo.Height > (topMargin - (topMargin * 0.1)) ? (int)(topMargin - (topMargin * 0.1)) : logo.Height;
+            int logoLeft = (width - logoWidth) / 2;
+            int logoTop = (topMargin - logoHeight) / 2;
+            // 在画布上绘制logo
+            graphics.DrawImage(logo, logoLeft, logoTop, logoWidth, logoHeight);
+        }
+
+        private static void FillRoundedRectangle(this Graphics graphics, Brush brush, Rectangle rectangle, int cornerRadius)
         {
             GraphicsPath path = CreateRoundedRectangle(rectangle, cornerRadius);
             graphics.FillPath(brush, path);
         }
 
-        public static void DrawRoundedRectangle(this Graphics graphics, Pen pen, Rectangle rectangle, int cornerRadius)
+        private static void DrawRoundedRectangle(this Graphics graphics, Pen pen, Rectangle rectangle, int cornerRadius)
         {
             GraphicsPath path = CreateRoundedRectangle(rectangle, cornerRadius);
             graphics.DrawPath(pen, path);
         }
 
-        public static GraphicsPath CreateRoundedRectangle(Rectangle rectangle, int cornerRadius)
+        private static GraphicsPath CreateRoundedRectangle(Rectangle rectangle, int cornerRadius)
         {
             GraphicsPath path = new GraphicsPath();
 
