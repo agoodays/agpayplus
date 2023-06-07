@@ -179,6 +179,43 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             int textTop = (int)(bottomPath.GetBounds().Bottom + (topRect.Height - bottomPath.GetBounds().Bottom - textSize.Height) / 2);
             g.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
 
+            var payTypes = new List<PayType>() {
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "unionpay.png"), Alias = "银联", Name="unionpay"  },
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), Alias = "云闪付", Name="ysfpay" },
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "wxpay.png"), Alias = "微信", Name="wxpay"  },
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
+            };
+
+            int payTypeWidth = 100; // 每个大小
+            int padding = 50; // 每个LOGO之间间距
+            int payTypeCount = payTypes.Count;
+            int freeWidth = (int)bottomPath.GetBounds().Width - (payTypeWidth + padding) * (payTypeCount - 1);
+            int index = 0;
+            foreach (var item in payTypes)
+            {
+                logoPath = item.ImgUrl;
+                logo = Image.FromFile(logoPath);
+
+                logoWidth = logo.Width;
+                logoHeight = logo.Height;
+
+                // 计算每个LOGO的位置
+                if (index == 0)
+                {
+                    logoLeft = (freeWidth - logoWidth) / 2;
+                }
+                else
+                {
+                    logoLeft = (int)(bottomPath.GetBounds().Width - (payTypeWidth + padding) * (payTypeCount - index - 1) - logoWidth) / 2 + (payTypeWidth + padding) * index;
+                }
+
+                logoTop = (int)(bottomPath.GetBounds().Y - logoHeight) / 2;
+
+                g.DrawImage(logo, logoLeft, logoTop + 780, logoWidth, logoHeight);
+
+                index++;
+            }
+
             // 释放资源
             g.Dispose();
 
@@ -332,6 +369,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             g.Dispose();
             return bmp;
         }
+    }
+
+    public class PayType
+    {
+        public string ImgUrl { get; set; }
+        public string Name { get; set; }
+        public string Alias { get; set; }
     }
 
     public static class QrDraw
