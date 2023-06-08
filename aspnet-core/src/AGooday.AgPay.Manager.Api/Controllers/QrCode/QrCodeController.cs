@@ -381,6 +381,118 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             bitmap.Dispose();
             return File(ms.GetBuffer(), "image/png");
         }
+
+        [HttpGet, Route("shell/styled.png")]
+        public IActionResult StyleD()
+        {
+            // 设置图片宽高和边距
+            int width = 1190;
+            int height = 1684;
+            int leftMargin = (int)(width * 0.1);
+            int topMargin = (int)(width * 0.1);
+
+            // 创建位图对象
+            Bitmap bmp = new Bitmap(width, height);
+
+            // 创建画布对象
+            Graphics g = Graphics.FromImage(bmp);
+
+            // 设置画布背景色为红色
+            g.Clear(Color.Red);
+
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            int cornerRadius = 50;
+            int diameter = cornerRadius * 2;
+            // 分割成上下两部分
+            Rectangle topRect = new Rectangle(leftMargin, topMargin, width - leftMargin * 2, (int)((height - topMargin * 2) * 0.8));
+            // 创建下面部分圆角矩形路径
+            GraphicsPath topPath = new GraphicsPath();
+            Rectangle arcRect = new Rectangle(topRect.X, topRect.Y, diameter, diameter);
+            topPath.AddArc(arcRect, 180, 90);// 左上角
+            arcRect.X = topRect.Right - diameter;
+            topPath.AddArc(arcRect, 270, 90);// 右上角
+            arcRect.Y = topRect.Bottom - diameter;
+            topPath.AddArc(arcRect, 0, 90); // 右下角
+            arcRect.X = topRect.X;
+            topPath.AddArc(arcRect, 90, 90);// 左下角
+            topPath.CloseFigure();
+            // g.FillRectangle(Brushes.Yellow, topRect);
+            g.FillPath(Brushes.Yellow, topPath);
+
+            Rectangle bottomRect = new Rectangle(leftMargin, topRect.Bottom + ((int)(leftMargin / 2)), width - leftMargin * 2, (int)(height - topMargin - topRect.Bottom - ((int)(leftMargin / 2))));
+            // g.FillRectangle(Brushes.LightPink, bottomRect);
+            // 创建下面部分圆角矩形路径
+            GraphicsPath bottomPath = new GraphicsPath();
+            arcRect = new Rectangle(bottomRect.X, bottomRect.Y, diameter, diameter);
+            bottomPath.AddArc(arcRect, 180, 90);
+            arcRect.X = bottomRect.Right - diameter;
+            bottomPath.AddArc(arcRect, 270, 90);
+            arcRect.Y = bottomRect.Bottom - diameter;
+            bottomPath.AddArc(arcRect, 0, 90);
+            arcRect.X = bottomRect.X;
+            bottomPath.AddArc(arcRect, 90, 90);
+            bottomPath.CloseFigure();
+            // 填充上下两部分的背景
+            g.FillPath(Brushes.LightPink, bottomPath);
+
+            // 在画布上绘制二维码
+            Bitmap qrCode = QrCodeBuilder.Generate(icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")));
+            // 计算二维码位置和大小
+            int qrSize = width - (leftMargin * 2) - cornerRadius;
+            int qrLeft = (width - qrSize) / 2;
+            int qrTop = diameter + topRect.Top + (topRect.Height - qrSize) / 2;
+            g.DrawImage(qrCode, qrLeft, qrTop, qrSize, qrSize);
+
+            // 释放二维码资源
+            qrCode.Dispose();
+
+            // 绘制大标题文本
+            string title = "这里是大标题";
+            Font font = new Font("Arial", 48, FontStyle.Bold);
+            SizeF titleSize = g.MeasureString(title, font);
+            PointF textPos = new PointF(width / 2 - titleSize.Width / 2, topMargin + diameter);
+            g.DrawString(title, font, Brushes.Black, textPos);
+
+            // 在画布上绘制文字
+            string text = "No.220101000001";
+            SizeF textSize = g.MeasureString(text, new Font("Arial", 36));
+            int textLeft = (int)((bottomPath.GetBounds().Width - textSize.Width) / 2 + bottomPath.GetBounds().X);
+            int textTop = (int)(topRect.Bottom - diameter);
+            g.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
+
+            var payTypes = new List<PayType>() {
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "unionpay.png"), Alias = "银联", Name="unionpay"  },
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), Alias = "云闪付", Name="ysfpay" },
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "wxpay.png"), Alias = "微信", Name="wxpay"  },
+                new PayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
+            };
+
+            int payLogoWidth = (int)(width * 0.1);
+            int payLogoHeight = (int)(width * 0.1);
+            int payTypeCount = payTypes.Count;
+            int padding = ((width - leftMargin * 2) - (int)(payTypeCount * (width * 0.1))) / (payTypeCount + 1); // 每个LOGO之间间距
+            int index = 0;
+            foreach (var item in payTypes)
+            {
+                string payLogoPath = item.ImgUrl;
+                Image payLogo = Image.FromFile(payLogoPath);
+
+                int payLogoLeft = (leftMargin + padding) + (payLogoWidth + padding) * index;
+
+                int payLogoTop = (int)(((int)(leftMargin / 2)) + topMargin + topPath.GetBounds().Height) + (int)(height - (((int)(leftMargin / 2)) + topMargin + topPath.GetBounds().Height + topMargin) - payLogoHeight) / 2 ;
+
+                g.DrawImage(payLogo, payLogoLeft, payLogoTop, payLogoWidth, payLogoHeight);
+
+                index++;
+            }
+
+            var ms = new MemoryStream();
+            bmp.Save(ms, ImageFormat.Png);
+            g.Dispose();
+            bmp.Dispose();
+
+            return File(ms.GetBuffer(), "image/png");
+        }
     }
 
     public static class ColorAdjuster
