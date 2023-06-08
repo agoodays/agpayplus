@@ -398,7 +398,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             Graphics g = Graphics.FromImage(bmp);
 
             // 设置画布背景色为红色
-            g.Clear(Color.Red);
+            Color color = ColorTranslator.FromHtml("#ff0000");
+            g.Clear(color);
+
+            Color newColor = ColorAdjuster.LightenColor(color, 0);
+            SolidBrush brush = new SolidBrush(newColor);
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
             int cornerRadius = 50;
@@ -416,11 +420,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             arcRect.X = topRect.X;
             topPath.AddArc(arcRect, 90, 90);// 左下角
             topPath.CloseFigure();
-            // g.FillRectangle(Brushes.Yellow, topRect);
-            g.FillPath(Brushes.Yellow, topPath);
+            g.FillPath(Brushes.White, topPath);
 
-            Rectangle bottomRect = new Rectangle(leftMargin, topRect.Bottom + ((int)(leftMargin / 2)), width - leftMargin * 2, (int)(height - topMargin - topRect.Bottom - ((int)(leftMargin / 2))));
-            // g.FillRectangle(Brushes.LightPink, bottomRect);
+            Rectangle bottomRect = new Rectangle(leftMargin, topRect.Bottom + ((int)(leftMargin / 2)), width - leftMargin * 2, (int)(height - (topRect.Bottom + ((int)(leftMargin / 2)) + topMargin)));
             // 创建下面部分圆角矩形路径
             GraphicsPath bottomPath = new GraphicsPath();
             arcRect = new Rectangle(bottomRect.X, bottomRect.Y, diameter, diameter);
@@ -433,7 +435,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             bottomPath.AddArc(arcRect, 90, 90);
             bottomPath.CloseFigure();
             // 填充上下两部分的背景
-            g.FillPath(Brushes.LightPink, bottomPath);
+            g.FillPath(brush, bottomPath);
 
             // 在画布上绘制二维码
             Bitmap qrCode = QrCodeBuilder.Generate(icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")));
@@ -446,12 +448,23 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             // 释放二维码资源
             qrCode.Dispose();
 
-            // 绘制大标题文本
-            string title = "这里是大标题";
-            Font font = new Font("Arial", 48, FontStyle.Bold);
-            SizeF titleSize = g.MeasureString(title, font);
-            PointF textPos = new PointF(width / 2 - titleSize.Width / 2, topMargin + diameter);
-            g.DrawString(title, font, Brushes.Black, textPos);
+            //// 绘制大标题文本
+            //string title = "这里是大标题";
+            //Font font = new Font("Arial", 48, FontStyle.Bold);
+            //SizeF titleSize = g.MeasureString(title, font);
+            //PointF textPos = new PointF(width / 2 - titleSize.Width / 2, topMargin + (int)((qrTop - topMargin + cornerRadius - titleSize.Height) / 2));
+            //g.DrawString(title, font, Brushes.Black, textPos);
+
+            string logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay_blue.png");
+            // 加载logo图片
+            Image logo = Image.FromFile(logoPath);
+            // 计算logo的位置和大小
+            int logoWidth = logo.Width > (width - (width * 0.1)) ? (int)(width - (width * 0.1)) : logo.Width;
+            int logoHeight = logo.Height > (qrTop - topMargin + cornerRadius) ? (qrTop - topMargin + cornerRadius) : logo.Height;
+            int logoLeft = (width - logoWidth) / 2;
+            int logoTop = topMargin + (int)((qrTop - topMargin + cornerRadius - logoHeight) / 2);
+            // 在画布上绘制logo
+            g.DrawImage(logo, logoLeft, logoTop, logoWidth, logoHeight);
 
             // 在画布上绘制文字
             string text = "No.220101000001";
@@ -479,7 +492,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 
                 int payLogoLeft = (leftMargin + padding) + (payLogoWidth + padding) * index;
 
-                int payLogoTop = (int)(((int)(leftMargin / 2)) + topMargin + topPath.GetBounds().Height) + (int)(height - (((int)(leftMargin / 2)) + topMargin + topPath.GetBounds().Height + topMargin) - payLogoHeight) / 2 ;
+                int payLogoTop = bottomRect.Top + (int)((bottomRect.Bottom - bottomRect.Top - payLogoHeight) / 2);
 
                 g.DrawImage(payLogo, payLogoLeft, payLogoTop, payLogoWidth, payLogoHeight);
 
@@ -517,6 +530,33 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             Color newColor = HSLToColor(hue, saturation, lightness);
 
             return newColor;
+        }
+
+        public static Bitmap ChangeColor(string imgPath, string originColor, string targetColor)
+        {
+            // 加载图片
+            Bitmap bitmap = new Bitmap(Image.FromFile(imgPath));
+            Color color = ColorTranslator.FromHtml(originColor);
+
+            // 遍历图片的每一个像素
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                for (int y = 0; y < bitmap.Height; y++)
+                {
+                    // 获取当前像素的颜色
+                    Color pixelColor = bitmap.GetPixel(x, y);
+
+                    // 如果当前像素是白色，将其替换为蓝色
+                    if (pixelColor.R == color.R && pixelColor.G == color.G && pixelColor.B == color.B)
+                    {
+                        //Color newColor = Color.FromArgb(pixelColor.A, 0, 0, 255);
+                        Color newColor = ColorTranslator.FromHtml(targetColor);
+                        bitmap.SetPixel(x, y, newColor);
+                    }
+                }
+            }
+
+            return bitmap;
         }
 
         // 将 RGB 颜色模型转换为 HSL 颜色模型
