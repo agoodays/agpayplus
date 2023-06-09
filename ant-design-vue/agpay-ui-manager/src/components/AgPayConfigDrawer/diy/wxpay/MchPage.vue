@@ -9,11 +9,8 @@
     <a-form-model v-if="saveObject.infoType != 'AGENT'" ref="mchParamFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
       <a-row :gutter="16" v-if="mchType === 1">
         <a-col span="12">
-          <a-form-model-item label="环境配置" prop="sandbox">
-            <a-radio-group v-model="ifParams.sandbox">
-              <a-radio :value="1">沙箱环境</a-radio>
-              <a-radio :value="0">生产环境</a-radio>
-            </a-radio-group>
+          <a-form-model-item label="微信支付商户号" prop="mchId">
+            <a-input v-model="ifParams.mchId" placeholder="请输入" />
           </a-form-model-item>
         </a-col>
         <a-col span="12">
@@ -21,39 +18,46 @@
             <a-input v-model="ifParams.appId" placeholder="请输入" />
           </a-form-model-item>
         </a-col>
-        <a-col span="24">
-          <a-form-model-item label="应用私钥" prop="privateKey">
-            <a-input v-model="ifParams.privateKey" :placeholder="ifParams.privateKey_ph" type="textarea" />
-          </a-form-model-item>
-        </a-col>
-        <a-col span="24">
-          <a-form-model-item label="支付宝公钥" prop="alipayPublicKey">
-            <a-input v-model="ifParams.alipayPublicKey" :placeholder="ifParams.alipayPublicKey_ph" type="textarea" />
+        <a-col span="12">
+          <a-form-model-item label="应用AppSecret" prop="appSecret">
+            <a-input v-model="ifParams.appSecret" :placeholder="ifParams.appSecret_ph" />
           </a-form-model-item>
         </a-col>
         <a-col span="12">
-          <a-form-model-item label="接口签名方式(推荐使用RSA2)" prop="signType">
-            <a-radio-group v-model="ifParams.signType" defaultValue="RSA">
-              <a-radio value="RSA">RSA</a-radio>
-              <a-radio value="RSA2">RSA2</a-radio>
-            </a-radio-group>
+          <a-form-model-item label="oauth2地址（置空将使用官方）" prop="oauth2Url">
+            <a-input v-model="ifParams.oauth2Url" placeholder="请输入" />
           </a-form-model-item>
         </a-col>
         <a-col span="12">
-          <a-form-model-item label="公钥证书" prop="useCert">
-            <a-radio-group v-model="ifParams.useCert" defaultValue="1">
-              <a-radio :value="1">使用证书（请使用RSA2私钥）</a-radio>
-              <a-radio :value="0">不使用证书</a-radio>
+          <a-form-model-item label="微信支付API版本" prop="apiVersion">
+            <a-radio-group v-model="ifParams.apiVersion" defaultValue="V2">
+              <a-radio value="V2">V2</a-radio>
+              <a-radio value="V3">V3</a-radio>
             </a-radio-group>
           </a-form-model-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="应用公钥证书（.crt格式）" prop="appPublicCert">
+          <a-form-model-item label="APIv2密钥" prop="key">
+            <a-input v-model="ifParams.key" :placeholder="ifParams.key_ph" type="textarea" />
+          </a-form-model-item>
+        </a-col>
+        <a-col span="24">
+          <a-form-model-item label="APIv3秘钥" prop="apiV3Key">
+            <a-input v-model="ifParams.apiV3Key" :placeholder="ifParams.apiV3Key_ph" type="textarea" />
+          </a-form-model-item>
+        </a-col>
+        <a-col span="24">
+          <a-form-model-item label="序列号" prop="serialNo">
+            <a-input v-model="ifParams.serialNo" :placeholder="ifParams.serialNo_ph" type="textarea" />
+          </a-form-model-item>
+        </a-col>
+        <a-col span="24">
+          <a-form-model-item label="API证书(apiclient_cert.p12)" prop="cert">
             <AgUpload
               :action="action"
-              accept=".crt"
-              bind-name="appPublicCert"
-              :urls="[ifParams.appPublicCert]"
+              accept=".p12"
+              bind-name="cert"
+              :urls="[ifParams.cert]"
               listType="text"
               @uploadSuccess="uploadSuccess"
             >
@@ -64,12 +68,12 @@
           </a-form-model-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="支付宝公钥证书（.crt格式）" prop="alipayPublicCert">
+          <a-form-model-item label="证书文件(apiclient_cert.pem)" prop="apiClientCert">
             <AgUpload
               :action="action"
-              accept=".crt"
-              bind-name="alipayPublicCert"
-              :urls="[ifParams.alipayPublicCert]"
+              accept=".pem"
+              bind-name="apiClientCert"
+              :urls="[ifParams.apiClientCert]"
               listType="text"
               @uploadSuccess="uploadSuccess"
             >
@@ -80,12 +84,12 @@
           </a-form-model-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="支付宝根证书（.crt格式）" prop="alipayRootCert">
+          <a-form-model-item label="私钥文件(apiclient_key.pem)" prop="apiClientKey">
             <AgUpload
               :action="action"
-              accept=".crt"
-              bind-name="alipayRootCert"
-              :urls="[ifParams.alipayRootCert]"
+              accept=".pem"
+              bind-name="apiClientKey"
+              :urls="[ifParams.apiClientKey]"
               listType="text"
               @uploadSuccess="uploadSuccess"
             >
@@ -98,8 +102,13 @@
       </a-row>
       <a-row :gutter="16" v-else-if="mchType === 2">
         <a-col span="12">
-          <a-form-model-item label="子商户app_auth_token" prop="appAuthToken">
-            <a-input v-model="ifParams.appAuthToken" placeholder="请输入子商户app_auth_token" />
+          <a-form-model-item label="子商户ID" prop="subMchId">
+            <a-input v-model="ifParams.subMchId" placeholder="请输入" />
+          </a-form-model-item>
+        </a-col>
+        <a-col span="12">
+          <a-form-model-item label="子账户appID(线上支付必填)" prop="subMchAppId">
+            <a-input v-model="ifParams.subMchAppId" placeholder="请输入" />
           </a-form-model-item>
         </a-col>
       </a-row>
