@@ -270,6 +270,23 @@ CREATE TABLE `t_qr_code` (
   PRIMARY KEY (qrc_id)
 );
 
+-- 设备配置
+INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE', '设备配置', 'appstore', '', 'RouteView', 'ML', 0, 1,  'ROOT', '70', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_QRC', '码牌', 'shop', '', 'RouteView', 'ML', 0, 1,  'ENT_DEVICE', '10', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_SHELL', '模板管理', 'file', '/shell', 'QrCodeShellPage', 'ML', 0, 1,  'ENT_QRC', '10', 'MGR', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_SHELL_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DEVICE_QRC_SHELL', '0', 'MGR', NOW(), NOW());
+ 	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_SHELL_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC_SHELL', '0', 'MGR', NOW(), NOW());
+ 	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_SHELL_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC_SHELL', '0', 'MGR', NOW(), NOW());
+ 	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_SHELL_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC_SHELL', '0', 'MGR', NOW(), NOW());
+ 	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_SHELL_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC_SHELL', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC', '码牌管理', 'qrcode', '/qrc', 'QrCodeCardPage', 'ML', 0, 1,  'ENT_QRC', '10', 'MGR', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
+ 	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
+ 	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
+ 	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
+ 	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
+ 	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_EXPORT', '按钮：导出', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
+
 ALTER TABLE `t_mch_info`   
   ADD COLUMN `mch_level` VARCHAR(8) DEFAULT 'M0' NOT NULL COMMENT '商户级别: M0商户-简单模式（页面简洁，仅基础收款功能）, M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）' AFTER `type`,
   ADD COLUMN `refund_mode` JSON NULL COMMENT '退款方式[\"plat\", \"api\"],平台退款、接口退款，平台退款方式必须包含接口退款。' AFTER `mch_level`,
