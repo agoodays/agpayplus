@@ -49,6 +49,8 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IPayOrderService, PayOrderService>();
             services.AddScoped<IPayRateConfigService, PayRateConfigService>();
             services.AddScoped<IPayWayService, PayWayService>();
+            services.AddScoped<IQrCodeService, QrCodeService>();
+            services.AddScoped<IQrCodeShellService, QrCodeShellService>();
             services.AddScoped<IRefundOrderService, RefundOrderService>();
             services.AddScoped<ISysArticleService, SysArticleService>();
             services.AddScoped<ISysConfigService, SysConfigService>();
@@ -114,6 +116,8 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IPayOrderRepository, PayOrderRepository>();
             services.AddScoped<IPayRateConfigRepository, PayRateConfigRepository>();
             services.AddScoped<IPayWayRepository, PayWayRepository>();
+            services.AddScoped<IQrCodeRepository, QrCodeRepository>();
+            services.AddScoped<IQrCodeShellRepository, QrCodeShellRepository>();
             services.AddScoped<IRefundOrderRepository, RefundOrderRepository>();
             services.AddScoped<ISysArticleRepository, SysArticleRepository>();
             services.AddScoped<ISysConfigRepository, SysConfigRepository>();

@@ -50,6 +50,9 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<PayWay, PayWayDto>();
             CreateMap<PayWay, MchPayPassagePayWayDto>();
 
+            CreateMap<QrCode, QrCodeDto>();
+            CreateMap<QrCodeShell, QrCodeShellDto>();
+
             CreateMap<RefundOrder, RefundOrderDto>();
             CreateMap<SysArticle, SysArticleDto>()
                 .ForMember(d => d.ArticleRange, o => o.MapFrom(s => JArray.Parse(s.ArticleRange)));

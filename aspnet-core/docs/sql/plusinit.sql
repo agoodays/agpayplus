@@ -229,7 +229,7 @@ CREATE TABLE `t_pay_rate_level_config` (
 -- 码牌模板信息表
 DROP TABLE IF EXISTS `t_qr_code_shell`;
 CREATE TABLE `t_qr_code_shell` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '码牌模板ID',
   `style_code` VARCHAR(20) NOT NULL COMMENT '样式代码: shellA, shellB', 
   `shell_alias` VARCHAR(20) NOT NULL COMMENT '模板别名',
   `config_info` VARCHAR(4096) NOT NULL COMMENT '模板配置信息,json字符串',
@@ -258,7 +258,7 @@ CREATE TABLE `t_qr_code` (
   `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
   -- `mch_name` VARCHAR(30) NOT NULL COMMENT '商户名称',
   `app_id` VARCHAR(64) NOT NULL COMMENT '应用ID',
-  `store_id` VARCHAR(64) NOT NULL COMMENT '门店ID',
+  `store_id` BIGINT NOT NULL COMMENT '门店ID',
   `qr_url` VARCHAR(255) NOT NULL COMMENT '二维码Url', 
   -- `qrc_state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用', 
   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',

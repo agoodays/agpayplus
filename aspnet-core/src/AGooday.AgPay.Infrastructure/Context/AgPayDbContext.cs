@@ -32,6 +32,8 @@ namespace AGooday.AgPay.Infrastructure.Context
         public DbSet<PayOrderDivisionRecord> PayOrderDivisionRecord { get; set; }
         public DbSet<PayRateConfig> PayRateConfig { get; set; }
         public DbSet<PayWay> PayWay { get; set; }
+        public DbSet<QrCode> QrCode { get; set; }
+        public DbSet<QrCodeShell> QrCodeShell { get; set; }
         public DbSet<RefundOrder> RefundOrder { get; set; }
         public DbSet<SysArticle> SysArticle { get; set; }
         public DbSet<SysConfig> SysConfig { get; set; }
@@ -194,6 +196,13 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<PayRateConfig>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayWay>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayWay>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<QrCode>().Property(c => c.FixedPayAmount).HasDefaultValue(0);
+            modelBuilder.Entity<QrCode>().Property(c => c.State).HasDefaultValue(0);
+            modelBuilder.Entity<QrCode>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<QrCode>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<QrCodeShell>().Property(c => c.State).HasDefaultValue(0);
+            modelBuilder.Entity<QrCodeShell>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<QrCodeShell>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<RefundOrder>().Property(c => c.Currency).HasDefaultValue("cny");
             modelBuilder.Entity<RefundOrder>().Property(c => c.State).HasDefaultValue(0);
             modelBuilder.Entity<RefundOrder>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");

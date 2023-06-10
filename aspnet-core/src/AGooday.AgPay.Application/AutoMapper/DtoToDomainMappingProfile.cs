@@ -52,6 +52,8 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<PayRateConfigDto, PayRateConfig>();
 
             CreateMap<PayWayDto, PayWay>();
+            CreateMap<QrCodeDto, QrCode>();
+            CreateMap<QrCodeShellDto, QrCodeShell>();
             CreateMap<RefundOrderDto, RefundOrder>();
             CreateMap<SysArticleDto, SysArticle>()
                 .ForMember(d => d.ArticleRange, o => o.MapFrom(s => JsonConvert.SerializeObject(s.ArticleRange)));

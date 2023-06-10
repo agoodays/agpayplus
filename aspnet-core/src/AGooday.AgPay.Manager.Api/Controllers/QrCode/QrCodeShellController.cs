@@ -1,5 +1,10 @@
-﻿using AGooday.AgPay.Common.Models;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Manager.Api.Attributes;
+using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing;
@@ -14,10 +19,96 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
     {
         private readonly IWebHostEnvironment _env; 
         private readonly ILogger<QrCodeController> _logger;
-        public QrCodeShellController(IWebHostEnvironment env, ILogger<QrCodeController> logger)
+        private readonly IQrCodeShellService _qrCodeShellService;
+
+        public QrCodeShellController(IWebHostEnvironment env, ILogger<QrCodeController> logger, 
+            IQrCodeShellService qrCodeShellService)
         {
             _env = env;
             _logger = logger;
+            _qrCodeShellService = qrCodeShellService;
+        }
+
+        /// <summary>
+        /// 码牌模板
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet, Route(""), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_LIST)]
+        public ApiRes List([FromQuery] QrCodeShellQueryDto dto)
+        {
+            var data = _qrCodeShellService.GetPaginatedData<QrCodeShellDto>(dto);
+            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+        }
+
+        /// <summary>
+        /// 新增码牌模板
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
+        [HttpPost, Route(""), MethodLog("新增码牌模板")]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_ADD)]
+        public ApiRes Add(QrCodeShellDto dto)
+        {
+            bool result = _qrCodeShellService.Add(dto);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
+            }
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 删除码牌模板
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        [HttpDelete, Route("{recordId}"), MethodLog("删除码牌模板")]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_DEL)]
+        public ApiRes Delete(string recordId)
+        {
+            bool result = _qrCodeShellService.Remove(recordId);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_DELETE);
+            }
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 更新码牌模板
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut, Route("{recordId}"), MethodLog("更新码牌模板")]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
+        public ApiRes Update(QrCodeShellDto dto)
+        {
+            bool result = _qrCodeShellService.Update(dto);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
+            }
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 查看码牌模板
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        [HttpGet, Route("{recordId}"), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_VIEW, PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
+        public ApiRes Detail(string recordId)
+        {
+            var qrCodeShell = _qrCodeShellService.GetById(recordId);
+            if (qrCodeShell == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            return ApiRes.Ok(qrCodeShell);
         }
 
         [HttpGet, AllowAnonymous, Route("nostyle.png")]

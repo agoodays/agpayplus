@@ -130,6 +130,21 @@
             public const string ENT_NOTICE_EDIT = "ENT_NOTICE_EDIT";
             public const string ENT_NOTICE_LIST = "ENT_NOTICE_LIST";
             public const string ENT_NOTICE_VIEW = "ENT_NOTICE_VIEW";
+            public const string ENT_DEVICE = "ENT_DEVICE";
+            public const string ENT_QRC = "ENT_QRC";
+            public const string ENT_DEVICE_QRC_SHELL = "ENT_DEVICE_QRC_SHELL";
+            public const string ENT_DEVICE_QRC_SHELL_ADD = "ENT_DEVICE_QRC_SHELL_ADD";
+            public const string ENT_DEVICE_QRC_SHELL_DEL = "ENT_DEVICE_QRC_SHELL_DEL";
+            public const string ENT_DEVICE_QRC_SHELL_EDIT = "ENT_DEVICE_QRC_SHELL_EDIT";
+            public const string ENT_DEVICE_QRC_SHELL_LIST = "ENT_DEVICE_QRC_SHELL_LIST";
+            public const string ENT_DEVICE_QRC_SHELL_VIEW = "ENT_DEVICE_QRC_SHELL_VIEW";
+            public const string ENT_DEVICE_QRC = "ENT_DEVICE_QRC";
+            public const string ENT_DEVICE_QRC_ADD = "ENT_DEVICE_QRC_ADD";
+            public const string ENT_DEVICE_QRC_DEL = "ENT_DEVICE_QRC_DEL";
+            public const string ENT_DEVICE_QRC_EDIT = "ENT_DEVICE_QRC_EDIT";
+            public const string ENT_DEVICE_QRC_LIST = "ENT_DEVICE_QRC_LIST";
+            public const string ENT_DEVICE_QRC_VIEW = "ENT_DEVICE_QRC_VIEW";
+            public const string ENT_DEVICE_QRC_EXPORT = "ENT_DEVICE_QRC_EXPORT";
         }
 
         public static class AGENT
