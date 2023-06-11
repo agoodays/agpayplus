@@ -279,7 +279,7 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE', '设备配置', 'appstore', 
  	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_SHELL_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC_SHELL', '0', 'MGR', NOW(), NOW());
  	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_SHELL_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC_SHELL', '0', 'MGR', NOW(), NOW());
  	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_SHELL_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC_SHELL', '0', 'MGR', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC', '码牌管理', 'qrcode', '/qrc', 'QrCodeCardPage', 'ML', 0, 1,  'ENT_QRC', '10', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC', '码牌管理', 'qrcode', '/qrc', 'QrCodePage', 'ML', 0, 1,  'ENT_QRC', '20', 'MGR', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
  	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
  	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());

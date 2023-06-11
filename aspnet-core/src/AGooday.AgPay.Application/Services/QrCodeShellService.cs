@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Application.Services
             return _qrCodeShellRepository.SaveChanges(out int _);
         }
 
-        public bool Remove(string recordId)
+        public bool Remove(int recordId)
         {
             _qrCodeShellRepository.Remove(recordId);
             return _qrCodeShellRepository.SaveChanges(out int _);
@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Application.Services
             return _qrCodeShellRepository.SaveChanges(out int _);
         }
 
-        public QrCodeShellDto GetById(string recordId)
+        public QrCodeShellDto GetById(int recordId)
         {
             var entity = _qrCodeShellRepository.GetById(recordId);
             var dto = _mapper.Map<QrCodeShellDto>(entity);

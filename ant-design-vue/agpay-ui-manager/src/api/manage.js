@@ -126,6 +126,11 @@ export const API_URL_MCH_CONFIG = 'api/mchConfig'
 /** 转账订单管理 **/
 export const API_URL_TRANSFER_ORDER_LIST = '/api/transferOrders'
 
+/** 码牌模板管理 **/
+export const API_URL_QRC_SHELL_LIST = '/api/qrc/shell'
+/** 码牌管理 **/
+export const API_URL_QRC_LIST = '/api/qrc'
+
 /** 上传图片/文件地址 **/
 export const upload = {
   avatar: request.baseUrl + '/api/ossFiles/avatar',

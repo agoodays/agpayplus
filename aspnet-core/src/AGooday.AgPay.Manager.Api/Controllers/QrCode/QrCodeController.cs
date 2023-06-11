@@ -16,9 +16,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         private readonly ILogger<QrCodeController> _logger;
         private readonly IQrCodeService _qrCodeService;
 
-        public QrCodeController(ILogger<QrCodeController> logger)
+        public QrCodeController(ILogger<QrCodeController> logger, IQrCodeService qrCodeService)
         {
             _logger = logger;
+            _qrCodeService = qrCodeService;
         }
 
         /// <summary>

@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除码牌模板")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_DEL)]
-        public ApiRes Delete(string recordId)
+        public ApiRes Delete(int recordId)
         {
             bool result = _qrCodeShellService.Remove(recordId);
             if (!result)
@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_VIEW, PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
-        public ApiRes Detail(string recordId)
+        public ApiRes Detail(int recordId)
         {
             var qrCodeShell = _qrCodeShellService.GetById(recordId);
             if (qrCodeShell == null)
@@ -109,6 +109,25 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             return ApiRes.Ok(qrCodeShell);
+        }
+
+        [HttpGet, AllowAnonymous, Route("view")]
+        public IActionResult View(QrCodeShellDto dto)
+        {
+            var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay.png");
+
+            var payTypes = new List<QrCodePayType>() {
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "unionpay.png"), Alias = "银联", Name="unionpay"  },
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), Alias = "云闪付", Name="ysfpay" },
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "wxpay.png"), Alias = "微信", Name="wxpay"  },
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
+            };
+
+            var bitmap = DrawQrCode.GenerateStyleAImage(title: "", logoPath: logoPath, icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")), payTypes: payTypes);
+            var ms = new MemoryStream();
+            bitmap.Save(ms, ImageFormat.Png);
+            bitmap.Dispose();
+            return File(ms.GetBuffer(), "image/png");
         }
 
         [HttpGet, AllowAnonymous, Route("nostyle.png")]
