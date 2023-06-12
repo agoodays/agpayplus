@@ -1,4 +1,7 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using AGooday.AgPay.Common.Models;
+using Newtonsoft.Json.Linq;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 码牌模板信息表
@@ -23,7 +26,7 @@
         /// <summary>
         /// 模板配置信息,json字符串
         /// </summary>
-        public string ConfigInfo { get; set; }
+        public JObject ConfigInfo { get; set; }
 
         /// <summary>
         /// 状态: 0-停用, 1-正常
@@ -54,5 +57,15 @@
         /// 更新时间
         /// </summary>
         public DateTime UpdatedAt { get; set; }
+    }
+
+    public class QrCodeConfigInfo
+    {
+        public List<QrCodePayType> PayTypeList { get; set; }
+        public bool ShowIdFlag { get; set; }
+        public string CustomBgColor { get; set; }
+        public string BgColor { get; set; }
+        public string QrInnerImgUrl { get; set; }
+        public string LogoImgUrl { get; set; }
     }
 }

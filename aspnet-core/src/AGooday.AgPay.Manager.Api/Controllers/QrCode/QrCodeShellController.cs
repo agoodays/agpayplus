@@ -1,12 +1,14 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -111,23 +113,34 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             return ApiRes.Ok(qrCodeShell);
         }
 
-        [HttpGet, AllowAnonymous, Route("view")]
-        public IActionResult View(QrCodeShellDto dto)
+        [HttpPost, AllowAnonymous, Route("view")]
+        public ApiRes View(QrCodeShellDto dto)
         {
+            var configInfo = JsonConvert.DeserializeObject<QrCodeConfigInfo>(dto.ConfigInfo.ToString());
             var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay.png");
 
-            var payTypes = new List<QrCodePayType>() {
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "unionpay.png"), Alias = "银联", Name="unionpay"  },
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), Alias = "云闪付", Name="ysfpay" },
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "wxpay.png"), Alias = "微信", Name="wxpay"  },
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
-            };
-
-            var bitmap = DrawQrCode.GenerateStyleAImage(title: "", logoPath: logoPath, icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")), payTypes: payTypes);
-            var ms = new MemoryStream();
-            bitmap.Save(ms, ImageFormat.Png);
-            bitmap.Dispose();
-            return File(ms.GetBuffer(), "image/png");
+            var backgroundColor = configInfo.BgColor == "custom" ? configInfo.CustomBgColor : configInfo.BgColor;
+            foreach (var item in configInfo.PayTypeList)
+            {
+                item.ImgUrl = string.IsNullOrWhiteSpace(item.ImgUrl) ? Path.Combine(_env.WebRootPath, "images", $"{item.Name}.png") : item.ImgUrl;
+            }
+            string text = configInfo.ShowIdFlag ? "No.220101000001" : string.Empty;
+            var icon = new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png"));
+            Bitmap bitmap = null;
+            switch (dto.StyleCode)
+            {
+                case CS.STYLE_CODE.A:
+                    bitmap = DrawQrCode.GenerateStyleAImage(backgroundColor: backgroundColor, title: "", logoPath: logoPath, icon: icon, text: text, payTypes: configInfo.PayTypeList);
+                    break;
+                case CS.STYLE_CODE.B:
+                    logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay_blue.png");
+                    bitmap = DrawQrCode.GenerateStyleBImage(backgroundColor: backgroundColor, title: "", logoPath: logoPath, icon: icon, text: text, payTypes: configInfo.PayTypeList);
+                    break;
+                default:
+                    break;
+            }
+            var imageBase64Data = bitmap == null ? "" : $"data:image/png;base64,{DrawQrCode.BitmapToBase64Str(bitmap)}";
+            return ApiRes.Ok(imageBase64Data);
         }
 
         [HttpGet, AllowAnonymous, Route("nostyle.png")]

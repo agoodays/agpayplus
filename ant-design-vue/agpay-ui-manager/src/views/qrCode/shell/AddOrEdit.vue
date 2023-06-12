@@ -10,18 +10,23 @@
     class="drawer-width">
     <a-row>
       <a-col span="14">
-        <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 6}" :wrapper-col="{span: 15}" :rules="rules">
+        <a-form-model
+          ref="infoFormModel"
+          :model="saveObject"
+          :label-col="{span: 6}"
+          :wrapper-col="{span: 15}"
+          :rules="rules">
           <a-form-model-item label="模板别名：" prop="shellAlias">
             <a-input v-model="saveObject.shellAlias"/>
           </a-form-model-item>
           <a-form-model-item label="选择渲染模板：" prop="styleCode">
-            <a-radio-group v-model="saveObject.styleCode" size="small" button-style="solid">
+            <a-radio-group v-model="saveObject.styleCode" size="small" button-style="solid" @change="onChange">
               <a-radio-button value="shellA">模板A</a-radio-button>
               <a-radio-button value="shellB">模板B</a-radio-button>
             </a-radio-group>
           </a-form-model-item>
           <a-form-model-item label="显示ID：" prop="showIdFlag">
-            <a-radio-group v-model="saveObject.configInfo.showIdFlag" size="small" button-style="solid">
+            <a-radio-group v-model="saveObject.configInfo.showIdFlag" size="small" button-style="solid" @change="onChange">
               <a-radio-button :value="true">显示</a-radio-button>
               <a-radio-button :value="false">隐藏</a-radio-button>
             </a-radio-group>
@@ -30,12 +35,12 @@
             <a-radio-group :options="payTypeOptions" v-for="item in saveObject.configInfo.payTypeList" :key="item.Key" v-model="item.name" />
           </a-form-model-item>
           <a-form-model-item label="背景颜色：" prop="bgColor">
-            <a-radio-group v-model="saveObject.bgColor">
+            <a-radio-group v-model="saveObject.configInfo.bgColor" @change="onChange">
               <a-radio :value="'#1a53ff'" style="color: #1a53ff">蓝色</a-radio>
               <a-radio :value="'#ff0000'" style="color: #ff0000">红色</a-radio>
               <a-radio :value="'#09bb07'" style="color: #09bb07">绿色</a-radio>
-              <a-radio :value="'custom'" :style="{ color:saveObject.customBgColor }">
-                自定义 <colorPicker v-if="saveObject.bgColor === 'custom'" v-model="saveObject.customBgColor" style="margin-top: 12px;"/>
+              <a-radio :value="'custom'" :style="{ color:saveObject.configInfo.customBgColor }">
+                自定义 <colorPicker v-if="saveObject.configInfo.bgColor === 'custom'" v-model="saveObject.configInfo.customBgColor" style="margin-top: 12px;" @change="onChange"/>
               </a-radio>
             </a-radio-group>
           </a-form-model-item>
@@ -51,6 +56,7 @@
                 <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
               </template>
             </AgUpload>
+            <span class="agpay-tip-text">(显示在顶部， 透明图片， 建议尺寸： 924 X 282)</span>
           </a-form-model-item>
           <a-form-model-item label="二维码上的logo：" prop="qrInnerImgUrl">
             <AgUpload
@@ -64,13 +70,16 @@
                 <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
               </template>
             </AgUpload>
+            <div class="agpay-tip-text">
+              <span>(建议尺寸： 80 X 80)</span>
+            </div>
           </a-form-model-item>
         </a-form-model>
       </a-col>
       <a-col span="10">
         <div style="display: flex; justify-content: center;">
           <div>
-            <img src="https://localhost:9817/api/qrc/shell/stylea.png" style="max-width: 400px; border: 1px solid darkgrey;">
+            <img :src="saveObject.shellImgViewUrl" style="max-width: 400px; border: 1px solid darkgrey;">
           </div>
         </div>
       </a-col>
@@ -90,7 +99,7 @@ import AgUpload from '@/components/AgUpload/AgUpload'
 import { API_URL_QRC_SHELL_LIST, req, upload } from '@/api/manage'
 
 const payTypeOptions = [
-  { value: 'wechat', label: '微信' },
+  { value: 'wxpay', label: '微信' },
   { value: 'alipay', label: '支付宝' },
   { value: 'ysfpay', label: '云闪付' },
   { value: 'unionpay', label: '银联' },
@@ -115,11 +124,12 @@ export default {
         configInfo: {
           showIdFlag: true,
           payTypeList: [
-            { imgUrl: '', name: 'wechat', alias: '微信' },
+            { imgUrl: '', name: 'wxpay', alias: '微信' },
             { imgUrl: '', name: 'alipay', alias: '支付宝' },
             { imgUrl: '', name: 'ysfpay', alias: '云闪付' },
             { imgUrl: '', name: 'unionpay', alias: '银联' }
-          ]
+          ],
+          bgColor: '#1a53ff'
         }
       }, // 数据对象
       recordId: null, // 更新对象ID
@@ -141,11 +151,12 @@ export default {
         configInfo: {
           showIdFlag: true,
           payTypeList: [
-            { imgUrl: '', name: 'wechat', alias: '微信' },
+            { imgUrl: '', name: 'wxpay', alias: '微信' },
             { imgUrl: '', name: 'alipay', alias: '支付宝' },
             { imgUrl: '', name: 'ysfpay', alias: '云闪付' },
             { imgUrl: '', name: 'unionpay', alias: '银联' }
-          ]
+          ],
+          bgColor: '#1a53ff'
         }
       } // 数据初始化
       if (this.$refs.infoFormModel !== undefined) {
@@ -158,11 +169,20 @@ export default {
         req.getById(API_URL_QRC_SHELL_LIST, recordId).then(res => { that.saveObject = res })
         this.visible = true
       } else {
+        that.onChange()
         that.visible = true // 立马展示弹层信息
       }
     },
     onClose () {
       this.visible = false
+    },
+    onChange () {
+      const that = this
+      console.log(that.saveObject)
+      req.post(API_URL_QRC_SHELL_LIST + '/view', that.saveObject).then(res => {
+        that.saveObject.shellImgViewUrl = res
+        that.$forceUpdate()
+      })
     },
     // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
     uploadSuccess (name, fileList) {
@@ -196,6 +216,27 @@ export default {
 </script>
 
 <style lang="less">
+  .agpay-tip-text:before {
+    content: "";
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-bottom-color: #ffeed8;
+    position: absolute;
+    top: -20px;
+    left: 30px;
+  }
+  .agpay-tip-text {
+    font-size: 10px !important;
+    border-radius: 5px;
+    background: #ffeed8;
+    color: #c57000 !important;
+    padding: 5px 10px;
+    display: inline-block;
+    max-width: 100%;
+    position: relative;
+    margin-top: 15px;
+  }
   .ag-upload-btn {
     height: 66px;
   }

@@ -2,6 +2,7 @@
 using QRCoder;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 
 namespace AGooday.AgPay.Common.Utils
 {
@@ -212,11 +213,14 @@ namespace AGooday.AgPay.Common.Utils
             SolidBrush brush = new SolidBrush(color);
             graphics.FillPath(brush, bottomPath);
 
-            // 在画布上绘制文字
-            SizeF textSize = graphics.MeasureString(text, new Font("Arial", 36));
-            int textLeft = (int)((bottomPath.GetBounds().Width - textSize.Width) / 2 + bottomPath.GetBounds().X);
-            int textTop = (int)(bottomPath.GetBounds().Bottom + (middleRectangle.Width - bottomPath.GetBounds().Bottom - textSize.Height) / 2);
-            graphics.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                // 在画布上绘制文字
+                SizeF textSize = graphics.MeasureString(text, new Font("Arial", 36));
+                int textLeft = (int)((bottomPath.GetBounds().Width - textSize.Width) / 2 + bottomPath.GetBounds().X);
+                int textTop = (int)(bottomPath.GetBounds().Bottom + (middleRectangle.Width - bottomPath.GetBounds().Bottom - textSize.Height) / 2);
+                graphics.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
+            }
 
             int payLogoWidth = (int)(width * 0.1);
             int payLogoHeight = (int)(width * 0.1);
@@ -293,11 +297,14 @@ namespace AGooday.AgPay.Common.Utils
                 graphics.DrawMainLogo(logoPath, width, qrTop - topMargin + cornerRadius, topMargin);
             }
 
-            // 在画布上绘制文字
-            SizeF textSize = graphics.MeasureString(text, new Font("Arial", 36));
-            int textLeft = (int)((bottomRect.Width - textSize.Width) / 2 + bottomRect.X);
-            int textTop = (int)(topRect.Bottom - diameter);
-            graphics.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                // 在画布上绘制文字
+                SizeF textSize = graphics.MeasureString(text, new Font("Arial", 36));
+                int textLeft = (int)((bottomRect.Width - textSize.Width) / 2 + bottomRect.X);
+                int textTop = (int)(topRect.Bottom - diameter);
+                graphics.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
+            }
 
             int payLogoWidth = (int)(width * 0.1);
             int payLogoHeight = (int)(width * 0.1);
@@ -323,6 +330,16 @@ namespace AGooday.AgPay.Common.Utils
             // 将图像保存到文件
             //image.Save(outputPath, ImageFormat.Png);
             return image;
+        }
+
+        public static string BitmapToBase64Str(Bitmap bitmap)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                bitmap.Save(memoryStream, ImageFormat.Jpeg);
+                byte[] bytes = memoryStream.ToArray();
+                return Convert.ToBase64String(memoryStream.ToArray());
+            }
         }
 
         private static void DrawTitleText(this Graphics graphics, string title, Brush brush, int width, int height, int topMargin = 0)

@@ -29,6 +29,11 @@ export const req = {
     return request.request({ url: url + '/export/' + bizType, method: 'GET', params: params, responseType: 'blob' }, true, true, false)
   },
 
+  // 通用Post接口
+  post: (url, data) => {
+    return request.request({ url: url, method: 'POST', data: data }, true, true, false)
+  },
+
   // 通用新增接口
   add: (url, data) => {
     return request.request({ url: url, method: 'POST', data: data }, true, true, false)
