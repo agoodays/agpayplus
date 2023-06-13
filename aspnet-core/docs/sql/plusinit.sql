@@ -287,6 +287,39 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE', '设备配置', 'appstore', 
  	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
  	    INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE_QRC_EXPORT', '按钮：导出', 'no-icon', '', '', 'PB', 0, 1, 'ENT_DEVICE_QRC', '0', 'MGR', NOW(), NOW());
 
+-- 供应商定义表
+DROP TABLE IF EXISTS t_provider_define;
+CREATE TABLE `t_provider_define` (
+          `provider_code` VARCHAR(20) NOT NULL COMMENT '供应商代码 全小写 zgwl',
+          `provider_name` VARCHAR(20) NOT NULL COMMENT '供应商名称',
+--           `provider_type` TINYINT(6) NOT NULL COMMENT '供应商类型:1-云音响 2-云打印',
+          `config_page_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '支付参数配置页面类型:1-JSON渲染,2-自定义',
+          `provider_params` VARCHAR(4096) DEFAULT NULL COMMENT '供应商配置定义描述,json字符串',
+          `device_types` JSON NOT NULL COMMENT '支持设备类型 [1, 2]',
+          `icon` VARCHAR(256) DEFAULT NULL COMMENT '页面展示：卡片-图标',
+          `bg_color` VARCHAR(20) DEFAULT NULL COMMENT '页面展示：卡片-背景色',
+          `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
+          `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
+          `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+          `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+          PRIMARY KEY (`provider_code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='供应商定义表';
+
+-- 设备配置参数表
+DROP TABLE IF EXISTS t_device_config;
+CREATE TABLE `t_device_config` (
+          `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+          `device_type` TINYINT(6) NOT NULL COMMENT '设备类型:1-云音响 2-云打印',
+          `provider_code` VARCHAR(20) NOT NULL COMMENT '供应商代码',
+          `provider_params` VARCHAR(4096) NOT NULL COMMENT '接口配置参数,json字符串',
+          `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
+          `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
+          `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+          `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `Uni_DeviceType_Provider` (`device_type`, `provider`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='设备配置参数表';
+
 ALTER TABLE `t_mch_info`   
   ADD COLUMN `mch_level` VARCHAR(8) DEFAULT 'M0' NOT NULL COMMENT '商户级别: M0商户-简单模式（页面简洁，仅基础收款功能）, M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）' AFTER `type`,
   ADD COLUMN `refund_mode` JSON NULL COMMENT '退款方式[\"plat\", \"api\"],平台退款、接口退款，平台退款方式必须包含接口退款。' AFTER `mch_level`,
