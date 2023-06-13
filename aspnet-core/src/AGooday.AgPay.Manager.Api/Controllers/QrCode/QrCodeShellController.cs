@@ -54,6 +54,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_ADD)]
         public ApiRes Add(QrCodeShellDto dto)
         {
+            dto.State = CS.YES;
+            dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
+            dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             bool result = _qrCodeShellService.Add(dto);
             if (!result)
             {
@@ -117,24 +120,23 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         public ApiRes View(QrCodeShellDto dto)
         {
             var configInfo = JsonConvert.DeserializeObject<QrCodeConfigInfo>(dto.ConfigInfo.ToString());
-            var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay.png");
+            var logoPath = configInfo.LogoImgUrl;
 
             var backgroundColor = configInfo.BgColor == "custom" ? configInfo.CustomBgColor : configInfo.BgColor;
             foreach (var item in configInfo.PayTypeList)
             {
-                item.ImgUrl = string.IsNullOrWhiteSpace(item.ImgUrl) ? Path.Combine(_env.WebRootPath, "images", $"{item.Name}.png") : item.ImgUrl;
+                item.ImgUrl = string.IsNullOrWhiteSpace(item.ImgUrl) && item.Name != "custom" ? Path.Combine(_env.WebRootPath, "images", $"{item.Name}.png") : item.ImgUrl;
             }
             string text = configInfo.ShowIdFlag ? "No.220101000001" : string.Empty;
-            var icon = new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png"));
+            var iconPath = configInfo.QrInnerImgUrl;
             Bitmap bitmap = null;
             switch (dto.StyleCode)
             {
                 case CS.STYLE_CODE.A:
-                    bitmap = DrawQrCode.GenerateStyleAImage(backgroundColor: backgroundColor, title: "", logoPath: logoPath, icon: icon, text: text, payTypes: configInfo.PayTypeList);
+                    bitmap = DrawQrCode.GenerateStyleAImage(backgroundColor: backgroundColor, title: "", logoPath: logoPath, iconPath: iconPath, text: text, payTypes: configInfo.PayTypeList);
                     break;
                 case CS.STYLE_CODE.B:
-                    logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay_blue.png");
-                    bitmap = DrawQrCode.GenerateStyleBImage(backgroundColor: backgroundColor, title: "", logoPath: logoPath, icon: icon, text: text, payTypes: configInfo.PayTypeList);
+                    bitmap = DrawQrCode.GenerateStyleBImage(backgroundColor: backgroundColor, title: "", logoPath: logoPath, iconPath: iconPath, text: text, payTypes: configInfo.PayTypeList);
                     break;
                 default:
                     break;
@@ -168,7 +170,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                 new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
             };
 
-            var bitmap = DrawQrCode.GenerateStyleAImage(title: "", logoPath: logoPath, icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")), payTypes: payTypes);
+            var bitmap = DrawQrCode.GenerateStyleAImage(title: "", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
             var ms = new MemoryStream();
             bitmap.Save(ms, ImageFormat.Png);
             bitmap.Dispose();
@@ -187,7 +189,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                 new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
             };
 
-            var bitmap = DrawQrCode.GenerateStyleBImage(title: "", logoPath: logoPath, icon: new Bitmap(Path.Combine(_env.WebRootPath, "images", "avatar.png")), payTypes: payTypes);
+            var bitmap = DrawQrCode.GenerateStyleBImage(title: "", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
             var ms = new MemoryStream();
             bitmap.Save(ms, ImageFormat.Png);
             bitmap.Dispose();

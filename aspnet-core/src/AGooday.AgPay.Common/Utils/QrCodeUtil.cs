@@ -154,7 +154,7 @@ namespace AGooday.AgPay.Common.Utils
 
     public static class DrawQrCode
     {
-        public static Bitmap GenerateStyleAImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", Bitmap icon = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
+        public static Bitmap GenerateStyleAImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", string iconPath = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
         {
             int leftMargin = (int)(width * 0.1);
             int topMargin = (int)(width * 0.3);
@@ -190,7 +190,12 @@ namespace AGooday.AgPay.Common.Utils
             //graphics.DrawRoundedRectangle(Pens.White, middleRectangle, cornerRadius);
 
             // 在画布上绘制二维码
-            Bitmap qrCode = QrCodeBuilder.Generate(icon: icon);
+            Bitmap icon = null;
+            if (iconPath != null)
+            {
+                icon= new Bitmap(GetImageAsync(iconPath).Result);
+            }
+            Bitmap qrCode = QrCodeBuilder.Generate(content, icon);
             // 计算二维码位置和大小
             int qrSize = width - (leftMargin * 2) - cornerRadius;
             int qrLeft = (width - qrSize) / 2;
@@ -222,6 +227,7 @@ namespace AGooday.AgPay.Common.Utils
                 graphics.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
             }
 
+            payTypes = payTypes.Where(w => !string.IsNullOrWhiteSpace(w.ImgUrl)).ToList();
             int payLogoWidth = (int)(width * 0.1);
             int payLogoHeight = (int)(width * 0.1);
             int payTypeCount = payTypes.Count;
@@ -230,7 +236,7 @@ namespace AGooday.AgPay.Common.Utils
             foreach (var item in payTypes)
             {
                 string payLogoPath = item.ImgUrl;
-                Image payLogo = Image.FromFile(payLogoPath);
+                Image payLogo = GetImageAsync(payLogoPath).Result;
 
                 int payLogoLeft = (leftMargin + padding) + (payLogoWidth + padding) * index;
 
@@ -248,7 +254,7 @@ namespace AGooday.AgPay.Common.Utils
             return image;
         }
 
-        public static Bitmap GenerateStyleBImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", Bitmap icon = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
+        public static Bitmap GenerateStyleBImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", string iconPath = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
         {
             int leftMargin = (int)(width * 0.1);
             int topMargin = (int)(width * 0.1);
@@ -276,6 +282,11 @@ namespace AGooday.AgPay.Common.Utils
             graphics.FillRoundedRectangle(brush, bottomRect, cornerRadius);
 
             // 在画布上绘制二维码
+            Bitmap icon = null;
+            if (iconPath != null)
+            {
+                icon = new Bitmap(GetImageAsync(iconPath).Result);
+            }
             Bitmap qrCode = QrCodeBuilder.Generate(content, icon);
             // 计算二维码位置和大小
             int qrSize = width - (leftMargin * 2) - cornerRadius;
@@ -306,6 +317,7 @@ namespace AGooday.AgPay.Common.Utils
                 graphics.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
             }
 
+            payTypes = payTypes.Where(w => !string.IsNullOrWhiteSpace(w.ImgUrl)).ToList();
             int payLogoWidth = (int)(width * 0.1);
             int payLogoHeight = (int)(width * 0.1);
             int payTypeCount = payTypes.Count;
@@ -314,7 +326,7 @@ namespace AGooday.AgPay.Common.Utils
             foreach (var item in payTypes)
             {
                 string payLogoPath = item.ImgUrl;
-                Image payLogo = Image.FromFile(payLogoPath);
+                Image payLogo = GetImageAsync(payLogoPath).Result;
 
                 int payLogoLeft = (leftMargin + padding) + (payLogoWidth + padding) * index;
 
@@ -354,7 +366,7 @@ namespace AGooday.AgPay.Common.Utils
         private static void DrawMainLogo(this Graphics graphics, string logoPath, int width, int height, int topMargin = 0)
         {
             // 加载logo图片
-            Image logo = Image.FromFile(logoPath);
+            Image logo = GetImageAsync(logoPath).Result;
             // 计算logo的位置和大小
             int logoWidth = logo.Width > (width - (width * 0.1)) ? (int)(width - (width * 0.1)) : logo.Width;
             int logoHeight = logo.Height > height ? height : logo.Height;
@@ -362,6 +374,36 @@ namespace AGooday.AgPay.Common.Utils
             int logoTop = topMargin + (height - logoHeight) / 2;
             // 在画布上绘制logo
             graphics.DrawImage(logo, logoLeft, logoTop, logoWidth, logoHeight);
+        }
+
+        private static async Task<Image> GetImageAsync(string path)
+        {
+            Uri uriResult;
+            bool isUrl = Uri.TryCreate(path, UriKind.Absolute, out uriResult)
+                         && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+            Image img;
+
+            if (isUrl)
+            {
+                // logoPath 是一个 URL 地址
+                // 可以使用 HttpClient 对象来获取图像流
+                using (HttpClient client = new HttpClient())
+                using (HttpResponseMessage response = await client.GetAsync(path))
+                using (Stream stream = await response.Content.ReadAsStreamAsync())
+                {
+                    img = Image.FromStream(stream);
+                }
+            }
+            else
+            {
+                // logoPath 不是一个 URL 地址
+                // 可以使用 Image.FromFile 方法从磁盘上的文件加载图像
+                img = Image.FromFile(path);
+            }
+
+            // 在这里使用图像对象 logo
+            return img;
         }
 
         private static void FillRoundedRectangle(this Graphics graphics, Brush brush, Rectangle rectangle, int cornerRadius)

@@ -13,8 +13,8 @@
         <a-form-model
           ref="infoFormModel"
           :model="saveObject"
-          :label-col="{span: 6}"
-          :wrapper-col="{span: 15}"
+          :label-col="{span: 4}"
+          :wrapper-col="{span: 18}"
           :rules="rules">
           <a-form-model-item label="模板别名：" prop="shellAlias">
             <a-input v-model="saveObject.shellAlias"/>
@@ -32,7 +32,33 @@
             </a-radio-group>
           </a-form-model-item>
           <a-form-model-item label="支付方式：" prop="payType">
-            <a-radio-group :options="payTypeOptions" v-for="item in saveObject.configInfo.payTypeList" :key="item.Key" v-model="item.name" />
+            <a-row v-for="(item, index) in saveObject.configInfo.payTypeList" :key="index" >
+              <a-col>
+                <a-radio-group :options="payTypeOptions" v-model="item.name" @change="onPayTypeChange($event, index)"/>
+                <span><lable>名称：</lable><a-input size="small" v-model="item.alias" style="width: 60px" @change="onChange"/></span>
+                <a-button size="small" @click="removePayTypeItem(index)">删除</a-button>
+                <a-button size="small" @click="addPayTypeItem" v-if="saveObject.configInfo.payTypeList.length<=4 && index === saveObject.configInfo.payTypeList.length-1">新增</a-button>
+                <div v-if="item.name==='custom'">
+                  <AgUpload
+                    :action="action"
+                    accept=".jpg, .jpeg, .png"
+                    :bind-name="`${index},imgUrl`"
+                    :urls="[item.imgUrl]"
+                    @uploadSuccess="payTypeImgUploadSuccess"
+                  >
+                    <template slot="uploadSlot" slot-scope="{loading}">
+                      <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+                    </template>
+                  </AgUpload>
+                  <div class="agpay-tip-text">
+                    <span>(建议尺寸： 120 X 120)</span>
+                  </div>
+                </div>
+              </a-col>
+            </a-row>
+            <a-row v-if="saveObject.configInfo.payTypeList.length<=0">
+              <a-button size="small" @click="addPayTypeItem">新增</a-button>
+            </a-row>
           </a-form-model-item>
           <a-form-model-item label="背景颜色：" prop="bgColor">
             <a-radio-group v-model="saveObject.configInfo.bgColor" @change="onChange">
@@ -71,7 +97,7 @@
               </template>
             </AgUpload>
             <div class="agpay-tip-text">
-              <span>(建议尺寸： 80 X 80)</span>
+              <span>(建议尺寸： 100 X 100)</span>
             </div>
           </a-form-model-item>
         </a-form-model>
@@ -166,28 +192,64 @@ export default {
       const that = this
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.recordId = recordId
-        req.getById(API_URL_QRC_SHELL_LIST, recordId).then(res => { that.saveObject = res })
+        req.getById(API_URL_QRC_SHELL_LIST, recordId).then(res => {
+          that.saveObject = res
+          that.onChange()
+        })
         this.visible = true
       } else {
-        that.onChange()
         that.visible = true // 立马展示弹层信息
+        that.onChange()
       }
     },
     onClose () {
       this.visible = false
     },
+    onPayTypeChange (e, index) {
+      const selectedOption = this.payTypeOptions.find(option => option.value === e.target.value)
+      if (selectedOption) {
+        this.saveObject.configInfo.payTypeList.forEach((item, i) => {
+          if (i === index) {
+            item.imgUrl = ''
+            item.name = selectedOption.value
+            item.alias = selectedOption.value === 'custom' ? '' : selectedOption.label
+          }
+        })
+      }
+      this.onChange()
+    },
     onChange () {
       const that = this
-      console.log(that.saveObject)
       req.post(API_URL_QRC_SHELL_LIST + '/view', that.saveObject).then(res => {
         that.saveObject.shellImgViewUrl = res
         that.$forceUpdate()
       })
     },
+    removePayTypeItem (index) {
+      this.saveObject.configInfo.payTypeList.splice(index, 1)
+      this.onChange()
+    },
+    addPayTypeItem () {
+      this.saveObject.configInfo.payTypeList.push({
+        imgUrl: '',
+        name: 'wxpay',
+        alias: '微信'
+      })
+      this.onChange()
+    },
     // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
     uploadSuccess (name, fileList) {
       const [firstItem] = fileList
       this.saveObject.configInfo[name] = firstItem?.url
+      this.onChange()
+      this.$forceUpdate()
+    },
+    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
+    payTypeImgUploadSuccess (name, fileList) {
+      const [firstItem] = fileList
+      const keyValue = name.split(',')
+      this.saveObject.configInfo.payTypeList[keyValue[0]][keyValue[1]] = firstItem?.url
+      this.onChange()
       this.$forceUpdate()
     },
     handleOkFunc: function () { // 点击【确认】按钮事件
