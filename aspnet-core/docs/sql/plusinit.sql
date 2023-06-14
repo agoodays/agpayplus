@@ -234,7 +234,7 @@ CREATE TABLE `t_qr_code_shell` (
   `shell_alias` VARCHAR(20) NOT NULL COMMENT '模板别名',
   `config_info` VARCHAR(4096) NOT NULL COMMENT '模板配置信息,json字符串',
   `shell_img_view_url` VARCHAR(255) COMMENT '模板预览图Url',
-  `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
+--   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
   `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
   `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
@@ -252,13 +252,14 @@ CREATE TABLE `t_qr_code` (
   `fixed_flag` TINYINT NOT NULL COMMENT '是否固定金额: 0-任意金额, 1-固定金额', 
   `fixed_pay_amount` INT NOT NULL DEFAULT '0' COMMENT '固定金额',
   `entry_page` VARCHAR(20) NOT NULL COMMENT '选择页面类型: default-默认(未指定，取决于二维码是否绑定到微信侧), h5-固定H5页面, lite-固定小程序页面', 
-  `alipay_way_code` VARCHAR(20) NOT NULL COMMENT '支付宝支付方式(仅H5呈现时生效)', 
+  `alipay_way_code` VARCHAR(20) NOT NULL COMMENT '支付宝支付方式(仅H5呈现时生效): ALI_JSAPI ALI_WAP', 
   `qrc_alias` VARCHAR(20) COMMENT '码牌别名',
   `bind_state` TINYINT NOT NULL COMMENT '码牌绑定状态: 0-未绑定, 1-已绑定',  
-  `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
+  `agent_no` VARCHAR(64) NULL COMMENT '代理商号',
+  `mch_no` VARCHAR(64) NULL COMMENT '商户号',
   -- `mch_name` VARCHAR(30) NOT NULL COMMENT '商户名称',
-  `app_id` VARCHAR(64) NOT NULL COMMENT '应用ID',
-  `store_id` BIGINT NOT NULL COMMENT '门店ID',
+  `app_id` VARCHAR(64) NULL COMMENT '应用ID',
+  `store_id` BIGINT NULL COMMENT '门店ID',
   `qr_url` VARCHAR(255) NOT NULL COMMENT '二维码Url', 
   -- `qrc_state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用', 
   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
@@ -319,6 +320,36 @@ CREATE TABLE `t_device_config` (
           PRIMARY KEY (`id`),
           UNIQUE KEY `Uni_DeviceType_Provider` (`device_type`, `provider`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='设备配置参数表';
+
+INSERT INTO t_provider_define (provider_code, provider_name, config_page_type, provider_params, isvsub_mch_params, device_types, icon, bg_color, state, remark)
+VALUES ('zgwl', '智谷联', 1,
+        '[{"name":"accessKeyId","desc":"AccessKeyId","type":"text","verify":"required","star":"1"},{"name":"accessKeySecret","desc":"AccessKeySecret","type":"text","verify":"required","star":"1"},{"name":"instanceId","desc":"实例ID","type":"text","verify":"required"},{"name":"endPoint","desc":"公网接入点","type":"text","verify":"required"},{"name":"topic","desc":"Topic","type":"text","verify":"required"},{"name":"groupId","desc":"GroupId","type":"text","verify":"required"}]',
+        '[1, 2]'
+        'http://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/alipay.png', '#1779FF', 1, '智谷联');
+
+-- 设备信息表
+DROP TABLE IF EXISTS t_device_info;
+CREATE TABLE `t_device_config` (
+	  `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+          `device_no` VARCHAR(64) NOT NULL COMMENT '设备号',
+          `device_name` VARCHAR(64) NOT NULL COMMENT '设备名称',
+          `device_config_id` BIGINT(20) NOT NULL COMMENT '设备配置参数ID',
+	  `batch_id` VARCHAR(64) NULL COMMENT '批次号',
+	  `bind_state` TINYINT NOT NULL COMMENT '绑定状态: 0-未绑定, 1-已绑定',
+	  `bind_type` TINYINT NOT NULL COMMENT '绑定类型: 0-门店, 1-码牌', 
+	  `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
+	  `app_id` VARCHAR(64) NOT NULL COMMENT '应用ID',
+	  `store_id` BIGINT NOT NULL COMMENT '门店ID',
+	  `bind_qrc_id` BIGINT NOT NULL COMMENT '绑定码牌ID',
+          `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
+          `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
+	  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
+	  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
+          `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+          `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `Uni_DeviceNo` (`device_no`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='设备信息表';
 
 ALTER TABLE `t_mch_info`   
   ADD COLUMN `mch_level` VARCHAR(8) DEFAULT 'M0' NOT NULL COMMENT '商户级别: M0商户-简单模式（页面简洁，仅基础收款功能）, M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）' AFTER `type`,

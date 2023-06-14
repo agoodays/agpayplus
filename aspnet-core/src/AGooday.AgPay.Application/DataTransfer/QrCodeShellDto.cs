@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 码牌模板ID
         /// </summary>
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// 样式代码: shellA, shellB
@@ -27,11 +27,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 模板配置信息,json字符串
         /// </summary>
         public JObject ConfigInfo { get; set; }
-
-        /// <summary>
-        /// 状态: 0-停用, 1-正常
-        /// </summary>
-        public byte State { get; set; }
 
         /// <summary>
         /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心

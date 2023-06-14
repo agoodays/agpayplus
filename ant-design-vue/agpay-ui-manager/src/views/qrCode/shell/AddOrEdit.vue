@@ -14,7 +14,7 @@
           ref="infoFormModel"
           :model="saveObject"
           :label-col="{span: 4}"
-          :wrapper-col="{span: 18}"
+          :wrapper-col="{span: 20}"
           :rules="rules">
           <a-form-model-item label="模板别名：" prop="shellAlias">
             <a-input v-model="saveObject.shellAlias"/>

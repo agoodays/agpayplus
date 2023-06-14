@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Domain.Models
         /// </summary>
         [Comment("模板ID")]
         [Column("qrc_shell_id", TypeName = "int")]
-        public int QrcShellId { get; set; }
+        public long? QrcShellId { get; set; }
 
         /// <summary>
         /// 批次号
@@ -75,25 +75,32 @@ namespace AGooday.AgPay.Domain.Models
         public byte BindState { get; set; }
 
         /// <summary>
+        /// 代理商号
+        /// </summary>
+        [Comment("代理商号")]
+        [Column("agent_no", TypeName = "varchar(64)")]
+        public string AgentNo { get; set; }
+
+        /// <summary>
         /// 商户号
         /// </summary>
         [Comment("商户号")]
-        [Required, Column("mch_no", TypeName = "varchar(64)")]
+        [Column("mch_no", TypeName = "varchar(64)")]
         public string MchNo { get; set; }
 
         /// <summary>
         /// 应用ID
         /// </summary>
         [Comment("应用ID")]
-        [Required, Column("app_id", TypeName = "varchar(64)")]
+        [Column("app_id", TypeName = "varchar(64)")]
         public string AppId { get; set; }
 
         /// <summary>
         /// 门店ID
         /// </summary>
         [Comment("门店ID")]
-        [Required, Column("store_id", TypeName = "bigint")]
-        public long StoreId { get; set; }
+        [Column("store_id", TypeName = "bigint")]
+        public long? StoreId { get; set; }
 
         /// <summary>
         /// 二维码Url

@@ -7,5 +7,9 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// </summary>
     public class QrCodeShellQueryDto : PageQuery
     {
+        /// <summary>
+        /// 模板别名
+        /// </summary>
+        public string ShellAlias { get; set; }
     }
 }

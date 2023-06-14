@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Application.Services
             return _qrCodeShellRepository.SaveChanges(out int _);
         }
 
-        public bool Remove(int recordId)
+        public bool Remove(long recordId)
         {
             _qrCodeShellRepository.Remove(recordId);
             return _qrCodeShellRepository.SaveChanges(out int _);
@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Application.Services
             return _qrCodeShellRepository.SaveChanges(out int _);
         }
 
-        public QrCodeShellDto GetById(int recordId)
+        public QrCodeShellDto GetById(long recordId)
         {
             var entity = _qrCodeShellRepository.GetById(recordId);
             var dto = _mapper.Map<QrCodeShellDto>(entity);
@@ -68,7 +68,8 @@ namespace AGooday.AgPay.Application.Services
         public PaginatedList<T> GetPaginatedData<T>(QrCodeShellQueryDto dto)
         {
             var QrCodeShells = _qrCodeShellRepository.GetAll()
-                .OrderByDescending(o => o.CreatedAt);
+                .Where(w => (string.IsNullOrWhiteSpace(dto.ShellAlias) || w.ShellAlias.Contains(dto.ShellAlias))
+                ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<QrCodeShell>.Create<T>(QrCodeShells.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }

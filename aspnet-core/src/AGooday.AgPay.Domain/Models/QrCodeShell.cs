@@ -15,8 +15,8 @@ namespace AGooday.AgPay.Domain.Models
         /// 码牌模板ID
         /// </summary>
         [Comment("码牌模板ID")]
-        [Key, Required, Column("id", TypeName = "int")]
-        public int Id { get; set; }
+        [Key, Required, Column("id", TypeName = "bigint")]
+        public long Id { get; set; }
 
         /// <summary>
         /// 样式代码: shellA, shellB
@@ -38,13 +38,6 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("模板配置信息,json字符串")]
         [Required, Column("config_info", TypeName = "varchar(4096)")]
         public string ConfigInfo { get; set; }
-
-        /// <summary>
-        /// 状态: 0-停用, 1-启用
-        /// </summary>
-        [Comment("状态: 0-停用, 1-启用")]
-        [Required, Column("state", TypeName = "tinyint(6)")]
-        public byte State { get; set; }
 
         /// <summary>
         /// 所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心

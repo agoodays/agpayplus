@@ -30,6 +30,7 @@
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
+            <a v-if="$access('ENT_DEVICE_QRC_SHELL_VIEW')" @click="onPreview(record.id)">详情</a>
             <a v-if="$access('ENT_DEVICE_QRC_SHELL_EDIT')" @click="editFunc(record.id)">修改</a>
             <a style="color: red" v-if="$access('ENT_DEVICE_QRC_SHELL_DEL')" @click="delFunc(record.id)">删除</a>
           </AgTableColumns>
@@ -84,6 +85,18 @@ export default {
     searchFunc (isToFirst = false) { // 点击【查询】按钮点击事件
       this.btnLoading = true
       this.$refs.infoTable.refTable(isToFirst)
+    },
+
+    onPreview (recordId) {
+      const that = this
+      req.get(API_URL_QRC_SHELL_LIST + '/view/' + recordId).then(res => {
+        that.$viewerApi({
+          images: [res],
+          options: {
+            initialViewIndex: 0
+          }
+        })
+      })
     },
 
     addFunc: function () { // 业务通用【新增】 函数

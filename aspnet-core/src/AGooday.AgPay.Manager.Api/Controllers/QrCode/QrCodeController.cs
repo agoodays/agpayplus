@@ -1,11 +1,16 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Application.Services;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Drawing;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 {
@@ -13,13 +18,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
     [Route("api/qrc")]
     public class QrCodeController : ControllerBase
     {
+        private readonly IWebHostEnvironment _env;
         private readonly ILogger<QrCodeController> _logger;
         private readonly IQrCodeService _qrCodeService;
+        private readonly IQrCodeShellService _qrCodeShellService;
 
-        public QrCodeController(ILogger<QrCodeController> logger, IQrCodeService qrCodeService)
+        public QrCodeController(IWebHostEnvironment env, ILogger<QrCodeController> logger, IQrCodeService qrCodeService, IQrCodeShellService qrCodeShellService)
         {
+            _env = env;
             _logger = logger;
             _qrCodeService = qrCodeService;
+            _qrCodeShellService = qrCodeShellService;
         }
 
         /// <summary>
@@ -102,6 +111,52 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             return ApiRes.Ok(qrCode);
+        }
+
+        [HttpGet, Route("view/{recordId}")]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_VIEW, PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
+        public ApiRes View(string recordId)
+        {
+            var qrCode = _qrCodeService.GetById(recordId);
+            Bitmap bitmap = null;
+            if (qrCode.QrcShellId.HasValue)
+            {
+                var qrCodeShell = _qrCodeShellService.GetById(qrCode.QrcShellId.Value);
+                bitmap = GetBitmap(qrCodeShell, qrCode.QrUrl, qrCode.QrcId);
+            }
+            else
+            {
+                bitmap = QrCodeBuilder.Generate(qrCode.QrUrl);
+            }
+            var imageBase64Data = bitmap == null ? "" : $"data:image/png;base64,{DrawQrCode.BitmapToBase64Str(bitmap)}";
+            return ApiRes.Ok(imageBase64Data);
+        }
+
+        private Bitmap GetBitmap(QrCodeShellDto dto, string content, string text)
+        {
+            var configInfo = JsonConvert.DeserializeObject<QrCodeConfigInfo>(dto.ConfigInfo.ToString());
+            var logoPath = configInfo.LogoImgUrl;
+
+            var backgroundColor = configInfo.BgColor == "custom" ? configInfo.CustomBgColor : configInfo.BgColor;
+            foreach (var item in configInfo.PayTypeList)
+            {
+                item.ImgUrl = string.IsNullOrWhiteSpace(item.ImgUrl) && item.Name != "custom" ? Path.Combine(_env.WebRootPath, "images", $"{item.Name}.png") : item.ImgUrl;
+            }
+            text = configInfo.ShowIdFlag ? text : string.Empty;
+            var iconPath = configInfo.QrInnerImgUrl;
+            Bitmap bitmap = null;
+            switch (dto.StyleCode)
+            {
+                case CS.STYLE_CODE.A:
+                    bitmap = DrawQrCode.GenerateStyleAImage(backgroundColor: backgroundColor, title: "", content: content, logoPath: logoPath, iconPath: iconPath, text: text, payTypes: configInfo.PayTypeList);
+                    break;
+                case CS.STYLE_CODE.B:
+                    bitmap = DrawQrCode.GenerateStyleBImage(backgroundColor: backgroundColor, title: "", content: content, logoPath: logoPath, iconPath: iconPath, text: text, payTypes: configInfo.PayTypeList);
+                    break;
+                default:
+                    break;
+            }
+            return bitmap;
         }
     }
 }

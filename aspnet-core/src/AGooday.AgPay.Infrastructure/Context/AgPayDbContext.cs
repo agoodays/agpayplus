@@ -200,7 +200,6 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<QrCode>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<QrCode>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<QrCode>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-            modelBuilder.Entity<QrCodeShell>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<QrCodeShell>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<QrCodeShell>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<RefundOrder>().Property(c => c.Currency).HasDefaultValue("cny");

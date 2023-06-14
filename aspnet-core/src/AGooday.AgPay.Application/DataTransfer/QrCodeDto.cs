@@ -13,7 +13,7 @@
         /// <summary>
         /// 码牌模板ID
         /// </summary>
-        public int QrcShellId { get; set; }
+        public long? QrcShellId { get; set; }
 
         /// <summary>
         /// 批次号
@@ -51,6 +51,11 @@
         public byte BindState { get; set; }
 
         /// <summary>
+        /// 代理商号
+        /// </summary>
+        public string AgentNo { get; set; }
+
+        /// <summary>
         /// 商户号
         /// </summary>
         public string MchNo { get; set; }
@@ -63,7 +68,7 @@
         /// <summary>
         /// 门店ID
         /// </summary>
-        public long StoreId { get; set; }
+        public long? StoreId { get; set; }
 
         /// <summary>
         /// 二维码Url

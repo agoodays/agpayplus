@@ -54,7 +54,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_ADD)]
         public ApiRes Add(QrCodeShellDto dto)
         {
-            dto.State = CS.YES;
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             bool result = _qrCodeShellService.Add(dto);
@@ -72,7 +71,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除码牌模板")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_DEL)]
-        public ApiRes Delete(int recordId)
+        public ApiRes Delete(long recordId)
         {
             bool result = _qrCodeShellService.Remove(recordId);
             if (!result)
@@ -106,7 +105,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_VIEW, PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
-        public ApiRes Detail(int recordId)
+        public ApiRes Detail(long recordId)
         {
             var qrCodeShell = _qrCodeShellService.GetById(recordId);
             if (qrCodeShell == null)
@@ -116,7 +115,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             return ApiRes.Ok(qrCodeShell);
         }
 
-        [HttpPost, AllowAnonymous, Route("view")]
+        [HttpPost, Route("view")]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_VIEW, PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
         public ApiRes View(QrCodeShellDto dto)
         {
             var configInfo = JsonConvert.DeserializeObject<QrCodeConfigInfo>(dto.ConfigInfo.ToString());
@@ -143,6 +143,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             }
             var imageBase64Data = bitmap == null ? "" : $"data:image/png;base64,{DrawQrCode.BitmapToBase64Str(bitmap)}";
             return ApiRes.Ok(imageBase64Data);
+        }
+
+        [HttpGet, Route("view/{recordId}")]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_VIEW, PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
+        public ApiRes View(long recordId)
+        {
+            var qrCodeShell = _qrCodeShellService.GetById(recordId);
+            return View(qrCodeShell);
         }
 
         [HttpGet, AllowAnonymous, Route("nostyle.png")]
