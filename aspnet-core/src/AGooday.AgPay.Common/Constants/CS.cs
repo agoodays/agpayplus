@@ -325,6 +325,7 @@
             public const string YSFPAY = "ysfpay";   // 云闪付开放平台
             public const string XXPAY = "xxpay";     // 小新支付
             public const string PPPAY = "pppay";     // Paypal 支付
+            public const string SXFPAY = "sxfpay";     // Paypal 支付
         }
 
         /// <summary>
