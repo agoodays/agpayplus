@@ -12,7 +12,6 @@ using AGooday.AgPay.Payment.Api.Utils;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 {
@@ -66,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public JObject PackageParamAndReq(string apiUri, JObject reqData, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             SxfPayIsvParams isvParams = (SxfPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
@@ -77,23 +76,23 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             }
 
             SxfPayIsvSubMchParams isvsubMchParams = (SxfPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-            reqParams.Add("mno", isvsubMchParams.Mno); // 商户号
+            reqData.Add("mno", isvsubMchParams.Mno); // 商户号
 
-            var param = new JObject();
-            param.Add("orgId", isvParams.OrgId); //天阙平台机构编号
-            param.Add("reqId", Guid.NewGuid().ToString("N")); //合作方系统生成的唯一请求ID，最大长度32位
-            param.Add("reqData", reqParams); //每个接口的业务参数
-            param.Add("timestamp", DateTime.Now.ToString("yyyyMMddHHmmss")); //请求时间戳，格式：yyyyMMddHHmmss
-            param.Add("version", "1.0"); //接口版本号，默认值：1.0
-            param.Add("signType", "RSA"); //签名类型，默认值：RSA
+            var reqParams = new JObject();//reqData
+            reqParams.Add("orgId", isvParams.OrgId); //天阙平台机构编号
+            reqParams.Add("reqId", Guid.NewGuid().ToString("N")); //合作方系统生成的唯一请求ID，最大长度32位
+            reqParams.Add("reqData", reqData); //每个接口的业务参数
+            reqParams.Add("timestamp", DateTime.Now.ToString("yyyyMMddHHmmss")); //请求时间戳，格式：yyyyMMddHHmmss
+            reqParams.Add("version", "1.0"); //接口版本号，默认值：1.0
+            reqParams.Add("signType", "RSA"); //签名类型，默认值：RSA
 
             // 签名
             string privateKey = isvParams.PrivateKey;
-            param.Add("sign", SxfSignUtil.Sign(param, privateKey)); //RSA 签名字符串
+            reqParams.Add("sign", SxfSignUtil.Sign(reqParams, privateKey)); //RSA 签名字符串
 
             // 调起上游接口
-            log.Info($"{logPrefix} reqJSON={param}");
-            string resText = SxfHttpUtil.DoPostJson(GetSxfpayHost4env(isvParams) + apiUri, null, param);
+            log.Info($"{logPrefix} reqJSON={reqParams}");
+            string resText = SxfHttpUtil.DoPostJson(GetSxfpayHost4env(isvParams) + apiUri, null, reqParams);
             log.Info($"{logPrefix} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -107,7 +106,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             var isPassed = SxfSignUtil.CheckSign(resParams, publicKey);
             if (isPassed)
             {
-                log.Warn($"{logPrefix}验签失败 reqJSON={param} resJSON={resText}");
+                log.Warn($"{logPrefix} 验签失败！ reqJSON={reqParams} resJSON={resParams}");
             }
 
             return resParams;

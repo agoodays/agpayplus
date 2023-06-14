@@ -343,6 +343,7 @@
             public const string ALI_PC = "ALI_PC";  //支付宝 电脑网站支付
             public const string ALI_WAP = "ALI_WAP";  //支付宝 wap支付
             public const string ALI_QR = "ALI_QR";  //支付宝 二维码付款
+            public const string ALI_LITE = "ALI_LITE";  //支付宝 小程序
 
             public const string YSF_BAR = "YSF_BAR";  //云闪付条码支付
             public const string YSF_JSAPI = "YSF_JSAPI";  //云闪付服务窗支付
