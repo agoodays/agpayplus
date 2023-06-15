@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Payment.Api.Services;
 using Quartz;
 
@@ -14,11 +13,11 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     public class RefundOrderReissueJob : IJob
     {
         private static int QUERY_PAGE_SIZE = 100; //每次查询数量
-        private readonly ILogger<PayOrderExpiredJob> logger;
+        private readonly ILogger<RefundOrderReissueJob> logger;
         private readonly IRefundOrderService refundOrderService;
         private readonly ChannelOrderReissueService channelOrderReissueService;
 
-        public RefundOrderReissueJob(ILogger<PayOrderExpiredJob> logger, IRefundOrderService refundOrderService, ChannelOrderReissueService channelOrderReissueService)
+        public RefundOrderReissueJob(ILogger<RefundOrderReissueJob> logger, IRefundOrderService refundOrderService, ChannelOrderReissueService channelOrderReissueService)
         {
             this.logger = logger;
             this.refundOrderService = refundOrderService;
@@ -38,7 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                         {
                             PageNumber = currentPageIndex,
                             PageSize = QUERY_PAGE_SIZE,
-                            State = (byte)PayOrderState.STATE_ING,
+                            State = (byte)RefundOrderState.STATE_ING,
                             CreatedStart = DateTime.Now.AddMinutes(-10),
                         };
                         var refundOrders = refundOrderService.GetPaginatedData(dto);

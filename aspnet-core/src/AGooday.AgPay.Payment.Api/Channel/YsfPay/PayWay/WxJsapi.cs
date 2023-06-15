@@ -1,16 +1,16 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
-using AGooday.AgPay.Payment.Api.RQRS;
-using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
-using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.Utils;
-using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Application.Interfaces;
-using Newtonsoft.Json.Linq;
 using AGooday.AgPay.Application.Params.WxPay;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Payment.Api.Models;
+using AGooday.AgPay.Payment.Api.RQRS;
+using AGooday.AgPay.Payment.Api.RQRS.Msg;
+using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
+using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
+using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 {

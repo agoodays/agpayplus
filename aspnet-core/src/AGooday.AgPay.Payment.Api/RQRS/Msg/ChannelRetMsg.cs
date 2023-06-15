@@ -23,6 +23,16 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         public string ChannelUserId { get; set; }
 
         /// <summary>
+        /// 用户支付凭证交易单号 微信/支付宝流水号
+        /// </summary>
+        public string PlatformOrderId { get; set; }
+
+        /// <summary>
+        /// 用户支付凭证商户单号
+        /// </summary>
+        public string PlatformMchOrderId { get; set; }
+
+        /// <summary>
         /// 渠道错误码
         /// </summary>
         public string ChannelErrCode { get; set; }

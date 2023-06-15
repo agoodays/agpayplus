@@ -15,7 +15,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     /// 渠道侧的通知入口Controller 【分为同步跳转（doReturn）和异步回调(doNotify) 】
     /// </summary>
     [ApiController]
-    [Route("api/pay")]
     public class ChannelNoticeController : Controller
     {
         private readonly ILogger<AbstractPayOrderController> log;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,7 @@ namespace AGooday.AgPay.Application.Params.SxfPay
         public string PrivateKey { get; set; }
         public string PublicKey { get; set; }
         public string OrgId { get; set; }
+        public string AppId { get; set; }
 
         public override string DeSenData()
         {

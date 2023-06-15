@@ -6,6 +6,7 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
+using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
@@ -44,6 +45,79 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
         {
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
+        }
+
+        public ChannelRetMsg SxfBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        {
+            ChannelRetMsg channelRetMsg = new ChannelRetMsg();
+            // 发送请求
+            JObject resJSON = PackageParamAndReq("/order/reverseScan", reqParams, logPrefix, mchAppConfigContext);
+            //请求 & 响应成功， 判断业务逻辑
+            string code = resJSON.GetValue("code").ToString(); //请求响应码
+            string msg = resJSON.GetValue("msg").ToString(); //响应信息
+            try
+            {
+                if ("0000".Equals(code))
+                {
+                    var respData = resJSON.GetValue("respData").ToObject<JObject>();
+                    string bizCode = respData.GetValue("bizCode").ToString(); //业务响应码
+                    string bizMsg = respData.GetValue("bizMsg").ToString(); //业务响应信息
+                    if ("0000".Equals(bizCode))
+                    {
+                        /*订单状态
+                        取值范围：
+                        SUCCESS 交易成功
+                        FAIL 交易失败
+                        PAYING 支付中*/
+                        string tranSts = respData.GetValue("tranSts").ToString();
+                        string uuid = respData.GetValue("uuid").ToString();//天阙平台订单号
+                        /*落单号
+                        仅供退款使用
+                        消费者账单中的条形码订单号*/
+                        string sxfUuid = respData.GetValue("sxfUuid").ToString();
+                        string transactionId = respData.GetValue("transactionId").ToString();//微信/支付宝流水号
+                        /*买家用户号
+                        支付宝渠道：买家支付宝用户号buyer_user_id
+                        微信渠道：微信平台的sub_openid*/
+                        string buyerId = respData.GetValue("buyerId").ToString();
+                        switch (tranSts)
+                        {
+                            case "SUCCESS":
+                                channelRetMsg.ChannelOrderId = uuid;
+                                channelRetMsg.ChannelUserId = buyerId;
+                                channelRetMsg.PlatformOrderId = transactionId;
+                                channelRetMsg.PlatformMchOrderId = sxfUuid;
+                                channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                                break;
+                            case "FAIL":
+                                channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                                break;
+                            case "PAYING":
+                                channelRetMsg.ChannelState = ChannelState.WAITING;
+                                channelRetMsg.IsNeedQuery = true; // 开启轮询查单;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = bizCode;
+                        channelRetMsg.ChannelErrMsg = bizMsg;
+                    }
+                }
+                else
+                {
+                    channelRetMsg.ChannelState = ChannelState.WAITING;
+                    channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                }
+            }
+            catch (Exception e)
+            {
+                channelRetMsg.ChannelErrCode = code;
+                channelRetMsg.ChannelErrMsg = msg;
+            }
+
+            return channelRetMsg;
         }
 
         /// <summary>
@@ -103,8 +177,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             // 验签
             var resParams = JObject.Parse(resText);
             string publicKey = isvParams.PublicKey;
-            var isPassed = SxfSignUtil.CheckSign(resParams, publicKey);
-            if (isPassed)
+            if (!SxfSignUtil.Verify(resParams, publicKey))
             {
                 log.Warn($"{logPrefix} 验签失败！ reqJSON={reqParams} resJSON={resParams}");
             }
@@ -119,8 +192,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         /// <param name="payOrder"></param>
         /// <param name="notifyUrl"></param>
         /// <param name="returnUrl"></param>
-        public static void JsapiParamsSet(JObject reqParams, PayOrderDto payOrder, String notifyUrl, String returnUrl)
+        public static void JsapiParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
+            SxfPublicParams(reqParams, payOrder);
             string payType = SxfHttpUtil.GetPayType(payOrder.WayCode);
             /*支付渠道，枚举值
             取值范围：
@@ -134,10 +208,26 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             02 微信公众号 / 支付宝生活号 / 银联js支付 / 支付宝小程序
             03 微信小程序*/
             reqParams.Add("payWay", payWay);
-            SxfPublicParams(reqParams, payOrder);
             reqParams.Add("notifyUrl", notifyUrl); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
             reqParams.Add("outFrontUrl", returnUrl); //银联js支付成功前端跳转地址与成功地址/失败地址同时存在或同时不存在
             reqParams.Add("outFrontFailUrl", returnUrl); //银联js支付成功前端跳转地址与成功地址/失败地址同时存在或同时不存在
+        }
+
+        /// <summary>
+        /// 随行付 bar下单请求统一发送参数
+        /// </summary>
+        /// <param name="reqParams"></param>
+        /// <param name="payOrder"></param>
+        public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder)
+        {
+            SxfPublicParams(reqParams, payOrder);
+            string payType = SxfHttpUtil.GetPayType(payOrder.WayCode);
+            /*支付渠道，枚举值
+            取值范围：
+            WECHAT 微信
+            ALIPAY 支付宝
+            UNIONPAY 银联*/
+            reqParams.Add("payType", payType);
         }
 
         /// <summary>

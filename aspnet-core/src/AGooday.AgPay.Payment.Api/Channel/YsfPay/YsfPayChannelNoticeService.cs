@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 {
     /// <summary>
-    /// 云闪付下单
+    /// 云闪付回调
     /// </summary>
     public class YsfPayChannelNoticeService : AbstractChannelNoticeService
     {
