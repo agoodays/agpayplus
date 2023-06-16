@@ -68,7 +68,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
                     res.CodeImgUrl = _sysConfigService.GetDBApplicationConfig().GenScanImgUrl(alipayResp.QrCode);
                 }
                 else
-                { //默认都为跳转地址方式
+                { 
+                    //默认都为跳转地址方式
                     res.CodeUrl = alipayResp.QrCode;
                 }
 

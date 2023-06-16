@@ -13,6 +13,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
 {
     public class AliBar : SxfPayPaymentService
     {
+        /// <summary>
+        /// 随行付 支付宝 条码支付
+        /// </summary>
         public AliBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
