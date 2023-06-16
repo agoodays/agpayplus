@@ -184,6 +184,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             }
             catch (Exception e)
             {
+                log.LogError(e, $"{logPrefix}, 异常:{e.Message}");
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }
             return channelRetMsg;

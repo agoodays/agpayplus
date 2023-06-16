@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
             {
                 ChannelRetMsg result = ChannelRetMsg.ConfirmSuccess(null);
 
-                String logPrefix = "【处理云闪付支付回调】";
+                string logPrefix = "【处理云闪付支付回调】";
 
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
@@ -78,7 +78,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 
         public bool VerifyParams(JObject jsonParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-
             string orderNo = jsonParams.GetValue("orderNo").ToString();       // 商户订单号
             string txnAmt = jsonParams.GetValue("txnAmt").ToString();         // 支付金额
             if (string.IsNullOrWhiteSpace(orderNo))

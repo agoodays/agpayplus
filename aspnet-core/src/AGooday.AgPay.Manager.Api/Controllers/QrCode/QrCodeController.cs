@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             if (qrCode.QrcShellId.HasValue)
             {
                 var qrCodeShell = _qrCodeShellService.GetById(qrCode.QrcShellId.Value);
-                bitmap = GetBitmap(qrCodeShell, qrCode.QrUrl, qrCode.QrcId);
+                bitmap = GetBitmap(qrCodeShell, qrCode.QrUrl, $"No.{qrCode.QrcId}");
             }
             else
             {

@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                                 channelRetMsg.PlatformMchOrderId = sxfUuid;
                                 break;
                             case "FAIL":
-                                channelRetMsg = ChannelRetMsg.ConfirmFail(bizCode, bizMsg);   
+                                channelRetMsg = ChannelRetMsg.ConfirmFail(bizCode, bizMsg);
                                 break;
                             case "PAYING":
                                 break;
@@ -97,6 +97,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             }
             catch (Exception e)
             {
+                log.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //支付中
             }
         }

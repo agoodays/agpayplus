@@ -2,62 +2,30 @@
 using AGooday.AgPay.Common.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils
 {
     public class SxfHttpUtil
     {
         private static readonly string DEFAULT_CHARSET = "UTF-8";
-        private static readonly int DEFAULT_TIMEOUT = 60 * 1000; // 60 秒超时
+        private static readonly int DEFAULT_TIMEOUT = 60; // 60 秒超时
 
-        public static string DoPostJson(string url, Dictionary<string, object> headers, JObject reqParams)
+        public static string DoPostJson(string url, JObject reqParams)
         {
-            if (headers == null)
+            var headers = new Dictionary<string, string>() {
+                    {"Content-Type","application/json; charset=" + DEFAULT_CHARSET }
+            };
+            var client = new AgHttpClient(DEFAULT_TIMEOUT, DEFAULT_CHARSET);
+            var request = new AgHttpClient.Request()
             {
-                headers = new Dictionary<string, object>();
-            }
-            if (!headers.ContainsKey("Content-Type"))
-            {
-                headers.Add("Content-Type", "application/json; charset=" + DEFAULT_CHARSET);
-            }
-            return DoPostStr(url, headers, JsonConvert.SerializeObject(reqParams));
-        }
-
-        private static string DoPostStr(string url, Dictionary<string, object> headers, string data)
-        {
-            return DoRequest(url, "POST", headers, data);
-        }
-
-        private static string DoRequest(string url, string method, Dictionary<string, object> headers, string data)
-        {
-            using var client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(DEFAULT_TIMEOUT);
-            foreach (var header in headers)
-            {
-                client.DefaultRequestHeaders.Add(header.Key, header.Value.ToString());
-            }
-            string result = string.Empty;
-            StringContent content = null;
-            HttpResponseMessage response = null;
-            switch (method)
-            {
-                case "POST":
-                    content = new StringContent(data, Encoding.GetEncoding(DEFAULT_CHARSET), "application/json");
-                    response = client.PostAsync(url, content).Result;
-                    result = response.Content.ReadAsStringAsync().Result;
-                    break;
-                case "PUT":
-                    break;
-                case "GET":
-                    response = client.GetAsync(URLUtil.AppendUrlQuery(url, JObject.Parse(data))).Result;
-                    result = response.Content.ReadAsStringAsync().Result;
-                    break;
-                case "DELETE":
-                    break;
-                default:
-                    break;
-            }
+                Url = url,
+                Method = "POST",
+                Headers = headers,
+                Content = JsonConvert.SerializeObject(reqParams),
+                ContentType = "application/json"
+            };
+            var response = client.Send(request);
+            string result = response.Content;
             return result;
         }
 

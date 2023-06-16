@@ -20,8 +20,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
     {
         private readonly ILog log = LogManager.GetLogger(typeof(SxfPayPaymentService));
 
-        public SxfPayPaymentService(IServiceProvider serviceProvider, 
-            ISysConfigService sysConfigService, 
+        public SxfPayPaymentService(IServiceProvider serviceProvider,
+            ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
@@ -166,7 +166,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 
             // 调起上游接口
             log.Info($"{logPrefix} reqJSON={reqParams}");
-            string resText = SxfHttpUtil.DoPostJson(GetSxfpayHost4env(isvParams) + apiUri, null, reqParams);
+            string resText = SxfHttpUtil.DoPostJson(GetSxfpayHost4env(isvParams) + apiUri, reqParams);
             log.Info($"{logPrefix} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
