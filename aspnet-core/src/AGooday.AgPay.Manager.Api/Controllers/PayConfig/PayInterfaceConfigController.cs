@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
@@ -23,11 +24,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<PayInterfaceConfigController> _logger;
+        private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
-        public PayInterfaceConfigController(IMQSender mqSender, 
-            IMchInfoService mchInfoService, 
+        public PayInterfaceConfigController(IMQSender mqSender,
+            IMchAppService mchAppService,
+            IMchInfoService mchInfoService,
             IPayInterfaceConfigService payIfConfigService,
             ILogger<PayInterfaceConfigController> logger,
             RedisUtil client,
@@ -40,6 +43,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             _logger = logger;
             _payIfConfigService = payIfConfigService;
             _mchInfoService = mchInfoService;
+            _mchAppService = mchAppService;
         }
 
         /// <summary>
@@ -111,15 +115,40 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
             if (payInterfaceConfig != null)
             {
-                // 费率转换为百分比数值
-                payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
-                if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
-                {
-                    var isvParams = IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
-                    if (isvParams != null)
-                    {
-                        payInterfaceConfig.IfParams = isvParams.DeSenData();
-                    }
+                switch (infoType) {
+                    case CS.INFO_TYPE.ISV:
+                        // 费率转换为百分比数值
+                        payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
+                        if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
+                        {
+                            var isvParams = IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
+                            if (isvParams != null)
+                            {
+                                payInterfaceConfig.IfParams = isvParams.DeSenData();
+                            }
+                        }
+                        break;
+                    case CS.INFO_TYPE.MCH_APP:
+                        // 费率转换为百分比数值
+                        payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
+
+                        // 敏感数据脱敏
+                        if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
+                        {
+                            var mchApp = _mchAppService.GetById(infoId);
+                            var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+
+                            // 普通商户的支付参数执行数据脱敏
+                            if (mchInfo.Type == CS.MCH_TYPE_NORMAL)
+                            {
+                                NormalMchParams mchParams = NormalMchParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
+                                if (mchParams != null)
+                                {
+                                    payInterfaceConfig.IfParams = mchParams.DeSenData();
+                                }
+                            }
+                        }
+                        break;
                 }
             }
             return ApiRes.Ok(payInterfaceConfig);
