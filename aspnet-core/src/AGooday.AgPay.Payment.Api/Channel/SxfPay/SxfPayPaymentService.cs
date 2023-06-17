@@ -155,7 +155,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             var reqParams = new JObject();//reqData
             reqParams.Add("orgId", isvParams.OrgId); //天阙平台机构编号
             reqParams.Add("reqId", Guid.NewGuid().ToString("N")); //合作方系统生成的唯一请求ID，最大长度32位
-            reqParams.Add("reqData", reqData); //每个接口的业务参数
+            reqParams.Add("reqData", reqData.ToString()); //每个接口的业务参数
             reqParams.Add("timestamp", DateTime.Now.ToString("yyyyMMddHHmmss")); //请求时间戳，格式：yyyyMMddHHmmss
             reqParams.Add("version", "1.0"); //接口版本号，默认值：1.0
             reqParams.Add("signType", "RSA"); //签名类型，默认值：RSA

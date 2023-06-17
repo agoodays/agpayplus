@@ -246,6 +246,14 @@ namespace AGooday.AgPay.Common.Utils
         {
             return jobj.GetValue(propertyName).ToString();
         }
+
+        public static bool TryGetString(this JObject jobj, string propertyName, out string propertyVlue)
+        {
+            var result = jobj.TryGetValue(propertyName, out JToken jToken);
+            propertyVlue = jToken?.ToString();
+            return result;
+        }
+
         #endregion
         public static IDictionary<string, string> ToKeyValue(this object metaToken)
         {

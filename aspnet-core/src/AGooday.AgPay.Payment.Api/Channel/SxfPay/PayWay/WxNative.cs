@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
@@ -60,7 +61,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
                         /*落单号
                         仅供退款使用
                         消费者账单中的条形码订单号*/
-                        string sxfUuid = respData.GetValue("sxfUuid").ToString();
+                        respData.TryGetString("sxfUuid", out string sxfUuid);
                         string payUrl = respData.GetValue("payUrl").ToString();
                         //二维码地址
                         if (CS.PAY_DATA_TYPE.CODE_IMG_URL.Equals(bizRQ.PayDataType))

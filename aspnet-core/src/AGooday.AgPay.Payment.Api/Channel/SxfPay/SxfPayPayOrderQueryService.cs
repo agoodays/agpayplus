@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
@@ -65,13 +66,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         /*落单号
                         仅供退款使用
                         消费者账单中的条形码订单号*/
-                        string sxfUuid = respData.GetValue("sxfUuid").ToString();
-                        string channelId = respData.GetValue("channelId").ToString();//渠道商商户号
-                        string transactionId = respData.GetValue("transactionId").ToString();//微信/支付宝流水号
+                        respData.TryGetString("sxfUuid", out string sxfUuid);
+                        respData.TryGetString("channelId", out string channelId);//渠道商商户号
+                        respData.TryGetString("transactionId", out string transactionId);//微信/支付宝流水号
                         /*买家用户号
                         支付宝渠道：买家支付宝用户号buyer_user_id
                         微信渠道：微信平台的sub_openid*/
-                        string buyerId = respData.GetValue("buyerId").ToString();
+                        respData.TryGetString("buyerId", out string buyerId);
                         switch (tranSts)
                         {
                             case "SUCCESS":

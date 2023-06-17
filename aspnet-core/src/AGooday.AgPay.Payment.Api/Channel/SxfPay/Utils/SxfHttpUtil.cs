@@ -12,15 +12,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils
 
         public static string DoPostJson(string url, JObject reqParams)
         {
-            var headers = new Dictionary<string, string>() {
-                    {"Content-Type","application/json; charset=" + DEFAULT_CHARSET }
-            };
             var client = new AgHttpClient(DEFAULT_TIMEOUT, DEFAULT_CHARSET);
             var request = new AgHttpClient.Request()
             {
                 Url = url,
                 Method = "POST",
-                Headers = headers,
                 Content = JsonConvert.SerializeObject(reqParams),
                 ContentType = "application/json"
             };

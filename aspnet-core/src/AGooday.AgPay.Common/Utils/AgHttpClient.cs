@@ -5,12 +5,14 @@ namespace AGooday.AgPay.Common.Utils
 {
     public class AgHttpClient
     {
+        private readonly HttpClientHandler handler;
         private readonly int timeout;
         private readonly string charset;
         private readonly Encoding encoding;
 
         public AgHttpClient(int timeout = 60, string charset = "UTF-8")
         {
+            handler = new HttpClientHandler();
             this.timeout = timeout;
             this.charset = charset;
             this.encoding = Encoding.GetEncoding(charset);
@@ -18,11 +20,14 @@ namespace AGooday.AgPay.Common.Utils
 
         public Response Send(Request request)
         {
-            var client = new HttpClient();
+            var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(timeout);
-            foreach (var header in request.Headers)
+            if (request.Headers != null)
             {
-                client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                foreach (var header in request.Headers)
+                {
+                    client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                }
             }
 
             var response = new Response();
