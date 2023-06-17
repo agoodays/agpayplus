@@ -28,13 +28,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils
         /// <returns></returns>
         private static string ConvertSignStringIncludeEmpty(JObject jobjParams)
         {
-            SortedDictionary<string, string> keyValuePairs = JsonConvert.DeserializeObject<SortedDictionary<string, string>>(jobjParams.ToString());
+            SortedDictionary<string, object> keyValuePairs = JsonConvert.DeserializeObject<SortedDictionary<string, object>>(jobjParams.ToString());
 
             //所有参数进行排序，拼接为 key=value&形式
-            var keyvalues = keyValuePairs.Where(w => !w.Key.Equals("sign") && !string.IsNullOrEmpty(w.Value))
+            var keyvalues = keyValuePairs.Where(w => !w.Key.Equals("sign") && !string.IsNullOrEmpty(w.Value.ToString()))
                 .OrderBy(o => o.Key)
                 .Select(s => $"{s.Key}={s.Value}");
-            return string.Join("&", keyvalues);
+            return string.Join("&", keyvalues).Replace("\\", string.Empty);
         }
     }
 }

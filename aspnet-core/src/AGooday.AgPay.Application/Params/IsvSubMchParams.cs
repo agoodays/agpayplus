@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.Params.AliPay;
+using AGooday.AgPay.Application.Params.SxfPay;
 using AGooday.AgPay.Application.Params.WxPay;
 using AGooday.AgPay.Application.Params.YsfPay;
 using AGooday.AgPay.Common.Constants;
@@ -24,6 +25,10 @@ namespace AGooday.AgPay.Application.Params
             else if (CS.IF_CODE.YSFPAY.Equals(ifCode))
             {
                 return JsonConvert.DeserializeObject<YsfPayIsvSubMchParams>(paramsStr);
+            }
+            else if (CS.IF_CODE.SXFPAY.Equals(ifCode))
+            {
+                return JsonConvert.DeserializeObject<SxfPayIsvSubMchParams>(paramsStr);
             }
             return null;
         }

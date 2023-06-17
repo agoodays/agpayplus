@@ -12,6 +12,7 @@ using AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay;
 using AGooday.AgPay.Payment.Api.Channel.WxPay;
 using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay;
+using AGooday.AgPay.Payment.Api.Channel.SxfPay;
 using AGooday.AgPay.Payment.Api.Extensions;
 using AGooday.AgPay.Payment.Api.FilterAttributes;
 using AGooday.AgPay.Payment.Api.Jobs;
@@ -52,6 +53,21 @@ using YsfAliJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.AliJsapi;
 
 using YsfWxBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxBar;
 using YsfWxJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.WxJsapi;
+
+using YsfBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.YsfBar;
+using YsfJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.YsfJsapi;
+#endregion
+#region SxfPay
+using SxfAliBar = AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay.AliBar;
+using SxfAliQr = AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay.AliQr;
+using SxfAliJsapi = AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay.AliJsapi;
+
+using SxfWxBar = AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay.WxBar;
+using SxfWxNative = AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay.WxNative;
+using SxfWxJsapi = AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay.WxJsapi;
+
+using SxfYsfBar = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.YsfBar;
+using SxfYsfJsapi = AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay.YsfJsapi;
 #endregion
 #endregion
 
@@ -263,6 +279,7 @@ services.AddSingleton(provider =>
 services.AddSingleton<AliPayPaymentService>();
 services.AddSingleton<WxPayPaymentService>();
 services.AddSingleton<YsfPayPaymentService>();
+services.AddSingleton<SxfPayPaymentService>();
 services.AddSingleton(provider =>
 {
     Func<string, IPaymentService> funcFactory = ifCode =>
@@ -275,6 +292,8 @@ services.AddSingleton(provider =>
                 return provider.GetService<WxPayPaymentService>();
             case CS.IF_CODE.YSFPAY:
                 return provider.GetService<YsfPayPaymentService>();
+            case CS.IF_CODE.SXFPAY:
+                return provider.GetService<SxfPayPaymentService>();
             default:
                 return null;
         }
@@ -286,6 +305,7 @@ services.AddSingleton(provider =>
 services.AddSingleton<AliPayRefundService>();
 services.AddSingleton<WxPayRefundService>();
 services.AddSingleton<YsfPayRefundService>();
+services.AddSingleton<SxfPayRefundService>();
 services.AddSingleton(provider =>
 {
     Func<string, IRefundService> funcFactory = ifCode =>
@@ -298,6 +318,8 @@ services.AddSingleton(provider =>
                 return provider.GetService<WxPayRefundService>();
             case CS.IF_CODE.YSFPAY:
                 return provider.GetService<YsfPayRefundService>();
+            case CS.IF_CODE.SXFPAY:
+                return provider.GetService<SxfPayRefundService>();
             default:
                 return null;
         }
@@ -309,6 +331,7 @@ services.AddSingleton(provider =>
 services.AddSingleton<AliPayChannelNoticeService>();
 services.AddSingleton<WxPayChannelNoticeService>();
 services.AddSingleton<YsfPayChannelNoticeService>();
+services.AddSingleton<SxfPayChannelNoticeService>();
 services.AddSingleton(provider =>
 {
     Func<string, IChannelNoticeService> funcFactory = ifCode =>
@@ -321,6 +344,34 @@ services.AddSingleton(provider =>
                 return provider.GetService<WxPayChannelNoticeService>();
             case CS.IF_CODE.YSFPAY:
                 return provider.GetService<YsfPayChannelNoticeService>();
+            case CS.IF_CODE.SXFPAY:
+                return provider.GetService<SxfPayChannelNoticeService>();
+            default:
+                return null;
+        }
+    };
+    return funcFactory;
+});
+#endregion
+#region ChannelRefundNoticeService
+//services.AddSingleton<AliPayChannelRefundNoticeService>();
+//services.AddSingleton<WxPayChannelRefundNoticeService>();
+//services.AddSingleton<YsfPayChannelRefundNoticeService>();
+services.AddSingleton<SxfPayChannelNoticeService>();
+services.AddSingleton(provider =>
+{
+    Func<string, IChannelRefundNoticeService> funcFactory = ifCode =>
+    {
+        switch (ifCode)
+        {
+            //case CS.IF_CODE.ALIPAY:
+            //    return provider.GetService<AliPayChannelRefundNoticeService>();
+            //case CS.IF_CODE.WXPAY:
+            //    return provider.GetService<WxPayChannelRefundNoticeService>();
+            //case CS.IF_CODE.YSFPAY:
+            //    return provider.GetService<YsfPayChannelRefundNoticeService>();
+            case CS.IF_CODE.SXFPAY:
+                return provider.GetService<SxfPayChannelRefundNoticeService>();
             default:
                 return null;
         }
@@ -332,6 +383,7 @@ services.AddSingleton(provider =>
 services.AddSingleton<AliPayPayOrderQueryService>();
 services.AddSingleton<WxPayPayOrderQueryService>();
 services.AddSingleton<YsfPayPayOrderQueryService>();
+services.AddSingleton<SxfPayPayOrderQueryService>();
 services.AddSingleton(provider =>
 {
     Func<string, IPayOrderQueryService> funcFactory = ifCode =>
@@ -344,6 +396,8 @@ services.AddSingleton(provider =>
                 return provider.GetService<WxPayPayOrderQueryService>();
             case CS.IF_CODE.YSFPAY:
                 return provider.GetService<YsfPayPayOrderQueryService>();
+            case CS.IF_CODE.SXFPAY:
+                return provider.GetService<SxfPayPayOrderQueryService>();
             default:
                 return null;
         }
@@ -380,6 +434,21 @@ services.AddSingleton<IPaymentService, YsfAliJsapi>();
 
 services.AddSingleton<IPaymentService, YsfWxBar>();
 services.AddSingleton<IPaymentService, YsfWxJsapi>();
+
+services.AddSingleton<IPaymentService, YsfBar>();
+services.AddSingleton<IPaymentService, YsfJsapi>();
+#endregion
+#region SxfPay
+services.AddSingleton<IPaymentService, SxfAliBar>();
+services.AddSingleton<IPaymentService, SxfAliQr>();
+services.AddSingleton<IPaymentService, SxfAliJsapi>();
+
+services.AddSingleton<IPaymentService, SxfWxBar>();
+services.AddSingleton<IPaymentService, SxfWxNative>();
+services.AddSingleton<IPaymentService, SxfWxJsapi>();
+
+services.AddSingleton<IPaymentService, SxfYsfBar>();
+services.AddSingleton<IPaymentService, SxfYsfJsapi>();
 #endregion
 #region ChannelUserService
 services.AddSingleton<AliPayChannelUserService>();

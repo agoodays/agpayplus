@@ -22,6 +22,8 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly IPayOrderService payOrderService;
 
         public ChannelOrderReissueService(ILogger<PayOrderMchNotifyMQReceiver> log,
+            Func<string, IPayOrderQueryService> payOrderQueryServiceFactory,
+            Func<string, IRefundService> refundServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
             RefundOrderProcessService refundOrderProcessService,
@@ -32,6 +34,8 @@ namespace AGooday.AgPay.Payment.Api.Services
             this.refundOrderProcessService = refundOrderProcessService;
             this.payOrderService = payOrderService;
             this.log = log;
+            _payOrderQueryServiceFactory = payOrderQueryServiceFactory;
+            _refundServiceFactory = refundServiceFactory;
         }
 
         /// <summary>
