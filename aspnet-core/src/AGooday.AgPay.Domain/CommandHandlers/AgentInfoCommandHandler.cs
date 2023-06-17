@@ -105,91 +105,109 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             }
             #endregion
 
-            #region 插入用户信息
-            // 插入用户信息
-            SysUser sysUser = new SysUser();
-            sysUser.LoginUsername = request.LoginUsername;
-            sysUser.Realname = agentInfo.ContactName;
-            sysUser.Telphone = agentInfo.ContactTel;
-            sysUser.UserNo = agentInfo.AgentNo;
-            sysUser.BelongInfoId = agentInfo.AgentNo;
-            sysUser.SysType = CS.SYS_TYPE.AGENT;
-            sysUser.Sex = CS.SEX_MALE;
-            sysUser.AvatarUrl = CS.DEFAULT_MALE_AVATAR_URL;//默认头像
-            sysUser.IsAdmin = CS.YES;
-            sysUser.State = agentInfo.State;
-
-            #region 检查
-            // 登录用户名不可重复
-            // 这些业务逻辑，当然要在领域层中（领域命令处理程序中）进行处理
-            if (_sysUserRepository.IsExistLoginUsername(sysUser.LoginUsername, sysUser.SysType))
+            try
             {
-                // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "登录名已经被使用！"));
-                return Task.FromResult(new Unit());
+                BeginTransaction();
+                #region 插入用户信息
+                // 插入用户信息
+                SysUser sysUser = new SysUser();
+                sysUser.LoginUsername = request.LoginUsername;
+                sysUser.Realname = agentInfo.ContactName;
+                sysUser.Telphone = agentInfo.ContactTel;
+                sysUser.UserNo = agentInfo.AgentNo;
+                sysUser.BelongInfoId = agentInfo.AgentNo;
+                sysUser.SysType = CS.SYS_TYPE.AGENT;
+                sysUser.Sex = CS.SEX_MALE;
+                sysUser.AvatarUrl = CS.DEFAULT_MALE_AVATAR_URL;//默认头像
+                sysUser.IsAdmin = CS.YES;
+                sysUser.State = agentInfo.State;
+
+                #region 检查
+                // 登录用户名不可重复
+                // 这些业务逻辑，当然要在领域层中（领域命令处理程序中）进行处理
+                if (_sysUserRepository.IsExistLoginUsername(sysUser.LoginUsername, sysUser.SysType))
+                {
+                    // 引发错误事件
+                    Bus.RaiseEvent(new DomainNotification("", "登录名已经被使用！"));
+                    return Task.FromResult(new Unit());
+                }
+                // 手机号不可重复
+                if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "联系人手机号已存在！"));
+                    return Task.FromResult(new Unit());
+                }
+                // 员工号不可重复
+                if (_sysUserRepository.IsExistUserNo(sysUser.UserNo, sysUser.SysType))
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
+                    return Task.FromResult(new Unit());
+                }
+                #endregion
+
+                _sysUserRepository.Add(sysUser);
+                _sysUserRepository.SaveChanges();
+
+                #region 添加默认用户认证表
+                string salt = StringUtil.GetUUID(6); //6位随机数
+                string authPwd = request.PasswordType.Equals("custom") ? request.LoginPassword : CS.DEFAULT_PWD;
+                string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
+                //用户名登录方式
+                var sysUserAuthByLoginUsername = new SysUserAuth()
+                {
+                    UserId = sysUser.SysUserId,
+                    IdentityType = CS.AUTH_TYPE.LOGIN_USER_NAME,
+                    Identifier = sysUser.LoginUsername,
+                    Credential = userPwd,
+                    Salt = salt,
+                    SysType = sysUser.SysType
+                };
+                _sysUserAuthRepository.Add(sysUserAuthByLoginUsername);
+
+                //手机号登录方式
+                var sysUserAuthByTelphone = new SysUserAuth()
+                {
+                    UserId = sysUser.SysUserId,
+                    IdentityType = CS.AUTH_TYPE.TELPHONE,
+                    Identifier = sysUser.Telphone,
+                    Credential = userPwd,
+                    Salt = salt,
+                    SysType = sysUser.SysType
+                };
+                _sysUserAuthRepository.Add(sysUserAuthByTelphone);
+                #endregion
+                #endregion
+
+                // 插入代理商基本信息
+                // 存入代理商默认用户ID
+                agentInfo.Sipw = BCrypt.Net.BCrypt.HashPassword(CS.DEFAULT_SIPW);
+                agentInfo.InitUserId = sysUser.SysUserId;
+                _agentInfoRepository.Add(agentInfo);
+
+                if (!Commit())
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "添加代理商失败"));
+                    return Task.FromResult(new Unit());
+                }
+
+                CommitTransaction();
+
+                if (request.IsNotify == CS.YES)
+                {
+                    // 提交成功后，这里需要发布领域事件
+                    // 比如欢迎用户注册邮件呀，短信呀等
+                    var createdEvent = _mapper.Map<AgentInfoCreatedEvent>(agentInfo);
+                    createdEvent.LoginUsername = request.LoginUsername;
+                    createdEvent.LoginPassword = authPwd;
+                    createdEvent.IsNotify = request.IsNotify;
+                    Bus.RaiseEvent(createdEvent);
+                }
             }
-            // 手机号不可重复
-            if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
+            catch (Exception e)
             {
-                Bus.RaiseEvent(new DomainNotification("", "联系人手机号已存在！"));
+                RollbackTransaction();
+                Bus.RaiseEvent(new DomainNotification("", e.Message));
                 return Task.FromResult(new Unit());
-            }
-            // 员工号不可重复
-            if (_sysUserRepository.IsExistUserNo(sysUser.UserNo, sysUser.SysType))
-            {
-                Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
-                return Task.FromResult(new Unit());
-            }
-            #endregion
-
-            _sysUserRepository.Add(sysUser);
-            _sysUserRepository.SaveChanges();
-
-            #region 添加默认用户认证表
-            string salt = StringUtil.GetUUID(6); //6位随机数
-            string authPwd = request.PasswordType.Equals("custom") ? request.LoginPassword : CS.DEFAULT_PWD;
-            string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
-            //用户名登录方式
-            var sysUserAuthByLoginUsername = new SysUserAuth()
-            {
-                UserId = sysUser.SysUserId,
-                IdentityType = CS.AUTH_TYPE.LOGIN_USER_NAME,
-                Identifier = sysUser.LoginUsername,
-                Credential = userPwd,
-                Salt = salt,
-                SysType = sysUser.SysType
-            };
-            _sysUserAuthRepository.Add(sysUserAuthByLoginUsername);
-
-            //手机号登录方式
-            var sysUserAuthByTelphone = new SysUserAuth()
-            {
-                UserId = sysUser.SysUserId,
-                IdentityType = CS.AUTH_TYPE.TELPHONE,
-                Identifier = sysUser.Telphone,
-                Credential = userPwd,
-                Salt = salt,
-                SysType = sysUser.SysType
-            };
-            _sysUserAuthRepository.Add(sysUserAuthByTelphone);
-            #endregion
-            #endregion
-
-            // 插入代理商基本信息
-            // 存入代理商默认用户ID
-            agentInfo.Sipw = BCrypt.Net.BCrypt.HashPassword(CS.DEFAULT_SIPW);
-            agentInfo.InitUserId = sysUser.SysUserId;
-            _agentInfoRepository.Add(agentInfo);
-
-            if (Commit())
-            {
-                // 提交成功后，这里需要发布领域事件
-                // 比如欢迎用户注册邮件呀，短信呀等
-                var createdEvent = _mapper.Map<AgentInfoCreatedEvent>(agentInfo);
-                createdEvent.LoginUsername = request.LoginUsername;
-                createdEvent.LoginPassword = authPwd;
-                createdEvent.IsNotify = request.IsNotify;
-                Bus.RaiseEvent(createdEvent);
             }
 
             return Task.FromResult(new Unit());
@@ -219,48 +237,65 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     .Select(w => w.SysUserId).ToList();
             }
 
-            //修改了手机号， 需要修改auth表信息
-            // 获取代理商超管
-            long agentAdminUserId = _sysUserRepository.FindMchAdminUserId(agentInfo.AgentNo);
-            var sysUserAuth = _sysUserAuthRepository.GetAll()
-                 .Where(w => w.UserId.Equals(agentAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.AGENT)
-                 && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE)).FirstOrDefault();
-            if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
+            try
             {
-                if (_sysUserRepository.IsExistTelphone(request.ContactTel, request.ContactTel))
+                BeginTransaction();
+                //修改了手机号， 需要修改auth表信息
+                // 获取代理商超管
+                long agentAdminUserId = _sysUserRepository.FindMchAdminUserId(agentInfo.AgentNo);
+                var sysUserAuth = _sysUserAuthRepository.GetAll()
+                     .Where(w => w.UserId.Equals(agentAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.AGENT)
+                     && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE)).FirstOrDefault();
+
+                if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                    if (_sysUserRepository.IsExistTelphone(request.ContactTel, request.ContactTel))
+                    {
+                        Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                        return Task.FromResult(new Unit());
+                    }
+                    sysUserAuth.Identifier = request.ContactTel;
+                    _sysUserAuthRepository.Update(sysUserAuth);
+                }
+
+                // 判断是否重置密码
+                if (request.ResetPass)
+                {
+                    // 待更新的密码
+                    string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
+
+                    // 重置超管密码
+                    _sysUserAuthRepository.ResetAuthInfo(agentAdminUserId, CS.SYS_TYPE.AGENT, null, null, updatePwd);
+                    _sysUserAuthRepository.SaveChanges();
+
+                    // 删除超管登录信息
+                    removeCacheUserIdList.Add(agentAdminUserId);
+                }
+
+                // 推送mq删除redis用户认证信息
+                if (removeCacheUserIdList.Any())
+                {
+                    mqSender.Send(CleanAgentLoginAuthCacheMQ.Build(removeCacheUserIdList));
+                }
+
+                // 更新代理商信息
+                _agentInfoRepository.Update(agentInfo);
+                //_agentInfoRepository.SaveChanges();
+
+                if (!Commit())
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "修改当前代理商失败"));
                     return Task.FromResult(new Unit());
                 }
-                sysUserAuth.Identifier = request.ContactTel;
-                _sysUserAuthRepository.Update(sysUserAuth);
-            }
 
-            // 判断是否重置密码
-            if (request.ResetPass)
+                CommitTransaction();
+            }
+            catch (Exception e)
             {
-                // 待更新的密码
-                string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
-
-                // 重置超管密码
-                _sysUserAuthRepository.ResetAuthInfo(agentAdminUserId, CS.SYS_TYPE.AGENT, null, null, updatePwd);
-                _sysUserAuthRepository.SaveChanges();
-
-                // 删除超管登录信息
-                removeCacheUserIdList.Add(agentAdminUserId);
+                RollbackTransaction();
+                Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return Task.FromResult(new Unit());
             }
-
-            // 推送mq删除redis用户认证信息
-            if (removeCacheUserIdList.Any())
-            {
-                mqSender.Send(CleanAgentLoginAuthCacheMQ.Build(removeCacheUserIdList));
-            }
-
-            // 更新代理商信息
-            _agentInfoRepository.Update(agentInfo);
-            _agentInfoRepository.SaveChanges();
-
-            Commit();
 
             return Task.FromResult(new Unit());
         }
@@ -292,31 +327,43 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return Task.FromResult(new Unit());
             }
 
-            var sysUsers = _sysUserRepository.GetAll().Where(w => w.BelongInfoId.Equals(request.AgentNo) && w.SysType.Equals(CS.SYS_TYPE.AGENT));
-            foreach (var sysUser in sysUsers)
+            try
             {
-                var sysUserAuths = _sysUserAuthRepository.GetAll().Where(w => w.UserId.Equals(sysUser.SysUserId));
-                // 删除当前代理商用户认证信息
-                foreach (var sysUserAuth in sysUserAuths)
+                BeginTransaction();
+                var sysUsers = _sysUserRepository.GetAll().Where(w => w.BelongInfoId.Equals(request.AgentNo) && w.SysType.Equals(CS.SYS_TYPE.AGENT));
+                foreach (var sysUser in sysUsers)
                 {
-                    _sysUserAuthRepository.Remove(sysUserAuth.AuthId);
+                    var sysUserAuths = _sysUserAuthRepository.GetAll().Where(w => w.UserId.Equals(sysUser.SysUserId));
+                    // 删除当前代理商用户认证信息
+                    foreach (var sysUserAuth in sysUserAuths)
+                    {
+                        _sysUserAuthRepository.Remove(sysUserAuth.AuthId);
+                    }
+                    // 删除当前代理商的登录用户
+                    _sysUserRepository.Remove(sysUser.SysUserId);
                 }
-                // 删除当前代理商的登录用户
-                _sysUserRepository.Remove(sysUser.SysUserId);
+
+                // 2.删除当前代理商信息
+                _agentInfoRepository.Remove(agentInfo.AgentNo);
+
+                if (!Commit())
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "删除当前代理商失败"));
+                    return Task.FromResult(new Unit());
+                }
+
+                CommitTransaction();
+
+                // 推送mq删除redis用户缓存
+                var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
+                mqSender.Send(CleanAgentLoginAuthCacheMQ.Build(userIdList));
             }
-
-            // 2.删除当前代理商信息
-            _agentInfoRepository.Remove(agentInfo.AgentNo);
-
-            if (!Commit())
+            catch (Exception e)
             {
-                Bus.RaiseEvent(new DomainNotification("", "删除当前代理商失败"));
+                RollbackTransaction();
+                Bus.RaiseEvent(new DomainNotification("", e.Message));
                 return Task.FromResult(new Unit());
             }
-
-            // 推送mq删除redis用户缓存
-            var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
-            mqSender.Send(CleanAgentLoginAuthCacheMQ.Build(userIdList));
 
             return Task.FromResult(new Unit());
         }

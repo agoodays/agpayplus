@@ -96,45 +96,63 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             sysUser.InviteCode = StringUtil.GetUUID(6); //6位随机数
 
-            _sysUserRepository.Add(sysUser);
-
-            #region 添加默认用户认证表
-            string salt = StringUtil.GetUUID(6); //6位随机数
-            string authPwd = request.PasswordType.Equals("custom") ? request.LoginPassword : CS.DEFAULT_PWD;
-            string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
-            //用户名登录方式
-            var sysUserAuthByLoginUsername = new SysUserAuth()
+            try
             {
-                UserId = sysUser.SysUserId,
-                IdentityType = CS.AUTH_TYPE.LOGIN_USER_NAME,
-                Identifier = sysUser.LoginUsername,
-                Credential = userPwd,
-                Salt = salt,
-                SysType = sysUser.SysType
-            };
-            _sysUserAuthRepository.Add(sysUserAuthByLoginUsername);
+                BeginTransaction();
+                _sysUserRepository.Add(sysUser);
 
-            //手机号登录方式
-            var sysUserAuthByTelphone = new SysUserAuth()
-            {
-                UserId = sysUser.SysUserId,
-                IdentityType = CS.AUTH_TYPE.TELPHONE,
-                Identifier = sysUser.Telphone,
-                Credential = userPwd,
-                Salt = salt,
-                SysType = sysUser.SysType
-            };
-            _sysUserAuthRepository.Add(sysUserAuthByTelphone);
-            #endregion
+                #region 添加默认用户认证表
+                string salt = StringUtil.GetUUID(6); //6位随机数
+                string authPwd = request.PasswordType.Equals("custom") ? request.LoginPassword : CS.DEFAULT_PWD;
+                string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
+                //用户名登录方式
+                var sysUserAuthByLoginUsername = new SysUserAuth()
+                {
+                    UserId = sysUser.SysUserId,
+                    IdentityType = CS.AUTH_TYPE.LOGIN_USER_NAME,
+                    Identifier = sysUser.LoginUsername,
+                    Credential = userPwd,
+                    Salt = salt,
+                    SysType = sysUser.SysType
+                };
+                _sysUserAuthRepository.Add(sysUserAuthByLoginUsername);
 
-            if (Commit())
+                //手机号登录方式
+                var sysUserAuthByTelphone = new SysUserAuth()
+                {
+                    UserId = sysUser.SysUserId,
+                    IdentityType = CS.AUTH_TYPE.TELPHONE,
+                    Identifier = sysUser.Telphone,
+                    Credential = userPwd,
+                    Salt = salt,
+                    SysType = sysUser.SysType
+                };
+                _sysUserAuthRepository.Add(sysUserAuthByTelphone);
+                #endregion
+
+                if (!Commit())
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "添加用户失败"));
+                    return Task.FromResult(new Unit());
+                }
+
+                CommitTransaction();
+
+                if (request.IsNotify == CS.YES)
+                {
+                    // 提交成功后，这里需要发布领域事件
+                    // 比如欢迎用户注册邮件呀，短信呀等
+                    var createdEvent = _mapper.Map<SysUserCreatedEvent>(sysUser);
+                    createdEvent.LoginPassword = authPwd;
+                    createdEvent.IsNotify = request.IsNotify;
+                    Bus.RaiseEvent(createdEvent);
+                }
+            }
+            catch (Exception e)
             {
-                // 提交成功后，这里需要发布领域事件
-                // 比如欢迎用户注册邮件呀，短信呀等
-                var createdEvent = _mapper.Map<SysUserCreatedEvent>(sysUser);
-                createdEvent.LoginPassword = authPwd;
-                createdEvent.IsNotify = request.IsNotify;
-                Bus.RaiseEvent(createdEvent);
+                RollbackTransaction();
+                Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return Task.FromResult(new Unit());
             }
 
             return Task.FromResult(new Unit());
@@ -174,16 +192,31 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return Task.FromResult(new Unit());
             }
 
-            // 删除用户登录信息
-            _sysUserAuthRepository.RemoveByUserId(sysUser.SysUserId, sysUser.SysType);
+            try
+            {
+                BeginTransaction();
+                // 删除用户登录信息
+                _sysUserAuthRepository.RemoveByUserId(sysUser.SysUserId, sysUser.SysType);
 
-            // 删除用户角色信息
-            _sysUserRoleRelaRepository.RemoveByUserId(sysUser.SysUserId);
+                // 删除用户角色信息
+                _sysUserRoleRelaRepository.RemoveByUserId(sysUser.SysUserId);
 
-            // 删除用户
-            _sysUserRepository.Remove(sysUser);
+                // 删除用户
+                _sysUserRepository.Remove(sysUser);
 
-            Commit();
+                if (!Commit())
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "删除用户失败"));
+                    return Task.FromResult(new Unit());
+                }
+                CommitTransaction();
+            }
+            catch (Exception e)
+            {
+                RollbackTransaction();
+                Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return Task.FromResult(new Unit());
+            }
 
             return Task.FromResult(new Unit());
         }
@@ -216,40 +249,56 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return Task.FromResult(new Unit());
             }
 
-            //判断是否重置密码
-            if (request.ResetPass)
+            try
             {
-                string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
-                _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, null, updatePwd);
-            }
-
-            //修改了手机号， 需要修改auth表信息
-            if (!sysUser.Telphone.Equals(request.Telphone))
-            {
-                if (_sysUserRepository.IsExistTelphone(request.Telphone, request.SysType))
+                BeginTransaction();
+                //判断是否重置密码
+                if (request.ResetPass)
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                    string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
+                    _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, null, updatePwd);
+                }
+
+                //修改了手机号， 需要修改auth表信息
+                if (!sysUser.Telphone.Equals(request.Telphone))
+                {
+                    if (_sysUserRepository.IsExistTelphone(request.Telphone, request.SysType))
+                    {
+                        Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                        return Task.FromResult(new Unit());
+                    }
+                    _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, request.Telphone, null);
+                }
+
+                //修改了用户名， 需要修改auth表信息
+                if (!sysUser.LoginUsername.Equals(request.LoginUsername))
+                {
+                    if (_sysUserRepository.IsExistLoginUsername(request.LoginUsername, request.SysType))
+                    {
+                        Bus.RaiseEvent(new DomainNotification("", "该登录用户名已关联其他用户！"));
+                        return Task.FromResult(new Unit());
+                    }
+                    _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, request.LoginUsername, null, null);
+                }
+
+                _mapper.Map(request, sysUser);
+                sysUser.UpdatedAt = DateTime.Now;
+                _sysUserRepository.Update(sysUser);
+
+                if (!Commit())
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "修改当前用户失败"));
                     return Task.FromResult(new Unit());
                 }
-                _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, request.Telphone, null);
-            }
 
-            //修改了用户名， 需要修改auth表信息
-            if (!sysUser.LoginUsername.Equals(request.LoginUsername))
+                CommitTransaction();
+            }
+            catch (Exception e)
             {
-                if (_sysUserRepository.IsExistLoginUsername(request.LoginUsername, request.SysType))
-                {
-                    Bus.RaiseEvent(new DomainNotification("", "该登录用户名已关联其他用户！"));
-                    return Task.FromResult(new Unit());
-                }
-                _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, request.LoginUsername, null, null);
+                RollbackTransaction();
+                Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return Task.FromResult(new Unit());
             }
-
-            _mapper.Map(request, sysUser);
-            sysUser.UpdatedAt = DateTime.Now;
-            _sysUserRepository.Update(sysUser);
-
-            Commit();
 
             return Task.FromResult(new Unit());
         }

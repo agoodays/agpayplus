@@ -188,9 +188,16 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 mchInfo.InitUserId = sysUser.SysUserId;
                 _mchInfoRepository.Add(mchInfo);
 
-                if (Commit())
+                if (!Commit())
                 {
-                    CommitTransaction();
+                    Bus.RaiseEvent(new DomainNotification("", "添加商户失败"));
+                    return Task.FromResult(new Unit());
+                }
+
+                CommitTransaction();
+
+                if (request.IsNotify == CS.YES)
+                {
                     // 提交成功后，这里需要发布领域事件
                     // 比如欢迎用户注册邮件呀，短信呀等
                     var createdEvent = _mapper.Map<MchInfoCreatedEvent>(mchInfo);
@@ -198,11 +205,6 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     createdEvent.LoginPassword = authPwd;
                     createdEvent.IsNotify = request.IsNotify;
                     Bus.RaiseEvent(createdEvent);
-                }
-                else
-                {
-                    Bus.RaiseEvent(new DomainNotification("", "添加商户失败"));
-                    return Task.FromResult(new Unit());
                 }
             }
             catch (Exception e)
@@ -239,53 +241,66 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     .Select(w => w.SysUserId).ToList();
             }
 
-            //修改了手机号， 需要修改auth表信息
-            // 获取商户超管
-            long mchAdminUserId = _sysUserRepository.FindMchAdminUserId(mchInfo.MchNo);
-            var sysUserAuth = _sysUserAuthRepository.GetAll()
-                 .Where(w => w.UserId.Equals(mchAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.MCH)
-                 && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE)).FirstOrDefault();
-            if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
+            try
             {
-                if (_sysUserRepository.IsExistTelphone(request.ContactTel, request.ContactTel))
+                BeginTransaction();
+                //修改了手机号， 需要修改auth表信息
+                // 获取商户超管
+                long mchAdminUserId = _sysUserRepository.FindMchAdminUserId(mchInfo.MchNo);
+                var sysUserAuth = _sysUserAuthRepository.GetAll()
+                     .Where(w => w.UserId.Equals(mchAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.MCH)
+                     && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE)).FirstOrDefault();
+
+                if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                    if (_sysUserRepository.IsExistTelphone(request.ContactTel, request.ContactTel))
+                    {
+                        Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                        return Task.FromResult(new Unit());
+                    }
+                    sysUserAuth.Identifier = request.ContactTel;
+                    _sysUserAuthRepository.Update(sysUserAuth);
+                }
+
+                // 判断是否重置密码
+                if (request.ResetPass)
+                {
+                    // 待更新的密码
+                    string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
+
+                    // 重置超管密码
+                    _sysUserAuthRepository.ResetAuthInfo(mchAdminUserId, CS.SYS_TYPE.MCH, null, null, updatePwd);
+
+                    // 删除超管登录信息
+                    removeCacheUserIdList.Add(mchAdminUserId);
+                }
+
+                // 推送mq删除redis用户认证信息
+                if (removeCacheUserIdList.Any())
+                {
+                    mqSender.Send(CleanMchLoginAuthCacheMQ.Build(removeCacheUserIdList));
+                }
+
+                // 更新商户信息
+                _mchInfoRepository.Update(mchInfo);
+
+                if (!Commit())
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "修改当前商户失败"));
                     return Task.FromResult(new Unit());
                 }
-                sysUserAuth.Identifier = request.ContactTel;
-                _sysUserAuthRepository.Update(sysUserAuth);
+
+                CommitTransaction();
+
+                // 推送mq到目前节点进行更新数据
+                mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, mchInfo.MchNo, null));
             }
-
-            // 判断是否重置密码
-            if (request.ResetPass)
+            catch (Exception e)
             {
-                // 待更新的密码
-                string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
-
-                // 重置超管密码
-                _sysUserAuthRepository.ResetAuthInfo(mchAdminUserId, CS.SYS_TYPE.MCH, null, null, updatePwd);
-
-                // 删除超管登录信息
-                removeCacheUserIdList.Add(mchAdminUserId);
-            }
-
-            // 推送mq删除redis用户认证信息
-            if (removeCacheUserIdList.Any())
-            {
-                mqSender.Send(CleanMchLoginAuthCacheMQ.Build(removeCacheUserIdList));
-            }
-
-            // 更新商户信息
-            _mchInfoRepository.Update(mchInfo);
-
-            if (!Commit())
-            {
-                Bus.RaiseEvent(new DomainNotification("", "修改当前商户失败"));
+                RollbackTransaction();
+                Bus.RaiseEvent(new DomainNotification("", e.Message));
                 return Task.FromResult(new Unit());
             }
-
-            // 推送mq到目前节点进行更新数据
-            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, mchInfo.MchNo, null));
 
             return Task.FromResult(new Unit());
         }
@@ -317,47 +332,60 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return Task.FromResult(new Unit());
             }
 
-            // 2.删除当前商户配置的支付通道
-            _mchPayPassageRepository.RemoveByMchNo(request.MchNo);
-
-            // 3.删除当前商户支付接口配置参数
-            var appIds = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(request.MchNo)).Select(s => s.AppId).ToList();
-            _payInterfaceConfigRepository.RemoveByInfoIds(appIds, CS.INFO_TYPE.MCH_APP);
-
-            // 4.删除当前商户应用信息
-            foreach (var appId in appIds)
+            try
             {
-                _mchAppRepository.Remove(appId);
-            }
+                BeginTransaction();
 
-            var sysUsers = _sysUserRepository.GetAll().Where(w => w.BelongInfoId.Equals(request.MchNo) && w.SysType.Equals(CS.SYS_TYPE.MCH));
-            foreach (var sysUser in sysUsers)
-            {
-                var sysUserAuths = _sysUserAuthRepository.GetAll().Where(w => w.UserId.Equals(sysUser.SysUserId));
-                // 5.删除当前商户用户认证信息
-                foreach (var sysUserAuth in sysUserAuths)
+                // 2.删除当前商户配置的支付通道
+                _mchPayPassageRepository.RemoveByMchNo(request.MchNo);
+
+                // 3.删除当前商户支付接口配置参数
+                var appIds = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(request.MchNo)).Select(s => s.AppId).ToList();
+                _payInterfaceConfigRepository.RemoveByInfoIds(appIds, CS.INFO_TYPE.MCH_APP);
+
+                // 4.删除当前商户应用信息
+                foreach (var appId in appIds)
                 {
-                    _sysUserAuthRepository.Remove(sysUserAuth.AuthId);
+                    _mchAppRepository.Remove(appId);
                 }
-                // 6.删除当前商户的登录用户
-                _sysUserRepository.Remove(sysUser.SysUserId);
+
+                var sysUsers = _sysUserRepository.GetAll().Where(w => w.BelongInfoId.Equals(request.MchNo) && w.SysType.Equals(CS.SYS_TYPE.MCH));
+                foreach (var sysUser in sysUsers)
+                {
+                    var sysUserAuths = _sysUserAuthRepository.GetAll().Where(w => w.UserId.Equals(sysUser.SysUserId));
+                    // 5.删除当前商户用户认证信息
+                    foreach (var sysUserAuth in sysUserAuths)
+                    {
+                        _sysUserAuthRepository.Remove(sysUserAuth.AuthId);
+                    }
+                    // 6.删除当前商户的登录用户
+                    _sysUserRepository.Remove(sysUser.SysUserId);
+                }
+
+                // 7.删除当前商户
+                _mchInfoRepository.Remove(mchInfo.MchNo);
+
+                if (!Commit())
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "删除当前商户失败"));
+                    return Task.FromResult(new Unit());
+                }
+
+                CommitTransaction();
+
+                // 推送mq删除redis用户缓存
+                var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
+                mqSender.Send(CleanMchLoginAuthCacheMQ.Build(userIdList));
+
+                // 推送mq到目前节点进行更新数据
+                mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, request.MchNo, null));
             }
-
-            // 7.删除当前商户
-            _mchInfoRepository.Remove(mchInfo.MchNo);
-
-            if (!Commit())
+            catch (Exception e)
             {
-                Bus.RaiseEvent(new DomainNotification("", "删除当前商户失败"));
+                RollbackTransaction();
+                Bus.RaiseEvent(new DomainNotification("", e.Message));
                 return Task.FromResult(new Unit());
             }
-
-            // 推送mq删除redis用户缓存
-            var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
-            mqSender.Send(CleanMchLoginAuthCacheMQ.Build(userIdList));
-
-            // 推送mq到目前节点进行更新数据
-            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, request.MchNo, null));
 
             return Task.FromResult(new Unit());
         }
