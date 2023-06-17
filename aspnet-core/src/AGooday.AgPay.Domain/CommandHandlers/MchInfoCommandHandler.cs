@@ -94,105 +94,122 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             }
             #endregion
 
-            #region 插入用户信息
-            // 插入用户信息
-            SysUser sysUser = new SysUser();
-            sysUser.LoginUsername = request.LoginUsername;
-            sysUser.Realname = mchInfo.ContactName;
-            sysUser.Telphone = mchInfo.ContactTel;
-            sysUser.UserNo = mchInfo.MchNo;
-            sysUser.BelongInfoId = mchInfo.MchNo;
-            sysUser.SysType = CS.SYS_TYPE.MCH;
-            sysUser.Sex = CS.SEX_MALE;
-            sysUser.AvatarUrl = CS.DEFAULT_MALE_AVATAR_URL;//默认头像
-            sysUser.IsAdmin = CS.YES;
-            sysUser.State = mchInfo.State;
-
-            #region 检查
-            // 登录用户名不可重复
-            // 这些业务逻辑，当然要在领域层中（领域命令处理程序中）进行处理
-            if (_sysUserRepository.IsExistLoginUsername(sysUser.LoginUsername, sysUser.SysType))
+            try
             {
-                // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "登录名已经被使用！"));
-                return Task.FromResult(new Unit());
+                BeginTransaction();
+                #region 插入用户信息
+                // 插入用户信息
+                SysUser sysUser = new SysUser();
+                sysUser.LoginUsername = request.LoginUsername;
+                sysUser.Realname = mchInfo.ContactName;
+                sysUser.Telphone = mchInfo.ContactTel;
+                sysUser.UserNo = mchInfo.MchNo;
+                sysUser.BelongInfoId = mchInfo.MchNo;
+                sysUser.SysType = CS.SYS_TYPE.MCH;
+                sysUser.Sex = CS.SEX_MALE;
+                sysUser.AvatarUrl = CS.DEFAULT_MALE_AVATAR_URL;//默认头像
+                sysUser.IsAdmin = CS.YES;
+                sysUser.State = mchInfo.State;
+
+                #region 检查
+                // 登录用户名不可重复
+                // 这些业务逻辑，当然要在领域层中（领域命令处理程序中）进行处理
+                if (_sysUserRepository.IsExistLoginUsername(sysUser.LoginUsername, sysUser.SysType))
+                {
+                    // 引发错误事件
+                    Bus.RaiseEvent(new DomainNotification("", "登录名已经被使用！"));
+                    return Task.FromResult(new Unit());
+                }
+                // 手机号不可重复
+                if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "联系人手机号已存在！"));
+                    return Task.FromResult(new Unit());
+                }
+                // 员工号不可重复
+                if (_sysUserRepository.IsExistUserNo(sysUser.UserNo, sysUser.SysType))
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
+                    return Task.FromResult(new Unit());
+                }
+                #endregion
+
+                _sysUserRepository.Add(sysUser);
+                _sysUserRepository.SaveChanges();
+
+                #region 添加默认用户认证表
+                string salt = StringUtil.GetUUID(6); //6位随机数
+                string authPwd = request.PasswordType.Equals("custom") ? request.LoginPassword : CS.DEFAULT_PWD;
+                string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
+                //用户名登录方式
+                var sysUserAuthByLoginUsername = new SysUserAuth()
+                {
+                    UserId = sysUser.SysUserId,
+                    IdentityType = CS.AUTH_TYPE.LOGIN_USER_NAME,
+                    Identifier = sysUser.LoginUsername,
+                    Credential = userPwd,
+                    Salt = salt,
+                    SysType = sysUser.SysType
+                };
+                _sysUserAuthRepository.Add(sysUserAuthByLoginUsername);
+
+                //手机号登录方式
+                var sysUserAuthByTelphone = new SysUserAuth()
+                {
+                    UserId = sysUser.SysUserId,
+                    IdentityType = CS.AUTH_TYPE.TELPHONE,
+                    Identifier = sysUser.Telphone,
+                    Credential = userPwd,
+                    Salt = salt,
+                    SysType = sysUser.SysType
+                };
+                _sysUserAuthRepository.Add(sysUserAuthByTelphone);
+                #endregion
+                #endregion
+
+                #region 插入商户默认应用
+                // 插入商户默认应用
+                MchApp mchApp = new MchApp();
+                mchApp.AppId = SeqUtil.GenAppId();
+                mchApp.MchNo = mchInfo.MchNo;
+                mchApp.AppName = "默认应用";
+                mchApp.AppSignType = "[\"MD5\"]";
+                mchApp.AppSecret = RandomUtil.RandomString(128);
+                mchApp.State = CS.YES;
+                mchApp.CreatedBy = sysUser.Realname;
+                mchApp.CreatedUid = sysUser.SysUserId;
+
+                _mchAppRepository.Add(mchApp);
+                #endregion
+
+                // 插入商户基本信息
+                // 存入商户默认用户ID
+                mchInfo.Sipw = BCrypt.Net.BCrypt.HashPassword(CS.DEFAULT_SIPW);
+                mchInfo.InitUserId = sysUser.SysUserId;
+                _mchInfoRepository.Add(mchInfo);
+
+                if (Commit())
+                {
+                    CommitTransaction();
+                    // 提交成功后，这里需要发布领域事件
+                    // 比如欢迎用户注册邮件呀，短信呀等
+                    var createdEvent = _mapper.Map<MchInfoCreatedEvent>(mchInfo);
+                    createdEvent.LoginUsername = request.LoginUsername;
+                    createdEvent.LoginPassword = authPwd;
+                    createdEvent.IsNotify = request.IsNotify;
+                    Bus.RaiseEvent(createdEvent);
+                }
+                else
+                {
+                    Bus.RaiseEvent(new DomainNotification("", "添加商户失败"));
+                    return Task.FromResult(new Unit());
+                }
             }
-            // 手机号不可重复
-            if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
+            catch (Exception e)
             {
-                Bus.RaiseEvent(new DomainNotification("", "联系人手机号已存在！"));
+                RollbackTransaction();
+                Bus.RaiseEvent(new DomainNotification("", e.Message));
                 return Task.FromResult(new Unit());
-            }
-            // 员工号不可重复
-            if (_sysUserRepository.IsExistUserNo(sysUser.UserNo, sysUser.SysType))
-            {
-                Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
-                return Task.FromResult(new Unit());
-            }
-            #endregion
-
-            _sysUserRepository.Add(sysUser);
-            _sysUserRepository.SaveChanges();
-
-            #region 添加默认用户认证表
-            string salt = StringUtil.GetUUID(6); //6位随机数
-            string authPwd = request.PasswordType.Equals("custom") ? request.LoginPassword : CS.DEFAULT_PWD;
-            string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
-            //用户名登录方式
-            var sysUserAuthByLoginUsername = new SysUserAuth()
-            {
-                UserId = sysUser.SysUserId,
-                IdentityType = CS.AUTH_TYPE.LOGIN_USER_NAME,
-                Identifier = sysUser.LoginUsername,
-                Credential = userPwd,
-                Salt = salt,
-                SysType = sysUser.SysType
-            };
-            _sysUserAuthRepository.Add(sysUserAuthByLoginUsername);
-
-            //手机号登录方式
-            var sysUserAuthByTelphone = new SysUserAuth()
-            {
-                UserId = sysUser.SysUserId,
-                IdentityType = CS.AUTH_TYPE.TELPHONE,
-                Identifier = sysUser.Telphone,
-                Credential = userPwd,
-                Salt = salt,
-                SysType = sysUser.SysType
-            };
-            _sysUserAuthRepository.Add(sysUserAuthByTelphone);
-            #endregion
-            #endregion
-
-            #region 插入商户默认应用
-            // 插入商户默认应用
-            MchApp mchApp = new MchApp();
-            mchApp.AppId = SeqUtil.GenAppId();
-            mchApp.MchNo = mchInfo.MchNo;
-            mchApp.AppName = "默认应用";
-            mchApp.AppSecret = RandomUtil.RandomString(128);
-            mchApp.State = CS.YES;
-            mchApp.CreatedBy = sysUser.Realname;
-            mchApp.CreatedUid = sysUser.SysUserId;
-
-            _mchAppRepository.Add(mchApp);
-            #endregion
-
-            // 插入商户基本信息
-            // 存入商户默认用户ID
-            mchInfo.Sipw = BCrypt.Net.BCrypt.HashPassword(CS.DEFAULT_SIPW);
-            mchInfo.InitUserId = sysUser.SysUserId;
-            _mchInfoRepository.Add(mchInfo);
-
-            if (Commit())
-            {
-                // 提交成功后，这里需要发布领域事件
-                // 比如欢迎用户注册邮件呀，短信呀等
-                var createdEvent = _mapper.Map<MchInfoCreatedEvent>(mchInfo);
-                createdEvent.LoginUsername = request.LoginUsername;
-                createdEvent.LoginPassword = authPwd;
-                createdEvent.IsNotify = request.IsNotify;
-                Bus.RaiseEvent(createdEvent);
             }
 
             return Task.FromResult(new Unit());

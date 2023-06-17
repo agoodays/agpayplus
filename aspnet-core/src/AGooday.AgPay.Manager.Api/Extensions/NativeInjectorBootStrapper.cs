@@ -102,7 +102,6 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
-            services.AddScoped<IPayRateLevelConfigRepository, PayRateLevelConfigRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
             services.AddScoped<IMchStoreRepository, MchStoreRepository>();
             services.AddScoped<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();
@@ -115,6 +114,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IPayOrderDivisionRecordRepository, PayOrderDivisionRecordRepository>();
             services.AddScoped<IPayOrderRepository, PayOrderRepository>();
             services.AddScoped<IPayRateConfigRepository, PayRateConfigRepository>();
+            services.AddScoped<IPayRateLevelConfigRepository, PayRateLevelConfigRepository>();
             services.AddScoped<IPayWayRepository, PayWayRepository>();
             services.AddScoped<IQrCodeRepository, QrCodeRepository>();
             services.AddScoped<IQrCodeShellRepository, QrCodeShellRepository>();

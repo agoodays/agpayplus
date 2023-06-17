@@ -62,6 +62,22 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             //将错误信息收集一：缓存方法（错误示范）
             //_cache.Set("ErrorData", errorInfo);
         }
+
+        public void BeginTransaction()
+        {
+            _uow.BeginTransaction();
+        }
+
+        public void CommitTransaction()
+        {
+            _uow.CommitTransaction();
+        }
+
+        public void RollbackTransaction()
+        {
+            _uow.RollbackTransaction();
+        }
+
         //工作单元提交
         //如果有错误，下一步会在这里添加领域通知
         public bool Commit()

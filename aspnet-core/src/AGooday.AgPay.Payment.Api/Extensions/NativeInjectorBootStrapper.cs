@@ -44,6 +44,7 @@ namespace AGooday.AgPay.Payment.Api.Extensions
             services.AddTransient<IPayInterfaceDefineService, PayInterfaceDefineService>();
             services.AddTransient<IPayOrderDivisionRecordService, PayOrderDivisionRecordService>();
             services.AddTransient<IPayOrderService, PayOrderService>();
+            services.AddTransient<IPayRateConfigService, PayRateConfigService>();
             services.AddTransient<IPayWayService, PayWayService>();
             services.AddTransient<IRefundOrderService, RefundOrderService>();
             services.AddTransient<ISysConfigService, SysConfigService>();
@@ -100,6 +101,8 @@ namespace AGooday.AgPay.Payment.Api.Extensions
             services.AddTransient<IPayInterfaceDefineRepository, PayInterfaceDefineRepository>();
             services.AddTransient<IPayOrderDivisionRecordRepository, PayOrderDivisionRecordRepository>();
             services.AddTransient<IPayOrderRepository, PayOrderRepository>();
+            services.AddTransient<IPayRateConfigRepository, PayRateConfigRepository>();
+            services.AddTransient<IPayRateLevelConfigRepository, PayRateLevelConfigRepository>();
             services.AddTransient<IPayWayRepository, PayWayRepository>();
             services.AddTransient<IRefundOrderRepository, RefundOrderRepository>();
             services.AddTransient<ISysConfigRepository, SysConfigRepository>();
