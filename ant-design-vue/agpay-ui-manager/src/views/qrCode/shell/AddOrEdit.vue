@@ -105,7 +105,7 @@
       <a-col span="10">
         <div style="display: flex; justify-content: center;">
           <div>
-            <img :src="saveObject.shellImgViewUrl" style="max-width: 400px; border: 1px solid darkgrey;">
+            <img :src="saveObject.shellImgViewUrl" @click="onPreview" style="max-width: 400px; border: 1px solid darkgrey;">
           </div>
         </div>
       </a-col>
@@ -236,6 +236,15 @@ export default {
         alias: '微信'
       })
       this.onChange()
+    },
+    onPreview () {
+      const that = this
+      that.$viewerApi({
+        images: [that.saveObject.shellImgViewUrl],
+        options: {
+          initialViewIndex: 0
+        }
+      })
     },
     // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
     uploadSuccess (name, fileList) {
