@@ -4,7 +4,7 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
+            <a-form-item label="" class="table-head-layout">
               <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
             </a-form-item>
             <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
@@ -325,17 +325,17 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'payAmount', title: '支付金额', scopedSlots: { customRender: 'payAmountSlot' } },
-    { key: 'refundAmount', title: '退款金额', scopedSlots: { customRender: 'refundAmountSlot' } },
-    { key: 'pay', title: '退款订单号', scopedSlots: { customRender: 'refundOrderSlot' }, width: '260px' },
-    { key: 'refund', title: '支付订单号', scopedSlots: { customRender: 'payOrderSlot' }, width: '260px' },
+    { key: 'payAmount', title: '支付金额', scopedSlots: { customRender: 'payAmountSlot' }, width: 100 },
+    { key: 'refundAmount', title: '退款金额', scopedSlots: { customRender: 'refundAmountSlot' }, width: 100 },
+    { key: 'pay', title: '退款订单号', scopedSlots: { customRender: 'refundOrderSlot' }, width: 260 },
+    { key: 'refund', title: '支付订单号', scopedSlots: { customRender: 'payOrderSlot' }, width: 260 },
     // { key: 'refundOrderId', dataIndex: 'refundOrderId', title: '退款订单号' },
     // { key: 'mchRefundNo', dataIndex: 'mchRefundNo', title: '商户退款单号' },
     // { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
     // { key: 'channelPayOrderNo', dataIndex: 'channelPayOrderNo', title: '渠道订单号' },
-    { key: 'state', title: '支付状态', scopedSlots: { customRender: 'stateSlot' } },
-    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
-    { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+    { key: 'state', title: '支付状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
+    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+    { key: 'op', title: '操作', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' }, width: 100 }
   ]
 
   export default {

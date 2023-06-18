@@ -98,17 +98,17 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'amount', title: '转账金额', scopedSlots: { customRender: 'transferAmountSlot' } },
+    { key: 'amount', title: '转账金额', scopedSlots: { customRender: 'transferAmountSlot' }, width: 100 },
     { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 260 },
     // { key: 'transferId', dataIndex: 'transferId', title: '转账订单号' },
     // { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户转账单号' },
     // { key: 'channelOrderNo', dataIndex: 'channelOrderNo', title: '渠道订单号' },
     { key: 'accountNo', dataIndex: 'accountNo', title: '收款账号', width: 200 },
-    { key: 'accountName', dataIndex: 'accountName', title: '收款人姓名' },
-    { key: 'transferDesc', dataIndex: 'transferDesc', title: '转账备注' },
+    { key: 'accountName', dataIndex: 'accountName', title: '收款人姓名', width: 120 },
+    { key: 'transferDesc', dataIndex: 'transferDesc', title: '转账备注', width: 200 },
     { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
-    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
-    { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+    { key: 'op', title: '操作', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' }, width: 100 }
   ]
 
   export default {

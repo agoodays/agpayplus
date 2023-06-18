@@ -491,17 +491,17 @@ import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'amount', title: '支付金额', scopedSlots: { customRender: 'amountSlot' } },
-  { key: 'refundAmount', title: '退款金额', scopedSlots: { customRender: 'refundAmountSlot' } },
-  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', customRender: (text) => '￥' + (text / 100).toFixed(2) },
-  { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: '260px' },
+  { key: 'amount', title: '支付金额', scopedSlots: { customRender: 'amountSlot' }, width: 100 },
+  { key: 'refundAmount', title: '退款金额', scopedSlots: { customRender: 'refundAmountSlot' }, width: 100 },
+  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', customRender: (text) => '￥' + (text / 100).toFixed(2), width: 100 },
+  { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 260 },
   // { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
   // { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号' },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式', width: 150 },
-  { key: 'state', title: '支付状态', scopedSlots: { customRender: 'stateSlot' } },
-  { key: 'divisionState', title: '分账状态', scopedSlots: { customRender: 'divisionStateSlot' }, align: 'center' },
-  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
-  { key: 'op', title: '操作', width: '120px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'state', title: '支付状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
+  { key: 'divisionState', title: '分账状态', scopedSlots: { customRender: 'divisionStateSlot' }, align: 'center', width: 100 },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+  { key: 'op', title: '操作', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' }, width: 120 }
 ]
 
 export default {

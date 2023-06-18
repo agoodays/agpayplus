@@ -92,6 +92,7 @@ namespace AGooday.AgPay.Payment.Api.Extensions
             services.AddTransient<IAgentInfoRepository, AgentInfoRepository>();
             services.AddTransient<IIsvInfoRepository, IsvInfoRepository>();
             services.AddTransient<IMchAppRepository, MchAppRepository>();
+            services.AddTransient<IMchStoreRepository, MchStoreRepository>();
             services.AddTransient<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();
             services.AddTransient<IMchDivisionReceiverRepository, MchDivisionReceiverRepository>();
             services.AddTransient<IMchInfoRepository, MchInfoRepository>();

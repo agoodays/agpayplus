@@ -84,12 +84,12 @@ export default {
           end = moment().endOf('day').subtract(1, 'days')
           break
         case 'near2now_7':
-          start = moment().startOf('day').subtract(7, 'days')
-          end = moment().endOf('day').subtract(1, 'days')
+          start = moment().startOf('day').subtract(6, 'days')
+          end = moment().endOf('day')
           break
         case 'near2now_30':
-          start = moment().startOf('day').subtract(30, 'days')
-          end = moment().endOf('day').subtract(1, 'days')
+          start = moment().startOf('day').subtract(29, 'days')
+          end = moment().endOf('day')
           break
         default:
           if (start?.length > 0 && end?.length > 0) {

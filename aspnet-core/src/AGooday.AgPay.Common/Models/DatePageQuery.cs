@@ -19,8 +19,8 @@
             if (QueryDateRange.Contains("near2now"))
             {
                 int day = Convert.ToInt32(QueryDateRange.Split("_")[1]);
-                createdStart = DateTime.Today.AddDays(-day).ToString("yyyy-MM-dd");
-                createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
+                createdStart = DateTime.Today.AddDays(-(day - 1)).ToString("yyyy-MM-dd");
+                createdEnd = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
             }
             if (QueryDateRange.Contains("customDateTime"))
             {

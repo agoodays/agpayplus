@@ -25,6 +25,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         private readonly ISysUserRepository _sysUserRepository;
         private readonly ISysUserAuthRepository _sysUserAuthRepository;
         private readonly IMchAppRepository _mchAppRepository;
+        private readonly IMchStoreRepository _mchStoreRepository;
         private readonly IPayOrderRepository _payOrderRepository;
         private readonly IMchPayPassageRepository _mchPayPassageRepository;
         private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
@@ -43,7 +44,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             IIsvInfoRepository isvInfoRepository,
             ISysUserRepository sysUserRepository,
             ISysUserAuthRepository sysUserAuthRepository,
-            IMchAppRepository mchAppRepository,
+            IMchAppRepository mchAppRepository, 
+            IMchStoreRepository mchStoreRepository,
             IPayOrderRepository payOrderRepository,
             IMchPayPassageRepository mchPayPassageRepository,
             IPayInterfaceConfigRepository payInterfaceConfigRepository)
@@ -56,6 +58,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _sysUserRepository = sysUserRepository;
             _mchInfoRepository = mchInfoRepository;
             _isvInfoRepository = isvInfoRepository;
+            _mchStoreRepository = mchStoreRepository;
             _mchAppRepository = mchAppRepository;
             _sysUserAuthRepository = sysUserAuthRepository;
             _payOrderRepository = payOrderRepository;
@@ -180,6 +183,30 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 mchApp.CreatedUid = sysUser.SysUserId;
 
                 _mchAppRepository.Add(mchApp);
+                #endregion
+
+                #region 插入商户默认店铺
+                // 插入商户默认店铺
+                MchStore mchStore = new MchStore();
+                mchStore.StoreName = mchInfo.MchName;
+                mchStore.MchNo = mchInfo.MchNo;
+                mchStore.AgentNo = mchInfo.AgentNo;
+                mchStore.IsvNo = mchInfo.IsvNo;
+                mchStore.ContactPhone = mchInfo.ContactTel;
+                mchStore.StoreLogo = string.Empty;
+                mchStore.StoreOuterImg = string.Empty;
+                mchStore.StoreInnerImg = string.Empty;
+                mchStore.ProvinceCode = string.Empty;
+                mchStore.CityCode = string.Empty;
+                mchStore.AreaCode = string.Empty;
+                mchStore.Address = string.Empty;
+                mchStore.Lng = string.Empty;
+                mchStore.Lat = string.Empty;
+                mchStore.DefaultFlag = CS.YES;
+                mchStore.CreatedBy = sysUser.Realname;
+                mchStore.CreatedUid = sysUser.SysUserId;
+
+                _mchStoreRepository.Add(mchStore);
                 #endregion
 
                 // 插入商户基本信息
