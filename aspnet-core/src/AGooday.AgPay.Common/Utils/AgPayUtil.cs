@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Common.Utils
 
         public static string AesDecode(string data)
         {
-            return EnDecryptUtil.AESDecryptUnHex(data, AES_KEY);
+            return EnDecryptUtil.AESDecryptFromHex(data, AES_KEY);
         }
 
         /// <summary>

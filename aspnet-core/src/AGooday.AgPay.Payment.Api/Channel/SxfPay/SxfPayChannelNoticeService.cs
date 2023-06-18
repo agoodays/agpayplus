@@ -2,11 +2,13 @@
 using AGooday.AgPay.Application.Params.SxfPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Ocsp;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 {
@@ -76,12 +78,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                     /*落单号
                     仅供退款使用
                     消费者账单中的条形码订单号*/
-                    string sxfUuid = jsonParams.GetValue("sxfUuid").ToString();
-                    string transactionId = jsonParams.GetValue("transactionId").ToString();//微信/支付宝流水号
+                    jsonParams.TryGetString("sxfUuid", out string sxfUuid);
+                    jsonParams.TryGetString("channelId", out string channelId);//渠道商商户号
+                    jsonParams.TryGetString("transactionId", out string transactionId);//微信/支付宝流水号
                     /*买家用户号
                     支付宝渠道：买家支付宝用户号buyer_user_id
                     微信渠道：微信平台的sub_openid*/
-                    string buyerId = jsonParams.GetValue("buyerId").ToString();
+                    jsonParams.TryGetString("buyerId", out string buyerId);
                     result.ChannelOrderId = uuid;
                     result.ChannelUserId = buyerId;
                     result.PlatformOrderId = transactionId;

@@ -96,7 +96,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto)
         {
-            var mchInfos = _refundOrderRepository.GetAll()
+            var refundOrders = _refundOrderRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (dto.MchType.Equals(0) || w.MchType.Equals(dto.MchType))
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<RefundOrder>.Create<RefundOrderDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<RefundOrder>.Create<RefundOrderDto>(refundOrders.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
         public long SumSuccessRefundAmount(string payOrderId)

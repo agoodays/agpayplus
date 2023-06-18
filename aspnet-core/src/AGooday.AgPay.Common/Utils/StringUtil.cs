@@ -6,32 +6,53 @@ namespace AGooday.AgPay.Common.Utils
 {
     public static class StringUtil
     {
-        public static string ToHex(byte[] bytes) // 0xae00cf => "AE00CF "
+        public static string ToHex(byte[] bytes)
         {
-            string hexString = string.Empty;
-            if (bytes != null)
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in bytes)
             {
-                StringBuilder strB = new StringBuilder();
-
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    strB.Append(bytes[i].ToString("X2"));
-                }
-                hexString = strB.ToString().ToLower();
+                sb.Append(b.ToString("X2"));
             }
-            return hexString;
+            return sb.ToString();
         }
 
         public static byte[] UnHex(string hex)
         {
-            byte[] inputByteArray = new byte[hex.Length / 2];
-            for (int x = 0; x < hex.Length / 2; x++)
+            int len = hex.Length / 2;
+            byte[] bytes = new byte[len];
+            for (int i = 0; i < len; i++)
             {
-                int i = (Convert.ToInt32(hex.Substring(x * 2, 2), 16));
-                inputByteArray[x] = (byte)i;
+                bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
             }
-            return inputByteArray;
+            return bytes;
         }
+
+        //public static string ToHex(byte[] bytes) // 0xae00cf => "AE00CF "
+        //{
+        //    string hexString = string.Empty;
+        //    if (bytes != null)
+        //    {
+        //        StringBuilder strB = new StringBuilder();
+
+        //        for (int i = 0; i < bytes.Length; i++)
+        //        {
+        //            strB.Append(bytes[i].ToString("X2"));
+        //        }
+        //        hexString = strB.ToString().ToLower();
+        //    }
+        //    return hexString;
+        //}
+
+        //public static byte[] UnHex(string hex)
+        //{
+        //    byte[] inputByteArray = new byte[hex.Length / 2];
+        //    for (int x = 0; x < hex.Length / 2; x++)
+        //    {
+        //        int i = (Convert.ToInt32(hex.Substring(x * 2, 2), 16));
+        //        inputByteArray[x] = (byte)i;
+        //    }
+        //    return inputByteArray;
+        //}
 
         public static string ToHex(string s)
         {

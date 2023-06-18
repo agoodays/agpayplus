@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
@@ -76,16 +77,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         /*落单号
                         仅供退款使用
                         消费者账单中的条形码订单号*/
-                        string sxfUuid = respData.GetValue("sxfUuid").ToString();
-                        string channelId = respData.GetValue("channelId").ToString();//渠道商商户号
-                        string transactionId = respData.GetValue("transactionId").ToString();//微信/支付宝流水号
+                        respData.TryGetString("sxfUuid", out string sxfUuid);
+                        respData.TryGetString("channelId", out string channelId);//渠道商商户号
+                        respData.TryGetString("transactionId", out string transactionId);//微信/支付宝流水号
                         /*买家用户号
                         支付宝渠道：买家支付宝用户号buyer_user_id
                         微信渠道：微信平台的sub_openid*/
-                        string buyerId = respData.GetValue("buyerId").ToString();
+                        respData.TryGetString("buyerId", out string buyerId);
                         switch (tranSts)
                         {
                             case "REFUNDSUC":
+                                channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                                 log.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;
@@ -103,6 +105,18 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                                 break;
                         }
                     }
+                    else
+                    {
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = bizCode;
+                        channelRetMsg.ChannelErrMsg = bizMsg;
+                    }
+                }
+                else
+                {
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    channelRetMsg.ChannelErrCode = code;
+                    channelRetMsg.ChannelErrMsg = msg;
                 }
             }
             catch (Exception e)
@@ -122,7 +136,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             {
                 reqParams.Add("ordNo", refundOrder.RefundOrderId); // 退款订单号
                 reqParams.Add("origOrderNo", payOrder.PayOrderId); // 原交易订单号
-                reqParams.Add("amt", refundOrder.RefundAmount); // 退款金额
+                reqParams.Add("amt", AmountUtil.ConvertCent2Dollar(refundOrder.RefundAmount)); // 退款金额
                 reqParams.Add("notifyUrl ", GetNotifyUrl()); // 订单类型
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
@@ -153,16 +167,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         /*落单号
                         仅供退款使用
                         消费者账单中的条形码订单号*/
-                        string sxfUuid = respData.GetValue("sxfUuid").ToString();
-                        string channelId = respData.GetValue("channelId").ToString();//渠道商商户号
-                        string transactionId = respData.GetValue("transactionId").ToString();//微信/支付宝流水号
+                        respData.TryGetString("sxfUuid", out string sxfUuid);
+                        respData.TryGetString("channelId", out string channelId);//渠道商商户号
+                        respData.TryGetString("transactionId", out string transactionId);//微信/支付宝流水号
                         /*买家用户号
                         支付宝渠道：买家支付宝用户号buyer_user_id
                         微信渠道：微信平台的sub_openid*/
-                        string buyerId = respData.GetValue("buyerId").ToString();
+                        respData.TryGetString("buyerId", out string buyerId);
                         switch (tranSts)
                         {
                             case "REFUNDSUC":
+                                channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                                 log.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;

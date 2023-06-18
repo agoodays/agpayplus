@@ -112,7 +112,7 @@ export default {
           this.confirmLoading = true
           const that = this
           // 退款接口
-          payOrderRefund(that.recordId, that.refund.refundAmount, that.refund.refundReason).then(res => {
+          payOrderRefund(that.recordId, that.refund.refundAmount * 100, that.refund.refundReason).then(res => {
               that.visible = false // 关闭弹窗
               that.confirmLoading = false // 取消按钮转圈
 

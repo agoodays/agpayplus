@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             {
                 model.Currency = "CNY";
             }
-            model.ClientIp = "127.1.0.0";
+            model.ClientIp = IpUtil.GetIP(Request);
             model.Subject = $"{payOrder.OrderTitle}[{model.MchNo}商户联调]";
             model.Body = $"{payOrder.OrderTitle}[{model.MchNo}商户联调]";
 

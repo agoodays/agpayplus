@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 退款状态:0-订单生成,1-退款中,2-退款成功,3-退款失败,4-退款任务关闭
         /// </summary>
-        public byte State { get; set; }
+        public byte? State { get; set; }
 
         /// <summary>
         /// 客户端IP

@@ -93,6 +93,18 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                                 break;
                         }
                     }
+                    else
+                    {
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = bizCode;
+                        channelRetMsg.ChannelErrMsg = bizMsg;
+                    }
+                }
+                else
+                {
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    channelRetMsg.ChannelErrCode = code;
+                    channelRetMsg.ChannelErrMsg = msg;
                 }
                 return channelRetMsg; //支付中
             }
