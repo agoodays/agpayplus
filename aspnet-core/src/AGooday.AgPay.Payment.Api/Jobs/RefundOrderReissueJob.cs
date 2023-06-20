@@ -17,7 +17,9 @@ namespace AGooday.AgPay.Payment.Api.Jobs
         private readonly IRefundOrderService refundOrderService;
         private readonly ChannelOrderReissueService channelOrderReissueService;
 
-        public RefundOrderReissueJob(ILogger<RefundOrderReissueJob> logger, IRefundOrderService refundOrderService, ChannelOrderReissueService channelOrderReissueService)
+        public RefundOrderReissueJob(ILogger<RefundOrderReissueJob> logger, 
+            IRefundOrderService refundOrderService, 
+            ChannelOrderReissueService channelOrderReissueService)
         {
             this.logger = logger;
             this.refundOrderService = refundOrderService;

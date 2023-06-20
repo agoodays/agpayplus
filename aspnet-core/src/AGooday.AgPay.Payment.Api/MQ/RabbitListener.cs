@@ -15,7 +15,9 @@ namespace AGooday.AgPay.Payment.Api.MQ
         private readonly ILogger<RabbitListener> _logger;
         private readonly IOptions<RabbitMQConfiguration> rabbitMQConfiguration;
         private readonly IServiceProvider _serviceProvider;
-        public RabbitListener(ILogger<RabbitListener> logger, IServiceProvider serviceProvider, IOptions<RabbitMQConfiguration> rabbitMQConfiguration)
+        public RabbitListener(ILogger<RabbitListener> logger, 
+            IServiceProvider serviceProvider, 
+            IOptions<RabbitMQConfiguration> rabbitMQConfiguration)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;

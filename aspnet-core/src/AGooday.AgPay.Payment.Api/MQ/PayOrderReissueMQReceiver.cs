@@ -20,7 +20,10 @@ namespace AGooday.AgPay.Payment.Api.MQ
         private readonly IPayOrderService payOrderService;
         private readonly ChannelOrderReissueService channelOrderReissueService;
 
-        public PayOrderReissueMQReceiver(IMQSender mqSender, ILogger<PayOrderMchNotifyMQReceiver> log, IPayOrderService payOrderService, ChannelOrderReissueService channelOrderReissueService)
+        public PayOrderReissueMQReceiver(IMQSender mqSender, 
+            ILogger<PayOrderMchNotifyMQReceiver> log, 
+            IPayOrderService payOrderService, 
+            ChannelOrderReissueService channelOrderReissueService)
         {
             this.mqSender = mqSender;
             this.log = log;

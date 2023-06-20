@@ -12,7 +12,8 @@ namespace AGooday.AgPay.Payment.Api.Jobs
         private readonly ILogger<PayOrderExpiredJob> logger;
         private readonly IPayOrderService payOrderService;
 
-        public PayOrderExpiredJob(ILogger<PayOrderExpiredJob> logger,IPayOrderService payOrderService)
+        public PayOrderExpiredJob(ILogger<PayOrderExpiredJob> logger,
+            IPayOrderService payOrderService)
         {
             this.logger = logger;
             this.payOrderService = payOrderService;

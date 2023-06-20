@@ -13,7 +13,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
         private readonly ILogger<ResetAppConfigMQReceiver> log;
         private ISysConfigService sysConfigService;
 
-        public ResetAppConfigMQReceiver(ILogger<ResetAppConfigMQReceiver> log, ISysConfigService sysConfigService)
+        public ResetAppConfigMQReceiver(ILogger<ResetAppConfigMQReceiver> log, 
+            ISysConfigService sysConfigService)
         {
             this.log = log;
             this.sysConfigService = sysConfigService;

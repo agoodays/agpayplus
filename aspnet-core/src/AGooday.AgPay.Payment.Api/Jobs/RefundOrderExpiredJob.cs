@@ -12,7 +12,8 @@ namespace AGooday.AgPay.Payment.Api.Jobs
         private readonly ILogger<RefundOrderExpiredJob> logger;
         private readonly IRefundOrderService refundOrderService;
 
-        public RefundOrderExpiredJob(ILogger<RefundOrderExpiredJob> logger, IRefundOrderService refundOrderService)
+        public RefundOrderExpiredJob(ILogger<RefundOrderExpiredJob> logger, 
+            IRefundOrderService refundOrderService)
         {
             this.logger = logger;
             this.refundOrderService = refundOrderService;

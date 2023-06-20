@@ -19,7 +19,10 @@ namespace AGooday.AgPay.Payment.Api.MQ
         private readonly IPayOrderService payOrderService;
         private readonly IMchNotifyRecordService mchNotifyRecordService;
 
-        public PayOrderMchNotifyMQReceiver(IMQSender mqSender, ILogger<PayOrderMchNotifyMQReceiver> logger, IPayOrderService payOrderService, IMchNotifyRecordService mchNotifyRecordService)
+        public PayOrderMchNotifyMQReceiver(IMQSender mqSender, 
+            ILogger<PayOrderMchNotifyMQReceiver> logger, 
+            IPayOrderService payOrderService, 
+            IMchNotifyRecordService mchNotifyRecordService)
         {
             this.mqSender = mqSender;
             log = logger;
