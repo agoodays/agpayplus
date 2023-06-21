@@ -326,6 +326,7 @@
             public const string XXPAY = "xxpay";     // 小新支付
             public const string PPPAY = "pppay";     // Paypal 支付
             public const string SXFPAY = "sxfpay";     // 随行付支付
+            public const string LESPAY = "lespay";     // 乐刷支付
         }
 
         /// <summary>

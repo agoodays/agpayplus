@@ -61,14 +61,23 @@
             </a-row>
           </a-form-model-item>
           <a-form-model-item label="背景颜色：" prop="bgColor">
-            <a-radio-group v-model="saveObject.configInfo.bgColor" @change="onChange">
-              <a-radio :value="'#1a53ff'" style="color: #1a53ff">蓝色</a-radio>
-              <a-radio :value="'#ff0000'" style="color: #ff0000">红色</a-radio>
-              <a-radio :value="'#09bb07'" style="color: #09bb07">绿色</a-radio>
-              <a-radio :value="'custom'" :style="{ color:saveObject.configInfo.customBgColor }">
-                自定义 <colorPicker v-if="saveObject.configInfo.bgColor === 'custom'" v-model="saveObject.configInfo.customBgColor" style="margin-top: 12px;" @change="onChange"/>
-              </a-radio>
-            </a-radio-group>
+            <a-row>
+              <a-col>
+                <a-radio-group v-model="saveObject.configInfo.bgColor" @change="onChange">
+                  <a-radio :value="'#1a53ff'" style="color: #1a53ff">蓝色</a-radio>
+                  <a-radio :value="'#ff0000'" style="color: #ff0000">红色</a-radio>
+                  <a-radio :value="'#09bb07'" style="color: #09bb07">绿色</a-radio>
+                  <a-radio :value="'custom'" :style="{ color:saveObject.configInfo.customBgColor }">
+                    自定义
+                  </a-radio>
+                </a-radio-group>
+              </a-col>
+            </a-row>
+            <a-row>
+              <a-col>
+                <colorPicker v-if="saveObject.configInfo.bgColor === 'custom'" v-model="saveObject.configInfo.customBgColor" style="height: 66px; margin-top: 8px;" @change="onChange"/>
+              </a-col>
+            </a-row>
           </a-form-model-item>
           <a-form-model-item label="主logo：" prop="logoImgUrl">
             <AgUpload
@@ -286,7 +295,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
   .agpay-tip-text:before {
     content: "";
     width: 0;
@@ -297,6 +306,7 @@ export default {
     top: -20px;
     left: 30px;
   }
+
   .agpay-tip-text {
     font-size: 10px !important;
     border-radius: 5px;
@@ -308,7 +318,27 @@ export default {
     position: relative;
     margin-top: 15px;
   }
+
   .ag-upload-btn {
     height: 66px;
+  }
+
+  .m-colorPicker {
+    height: 66px;
+    width: 100%;
+    margin-top: 8px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+
+    /deep/ .colorBtn {
+      height: 48px;
+      width: calc(100% - 16px);
+      margin: 8px;
+      border-radius: 4px;
+    }
+
+    /deep/ .box.open {
+      z-index: 3;
+    }
   }
 </style>

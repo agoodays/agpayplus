@@ -1,6 +1,8 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Channel.AliPay.Extensions;
+using AGooday.AgPay.Payment.Api.Channel.LesPay;
+using AGooday.AgPay.Payment.Api.Channel.LesPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.WxPay;
@@ -63,6 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddSingleton<WxPayPaymentService>();
             services.AddSingleton<YsfPayPaymentService>();
             services.AddSingleton<SxfPayPaymentService>();
+            services.AddSingleton<LesPayPaymentService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IPaymentService> funcFactory = ifCode =>
@@ -77,6 +80,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<YsfPayPaymentService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayPaymentService>();
+                        case CS.IF_CODE.LESPAY:
+                            return provider.GetService<LesPayPaymentService>();
                         default:
                             return null;
                     }
@@ -89,6 +94,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddSingleton<WxPayRefundService>();
             services.AddSingleton<YsfPayRefundService>();
             services.AddSingleton<SxfPayRefundService>();
+            services.AddSingleton<LesPayRefundService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IRefundService> funcFactory = ifCode =>
@@ -103,6 +109,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<YsfPayRefundService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayRefundService>();
+                        case CS.IF_CODE.LESPAY:
+                            return provider.GetService<LesPayRefundService>();
                         default:
                             return null;
                     }
@@ -115,6 +123,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddSingleton<WxPayChannelNoticeService>();
             services.AddSingleton<YsfPayChannelNoticeService>();
             services.AddSingleton<SxfPayChannelNoticeService>();
+            services.AddSingleton<LesPayChannelNoticeService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IChannelNoticeService> funcFactory = ifCode =>
@@ -129,6 +138,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<YsfPayChannelNoticeService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayChannelNoticeService>();
+                        case CS.IF_CODE.LESPAY:
+                            return provider.GetService<LesPayChannelNoticeService>();
                         default:
                             return null;
                     }
@@ -141,6 +152,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             //services.AddSingleton<WxPayChannelRefundNoticeService>();
             //services.AddSingleton<YsfPayChannelRefundNoticeService>();
             services.AddSingleton<SxfPayChannelNoticeService>();
+            services.AddSingleton<LesPayChannelRefundNoticeService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IChannelRefundNoticeService> funcFactory = ifCode =>
@@ -155,6 +167,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                         //    return provider.GetService<YsfPayChannelRefundNoticeService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayChannelRefundNoticeService>();
+                        case CS.IF_CODE.LESPAY:
+                            return provider.GetService<LesPayChannelRefundNoticeService>();
                         default:
                             return null;
                     }
@@ -167,6 +181,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddSingleton<WxPayPayOrderQueryService>();
             services.AddSingleton<YsfPayPayOrderQueryService>();
             services.AddSingleton<SxfPayPayOrderQueryService>();
+            services.AddSingleton<LesPayPayOrderQueryService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IPayOrderQueryService> funcFactory = ifCode =>
@@ -181,6 +196,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<YsfPayPayOrderQueryService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayPayOrderQueryService>();
+                        case CS.IF_CODE.LESPAY:
+                            return provider.GetService<LesPayPayOrderQueryService>();
                         default:
                             return null;
                     }
@@ -201,6 +218,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             #endregion
             #region SxfPay
             SxfPayNativeInjectorBootStrapper.RegisterServices(services);
+            #endregion
+            #region LesPay
+            LesPayNativeInjectorBootStrapper.RegisterServices(services);
             #endregion
 
             var serviceProvider = services.BuildServiceProvider();
