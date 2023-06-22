@@ -1,7 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Channel.LesPay.Utils;
+using AGooday.AgPay.Payment.Api.Channel.LesPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using Newtonsoft.Json.Linq;
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
-            string payType = LesHttpUtil.GetPayWay(payOrder.WayCode);
+            string payType = LesPayEnum.GetPayWay(payOrder.WayCode);
             string logPrefix = $"【乐刷({payType})查单】";
 
             try
@@ -63,21 +63,22 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                         resJSON.TryGetString("out_transaction_id", out string out_transaction_id);//微信、支付宝等订单号
                         resJSON.TryGetString("channel_order_id", out string channel_order_id);//通道订单号
                         resJSON.TryGetString("sub_openid", out string sub_openid);//用户子标识 微信：公众号APPID下用户唯一标识；支付宝：买家的支付宝用户ID
-                        switch (status)
+                        var orderStatus = LesPayEnum.ConvertOrderStatus(status);
+                        switch (orderStatus)
                         {
-                            case "2":
+                            case LesPayEnum.OrderStatus.PaySuccess:
                                 channelRetMsg = ChannelRetMsg.ConfirmSuccess(leshua_order_id);  //支付成功
                                 channelRetMsg.ChannelOrderId = leshua_order_id;
                                 channelRetMsg.ChannelUserId = sub_openid;
                                 channelRetMsg.PlatformOrderId = out_transaction_id;
                                 channelRetMsg.PlatformMchOrderId = channel_order_id;
                                 break;
-                            case "8":
+                            case LesPayEnum.OrderStatus.PayFail:
                                 channelRetMsg = ChannelRetMsg.ConfirmFail(error_code, error_msg);
                                 break;
-                            case "0": // 支付中
+                            case LesPayEnum.OrderStatus.Paying: // 支付中
                                 break;
-                            case "6": // 订单关闭
+                            case LesPayEnum.OrderStatus.PayClosed: // 订单关闭
                                 break;
                         }
                     }

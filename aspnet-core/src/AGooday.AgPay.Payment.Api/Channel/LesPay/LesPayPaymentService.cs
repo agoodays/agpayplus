@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Params.LesPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Channel.LesPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Channel.LesPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
@@ -71,19 +72,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                         resJSON.TryGetString("out_transaction_id", out string out_transaction_id);//微信、支付宝等订单号
                         resJSON.TryGetString("channel_order_id", out string channel_order_id);//通道订单号
                         resJSON.TryGetString("sub_openid", out string sub_openid);//用户子标识 微信：公众号APPID下用户唯一标识；支付宝：买家的支付宝用户ID
-                        switch (status)
+                        var orderStatus = LesPayEnum.ConvertOrderStatus(status);
+                        switch (orderStatus)
                         {
-                            case "2":
+                            case LesPayEnum.OrderStatus.PaySuccess:
                                 channelRetMsg.ChannelOrderId = leshua_order_id;
                                 channelRetMsg.ChannelUserId = sub_openid;
                                 channelRetMsg.PlatformOrderId = out_transaction_id;
                                 channelRetMsg.PlatformMchOrderId = channel_order_id;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                                 break;
-                            case "8":
+                            case LesPayEnum.OrderStatus.PayFail:
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 break;
-                            case "0":
+                            case LesPayEnum.OrderStatus.Paying:
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
                                 channelRetMsg.IsNeedQuery = true; // 开启轮询查单;
                                 break;
@@ -175,9 +177,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         {
             LesPublicParams(reqParams, payOrder);
             reqParams.Add("service", "get_tdcode");
-            string payWay = LesHttpUtil.GetPayWay(payOrder.WayCode);
+            string payWay = LesPayEnum.GetPayWay(payOrder.WayCode);
             reqParams.Add("pay_way", payWay);
-            string jspayflag = LesHttpUtil.GetJspayFlag(payOrder.WayCode);
+            string jspayflag = LesPayEnum.GetJspayFlag(payOrder.WayCode);
             reqParams.Add("jspay_flag", jspayflag);
             reqParams.Add("notify_url", notifyUrl); //通知地址 接收乐刷通知（支付结果通知）的URL，需做UrlEncode 处理，需要绝对路径，确保乐刷能正确访问，若不需要回调请忽略
             reqParams.Add("jump_url", returnUrl); //前台跳转地址 简易支付时必填，完成后，乐刷将跳转到该页面，需做UrlEncode 处理

@@ -2,7 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Channel.LesPay.Utils;
+using AGooday.AgPay.Payment.Api.Channel.LesPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.Refund;
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
-            string payType = LesHttpUtil.GetPayWay(refundOrder.WayCode);
+            string payType = LesPayEnum.GetPayWay(refundOrder.WayCode);
             string logPrefix = $"【乐刷({payType})退款查询】";
             try
             {
@@ -69,21 +69,22 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                         string status = resJSON.GetValue("status").ToString();
                         string leshua_refund_id = resJSON.GetValue("leshua_refund_id").ToString();//乐刷退款id
                         resJSON.TryGetString("sub_merchant_id", out string sub_merchant_id);//渠道商商户号
-                        switch (status)
+                        var orderStatus = LesPayEnum.ConvertOrderStatus(status);
+                        switch (orderStatus)
                         {
-                            case "11":
+                            case LesPayEnum.OrderStatus.RefundSuccess:
                                 channelRetMsg.ChannelOrderId = leshua_refund_id;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                                 log.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;
-                            case "12":
+                            case LesPayEnum.OrderStatus.RefundFail:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = error_code;
                                 channelRetMsg.ChannelErrMsg = error_msg;
                                 log.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
                                 break;
-                            case "10":
+                            case LesPayEnum.OrderStatus.Refunding:
                                 //退款中
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
                                 log.LogInformation($"{logPrefix} >>> 退款中");
@@ -115,7 +116,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
-            string payType = LesHttpUtil.GetPayWay(refundOrder.WayCode);
+            string payType = LesPayEnum.GetPayWay(refundOrder.WayCode);
             string logPrefix = $"【乐刷({payType})订单退款】";
             try
             {

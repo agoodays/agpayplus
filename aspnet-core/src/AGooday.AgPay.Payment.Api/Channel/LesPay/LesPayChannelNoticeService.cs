@@ -3,12 +3,12 @@ using AGooday.AgPay.Application.Params.LesPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Channel.LesPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Channel.LesPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Ocsp;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LesPay
 {
@@ -80,19 +80,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                     resParams.TryGetString("out_transaction_id", out string out_transaction_id);//微信、支付宝等订单号
                     resParams.TryGetString("channel_order_id", out string channel_order_id);//通道订单号
                     resParams.TryGetString("sub_openid", out string sub_openid);//用户子标识 微信：公众号APPID下用户唯一标识；支付宝：买家的支付宝用户ID
-                    switch (status)
+                    var orderStatus = LesPayEnum.ConvertOrderStatus(status);
+                    switch (orderStatus)
                     {
-                        case "2":
+                        case LesPayEnum.OrderStatus.PaySuccess:
                             result.ChannelOrderId = leshua_order_id;
                             result.ChannelUserId = sub_openid;
                             result.PlatformOrderId = out_transaction_id;
                             result.PlatformMchOrderId = channel_order_id;
                             result.ChannelState = ChannelState.CONFIRM_SUCCESS;
                             break;
-                        case "8":
+                        case LesPayEnum.OrderStatus.PayFail:
                             result.ChannelState = ChannelState.CONFIRM_FAIL;
                             break;
-                            //case "0":
+                            //case LesPayEnum.OrderStatus.Paying:
                             //    result.ChannelState = ChannelState.WAITING;
                             //    result.IsNeedQuery = true; // 开启轮询查单;
                             //    break;
