@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Params.SxfPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Channel.SxfPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
@@ -82,19 +83,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         支付宝渠道：买家支付宝用户号buyer_user_id
                         微信渠道：微信平台的sub_openid*/
                         respData.TryGetString("buyerId", out string buyerId);
-                        switch (tranSts)
+                        var orderStatus = SxfPayEnum.ConvertOrderStatus(tranSts);
+                        switch (orderStatus)
                         {
-                            case "SUCCESS":
+                            case SxfPayEnum.OrderStatus.SUCCESS:
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelUserId = buyerId;
                                 channelRetMsg.PlatformOrderId = transactionId;
                                 channelRetMsg.PlatformMchOrderId = sxfUuid;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                                 break;
-                            case "FAIL":
+                            case SxfPayEnum.OrderStatus.FAIL:
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 break;
-                            case "PAYING":
+                            case SxfPayEnum.OrderStatus.PAYING:
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
                                 channelRetMsg.IsNeedQuery = true; // 开启轮询查单;
                                 break;
@@ -197,14 +199,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         public static void JsapiParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
             SxfPublicParams(reqParams, payOrder);
-            string payType = SxfHttpUtil.GetPayType(payOrder.WayCode);
+            string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
             /*支付渠道，枚举值
             取值范围：
             WECHAT 微信
             ALIPAY 支付宝
             UNIONPAY 银联*/
             reqParams.Add("payType", payType);
-            string payWay = SxfHttpUtil.GetPayWay(payOrder.WayCode);
+            string payWay = SxfPayEnum.GetPayWay(payOrder.WayCode);
             /*支付方式，枚举值
             取值范围：
             02 微信公众号 / 支付宝生活号 / 银联js支付 / 支付宝小程序
@@ -223,7 +225,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder)
         {
             SxfPublicParams(reqParams, payOrder);
-            string payType = SxfHttpUtil.GetPayType(payOrder.WayCode);
+            string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
             /*支付渠道，枚举值
             取值范围：
             WECHAT 微信

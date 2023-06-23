@@ -1,7 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
+using AGooday.AgPay.Payment.Api.Channel.SxfPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using Newtonsoft.Json.Linq;
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
-            string payType = SxfHttpUtil.GetPayType(payOrder.WayCode);
+            string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
             string logPrefix = $"【随行付({payType})查单】";
 
             try
@@ -73,23 +73,24 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         支付宝渠道：买家支付宝用户号buyer_user_id
                         微信渠道：微信平台的sub_openid*/
                         respData.TryGetString("buyerId", out string buyerId);
-                        switch (tranSts)
+                        var orderStatus = SxfPayEnum.ConvertOrderStatus(tranSts);
+                        switch (orderStatus)
                         {
-                            case "SUCCESS":
+                            case SxfPayEnum.OrderStatus.SUCCESS:
                                 channelRetMsg = ChannelRetMsg.ConfirmSuccess(uuid);  //支付成功
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelUserId = buyerId;
                                 channelRetMsg.PlatformOrderId = transactionId;
                                 channelRetMsg.PlatformMchOrderId = sxfUuid;
                                 break;
-                            case "FAIL":
+                            case SxfPayEnum.OrderStatus.FAIL:
                                 channelRetMsg = ChannelRetMsg.ConfirmFail(bizCode, bizMsg);
                                 break;
-                            case "PAYING":
+                            case SxfPayEnum.OrderStatus.PAYING:
                                 break;
-                            case "CLOSED":
+                            case SxfPayEnum.OrderStatus.CLOSED:
                                 break;
-                            case "CANCELED":
+                            case SxfPayEnum.OrderStatus.CANCELED:
                                 break;
                         }
                     }

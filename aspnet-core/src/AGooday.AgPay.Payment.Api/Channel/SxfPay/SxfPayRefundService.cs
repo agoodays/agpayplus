@@ -2,7 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
+using AGooday.AgPay.Payment.Api.Channel.SxfPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.Refund;
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
-            string payType = SxfHttpUtil.GetPayType(refundOrder.WayCode);
+            string payType = SxfPayEnum.GetPayType(refundOrder.WayCode);
             string logPrefix = $"【随行付({payType})退款查询】";
             try
             {
@@ -84,21 +84,22 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         支付宝渠道：买家支付宝用户号buyer_user_id
                         微信渠道：微信平台的sub_openid*/
                         respData.TryGetString("buyerId", out string buyerId);
-                        switch (tranSts)
+                        var orderStatus = SxfPayEnum.ConvertOrderStatus(tranSts);
+                        switch (orderStatus)
                         {
-                            case "REFUNDSUC":
+                            case SxfPayEnum.OrderStatus.REFUNDSUC:
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                                 log.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;
-                            case "REFUNDFAIL":
+                            case SxfPayEnum.OrderStatus.REFUNDFAIL:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = bizCode;
                                 channelRetMsg.ChannelErrMsg = bizMsg;
                                 log.LogInformation($"{logPrefix} >>> 退款失败, {bizMsg}");
                                 break;
-                            case "REFUNDING":
+                            case SxfPayEnum.OrderStatus.REFUNDING:
                                 //退款中
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
                                 log.LogInformation($"{logPrefix} >>> 退款中");
@@ -130,7 +131,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
-            string payType = SxfHttpUtil.GetPayType(refundOrder.WayCode);
+            string payType = SxfPayEnum.GetPayType(refundOrder.WayCode);
             string logPrefix = $"【随行付({payType})订单退款】";
             try
             {

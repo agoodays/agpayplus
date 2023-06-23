@@ -2,7 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
+using AGooday.AgPay.Payment.Api.Channel.SxfPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
 
             // 请求参数赋值
             SxfPublicParams(reqParams, payOrder);
-            string payType = SxfHttpUtil.GetPayType(payOrder.WayCode);
+            string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
             /*支付渠道，枚举值
             取值范围：
             WECHAT 微信
