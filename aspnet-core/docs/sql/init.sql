@@ -764,7 +764,7 @@ VALUES ('sxfpay', '随行付支付', 0, 1, 1,
 
 INSERT INTO t_pay_interface_define (if_code, if_name, is_mch_mode, is_isv_mode, config_page_type, isv_params, isvsub_mch_params, normal_mch_params, way_codes, icon, bg_color, state, remark)
 VALUES ('lespay', '乐刷支付', 0, 1, 1,
-        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"agentId","desc":"服务商编号","type":"text","verify":"required"},{"name":"pradeKey","desc":"交易私钥","type":"textarea","verify":"required","star":"1"}]',
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"agentId","desc":"服务商编号","type":"text","verify":"required"},{"name":"tradeKey","desc":"交易密钥","type":"textarea","verify":"required","star":"1"}]',
         '[{"name":"merchantId","desc":"商户编号","type":"text","verify":"required"}]',
         NULL,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',

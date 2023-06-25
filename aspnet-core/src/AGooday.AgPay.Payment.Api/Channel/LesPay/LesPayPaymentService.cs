@@ -192,10 +192,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void BarParamsSet(SortedDictionary<string, string> reqParams, PayOrderDto payOrder)
+        public static void BarParamsSet(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, string notifyUrl)
         {
             LesPublicParams(reqParams, payOrder);
             reqParams.Add("service", "upload_authcode");
+            reqParams.Add("notify_url", notifyUrl); //通知地址 接收乐刷通知（支付结果通知）的URL，需做UrlEncode 处理，需要绝对路径，确保乐刷能正确访问，若不需要回调请忽略
         }
 
         /// <summary>
@@ -206,21 +207,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         public static void LesPublicParams(SortedDictionary<string, string> reqParams, PayOrderDto payOrder)
         {
             //获取订单类型
-            reqParams.Add("third_order_id", payOrder.PayOrderId); //商户订单号（字母、数字、下划线）需保证在合作方系统中不重复
-            reqParams.Add("amount", AmountUtil.ConvertCent2Dollar(payOrder.Amount)); //订单总金额(元)，格式：#########.##
-            /*支付渠道，枚举值
-            取值范围：
-            WECHAT 微信
-            ALIPAY 支付宝
-            UNIONPAY 银联*/
-            //reqParams.Add("payType", "");
-            /*支付方式，枚举值
-            取值范围：
-            02 微信公众号 / 支付宝生活号 / 银联js支付 / 支付宝小程序
-            03 微信小程序*/
-            //reqParams.Add("payWay", "");
-            reqParams.Add("body", payOrder.Body); //订单标题
-            reqParams.Add("client_ip", payOrder.ClientIp); //商户终端ip地址
+            reqParams.Add("third_order_id", payOrder.PayOrderId); //商户内部订单号 可以包含字母：确保同一个商户下唯一
+            reqParams.Add("amount", payOrder.Amount.ToString()); //订单总金额 金额不能为零或负数
+            reqParams.Add("body", payOrder.Body); //商品描述,不能包含回车换行等特殊字符
+            reqParams.Add("client_ip", payOrder.ClientIp); //商户发起交易的IP地址
         }
     }
 }

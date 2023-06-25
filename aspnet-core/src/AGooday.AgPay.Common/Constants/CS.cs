@@ -346,6 +346,14 @@
             public const string ALI_QR = "ALI_QR";  //支付宝 二维码付款
             public const string ALI_LITE = "ALI_LITE";  //支付宝 小程序
 
+            public const string UP_APP = "UP_APP";  //银联App支付
+            public const string UP_B2B = "UP_B2B";  //银联企业网银支付
+            public const string UP_BAR = "UP_BAR";  //银联二维码(被扫)
+            public const string UP_JSAPI = "UP_JSAPI";  //银联Js支付
+            public const string UP_PC = "UP_PC";  //银联网关支付
+            public const string UP_QR = "UP_QR";  //银联二维码(主扫)
+            public const string UP_WAP = "UP_WAP";  //银联手机网站支付
+
             public const string YSF_BAR = "YSF_BAR";  //云闪付条码支付
             public const string YSF_JSAPI = "YSF_JSAPI";  //云闪付服务窗支付
 

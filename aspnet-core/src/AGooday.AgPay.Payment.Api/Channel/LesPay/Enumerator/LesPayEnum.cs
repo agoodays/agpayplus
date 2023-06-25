@@ -165,16 +165,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.Enumerator
             switch (wayCode)
             {
                 case CS.PAY_WAY_CODE.ALI_WAP:
-                    payWay = JspayFlag.Native.ToString();
+                case CS.PAY_WAY_CODE.ALI_QR:
+                    payWay = ((sbyte)JspayFlag.Native).ToString();
                     break;
                 case CS.PAY_WAY_CODE.WX_JSAPI:
                 case CS.PAY_WAY_CODE.ALI_JSAPI:
                 case CS.PAY_WAY_CODE.YSF_JSAPI:
-                    payWay = JspayFlag.JSAPI.ToString();
+                    payWay = ((sbyte)JspayFlag.JSAPI).ToString();
                     break;
                 case CS.PAY_WAY_CODE.WX_LITE:
                 case CS.PAY_WAY_CODE.ALI_LITE:
-                    payWay = JspayFlag.Lite.ToString();
+                    payWay = ((sbyte)JspayFlag.Lite).ToString();
                     break;
                 default:
                     break;

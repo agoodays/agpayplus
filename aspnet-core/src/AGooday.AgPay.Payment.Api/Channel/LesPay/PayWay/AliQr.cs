@@ -2,7 +2,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Channel.LesPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
@@ -37,9 +36,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
 
             // 请求参数赋值
             JsapiParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
-            string pay_way = LesPayEnum.GetPayWay(payOrder.WayCode);
-            reqParams.Add("pay_way", pay_way);
-            reqParams.Add("notify_url", GetNotifyUrl()); //通知地址接收乐刷通知（支付结果通知）的URL
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
