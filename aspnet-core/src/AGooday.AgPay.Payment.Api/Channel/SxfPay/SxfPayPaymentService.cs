@@ -196,21 +196,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         /// <param name="payOrder"></param>
         /// <param name="notifyUrl"></param>
         /// <param name="returnUrl"></param>
-        public static void JsapiParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
+        public static void UnifiedParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
             SxfPublicParams(reqParams, payOrder);
             string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
-            /*支付渠道，枚举值
-            取值范围：
-            WECHAT 微信
-            ALIPAY 支付宝
-            UNIONPAY 银联*/
             reqParams.Add("payType", payType);
             string payWay = SxfPayEnum.GetPayWay(payOrder.WayCode);
-            /*支付方式，枚举值
-            取值范围：
-            02 微信公众号 / 支付宝生活号 / 银联js支付 / 支付宝小程序
-            03 微信小程序*/
             reqParams.Add("payWay", payWay);
             reqParams.Add("notifyUrl", notifyUrl); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
             reqParams.Add("outFrontUrl", returnUrl); //银联js支付成功前端跳转地址与成功地址/失败地址同时存在或同时不存在
@@ -222,16 +213,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder)
+        public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl)
         {
             SxfPublicParams(reqParams, payOrder);
             string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
-            /*支付渠道，枚举值
-            取值范围：
-            WECHAT 微信
-            ALIPAY 支付宝
-            UNIONPAY 银联*/
             reqParams.Add("payType", payType);
+            reqParams.Add("notifyUrl", notifyUrl); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
         }
 
         /// <summary>
@@ -241,20 +228,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         /// <param name="payOrder"></param>
         public static void SxfPublicParams(JObject reqParams, PayOrderDto payOrder)
         {
-            //获取订单类型
             reqParams.Add("ordNo", payOrder.PayOrderId); //商户订单号（字母、数字、下划线）需保证在合作方系统中不重复
             reqParams.Add("amt", AmountUtil.ConvertCent2Dollar(payOrder.Amount)); //订单总金额(元)，格式：#########.##
-            /*支付渠道，枚举值
-            取值范围：
-            WECHAT 微信
-            ALIPAY 支付宝
-            UNIONPAY 银联*/
-            //reqParams.Add("payType", "");
-            /*支付方式，枚举值
-            取值范围：
-            02 微信公众号 / 支付宝生活号 / 银联js支付 / 支付宝小程序
-            03 微信小程序*/
-            //reqParams.Add("payWay", "");
             reqParams.Add("subject", payOrder.Subject); //订单标题
             reqParams.Add("trmIp", payOrder.ClientIp); //商户终端ip地址
         }

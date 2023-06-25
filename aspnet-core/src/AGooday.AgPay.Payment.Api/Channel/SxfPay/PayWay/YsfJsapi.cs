@@ -1,13 +1,14 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Application.Interfaces;
+﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
+using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
+using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using AGooday.AgPay.Application.DataTransfer;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
 {
@@ -35,7 +36,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
             YsfJsapiOrderRQ bizRQ = (YsfJsapiOrderRQ)rq;
 
             // 请求参数赋值
-            JsapiParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
+            UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
             //客户端IP
             /*持卡人ip地址
             银联js支付时，该参数必传*/

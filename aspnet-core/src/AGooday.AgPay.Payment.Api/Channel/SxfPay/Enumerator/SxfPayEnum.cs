@@ -121,6 +121,15 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.Enumerator
             return orderStatus;
         }
 
+        /// <summary>
+        /// 支付渠道，枚举值
+        /// 取值范围：
+        /// WECHAT 微信
+        /// ALIPAY 支付宝
+        /// UNIONPAY 银联
+        /// </summary>
+        /// <param name="wayCode"></param>
+        /// <returns></returns>
         public static string GetPayType(string wayCode)
         {
             string payType = null;
@@ -152,6 +161,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.Enumerator
             return payType;
         }
 
+        /// <summary>
+        /// 支付方式，枚举值
+        /// 取值范围：
+        /// 02 微信公众号 / 支付宝生活号 / 银联js支付 / 支付宝小程序
+        /// 03 微信小程序
+        /// </summary>
+        /// <param name="wayCode"></param>
+        /// <returns></returns>
         public static string GetPayWay(string wayCode)
         {
             string payWay = null;

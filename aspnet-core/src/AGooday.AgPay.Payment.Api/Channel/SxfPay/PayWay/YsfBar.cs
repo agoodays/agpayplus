@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
             JObject reqParams = new JObject();
             reqParams.Add("authCode", bizRQ.AuthCode.Trim()); //授权码 通过扫码枪/声波获取设备获取的支付宝/微信/银联付款码
             // 随行付 bar 统一参数赋值
-            BarParamsSet(reqParams, payOrder);
+            BarParamsSet(reqParams, payOrder, GetNotifyUrl());
 
             var channelRetMsg = SxfBar(reqParams, logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;

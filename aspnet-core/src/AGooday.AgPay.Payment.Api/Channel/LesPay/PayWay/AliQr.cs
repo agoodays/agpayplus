@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
             res.ChannelRetMsg = channelRetMsg;
 
             // 请求参数赋值
-            JsapiParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
+            UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);

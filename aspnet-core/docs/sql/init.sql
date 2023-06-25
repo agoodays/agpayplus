@@ -176,6 +176,7 @@ DROP TABLE IF EXISTS t_pay_way;
 CREATE TABLE `t_pay_way` (
         `way_code` VARCHAR(20) NOT NULL COMMENT '支付方式代码  例如： wxpay_jsapi',
         `way_name` VARCHAR(20) NOT NULL COMMENT '支付方式名称',
+        `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他'
         `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
         `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
         PRIMARY KEY (`way_code`)
@@ -701,25 +702,33 @@ INSERT INTO `t_sys_config` VALUES ('ossPublicSiteUrl', '公共oss访问地址(�
 
 
 -- 初始化支付方式
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('ALI_BAR', '支付宝条码');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('ALI_JSAPI', '支付宝生活号');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('ALI_APP', '支付宝APP');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('ALI_WAP', '支付宝WAP');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('ALI_PC', '支付宝PC网站');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('ALI_QR', '支付宝二维码');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('ALI_LITE', '支付宝小程序');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('ALI_BAR', '支付宝条码', 'ALIPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('ALI_JSAPI', '支付宝生活号', 'ALIPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('ALI_APP', '支付宝APP', 'ALIPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('ALI_WAP', '支付宝WAP', 'ALIPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('ALI_PC', '支付宝PC网站', 'ALIPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('ALI_QR', '支付宝二维码', 'ALIPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('ALI_LITE', '支付宝小程序', 'ALIPAY');
 
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('WX_BAR', '微信条码');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('WX_JSAPI', '微信公众号');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('WX_APP', '微信APP');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('WX_H5', '微信H5');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('WX_NATIVE', '微信扫码');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('WX_LITE', '微信小程序');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('WX_BAR', '微信条码', 'WECHAT');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('WX_JSAPI', '微信公众号', 'WECHAT');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('WX_APP', '微信APP', 'WECHAT');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('WX_H5', '微信H5', 'WECHAT');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('WX_NATIVE', '微信扫码', 'WECHAT');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('WX_LITE', '微信小程序', 'WECHAT');
 
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('YSF_BAR', '云闪付条码');
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('YSF_JSAPI', '云闪付jsapi');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('UP_APP', '银联App支付', 'UNIONPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('UP_B2B', '银联企业网银支付', 'UNIONPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('UP_BAR', '银联二维码(被扫)', 'UNIONPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('UP_JSAPI', '银联Js支付', 'UNIONPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('UP_PC', '银联网关支付', 'UNIONPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('UP_QR', '银联二维码(主扫)', 'UNIONPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('UP_WAP', '银联手机网站支付', 'UNIONPAY');
 
-INSERT INTO t_pay_way (way_code, way_name) VALUES ('PP_PC', 'PayPal支付');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('YSF_BAR', '云闪付条码', 'YSFPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('YSF_JSAPI', '云闪付jsapi', 'YSFPAY');
+
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('PP_PC', 'PayPal支付', 'OTHER');
 
 -- 初始化支付接口定义
 INSERT INTO t_pay_interface_define (if_code, if_name, is_mch_mode, is_isv_mode, config_page_type, isv_params, isvsub_mch_params, normal_mch_params, way_codes, icon, bg_color, state, remark)

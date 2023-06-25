@@ -113,6 +113,15 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.Enumerator
             return orderStatus;
         }
 
+        /// <summary>
+        /// 支付类型
+        /// WXZF	微信
+        /// ZFBZF 支付宝
+        /// UPSMZF  银联二维码
+        /// DCPAY 数字货币
+        /// </summary>
+        /// <param name="wayCode"></param>
+        /// <returns></returns>
         public static string GetPayWay(string wayCode)
         {
             string payType = null;
@@ -144,21 +153,23 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.Enumerator
             return payType;
         }
 
-
         /// <summary>
-        /// 支付类型
-        /// 0-支付宝Native扫码支付、银联Native扫码支付；
-        /// 1-微信JSAPI、支付宝JSAPI支付、银联JSAPI支付；
-        /// 2-微信、支付宝简易支付<跳转乐刷收银台支付>；
-        /// （jspay_flag=2时必传jump_url，否则会报错）
-        /// 3-微信小程序支付、支付宝小程序支付
+        /// 支付类型：根据支付方式编码获取对应的 JSPayFlag 值。
+        /// </summary>
+        /// <para>
+        /// 可选取值如下：
+        /// 0 - 支付宝 Native 扫码支付、银联 Native 扫码支付；
+        /// 1 - 微信 JSAPI、支付宝 JSAPI 支付、银联 JSAPI 支付；
+        /// 2 - 微信、支付宝简易支付（跳转乐刷收银台支付）；
+        /// （jspay_flag=2时必传 jump_url，否则会报错）
+        /// 3 - 微信小程序支付、支付宝小程序支付
         /// 注：
         /// 1）微信拉码支付已下线；
-        /// 2）如需接入银联JS支付，请联系乐刷运营沟通域名报备。
-        /// 3）数字货币支付当前仅支持jspay_flag=0
-        /// </summary>
-        /// <param name="wayCode"></param>
-        /// <returns></returns>
+        /// 2）如需接入银联 JS 支付，请联系乐刷运营沟通域名报备。
+        /// 3）数字货币支付当前仅支持 jspay_flag=0
+        /// </para>
+        /// <param name="wayCode">支付方式编码</param>
+        /// <returns>对应的 JSPayFlag 值。</returns>
         public static string GetJspayFlag(string wayCode)
         {
             string payWay = null;

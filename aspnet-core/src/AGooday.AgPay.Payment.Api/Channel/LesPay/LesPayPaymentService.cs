@@ -173,7 +173,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         /// <param name="payOrder"></param>
         /// <param name="notifyUrl"></param>
         /// <param name="returnUrl"></param>
-        public static void JsapiParamsSet(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
+        public static void UnifiedParamsSet(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
             LesPublicParams(reqParams, payOrder);
             reqParams.Add("service", "get_tdcode");

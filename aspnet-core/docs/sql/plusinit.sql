@@ -397,18 +397,19 @@ ALTER TABLE `t_pay_interface_config`
 --   ADD COLUMN `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, mgrMch-商户, agentSubagent-子代理商, agentMch-代理商商户, mchSelfApp1-小程序支付配置, mchSelfApp2-支付配置' AFTER `info_id`,
   ADD COLUMN `sett_hold_day` TINYINT DEFAULT 0 NOT NULL COMMENT '结算周期（自然日）' AFTER `if_params`;
 
-ALTER TABLE `t_pay_way`   
-  ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他' AFTER `way_name`;
+-- ALTER TABLE `t_pay_way`   
+--   ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他' AFTER `way_name`;
 
-SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'WX_%';
-SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'ALI_%';
-SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'YSF_%';
-SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'PP_%';
-
-UPDATE `t_pay_way` SET `way_type` = 'WECHAT' WHERE `way_code` LIKE 'WX_%';
-UPDATE `t_pay_way` SET `way_type` = 'ALIPAY' WHERE `way_code` LIKE 'ALI_%';
-UPDATE `t_pay_way` SET `way_type` = 'YSFPAY' WHERE `way_code` LIKE 'YSF_%';
-UPDATE `t_pay_way` SET `way_type` = 'OTHER' WHERE `way_code` LIKE 'PP_%';
+-- SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'WX_%';
+-- SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'ALI_%';
+-- SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'YSF_%';
+-- SELECT * FROM `t_pay_way` WHERE `way_code` LIKE 'PP_%';
+-- 
+-- UPDATE `t_pay_way` SET `way_type` = 'WECHAT' WHERE `way_code` LIKE 'WX_%';
+-- UPDATE `t_pay_way` SET `way_type` = 'ALIPAY' WHERE `way_code` LIKE 'ALI_%';
+-- UPDATE `t_pay_way` SET `way_type` = 'YSFPAY' WHERE `way_code` LIKE 'YSF_%';
+-- UPDATE `t_pay_way` SET `way_type` = 'UNIONPAY' WHERE `way_code` LIKE 'UP_%';
+-- UPDATE `t_pay_way` SET `way_type` = 'OTHER' WHERE `way_code` LIKE 'PP_%';
 
 ALTER TABLE `t_pay_order`   
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_no`,

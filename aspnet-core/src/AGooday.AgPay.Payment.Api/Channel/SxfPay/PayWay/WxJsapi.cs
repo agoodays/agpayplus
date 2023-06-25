@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
             res.ChannelRetMsg = channelRetMsg;
 
             // 请求参数赋值
-            JsapiParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
+            UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
             //随行付扫一扫支付， 需要传入buyerUserId参数

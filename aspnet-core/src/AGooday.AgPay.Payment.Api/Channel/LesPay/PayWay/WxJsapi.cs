@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
             res.ChannelRetMsg = channelRetMsg;
 
             // 请求参数赋值
-            JsapiParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
+            UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
             //微信JSAPI、微信小程序、支付宝JSAPI、支付宝小程序、银联JSAPI支付必填
             reqParams.Add("sub_openid", bizRQ.Openid);
