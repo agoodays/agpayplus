@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Channel.AliPay.Extensions;
+using AGooday.AgPay.Payment.Api.Channel.HkrtPay;
 using AGooday.AgPay.Payment.Api.Channel.HkrtPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.LesPay;
 using AGooday.AgPay.Payment.Api.Channel.LesPay.Extensions;
@@ -67,6 +68,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddSingleton<YsfPayPaymentService>();
             services.AddSingleton<SxfPayPaymentService>();
             services.AddSingleton<LesPayPaymentService>();
+            services.AddSingleton<HkrtPayPaymentService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IPaymentService> funcFactory = ifCode =>
@@ -83,6 +85,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<SxfPayPaymentService>();
                         case CS.IF_CODE.LESPAY:
                             return provider.GetService<LesPayPaymentService>();
+                        case CS.IF_CODE.HKRTPAY:
+                            return provider.GetService<HkrtPayPaymentService>();
                         default:
                             return null;
                     }
@@ -96,6 +100,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddSingleton<YsfPayRefundService>();
             services.AddSingleton<SxfPayRefundService>();
             services.AddSingleton<LesPayRefundService>();
+            services.AddSingleton<HkrtPayRefundService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IRefundService> funcFactory = ifCode =>
@@ -112,6 +117,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<SxfPayRefundService>();
                         case CS.IF_CODE.LESPAY:
                             return provider.GetService<LesPayRefundService>();
+                        case CS.IF_CODE.HKRTPAY:
+                            return provider.GetService<HkrtPayRefundService>();
                         default:
                             return null;
                     }
@@ -125,6 +132,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddSingleton<YsfPayChannelNoticeService>();
             services.AddSingleton<SxfPayChannelNoticeService>();
             services.AddSingleton<LesPayChannelNoticeService>();
+            services.AddSingleton<HkrtPayChannelNoticeService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IChannelNoticeService> funcFactory = ifCode =>
@@ -141,6 +149,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<SxfPayChannelNoticeService>();
                         case CS.IF_CODE.LESPAY:
                             return provider.GetService<LesPayChannelNoticeService>();
+                        case CS.IF_CODE.HKRTPAY:
+                            return provider.GetService<HkrtPayChannelNoticeService>();
                         default:
                             return null;
                     }
@@ -154,6 +164,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             //services.AddSingleton<YsfPayChannelRefundNoticeService>();
             services.AddSingleton<SxfPayChannelNoticeService>();
             services.AddSingleton<LesPayChannelRefundNoticeService>();
+            services.AddSingleton<HkrtPayChannelRefundNoticeService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IChannelRefundNoticeService> funcFactory = ifCode =>
@@ -170,6 +181,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<SxfPayChannelRefundNoticeService>();
                         case CS.IF_CODE.LESPAY:
                             return provider.GetService<LesPayChannelRefundNoticeService>();
+                        case CS.IF_CODE.HKRTPAY:
+                            return provider.GetService<HkrtPayChannelRefundNoticeService>();
                         default:
                             return null;
                     }
@@ -183,6 +196,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddSingleton<YsfPayPayOrderQueryService>();
             services.AddSingleton<SxfPayPayOrderQueryService>();
             services.AddSingleton<LesPayPayOrderQueryService>();
+            services.AddSingleton<HkrtPayPayOrderQueryService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IPayOrderQueryService> funcFactory = ifCode =>
@@ -199,6 +213,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<SxfPayPayOrderQueryService>();
                         case CS.IF_CODE.LESPAY:
                             return provider.GetService<LesPayPayOrderQueryService>();
+                        case CS.IF_CODE.HKRTPAY:
+                            return provider.GetService<HkrtPayPayOrderQueryService>();
                         default:
                             return null;
                     }
