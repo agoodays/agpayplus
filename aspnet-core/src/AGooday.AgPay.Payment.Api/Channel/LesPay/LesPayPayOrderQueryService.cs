@@ -14,13 +14,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
     public class LesPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<LesPayPayOrderQueryService> log;
-        private readonly LesPayPaymentService LesPayPaymentService;
+        private readonly LesPayPaymentService lesPayPaymentService;
 
         public LesPayPayOrderQueryService(ILogger<LesPayPayOrderQueryService> log,
-            LesPayPaymentService LesPayPaymentService)
+            LesPayPaymentService lesPayPaymentService)
         {
             this.log = log;
-            this.LesPayPaymentService = LesPayPaymentService;
+            this.lesPayPaymentService = lesPayPaymentService;
         }
 
         public string GetIfCode()
@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                 reqParams.Add("third_order_id", payOrder.PayOrderId); //订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = LesPayPaymentService.PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = lesPayPaymentService.PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
                 log.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

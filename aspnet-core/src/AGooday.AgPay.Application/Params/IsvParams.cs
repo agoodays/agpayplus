@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.Params.AliPay;
+using AGooday.AgPay.Application.Params.HkrtPay;
 using AGooday.AgPay.Application.Params.LesPay;
 using AGooday.AgPay.Application.Params.SxfPay;
 using AGooday.AgPay.Application.Params.WxPay;
@@ -34,6 +35,10 @@ namespace AGooday.AgPay.Application.Params
             else if (CS.IF_CODE.LESPAY.Equals(ifCode))
             {
                 return JsonConvert.DeserializeObject<LesPayIsvParams>(paramsStr);
+            }
+            else if (CS.IF_CODE.HKRTPAY.Equals(ifCode))
+            {
+                return JsonConvert.DeserializeObject<HkrtPayIsvParams>(paramsStr);
             }
             return null;
         }

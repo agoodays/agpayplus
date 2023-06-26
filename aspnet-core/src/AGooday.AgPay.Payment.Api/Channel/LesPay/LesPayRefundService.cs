@@ -17,16 +17,16 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
     public class LesPayRefundService : AbstractRefundService
     {
         private readonly ILogger<LesPayRefundService> log;
-        private readonly LesPayPaymentService LesPayPaymentService;
+        private readonly LesPayPaymentService lesPayPaymentService;
         public LesPayRefundService(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService,
             ILogger<LesPayRefundService> log,
-            LesPayPaymentService LesPayPaymentService)
+            LesPayPaymentService lesPayPaymentService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
             this.log = log;
-            this.LesPayPaymentService = LesPayPaymentService;
+            this.lesPayPaymentService = lesPayPaymentService;
         }
 
         public override string GetIfCode()
@@ -47,10 +47,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             string logPrefix = $"【乐刷({payType})退款查询】";
             try
             {
-                reqParams.Add("third_order_id", refundOrder.RefundOrderId); // 退款订单号
+                reqParams.Add("service", "unified_query_refund"); //订单号
+                reqParams.Add("third_order_id", refundOrder.PayOrderId); // 原交易订单号
+                reqParams.Add("merchant_refund_id", refundOrder.RefundOrderId); // 退款订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = LesPayPaymentService.PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = lesPayPaymentService.PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
                 log.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -120,13 +122,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             string logPrefix = $"【乐刷({payType})订单退款】";
             try
             {
+                reqParams.Add("service", "unified_refund"); //订单号
                 reqParams.Add("merchant_refund_id", refundOrder.RefundOrderId); // 退款订单号
                 reqParams.Add("third_order_id", payOrder.PayOrderId); // 原交易订单号
-                reqParams.Add("refund_amount", AmountUtil.ConvertCent2Dollar(refundOrder.RefundAmount)); // 退款金额
+                reqParams.Add("refund_amount", refundOrder.RefundAmount.ToString()); // 退款金额
                 reqParams.Add("notify_url ", GetNotifyUrl()); // 订单类型
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = LesPayPaymentService.PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = lesPayPaymentService.PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
                 log.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -145,21 +148,22 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                         string status = resJSON.GetValue("status").ToString();
                         string leshua_refund_id = resJSON.GetValue("leshua_refund_id").ToString();//乐刷退款id
                         resJSON.TryGetString("sub_merchant_id", out string sub_merchant_id);//渠道商商户号
-                        switch (status)
+                        var orderStatus = LesPayEnum.ConvertOrderStatus(status);
+                        switch (orderStatus)
                         {
-                            case "11":
+                            case LesPayEnum.OrderStatus.RefundSuccess:
                                 channelRetMsg.ChannelOrderId = leshua_refund_id;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                                 log.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;
-                            case "12":
+                            case LesPayEnum.OrderStatus.RefundFail:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = error_code;
                                 channelRetMsg.ChannelErrMsg = error_msg;
                                 log.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
                                 break;
-                            case "10":
+                            case LesPayEnum.OrderStatus.Refunding:
                                 //退款中
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
                                 log.LogInformation($"{logPrefix} >>> 退款中");

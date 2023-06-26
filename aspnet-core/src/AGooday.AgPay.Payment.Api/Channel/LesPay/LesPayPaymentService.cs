@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg SxfBar(SortedDictionary<string, string> reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public ChannelRetMsg LesBar(SortedDictionary<string, string> reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求

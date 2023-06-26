@@ -18,7 +18,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.Utils
             SortedDictionary<string, string> keyValuePairs = JsonConvert.DeserializeObject<SortedDictionary<string, string>>(resParams.ToString());
 
             keyValuePairs.TryGetValue("sign", out string sign);
-            var signString = ConvertSignStringIncludeEmpty(keyValuePairs, key);
             keyValuePairs.Remove("sign");
             keyValuePairs.Remove("resp_code");
             keyValuePairs.Remove("error_code");

@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Channel.AliPay.Extensions;
+using AGooday.AgPay.Payment.Api.Channel.HkrtPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.LesPay;
 using AGooday.AgPay.Payment.Api.Channel.LesPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay;
@@ -221,6 +222,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             #endregion
             #region LesPay
             LesPayNativeInjectorBootStrapper.RegisterServices(services);
+            #endregion
+            #region HkrtPay
+            HkrtPayNativeInjectorBootStrapper.RegisterServices(services);
             #endregion
 
             var serviceProvider = services.BuildServiceProvider();

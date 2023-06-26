@@ -77,14 +77,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
                         string partnerId = respData.GetValue("partnerId").ToString();//微信 PartnerId
                         JObject payInfo = new JObject
                         {
-                            { "prepayId", prepayId },
-                            { "payAppId", payAppId },
-                            { "payTimeStamp", payTimeStamp },
-                            { "paynonceStr", paynonceStr },
-                            { "payPackage", payPackage },
-                            { "paySignType", paySignType },
-                            { "paySign", paySign },
-                            { "partnerId", partnerId }
+                            { "appId", payAppId },
+                            { "timeStamp", payTimeStamp },
+                            { "nonceStr", paynonceStr },
+                            { "package", payPackage },
+                            { "signType", paySignType },
+                            { "paySign", paySign }
                         };
                         res.PayInfo = payInfo.ToString();
                         channelRetMsg.ChannelOrderId = uuid;

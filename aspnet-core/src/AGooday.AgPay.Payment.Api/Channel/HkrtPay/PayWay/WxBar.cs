@@ -7,10 +7,11 @@ using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
+using Newtonsoft.Json.Linq;
 
-namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
+namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 {
-    public class WxBar : LesPayPaymentService
+    public class WxBar : HkrtPayPaymentService
     {
         public WxBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
@@ -21,17 +22,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【乐刷条码(wechat)支付】";
+            string logPrefix = "【海科融通条码(wechat)支付】";
             WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
             // 构造函数响应数据
             WxBarOrderRS res = ApiResBuilder.BuildSuccess<WxBarOrderRS>();
 
-            SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
+            JObject reqParams = new JObject();
             reqParams.Add("auth_code", bizRQ.AuthCode.Trim()); //授权码 通过扫码枪/声波获取设备获取的支付宝/微信/银联付款码
-            // 乐刷 bar 统一参数赋值
+            // 海科融通 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder, GetNotifyUrl());
 
-            var channelRetMsg = LesBar(reqParams, logPrefix, mchAppConfigContext);
+            var channelRetMsg = HkrtBar(reqParams, logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }

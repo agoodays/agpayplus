@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetSxfpayHost4env(SxfPayIsvParams isvParams)
+        public static string GetSxfPayHost4env(SxfPayIsvParams isvParams)
         {
             return CS.YES == isvParams.Sandbox ? SxfPayConfig.SANDBOX_SERVER_URL : SxfPayConfig.PROD_SERVER_URL;
         }
@@ -170,7 +170,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 
             // 调起上游接口
             log.Info($"{logPrefix} reqJSON={reqParams}");
-            string resText = SxfHttpUtil.DoPostJson(GetSxfpayHost4env(isvParams) + apiUri, reqParams);
+            string resText = SxfHttpUtil.DoPostJson(GetSxfPayHost4env(isvParams) + apiUri, reqParams);
             log.Info($"{logPrefix} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))

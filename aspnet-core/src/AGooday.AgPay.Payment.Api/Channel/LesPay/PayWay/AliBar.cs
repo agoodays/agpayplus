@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
             // 云闪付 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder,GetNotifyUrl());
 
-            var channelRetMsg = SxfBar(reqParams, logPrefix, mchAppConfigContext);
+            var channelRetMsg = LesBar(reqParams, logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }
