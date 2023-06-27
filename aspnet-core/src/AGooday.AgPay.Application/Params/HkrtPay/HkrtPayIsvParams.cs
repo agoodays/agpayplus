@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Application.Params.HkrtPay
         /// <summary>
         /// 服务商的传输密钥
         /// </summary>
-        public string Key { get; set; }
+        public string TransferKey { get; set; }
 
         public override string DeSenData()
         {
@@ -39,9 +39,9 @@ namespace AGooday.AgPay.Application.Params.HkrtPay
             {
                 AccessKey = AccessKey.Mask();
             }
-            if (!string.IsNullOrWhiteSpace(Key))
+            if (!string.IsNullOrWhiteSpace(TransferKey))
             {
-                Key = Key.Mask();
+                TransferKey = TransferKey.Mask();
             }
             return JsonConvert.SerializeObject(this);
         }

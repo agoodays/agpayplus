@@ -773,8 +773,16 @@ VALUES ('sxfpay', '随行付支付', 0, 1, 1,
 
 INSERT INTO t_pay_interface_define (if_code, if_name, is_mch_mode, is_isv_mode, config_page_type, isv_params, isvsub_mch_params, normal_mch_params, way_codes, icon, bg_color, state, remark)
 VALUES ('lespay', '乐刷支付', 0, 1, 1,
-        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"agentId","desc":"服务商编号","type":"text","verify":"required"},{"name":"tradeKey","desc":"交易密钥","type":"textarea","verify":"required","star":"1"}]',
-        '[{"name":"merchantId","desc":"商户编号","type":"text","verify":"required"}]',
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"agentId","desc":"服务商编号","type":"text","verify":"required"},{"name":"tradeKey","desc":"交易密钥","type":"textarea","verify":"required","star":"1"},{"name":"noticeKey","desc":"异步通知回调密钥","type":"textarea","verify":"required","star":"1"}]',
+        '[{"name":"merchantId","desc":"商户编号","type":"text","verify":"required"},{"name":"limitPay","desc":"是否禁止信用卡（默认为不禁用）","type":"radio","verify":"","values":"0,1","titles":"否,是"},{"name":"t0","desc":"t0交易标志（默认为d1）","type":"radio","verify":"required","values":"0,1","titles":"d1交易,d0交易"}]',
         NULL,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
         'https://h5-static.yeahka.com/static/leshuatech/images/favicon2.ico', '#ffe353', 1, '乐刷聚合支付');
+
+INSERT INTO t_pay_interface_define (if_code, if_name, is_mch_mode, is_isv_mode, config_page_type, isv_params, isvsub_mch_params, normal_mch_params, way_codes, icon, bg_color, state, remark)
+VALUES ('hkrtpay', '海科融通支付', 0, 1, 1,
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"agentNo","desc":"服务商编号","type":"text","verify":"required"},{"name":"accessId","desc":"接入机构标识accessid","type":"text","verify":"required"},{"name":"accessKey","desc":"服务商的接入秘钥","type":"text","verify":"required","star":"1"},{"name":"transferKey","desc":"服务商的传输密钥","type":"text","verify":"required","star":"1"}]',
+        '[{"name":"merchNo","desc":"商户编号","type":"text","verify":"required"}]',
+        NULL,
+        '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
+        'http://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/hkpay.svg', '#2d2f92', 1, '海科融通支付');

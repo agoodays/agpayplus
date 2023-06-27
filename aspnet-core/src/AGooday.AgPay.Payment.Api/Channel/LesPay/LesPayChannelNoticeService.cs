@@ -132,12 +132,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             LesPayIsvParams isvParams = (LesPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             //验签
-            string tradeKey = isvParams.TradeKey;
+            string noticeKey = isvParams.NoticeKey;
 
             //验签失败
-            if (!LesSignUtil.Verify(jsonParams, tradeKey))
+            if (!LesSignUtil.Verify(jsonParams, noticeKey))
             {
-                log.LogInformation($"【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {tradeKey} ");
+                log.LogInformation($"【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey} ");
                 return false;
             }
 

@@ -12,18 +12,21 @@ namespace AGooday.AgPay.Application.Params.SxfPay
         /// 是否沙箱环境
         /// </summary>
         public byte Sandbox { get; set; }
-        /// <summary>
-        /// 平台私钥
-        /// </summary>
-        public string PrivateKey { get; set; }
-        /// <summary>
-        /// 平台公钥
-        /// </summary>
-        public string PublicKey { get; set; }
+
         /// <summary>
         /// 机构编号
         /// </summary>
         public string OrgId { get; set; }
+
+        /// <summary>
+        /// 平台私钥
+        /// </summary>
+        public string PrivateKey { get; set; }
+
+        /// <summary>
+        /// 平台公钥
+        /// </summary>
+        public string PublicKey { get; set; }
 
         public override string DeSenData()
         {

@@ -12,20 +12,31 @@ namespace AGooday.AgPay.Application.Params.LesPay
         /// 是否沙箱环境
         /// </summary>
         public byte Sandbox { get; set; }
-        /// <summary>
-        /// 交易私钥
-        /// </summary>
-        public string TradeKey { get; set; }
+
         /// <summary>
         /// 服务商编号
         /// </summary>
         public string AgentId { get; set; }
+
+        /// <summary>
+        /// 交易私钥
+        /// </summary>
+        public string TradeKey { get; set; }
+
+        /// <summary>
+        /// 异步通知回调密钥
+        /// </summary>
+        public string NoticeKey { get; set; }
 
         public override string DeSenData()
         {
             if (!string.IsNullOrWhiteSpace(TradeKey))
             {
                 TradeKey = TradeKey.Mask();
+            }
+            if (!string.IsNullOrWhiteSpace(NoticeKey))
+            {
+                NoticeKey = NoticeKey.Mask();
             }
             return JsonConvert.SerializeObject(this);
         }
