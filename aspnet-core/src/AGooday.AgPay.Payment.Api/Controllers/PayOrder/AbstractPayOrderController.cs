@@ -274,7 +274,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             var nowDate = DateTime.Now;
 
             //订单过期时间 单位： 秒
-            if (rq.ExpiredTime != null)
+            if (rq.ExpiredTime.HasValue)
             {
                 payOrder.ExpiredTime = nowDate.AddSeconds(rq.ExpiredTime.Value);
             }

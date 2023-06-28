@@ -781,7 +781,7 @@ VALUES ('lespay', '乐刷支付', 0, 1, 1,
 
 INSERT INTO t_pay_interface_define (if_code, if_name, is_mch_mode, is_isv_mode, config_page_type, isv_params, isvsub_mch_params, normal_mch_params, way_codes, icon, bg_color, state, remark)
 VALUES ('hkrtpay', '海科融通支付', 0, 1, 1,
-        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"agentNo","desc":"服务商编号","type":"text","verify":"required"},{"name":"accessId","desc":"接入机构标识accessid","type":"text","verify":"required"},{"name":"accessKey","desc":"服务商的接入秘钥","type":"text","verify":"required","star":"1"},{"name":"transferKey","desc":"服务商的传输密钥","type":"text","verify":"required","star":"1"}]',
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"agentNo","desc":"服务商编号","type":"text","verify":"required"},{"name":"accessId","desc":"接入机构标识accessid","type":"text","verify":"required"},{"name":"accessKey","desc":"服务商的接入秘钥","type":"text","verify":"required","star":"1"},{"name":"transferKey","desc":"服务商的传输密钥","type":"text","verify":"required","star":"1"},{"name":"channelNoWx","desc":"微信渠道号[服务商通过海科在(微信)申请的渠道编号]","type":"text","verify":"required"},{"name":"channelNoAli","desc":"支付宝渠道号[服务商自行申请的支付宝渠道号(PID)]","type":"text","verify":"required"}]',
         '[{"name":"merchNo","desc":"商户编号","type":"text","verify":"required"}]',
         NULL,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
