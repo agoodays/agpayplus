@@ -12,7 +12,7 @@
         <a-col v-for="(item, key) in ifDefineArray" :key="key" :span="item.type === 'text' ? 12 : 24">
           <a-form-model-item :label="item.desc" :prop="item.name" v-if="item.type === 'text' || item.type === 'textarea'">
             <a-input v-if="item.star === '1'" v-model="ifParams[item.name]" :placeholder="ifParams[item.name + '_ph']" :type="item.type" />
-            <a-input v-else v-model="ifParams[item.name]" placeholder="请输入" :type="item.type" />
+            <a-input v-else v-model="ifParams[item.name]" :placeholder="'请输入'+item.desc" :type="item.type" />
           </a-form-model-item>
           <a-form-model-item :label="item.desc" :prop="item.name" v-else-if="item.type === 'radio'">
             <a-radio-group v-model="ifParams[item.name]">
@@ -118,7 +118,7 @@ export default {
           }
 
           if (item.star === '1') {
-            that.ifParams[item.name + '_ph'] = that.ifParams[item.name] ? that.ifParams[item.name] : '请输入'
+            that.ifParams[item.name + '_ph'] = that.ifParams[item.name] ? that.ifParams[item.name] : '请输入' + item.desc
             if (that.ifParams[item.name]) {
               that.ifParams[item.name] = ''
             }
@@ -141,12 +141,14 @@ export default {
     generateRules () {
       const rules = {}
       let newItems = []
-      this.ifDefineArray.forEach(item => {
+      const that = this
+      that.ifDefineArray.forEach(item => {
         newItems = []
-        if (item.verify === 'required' && item.star !== '1') {
+        const message = '请输入' + item.desc
+        if (item.verify === 'required' && (item.star !== '1' || that.ifParams[item.name + '_ph'] === message)) {
           newItems.push({
             required: true,
-            message: '请输入' + item.desc,
+            message: message,
             trigger: 'blur'
           })
           rules[item.name] = newItems
