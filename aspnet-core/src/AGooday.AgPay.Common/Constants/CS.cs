@@ -358,6 +358,7 @@
             public const string YSF_BAR = "YSF_BAR";  //云闪付条码支付
             public const string YSF_JSAPI = "YSF_JSAPI";  //云闪付服务窗支付
 
+            public const string WX_APP = "WX_APP";  //微信app支付
             public const string WX_JSAPI = "WX_JSAPI";  //微信jsapi支付
             public const string WX_LITE = "WX_LITE";  //微信小程序支付
             public const string WX_BAR = "WX_BAR";  //微信条码支付

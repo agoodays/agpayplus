@@ -101,7 +101,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             return ApiRes.Ok(new { Records = result.ToList(), Total = result.TotalCount, Current = result.PageIndex, HasNext = result.HasNext });
         }
 
-
         /// <summary>
         /// 应用支付通道配置
         /// </summary>

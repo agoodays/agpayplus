@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 {
     /// <summary>
-    /// 支付方式： WX_JSAPI
+    /// 支付方式： WX_APP
     /// </summary>
-    public class WxJsapiOrderRQ : UnifiedOrderRQ
+    public class WxAppOrderRQ : UnifiedOrderRQ
     {
         /// <summary>
         /// 微信openid
@@ -15,16 +15,11 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         public string Openid { get; set; }
 
         /// <summary>
-        /// 标志是否为 subMchAppId的对应 openId， 0-否， 1-是， 默认否
-        /// </summary>
-        public byte IsSubOpenId { get; set; }
-
-        /// <summary>
         /// 构造函数
         /// </summary>
-        public WxJsapiOrderRQ()
+        public WxAppOrderRQ()
         {
-            this.WayCode = CS.PAY_WAY_CODE.WX_JSAPI;
+            this.WayCode = CS.PAY_WAY_CODE.WX_APP; //默认 wayCode, 避免validate出现问题
         }
 
         public override string GetChannelUserId()
