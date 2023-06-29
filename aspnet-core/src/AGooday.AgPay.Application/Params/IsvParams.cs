@@ -1,11 +1,4 @@
-﻿using AGooday.AgPay.Application.Params.AliPay;
-using AGooday.AgPay.Application.Params.HkrtPay;
-using AGooday.AgPay.Application.Params.LesPay;
-using AGooday.AgPay.Application.Params.SxfPay;
-using AGooday.AgPay.Application.Params.WxPay;
-using AGooday.AgPay.Application.Params.YsfPay;
-using AGooday.AgPay.Common.Constants;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Params
 {
@@ -16,31 +9,18 @@ namespace AGooday.AgPay.Application.Params
     {
         public static IsvParams Factory(string ifCode, string paramsStr)
         {
-            if (CS.IF_CODE.WXPAY.Equals(ifCode))
+            try
             {
-                return JsonConvert.DeserializeObject<WxPayIsvParams>(paramsStr);
+                Type type = typeof(IsvParams);
+                string namespaceName = type.Namespace;
+                string typeName = namespaceName + "." + ifCode + "." + ifCode + "IsvParams";
+                Type targetType = Type.GetType(typeName, false, true);
+                return JsonConvert.DeserializeObject(paramsStr, targetType) as IsvParams;
             }
-            else if (CS.IF_CODE.ALIPAY.Equals(ifCode))
+            catch (Exception e)
             {
-                return JsonConvert.DeserializeObject<AliPayIsvParams>(paramsStr);
+                return null;
             }
-            else if (CS.IF_CODE.YSFPAY.Equals(ifCode))
-            {
-                return JsonConvert.DeserializeObject<YsfPayIsvParams>(paramsStr);
-            }
-            else if (CS.IF_CODE.SXFPAY.Equals(ifCode))
-            {
-                return JsonConvert.DeserializeObject<SxfPayIsvParams>(paramsStr);
-            }
-            else if (CS.IF_CODE.LESPAY.Equals(ifCode))
-            {
-                return JsonConvert.DeserializeObject<LesPayIsvParams>(paramsStr);
-            }
-            else if (CS.IF_CODE.HKRTPAY.Equals(ifCode))
-            {
-                return JsonConvert.DeserializeObject<HkrtPayIsvParams>(paramsStr);
-            }
-            return null;
         }
 
         /// <summary>

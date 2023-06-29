@@ -1,9 +1,4 @@
-﻿using AGooday.AgPay.Application.Params.AliPay;
-using AGooday.AgPay.Application.Params.PpPay;
-using AGooday.AgPay.Application.Params.WxPay;
-using AGooday.AgPay.Application.Params.XxPay;
-using AGooday.AgPay.Common.Constants;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Params
 {
@@ -14,23 +9,18 @@ namespace AGooday.AgPay.Application.Params
     {
         public static NormalMchParams Factory(string ifCode, string paramsStr)
         {
-            if (CS.IF_CODE.WXPAY.Equals(ifCode))
+            try
             {
-                return JsonConvert.DeserializeObject<WxPayNormalMchParams>(paramsStr);
+                Type type = typeof(NormalMchParams);
+                string namespaceName = type.Namespace;
+                string typeName = namespaceName + "." + ifCode + "." + ifCode + "NormalMchParams";
+                Type targetType = Type.GetType(typeName, false, true);
+                return JsonConvert.DeserializeObject(paramsStr, targetType) as NormalMchParams;
             }
-            else if (CS.IF_CODE.ALIPAY.Equals(ifCode))
+            catch (Exception e)
             {
-                return JsonConvert.DeserializeObject<AliPayNormalMchParams>(paramsStr);
+                return null;
             }
-            else if (CS.IF_CODE.XXPAY.Equals(ifCode))
-            {
-                return JsonConvert.DeserializeObject<XxPayNormalMchParams>(paramsStr);
-            }
-            else if (CS.IF_CODE.PPPAY.Equals(ifCode))
-            {
-                return JsonConvert.DeserializeObject<PpPayNormalMchParams>(paramsStr);
-            }
-            return null;
         }
 
         /// <summary>
