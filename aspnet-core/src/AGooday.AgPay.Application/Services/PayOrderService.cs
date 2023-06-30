@@ -221,6 +221,23 @@ namespace AGooday.AgPay.Application.Services
             return _payOrderRepository.SaveChanges(out int _);
         }
         /// <summary>
+        /// 更新订单状态  【支付中】 --》 【订单关闭】
+        /// </summary>
+        /// <param name="payOrderId"></param>
+        /// <returns></returns>
+        public bool UpdateIng2Close(string payOrderId)
+        {
+            var updateRecord = _payOrderRepository.GetById(payOrderId);
+            if (updateRecord.State != (byte)PayOrderState.STATE_ING)
+            {
+                return false;
+            }
+            updateRecord.State = (byte)PayOrderState.STATE_CLOSED;
+            updateRecord.SuccessTime = DateTime.Now;
+            _payOrderRepository.Update(updateRecord);
+            return _payOrderRepository.SaveChanges(out int _);
+        }
+        /// <summary>
         /// 更新订单状态 【支付中】 --》 【支付失败】
         /// </summary>
         /// <param name="payOrderId"></param>

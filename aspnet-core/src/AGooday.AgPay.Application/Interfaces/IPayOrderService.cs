@@ -32,6 +32,12 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <returns></returns>
         bool UpdateIng2Success(string payOrderId, string channelOrderNo, string channelUserId);
         /// <summary>
+        /// 更新订单状态  【支付中】 --》 【订单关闭】
+        /// </summary>
+        /// <param name="payOrderId"></param>
+        /// <returns></returns>
+        bool UpdateIng2Close(string payOrderId);
+        /// <summary>
         /// 更新订单状态 【支付中】 --》 【支付失败】
         /// </summary>
         /// <param name="payOrderId"></param>

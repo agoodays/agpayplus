@@ -190,6 +190,28 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                 return funcFactory;
             });
             #endregion
+            #region CloseService
+            services.AddSingleton<AliPayPayOrderCloseService>();
+            services.AddSingleton<WxPayPayOrderCloseService>();
+            services.AddSingleton(provider =>
+            {
+                Func<string, IPayOrderCloseService> funcFactory = ifCode =>
+                {
+                    switch (ifCode)
+                    {
+                        case CS.IF_CODE.ALIPAY:
+                            return provider.GetService<AliPayPayOrderCloseService>();
+                        case CS.IF_CODE.WXPAY:
+                            return provider.GetService<WxPayPayOrderCloseService>();
+                        case CS.IF_CODE.YSFPAY:
+                            return provider.GetService<YsfPayPayOrderCloseService>();
+                        default:
+                            return null;
+                    }
+                };
+                return funcFactory;
+            });
+            #endregion
             #region QueryService
             services.AddSingleton<AliPayPayOrderQueryService>();
             services.AddSingleton<WxPayPayOrderQueryService>();

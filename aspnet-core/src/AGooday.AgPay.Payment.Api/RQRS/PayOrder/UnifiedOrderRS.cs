@@ -1,6 +1,6 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
 {

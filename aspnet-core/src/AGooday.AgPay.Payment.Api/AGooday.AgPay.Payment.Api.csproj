@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Compile Include="Controllers\PayOrder\AbstractPayOrderController.cs" />
+    <Compile Include="Controllers\PayOrder\CloseOrderController.cs" />
     <Compile Include="Controllers\PayOrder\PayWay\AliBarOrderController.cs" />
     <Compile Include="Controllers\PayOrder\PayWay\YsfJsapiOrderController.cs" />
     <Compile Include="Controllers\PayOrder\PayWay\AliJsapiOrderController.cs" />
