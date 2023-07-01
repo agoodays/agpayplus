@@ -49,7 +49,8 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_APP_EDIT')" @click="editFunc(record.appId)">修改</a-button>
-            <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.appId)">支付配置</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="payConfigFunc(record.appId)">支付配置</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.appId)">支付配置(旧版)</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_PAY_TEST')">
               <router-link :to="{name:'ENT_MCH_PAY_TEST', params:{appId:record.appId}}">
                 支付测试
@@ -67,6 +68,8 @@
     </a-card>
     <!-- 新增应用  -->
     <MchAppAddOrEdit ref="mchAppAddOrEdit" :callbackFunc="searchFunc"/>
+    <!-- 支付配置组件  -->
+    <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_MCH_PAY_CONFIG_ADD'" :config-mode="'mgrMch'" />
     <!-- 支付参数配置页面组件  -->
     <MchPayIfConfigList ref="mchPayIfConfigList" />
   </page-header-wrapper>
@@ -127,6 +130,9 @@ export default {
           that.searchFunc()
         })
       })
+    },
+    payConfigFunc: function (recordId) { // 支付配置
+      this.$refs.payConfig.show(recordId)
     },
     showPayIfConfigList: function (recordId) { // 支付参数配置
       this.$refs.mchPayIfConfigList.show(recordId)

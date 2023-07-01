@@ -7,12 +7,12 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Manager.Api.Attributes;
-using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Attributes;
+using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
+namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
 {
     /// <summary>
     /// 支付接口管理类
