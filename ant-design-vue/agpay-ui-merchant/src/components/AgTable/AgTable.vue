@@ -7,7 +7,7 @@
 -->
 <template>
   <div>
-    <div class="ag-table-top-row">
+    <div class="ag-table-top-row" v-if="isShowTableTop">
       <div class="ag-table-top-left">
         <a-button icon="area-chart" class="statistics" v-if="isEnableDataStatistics" @click="isShowDataStatistics = !isShowDataStatistics">
           {{ isShowDataStatistics ? "关闭" : "数据" }}统计
@@ -111,6 +111,7 @@ export default {
   // 传递数据参数 ( 父-->子 参数 )
   props: {
     defaultCountdown: { type: Number, default: 180 },
+    isShowTableTop: { type: Boolean, default: true }, // 显示表格顶部操作， 默认false
     autoRefresh: { type: Boolean, default: false }, // 自动刷新， 默认false
     isShowAutoRefresh: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
     isShowDownload: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
@@ -124,7 +125,7 @@ export default {
     pageSize: { type: Number, default: 10 }, // 默认每页条数
     rowSelection: { type: Object, default: null }, // checkbox选择
     rowKey: { type: [String, Function], default: 'id' }, // 定义rowKey 如果不定义将会出现（树状结构出问题， checkbox不消失等）
-    scrollX: { type: Number, default: 800 }, // 定义表格的最小宽度，在小就会出现横向的滚动条
+    scrollX: { type: Number, default: 500 }, // 表格显示滚动条的宽度
     tableRowCrossColor: { type: Boolean, default: false } // 是隔行换色
   },
 

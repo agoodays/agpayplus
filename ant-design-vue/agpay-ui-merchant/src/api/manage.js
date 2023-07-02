@@ -15,6 +15,11 @@ export const req = {
     return request.request({ url: url, method: 'GET', params: params }, true, true, false)
   },
 
+  // 通用获取数据接口
+  get: (url, params) => {
+    return request.request({ url: url, method: 'GET', params: params }, true, true, false)
+  },
+
   // 通用列表查询统计接口
   count: (url, params) => {
     return request.request({ url: url + '/count', method: 'GET', params: params }, true, true, false)

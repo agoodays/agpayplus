@@ -66,12 +66,14 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 foreach (var payWay in payWays)
                 {
                     payWay.PassageState = CS.NO;
+                    payWay.IsConfig = CS.NO;
                     foreach (var mchPayPassage in mchPayPassages)
                     {
                         // 某种支付方式多个通道的情况下，只要有一个通道状态为开启，则该支付方式对应为开启状态
                         if (payWay.WayCode.Equals(mchPayPassage.WayCode) && mchPayPassage.State == CS.YES)
                         {
                             payWay.PassageState = CS.YES;
+                            payWay.IsConfig = CS.YES;
                             break;
                         }
                     }
@@ -88,7 +90,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("availablePayInterface/{appId}/{wayCode}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_PASSAGE_CONFIG)]
-        public ApiRes AvailablePayInterface(string appId, string wayCode)
+        public ApiRes AvailablePayInterface(string appId, string wayCode, int pageNumber, int pageSize)
         {
             var mchApp = _mchAppService.GetById(appId);
             if (mchApp == null || mchApp.State != CS.YES)
@@ -101,8 +103,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             // 根据支付方式查询可用支付接口列表
-            var result = _mchPayPassageService.SelectAvailablePayInterfaceList(wayCode, appId, CS.INFO_TYPE.MCH_APP, mchInfo.Type);
-            return ApiRes.Ok(result);
+            var result = _mchPayPassageService.SelectAvailablePayInterfaceList(wayCode, appId, CS.INFO_TYPE.MCH_APP, mchInfo.Type, pageNumber, pageSize);
+            return ApiRes.Ok(new { Records = result.ToList(), Total = result.TotalCount, Current = result.PageIndex, HasNext = result.HasNext });
         }
 
         /// <summary>

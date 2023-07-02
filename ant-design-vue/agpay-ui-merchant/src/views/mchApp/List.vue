@@ -69,7 +69,7 @@
     <!-- 新增应用  -->
     <MchAppAddOrEdit ref="mchAppAddOrEdit" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
-    <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_MCH_PAY_CONFIG_ADD'" :config-mode="'mgrMch'" />
+    <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_MCH_PAY_CONFIG_ADD'" :config-mode="'mchSelfApp2'" />
     <!-- 支付参数配置页面组件  -->
     <MchPayIfConfigList ref="mchPayIfConfigList" />
   </page-header-wrapper>
@@ -79,6 +79,7 @@
 import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import AgPayConfigDrawer from '@/components/AgPayConfigDrawer/AgPayConfigDrawer'
 import { API_URL_MCH_APP, req } from '@/api/manage'
 import MchAppAddOrEdit from './AddOrEdit'
 import MchPayIfConfigList from './MchPayIfConfigList'
@@ -95,7 +96,7 @@ const tableColumns = [
 
 export default {
   name: 'MchAppPage',
-  components: { AgTable, AgTableColumns, AgTextUp, MchAppAddOrEdit, MchPayIfConfigList },
+  components: { AgTable, AgTableColumns, AgTextUp, AgPayConfigDrawer, MchAppAddOrEdit, MchPayIfConfigList },
   data () {
     return {
       btnLoading: false,
