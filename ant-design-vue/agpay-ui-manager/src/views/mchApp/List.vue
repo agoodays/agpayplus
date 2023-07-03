@@ -50,7 +50,7 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_APP_EDIT')" @click="editFunc(record.appId)">修改</a-button>
-            <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="payConfigFunc(record.appId)">支付配置</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="payConfigFunc(record.appId, record.mchType)">支付配置</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.appId)">支付配置(旧版)</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_APP_DEL')" style="color: red" @click="delFunc(record.appId)">删除</a-button>
           </AgTableColumns>
@@ -128,8 +128,8 @@ export default {
         })
       })
     },
-    payConfigFunc: function (recordId) { // 支付配置
-      this.$refs.payConfig.show(recordId)
+    payConfigFunc: function (recordId, mchType) { // 支付配置
+      this.$refs.payConfig.show(recordId, mchType === 2)
     },
     showPayIfConfigList: function (recordId) { // 支付参数配置
       this.$refs.mchPayIfConfigList.show(recordId)

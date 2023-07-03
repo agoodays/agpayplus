@@ -7,7 +7,7 @@
     :body-style="{ padding: '0px 0px 80px', overflowY: 'auto' }"
     width="90%">
     <a-tabs v-model="topTabsVal">
-      <a-tab-pane :key="'paramsAndRateTab'" tab="参数及费率的填写">
+      <a-tab-pane v-if="topTabData.some(tab => tab.code === 'paramsAndRateTab')" :key="'paramsAndRateTab'" tab="参数及费率的填写">
         <div class="search">
           <a-input class="if-input" placeholder="搜索渠道名称" v-model="ifCodeListSearchData.ifName"/>
           <a-input class="if-input" placeholder="搜索渠道代码" v-model="ifCodeListSearchData.ifCode"/>
@@ -92,7 +92,7 @@
           </div>
         </div>
       </a-tab-pane>
-      <a-tab-pane v-if="infoType==='MCH_APP'" :key="'mchPassageTab'" tab="支付渠道的选择">
+      <a-tab-pane v-if="topTabData.some(tab => tab.code === 'mchPassageTab')" :key="'mchPassageTab'" tab="支付渠道的选择">
         <div class="content-box">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
@@ -227,6 +227,10 @@ export default {
       btnLoading: false,
       isShowMore: true,
       topTabsVal: 'paramsAndRateTab',
+      topTabData: [
+        { code: 'paramsAndRateTab', name: '参数及费率的填写' },
+        { code: 'mchPassageTab', name: '支付渠道的选择' }
+      ],
       currentIfCode: null,
       selectIfCode: null,
       configComponent: null,
@@ -258,8 +262,11 @@ export default {
     }
   },
   methods: {
-    show: function (infoId) { // 弹层打开事件
+    show: function (infoId, configMchAppIsIsvSubMch) { // 弹层打开事件
       this.infoId = infoId
+      this.topTabData = [
+        { code: 'paramsAndRateTab', name: '参数及费率的填写' }
+      ]
       this.tabData = [
         { code: 'paramsTab', name: '参数配置' },
         { code: 'rateTab', name: '费率配置' }
@@ -270,7 +277,17 @@ export default {
       }
       if (this.configMode === 'mgrMch' || this.configMode === 'agentMch' || this.configMode === 'mchSelfApp1') {
         infoType = 'MCH_APP'
-        this.tabData.push({ code: 'channelConfigTab', name: '渠道配置' })
+        this.topTabData.push({ code: 'mchPassageTab', name: '支付渠道的选择' })
+        if (configMchAppIsIsvSubMch) {
+          console.log('显示渠道配置')
+          this.tabData.push({ code: 'channelConfigTab', name: '渠道配置' })
+        }
+      }
+      if (this.configMode === 'mchSelfApp2') {
+        infoType = 'MCH_APP'
+        this.topTabData = [
+          { code: 'mchPassageTab', name: '支付渠道的选择' }
+        ]
       }
       this.infoType = infoType
       this.reset()
@@ -280,11 +297,13 @@ export default {
       this.visible = true
     },
     reset: function () {
+      const [firstTopTab] = this.topTabData
+      const [firstTab] = this.tabData
       this.btnLoading = false
       this.isShowMore = true
-      this.topTabsVal = 'paramsAndRateTab'
+      this.topTabsVal = firstTopTab.code
       this.currentIfCode = null
-      this.paramsAndRateTabVal = 'paramsTab'
+      this.paramsAndRateTabVal = firstTab.code
       this.restConfig()
     },
     onClose () {
