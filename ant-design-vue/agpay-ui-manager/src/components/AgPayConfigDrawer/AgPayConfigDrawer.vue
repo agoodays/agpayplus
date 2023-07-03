@@ -442,8 +442,13 @@ export default {
 </script>
 
 <style scoped>
-  >>> .ant-tabs-top-bar {
+  /*>>> .ant-tabs-top-bar {
     padding-left: 35vw;
+  }*/
+
+  >>> .ant-tabs-nav-wrap {
+    justify-content: center;
+    display: flex;
   }
 
   >>> .table-page-search-wrapper {
