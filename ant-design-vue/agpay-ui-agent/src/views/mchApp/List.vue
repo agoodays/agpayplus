@@ -50,7 +50,8 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_APP_EDIT')" @click="editFunc(record.appId)">修改</a-button>
-            <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.appId)">支付配置</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="payConfigFunc(record.appId, record.mchType)">支付配置</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.appId)">支付配置(旧版)</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_APP_DEL')" style="color: red" @click="delFunc(record.appId)">删除</a-button>
           </AgTableColumns>
         </template>
@@ -58,6 +59,8 @@
     </a-card>
     <!-- 新增应用  -->
     <MchAppAddOrEdit ref="mchAppAddOrEdit" :callbackFunc="searchFunc"/>
+    <!-- 支付配置组件  -->
+    <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_MCH_PAY_CONFIG_ADD'" :config-mode="'agentMch'" />
     <!-- 支付参数配置页面组件  -->
     <MchPayIfConfigList ref="mchPayIfConfigList" />
   </page-header-wrapper>
@@ -67,6 +70,7 @@
 import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import AgPayConfigDrawer from '@/components/AgPayConfigDrawer/AgPayConfigDrawer'
 import { API_URL_MCH_APP, req } from '@/api/manage'
 import MchAppAddOrEdit from './AddOrEdit'
 import MchPayIfConfigList from './MchPayIfConfigList'
@@ -84,7 +88,7 @@ const tableColumns = [
 
 export default {
   name: 'MchAppPage',
-  components: { AgTable, AgTableColumns, AgTextUp, MchAppAddOrEdit, MchPayIfConfigList },
+  components: { AgTable, AgTableColumns, AgTextUp, AgPayConfigDrawer, MchAppAddOrEdit, MchPayIfConfigList },
   data () {
     return {
       btnLoading: false,
@@ -123,6 +127,9 @@ export default {
           that.searchFunc()
         })
       })
+    },
+    payConfigFunc: function (recordId) { // 支付配置
+      this.$refs.payConfig.show(recordId)
     },
     showPayIfConfigList: function (recordId) { // 支付参数配置
       this.$refs.mchPayIfConfigList.show(recordId)

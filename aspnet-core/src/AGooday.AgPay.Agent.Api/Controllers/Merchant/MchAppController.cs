@@ -10,6 +10,7 @@ using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
 {
@@ -49,7 +50,16 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         public ApiRes List([FromQuery] MchAppQueryDto dto)
         {
             var data = _mchAppService.GetPaginatedData(dto, GetCurrentAgentNo());
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
+            var mchInfos = _mchInfoService.GetByMchNos(mchNos);
+            JArray records = new JArray();
+            foreach (var item in data)
+            {
+                var jitem = JObject.FromObject(item);
+                jitem["mchType"] = mchInfos.First(s => s.MchNo == item.MchNo).Type;
+                records.Add(jitem);
+            }
+            return ApiRes.Ok(new { Records = records, Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
         /// <summary>

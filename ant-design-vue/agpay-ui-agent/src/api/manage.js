@@ -14,6 +14,11 @@ export const req = {
     return request.request({ url: url, method: 'GET', params: params }, true, true, false)
   },
 
+  // 通用获取数据接口
+  get: (url, params) => {
+    return request.request({ url: url, method: 'GET', params: params }, true, true, false)
+  },
+
   // 通用列表查询统计接口
   count: (url, params) => {
     return request.request({ url: url + '/count', method: 'GET', params: params }, true, true, false)
@@ -107,6 +112,9 @@ export const API_URL_PAYWAYS_LIST = '/api/payWays'
 /** 代理商、商户支付参数配置 **/
 export const API_URL_AGENT_PAYCONFIGS_LIST = '/api/agent/payConfigs'
 export const API_URL_MCH_PAYCONFIGS_LIST = '/api/mch/payConfigs'
+/** 服务商、代理商、商户支付参数配置 **/
+export const API_URL_PAYCONFIGS_LIST = '/api/payConfig'
+export const API_URL_RATECONFIGS_LIST = '/api/rateConfig'
 /** 商户支付通道配置 **/
 export const API_URL_MCH_PAYPASSAGE_LIST = '/api/mch/payPassages'
 /** 转账订单管理 **/

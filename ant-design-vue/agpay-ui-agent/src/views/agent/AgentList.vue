@@ -50,6 +50,7 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_AGENT_INFO_EDIT')" @click="editFunc(record.agentNo)">修改</a-button>
+            <a-button type="link" v-if="$access('ENT_AGENT_PAY_CONFIG_LIST')" @click="payConfigFunc(record.agentNo)">费率配置</a-button>
             <a-button type="link" v-if="$access('ENT_AGENT_INFO_DEL')" style="color: red" @click="delFunc(record.agentNo)">删除</a-button>
           </AgTableColumns>
         </template>
@@ -59,6 +60,8 @@
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
     <!-- 新增页面组件  -->
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
+    <!-- 支付配置组件  -->
+    <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'agentSubagent'" />
   </page-header-wrapper>
 </template>
 
@@ -66,6 +69,7 @@
 import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import AgPayConfigDrawer from '@/components/AgPayConfigDrawer/AgPayConfigDrawer'
 import { API_URL_AGENT_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import InfoDetail from './Detail'
@@ -88,7 +92,7 @@ const tableColumns = [
 
 export default {
   name: 'AgentListPage',
-  components: { AgTable, AgTableColumns, InfoAddOrEdit, InfoDetail, AgTextUp },
+  components: { AgTextUp, AgTable, AgTableColumns, AgPayConfigDrawer, InfoAddOrEdit, InfoDetail },
   data () {
     return {
       btnLoading: false,
@@ -119,6 +123,9 @@ export default {
     },
     detailFunc: function (recordId) { // 代理商详情页
       this.$refs.infoDetail.show(recordId)
+    },
+    payConfigFunc: function (recordId) { // 支付配置
+      this.$refs.payConfig.show(recordId)
     },
     // 删除
     delFunc: function (recordId) {

@@ -105,12 +105,12 @@ export default {
     refCardList () {
       const that = this
       getAvailablePayInterfaceList(this.appId, this.wayCode).then(resData => {
-        if (resData === undefined || resData.length === 0) {
+        if (resData.records === undefined || resData.records.length === 0) {
           that.cardList = []
           return
         }
         const newItems = []
-        resData.forEach(item => {
+        resData.records.forEach(item => {
           newItems.push({
             passageId: item.passageId ? item.passageId : '',
             ifCode: item.ifCode,
