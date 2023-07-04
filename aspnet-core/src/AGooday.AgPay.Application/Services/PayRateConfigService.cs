@@ -200,6 +200,7 @@ namespace AGooday.AgPay.Application.Services
         {
             JObject result = new JObject();
             string infoType = string.Empty;
+            string isvNo = string.Empty;
             switch (configMode)
             {
                 case CS.CONFIG_MODE.MGR_ISV:
@@ -216,7 +217,11 @@ namespace AGooday.AgPay.Application.Services
                     result.Add(CS.CONFIG_TYPE.AGENTDEF, GetPayRateConfigJson(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
                     result.Add(CS.CONFIG_TYPE.AGENTRATE, GetPayRateConfigJson(CS.CONFIG_TYPE.AGENTRATE, infoType, infoId, ifCode));
                     result.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, GetPayRateConfigJson(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode));
-                    GetReadOnlyRateJson(ifCode, result, agent.IsvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
+                    if (!configMode.Equals(CS.CONFIG_MODE.AGENT_SELF))
+                    {
+                        isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_MCH) ? agent.IsvNo : string.Empty;
+                        GetReadOnlyRateJson(ifCode, result, isvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
+                    }
                     break;
                 case CS.CONFIG_MODE.MGR_MCH:
                 case CS.CONFIG_MODE.AGENT_MCH:
@@ -228,7 +233,8 @@ namespace AGooday.AgPay.Application.Services
                     result.Add(CS.CONFIG_TYPE.MCHRATE, GetPayRateConfigJson(CS.CONFIG_TYPE.MCHRATE, infoType, infoId, ifCode));
                     if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
                     {
-                        GetReadOnlyRateJson(ifCode, result, mchInfo.IsvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
+                        isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_MCH) ? mchInfo.IsvNo : string.Empty;
+                        GetReadOnlyRateJson(ifCode, result, isvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
                     }
                     break;
                 default:
@@ -239,9 +245,11 @@ namespace AGooday.AgPay.Application.Services
 
         private void GetReadOnlyRateJson(string ifCode, JObject result, string isvNo, string agentNo, string configType)
         {
-            // 服务商底价
-            result.Add(CS.CONFIG_TYPE.READONLYISVCOST, GetPayRateConfigJson(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode));
-
+            if (!string.IsNullOrWhiteSpace(isvNo))
+            {
+                // 服务商底价
+                result.Add(CS.CONFIG_TYPE.READONLYISVCOST, GetPayRateConfigJson(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode));
+            }
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
                 // 上级代理商费率

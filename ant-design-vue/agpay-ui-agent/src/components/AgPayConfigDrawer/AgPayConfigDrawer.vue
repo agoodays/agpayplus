@@ -272,8 +272,13 @@ export default {
         { code: 'rateTab', name: '费率配置' }
       ]
       let infoType = 'ISV'
-      if (this.configMode === 'mgrAgent' || this.configMode === 'agentSubagent') {
+      if (this.configMode === 'mgrAgent' || this.configMode === 'agentSelf' || this.configMode === 'agentSubagent') {
         infoType = 'AGENT'
+        if (this.configMode === 'agentSelf') {
+          this.tabData = [
+            { code: 'rateTab', name: '费率配置' }
+          ]
+        }
       }
       if (this.configMode === 'mgrMch' || this.configMode === 'agentMch' || this.configMode === 'mchSelfApp1') {
         infoType = 'MCH_APP'

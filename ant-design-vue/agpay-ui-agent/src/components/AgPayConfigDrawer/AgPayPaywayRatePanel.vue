@@ -19,7 +19,7 @@
               v-model="payWayItem.checked"
               @change="onChangeWayCode(payWayItem.wayCode, $event, mergeFeeItem)"
             >{{ payWayItem.wayName }}</a-checkbox>
-            <a-button type="primary" :disabled="!!configTypeReadonlyMaps.length" @click="mergeFeeItem.isMergeMode = !mergeFeeItem.isMergeMode">
+            <a-button type="primary" :disabled="!!configTypeReadonlyMaps.length || configMode==='agentSelf'" @click="mergeFeeItem.isMergeMode = !mergeFeeItem.isMergeMode">
               {{ mergeFeeItem.isMergeMode ? '拆分配置' : '合并配置' }}
             </a-button>
           </div>
@@ -47,27 +47,28 @@
                   是否开通：
                   <a-switch
                     @change="onChangeState(payWayItem.wayCode, $event)"
-                    :checked="!!rateConfig.mainFee[payWayItem.wayCode].state" />
+                    :checked="!!rateConfig.mainFee[payWayItem.wayCode].state"
+                    :disabled="configMode==='agentSelf'" />
                 </div>
                 <div class="h-right2-div" v-if="!!rateConfig.mainFee[payWayItem.wayCode].state">
                   是否可进件：
                   <a-switch
                     @change="onChangeApplymentSupport(payWayItem.wayCode, $event)"
                     :checked="!!rateConfig.mainFee[payWayItem.wayCode].applymentSupport"
-                    :disabled="!!configTypeReadonlyMaps.length"/>
+                    :disabled="!!configTypeReadonlyMaps.length || configMode==='agentSelf'"/>
                 </div>
                 <div class="h-right2-div" v-if="!!rateConfig.mainFee[payWayItem.wayCode].state">
                   阶梯费率：
                   <a-switch
                     @change="onChangeFeeType(payWayItem.wayCode, $event)"
                     :checked="rateConfig.mainFee[payWayItem.wayCode].feeType==='LEVEL'"
-                    :disabled="!!configTypeReadonlyMaps.length"/>
+                    :disabled="!!configTypeReadonlyMaps.length || configMode==='agentSelf'"/>
                 </div>
                 <div class="h-right2-div" v-if="!!rateConfig.mainFee[payWayItem.wayCode].state">
                   银联模式：
                   <a-switch
                     @change="onChangeLevelMode(payWayItem.wayCode, $event)"
-                    :disabled="rateConfig.mainFee[payWayItem.wayCode].feeType!=='LEVEL' || !!configTypeReadonlyMaps.length"
+                    :disabled="rateConfig.mainFee[payWayItem.wayCode].feeType!=='LEVEL' || !!configTypeReadonlyMaps.length || configMode==='agentSelf'"
                     :checked="rateConfig.mainFee[payWayItem.wayCode].feeType==='LEVEL'
                       && rateConfig.mainFee[payWayItem.wayCode].levelMode==='UNIONPAY'" />
                 </div>
@@ -113,7 +114,7 @@
                           addon-after="~"
                           @change="inputChangeAmount(payWayItem.wayCode, 'min', levelItem.id, $event)"
                           v-model="levelItem.minAmount"
-                          :disabled="!!configTypeReadonlyMaps.length"/>
+                          :disabled="!!configTypeReadonlyMaps.length || configMode==='agentSelf'"/>
                         <a-input
                           style="width: 50%;min-width: 100px;"
                           :min="0"
@@ -121,7 +122,7 @@
                           addon-after="元"
                           @change="inputChangeAmount(payWayItem.wayCode, 'max', levelItem.id, $event)"
                           v-model="levelItem.maxAmount"
-                          :disabled="!!configTypeReadonlyMaps.length"/>
+                          :disabled="!!configTypeReadonlyMaps.length || configMode==='agentSelf'"/>
                       </div>
                     </div>
                     <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
@@ -132,7 +133,7 @@
                         type="number"
                         addon-after="%"
                         @change="inputChange"
-                        :disabled="item.startsWith('readonly')"
+                        :disabled="item.startsWith('readonly') || (configMode==='agentSelf' && item==='mainFee')"
                         v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode]
                           .find(f => f.bankCardType === levelModeItem.bankCardType).levelList[levelKey].feeRate"/>
                     </div>
@@ -176,7 +177,7 @@
                               addon-before="保底："
                               addon-after="元"
                               @change="inputChange"
-                              :disabled="item.startsWith('readonly')"
+                              :disabled="item.startsWith('readonly') || (configMode==='agentSelf' && item==='mainFee')"
                               v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][levelModeKey].minFee"/>
                           </div>
                         </div>
@@ -191,7 +192,7 @@
                               addon-before="封顶："
                               addon-after="元"
                               @change="inputChange"
-                              :disabled="item.startsWith('readonly')"
+                              :disabled="item.startsWith('readonly') || (configMode==='agentSelf' && item==='mainFee')"
                               v-model="rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][levelModeKey].maxFee"/>
                           </div>
                         </div>
@@ -209,7 +210,7 @@
                     type="number"
                     addon-after="%"
                     @change="inputChange"
-                    :disabled="item.startsWith('readonly')"
+                    :disabled="item.startsWith('readonly') || (configMode==='agentSelf' && item==='mainFee')"
                     v-model="rateConfig[item][payWayItem.wayCode].feeRate"/>
                 </div>
               </div>
@@ -250,20 +251,20 @@
                 <a-switch
                   @change="onChangeApplymentSupport(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
                   :checked="!!mergeFeeItem.mainFee.applymentSupport"
-                  :disabled="!!configTypeReadonlyMaps.length"/>
+                  :disabled="!!configTypeReadonlyMaps.length || configMode==='agentSelf'"/>
               </div>
               <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee.state">
                 阶梯费率：
                 <a-switch
                   @change="onChangeFeeType(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
                   :checked="mergeFeeItem.mainFee.feeType==='LEVEL'"
-                  :disabled="!!configTypeReadonlyMaps.length"/>
+                  :disabled="!!configTypeReadonlyMaps.length || configMode==='agentSelf'"/>
               </div>
               <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee.state">
                 银联模式：
                 <a-switch
                   @change="onChangeLevelMode(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                  :disabled="mergeFeeItem.mainFee.feeType!=='LEVEL' || !!configTypeReadonlyMaps.length"
+                  :disabled="mergeFeeItem.mainFee.feeType!=='LEVEL' || !!configTypeReadonlyMaps.length || configMode==='agentSelf'"
                   :checked="mergeFeeItem.mainFee.feeType==='LEVEL'
                     && mergeFeeItem.mainFee.levelMode==='UNIONPAY'" />
               </div>
@@ -309,7 +310,7 @@
                         addon-after="~"
                         @change="inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'min', levelItem.id, $event, mergeFeeItem)"
                         v-model="levelItem.minAmount"
-                        :disabled="!!configTypeReadonlyMaps.length"/>
+                        :disabled="!!configTypeReadonlyMaps.length || configMode==='agentSelf'"/>
                       <a-input
                         style="width: 50%;min-width: 100px;"
                         :min="0"
@@ -317,7 +318,7 @@
                         addon-after="元"
                         @change="inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'max', levelItem.id, $event, mergeFeeItem)"
                         v-model="levelItem.maxAmount"
-                        :disabled="!!configTypeReadonlyMaps.length"/>
+                        :disabled="!!configTypeReadonlyMaps.length || configMode==='agentSelf'"/>
                     </div>
                   </div>
                   <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
@@ -328,7 +329,7 @@
                       type="number"
                       addon-after="%"
                       @change="inputChange"
-                      :disabled="item.startsWith('readonly')"
+                      :disabled="item.startsWith('readonly') || (configMode==='agentSelf' && item==='mainFee')"
                       v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode]
                         .find(f => f.bankCardType===levelModeItem.bankCardType).levelList[levelKey].feeRate"/>
                   </div>
@@ -372,7 +373,7 @@
                             addon-before="保底："
                             addon-after="元"
                             @change="inputChange"
-                            :disabled="item.startsWith('readonly')"
+                            :disabled="item.startsWith('readonly') || (configMode==='agentSelf' && item==='mainFee')"
                             v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].minFee"/>
                         </div>
                       </div>
@@ -387,7 +388,7 @@
                             addon-before="封顶："
                             addon-after="元"
                             @change="inputChange"
-                            :disabled="item.startsWith('readonly')"
+                            :disabled="item.startsWith('readonly') || (configMode==='agentSelf' && item==='mainFee')"
                             v-model="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].maxFee"/>
                         </div>
                       </div>
@@ -405,7 +406,7 @@
                   type="number"
                   addon-after="%"
                   @change="inputChange"
-                  :disabled="item.startsWith('readonly')"
+                  :disabled="item.startsWith('readonly') || (configMode==='agentSelf' && item==='mainFee')"
                   v-model="mergeFeeItem[item].feeRate"/>
               </div>
             </div>
@@ -1307,13 +1308,6 @@ export default {
         if (f === 'mchapplydefFee') {
           return '商户进件默认'
         }
-
-        if (f === 'readonlyIsvCost') {
-          return '服务商底价'
-        }
-        if (f === 'readonlyParentAgent') {
-          return '上级代理商'
-        }
       }
 
       if (that.configMode === 'agentSubagent') {
@@ -1325,13 +1319,6 @@ export default {
         }
         if (f === 'mchapplydefFee') {
           return '商户进件默认'
-        }
-
-        if (f === 'readonlyIsvCost') {
-          return '服务商底价'
-        }
-        if (f === 'readonlyParentAgent') {
-          return '我的代理'
         }
       }
 
