@@ -64,12 +64,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                     infoType = CS.INFO_TYPE.ISV;
                     break;
                 case "mgrAgent":
+                case "agentSelf":
                 case "agentSubagent":
                     infoType = CS.INFO_TYPE.AGENT;
                     break;
                 case "mgrMch":
                 case "agentMch":
-                case "agentSelf":
                 case "mchSelfApp1":
                 case "mchSelfApp2":
                     infoType = CS.INFO_TYPE.MCH_APP;
@@ -98,12 +98,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                     infoType = CS.INFO_TYPE.ISV;
                     break;
                 case "mgrAgent":
+                case "agentSelf":
                 case "agentSubagent":
                     infoType = CS.INFO_TYPE.AGENT;
                     break;
                 case "mgrMch":
                 case "agentMch":
-                case "agentSelf":
                 case "mchSelfApp1":
                 case "mchSelfApp2":
                     infoType = CS.INFO_TYPE.MCH_APP;

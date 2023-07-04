@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             if (!string.IsNullOrWhiteSpace(agentInfo.Pid))
             {
                 // 当前服务商状态是否正确
-                var pagentInfo = _agentInfoRepository.GetById(agentInfo.IsvNo);
+                var pagentInfo = _agentInfoRepository.GetById(agentInfo.Pid);
                 if (pagentInfo == null || pagentInfo.State == CS.NO)
                 {
                     Bus.RaiseEvent(new DomainNotification("", "上级代理商不可用！"));

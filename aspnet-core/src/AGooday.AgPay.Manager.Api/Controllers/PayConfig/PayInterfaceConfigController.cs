@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="ifCode"></param>
         /// <returns></returns>
         [HttpGet, Route("ifCodes"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.AGENT.ENT_AGENT_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_AGENT_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes List(string configMode, string infoId, string ifName, string ifCode)
         {
             string infoType = string.Empty;
@@ -64,12 +64,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                     infoType = CS.INFO_TYPE.ISV;
                     break;
                 case "mgrAgent":
+                case "agentSelf":
                 case "agentSubagent":
                     infoType = CS.INFO_TYPE.AGENT;
                     break;
                 case "mgrMch":
                 case "agentMch":
-                case "agentSelf":
                 case "mchSelfApp1":
                 case "mchSelfApp2":
                     infoType = CS.INFO_TYPE.MCH_APP;
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="ifCode"></param>
         /// <returns></returns>
         [HttpGet, Route("interfaceSavedConfigs"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_VIEW, PermCode.AGENT.ENT_AGENT_PAY_CONFIG_VIEW, PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_VIEW, PermCode.MGR.ENT_AGENT_PAY_CONFIG_VIEW, PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
         public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
         {
             string infoType = string.Empty;
@@ -98,12 +98,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                     infoType = CS.INFO_TYPE.ISV;
                     break;
                 case "mgrAgent":
+                case "agentSelf":
                 case "agentSubagent":
                     infoType = CS.INFO_TYPE.AGENT;
                     break;
                 case "mgrMch":
                 case "agentMch":
-                case "agentSelf":
                 case "mchSelfApp1":
                 case "mchSelfApp2":
                     infoType = CS.INFO_TYPE.MCH_APP;
@@ -159,7 +159,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, Route("interfaceParams"), MethodLog("更新支付参数")]
-        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD, PermCode.AGENT.ENT_AGENT_PAY_CONFIG_ADD, PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD, PermCode.MGR.ENT_AGENT_PAY_CONFIG_ADD, PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
             dto.IfRate = dto.IfRate / 100;// 存入真实费率

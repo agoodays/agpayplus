@@ -202,7 +202,7 @@ export default {
     editPayPassageFunc (record) {
       const that = this
       getAvailablePayInterfaceList(that.appId, record.wayCode).then(resData => {
-        if (!resData || resData.length === 0) {
+        if (!resData.records || resData.records.length === 0) {
           that.$error({
             title: '提示',
             content: '暂无可用支付接口配置'
