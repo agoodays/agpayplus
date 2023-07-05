@@ -215,6 +215,10 @@
             public const string ENT_MCH_STORE_ADD = "ENT_MCH_STORE_ADD";
             public const string ENT_MCH_STORE_EDIT = "ENT_MCH_STORE_EDIT";
             public const string ENT_MCH_STORE_DEL = "ENT_MCH_STORE_DEL";
+            public const string ENT_AGENT_ACCOUNT_CENTER = "ENT_AGENT_ACCOUNT_CENTER";
+            public const string ENT_AGENT_SELF_PAY_CONFIG = "ENT_AGENT_SELF_PAY_CONFIG";
+            public const string ENT_AGENT_SELF_PAY_CONFIG_LIST = "ENT_AGENT_SELF_PAY_CONFIG_LIST";
+            public const string ENT_AGENT_SELF_PAY_CONFIG_ADD = "ENT_AGENT_SELF_PAY_CONFIG_ADD";
             public const string ENT_AGENT_PAY_CONFIG_ADD = "ENT_AGENT_PAY_CONFIG_ADD";
             public const string ENT_AGENT_PAY_CONFIG_VIEW = "ENT_AGENT_PAY_CONFIG_VIEW";
             public const string ENT_AGENT_INFO = "ENT_AGENT_INFO";

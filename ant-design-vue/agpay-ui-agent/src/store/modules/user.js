@@ -16,6 +16,7 @@ const user = {
     loginUsername: '', // 登录用户名
     state: '', // 用户状态
     sysType: '', // 所属系统
+    belongInfoId: '', // 所属代理商ID
     telphone: '', // 手机号
     sex: '' // 性别
   },
@@ -41,6 +42,7 @@ const user = {
       state.loginUsername = userInfo.loginUsername // 登录用户名
       state.state = userInfo.state // 用户状态
       state.sysType = userInfo.sysType // 所属系统
+      state.belongInfoId = userInfo.belongInfoId // 所属代理商ID
       state.telphone = userInfo.telphone // 手机号
       state.sex = userInfo.sex // 性别
     }

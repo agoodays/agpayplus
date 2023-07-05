@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     Bus.RaiseEvent(new DomainNotification("", "上级代理商/服务商信息有误！"));
                     return Task.FromResult(new Unit());
                 }
-                agentInfo.Level = ++pagentInfo.Level;
+                agentInfo.Level = (byte)(pagentInfo.Level + 1);
             }
             else
             {

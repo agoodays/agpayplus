@@ -142,7 +142,7 @@ namespace AGooday.AgPay.Application.Services
             var agentInfos = _agentInfoRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (!agentNos.Any() || agentNos.Contains(dto.AgentNo))
-                && (string.IsNullOrWhiteSpace(dto.Pid) || w.IsvNo.Equals(dto.Pid))
+                && (string.IsNullOrWhiteSpace(dto.Pid) || w.Pid.Equals(dto.Pid))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.AgentName))
                 && (string.IsNullOrWhiteSpace(dto.ContactTel) || w.IsvNo.Equals(dto.ContactTel))

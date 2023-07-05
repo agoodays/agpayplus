@@ -21,6 +21,7 @@ export const asyncRouteDefine = {
   'CurrentUserInfo': { defaultPath: '/current/userinfo', component: () => import('@/views/current/UserinfoPage') }, // 用户设置
 
   'MainPage': { defaultPath: '/main', component: () => import('@/views/dashboard/Analysis2') },
+  'PayConfigPage': { defaultPath: '/passageConfig', component: () => import('@/views/account/PayConfigPage') },
   'SysUserPage': { defaultPath: '/users', component: () => import('@/views/sysuser/SysUserPage') },
   'SysUserTeamPage': { defaultPath: '/teams', component: () => import('@/views/sysUserTeam/TeamList') },
   'RolePage': { defaultPath: '/roles', component: () => import('@/views/role/RolePage') },

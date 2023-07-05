@@ -5,8 +5,6 @@
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
             <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo"/>
-            <ag-text-up :placeholder="'上级代理商号'" :msg="searchData.pid" v-model="searchData.pid"/>
-            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
             <ag-text-up :placeholder="'代理商名称'" :msg="searchData.agentName" v-model="searchData.agentName"/>
             <ag-text-up :placeholder="'代理商登录名'" :msg="searchData.loginUsername" v-model="searchData.loginUsername"/>
             <ag-text-up :placeholder="'手机号'" :msg="searchData.contactTel" v-model="searchData.contactTel"/>
@@ -79,12 +77,7 @@ const tableColumns = [
   { key: 'agentName', fixed: 'left', width: '200px', title: '代理商名称', scopedSlots: { customRender: 'agentNameSlot' } },
   { key: 'agentNo', dataIndex: 'agentNo', width: '140px', title: '代理商号' },
   { key: 'contactTel', dataIndex: 'contactTel', width: '140px', title: '手机号' },
-  { key: 'level', dataIndex: 'level', width: '70px', title: '等级' },
-  { key: 'pid', dataIndex: 'pid', width: '140px', title: '上级代理' },
-  { key: 'isvNo', dataIndex: 'isvNo', width: '140px', title: '服务商号' },
-  { key: 'auditProfitAmount', dataIndex: 'auditProfitAmount', width: '100px', title: '在途佣金' },
-  { key: 'balanceAmount', dataIndex: 'balanceAmount', width: '100px', title: '钱包余额' },
-  { key: 'unAmount', dataIndex: 'unAmount', width: '110px', title: '不可用金额' },
+  { key: 'mchCount', dataIndex: 'mchCount', width: '110px', title: '商户数量' },
   { key: 'state', title: '状态', width: '100px', scopedSlots: { customRender: 'stateSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
   { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }

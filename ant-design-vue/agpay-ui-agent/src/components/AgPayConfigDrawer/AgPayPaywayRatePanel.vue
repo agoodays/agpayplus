@@ -14,6 +14,7 @@
           <div class="rate-header-right">
             <a-checkbox
               v-if="mergeFeeItem.isMergeMode"
+              :disabled="configMode==='agentSelf'"
               v-for="(payWayItem, payWayKey) in mergeFeeItem.selectedWayCodeList"
               :key="payWayKey"
               v-model="payWayItem.checked"
@@ -244,7 +245,8 @@
                 是否开通：
                 <a-switch
                   @change="onChangeState(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                  :checked="!!mergeFeeItem.mainFee.state" />
+                  :checked="!!mergeFeeItem.mainFee.state"
+                  :disabled="configMode==='agentSelf'" />
               </div>
               <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee.state">
                 是否可进件：
@@ -418,7 +420,7 @@
           <a-checkbox :checked="!!noCheckRuleFlag" @change="noCheckRuleFlag = +!noCheckRuleFlag">不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox>
         </a-collapse-panel>
       </a-collapse>
-      <div class="drawer-btn-center" v-if="$access(permCode)">
+      <div :class="isDrawer?'drawer-btn-center':'btn-center'" v-if="$access(permCode)">
         <a-button type="primary" icon="check" @click="onSubmit" :loading="btnLoading">保存</a-button>
       </div>
     </div>
@@ -430,6 +432,7 @@ import { API_URL_RATECONFIGS_LIST, req } from '@/api/manage'
 export default {
   name: 'AgPayPaywayRatePanel',
   props: {
+    isDrawer: { type: Boolean, default: false },
     infoId: { type: String, default: null },
     infoType: { type: String, default: null },
     ifCode: { type: String, default: '' },
@@ -783,7 +786,9 @@ export default {
   },
   mounted () {
     console.log(this.currentIfCode)
-    this.getRateConfig()
+    if (this.currentIfCode) {
+      this.getRateConfig(this.currentIfCode)
+    }
   },
   methods: {
     initRateConfig (wayCode) {
@@ -912,6 +917,7 @@ export default {
       })
     },
     async getRateConfig (currentIfCode) {
+      console.log(currentIfCode)
       if (currentIfCode) {
         this.currentIfCode = currentIfCode
       }
@@ -1320,6 +1326,10 @@ export default {
         if (f === 'mchapplydefFee') {
           return '商户进件默认'
         }
+
+        if (f === 'readonlyParentAgent') {
+          return '我的代理'
+        }
       }
 
       if (that.configMode === 'agentSubagent' && f === 'mainFee') {
@@ -1570,7 +1580,9 @@ export default {
       }
       if (that.configMode === 'agentSubagent') {
         return {
-          AGENTRATE: mainFee
+          AGENTRATE: mainFee,
+          AGENTDEF: agentdefFee,
+          MCHAPPLYDEF: mchapplydefFee
         }
       }
       if (that.configMode === 'agentSelf') {
@@ -1910,5 +1922,12 @@ export default {
   .drawer-btn-center-payfee button {
     margin: 0;
     padding: 3px 20px
+  }
+
+  .btn-center {
+    border-top: 1px solid rgb(233, 233, 233);
+    padding: 10px 16px;
+    background: rgb(255, 255, 255);
+    text-align: center;
   }
 </style>

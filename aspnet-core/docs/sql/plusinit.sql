@@ -481,7 +481,7 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_MCH', '商户管理', 'shop', '', 'Ro
 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_CONFIG', '应用配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
 
-    -- 应用管理
+	-- 应用管理
 	INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP', '应用列表', 'appstore', '/apps', 'MchAppPage', 'ML', 0, 1, 'ENT_MCH', 20, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_LIST', '页面：应用列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
@@ -495,7 +495,7 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_MCH', '商户管理', 'shop', '', 'Ro
 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_CONFIG_LIST', '应用支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_CONFIG_ADD', '应用支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
 
--- 代理商管理		
+-- 代理商管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1, 'ROOT', 35, 'AGENT', NOW(), NOW());
 	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1, 'ENT_AGENT', 10, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
@@ -506,6 +506,12 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', ''
 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
+
+-- 账户中心
+INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_ACCOUNT_CENTER', '账户中心', 'wallet', '', 'RouteView', 'ML', 0, 1, 'ROOT', 5, 'AGENT', NOW(), NOW());
+	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG', '费率配置', 'file-done', '/passageConfig', 'PayConfigPage', 'ML', 0, 1, 'ENT_AGENT_ACCOUNT_CENTER', 30, 'AGENT', NOW(), NOW());
+ 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_LIST', '费率配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
+ 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_ADD', '费率配置保存', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
 		
 -- -- 服务商管理
 -- INSERT INTO t_sys_entitlement VALUES ('ENT_ISV', '服务商管理', 'block', '', 'RouteView', 'ML', 0, 1, 'ROOT', 40, 'AGENT', NOW(), NOW());

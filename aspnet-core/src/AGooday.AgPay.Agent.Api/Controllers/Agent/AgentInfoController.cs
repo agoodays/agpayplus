@@ -48,7 +48,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_LIST)]
         public ApiRes List([FromQuery] AgentInfoQueryDto dto)
         {
-            var data = _agentInfoService.GetPaginatedData(GetCurrentAgentNo(), dto);
+            dto.Pid = GetCurrentAgentNo();
+            var data = _agentInfoService.GetPaginatedData(dto);
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 

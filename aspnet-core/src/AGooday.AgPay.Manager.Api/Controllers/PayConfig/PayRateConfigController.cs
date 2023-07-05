@@ -45,7 +45,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="ifCode"></param>
         /// <returns></returns>
         [HttpGet, Route("savedMapData"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_AGENT_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes List(string configMode, string infoId, string ifCode)
         {
             return ApiRes.Ok(_payRateConfigService.GetByInfoIdAndIfCodeJson(configMode, infoId, ifCode));
@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="ifCode"></param>
         /// <returns></returns>
         [HttpGet, Route("payways"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_AGENT_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes GetPayWaysByInfoId([FromQuery] PayWayUsableQueryDto dto)
         {
             var data = _payRateConfigService.GetPayWaysByInfoId(dto);
@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("配置费率")]
-        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD, PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD, PermCode.MGR.ENT_AGENT_PAY_CONFIG_ADD, PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayRateConfigSaveDto dto)
         {
             _payRateConfigService.SaveOrUpdate(dto);
