@@ -1549,7 +1549,7 @@ export default {
       }
       let agentdefFee = null
       let mchapplydefFee = null
-      if (that.configMode === 'mgrIsv' || that.configMode === 'mgrAgent' || that.configMode === 'agentSelf') {
+      if (that.configMode === 'mgrIsv' || that.configMode === 'mgrAgent' || that.configMode === 'agentSubagent' || that.configMode === 'agentSelf') {
         agentdefFee = that.getFees('agentdefFee', Object.values(that.rateConfig.agentdefFee))
         if (typeof agentdefFee !== 'object') {
           return false
@@ -1566,7 +1566,7 @@ export default {
           MCHAPPLYDEF: mchapplydefFee
         }
       }
-      if (that.configMode === 'mgrAgent') {
+      if (that.configMode === 'mgrAgent' || that.configMode === 'agentSubagent' || that.configMode === 'agentSelf') {
         return {
           AGENTRATE: mainFee,
           AGENTDEF: agentdefFee,
@@ -1576,19 +1576,6 @@ export default {
       if (that.configMode === 'mgrMch' || that.configMode === 'agentMch' || that.configMode === 'mgrApplyment' || that.configMode === 'mchApplyment' || that.configMode === 'agentApplyment') {
         return {
           MCHRATE: mainFee
-        }
-      }
-      if (that.configMode === 'agentSubagent') {
-        return {
-          AGENTRATE: mainFee,
-          AGENTDEF: agentdefFee,
-          MCHAPPLYDEF: mchapplydefFee
-        }
-      }
-      if (that.configMode === 'agentSelf') {
-        return {
-          AGENTDEF: agentdefFee,
-          MCHAPPLYDEF: mchapplydefFee
         }
       }
       if (that.configMode === 'mchSelfApp1') {

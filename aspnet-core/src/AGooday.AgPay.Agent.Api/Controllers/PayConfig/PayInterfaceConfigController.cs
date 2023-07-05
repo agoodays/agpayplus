@@ -57,26 +57,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_PAY_CONFIG_LIST, PermCode.AGENT.ENT_MCH_PAY_CONFIG_LIST, PermCode.AGENT.ENT_AGENT_SELF_PAY_CONFIG_LIST)]
         public ApiRes List(string configMode, string infoId, string ifName, string ifCode)
         {
-            string infoType = string.Empty;
-            switch (configMode)
-            {
-                case "mgrIsv":
-                    infoType = CS.INFO_TYPE.ISV;
-                    break;
-                case "mgrAgent":
-                case "agentSelf":
-                case "agentSubagent":
-                    infoType = CS.INFO_TYPE.AGENT;
-                    break;
-                case "mgrMch":
-                case "agentMch":
-                case "mchSelfApp1":
-                case "mchSelfApp2":
-                    infoType = CS.INFO_TYPE.MCH_APP;
-                    break;
-                default:
-                    break;
-            }
+            string infoType = GetInfoType(configMode);
             var data = _payIfConfigService.PayIfConfigList(infoType, configMode, infoId, ifName, ifCode);
             return ApiRes.Ok(data);
         }
@@ -91,26 +72,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_PAY_CONFIG_VIEW, PermCode.AGENT.ENT_MCH_PAY_CONFIG_VIEW)]
         public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
         {
-            string infoType = string.Empty;
-            switch (configMode)
-            {
-                case "mgrIsv":
-                    infoType = CS.INFO_TYPE.ISV;
-                    break;
-                case "mgrAgent":
-                case "agentSelf":
-                case "agentSubagent":
-                    infoType = CS.INFO_TYPE.AGENT;
-                    break;
-                case "mgrMch":
-                case "agentMch":
-                case "mchSelfApp1":
-                case "mchSelfApp2":
-                    infoType = CS.INFO_TYPE.MCH_APP;
-                    break;
-                default:
-                    break;
-            }
+            string infoType = GetInfoType(configMode);
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
             if (payInterfaceConfig != null)
             {
@@ -198,6 +160,32 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
             mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null));
 
             return ApiRes.Ok();
+        }
+
+        private static string GetInfoType(string configMode)
+        {
+            string infoType = string.Empty;
+            switch (configMode)
+            {
+                case "mgrIsv":
+                    infoType = CS.INFO_TYPE.ISV;
+                    break;
+                case "mgrAgent":
+                case "agentSelf":
+                case "agentSubagent":
+                    infoType = CS.INFO_TYPE.AGENT;
+                    break;
+                case "mgrMch":
+                case "agentMch":
+                case "mchSelfApp1":
+                case "mchSelfApp2":
+                    infoType = CS.INFO_TYPE.MCH_APP;
+                    break;
+                default:
+                    break;
+            }
+
+            return infoType;
         }
     }
 }
