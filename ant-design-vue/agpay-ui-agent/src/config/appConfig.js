@@ -8,7 +8,7 @@
 
 /** 应用配置项 **/
 export default {
-  APP_TITLE: 'AgPay运营平台', // 设置浏览器title
+  APP_TITLE: 'AgPay代理商系统', // 设置浏览器title
   ACCESS_TOKEN_NAME: 'authorization' // 设置请求token的名字， 用于请求header 和 localstorage中存在名称
 }
 

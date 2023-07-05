@@ -219,7 +219,7 @@ namespace AGooday.AgPay.Application.Services
                     result.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, GetPayRateConfigJson(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode));
                     if (!configMode.Equals(CS.CONFIG_MODE.AGENT_SELF))
                     {
-                        isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_MCH) ? agent.IsvNo : string.Empty;
+                        isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_AGENT) ? agent.IsvNo : string.Empty;
                         GetReadOnlyRateJson(ifCode, result, isvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
                     }
                     break;

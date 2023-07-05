@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Application.Services
                 var mchNos = _mchInfoRepository.GetAll()
                     .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                     && w.AgentNo.Equals(agentNo)).Select(s => s.MchNo);
-                mchApps = mchApps.Where(w => mchNos.Contains(dto.MchNo)).OrderByDescending(o => o.CreatedAt);
+                mchApps = mchApps.Where(w => mchNos.Contains(w.MchNo)).OrderByDescending(o => o.CreatedAt);
             }
             var records = PaginatedList<MchApp>.Create<MchAppDto>(mchApps.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
