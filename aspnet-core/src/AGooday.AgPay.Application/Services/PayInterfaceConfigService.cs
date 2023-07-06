@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Application.Services
             IPayInterfaceConfigRepository payInterfaceConfigRepository,
             IPayInterfaceDefineRepository payInterfaceDefineRepository,
             IMchAppRepository mchAppRepository,
-            IMchInfoRepository mchInfoRepository, 
+            IMchInfoRepository mchInfoRepository,
             IAgentInfoRepository agentInfoRepository)
         {
             _mapper = mapper;
@@ -170,12 +170,17 @@ namespace AGooday.AgPay.Application.Services
                     break;
                 case CS.INFO_TYPE.MCH:
                 case CS.INFO_TYPE.MCH_APP:
-                    MchApp mchApp = _mchAppRepository.GetById(infoId);
-                    if (mchApp == null || mchApp.State != CS.YES)
+                    var mchNo = infoId;
+                    if (infoType.Equals(CS.INFO_TYPE.MCH_APP))
                     {
-                        throw new BizException("商户应用不存在");
+                        MchApp mchApp = _mchAppRepository.GetById(infoId);
+                        if (mchApp == null || mchApp.State != CS.YES)
+                        {
+                            throw new BizException("商户应用不存在");
+                        }
+                        mchNo = mchApp.MchNo;
                     }
-                    MchInfo mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
+                    MchInfo mchInfo = _mchInfoRepository.GetById(mchNo);
                     if (mchInfo == null || mchInfo.State != CS.YES)
                     {
                         throw new BizException("商户不存在");

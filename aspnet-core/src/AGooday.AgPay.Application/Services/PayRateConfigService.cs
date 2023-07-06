@@ -56,13 +56,14 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<PayWayDto> GetPayWaysByInfoId(PayWayUsableQueryDto dto)
         {
-            string infoType = string.Empty;
+            var infoType = string.Empty;
+            var configMode = dto.ConfigMode;
             var wayCodes = new List<string>();
 
             var payIfDefine = _payInterfaceDefineRepository.GetById(dto.IfCode);
             var payIfWayCodes = JsonConvert.DeserializeObject<object[]>(payIfDefine.WayCodes).Select(obj => (string)((dynamic)obj).wayCode).ToList();
 
-            switch (dto.ConfigMode)
+            switch (configMode)
             {
                 case CS.CONFIG_MODE.MGR_ISV:
                     infoType = CS.INFO_TYPE.ISV;
@@ -127,7 +128,8 @@ namespace AGooday.AgPay.Application.Services
 
         public Dictionary<string, Dictionary<string, PayRateConfigDto>> GetByInfoIdAndIfCode(string configMode, string infoId, string ifCode)
         {
-            string infoType = string.Empty;
+            var infoType = string.Empty;
+            var isvNo = string.Empty;
             Dictionary<string, Dictionary<string, PayRateConfigDto>> rateConfig = new Dictionary<string, Dictionary<string, PayRateConfigDto>>();
             switch (configMode)
             {
@@ -144,8 +146,11 @@ namespace AGooday.AgPay.Application.Services
                     var agent = _agentInfoRepository.GetById(infoId);
                     rateConfig.Add(CS.CONFIG_TYPE.AGENTDEF, GetPayRateConfig(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
                     rateConfig.Add(CS.CONFIG_TYPE.AGENTRATE, GetPayRateConfig(CS.CONFIG_TYPE.AGENTRATE, infoType, infoId, ifCode));
-                    rateConfig.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, GetPayRateConfig(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode));
-                    GetReadOnlyRate(ifCode, rateConfig, agent.IsvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
+                    rateConfig.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, GetPayRateConfig(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode)); if (!configMode.Equals(CS.CONFIG_MODE.AGENT_SELF))
+                    {
+                        isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_AGENT) ? agent.IsvNo : string.Empty;
+                        GetReadOnlyRate(ifCode, rateConfig, agent.IsvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
+                    }
                     break;
                 case CS.CONFIG_MODE.MGR_MCH:
                 case CS.CONFIG_MODE.AGENT_MCH:
@@ -157,7 +162,8 @@ namespace AGooday.AgPay.Application.Services
                     rateConfig.Add(CS.CONFIG_TYPE.MCHRATE, GetPayRateConfig(CS.CONFIG_TYPE.MCHRATE, infoType, infoId, ifCode));
                     if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
                     {
-                        GetReadOnlyRate(ifCode, rateConfig, mchInfo.IsvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
+                        isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_MCH) ? mchInfo.IsvNo : string.Empty;
+                        GetReadOnlyRate(ifCode, rateConfig, isvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
                     }
                     break;
                 default:
@@ -168,9 +174,11 @@ namespace AGooday.AgPay.Application.Services
 
         private void GetReadOnlyRate(string ifCode, Dictionary<string, Dictionary<string, PayRateConfigDto>> rateConfig, string isvNo, string agentNo, string configType)
         {
-            // 服务商底价
-            rateConfig.Add(CS.CONFIG_TYPE.READONLYISVCOST, GetPayRateConfig(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode));
-
+            if (!string.IsNullOrWhiteSpace(isvNo))
+            {
+                // 服务商底价
+                rateConfig.Add(CS.CONFIG_TYPE.READONLYISVCOST, GetPayRateConfig(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode));
+            }
             // 上级代理商费率
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
@@ -199,8 +207,8 @@ namespace AGooday.AgPay.Application.Services
         public JObject GetByInfoIdAndIfCodeJson(string configMode, string infoId, string ifCode)
         {
             JObject result = new JObject();
-            string infoType = string.Empty;
-            string isvNo = string.Empty;
+            var infoType = string.Empty;
+            var isvNo = string.Empty;
             switch (configMode)
             {
                 case CS.CONFIG_MODE.MGR_ISV:
@@ -420,11 +428,12 @@ namespace AGooday.AgPay.Application.Services
             {
                 throw new BizException(checkResult.Message);
             }
-            string infoId = dto.InfoId;
+            var infoId = dto.InfoId;
             var ifCode = dto.IfCode;
+            var configMode = dto.ConfigMode;
             var delPayWayCodes = dto.DelPayWayCodes;
-            string infoType;
-            switch (dto.ConfigMode)
+            var infoType = string.Empty;
+            switch (configMode)
             {
                 case CS.CONFIG_MODE.MGR_ISV:
                     infoType = CS.INFO_TYPE.ISV;
@@ -568,10 +577,11 @@ namespace AGooday.AgPay.Application.Services
 
         private (bool IsPassed, string Message) PayRateConfigCheck(PayRateConfigSaveDto dto)
         {
-            string infoId = dto.InfoId;
+            var infoId = dto.InfoId;
             var ifCode = dto.IfCode;
+            var configMode = dto.ConfigMode;
             List<PayRateConfigItem> ISVCOST = null, AGENTDEF = null, MCHAPPLYDEF = null, AGENTRATE = null, MCHRATE = null, PARENTRATE = null;
-            switch (dto.ConfigMode)
+            switch (configMode)
             {
                 case CS.CONFIG_MODE.MGR_ISV:
                     var isv = _isvInfoRepository.GetById(infoId);

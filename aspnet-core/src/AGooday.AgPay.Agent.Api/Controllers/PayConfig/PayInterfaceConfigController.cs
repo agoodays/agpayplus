@@ -76,7 +76,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
             if (payInterfaceConfig != null)
             {
-                switch (infoType) {
+                switch (infoType)
+                {
                     case CS.INFO_TYPE.ISV:
                         // 费率转换为百分比数值
                         payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
@@ -164,21 +165,26 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
 
         private static string GetInfoType(string configMode)
         {
-            string infoType = string.Empty;
+            var infoType = string.Empty;
             switch (configMode)
             {
-                case "mgrIsv":
+                case CS.CONFIG_MODE.MGR_ISV:
                     infoType = CS.INFO_TYPE.ISV;
                     break;
-                case "mgrAgent":
-                case "agentSelf":
-                case "agentSubagent":
+                case CS.CONFIG_MODE.MGR_AGENT:
+                case CS.CONFIG_MODE.AGENT_SELF:
+                case CS.CONFIG_MODE.AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE.AGENT;
                     break;
-                case "mgrMch":
-                case "agentMch":
-                case "mchSelfApp1":
-                case "mchSelfApp2":
+                case CS.CONFIG_MODE.MGR_APPLYMENT:
+                case CS.CONFIG_MODE.AGENT_APPLYMENT:
+                case CS.CONFIG_MODE.MCH_APPLYMENT:
+                    infoType = CS.INFO_TYPE.MCH;
+                    break;
+                case CS.CONFIG_MODE.MGR_MCH:
+                case CS.CONFIG_MODE.AGENT_MCH:
+                case CS.CONFIG_MODE.MCH_SELF_APP1:
+                case CS.CONFIG_MODE.MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE.MCH_APP;
                     break;
                 default:
