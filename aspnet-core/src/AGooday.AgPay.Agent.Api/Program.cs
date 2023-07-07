@@ -184,11 +184,11 @@ app.UseCalculateExecutionTime();
 
 app.UseRequestResponseLogging();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+//}
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

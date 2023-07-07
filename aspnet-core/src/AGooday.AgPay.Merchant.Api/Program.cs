@@ -179,11 +179,11 @@ app.UseWebSockets(new WebSocketOptions
 // Configure the HTTP request pipeline.
 app.UseCalculateExecutionTime();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+//}
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

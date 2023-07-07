@@ -1,14 +1,11 @@
-using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
-using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Components.OSS.Controllers;
 using AGooday.AgPay.Components.OSS.Extensions;
-using AGooday.AgPay.Components.OSS.Services;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.Extensions.AuthContext;
@@ -189,11 +186,11 @@ app.UseCalculateExecutionTime();
 
 app.UseRequestResponseLogging();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+//}
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
