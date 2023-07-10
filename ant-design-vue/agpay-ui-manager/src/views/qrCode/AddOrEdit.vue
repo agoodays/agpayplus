@@ -19,7 +19,7 @@
         </div>
       </a-form-model-item>
       <a-form-model-item label="创建数量：" prop="addNum">
-        <a-input-number v-model="saveObject.addNum" />
+        <a-input-number v-model="saveObject.addNum" :min="1" :max="500" />
       </a-form-model-item>
       <a-form-model-item label="选择模板" prop="qrcShellId">
         <a-select v-model="saveObject.qrcShellId" placeholder="请选择模板">
@@ -137,7 +137,16 @@ export default {
           { required: true, message: '请输入批次号', trigger: 'blur' }
         ],
         addNum: [
-          { required: true, message: '请输入创建数量', trigger: 'blur' }
+          { required: true, message: '请输入创建数量', trigger: 'blur' },
+          {
+            validator: (rule, value, callBack) => {
+              if (value < 1 || value > 500) {
+                callBack('数量请介于1-500之间')
+              }
+              callBack()
+            },
+            trigger: 'blur'
+          }
         ]
       }
     }
@@ -160,6 +169,9 @@ export default {
       const that = this
       req.list(API_URL_QRC_SHELL_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 模板下拉选择列表
         that.shellList = res.records
+      })
+      req.get(API_URL_QRC_LIST + '/batchIdDistinctCount').then(res => { // 模板下拉选择列表
+        that.saveObject.batchId = res
       })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.recordId = recordId

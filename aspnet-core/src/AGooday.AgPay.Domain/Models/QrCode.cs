@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Domain.Models
         /// </summary>
         [Comment("支付宝支付方式(仅H5呈现时生效)")]
         [Required, Column("alipay_way_code", TypeName = "varchar(20)")]
-        public string AlipaWayCode { get; set; }
+        public string AlipayWayCode { get; set; }
 
         /// <summary>
         /// 码牌别名

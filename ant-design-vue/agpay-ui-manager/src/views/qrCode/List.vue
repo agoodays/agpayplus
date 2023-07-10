@@ -82,13 +82,13 @@ import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 
 const tableColumns = [
   { key: 'qrcId', fixed: 'left', title: '码牌ID', scopedSlots: { customRender: 'qrcIdSlot' }, width: 180 },
-  { key: 'batchId', dataIndex: 'batchId', title: '批次号', width: 120 },
+  { key: 'batchId', dataIndex: 'batchId', title: '批次号', width: 135 },
   { key: 'bindInfo', title: '绑定商户信息', scopedSlots: { customRender: 'bindInfoSlot' }, width: 280 },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
   { key: 'entryPage', title: '扫码页面', scopedSlots: { customRender: 'entryPageSlot' }, width: 140 },
   { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 80 },
   { key: 'fixedPayAmount', title: '固定金额', scopedSlots: { customRender: 'fixedPayAmountSlot' }, width: 120 },
-  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 120 },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },
   { key: 'op', title: '操作', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' }, width: 200 }
 ]
 

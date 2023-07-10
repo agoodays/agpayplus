@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
@@ -45,6 +44,19 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         }
 
         /// <summary>
+        /// 码牌
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet, Route("batchIdDistinctCount"), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_LIST)]
+        public ApiRes BatchIdDistinctCount()
+        {
+            string data = _qrCodeService.BatchIdDistinctCount();
+            return ApiRes.Ok(data);
+        }
+
+        /// <summary>
         /// 新增码牌
         /// </summary>
         /// <param name="dto"></param>
@@ -52,9 +64,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <exception cref="BizException"></exception>
         [HttpPost, Route(""), MethodLog("新增码牌")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_ADD)]
-        public ApiRes Add(QrCodeDto dto)
+        public ApiRes Add(QrCodeAddDto dto)
         {
-            bool result = _qrCodeService.Add(dto);
+            dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
+            dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
+            bool result = _qrCodeService.BatchAdd(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);

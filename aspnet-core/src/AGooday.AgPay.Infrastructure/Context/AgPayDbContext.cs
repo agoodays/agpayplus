@@ -198,8 +198,10 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<PayWay>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<QrCode>().Property(c => c.FixedPayAmount).HasDefaultValue(0);
             modelBuilder.Entity<QrCode>().Property(c => c.State).HasDefaultValue(1);
+            modelBuilder.Entity<QrCode>().Property(c => c.BelongInfoId).HasDefaultValue(0);
             modelBuilder.Entity<QrCode>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<QrCode>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<QrCodeShell>().Property(c => c.BelongInfoId).HasDefaultValue(0);
             modelBuilder.Entity<QrCodeShell>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<QrCodeShell>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<RefundOrder>().Property(c => c.Currency).HasDefaultValue("cny");

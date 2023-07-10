@@ -32,6 +32,27 @@ namespace AGooday.AgPay.Application.Services
             GC.SuppressFinalize(this);
         }
 
+        public string BatchIdDistinctCount()
+        {
+            var BatchIdPrefix = DateTime.Now.ToString("yyyyMMdd");
+            var qrCodes = _qrCodeShellRepository.GetAll()
+                .Where(w => (w.BatchId ?? "").StartsWith(BatchIdPrefix))
+                .OrderByDescending(o => o.BatchId).FirstOrDefault();
+            return $"{Convert.ToInt64(qrCodes?.BatchId ?? $"{BatchIdPrefix}00") + 1}";
+        }
+
+        public bool BatchAdd(QrCodeAddDto dto)
+        {
+            for (int i = 1; i <= dto.AddNum; i++)
+            {
+                var m = _mapper.Map<QrCode>(dto);
+                m.QrcId = $"{dto.BatchId}{i.ToString("D4")}";
+                m.QrUrl = $"https://www.example.com/{m.QrcId}";
+                _qrCodeShellRepository.Add(m);
+            }
+            return _qrCodeShellRepository.SaveChanges(out int _);
+        }
+
         public bool Add(QrCodeDto dto)
         {
             var m = _mapper.Map<QrCode>(dto);
@@ -61,8 +82,8 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<QrCodeDto> GetAll()
         {
-            var QrCodes = _qrCodeShellRepository.GetAll();
-            return _mapper.Map<IEnumerable<QrCodeDto>>(QrCodes);
+            var qrCodes = _qrCodeShellRepository.GetAll();
+            return _mapper.Map<IEnumerable<QrCodeDto>>(qrCodes);
         }
 
         public PaginatedList<T> GetPaginatedData<T>(QrCodeQueryDto dto)
