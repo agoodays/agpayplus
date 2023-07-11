@@ -72,7 +72,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-model-item label="是否开启进件" prop="isOpenApplyment">
-            <a-radio-group v-model="saveObject.isOpenApplyment">
+            <a-radio-group v-model="saveObject.isOpenApplyment" :disabled="!saveObject.isSupportApplyment">
               <a-radio :value="1">
                 开启
               </a-radio>
@@ -96,7 +96,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-model-item label="是否开启对账" prop="isOpenCheckBill">
-            <a-radio-group v-model="saveObject.isOpenCheckBill">
+            <a-radio-group v-model="saveObject.isOpenCheckBill" :disabled="!saveObject.isSupportCheckBill">
               <a-radio :value="1">
                 开启
               </a-radio>
@@ -120,7 +120,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-model-item label="是否开启提现" prop="isOpenCashout">
-            <a-radio-group v-model="saveObject.isOpenCashout">
+            <a-radio-group v-model="saveObject.isOpenCashout" :disabled="!saveObject.isSupportCashout">
               <a-radio :value="1">
                 开启
               </a-radio>
@@ -361,14 +361,16 @@ export default {
     },
     getGroupName (wayType) {
       switch (wayType) {
-        case 'YSFPAY':
-          return '云闪付'
         case 'WECHAT':
           return '微信'
-        case 'UNIONPAY':
-          return '银联'
         case 'ALIPAY':
           return '支付宝'
+        case 'YSFPAY':
+          return '云闪付'
+        case 'UNIONPAY':
+          return '银联'
+        case 'DCEPPAY':
+          return '数字人民币'
         default:
           return '其他'
       }
@@ -382,7 +384,7 @@ export default {
         const groupedWays = that.groupBy(ways, 'wayType')
 
         // 指定顺序排序
-        const order = ['WECHAT', 'ALIPAY', 'YSFPAY', 'UNIONPAY', 'OTHER']
+        const order = ['WECHAT', 'ALIPAY', 'YSFPAY', 'UNIONPAY', 'DCEPPAY', 'OTHER']
         const sortedGroupedWays = Object.fromEntries(
             Object.entries(groupedWays)
                 .sort(([keyA], [keyB]) => {

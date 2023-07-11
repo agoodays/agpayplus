@@ -1,5 +1,5 @@
 <template>
-  <a-modal v-model="isShow" :title=" isAdd ? '新增支付方式' : '修改支付方式' " @ok="handleOkFunc">
+  <a-modal v-model="isShow" :title=" isAdd ? '新增支付方式' : '修改支付方式' " :width="700" @ok="handleOkFunc">
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 6}" :wrapper-col="{span: 15}" :rules="rules">
       <a-form-model-item label="支付方式代码：" prop="wayCode">
         <a-input v-model="saveObject.wayCode" :disabled="!isAdd" />
