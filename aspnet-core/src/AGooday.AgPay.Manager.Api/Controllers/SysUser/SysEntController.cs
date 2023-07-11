@@ -7,9 +7,7 @@ using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
@@ -75,11 +73,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             var sysEnt = _sysEntService.GetBySysType(sysType, null);
 
             //递归转换为树状结构
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
+            //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            //{
+            //    Formatting = Formatting.Indented,
+            //    ContractResolver = new CamelCasePropertyNamesContractResolver()
+            //};
             var jsonArray = JArray.FromObject(sysEnt);
             var leftMenuTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
             //var json = JsonConvert.SerializeObject(ApiRes.Ok(leftMenuTree));

@@ -1,3 +1,5 @@
+using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Models;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
@@ -5,14 +7,11 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Notifications;
-using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using StackExchange.Redis;
 
 namespace AGooday.AgPay.Agent.Api.Controllers
@@ -62,11 +61,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                 var sysEnts = _sysEntService.GetBySysType(CS.SYS_TYPE.AGENT, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
 
                 //递归转换为树状结构
-                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-                {
-                    Formatting = Formatting.Indented,
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                };
+                //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                //{
+                //    Formatting = Formatting.Indented,
+                //    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                //};
                 var jsonArray = JArray.FromObject(sysEnts);
                 var allMenuRouteTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
                 var user = JObject.FromObject(currentUser.SysUser);

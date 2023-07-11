@@ -110,7 +110,7 @@ CREATE TABLE `t_sys_log` (
   `method_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '方法名',
   `method_remark` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '方法描述',
   `req_url` VARCHAR(256) NOT NULL DEFAULT '' COMMENT '请求地址',
-  `opt_req_param` VARCHAR(2048) NOT NULL DEFAULT '' COMMENT '操作请求参数',
+  `opt_req_param` TEXT NOT NULL COMMENT '操作请求参数',
   `opt_res_info` VARCHAR(2048) NOT NULL DEFAULT '' COMMENT '操作响应结果',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   PRIMARY KEY (`sys_log_id`)
