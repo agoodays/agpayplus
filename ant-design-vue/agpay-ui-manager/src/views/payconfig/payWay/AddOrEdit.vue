@@ -13,6 +13,7 @@
           <a-radio-button value="ALIPAY">支付宝</a-radio-button>
           <a-radio-button value="YSFPAY">云闪付</a-radio-button>
           <a-radio-button value="UNIONPAY">银联</a-radio-button>
+          <a-radio-button value="DCEPPAY">数字人民币</a-radio-button>
           <a-radio-button value="OTHER">其他</a-radio-button>
         </a-radio-group>
       </a-form-model-item>

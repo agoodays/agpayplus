@@ -728,6 +728,9 @@ INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('UP_WAP', '银联�
 INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('YSF_BAR', '云闪付条码', 'YSFPAY');
 INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('YSF_JSAPI', '云闪付jsapi', 'YSFPAY');
 
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('DCEP_BAR', '数字人民币条码', 'DCEPPAY');
+INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('DCEP_QR', '数字人民币二维码', 'DCEPPAY');
+
 INSERT INTO t_pay_way (way_code, way_name, way_type) VALUES ('PP_PC', 'PayPal支付', 'OTHER');
 
 -- 初始化支付接口定义

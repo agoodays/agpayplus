@@ -13,6 +13,7 @@
                 <a-select-option value="ALIPAY">支付宝</a-select-option>
                 <a-select-option value="YSFPAY">云闪付</a-select-option>
                 <a-select-option value="UNIONPAY">银联</a-select-option>
+                <a-select-option value="DCEPPAY">数字人民币</a-select-option>
                 <a-select-option value="OTHER">其他</a-select-option>
               </a-select>
             </a-form-item>
@@ -46,11 +47,13 @@
             :color="record.wayType === 'WECHAT' ? 'rgb(4, 190, 2)' :
               record.wayType === 'ALIPAY' ? 'rgb(23, 121, 255)' :
               record.wayType === 'YSFPAY' ? '#f5222d' :
-              record.wayType === 'UNIONPAY' ? '#00508e' : '#fa8c16'">
+              record.wayType === 'UNIONPAY' ? '#00508e' :
+              record.wayType === 'DCEPPAY' ? '#d12c2c' : '#fa8c16'">
             {{ record.wayType === 'WECHAT' ? '微信' :
               record.wayType === 'ALIPAY' ? '支付宝' :
               record.wayType === 'YSFPAY' ? '云闪付' :
-              record.wayType === 'UNIONPAY' ? '银联' : '其他' }}
+              record.wayType === 'UNIONPAY' ? '银联' :
+              record.wayType === 'DCEPPAY' ? '数字人民币' : '其他' }}
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
