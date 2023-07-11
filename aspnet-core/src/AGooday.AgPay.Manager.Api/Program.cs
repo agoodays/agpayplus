@@ -96,6 +96,16 @@ services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 // Automapper 注入
 services.AddAutoMapperSetup();
+
+// Newtonsoft.Json 全部配置 
+JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+{
+    Formatting = Formatting.None,//格式化
+    DateFormatString = "yyyy-MM-dd HH:mm:ss",
+    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+    NullValueHandling = NullValueHandling.Ignore
+};
+
 services.AddControllers(options =>
 {
     ////添加全局异常过滤器
@@ -114,15 +124,6 @@ services.AddControllers(options =>
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
     });
-
-// Newtonsoft.Json 全部配置 
-JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-{
-    Formatting = Formatting.None,//格式化
-    DateFormatString = "yyyy-MM-dd HH:mm:ss",
-    ContractResolver = new CamelCasePropertyNamesContractResolver(),
-    NullValueHandling = NullValueHandling.Ignore
-};
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
