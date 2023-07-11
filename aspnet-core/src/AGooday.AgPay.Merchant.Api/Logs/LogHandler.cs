@@ -1,10 +1,12 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -68,6 +70,17 @@ namespace AGooday.AgPay.Merchant.Api.Logs
                 ObjectResult result = actionExecutedContext.Result as ObjectResult;
                 if (result != null)
                 {
+                    var controllername = ((ControllerActionDescriptor)context.ActionDescriptor).ControllerName;
+                    var actionname = ((ControllerActionDescriptor)context.ActionDescriptor).ActionName;
+                    if (controllername.EndsWith("Auth") && actionname.EndsWith("Validate"))
+                    {
+                        var jwtStr = (result.Value as ApiRes).Data.ToKeyValue().Values.First();
+                        var tokenModelJwt = JwtBearerAuthenticationExtension.SerializeJwt(jwtStr);
+                        sysUserId = tokenModelJwt.SysUserId;
+                        realname = tokenModelJwt.Realname;
+                        model.UserId = string.IsNullOrWhiteSpace(sysUserId) ? null : Convert.ToInt64(sysUserId);
+                        model.UserName = string.IsNullOrWhiteSpace(realname) ? null : realname;
+                    }
                     model.OptResInfo = JsonConvert.SerializeObject(result.Value);
                 }
                 else
