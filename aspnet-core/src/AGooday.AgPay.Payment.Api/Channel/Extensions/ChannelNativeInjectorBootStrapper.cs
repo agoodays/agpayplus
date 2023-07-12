@@ -7,6 +7,8 @@ using AGooday.AgPay.Payment.Api.Channel.LesPay;
 using AGooday.AgPay.Payment.Api.Channel.LesPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay.Extensions;
+using AGooday.AgPay.Payment.Api.Channel.UmsPay;
+using AGooday.AgPay.Payment.Api.Channel.UmsPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.WxPay;
 using AGooday.AgPay.Payment.Api.Channel.WxPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
@@ -87,6 +89,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<LesPayPaymentService>();
                         case CS.IF_CODE.HKRTPAY:
                             return provider.GetService<HkrtPayPaymentService>();
+                        case CS.IF_CODE.UMSPAY:
+                            return provider.GetService<UmsPayPaymentService>();
                         default:
                             return null;
                     }
@@ -119,6 +123,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<LesPayRefundService>();
                         case CS.IF_CODE.HKRTPAY:
                             return provider.GetService<HkrtPayRefundService>();
+                        case CS.IF_CODE.UMSPAY:
+                            return provider.GetService<UmsPayRefundService>();
                         default:
                             return null;
                     }
@@ -151,6 +157,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<LesPayChannelNoticeService>();
                         case CS.IF_CODE.HKRTPAY:
                             return provider.GetService<HkrtPayChannelNoticeService>();
+                        case CS.IF_CODE.UMSPAY:
+                            return provider.GetService<UmsPayChannelNoticeService>();
                         default:
                             return null;
                     }
@@ -183,6 +191,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<LesPayChannelRefundNoticeService>();
                         case CS.IF_CODE.HKRTPAY:
                             return provider.GetService<HkrtPayChannelRefundNoticeService>();
+                        case CS.IF_CODE.UMSPAY:
+                            return provider.GetService<UmsPayChannelRefundNoticeService>();
                         default:
                             return null;
                     }
@@ -205,6 +215,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<WxPayPayOrderCloseService>();
                         case CS.IF_CODE.YSFPAY:
                             return provider.GetService<YsfPayPayOrderCloseService>();
+                        case CS.IF_CODE.UMSPAY:
+                            return provider.GetService<UmsPayPayOrderCloseService>();
                         default:
                             return null;
                     }
@@ -237,6 +249,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<LesPayPayOrderQueryService>();
                         case CS.IF_CODE.HKRTPAY:
                             return provider.GetService<HkrtPayPayOrderQueryService>();
+                        case CS.IF_CODE.UMSPAY:
+                            return provider.GetService<UmsPayPayOrderQueryService>();
                         default:
                             return null;
                     }
@@ -263,6 +277,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             #endregion
             #region HkrtPay
             HkrtPayNativeInjectorBootStrapper.RegisterServices(services);
+            #endregion
+            #region UmsPay
+            UmsPayNativeInjectorBootStrapper.RegisterServices(services);
             #endregion
 
             var serviceProvider = services.BuildServiceProvider();

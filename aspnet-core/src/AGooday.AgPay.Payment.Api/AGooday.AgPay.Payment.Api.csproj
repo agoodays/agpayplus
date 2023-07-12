@@ -54,6 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Channel\UmsPay\Utils\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

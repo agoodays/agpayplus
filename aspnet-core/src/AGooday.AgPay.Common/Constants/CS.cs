@@ -328,6 +328,7 @@
             public const string SXFPAY = "sxfpay";   // 随行付支付
             public const string LESPAY = "lespay";   // 乐刷支付
             public const string HKRTPAY = "hkrtpay"; // 海科融通支付
+            public const string UMSPAY = "umspay";   // 银联商务支付
         }
 
         /// <summary>
