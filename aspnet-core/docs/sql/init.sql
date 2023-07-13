@@ -796,4 +796,4 @@ VALUES ('umspay', '银联商务支付', 0, 1, 1,
         '[{"name":"mid","desc":"商户号","type":"text","verify":"required"},{"name":"tid","desc":"终端号","type":"text","verify":"required"}]',
         NULL,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
-        'https://saas.chinaums.com/saas-web/favicon.ico', '#1eda82', 1, '银联商务天满服务平台');
+        'https://saas.chinaums.com/saas-web/img/logo.689cab92.png', '#1e0ae8', 1, '银联商务天满服务平台');
