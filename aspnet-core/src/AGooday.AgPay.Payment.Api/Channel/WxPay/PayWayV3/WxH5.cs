@@ -15,7 +15,7 @@ using SKIT.FlurlHttpClient.Wechat.TenpayV3.Models;
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
 {
     /// <summary>
-    /// 微信 bar
+    /// 微信 h5
     /// </summary>
     public class WxH5 : WxPayPaymentService
     {

@@ -1,7 +1,5 @@
 ﻿using AGooday.AgPay.Common.Utils;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.Utils
 {

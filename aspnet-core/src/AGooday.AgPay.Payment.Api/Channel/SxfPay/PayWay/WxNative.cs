@@ -14,6 +14,9 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
 {
+    /// <summary>
+    /// 随行付 微信 Native
+    /// </summary>
     public class WxNative : SxfPayPaymentService
     {
         public WxNative(IServiceProvider serviceProvider,

@@ -11,6 +11,9 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 {
+    /// <summary>
+    /// 海科融通 微信 条码支付
+    /// </summary>
     public class WxBar : HkrtPayPaymentService
     {
         public WxBar(IServiceProvider serviceProvider,

@@ -16,12 +16,11 @@ using Org.BouncyCastle.Ocsp;
 
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 {
+    /// <summary>
+    /// 海科融通 微信jsapi
+    /// </summary>
     public class WxJsapi : HkrtPayPaymentService
     {
-        /// <summary>
-        /// 海科融通 微信jsapi
-        /// </summary>
-        /// <param name="serviceProvider"></param>
         public WxJsapi(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

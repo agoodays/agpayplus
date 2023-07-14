@@ -15,12 +15,11 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
 {
+    /// <summary>
+    /// 乐刷 微信 jsapi
+    /// </summary>
     public class WxJsapi : LesPayPaymentService
     {
-        /// <summary>
-        /// 乐刷 微信jsapi
-        /// </summary>
-        /// <param name="serviceProvider"></param>
         public WxJsapi(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

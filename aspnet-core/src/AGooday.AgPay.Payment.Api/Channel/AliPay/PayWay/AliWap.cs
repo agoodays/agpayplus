@@ -17,7 +17,7 @@ using Aop.Api.Request;
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 {
     /// <summary>
-    /// 支付宝 APP支付
+    /// 支付宝 Wap支付
     /// </summary>
     public class AliWap : AliPayPaymentService
     {

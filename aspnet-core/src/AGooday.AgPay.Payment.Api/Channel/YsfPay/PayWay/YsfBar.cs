@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
     public class YsfBar : YsfPayPaymentService
     {
         /// <summary>
-        /// 云闪付 微信bar
+        /// 云闪付 条码支付
         /// </summary>
         /// <param name="serviceProvider"></param>
         public YsfBar(IServiceProvider serviceProvider,

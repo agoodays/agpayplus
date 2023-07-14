@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
     public class WxBar : YsfPayPaymentService
     {
         /// <summary>
-        /// 云闪付 微信bar
+        /// 云闪付 微信 条码支付
         /// </summary>
         /// <param name="serviceProvider"></param>
         public WxBar(IServiceProvider serviceProvider,

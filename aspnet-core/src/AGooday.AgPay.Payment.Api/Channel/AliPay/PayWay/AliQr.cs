@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
     public class AliQr : AliPayPaymentService
     {
         /// <summary>
-        /// 支付宝 条码支付
+        /// 支付宝 二维码支付
         /// </summary>
         /// <param name="serviceProvider"></param>
         public AliQr(IServiceProvider serviceProvider,

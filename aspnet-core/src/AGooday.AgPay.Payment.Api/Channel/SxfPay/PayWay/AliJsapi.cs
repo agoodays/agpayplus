@@ -12,12 +12,11 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
 {
+    /// <summary>
+    /// 随行付 支付宝 jsapi
+    /// </summary>
     public class AliJsapi : SxfPayPaymentService
     {
-        /// <summary>
-        /// 随行付 支付宝 jsapi
-        /// </summary>
-        /// <param name="serviceProvider"></param>
         public AliJsapi(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

@@ -12,12 +12,11 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
 {
+    /// <summary>
+    /// 乐刷 云闪付 jsapi
+    /// </summary>
     public class YsfJsapi : LesPayPaymentService
     {
-        /// <summary>
-        /// 乐刷 微信jsapi
-        /// </summary>
-        /// <param name="serviceProvider"></param>
         public YsfJsapi(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

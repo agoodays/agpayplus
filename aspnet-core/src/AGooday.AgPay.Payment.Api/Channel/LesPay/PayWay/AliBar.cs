@@ -10,11 +10,11 @@ using AGooday.AgPay.Payment.Api.Utils;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
 {
+    /// <summary>
+    /// 乐刷 支付宝 条码支付
+    /// </summary>
     public class AliBar : LesPayPaymentService
     {
-        /// <summary>
-        /// 乐刷 支付宝 条码支付
-        /// </summary>
         public AliBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

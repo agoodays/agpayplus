@@ -10,6 +10,9 @@ using AGooday.AgPay.Payment.Api.Utils;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
 {
+    /// <summary>
+    /// 乐刷 云闪付 条码支付
+    /// </summary>
     public class YsfBar : LesPayPaymentService
     {
         public YsfBar(IServiceProvider serviceProvider,

@@ -15,12 +15,11 @@ using Aop.Api.Response;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 {
+    /// <summary>
+    /// 支付宝 条码支付
+    /// </summary>
     public class AliBar : AliPayPaymentService
     {
-        /// <summary>
-        /// 支付宝 条码支付
-        /// </summary>
-        /// <param name="serviceProvider"></param>
         public AliBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

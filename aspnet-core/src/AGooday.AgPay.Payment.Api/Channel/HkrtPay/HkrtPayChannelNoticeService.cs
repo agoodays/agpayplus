@@ -9,7 +9,6 @@ using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
 using Newtonsoft.Json.Linq;
-using static SKIT.FlurlHttpClient.Wechat.Api.Models.ShopCouponGetResponse.Types.Result.Types.Coupon.Types.CouponDetail.Types.Discount.Types.DiscountCondidtion.Types;
 
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
 {

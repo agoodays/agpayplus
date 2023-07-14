@@ -12,12 +12,11 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 {
+    /// <summary>
+    /// 海科融通 云闪付 jsapi
+    /// </summary>
     public class YsfJsapi : HkrtPayPaymentService
     {
-        /// <summary>
-        /// 海科融通 微信jsapi
-        /// </summary>
-        /// <param name="serviceProvider"></param>
         public YsfJsapi(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

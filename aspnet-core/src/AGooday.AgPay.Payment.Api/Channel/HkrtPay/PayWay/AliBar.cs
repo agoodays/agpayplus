@@ -11,11 +11,11 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 {
+    /// <summary>
+    /// 海科融通 支付宝 条码支付
+    /// </summary>
     public class AliBar : HkrtPayPaymentService
     {
-        /// <summary>
-        /// 海科融通 支付宝 条码支付
-        /// </summary>
         public AliBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

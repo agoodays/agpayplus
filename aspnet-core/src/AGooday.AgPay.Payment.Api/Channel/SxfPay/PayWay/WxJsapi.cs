@@ -14,12 +14,11 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
 {
+    /// <summary>
+    /// 随行付 微信jsapi
+    /// </summary>
     public class WxJsapi : SxfPayPaymentService
     {
-        /// <summary>
-        /// 随行付 微信jsapi
-        /// </summary>
-        /// <param name="serviceProvider"></param>
         public WxJsapi(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

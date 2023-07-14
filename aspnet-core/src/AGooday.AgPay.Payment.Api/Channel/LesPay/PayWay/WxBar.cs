@@ -10,6 +10,9 @@ using AGooday.AgPay.Payment.Api.Utils;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
 {
+    /// <summary>
+    /// 乐刷 微信 条码支付
+    /// </summary>
     public class WxBar : LesPayPaymentService
     {
         public WxBar(IServiceProvider serviceProvider,

@@ -15,12 +15,11 @@ using Aop.Api.Response;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 {
+    /// <summary>
+    /// 支付宝 jsapi
+    /// </summary>
     public class AliJsapi : AliPayPaymentService
     {
-        /// <summary>
-        /// 支付宝 jsapi
-        /// </summary>
-        /// <param name="serviceProvider"></param>
         public AliJsapi(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
