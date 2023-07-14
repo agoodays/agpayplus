@@ -93,13 +93,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                     case "00":
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                         break;
-                    case "ER":
+                    case "0000":
+                    case "SUCCESS":
+                        channelRetMsg.ChannelState = ChannelState.WAITING;
+                        break;
+                    default:
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                         channelRetMsg.ChannelErrCode = errCode;
                         channelRetMsg.ChannelErrMsg = errInfo;
-                        break;
-                    default:
-                        channelRetMsg.ChannelState = ChannelState.WAITING;
                         break;
                 }
             }
@@ -146,12 +147,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                                 break;
                         }
                         break;
-                    case "ER":
+                    case "0000":
+                        channelRetMsg.ChannelState = ChannelState.WAITING;
+                        break;
+                    default:
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                         channelRetMsg.ChannelErrCode = errCode;
                         channelRetMsg.ChannelErrMsg = errInfo;
-                        break;
-                    default:
                         break;
                 }
             }
@@ -201,12 +203,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                                 break;
                         }
                         break;
-                    case "ER":
+                    case "0000":
+                        channelRetMsg.ChannelState = ChannelState.WAITING;
+                        break;
+                    default:
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                         channelRetMsg.ChannelErrCode = errCode;
                         channelRetMsg.ChannelErrMsg = errInfo;
-                        break;
-                    default:
                         break;
                 }
             }

@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
                 {
                     case "SUCCESS":
                         resJSON.TryGetString("seqId", out string seqId);// 平台流水号
-                        resJSON.TryGetString("settleRefId", out string settleRefId);// 清分ID 如果来源方传了bankRefId就等于bankRefId，否则等于seqId	
+                        resJSON.TryGetString("settleRefId", out string settleRefId);// 清分ID 如果来源方传了bankRefId就等于bankRefId，否则等于seqId
                         resJSON.TryGetValue("jsPayRequest", out JToken jsPayRequest);// JSAPI支付用的请求报文，带有签名信息
                         res.PayInfo = jsPayRequest.ToString();
                         channelRetMsg.ChannelOrderId = seqId;

@@ -52,8 +52,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
                     case "SUCCESS":
                         resJSON.TryGetString("seqId", out string seqId);// 平台流水号
                         resJSON.TryGetString("settleRefId", out string settleRefId);// 清分ID 如果来源方传了bankRefId就等于bankRefId，否则等于seqId
-                        resJSON.TryGetString("targetOrderId", out string targetOrderId);// 预下单订单号 支付宝交易下单成功后会返回
-                        res.AlipayTradeNo = targetOrderId;
+                        resJSON.TryGetString("targetOrderld", out string targetOrderld);// 第三方订单号
+                        resJSON.TryGetValue("jsPayRequest", out JToken jsPayRequest);// JSAPI支付用的请求报文，带有签名信息
+                        ((JObject)jsPayRequest).TryGetString("orderNo", out string orderNo);// 预下单订单号 支付宝交易下单成功后会返回
+                        res.AlipayTradeNo = orderNo;
                         channelRetMsg.ChannelOrderId = seqId;
                         channelRetMsg.ChannelState = ChannelState.WAITING;
                         break;
