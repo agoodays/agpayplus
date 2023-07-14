@@ -14,11 +14,11 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
 {
     /// <summary>
-    /// 银联商务 支付宝 jsapi
+    /// 银联商务 云闪付 jsapi
     /// </summary>
-    public class AliJsapi : UmsPayPaymentService
+    public class YsfJsapi : UmsPayPaymentService
     {
-        public AliJsapi(IServiceProvider serviceProvider,
+        public YsfJsapi(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -27,21 +27,18 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【银联商务(alipayJs)jsapi支付】";
-            AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
+            string logPrefix = "【银联商务(unionpay)jsapi支付】";
+            YsfJsapiOrderRQ bizRQ = (YsfJsapiOrderRQ)rq;
             // 构造函数响应数据
-            AliJsapiOrderRS res = ApiResBuilder.BuildSuccess<AliJsapiOrderRS>();
+            YsfJsapiOrderRS res = ApiResBuilder.BuildSuccess<YsfJsapiOrderRS>();
 
-            // 业务处理
             JObject reqParams = new JObject();
-            // 支付宝用户标识或者云闪付用户标识 支付宝必传，云闪付userId和code必传其一
-            reqParams.Add("userId", bizRQ.BuyerUserId);
             // 请求参数赋值
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/v1/netpay/trade/create", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = PackageParamAndReq("/v1/netpay/wx/unified-order", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
             string errInfo = resJSON.GetValue("errInfo").ToString(); // 错误说明
@@ -51,9 +48,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
                 {
                     case "SUCCESS":
                         resJSON.TryGetString("seqId", out string seqId);// 平台流水号
-                        resJSON.TryGetString("settleRefId", out string settleRefId);// 清分ID 如果来源方传了bankRefId就等于bankRefId，否则等于seqId
-                        resJSON.TryGetString("targetOrderId", out string targetOrderId);// 预下单订单号 支付宝交易下单成功后会返回
-                        res.AlipayTradeNo = targetOrderId;
+                        resJSON.TryGetString("settleRefId", out string settleRefId);// 清分ID 如果来源方传了bankRefId就等于bankRefId，否则等于seqId	
+                        resJSON.TryGetString("redirectUrl", out string redirectUrl);// 云闪付支付跳转url
+                        res.RedirectUrl = redirectUrl;
                         channelRetMsg.ChannelOrderId = seqId;
                         channelRetMsg.ChannelState = ChannelState.WAITING;
                         break;

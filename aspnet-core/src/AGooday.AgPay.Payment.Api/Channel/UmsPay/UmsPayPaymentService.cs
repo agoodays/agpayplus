@@ -3,9 +3,11 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.UmsPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.UmsPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
+using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
 using log4net;
@@ -94,6 +96,110 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
 
             var resParams = JObject.Parse(resText);
             return resParams;
+        }
+
+        /// <summary>
+        /// 银联商务 jsapi下单请求统一发送参数
+        /// </summary>
+        /// <param name="reqParams"></param>
+        /// <param name="payOrder"></param>
+        /// <param name="notifyUrl"></param>
+        /// <param name="returnUrl"></param>
+        public static void UnifiedParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
+        {
+            reqParams.Add("requestTimestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            reqParams.Add("merOrderId", payOrder.PayOrderId);
+            reqParams.Add("instMid", "YUEDANDEFAULT");
+            reqParams.Add("tradeType", "JSAPI");
+            reqParams.Add("originalAmount", payOrder.Amount);
+            reqParams.Add("totalAmount", payOrder.Amount);
+            reqParams.Add("notifyUrl", notifyUrl);
+            reqParams.Add("returnUrl", returnUrl);
+            reqParams.Add("clientIp", payOrder.ClientIp);
+        }
+
+        /// <summary>
+        /// 银联商务 bar下单请求统一发送参数
+        /// </summary>
+        /// <param name="reqParams"></param>
+        /// <param name="payOrder"></param>
+        public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl)
+        {
+            reqParams.Add("transactionAmount", payOrder.Amount);
+            reqParams.Add("transactionCurrencyCode", "156");
+            reqParams.Add("merchantOrderId", payOrder.PayOrderId);
+            reqParams.Add("merchantRemark", payOrder.Subject);
+            /* 支付方式
+             * E_CASH – 电子现金
+             * SOUNDWAVE – 声波
+             * NFC – NFC
+             * CODE_SCAN – 扫码
+             * MANUAL – 手输
+             * FACE_SCAN – 扫脸
+             */
+            reqParams.Add("payMode", "CODE_SCAN");
+            reqParams.Add("deviceType", "11");
+
+            /* 经度 长度⇐10。
+             * 实体类终端（设备类型非01,11,12,13）：经纬度与基站信息cust2字段必传其一；
+             * 非实体类终端（设备类型为01,11,12,13）：经纬度与ip字段必传其一。
+             * 格式： 1 位正负号+3 位整数+1 位小数点+5 位小数；
+             * 对于正负号：+表示东经， -表示西经。例如-121.48352
+             */
+            // reqParams.Add("longitude", "");
+            /* 纬度 长度⇐10。
+             * 实体类终端（设备类型非01,11,12,13）：经纬度与基站信息cust2字段必传其一；
+             * 非实体类终端（设备类型为01,11,12,13）：经纬度与ip字段必传其一。
+             * 格式： 1 位正负号 + 2 位整数 + 1 位小数点 + 6 位小数；
+             * 对于正负号：+表示北纬， -表示南纬。例如 + 31.221345或 - 03.561345
+             */
+            // reqParams.Add("latitude", "");
+            // 基站信息 注：实体类终端（设备类型非01,11,12,13）如无经纬度，该字段必送
+            // reqParams.Add("cust2", "");
+            // 终端设备IP地址 长度⇐64, 非实体类终端（设备类型为01,11,12,13）如无经纬度，该字段必送；格式如：“ip”:“172.20.11.089”
+            reqParams.Add("ip", payOrder.ClientIp);
+        }
+
+        public ChannelRetMsg UmsBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        {
+            ChannelRetMsg channelRetMsg = new ChannelRetMsg();
+            // 发送请求
+            JObject resJSON = PackageParamAndReq("/v6/poslink/transaction/pay", reqParams, logPrefix, mchAppConfigContext, true);
+            //请求 & 响应成功， 判断业务逻辑
+            string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
+            string errInfo = resJSON.GetValue("errInfo").ToString(); // 错误说明
+            try
+            {
+                switch (errCode)
+                {
+                    case "00":
+                        resJSON.TryGetString("orderId", out string orderId);// 20230713201936190033303567
+                        resJSON.TryGetString("userId", out string userId); // oUpF8uDs4900N84XIoXWcCqzbyyo
+                        resJSON.TryGetString("thirdPartyBuyerId", out string thirdPartyBuyerId); // 第三方买家Id oUpF8uDs4900N84XIoXWcCqzbyyo
+                        resJSON.TryGetString("thirdPartyBuyerId", out string thirdPartyOrderId);// 4200001857202307136819383689
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                        channelRetMsg.ChannelOrderId = orderId;
+                        channelRetMsg.ChannelUserId = userId;
+                        channelRetMsg.PlatformOrderId = thirdPartyOrderId;
+                        break;
+                    case "ER":
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = errCode;
+                        channelRetMsg.ChannelErrMsg = errInfo;
+                        break;
+                    default:
+                        channelRetMsg.ChannelState = ChannelState.WAITING;
+                        channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                channelRetMsg.ChannelErrCode = errCode;
+                channelRetMsg.ChannelErrMsg = errInfo;
+            }
+
+            return channelRetMsg;
         }
     }
 }

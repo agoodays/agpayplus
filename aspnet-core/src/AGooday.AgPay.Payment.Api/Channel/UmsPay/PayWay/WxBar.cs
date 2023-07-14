@@ -12,11 +12,11 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
 {
     /// <summary>
-    /// 银联商务 支付宝 条码支付
+    /// 银联商务 微信 条码支付
     /// </summary>
-    public class AliBar : UmsPayPaymentService
+    public class WxBar : UmsPayPaymentService
     {
-        public AliBar(IServiceProvider serviceProvider,
+        public WxBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -25,10 +25,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【银联商务条码(alipay)支付】";
-            AliBarOrderRQ bizRQ = (AliBarOrderRQ)rq;
+            string logPrefix = "【银联商务条码(wechat)支付】";
+            WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
             // 构造函数响应数据
-            AliBarOrderRS res = ApiResBuilder.BuildSuccess<AliBarOrderRS>();
+            WxBarOrderRS res = ApiResBuilder.BuildSuccess<WxBarOrderRS>();
 
             // 业务处理
             JObject reqParams = new JObject();
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            AliBarOrderRQ bizRQ = (AliBarOrderRQ)rq;
+            WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
             if (string.IsNullOrWhiteSpace(bizRQ.AuthCode))
             {
                 throw new BizException("用户支付条码[authCode]不可为空");
