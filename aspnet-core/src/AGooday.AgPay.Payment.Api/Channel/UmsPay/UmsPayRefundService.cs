@@ -96,6 +96,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                     case "0000":
                     case "SUCCESS":
                         channelRetMsg.ChannelState = ChannelState.WAITING;
+                        channelRetMsg.ChannelErrCode = errCode;
+                        channelRetMsg.ChannelErrMsg = errInfo;
                         break;
                     default:
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
@@ -130,10 +132,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                 {
                     case "SUCCESS":
                         resJSON.TryGetString("billStatus", out string billStatus);// 账单状态
-                        switch (billStatus)
+                        if (billStatus.Equals("REFUND"))
                         {
-                            case "PAID":
-                                resJSON.TryGetValue("billPayment", out JToken billPayment); // 账单支付信息
+                            resJSON.TryGetValue("billPayment", out JToken billPayment); // 账单支付信息
+                            ((JObject)billPayment).TryGetString("status", out string status);// 交易状态
+                            if (status.Equals("TRADE_REFUND"))
+                            {
                                 ((JObject)billPayment).TryGetString("paySeqId", out string paySeqId);// 交易参考号
                                 ((JObject)billPayment).TryGetString("buyerId", out string buyerId);// 交易参考号
                                 ((JObject)billPayment).TryGetString("targetOrderId", out string targetOrderId);// 目标平台单号
@@ -141,12 +145,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                                 channelRetMsg.ChannelOrderId = paySeqId;
                                 channelRetMsg.ChannelUserId = buyerId;
                                 channelRetMsg.PlatformOrderId = targetOrderId;
-                                break;
-                            case "UNPAID":
-                                channelRetMsg.ChannelState = ChannelState.WAITING;
-                                break;
+                            }
                         }
                         break;
+                    case "00":
                     case "0000":
                         channelRetMsg.ChannelState = ChannelState.WAITING;
                         break;
@@ -278,13 +280,16 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                     case "00":
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                         break;
-                    case "ER":
-                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    case "0000":
+                    case "SUCCESS":
+                        channelRetMsg.ChannelState = ChannelState.WAITING;
                         channelRetMsg.ChannelErrCode = errCode;
                         channelRetMsg.ChannelErrMsg = errInfo;
                         break;
                     default:
-                        channelRetMsg.ChannelState = ChannelState.WAITING;
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = errCode;
+                        channelRetMsg.ChannelErrMsg = errInfo;
                         break;
                 }
             }
@@ -316,31 +321,39 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                 switch (errCode)
                 {
                     case "SUCCESS":
-                        resJSON.TryGetString("refundStatus", out string refundStatus);// 账单状态
-                        switch (refundStatus)
+                        resJSON.TryGetString("billStatus", out string billStatus);// 账单状态
+                        if (billStatus.Equals("REFUND"))
                         {
-                            case "SUCCESS":
-                                resJSON.TryGetString("refundTargetOrderId", out string refundTargetOrderId);// 目标系统退货订单号
-                                channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                channelRetMsg.PlatformOrderId = refundTargetOrderId;
-                                break;
-                            case "UNKNOWN":
-                            case "PROCESSING":
-                                channelRetMsg.ChannelState = ChannelState.WAITING;
-                                break;
-                            case "FAIL":
-                                channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
-                                channelRetMsg.ChannelErrCode = errCode;
-                                channelRetMsg.ChannelErrMsg = errInfo;
-                                break;
+                            resJSON.TryGetString("refundStatus", out string refundStatus);// 账单状态
+                            switch (refundStatus)
+                            {
+                                case "SUCCESS":
+                                    resJSON.TryGetString("refundTargetOrderId", out string refundTargetOrderId);// 目标系统退货订单号
+                                    channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                                    channelRetMsg.PlatformOrderId = refundTargetOrderId;
+                                    break;
+                                case "UNKNOWN":
+                                case "PROCESSING":
+                                    channelRetMsg.ChannelState = ChannelState.WAITING;
+                                    break;
+                                case "FAIL":
+                                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                                    channelRetMsg.ChannelErrCode = errCode;
+                                    channelRetMsg.ChannelErrMsg = errInfo;
+                                    break;
+                            }
                         }
                         break;
-                    case "ER":
-                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    case "00":
+                    case "0000":
+                        channelRetMsg.ChannelState = ChannelState.WAITING;
                         channelRetMsg.ChannelErrCode = errCode;
                         channelRetMsg.ChannelErrMsg = errInfo;
                         break;
                     default:
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = errCode;
+                        channelRetMsg.ChannelErrMsg = errInfo;
                         break;
                 }
             }
@@ -372,33 +385,42 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                 switch (errCode)
                 {
                     case "SUCCESS":
-                        resJSON.TryGetString("refundStatus", out string refundStatus);// 账单状态
-                        switch (refundStatus)
+                        resJSON.TryGetString("billStatus", out string billStatus);// 账单状态
+                        if (billStatus.Equals("REFUND"))
                         {
-                            case "SUCCESS":
-                                resJSON.TryGetString("refundOrderId", out string refundOrderId);// 退货订单号
-                                resJSON.TryGetString("refundTargetOrderId", out string refundTargetOrderId);// 目标系统退货订单号
-                                channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                channelRetMsg.ChannelOrderId = refundOrderId;
-                                channelRetMsg.PlatformOrderId = refundTargetOrderId;
-                                break;
-                            case "UNKNOWN":
-                            case "PROCESSING":
-                                channelRetMsg.ChannelState = ChannelState.WAITING;
-                                break;
-                            case "FAIL":
-                                channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
-                                channelRetMsg.ChannelErrCode = errCode;
-                                channelRetMsg.ChannelErrMsg = errInfo;
-                                break;
+
+                            resJSON.TryGetString("refundStatus", out string refundStatus);// 账单状态
+                            switch (refundStatus)
+                            {
+                                case "SUCCESS":
+                                    resJSON.TryGetString("refundOrderId", out string refundOrderId);// 退货订单号
+                                    resJSON.TryGetString("refundTargetOrderId", out string refundTargetOrderId);// 目标系统退货订单号
+                                    channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                                    channelRetMsg.ChannelOrderId = refundOrderId;
+                                    channelRetMsg.PlatformOrderId = refundTargetOrderId;
+                                    break;
+                                case "UNKNOWN":
+                                case "PROCESSING":
+                                    channelRetMsg.ChannelState = ChannelState.WAITING;
+                                    break;
+                                case "FAIL":
+                                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                                    channelRetMsg.ChannelErrCode = errCode;
+                                    channelRetMsg.ChannelErrMsg = errInfo;
+                                    break;
+                            }
                         }
                         break;
-                    case "ER":
-                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    case "00":
+                    case "0000":
+                        channelRetMsg.ChannelState = ChannelState.WAITING;
                         channelRetMsg.ChannelErrCode = errCode;
                         channelRetMsg.ChannelErrMsg = errInfo;
                         break;
                     default:
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = errCode;
+                        channelRetMsg.ChannelErrMsg = errInfo;
                         break;
                 }
             }

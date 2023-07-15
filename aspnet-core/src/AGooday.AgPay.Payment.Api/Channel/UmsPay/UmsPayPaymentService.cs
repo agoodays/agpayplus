@@ -113,6 +113,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             reqParams.Add("tradeType", "JSAPI");
             reqParams.Add("originalAmount", payOrder.Amount);
             reqParams.Add("totalAmount", payOrder.Amount);
+            reqParams.Add("orderDesc", payOrder.Subject);
             reqParams.Add("notifyUrl", notifyUrl);
             reqParams.Add("returnUrl", returnUrl);
             reqParams.Add("clientIp", payOrder.ClientIp);
@@ -182,14 +183,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                         channelRetMsg.ChannelUserId = userId;
                         channelRetMsg.PlatformOrderId = thirdPartyOrderId;
                         break;
-                    case "ER":
+                    case "0000":
+                    case "SUCCESS":
+                        channelRetMsg.ChannelState = ChannelState.WAITING;
+                        channelRetMsg.ChannelErrCode = errCode;
+                        channelRetMsg.ChannelErrMsg = errInfo;
+                        channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                        break;
+                    default:
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                         channelRetMsg.ChannelErrCode = errCode;
                         channelRetMsg.ChannelErrMsg = errInfo;
-                        break;
-                    default:
-                        channelRetMsg.ChannelState = ChannelState.WAITING;
-                        channelRetMsg.IsNeedQuery = true; // 开启轮询查单
                         break;
                 }
             }

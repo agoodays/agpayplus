@@ -58,10 +58,19 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
                         res.AlipayTradeNo = orderNo;
                         channelRetMsg.ChannelOrderId = seqId;
                         channelRetMsg.ChannelState = ChannelState.WAITING;
+                        channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                        break;
+                    case "00":
+                    case "0000":
+                        channelRetMsg.ChannelState = ChannelState.WAITING;
+                        channelRetMsg.ChannelErrCode = errCode;
+                        channelRetMsg.ChannelErrMsg = errInfo;
+                        channelRetMsg.IsNeedQuery = true; // 开启轮询查单
                         break;
                     default:
-                        channelRetMsg.ChannelState = ChannelState.WAITING;
-                        channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = errCode;
+                        channelRetMsg.ChannelErrMsg = errInfo;
                         break;
                 }
             }
