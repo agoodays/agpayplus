@@ -302,7 +302,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             reqParams.Add("requestTimestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));// 报文请求时间 格式：yyyy-MM-dd HH:mm:ss
             reqParams.Add("instMid", "QRPAYDEFAULT");// 业务类型 QRPAYDEFAULT
             reqParams.Add("billNo", payOrder.PayOrderId); // 账单号
-            reqParams.Add("billNo", payOrder.CreatedAt?.ToString("yyyy-MM-dd")); // 订单时间 格式：yyyy-MM-dd
+            reqParams.Add("billDate", payOrder.CreatedAt?.ToString("yyyy-MM-dd")); // 订单时间 格式：yyyy-MM-dd
             reqParams.Add("refundOrderId", refundOrder.RefundOrderId); // 退款订单号 多次退款必传，每次退款上送的refundOrderId值需不同
             reqParams.Add("refundAmount", refundOrder.RefundAmount); // 要退货的金额，单位：分
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
@@ -362,7 +362,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             reqParams.Add("refundOrderId", refundOrder.RefundOrderId); // 退款订单号 多次退款必传，每次退款上送的refundOrderId值需不同，若多次退货，且后续退货上送的merOrderId和refundOrderId字段与之前退货上送的值一致，将不会走退货逻辑，而是返回已有退货订单的退货信息，遵循商户订单号生成规范
             reqParams.Add("refundDesc", refundOrder.RefundReason); // 退货说明
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/bills/refund", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/refund", reqParams, logPrefix, mchAppConfigContext);
 
             // 请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码

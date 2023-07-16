@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.Utils
                 Method = "POST",
                 Content = body,
                 ContentType = "application/json",
-                Headers = { { "Authorization", authorization } }
+                Headers = new Dictionary<string, string> { { "Authorization", authorization } }
             };
             var response = client.Send(request);
             string result = response.Content;

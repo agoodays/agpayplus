@@ -10,6 +10,7 @@ using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -42,12 +43,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
 
         public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            throw new NotImplementedException();
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
         {
-            throw new NotImplementedException();
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
         /// <summary>
@@ -167,7 +168,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             JObject resJSON = PackageParamAndReq("/v6/poslink/transaction/pay", reqParams, logPrefix, mchAppConfigContext, true);
             //请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
-            string errInfo = resJSON.GetValue("errInfo").ToString(); // 错误说明
+            resJSON.TryGetString("errInfo", out string errInfo); // 错误说明
             try
             {
                 switch (errCode)

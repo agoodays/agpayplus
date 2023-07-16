@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
             JObject resJSON = PackageParamAndReq("/v1/netpay/wx/unified-order", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
-            string errInfo = resJSON.GetValue("errInfo").ToString(); // 错误说明
+            resJSON.TryGetString("errInfo", out string errInfo); // 错误说明
             try
             {
                 switch (errCode)

@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
 
             //请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
-            string errInfo = resJSON.GetValue("errInfo").ToString(); // 错误说明
+            resJSON.TryGetString("errInfo", out string errInfo); // 错误说明
             try
             {
                 switch (errCode)
@@ -111,13 +111,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             reqParams.Add("requestTimestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));// 报文请求时间 格式：yyyy-MM-dd HH:mm:ss
             reqParams.Add("instMid", "QRPAYDEFAULT");// 业务类型 QRPAYDEFAULT
             reqParams.Add("billNo", payOrder.PayOrderId); // 账单号
-            reqParams.Add("billNo", payOrder.CreatedAt?.ToString("yyyy-MM-dd")); // 订单时间 格式：yyyy-MM-dd
+            reqParams.Add("billDate", payOrder.CreatedAt?.ToString("yyyy-MM-dd")); // 订单时间 格式：yyyy-MM-dd
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
             JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/bills/query", reqParams, logPrefix, mchAppConfigContext);
 
             // 请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
-            string errInfo = resJSON.GetValue("errInfo").ToString(); // 错误说明
+            resJSON.TryGetString("errInfo", out string errInfo); // 错误说明
             try
             {
                 switch (errCode)
@@ -172,7 +172,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
 
             //请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
-            string errInfo = resJSON.GetValue("errInfo").ToString(); // 错误说明
+            resJSON.TryGetString("errInfo", out string errInfo); // 错误说明
             try
             {
                 switch (errCode)
