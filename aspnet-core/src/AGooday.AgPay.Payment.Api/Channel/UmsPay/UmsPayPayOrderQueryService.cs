@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                     case "SUCCESS":
                         resJSON.TryGetString("orderId", out string orderId);// 银商订单号 最大长度26位
                         resJSON.TryGetString("thirdPartyBuyerId", out string thirdPartyBuyerId); // 第三方买家Id 最大长度32位
-                        resJSON.TryGetString("thirdPartyBuyerId", out string thirdPartyOrderId);// 第三方订单号
+                        resJSON.TryGetString("thirdPartyOrderId", out string thirdPartyOrderId);// 第三方订单号
                         resJSON.TryGetString("orderStatus", out string orderStatus);// 订单状态 TRADE_CLOSED、TRADE_SUCCESS、TRADE_REFUND、WAIT_BUYER_PAY、NEW_ORDER、UNKNOWN
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                         channelRetMsg.ChannelOrderId = orderId;
@@ -175,7 +175,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             //reqParams.Add("srcReserve", "webpay");
             reqParams.Add("instMid", "YUEDANDEFAULT");
             reqParams.Add("merOrderId", payOrder.PayOrderId); // 商户订单号
-                                                              //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
+            //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
             JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/query", reqParams, logPrefix, mchAppConfigContext);
 
             //请求 & 响应成功， 判断业务逻辑

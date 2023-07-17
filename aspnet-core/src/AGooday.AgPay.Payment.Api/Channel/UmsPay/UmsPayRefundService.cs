@@ -385,10 +385,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                 switch (errCode)
                 {
                     case "SUCCESS":
-                        resJSON.TryGetString("billStatus", out string billStatus);// 账单状态
-                        if (billStatus.Equals("REFUND"))
+                        resJSON.TryGetString("status", out string status);// 账单状态
+                        if (status.Equals("REFUND"))
                         {
-
                             resJSON.TryGetString("refundStatus", out string refundStatus);// 账单状态
                             switch (refundStatus)
                             {
