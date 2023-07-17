@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -27,9 +28,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.Utils
                 ContentType = "application/json",
                 Headers = new Dictionary<string, string> { { "Authorization", authorization } }
             };
-            var response = client.Send(request);
-            string result = response.Content;
-            return result;
+            try
+            {
+                var response = client.Send(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = response.Content;
+                    return result;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                throw ChannelException.SysError(e.Message);
+            }
         }
     }
 }

@@ -48,15 +48,45 @@ namespace AGooday.AgPay.Common.Utils
                     case "DELETE":
                         httpResponse = client.DeleteAsync(request.Url).Result;
                         break;
+                    default:
+                        response.StatusCode = HttpStatusCode.BadRequest;
+                        response.Content = "Invalid request method.";
+                        return response;
                 }
-                response.StatusCode = httpResponse.StatusCode;
-                response.Headers = httpResponse.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault());
-                response.Content = httpResponse.Content.ReadAsStringAsync().Result;
+                httpResponse.EnsureSuccessStatusCode();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    response.StatusCode = httpResponse.StatusCode;
+                    response.Headers = httpResponse.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault());
+                    response.Content = httpResponse.Content.ReadAsStringAsync().Result;
+                }
+                else if (httpResponse.StatusCode == HttpStatusCode.RequestTimeout)
+                {
+                    response.StatusCode = HttpStatusCode.GatewayTimeout;
+                    response.Content = "The request has timed out.";
+                }
+                else if (httpResponse.StatusCode == HttpStatusCode.GatewayTimeout)
+                {
+                    response.StatusCode = HttpStatusCode.GatewayTimeout;
+                    response.Content = "The gateway has timed out.";
+                }
+                else
+                {
+                    response.StatusCode = httpResponse.StatusCode;
+                    response.Content = httpResponse.Content.ReadAsStringAsync().Result;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                // 日志和异常处理
+                LogUtil<AgHttpClient>.Error("Http请求客户端异常", e);
+                throw;
             }
             catch (Exception e)
             {
                 // 日志和异常处理
-                LogUtil<AgHttpClient>.Error("Http请求客户端异常", e);
+                LogUtil<AgHttpClient>.Error("Http客户端异常", e);
+                throw;
             }
             return response;
         }
@@ -88,15 +118,45 @@ namespace AGooday.AgPay.Common.Utils
                     case "DELETE":
                         httpResponse = await client.DeleteAsync(request.Url);
                         break;
+                    default:
+                        response.StatusCode = HttpStatusCode.BadRequest;
+                        response.Content = "Invalid request method.";
+                        return response;
                 }
-                response.StatusCode = httpResponse.StatusCode;
-                response.Headers = httpResponse.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault());
-                response.Content = await httpResponse.Content.ReadAsStringAsync();
+                httpResponse.EnsureSuccessStatusCode();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    response.StatusCode = httpResponse.StatusCode;
+                    response.Headers = httpResponse.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault());
+                    response.Content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                else if (httpResponse.StatusCode == HttpStatusCode.RequestTimeout)
+                {
+                    response.StatusCode = HttpStatusCode.GatewayTimeout;
+                    response.Content = "The request has timed out.";
+                }
+                else if (httpResponse.StatusCode == HttpStatusCode.GatewayTimeout)
+                {
+                    response.StatusCode = HttpStatusCode.GatewayTimeout;
+                    response.Content = "The gateway has timed out.";
+                }
+                else
+                {
+                    response.StatusCode = httpResponse.StatusCode;
+                    response.Content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                // 日志和异常处理
+                LogUtil<AgHttpClient>.Error("Http请求客户端异常", e);
+                throw;
             }
             catch (Exception e)
             {
                 // 日志和异常处理
-                LogUtil<AgHttpClient>.Error("Http请求客户端异常", e);
+                LogUtil<AgHttpClient>.Error("Http客户端异常", e);
+                throw;
             }
             return response;
         }
@@ -106,6 +166,11 @@ namespace AGooday.AgPay.Common.Utils
             public HttpStatusCode StatusCode { get; set; }
             public Dictionary<string, string> Headers { get; set; }
             public string Content { get; set; }
+
+            public bool IsSuccessStatusCode
+            {
+                get { return ((int)StatusCode >= 200) && ((int)StatusCode <= 299); }
+            }
         }
 
         public class Request

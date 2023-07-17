@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Exceptions;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LesPay.Utils
 {
@@ -17,9 +18,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.Utils
                 Content = reqParams,
                 ContentType = "application/x-www-form-urlencoded"
             };
-            var response = client.Send(request);
-            string result = response.Content;
-            return result;
+            try
+            {
+                var response = client.Send(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = response.Content;
+                    return result;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                throw ChannelException.SysError(e.Message);
+            }
         }
     }
 }
