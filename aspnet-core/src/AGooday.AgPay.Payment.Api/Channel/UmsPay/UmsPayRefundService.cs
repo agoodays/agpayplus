@@ -73,6 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                 return ChannelRetMsg.Waiting(); //退款中
             }
         }
+
         private ChannelRetMsg BarQuery(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();

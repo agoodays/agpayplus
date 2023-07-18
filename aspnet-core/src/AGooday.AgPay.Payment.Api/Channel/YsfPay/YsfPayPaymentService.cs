@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
             reqParams.Add("signature", YsfSignUtil.SignBy256(reqParams, isvPrivateCertFile, isvPrivateCertPwd)); //RSA 签名串
 
             // 调起上游接口
-            log.Info($"{logPrefix} reqJSON={reqParams}");
+            log.Info($"{logPrefix} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = YsfHttpUtil.DoPostJson(GetYsfpayHost4env(isvParams) + apiUri, null, reqParams);
             log.Info($"{logPrefix} resJSON={resText}");
 

@@ -148,7 +148,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 支付接口代码
         /// </summary>
         [Comment("支付接口代码")]
-        [Column("if_code", TypeName = "varchar(20)")]
+        [Required, Column("if_code", TypeName = "varchar(20)")]
         public string IfCode { get; set; }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 渠道订单号
         /// </summary>
         [Comment("渠道订单号")]
-        [Required, Column("channel_order_no", TypeName = "varchar(32)")]
+        [Column("channel_order_no", TypeName = "varchar(32)")]
         public string ChannelOrderNo { get; set; }
 
         /// <summary>

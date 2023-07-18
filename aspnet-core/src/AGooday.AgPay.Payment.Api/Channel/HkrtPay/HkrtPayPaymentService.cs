@@ -166,9 +166,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
             reqParams.Add("sign", HkrtSignUtil.Sign(reqParams, accessKey)); //RSA 签名字符串
 
             // 调起上游接口
-            log.Info($"{logPrefix} reqJSON={reqParams}");
-            string resText = HkrtHttpUtil.DoPost(GetHkrtPayHost4env(isvParams) + apiUri, reqParams);
-            log.Info($"{logPrefix} resJSON={resText}");
+            string url = GetHkrtPayHost4env(isvParams) + apiUri;
+            string unionId = Guid.NewGuid().ToString("N");
+            log.Info($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            string resText = HkrtHttpUtil.DoPost(url, reqParams);
+            log.Info($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

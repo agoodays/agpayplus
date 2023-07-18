@@ -86,9 +86,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             reqParams.Add(isBarPay ? "terminalCode" : "tid", isvsubMchParams.Tid); //终端号
 
             // 调起上游接口
-            log.Info($"{logPrefix} reqJSON={reqParams}");
-            string resText = UmsHttpUtil.DoPostJson(GetUmsPayHost4env(isvParams) + apiUri, isvParams.AppId, isvParams.AppKey, reqParams);
-            log.Info($"{logPrefix} resJSON={resText}");
+            string url = GetUmsPayHost4env(isvParams) + apiUri;
+            string unionId = Guid.NewGuid().ToString("N");
+            log.Info($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            string resText = UmsHttpUtil.DoPostJson(url, isvParams.AppId, isvParams.AppKey, reqParams);
+            log.Info($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -178,7 +180,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                         resJSON.TryGetString("orderId", out string orderId);// 20230713201936190033303567
                         resJSON.TryGetString("userId", out string userId); // oUpF8uDs4900N84XIoXWcCqzbyyo
                         resJSON.TryGetString("thirdPartyBuyerId", out string thirdPartyBuyerId); // 第三方买家Id oUpF8uDs4900N84XIoXWcCqzbyyo
-                        resJSON.TryGetString("thirdPartyBuyerId", out string thirdPartyOrderId);// 4200001857202307136819383689
+                        resJSON.TryGetString("thirdPartyOrderId", out string thirdPartyOrderId);// 4200001857202307136819383689
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                         channelRetMsg.ChannelOrderId = orderId;
                         channelRetMsg.ChannelUserId = userId;

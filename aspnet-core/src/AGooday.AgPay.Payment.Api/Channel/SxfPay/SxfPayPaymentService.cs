@@ -169,9 +169,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             reqParams.Add("sign", SxfSignUtil.Sign(reqParams, privateKey)); //RSA 签名字符串
 
             // 调起上游接口
-            log.Info($"{logPrefix} reqJSON={reqParams}");
-            string resText = SxfHttpUtil.DoPostJson(GetSxfPayHost4env(isvParams) + apiUri, reqParams);
-            log.Info($"{logPrefix} resJSON={resText}");
+            string url = GetSxfPayHost4env(isvParams) + apiUri;
+            string unionId = Guid.NewGuid().ToString("N");
+            log.Info($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            string resText = SxfHttpUtil.DoPostJson(url, reqParams);
+            log.Info($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -183,7 +185,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             string publicKey = isvParams.PublicKey;
             if (!SxfSignUtil.Verify(resParams, publicKey))
             {
-                log.Warn($"{logPrefix} 验签失败！ reqJSON={reqParams} resJSON={resParams}");
+                log.Warn($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }
 
             return resParams;

@@ -151,10 +151,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             reqParams.Add("sign", LesSignUtil.Sign(reqParams, tradeKey)); //RSA 签名字符串
 
             // 调起上游接口
+            string url = GetLesPayHost4env(isvParams) + apiUri;
+            string unionId = Guid.NewGuid().ToString("N");
             var reqText = string.Join("&", reqParams.Select(s => $"{s.Key}={s.Value}"));
-            log.Info($"{logPrefix} reqText={reqText}");
-            string resText = LesHttpUtil.DoPost(GetLesPayHost4env(isvParams) + apiUri, reqText);
-            log.Info($"{logPrefix} resText={resText}");
+            log.Info($"{logPrefix} unionId={unionId} url={url} reqText={reqText}");
+            string resText = LesHttpUtil.DoPost(url, reqText);
+            log.Info($"{logPrefix} unionId={unionId} url={url} resText={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
