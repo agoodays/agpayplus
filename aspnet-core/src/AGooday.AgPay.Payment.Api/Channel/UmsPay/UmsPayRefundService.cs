@@ -92,13 +92,21 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                 switch (errCode)
                 {
                     case "00":
-                        channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                        break;
                     case "0000":
                     case "SUCCESS":
-                        channelRetMsg.ChannelState = ChannelState.WAITING;
-                        channelRetMsg.ChannelErrCode = errCode;
-                        channelRetMsg.ChannelErrMsg = errInfo;
+                        // 查询结果 0：成功 1：超时 2：已撤销 3：已退货 4：已冲正 5：失败（失败情况，后面追加失败描述) FF：交易状态未知
+                        resJSON.TryGetString("queryResCode", out string queryResCode);
+                        resJSON.TryGetString("queryResInfo", out string queryResInfo);
+                        if (queryResCode.Equals("00"))
+                        {
+                            channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                        }
+                        else
+                        {
+                            channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                            channelRetMsg.ChannelErrCode = queryResCode;
+                            channelRetMsg.ChannelErrMsg = queryResInfo;
+                        }
                         break;
                     default:
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;

@@ -76,21 +76,37 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             {
                 switch (errCode)
                 {
-                    case "SUCCESS":
-                        resJSON.TryGetString("orderId", out string orderId);// 银商订单号 最大长度26位
-                        resJSON.TryGetString("thirdPartyBuyerId", out string thirdPartyBuyerId); // 第三方买家Id 最大长度32位
-                        resJSON.TryGetString("thirdPartyOrderId", out string thirdPartyOrderId);// 第三方订单号
-                        resJSON.TryGetString("orderStatus", out string orderStatus);// 订单状态 TRADE_CLOSED、TRADE_SUCCESS、TRADE_REFUND、WAIT_BUYER_PAY、NEW_ORDER、UNKNOWN
-                        channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                        channelRetMsg.ChannelOrderId = orderId;
-                        channelRetMsg.ChannelUserId = thirdPartyBuyerId;
-                        channelRetMsg.PlatformOrderId = thirdPartyOrderId;
-                        break;
                     case "00":
                     case "0000":
-                        channelRetMsg.ChannelState = ChannelState.WAITING;
-                        channelRetMsg.ChannelErrCode = errCode;
-                        channelRetMsg.ChannelErrMsg = errInfo;
+                    case "SUCCESS":
+                        // 查询结果 0：成功 1：超时 2：已撤销 3：已退货 4：已冲正 5：失败（失败情况，后面追加失败描述) FF：交易状态未知
+                        resJSON.TryGetString("queryResCode", out string queryResCode);
+                        switch (queryResCode)
+                        {
+                            case "0":
+                            case "3":
+                            case "4":
+                                resJSON.TryGetString("orderId", out string orderId);// 银商订单号 最大长度26位
+                                resJSON.TryGetString("thirdPartyBuyerId", out string thirdPartyBuyerId); // 第三方买家Id 最大长度32位
+                                resJSON.TryGetString("thirdPartyOrderId", out string thirdPartyOrderId);// 第三方订单号
+                                channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                                channelRetMsg.ChannelOrderId = orderId;
+                                channelRetMsg.ChannelUserId = thirdPartyBuyerId;
+                                channelRetMsg.PlatformOrderId = thirdPartyOrderId;
+                                break;
+                            case "1":
+                            case "2":
+                            case "5":
+                                channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                                channelRetMsg.ChannelErrCode = errCode;
+                                channelRetMsg.ChannelErrMsg = errInfo;
+                                break;
+                            case "FF":
+                                channelRetMsg.ChannelState = ChannelState.WAITING;
+                                channelRetMsg.ChannelErrCode = errCode;
+                                channelRetMsg.ChannelErrMsg = errInfo;
+                                break;
+                        }
                         break;
                     default:
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
@@ -126,25 +142,43 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                 {
                     case "SUCCESS":
                         resJSON.TryGetString("billStatus", out string billStatus);// 账单状态
-                        if (billStatus.Equals("PAID"))
-                        {
-                            resJSON.TryGetValue("billPayment", out JToken billPayment); // 账单支付信息
-                            ((JObject)billPayment).TryGetString("status", out string status);// 交易状态
-                            switch (status)
-                            {
-                                case "TRADE_SUCCESS":
-                                    ((JObject)billPayment).TryGetString("paySeqId", out string paySeqId);// 交易参考号
-                                    ((JObject)billPayment).TryGetString("buyerId", out string buyerId);// 交易参考号
-                                    ((JObject)billPayment).TryGetString("targetOrderId", out string targetOrderId);// 目标平台单号
-                                    channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                    channelRetMsg.ChannelOrderId = paySeqId;
-                                    channelRetMsg.ChannelUserId = buyerId;
-                                    channelRetMsg.PlatformOrderId = targetOrderId;
-                                    break;
-                                case "WAIT_BUYER_PAY":
-                                    channelRetMsg.ChannelState = ChannelState.WAITING;
-                                    break;
-                            }
+                        switch (billStatus) {
+                            case "PAID":
+                            case "REFUND":
+                                resJSON.TryGetValue("billPayment", out JToken billPayment); // 账单支付信息
+                                ((JObject)billPayment).TryGetString("status", out string status);// 交易状态
+                                switch (status)
+                                {
+                                    case "TRADE_SUCCESS":
+                                    case "TRADE_REFUND":
+                                        ((JObject)billPayment).TryGetString("paySeqId", out string paySeqId);// 交易参考号
+                                        ((JObject)billPayment).TryGetString("buyerId", out string buyerId);// 交易参考号
+                                        ((JObject)billPayment).TryGetString("targetOrderId", out string targetOrderId);// 目标平台单号
+                                        channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                                        channelRetMsg.ChannelOrderId = paySeqId;
+                                        channelRetMsg.ChannelUserId = buyerId;
+                                        channelRetMsg.PlatformOrderId = targetOrderId;
+                                        break;
+                                    case "TRADE_CLOSED":
+                                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                                        channelRetMsg.ChannelErrCode = errCode;
+                                        channelRetMsg.ChannelErrMsg = errInfo;
+                                        break;
+                                    case "NEW_ORDER":
+                                    case "UNKNOWN":
+                                    case "WAIT_BUYER_PAY":
+                                    default:
+                                        channelRetMsg.ChannelState = ChannelState.WAITING;
+                                        break;
+                                }
+                                break;
+                            case "UNPAID": 
+                                break;
+                            case "CLOSED":
+                                channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                                channelRetMsg.ChannelErrCode = errCode;
+                                channelRetMsg.ChannelErrMsg = errInfo;
+                                break;
                         }
                         break;
                     case "00":
@@ -195,17 +229,25 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                         switch (status)
                         {
                             case "TRADE_SUCCESS":
+                            case "TRADE_REFUND":
+                                channelRetMsg.ChannelOrderId = seqId;
+                                channelRetMsg.ChannelUserId = buyerId;
+                                channelRetMsg.PlatformOrderId = targetOrderId;
+                                channelRetMsg.PlatformMchOrderId = goodsTradeNo;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                                 break;
+                            case "TRADE_CLOSED":
+                                channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                                channelRetMsg.ChannelErrCode = errCode;
+                                channelRetMsg.ChannelErrMsg = errInfo;
+                                break;
+                            case "NEW_ORDER":
+                            case "UNKNOWN":
                             case "WAIT_BUYER_PAY":
                             default:
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
                                 break;
                         }
-                        channelRetMsg.ChannelOrderId = seqId;
-                        channelRetMsg.ChannelUserId = buyerId;
-                        channelRetMsg.PlatformOrderId = targetOrderId;
-                        channelRetMsg.PlatformMchOrderId = goodsTradeNo;
                         break;
                     case "00":
                     case "0000":
