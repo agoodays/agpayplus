@@ -146,18 +146,18 @@ CREATE TABLE `t_sys_user_team` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='团队信息表';
 
 INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM', '团队管理', 'team', '/teams', 'SysUserTeamPage', 'ML', 0, 1, 'ENT_UR', 15, 'MGR', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_LIST', '页面：团队列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_DEL', '按钮： 删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_LIST', '页面：团队列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_DEL', '按钮： 删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
 	
 INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM', '团队管理', 'team', '/teams', 'SysUserTeamPage', 'ML', 0, 1, 'ENT_UR', 15, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_LIST', '页面：团队列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_DEL', '按钮： 删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_LIST', '页面：团队列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_DEL', '按钮： 删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'AGENT', NOW(), NOW());
 
 -- 文章信息表
 CREATE TABLE `t_sys_article`(  
@@ -174,8 +174,7 @@ CREATE TABLE `t_sys_article`(
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`article_id`)
-) ENGINE=INNODB CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-AUTO_INCREMENT=1001 COMMENT='文章信息表';
+) ENGINE=INNODB AUTO_INCREMENT=1001 CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='文章信息表';
 
 -- 公告管理
 INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_NOTICEINFO', '公告管理', 'message', '/notices', 'NoticeInfoPage', 'ML', 0, 1,  'ENT_SYS_CONFIG', '30', 'MGR', NOW(), NOW());
@@ -194,7 +193,7 @@ CREATE TABLE `t_pay_rate_config` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
 --   `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, agentSubagent-子代理商, mgrMch-商户, agentMch-代理商商户',
   `config_type` VARCHAR(20) NOT NULL COMMENT '配置类型: ISVCOST-服务商低价, AGENTRATE-代理商费率, AGENTDEF-代理商默认费率, MCHAPPLYDEF-商户进件默认费率, MCHRATE-商户费率',
-  `info_type` VARCHAR(20) NOT NULL COMMENT '账号类型:ISV-服务商, AGENT-代理商, MCH_APP-商户应用',
+  `info_type` VARCHAR(20) NOT NULL COMMENT '账号类型:ISV-服务商, AGENT-代理商, MCH_APP-商户应用, MCH_APPLY-商户进件',
   `info_id` VARCHAR(64) NOT NULL COMMENT '服务商号/商户号/应用ID',
   `if_code` VARCHAR(20) NOT NULL COMMENT '支付接口',
   `way_code` VARCHAR(20) NOT NULL COMMENT '支付方式',
@@ -240,7 +239,7 @@ CREATE TABLE `t_qr_code_shell` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (id)
-);
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='码牌模板信息表';
 
 -- 码牌信息表
 DROP TABLE IF EXISTS `t_qr_code`;
@@ -269,7 +268,7 @@ CREATE TABLE `t_qr_code` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (qrc_id)
-);
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='码牌信息表';
 
 -- 设备配置
 INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE', '设备配置', 'appstore', '', 'RouteView', 'ML', 0, 1,  'ROOT', '70', 'MGR', NOW(), NOW());
@@ -291,34 +290,34 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE', '设备配置', 'appstore', 
 -- 供应商定义表
 DROP TABLE IF EXISTS t_provider_define;
 CREATE TABLE `t_provider_define` (
-          `provider_code` VARCHAR(20) NOT NULL COMMENT '供应商代码 全小写 zgwl',
-          `provider_name` VARCHAR(20) NOT NULL COMMENT '供应商名称',
---           `provider_type` TINYINT(6) NOT NULL COMMENT '供应商类型:1-云音响 2-云打印',
-          `config_page_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '支付参数配置页面类型:1-JSON渲染,2-自定义',
-          `provider_params` VARCHAR(4096) DEFAULT NULL COMMENT '供应商配置定义描述,json字符串',
-          `device_types` JSON NOT NULL COMMENT '支持设备类型 [1, 2]',
-          `icon` VARCHAR(256) DEFAULT NULL COMMENT '页面展示：卡片-图标',
-          `bg_color` VARCHAR(20) DEFAULT NULL COMMENT '页面展示：卡片-背景色',
-          `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
-          `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
-          `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
-          `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-          PRIMARY KEY (`provider_code`)
+  `provider_code` VARCHAR(20) NOT NULL COMMENT '供应商代码 全小写 zgwl',
+  `provider_name` VARCHAR(20) NOT NULL COMMENT '供应商名称',
+--   `provider_type` TINYINT(6) NOT NULL COMMENT '供应商类型:1-云音响 2-云打印',
+  `config_page_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '支付参数配置页面类型:1-JSON渲染,2-自定义',
+  `provider_params` VARCHAR(4096) DEFAULT NULL COMMENT '供应商配置定义描述,json字符串',
+  `device_types` JSON NOT NULL COMMENT '支持设备类型 [1, 2]',
+  `icon` VARCHAR(256) DEFAULT NULL COMMENT '页面展示：卡片-图标',
+  `bg_color` VARCHAR(20) DEFAULT NULL COMMENT '页面展示：卡片-背景色',
+  `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
+  `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (`provider_code`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='供应商定义表';
 
 -- 设备配置参数表
 DROP TABLE IF EXISTS t_device_config;
 CREATE TABLE `t_device_config` (
-          `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-          `device_type` TINYINT(6) NOT NULL COMMENT '设备类型:1-云音响 2-云打印',
-          `provider_code` VARCHAR(20) NOT NULL COMMENT '供应商代码',
-          `provider_params` VARCHAR(4096) NOT NULL COMMENT '接口配置参数,json字符串',
-          `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
-          `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
-          `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
-          `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-          PRIMARY KEY (`id`),
-          UNIQUE KEY `Uni_DeviceType_Provider` (`device_type`, `provider`)
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `device_type` TINYINT(6) NOT NULL COMMENT '设备类型:1-云音响 2-云打印',
+  `provider_code` VARCHAR(20) NOT NULL COMMENT '供应商代码',
+  `provider_params` VARCHAR(4096) NOT NULL COMMENT '接口配置参数,json字符串',
+  `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
+  `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Uni_DeviceType_Provider` (`device_type`, `provider`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='设备配置参数表';
 
 INSERT INTO t_provider_define (provider_code, provider_name, config_page_type, provider_params, isvsub_mch_params, device_types, icon, bg_color, state, remark)
@@ -330,25 +329,25 @@ VALUES ('zgwl', '智谷联', 1,
 -- 设备信息表
 DROP TABLE IF EXISTS t_device_info;
 CREATE TABLE `t_device_config` (
-	  `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-          `device_no` VARCHAR(64) NOT NULL COMMENT '设备号',
-          `device_name` VARCHAR(64) NOT NULL COMMENT '设备名称',
-          `device_config_id` BIGINT(20) NOT NULL COMMENT '设备配置参数ID',
-	  `batch_id` VARCHAR(64) NULL COMMENT '批次号',
-	  `bind_state` TINYINT NOT NULL COMMENT '绑定状态: 0-未绑定, 1-已绑定',
-	  `bind_type` TINYINT NOT NULL COMMENT '绑定类型: 0-门店, 1-码牌', 
-	  `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
-	  `app_id` VARCHAR(64) NOT NULL COMMENT '应用ID',
-	  `store_id` BIGINT NOT NULL COMMENT '门店ID',
-	  `bind_qrc_id` BIGINT NOT NULL COMMENT '绑定码牌ID',
-          `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
-          `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
-	  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
-	  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
-          `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
-          `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-          PRIMARY KEY (`id`),
-          UNIQUE KEY `Uni_DeviceNo` (`device_no`)
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `device_no` VARCHAR(64) NOT NULL COMMENT '设备号',
+  `device_name` VARCHAR(64) NOT NULL COMMENT '设备名称',
+  `device_config_id` BIGINT(20) NOT NULL COMMENT '设备配置参数ID',
+  `batch_id` VARCHAR(64) NULL COMMENT '批次号',
+  `bind_state` TINYINT NOT NULL COMMENT '绑定状态: 0-未绑定, 1-已绑定',
+  `bind_type` TINYINT NOT NULL COMMENT '绑定类型: 0-门店, 1-码牌', 
+  `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
+  `app_id` VARCHAR(64) NOT NULL COMMENT '应用ID',
+  `store_id` BIGINT NOT NULL COMMENT '门店ID',
+  `bind_qrc_id` BIGINT NOT NULL COMMENT '绑定码牌ID',
+  `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
+  `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
+  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Uni_DeviceNo` (`device_no`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='设备信息表';
 
 ALTER TABLE `t_mch_info`   
@@ -362,7 +361,7 @@ ALTER TABLE `t_mch_info`
 ALTER TABLE `t_mch_app`   
   ADD COLUMN `default_flag` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否默认: 0-否, 1-是' AFTER `state`,
   ADD COLUMN `app_sign_type` JSON NOT NULL COMMENT '支持的签名方式 [\"MD5\", \"RSA2\"]' AFTER `default_flag`,
-  CHANGE `app_secret` `app_secret` VARCHAR(128) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '应用MD5私钥',
+  CHANGE `app_secret` `app_secret` VARCHAR(128) NOT NULL COMMENT '应用MD5私钥',
   ADD COLUMN `app_rsa2_public_key` VARCHAR(448) NULL COMMENT 'RSA2应用公钥' AFTER `app_secret`;
   
 -- select * from `t_mch_app` WHERE JSON_TYPE(app_sign_type) = 'NULL'
@@ -371,7 +370,7 @@ UPDATE `t_mch_app` SET `app_sign_type` = '["MD5"]' WHERE JSON_TYPE(app_sign_type
 ALTER TABLE `t_sys_user`   
   CHANGE `sex` `sex` TINYINT DEFAULT 0 NOT NULL COMMENT '性别: 0-未知, 1-男, 2-女',
   CHANGE `is_admin` `is_admin` TINYINT DEFAULT 0 NOT NULL COMMENT '是否超管（超管拥有全部权限）: 0-否 1-是',
-  CHANGE `sys_type` `sys_type` VARCHAR(8) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
+  CHANGE `sys_type` `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
   ADD COLUMN `user_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员' AFTER `sys_type`,
   ADD COLUMN `invite_code` VARCHAR(20) NULL COMMENT '邀请码' AFTER `user_type`,
   ADD COLUMN `team_id` BIGINT NULL COMMENT '团队ID' AFTER `invite_code`,
@@ -424,21 +423,21 @@ ALTER TABLE `t_pay_order`
   ADD COLUMN `buyer_remark` VARCHAR(256) NULL COMMENT '卖家备注' AFTER `seller_remark`;
 
 ALTER TABLE `t_pay_order`   
-  CHANGE `mch_name` `mch_name` VARCHAR(64) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
-  CHANGE `mch_short_name` `mch_short_name` VARCHAR(32) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '商户简称'  AFTER `mch_name`,
+  CHANGE `mch_name` `mch_name` VARCHAR(64) NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
+  CHANGE `mch_short_name` `mch_short_name` VARCHAR(32) NULL COMMENT '商户简称'  AFTER `mch_name`,
   ADD COLUMN `agent_name` VARCHAR(64) NULL COMMENT '代理商名称' AFTER `agent_no`,
   ADD COLUMN `agent_short_name` VARCHAR(32) NULL COMMENT '代理商简称' AFTER `agent_name`;
 
 ALTER TABLE `t_refund_order`   
-  CHANGE `mch_name` `mch_name` VARCHAR(64) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
+  CHANGE `mch_name` `mch_name` VARCHAR(64) NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
   ADD COLUMN `mch_short_name` VARCHAR(32) NULL COMMENT '商户简称' AFTER `mch_name`,
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_short_name`,
   ADD COLUMN `agent_name` VARCHAR(64) NULL COMMENT '代理商名称' AFTER `agent_no`,
   ADD COLUMN `agent_short_name` VARCHAR(32) NULL COMMENT '代理商简称' AFTER `agent_name`,
-  CHANGE `isv_no` `isv_no` VARCHAR(64) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '服务商号'  AFTER `agent_short_name`,
+  CHANGE `isv_no` `isv_no` VARCHAR(64) NULL COMMENT '服务商号'  AFTER `agent_short_name`,
   ADD COLUMN `isv_name` VARCHAR(64) NULL COMMENT '服务商名称' AFTER `isv_no`,
   ADD COLUMN `isv_short_name` VARCHAR(32) NULL COMMENT '服务商简称' AFTER `isv_name`,
-  CHANGE `app_id` `app_id` VARCHAR(64) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '应用ID'  AFTER `isv_short_name`,
+  CHANGE `app_id` `app_id` VARCHAR(64) NOT NULL COMMENT '应用ID'  AFTER `isv_short_name`,
   ADD COLUMN `app_name` VARCHAR(64) NULL COMMENT '应用名称' AFTER `app_id`,
   ADD COLUMN `store_id` VARCHAR(64) NULL COMMENT '门店ID' AFTER `app_name`,
   ADD COLUMN `store_name` VARCHAR(64) NULL COMMENT '门店名称' AFTER `store_id`;
@@ -463,134 +462,134 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', ''
 
 -- 权限表数据 （ 不包含根目录 ）
 INSERT INTO t_sys_entitlement VALUES ('ENT_COMMONS', '系统通用菜单', 'no-icon', '', 'RouteView', 'MO', 0, 1, 'ROOT', -1, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_C_USERINFO', '个人中心', 'no-icon', '/current/userinfo', 'CurrentUserInfo', 'MO', 0, 1, 'ENT_COMMONS', -1, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_C_USERINFO', '个人中心', 'no-icon', '/current/userinfo', 'CurrentUserInfo', 'MO', 0, 1, 'ENT_COMMONS', -1, 'AGENT', NOW(), NOW());
 
 INSERT INTO t_sys_entitlement VALUES ('ENT_C_MAIN', '主页', 'home', '/main', 'MainPage', 'ML', 0, 1, 'ROOT', 1, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_C_MAIN_PAY_TYPE_COUNT', '主页交易方式统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_C_MAIN', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_C_MAIN_PAY_COUNT', '主页交易统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_C_MAIN', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_C_MAIN_PAY_AMOUNT_WEEK', '主页周支付统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_C_MAIN', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_C_MAIN_NUMBER_COUNT', '主页数量总统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_C_MAIN', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_C_MAIN_PAY_TYPE_COUNT', '主页交易方式统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_C_MAIN', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_C_MAIN_PAY_COUNT', '主页交易统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_C_MAIN', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_C_MAIN_PAY_AMOUNT_WEEK', '主页周支付统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_C_MAIN', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_C_MAIN_NUMBER_COUNT', '主页数量总统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_C_MAIN', 0, 'AGENT', NOW(), NOW());
 
 -- 商户管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_MCH', '商户管理', 'shop', '', 'RouteView', 'ML', 0, 1, 'ROOT', 30, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO', '商户列表', 'profile', '/mch', 'MchListPage', 'ML', 0, 1, 'ENT_MCH', 10, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_LIST', '页面：商户列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_CONFIG', '应用配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO', '商户列表', 'profile', '/mch', 'MchListPage', 'ML', 0, 1, 'ENT_MCH', 10, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_LIST', '页面：商户列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_CONFIG', '应用配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
 
-	-- 应用管理
-	INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP', '应用列表', 'appstore', '/apps', 'MchAppPage', 'ML', 0, 1, 'ENT_MCH', 20, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_LIST', '页面：应用列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_PASSAGE_LIST', '应用支付通道配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_PASSAGE_CONFIG', '应用支付通道配置入口', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_PAY_PASSAGE_LIST', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_PASSAGE_ADD', '应用支付通道配置保存', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_PAY_PASSAGE_LIST', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_CONFIG_VIEW', '应用支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_CONFIG_LIST', '应用支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_CONFIG_ADD', '应用支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
+    -- 应用管理
+    INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP', '应用列表', 'appstore', '/apps', 'MchAppPage', 'ML', 0, 1, 'ENT_MCH', 20, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_LIST', '页面：应用列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_APP_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_PASSAGE_LIST', '应用支付通道配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_PASSAGE_CONFIG', '应用支付通道配置入口', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_PAY_PASSAGE_LIST', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_PASSAGE_ADD', '应用支付通道配置保存', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_PAY_PASSAGE_LIST', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_CONFIG_VIEW', '应用支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_CONFIG_LIST', '应用支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_APP', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_PAY_CONFIG_ADD', '应用支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
 
 -- 代理商管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1, 'ROOT', 35, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1, 'ENT_AGENT', 10, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
- 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_LIST', '代理商支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
- 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_VIEW', '代理商支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
- 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_ADD', '代理商支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1, 'ENT_AGENT', 10, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_LIST', '代理商支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_VIEW', '代理商支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_ADD', '代理商支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
 
 -- 账户中心
 INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_ACCOUNT_CENTER', '账户中心', 'wallet', '', 'RouteView', 'ML', 0, 1, 'ROOT', 5, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG', '费率配置', 'file-done', '/passageConfig', 'PayConfigPage', 'ML', 0, 1, 'ENT_AGENT_ACCOUNT_CENTER', 30, 'AGENT', NOW(), NOW());
- 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_LIST', '费率配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
- 		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_ADD', '费率配置保存', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG', '费率配置', 'file-done', '/passageConfig', 'PayConfigPage', 'ML', 0, 1, 'ENT_AGENT_ACCOUNT_CENTER', 30, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_LIST', '费率配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_ADD', '费率配置保存', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
 		
 -- -- 服务商管理
 -- INSERT INTO t_sys_entitlement VALUES ('ENT_ISV', '服务商管理', 'block', '', 'RouteView', 'ML', 0, 1, 'ROOT', 40, 'AGENT', NOW(), NOW());
--- 	INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO', '服务商列表', 'profile', '/isv', 'IsvListPage', 'ML', 0, 1, 'ENT_ISV', 10, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_VIEW', '服务商支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_LIST', '服务商支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_ADD', '服务商支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_LIST', '页面：服务商列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+--    INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO', '服务商列表', 'profile', '/isv', 'IsvListPage', 'ML', 0, 1, 'ENT_ISV', 10, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_VIEW', '服务商支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_LIST', '服务商支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_PAY_CONFIG_ADD', '服务商支付参数配置', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_PAY_CONFIG_LIST', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_LIST', '页面：服务商列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_ISV_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ISV_INFO', 0, 'AGENT', NOW(), NOW());
 
 -- 订单管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_ORDER', '订单管理', 'transaction', '', 'RouteView', 'ML', 0, 1, 'ROOT', 50, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_PAY_ORDER', '支付订单', 'account-book', '/pay', 'PayOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 10, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_ORDER_LIST', '页面：订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PAY_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PAY_ORDER_REFUND', '按钮：订单退款', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_PAY_ORDER_SEARCH_PAY_WAY', '筛选项：支付方式', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_REFUND_ORDER', '退款订单', 'exception', '/refund', 'RefundOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 20, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_REFUND_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_REFUND_ORDER', 0, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_REFUND_LIST', '页面：退款订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_REFUND_ORDER', 0, 'AGENT', NOW(), NOW());
--- 	INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 25, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_TRANSFER_ORDER', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_TRANSFER_ORDER', 0, 'AGENT', NOW(), NOW());
--- 	INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY', '商户通知', 'notification', '/notify', 'MchNotifyListPage', 'ML', 0, 1, 'ENT_ORDER', 30, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_NOTIFY_LIST', '页面：商户通知列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_RESEND', '按钮：重发通知', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_PAY_ORDER', '支付订单', 'account-book', '/pay', 'PayOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 10, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_ORDER_LIST', '页面：订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_PAY_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_PAY_ORDER_REFUND', '按钮：订单退款', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_PAY_ORDER_SEARCH_PAY_WAY', '筛选项：支付方式', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_REFUND_ORDER', '退款订单', 'exception', '/refund', 'RefundOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 20, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_REFUND_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_REFUND_ORDER', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_REFUND_LIST', '页面：退款订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_REFUND_ORDER', 0, 'AGENT', NOW(), NOW());
+--    INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 25, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_TRANSFER_ORDER', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_TRANSFER_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_TRANSFER_ORDER', 0, 'AGENT', NOW(), NOW());
+--    INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY', '商户通知', 'notification', '/notify', 'MchNotifyListPage', 'ML', 0, 1, 'ENT_ORDER', 30, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_NOTIFY_LIST', '页面：商户通知列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
+--        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_NOTIFY_RESEND', '按钮：重发通知', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_NOTIFY', 0, 'AGENT', NOW(), NOW());
 
 -- -- 支付配置菜单
 -- INSERT INTO t_sys_entitlement VALUES ('ENT_PC', '支付配置', 'file-done', '', 'RouteView', 'ML', 0, 1, 'ROOT', 60, 'AGENT', NOW(), NOW());
--- 	INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE', '支付接口', 'interaction', '/ifdefines', 'IfDefinePage', 'ML', 0, 1, 'ENT_PC', 10, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_LIST', '页面：支付接口定义列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
--- 	INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY', '支付方式', 'appstore', '/payways', 'PayWayPage', 'ML', 0, 1, 'ENT_PC', 20, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_LIST', '页面：支付方式列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+--     INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE', '支付接口', 'interaction', '/ifdefines', 'IfDefinePage', 'ML', 0, 1, 'ENT_PC', 10, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_LIST', '页面：支付接口定义列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_IF_DEFINE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_IF_DEFINE', 0, 'AGENT', NOW(), NOW());
+--     INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY', '支付方式', 'appstore', '/payways', 'PayWayPage', 'ML', 0, 1, 'ENT_PC', 20, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_LIST', '页面：支付方式列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_PC_WAY_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PC_WAY', 0, 'AGENT', NOW(), NOW());
 
 -- 系统管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_CONFIG', '系统管理', 'setting', '', 'RouteView', 'ML', 0, 1, 'ROOT', 200, 'AGENT', NOW(), NOW());
-	INSERT INTO t_sys_entitlement VALUES ('ENT_UR', '用户角色管理', 'team', '', 'RouteView', 'ML', 0, 1, 'ENT_SYS_CONFIG', 10, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER', '操作员管理', 'contacts', '/users', 'SysUserPage', 'ML', 0, 1, 'ENT_UR', 10, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_VIEW', '按钮： 详情', '', 'no-icon', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_UPD_ROLE', '按钮： 角色分配', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_SEARCH', '按钮：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_LIST', '页面：操作员列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_EDIT', '按钮： 修改基本信息', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_DELETE', '按钮： 删除操作员', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_ADD', '按钮：添加操作员', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_UR', '用户角色管理', 'team', '', 'RouteView', 'ML', 0, 1, 'ENT_SYS_CONFIG', 10, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER', '操作员管理', 'contacts', '/users', 'SysUserPage', 'ML', 0, 1, 'ENT_UR', 10, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_VIEW', '按钮： 详情', '', 'no-icon', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_UPD_ROLE', '按钮： 角色分配', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_SEARCH', '按钮：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_LIST', '页面：操作员列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_EDIT', '按钮： 修改基本信息', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_DELETE', '按钮： 删除操作员', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_ADD', '按钮：添加操作员', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
 
-		INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE', '角色管理', 'user', '/roles', 'RolePage', 'ML', 0, 1, 'ENT_UR', 20, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_EDIT', '按钮： 修改基本信息', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_DIST', '按钮： 分配权限', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_DEL', '按钮： 删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_ADD', '按钮：添加角色', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());		
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
-			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_LIST', '页面：角色列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE', '角色管理', 'user', '/roles', 'RolePage', 'ML', 0, 1, 'ENT_UR', 20, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_EDIT', '按钮： 修改基本信息', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_DIST', '按钮： 分配权限', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_DEL', '按钮： 删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_ADD', '按钮：添加角色', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());		
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_LIST', '页面：角色列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
 
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_ENT', '权限管理', 'apartment', '/ents', 'EntPage', 'ML', 0, 1, 'ENT_UR', 30, 'AGENT', NOW(), NOW());
--- 			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_ENT_LIST', '页面： 权限列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE_ENT', 0, 'AGENT', NOW(), NOW());
--- 			INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_ENT_EDIT', '按钮： 权限变更', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE_ENT', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_ENT', '权限管理', 'apartment', '/ents', 'EntPage', 'ML', 0, 1, 'ENT_UR', 30, 'AGENT', NOW(), NOW());
+--             INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_ENT_LIST', '页面： 权限列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE_ENT', 0, 'AGENT', NOW(), NOW());
+--             INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_ENT_EDIT', '按钮： 权限变更', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE_ENT', 0, 'AGENT', NOW(), NOW());
 
-	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_CONFIG', '系统配置', 'setting', '/config', 'AgentConfigPage', 'ML', 0, 1, 'ENT_SYS_CONFIG', 15, 'AGENT', NOW(), NOW());
-		INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_CONFIG_EDIT', '按钮： 修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_CONFIG', 0, 'AGENT', NOW(), NOW());
+--     INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_CONFIG', '系统配置', 'setting', '/config', 'AgentConfigPage', 'ML', 0, 1, 'ENT_SYS_CONFIG', 15, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_CONFIG_EDIT', '按钮： 修改', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_CONFIG', 0, 'AGENT', NOW(), NOW());
 
--- 	INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_LOG', '系统日志', 'file-text', '/log', 'SysLogPage', 'ML', 0, 1, 'ENT_SYS_CONFIG', 20, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_LOG_LIST', '页面：系统日志列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_SYS_LOG', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_LOG_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_SYS_LOG', 0, 'AGENT', NOW(), NOW());
--- 		INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_LOG_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_SYS_LOG', 0, 'AGENT', NOW(), NOW());
+--     INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_LOG', '系统日志', 'file-text', '/log', 'SysLogPage', 'ML', 0, 1, 'ENT_SYS_CONFIG', 20, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_LOG_LIST', '页面：系统日志列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_SYS_LOG', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_LOG_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_SYS_LOG', 0, 'AGENT', NOW(), NOW());
+--         INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_LOG_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_SYS_LOG', 0, 'AGENT', NOW(), NOW());
 
 #####  ↓↓↓↓↓↓↓↓↓↓  系统配置初始化DML  ↓↓↓↓↓↓↓↓↓↓  #####
 

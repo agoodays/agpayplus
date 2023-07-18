@@ -48,6 +48,13 @@ namespace AGooday.AgPay.Domain.Models
         public string IfParams { get; set; }
 
         /// <summary>
+        /// 结算周期（自然日）
+        /// </summary>
+        [Comment("结算周期（自然日）")]
+        [Required, Column("sett_hold_day", TypeName = "tinyint(6)")]
+        public byte SettHoldDay { get; set; }
+
+        /// <summary>
         /// 支付接口费率
         /// </summary>
         [Comment("支付接口费率")]

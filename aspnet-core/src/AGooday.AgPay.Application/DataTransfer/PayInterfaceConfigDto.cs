@@ -31,6 +31,11 @@
         public string IfParams { get; set; }
 
         /// <summary>
+        /// 结算周期（自然日）
+        /// </summary>
+        public byte SettHoldDay { get; set; }
+
+        /// <summary>
         /// 支付接口费率
         /// </summary>
         public decimal IfRate { get; set; }

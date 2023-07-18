@@ -51,6 +51,10 @@
             /// </summary>
             public const string ISV = "ISV";
             /// <summary>
+            /// 服务商oauth2
+            /// </summary>
+            public const string ISV_OAUTH2 = "ISV_OAUTH2";
+            /// <summary>
             /// 商户
             /// </summary>
             public const string MCH = "MCH";
@@ -58,6 +62,14 @@
             /// 商户应用
             /// </summary>
             public const string MCH_APP = "MCH_APP";
+            /// <summary>
+            /// 商户进件
+            /// </summary>
+            public const string MCH_APPLY = "MCH_APPLY";
+            /// <summary>
+            /// 商户应用oauth2
+            /// </summary>
+            public const string MCH_APP_OAUTH2 = "MCH_APP_OAUTH2";
             /// <summary>
             /// 代理商
             /// </summary>
