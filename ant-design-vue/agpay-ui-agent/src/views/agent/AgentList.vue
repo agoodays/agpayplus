@@ -67,7 +67,7 @@
 import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import AgPayConfigDrawer from '@/components/AgPayConfigDrawer/AgPayConfigDrawer'
+    import AgPayConfigDrawer from '@/components/AgPayConfig/AgPayConfigDrawer'
 import { API_URL_AGENT_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import InfoDetail from './Detail'

@@ -12,7 +12,7 @@
 
 <script>
 import store from '@/store'
-import AgPayConfigPanel from '@/components/AgPayConfigDrawer/AgPayConfigPanel'
+import AgPayConfigPanel from '@/components/AgPayConfig/AgPayConfigPanel'
 
 export default {
   name: 'PayConfigPage',
