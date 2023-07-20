@@ -62,6 +62,34 @@ namespace AGooday.AgPay.Domain.Models
         public decimal? IfRate { get; set; }
 
         /// <summary>
+        /// 是否开启进件: 0-关闭, 1-开启
+        /// </summary>
+        [Comment("是否开启进件: 0-关闭, 1-开启")]
+        [Required, Column("is_open_applyment", TypeName = "tinyint(6)")]
+        public byte IsOpenApplyment { get; set; }
+
+        /// <summary>
+        /// 是否开启提现: 0-关闭, 1-开启
+        /// </summary>
+        [Comment("是否开启提现: 0-关闭, 1-开启")]
+        [Required, Column("is_open_cashout", TypeName = "tinyint(6)")]
+        public byte IsOpenCashout { get; set; }
+
+        /// <summary>
+        /// 是否开启对账: 0-关闭, 1-开启
+        /// </summary>
+        [Comment("是否开启对账: 0-关闭, 1-开启")]
+        [Required, Column("is_open_check_bill", TypeName = "tinyint(6)")]
+        public byte IsOpenCheckBill { get; set; }
+
+        /// <summary>
+        /// 对账过滤子商户
+        /// </summary>
+        [Comment("对账过滤子商户")]
+        [Column("ignore_check_bill_mch_nos", TypeName = "varchar(4096)")]
+        public string IgnoreCheckBillMchNos { get; set; }
+
+        /// <summary>
         /// 状态: 0-停用, 1-启用
         /// </summary>
         [Comment("状态: 0-停用, 1-启用")]

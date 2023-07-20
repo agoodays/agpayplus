@@ -394,7 +394,12 @@ ALTER TABLE `t_pay_interface_define`
 ALTER TABLE `t_pay_interface_config`
   CHANGE `info_type` `info_type` VARCHAR(20) NOT NULL COMMENT '账号类型:ISV-服务商, ISV_OAUTH2-服务商oauth2, AGENT-代理商, MCH_APP-商户应用, MCH_APP_OAUTH2-商户应用oauth2',
 --   ADD COLUMN `config_mode` VARCHAR(20) NOT NULL COMMENT '配置模式: mgrIsv-服务商, mgrAgent-代理商, mgrMch-商户, agentSubagent-子代理商, agentMch-代理商商户, mchSelfApp1-小程序支付配置, mchSelfApp2-支付配置' AFTER `info_id`,
-  ADD COLUMN `sett_hold_day` TINYINT DEFAULT 0 NOT NULL COMMENT '结算周期（自然日）' AFTER `if_params`;
+  ADD COLUMN `sett_hold_day` TINYINT DEFAULT 0 NOT NULL COMMENT '结算周期（自然日）' AFTER `if_params`
+  ADD COLUMN `is_open_applyment` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启进件: 0-关闭, 1-开启' AFTER `if_rate`,
+  ADD COLUMN `is_open_cashout` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启提现: 0-关闭, 1-开启' AFTER `is_open_applyment`,
+  ADD COLUMN `is_open_check_bill` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启对账: 0-关闭, 1-开启' AFTER `is_open_cashout`,
+  ADD COLUMN `ignore_check_bill_mch_nos` VARCHAR(4096) NULL COMMENT '对账过滤子商户' AFTER `is_open_check_bill`;
+  ;
 
 -- ALTER TABLE `t_pay_way`   
 --   ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他' AFTER `way_name`;

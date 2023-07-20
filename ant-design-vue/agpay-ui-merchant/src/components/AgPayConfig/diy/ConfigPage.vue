@@ -70,15 +70,19 @@ export default {
         infoId: this.infoId,
         infoType: this.infoType,
         ifCode: this.ifDefine.ifCode,
-        state: this.ifDefine.ifConfigState === 0 ? 0 : 1
+        state: this.ifDefine.ifConfigState === 0 ? 0 : 1,
+        ifRate: null,
+        settHoldDay: null,
+        isOpenApplyment: 0,
+        isOpenCashout: 0,
+        isOpenCheckBill: 0,
+        ignoreCheckBillMchNos: null,
+        isSupportApplyment: this.ifDefine.isSupportApplyment === 1 ? 1 : 0,
+        isSupportCashout: this.ifDefine.isSupportCashout === 1 ? 1 : 0,
+        isSupportCheckBill: this.ifDefine.isSupportCheckBill === 1 ? 1 : 0
       }, // 保存的对象
       ifDefineArray: {}, // 支付接口定义描述
       ifParams: {}, // 参数配置对象
-      rules: {
-        infoId: [{ required: true, trigger: 'blur' }],
-        ifCode: [{ required: true, trigger: 'blur' }],
-        ifRate: [{ required: false, pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/, message: '请输入0-100之间的数字，最多四位小数', trigger: 'blur' }]
-      },
       ifParamsRules: {}
     }
   },
@@ -97,7 +101,7 @@ export default {
 
         const newItems = [] // 重新加载支付接口配置定义描述json
         const params = that.ifDefine.mchType ? (
-            this.ifDefine.mchType === 1 ? that.ifDefine.normalMchParams : that.ifDefine.isvsubMchParams // 根据商户类型获取接口定义描述
+            that.ifDefine.mchType === 1 ? that.ifDefine.normalMchParams : that.ifDefine.isvsubMchParams // 根据商户类型获取接口定义描述
         ) : that.ifDefine.isvParams
         JSON.parse(params || '[]').forEach(item => {
           const radioItems = [] // 存放单选框value title
@@ -195,6 +199,11 @@ export default {
         ifCode: this.saveObject.ifCode,
         ifRate: this.saveObject.ifRate,
         state: this.saveObject.state,
+        settHoldDay: this.saveObject.settHoldDay,
+        isOpenApplyment: this.saveObject.isOpenApplyment,
+        isOpenCashout: this.saveObject.isOpenCashout,
+        isOpenCheckBill: this.saveObject.isOpenCheckBill,
+        ignoreCheckBillMchNos: this.saveObject.ignoreCheckBillMchNos,
         remark: this.saveObject.remark,
         ifParams: ifParams
       }

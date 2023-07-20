@@ -41,6 +41,26 @@
         public decimal IfRate { get; set; }
 
         /// <summary>
+        /// 是否开启进件: 0-关闭, 1-开启
+        /// </summary>
+        public byte IsOpenApplyment { get; set; }
+
+        /// <summary>
+        /// 是否开启提现: 0-关闭, 1-开启
+        /// </summary>
+        public byte IsOpenCashout { get; set; }
+
+        /// <summary>
+        /// 是否开启对账: 0-关闭, 1-开启
+        /// </summary>
+        public byte IsOpenCheckBill { get; set; }
+
+        /// <summary>
+        /// 对账过滤子商户
+        /// </summary>
+        public string IgnoreCheckBillMchNos { get; set; }
+
+        /// <summary>
         /// 状态: 0-停用, 1-启用
         /// </summary>
         public byte State { get; set; }

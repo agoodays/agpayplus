@@ -149,7 +149,16 @@ export default {
         infoId: this.infoId,
         infoType: this.infoType,
         ifCode: this.ifDefine.ifCode,
-        state: this.ifDefine.ifConfigState === 0 ? 0 : 1
+        state: this.ifDefine.ifConfigState === 0 ? 0 : 1,
+        ifRate: null,
+        settHoldDay: null,
+        isOpenApplyment: 0,
+        isOpenCashout: 0,
+        isOpenCheckBill: 0,
+        ignoreCheckBillMchNos: null,
+        isSupportApplyment: this.ifDefine.isSupportApplyment === 1 ? 1 : 0,
+        isSupportCashout: this.ifDefine.isSupportCashout === 1 ? 1 : 0,
+        isSupportCheckBill: this.ifDefine.isSupportCheckBill === 1 ? 1 : 0
       }, // 保存的对象
       ifParams: {
         apiVersion: 'V2',
@@ -162,9 +171,6 @@ export default {
         serialNo: '',
         serialNo_ph: '请输入'
       }, // 参数配置对象，数据初始化
-      rules: {
-        // ifRate: [{ required: false, pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/, message: '请输入0-100之间的数字，最多四位小数', trigger: 'blur' }]
-      },
       ifParamsRules: {
         mchId: [{ trigger: 'blur',
           validator: (rule, value, callback) => {
@@ -308,6 +314,11 @@ export default {
         ifCode: this.saveObject.ifCode,
         // ifRate: this.saveObject.ifRate,
         state: this.saveObject.state,
+        settHoldDay: this.saveObject.settHoldDay,
+        isOpenApplyment: this.saveObject.isOpenApplyment,
+        isOpenCashout: this.saveObject.isOpenCashout,
+        isOpenCheckBill: this.saveObject.isOpenCheckBill,
+        ignoreCheckBillMchNos: this.saveObject.ignoreCheckBillMchNos,
         remark: this.saveObject.remark,
         ifParams: ifParams
       }

@@ -150,7 +150,7 @@
             /// </summary>
             public const string AGENT_MCH = "agentMch";
             /// <summary>
-            /// 代理商系统-Self
+            /// 代理商系统-Self[自身]
             /// </summary>
             public const string AGENT_SELF = "agentSelf";
             /// <summary>
@@ -158,11 +158,11 @@
             /// </summary>
             public const string AGENT_APPLYMENT = "agentApplyment";
             /// <summary>
-            /// 商户系统-SelfApp1
+            /// 商户系统-SelfApp1[自身应用(普通商户)]
             /// </summary>
             public const string MCH_SELF_APP1 = "mchSelfApp1";
             /// <summary>
-            /// 商户系统-SelfApp2
+            /// 商户系统-SelfApp2[自身应用(特约商户)]
             /// </summary>
             public const string MCH_SELF_APP2 = "mchSelfApp2";
             /// <summary>

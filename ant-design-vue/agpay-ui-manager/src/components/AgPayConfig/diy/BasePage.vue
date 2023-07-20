@@ -1,7 +1,7 @@
 <template>
   <a-form-model ref="infoFormModel" :model="formData" layout="vertical" :rules="rules">
-    <a-row :gutter="16">
-      <a-col :span="12" v-if="formData.infoType === 'ISV'">
+    <a-row :gutter="24">
+<!--      <a-col :span="8" v-if="formData.infoType === 'ISV'">
         <a-form-model-item label="支付接口费率" prop="ifRate">
           <a-input
             v-model="formData.ifRate"
@@ -13,8 +13,8 @@
             addon-after="%"
             placeholder="请输入"/>
         </a-form-model-item>
-      </a-col>
-      <a-col :span="12">
+      </a-col>-->
+      <a-col :span="8">
         <a-form-model-item label="状态" prop="state">
           <a-radio-group v-model="formData.state" @change="updateFormData('state', $event.target.value)">
             <a-radio :value="1">
@@ -26,6 +26,68 @@
           </a-radio-group>
         </a-form-model-item>
       </a-col>
+      <a-col :span="8" v-if="formData.isSupportApplyment">
+        <a-form-model-item label="是否开启进件" prop="isOpenApplyment">
+          <a-radio-group v-model="formData.isOpenApplyment" @change="updateFormData('isOpenApplyment', $event.target.value)">
+            <a-radio :value="1">
+              开启
+            </a-radio>
+            <a-radio :value="0">
+              关闭
+            </a-radio>
+          </a-radio-group>
+        </a-form-model-item>
+      </a-col>
+      <a-col :span="8">
+        <a-form-model-item label="结算周期（自然日）" prop="settHoldDay">
+          <a-input-number v-model="formData.settHoldDay" style="width: 100%"/>
+          <p class="agpay-tip-text">设置为 0 表示实时结算；设置为 -1 不计算分润</p>
+        </a-form-model-item>
+      </a-col>
+    </a-row>
+    <a-row :gutter="24">
+      <a-col :span="8" v-if="formData.isSupportCashout">
+        <a-form-model-item label="是否开启提现" prop="isOpenCashout">
+          <a-radio-group v-model="formData.isOpenCashout" @change="updateFormData('isOpenCashout', $event.target.value)">
+            <a-radio :value="1">
+              开启
+            </a-radio>
+            <a-radio :value="0">
+              关闭
+            </a-radio>
+          </a-radio-group>
+        </a-form-model-item>
+      </a-col>
+      <a-col :span="8" v-if="formData.isSupportCheckBill">
+        <a-form-model-item label="是否开启对账" prop="isOpenCheckBill">
+          <a-radio-group v-model="formData.isOpenCheckBill" @change="updateFormData('isOpenCheckBill', $event.target.value)">
+            <a-radio :value="1">
+              开启
+            </a-radio>
+            <a-radio :value="0">
+              关闭
+            </a-radio>
+          </a-radio-group>
+        </a-form-model-item>
+      </a-col>
+      <a-col :span="24" v-if="formData.isOpenCheckBill">
+        <a-form-model-item prop="ignoreCheckBillMchNos">
+          <template slot="label">
+            <div>
+              <label title="对账过滤子商户" style="margin-right: 4px">对账过滤子商户</label>
+              <a-tooltip placement="top">
+                <template #title>
+                  <span>填写不执行对账的渠道子商户号<br/>多个以英文逗号隔开<br/>为空表示下属子商户全部执行对账</span>
+                </template>
+                <a-icon type="question-circle" />
+              </a-tooltip>
+            </div>
+          </template>
+          <a-input v-model="formData.ignoreCheckBillMchNos" @input="updateFormData('ignoreCheckBillMchNos', $event.target.value)" placeholder="请输入" type="textarea" />
+        </a-form-model-item>
+      </a-col>
+    </a-row>
+    <a-row :gutter="24">
       <a-col :span="24">
         <a-form-model-item label="备注" prop="remark">
           <a-input v-model="formData.remark" @input="updateFormData('remark', $event.target.value)" placeholder="请输入" type="textarea" />
@@ -47,7 +109,11 @@ export default {
         infoId: [{ required: true, trigger: 'blur' }],
         ifCode: [{ required: true, trigger: 'blur' }],
         state: [{ required: true, trigger: 'blur', message: '请选择状态' }],
-        ifRate: [{ required: false, pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/, message: '请输入0-100之间的数字，最多四位小数', trigger: 'blur' }]
+        settHoldDay: [{ required: true, trigger: 'blur', message: '请输入结算周期' }],
+        isOpenApplyment: [{ required: this.formData.isSupportApplyment, trigger: 'blur', message: '请选择是否开启进件' }],
+        isOpenCashout: [{ required: this.formData.isSupportCashout, trigger: 'blur', message: '请选择是否开启提现' }],
+        isOpenCheckBill: [{ required: this.formData.isSupportCheckBill, trigger: 'blur', message: '请选择是否开启对账' }],
+        ifRate: [{ required: true, pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/, message: '请输入0-100之间的数字，最多四位小数', trigger: 'blur' }]
       }
     }
   },
@@ -68,6 +134,26 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="less" scoped>
+  .agpay-tip-text:before {
+    content: "";
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-bottom-color: #ffeed8;
+    position: absolute;
+    top: -20px;
+    left: 30px;
+  }
+  .agpay-tip-text {
+    font-size: 10px !important;
+    border-radius: 5px;
+    background: #ffeed8;
+    color: #c57000 !important;
+    padding: 5px 10px;
+    display: inline-block;
+    max-width: 100%;
+    position: relative;
+    margin-top: 15px;
+  }
 </style>
