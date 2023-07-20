@@ -11,6 +11,7 @@ using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 {
@@ -26,6 +27,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
+        private readonly IPayInterfaceDefineService _payIfDefineService;
 
         public PayInterfaceConfigController(IMQSender mqSender,
             IMchAppService mchAppService,
@@ -35,7 +37,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             RedisUtil client,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
+            ISysUserRoleRelaService sysUserRoleRelaService,
+            IPayInterfaceDefineService payIfDefineService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             this.mqSender = mqSender;
@@ -43,6 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             _payIfConfigService = payIfConfigService;
             _mchInfoService = mchInfoService;
             _mchAppService = mchAppService;
+            _payIfDefineService = payIfDefineService;
         }
 
         /// <summary>
@@ -74,6 +78,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         {
             string infoType = GetInfoType(configMode);
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
+            var payIfDefine = _payIfDefineService.GetById(ifCode);
+            var result = new JObject();
             if (payInterfaceConfig != null)
             {
                 switch (infoType)
@@ -112,6 +118,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                         }
                         break;
                 }
+                result = JObject.FromObject(payInterfaceConfig);
+                result["isSupportApplyment"] = payIfDefine.IsSupportApplyment;
+                result["isSupportCheckBill"] = payIfDefine.IsSupportCheckBill;
+                result["isSupportCashout"] = payIfDefine.IsSupportCashout;
             }
             return ApiRes.Ok(payInterfaceConfig);
         }
