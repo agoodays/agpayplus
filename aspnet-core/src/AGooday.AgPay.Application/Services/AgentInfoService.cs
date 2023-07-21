@@ -115,6 +115,13 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<AgentInfoDto>>(agentInfos);
         }
 
+        public IEnumerable<AgentInfoDto> GetParents(string agentNo)
+        {
+            var agentInfos = _agentInfoRepository.GetAll();
+            var source = GetParents(agentInfos.AsNoTracking(), agentNo);
+            return _mapper.Map<IEnumerable<AgentInfoDto>>(source);
+        }
+
         public PaginatedList<AgentInfoDto> GetPaginatedData(AgentInfoQueryDto dto)
         {
             IOrderedQueryable<AgentInfo> agentInfos = GetAgentInfos(dto);
@@ -171,6 +178,11 @@ namespace AGooday.AgPay.Application.Services
         {
             var query = list.Where(p => p.AgentNo == Id).ToList();
             return query.ToList().Concat(query.ToList().SelectMany(t => GetFatherList(list, t.Pid)));
+        }
+        private IEnumerable<AgentInfo> GetParents(IQueryable<AgentInfo> list, string agentNo)
+        {
+            var query = list.Where(p => p.AgentNo.Equals(agentNo));
+            return query.Concat(query.SelectMany(t => GetParents(list, t.Pid)));
         }
         #endregion
     }

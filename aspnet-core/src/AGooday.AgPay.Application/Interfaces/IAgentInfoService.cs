@@ -15,6 +15,7 @@ namespace AGooday.AgPay.Application.Interfaces
         AgentInfoDto GetById(string recordId);
         AgentInfoDetailDto GetByAgentNo(string agentNo);
         IEnumerable<AgentInfoDto> GetAll();
+        IEnumerable<AgentInfoDto> GetParents(string agentNo);
         PaginatedList<AgentInfoDto> GetPaginatedData(AgentInfoQueryDto dto);
         PaginatedList<AgentInfoDto> GetPaginatedData(string agentNo, AgentInfoQueryDto dto);
     }

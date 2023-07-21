@@ -115,6 +115,14 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<PayInterfaceConfigDto>(payInterfaceConfig);
         }
 
+        public IEnumerable<PayInterfaceConfigDto> GetByInfoIdAndIfCodes(string infoType, List<string> infoIds, string ifCode)
+        {
+            // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
+            var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().AsNoTracking().Where(w => infoIds.Contains(w.InfoId)
+            && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode));
+            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfig);
+        }
+
         /// <summary>
         /// 根据 账户类型、账户号 获取支付参数配置
         /// </summary>

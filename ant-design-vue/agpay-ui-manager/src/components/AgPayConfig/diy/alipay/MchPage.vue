@@ -225,9 +225,9 @@ export default {
       // 获取支付参数
       const params = Object.assign({}, { configMode: that.configMode, infoId: that.saveObject.infoId, ifCode: that.saveObject.ifCode })
       req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(res => {
-        if (res && res.ifParams) {
+        if (res) {
           that.saveObject = res
-          that.ifParams = JSON.parse(res.ifParams)
+          that.ifParams = JSON.parse(res.ifParams || '{}')
 
           that.ifParams.privateKey_ph = that.ifParams.privateKey
           that.ifParams.privateKey = ''
@@ -267,7 +267,7 @@ export default {
         }
       })
     },
-    submitRequest (ifParams = '') {
+    submitRequest (ifParams = '{}') {
       const that = this
       that.btnLoading = true
       const reqParams = {
@@ -296,6 +296,8 @@ export default {
         that.visible = false
         that.btnLoading = false
         that.callbackFunc()
+      }).catch(res => {
+        that.btnLoading = false
       })
     },
     // 脱敏数据为空时，删除对应key

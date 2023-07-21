@@ -94,9 +94,9 @@ export default {
       const that = this
       const params = Object.assign({}, { configMode: that.configMode, infoId: that.saveObject.infoId, ifCode: that.saveObject.ifCode })
       req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(res => {
-        if (res && res.ifParams) {
-          this.saveObject = res
-          this.ifParams = JSON.parse(res.ifParams || '{}')
+        if (res) {
+          that.saveObject = res
+          that.ifParams = JSON.parse(res.ifParams || '{}')
         }
 
         const newItems = [] // 重新加载支付接口配置定义描述json
@@ -190,7 +190,7 @@ export default {
         }
       })
     },
-    submitRequest (ifParams = '') {
+    submitRequest (ifParams = '{}') {
       const that = this
       that.btnLoading = true
       const reqParams = {
@@ -219,6 +219,8 @@ export default {
         that.visible = false
         that.btnLoading = false
         that.callbackFunc()
+      }).catch(res => {
+        that.btnLoading = false
       })
     },
     handleUpdateFormData (formData) {

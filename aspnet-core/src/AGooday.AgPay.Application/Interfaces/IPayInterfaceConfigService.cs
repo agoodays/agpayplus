@@ -29,6 +29,7 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="ifCode">接口类型</param>
         /// <returns></returns>
         PayInterfaceConfigDto GetByInfoIdAndIfCode(string infoType, string infoId, string ifCode);
+        IEnumerable<PayInterfaceConfigDto> GetByInfoIdAndIfCodes(string infoType, List<string> infoIds, string ifCode);
         IEnumerable<PayInterfaceConfigDto> GetByInfoId(string infoType, string infoId);
         /// <summary>
         /// 查询商户app使用已正确配置了通道信息

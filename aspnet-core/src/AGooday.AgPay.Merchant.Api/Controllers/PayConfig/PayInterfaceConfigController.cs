@@ -26,26 +26,29 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         private readonly ILogger<PayInterfaceConfigController> _logger;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
+        private readonly IAgentInfoService _agentInfoService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IPayInterfaceDefineService _payIfDefineService;
 
         public PayInterfaceConfigController(IMQSender mqSender,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
+            IAgentInfoService agentInfoService,
+            IPayInterfaceDefineService payIfDefineService,
             IPayInterfaceConfigService payIfConfigService,
             ILogger<PayInterfaceConfigController> logger,
             RedisUtil client,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
-            IPayInterfaceDefineService payIfDefineService)
+            ISysUserRoleRelaService sysUserRoleRelaService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             this.mqSender = mqSender;
             _logger = logger;
-            _payIfConfigService = payIfConfigService;
-            _mchInfoService = mchInfoService;
             _mchAppService = mchAppService;
+            _mchInfoService = mchInfoService;
+            _agentInfoService = agentInfoService;
+            _payIfConfigService = payIfConfigService;
             _payIfDefineService = payIfDefineService;
         }
 
@@ -79,14 +82,18 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
             string infoType = GetInfoType(configMode);
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
             var payIfDefine = _payIfDefineService.GetById(ifCode);
-            var result = new JObject();
+            JObject result = null;
             if (payInterfaceConfig != null)
             {
+                // 费率转换为百分比数值
+                payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
+                result = JObject.FromObject(payInterfaceConfig);
+                List<byte> isSupportApplyments = new List<byte>() { payIfDefine.IsSupportApplyment };
+                List<byte> isSupportCheckBills = new List<byte>() { payIfDefine.IsSupportCheckBill };
+                List<byte> isSupportCashouts = new List<byte>() { payIfDefine.IsSupportCashout };
                 switch (infoType)
                 {
                     case CS.INFO_TYPE.ISV:
-                        // 费率转换为百分比数值
-                        payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
                         if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
                         {
                             var isvParams = IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
@@ -96,16 +103,50 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                             }
                         }
                         break;
+                    case CS.INFO_TYPE.AGENT:
+                        var agentInfo = _agentInfoService.GetById(infoId);
+                        var isvPayInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, agentInfo.IsvNo, ifCode);
+                        isSupportApplyments.Add(isvPayInterfaceConfig.IsOpenApplyment);
+                        isSupportCheckBills.Add(isvPayInterfaceConfig.IsOpenCheckBill);
+                        isSupportCashouts.Add(isvPayInterfaceConfig.IsOpenCashout);
+                        if (!string.IsNullOrEmpty(agentInfo.Pid))
+                        {
+                            var parentAgents = _agentInfoService.GetParents(agentInfo.Pid);
+                            var agentNos = parentAgents.Select(o => o.AgentNo).ToList();
+                            var agentPayInterfaceConfigs = _payIfConfigService.GetByInfoIdAndIfCodes(CS.INFO_TYPE.AGENT, agentNos, ifCode);
+                            foreach (var item in agentPayInterfaceConfigs)
+                            {
+                                isSupportApplyments.Add(item.IsOpenApplyment);
+                                isSupportCheckBills.Add(item.IsOpenCheckBill);
+                                isSupportCashouts.Add(item.IsOpenCashout);
+                            }
+                        }
+                        break;
                     case CS.INFO_TYPE.MCH_APP:
-                        // 费率转换为百分比数值
-                        payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
-
+                        var mchApp = _mchAppService.GetById(infoId);
+                        var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+                        if (!string.IsNullOrEmpty(mchInfo.IsvNo))
+                        {
+                            var mchIsvPayInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, mchInfo.IsvNo, ifCode);
+                            isSupportApplyments.Add(mchIsvPayInterfaceConfig.IsOpenApplyment);
+                            isSupportCheckBills.Add(mchIsvPayInterfaceConfig.IsOpenCheckBill);
+                            isSupportCashouts.Add(mchIsvPayInterfaceConfig.IsOpenCashout);
+                            if (!string.IsNullOrEmpty(mchInfo.AgentNo))
+                            {
+                                var mchParentAgents = _agentInfoService.GetParents(mchInfo.AgentNo);
+                                var agentNos = mchParentAgents.Select(o => o.AgentNo).ToList();
+                                var agentPayInterfaceConfigs = _payIfConfigService.GetByInfoIdAndIfCodes(CS.INFO_TYPE.AGENT, agentNos, ifCode);
+                                foreach (var item in agentPayInterfaceConfigs)
+                                {
+                                    isSupportApplyments.Add(item.IsOpenApplyment);
+                                    isSupportCheckBills.Add(item.IsOpenCheckBill);
+                                    isSupportCashouts.Add(item.IsOpenCashout);
+                                }
+                            }
+                        }
                         // 敏感数据脱敏
                         if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
                         {
-                            var mchApp = _mchAppService.GetById(infoId);
-                            var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
-
                             // 普通商户的支付参数执行数据脱敏
                             if (mchInfo.Type == CS.MCH_TYPE_NORMAL)
                             {
@@ -118,10 +159,15 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                         }
                         break;
                 }
-                result = JObject.FromObject(payInterfaceConfig);
-                result["isSupportApplyment"] = payIfDefine.IsSupportApplyment;
-                result["isSupportCheckBill"] = payIfDefine.IsSupportCheckBill;
-                result["isSupportCashout"] = payIfDefine.IsSupportCashout;
+                bool isSupportApplyment = isSupportApplyments.Any(a => a == CS.NO);
+                bool isSupportCheckBill = isSupportCheckBills.Any(a => a == CS.NO);
+                bool isSupportCashout = isSupportCashouts.Any(a => a == CS.NO);
+                payInterfaceConfig.IsOpenApplyment = isSupportApplyment ? CS.NO : payInterfaceConfig.IsOpenApplyment;
+                payInterfaceConfig.IsOpenCheckBill = isSupportCheckBill ? CS.NO : payInterfaceConfig.IsOpenCheckBill;
+                payInterfaceConfig.IsOpenCashout = isSupportApplyment ? CS.NO : payInterfaceConfig.IsOpenCashout;
+                result["isSupportApplyment"] = isSupportApplyment ? CS.NO : CS.YES;
+                result["isSupportCheckBill"] = isSupportCheckBill ? CS.NO : CS.YES;
+                result["isSupportCashout"] = isSupportCashout ? CS.NO : CS.YES;
             }
             return ApiRes.Ok(result);
         }
