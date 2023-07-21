@@ -33,7 +33,7 @@
         /// <summary>
         /// 结算周期（自然日）
         /// </summary>
-        public byte SettHoldDay { get; set; }
+        public byte? SettHoldDay { get; set; }
 
         /// <summary>
         /// 支付接口费率
@@ -83,7 +83,7 @@
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// 更新者用户ID
@@ -98,7 +98,7 @@
         /// <summary>
         /// 更新时间
         /// </summary>
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
