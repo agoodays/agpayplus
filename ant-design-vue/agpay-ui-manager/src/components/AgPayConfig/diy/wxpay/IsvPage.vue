@@ -141,6 +141,14 @@ export default {
         settHoldDay: null,
         isOpenApplyment: 0,
         isOpenCashout: 0,
+        cashoutParams: {
+          isOpenMchOrderCashout: 0,
+          isOpenMchTaskCashout: 0,
+          minCashoutAmount: null,
+          maxCashoutAmount: null,
+          startTime: null,
+          endTime: null
+        },
         isOpenCheckBill: 0,
         ignoreCheckBillMchNos: null,
         isSupportApplyment: this.ifDefine.isSupportApplyment === 1 ? 1 : 0,
@@ -225,6 +233,7 @@ export default {
       req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(res => {
         if (res) {
           that.saveObject = res
+          that.saveObject.cashoutParams = JSON.parse(res.cashoutParams || '{}')
           that.ifParams = JSON.parse(res.ifParams || '{}')
 
           that.ifParams.appSecret_ph = that.ifParams.appSecret
@@ -285,6 +294,7 @@ export default {
         settHoldDay: this.saveObject.settHoldDay,
         isOpenApplyment: this.saveObject.isOpenApplyment,
         isOpenCashout: this.saveObject.isOpenCashout,
+        cashoutParams: JSON.stringify(this.saveObject.cashoutParams),
         isOpenCheckBill: this.saveObject.isOpenCheckBill,
         ignoreCheckBillMchNos: this.saveObject.ignoreCheckBillMchNos,
         remark: this.saveObject.remark,
