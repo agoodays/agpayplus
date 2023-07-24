@@ -5,7 +5,6 @@ using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -118,7 +117,7 @@ namespace AGooday.AgPay.Application.Services
         public IEnumerable<AgentInfoDto> GetParents(string agentNo)
         {
             var agentInfos = _agentInfoRepository.GetAll();
-            var source = GetParents(agentInfos.AsNoTracking(), agentNo);
+            var source = GetParents(agentInfos.ToList(), agentNo);
             return _mapper.Map<IEnumerable<AgentInfoDto>>(source);
         }
 
@@ -179,7 +178,7 @@ namespace AGooday.AgPay.Application.Services
             var query = list.Where(p => p.AgentNo == Id).ToList();
             return query.ToList().Concat(query.ToList().SelectMany(t => GetFatherList(list, t.Pid)));
         }
-        private IEnumerable<AgentInfo> GetParents(IQueryable<AgentInfo> list, string agentNo)
+        private IEnumerable<AgentInfo> GetParents(IEnumerable<AgentInfo> list, string agentNo)
         {
             var query = list.Where(p => p.AgentNo.Equals(agentNo));
             return query.Concat(query.SelectMany(t => GetParents(list, t.Pid)));
