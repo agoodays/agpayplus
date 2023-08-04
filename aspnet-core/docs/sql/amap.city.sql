@@ -1,13 +1,13 @@
+DROP TABLE IF EXISTS `t_amap_city`;
 CREATE TABLE `t_amap_city` 
 (
   `code` VARCHAR(16) NOT NULL DEFAULT '' COMMENT '城市代码',
   `name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '城市名称',
   `level` VARCHAR(16) NOT NULL DEFAULT '' COMMENT '级别',
-  `lng` VARCHAR(16) NOT NULL DEFAULT '' COMMENT '级别',
-  `lat` VARCHAR(16) NOT NULL DEFAULT '' COMMENT '级别',
+  `lng` VARCHAR(16) NOT NULL DEFAULT '' COMMENT '经度',
+  `lat` VARCHAR(16) NOT NULL DEFAULT '' COMMENT '纬度',
   `city_code` VARCHAR(16) NOT NULL DEFAULT '' COMMENT '区号',
-  `parent_code` VARCHAR(16) NOT NULL DEFAULT '' COMMENT '上级城市代码',
-  PRIMARY KEY (`store_id`)
+  `parent_code` VARCHAR(16) NOT NULL DEFAULT '' COMMENT '上级城市代码'
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='高德地图城市编码';
 
 INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `parent_code`) VALUES ('100000', '中华人民共和国', 'country', '116.368324', '39.915085', '', '');
@@ -3612,7 +3612,7 @@ INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `
 -- INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `parent_code`) VALUES ('659006', '博古其镇', 'street', '85.584894', '41.882542', '1996', '659006');
 -- INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `parent_code`) VALUES ('659006', '双丰镇', 'street', '85.635217', '41.880304', '1996', '659006');
 INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `parent_code`) VALUES ('659007', '双河市', 'city', '82.353656', '44.840524', '1909', '650000');
-INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `parent_code`) VALUES ('659007', '兵团八十九团', 'street', '82.455805', '44.812134', '1909', '659007');
+-- INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `parent_code`) VALUES ('659007', '兵团八十九团', 'street', '82.455805', '44.812134', '1909', '659007');
 -- INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `parent_code`) VALUES ('659007', '博河镇', 'street', '82.158974', '44.79635', '1909', '659007');
 -- INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `parent_code`) VALUES ('659007', '双桥镇', 'street', '82.490803', '44.746864', '1909', '659007');
 -- INSERT INTO `t_amap_city` (`code`, `name`, `level`, `lng`, `lat`, `city_code`, `parent_code`) VALUES ('659007', '石峪镇', 'street', '82.066675', '45.04083', '1909', '659007');
