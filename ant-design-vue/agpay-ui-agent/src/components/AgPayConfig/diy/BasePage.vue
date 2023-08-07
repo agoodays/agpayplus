@@ -26,7 +26,7 @@
           </a-radio-group>
         </a-form-model-item>
       </a-col>
-      <a-col :span="8" v-if="formData.isSupportApplyment">
+      <a-col :span="8" v-if="formData.isSupportApplyment && formData.infoType!=='MCH_APP'">
         <a-form-model-item label="是否开启进件" prop="isOpenApplyment">
           <a-radio-group v-model="formData.isOpenApplyment" @change="updateFormData('isOpenApplyment', $event.target.value)">
             <a-radio :value="1">
@@ -38,14 +38,54 @@
           </a-radio-group>
         </a-form-model-item>
       </a-col>
-      <a-col :span="8">
+      <a-col :span="8" v-if="formData.infoType==='ISV'">
         <a-form-model-item label="结算周期（自然日）" prop="settHoldDay">
           <a-input-number v-model="formData.settHoldDay" style="width: 100%"/>
           <p class="agpay-tip-text">设置为 0 表示实时结算；设置为 -1 不计算分润</p>
         </a-form-model-item>
       </a-col>
     </a-row>
-    <a-row :gutter="24">
+    <a-row :gutter="24" v-if="formData.infoType==='MCH_APP' && !!formData.isSupportCashout">
+      <a-col :span="6">
+        <a-form-model-item label="自动提现（支付成功立刻提现）" prop="cashoutParams.isOpenMchOrderCashout">
+          <a-radio-group v-model="formData.cashoutParams.isOpenMchOrderCashout" @change="updateFormDataCashoutParams('isOpenMchOrderCashout', $event.target.value)">
+            <a-radio :value="1">
+              开启
+            </a-radio>
+            <a-radio :value="0">
+              关闭
+            </a-radio>
+          </a-radio-group>
+        </a-form-model-item>
+      </a-col>
+      <a-col :span="6">
+        <a-form-model-item label="自动提现（定时任务）" prop="cashoutParams.isOpenMchTaskCashout">
+          <a-radio-group v-model="formData.cashoutParams.isOpenMchTaskCashout" @change="updateFormDataCashoutParams('isOpenMchTaskCashout', $event.target.value)">
+            <a-radio :value="1">
+              开启
+            </a-radio>
+            <a-radio :value="0">
+              关闭
+            </a-radio>
+          </a-radio-group>
+        </a-form-model-item>
+      </a-col>
+      <a-col :span="6">
+        <a-form-model-item label="提现起止金额（元）" prop="minCashoutAmount">
+          <a-input-number :min="0" v-model="formData.cashoutParams.minCashoutAmount" @change="updateFormDataCashoutParams('minCashoutAmount', $event)"/>
+          <span>~</span>
+          <a-input-number :min="0" v-model="formData.cashoutParams.maxCashoutAmount" @change="updateFormDataCashoutParams('maxCashoutAmount', $event)"/>
+        </a-form-model-item>
+      </a-col>
+      <a-col :span="6">
+        <a-form-model-item label="提现起止时间" prop="minCashoutAmount">
+          <a-time-picker valueFormat="HH:mm:ss" v-model="formData.cashoutParams.startTime" @change="updateFormDataCashoutParams('startTime', $event)"/>
+          <span>~</span>
+          <a-time-picker valueFormat="HH:mm:ss" v-model="formData.cashoutParams.endTime" @change="updateFormDataCashoutParams('endTime', $event)"/>
+        </a-form-model-item>
+      </a-col>
+    </a-row>
+    <a-row :gutter="24" v-if="formData.infoType!=='MCH_APP'">
       <a-col :span="8" v-if="formData.isSupportCashout">
         <a-form-model-item label="是否开启提现" prop="isOpenCashout">
           <a-radio-group v-model="formData.isOpenCashout" @change="updateFormData('isOpenCashout', $event.target.value)">
@@ -113,6 +153,8 @@ export default {
         isOpenApplyment: [{ required: this.formData.isSupportApplyment, trigger: 'blur', message: '请选择是否开启进件' }],
         isOpenCashout: [{ required: this.formData.isSupportCashout, trigger: 'blur', message: '请选择是否开启提现' }],
         isOpenCheckBill: [{ required: this.formData.isSupportCheckBill, trigger: 'blur', message: '请选择是否开启对账' }],
+        'cashoutParams.isOpenMchOrderCashout': [{ required: this.formData.infoType === 'MCH_APP', trigger: 'blur', message: '请选择自动提现（支付成功立刻提现）' }],
+        'cashoutParams.isOpenMchTaskCashout': [{ required: this.formData.infoType === 'MCH_APP', trigger: 'blur', message: '请选择自动提现（定时任务）' }],
         ifRate: [{ required: true, pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/, message: '请输入0-100之间的数字，最多四位小数', trigger: 'blur' }]
       }
     }
@@ -122,6 +164,15 @@ export default {
       this.$emit('update-form-data', {
         ...this.formData,
         [key]: value
+      })
+    },
+    updateFormDataCashoutParams (key, value) {
+      this.$emit('update-form-data', {
+        ...this.formData,
+        cashoutParams: {
+          ...this.formData.cashoutParams,
+          [key]: value
+        }
       })
     },
     validate: function validate (callback) {

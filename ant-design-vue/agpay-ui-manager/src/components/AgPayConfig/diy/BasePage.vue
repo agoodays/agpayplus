@@ -38,7 +38,7 @@
           </a-radio-group>
         </a-form-model-item>
       </a-col>
-      <a-col :span="8" v-if="formData.infoType!=='MCH_APP'">
+      <a-col :span="8" v-if="formData.infoType==='ISV'">
         <a-form-model-item label="结算周期（自然日）" prop="settHoldDay">
           <a-input-number v-model="formData.settHoldDay" style="width: 100%"/>
           <p class="agpay-tip-text">设置为 0 表示实时结算；设置为 -1 不计算分润</p>
