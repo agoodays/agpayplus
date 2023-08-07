@@ -88,7 +88,7 @@
         <a-col :span="10">
           <a-form-model-item label="选址省/市/区" prop="areas">
             <a-cascader placeholder="请选择省市区" :options="areasOptions" v-model="areas" @change="areasChange" />
-            <!--<a-cascader placeholder="请选择省市区" :options="areasOptions" :value="[saveObject.provinceCode, saveObject.cityCode, saveObject.areaCode]" @change="areasChange" />-->
+            <!--<a-cascader placeholder="请选择省市区" :options="areasOptions" :value="[saveObject.provinceCode, saveObject.cityCode, saveObject.districtCode]" @change="areasChange" />-->
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
@@ -286,7 +286,7 @@ export default {
 
           if (!this.isAdd && that.saveObject.lng?.length && that.saveObject.lat?.length) {
             const lnglat = { lng: that.saveObject.lng, lat: that.saveObject.lat }
-            const areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.areaCode]
+            const areas = [that.saveObject.provinceCode, that.saveObject.cityCode, that.saveObject.districtCode]
             that.aMapMarker(that, lnglat, that.saveObject.address, areas)
           }
         }).catch(e => {
@@ -305,7 +305,7 @@ export default {
           that.saveObject.cityCode = node.value
           break
         case 'district':
-          that.saveObject.areaCode = node.value
+          that.saveObject.districtCode = node.value
           break
       }
     },
@@ -314,7 +314,7 @@ export default {
       that.areas = value
       that.saveObject.provinceCode = null
       that.saveObject.cityCode = null
-      that.saveObject.areaCode = null
+      that.saveObject.districtCode = null
       for (const i in value) {
         if (value[i]?.length) {
           that.setCode(value[i])
@@ -473,7 +473,7 @@ export default {
         // 将创建的点标记添加到已有的地图实例：
         that.map.add(that.marker)
         that.aMapPolygon(areas, lnglat)
-        // console.log([this.saveObject.provinceCode, this.saveObject.cityCode, this.saveObject.areaCode])
+        // console.log([this.saveObject.provinceCode, this.saveObject.cityCode, this.saveObject.districtCode])
       }
     },
     aMapPolygon: function (areas, lnglat) {
@@ -571,14 +571,14 @@ export default {
       } else {
         this.saveObject.provinceCode = null
         this.saveObject.cityCode = null
-        this.saveObject.areaCode = null
+        this.saveObject.districtCode = null
 
         // 清除地图上所有覆盖物
         for (let i = 0, l = that.polygons.length; i < l; i++) {
           that.polygons[i].setMap(null)
         }
       }
-      // console.log([this.saveObject.provinceCode, this.saveObject.cityCode, this.saveObject.areaCode])
+      // console.log([this.saveObject.provinceCode, this.saveObject.cityCode, this.saveObject.districtCode])
     },
     lngLatChange (e) {
       // console.log(e)

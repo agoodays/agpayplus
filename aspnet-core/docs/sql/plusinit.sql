@@ -13,7 +13,7 @@ CREATE TABLE `t_mch_store` (
   `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
   `province_code` VARCHAR(32) NOT NULL COMMENT '省代码',
   `city_code` VARCHAR(32) NOT NULL COMMENT '市代码',
-  `area_code` VARCHAR(32) NOT NULL COMMENT '区代码',
+  `district_code` VARCHAR(32) NOT NULL COMMENT '区代码',
   `address` VARCHAR(128) NOT NULL COMMENT '详细地址',
   `lng` VARCHAR(32) NOT NULL COMMENT '经度',
   `lat` VARCHAR(32) NOT NULL COMMENT '纬度',

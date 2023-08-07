@@ -100,8 +100,8 @@ namespace AGooday.AgPay.Domain.Models
         /// 区代码
         /// </summary>
         [Comment("区代码")]
-        [Required, Column("area_code", TypeName = "varchar(32)")]
-        public string AreaCode { get; set; }
+        [Required, Column("district_code", TypeName = "varchar(32)")]
+        public string DistrictCode { get; set; }
 
         /// <summary>
         /// 详细地址

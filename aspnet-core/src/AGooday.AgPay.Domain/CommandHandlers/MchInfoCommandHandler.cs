@@ -198,7 +198,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 mchStore.StoreInnerImg = string.Empty;
                 mchStore.ProvinceCode = string.Empty;
                 mchStore.CityCode = string.Empty;
-                mchStore.AreaCode = string.Empty;
+                mchStore.DistrictCode = string.Empty;
                 mchStore.Address = string.Empty;
                 mchStore.Lng = string.Empty;
                 mchStore.Lat = string.Empty;

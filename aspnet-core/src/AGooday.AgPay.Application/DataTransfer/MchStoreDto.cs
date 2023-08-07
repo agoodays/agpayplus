@@ -68,7 +68,7 @@
         /// <summary>
         /// 区代码
         /// </summary>
-        public string AreaCode { get; set; }
+        public string DistrictCode { get; set; }
 
         /// <summary>
         /// 详细地址
