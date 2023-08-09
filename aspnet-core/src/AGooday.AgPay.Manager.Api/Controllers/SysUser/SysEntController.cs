@@ -42,8 +42,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_LIST)]
         public ApiRes BySystem(string sysType, string entId)
         {
-            var sysEnts = _sysEntService.GetBySysType(sysType, entId).FirstOrDefault();
-            return ApiRes.Ok(sysEnts);
+            var sysEnt = _sysEntService.GetByKey(entId, sysType);
+            return ApiRes.Ok(sysEnt);
         }
 
         /// <summary>
@@ -55,6 +55,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
         public ApiRes Update(string entId, SysEntModifyDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.EntId))
+            {
+                var sysEnt = _sysEntService.GetByKeyAsNoTracking(entId, dto.SysType);
+                sysEnt.State = dto.State;
+                CopyUtil.CopyProperties(sysEnt, dto);
+            }
             _sysEntService.Update(dto);
             return ApiRes.Ok();
         }

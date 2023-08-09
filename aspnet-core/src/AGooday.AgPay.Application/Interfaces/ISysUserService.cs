@@ -11,6 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void Update(SysUserDto dto);
         void ModifyCurrentUserInfo(ModifyCurrentUserInfoDto user);
         void Modify(SysUserModifyDto dto);
+        SysUserDto GetByKeyAsNoTracking(long recordId);
         SysUserDto GetById(long recordId);
         SysUserDto GetByUserId(long sysUserId);
         SysUserDto GetById(long recordId, string belongInfoId);

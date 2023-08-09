@@ -107,7 +107,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         public ApiRes Update(long recordId, SysUserModifyDto dto)
         {
             //dto.SysType = CS.SYS_TYPE.MGR;
-            dto.SysUserId = dto.SysUserId > 0 ? dto.SysUserId : recordId;
+            if (dto.SysUserId <= 0)
+            {
+                var sysUser = _sysUserService.GetByKeyAsNoTracking(recordId);
+                sysUser.State = dto.State;
+                CopyUtil.CopyProperties(sysUser, dto);
+            }
             _sysUserService.Modify(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

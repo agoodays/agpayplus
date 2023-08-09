@@ -60,6 +60,19 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public SysEntitlementDto GetByKeyAsNoTracking(string entId, string sysType)
+        {
+            var entity = _sysEntitlementRepository.GetByKeyAsNoTracking(entId, sysType);
+            return _mapper.Map<SysEntitlementDto>(entity);
+        }
+
+        public SysEntitlementDto GetByKey(string entId, string sysType)
+        {
+            var entity = _sysEntitlementRepository.GetByKey(entId, sysType);
+            var dto = _mapper.Map<SysEntitlementDto>(entity);
+            return dto;
+        }
+
         public IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId)
         {
             var sysEnts = _sysEntitlementRepository.GetAll()

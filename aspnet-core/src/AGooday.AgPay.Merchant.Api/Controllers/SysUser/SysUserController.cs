@@ -120,6 +120,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
+            if (dto.SysUserId <= 0)
+            {
+                var sysUser = _sysUserService.GetByKeyAsNoTracking(recordId);
+                sysUser.State = dto.State;
+                CopyUtil.CopyProperties(sysUser, dto);
+            }
             _sysUserService.Modify(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

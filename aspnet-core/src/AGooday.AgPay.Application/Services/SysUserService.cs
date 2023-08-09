@@ -98,6 +98,13 @@ namespace AGooday.AgPay.Application.Services
             Bus.SendCommand(command);
         }
 
+        public SysUserDto GetByKeyAsNoTracking(long recordId)
+        {
+            var entity = _sysUserRepository.GetByKeyAsNoTracking(recordId);
+            var dto = _mapper.Map<SysUserDto>(entity);
+            return dto;
+        }
+
         public SysUserDto GetById(long recordId)
         {
             var entity = _sysUserRepository.GetById(recordId);

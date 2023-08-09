@@ -33,6 +33,15 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return DbSet.AsNoTracking().Any(c => c.SysUserId == sysUserId && c.SysType == sysType);
         }
 
+        public SysUser GetByKeyAsNoTracking(long recordId)
+        {
+            var entity = DbSet.AsNoTracking()
+                .Where(w => w.SysUserId.Equals(recordId))
+                .FirstOrDefault();
+
+            return entity;
+        }
+
         public SysUser GetByUserId(long sysUserId)
         {
             return DbSet.Single(w => w.SysUserId == sysUserId);
