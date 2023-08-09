@@ -67,6 +67,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             dto.IsAdmin = CS.NO;
             dto.SysType = CS.SYS_TYPE.MCH;
             dto.BelongInfoId = GetCurrentMchNo();
+            dto.CreatedAt = DateTime.Now;
+            dto.UpdatedAt = DateTime.Now;
             _sysUserService.Create(dto);
             //var errorData = _cache.Get("ErrorData");
             //if (errorData == null)
@@ -115,30 +117,30 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         public ApiRes Update(long recordId, SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
-            var dbRecord = _sysUserService.GetById(dto.SysUserId, GetCurrentMchNo());
+            var dbRecord = _sysUserService.GetById(recordId, GetCurrentMchNo());
             if (dbRecord == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (dto.SysUserId <= 0)
+            if (!dto.SysUserId.HasValue || dto.SysUserId.Value <= 0)
             {
                 var sysUser = _sysUserService.GetByKeyAsNoTracking(recordId);
-                sysUser.State = dto.State;
+                sysUser.State = dto.State.Value;
                 CopyUtil.CopyProperties(sysUser, dto);
             }
             _sysUserService.Modify(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
             {
-                if (dto.ResetPass)
+                if (dto.ResetPass.HasValue && dto.ResetPass.Value)
                 {
                     // 删除用户redis缓存信息
-                    DelAuthentication(new List<long> { dto.SysUserId });
+                    DelAuthentication(new List<long> { dto.SysUserId.Value });
                 }
-                if (dto.State.Equals(CS.PUB_DISABLE))
+                if (dto.State.HasValue && dto.State.Value.Equals(CS.PUB_DISABLE))
                 {
                     //如果用户被禁用，需要更新redis数据
-                    RefAuthentication(new List<long> { dto.SysUserId });
+                    RefAuthentication(new List<long> { dto.SysUserId.Value });
                 }
                 return ApiRes.Ok();
             }

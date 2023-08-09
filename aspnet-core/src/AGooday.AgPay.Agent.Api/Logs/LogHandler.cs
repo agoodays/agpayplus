@@ -35,11 +35,10 @@ namespace AGooday.AgPay.Agent.Api.Logs
         {
             var sw = new Stopwatch();
             sw.Start();
-            var actionExecutedContext = await next();
-            sw.Stop();
-
             //操作参数
             var args = JsonConvert.SerializeObject(context.ActionArguments);
+            var actionExecutedContext = await next();
+            sw.Stop();
             //操作结果
             //var result = JsonConvert.SerializeObject(actionResult?.Value);
             var model = new SysLogDto();

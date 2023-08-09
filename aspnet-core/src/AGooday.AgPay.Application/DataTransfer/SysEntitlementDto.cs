@@ -35,12 +35,12 @@
         /// <summary>
         /// 快速开始菜单 0-否, 1-是
         /// </summary>
-        public byte QuickJump { get; set; }
+        public byte? QuickJump { get; set; }
 
         /// <summary>
         /// 状态 0-停用, 1-启用
         /// </summary>
-        public byte State { get; set; }
+        public byte? State { get; set; }
 
         /// <summary>
         /// 父ID
@@ -50,7 +50,7 @@
         /// <summary>
         /// 排序字段, 规则：正序
         /// </summary>
-        public int EntSort { get; set; }
+        public int? EntSort { get; set; }
 
         /// <summary>
         /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
@@ -60,11 +60,11 @@
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

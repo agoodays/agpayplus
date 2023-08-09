@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 性别 0-未知, 1-男, 2-女
         /// </summary>
-        public byte Sex { get; set; }
+        public byte? Sex { get; set; }
 
         /// <summary>
         /// 头像地址
@@ -41,12 +41,12 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 是否超管（超管拥有全部权限） 0-否 1-是
         /// </summary>
-        public byte IsAdmin { get; set; }
+        public byte? IsAdmin { get; set; }
 
         /// <summary>
         /// 状态 0-停用 1-启用
         /// </summary>
-        public byte State { get; set; }
+        public byte? State { get; set; }
 
         /// <summary>
         /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员
         /// </summary>
-        public byte UserType { get; set; }
+        public byte? UserType { get; set; }
 
         /// <summary>
         /// 邀请码
@@ -84,13 +84,13 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 创建时间
         /// </summary>
         [BindNever]
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
         [BindNever]
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
         /// 密码类型
@@ -105,6 +105,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 是否发送开通提醒
         /// </summary>
-        public byte IsNotify { get; set; }
+        public byte? IsNotify { get; set; }
     }
 }
