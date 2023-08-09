@@ -49,9 +49,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{groupKey}"), MethodLog("更新商户配置信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_CONFIG_PAGE)]
-        public ApiRes Update(string groupKey, MchConfigRequest request)
+        public ApiRes Update(string groupKey, MchConfigRequest model)
         {
-            int update = _sysConfigService.UpdateByConfigKey(request.Configs, groupKey, CS.SYS_TYPE.MCH, request.MchNo);
+            int update = _sysConfigService.UpdateByConfigKey(model.Configs, groupKey, CS.SYS_TYPE.MCH, model.MchNo);
             if (update <= 0)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");

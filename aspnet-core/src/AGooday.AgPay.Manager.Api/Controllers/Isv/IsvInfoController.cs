@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
 
         public IsvInfoController(IMQSender mqSender, ILogger<IsvInfoController> logger, RedisUtil client,
             IIsvInfoService isvInfoService,
-            IMchInfoService mchInfoService, 
+            IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
             ISysUserService sysUserService,
             IPayInterfaceConfigService payInterfaceConfigService,

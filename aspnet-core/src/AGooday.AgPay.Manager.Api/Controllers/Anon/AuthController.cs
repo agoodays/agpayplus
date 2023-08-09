@@ -56,8 +56,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route("validate")]
-        [MethodLog("登录认证")]
+        [HttpPost, Route("validate"), MethodLog("登录认证")]
         public ApiRes Validate(Validate model)
         {
             string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理

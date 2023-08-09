@@ -103,14 +103,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// <summary>
         /// 修改密码
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPut, Route("modifyPwd"), MethodLog("修改密码")]
-        public ApiRes ModifyPwd(ModifyPwd dto)
+        public ApiRes ModifyPwd(ModifyPwd model)
         {
             var currentUser = GetCurrentUser();
-            string currentUserPwd = Base64Util.DecodeBase64(dto.OriginalPwd); //当前用户登录密码currentUser
+            string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码currentUser
             var user = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             bool verified = BCrypt.Net.BCrypt.Verify(currentUserPwd, user.Credential);
             //验证当前密码是否正确
@@ -118,13 +118,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             {
                 throw new BizException("原密码验证失败！");
             }
-            string opUserPwd = Base64Util.DecodeBase64(dto.ConfirmPwd);
+            string opUserPwd = Base64Util.DecodeBase64(model.ConfirmPwd);
             // 验证原密码与新密码是否相同
             if (opUserPwd.Equals(currentUserPwd))
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            _sysUserAuthService.ResetAuthInfo(dto.RecordId, null, null, opUserPwd, CS.SYS_TYPE.MGR);
+            _sysUserAuthService.ResetAuthInfo(model.RecordId, null, null, opUserPwd, CS.SYS_TYPE.MGR);
             return Logout();
         }
 
