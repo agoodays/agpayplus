@@ -77,13 +77,16 @@
           </div>
         </div>-->
         <div v-if="paramsAndRateTabVal === 'channelConfigTab'">
-          <div>
-            {{ currentIfCode }} —— 渠道配置
-          </div>
-          <div :class="isDrawer?'drawer-btn-center':'btn-center'" v-if="$access(permCode)">
+          <component
+            ref="appConfigComponentRef"
+            :is="appConfigComponent"
+            :ifCode="currentIfCode"
+            v-if="paramsAndRateTabVal === 'channelConfigTab'"
+          />
+<!--          <div :class="isDrawer?'drawer-btn-center':'btn-center'" v-if="$access(permCode)">
             <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
             <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
-          </div>
+          </div>-->
         </div>
       </div>
     </a-tab-pane>
@@ -230,6 +233,7 @@ export default {
       currentIfCode: null,
       selectIfCode: null,
       configComponent: null,
+      appConfigComponent: null,
       ifCodeList: [],
       ifCodeListSearchData: {},
       searchData: {},
@@ -393,6 +397,24 @@ export default {
           return import('./diy/ConfigPage.vue')
       }
     },
+    getAppConfigComponent () {
+      switch (this.currentIfCode) {
+        // case 'alipay':
+        //   return import('../AgPayMchApplyment/diy/alipay/AppConfig.vue')
+        // case 'wxpay':
+        //   return import('../AgPayMchApplyment/diy/wxpay/AppConfig.vue')
+        case 'ysfpay':
+          return import('../AgPayMchApplyment/diy/ysfpay/AppConfig.vue')
+        case 'lespay':
+          return import('../AgPayMchApplyment/diy/lespay/AppConfig.vue')
+        case 'sxfpay':
+          return import('../AgPayMchApplyment/diy/sxfpay/AppConfig.vue')
+        case 'shengpay':
+          return import('../AgPayMchApplyment/diy/shengpay/AppConfig.vue')
+        default:
+          return Promise.reject(new Error('Unknown variable dynamic import: ' + this.currentIfCode))
+      }
+    },
     getConfig (code) {
       const that = this
       if (that.currentIfCode) {
@@ -414,6 +436,14 @@ export default {
                 that.configComponent = module.default || module
               })
             }
+            break
+          case 'channelConfigTab':
+            that.getAppConfigComponent().then(module => {
+              that.appConfigComponent = module.default || module
+            }).catch(() => {
+              that.appConfigComponent = null
+              that.$message.error('当前渠道不支持参数配置！')
+            })
             break
           case 'rateTab':
             // this.getRateConfig(code)
