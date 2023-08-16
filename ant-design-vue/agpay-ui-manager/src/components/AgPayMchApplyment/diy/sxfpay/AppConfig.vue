@@ -1,7 +1,10 @@
 <template>
   <div>
-    <h3>随行付配置</h3>
     <AppConfigCommonPage :if-code="ifCode"/>
+    <a-divider orientation="left">
+      <a-tag color="red">{{ ifCode }} 随行付配置</a-tag>
+    </a-divider>
+    <h3>随行付配置</h3>
   </div>
 </template>
 
