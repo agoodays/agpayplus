@@ -140,6 +140,18 @@ namespace AGooday.AgPay.Common.Utils
 
     public static class QrCodeBuilder
     {
+        public static Bitmap Generate(string plainText, int pixel)
+        {
+            var generator = new QRCodeGenerator();
+            var qrCodeData = generator.CreateQrCode(plainText, QRCodeGenerator.ECCLevel.L);
+            var qrCode = new QRCode(qrCodeData);
+
+            var bitmap = qrCode.GetGraphic(pixel);
+            //var bitmap = qrCode.GetGraphic(pixel, Color.Black, Color.White, null, 15, 6, false);
+
+            return bitmap;
+        }
+
         public static Bitmap Generate(string content = "https://www.example.com", Bitmap icon = null)
         {
             // 创建二维码对象
