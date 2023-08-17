@@ -2,7 +2,7 @@
 using EmitMapper.MappingConfiguration;
 using log4net;
 using System.ComponentModel;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json;
 
 namespace AGooday.AgPay.Common.Utils
 {
@@ -18,14 +18,14 @@ namespace AGooday.AgPay.Common.Utils
         public static T DeepClone<T>(T obj) where T : class
         {
             if (obj == null) return default(T);
-            using (var stream = new MemoryStream())
+            var options = new JsonSerializerOptions
             {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(stream, obj);
-                stream.Position = 0;
-                var newObj = (T)formatter.Deserialize(stream);
-                return newObj;
-            }
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            var jsonString = JsonSerializer.Serialize(obj, options);
+            var newObj = JsonSerializer.Deserialize<T>(jsonString, options);
+            return newObj;
         }
 
         /// <summary>
