@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.Find(id);
         }
-        public virtual async Task<TEntity> FindByIdAsync(TPrimaryKey id)
+        public virtual async Task<TEntity> GetByIdAsync(TPrimaryKey id)
         {
             return await DbSet.FindAsync(id);
         }
@@ -147,7 +147,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.Find(id);
         }
-        public virtual async Task<TEntity> FindByIdAsync<TPrimaryKey>(TPrimaryKey id)
+        public virtual async Task<TEntity> GetByIdAsync<TPrimaryKey>(TPrimaryKey id)
         {
             return await DbSet.FindAsync(id);
         }

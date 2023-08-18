@@ -46,9 +46,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_LIST)]
-        public ApiRes List([FromQuery] SysUserQueryDto dto)
+        //public ApiRes List([FromQuery] SysUserQueryDto dto)
+        //{
+        //    var data = _sysUserService.GetPaginatedData(dto, GetCurrentUserId());
+        //    return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+        //}
+        public async Task<ApiRes> List([FromQuery] SysUserQueryDto dto)
         {
-            var data = _sysUserService.GetPaginatedData(dto, GetCurrentUserId());
+            var data = await _sysUserService.GetPaginatedDataAsync(dto, GetCurrentUserId());
             return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
@@ -142,9 +147,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
-        public ApiRes Detail(long recordId)
+        //public ApiRes Detail(long recordId)
+        //{
+        //    var sysUser = _sysUserService.GetById(recordId);
+        //    if (sysUser == null)
+        //    {
+        //        return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+        //    }
+        //    return ApiRes.Ok(sysUser);
+        //}
+        public async Task<ApiRes> Detail(long recordId)
         {
-            var sysUser = _sysUserService.GetById(recordId);
+            var sysUser = await _sysUserService.GetByIdAsync(recordId);
             if (sysUser == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

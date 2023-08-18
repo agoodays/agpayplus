@@ -1,9 +1,16 @@
 ﻿using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Domain.Models;
+using MediatR;
 
-namespace AGooday.AgPay.Application.DataTransfer
+namespace AGooday.AgPay.Domain.Queries.SysUsers
 {
-    public class SysUserQueryDto : PageQuery
+    public class SysUserQuery : PageQuery, IRequest<IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>>
     {
+        /// <summary>
+        /// 当前用户ID
+        /// </summary>
+        public long CurrentUserId { get; set; }
+
         /// <summary>
         /// 系统用户ID
         /// </summary>

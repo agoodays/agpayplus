@@ -21,7 +21,7 @@
         /// <returns></returns>
         TEntity GetById(TPrimaryKey id);
 
-        Task<TEntity> FindByIdAsync(TPrimaryKey id);
+        Task<TEntity> GetByIdAsync(TPrimaryKey id);
         /// <summary>
         /// 获取列表
         /// </summary>
@@ -68,7 +68,7 @@
         /// <returns></returns>
         TEntity GetById<TPrimaryKey>(TPrimaryKey id);
 
-        Task<TEntity> FindByIdAsync<TPrimaryKey>(TPrimaryKey id);
+        Task<TEntity> GetByIdAsync<TPrimaryKey>(TPrimaryKey id);
         /// <summary>
         /// 获取列表
         /// </summary>

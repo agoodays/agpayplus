@@ -9,6 +9,10 @@ using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Domain.EventHandlers;
 using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Interfaces;
+using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Domain.Queries;
+using AGooday.AgPay.Domain.Queries.SysUsers;
+using AGooday.AgPay.Domain.QueryHandlers;
 using AGooday.AgPay.Infrastructure.Bus;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Infrastructure.Repositories;
@@ -79,6 +83,9 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IRequestHandler<CreateSysUserCommand, Unit>, SysUserCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveSysUserCommand, Unit>, SysUserCommandHandler>();
             services.AddScoped<IRequestHandler<ModifySysUserCommand, Unit>, SysUserCommandHandler>();
+
+            services.AddScoped<IRequestHandler<GetByIdQuery<SysUser, long>, SysUser>, SysUserQueryHandler>();
+            services.AddScoped<IRequestHandler<SysUserQuery, IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>>, SysUserQueryHandler>();
 
             services.AddScoped<IRequestHandler<CreateAgentInfoCommand, Unit>, AgentInfoCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveAgentInfoCommand, Unit>, AgentInfoCommandHandler>();

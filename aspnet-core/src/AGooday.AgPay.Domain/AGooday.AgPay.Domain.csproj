@@ -17,9 +17,4 @@
     <ProjectReference Include="..\AGooday.AgPay.Domain.Core\AGooday.AgPay.Domain.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Queries\" />
-    <Folder Include="QueryHandlers\" />
-  </ItemGroup>
-
 </Project>

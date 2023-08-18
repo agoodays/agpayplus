@@ -3,6 +3,7 @@ using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Domain.Queries.SysUsers;
 using AutoMapper;
 using Newtonsoft.Json;
 
@@ -79,6 +80,7 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<CreateSysUserCommand, SysUser>();
             CreateMap<SysUserModifyDto, ModifySysUserCommand>();
             CreateMap<ModifySysUserCommand, SysUser>();
+            CreateMap<SysUserQueryDto, SysUserQuery>();
 
             CreateMap<SysUserTeamDto, SysUserTeam>();
 

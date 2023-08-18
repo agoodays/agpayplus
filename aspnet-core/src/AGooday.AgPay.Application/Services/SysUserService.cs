@@ -4,6 +4,8 @@ using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Domain.Queries;
+using AGooday.AgPay.Domain.Queries.SysUsers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -112,6 +114,13 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public async Task<SysUserDto> GetByIdAsync(long recordId)
+        {
+            var entity = await Bus.SendQuery(new GetByIdQuery<SysUser, long>(recordId));
+            var dto = _mapper.Map<SysUserDto>(entity);
+            return dto;
+        }
+
         public SysUserDto GetByUserId(long sysUserId)
         {
             var entity = _sysUserRepository.GetByUserId(sysUserId);
@@ -164,9 +173,25 @@ namespace AGooday.AgPay.Application.Services
             return records;
         }
 
-        public Task<IEnumerable<SysUserDto>> ListAsync()
+        public async Task<PaginatedList<SysUserListDto>> GetPaginatedDataAsync(SysUserQueryDto dto, long currentUserId)
         {
-            throw new NotImplementedException();
+            var query = _mapper.Map<SysUserQuery>(dto);
+            query.CurrentUserId = currentUserId;
+            var sysUsers = (IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>)await Bus.SendQuery(query);
+            var result = sysUsers.Select(s =>
+            {
+                var item = _mapper.Map<SysUserListDto>(s.SysUser);
+                item.TeamName = s.SysUserTeam?.TeamName;
+                return item;
+            });
+            var records = PaginatedList<SysUserListDto>.Create(result, dto.PageNumber, dto.PageSize);
+            return records;
+        }
+
+        public async Task<IEnumerable<SysUserDto>> ListAsync()
+        {
+            var sysUsers = await _sysUserRepository.ListAsync();
+            return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
     }
 }
