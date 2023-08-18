@@ -37,10 +37,10 @@
                   <template slot="title">
                     {{ mainTips.recentAmountTip }}
                   </template>
-                  <a-icon type="question-circle" />
+                  <a-icon class="bi" type="info-circle" />
                 </a-tooltip>
               </div>
-              <a-select v-model="recentDay" placeholder="" :default-value="30" style="width: 215px" @change="recentDayChange">
+              <a-select v-model="recentDay" placeholder="" :default-value="30" class="date" @change="recentDayChange">
                 <a-select-option :value="30">近30天</a-select-option>
                 <a-select-option :value="7">近7天</a-select-option>
               </a-select>
@@ -60,7 +60,7 @@
               <template slot="title">
                 {{ mainTips.totalAgentTip }}
               </template>
-              <a-icon type="question-circle" />
+              <a-icon class="bi" type="info-circle" />
             </a-tooltip>
           </div>
           <div class="quantity-number">{{ mainChart.totalAgent }}</div>
@@ -74,7 +74,7 @@
               <template slot="title">
                 {{ mainTips.totalMchTip }}
               </template>
-              <a-icon type="question-circle" />
+              <a-icon class="bi" type="info-circle" />
             </a-tooltip>
           </div>
           <div class="quantity-number">{{ mainChart.totalMch }}</div>
