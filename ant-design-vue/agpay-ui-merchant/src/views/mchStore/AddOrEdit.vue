@@ -595,13 +595,21 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style scoped>
   #amap-container {
     padding: 0;
     margin: 0;
     width: 100%;
     height: 600px;
     position: relative;
+  }
+
+  /*>>> .amap-copyright , >>> .amap-logo {
+    z-index: 2;
+  }*/
+
+  .drawer-btn-center{
+    z-index: 200;
   }
 
   .ag-upload-btn {
