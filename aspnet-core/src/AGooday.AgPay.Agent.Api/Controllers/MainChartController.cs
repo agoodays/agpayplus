@@ -6,6 +6,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Agent.Api.Controllers
 {
@@ -18,8 +19,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers
     {
         private readonly ILogger<MainChartController> _logger;
         private readonly IPayOrderService _payOrderService;
+        private readonly ISysUserService _sysUserService;
+        private readonly IAgentInfoService _agentInfoService;
 
-        public MainChartController(ILogger<MainChartController> logger, IPayOrderService payOrderService, RedisUtil client,
+        public MainChartController(ILogger<MainChartController> logger, RedisUtil client, 
+            IPayOrderService payOrderService,
+            IAgentInfoService agentInfoService,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
@@ -27,6 +32,24 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         {
             _logger = logger;
             _payOrderService = payOrderService;
+            _sysUserService = sysUserService;
+            _agentInfoService = agentInfoService;
+        }
+
+        /// <summary>
+        /// 代理商基本信息、用户基本信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("")]
+        [PermissionAuth(PermCode.AGENT.ENT_AGENT_CURRENT_INFO)]
+        public ApiRes AgentInfo()
+        {
+            var sysUser = _sysUserService.GetById(GetCurrentUser().SysUser.SysUserId);
+            var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
+            var jobj = JObject.FromObject(agentInfo);
+            jobj.Add("loginUsername", sysUser.LoginUsername);
+            jobj.Add("realname", sysUser.Realname);
+            return ApiRes.Ok(jobj);
         }
 
         /// <summary>

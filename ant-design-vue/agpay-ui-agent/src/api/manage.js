@@ -277,9 +277,9 @@ export function getPayType (parameter) {
   })
 }
 
-export function getMainUserInfo (parameter) {
+export function getMainUserInfo () {
   return request.request({
-    url: API_URL_MAIN_STATISTIC + '/' + parameter,
+    url: API_URL_MAIN_STATISTIC,
     method: 'GET'
   })
 }

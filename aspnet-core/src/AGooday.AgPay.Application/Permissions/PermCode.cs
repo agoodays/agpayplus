@@ -219,6 +219,11 @@
             public const string ENT_AGENT_SELF_PAY_CONFIG = "ENT_AGENT_SELF_PAY_CONFIG";
             public const string ENT_AGENT_SELF_PAY_CONFIG_LIST = "ENT_AGENT_SELF_PAY_CONFIG_LIST";
             public const string ENT_AGENT_SELF_PAY_CONFIG_ADD = "ENT_AGENT_SELF_PAY_CONFIG_ADD";
+            public const string ENT_AGENT_STATISTIC = "ENT_AGENT_STATISTIC";
+            public const string ENT_AGENT_CURRENT_INFO = "ENT_AGENT_CURRENT_INFO";
+            public const string ENT_AGENT_ORDER_STATISTIC = "ENT_AGENT_ORDER_STATISTIC";
+            public const string ENT_AGENT_STATISTIC_COUNT = "ENT_AGENT_STATISTIC_COUNT";
+            public const string ENT_AGENT_HARDWARE_STATISTIC = "ENT_AGENT_HARDWARE_STATISTIC";
             public const string ENT_AGENT_PAY_CONFIG_ADD = "ENT_AGENT_PAY_CONFIG_ADD";
             public const string ENT_AGENT_PAY_CONFIG_VIEW = "ENT_AGENT_PAY_CONFIG_VIEW";
             public const string ENT_AGENT_INFO = "ENT_AGENT_INFO";
