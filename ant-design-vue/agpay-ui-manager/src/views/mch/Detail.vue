@@ -60,7 +60,9 @@
       <a-col :sm="12">
         <a-descriptions>
           <a-descriptions-item label="商户类型">
-            {{ detailData.type === 1 ? '普通商户': '特约商户' }}
+            <a-tag :color="detailData.type === 1 ? 'green' : 'orange'">
+              {{ detailData.type === 1 ? '普通商户': '特约商户' }}
+            </a-tag>
           </a-descriptions-item>
         </a-descriptions>
       </a-col>
