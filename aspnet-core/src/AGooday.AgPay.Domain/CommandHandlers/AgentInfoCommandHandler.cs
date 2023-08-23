@@ -121,6 +121,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 sysUser.AvatarUrl = CS.DEFAULT_MALE_AVATAR_URL;//默认头像
                 sysUser.IsAdmin = CS.YES;
                 sysUser.State = agentInfo.State;
+                sysUser.InviteCode = StringUtil.GetUUID(6); //6位随机数
 
                 #region 检查
                 // 登录用户名不可重复
