@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         [PermissionAuth(PermCode.MGR.ENT_AGENT_INFO_EDIT)]
         public async Task<ApiRes> Update(string agentNo, AgentInfoModifyDto dto)
         {
-            _agentInfoService.Modify(dto);
+            await _agentInfoService.Modify(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();

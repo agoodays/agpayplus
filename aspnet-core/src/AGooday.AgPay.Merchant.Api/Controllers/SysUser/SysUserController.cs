@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("添加操作员信息")]
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_ADD)]
-        public ApiRes Add(SysUserCreateDto dto)
+        public async Task<ApiRes> Add(SysUserCreateDto dto)
         {
             //_cache.Remove("ErrorData");
             dto.IsAdmin = CS.NO;
@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             dto.BelongInfoId = GetCurrentMchNo();
             dto.CreatedAt = DateTime.Now;
             dto.UpdatedAt = DateTime.Now;
-            _sysUserService.Create(dto);
+            await _sysUserService.Create(dto);
             //var errorData = _cache.Get("ErrorData");
             //if (errorData == null)
             // 是否存在消息通知
@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除操作员")]
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_DELETE)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> Delete(long recordId)
         {
             var currentUserId = 0;
             //判断是否删除商户默认超管
@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             {
                 return ApiRes.CustomFail("系统不允许删除商户默认用户！");
             }
-            _sysUserService.Remove(recordId, currentUserId, CS.SYS_TYPE.MCH);
+            await _sysUserService.Remove(recordId, currentUserId, CS.SYS_TYPE.MCH);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
             {
@@ -114,7 +114,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新操作员信息")]
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_EDIT)]
-        public ApiRes Update(long recordId, SysUserModifyDto dto)
+        public async Task<ApiRes> Update(long recordId, SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
             var dbRecord = _sysUserService.GetById(recordId, GetCurrentMchNo());
@@ -128,7 +128,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
                 sysUser.State = dto.State.Value;
                 CopyUtil.CopyProperties(sysUser, dto);
             }
-            _sysUserService.Modify(dto);
+            await _sysUserService.Modify(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
             {

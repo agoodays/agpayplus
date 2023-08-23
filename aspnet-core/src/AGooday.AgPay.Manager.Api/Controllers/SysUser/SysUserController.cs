@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("添加操作员信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_ADD)]
-        public ApiRes Add(SysUserCreateDto dto)
+        public async Task<ApiRes> Add(SysUserCreateDto dto)
         {
             //_cache.Remove("ErrorData");
             dto.IsAdmin = CS.NO;
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             dto.CreatedAt = DateTime.Now;
             dto.UpdatedAt = DateTime.Now;
-            _sysUserService.Create(dto);
+            await _sysUserService.Create(dto);
             //var errorData = _cache.Get("ErrorData");
             //if (errorData == null)
             // 是否存在消息通知
@@ -89,10 +89,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除操作员")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_DELETE)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> Delete(long recordId)
         {
             var currentUserId = 0;
-            _sysUserService.Remove(recordId, currentUserId, string.Empty);
+            await _sysUserService.Remove(recordId, currentUserId, string.Empty);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
             {
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("修改操作员信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
-        public ApiRes Update(long recordId, SysUserModifyDto dto)
+        public async Task<ApiRes> Update(long recordId, SysUserModifyDto dto)
         {
             //dto.SysType = CS.SYS_TYPE.MGR;
             if (!dto.SysUserId.HasValue || dto.SysUserId.Value <= 0)
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
                 sysUser.State = dto.State.Value;
                 CopyUtil.CopyProperties(sysUser, dto);
             }
-            _sysUserService.Modify(dto);
+            await _sysUserService.Modify(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
             {

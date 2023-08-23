@@ -59,18 +59,18 @@ namespace AGooday.AgPay.Application.Services
             return _mchInfoRepository.SaveChanges(out int _);
         }
 
-        public void Create(MchInfoCreateDto dto)
+        public async Task Create(MchInfoCreateDto dto)
         {
             var command = _mapper.Map<CreateMchInfoCommand>(dto);
-            Bus.SendCommand(command);
+            await Bus.SendCommand(command);
         }
 
-        public void Remove(string recordId)
+        public async Task Remove(string recordId)
         {
             //_mchInfoRepository.Remove(recordId);
             //_mchInfoRepository.SaveChanges();
             var command = new RemoveMchInfoCommand() { MchNo = recordId };
-            Bus.SendCommand(command);
+            await Bus.SendCommand(command);
         }
 
         public bool Update(MchInfoDto dto)
@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Application.Services
             return _mchInfoRepository.SaveChanges(out int _);
         }
 
-        public async void Modify(MchInfoModifyDto dto)
+        public async Task Modify(MchInfoModifyDto dto)
         {
             var command = _mapper.Map<ModifyMchInfoCommand>(dto);
             await Bus.SendCommand(command);
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<MchInfoDto> GetByMchNos(List<string> mchNos)
         {
-           var mchInfos = _mchInfoRepository.GetAll().Where(w => mchNos.Contains(w.MchNo));
+            var mchInfos = _mchInfoRepository.GetAll().Where(w => mchNos.Contains(w.MchNo));
             return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
         }
 

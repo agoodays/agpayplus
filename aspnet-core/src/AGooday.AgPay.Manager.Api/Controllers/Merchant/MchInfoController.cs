@@ -79,9 +79,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpDelete, Route("{mchNo}"), MethodLog("删除商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_DEL)]
-        public ApiRes Delete(string mchNo)
+        public async Task<ApiRes> Delete(string mchNo)
         {
-            _mchInfoService.Remove(mchNo);
+            await _mchInfoService.Remove(mchNo);
             return ApiRes.Ok();
         }
 
@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_EDIT)]
         public async Task<ApiRes> Update(string mchNo, MchInfoModifyDto dto)
         {
-            _mchInfoService.Modify(dto);
+            await _mchInfoService.Modify(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();

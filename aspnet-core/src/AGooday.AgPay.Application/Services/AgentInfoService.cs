@@ -55,18 +55,18 @@ namespace AGooday.AgPay.Application.Services
             return _agentInfoRepository.SaveChanges(out int _);
         }
 
-        public void Create(AgentInfoCreateDto dto)
+        public async Task Create(AgentInfoCreateDto dto)
         {
             var command = _mapper.Map<CreateAgentInfoCommand>(dto);
-            Bus.SendCommand(command);
+            await Bus.SendCommand(command);
         }
 
-        public void Remove(string recordId)
+        public async Task Remove(string recordId)
         {
             //_agentInfoRepository.Remove(recordId);
             //_agentInfoRepository.SaveChanges();
             var command = new RemoveAgentInfoCommand() { AgentNo = recordId };
-            Bus.SendCommand(command);
+            await Bus.SendCommand(command);
         }
 
         public bool Update(AgentInfoDto dto)
@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Application.Services
             return _agentInfoRepository.SaveChanges(out int _);
         }
 
-        public async void Modify(AgentInfoModifyDto dto)
+        public async Task Modify(AgentInfoModifyDto dto)
         {
             var command = _mapper.Map<ModifyAgentInfoCommand>(dto);
             await Bus.SendCommand(command);

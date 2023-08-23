@@ -47,10 +47,10 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository.SaveChanges();
         }
 
-        public void Create(SysUserCreateDto dto)
+        public async Task Create(SysUserCreateDto dto)
         {
             var command = _mapper.Map<CreateSysUserCommand>(dto);
-            Bus.SendCommand(command);
+            await Bus.SendCommand(command);
         }
 
         public void Remove(long recordId)
@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository.SaveChanges();
         }
 
-        public void Remove(long sysUserId, long currentUserId, string sysType)
+        public async Task Remove(long sysUserId, long currentUserId, string sysType)
         {
             var command = new RemoveSysUserCommand()
             {
@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Application.Services
                 CurrentSysUserId = currentUserId,
                 SysType = sysType
             };
-            Bus.SendCommand(command);
+            await Bus.SendCommand(command);
         }
 
         public void Update(SysUserDto dto)
@@ -94,10 +94,10 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository.SaveChanges();
         }
 
-        public void Modify(SysUserModifyDto dto)
+        public async Task Modify(SysUserModifyDto dto)
         {
             var command = _mapper.Map<ModifySysUserCommand>(dto);
-            Bus.SendCommand(command);
+            await Bus.SendCommand(command);
         }
 
         public SysUserDto GetByKeyAsNoTracking(long recordId)
