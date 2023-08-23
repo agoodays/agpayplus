@@ -140,9 +140,11 @@
             <div class="post-list">
               <template v-for="noticeItem in noticeData">
                 <div :key="noticeItem.articleId" class="post-item" @click="noticeDetailShow(noticeItem.articleId)">
-                  <span>
-                    {{ noticeItem.title }}
-                  </span>
+                  <a-tooltip placement="top" :title="noticeItem.title">
+                    <span class="title">
+                      {{ noticeItem.title }}
+                    </span>
+                  </a-tooltip>
                   <span>
                     {{ moment(noticeItem.createdAt).format('YYYY-MM-DD') }}
                     <a-icon type="right" />
