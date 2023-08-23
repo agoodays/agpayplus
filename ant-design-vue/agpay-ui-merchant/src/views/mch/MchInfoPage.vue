@@ -98,14 +98,11 @@ export default {
       const text = data.map((c) => getText(c)).join('\n')
 
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(text)
-            .then(() => {
-              console.log('复制成功！')
-              this.$message.success('复制成功！')
-            })
-            .catch((error) => {
-              console.log('复制失败:', error)
-            })
+        navigator.clipboard.writeText(text).then(() => {
+          this.$message.success('复制成功')
+        }).catch((error) => {
+          console.log('复制失败:', error)
+        })
       } else {
         console.log('当前浏览器不支持剪贴板操作！')
       }

@@ -2,7 +2,7 @@
   <a-modal v-model="isShow" title="邀请码" footer="">
     <div>
       <span>邀请码：{{inviteCode}}</span>
-      <a @click="copyFunc(inviteCode)" class="a-copy">复制</a>
+      <a @click="copyFunc(inviteCode,'邀请码已复制')" class="a-copy">复制</a>
     </div>
     <div>
       <div>
@@ -46,7 +46,7 @@ export default {
     }
   },
   methods: {
-    copyFunc (text) {
+    copyFunc (text, msg) {
       // text是复制文本
       // 创建input元素
       const el = document.createElement('input')
@@ -60,7 +60,7 @@ export default {
       document.execCommand('copy')
       // 删除input元素
       document.body.removeChild(el)
-      this.$message.success('邀请码已复制')
+      this.$message.success(msg || '复制成功')
     },
     show: function (inviteCode, sysType) { // 弹层打开事件
       this.inviteCode = inviteCode
