@@ -254,14 +254,14 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', ''
 
 -- 账户中心
 INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_ACCOUNT_CENTER', '账户中心', 'wallet', '', 'RouteView', 'ML', 0, 1, 'ROOT', 5, 'AGENT', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG', '费率配置', 'file-done', '/passageConfig', 'PayConfigPage', 'ML', 0, 1, 'ENT_AGENT_ACCOUNT_CENTER', 30, 'AGENT', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_LIST', '费率配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_ADD', '费率配置保存', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_STATISTIC', '数据统计', 'fund-view', '/statistic', 'StatisticsPage', 'ML', 0, 1, 'ENT_AGENT_ACCOUNT_CENTER', 30, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_STATISTIC', '数据统计', 'fund-view', '/statistic', 'StatisticsPage', 'ML', 0, 1, 'ENT_AGENT_ACCOUNT_CENTER', 20, 'AGENT', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_CURRENT_INFO', '代理商信息', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_STATISTIC', 0, 'AGENT', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_ORDER_STATISTIC', '订单/商户统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_STATISTIC', 0, 'AGENT', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_STATISTIC_COUNT', '代理商统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_STATISTIC', 0, 'AGENT', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_HARDWARE_STATISTIC', '硬件统计', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_STATISTIC', 0, 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG', '费率配置', 'file-done', '/passageConfig', 'PayConfigPage', 'ML', 0, 1, 'ENT_AGENT_ACCOUNT_CENTER', 30, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_LIST', '费率配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_SELF_PAY_CONFIG_ADD', '费率配置保存', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_SELF_PAY_CONFIG', 0, 'AGENT', NOW(), NOW());
 		
 -- -- 服务商管理
 -- INSERT INTO t_sys_entitlement VALUES ('ENT_ISV', '服务商管理', 'block', '', 'RouteView', 'ML', 0, 1, 'ROOT', 40, 'AGENT', NOW(), NOW());

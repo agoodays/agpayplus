@@ -4,7 +4,7 @@
       <a-card :bordered="false" class="mch-info" style="padding: 30px;">
         <div class="title">
           <b>商户中心</b>
-          <a-button icon="copy" type="link" @click="copyFunc">复制商户信息</a-button>
+          <a-button icon="copy" type="link" @click="copyFunc" style="padding-right: 0">复制商户信息</a-button>
         </div>
         <div class="item">
           <span class="label">商户名称</span>

@@ -4,7 +4,7 @@
       <a-card :bordered="false" class="agent-info" style="padding: 30px;">
         <div class="title">
           <b>代理商信息</b>
-          <a-button icon="copy" type="link" @click="copyFunc">复制代理商信息</a-button>
+          <a-button icon="copy" type="link" @click="copyFunc" style="padding-right: 0">复制代理商信息</a-button>
         </div>
         <div class="item">
           <span class="label">代理商名称</span>
