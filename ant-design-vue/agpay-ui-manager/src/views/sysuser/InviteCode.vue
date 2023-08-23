@@ -2,12 +2,12 @@
   <a-modal v-model="isShow" title="邀请码" footer="">
     <div>
       <span>邀请码：{{ inviteCode }}</span>
-      <a @click="copyFunc(inviteCode,'邀请码已复制')" class="a-copy">复制</a>
+      <a-button icon="copy" type="link" @click="copyFunc(inviteCode,'邀请码已复制')"/>
     </div>
     <div>
       <div>
         <span>商户注册链接：{{ mchRegisterUrl }}</span>
-        <a @click="copyFunc(mchRegisterUrl)" class="a-copy">复制</a>
+        <a-button icon="copy" type="link" @click="copyFunc(mchRegisterUrl)"/>
       </div>
       <div>
         <span>商户注册二维码：</span>
@@ -19,7 +19,7 @@
     <div v-if="sysType!=='MCH'">
       <div>
         <span>代理商注册链接：{{ agentRegisterUrl }}</span>
-        <a @click="copyFunc(agentRegisterUrl)" class="a-copy">复制</a>
+        <a-button icon="copy" type="link" @click="copyFunc(agentRegisterUrl)"/>
       </div>
       <div>
         <span>代理商注册二维码：</span>
@@ -79,8 +79,5 @@ export default {
 <style scoped>
   .ant-modal-body div{
     padding: 2px 0;
-  }
-  .a-copy{
-    padding: 0 7px;
   }
 </style>

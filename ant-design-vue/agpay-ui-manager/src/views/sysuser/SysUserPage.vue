@@ -67,10 +67,9 @@
         </template>
 
         <template slot="inviteCodeSlot" slot-scope="{record}">
-          <a @click="copyFunc(record.inviteCode)" class="a-copy">{{ record.inviteCode }}</a>
-          <span v-if="record.inviteCode">
-            <a-icon type="info-circle" @click="inviteCodeFunc(record.inviteCode, record.sysType)" style="cursor: pointer;"/>
-          </span>
+          <b>{{ record.inviteCode }}</b>
+          <a-button icon="copy" type="link" @click="copyFunc(record.inviteCode)"/>
+          <a-button icon="info-circle" type="link" @click="inviteCodeFunc(record.inviteCode, record.sysType)" v-if="record.inviteCode"/>
         </template>
 
         <template slot="stateSlot" slot-scope="{record}">
@@ -121,7 +120,7 @@ const tableColumns = [
   { key: 'isAdmin', dataIndex: 'isAdmin', title: '超管', width: 65, customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
   { key: 'userType', title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
   { key: 'teamName', dataIndex: 'teamName', title: '团队', width: 160 },
-  { key: 'inviteCode', title: '邀请码', width: 120, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
+  { key: 'inviteCode', title: '邀请码', width: 150, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
   { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
   { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
@@ -228,7 +227,4 @@ export default {
 </script>
 
 <style scoped>
-.a-copy{
-  padding: 0 7px;
-}
 </style>
