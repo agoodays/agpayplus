@@ -121,6 +121,8 @@ export default {
     }
   },
   mounted () {
+    this.saveObject.inviteCode = this.$route.query.c
+    this.$forceUpdate()
   },
   methods: {
     ...mapActions(['Login', 'Logout']),
