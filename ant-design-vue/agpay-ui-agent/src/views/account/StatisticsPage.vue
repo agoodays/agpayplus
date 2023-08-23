@@ -22,7 +22,7 @@
           <span class="label">代理商号</span>
           <span class="desc">{{ agentInfo.agentNo }}</span>
         </div>
-        <div class="item" v-if="agentInfo.isvNo">
+        <div class="item">
           <span class="label">服务商号</span>
           <span class="desc">{{ agentInfo.isvNo }}</span>
         </div>
@@ -42,42 +42,60 @@
       <a-card :bordered="false" class="statistics-box order-statistics order" style="padding: 30px;">
         <div class="box-flex">
           <div class="title">
-            <b>订单/商户统计</b>
+            <b style="flex-grow: 1;">订单/商户统计</b>
+            <a-select v-model="selectedAgentNo" placeholder="请选择代理商" @change="agentNoChange" style="width: 215px; margin-right: 10px;">
+              <a-select-option :value="1" :key="1">仅统计自己</a-select-option>
+              <a-select-option :value="2" :key="2">全部代理商</a-select-option>
+              <a-select-option v-for="d in agentList" :value="d.agentNo" :key="d.agentNo">
+                {{ d.agentName + " [ ID: " + d.agentNo + " ]" }}
+              </a-select-option>
+            </a-select>
+            <AgDateRangePicker
+              class="date"
+              :value="statistics.params.queryDateRange"
+              :options="[
+                { name: '今天', value: 'today' },
+                { name: '昨天', value: 'yesterday' },
+                { name: '近7天', value: 'near2now_7' },
+                { name: '近30天', value: 'near2now_30' },
+                { name: '自定义时间', value: 'customDateTime' }
+              ]"
+              @change="queryDateRangeChange"/>
           </div>
-          <div class="other-item" style="margin: 30px 0px;">
+          <div class="other-item" style="margin: 30px 0;">
             <div class="item">
               <p class="item-title">成交金额（元）</p>
-              <p class="item-text" style="color: rgb(24, 144, 255) !important;">0.00</p>
+              <p class="item-text" style="color: rgb(24, 144, 255) !important;">{{ statistics.data.payAmount.toFixed(2) }}</p>
             </div>
             <div class="item">
               <p class="item-title">交易笔数（笔）</p>
-              <p class="item-text">0</p>
+              <p class="item-text">{{ statistics.data.payCount }}</p>
             </div>
             <div class="item">
               <p class="item-title">退款金额（元）</p>
-              <p class="item-text">0.00</p>
+              <p class="item-text">{{ statistics.data.refundAmount.toFixed(2) }}</p>
             </div>
             <div class="item">
               <p class="item-title">退款笔数（笔）</p>
-              <p class="item-text">0</p>
+              <p class="item-text">{{ statistics.data.refundCount }}</p>
             </div>
           </div>
           <div class="other-item">
             <div class="item">
               <p class="item-title">商户总数</p>
-              <p class="item-text" style="color: rgb(24, 144, 255) !important;">0</p>
+              <p class="item-text" style="color: rgb(24, 144, 255) !important;">{{ statistics.data.mchAllCount }}</p>
             </div>
             <div class="item">
               <p class="item-title">新增商户数</p>
-              <p class="item-text">0</p>
+              <p class="item-text">{{ statistics.data.mchNewCount }}</p>
             </div>
             <div class="item">
               <p class="item-title">入网商户数</p>
-              <p class="item-text">0</p>
+              <p class="item-text">{{ statistics.data.mchOnNetCount }}</p>
             </div>
             <div class="item">
               <p class="item-title">新增入网商户</p>
-              <p class="item-text">0</p>
+              <p class="item-text">{{ statistics.data.mchOnNetNewCount }}</p>
             </div>
           </div>
         </div>
@@ -89,16 +107,16 @@
           </div>
           <div class="main-item">
             <p class="item-title">代理商总数</p>
-            <p class="item-text">0.00</p>
+            <p class="item-text">{{ statistics.data.agentAllCount }}</p>
           </div>
           <div class="other-item">
             <div class="item">
               <p class="item-title">新增代理商数</p>
-              <p class="item-text">0</p>
+              <p class="item-text">{{ statistics.data.agentNewCount }}</p>
             </div>
             <div class="item">
               <p class="item-title">活动代理商数</p>
-              <p class="item-text">0</p>
+              <p class="item-text">{{ statistics.data.agentOnCount }}</p>
             </div>
           </div>
         </div>
@@ -110,37 +128,37 @@
         <div class="other-item hardware-item">
           <div class="item">
             <p class="item-title">码牌总数</p>
-            <p class="item-text item-text-top">0</p>
+            <p class="item-text item-text-top">{{ statistics.data.qrCodeCardAllCount }}</p>
           </div>
           <div class="item">
             <p class="item-title">云喇叭总数</p>
-            <p class="item-text item-text-top">0</p>
+            <p class="item-text item-text-top">{{ statistics.data.speakerAllCount }}</p>
           </div>
           <div class="item">
             <p class="item-title">云打印总数</p>
-            <p class="item-text item-text-top">0</p>
+            <p class="item-text item-text-top">{{ statistics.data.printerAllCount }}</p>
           </div>
           <div class="item">
             <p class="item-title">POS机总数</p>
-            <p class="item-text item-text-top">0</p>
+            <p class="item-text item-text-top">{{ statistics.data.posAllCount }}</p>
           </div>
         </div>
         <div class="other-item">
           <div class="item">
             <p class="item-title">空码数量</p>
-            <p class="item-text">0</p>
+            <p class="item-text">{{ statistics.data.qrCodeCardUnBindCount }}</p>
           </div>
           <div class="item">
             <p class="item-title">未绑定云喇叭数</p>
-            <p class="item-text">0</p>
+            <p class="item-text">{{ statistics.data.speakerUnBindCount }}</p>
           </div>
           <div class="item">
             <p class="item-title">未绑定云打印数</p>
-            <p class="item-text">0</p>
+            <p class="item-text">{{ statistics.data.printerUnBindCount }}</p>
           </div>
           <div class="item">
             <p class="item-title">未绑定POS机数</p>
-            <p class="item-text">0</p>
+            <p class="item-text">{{ statistics.data.posUnBindCount }}</p>
           </div>
         </div>
       </a-card>
@@ -149,17 +167,70 @@
 </template>
 
 <script>
-import { getMainUserInfo } from '@/api/manage'
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
+import { getMainUserInfo, API_URL_AGENT_LIST, req } from '@/api/manage'
 export default {
+  components: { AgDateRangePicker },
   data () {
     return {
-      agentInfo: {}
+      agentInfo: {},
+      selectedAgentNo: 2,
+      agentList: [],
+      statistics: {
+        params: {
+          countType: 2,
+          agentNo: '',
+          queryDateRange: 'today'
+        },
+        data: {
+          payAmount: 0.00,
+          payCount: 0,
+          refundAmount: 0.00,
+          refundCount: 0.00,
+          mchAllCount: 0,
+          mchNewCount: 0,
+          mchOnNetCount: 0,
+          mchOnNetNewCount: 0,
+          mchOnNetFailCount: 0,
+          agentAllCount: 0,
+          agentNewCount: 0,
+          agentOnCount: 0,
+          qrCodeCardAllCount: 0,
+          speakerAllCount: 0,
+          printerAllCount: 0,
+          posAllCount: 0,
+          qrCodeCardUnBindCount: 0,
+          speakerUnBindCount: 0,
+          printerUnBindCount: 0,
+          posUnBindCount: 0
+        }
+      }
     }
   },
   created () {
-    this.detail()
+    this.show()
   },
   methods: {
+    show () { // 获取基本信息
+      const that = this
+      getMainUserInfo().then(res => {
+        that.agentInfo = res
+        // console.log(res)
+      })
+
+      req.list(API_URL_AGENT_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 代理商下拉选择列表
+        that.agentList = res.records
+      })
+    },
+    agentNoChange (value) {
+      this.statistics.params.countType = [1, 2].includes(value) ? value : 3
+      this.statistics.params.agentNo = [1, 2].includes(value) ? '' : value
+      console.log(this.statistics.params)
+    },
+    queryDateRangeChange (value) {
+      this.statistics.params.queryDateRange = value
+      console.log(this.statistics.params)
+    },
     copyFunc () {
       const data = [
         { title: '代理商名称', value: 'agentName' },
@@ -194,13 +265,6 @@ export default {
       } else {
         console.log('当前浏览器不支持剪贴板操作！')
       }
-    },
-    detail () { // 获取基本信息
-      const that = this
-      getMainUserInfo().then(res => {
-        that.agentInfo = res
-        // console.log(res)
-      })
     }
   }
 }
