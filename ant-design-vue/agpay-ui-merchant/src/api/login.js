@@ -26,8 +26,8 @@ export function register ({ agentName, code, confirmPwd, phone }) {
   const data = {
     agentName: agentName, // 账号
     code: Base64.encode(code), // 验证码
-    confirmPwd: Base64.encode(confirmPwd), // 验证码值
-    phone: Base64.encode(phone) // 验证码token
+    confirmPwd: Base64.encode(confirmPwd), // 密码
+    phone: Base64.encode(phone) // 手机号
   }
   return request.request({
     url: '/api/anon/register',
@@ -42,7 +42,12 @@ export function treaty () {
 }
 
 // 找回密码接口
-export function forget (data) {
+export function forget ({ phone, code, confirmPwd }) {
+  const data = {
+    phone: Base64.encode(phone), // 手机号
+    code: Base64.encode(code), // 验证码
+    newPwd: Base64.encode(confirmPwd) // 密码
+  }
   return request.request({
     url: '/api/anon/cipher/retrieve',
     method: 'post',

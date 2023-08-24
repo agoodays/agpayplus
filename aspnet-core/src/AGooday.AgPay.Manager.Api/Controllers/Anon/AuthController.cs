@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
     /// 认证接口
     /// </summary>
     [ApiController, AllowAnonymous]
-    [Route("api/anon/auth")]
+    [Route("api/anon")]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route("validate"), MethodLog("登录认证")]
+        [HttpPost, Route("auth/validate"), MethodLog("登录认证")]
         public ApiRes Validate(Validate model)
         {
             string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理
@@ -143,7 +143,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// 图片验证码
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("vercode"), NoLog]
+        [HttpGet, Route("auth/vercode"), NoLog]
         public ApiRes Vercode()
         {
             //定义图形验证码的长和宽 // 6位验证码
@@ -163,6 +163,45 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             _redis.StringSet(CS.GetCacheKeyImgCode(vercodeToken), code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
 
             return ApiRes.Ok(new { imageBase64Data, vercodeToken, expireTime = CS.VERCODE_CACHE_TIME });
+        }
+
+        /// <summary>
+        /// 发送短信验证码
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost, Route("sms/code"), NoLog]
+        public ApiRes SendCode(SmsCode model)
+        {
+            var code = VerificationCodeUtil.RandomVerificationCode(6);
+
+            //redis
+            string vercodeToken = $"{model.phone}_{model.smsType}";
+            _redis.StringSet(CS.GetCacheKeySmsCode(vercodeToken), code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
+
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 找回密码
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost, Route("cipher/retrieve"), NoLog]
+        public ApiRes Retrieve(Retrieve model)
+        {
+            string phone = Base64Util.DecodeBase64(model.phone);
+            string code = Base64Util.DecodeBase64(model.code);
+            string newPwd = Base64Util.DecodeBase64(model.newPwd);
+
+#if !DEBUG
+            string cacheCode = _redis.StringGet(CS.GetCacheKeySmsCode($"{phone}_retrieve"));
+            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(code))
+            {
+                throw new BizException("验证码已过期，请重新点击发送验证码！");
+            }
+#endif
+            return ApiRes.Ok();
         }
     }
 }

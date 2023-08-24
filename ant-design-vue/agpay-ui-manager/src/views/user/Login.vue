@@ -64,7 +64,7 @@
         <!-- <a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">自动登录</a-checkbox> -->
         <a-checkbox v-model="isAutoLogin">自动登录</a-checkbox>
         <!-- 忘记密码 -->
-        <a class="forge-password" style="float: right;">忘记密码?</a>
+        <a class="forge-password" style="float: right;" href="/forget">忘记密码?</a>
       </a-form-item>
 
       <a-form-item class="submit">

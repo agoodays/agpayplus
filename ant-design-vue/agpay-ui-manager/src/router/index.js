@@ -15,10 +15,11 @@ Vue.use(Router)
 // 纯静态路由配置项
 const constantRouterMap = [
   {
-    path: '/user',
+    path: '/',
     component: UserLayout,
     children: [
-      { path: 'login', name: 'login', component: () => import('@/views/user/Login') }
+      { path: 'login', name: 'login', component: () => import('@/views/user/Login') },
+      { path: 'forget', name: 'forget', component: () => import('@/views/user/Forget') }
     ]
   }
 ]

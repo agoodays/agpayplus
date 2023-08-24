@@ -11,7 +11,12 @@ import { getInfo } from '@/api/login'
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const allowList = ['login', 'forget', 'register', 'registerResult'] // no redirect allowList
-const loginRoutePath = '/user/login'
+const loginRoutePath = '/login'
+
+// 封装跳转到指定路由的函数
+function redirectToTargetRoute (path, next) {
+  next(path === '/' ? '/main' : undefined)
+}
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
@@ -49,7 +54,7 @@ router.beforeEach((to, from, next) => {
         router.addRoutes(store.state.asyncRouter.addRouters)
       })
 
-      next()
+      redirectToTargetRoute(to.path, next)
     }).catch(() => {
       // 失败时，获取用户信息失败时，调用登出，来清空历史保留信息
       store.dispatch('Logout').then(() => {
@@ -57,7 +62,7 @@ router.beforeEach((to, from, next) => {
       })
     })
   } else {
-    next()
+    redirectToTargetRoute(to.path, next)
   }
 })
 

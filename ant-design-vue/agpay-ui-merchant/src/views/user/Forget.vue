@@ -33,7 +33,7 @@
       </a-form-model-item>
 
       <a-form-model-item>
-        <a class="forge-password" style="float: right;" href="/user/login" >去登录 >></a>
+        <a class="forge-password" style="float: right;" href="/login" >去登录 >></a>
       </a-form-model-item>
 
       <a-form-model-item class="submit">
@@ -107,14 +107,17 @@ export default {
       this.$refs.infoFormModel.validate(valid => {
         if (valid) { // 验证通过
           console.log(that.saveObject)
-          forget(that.saveObject)
-              .then((res) => {
-                this.retrieveSuccess(res)
-              })
-              .catch(err => {
-                that.showForgetErrorInfo = (err.msg || JSON.stringify(err))
-                that.forgetBtnLoadingFlag = false
-              })
+          const forgetParams = {
+            phone: that.saveObject.phone,
+            code: that.saveObject.code,
+            confirmPwd: that.saveObject.confirmPwd
+          }
+          forget(forgetParams).then((res) => {
+            this.retrieveSuccess(res)
+          }).catch(err => {
+            that.showForgetErrorInfo = (err.msg || JSON.stringify(err))
+            that.forgetBtnLoadingFlag = false
+          })
         }
       })
     },

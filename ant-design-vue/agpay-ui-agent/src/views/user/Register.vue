@@ -40,7 +40,7 @@
       </a-form-model-item>
 
       <a-form-model-item>
-        <a class="forge-password" style="float: right;" href="/user/login" >去登录 >></a>
+        <a class="forge-password" style="float: right;" href="/login" >去登录 >></a>
       </a-form-model-item>
 
       <a-form-model-item>

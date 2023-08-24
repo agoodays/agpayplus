@@ -179,7 +179,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         /// <summary>
         /// 注册
         /// </summary>
-        /// <param name="appId"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost, Route("register/agentRegister"), NoLog]
         public ApiRes Register(Register model)
@@ -201,7 +201,6 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         /// <summary>
         /// 获取条约
         /// </summary>
-        /// <param name="appId"></param>
         /// <returns></returns>
         [HttpGet, Route("treaty"), NoLog]
         public ApiRes Treaty()
@@ -213,7 +212,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         /// <summary>
         /// 发送短信验证码
         /// </summary>
-        /// <param name="appId"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost, Route("sms/code"), NoLog]
         public ApiRes SendCode(SmsCode model)
@@ -230,7 +229,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         /// <summary>
         /// 找回密码
         /// </summary>
-        /// <param name="appId"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost, Route("cipher/retrieve"), NoLog]
         public ApiRes Retrieve(Retrieve model)

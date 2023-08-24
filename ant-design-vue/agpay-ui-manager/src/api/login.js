@@ -21,6 +21,29 @@ export function vercode () {
   return request.request({ url: '/api/anon/auth/vercode', method: 'get' }, true, true, true)
 }
 
+// 找回密码接口
+export function forget ({ phone, code, confirmPwd }) {
+  const data = {
+    phone: Base64.encode(phone), // 手机号
+    code: Base64.encode(code), // 验证码
+    newPwd: Base64.encode(confirmPwd) // 密码
+  }
+  return request.request({
+    url: '/api/anon/cipher/retrieve',
+    method: 'post',
+    data: data
+  }, true, true, true)
+}
+
+// 发送短信验证码信息接口
+export function sendcode (data) {
+  return request.request({
+    url: '/api/anon/sms/code',
+    method: 'post',
+    data: data
+  }, true, true, true)
+}
+
 // 获取当前用户信息
 export function getInfo () {
   return request.request({
