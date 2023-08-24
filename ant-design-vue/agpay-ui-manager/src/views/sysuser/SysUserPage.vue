@@ -66,10 +66,10 @@
           <span>{{ getUserTypeName(record.userType) }}</span>
         </template>
 
-        <template slot="inviteCodeSlot" slot-scope="{record}">
+        <template slot="inviteCodeSlot" slot-scope="{record}" v-if="record.inviteCode">
           <b>{{ record.inviteCode }}</b>
           <a-button icon="copy" type="link" @click="copyFunc(record.inviteCode)"/>
-          <a-button icon="info-circle" type="link" @click="inviteCodeFunc(record.inviteCode, record.sysType)" v-if="record.inviteCode"/>
+          <a-button icon="info-circle" type="link" @click="inviteCodeFunc(record.inviteCode, record.sysType)"/>
         </template>
 
         <template slot="stateSlot" slot-scope="{record}">
