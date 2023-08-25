@@ -30,7 +30,7 @@ export function register ({ agentName, code, confirmPwd, phone }) {
     phone: Base64.encode(phone) // 手机号
   }
   return request.request({
-    url: '/api/anon/register',
+    url: '/api/anon/register/agentRegister',
     method: 'post',
     data: data
   }, true, true, true)

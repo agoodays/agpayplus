@@ -16,11 +16,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             string sql = $@"select pid.if_code IfCode, pid.if_name IfName, pid.config_page_type ConfigPageType, pid.bg_color BgColor, pid.icon Icon, pic.if_params IfParams, pic.if_rate IfRate from t_pay_interface_define pid
                             inner join t_pay_interface_config pic on pid.if_code = pic.if_code
-                            where JSON_CONTAINS(pid.way_codes, JSON_OBJECT('wayCode', @wayCode))
+                            where JSON_CONTAINS(pid.way_codes, JSON_OBJECT('wayCode', @WayCode))
                             and pid.state = 1
                             and pic.state = 1
-                            and pic.info_type = @infoType
-                            and pic.info_id = @appId
+                            and pic.info_type = @InfoType
+                            and pic.info_id = @AppId
                             and (pic.if_params is not null and trim(pic.if_params) != '')";
             switch (mchType)
             {
@@ -31,10 +31,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                     sql += "\nand pid.is_isv_mode = 1";
                     break;
             }
-            return Db.Database.FromSql<T>(sql, new {
-                WayCode= wayCode,
+            return Db.Database.FromSql<T>(sql, new
+            {
+                WayCode = wayCode,
                 InfoType = infoType,
-                AppId= appId
+                AppId = appId
             });
         }
     }

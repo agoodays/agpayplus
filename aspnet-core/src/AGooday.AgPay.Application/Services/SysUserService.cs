@@ -135,6 +135,18 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public bool IsExistTelphone(string telphone, string sysType)
+        {
+            return _sysUserRepository.IsExistTelphone(telphone, sysType);
+        }
+
+        public SysUserDto GetByTelphone(string telphone, string sysType)
+        {
+            var entity = _sysUserRepository.GetByTelphone(telphone, sysType);
+            var dto = _mapper.Map<SysUserDto>(entity);
+            return dto;
+        }
+
         public IEnumerable<SysUserDto> GetAll()
         {
             //第一种写法 Map

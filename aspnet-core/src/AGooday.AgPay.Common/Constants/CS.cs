@@ -10,12 +10,34 @@
         /// </summary>
         public const int VERCODE_CACHE_TIME = 60;
 
-        /** 系统类型定义 **/
+        /// <summary>
+        /// 短信验证码缓存时间，单位：s
+        /// </summary>
+        public const int SMSCODE_CACHE_TIME = 60;
+
+        /// <summary>
+        /// 系统类型定义
+        /// </summary>
         public interface SYS_TYPE
         {
             public const string MCH = "MCH";
             public const string AGENT = "AGENT";
             public const string MGR = "MGR";
+        }
+
+        /// <summary>
+        /// 短信类型定义
+        /// </summary>
+        public interface SMS_TYPE
+        {
+            /// <summary>
+            /// 注册
+            /// </summary>
+            public const string REGISTER = "register";
+            /// <summary>
+            /// 找回密码
+            /// </summary>
+            public const string RETRIEVE = "retrieve";
         }
 
         public interface BASE_BELONG_INFO_ID

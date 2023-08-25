@@ -16,6 +16,8 @@ namespace AGooday.AgPay.Application.Interfaces
         Task<SysUserDto> GetByIdAsync(long recordId);
         SysUserDto GetByUserId(long sysUserId);
         SysUserDto GetById(long recordId, string belongInfoId);
+        bool IsExistTelphone(string telphone, string sysType);
+        SysUserDto GetByTelphone(string telphone, string sysType);
         IEnumerable<SysUserDto> GetAll();
         IEnumerable<SysUserDto> GetAll(List<long> recordIds);
         PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long currentUserId);

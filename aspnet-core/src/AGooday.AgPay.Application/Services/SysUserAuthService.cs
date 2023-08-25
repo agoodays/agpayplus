@@ -63,6 +63,13 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public SysUserAuthDto GetByIdentifier(byte identityType, string identifier, string sysType)
+        {
+            var entity = _sysUserAuthRepository.GetByIdentifier(identityType, identifier, sysType);
+            var dto = _mapper.Map<SysUserAuthDto>(entity);
+            return dto;
+        }
+
         public IEnumerable<SysUserAuthDto> GetAll()
         {
             var sysUserAuths = _sysUserAuthRepository.GetAll();
@@ -99,7 +106,7 @@ namespace AGooday.AgPay.Application.Services
         public SysUserAuthInfoDto SelectByLogin(string identifier, byte identityType, string sysType)
         {
             var entity = _sysUserAuthRepository.GetAll()
-                .Join(_sysUserAuthRepository.GetAll<SysUser>(),
+                .Join(_sysUserRepository.GetAll(),
                 ua => ua.UserId, ur => ur.SysUserId,
                 (ua, ur) => new { ua, ur })
                 .Where(w => w.ua.IdentityType == identityType && w.ua.Identifier.Equals(identifier) && w.ua.SysType.Equals(sysType) && w.ur.State == CS.PUB_USABLE)

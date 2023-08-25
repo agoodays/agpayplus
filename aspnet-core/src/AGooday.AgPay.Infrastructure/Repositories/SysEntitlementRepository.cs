@@ -14,20 +14,12 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public SysEntitlement GetByKeyAsNoTracking(string entId, string sysType)
         {
-            var entity = DbSet.AsNoTracking()
-                .Where(w => w.SysType.Equals(sysType) && w.EntId.Equals(entId))
-                .FirstOrDefault();
-
-            return entity;
+            return DbSet.AsNoTracking().FirstOrDefault(w => w.SysType.Equals(sysType) && w.EntId.Equals(entId));
         }
 
         public SysEntitlement GetByKey(string entId, string sysType)
         {
-            var entity = DbSet
-                .Where(w => w.SysType.Equals(sysType) && w.EntId.Equals(entId))
-                .FirstOrDefault();
-
-            return entity;
+            return DbSet.FirstOrDefault(w => w.SysType.Equals(sysType) && w.EntId.Equals(entId));
         }
     }
 }

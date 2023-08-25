@@ -11,6 +11,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         SysUser GetByKeyAsNoTracking(long recordId);
         SysUser GetByUserId(long sysUserId);
         SysUser GetByUserId(long sysUserId, string sysType);
+        SysUser GetByTelphone(string telphone, string sysType);
         void Remove(SysUser sysUser);
         long FindMchAdminUserId(string mchNo);
         long FindAgentAdminUserId(string agentNo);

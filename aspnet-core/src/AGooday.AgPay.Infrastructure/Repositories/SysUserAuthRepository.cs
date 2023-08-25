@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public void RemoveByUserId(long userId, string sysType)
         {
-            var entitys = DbSet.Where(w => w.UserId == userId && w.SysType == sysType);
+            var entitys = DbSet.Where(w => w.UserId .Equals( userId) && w.SysType.Equals(sysType));
             foreach (var entity in entitys)
             {
                 DbSet.Remove(entity);
@@ -24,12 +24,12 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public void ResetAuthInfo(long userId, string sysType, string loginUserName, string telphone, string newPwd)
         {
-            var sysUserAuths = DbSet.Where(w => w.UserId == userId && w.SysType == sysType);
+            var sysUserAuths = DbSet.Where(w => w.UserId.Equals(userId) && w.SysType.Equals(sysType));
 
             //更改登录用户名
             if (!string.IsNullOrWhiteSpace(loginUserName))
             {
-                var sysUserAuth = sysUserAuths.Where(w => w.IdentityType == CS.AUTH_TYPE.LOGIN_USER_NAME).FirstOrDefault();
+                var sysUserAuth = sysUserAuths.FirstOrDefault(w => w.IdentityType.Equals(CS.AUTH_TYPE.LOGIN_USER_NAME));
                 if (sysUserAuth != null)
                 {
                     sysUserAuth.Identifier = loginUserName;
@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             //更新手机号认证
             if (!string.IsNullOrWhiteSpace(telphone))
             {
-                var sysUserAuth = sysUserAuths.Where(w => w.IdentityType == CS.AUTH_TYPE.TELPHONE).FirstOrDefault();
+                var sysUserAuth = sysUserAuths.FirstOrDefault(w => w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE));
                 if (sysUserAuth != null)
                 {
                     sysUserAuth.Identifier = telphone;
@@ -57,6 +57,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                     Update(sysUserAuth);
                 }
             }
+        }
+
+        public SysUserAuth GetByIdentifier(byte identityType, string identifier, string sysType)
+        {
+            return DbSet.FirstOrDefault(w => w.IdentityType.Equals(identityType) && w.Identifier.Equals(identifier) && w.SysType.Equals(sysType));
         }
 
         public List<SysUserAuth> GetUserAuths(string identifier, string sysType)

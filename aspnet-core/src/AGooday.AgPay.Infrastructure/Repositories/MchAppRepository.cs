@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public MchApp GetAsNoTrackingById(string id)
         {
-            return DbSet.AsNoTracking().Where(w => w.AppId.Equals(id)).FirstOrDefault();
+            return DbSet.AsNoTracking().FirstOrDefault(w => w.AppId.Equals(id));
         }
     }
 }

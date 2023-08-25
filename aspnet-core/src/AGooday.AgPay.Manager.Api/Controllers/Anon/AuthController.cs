@@ -26,6 +26,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
     {
         private readonly ILogger<AuthController> _logger;
         private readonly JwtSettings _jwtSettings;
+        private readonly ISysUserService _sysUserService;
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
@@ -36,18 +37,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 
         public AuthController(ILogger<AuthController> logger, IOptions<JwtSettings> jwtSettings, IMemoryCache cache, RedisUtil client,
             INotificationHandler<DomainNotification> notifications,
+            ISysUserService sysUserService,
             ISysUserAuthService sysUserAuthService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
+            _sysUserService = sysUserService;
             _sysUserAuthService = sysUserAuthService;
+            _sysRoleEntRelaService = sysRoleEntRelaService;
+            _sysUserRoleRelaService = sysUserRoleRelaService;
             _cache = cache;
             _redis = client.GetDatabase();
             _notifications = (DomainNotificationHandler)notifications;
-            _sysRoleEntRelaService = sysRoleEntRelaService;
-            _sysUserRoleRelaService = sysUserRoleRelaService;
         }
 
         /// <summary>
@@ -173,11 +176,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         [HttpPost, Route("sms/code"), NoLog]
         public ApiRes SendCode(SmsCode model)
         {
+            if (model.smsType.Equals(CS.SMS_TYPE.REGISTER) && _sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.MGR))
+            {
+                throw new BizException("用户不存在！");
+            }
+
+            if (model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) && !_sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.MGR))
+            {
+                throw new BizException("当前用户已存在！");
+            }
+
             var code = VerificationCodeUtil.RandomVerificationCode(6);
 
             //redis
-            string vercodeToken = $"{model.phone}_{model.smsType}";
-            _redis.StringSet(CS.GetCacheKeySmsCode(vercodeToken), code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
+            string smsCodeToken = $"{model.phone}_{model.smsType}";
+            _redis.StringSet(CS.GetCacheKeySmsCode(smsCodeToken), code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
 
             return ApiRes.Ok();
         }
@@ -187,7 +200,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPost, Route("cipher/retrieve"), NoLog]
+        [HttpPost, Route("cipher/retrieve"), MethodLog("密码找回")]
         public ApiRes Retrieve(Retrieve model)
         {
             string phone = Base64Util.DecodeBase64(model.phone);
@@ -195,12 +208,36 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             string newPwd = Base64Util.DecodeBase64(model.newPwd);
 
 #if !DEBUG
-            string cacheCode = _redis.StringGet(CS.GetCacheKeySmsCode($"{phone}_retrieve"));
-            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(code))
+            string cacheCode = _redis.StringGet(CS.GetCacheKeySmsCode($"{phone}_{CS.SMS_TYPE.RETRIEVE}"));
+            if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
             }
+            if (!cacheCode.Equals(code))
+            {
+                throw new BizException("验证码有误！");
+            }
 #endif
+            var sysUser = _sysUserService.GetByTelphone(model.phone, CS.SYS_TYPE.MGR);
+            if (sysUser == null)
+            {
+                throw new BizException("用户不存在！");
+            }
+            if (sysUser.State.Equals(CS.PUB_DISABLE))
+            {
+                throw new BizException("用户已停用！");
+            }
+            var sysUserAuth = _sysUserAuthService.GetByIdentifier(CS.AUTH_TYPE.TELPHONE, model.phone, CS.SYS_TYPE.MGR);
+            if (sysUserAuth == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            bool verified = BCrypt.Net.BCrypt.Verify(newPwd, sysUserAuth.Credential);
+            if (verified)
+            {
+                throw new BizException("新密码与原密码相同！");
+            }
+            _sysUserAuthService.ResetAuthInfo(sysUser.SysUserId, null, null, newPwd, CS.SYS_TYPE.MGR);
             return ApiRes.Ok();
         }
     }
