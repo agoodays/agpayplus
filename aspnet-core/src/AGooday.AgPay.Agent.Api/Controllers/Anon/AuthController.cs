@@ -32,6 +32,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly ISysConfigService _sysConfigService;
         private readonly IAgentInfoService _agentInfoService;
+        private readonly ISysLogService _sysLogService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         // 将领域通知处理程序注入Controller
@@ -44,7 +45,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService,
             ISysConfigService sysConfigService,
-            IAgentInfoService agentInfoService)
+            IAgentInfoService agentInfoService, 
+            ISysLogService sysLogService)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
@@ -54,6 +56,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysConfigService = sysConfigService;
             _agentInfoService = agentInfoService;
+            _sysLogService = sysLogService;
             _cache = cache;
             _redis = client.GetDatabase();
             _notifications = (DomainNotificationHandler)notifications;
@@ -148,6 +151,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             // 删除图形验证码缓存数据
             _redis.KeyDelete(CS.GetCacheKeyImgCode(vercodeToken));
 
+            var lastLoginTime = _sysLogService.GetLastSysLog(auth.SysUserId, "登录认证", auth.SysType)?.CreatedAt;
+            if (lastLoginTime != null)
+            {
+                var data = new Dictionary<string, object>();
+                data.Add(CS.ACCESS_TOKEN_NAME, accessToken);
+                data.Add("lastLoginTime", lastLoginTime);
+                return ApiRes.Ok(data);
+            }
             return ApiRes.Ok4newJson(CS.ACCESS_TOKEN_NAME, accessToken);
         }
 

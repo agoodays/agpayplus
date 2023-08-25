@@ -9,6 +9,7 @@ namespace AGooday.AgPay.Application.Interfaces
         bool RemoveByIds(List<long> recordIds);
         void Update(SysLogDto dto);
         SysLogDto GetById(long recordId);
+        SysLogDto GetLastSysLog(long userId, string methodRemark, string sysType);
         IEnumerable<SysLogDto> GetAll();
         PaginatedList<SysLogDto> GetPaginatedData(SysLogQueryDto dto);
     }

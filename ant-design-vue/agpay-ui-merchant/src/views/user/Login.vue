@@ -146,7 +146,10 @@ export default {
       setTimeout(() => {
         this.$notification.success({
           message: '欢迎',
-          description: `${timeFix()}，欢迎回来`
+          description: `${timeFix()}，欢迎回来${(res.lastLoginTime ? `\n上次登录时间：${res.lastLoginTime}` : '')}`,
+          style: {
+            whiteSpace: 'pre-wrap'
+          }
         })
       }, 1000)
       this.showLoginErrorInfo = ''

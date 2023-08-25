@@ -51,7 +51,7 @@ const user = {
         login(loginParams).then(bizData => {
           storage.setToken(bizData[appConfig.ACCESS_TOKEN_NAME], isSaveStorage)
           commit('SET_TOKEN', bizData[appConfig.ACCESS_TOKEN_NAME])
-          resolve()
+          resolve(bizData) // 返回登录响应结果
         }).catch(error => {
           reject(error)
         })

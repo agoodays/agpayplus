@@ -49,9 +49,9 @@ namespace AGooday.AgPay.Application.Services
         {
             foreach (var recordId in recordIds)
             {
-                _sysLogRepository.Remove(recordId); 
+                _sysLogRepository.Remove(recordId);
             }
-            return _sysLogRepository.SaveChanges()>0;
+            return _sysLogRepository.SaveChanges() > 0;
         }
 
         public void Update(SysLogDto dto)
@@ -64,6 +64,13 @@ namespace AGooday.AgPay.Application.Services
         public SysLogDto GetById(long recordId)
         {
             var entity = _sysLogRepository.GetById(recordId);
+            var dto = _mapper.Map<SysLogDto>(entity);
+            return dto;
+        }
+
+        public SysLogDto GetLastSysLog(long userId, string methodRemark, string sysType)
+        {
+            var entity = _sysLogRepository.GetLastSysLog(userId, methodRemark, sysType);
             var dto = _mapper.Map<SysLogDto>(entity);
             return dto;
         }

@@ -49,7 +49,7 @@ export default {
       this.$router.push({ name: 'ENT_C_USERINFO' })
     },
     handleLogout: function (e) {
-      this.$infoBox.confirmPrimary('确认退出?', '', () => {
+      this.$infoBox.confirmPrimary('是否退出登录？', `你好${this.currentUserName}确认退出登录吗？`, () => {
         this.$store.dispatch('Logout').then(() => {
           this.$router.push({ name: 'login' })
         })
