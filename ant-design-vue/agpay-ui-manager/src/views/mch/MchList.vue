@@ -61,6 +61,7 @@
             <a-button type="link" v-if="$access('ENT_MCH_INFO_EDIT')" @click="editFunc(record.mchNo)">修改</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_APP_CONFIG')" @click="mchAppConfig(record.mchNo)">应用配置</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_CONFIG_PAGE')" @click="mchConfigFunc(record.mchNo)">高级功能配置</a-button>
+            <a-button type="link" v-if="$access('ENT_DEVICE_QRC_LIST')" @click="mchQRC(record.mchNo)">码牌管理</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_INFO_DEL')" style="color: red" @click="delFunc(record.mchNo)">删除</a-button>
           </AgTableColumns>
         </template>
@@ -146,6 +147,12 @@ export default {
     mchAppConfig: function (recordId) { // 应用配置
       this.$router.push({
         path: '/apps',
+        query: { mchNo: recordId }
+      })
+    },
+    mchQRC: function (recordId) { // 码牌管理
+      this.$router.push({
+        path: '/qrc',
         query: { mchNo: recordId }
       })
     }

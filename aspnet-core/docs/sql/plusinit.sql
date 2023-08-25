@@ -423,7 +423,7 @@ CREATE TABLE `t_mch_apply` (
   `contact_email` VARCHAR(32) NULL COMMENT '商户联系人邮箱', 
   `province_code` VARCHAR(32) NOT NULL COMMENT '省代码',
   `city_code` VARCHAR(32) NOT NULL COMMENT '市代码',
-  `area_code` VARCHAR(32) NOT NULL COMMENT '区代码',
+  `district_code` VARCHAR(32) NOT NULL COMMENT '区代码',
   `address` VARCHAR(128) NOT NULL COMMENT '商户详细地址',
   `ep_user_id` BIGINT DEFAULT NULL COMMENT '商户拓展员ID',
   `created_uid` BIGINT DEFAULT NULL COMMENT '创建者用户ID',

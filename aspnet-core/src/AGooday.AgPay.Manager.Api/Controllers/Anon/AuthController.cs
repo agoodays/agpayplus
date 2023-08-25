@@ -178,12 +178,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         {
             if (model.smsType.Equals(CS.SMS_TYPE.REGISTER) && _sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.MGR))
             {
-                throw new BizException("用户不存在！");
+                throw new BizException("当前用户已存在！");
             }
 
             if (model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) && !_sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.MGR))
             {
-                throw new BizException("当前用户已存在！");
+                throw new BizException("用户不存在！");
             }
 
             var code = VerificationCodeUtil.RandomVerificationCode(6);

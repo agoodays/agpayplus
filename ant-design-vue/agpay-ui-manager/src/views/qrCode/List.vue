@@ -102,6 +102,10 @@ export default {
       btnLoading: false
     }
   },
+  mounted () {
+    this.searchData.mchNo = this.$route.query.mchNo
+    this.searchFunc(true)
+  },
   methods: {
     // 请求table接口数据
     reqTableDataFunc: (params) => {
