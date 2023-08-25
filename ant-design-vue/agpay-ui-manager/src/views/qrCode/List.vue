@@ -23,7 +23,7 @@
       <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
-        :initData="true"
+        :initData="false"
         :reqTableDataFunc="reqTableDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
