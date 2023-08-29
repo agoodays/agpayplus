@@ -51,6 +51,11 @@
         public string ReqMethod { get; set; }
 
         /// <summary>
+        /// 通知请求媒体类型
+        /// </summary>
+        public string ReqMediaType { get; set; }
+
+        /// <summary>
         /// 通知请求正文
         /// </summary>
         public string ReqBody { get; set; }

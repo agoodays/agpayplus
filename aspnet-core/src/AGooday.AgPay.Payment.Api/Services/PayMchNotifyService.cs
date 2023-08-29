@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
@@ -19,13 +20,19 @@ namespace AGooday.AgPay.Payment.Api.Services
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<PayMchNotifyService> _logger;
+        private readonly ISysConfigService _sysConfigService;
         private readonly IMchNotifyRecordService _mchNotifyRecordService;
         private readonly ConfigContextQueryService _configContextQueryService;
 
-        public PayMchNotifyService(IMQSender mqSender, ILogger<PayMchNotifyService> logger, IMchNotifyRecordService mchNotifyRecordService, ConfigContextQueryService configContextQueryService)
+        public PayMchNotifyService(IMQSender mqSender,
+            ILogger<PayMchNotifyService> logger,
+            ISysConfigService sysConfigService,
+            IMchNotifyRecordService mchNotifyRecordService,
+            ConfigContextQueryService configContextQueryService)
         {
             this.mqSender = mqSender;
             _logger = logger;
+            _sysConfigService = sysConfigService;
             _mchNotifyRecordService = mchNotifyRecordService;
             _configContextQueryService = configContextQueryService;
         }
@@ -53,12 +60,29 @@ namespace AGooday.AgPay.Payment.Api.Services
                     return;
                 }
 
+                var mchConfigList = _sysConfigService.GetByGroupKey("payOrderNotifyConfig", CS.SYS_TYPE.MCH, dbPayOrder.MchNo);
+                var mchNotifyPostType = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("mchNotifyPostType")).ConfigVal;
+                var payOrderNotifyExtParams = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("payOrderNotifyExtParams"))?.ConfigVal;
+
                 //商户app私钥
                 string appSecret = _configContextQueryService.QueryMchApp(dbPayOrder.MchNo, dbPayOrder.AppId).AppSecret;
 
                 // 封装通知url
                 string reqMethod = "POST";
-                string notifyUrl = CreateNotifyUrl(dbPayOrder, appSecret, reqMethod, out string reqBody);
+                string reqMediaType = string.Empty;
+                switch (mchNotifyPostType)
+                {
+                    case "POST_QUERYSTRING":
+                        break;
+                    case "POST_BODY":
+                        reqMediaType = "application/x-www-form-urlencoded";
+                        break;
+                    case "POST_JSON":
+                    default:
+                        reqMediaType = "application/json";
+                        break;
+                }
+                string notifyUrl = CreateNotifyUrl(dbPayOrder, appSecret, reqMethod, reqMediaType, payOrderNotifyExtParams, out string reqBody);
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbPayOrder.PayOrderId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_PAY_ORDER;
@@ -68,8 +92,9 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchNotifyRecord.AppId = dbPayOrder.AppId;
                 mchNotifyRecord.NotifyUrl = notifyUrl;
                 mchNotifyRecord.ReqMethod = reqMethod;
-                mchNotifyRecord.ReqBody = "";
-                mchNotifyRecord.ResResult = "";
+                mchNotifyRecord.ReqMediaType = reqMediaType;
+                mchNotifyRecord.ReqBody = reqBody;
+                mchNotifyRecord.ResResult = string.Empty;
                 mchNotifyRecord.NotifyCount = 0;
                 mchNotifyRecord.State = (byte)MchNotifyRecordState.STATE_ING; // 通知中
 
@@ -116,12 +141,29 @@ namespace AGooday.AgPay.Payment.Api.Services
                     return;
                 }
 
+                var mchConfigList = _sysConfigService.GetByGroupKey("payOrderNotifyConfig", CS.SYS_TYPE.MCH, dbRefundOrder.MchNo);
+                var mchNotifyPostType = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("mchNotifyPostType")).ConfigVal;
+                var payOrderNotifyExtParams = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("payOrderNotifyExtParams"))?.ConfigVal;
+
                 //商户app私钥
                 string appSecret = _configContextQueryService.QueryMchApp(dbRefundOrder.MchNo, dbRefundOrder.AppId).AppSecret;
 
                 // 封装通知url
                 string reqMethod = "POST";
-                string notifyUrl = CreateNotifyUrl(dbRefundOrder, appSecret, reqMethod, out string reqBody);
+                string reqMediaType = string.Empty;
+                switch (mchNotifyPostType)
+                {
+                    case "POST_QUERYSTRING":
+                        break;
+                    case "POST_BODY":
+                        reqMediaType = "application/x-www-form-urlencoded";
+                        break;
+                    case "POST_JSON":
+                    default:
+                        reqMediaType = "application/json";
+                        break;
+                }
+                string notifyUrl = CreateNotifyUrl(dbRefundOrder, appSecret, reqMethod, reqMediaType, payOrderNotifyExtParams, out string reqBody);
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbRefundOrder.RefundOrderId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
@@ -179,12 +221,29 @@ namespace AGooday.AgPay.Payment.Api.Services
                     return;
                 }
 
+                var mchConfigList = _sysConfigService.GetByGroupKey("payOrderNotifyConfig", CS.SYS_TYPE.MCH, dbTransferOrder.MchNo);
+                var mchNotifyPostType = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("mchNotifyPostType")).ConfigVal;
+                var payOrderNotifyExtParams = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("payOrderNotifyExtParams"))?.ConfigVal;
+
                 //商户app私钥
                 string appSecret = _configContextQueryService.QueryMchApp(dbTransferOrder.MchNo, dbTransferOrder.AppId).AppSecret;
 
                 // 封装通知url
                 string reqMethod = "POST";
-                string notifyUrl = CreateNotifyUrl(dbTransferOrder, appSecret, reqMethod, out string reqBody);
+                string reqMediaType = string.Empty;
+                switch (mchNotifyPostType)
+                {
+                    case "POST_QUERYSTRING":
+                        break;
+                    case "POST_BODY":
+                        reqMediaType = "application/x-www-form-urlencoded";
+                        break;
+                    case "POST_JSON":
+                    default:
+                        reqMediaType = "application/json";
+                        break;
+                }
+                string notifyUrl = CreateNotifyUrl(dbTransferOrder, appSecret, reqMethod, reqMediaType, payOrderNotifyExtParams, out string reqBody);
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbTransferOrder.TransferId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
@@ -225,11 +284,13 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="payOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(PayOrderDto payOrder, string appSecret, string method, out string body)
+        public string CreateNotifyUrl(PayOrderDto payOrder, string appSecret, string method, string mediaType, string extParams, out string body)
         {
             QueryPayOrderRS queryPayOrderRS = QueryPayOrderRS.BuildByPayOrder(payOrder);
             JObject jsonObject = JObject.FromObject(queryPayOrderRS);
-            return GenNotifyUrlAndBody(jsonObject, appSecret, payOrder.NotifyUrl, method, out body);
+            JObject payOrderJson = JObject.FromObject(payOrder);
+            AppendExtParams(extParams, payOrderJson, jsonObject);
+            return GenNotifyUrlAndBody(jsonObject, appSecret, payOrder.NotifyUrl, method, mediaType, out body);
         }
 
         /// <summary>
@@ -238,11 +299,13 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="refundOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(RefundOrderDto refundOrder, string appSecret, string method, out string body)
+        public string CreateNotifyUrl(RefundOrderDto refundOrder, string appSecret, string method, string mediaType, string extParams, out string body)
         {
             QueryRefundOrderRS queryRefundOrderRS = QueryRefundOrderRS.BuildByRefundOrder(refundOrder);
             JObject jsonObject = JObject.FromObject(queryRefundOrderRS);
-            return GenNotifyUrlAndBody(jsonObject, appSecret, refundOrder.NotifyUrl, method, out body);
+            JObject refundOrderJson = JObject.FromObject(refundOrder);
+            AppendExtParams(extParams, refundOrderJson, jsonObject);
+            return GenNotifyUrlAndBody(jsonObject, appSecret, refundOrder.NotifyUrl, method, mediaType, out body);
         }
 
         /// <summary>
@@ -251,11 +314,13 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="transferOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(TransferOrderDto transferOrder, string appSecret, string method, out string body)
+        public string CreateNotifyUrl(TransferOrderDto transferOrder, string appSecret, string method, string mediaType, string extParams, out string body)
         {
-            QueryTransferOrderRS rs = QueryTransferOrderRS.BuildByRecord(transferOrder);
-            JObject jsonObject = JObject.FromObject(rs);
-            return GenNotifyUrlAndBody(jsonObject, appSecret, transferOrder.NotifyUrl, method, out body);
+            QueryTransferOrderRS queryTransferOrderRS = QueryTransferOrderRS.BuildByRecord(transferOrder);
+            JObject jsonObject = JObject.FromObject(queryTransferOrderRS);
+            JObject transferOrderJson = JObject.FromObject(transferOrder);
+            AppendExtParams(extParams, transferOrderJson, jsonObject);
+            return GenNotifyUrlAndBody(jsonObject, appSecret, transferOrder.NotifyUrl, method, mediaType, out body);
         }
 
         /// <summary>
@@ -282,7 +347,21 @@ namespace AGooday.AgPay.Payment.Api.Services
             return URLUtil.AppendUrlQuery(payOrder.ReturnUrl, jsonObject);
         }
 
-        private static string GenNotifyUrlAndBody(JObject jsonObject, string appSecret, string notifyUrl, string method, out string body)
+        private static void AppendExtParams(string extParams, JObject originJsonObject, JObject targetJsonObject)
+        {
+            JArray extParamsArray = JArray.Parse(extParams);
+            foreach (var extKey in extParamsArray)
+            {
+                string key = extKey.ToString();
+                bool exists = targetJsonObject.ContainsKey(key);
+                if (!exists && originJsonObject.TryGetValue(key, out JToken value))
+                {
+                    targetJsonObject.Add(key, value);
+                }
+            }
+        }
+
+        private static string GenNotifyUrlAndBody(JObject jsonObject, string appSecret, string notifyUrl, string method, string mediaType, out string body)
         {
             jsonObject.Add("reqTime", DateTimeOffset.Now.ToUnixTimeSeconds());// 添加请求时间
             jsonObject.Add("sign", AgPayUtil.GetSign(jsonObject, appSecret));// 报文签名
@@ -291,7 +370,19 @@ namespace AGooday.AgPay.Payment.Api.Services
             switch (method)
             {
                 case "POST":
-                    body = JsonConvert.SerializeObject(jsonObject);
+                    switch (mediaType)
+                    {
+                        case "":
+                            notifyUrl = URLUtil.AppendUrlQuery(notifyUrl, jsonObject);
+                            break;
+                        case "application/x-www-form-urlencoded":
+                            body = BuildQueryString(jsonObject);
+                            break;
+                        case "application/json":
+                        default:
+                            body = JsonConvert.SerializeObject(jsonObject);
+                            break;
+                    }
                     break;
                 case "GET":
                     notifyUrl = URLUtil.AppendUrlQuery(notifyUrl, jsonObject);
@@ -300,6 +391,23 @@ namespace AGooday.AgPay.Payment.Api.Services
                     break;
             }
             return notifyUrl;
+        }
+
+        private static string BuildQueryString(JObject data)
+        {
+            var parameters = new List<string>();
+
+            foreach (var property in data.Properties())
+            {
+                string key = property.Name;
+                string value = property.Value.ToString();
+                string encodedKey = Uri.EscapeDataString(key);
+                string encodedValue = Uri.EscapeDataString(value);
+                string parameter = $"{encodedKey}={encodedValue}";
+                parameters.Add(parameter);
+            }
+
+            return string.Join("&", parameters);
         }
     }
 }

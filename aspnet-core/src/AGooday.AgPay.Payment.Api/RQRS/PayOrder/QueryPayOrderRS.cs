@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
         /// <summary>
         /// 支付订单号
         /// </summary>
-        public string PAyOrderId { get; set; }
+        public string PayOrderId { get; set; }
 
         /// <summary>
         /// 商户号

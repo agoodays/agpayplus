@@ -76,6 +76,13 @@ namespace AGooday.AgPay.Domain.Models
         public string ReqMethod { get; set; }
 
         /// <summary>
+        /// 通知请求媒体类型
+        /// </summary>
+        [Comment("通知请求媒体类型")]
+        [Required, Column("req_media_type", TypeName = "varchar(10)")]
+        public string ReqMediaType { get; set; }
+
+        /// <summary>
         /// 通知请求正文
         /// </summary>
         [Comment("通知请求正文")]

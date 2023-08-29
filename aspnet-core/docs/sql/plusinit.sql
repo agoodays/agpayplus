@@ -145,7 +145,8 @@ ALTER TABLE `t_refund_order`
 
 ALTER TABLE `t_mch_notify_record`   
   ADD COLUMN `req_method` VARCHAR(10) NOT NULL COMMENT '通知请求方法' AFTER `notify_url`,
-  ADD COLUMN `req_body` TEXT NULL COMMENT '通知请求正文' AFTER `req_method`;
+  ADD COLUMN `req_media_type` VARCHAR(10) NOT NULL COMMENT '通知请求媒体类型' AFTER `req_method`
+  ADD COLUMN `req_body` TEXT NULL COMMENT '通知请求正文' AFTER `req_media_type`;
   
 #####  ----------  代理商-表结构DDL+初始化DML  ----------  #####
 

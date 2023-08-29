@@ -53,6 +53,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 int currentCount = record.NotifyCount + 1;
 
                 string method = record.ReqMethod;
+                string mediaType = record.ReqMediaType;
                 string body = record.ReqBody;
                 string notifyUrl = record.NotifyUrl;
                 string res = "";
@@ -66,7 +67,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     switch (method)
                     {
                         case "POST":
-                            content = new StringContent(body, Encoding.UTF8, "application/json");
+                            content = new StringContent(body, Encoding.UTF8, mediaType);
                             response = client.PostAsync(notifyUrl, content).Result;
                             res = response.Content.ReadAsStringAsync().Result;
                             break;
