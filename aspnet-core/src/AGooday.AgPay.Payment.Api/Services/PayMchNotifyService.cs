@@ -60,29 +60,13 @@ namespace AGooday.AgPay.Payment.Api.Services
                     return;
                 }
 
-                var mchConfigList = _sysConfigService.GetByGroupKey("payOrderNotifyConfig", CS.SYS_TYPE.MCH, dbPayOrder.MchNo);
-                var mchNotifyPostType = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("mchNotifyPostType")).ConfigVal;
-                var payOrderNotifyExtParams = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("payOrderNotifyExtParams"))?.ConfigVal;
-
                 //商户app私钥
                 string appSecret = _configContextQueryService.QueryMchApp(dbPayOrder.MchNo, dbPayOrder.AppId).AppSecret;
 
                 // 封装通知url
                 string reqMethod = "POST";
-                string reqMediaType = string.Empty;
-                switch (mchNotifyPostType)
-                {
-                    case "POST_QUERYSTRING":
-                        break;
-                    case "POST_BODY":
-                        reqMediaType = "application/x-www-form-urlencoded";
-                        break;
-                    case "POST_JSON":
-                    default:
-                        reqMediaType = "application/json";
-                        break;
-                }
-                string notifyUrl = CreateNotifyUrl(dbPayOrder, appSecret, reqMethod, reqMediaType, payOrderNotifyExtParams, out string reqBody);
+                string extParams = GetExtParams(dbPayOrder.MchNo, out string reqMediaType);
+                string notifyUrl = CreateNotifyUrl(dbPayOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbPayOrder.PayOrderId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_PAY_ORDER;
@@ -141,29 +125,13 @@ namespace AGooday.AgPay.Payment.Api.Services
                     return;
                 }
 
-                var mchConfigList = _sysConfigService.GetByGroupKey("payOrderNotifyConfig", CS.SYS_TYPE.MCH, dbRefundOrder.MchNo);
-                var mchNotifyPostType = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("mchNotifyPostType")).ConfigVal;
-                var payOrderNotifyExtParams = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("payOrderNotifyExtParams"))?.ConfigVal;
-
                 //商户app私钥
                 string appSecret = _configContextQueryService.QueryMchApp(dbRefundOrder.MchNo, dbRefundOrder.AppId).AppSecret;
 
                 // 封装通知url
                 string reqMethod = "POST";
-                string reqMediaType = string.Empty;
-                switch (mchNotifyPostType)
-                {
-                    case "POST_QUERYSTRING":
-                        break;
-                    case "POST_BODY":
-                        reqMediaType = "application/x-www-form-urlencoded";
-                        break;
-                    case "POST_JSON":
-                    default:
-                        reqMediaType = "application/json";
-                        break;
-                }
-                string notifyUrl = CreateNotifyUrl(dbRefundOrder, appSecret, reqMethod, reqMediaType, payOrderNotifyExtParams, out string reqBody);
+                string extParams = GetExtParams(dbRefundOrder.MchNo, out string reqMediaType);
+                string notifyUrl = CreateNotifyUrl(dbRefundOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbRefundOrder.RefundOrderId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
@@ -221,29 +189,13 @@ namespace AGooday.AgPay.Payment.Api.Services
                     return;
                 }
 
-                var mchConfigList = _sysConfigService.GetByGroupKey("payOrderNotifyConfig", CS.SYS_TYPE.MCH, dbTransferOrder.MchNo);
-                var mchNotifyPostType = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("mchNotifyPostType")).ConfigVal;
-                var payOrderNotifyExtParams = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("payOrderNotifyExtParams"))?.ConfigVal;
-
                 //商户app私钥
                 string appSecret = _configContextQueryService.QueryMchApp(dbTransferOrder.MchNo, dbTransferOrder.AppId).AppSecret;
 
                 // 封装通知url
                 string reqMethod = "POST";
-                string reqMediaType = string.Empty;
-                switch (mchNotifyPostType)
-                {
-                    case "POST_QUERYSTRING":
-                        break;
-                    case "POST_BODY":
-                        reqMediaType = "application/x-www-form-urlencoded";
-                        break;
-                    case "POST_JSON":
-                    default:
-                        reqMediaType = "application/json";
-                        break;
-                }
-                string notifyUrl = CreateNotifyUrl(dbTransferOrder, appSecret, reqMethod, reqMediaType, payOrderNotifyExtParams, out string reqBody);
+                string extParams = GetExtParams(dbTransferOrder.MchNo, out string reqMediaType);
+                string notifyUrl = CreateNotifyUrl(dbTransferOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbTransferOrder.TransferId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
@@ -345,6 +297,28 @@ namespace AGooday.AgPay.Payment.Api.Services
 
             // 生成跳转地址
             return URLUtil.AppendUrlQuery(payOrder.ReturnUrl, jsonObject);
+        }
+
+        private string GetExtParams(string mhNo, out string reqMediaType)
+        {
+            reqMediaType = string.Empty;
+            var mchConfigList = _sysConfigService.GetByGroupKey("payOrderNotifyConfig", CS.SYS_TYPE.MCH, mhNo);
+            var mchNotifyPostType = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("mchNotifyPostType")).ConfigVal;
+            var payOrderNotifyExtParams = mchConfigList.FirstOrDefault(f => f.ConfigKey.Equals("payOrderNotifyExtParams"))?.ConfigVal;
+            switch (mchNotifyPostType)
+            {
+                case "POST_QUERYSTRING":
+                    break;
+                case "POST_BODY":
+                    reqMediaType = "application/x-www-form-urlencoded";
+                    break;
+                case "POST_JSON":
+                default:
+                    reqMediaType = "application/json";
+                    break;
+            }
+
+            return payOrderNotifyExtParams;
         }
 
         private static void AppendExtParams(string extParams, JObject originJsonObject, JObject targetJsonObject)
