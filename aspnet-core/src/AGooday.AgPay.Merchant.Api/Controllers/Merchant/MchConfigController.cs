@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         {
             var mchinfo = _mchInfoService.GetById(GetCurrentMchNo());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);
-            bool verified = BCrypt.Net.BCrypt.Verify(currentSipw, mchinfo.Sipw);
+            bool verified = BCryptUtil.VerifyHash(currentSipw, mchinfo.Sipw);
             //验证当前密码是否正确
             if (!verified)
             {

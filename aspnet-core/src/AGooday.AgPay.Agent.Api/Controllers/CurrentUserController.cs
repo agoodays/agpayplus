@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
             var currentUser = GetCurrentUser();
             string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码currentUser
             var user = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
-            bool verified = BCrypt.Net.BCrypt.Verify(currentUserPwd, user.Credential);
+            bool verified = BCryptUtil.VerifyHash(currentUserPwd, user.Credential);
             //验证当前密码是否正确
             if (!verified)
             {

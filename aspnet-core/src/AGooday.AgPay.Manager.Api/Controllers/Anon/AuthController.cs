@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 
             //https://jasonwatmore.com/post/2022/01/16/net-6-hash-and-verify-passwords-with-bcrypt
             //https://bcrypt.online/
-            bool verified = BCrypt.Net.BCrypt.Verify(ipassport, auth.Credential);
+            bool verified = BCryptUtil.VerifyHash(ipassport, auth.Credential);
             if (!verified)
             {
                 //没有该用户信息
@@ -243,7 +243,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            bool verified = BCrypt.Net.BCrypt.Verify(newPwd, sysUserAuth.Credential);
+            bool verified = BCryptUtil.VerifyHash(newPwd, sysUserAuth.Credential);
             if (verified)
             {
                 throw new BizException("新密码与原密码相同！");

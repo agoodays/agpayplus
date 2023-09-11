@@ -102,9 +102,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 _sysUserRepository.Add(sysUser);
 
                 #region 添加默认用户认证表
-                string salt = StringUtil.GetUUID(6); //6位随机数
-                string authPwd = request.PasswordType.Equals("custom") ? request.LoginPassword : CS.DEFAULT_PWD;
-                string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
+                //string salt = StringUtil.GetUUID(6); //6位随机数
+                string authPwd = request.PasswordType.Equals(CS.PASSWORD_TYPE.CUSTOM) ? request.LoginPassword : CS.DEFAULT_PWD;
+                string userPwd = BCryptUtil.Hash(authPwd,out string salt);
                 //用户名登录方式
                 var sysUserAuthByLoginUsername = new SysUserAuth()
                 {

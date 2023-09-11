@@ -257,6 +257,21 @@
         public const string DEFAULT_FEMALE_AVATAR_URL = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_f.png";
 
         /// <summary>
+        /// 密码类型
+        /// </summary>
+        public interface PASSWORD_TYPE
+        {
+            /// <summary>
+            /// 自定义
+            /// </summary>
+            public const string CUSTOM = "custom";
+            /// <summary>
+            /// 默认
+            /// </summary>
+            public const string DEFAULT = "default";
+        }
+
+        /// <summary>
         /// 默认密码
         /// </summary>
         public const string DEFAULT_PWD = "agpay666";

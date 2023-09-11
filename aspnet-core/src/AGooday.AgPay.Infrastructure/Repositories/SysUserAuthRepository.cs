@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
@@ -53,7 +54,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             {
                 foreach (var sysUserAuth in sysUserAuths)
                 {
-                    sysUserAuth.Credential = BCrypt.Net.BCrypt.HashPassword(newPwd);
+                    sysUserAuth.Credential = BCryptUtil.Hash(newPwd, out string salt);
+                    sysUserAuth.Salt = salt;
                     Update(sysUserAuth);
                 }
             }

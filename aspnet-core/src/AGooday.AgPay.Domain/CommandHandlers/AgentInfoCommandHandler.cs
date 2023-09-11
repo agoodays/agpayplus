@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
         public AgentInfoCommandHandler(IUnitOfWork uow, IMediatorHandler bus, IMapper mapper, IMQSender mqSender, IMemoryCache cache,
             IAgentInfoRepository agentInfoRepository,
-            IIsvInfoRepository isvInfoRepository, 
+            IIsvInfoRepository isvInfoRepository,
             IMchInfoRepository mchInfoRepository,
             ISysUserRepository sysUserRepository,
             ISysUserAuthRepository sysUserAuthRepository)
@@ -150,9 +150,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 _sysUserRepository.SaveChanges();
 
                 #region 添加默认用户认证表
-                string salt = StringUtil.GetUUID(6); //6位随机数
-                string authPwd = request.PasswordType.Equals("custom") ? request.LoginPassword : CS.DEFAULT_PWD;
-                string userPwd = BCrypt.Net.BCrypt.HashPassword(authPwd);
+                //string salt = StringUtil.GetUUID(6); //6位随机数
+                string authPwd = request.PasswordType.Equals(CS.PASSWORD_TYPE.CUSTOM) ? request.LoginPassword : CS.DEFAULT_PWD;
+                string userPwd = BCryptUtil.Hash(authPwd, out string salt);
                 //用户名登录方式
                 var sysUserAuthByLoginUsername = new SysUserAuth()
                 {
@@ -181,7 +181,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
                 // 插入代理商基本信息
                 // 存入代理商默认用户ID
-                agentInfo.Sipw = BCrypt.Net.BCrypt.HashPassword(CS.DEFAULT_SIPW);
+                agentInfo.Sipw = BCryptUtil.Hash(CS.DEFAULT_SIPW, out salt);
                 agentInfo.InitUserId = sysUser.SysUserId;
                 _agentInfoRepository.Add(agentInfo);
 

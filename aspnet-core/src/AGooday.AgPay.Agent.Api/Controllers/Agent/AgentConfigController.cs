@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         {
             var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);
-            bool verified = BCrypt.Net.BCrypt.Verify(currentSipw, agentInfo.Sipw);
+            bool verified = BCryptUtil.VerifyHash(currentSipw, agentInfo.Sipw);
             //验证当前密码是否正确
             if (!verified)
             {
