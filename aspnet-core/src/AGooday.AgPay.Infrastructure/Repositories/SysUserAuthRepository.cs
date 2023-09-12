@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public void RemoveByUserId(long userId, string sysType)
         {
-            var entitys = DbSet.Where(w => w.UserId .Equals( userId) && w.SysType.Equals(sysType));
+            var entitys = DbSet.Where(w => w.UserId.Equals(userId) && w.SysType.Equals(sysType));
             foreach (var entity in entitys)
             {
                 DbSet.Remove(entity);
@@ -52,9 +52,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             //更改密码
             if (!string.IsNullOrWhiteSpace(newPwd))
             {
+                var hashedPassword = BCryptUtil.Hash(newPwd, out string salt);
                 foreach (var sysUserAuth in sysUserAuths)
                 {
-                    sysUserAuth.Credential = BCryptUtil.Hash(newPwd, out string salt);
+                    sysUserAuth.Credential = hashedPassword;
                     sysUserAuth.Salt = salt;
                     Update(sysUserAuth);
                 }
