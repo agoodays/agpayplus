@@ -141,7 +141,8 @@ export default {
     loginSuccess (res) {
       // this.$router.push({ path: '/' })
       // 通过这里的传参 来得知是否点击自动登录按钮
-      this.$router.push({ path: '/', query: { isAutoLogin: this.isAutoLogin } })
+      const redirect = this.$route.query.redirect
+      this.$router.push({ path: '/', query: { isAutoLogin: this.isAutoLogin, redirect: redirect } })
       // 延迟 1 秒显示欢迎信息
       setTimeout(() => {
         this.$notification.success({

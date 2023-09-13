@@ -54,7 +54,12 @@ router.beforeEach((to, from, next) => {
         router.addRoutes(store.state.asyncRouter.addRouters)
       })
 
-      redirectToTargetRoute(to.path, next)
+      // 判断是否存在路由参数 redirect
+      if (to.query.redirect) {
+        next(to.query.redirect) // 跳转到指定的路由
+      } else {
+        redirectToTargetRoute(to.path, next)
+      }
     }).catch(() => {
       // 失败时，获取用户信息失败时，调用登出，来清空历史保留信息
       store.dispatch('Logout').then(() => {
