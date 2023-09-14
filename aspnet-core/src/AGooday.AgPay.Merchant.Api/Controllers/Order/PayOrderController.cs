@@ -153,7 +153,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
                         switch (excelHeader.Key)
                         {
                             case "state":
-                                value = order.State == 0 ? "订单生成" : order.State == 1 ? "支付中" : order.State == 2 ? "支付成功" : order.State == 3 ? "支付失败" : order.State == 4 ? "已撤销" : order.State == 5 ? "已退款" : order.State == 6 ? "订单关闭" : "未知";
+                                value = order.State.ToEnum<PayOrderState>()?.GetDescription() ?? "未知";
                                 break;
                             case "amount":
                             case "refundAmount":
