@@ -181,6 +181,8 @@ app.UseWebSockets(new WebSocketOptions
 // Configure the HTTP request pipeline.
 app.UseCalculateExecutionTime();
 
+app.UseRequestResponseLogging();
+
 //if (app.Environment.IsDevelopment())
 //{
 app.UseSwagger();
@@ -198,8 +200,6 @@ AuthContextService.Configure(httpContextAccessor);
 app.UseAuthorization();
 
 app.UseExceptionHandling();
-
-//app.UseRequestResponseLogging();
 
 app.MapControllers();
 

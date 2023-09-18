@@ -9,6 +9,7 @@ using AGooday.AgPay.Payment.Api.Channel.Extensions;
 using AGooday.AgPay.Payment.Api.Extensions;
 using AGooday.AgPay.Payment.Api.FilterAttributes;
 using AGooday.AgPay.Payment.Api.Jobs;
+using AGooday.AgPay.Payment.Api.Middlewares;
 using AGooday.AgPay.Payment.Api.MQ;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
@@ -212,6 +213,10 @@ ChannelNativeInjectorBootStrapper.RegisterServices(services);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseCalculateExecutionTime();
+
+app.UseRequestResponseLogging();
+
 //if (app.Environment.IsDevelopment())
 //{
 app.UseSwagger();
@@ -222,6 +227,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseAuthorization();
+
+app.UseExceptionHandling();
 
 app.MapControllers();
 
