@@ -80,7 +80,50 @@ namespace AGooday.AgPay.Common.Utils
             return result;
         }
 
-        public static string GetStrSort(Dictionary<string, object> map)
+        public static bool Verify(JObject param, string signType, string sign, string appSecret, string appPublicKey)
+        {
+            if ("MD5".Equals(signType))
+            {
+                return VerifyMD5(param, sign, appSecret);
+            }
+            else if ("RSA2".Equals(signType))
+            {
+                return VerifyRSA2(param, sign, appPublicKey);
+            }
+            else
+            {
+                throw new BizException("请设置正确的签名类型");
+            }
+        }
+
+        public static bool VerifyMD5(JObject param, string sign, string key)
+        {
+            return sign.Equals(GetSign(param, key), StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool VerifyRSA2(JObject param, string sign,string publicKey)
+        {
+            var signString = ConvertSignStringIncludeEmpty(param);
+            var flag = RsaUtil.Verify(signString, publicKey, sign);
+            return flag;
+        }
+
+        /// <summary>
+        /// 将JSON中的数据转换成key1=value1&key2=value2的形式，忽略null、空串内容 和 sign字段*
+        /// </summary>
+        /// <param name="jobjParams"></param>
+        /// <returns></returns>
+        private static string ConvertSignStringIncludeEmpty(JObject jobjParams)
+        {
+            var keyValuePairs = jobjParams.ToObject<SortedDictionary<string, object>>();
+            //所有参数进行排序，拼接为 key=value&形式
+            var keyvalues = keyValuePairs.Where(w => !w.Key.Equals("sign") && !string.IsNullOrEmpty(w.Value.ToString()))
+                .OrderBy(o => o.Key)
+                .Select(s => $"{s.Key}={s.Value}");
+            return string.Join("&", keyvalues).Replace("\\", string.Empty);
+        }
+
+        private static string GetStrSort(Dictionary<string, object> map)
         {
             var _map = new Dictionary<string, string>();
             foreach (var item in map)
@@ -102,14 +145,14 @@ namespace AGooday.AgPay.Common.Utils
         /// </summary>
         /// <param name="str">要加密的字符串</param>
         /// <returns>加密后的十六进制的哈希散列（字符串）</returns>
-        public static string Md5(string str, string charset)
+        private static string Md5(string str, string charset)
         {
             var buffer = Encoding.GetEncoding(charset).GetBytes(str);
             var digestData = MD5.Create().ComputeHash(buffer);
             return ToHex(digestData);
         }
 
-        public static string ToHex(byte[] bytes)
+        private static string ToHex(byte[] bytes)
         {
             string hexString = string.Empty;
             if (bytes != null)

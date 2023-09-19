@@ -71,6 +71,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             //业务校验， 包括： 验签， 商户状态是否可用， 是否支持该支付方式下单等。
             string mchNo = abstractMchAppRQ.MchNo;
             string appId = abstractMchAppRQ.AppId;
+            string signType = bizRQ.SignType;
             string sign = bizRQ.Sign;
 
             if (StringUtil.IsAnyNullOrEmpty(mchNo, appId, sign))
@@ -96,6 +97,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers
                 throw new BizException("商户应用不存在或应用状态不可用");
             }
 
+            if (!(mchApp.AppSignType?.Contains(signType) ?? false))
+            {
+                throw new BizException($"商户应用不支持[{signType}]签名方式");
+            }
+
             if (!mchApp.MchNo.Equals(mchNo))
             {
                 throw new BizException("参数appId与商户号不匹配");
@@ -103,13 +109,29 @@ namespace AGooday.AgPay.Payment.Api.Controllers
 
             // 验签
             string appSecret = mchApp.AppSecret;
+            string appPublicKey = mchApp.AppRsa2PublicKey;
 
             // 转换为 JSON
             JObject bizReqJSON = JObject.FromObject(bizRQ);
             bizReqJSON.Remove("sign");
-            if (!sign.Equals(AgPayUtil.GetSign(bizReqJSON, appSecret), StringComparison.OrdinalIgnoreCase))
+
+            if ("MD5".Equals(signType))
             {
-                throw new BizException("验签失败");
+                if (!AgPayUtil.VerifyMD5(bizReqJSON, sign, appSecret))
+                {
+                    throw new BizException("验签失败");
+                }
+            }
+            else if ("RSA2".Equals(signType))
+            {
+                if (!AgPayUtil.VerifyRSA2(bizReqJSON, sign, appPublicKey))
+                {
+                    throw new BizException("验签失败");
+                }
+            }
+            else
+            {
+                throw new BizException("请设置正确的签名类型");
             }
 
             return bizRQ;
