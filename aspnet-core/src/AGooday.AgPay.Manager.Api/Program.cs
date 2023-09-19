@@ -94,6 +94,13 @@ services.AddJwtBearerAuthentication(appSettings);
 
 services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
+var sysRSA2Section = builder.Configuration.GetSection("SysRSA2");
+services.Configure<SysRSA2Config>(sysRSA2Section);
+
+AgPayUtil.AES_KEY = builder.Configuration["AesKey"];
+var sysRSA2Config = sysRSA2Section.Get<SysRSA2Config>();
+AgPayUtil.RSA2_PRIVATE_KEY = sysRSA2Config.PrivateKey;
+
 // Automapper ×¢Èë
 services.AddAutoMapperSetup();
 

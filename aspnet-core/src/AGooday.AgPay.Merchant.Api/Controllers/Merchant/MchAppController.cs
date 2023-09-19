@@ -8,8 +8,10 @@ using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
@@ -23,12 +25,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<MchAppController> _logger;
+        private readonly SysRSA2Config _sysRSA2Config;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MchAppController(IMQSender mqSender, ILogger<MchAppController> logger, RedisUtil client,
+        public MchAppController(IMQSender mqSender, ILogger<MchAppController> logger, IOptions<SysRSA2Config> sysRSA2Config,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService,
+            IMchInfoService mchInfoService, RedisUtil client,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
@@ -36,6 +39,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         {
             this.mqSender = mqSender;
             _logger = logger;
+            _sysRSA2Config = sysRSA2Config.Value;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
         }
@@ -154,8 +158,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [HttpGet, Route("sysRSA2PublicKey"), AllowAnonymous, NoLog]
         public ApiRes SysRSA2PublicKey(string appId)
         {
-            var sysRSA2PublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi1NJVybvb3CQsK8BRsE9Qql1EmPiTFtokkT7YC8OpcY1ONN4UtVcisQObk2aJL/NFnfm3MQzKzPQ8B3hqoY5Vr2wf5amkZYiSUXYC1VHnaw2Pt2Eje+bhwbS5sWW52lKVev2lgP2vpZDah8WAlgdY4IBQfQ4VYNkoKDBgzmBwzQOWQ5eO7CqWp1tJHxvZSDUleMYAz5gCcVJ4ZBv+3lRAQ3r/RCIXPiyDAu2Y/lGHPrP0yuHN9XxU1uHWQKdy1RHXLfal1Oapv31yF8XqNxNG1sjj91S+F5sdkvR6LLdWM481z0otUyY1+68UJIZmxP3UCfsLP1byj7lKZixDxrJvwIDAQAB";
-            return ApiRes.Ok(sysRSA2PublicKey);
+            return ApiRes.Ok(_sysRSA2Config.PublicKey);
         }
     }
 }
