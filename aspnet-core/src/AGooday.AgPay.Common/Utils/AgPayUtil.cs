@@ -62,6 +62,23 @@ namespace AGooday.AgPay.Common.Utils
             }
         }
 
+        public static string Sign(JObject param, string signType, string key)
+        {
+            if ("MD5".Equals(signType))
+            {
+                return GetSign(param, key);
+            }
+            else if ("RSA2".Equals(signType))
+            {
+                var signString = ConvertSignStringIncludeEmpty(param);
+                return RsaUtil.Sign(signString, RSA2_PRIVATE_KEY);
+            }
+            else
+            {
+                throw new BizException("请设置正确的签名类型");
+            }
+        }
+
         public static string GetSign(JObject param, string key)
         {
             var map = param.ToObject<Dictionary<string, object>>();
@@ -98,12 +115,12 @@ namespace AGooday.AgPay.Common.Utils
             }
         }
 
-        public static bool VerifyMD5(JObject param, string sign, string key)
+        private static bool VerifyMD5(JObject param, string sign, string key)
         {
             return sign.Equals(GetSign(param, key), StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool VerifyRSA2(JObject param, string sign,string publicKey)
+        private static bool VerifyRSA2(JObject param, string sign, string publicKey)
         {
             var signString = ConvertSignStringIncludeEmpty(param);
             var flag = RsaUtil.Verify(signString, publicKey, sign);

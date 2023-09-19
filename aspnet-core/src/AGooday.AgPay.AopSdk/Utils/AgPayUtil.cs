@@ -7,6 +7,40 @@ namespace AGooday.AgPay.AopSdk.Utils
     {
         private static string encodingCharset = "utf-8";
 
+        public static string Sign(Dictionary<string, object> map, string signType, string key)
+        {
+            if ("MD5".Equals(signType))
+            {
+                return GetSign(map, key);
+            }
+            else if ("RSA2".Equals(signType))
+            {
+                var signString = GetStrSort(map);
+                return RsaUtil.Sign(signString, key);
+            }
+            else
+            {
+                throw new ArithmeticException("请设置正确的签名类型");
+            }
+        }
+
+        public static bool Verify(Dictionary<string, object> map, string signType, string sign, string key)
+        {
+            if ("MD5".Equals(signType))
+            {
+                return sign.Equals(GetSign(map, key));
+            }
+            else if ("RSA2".Equals(signType))
+            {
+                var signString = GetStrSort(map);
+                return RsaUtil.Verify(signString, key, sign);
+            }
+            else
+            {
+                throw new ArithmeticException("请设置正确的签名类型");
+            }
+        }
+
         /// <summary>
         /// 计算签名摘要
         /// </summary>

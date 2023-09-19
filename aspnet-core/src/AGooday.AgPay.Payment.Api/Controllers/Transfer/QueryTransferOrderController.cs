@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             }
 
             QueryTransferOrderRS bizRes = QueryTransferOrderRS.BuildByRecord(tansferOrder);
-            return ApiRes.OkWithSign(bizRes, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
         }
     }
 }

@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 bizRS.ChannelBatchOrderId = channelRetMsg.ChannelOrderId;
                 bizRS.ErrCode = channelRetMsg.ChannelErrCode;
                 bizRS.ErrMsg = channelRetMsg.ChannelErrMsg;
-                return ApiRes.OkWithSign(bizRS, mchAppConfigContext.MchApp.AppSecret);
+                return ApiRes.OkWithSign(bizRS, bizRQ.SignType, mchAppConfigContext.MchApp.AppSecret);
             }
             catch (BizException e)
             {

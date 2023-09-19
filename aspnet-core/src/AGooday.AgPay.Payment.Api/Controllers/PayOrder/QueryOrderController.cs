@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
 
             QueryPayOrderRS bizRes = QueryPayOrderRS.BuildByPayOrder(payOrder);
-            return ApiRes.OkWithSign(bizRes, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
         }
     }
 }

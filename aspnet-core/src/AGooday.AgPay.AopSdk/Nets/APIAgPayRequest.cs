@@ -211,15 +211,16 @@ namespace AGooday.AgPay.AopSdk.Nets
         private static string BuildAgPaySignature(Dictionary<string, object> @params, RequestOptions options)
         {
             var signType = options.GetSignType();
-            if ("MD5".Equals(signType))
-            {
-                return AgPayUtil.GetSign(@params, options.GetApiKey());
-            }
-            else if ("RSA2".Equals(signType))
-            {
-                throw new ArithmeticException("暂不支持RSA2签名");
-            }
-            throw new ArithmeticException("请设置正确的签名类型");
+            return AgPayUtil.Sign(@params, signType, options.GetApiKey());
+            //if ("MD5".Equals(signType))
+            //{
+            //    return AgPayUtil.GetSign(@params, options.GetApiKey());
+            //}
+            //else if ("RSA2".Equals(signType))
+            //{
+            //    throw new ArithmeticException("暂不支持RSA2签名");
+            //}
+            //throw new ArithmeticException("请设置正确的签名类型");
         }
 
         public static string GenUrl(string url, string uri)

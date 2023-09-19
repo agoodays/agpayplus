@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 res.PayData = bizRes.BuildPayData();
             }
 
-            return ApiRes.OkWithSign(res, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(res, rq.SignType, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
         }
         private UnifiedOrderRQ BuildBizRQ(UnifiedOrderRQ rq)
         {

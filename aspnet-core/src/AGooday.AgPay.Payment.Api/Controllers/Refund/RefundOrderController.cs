@@ -143,7 +143,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 this.ProcessChannelMsg(channelRetMsg, refundOrder);
 
                 RefundOrderRS bizRes = RefundOrderRS.BuildByRefundOrder(refundOrder);
-                return ApiRes.OkWithSign(bizRes, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+                return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
             }
             catch (BizException e)
             {
@@ -160,7 +160,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 RefundOrderRS bizRes = RefundOrderRS.BuildByRefundOrder(refundOrder);
-                return ApiRes.OkWithSign(bizRes, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+                return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
             }
             catch (Exception e)
             {

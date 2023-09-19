@@ -12,15 +12,15 @@ namespace AGooday.AgPay.AopSdk.Response
         public string msg { get; set; }
         public string sign { get; set; }
         public JObject data { get; set; }
-        public bool CheckSign(string apiKey)
+        public bool CheckSign(string signType, string apiKey)
         {
             if (data == null && string.IsNullOrWhiteSpace(sign)) return true;
-            return sign.Equals(AgPayUtil.GetSign(data.ToObject<Dictionary<string, object>>(), apiKey));
+            return AgPayUtil.Verify(data.ToObject<Dictionary<string, object>>(), signType, sign, apiKey);
         }
-        public virtual bool IsSuccess(string apiKey)
+        public virtual bool IsSuccess(string signType, string apiKey)
         {
-            if (string.IsNullOrWhiteSpace(apiKey)) return code == 0;
-            return code == 0 && CheckSign(apiKey);
+            if (string.IsNullOrWhiteSpace(signType) || string.IsNullOrWhiteSpace(apiKey)) return code == 0;
+            return code == 0 && CheckSign(signType, apiKey);
         }
     }
 }

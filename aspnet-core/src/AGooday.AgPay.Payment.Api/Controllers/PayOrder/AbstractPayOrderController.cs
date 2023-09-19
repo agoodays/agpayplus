@@ -443,7 +443,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 bizRS.ErrMsg = bizRS.ChannelRetMsg != null ? bizRS.ChannelRetMsg.ChannelErrMsg : null;
             }
 
-            return ApiRes.OkWithSign(bizRS, _configContextQueryService.QueryMchApp(bizRQ.MchNo, bizRQ.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRS, bizRQ.SignType, _configContextQueryService.QueryMchApp(bizRQ.MchNo, bizRQ.AppId).AppSecret);
         }
     }
 }

@@ -121,7 +121,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                     bizRes.ErrMsg = retMsg.ChannelErrMsg;
                 }
 
-                return ApiRes.OkWithSign(bizRes, mchAppConfigContext.MchApp.AppSecret);
+                return ApiRes.OkWithSign(bizRes,bizRQ.SignType, mchAppConfigContext.MchApp.AppSecret);
             }
             catch (BizException e)
             {

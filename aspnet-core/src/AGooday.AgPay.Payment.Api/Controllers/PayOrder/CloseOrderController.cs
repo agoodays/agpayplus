@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             {
                 payOrderService.UpdateIng2Close(payOrder.PayOrderId);
                 bizRes.ChannelRetMsg = ChannelRetMsg.ConfirmSuccess(null);
-                return ApiRes.OkWithSign(bizRes, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+                return ApiRes.OkWithSign(bizRes, rq.SignType, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
             }
 
             try
@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 return null;
             }
 
-            return ApiRes.OkWithSign(bizRes, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRes, rq.SignType, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
         }
     }
 }

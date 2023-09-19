@@ -58,14 +58,14 @@ namespace AGooday.AgPay.Common.Models
         /// <param name="data"></param>
         /// <param name="mchKey"></param>
         /// <returns></returns>
-        public static ApiRes OkWithSign(object data, string mchKey)
+        public static ApiRes OkWithSign(object data, string signType, string mchKey)
         {
             if (data == null)
             {
                 return new ApiRes(ApiCode.SUCCESS.GetCode(), ApiCode.SUCCESS.GetMsg(), data: null, sign: null);
             }
             var jsonObject = JObject.FromObject(data);
-            string sign = AgPayUtil.GetSign(jsonObject, mchKey);
+            string sign = AgPayUtil.Sign(jsonObject, signType, mchKey);
             return new ApiRes(ApiCode.SUCCESS.GetCode(), ApiCode.SUCCESS.GetMsg(), data, sign);
         }
 

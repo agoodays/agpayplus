@@ -115,23 +115,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             JObject bizReqJSON = JObject.FromObject(bizRQ);
             bizReqJSON.Remove("sign");
 
-            if ("MD5".Equals(signType))
+            if (!AgPayUtil.Verify(bizReqJSON, signType, sign, appSecret, appPublicKey))
             {
-                if (!AgPayUtil.VerifyMD5(bizReqJSON, sign, appSecret))
-                {
-                    throw new BizException("验签失败");
-                }
-            }
-            else if ("RSA2".Equals(signType))
-            {
-                if (!AgPayUtil.VerifyRSA2(bizReqJSON, sign, appPublicKey))
-                {
-                    throw new BizException("验签失败");
-                }
-            }
-            else
-            {
-                throw new BizException("请设置正确的签名类型");
+                throw new BizException("验签失败");
             }
 
             return bizRQ;

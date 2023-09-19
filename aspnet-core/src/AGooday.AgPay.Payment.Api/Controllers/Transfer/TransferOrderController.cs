@@ -118,7 +118,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 this.ProcessChannelMsg(channelRetMsg, transferOrder);
 
                 TransferOrderRS bizRes = TransferOrderRS.BuildByRecord(transferOrder);
-                return ApiRes.OkWithSign(bizRes, mchApp.AppSecret);
+                return ApiRes.OkWithSign(bizRes, bizRQ.SignType, mchApp.AppSecret);
 
             }
             catch (BizException e)
@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 }
 
                 TransferOrderRS bizRes = TransferOrderRS.BuildByRecord(transferOrder);
-                return ApiRes.OkWithSign(bizRes, _configContextQueryService.QueryMchApp(bizRQ.MchNo, bizRQ.AppId).AppSecret);
+                return ApiRes.OkWithSign(bizRes, bizRQ.SignType, _configContextQueryService.QueryMchApp(bizRQ.MchNo, bizRQ.AppId).AppSecret);
             }
             catch (Exception e)
             {

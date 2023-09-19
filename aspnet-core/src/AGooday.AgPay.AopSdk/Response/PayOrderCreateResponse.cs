@@ -14,9 +14,9 @@ namespace AGooday.AgPay.AopSdk.Response
             return data.ToObject<PayOrderCreateResModel>();
         }
 
-        public override bool IsSuccess(string apiKey)
+        public override bool IsSuccess(string signType, string apiKey)
         {
-            if (base.IsSuccess(apiKey))
+            if (base.IsSuccess(signType, apiKey))
             {
                 int orderState = Get().OrderState;
                 return orderState == 0 || orderState == 1 || orderState == 2;
