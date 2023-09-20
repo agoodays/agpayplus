@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
                 throw new BizException("商户应用不存在或应用状态不可用");
             }
 
-            if (!(mchApp.AppSignType?.Contains(signType) ?? false))
+            if (!(mchApp.AppSignType?.Any(item => signType.Equals(item.ToString())) ?? false))
             {
                 throw new BizException($"商户应用不支持[{signType}]签名方式");
             }
