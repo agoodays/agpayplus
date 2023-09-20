@@ -10,10 +10,11 @@
     <div class="modal-body">
       <div>
         <img v-if="apiRes.payDataType == 'codeImgUrl'" :src="apiRes.payData" alt="">
-        <div class="zfb-wx" style="margin: 10px 0px;">
+        <div class="zfb-wx" style="margin-bottom: 10px;text-align: center;">
           <img src="~@/assets/svg/alipay.svg" alt="">
           <img src="~@/assets/svg/wechatpay.svg" alt="" style="margin: 0px 5px;">
-          <span style="color: grey;">支持支付宝与微信支付</span>
+          <img src="~@/assets/svg/unionpay.svg" alt="">
+          <p style="color: grey;">支持支付宝、微信与云闪付支付</p>
         </div>
       </div>
       <p style="font-size: 20px; font-weight: 500; color: grey;">请扫描付款码收款</p>

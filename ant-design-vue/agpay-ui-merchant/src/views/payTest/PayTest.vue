@@ -12,10 +12,6 @@
               <a-select-option v-for="(item) in mchAppList" :key="item.appId" >{{ item.appName }} [{{ item.appId }}]</a-select-option>
             </a-select>
           </a-form-item>
-
-          <a-form-item label="" class="table-head-layout">
-            <a-button type="text" @click="quickCashier" style="margin-left: 100px">快捷收银</a-button>
-          </a-form-item>
         </div>
       </a-form>
 
@@ -155,9 +151,6 @@
 
     <!-- 条码弹框 -->
     <pay-test-bar-code ref="payTestBarCode" @barCodeValue="barCodeChange" @CodeAgainChange="testCodeChange"></pay-test-bar-code>
-
-    <!-- 快捷收银弹层  -->
-    <AgQuickCashier ref="quickCashier"/>
   </div>
 </template>
 
@@ -165,10 +158,9 @@
 import { API_URL_MCH_APP, req, payTest, payTestOrder } from '@/api/manage' // 接口
 import PayTestModal from './PayTestModal' // 二维码对话框组件
 import PayTestBarCode from './PayTestBarCode' // 条码对话框组件
-import AgQuickCashier from '@/components/AgQuickCashier/AgQuickCashier'
 export default {
   props: {},
-  components: { PayTestModal, PayTestBarCode, AgQuickCashier },
+  components: { PayTestModal, PayTestBarCode },
   data () {
     return {
       mchAppList: [], // app列表
@@ -330,10 +322,6 @@ export default {
     // 条码弹窗点击x或者蒙版关闭
     testCodeChange () {
       this.randomOrderNo() // 刷新订单号
-    },
-    quickCashier () { // 快捷收银
-      this.isRouterAlive = false
-      this.$refs.quickCashier.open()
     }
 
     // handleCloseBarCode () {

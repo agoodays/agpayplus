@@ -31,6 +31,7 @@
           <a-icon type="reload" style="font-size: 18px;cursor: pointer;" />
         </a-tooltip>
       </div>
+      <a-button type="link" @click="openQuickCashier">快捷收银</a-button>
     </template>
 
     <template v-slot:rightContentRender>
@@ -141,6 +142,9 @@ export default {
     routeReload () { // 刷新页面函数
       this.isRouterAlive = false
       this.$nextTick(() => { this.isRouterAlive = true })
+    },
+    openQuickCashier () { // 快捷收银
+      this.$openQuickCashierModal()
     }
   }
 }
