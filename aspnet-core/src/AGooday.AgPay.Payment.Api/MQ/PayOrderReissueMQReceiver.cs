@@ -17,66 +17,68 @@ namespace AGooday.AgPay.Payment.Api.MQ
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<PayOrderMchNotifyMQReceiver> log;
-        private readonly IPayOrderService payOrderService;
-        private readonly ChannelOrderReissueService channelOrderReissueService;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public PayOrderReissueMQReceiver(IMQSender mqSender, 
-            ILogger<PayOrderMchNotifyMQReceiver> log, 
-            IPayOrderService payOrderService, 
-            ChannelOrderReissueService channelOrderReissueService)
+        public PayOrderReissueMQReceiver(IMQSender mqSender,
+            ILogger<PayOrderMchNotifyMQReceiver> log,
+            IServiceScopeFactory serviceScopeFactory)
         {
             this.mqSender = mqSender;
             this.log = log;
-            this.payOrderService = payOrderService;
-            this.channelOrderReissueService = channelOrderReissueService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public void Receive(PayOrderReissueMQ.MsgPayload payload)
         {
-            try
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                log.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject(payload)}");
-                string payOrderId = payload.PayOrderId;
-                int currentCount = payload.Count;
-                currentCount++;
-
-                PayOrderDto payOrder = payOrderService.GetById(payOrderId);
-                if (payOrder == null)
+                var payOrderService = scope.ServiceProvider.GetService<IPayOrderService>();
+                var channelOrderReissueService = scope.ServiceProvider.GetService<ChannelOrderReissueService>();
+                try
                 {
-                    log.LogWarning($"查询支付订单为空,payOrderId={payOrderId}");
-                    return;
-                }
+                    log.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                    string payOrderId = payload.PayOrderId;
+                    int currentCount = payload.Count;
+                    currentCount++;
 
-                if (payOrder.State != (byte)PayOrderState.STATE_ING)
-                {
-                    log.LogWarning($"订单状态不是支付中,不需查询渠道.payOrderId={payOrderId}");
-                    return;
-                }
-
-                ChannelRetMsg channelRetMsg = channelOrderReissueService.ProcessPayOrder(payOrder);
-
-                //返回null 可能为接口报错等， 需要再次轮询
-                if (channelRetMsg == null || channelRetMsg.ChannelState == null || channelRetMsg.ChannelState.Equals(ChannelState.WAITING))
-                {
-                    //最多查询6次
-                    if (currentCount <= 6)
+                    PayOrderDto payOrder = payOrderService.GetById(payOrderId);
+                    if (payOrder == null)
                     {
-                        mqSender.Send(PayOrderReissueMQ.Build(payOrderId, currentCount), 5); //延迟5s再次查询
+                        log.LogWarning($"查询支付订单为空,payOrderId={payOrderId}");
+                        return;
+                    }
+
+                    if (payOrder.State != (byte)PayOrderState.STATE_ING)
+                    {
+                        log.LogWarning($"订单状态不是支付中,不需查询渠道.payOrderId={payOrderId}");
+                        return;
+                    }
+
+                    ChannelRetMsg channelRetMsg = channelOrderReissueService.ProcessPayOrder(payOrder);
+
+                    //返回null 可能为接口报错等， 需要再次轮询
+                    if (channelRetMsg == null || channelRetMsg.ChannelState == null || channelRetMsg.ChannelState.Equals(ChannelState.WAITING))
+                    {
+                        //最多查询6次
+                        if (currentCount <= 6)
+                        {
+                            mqSender.Send(PayOrderReissueMQ.Build(payOrderId, currentCount), 5); //延迟5s再次查询
+                        }
+                        else
+                        {
+                            //TODO 调用【撤销订单】接口
+                        }
                     }
                     else
                     {
-                        //TODO 调用【撤销订单】接口
+                        //其他状态， 不需要再次轮询。
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    //其他状态， 不需要再次轮询。
+                    log.LogError(e, e.Message);
+                    return;
                 }
-            }
-            catch (Exception e)
-            {
-                log.LogError(e, e.Message);
-                return;
             }
         }
     }

@@ -6,12 +6,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Extensions
     {
         public static void RegisterServices(IServiceCollection services)
         {
-            services.AddSingleton<IPaymentService, WxApp>();
-            services.AddSingleton<IPaymentService, WxBar>();
-            services.AddSingleton<IPaymentService, WxH5>();
-            services.AddSingleton<IPaymentService, WxJsapi>();
-            services.AddSingleton<IPaymentService, WxLite>();
-            services.AddSingleton<IPaymentService, WxNative>();
+            services.AddScoped<IPaymentService, WxApp>();
+            services.AddScoped<IPaymentService, WxBar>();
+            services.AddScoped<IPaymentService, WxH5>();
+            services.AddScoped<IPaymentService, WxJsapi>();
+            services.AddScoped<IPaymentService, WxLite>();
+            services.AddScoped<IPaymentService, WxNative>();
         }
     }
 }

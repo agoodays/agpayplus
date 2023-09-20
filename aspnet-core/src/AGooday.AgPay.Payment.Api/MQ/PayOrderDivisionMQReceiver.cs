@@ -11,25 +11,29 @@ namespace AGooday.AgPay.Payment.Api.MQ
     public class PayOrderDivisionMQReceiver : PayOrderDivisionMQ.IMQReceiver
     {
         private readonly ILogger<PayOrderDivisionMQReceiver> log;
-        private readonly PayOrderDivisionProcessService payOrderDivisionProcessService;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public PayOrderDivisionMQReceiver(ILogger<PayOrderDivisionMQReceiver> log,
-            PayOrderDivisionProcessService payOrderDivisionProcessService)
+            IServiceScopeFactory serviceScopeFactory)
         {
             this.log = log;
-            this.payOrderDivisionProcessService = payOrderDivisionProcessService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public void Receive(PayOrderDivisionMQ.MsgPayload payload)
         {
-            try
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                log.LogInformation($"接收订单分账通知MQ, msg={JsonConvert.SerializeObject(payload)}");
-                payOrderDivisionProcessService.ProcessPayOrderDivision(payload.PayOrderId, payload.UseSysAutoDivisionReceivers, payload.ReceiverList);
-            }
-            catch (Exception e)
-            {
-                log.LogError(e, e.Message);
+                var payOrderDivisionProcessService = scope.ServiceProvider.GetService<PayOrderDivisionProcessService>();
+                try
+                {
+                    log.LogInformation($"接收订单分账通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                    payOrderDivisionProcessService.ProcessPayOrderDivision(payload.PayOrderId, payload.UseSysAutoDivisionReceivers, payload.ReceiverList);
+                }
+                catch (Exception e)
+                {
+                    log.LogError(e, e.Message);
+                }
             }
         }
     }

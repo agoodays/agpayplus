@@ -6,12 +6,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.Extensions
     {
         public static void RegisterServices(IServiceCollection services)
         {
-            services.AddSingleton<IPaymentService, AliApp>();
-            services.AddSingleton<IPaymentService, AliBar>();
-            services.AddSingleton<IPaymentService, AliJsapi>();
-            services.AddSingleton<IPaymentService, AliPc>();
-            services.AddSingleton<IPaymentService, AliQr>();
-            services.AddSingleton<IPaymentService, AliWap>();
+            services.AddScoped<IPaymentService, AliApp>();
+            services.AddScoped<IPaymentService, AliBar>();
+            services.AddScoped<IPaymentService, AliJsapi>();
+            services.AddScoped<IPaymentService, AliPc>();
+            services.AddScoped<IPaymentService, AliQr>();
+            services.AddScoped<IPaymentService, AliWap>();
         }
     }
 }

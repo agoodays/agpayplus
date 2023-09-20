@@ -6,14 +6,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.Extensions
     {
         public static void RegisterServices(IServiceCollection services)
         {
-            services.AddSingleton<IPaymentService, AliBar>();
-            services.AddSingleton<IPaymentService, AliJsapi>();
+            services.AddScoped<IPaymentService, AliBar>();
+            services.AddScoped<IPaymentService, AliJsapi>();
 
-            services.AddSingleton<IPaymentService, WxBar>();
-            services.AddSingleton<IPaymentService, WxJsapi>();
+            services.AddScoped<IPaymentService, WxBar>();
+            services.AddScoped<IPaymentService, WxJsapi>();
 
-            services.AddSingleton<IPaymentService, YsfBar>();
-            services.AddSingleton<IPaymentService, YsfJsapi>();
+            services.AddScoped<IPaymentService, YsfBar>();
+            services.AddScoped<IPaymentService, YsfJsapi>();
         }
     }
 }

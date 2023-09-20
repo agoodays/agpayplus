@@ -11,13 +11,15 @@ namespace AGooday.AgPay.Payment.Api.MQ
     public class ResetIsvMchAppInfoMQReceiver : ResetIsvMchAppInfoConfigMQ.IMQReceiver
     {
         private readonly ILogger<ResetIsvMchAppInfoMQReceiver> log;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ConfigContextService configContextService;
 
-        public ResetIsvMchAppInfoMQReceiver(ILogger<ResetIsvMchAppInfoMQReceiver> log, 
-            ConfigContextService configContextService)
+        public ResetIsvMchAppInfoMQReceiver(ILogger<ResetIsvMchAppInfoMQReceiver> log,
+            IServiceScopeFactory serviceScopeFactory)
         {
             this.log = log;
-            this.configContextService = configContextService;
+            _serviceScopeFactory = serviceScopeFactory;
+            this.configContextService = _serviceScopeFactory.CreateScope().ServiceProvider.GetService<ConfigContextService>();
         }
 
         public void Receive(ResetIsvMchAppInfoConfigMQ.MsgPayload payload)

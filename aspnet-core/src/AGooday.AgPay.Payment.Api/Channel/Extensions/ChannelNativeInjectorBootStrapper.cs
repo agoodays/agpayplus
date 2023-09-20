@@ -23,8 +23,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
         public static void RegisterServices(IServiceCollection services)
         {
             #region ChannelUserService
-            services.AddSingleton<AliPayChannelUserService>();
-            services.AddSingleton<WxPayChannelUserService>();
+            services.AddScoped<AliPayChannelUserService>();
+            services.AddScoped<WxPayChannelUserService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IChannelUserService> funcFactory = ifCode =>
@@ -45,8 +45,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             #region DivisionService
             //services.AddSingleton<IDivisionService, AliPayDivisionService>();
             //services.AddSingleton<IDivisionService, WxPayDivisionService>();
-            services.AddSingleton<AliPayDivisionService>();
-            services.AddSingleton<WxPayDivisionService>();
+            services.AddScoped<AliPayDivisionService>();
+            services.AddScoped<WxPayDivisionService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IDivisionService> funcFactory = ifCode =>
@@ -65,13 +65,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             });
             #endregion
             #region PaymentService
-            services.AddSingleton<AliPayPaymentService>();
-            services.AddSingleton<WxPayPaymentService>();
-            services.AddSingleton<YsfPayPaymentService>();
-            services.AddSingleton<SxfPayPaymentService>();
-            services.AddSingleton<LesPayPaymentService>();
-            services.AddSingleton<HkrtPayPaymentService>();
-            services.AddSingleton<UmsPayPaymentService>();
+            services.AddScoped<AliPayPaymentService>();
+            services.AddScoped<WxPayPaymentService>();
+            services.AddScoped<YsfPayPaymentService>();
+            services.AddScoped<SxfPayPaymentService>();
+            services.AddScoped<LesPayPaymentService>();
+            services.AddScoped<HkrtPayPaymentService>();
+            services.AddScoped<UmsPayPaymentService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IPaymentService> funcFactory = ifCode =>
@@ -100,13 +100,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             });
             #endregion
             #region RefundService
-            services.AddSingleton<AliPayRefundService>();
-            services.AddSingleton<WxPayRefundService>();
-            services.AddSingleton<YsfPayRefundService>();
-            services.AddSingleton<SxfPayRefundService>();
-            services.AddSingleton<LesPayRefundService>();
-            services.AddSingleton<HkrtPayRefundService>();
-            services.AddSingleton<UmsPayRefundService>();
+            services.AddScoped<AliPayRefundService>();
+            services.AddScoped<WxPayRefundService>();
+            services.AddScoped<YsfPayRefundService>();
+            services.AddScoped<SxfPayRefundService>();
+            services.AddScoped<LesPayRefundService>();
+            services.AddScoped<HkrtPayRefundService>();
+            services.AddScoped<UmsPayRefundService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IRefundService> funcFactory = ifCode =>
@@ -135,13 +135,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             });
             #endregion
             #region ChannelNoticeService
-            services.AddSingleton<AliPayChannelNoticeService>();
-            services.AddSingleton<WxPayChannelNoticeService>();
-            services.AddSingleton<YsfPayChannelNoticeService>();
-            services.AddSingleton<SxfPayChannelNoticeService>();
-            services.AddSingleton<LesPayChannelNoticeService>();
-            services.AddSingleton<HkrtPayChannelNoticeService>();
-            services.AddSingleton<UmsPayChannelNoticeService>();
+            services.AddScoped<AliPayChannelNoticeService>();
+            services.AddScoped<WxPayChannelNoticeService>();
+            services.AddScoped<YsfPayChannelNoticeService>();
+            services.AddScoped<SxfPayChannelNoticeService>();
+            services.AddScoped<LesPayChannelNoticeService>();
+            services.AddScoped<HkrtPayChannelNoticeService>();
+            services.AddScoped<UmsPayChannelNoticeService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IChannelNoticeService> funcFactory = ifCode =>
@@ -173,10 +173,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             //services.AddSingleton<AliPayChannelRefundNoticeService>();
             //services.AddSingleton<WxPayChannelRefundNoticeService>();
             //services.AddSingleton<YsfPayChannelRefundNoticeService>();
-            services.AddSingleton<SxfPayChannelNoticeService>();
-            services.AddSingleton<LesPayChannelRefundNoticeService>();
-            services.AddSingleton<HkrtPayChannelRefundNoticeService>();
-            services.AddSingleton<UmsPayChannelRefundNoticeService>();
+            services.AddScoped<SxfPayChannelNoticeService>();
+            services.AddScoped<LesPayChannelRefundNoticeService>();
+            services.AddScoped<HkrtPayChannelRefundNoticeService>();
+            services.AddScoped<UmsPayChannelRefundNoticeService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IChannelRefundNoticeService> funcFactory = ifCode =>
@@ -205,10 +205,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             });
             #endregion
             #region CloseService
-            services.AddSingleton<AliPayPayOrderCloseService>();
-            services.AddSingleton<WxPayPayOrderCloseService>();
-            services.AddSingleton<YsfPayPayOrderCloseService>();
-            services.AddSingleton<UmsPayPayOrderCloseService>();
+            services.AddScoped<AliPayPayOrderCloseService>();
+            services.AddScoped<WxPayPayOrderCloseService>();
+            services.AddScoped<YsfPayPayOrderCloseService>();
+            services.AddScoped<UmsPayPayOrderCloseService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IPayOrderCloseService> funcFactory = ifCode =>
@@ -231,13 +231,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             });
             #endregion
             #region QueryService
-            services.AddSingleton<AliPayPayOrderQueryService>();
-            services.AddSingleton<WxPayPayOrderQueryService>();
-            services.AddSingleton<YsfPayPayOrderQueryService>();
-            services.AddSingleton<SxfPayPayOrderQueryService>();
-            services.AddSingleton<LesPayPayOrderQueryService>();
-            services.AddSingleton<HkrtPayPayOrderQueryService>();
-            services.AddSingleton<UmsPayPayOrderQueryService>();
+            services.AddScoped<AliPayPayOrderQueryService>();
+            services.AddScoped<WxPayPayOrderQueryService>();
+            services.AddScoped<YsfPayPayOrderQueryService>();
+            services.AddScoped<SxfPayPayOrderQueryService>();
+            services.AddScoped<LesPayPayOrderQueryService>();
+            services.AddScoped<HkrtPayPayOrderQueryService>();
+            services.AddScoped<UmsPayPayOrderQueryService>();
             services.AddSingleton(provider =>
             {
                 Func<string, IPayOrderQueryService> funcFactory = ifCode =>

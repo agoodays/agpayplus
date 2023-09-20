@@ -10,21 +10,25 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     public class PayOrderExpiredJob : IJob
     {
         private readonly ILogger<PayOrderExpiredJob> logger;
-        private readonly IPayOrderService payOrderService;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public PayOrderExpiredJob(ILogger<PayOrderExpiredJob> logger,
-            IPayOrderService payOrderService)
+            IServiceScopeFactory serviceScopeFactory)
         {
             this.logger = logger;
-            this.payOrderService = payOrderService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public Task Execute(IJobExecutionContext context)
         {
             return Task.Run(() =>
             {
-                int updateCount = payOrderService.UpdateOrderExpired();
-                logger.LogInformation($"处理订单超时{updateCount}条.");
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    var payOrderService = scope.ServiceProvider.GetService<IPayOrderService>();
+                    int updateCount = payOrderService.UpdateOrderExpired();
+                    logger.LogInformation($"处理订单超时{updateCount}条.");
+                }
             });
         }
     }

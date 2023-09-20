@@ -198,13 +198,13 @@ services.AddSingleton<ChannelCertConfigKit>(serviceProvider =>
 //services.AddSingleton(new ConfigContextService(mchAppService, mchInfoService, isvInfoService, payInterfaceConfigService));
 //services.AddSingleton(typeof(ConfigContextQueryService));
 //services.AddSingleton(typeof(ConfigContextService));
-services.AddSingleton<ChannelOrderReissueService>();
-services.AddSingleton<ConfigContextQueryService>();
-services.AddSingleton<ConfigContextService>();
-services.AddSingleton<PayMchNotifyService>();
-services.AddSingleton<PayOrderDivisionProcessService>();
-services.AddSingleton<PayOrderProcessService>();
-services.AddSingleton<RefundOrderProcessService>();
+services.AddScoped<ConfigContextService>();
+services.AddScoped<ConfigContextQueryService>();
+services.AddScoped<ChannelOrderReissueService>();
+services.AddScoped<PayMchNotifyService>();
+services.AddScoped<PayOrderDivisionProcessService>();
+services.AddScoped<PayOrderProcessService>();
+services.AddScoped<RefundOrderProcessService>();
 
 services.AddSingleton<IQRCodeService, QRCodeService>();
 
