@@ -108,13 +108,19 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_STORE_EDIT)]
         public ApiRes Update(long recordId, MchStoreDto dto)
         {
+            if (!dto.StoreId.HasValue || dto.StoreId.Value <= 0) // 应用分配
+            {
+                var sysUser = _mchStoreService.GetByKeyAsNoTracking(recordId);
+                sysUser.BindAppId = dto.BindAppId;
+                CopyUtil.CopyProperties(sysUser, dto);
+            }
             var result = _mchStoreService.Update(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
             }
             //// 推送修改门店消息
-            //mqSender.Send(ResetIsvMchStoreInfoConfigMQ.Build(ResetIsvMchStoreInfoConfigMQ.RESET_TYPE_MCH_STORE, null, dto.MchNo, dto.AppId));
+            //mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_STORE, null, dto.MchNo, dto.AppId));
 
             return ApiRes.Ok();
         }

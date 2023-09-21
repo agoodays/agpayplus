@@ -378,6 +378,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE', '门店管理', 'profile',
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_LIST', '页面：门店列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_APP_DIS', '按钮：应用分配', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MGR', NOW(), NOW());
     
@@ -386,6 +387,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE', '门店管理', 'profile',
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_LIST', '页面：门店列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_APP_DIS', '按钮：应用分配', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'AGENT', NOW(), NOW());
     
@@ -394,6 +396,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE', '门店管理', 'shop', '/
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_LIST', '页面：门店列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_APP_DIS', '按钮：应用分配', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_STORE', '0', 'MCH', NOW(), NOW());
    

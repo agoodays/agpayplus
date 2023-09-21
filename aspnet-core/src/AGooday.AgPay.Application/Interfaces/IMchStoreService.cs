@@ -9,6 +9,7 @@ namespace AGooday.AgPay.Application.Interfaces
         bool Update(MchStoreDto dto);
         MchStoreDto GetById(long recordId);
         MchStoreDto GetById(long recordId, string mchNo);
+        MchStoreDto GetByKeyAsNoTracking(long recordId);
         IEnumerable<MchStoreDto> GetAll();
         PaginatedList<MchStoreListDto> GetPaginatedData(MchStoreQueryDto dto, string agentNo = null);
     }

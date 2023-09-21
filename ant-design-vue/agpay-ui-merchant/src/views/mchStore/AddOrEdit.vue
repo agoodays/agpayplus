@@ -92,12 +92,12 @@
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="具体位置" prop="remark">
+          <a-form-model-item label="具体位置" prop="address">
             <a-input id="address" v-model="saveObject.address" />
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="经纬度" prop="lngLat">
+          <a-form-model-item label="经纬度" prop="lnglat">
             <a-input v-model="lnglat" @change="lngLatChange" disabled="disabled" />
             <!--<a-input :value="saveObject.lng?.length || saveObject.lat?.length ? saveObject.lng + ',' + saveObject.lat : ''" @change="lngLatChange" />-->
           </a-form-model-item>
@@ -152,7 +152,13 @@ export default {
       action: upload.form, // 上传文件地址
       rules: {
         storeName: [{ required: true, message: '请输入门店名称', trigger: 'blur' }],
-        contactPhone: [{ required: true, pattern: /^1\d{10}$/, message: '请输入正确的手机号', trigger: 'blur' }]
+        contactPhone: [{ required: true, pattern: /^1\d{10}$/, message: '请输入正确的手机号', trigger: 'blur' }],
+        storeLogo: [{ required: true }],
+        storeOuterImg: [{ required: true }],
+        storeInnerImg: [{ required: true }]
+        // areas: [{ required: true }],
+        // address: [{ required: true, message: '请输入具体位置', trigger: 'blur' }],
+        // lnglat: [{ required: true, message: '请输入经纬度', trigger: 'blur' }]
       }
     }
   },
@@ -521,6 +527,26 @@ export default {
     },
     onSubmit: function () { // 点击【保存】按钮事件
       const that = this
+      if (!that.saveObject.storeLogo) {
+        that.$message.error('请上传门店LOGO')
+        return
+      }
+      if (!that.saveObject.storeOuterImg) {
+        that.$message.error('请上传门头照')
+        return
+      }
+      if (!that.saveObject.storeInnerImg) {
+        that.$message.error('请上传门店内景照')
+        return
+      }
+      if (!that.lnglat || !that.saveObject.address || !that.areas?.length) {
+        that.$message.error('请选择地理位置')
+        return
+      }
+      if (!that.saveObject.lng || !that.saveObject.lat) {
+        that.$message.error('请输入正确的经纬度')
+        return
+      }
       this.$refs.infoFormModel.validate(valid => {
         if (valid) { // 验证通过
           // 请求接口
