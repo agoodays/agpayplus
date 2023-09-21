@@ -65,6 +65,12 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mchStoreRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.StoreId.Equals(recordId)).FirstOrDefault();
             return _mapper.Map<MchStoreDto>(entity);
         }
+        public MchStoreDto GetByKeyAsNoTracking(long recordId)
+        {
+            var entity = _mchStoreRepository.GetByKeyAsNoTracking(recordId);
+            var dto = _mapper.Map<MchStoreDto>(entity);
+            return dto;
+        }
         public IEnumerable<MchStoreDto> GetAll()
         {
             var mchStores = _mchStoreRepository.GetAll();

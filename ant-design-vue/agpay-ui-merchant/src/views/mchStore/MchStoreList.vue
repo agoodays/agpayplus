@@ -39,6 +39,7 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_STORE_EDIT')" @click="editFunc(record.storeId)">修改</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_STORE_APP_DIS')" @click="bindAppId(record.storeId, record.bindAppId)">应用分配</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_STORE_DEL')" style="color: red" @click="delFunc(record.storeId)">删除</a-button>
           </AgTableColumns>
         </template>
@@ -46,6 +47,8 @@
     </a-card>
     <!-- 新增页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
+    <!-- 应用分配组件  -->
+    <InfoBindAppId ref="infoBindAppId" :callbackFunc="searchFunc"/>
     <!-- 新增页面组件  -->
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
   </page-header-wrapper>
@@ -56,6 +59,7 @@ import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_MCH_STORE, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
+import InfoBindAppId from './BindAppId'
 import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
@@ -70,7 +74,7 @@ const tableColumns = [
 
 export default {
   name: 'MchStorePage',
-  components: { AgTable, AgTextUp, AgTableColumns, InfoAddOrEdit, InfoDetail },
+  components: { AgTable, AgTextUp, AgTableColumns, InfoAddOrEdit, InfoBindAppId, InfoDetail },
   data () {
     return {
       btnLoading: false,
@@ -98,6 +102,9 @@ export default {
     },
     editFunc: function (recordId) { // 业务通用【修改】 函数
       this.$refs.infoAddOrEdit.show(recordId)
+    },
+    bindAppId: function (recordId, bindAppId) { // 业务通用【应用分配】 函数
+      this.$refs.infoBindAppId.show(recordId, bindAppId)
     },
     detailFunc: function (recordId) { // 门店详情页
       this.$refs.infoDetail.show(recordId)

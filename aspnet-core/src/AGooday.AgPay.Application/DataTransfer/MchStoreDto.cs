@@ -8,7 +8,7 @@
         /// <summary>
         /// 门店ID
         /// </summary>
-        public long StoreId { get; set; }
+        public long? StoreId { get; set; }
 
         /// <summary>
         /// 门店名称
@@ -88,7 +88,7 @@
         /// <summary>
         /// 是否默认: 0-否, 1-是
         /// </summary>
-        public byte DefaultFlag { get; set; }
+        public byte? DefaultFlag { get; set; }
 
         /// <summary>
         /// 绑定AppId
@@ -108,11 +108,11 @@
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }
