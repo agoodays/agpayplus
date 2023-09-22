@@ -348,7 +348,7 @@ export default {
     width: 100%;
     height: 182px;
     background: #ffb22d;
-    border-radius: 0 0 5px;
+    border-radius: 5px;
     line-height: 184px;
     font-size: 22px;
     font-family: PingFang SC,PingFang SC-Bold;

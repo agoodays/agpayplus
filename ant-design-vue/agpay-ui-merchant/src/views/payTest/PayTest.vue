@@ -1,19 +1,25 @@
 <template>
   <div>
     <a-card style="box-sizing:border-box;padding:30px">
-
-      <!-- 选择下单的应用列表 -->
-      <a-form>
-        <div style="display:flex;flex-direction:row">
-          <!-- <p style="margin-top:9px;margin-right:10px;"></p> -->
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model="appId" @change="changeAppId" style="width:300px">
-              <a-select-option key="" >应用APPID</a-select-option>
-              <a-select-option v-for="(item) in mchAppList" :key="item.appId" >{{ item.appName }} [{{ item.appId }}]</a-select-option>
-            </a-select>
-          </a-form-item>
-        </div>
-      </a-form>
+      <!-- 选择下单的应用列表和门店列表 -->
+      <a-row :gutter="24">
+        <a-col :md="24" :lg="24">
+          <a-form :label-col="{span: 4}" :wrapper-col="{span: 20}" layout="inline">
+            <a-form-item label="应用：" prop="originalPwd">
+              <a-select v-model="appId" @change="changeAppId" style="width:300px">
+                <a-select-option key="" >应用APPID</a-select-option>
+                <a-select-option v-for="(item) in mchAppList" :key="item.appId" >{{ item.appName }} [{{ item.appId }}]</a-select-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item label="门店：" prop="newPwd">
+              <a-select v-model="storeId" style="width:300px">
+                <a-select-option key="">选择门店</a-select-option>
+                <a-select-option v-for="(item) in mchStoreList" :key="item.storeId">{{ item.storeName }} [{{ item.storeId }}]</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-form>
+        </a-col>
+      </a-row>
 
       <!-- 未配置支付方式提示框 -->
       <a-divider v-if="!appId">请选择应用APPID</a-divider>
@@ -155,7 +161,7 @@
 </template>
 
 <script>
-import { API_URL_MCH_APP, req, payTest, payTestOrder } from '@/api/manage' // 接口
+import { API_URL_MCH_APP, API_URL_MCH_STORE, req, payTest, payTestOrder } from '@/api/manage' // 接口
 import PayTestModal from './PayTestModal' // 二维码对话框组件
 import PayTestBarCode from './PayTestBarCode' // 条码对话框组件
 export default {
@@ -163,8 +169,10 @@ export default {
   components: { PayTestModal, PayTestBarCode },
   data () {
     return {
-      mchAppList: [], // app列表
       appId: '', // 已选择的appId
+      mchAppList: [], // app列表
+      storeId: '', // 已选择的门店Id
+      mchStoreList: [], // 门店列表
       appPaywayList: [], // 商户app支持的支付方式
       currentWayCode: '', // 以何种方式进行支付，默认是微信二维码
       currentPayDataType: '', // 支付参数
@@ -195,6 +203,13 @@ export default {
         that.appId = that.mchAppList[0].appId
         // 根据appId的值，动态显示支付方式
         this.appPaywayListHandle(that.appId)
+      }
+    })
+    req.list(API_URL_MCH_STORE, { pageSize: -1 }).then(res => {
+      that.mchStoreList = res.records
+      if (that.mchStoreList.length > 0) {
+        // 赋予默认值
+        that.storeId = that.mchStoreList[0].storeId
       }
     })
 
@@ -279,6 +294,7 @@ export default {
         wayCode: (this.currentWayCode === 'WX_JSAPI' || this.currentWayCode === 'ALI_JSAPI') ? 'QR_CASHIER' : this.currentWayCode, // 支付方式
         amount: this.paytestAmount, // 支付金额
         appId: this.appId, // appId
+        storeId: this.storeId, // 门店Id
         mchOrderNo: this.mchOrderNo, // 订单编号
         payDataType: this.currentPayDataType, // 支付参数（二维码，条码）
         authCode: this.authCode,
