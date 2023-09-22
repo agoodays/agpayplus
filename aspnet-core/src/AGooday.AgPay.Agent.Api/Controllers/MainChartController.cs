@@ -135,14 +135,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers
             if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
             {
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd");
-                createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
+                createdEnd = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
             }
             List<string> resDateArr = new List<string>();
             List<string> resPayAmountArr = new List<string>();
             List<string> resPayCountArr = new List<string>();
             List<string> resRefAmountArr = new List<string>();
 
-            for (DateTime dt = Convert.ToDateTime(createdStart); dt < Convert.ToDateTime(createdEnd).AddDays(1); dt = dt.AddDays(1))
+            for (DateTime dt = Convert.ToDateTime(createdStart); dt < Convert.ToDateTime(createdEnd); dt = dt.AddDays(1))
             {
                 resDateArr.Add(dt.ToString("yyyy-MM-dd"));
                 resPayAmountArr.Add((Random.Shared.Next(10000, 1000000) / 100.00).ToString("0.00"));
@@ -165,7 +165,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
             if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
             {
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd");
-                createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
+                createdEnd = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
             }
             return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(null, GetCurrentAgentNo(), createdStart, createdEnd));
         }
@@ -187,8 +187,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers
             if (queryDateRange.Contains("near2now"))
             {
                 int day = Convert.ToInt32(queryDateRange.Split("_")[1]);
-                createdStart = DateTime.Today.AddDays(-day).ToString("yyyy-MM-dd");
-                createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
+                createdStart = DateTime.Today.AddDays(-(day - 1)).ToString("yyyy-MM-dd");
+                createdEnd = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
             }
             if (queryDateRange.Contains("customDateTime"))
             {

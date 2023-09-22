@@ -661,7 +661,7 @@ namespace AGooday.AgPay.Application.Services
             if (DateTime.TryParse(createdStart, out DateTime dayStart) && DateTime.TryParse(createdEnd, out DateTime dayEnd))
             {
                 dayStart = dayStart.Date;
-                dayEnd = dayEnd.Date.AddDays(1);
+                dayEnd = dayEnd.Date;
                 // 计算两时间间隔天数
                 daySpace = dayEnd.AddSeconds(-1).Subtract(dayStart).Days;
             }
@@ -694,7 +694,7 @@ namespace AGooday.AgPay.Application.Services
             if (DateTime.TryParse(createdStart, out DateTime dayStart) && DateTime.TryParse(createdEnd, out DateTime dayEnd))
             {
                 dayStart = dayStart.Date;
-                dayEnd = dayEnd.Date.AddDays(1);
+                dayEnd = dayEnd.Date;
             }
             else
             {
