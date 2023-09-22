@@ -83,12 +83,9 @@ export default {
           start = moment().startOf('day').subtract(1, 'days')
           end = moment().endOf('day').subtract(1, 'days')
           break
-        case 'near2now_7':
-          start = moment().startOf('day').subtract(6, 'days')
-          end = moment().endOf('day')
-          break
-        case 'near2now_30':
-          start = moment().startOf('day').subtract(29, 'days')
+        case value?.startsWith('near2now'):
+          const day = +value.split('_')[1]
+          start = moment().startOf('day').subtract(day - 1, 'days')
           end = moment().endOf('day')
           break
         default:

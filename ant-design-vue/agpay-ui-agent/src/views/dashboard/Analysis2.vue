@@ -203,6 +203,7 @@
               :options="[
                 { name: '近7天', value: 'near2now_7' },
                 { name: '近30天', value: 'near2now_30' },
+                { name: '近90天', value: 'near2now_90' },
                 { name: '自定义时间', value: 'customDateTime' }
               ]"
               @change="payCountQueryDateChange"/>

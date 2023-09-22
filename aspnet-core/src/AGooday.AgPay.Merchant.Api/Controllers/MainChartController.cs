@@ -159,6 +159,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         private static void GetDateRange(string queryDateRange, out string createdStart, out string createdEnd)
         {
             createdStart = null; createdEnd = null;
+            queryDateRange = queryDateRange ?? string.Empty;
             if (queryDateRange.Equals("today"))
             {
                 createdStart = DateTime.Today.ToString("yyyy-MM-dd");
