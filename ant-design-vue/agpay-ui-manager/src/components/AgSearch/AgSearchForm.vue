@@ -14,7 +14,7 @@
       </a-form>
     </div>
     <div class="split-line">
-      <div class="btns" @click="setIsShowMore">
+      <div v-if="openIsShowMore" class="btns" @click="setIsShowMore">
         <div>
           {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
         </div>
@@ -28,6 +28,7 @@ export default {
   name: 'AgSearchForm',
   props: {
     searchData: { type: Object, default: null },
+    openIsShowMore: { type: Boolean, default: false },
     isShowMore: { type: Boolean, default: false },
     btnLoading: { type: Boolean, default: false }
   },

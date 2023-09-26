@@ -1,50 +1,43 @@
 <template>
   <page-header-wrapper>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <a-form-item label="" class="table-head-layout">
-              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
-            </a-form-item>
-            <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-<!--            <ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
-<!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
-<!--            <ag-text-up :placeholder="'渠道支付订单号'" :msg="searchData.channelPayOrderNo" v-model="searchData.channelPayOrderNo" />-->
-            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
-            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
-            <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="退款状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">订单生成</a-select-option>
-                <a-select-option value="1">退款中</a-select-option>
-                <a-select-option value="2">退款成功</a-select-option>
-                <a-select-option value="3">退款失败</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
-              <a-select v-model="searchData.mchType" placeholder="商户类型" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="1">普通商户</a-select-option>
-                <a-select-option value="2">特约商户</a-select-option>
-              </a-select>
-            </a-form-item>
-
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">搜索</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line">
-        <div class="btns" @click="isShowMore = !isShowMore">
-          <div>
-            {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
-          </div>
-        </div>
-      </div>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="true"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <a-form-item label="" class="table-head-layout">
+            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+          </a-form-item>
+          <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
+<!--          <ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
+<!--          <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
+<!--          <ag-text-up :placeholder="'渠道支付订单号'" :msg="searchData.channelPayOrderNo" v-model="searchData.channelPayOrderNo" />-->
+          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
+          <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+          <a-form-item v-if="isShowMore" label="" class="table-head-layout">
+            <a-select v-model="searchData.state" placeholder="退款状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">订单生成</a-select-option>
+              <a-select-option value="1">退款中</a-select-option>
+              <a-select-option value="2">退款成功</a-select-option>
+              <a-select-option value="3">退款失败</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item v-if="isShowMore" label="" class="table-head-layout">
+            <a-select v-model="searchData.mchType" placeholder="商户类型" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="1">普通商户</a-select-option>
+              <a-select-option value="2">特约商户</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -323,6 +316,7 @@
   </page-header-wrapper>
 </template>
 <script>
+  import AgSearchForm from '@/components/AgSearch/AgSearchForm'
   import AgTable from '@/components/AgTable/AgTable'
   import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
@@ -345,7 +339,7 @@
 
   export default {
     name: 'IsvListPage',
-    components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
+    components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
     data () {
       return {
         isShowMore: false,
@@ -366,6 +360,12 @@
     mounted () {
     },
     methods: {
+      handleSearchFormData (searchData) {
+        this.searchData = searchData
+      },
+      setIsShowMore (isShowMore) {
+        this.isShowMore = isShowMore
+      },
       queryFunc () {
         this.btnLoading = true
         this.$refs.infoTable.refTable(true)
