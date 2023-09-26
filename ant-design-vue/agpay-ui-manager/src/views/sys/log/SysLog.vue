@@ -1,31 +1,30 @@
 <template>
   <page-header-wrapper>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <a-form-item label="" class="table-head-layout">
-              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
-            </a-form-item>
-            <ag-text-up :placeholder="'用户ID'" :msg="searchData.userId" v-model="searchData.userId" />
-            <ag-text-up :placeholder="'用户名'" :msg="searchData.userName" v-model="searchData.userName" />
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="MGR">运营平台</a-select-option>
-                <a-select-option value="AGENT">代理商系统</a-select-option>
-                <a-select-option value="MCH">商户系统</a-select-option>
-              </a-select>
-            </a-form-item>
-
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" @click="queryhFunc" :loading="btnLoading">搜索</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <a-form-item label="" class="table-head-layout">
+            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+          </a-form-item>
+          <ag-text-up :placeholder="'用户ID'" :msg="searchData.userId" v-model="searchData.userId" />
+          <ag-text-up :placeholder="'用户名'" :msg="searchData.userName" v-model="searchData.userName" />
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="MGR">运营平台</a-select-option>
+              <a-select-option value="AGENT">代理商系统</a-select-option>
+              <a-select-option value="MCH">商户系统</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -166,10 +165,11 @@
   </page-header-wrapper>
 </template>
 <script>
-import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
-import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import { API_URL_SYS_LOG, req } from '@/api/manage'
 import moment from 'moment'
 import { message, Modal } from 'ant-design-vue'
@@ -187,16 +187,15 @@ const tableColumns = [
 
 export default {
   name: 'IsvListPage',
-  components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
   data () {
     return {
       tableColumns: tableColumns,
       searchData: {},
       selectedIds: [], // 选中的数据
-      createdStart: '', // 选择开始时间
-      createdEnd: '', // 选择结束时间
       visible: false,
       detailData: {},
+      isShowMore: false,
       btnLoading: false
     }
   },
@@ -216,9 +215,19 @@ export default {
   mounted () {
   },
   methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_SYS_LOG, params)
+    },
+    queryFunc () {
+      this.btnLoading = true
+      this.$refs.infoTable.refTable(true)
     },
     delFunc: function () {
       const that = this
@@ -260,10 +269,6 @@ export default {
     },
     onClose () {
       this.visible = false
-    },
-    queryhFunc () {
-      this.btnLoading = true
-      this.$refs.infoTable.refTable(true)
     }
   }
 }

@@ -1,30 +1,30 @@
 <template>
   <page-header-wrapper>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" v-if="$access('ENT_PC_WAY_SEARCH')" class="table-head-ground">
-          <div class="table-layer">
-            <ag-text-up :placeholder="'支付方式代码'" :msg="searchData.wayCode" v-model="searchData.wayCode" />
-            <ag-text-up :placeholder="'支付方式名称'" :msg="searchData.wayName" v-model="searchData.wayName" />
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.wayType" placeholder="支付类型" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="WECHAT">微信</a-select-option>
-                <a-select-option value="ALIPAY">支付宝</a-select-option>
-                <a-select-option value="YSFPAY">云闪付</a-select-option>
-                <a-select-option value="UNIONPAY">银联</a-select-option>
-                <a-select-option value="DCEPPAY">数字人民币</a-select-option>
-                <a-select-option value="OTHER">其他</a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" @click="searchFunc(true)" icon="search" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <ag-text-up :placeholder="'支付方式代码'" :msg="searchData.wayCode" v-model="searchData.wayCode" />
+          <ag-text-up :placeholder="'支付方式名称'" :msg="searchData.wayName" v-model="searchData.wayName" />
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.wayType" placeholder="支付类型" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="WECHAT">微信</a-select-option>
+              <a-select-option value="ALIPAY">支付宝</a-select-option>
+              <a-select-option value="YSFPAY">云闪付</a-select-option>
+              <a-select-option value="UNIONPAY">银联</a-select-option>
+              <a-select-option value="DCEPPAY">数字人民币</a-select-option>
+              <a-select-option value="OTHER">其他</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -66,11 +66,12 @@
     </a-card>
 
     <!-- 新增页面组件  -->
-    <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
+    <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="queryFunc"/>
   </page-header-wrapper>
 
 </template>
 <script>
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_PAYWAYS_LIST, req } from '@/api/manage'
@@ -107,34 +108,36 @@ const tableColumns = [
 
 export default {
   name: 'PayWayPage',
-  components: { AgTable, AgTableColumns, InfoAddOrEdit, AgTextUp },
+  components: { AgSearchForm, AgTable, AgTableColumns, InfoAddOrEdit, AgTextUp },
   data () {
     return {
+      isShowMore: false,
+      btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {},
-      btnLoading: false
+      searchData: {}
     }
   },
   methods: {
-
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_PAYWAYS_LIST, params)
     },
-
-    searchFunc (isToFirst = false) { // 点击【查询】按钮点击事件
+    queryFunc () { // 点击【查询】按钮点击事件
       this.btnLoading = true
-      this.$refs.infoTable.refTable(isToFirst)
+      this.$refs.infoTable.refTable(true)
     },
-
     addFunc: function () { // 业务通用【新增】 函数
       this.$refs.infoAddOrEdit.show()
     },
-
     editFunc: function (wayCode) { // 业务通用【修改】 函数
       this.$refs.infoAddOrEdit.show(wayCode)
     },
-
     delFunc: function (wayCode) {
       const that = this
       this.$infoBox.confirmDanger('确认删除？', '', () => {

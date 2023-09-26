@@ -1,35 +1,36 @@
 <template>
   <page-header-wrapper>
     <a-card>
-      <div v-if="$access('ENT_UR_USER_SEARCH')" class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="MGR">运营平台</a-select-option>
-                <a-select-option value="AGENT">代理商</a-select-option>
-                <a-select-option value="MCH">商户</a-select-option>
-              </a-select>
-            </a-form-item>
-            <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />
-            <ag-text-up :placeholder="'用户ID'" :msg="searchData.sysUserId" v-model="searchData.sysUserId" />
-            <ag-text-up :placeholder="'用户姓名'" :msg="searchData.realname" v-model="searchData.realname" />
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.userType" placeholder="请选择用户类型">
-                <a-select-option v-for="d in userTypeOptions" :value="d.userType" :key="d.userType">
-                  {{ d.userTypeName }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" @click="searchFunc" icon="search" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+      <AgSearchForm
+        v-if="$access('ENT_UR_USER_SEARCH')"
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="MGR">运营平台</a-select-option>
+              <a-select-option value="AGENT">代理商</a-select-option>
+              <a-select-option value="MCH">商户</a-select-option>
+            </a-select>
+          </a-form-item>
+          <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />
+          <ag-text-up :placeholder="'用户ID'" :msg="searchData.sysUserId" v-model="searchData.sysUserId" />
+          <ag-text-up :placeholder="'用户姓名'" :msg="searchData.realname" v-model="searchData.realname" />
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.userType" placeholder="请选择用户类型">
+              <a-select-option v-for="d in userTypeOptions" :value="d.userType" :key="d.userType">
+                {{ d.userTypeName }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -87,7 +88,7 @@
     </a-card>
 
     <!-- 新增 / 修改 页面组件  -->
-    <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
+    <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="queryFunc"/>
 
     <!-- 邀请码窗口  -->
     <InviteCode ref="inviteCode"/>
@@ -99,14 +100,15 @@
 
 </template>
 <script>
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgTableColState from '@/components/AgTable/AgTableColState'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import { API_URL_SYS_USER_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import InviteCode from './InviteCode'
 import RoleDist from './RoleDist'
-import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 const tableColumns = [
   { key: 'avatar', title: '头像', fixed: 'left', width: 65, scopedSlots: { customRender: 'avatarSlot' } },
@@ -137,7 +139,7 @@ const userTypeList = [
 ]
 
 export default {
-  components: { AgTable, AgTableColumns, InfoAddOrEdit, InviteCode, RoleDist, AgTableColState, AgTextUp },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgTableColState, AgTextUp, InfoAddOrEdit, InviteCode, RoleDist },
   data () {
     return {
       tableColumns: tableColumns,
@@ -146,6 +148,7 @@ export default {
         sysType: 'MGR'
       },
       userTypeOptions: userTypeList,
+      isShowMore: false,
       btnLoading: false
     }
   },
@@ -174,24 +177,26 @@ export default {
     getUserTypeName: (userType) => {
       return userTypeList.find(f => f.userType === userType).userTypeName
     },
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_SYS_USER_LIST, params)
     },
-
-    searchFunc: function () { // 点击【查询】按钮点击事件
+    queryFunc: function () { // 点击【查询】按钮点击事件
       this.btnLoading = true // 打开查询按钮的loading
       this.$refs.infoTable.refTable(true)
     },
-
     addFunc: function () { // 业务通用【新增】 函数
       this.$refs.infoAddOrEdit.show()
     },
-
     editFunc: function (recordId, sysType, belongInfoId) { // 业务通用【修改】 函数
       this.$refs.infoAddOrEdit.show(recordId, sysType, belongInfoId)
     },
-
     delFunc: function (recordId) { // 业务通用【删除】 函数
       const that = this
       this.$infoBox.confirmDanger('确认删除？', '', () => {
@@ -201,7 +206,6 @@ export default {
         })
       })
     },
-
     roleDist: function (recordId, sysType, belongInfoId) { // 【分配权限】 按钮点击事件
       this.$refs.roleDist.show(recordId, sysType, belongInfoId)
     },

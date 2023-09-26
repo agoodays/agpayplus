@@ -1,29 +1,29 @@
 <template>
   <page-header-wrapper>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="MGR">运营平台</a-select-option>
-                <a-select-option value="AGENT">代理商</a-select-option>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="MGR">运营平台</a-select-option>
+              <a-select-option value="AGENT">代理商</a-select-option>
 <!--                <a-select-option value="MCH">商户</a-select-option>-->
-              </a-select>
-            </a-form-item>
-            <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />
-            <ag-text-up :placeholder="'团队ID'" :msg="searchData.teamId" v-model="searchData.teamId"/>
-            <ag-text-up :placeholder="'团队编号'" :msg="searchData.teamNo" v-model="searchData.teamNo"/>
-            <ag-text-up :placeholder="'团队名称'" :msg="searchData.teamName" v-model="searchData.teamName"/>
-            <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+            </a-select>
+          </a-form-item>
+          <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />
+          <ag-text-up :placeholder="'团队ID'" :msg="searchData.teamId" v-model="searchData.teamId"/>
+          <ag-text-up :placeholder="'团队编号'" :msg="searchData.teamNo" v-model="searchData.teamNo"/>
+          <ag-text-up :placeholder="'团队名称'" :msg="searchData.teamName" v-model="searchData.teamName"/>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -73,9 +73,10 @@
   </page-header-wrapper>
 </template>
 <script>
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
-import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import { API_URL_UR_TEAM_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import InfoDetail from './Detail'
@@ -94,20 +95,26 @@ const tableColumns = [
 
 export default {
   name: 'SysUserTeamPage',
-  components: { AgTable, AgTextUp, AgTableColumns, InfoAddOrEdit, InfoDetail },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgTextUp, InfoAddOrEdit, InfoDetail },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
       searchData: {
         sysType: 'MGR'
-      },
-      value: "''"
+      }
     }
   },
   mounted () {
   },
   methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)

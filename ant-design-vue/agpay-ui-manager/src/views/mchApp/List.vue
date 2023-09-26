@@ -1,28 +1,28 @@
 <template>
   <page-header-wrapper>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
-            <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <ag-text-up :placeholder="'应用名称'" :msg="searchData.appName" v-model="searchData.appName"/>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
+          <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+          <ag-text-up :placeholder="'应用名称'" :msg="searchData.appName" v-model="searchData.appName"/>
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.state" placeholder="状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
 
-                <a-select-option value="0">禁用</a-select-option>
-                <a-select-option value="1">启用</a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+              <a-select-option value="0">禁用</a-select-option>
+              <a-select-option value="1">启用</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
@@ -88,12 +89,15 @@ const tableColumns = [
 
 export default {
   name: 'MchAppPage',
-  components: { AgTable, AgTableColumns, AgPayConfigDrawer, AgTextUp, MchAppAddOrEdit, MchPayIfConfigList },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgPayConfigDrawer, AgTextUp, MchAppAddOrEdit, MchPayIfConfigList },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: { 'mchNo': '' }
+      searchData: {
+        mchNo: ''
+      }
     }
   },
   mounted () {
@@ -101,6 +105,12 @@ export default {
     this.queryFunc()
   },
   methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)

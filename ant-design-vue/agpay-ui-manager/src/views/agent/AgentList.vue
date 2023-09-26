@@ -1,30 +1,30 @@
 <template>
   <page-header-wrapper>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo"/>
-            <ag-text-up :placeholder="'上级代理商号'" :msg="searchData.pid" v-model="searchData.pid"/>
-            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
-            <ag-text-up :placeholder="'代理商名称'" :msg="searchData.agentName" v-model="searchData.agentName"/>
-            <ag-text-up :placeholder="'代理商登录名'" :msg="searchData.loginUsername" v-model="searchData.loginUsername"/>
-            <ag-text-up :placeholder="'手机号'" :msg="searchData.contactTel" v-model="searchData.contactTel"/>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="代理商状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">禁用</a-select-option>
-                <a-select-option value="1">启用</a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="true"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo"/>
+          <ag-text-up :placeholder="'上级代理商号'" :msg="searchData.pid" v-model="searchData.pid"/>
+          <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
+          <ag-text-up :placeholder="'代理商名称'" :msg="searchData.agentName" v-model="searchData.agentName"/>
+          <ag-text-up :placeholder="'代理商登录名'" :msg="searchData.loginUsername" v-model="searchData.loginUsername"/>
+          <ag-text-up v-if="isShowMore" :placeholder="'手机号'" :msg="searchData.contactTel" v-model="searchData.contactTel"/>
+          <a-form-item v-if="isShowMore" label="" class="table-head-layout">
+            <a-select v-model="searchData.state" placeholder="代理商状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">禁用</a-select-option>
+              <a-select-option value="1">启用</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
@@ -92,9 +93,10 @@ const tableColumns = [
 
 export default {
   name: 'AgentListPage',
-  components: { AgTextUp, AgTable, AgTableColumns, AgPayConfigDrawer, InfoAddOrEdit, InfoDetail },
+  components: { AgSearchForm, AgTable, AgTextUp, AgTableColumns, AgPayConfigDrawer, InfoAddOrEdit, InfoDetail },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
       searchData: {},
@@ -104,6 +106,12 @@ export default {
   mounted () {
   },
   methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)

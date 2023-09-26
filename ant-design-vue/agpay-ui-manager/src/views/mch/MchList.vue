@@ -1,34 +1,34 @@
 <template>
   <page-header-wrapper>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
-            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
-            <ag-text-up :placeholder="'商户名称'" :msg="searchData.mchName" v-model="searchData.mchName"/>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="商户状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">禁用</a-select-option>
-                <a-select-option value="1">启用</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.type" placeholder="商户类型" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="1">普通商户</a-select-option>
-                <a-select-option value="2">特约商户</a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
+          <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
+          <ag-text-up :placeholder="'商户名称'" :msg="searchData.mchName" v-model="searchData.mchName"/>
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.state" placeholder="商户状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">禁用</a-select-option>
+              <a-select-option value="1">启用</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.type" placeholder="商户类型" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="1">普通商户</a-select-option>
+              <a-select-option value="2">特约商户</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -76,6 +76,7 @@
   </page-header-wrapper>
 </template>
 <script>
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
@@ -99,18 +100,24 @@ const tableColumns = [
 
 export default {
   name: 'MchListPage',
-  components: { AgTable, AgTableColumns, InfoAddOrEdit, InfoDetail, MchConfig, AgTextUp },
+  components: { AgSearchForm, AgTable, AgTableColumns, InfoAddOrEdit, InfoDetail, MchConfig, AgTextUp },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {},
-      value: "''"
+      searchData: {}
     }
   },
   mounted () {
   },
   methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)

@@ -1,26 +1,26 @@
 <template>
   <page-header-wrapper>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
-            <ag-text-up :placeholder="'服务商名称'" :msg="searchData.isvName" v-model="searchData.isvName" />
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="服务商状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">禁用</a-select-option>
-                <a-select-option value="1">启用</a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">搜索</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
+          <ag-text-up :placeholder="'服务商名称'" :msg="searchData.isvName" v-model="searchData.isvName" />
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.state" placeholder="服务商状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">禁用</a-select-option>
+              <a-select-option value="1">启用</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -59,6 +59,7 @@
   </page-header-wrapper>
 </template>
 <script>
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
@@ -79,6 +80,7 @@ const tableColumns = [
 export default {
   name: 'IsvListPage',
   components: {
+    AgSearchForm,
     AgTable,
     AgTableColumns,
     AgPayConfigDrawer,
@@ -88,6 +90,7 @@ export default {
   },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
       searchData: {}
@@ -96,6 +99,12 @@ export default {
   mounted () {
   },
   methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)
