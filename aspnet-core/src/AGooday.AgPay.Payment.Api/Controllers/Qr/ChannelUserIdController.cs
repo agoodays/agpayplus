@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             jsonObject.Add("redirectUrl", rq.RedirectUrl);
 
             //回调地址
-            String callbackUrl = _sysConfigService.GetDBApplicationConfig().GenMchChannelUserIdApiOauth2RedirectUrlEncode(jsonObject);
+            string callbackUrl = _sysConfigService.GetDBApplicationConfig().GenMchChannelUserIdApiOauth2RedirectUrlEncode(jsonObject);
 
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(rq.MchNo, rq.AppId);
@@ -105,7 +105,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
 
             //获取渠道用户ID
-            String channelUserId = channelUserService.GetChannelUserId(GetReqParamJson(), mchAppConfigContext);
+            string channelUserId = channelUserService.GetChannelUserId(GetReqParamJson(), mchAppConfigContext);
 
             //同步跳转
             JObject appendParams = new JObject();

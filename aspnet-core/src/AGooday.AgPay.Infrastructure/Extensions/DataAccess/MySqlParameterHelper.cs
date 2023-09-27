@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
                 var name = p.Names.FirstOrDefault() as QueryParamNameAttribute;
                 var pinfo = new QueryParamInfo();
 
-                if (name != null && !String.IsNullOrWhiteSpace(name.Name))
+                if (name != null && !string.IsNullOrWhiteSpace(name.Name))
                     pinfo.Name = name.Name.Replace("@", "");
                 else
                     pinfo.Name = p.Property.Name.Replace("@", "");

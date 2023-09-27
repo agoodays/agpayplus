@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
             var bytes = Encoding.UTF8.GetBytes(json);
             MD5 md5 = MD5.Create();
             byte[] temp = md5.ComputeHash(bytes);
-            String sign = "";
+            string sign = "";
             foreach (byte b in temp)
             {
                 sign = sign + b.ToString("X").PadLeft(2, '0');

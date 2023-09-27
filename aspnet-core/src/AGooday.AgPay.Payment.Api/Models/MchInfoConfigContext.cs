@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        public MchAppDto GetMchApp(String appId)
+        public MchAppDto GetMchApp(string appId)
         {
             AppMap.TryGetValue(appId, out MchAppDto mchApp);
 

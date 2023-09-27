@@ -119,7 +119,7 @@ namespace AGooday.AgPay.Components.OSS.Models
             return this.MaxSize >= (fileSize == null ? 0L : fileSize);
         }
 
-        public static OssFileConfig GetOssFileConfigByBizType(String bizType)
+        public static OssFileConfig GetOssFileConfigByBizType(string bizType)
         {
             ALL_BIZ_TYPE_MAP.TryGetValue(bizType, out OssFileConfig ossFileConfig);
             return ossFileConfig;

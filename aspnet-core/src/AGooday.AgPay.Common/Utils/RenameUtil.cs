@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Common.Utils
             var name = str.ToCharArray();
             name[0] = char.ToLowerInvariant(firstChar);
 
-            return new String(name);
+            return new string(name);
         }
 
         /// <summary>

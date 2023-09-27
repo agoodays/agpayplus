@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         /// <param name="payOrder"></param>
         /// <param name="notifyUrl"></param>
         /// <param name="returnUrl"></param>
-        public static void JsapiParamsSet(JObject reqParams, PayOrderDto payOrder, String notifyUrl, String returnUrl)
+        public static void JsapiParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
             string orderType = YsfHttpUtil.GetOrderTypeByJSapi(payOrder.WayCode);
             reqParams.Add("orderType", orderType); //订单类型： alipayJs-支付宝， wechatJs-微信支付， upJs-银联二维码
