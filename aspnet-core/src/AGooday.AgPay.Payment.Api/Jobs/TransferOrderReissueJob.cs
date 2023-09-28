@@ -7,16 +7,16 @@ using Quartz;
 namespace AGooday.AgPay.Payment.Api.Jobs
 {
     /// <summary>
-    /// 补单定时任务
+    /// 转账补单定时任务
     /// </summary>
     [DisallowConcurrentExecution]
-    public class PayOrderReissueJob : IJob
+    public class TransferOrderReissueJob : IJob
     {
         private static int QUERY_PAGE_SIZE = 100; //每次查询数量
-        private readonly ILogger<PayOrderExpiredJob> logger;
+        private readonly ILogger<TransferOrderReissueJob> logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public PayOrderReissueJob(ILogger<PayOrderExpiredJob> logger,
+        public TransferOrderReissueJob(ILogger<TransferOrderReissueJob> logger,
             IServiceScopeFactory serviceScopeFactory)
         {
             this.logger = logger;
@@ -29,36 +29,35 @@ namespace AGooday.AgPay.Payment.Api.Jobs
             {
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    var payOrderService = scope.ServiceProvider.GetService<IPayOrderService>();
-                    var channelOrderReissueService = scope.ServiceProvider.GetService<ChannelOrderReissueService>();
-
+                    var transferOrderService = scope.ServiceProvider.GetService<ITransferOrderService>();
+                    var transferOrderReissueService = scope.ServiceProvider.GetService<TransferOrderReissueService>();
                     int currentPageIndex = 1; //当前页码
                     while (true)
                     {
                         try
                         {
-                            var dto = new PayOrderQueryDto()
+                            var dto = new TransferOrderQueryDto()
                             {
                                 PageNumber = currentPageIndex,
                                 PageSize = QUERY_PAGE_SIZE,
-                                State = (byte)PayOrderState.STATE_ING,                                
-                                CreatedStart = DateTime.Now.AddMinutes(-10),// 当前时间 减去10分钟。
+                                State = (byte)TransferOrderState.STATE_ING, // 转账中
+                                CreatedStart = DateTime.Now.AddDays(-1), // 只查询一天内的转账单;
                             };
-                            var payOrders = payOrderService.GetPaginatedData(dto);
+                            var transferOrders = transferOrderService.GetPaginatedData(dto);
 
-                            if (payOrders == null || !payOrders.Any())
+                            if (transferOrders == null || !transferOrders.Any())
                             {
                                 //本次查询无结果, 不再继续查询;
                                 break;
                             }
 
-                            foreach (var payOrder in payOrders)
+                            foreach (var transferOrder in transferOrders)
                             {
-                                channelOrderReissueService.ProcessPayOrder(payOrder);
+                                transferOrderReissueService.ProcessOrder(transferOrder);
                             }
 
                             //已经到达页码最大量，无需再次查询
-                            if (payOrders.TotalPages <= currentPageIndex)
+                            if (transferOrders.TotalPages <= currentPageIndex)
                             {
                                 break;
                             }

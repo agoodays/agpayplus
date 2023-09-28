@@ -198,7 +198,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string notifyUrl = CreateNotifyUrl(dbTransferOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbTransferOrder.TransferId;
-                mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
+                mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_TRANSFER_ORDER;
                 mchNotifyRecord.MchNo = dbTransferOrder.MchNo;
                 mchNotifyRecord.MchOrderNo = dbTransferOrder.MchOrderNo; //商户订单号
                 mchNotifyRecord.IsvNo = dbTransferOrder.IsvNo;

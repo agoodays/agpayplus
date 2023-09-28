@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Application.Services
         }
 
         /// <summary>
-        /// 查询退款订单订单
+        /// 查询转账订单订单
         /// </summary>
         /// <param name="transferId"></param>
         /// <returns></returns>

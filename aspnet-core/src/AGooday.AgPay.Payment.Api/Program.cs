@@ -164,6 +164,7 @@ services.AddSingleton<PayOrderExpiredJob>();
 services.AddSingleton<PayOrderReissueJob>();
 services.AddSingleton<RefundOrderExpiredJob>();
 services.AddSingleton<RefundOrderReissueJob>();
+services.AddSingleton<TransferOrderReissueJob>();
 services.AddSingleton(new JobSchedule(
     jobType: typeof(PayOrderExpiredJob),
     cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
@@ -175,6 +176,9 @@ services.AddSingleton(new JobSchedule(
     cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
 services.AddSingleton(new JobSchedule(
     jobType: typeof(RefundOrderReissueJob),
+    cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
+services.AddSingleton(new JobSchedule(
+    jobType: typeof(TransferOrderReissueJob),
     cronExpression: "0 0/1 * * * ?")); // 每分钟执行一次
 
 services.AddHostedService<QuartzHostedService>();

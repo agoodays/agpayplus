@@ -47,5 +47,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
         {
             throw new NotImplementedException();
         }
+
+        public ChannelRetMsg Query(TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

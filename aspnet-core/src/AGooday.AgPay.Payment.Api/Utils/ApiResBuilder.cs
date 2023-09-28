@@ -7,7 +7,11 @@ namespace AGooday.AgPay.Payment.Api.Utils
     /// </summary>
     public class ApiResBuilder
     {
-        /** 构建自定义响应对象, 默认响应成功 **/
+        /// <summary>
+        /// 构建自定义响应对象, 默认响应成功
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static T BuildSuccess<T>() where T : AbstractRS, new()
         {
             try

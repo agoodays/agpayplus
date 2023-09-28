@@ -7,7 +7,7 @@ using Quartz;
 namespace AGooday.AgPay.Payment.Api.Jobs
 {
     /// <summary>
-    /// 补单定时任务
+    /// 补单定时任务(退款单)
     /// </summary>
     [DisallowConcurrentExecution]
     public class RefundOrderReissueJob : IJob
@@ -40,8 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                             {
                                 PageNumber = currentPageIndex,
                                 PageSize = QUERY_PAGE_SIZE,
-                                State = (byte)RefundOrderState.STATE_ING,
-                                CreatedStart = DateTime.Now.AddMinutes(-10),
+                                State = (byte)RefundOrderState.STATE_ING
                             };
                             var refundOrders = refundOrderService.GetPaginatedData(dto);
 
