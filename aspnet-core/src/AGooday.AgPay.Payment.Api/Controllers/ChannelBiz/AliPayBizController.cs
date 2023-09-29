@@ -1,19 +1,20 @@
-﻿using AGooday.AgPay.Application.Interfaces;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.AliPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.Services;
 using Aop.Api.Domain;
 using Aop.Api.Request;
 using Aop.Api.Response;
 using Microsoft.AspNetCore.Mvc;
-using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using Newtonsoft.Json.Linq;
-using AGooday.AgPay.Components.MQ.Vender;
+using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
 {
@@ -143,6 +144,47 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
             ViewBag.ErrMsg = errMsg;
             ViewBag.IsAlipaySysAuth = isAlipaySysAuth;
             return View("~/Views/Channel/Alipay/IsvSubMchAuth.cshtml");
+        }
+
+        [HttpGet, Route("/appGatewayMsgReceive")]
+        public ActionResult AlipayAppGatewayMsgReceive()
+        {
+            JObject reqJSON = GetReqParamJson();
+
+            // 获取到报文信息，然后转发到对应的ctrl
+            log.LogInformation("支付宝应用网关接收消息参数：{0}", reqJSON);
+
+            // 分账交易通知
+            if ("alipay.trade.order.settle.notify".Equals(reqJSON.GetValue("msg_method").ToString()))
+            {
+                // 直接转发到分账通知的URL去。
+                return Redirect($"/api/divisionRecordChannelNotify/{CS.IF_CODE.ALIPAY}");
+            }
+
+            throw new BizException($"无此事件[{reqJSON.GetValue("msg_method")}]处理器");
+        }
+
+        /// <summary>
+        /// 获取json格式的请求参数
+        /// </summary>
+        /// <returns></returns>
+        protected JObject GetReqParamJson()
+        {
+            Request.EnableBuffering();
+
+            string body = "";
+            var stream = Request.Body;
+            if (stream != null)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                using (var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true))
+                {
+                    body = reader.ReadToEndAsync().Result;
+                }
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
+            return JObject.Parse(body);
         }
     }
 }

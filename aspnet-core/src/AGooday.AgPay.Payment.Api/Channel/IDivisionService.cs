@@ -37,5 +37,14 @@ namespace AGooday.AgPay.Payment.Api.Channel
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         ChannelRetMsg SingleDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
+
+        /// <summary>
+        /// 查询分账结果
+        /// </summary>
+        /// <param name="payOrder"></param>
+        /// <param name="recordList"></param>
+        /// <param name="mchAppConfigContext"></param>
+        /// <returns></returns>
+        Dictionary<long, ChannelRetMsg> QueryDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
     }
 }

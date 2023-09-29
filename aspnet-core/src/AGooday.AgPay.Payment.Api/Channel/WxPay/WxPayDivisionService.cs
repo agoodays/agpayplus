@@ -221,5 +221,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                 return channelRetMsg;
             }
         }
+
+        public Dictionary<long, ChannelRetMsg> QueryDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

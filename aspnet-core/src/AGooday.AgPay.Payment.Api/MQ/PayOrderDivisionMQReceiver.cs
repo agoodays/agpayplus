@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 try
                 {
                     log.LogInformation($"接收订单分账通知MQ, msg={JsonConvert.SerializeObject(payload)}");
-                    payOrderDivisionProcessService.ProcessPayOrderDivision(payload.PayOrderId, payload.UseSysAutoDivisionReceivers, payload.ReceiverList);
+                    payOrderDivisionProcessService.ProcessPayOrderDivision(payload.PayOrderId, payload.UseSysAutoDivisionReceivers, payload.ReceiverList, payload.IsResend);
                 }
                 catch (Exception e)
                 {

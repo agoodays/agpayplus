@@ -232,43 +232,6 @@ namespace AGooday.AgPay.Common.Enumerator
         /// </summary>
         [Description("全额退款")]
         REFUND_STATE_ALL = 2,
-
-        /// <summary>
-        /// 该笔订单不允许分账
-        /// </summary>
-        [Description("禁止分账")]
-        DIVISION_MODE_FORBID = 0,
-        /// <summary>
-        /// 支付成功按配置自动完成分账
-        /// </summary>
-        [Description("自动分账")]
-        DIVISION_MODE_AUTO = 1,
-        /// <summary>
-        /// 商户手动分账(解冻商户金额)
-        /// </summary>
-        [Description("手动分账")]
-        DIVISION_MODE_MANUAL = 2,
-
-        /// <summary>
-        /// 未发生分账
-        /// </summary>
-        [Description("未分账")]
-        DIVISION_STATE_UNHAPPEN = 0,
-        /// <summary>
-        /// 等待分账任务处理
-        /// </summary>
-        [Description("等待分账")]
-        DIVISION_STATE_WAIT_TASK = 1,
-        /// <summary>
-        /// 分账处理中
-        /// </summary>
-        [Description("分账中")]
-        DIVISION_STATE_ING = 2,
-        /// <summary>
-        /// 分账任务已结束(不体现状态)
-        /// </summary>
-        [Description("已分账")]
-        DIVISION_STATE_FINISH = 3,
     }
 
     public enum PayOrderDivision
@@ -311,7 +274,7 @@ namespace AGooday.AgPay.Common.Enumerator
         DIVISION_STATE_FINISH = 3,
     }
 
-    public enum PayOrderDivisionState
+    public enum PayOrderDivisionRecordState
     {
         /// <summary>
         /// 待分账
@@ -319,15 +282,20 @@ namespace AGooday.AgPay.Common.Enumerator
         [Description("待分账")]
         STATE_WAIT = 0,
         /// <summary>
-        /// 分账成功
+        /// 分账成功（明确成功）
         /// </summary>
         [Description("分账成功")]
         STATE_SUCCESS = 1,
         /// <summary>
-        /// 分账失败
+        /// 分账失败（明确失败）
         /// </summary>
         [Description("分账失败")]
         STATE_FAIL = 2,
+        /// <summary>
+        /// 分账已受理（上游受理）
+        /// </summary>
+        [Description("分账已受理")]
+        STATE_ACCEPT = 3,
     }
 
     /// <summary>

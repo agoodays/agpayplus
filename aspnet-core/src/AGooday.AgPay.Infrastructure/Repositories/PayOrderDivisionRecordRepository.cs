@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public long SumSuccessDivisionAmount(string payOrderId)
         {
-            return DbSet.Where(w => w.PayOrderId.Equals(payOrderId) && w.State.Equals((byte)PayOrderDivisionState.STATE_SUCCESS))
+            return DbSet.Where(w => w.PayOrderId.Equals(payOrderId) && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_SUCCESS))
                 .Sum(s => s.CalDivisionAmount);
         }
     }

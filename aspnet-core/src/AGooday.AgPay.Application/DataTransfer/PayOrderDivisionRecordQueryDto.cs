@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// <summary>
     /// 分账记录表
     /// </summary>
-    public class PayOrderDivisionRecordQueryDto : PageQuery
+    public class PayOrderDivisionRecordQueryDto : DatePageQuery
     {
         /// <summary>
         /// 分账记录ID
@@ -160,15 +160,5 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// </summary>
         [BindNever]
         public DateTime UpdatedAt { get; set; }
-
-        /// <summary>
-        /// 开始时间
-        /// </summary>
-        public DateTime? CreatedStart { get; set; }
-
-        /// <summary>
-        /// 结束时间
-        /// </summary>
-        public DateTime? CreatedEnd { get; set; }
     }
 }

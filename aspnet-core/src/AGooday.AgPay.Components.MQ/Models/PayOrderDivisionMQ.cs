@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Components.MQ.Models
             /// <summary>
             /// 是否使用默认分组
             /// </summary>
-            public byte UseSysAutoDivisionReceivers { get; private set; }
+            public byte? UseSysAutoDivisionReceivers { get; private set; }
 
             /// <summary>
             /// 分账接受者列表， 字段值为空表示系统默认配置项。
@@ -44,11 +44,17 @@ namespace AGooday.AgPay.Components.MQ.Models
             /// </summary>
             public List<CustomerDivisionReceiver> ReceiverList { get; private set; }
 
-            public MsgPayload(string payOrderId, byte useSysAutoDivisionReceivers, List<CustomerDivisionReceiver> receiverList)
+            /// <summary>
+            /// 是否重新发送 ( 如分账失败，重新请求分账接口 ) ， 空表示false
+            /// </summary>
+            public bool IsResend { get; private set; }
+
+            public MsgPayload(string payOrderId, byte? useSysAutoDivisionReceivers, List<CustomerDivisionReceiver> receiverList, bool isResend)
             {
                 PayOrderId = payOrderId;
                 UseSysAutoDivisionReceivers = useSysAutoDivisionReceivers;
                 ReceiverList = receiverList;
+                IsResend = isResend;
             }
         }
 
@@ -66,8 +72,15 @@ namespace AGooday.AgPay.Components.MQ.Models
         /// 【！重要配置项！】 构造MQModel , 一般用于发送MQ时
         /// </summary>
         /// <returns></returns>
-        public static PayOrderDivisionMQ Build(string payOrderId, byte useSysAutoDivisionReceivers, List<CustomerDivisionReceiver> receiverList) 
-            => new PayOrderDivisionMQ(new MsgPayload(payOrderId, useSysAutoDivisionReceivers, receiverList));
+        public static PayOrderDivisionMQ Build(string payOrderId, byte? useSysAutoDivisionReceivers, List<CustomerDivisionReceiver> receiverList)
+            => new PayOrderDivisionMQ(new MsgPayload(payOrderId, useSysAutoDivisionReceivers, receiverList, false));
+
+        /// <summary>
+        /// 【！重要配置项！】 构造MQModel , 一般用于发送MQ时
+        /// </summary>
+        /// <returns></returns>
+        public static PayOrderDivisionMQ Build(string payOrderId, byte? useSysAutoDivisionReceivers, List<CustomerDivisionReceiver> receiverList, bool isResend)
+            => new PayOrderDivisionMQ(new MsgPayload(payOrderId, useSysAutoDivisionReceivers, receiverList, isResend));
 
         /// <summary>
         /// 解析MQ消息， 一般用于接收MQ消息时

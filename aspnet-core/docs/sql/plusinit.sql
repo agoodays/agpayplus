@@ -59,6 +59,8 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH_INFO', '商户信息', 'user', '/i
 
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG', '系统配置', 'setting', '/config', 'MchConfigPage', 'ML', 0, 1,  'ENT_SYS_CONFIG', '30', 'MCH', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG_EDIT', '按钮：修改系统配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_CONFIG', '0', 'MCH', NOW(), NOW());
+    
+INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECORD_RESEND', '按钮：重试', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECORD', '0', 'MCH', NOW(), NOW());
 
 #####  ----------  修改表结构  ----------  #####
 
