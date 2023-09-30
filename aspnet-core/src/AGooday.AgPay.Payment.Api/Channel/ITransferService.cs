@@ -6,7 +6,7 @@ using AGooday.AgPay.Payment.Api.RQRS.Transfer;
 namespace AGooday.AgPay.Payment.Api.Channel
 {
     /// <summary>
-    /// 调起上游渠道侧退款接口
+    /// 转账接口
     /// </summary>
     public interface ITransferService
     {

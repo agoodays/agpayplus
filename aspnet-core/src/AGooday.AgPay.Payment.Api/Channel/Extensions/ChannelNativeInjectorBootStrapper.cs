@@ -265,6 +265,43 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                 return funcFactory;
             });
             #endregion
+            #region TransferService
+            services.AddScoped<AlipayTransferService>();
+            services.AddScoped<WxPayTransferService>();
+            services.AddSingleton(provider =>
+            {
+                Func<string, ITransferService> funcFactory = ifCode =>
+                {
+                    switch (ifCode)
+                    {
+                        case CS.IF_CODE.ALIPAY:
+                            return provider.GetService<AlipayTransferService>();
+                        case CS.IF_CODE.WXPAY:
+                            return provider.GetService<WxPayTransferService>();
+                        default:
+                            return null;
+                    }
+                };
+                return funcFactory;
+            });
+            #endregion
+            #region TransferNoticeService
+            services.AddScoped<AlipayTransferNoticeService>();
+            services.AddSingleton(provider =>
+            {
+                Func<string, ITransferNoticeService> funcFactory = ifCode =>
+                {
+                    switch (ifCode)
+                    {
+                        case CS.IF_CODE.ALIPAY:
+                            return provider.GetService<AlipayTransferNoticeService>();
+                        default:
+                            return null;
+                    }
+                };
+                return funcFactory;
+            });
+            #endregion
 
             #region AliPay
             AliPayNativeInjectorBootStrapper.RegisterServices(services);
