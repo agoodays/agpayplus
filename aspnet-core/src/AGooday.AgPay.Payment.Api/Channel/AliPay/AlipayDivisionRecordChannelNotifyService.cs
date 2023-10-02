@@ -142,13 +142,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 result.ApiRes = TextResp("success");
 
                 return result;
-
             }
             catch (Exception e)
             {
                 log.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
-
             }
         }
     }
