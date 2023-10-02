@@ -108,6 +108,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 model.OutRequestNo = recordList[0].BatchOrderId; // 结算请求流水号，由商家自定义。32个字符以内，仅可包含字母、数字、下划线。需保证在商户端不重复。
                 model.TradeNo = recordList[0].PayOrderChannelOrderNo; // 支付宝订单号
 
+                // royalty_mode 参数说明:  同步执行 sync  ; 分账异步执行 async ( 使用异步：  需要 1、请配置 支付宝应用的网关地址 （ xxx.com/api/channelbiz/alipay/appGatewayMsgReceive ）， 2、 订阅消息。   )
+                // 2023-03-30 咨询支付宝客服：  如果没有传royalty_mode分账模式,这个默认会是同步分账,同步分账不需要关注异步通知,接口调用成功就分账成功了  2,同步分账默认不会给您发送异步通知。
+                // 3. 服务商代商户调用商家分账，当异步分账时服务商必须调用alipay.open.app.message.topic.subscribe(订阅消息主题)对消息api做关联绑定，服务商才会收到alipay.trade.order.settle.notify通知，否则服务商无法收到通知。
+                // https://opendocs.alipay.com/open/20190308105425129272/quickstart#%E8%9A%82%E8%9A%81%E6%B6%88%E6%81%AF%EF%BC%9A%E4%BA%A4%E6%98%93%E5%88%86%E8%B4%A6%E7%BB%93%E6%9E%9C%E9%80%9A%E7%9F%A5
+
+                model.RoyaltyMode = "sync"; // 综上所述， 目前使用同步调用。
+
                 // 统一放置 isv 接口必传信息
                 AliPayKit.PutApiIsvInfo(mchAppConfigContext, request, model);
 

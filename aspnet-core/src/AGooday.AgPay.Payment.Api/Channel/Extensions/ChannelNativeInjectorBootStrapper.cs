@@ -64,6 +64,23 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                 return funcFactory;
             });
             #endregion
+            #region DivisionRecordChannelNotifyService
+            services.AddScoped<AliPayDivisionRecordChannelNotifyService>();
+            services.AddSingleton(provider =>
+            {
+                Func<string, AbstractDivisionRecordChannelNotifyService> funcFactory = ifCode =>
+                {
+                    switch (ifCode)
+                    {
+                        case CS.IF_CODE.ALIPAY:
+                            return provider.GetService<AliPayDivisionRecordChannelNotifyService>();
+                        default:
+                            return null;
+                    }
+                };
+                return funcFactory;
+            });
+            #endregion
             #region PaymentService
             services.AddScoped<AliPayPaymentService>();
             services.AddScoped<WxPayPaymentService>();
