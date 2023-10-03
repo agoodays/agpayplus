@@ -146,19 +146,21 @@ namespace AGooday.AgPay.Payment.Api.Services
 
                 channelRetMsg = divisionService.SingleDivision(payOrder, recordList, configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId));
 
-                // 确认分账成功
+                // 确认分账成功 ( 明确分账成功 )
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
                     //分账成功
                     payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_SUCCESS, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelOriginResponse);
 
                 }
+                // 分账失败 ( 明确分账成功 )
                 else if (channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
                 {
                     //分账失败
                     payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
 
                 }
+                // 已受理
                 else if (channelRetMsg.ChannelState == ChannelState.WAITING)
                 {
                     payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_ACCEPT, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
