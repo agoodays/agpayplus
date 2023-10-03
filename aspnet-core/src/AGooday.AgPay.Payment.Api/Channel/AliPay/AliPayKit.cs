@@ -89,6 +89,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             {
                 ((AlipayTradeCloseRequest)req).PutOtherTextParam("app_auth_token", isvsubMchParams.AppAuthToken);
             }
+            else if (typeof(AlipayTradeOrderSettleQueryRequest).IsInstanceOfType(req))
+            {
+                ((AlipayTradeOrderSettleQueryRequest)req).PutOtherTextParam("app_auth_token", isvsubMchParams.AppAuthToken);
+            }
 
             // 服务商信息
             ExtendParams extendParams = new ExtendParams();
