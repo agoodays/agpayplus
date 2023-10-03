@@ -196,18 +196,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
         }
 
         public Dictionary<long, ChannelRetMsg> QueryDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext)
-        {    
+        {
             // 创建返回结果
             Dictionary<long, ChannelRetMsg> resultMap = new Dictionary<long, ChannelRetMsg>();
 
-            // 同批次分账记录结果集
-            Dictionary<string, RoyaltyDetail> aliAcMap = new Dictionary<string, RoyaltyDetail>();
             try
             {
-                // 当无分账用户时，支付宝不允许发起分账请求，支付宝没有完结接口，直接响应成功即可。
-                if (recordList.Count == 0)
+                // 得到所有的 accNo 与 recordId map
+                Dictionary<string, long?> accnoAndRecordIdSet = new Dictionary<string, long?>();
+                foreach (PayOrderDivisionRecordDto record in recordList)
                 {
-                    throw new BizException("payOrderId:" + payOrder.PayOrderId + "分账记录为空。recordList：" + recordList);
+                    accnoAndRecordIdSet[record.AccNo] = record.RecordId;
                 }
 
                 var request = new AlipayTradeOrderSettleQueryRequest();
@@ -217,20 +216,15 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 // 统一放置 isv 接口必传信息
                 AliPayKit.PutApiIsvInfo(mchAppConfigContext, request, model);
 
-                // 支付宝分账请求单号
-                model.SettleNo = recordList[0].BatchOrderId;
-                // 结算请求流水号，由商家自定义。32个字符以内，仅可包含字母、数字、下划线。需保证在商户端不重复。
-                model.OutRequestNo = payOrder.PayOrderId;
-                // 支付宝订单号
-                model.TradeNo = payOrder.ChannelOrderNo;
+                //结算请求流水号，由商家自定义。32个字符以内，仅可包含字母、数字、下划线。需保证在商户端不重复。
+                model.OutRequestNo = recordList[0].BatchOrderId;
+                model.TradeNo = payOrder.ChannelOrderNo; //支付宝订单号
 
                 // 调起支付宝分账接口
-                if (log.IsEnabled(LogLevel.Information))
-                {
-                    log.LogInformation($"订单：[{recordList[0].BatchOrderId}], 支付宝查询分账请求：{JsonConvert.SerializeObject(model)}");
-                }
+                log.LogInformation($"订单：[{recordList[0].BatchOrderId}], 支付宝查询分账请求：{JsonConvert.SerializeObject(model)}");
                 var alipayResp = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
                 log.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝查询分账响应：{alipayResp.Body}");
+
                 if (!alipayResp.IsError)
                 {
                     var detailList = alipayResp.RoyaltyDetailList;
@@ -239,10 +233,23 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                         // 遍历匹配与当前账户相同的分账单
                         foreach (var item in detailList)
                         {
+                            // 我方系统的分账接收记录ID
+                            long? recordId = accnoAndRecordIdSet[item.TransIn];
+
                             // 分账操作类型为转账类型
-                            if ("transfer".Equals(item.OperationType))
+                            if ("transfer".Equals(item.OperationType) && recordId != null)
                             {
-                                aliAcMap[item.TransIn] = item;
+                                // 仅返回分账记录为最终态的结果 处理中的分账单不做返回处理
+                                if ("SUCCESS".Equals(item.State))
+                                {
+
+                                    resultMap[recordId.Value] = ChannelRetMsg.ConfirmSuccess(null);
+
+                                }
+                                else if ("FAIL".Equals(item.State))
+                                {
+                                    resultMap[recordId.Value] = ChannelRetMsg.ConfirmFail(null, item.ErrorCode, item.ErrorDesc);
+                                }
                             }
                         }
                     }
@@ -251,35 +258,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 {
                     log.LogError($"支付宝分账查询响应异常, alipayResp:{0}", JsonConvert.SerializeObject(alipayResp));
                     throw new BizException("支付宝分账查询响应异常：" + alipayResp.SubMsg);
-                }
-
-                // 返回结果
-                foreach (var record in recordList)
-                {
-                    // 对应入账账号匹配
-                    if (aliAcMap.ContainsKey(record.AccNo))
-                    {
-                        var detail = aliAcMap[record.AccNo];
-                        var channelRetMsg = new ChannelRetMsg();
-                        // 错误码
-                        channelRetMsg.ChannelErrCode = detail.ErrorCode;
-                        // 错误信息
-                        channelRetMsg.ChannelErrMsg = detail.ErrorDesc;
-
-                        // 仅返回分账记录为最终态的结果 处理中的分账单不做返回处理
-                        if ("SUCCESS".Equals(detail.State))
-                        {
-                            channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-
-                            resultMap[record.RecordId] = channelRetMsg;
-                        }
-                        else if ("FAIL".Equals(detail.State))
-                        {
-                            channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
-
-                            resultMap[record.RecordId] = channelRetMsg;
-                        }
-                    }
                 }
             }
             catch (Exception e)
