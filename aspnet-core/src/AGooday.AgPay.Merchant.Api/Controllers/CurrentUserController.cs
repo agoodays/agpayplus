@@ -53,6 +53,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             {
                 //当前用户信息
                 var currentUser = GetCurrentUser();
+                var user = currentUser.SysUser;
 
                 //1. 当前用户所有权限ID集合
                 var entIds = currentUser.Authorities.ToList();
@@ -68,9 +69,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 //};
                 var jsonArray = JArray.FromObject(sysEnts);
                 var leftMenuTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
-                var user = JObject.FromObject(currentUser.SysUser);
-                user.Add("entIdList", JArray.FromObject(entIds));
-                user.Add("allMenuRouteTree", JToken.FromObject(leftMenuTree));
+                //var user = JObject.FromObject(currentUser.SysUser);
+                //user.Add("entIdList", JArray.FromObject(entIds));
+                //user.Add("allMenuRouteTree", JToken.FromObject(leftMenuTree));
+                user.AddExt("entIdList", entIds);
+                user.AddExt("allMenuRouteTree", leftMenuTree);
                 return ApiRes.Ok(user);
             }
             catch (Exception)

@@ -6,6 +6,7 @@ using AGooday.AgPay.Agent.Api.Logs;
 using AGooday.AgPay.Agent.Api.Middlewares;
 using AGooday.AgPay.Agent.Api.Models;
 using AGooday.AgPay.Agent.Api.MQ;
+using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
@@ -128,6 +129,7 @@ services.AddControllers(options =>
         //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
         options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
+        options.SerializerSettings.Converters.Add(new BaseModelJsonConverter<BaseModel>());
     });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

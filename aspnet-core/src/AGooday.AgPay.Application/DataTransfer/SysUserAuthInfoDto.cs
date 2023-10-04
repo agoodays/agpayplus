@@ -1,6 +1,8 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using AGooday.AgPay.Common.Models;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
-    public class SysUserAuthInfoDto
+    public class SysUserAuthInfoDto : BaseModel
     {
         /// <summary>
         /// 系统用户ID
