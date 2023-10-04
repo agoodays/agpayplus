@@ -1,9 +1,11 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using AGooday.AgPay.Common.Models;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 代理商信息表
     /// </summary>
-    public class AgentInfoDto
+    public class AgentInfoDto : BaseModel
     {
         /// <summary>
         /// 代理商号
@@ -78,7 +80,7 @@
         /// <summary>
         /// 初始用户ID（创建代理商时，允许代理商登录的用户）
         /// </summary>
-        public long InitUserId { get; set; }
+        public long? InitUserId { get; set; }
 
         /// <summary>
         /// 账户类型: ALIPAY_CASH-支付宝转账, WX_CASH-微信零钱, BANK_CARD-银行卡

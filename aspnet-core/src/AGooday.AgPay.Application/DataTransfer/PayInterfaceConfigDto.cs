@@ -1,9 +1,11 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using AGooday.AgPay.Common.Models;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 支付接口配置参数表
     /// </summary>
-    public class PayInterfaceConfigDto
+    public class PayInterfaceConfigDto : BaseModel
     {
         /// <summary>
         /// ID

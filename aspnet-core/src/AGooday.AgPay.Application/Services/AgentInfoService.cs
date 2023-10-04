@@ -99,15 +99,6 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public AgentInfoDetailDto GetByAgentNo(string agentNo)
-        {
-            var agentInfo = _agentInfoRepository.GetById(agentNo);
-            var dto = _mapper.Map<AgentInfoDetailDto>(agentInfo);
-            var sysUser = _sysUserRepository.GetById(agentInfo.InitUserId.Value);
-            dto.LoginUsername = sysUser.LoginUsername;
-            return dto;
-        }
-
         public IEnumerable<AgentInfoDto> GetAll()
         {
             var agentInfos = _agentInfoRepository.GetAll();

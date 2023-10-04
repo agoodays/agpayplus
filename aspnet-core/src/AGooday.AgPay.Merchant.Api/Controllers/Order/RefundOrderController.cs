@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Merchant.Api.Attributes;
@@ -8,8 +9,8 @@ using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using OfficeOpenXml.Style;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Order
 {
@@ -111,7 +112,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
                         switch (excelHeader.Key)
                         {
                             case "state":
-                                value = refundOrder.State == 0 ? "订单生成" : refundOrder.State == 1 ? "退款中" : refundOrder.State == 2 ? "退款成功" : refundOrder.State == 3 ? "退款失败" : refundOrder.State == 4 ? "退款任务关闭" : "未知";
+                                value = refundOrder.State.ToEnum<RefundOrderState>()?.GetDescription() ?? "未知";
                                 break;
                             case "payAmount":
                             case "refundAmount":

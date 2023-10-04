@@ -12,7 +12,6 @@ using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -56,14 +55,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             var data = _mchAppService.GetPaginatedData(dto);
             var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
             var mchInfos = _mchInfoService.GetByMchNos(mchNos);
-            JArray records = new JArray();
+            //JArray records = new JArray();
             foreach (var item in data)
             {
-                var jitem = JObject.FromObject(item);
-                jitem["mchType"] = mchInfos.First(s => s.MchNo == item.MchNo).Type;
-                records.Add(jitem);
+                //var jitem = JObject.FromObject(item);
+                //jitem["mchType"] = mchInfos.First(s => s.MchNo == item.MchNo).Type;
+                //records.Add(jitem);
+                item.AddExt("mchType", mchInfos.First(s => s.MchNo == item.MchNo).Type);
             }
-            return ApiRes.Ok(new { Records = records, Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiRes.Ok(new { Records = data, Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
         }
 
         /// <summary>

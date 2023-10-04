@@ -6,7 +6,6 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Agent.Api.Controllers
 {
@@ -46,10 +45,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         {
             var sysUser = _sysUserService.GetById(GetCurrentUser().SysUser.SysUserId);
             var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
-            var jobj = JObject.FromObject(agentInfo);
-            jobj.Add("loginUsername", sysUser.LoginUsername);
-            jobj.Add("realname", sysUser.Realname);
-            return ApiRes.Ok(jobj);
+            //var jobj = JObject.FromObject(agentInfo);
+            //jobj.Add("loginUsername", sysUser.LoginUsername);
+            //jobj.Add("realname", sysUser.Realname);
+            agentInfo.AddExt("loginUsername", sysUser.LoginUsername);
+            agentInfo.AddExt("realname", sysUser.Realname);
+            return ApiRes.Ok(agentInfo);
         }
 
         /// <summary>

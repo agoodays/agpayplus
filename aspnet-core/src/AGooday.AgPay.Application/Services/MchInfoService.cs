@@ -105,15 +105,6 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public MchInfoDetailDto GetByMchNo(string mchNo)
-        {
-            var mchInfo = _mchInfoRepository.GetById(mchNo);
-            var dto = _mapper.Map<MchInfoDetailDto>(mchInfo);
-            var sysUser = _sysUserRepository.GetById(mchInfo.InitUserId.Value);
-            dto.LoginUsername = sysUser.LoginUsername;
-            return dto;
-        }
-
         public IEnumerable<MchInfoDto> GetByMchNos(List<string> mchNos)
         {
             var mchInfos = _mchInfoRepository.GetAll().Where(w => mchNos.Contains(w.MchNo));

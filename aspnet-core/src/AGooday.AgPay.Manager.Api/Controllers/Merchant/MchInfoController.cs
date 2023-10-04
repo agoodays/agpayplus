@@ -23,6 +23,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly IMQSender mqSender;
         private readonly ILogger<MchInfoController> _logger;
         private readonly IMchInfoService _mchInfoService;
+        private readonly ISysUserService _sysUserService;
 
         private readonly DomainNotificationHandler _notifications;
 
@@ -36,6 +37,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             this.mqSender = mqSender;
             _logger = logger;
             _mchInfoService = mchInfoService;
+            _sysUserService = sysUserService;
             _notifications = (DomainNotificationHandler)notifications;
         }
 
@@ -111,10 +113,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_VIEW, PermCode.MGR.ENT_MCH_INFO_EDIT)]
         public ApiRes Detail(string mchNo)
         {
-            var mchInfo = _mchInfoService.GetByMchNo(mchNo);
+            var mchInfo = _mchInfoService.GetById(mchNo);
             if (mchInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            var sysUser = _sysUserService.GetById(mchInfo.InitUserId.Value);
+            if (sysUser != null)
+            {
+                mchInfo.AddExt("loginUsername", sysUser.LoginUsername);
             }
             return ApiRes.Ok(mchInfo);
         }

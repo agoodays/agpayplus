@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
@@ -101,7 +102,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                         switch (excelHeader.Key)
                         {
                             case "state":
-                                value = transferOrder.State == 0 ? "订单生成" : transferOrder.State == 1 ? "转账中" : transferOrder.State == 2 ? "转账成功" : transferOrder.State == 3 ? "转账失败" : transferOrder.State == 4 ? "订单关闭" : "未知";
+                                value = transferOrder.State.ToEnum<TransferOrderState>()?.GetDescription() ?? "未知";
                                 break;
                             case "amount":
                                 value = Convert.ToDecimal(value) / 100;

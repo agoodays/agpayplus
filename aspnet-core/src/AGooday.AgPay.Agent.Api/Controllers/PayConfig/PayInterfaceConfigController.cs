@@ -1,4 +1,6 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Authorization;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params;
 using AGooday.AgPay.Application.Permissions;
@@ -7,11 +9,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
 {
@@ -168,11 +167,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
             payInterfaceConfig.IsOpenApplyment = isSupportApplyment ? CS.NO : payInterfaceConfig.IsOpenApplyment;
             payInterfaceConfig.IsOpenCheckBill = isSupportCheckBill ? CS.NO : payInterfaceConfig.IsOpenCheckBill;
             payInterfaceConfig.IsOpenCashout = isSupportApplyment ? CS.NO : payInterfaceConfig.IsOpenCashout;
-            var result = JObject.FromObject(payInterfaceConfig);
-            result["isSupportApplyment"] = isSupportApplyment ? CS.NO : CS.YES;
-            result["isSupportCheckBill"] = isSupportCheckBill ? CS.NO : CS.YES;
-            result["isSupportCashout"] = isSupportCashout ? CS.NO : CS.YES;
-            return ApiRes.Ok(result);
+            //var result = JObject.FromObject(payInterfaceConfig);
+            //result["isSupportApplyment"] = isSupportApplyment ? CS.NO : CS.YES;
+            //result["isSupportCheckBill"] = isSupportCheckBill ? CS.NO : CS.YES;
+            //result["isSupportCashout"] = isSupportCashout ? CS.NO : CS.YES;
+            payInterfaceConfig.AddExt("isSupportApplyment", isSupportApplyment ? CS.NO : CS.YES);
+            payInterfaceConfig.AddExt("isSupportCheckBill", isSupportCheckBill ? CS.NO : CS.YES);
+            payInterfaceConfig.AddExt("isSupportCashout", isSupportCashout ? CS.NO : CS.YES);
+            return ApiRes.Ok(payInterfaceConfig);
         }
 
         /// <summary>

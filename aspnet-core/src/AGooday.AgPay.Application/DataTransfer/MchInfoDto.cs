@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using AGooday.AgPay.Common.Models;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 商户信息表
     /// </summary>
-    public class MchInfoDto
+    public class MchInfoDto : BaseModel
     {
         /// <summary>
         /// 商户号

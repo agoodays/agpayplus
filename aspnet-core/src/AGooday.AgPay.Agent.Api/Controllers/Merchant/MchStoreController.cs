@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var mchInfo = _mchInfoService.GetByMchNo(dto.MchNo);
+            var mchInfo = _mchInfoService.GetById(dto.MchNo);
             var sysUser = GetCurrentUser().SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;

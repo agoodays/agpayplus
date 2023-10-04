@@ -11,7 +11,6 @@ using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 {
@@ -168,11 +167,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             payInterfaceConfig.IsOpenApplyment = isSupportApplyment ? CS.NO : payInterfaceConfig.IsOpenApplyment;
             payInterfaceConfig.IsOpenCheckBill = isSupportCheckBill ? CS.NO : payInterfaceConfig.IsOpenCheckBill;
             payInterfaceConfig.IsOpenCashout = isSupportApplyment ? CS.NO : payInterfaceConfig.IsOpenCashout;
-            var result = JObject.FromObject(payInterfaceConfig);
-            result["isSupportApplyment"] = isSupportApplyment ? CS.NO : CS.YES;
-            result["isSupportCheckBill"] = isSupportCheckBill ? CS.NO : CS.YES;
-            result["isSupportCashout"] = isSupportCashout ? CS.NO : CS.YES;
-            return ApiRes.Ok(result);
+            //var result = JObject.FromObject(payInterfaceConfig);
+            //result["isSupportApplyment"] = isSupportApplyment ? CS.NO : CS.YES;
+            //result["isSupportCheckBill"] = isSupportCheckBill ? CS.NO : CS.YES;
+            //result["isSupportCashout"] = isSupportCashout ? CS.NO : CS.YES;
+            payInterfaceConfig.AddExt("isSupportApplyment", isSupportApplyment ? CS.NO : CS.YES);
+            payInterfaceConfig.AddExt("isSupportCheckBill", isSupportCheckBill ? CS.NO : CS.YES);
+            payInterfaceConfig.AddExt("isSupportCashout", isSupportCashout ? CS.NO : CS.YES);
+            return ApiRes.Ok(payInterfaceConfig);
         }
 
         /// <summary>

@@ -26,6 +26,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         private readonly ILogger<MchInfoController> _logger;
         private readonly IMchInfoService _mchInfoService;
         private readonly IAgentInfoService _agentInfoService;
+        private readonly ISysUserService _sysUserService;
 
         private readonly DomainNotificationHandler _notifications;
 
@@ -40,6 +41,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             _logger = logger;
             _mchInfoService = mchInfoService;
             _agentInfoService = agentInfoService;
+            _sysUserService = sysUserService;
             _notifications = (DomainNotificationHandler)notifications;
         }
 
@@ -70,7 +72,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             var agentNo = sysUser.BelongInfoId;
-            var agentInfo = _agentInfoService.GetByAgentNo(agentNo);
+            var agentInfo = _agentInfoService.GetById(agentNo);
             dto.RefundMode = JArray.Parse("[\"plat\", \"api\"]");
             dto.Type = CS.MCH_TYPE_ISVSUB;
             dto.AgentNo = agentInfo.AgentNo;
@@ -122,10 +124,15 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_INFO_VIEW, PermCode.AGENT.ENT_MCH_INFO_EDIT)]
         public ApiRes Detail(string mchNo)
         {
-            var mchInfo = _mchInfoService.GetByMchNo(mchNo);
+            var mchInfo = _mchInfoService.GetById(mchNo);
             if (mchInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            var sysUser = _sysUserService.GetById(mchInfo.InitUserId.Value);
+            if (sysUser != null)
+            {
+                mchInfo.AddExt("loginUsername", sysUser.LoginUsername);
             }
             return ApiRes.Ok(mchInfo);
         }

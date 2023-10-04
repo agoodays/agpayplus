@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Merchant.Api.Attributes;
@@ -8,8 +9,8 @@ using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using OfficeOpenXml.Style;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Order
 {
@@ -107,7 +108,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
                         switch (excelHeader.Key)
                         {
                             case "state":
-                                value = transferOrder.State == 0 ? "订单生成" : transferOrder.State == 1 ? "转账中" : transferOrder.State == 2 ? "转账成功" : transferOrder.State == 3 ? "转账失败" : transferOrder.State == 4 ? "订单关闭" : "未知";
+                                value = transferOrder.State.ToEnum<TransferOrderState>()?.GetDescription() ?? "未知";
                                 break;
                             case "amount":
                                 value = Convert.ToDecimal(value) / 100;

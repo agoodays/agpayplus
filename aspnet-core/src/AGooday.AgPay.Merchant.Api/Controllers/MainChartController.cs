@@ -5,7 +5,6 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers
 {
@@ -45,10 +44,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         {
             var sysUser = _sysUserService.GetById(GetCurrentUser().SysUser.SysUserId);
             var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
-            var jobj = JObject.FromObject(mchInfo);
-            jobj.Add("loginUsername", sysUser.LoginUsername);
-            jobj.Add("realname", sysUser.Realname);
-            return ApiRes.Ok(jobj);
+            //var jobj = JObject.FromObject(mchInfo);
+            //jobj.Add("loginUsername", sysUser.LoginUsername);
+            //jobj.Add("realname", sysUser.Realname);
+            mchInfo.AddExt("loginUsername", sysUser.LoginUsername);
+            mchInfo.AddExt("realname", sysUser.Realname);
+            return ApiRes.Ok(mchInfo);
         }
 
         /// <summary>
