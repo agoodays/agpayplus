@@ -1,9 +1,11 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using AGooday.AgPay.Common.Models;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 支付订单表
     /// </summary>
-    public class PayOrderDto
+    public class PayOrderDto : BaseModel
     {
         /// <summary>
         /// 支付订单号
@@ -99,11 +101,6 @@
         /// 支付方式代码
         /// </summary>
         public string WayCode { get; set; }
-
-        /// <summary>
-        /// 支付方式名称
-        /// </summary>
-        public string WayName { get; set; }
 
         /// <summary>
         /// 支付金额,单位分

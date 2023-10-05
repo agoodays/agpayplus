@@ -152,7 +152,7 @@ namespace AGooday.AgPay.Application.Services
             var result = defineList.ToList().Select(s =>
             {
                 var entity = _mapper.Map<PayInterfaceDefineDto>(s);
-                entity.IfConfigState = configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
+                entity.AddExt("ifConfigState", configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null);
                 return entity;
             }).ToList();
 
@@ -217,8 +217,8 @@ namespace AGooday.AgPay.Application.Services
                         .Select(define =>
                         {
                             var entity = _mapper.Map<PayInterfaceDefineDto>(define);
-                            entity.MchType = mchInfo.Type;// 所属商户类型
-                            entity.IfConfigState = configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
+                            entity.AddExt("mchType", mchInfo.Type);// 所属商户类型
+                            entity.AddExt("ifConfigState", configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null);
                             return entity;
                         }).ToList();
                     return results;
@@ -239,7 +239,7 @@ namespace AGooday.AgPay.Application.Services
             var result = defineList.ToList().Select(s =>
             {
                 var entity = _mapper.Map<PayInterfaceDefineDto>(s);
-                entity.IfConfigState = configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
+                entity.AddExt("ifConfigState", configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null);
                 return entity;
             }).ToList();
 
@@ -286,9 +286,9 @@ namespace AGooday.AgPay.Application.Services
             var result = defineList.ToList().Select(define =>
             {
                 var entity = _mapper.Map<PayInterfaceDefineDto>(define);
-                entity.MchType = mchInfo.Type;// 所属商户类型
-                entity.IfConfigState = configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null;
-                entity.SubMchIsvConfig = mchInfo.Type == CS.MCH_TYPE_ISVSUB && !isvPayConfigMap.TryGetValue(define.IfCode, out _) ? CS.NO : null;
+                entity.AddExt("mchType",  mchInfo.Type);// 所属商户类型
+                entity.AddExt("ifConfigState", configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null);
+                entity.AddExt("subMchIsvConfig", mchInfo.Type == CS.MCH_TYPE_ISVSUB && !isvPayConfigMap.TryGetValue(define.IfCode, out _) ? CS.NO : null);
                 return entity;
             }).ToList();
 

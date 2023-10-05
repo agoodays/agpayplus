@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             foreach (var payOrder in payOrders)
             {
                 // 存入支付方式名称
-                payOrder.WayName = payWayNameMap.ContainsKey(payOrder.WayCode) ? payWayNameMap[payOrder.WayCode] : payOrder.WayCode;
+                payOrder.AddExt("wayName", payWayNameMap.ContainsKey(payOrder.WayCode) ? payWayNameMap[payOrder.WayCode] : payOrder.WayCode);
             }
             return ApiRes.Ok(new { Records = payOrders.ToList(), Total = payOrders.TotalCount, Current = payOrders.PageIndex, HasNext = payOrders.HasNext });
         }
