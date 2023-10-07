@@ -8,6 +8,7 @@ using AGooday.AgPay.Payment.Api.Channel.HkrtPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
@@ -18,8 +19,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
     public class HkrtPayChannelRefundNoticeService : AbstractChannelRefundNoticeService
     {
         public HkrtPayChannelRefundNoticeService(ILogger<AbstractChannelRefundNoticeService> logger,
+            RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(logger, configContextQueryService)
+            : base(logger, requestKit, configContextQueryService)
         {
         }
 
@@ -32,7 +34,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
         {
             try
             {
-                string resText = GetReqParamFromBody(request);
+                string resText = GetReqParamFromBody();
                 var resJson = XmlUtil.ConvertToJson(resText);
                 var resParams = JObject.Parse(resJson);
                 string refundOrderId = resParams.GetValue("third_order_id").ToString();
@@ -78,7 +80,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
                 string trade_no = resJSON.GetValue("trade_no").ToString();//交易订单号 SaaS平台的交易订单编号
                 string channel_trade_no = resJSON.GetValue("channel_trade_no").ToString();//凭证条码订单号
                 var refundStatus = HkrtPayEnum.ConvertRefundStatus(status);
-                switch (refundStatus) {
+                switch (refundStatus)
+                {
                     case HkrtPayEnum.RefundStatus.Success:
                         result.ChannelOrderId = trade_no;
                         result.ChannelState = ChannelState.CONFIRM_SUCCESS;

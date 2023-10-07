@@ -29,12 +29,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
 
         public TransferOrderController(ILogger<TransferOrderController> logger,
             Func<string, ITransferService> transferServiceFactory,
-            RequestIpUtil requestIpUtil,
+            RequestKit requestKit,
             ConfigContextQueryService configContextQueryService,
             ITransferOrderService transferOrderService,
             IPayInterfaceConfigService payInterfaceConfigService,
             PayMchNotifyService payMchNotifyService)
-            : base(requestIpUtil, configContextQueryService)
+            : base(requestKit, configContextQueryService)
         {
             _logger = logger;
             _transferServiceFactory = transferServiceFactory;

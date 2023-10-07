@@ -19,13 +19,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers
     [ApiController]
     public abstract class ApiControllerBase : ControllerBase
     {
-        protected readonly RequestIpUtil _requestIpUtil;
+        protected readonly RequestKit _requestKit;
         protected readonly ConfigContextQueryService _configContextQueryService;
 
-        protected ApiControllerBase(RequestIpUtil requestIpUtil,
+        protected ApiControllerBase(RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
         {
-            _requestIpUtil = requestIpUtil;
+            _requestKit = requestKit;
             _configContextQueryService = configContextQueryService;
         }
 
@@ -162,7 +162,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
         /// <returns></returns>
         protected string GetClientIp()
         {
-            return _requestIpUtil.GetRequestIP();
+            return _requestKit.GetClientIp();
         }
     }
 }

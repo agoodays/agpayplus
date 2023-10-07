@@ -16,16 +16,16 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         private readonly ILogger<DivisionRecordChannelNotifyController> _logger;
         private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
         private readonly Func<string, AbstractDivisionRecordChannelNotifyService> _divisionRecordChannelNotifyServiceFactory;
-        private readonly ConfigContextQueryService _configContextQueryService;
         private readonly PayOrderProcessService _payOrderProcessService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public DivisionRecordChannelNotifyController(ILogger<DivisionRecordChannelNotifyController> logger,
             IPayOrderDivisionRecordService payOrderDivisionRecordService,
             Func<string, AbstractDivisionRecordChannelNotifyService> divisionRecordChannelNotifyServiceFactory,
-            RequestIpUtil requestIpUtil,
-            ConfigContextQueryService configContextQueryService,
-            PayOrderProcessService payOrderProcessService)
-            : base(requestIpUtil, configContextQueryService)
+            PayOrderProcessService payOrderProcessService,
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
+            : base(requestKit, configContextQueryService)
         {
             _logger = logger;
             _payOrderDivisionRecordService = payOrderDivisionRecordService;

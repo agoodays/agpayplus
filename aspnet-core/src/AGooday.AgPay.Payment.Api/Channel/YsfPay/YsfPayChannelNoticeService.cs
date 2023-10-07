@@ -6,6 +6,7 @@ using AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -16,9 +17,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
     /// </summary>
     public class YsfPayChannelNoticeService : AbstractChannelNoticeService
     {
-        public YsfPayChannelNoticeService(ILogger<YsfPayChannelNoticeService> logger, 
-            ConfigContextQueryService configContextQueryService) 
-            : base(logger, configContextQueryService)
+        public YsfPayChannelNoticeService(ILogger<YsfPayChannelNoticeService> logger,
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
+            : base(logger, requestKit, configContextQueryService)
         {
         }
 
@@ -31,7 +33,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         {
             try
             {
-                JObject @params = GetReqParamJson(request);
+                JObject @params = GetReqParamJSON();
                 string payOrderId = @params.GetValue("orderNo").ToString();
                 return new Dictionary<string, object>() { { payOrderId, @params } };
             }
@@ -65,13 +67,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 
                 //验签成功后判断上游订单状态
                 ContentResult okResponse = TextResp("success");
-                result.ResponseEntity=okResponse;
-                result.ChannelOrderId=jsonParams.GetValue("transIndex").ToString();
+                result.ResponseEntity = okResponse;
+                result.ChannelOrderId = jsonParams.GetValue("transIndex").ToString();
                 return result;
             }
             catch (Exception e)
             {
-                log.LogError(e,"error");
+                log.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }
@@ -82,7 +84,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
             string txnAmt = jsonParams.GetValue("txnAmt").ToString();         // 支付金额
             if (string.IsNullOrWhiteSpace(orderNo))
             {
-                log.LogInformation($"订单ID为空 [orderNo]={orderNo}" );
+                log.LogInformation($"订单ID为空 [orderNo]={orderNo}");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(txnAmt))
@@ -107,7 +109,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
             long dbPayAmt = payOrder.Amount;
             if (dbPayAmt != Convert.ToInt64(txnAmt))
             {
-                log.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, txnAmt={txnAmt}, payOrderId={orderNo}" );
+                log.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, txnAmt={txnAmt}, payOrderId={orderNo}");
                 return false;
             }
             return true;

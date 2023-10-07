@@ -29,12 +29,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             //IEnumerable<IDivisionService> divisionServices,
             //IServiceProvider serviceProvider,
             Func<string, IDivisionService> divisionServiceFactory,
-            ConfigContextQueryService configContextQueryService,
             IPayInterfaceConfigService payInterfaceConfigService,
             IMchDivisionReceiverService mchDivisionReceiverService,
             IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
-            RequestIpUtil requestIpUtil)
-            : base(requestIpUtil, configContextQueryService)
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
+            : base(requestKit, configContextQueryService)
         {
             _logger = logger;
             _divisionServiceFactory = divisionServiceFactory;
@@ -121,7 +121,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                     bizRes.ErrMsg = retMsg.ChannelErrMsg;
                 }
 
-                return ApiRes.OkWithSign(bizRes,bizRQ.SignType, mchAppConfigContext.MchApp.AppSecret);
+                return ApiRes.OkWithSign(bizRes, bizRQ.SignType, mchAppConfigContext.MchApp.AppSecret);
             }
             catch (BizException e)
             {

@@ -22,8 +22,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         public QueryRefundOrderController(ILogger<QueryRefundOrderController> logger,
             IRefundOrderService refundOrderService,
             ConfigContextQueryService configContextQueryService,
-            RequestIpUtil requestIpUtil)
-            : base(requestIpUtil, configContextQueryService)
+            RequestKit requestKit)
+            : base(requestKit, configContextQueryService)
         {
             _logger = logger;
             _refundOrderService = refundOrderService;

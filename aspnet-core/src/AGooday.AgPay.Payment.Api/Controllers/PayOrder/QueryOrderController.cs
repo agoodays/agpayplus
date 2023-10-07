@@ -19,10 +19,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     {
         private readonly IPayOrderService payOrderService;
 
-        public QueryOrderController(RequestIpUtil requestIpUtil,
+        public QueryOrderController(RequestKit requestKit,
             IPayOrderService payOrderService,
             ConfigContextQueryService configContextQueryService)
-            : base(requestIpUtil, configContextQueryService)
+            : base(requestKit, configContextQueryService)
         {
             this.payOrderService = payOrderService;
         }

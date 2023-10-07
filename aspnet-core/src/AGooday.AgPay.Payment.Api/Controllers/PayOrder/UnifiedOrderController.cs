@@ -27,13 +27,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             Func<string, IPaymentService> paymentServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
-            RequestIpUtil requestIpUtil,
+            RequestKit requestKit,
             ILogger<UnifiedOrderController> logger,
             IMchPayPassageService mchPayPassageService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService,
             IPayWayService payWayService)
-            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestIpUtil, logger, mchPayPassageService, payOrderService, sysConfigService)
+            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payOrderService, sysConfigService)
         {
             this.payWayService = payWayService;
             this.configContextQueryService = configContextQueryService;

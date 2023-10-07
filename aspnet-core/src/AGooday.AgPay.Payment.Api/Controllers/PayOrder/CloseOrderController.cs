@@ -29,9 +29,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         public CloseOrderController(ILogger<AbstractPayOrderController> log,
             PayOrderService payOrderService,
             Func<string, IPayOrderCloseService> payOrderCloseServiceFactory,
-            RequestIpUtil requestIpUtil,
+            RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(requestIpUtil, configContextQueryService)
+            : base(requestKit, configContextQueryService)
         {
             this.log = log;
             this.payOrderService = payOrderService;

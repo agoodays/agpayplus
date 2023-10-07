@@ -36,12 +36,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             Func<string, IPaymentService> paymentServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
-            RequestIpUtil requestIpUtil,
+            RequestKit requestKit,
             ILogger<AbstractPayOrderController> logger,
             IMchPayPassageService mchPayPassageService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService)
-            : base(requestIpUtil, configContextQueryService)
+            : base(requestKit, configContextQueryService)
         {
             _paymentServiceFactory = paymentServiceFactory;
             _payOrderProcessService = payOrderProcessService;

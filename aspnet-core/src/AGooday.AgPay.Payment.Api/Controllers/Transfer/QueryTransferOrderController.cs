@@ -23,8 +23,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         public QueryTransferOrderController(ILogger<QueryRefundOrderController> logger,
             ITransferOrderService transferOrderService,
             ConfigContextQueryService configContextQueryService,
-            RequestIpUtil requestIpUtil)
-            : base(requestIpUtil, configContextQueryService)
+            RequestKit requestKit)
+            : base(requestKit, configContextQueryService)
         {
             _logger = logger;
             _transferOrderService = transferOrderService;

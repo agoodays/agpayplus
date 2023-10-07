@@ -7,6 +7,7 @@ using AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
@@ -17,8 +18,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
     public class SxfPayChannelNoticeService : AbstractChannelNoticeService
     {
         public SxfPayChannelNoticeService(ILogger<AbstractChannelNoticeService> logger,
+            RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(logger, configContextQueryService)
+            : base(logger, requestKit, configContextQueryService)
         {
         }
 
@@ -31,7 +33,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         {
             try
             {
-                JObject @params = GetReqParamJson(request);
+                JObject @params = GetReqParamJSON();
                 string payOrderId = @params.GetValue("ordNo").ToString();
                 return new Dictionary<string, object>() { { payOrderId, @params } };
             }

@@ -6,6 +6,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json.Linq;
 using SKIT.FlurlHttpClient.Wechat.TenpayV2;
 using SKIT.FlurlHttpClient.Wechat.TenpayV2.Events;
@@ -26,9 +27,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
         private readonly ILogger<WxPayChannelNoticeService> logger;
 
         public WxPayChannelNoticeService(ILogger<WxPayChannelNoticeService> logger,
+            RequestKit requestKit,
             ConfigContextQueryService configContextQueryService,
             IPayOrderService payOrderService)
-            : base(logger, configContextQueryService)
+            : base(logger, requestKit, configContextQueryService)
         {
             this.logger = logger;
             this.payOrderService = payOrderService;
@@ -68,7 +70,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     var nonce = request.Headers["Wechatpay-Nonce"].FirstOrDefault();
                     var signature = request.Headers["Wechatpay-Signature"].FirstOrDefault();
                     var serialNumber = request.Headers["Wechatpay-Serial"].FirstOrDefault();
-                    string callbackJson = GetReqParamFromBody(request);
+                    string callbackJson = GetReqParamFromBody();
 
                     JObject headerJSON = new JObject();
                     headerJSON.Add("Wechatpay-Timestamp", timestamp);
@@ -110,7 +112,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                 // V2接口回调
                 else
                 {
-                    string callbackXml = GetReqParamFromBody(request);
+                    string callbackXml = GetReqParamFromBody();
                     if (string.IsNullOrWhiteSpace(callbackXml))
                     {
                         return null;
@@ -144,7 +146,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     // 获取回调参数
                     //var result = (OrderEvent)@params;
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
-                    string callbackXml = GetReqParamFromBody(request);
+                    string callbackXml = GetReqParamFromBody();
                     var result = client.JsonSerializer.Deserialize<OrderEvent>(callbackXml);
                     // 验证参数
                     bool valid = client.VerifyEventSignature(callbackXml, out Exception error);
@@ -173,7 +175,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     var nonce = request.Headers["Wechatpay-Nonce"].FirstOrDefault();
                     var signature = request.Headers["Wechatpay-Signature"].FirstOrDefault();
                     var serialNumber = request.Headers["Wechatpay-Serial"].FirstOrDefault();
-                    string callbackJson = GetReqParamFromBody(request);
+                    string callbackJson = GetReqParamFromBody();
                     // 验证参数
                     bool valid = client.VerifyEventSignature(
                         callbackTimestamp: timestamp,

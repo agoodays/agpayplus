@@ -3,6 +3,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 
 namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
 {
@@ -12,8 +13,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
     public class UmsPayChannelNoticeService : AbstractChannelNoticeService
     {
         public UmsPayChannelNoticeService(ILogger<AbstractChannelNoticeService> logger,
+            RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(logger, configContextQueryService)
+            : base(logger, requestKit, configContextQueryService)
         {
         }
 

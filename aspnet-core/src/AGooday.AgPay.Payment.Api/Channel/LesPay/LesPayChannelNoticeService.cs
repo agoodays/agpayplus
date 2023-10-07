@@ -8,6 +8,7 @@ using AGooday.AgPay.Payment.Api.Channel.LesPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LesPay
@@ -18,8 +19,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
     public class LesPayChannelNoticeService : AbstractChannelNoticeService
     {
         public LesPayChannelNoticeService(ILogger<AbstractChannelNoticeService> logger,
+            RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(logger, configContextQueryService)
+            : base(logger, requestKit, configContextQueryService)
         {
         }
 
@@ -32,7 +34,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         {
             try
             {
-                string resText = GetReqParamFromBody(request);
+                string resText = GetReqParamFromBody();
                 var resJson = XmlUtil.ConvertToJson(resText);
                 var resParams = JObject.Parse(resJson);
                 string payOrderId = resParams.GetValue("third_order_id").ToString();

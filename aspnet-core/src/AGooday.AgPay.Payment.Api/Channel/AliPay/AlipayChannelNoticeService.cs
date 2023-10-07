@@ -6,6 +6,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Payment.Api.Utils;
 using Aop.Api.Util;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -18,8 +19,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
     public class AliPayChannelNoticeService : AbstractChannelNoticeService
     {
         public AliPayChannelNoticeService(ILogger<AliPayChannelNoticeService> logger,
+            RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(logger, configContextQueryService)
+            : base(logger, requestKit, configContextQueryService)
         {
         }
 
@@ -32,7 +34,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
         {
             try
             {
-                JObject @params = GetReqParamJson(request);
+                JObject @params = GetReqParamJSON();
                 string payOrderId = @params.GetValue("out_trade_no").ToString();
                 return new Dictionary<string, object>() { { payOrderId, @params } };
             }

@@ -33,8 +33,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             IRefundOrderService refundOrderService,
             PayMchNotifyService payMchNotifyService,
             ConfigContextQueryService configContextQueryService,
-            RequestIpUtil requestIpUtil)
-            : base(requestIpUtil, configContextQueryService)
+            RequestKit requestKit)
+            : base(requestKit, configContextQueryService)
         {
             _refundServiceFactory = refundServiceFactory;
             _logger = logger;

@@ -7,19 +7,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
-using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Channel
 {
     public abstract class AbstractChannelNoticeService : IChannelNoticeService
     {
         protected readonly ILogger<AbstractChannelNoticeService> log;
+        protected readonly RequestKit _requestKit;
         protected ConfigContextQueryService configContextQueryService;
 
-        protected AbstractChannelNoticeService(ILogger<AbstractChannelNoticeService> logger, 
+        protected AbstractChannelNoticeService(ILogger<AbstractChannelNoticeService> logger,
+            RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
         {
             this.log = logger;
+            _requestKit = requestKit;
             this.configContextQueryService = configContextQueryService;
         }
 
@@ -64,42 +66,14 @@ namespace AGooday.AgPay.Payment.Api.Channel
             };
         }
 
-        protected JObject GetReqParamJson(HttpRequest request)
+        protected JObject GetReqParamJSON()
         {
-            request.EnableBuffering();
-
-            string body = "";
-            var stream = request.Body;
-            if (stream != null)
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                using (var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true))
-                {
-                    body = reader.ReadToEndAsync().Result;
-                }
-                stream.Seek(0, SeekOrigin.Begin);
-            }
-
-            return JObject.FromObject(body);
+            return _requestKit.GetReqParamJSON();
         }
 
-        protected string GetReqParamFromBody(HttpRequest request)
+        protected string GetReqParamFromBody()
         {
-            request.EnableBuffering();
-
-            string body = "";
-            var stream = request.Body;
-            if (stream != null)
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                using (var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true))
-                {
-                    body = reader.ReadToEndAsync().Result;
-                }
-                stream.Seek(0, SeekOrigin.Begin);
-            }
-
-            return body;
+            return _requestKit.GetReqParamFromBody();
         }
 
         /// <summary>
