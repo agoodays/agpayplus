@@ -12,9 +12,9 @@ using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {
-    public class AlipayTransferNoticeService : AbstractTransferNoticeService
+    public class AliPayTransferNoticeService : AbstractTransferNoticeService
     {
-        public AlipayTransferNoticeService(ILogger<AbstractChannelNoticeService> log,
+        public AliPayTransferNoticeService(ILogger<AbstractChannelNoticeService> log,
             RequestKit requestKit, ChannelCertConfigKit channelCertConfigKit, ConfigContextQueryService configContextQueryService)
             : base(log, requestKit, channelCertConfigKit, configContextQueryService)
         {

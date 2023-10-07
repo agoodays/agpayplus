@@ -15,11 +15,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
     /// <summary>
     /// 转账接口： 支付宝官方
     /// </summary>
-    public class AlipayTransferService : ITransferService
+    public class AliPayTransferService : ITransferService
     {
         private readonly ConfigContextQueryService configContextQueryService;
 
-        public AlipayTransferService(ConfigContextQueryService configContextQueryService)
+        public AliPayTransferService(ConfigContextQueryService configContextQueryService)
         {
             this.configContextQueryService = configContextQueryService;
         }

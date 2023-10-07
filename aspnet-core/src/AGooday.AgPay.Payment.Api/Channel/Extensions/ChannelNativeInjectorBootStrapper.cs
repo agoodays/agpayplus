@@ -283,7 +283,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             });
             #endregion
             #region TransferService
-            services.AddScoped<AlipayTransferService>();
+            services.AddScoped<AliPayTransferService>();
             services.AddScoped<WxPayTransferService>();
             services.AddSingleton(provider =>
             {
@@ -292,7 +292,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                     switch (ifCode)
                     {
                         case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AlipayTransferService>();
+                            return provider.GetService<AliPayTransferService>();
                         case CS.IF_CODE.WXPAY:
                             return provider.GetService<WxPayTransferService>();
                         default:
@@ -303,7 +303,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             });
             #endregion
             #region TransferNoticeService
-            services.AddScoped<AlipayTransferNoticeService>();
+            services.AddScoped<AliPayTransferNoticeService>();
             services.AddSingleton(provider =>
             {
                 Func<string, ITransferNoticeService> funcFactory = ifCode =>
@@ -311,7 +311,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                     switch (ifCode)
                     {
                         case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AlipayTransferNoticeService>();
+                            return provider.GetService<AliPayTransferNoticeService>();
                         default:
                             return null;
                     }
