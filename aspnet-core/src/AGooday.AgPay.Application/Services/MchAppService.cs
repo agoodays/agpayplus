@@ -68,6 +68,16 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId)).FirstOrDefault();
             return _mapper.Map<MchAppDto>(entity);
         }
+        public IEnumerable<MchAppDto> GetByMchNo(string mchNo)
+        {
+            var mchApps = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(mchNo));
+            return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
+        }
+        public IEnumerable<MchAppDto> GetByMchNos(IEnumerable<string> mchNos)
+        {
+            var mchApps = _mchAppRepository.GetAll().Where(w => mchNos.Contains(w.MchNo));
+            return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
+        }
         public IEnumerable<MchAppDto> GetAll()
         {
             var mchApps = _mchAppRepository.GetAll();

@@ -179,8 +179,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var result = _payIfConfigService.GetAll()
-                .Where(w => w.State.Equals(CS.PUB_USABLE) && w.InfoType.Equals(CS.INFO_TYPE.MCH_APP) && w.InfoId.Equals(appId))
+            var result = _payIfConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP, appId)
                 .Select(s => s.IfCode).ToList();
             return ApiRes.Ok(result);
         }

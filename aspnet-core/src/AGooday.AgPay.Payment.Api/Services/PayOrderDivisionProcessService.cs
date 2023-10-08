@@ -93,8 +93,8 @@ namespace AGooday.AgPay.Payment.Api.Services
             if (isResend.Value)
             {
                 // 根据payOrderId && 待分账（ 重试时将更新为待分账状态 ）  ， 此处不可查询出分账成功的订单。
-                recordList = payOrderDivisionRecordService.GetAll()
-                    .Where(w => w.PayOrderId.Equals(payOrderId) && w.State == (byte)PayOrderDivisionRecordState.STATE_WAIT).ToList();
+                recordList = payOrderDivisionRecordService.GetByPayOrderId(payOrderId)
+                    .Where(w => w.State == (byte)PayOrderDivisionRecordState.STATE_WAIT).ToList();
             }
             else
             {
@@ -247,7 +247,8 @@ namespace AGooday.AgPay.Payment.Api.Services
             // 自动分账组的账号
             if (useSysAutoDivisionReceivers == CS.YES)
             {
-                var groups = mchDivisionReceiverGroupService.GetByMchNo(payOrder.MchNo);
+                var groups = mchDivisionReceiverGroupService.GetByMchNo(payOrder.MchNo)
+                    .Where(w => w.AutoDivisionFlag.Equals(CS.YES));
 
                 if (!groups.Any())
                 {

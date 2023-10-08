@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 var wayCodes = payWays.Select(s => s.WayCode).ToList();
 
                 // 应用支付通道集合
-                var mchPayPassages = _mchPayPassageService.GetAll(appId, wayCodes);
+                var mchPayPassages = _mchPayPassageService.GetByAppId(appId, wayCodes);
 
                 foreach (var payWay in payWays)
                 {

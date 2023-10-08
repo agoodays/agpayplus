@@ -98,7 +98,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
                 {
                     throw new BizException(response.msg);
                 }
-                return ApiRes.Ok(response);
+                return ApiRes.Ok(response.Get());
             }
             catch (AgPayException e)
             {

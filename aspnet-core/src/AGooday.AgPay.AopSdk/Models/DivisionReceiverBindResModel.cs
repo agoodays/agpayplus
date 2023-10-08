@@ -95,7 +95,7 @@ namespace AGooday.AgPay.AopSdk.Models
         /// 分账状态 1-绑定成功, 0-绑定异常
         /// </summary>
         [JsonProperty("bindState")]
-        private byte BindState { get; set; }
+        public byte BindState { get; set; }
 
         /// <summary>
         /// 支付渠道错误码

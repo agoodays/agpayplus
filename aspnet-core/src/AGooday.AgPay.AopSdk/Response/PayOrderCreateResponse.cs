@@ -7,7 +7,6 @@ namespace AGooday.AgPay.AopSdk.Response
     /// </summary>
     public class PayOrderCreateResponse : AgPayResponse
     {
-
         public PayOrderCreateResModel Get()
         {
             if (data == null) return new PayOrderCreateResModel();

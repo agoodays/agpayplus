@@ -77,8 +77,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
                 // 更新其他组为非默认分账组
                 if (record.AutoDivisionFlag == CS.YES)
                 {
-                    _mchDivisionReceiverGroupService.GetAll()
-                        .Where(w => w.MchNo == record.MchNo && !w.ReceiverGroupId.Equals(record.ReceiverGroupId))
+                    _mchDivisionReceiverGroupService.GetByMchNo(record.MchNo)
+                        .Where(w => !w.ReceiverGroupId.Equals(record.ReceiverGroupId))
                         .ToList().ForEach(w =>
                         {
                             w.AutoDivisionFlag = CS.NO;
@@ -105,8 +105,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
                 // 更新其他组为非默认分账组
                 if (record.AutoDivisionFlag == CS.YES)
                 {
-                    _mchDivisionReceiverGroupService.GetAll()
-                        .Where(w => w.MchNo == record.MchNo && !w.ReceiverGroupId.Equals(record.ReceiverGroupId))
+                    _mchDivisionReceiverGroupService.GetByMchNo(record.MchNo)
+                        .Where(w => !w.ReceiverGroupId.Equals(record.ReceiverGroupId))
                         .ToList().ForEach(w =>
                         {
                             w.AutoDivisionFlag = CS.NO;

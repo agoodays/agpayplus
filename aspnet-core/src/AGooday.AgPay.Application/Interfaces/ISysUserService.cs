@@ -14,12 +14,11 @@ namespace AGooday.AgPay.Application.Interfaces
         SysUserDto GetByKeyAsNoTracking(long recordId);
         SysUserDto GetById(long recordId);
         Task<SysUserDto> GetByIdAsync(long recordId);
-        SysUserDto GetByUserId(long sysUserId);
         SysUserDto GetById(long recordId, string belongInfoId);
         bool IsExistTelphone(string telphone, string sysType);
         SysUserDto GetByTelphone(string telphone, string sysType);
         IEnumerable<SysUserDto> GetAll();
-        IEnumerable<SysUserDto> GetAll(List<long> recordIds);
+        IEnumerable<SysUserDto> GetByIds(List<long> recordIds);
         PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long currentUserId);
         Task<PaginatedList<SysUserListDto>> GetPaginatedDataAsync(SysUserQueryDto dto, long currentUserId);
         Task<IEnumerable<SysUserDto>> ListAsync();

@@ -60,6 +60,14 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public IEnumerable<PayInterfaceDefineDto> GetByIfCodes(IEnumerable<string> ifCodes)
+        {
+            var entitys = _payInterfaceDefineRepository.GetAll()
+                .Where(w => ifCodes.Contains(w.IfCode)); ;
+            var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entitys);
+            return result;
+        }
+
         public IEnumerable<PayInterfaceDefineDto> GetAll()
         {
             var payInterfaceDefines = _payInterfaceDefineRepository.GetAll();

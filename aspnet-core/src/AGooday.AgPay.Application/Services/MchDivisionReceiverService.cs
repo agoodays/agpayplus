@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
@@ -64,6 +65,21 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mchDivisionReceiverRepository.GetAll().Where(w => w.ReceiverId.Equals(recordId) && w.MchNo.Equals(mchNo)).FirstOrDefault();
             var dto = _mapper.Map<MchDivisionReceiverDto>(entity);
             return dto;
+        }
+
+        public int GetCount(HashSet<long> receiverIds, string mchNo, string appId, string ifCode, byte state = CS.YES)
+        {
+            var count = _mchDivisionReceiverRepository.GetAll()
+                    .Where(w => receiverIds.Contains(w.ReceiverId)
+                    && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.IfCode.Equals(ifCode) && w.State.Equals(state)).Count();
+            return count;
+        }
+
+        public int GetCount(HashSet<long> receiverGroupIds, string mchNo)
+        {
+            var count = _mchDivisionReceiverRepository.GetAll()
+                    .Where(w => receiverGroupIds.Contains(w.ReceiverGroupId) && w.MchNo.Equals(mchNo)).Count();
+            return count;
         }
 
         public IEnumerable<MchDivisionReceiverDto> GetAll()

@@ -70,9 +70,10 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<PayOrderDivisionRecordDto>(entity);
         }
 
-        public IEnumerable<PayOrderDivisionRecordDto> GetAll()
+        public IEnumerable<PayOrderDivisionRecordDto> GetByPayOrderId(string payOrderId)
         {
-            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAll();
+            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAll()
+                    .Where(w => w.PayOrderId.Equals(payOrderId));
             return _mapper.Map<IEnumerable<PayOrderDivisionRecordDto>>(payOrderDivisionRecords);
         }
 
@@ -83,6 +84,12 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderBy(o => o.RecordId);
             return _mapper.Map<List<PayOrderDivisionRecordDto>>(payOrderDivisionRecords);
+        }
+
+        public IEnumerable<PayOrderDivisionRecordDto> GetAll()
+        {
+            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAll();
+            return _mapper.Map<IEnumerable<PayOrderDivisionRecordDto>>(payOrderDivisionRecords);
         }
 
         public PaginatedList<PayOrderDivisionRecordDto> GetPaginatedData(PayOrderDivisionRecordQueryDto dto)

@@ -111,6 +111,12 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
         }
 
+        public IEnumerable<MchInfoDto> GetByIsvNo(string isvNo)
+        {
+            var mchInfos = _mchInfoRepository.GetAll().Where(w => w.IsvNo.Equals(isvNo));
+            return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
+        }
+
         public IEnumerable<MchInfoDto> GetAll()
         {
             var mchInfos = _mchInfoRepository.GetAll();

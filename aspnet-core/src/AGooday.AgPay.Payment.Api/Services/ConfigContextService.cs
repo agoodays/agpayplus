@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             mchInfoConfigContext.MchNo = mchInfo.MchNo;
             mchInfoConfigContext.MchType = mchInfo.Type;
             mchInfoConfigContext.MchInfo = mchInfo;
-            _mchAppService.GetAll().Where(w => w.MchNo.Equals(mchNo)).ToList().ForEach(mchApp =>
+            _mchAppService.GetByMchNo(mchNo).ToList().ForEach(mchApp =>
             {
                 //1. 更新商户内appId集合
                 mchInfoConfigContext.PutMchApp(mchApp);
@@ -265,18 +265,18 @@ namespace AGooday.AgPay.Payment.Api.Services
         {
             // 当前系统不进行缓存
             if (!IsCache())
-            { 
+            {
                 return;
             }
 
             //查询出所有商户的配置信息并更新
-            var mchNoList = _mchInfoService.GetAll().Where(w => w.IsvNo.Equals(isvNo)).Select(s => s.MchNo);
+            var mchNoList = _mchInfoService.GetByIsvNo(isvNo).Select(s => s.MchNo);
 
             // 查询出所有 所属当前服务商的所有应用集合
             IEnumerable<string> mchAppIdList = new List<string>();
             if (mchNoList?.Count() > 0)
             {
-                mchAppIdList = _mchAppService.GetAll().Where(w => mchNoList.Contains(w.MchNo)).Select(s => s.AppId);
+                mchAppIdList = _mchAppService.GetByMchNos(mchNoList).Select(s => s.AppId);
             }
 
             IsvConfigContext isvConfigContext = new IsvConfigContext();

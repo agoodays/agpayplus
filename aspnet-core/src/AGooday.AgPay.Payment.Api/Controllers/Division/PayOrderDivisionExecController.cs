@@ -163,9 +163,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
             if (!receiverIdSet.IsNotEmptyOrNull())
             {
-                int receiverCount = _mchDivisionReceiverService.GetAll()
-                    .Where(w => receiverIdSet.Contains(w.ReceiverId.Value)
-                    && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.IfCode.Equals(ifCode) && w.State.Equals(CS.YES)).Count();
+                int receiverCount = _mchDivisionReceiverService.GetCount(receiverIdSet, mchNo, appId, ifCode);
 
                 if (receiverCount != receiverIdSet.Count())
                 {
@@ -175,8 +173,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
             if (!receiverGroupIdSet.IsNotEmptyOrNull())
             {
-                int receiverGroupCount = _mchDivisionReceiverService.GetAll()
-                    .Where(w => receiverGroupIdSet.Contains(w.ReceiverGroupId.Value) && w.MchNo.Equals(mchNo)).Count();
+                int receiverGroupCount = _mchDivisionReceiverService.GetCount(receiverGroupIdSet, mchNo);
 
                 if (receiverGroupCount != receiverGroupIdSet.Count())
                 {

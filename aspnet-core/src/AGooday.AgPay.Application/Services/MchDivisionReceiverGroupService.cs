@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Application.Services
         public IEnumerable<MchDivisionReceiverGroupDto> GetByMchNo(string mchNo)
         {
             var mchDivisionReceiverGroups = _mchDivisionReceiverGroupRepository.GetAll()
-                .Where(w => w.MchNo.Equals(mchNo) && w.AutoDivisionFlag.Equals(CS.YES));
+                .Where(w => w.MchNo.Equals(mchNo));
             return _mapper.Map<IEnumerable<MchDivisionReceiverGroupDto>>(mchDivisionReceiverGroups);
         }
 

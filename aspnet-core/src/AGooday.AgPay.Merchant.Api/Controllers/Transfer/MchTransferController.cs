@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
                 .Select(s => s.IfCode);
             if (ifCodes is null)
                 return ApiRes.Ok(ifCodes);
-            var result = _payIfDefineService.GetAll().Where(w => ifCodes.Contains(w.IfCode));
+            var result = _payIfDefineService.GetByIfCodes(ifCodes);
             return ApiRes.Ok(result);
         }
 
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
             param.Add("sign", AgPayUtil.GetSign(param, mchApp.AppSecret));
 
             var url = URLUtil.AppendUrlQuery($"{dbApplicationConfig.PaySiteUrl}/api/channelUserId/jump", param);
-            return ApiRes.Ok();
+            return ApiRes.Ok(url);
         }
 
         [HttpPost, Route("doTransfer")]
@@ -119,7 +119,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
                 {
                     throw new BizException(response.msg);
                 }
-                return ApiRes.Ok(response);
+                return ApiRes.Ok(response.Get());
             }
             catch (AgPayException e)
             {

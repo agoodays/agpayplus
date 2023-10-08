@@ -64,10 +64,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             var payOrders = _payOrderService.GetPaginatedData(dto);
             // 得到所有支付方式
             Dictionary<string, string> payWayNameMap = new Dictionary<string, string>();
-            _payWayService.GetAll().Select(s => new { s.WayCode, s.WayName }).ToList().ForEach((c) =>
-            {
-                payWayNameMap.Add(c.WayCode, c.WayName);
-            });
+            _payWayService.GetAll()
+                .Select(s => new { s.WayCode, s.WayName }).ToList()
+                .ForEach((c) =>
+                {
+                    payWayNameMap.Add(c.WayCode, c.WayName);
+                });
 
             foreach (var payOrder in payOrders)
             {

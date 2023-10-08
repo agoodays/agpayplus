@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 
-        public IEnumerable<MchPayPassageDto> GetAll(string appId, List<string> wayCodes)
+        public IEnumerable<MchPayPassageDto> GetByAppId(string appId, List<string> wayCodes)
         {
             var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId)
             && (wayCodes.Count.Equals(0) || wayCodes.Contains(w.WayCode)));

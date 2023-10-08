@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         /// <param name="sysUserIdList"></param>
         protected void RefAuthentication(List<long> sysUserIdList)
         {
-            var sysUserMap = _sysUserService.GetAll(sysUserIdList);
+            var sysUserMap = _sysUserService.GetByIds(sysUserIdList);
             sysUserIdList.ForEach(sysUserId =>
             {
                 var redisKeys = redisServer.Keys(defaultDB, CS.GetCacheKeyToken(sysUserId, "*"));

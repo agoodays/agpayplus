@@ -17,5 +17,6 @@ namespace AGooday.AgPay.Application.Interfaces
         IEnumerable<MchInfoDto> GetByMchNos(List<string> mchNos);
         IEnumerable<MchInfoDto> GetAll();
         PaginatedList<MchInfoDto> GetPaginatedData(MchInfoQueryDto dto);
+        IEnumerable<MchInfoDto> GetByIsvNo(string isvNo);
     }
 }

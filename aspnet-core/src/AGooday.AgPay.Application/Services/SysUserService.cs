@@ -121,18 +121,17 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public SysUserDto GetByUserId(long sysUserId)
-        {
-            var entity = _sysUserRepository.GetByUserId(sysUserId);
-            var dto = _mapper.Map<SysUserDto>(entity);
-            return dto;
-        }
-
         public SysUserDto GetById(long recordId, string belongInfoId)
         {
             var entity = _sysUserRepository.GetAll().Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefault();
             var dto = _mapper.Map<SysUserDto>(entity);
             return dto;
+        }
+
+        public IEnumerable<SysUserDto> GetByIds(List<long> recordIds)
+        {
+            var sysUsers = _sysUserRepository.GetAll().Where(w => recordIds.Contains(w.SysUserId));
+            return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
 
         public bool IsExistTelphone(string telphone, string sysType)
@@ -155,12 +154,6 @@ namespace AGooday.AgPay.Application.Services
 
             //第二种写法 ProjectTo
             //return (_UsersRepository.GetAll()).ProjectTo<SysUserVM>(_mapper.ConfigurationProvider);
-        }
-
-        public IEnumerable<SysUserDto> GetAll(List<long> recordIds)
-        {
-            var sysUsers = _sysUserRepository.GetAll().Where(w => recordIds.Contains(w.SysUserId));
-            return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
 
         public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long currentUserId)
