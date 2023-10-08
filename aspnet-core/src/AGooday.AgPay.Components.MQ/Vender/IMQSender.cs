@@ -19,5 +19,10 @@ namespace AGooday.AgPay.Components.MQ.Vender
         /// <param name="mqModel"></param>
         /// <param name="delay"></param>
         void Send(AbstractMQ mqModel, int delay);
+
+        /// <summary>
+        /// MQ消息接收
+        /// </summary>
+        void Receive();
     }
 }

@@ -57,11 +57,6 @@ int _defaultDB = int.Parse(section.GetSection("DefaultDB").Value ?? "0");
 services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB));
 #endregion
 
-#region MQ
-var mqconfiguration = builder.Configuration.GetSection("MQ:RabbitMQ");
-services.Configure<RabbitMQConfiguration>(mqconfiguration);
-#endregion
-
 #region OSS
 builder.Configuration.GetSection("OSS").Bind(LocalOssConfig.Oss);
 builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
@@ -122,7 +117,12 @@ services.AddSingleton<RequestKit>();
 NativeInjectorBootStrapper.RegisterServices(services);
 
 #region RabbitMQ
-services.AddSingleton<IMQSender, RabbitMQSender>();
+services.AddTransient<RabbitMQSender>();
+services.AddSingleton<IMQSender>(provider =>
+{
+    var mqSenderFactory = new MQSenderFactory(builder.Configuration, provider);
+    return mqSenderFactory.CreateSender();
+});
 services.AddSingleton<IMQMsgReceiver, PayOrderDivisionRabbitMQReceiver>();
 services.AddSingleton<IMQMsgReceiver, PayOrderMchNotifyRabbitMQReceiver>();
 services.AddSingleton<IMQMsgReceiver, PayOrderReissueRabbitMQReceiver>();
@@ -133,7 +133,7 @@ services.AddSingleton<PayOrderMchNotifyMQ.IMQReceiver, PayOrderMchNotifyMQReceiv
 services.AddSingleton<PayOrderReissueMQ.IMQReceiver, PayOrderReissueMQReceiver>();
 services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
 services.AddSingleton<ResetIsvMchAppInfoConfigMQ.IMQReceiver, ResetIsvMchAppInfoMQReceiver>();
-services.AddHostedService<RabbitListener>();
+services.AddHostedService<MQReceiverHostedService>();
 #endregion
 
 #region Quartz

@@ -65,11 +65,6 @@ int _defaultDB = int.Parse(section.GetSection("DefaultDB").Value ?? "0");
 services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB));
 #endregion
 
-#region MQ
-var mqconfiguration = builder.Configuration.GetSection("MQ:RabbitMQ");
-services.Configure<RabbitMQConfiguration>(mqconfiguration);
-#endregion
-
 #region OSS
 builder.Configuration.GetSection("OSS").Bind(LocalOssConfig.Oss);
 builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
@@ -160,14 +155,19 @@ services.AddMediatR(typeof(Program));//目的是为了扫描Handler的实现对象并添加到IO
 NativeInjectorBootStrapper.RegisterServices(services);
 
 #region RabbitMQ
-services.AddSingleton<IMQSender, RabbitMQSender>();
+services.AddTransient<RabbitMQSender>();
+services.AddSingleton<IMQSender>(provider =>
+{
+    var mqSenderFactory = new MQSenderFactory(builder.Configuration, provider);
+    return mqSenderFactory.CreateSender();
+});
 services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
 services.AddSingleton<IMQMsgReceiver, CleanMchLoginAuthCacheRabbitMQReceiver>();
 services.AddSingleton<IMQMsgReceiver, CleanAgentLoginAuthCacheRabbitMQReceiver>();
 services.AddSingleton<CleanMchLoginAuthCacheMQ.IMQReceiver, CleanMchLoginAuthCacheMQReceiver>();
 services.AddSingleton<CleanAgentLoginAuthCacheMQ.IMQReceiver, CleanAgentLoginAuthCacheMQReceiver>();
 services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
-services.AddHostedService<RabbitListener>();
+services.AddHostedService<MQReceiverHostedService>();
 #endregion
 
 #region OSS
