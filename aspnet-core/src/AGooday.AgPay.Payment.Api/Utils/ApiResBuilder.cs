@@ -18,7 +18,6 @@ namespace AGooday.AgPay.Payment.Api.Utils
             {
                 T result = new T();
                 return result;
-
             }
             catch (Exception e) { return null; }
         }
