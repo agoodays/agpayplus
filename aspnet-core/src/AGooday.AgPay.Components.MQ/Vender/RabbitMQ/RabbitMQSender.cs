@@ -1,7 +1,7 @@
-﻿using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.MQ.Constant;
+﻿using AGooday.AgPay.Components.MQ.Constant;
 using AGooday.AgPay.Components.MQ.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -10,10 +10,15 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 {
     public class RabbitMQSender : IMQSender
     {
+        private IConnection connection;
+        private IModel channel;
+
+        private readonly ILogger<RabbitMQSender> _logger;
         private readonly IServiceProvider _serviceProvider;
 
-        public RabbitMQSender(IServiceProvider serviceProvider)
+        public RabbitMQSender(ILogger<RabbitMQSender> logger, IServiceProvider serviceProvider)
         {
+            _logger = logger;
             _serviceProvider = serviceProvider;
         }
 
@@ -44,7 +49,67 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
             }
         }
 
-        private static void ConvertAndSend(MQSendTypeEnum mqtype, string exchange, string queue, string routingKey, string message)
+        public void Receive()
+        {
+            try
+            {
+                var factory = new ConnectionFactory()
+                {
+                    HostName = RabbitMQConfig.MQ.HostName,
+                    UserName = RabbitMQConfig.MQ.UserName,
+                    Password = RabbitMQConfig.MQ.Password,
+                    Port = RabbitMQConfig.MQ.Port
+                };
+                connection = factory.CreateConnection();
+                channel = connection.CreateModel();
+                var msgReceivers = _serviceProvider.GetServices<IMQMsgReceiver>()
+                    .Where(w => $"{w.GetType().Name}".EndsWith("RabbitMQReceiver", StringComparison.OrdinalIgnoreCase));
+                foreach (var msgReceiver in msgReceivers)
+                {
+                    string queue = string.Empty;
+                    if (msgReceiver.GetMQType() == MQSendTypeEnum.QUEUE)
+                    {
+                        queue = msgReceiver.GetMQName();
+                        channel.QueueDeclare(queue, true, false, false, null);
+                    }
+                    else
+                    {
+                        var exchange = RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + msgReceiver.GetMQName();
+                        channel.ExchangeDeclare(exchange, "fanout");
+                        queue = channel.QueueDeclare().QueueName;
+                        channel.QueueBind(queue, exchange, "");
+                    }
+                    channel.BasicQos(0, 1, false);
+
+                    var consumer = new EventingBasicConsumer(channel);
+                    consumer.Received += (model, ea) =>
+                    {
+                        var body = ea.Body.ToArray();
+                        var message = Encoding.UTF8.GetString(body);
+                        msgReceiver.ReceiveMsg(message);
+
+                        channel.BasicAck(ea.DeliveryTag, false);
+                    };
+                    channel.BasicConsume(queue, false, consumer);
+                }
+            }
+            catch (Exception ex)
+            {
+                //LogUtil<RabbitMQSender>.Error("RabbitMQ消息接收出现异常", ex);
+                //throw;
+                _logger.LogError(ex, "RabbitMQ消息接收出现异常");
+            }
+        }
+
+        public void Close()
+        {
+            if (channel != null)
+                this.channel.Close();
+            if (connection != null)
+                this.connection.Close();
+        }
+
+        private void ConvertAndSend(MQSendTypeEnum mqtype, string exchange, string queue, string routingKey, string message)
         {
             try
             {
@@ -78,11 +143,13 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
             }
             catch (Exception e)
             {
-                LogUtil<RabbitMQSender>.Error("Rabbit连接出现异常", e);
+                //LogUtil<RabbitMQSender>.Error("RabbitMQ消息推送出现异常", e);
+                //throw;
+                _logger.LogError(e, "RabbitMQ消息推送出现异常");
             }
         }
 
-        private static void ConvertAndDelaySend(string exchange, string queue, string routingKey, string message, int delay)
+        private void ConvertAndDelaySend(string exchange, string queue, string routingKey, string message, int delay)
         {
             try
             {
@@ -120,59 +187,9 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
             }
             catch (Exception e)
             {
-                LogUtil<RabbitMQSender>.Error("Rabbit连接出现异常", e);
-            }
-        }
-
-        public void Receive()
-        {
-            try
-            {
-                var factory = new ConnectionFactory()
-                {
-                    HostName = RabbitMQConfig.MQ.HostName,
-                    UserName = RabbitMQConfig.MQ.UserName,
-                    Password = RabbitMQConfig.MQ.Password,
-                    Port = RabbitMQConfig.MQ.Port
-                };
-                using (var connection = factory.CreateConnection())
-                using (var channel = connection.CreateModel())
-                {
-                    var msgReceivers = _serviceProvider.GetServices<IMQMsgReceiver>()
-                        .Where(w => $"{w.GetType().Name}".EndsWith("RabbitMQReceiver", StringComparison.OrdinalIgnoreCase));
-                    foreach (var msgReceiver in msgReceivers)
-                    {
-                        string queue = string.Empty;
-                        if (msgReceiver.GetMQType() == MQSendTypeEnum.QUEUE)
-                        {
-                            queue = msgReceiver.GetMQName();
-                            channel.QueueDeclare(queue, true, false, false, null);
-                        }
-                        else
-                        {
-                            var exchange = RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + msgReceiver.GetMQName();
-                            channel.ExchangeDeclare(exchange, "fanout");
-                            queue = channel.QueueDeclare().QueueName;
-                            channel.QueueBind(queue, exchange, "");
-                        }
-                        channel.BasicQos(0, 1, false);
-
-                        var consumer = new EventingBasicConsumer(channel);
-                        consumer.Received += (model, ea) =>
-                        {
-                            var body = ea.Body.ToArray();
-                            var message = Encoding.UTF8.GetString(body);
-                            msgReceiver.ReceiveMsg(message);
-
-                            channel.BasicAck(ea.DeliveryTag, false);
-                        };
-                        channel.BasicConsume(queue, false, consumer);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogUtil<RabbitMQSender>.Error("Rabbit连接出现异常", ex);
+                //LogUtil<RabbitMQSender>.Error("RabbitMQ延迟消息推送出现异常", e);
+                //throw;
+                _logger.LogError(e, "RabbitMQ延迟消息推送出现异常");
             }
         }
     }

@@ -24,5 +24,7 @@ namespace AGooday.AgPay.Components.MQ.Vender
         /// MQ消息接收
         /// </summary>
         void Receive();
+
+        void Close();
     }
 }
