@@ -1,5 +1,4 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using Microsoft.AspNetCore.Mvc;
