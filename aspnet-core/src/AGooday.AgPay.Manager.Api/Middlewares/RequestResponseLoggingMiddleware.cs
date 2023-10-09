@@ -17,7 +17,12 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
         public async Task InvokeAsync(HttpContext context)
         {
             // 过滤，只有接口
-            if (context.Request.Path.Value.Contains("api") && !context.Request.Path.Value.Contains("localOssFiles"))
+            if (context.Request.Path.Value.StartsWith("/api")
+                && !context.Request.Path.Value.Contains("/localOssFiles")
+                && !context.Request.Path.Value.Contains("/auth/vercode")
+                && !context.Request.Path.Value.Contains("/qrc/view")
+                && !context.Request.Path.Value.Contains("/qrc/shell/view")
+                && !context.Request.Path.Value.Contains("/export/"))
             {
                 context.TraceIdentifier = Guid.NewGuid().ToString("N");
                 context.Request.EnableBuffering();
