@@ -3,7 +3,6 @@ using AGooday.AgPay.Agent.Api.Authorization;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,10 +39,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_PAY_ORDER_SEARCH_PAY_WAY)]
-        public ApiRes List([FromQuery] PayWayQueryDto dto)
+        public ApiPageRes<PayWayDto> List([FromQuery] PayWayQueryDto dto)
         {
             var data = _payWayService.GetPaginatedData<PayWayDto>(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<PayWayDto>.Pages(data);
         }
     }
 }

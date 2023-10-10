@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_LIST)]
-        public ApiRes List([FromQuery] MchAppQueryDto dto)
+        public ApiPageRes<MchAppDto> List([FromQuery] MchAppQueryDto dto)
         {
             var data = _mchAppService.GetPaginatedData(dto);
             var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 //records.Add(jitem);
                 item.AddExt("mchType", mchInfos.First(s => s.MchNo == item.MchNo).Type);
             }
-            return ApiRes.Ok(new { Records = data, Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<MchAppDto>.Pages(data);
         }
 
         /// <summary>

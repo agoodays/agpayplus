@@ -40,10 +40,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_LIST, PermCode.MGR.ENT_PAY_ORDER_SEARCH_PAY_WAY)]
-        public ApiRes List([FromQuery] PayWayQueryDto dto)
+        public ApiPageRes<PayWayDto> List([FromQuery] PayWayQueryDto dto)
         {
             var data = _payWayService.GetPaginatedData<PayWayDto>(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<PayWayDto>.Pages(data);
         }
 
         /// <summary>

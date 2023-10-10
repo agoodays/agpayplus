@@ -10,6 +10,7 @@ using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
@@ -47,7 +48,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_LIST)]
-        public ApiRes List(string appId, [FromQuery] PayWayQueryDto dto)
+        public ApiPageRes<MchPayPassagePayWayDto> List(string appId, [FromQuery] PayWayQueryDto dto)
         {
             var payWays = _payWayService.GetPaginatedData<MchPayPassagePayWayDto>(dto);
             if (payWays?.Count() > 0)
@@ -73,7 +74,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                     }
                 }
             }
-            return ApiRes.Ok(new { Records = payWays.ToList(), Total = payWays.TotalCount, Current = payWays.PageIndex, payWays.HasNext });
+            return ApiPageRes<MchPayPassagePayWayDto>.Pages(payWays);
         }
 
         /// <summary>
@@ -98,7 +99,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             }
             // 根据支付方式查询可用支付接口列表
             var result = _mchPayPassageService.SelectAvailablePayInterfaceList(wayCode, appId, CS.INFO_TYPE.MCH_APP, mchInfo.Type, pageNumber, pageSize);
-            return ApiRes.Ok(new { Records = result.ToList(), Total = result.TotalCount, Current = result.PageIndex, HasNext = result.HasNext });
+            return ApiPageRes<AvailablePayInterfaceDto>.Pages(result);
         }
 
         /// <summary>
@@ -153,7 +154,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             }
             catch (Exception e)
             {
-                return ApiRes.Fail(ApiCode.SYSTEM_ERROR,e.Message);
+                return ApiRes.Fail(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }
     }

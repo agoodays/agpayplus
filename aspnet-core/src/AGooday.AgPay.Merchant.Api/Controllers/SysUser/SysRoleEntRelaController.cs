@@ -44,10 +44,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST), NoLog]
-        public ApiRes List([FromQuery] SysRoleEntRelaQueryDto dto)
+        public ApiPageRes<SysRoleEntRelaDto> List([FromQuery] SysRoleEntRelaQueryDto dto)
         {
             var data = _sysRoleEntRelaService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<SysRoleEntRelaDto>.Pages(data);
         }
 
         /// <summary>

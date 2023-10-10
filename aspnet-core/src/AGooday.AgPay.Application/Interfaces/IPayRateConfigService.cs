@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Common.Models;
 using Newtonsoft.Json.Linq;
 using static AGooday.AgPay.Application.DataTransfer.PayRateConfigSaveDto;
 

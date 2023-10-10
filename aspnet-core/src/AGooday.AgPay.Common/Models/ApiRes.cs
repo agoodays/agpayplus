@@ -25,6 +25,8 @@ namespace AGooday.AgPay.Common.Models
         /// </summary>
         public string Sign { get; set; }
 
+        public ApiRes() { }
+
         public ApiRes(int code, string msg, object data, string sign)
         {
             this.Code = code;

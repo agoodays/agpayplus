@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         {
             dto.BindDateRange();
             var transferOrders = _transferOrderService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = transferOrders.ToList(), Total = transferOrders.TotalCount, Current = transferOrders.PageIndex, HasNext = transferOrders.HasNext });
+            return ApiPageRes<TransferOrderDto>.Pages(transferOrders);
         }
 
         /// <summary>

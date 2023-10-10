@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
-        public ApiRes List([FromQuery] PayOrderQueryDto dto)
+        public ApiPageRes<PayOrderDto> List([FromQuery] PayOrderQueryDto dto)
         {
             dto.BindDateRange();
             var payOrders = _payOrderService.GetPaginatedData(dto);
@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 // 存入支付方式名称
                 payOrder.AddExt("wayName", payWayNameMap.ContainsKey(payOrder.WayCode) ? payWayNameMap[payOrder.WayCode] : payOrder.WayCode);
             }
-            return ApiRes.Ok(new { Records = payOrders.ToList(), Total = payOrders.TotalCount, Current = payOrders.PageIndex, HasNext = payOrders.HasNext });
+            return ApiPageRes<PayOrderDto>.Pages(payOrders);
         }
 
         /// <summary>

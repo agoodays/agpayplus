@@ -1,3 +1,5 @@
+using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Authorization;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
@@ -5,8 +7,6 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Notifications;
-using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,12 +46,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_UR_USER_LIST)]
-        public ApiRes List([FromQuery] SysUserQueryDto dto)
+        public ApiPageRes<SysUserListDto> List([FromQuery] SysUserQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = GetCurrentAgentNo();
             var data = _sysUserService.GetPaginatedData(dto, GetCurrentUserId());
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<SysUserListDto>.Pages(data);
         }
 
         /// <summary>

@@ -42,11 +42,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.MCH.ENT_TRANSFER_ORDER_LIST)]
-        public ApiRes List([FromQuery] TransferOrderQueryDto dto)
+        public ApiPageRes<TransferOrderDto> List([FromQuery] TransferOrderQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
             var transferOrders = _transferOrderService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = transferOrders.ToList(), Total = transferOrders.TotalCount, Current = transferOrders.PageIndex, HasNext = transferOrders.HasNext });
+            return ApiPageRes<TransferOrderDto>.Pages(transferOrders);
         }
 
         /// <summary>

@@ -5,7 +5,6 @@
     /// </summary>
     public class SysUserListDto : SysUserDto
     {
-
         /// <summary>
         /// 团队名称
         /// </summary>

@@ -38,10 +38,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_LIST)]
-        public ApiRes List([FromQuery] QrCodeShellQueryDto dto)
+        public ApiPageRes<QrCodeShellDto> List([FromQuery] QrCodeShellQueryDto dto)
         {
             var data = _qrCodeShellService.GetPaginatedData<QrCodeShellDto>(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<QrCodeShellDto>.Pages(data);
         }
 
         /// <summary>

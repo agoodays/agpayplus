@@ -52,11 +52,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_LIST)]
-        public ApiRes List([FromQuery] MchInfoQueryDto dto)
+        public ApiPageRes<MchInfoDto> List([FromQuery] MchInfoQueryDto dto)
         {
             dto.AgentNo = GetCurrentAgentNo();
             var data = _mchInfoService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<MchInfoDto>.Pages(data);
         }
 
         /// <summary>

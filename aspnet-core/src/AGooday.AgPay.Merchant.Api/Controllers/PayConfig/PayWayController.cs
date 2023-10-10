@@ -33,10 +33,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet,Route("")]
         [PermissionAuth(PermCode.MCH.ENT_PAY_ORDER_SEARCH_PAY_WAY)]
-        public ApiRes List([FromQuery] PayWayQueryDto dto)
+        public ApiPageRes<PayWayDto> List([FromQuery] PayWayQueryDto dto)
         {
             var data = _payWayService.GetPaginatedData<PayWayDto>(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<PayWayDto>.Pages(data);
         }
     }
 }

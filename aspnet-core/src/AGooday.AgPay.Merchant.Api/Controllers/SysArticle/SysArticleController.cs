@@ -1,10 +1,9 @@
-﻿using AGooday.AgPay.Merchant.Api.Attributes;
-using AGooday.AgPay.Merchant.Api.Authorization;
-using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Merchant.Api.Attributes;
+using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,11 +33,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysArticle
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_ARTICLE_NOTICEINFO)]
-        public ApiRes List([FromQuery] SysArticleQueryDto dto)
+        public ApiPageRes<SysArticleDto> List([FromQuery] SysArticleQueryDto dto)
         {
             dto.ArticleRange = "MCH";
             var data = _sysArticleService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<SysArticleDto>.Pages(data);
         }
 
         /// <summary>

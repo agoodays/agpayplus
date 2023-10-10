@@ -1,10 +1,10 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Authorization;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,10 +43,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_UR_ROLE_ADD, PermCode.AGENT.ENT_UR_ROLE_DIST)]
-        public ApiRes List([FromQuery] SysRoleEntRelaQueryDto dto)
+        public ApiPageRes<SysRoleEntRelaDto> List([FromQuery] SysRoleEntRelaQueryDto dto)
         {
             var data = _sysRoleEntRelaService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<SysRoleEntRelaDto>.Pages(data);
         }
     }
 }

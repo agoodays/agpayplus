@@ -1,12 +1,12 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Authorization;
+using AGooday.AgPay.Agent.Api.Models;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Authorization;
-using AGooday.AgPay.Agent.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_PAY_PASSAGE_LIST)]
-        public ApiRes List(string appId, [FromQuery] PayWayQueryDto dto)
+        public ApiPageRes<MchPayPassagePayWayDto> List(string appId, [FromQuery] PayWayQueryDto dto)
         {
             var payWays = _payWayService.GetPaginatedData<MchPayPassagePayWayDto>(dto);
             if (payWays?.Count() > 0)
@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
                     }
                 }
             }
-            return ApiRes.Ok(new { Records = payWays.ToList(), Total = payWays.TotalCount, Current = payWays.PageIndex, HasNext = payWays.HasNext });
+            return ApiPageRes<MchPayPassagePayWayDto>.Pages(payWays);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             }
             // 根据支付方式查询可用支付接口列表
             var result = _mchPayPassageService.SelectAvailablePayInterfaceList(wayCode, appId, CS.INFO_TYPE.MCH_APP, mchInfo.Type, pageNumber, pageSize);
-            return ApiRes.Ok(new { Records = result.ToList(), Total = result.TotalCount, Current = result.PageIndex, HasNext = result.HasNext });
+            return ApiPageRes<AvailablePayInterfaceDto>.Pages(result);
         }
 
         /// <summary>

@@ -38,11 +38,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.MGR.ENT_NOTIFY_LIST)]
-        public ApiRes List([FromQuery] MchNotifyQueryDto dto)
+        public ApiPageRes<MchNotifyRecordDto> List([FromQuery] MchNotifyQueryDto dto)
         {
             dto.BindDateRange();
             var data = _mchNotifyService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<MchNotifyRecordDto>.Pages(data);
         }
 
         /// <summary>

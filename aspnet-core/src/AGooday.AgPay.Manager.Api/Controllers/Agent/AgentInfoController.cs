@@ -48,10 +48,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_AGENT_LIST)]
-        public ApiRes List([FromQuery] AgentInfoQueryDto dto)
+        public ApiPageRes<AgentInfoDto> List([FromQuery] AgentInfoQueryDto dto)
         {
             var data = _agentInfoService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<AgentInfoDto>.Pages(data);
         }
 
         /// <summary>

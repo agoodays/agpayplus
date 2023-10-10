@@ -1,11 +1,11 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Authorization;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,10 +59,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("payways"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_AGENT_PAY_CONFIG_LIST, PermCode.AGENT.ENT_MCH_PAY_CONFIG_LIST, PermCode.AGENT.ENT_AGENT_SELF_PAY_CONFIG_LIST)]
-        public ApiRes GetPayWaysByInfoId([FromQuery] PayWayUsableQueryDto dto)
+        public ApiPageRes<PayWayDto> GetPayWaysByInfoId([FromQuery] PayWayUsableQueryDto dto)
         {
             var data = _payRateConfigService.GetPayWaysByInfoId(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<PayWayDto>.Pages(data);
         }
 
         /// <summary>

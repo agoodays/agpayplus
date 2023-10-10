@@ -42,12 +42,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_LIST)]
-        public ApiRes List([FromQuery] SysUserTeamQueryDto dto)
+        public ApiPageRes<SysUserTeamDto> List([FromQuery] SysUserTeamQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = GetCurrentAgentNo();
             var data = _mchStoreService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<SysUserTeamDto>.Pages(data);
         }
 
         /// <summary>

@@ -53,10 +53,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_LIST)]
-        public ApiRes List([FromQuery] IsvInfoQueryDto dto)
+        public ApiPageRes<IsvInfoDto> List([FromQuery] IsvInfoQueryDto dto)
         {
             var data = _isvInfoService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<IsvInfoDto>.Pages(data);
         }
 
         /// <summary>

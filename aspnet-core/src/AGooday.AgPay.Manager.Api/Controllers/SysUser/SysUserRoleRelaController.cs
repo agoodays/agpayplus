@@ -37,10 +37,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
-        public ApiRes List([FromQuery] SysUserRoleRelaQueryDto dto)
+        public ApiPageRes<SysUserRoleRelaDto> List([FromQuery] SysUserRoleRelaQueryDto dto)
         {
             var data = _sysUserRoleRelaService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<SysUserRoleRelaDto>.Pages(data);
         }
 
         /// <summary>

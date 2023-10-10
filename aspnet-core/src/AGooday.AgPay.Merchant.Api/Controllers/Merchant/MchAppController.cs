@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_LIST)]
-        public ApiRes List([FromQuery] MchAppQueryDto dto)
+        public ApiPageRes<MchAppDto> List([FromQuery] MchAppQueryDto dto)
         {
             var mchNo = GetCurrentMchNo();
             dto.MchNo = mchNo;
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 jitem["mchType"] = mchInfo.Type;
                 records.Add(jitem);
             }
-            return ApiRes.Ok(new { Records = records, Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<MchAppDto>.Pages(data);
         }
 
         /// <summary>

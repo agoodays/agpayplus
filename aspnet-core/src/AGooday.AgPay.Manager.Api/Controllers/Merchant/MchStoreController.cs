@@ -48,10 +48,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_LIST)]
-        public ApiRes List([FromQuery] MchStoreQueryDto dto)
+        public ApiPageRes<MchStoreListDto> List([FromQuery] MchStoreQueryDto dto)
         {
             var data = _mchStoreService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<MchStoreListDto>.Pages(data);
         }
 
         /// <summary>

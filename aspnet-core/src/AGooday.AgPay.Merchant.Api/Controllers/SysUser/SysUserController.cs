@@ -46,12 +46,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_LIST)]
-        public ApiRes List([FromQuery] SysUserQueryDto dto)
+        public ApiPageRes<SysUserListDto> List([FromQuery] SysUserQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
             dto.BelongInfoId = GetCurrentMchNo();
             var data = _sysUserService.GetPaginatedData(dto, GetCurrentUserId());
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<SysUserListDto>.Pages(data);
         }
 
         /// <summary>

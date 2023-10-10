@@ -42,12 +42,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.MCH.ENT_REFUND_LIST)]
-        public ApiRes List([FromQuery] RefundOrderQueryDto dto)
+        public ApiPageRes<RefundOrderDto> List([FromQuery] RefundOrderQueryDto dto)
         {
             dto.BindDateRange();
             dto.MchNo = GetCurrentMchNo();
             var refundOrders = _refundOrderService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = refundOrders.ToList(), Total = refundOrders.TotalCount, Current = refundOrders.PageIndex, HasNext = refundOrders.HasNext });
+            return ApiPageRes<RefundOrderDto>.Pages(refundOrders);
         }
 
         /// <summary>

@@ -49,11 +49,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_LIST)]
-        public ApiRes List([FromQuery] MchDivisionReceiverQueryDto dto)
+        public ApiPageRes<MchDivisionReceiverDto> List([FromQuery] MchDivisionReceiverQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
             var data = _mchDivisionReceiverService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<MchDivisionReceiverDto>.Pages(data);
         }
 
         [HttpGet, Route("{recordId}"), NoLog]

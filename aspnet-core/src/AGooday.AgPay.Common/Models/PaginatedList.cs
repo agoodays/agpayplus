@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
-namespace AGooday.AgPay.Application
+namespace AGooday.AgPay.Common.Models
 {
     public class PaginatedList<TSource> : List<TSource>
     {

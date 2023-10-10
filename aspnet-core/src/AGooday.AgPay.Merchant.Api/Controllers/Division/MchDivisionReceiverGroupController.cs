@@ -38,11 +38,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_LIST)]
-        public ApiRes List([FromQuery] MchDivisionReceiverGroupQueryDto dto)
+        public ApiPageRes<MchDivisionReceiverGroupDto> List([FromQuery] MchDivisionReceiverGroupQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
             var data = _mchDivisionReceiverGroupService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<MchDivisionReceiverGroupDto>.Pages(data);
         }
 
         [HttpGet, Route("{recordId}"), NoLog]

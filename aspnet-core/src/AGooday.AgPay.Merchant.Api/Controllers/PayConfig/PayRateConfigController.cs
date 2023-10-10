@@ -59,10 +59,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("payways"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiRes GetPayWaysByInfoId([FromQuery] PayWayUsableQueryDto dto)
+        public ApiPageRes<PayWayDto> GetPayWaysByInfoId([FromQuery] PayWayUsableQueryDto dto)
         {
             var data = _payRateConfigService.GetPayWaysByInfoId(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<PayWayDto>.Pages(data);
         }
 
         /// <summary>

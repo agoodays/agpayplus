@@ -43,11 +43,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_LIST, PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
-        public ApiRes List([FromQuery] SysRoleQueryDto dto)
+        public ApiPageRes<SysRoleDto> List([FromQuery] SysRoleQueryDto dto)
         {
             dto.BelongInfoId = string.IsNullOrWhiteSpace(dto.BelongInfoId) ? (dto.SysType ?? string.Empty).Equals(CS.SYS_TYPE.MGR) ? CS.BASE_BELONG_INFO_ID.MGR : dto.BelongInfoId : dto.BelongInfoId;
             var data = _sysRoleService.GetPaginatedData(dto);
-            return ApiRes.Ok(new { Records = data.ToList(), Total = data.TotalCount, Current = data.PageIndex, HasNext = data.HasNext });
+            return ApiPageRes<SysRoleDto>.Pages(data);
         }
 
         /// <summary>
