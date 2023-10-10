@@ -32,11 +32,8 @@ namespace AGooday.AgPay.Common.Models
         /// <returns></returns>
         public BaseModel AddExt(string key, object value)
         {
-            if (ext == null)
-            {
-                ext = new JObject();
-            }
-            ext[key] = JToken.FromObject(value);
+            ext ??= new JObject();
+            ext[key] = value != null ? JToken.FromObject(value) : null;
             return this;
         }
     }
