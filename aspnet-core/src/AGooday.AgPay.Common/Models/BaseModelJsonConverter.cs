@@ -6,6 +6,8 @@ namespace AGooday.AgPay.Common.Models
 {
     /// <summary>
     /// 自定义的Json转换器
+    /// 处理model的扩展字段 (只需要在model中设置[ext]参数， 可以实现json自动转换为外层字段。 )
+    /// 比如 model为 {id:1, ext:{abc:222}}  则自动转换为： {id:1, abc:222}
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class BaseModelJsonConverter<T> : JsonConverter<T> where T : BaseModel

@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Common.Utils
     /// <summary>
     /// 文件工具类
     /// </summary>
-    public class FileKit
+    public class FileUtil
     {
         /// <summary>
         /// 获取文件的后缀名

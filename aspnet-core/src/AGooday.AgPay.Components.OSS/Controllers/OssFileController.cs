@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
 
                 // 2. 判断文件是否支持
                 string suffix = Path.GetExtension(file.FileName);
-                string fileSuffix = FileKit.GetFileSuffix(file.FileName, false);
+                string fileSuffix = FileUtil.GetFileSuffix(file.FileName, false);
                 if (!ossFileConfig.IsAllowFileSuffix(fileSuffix))
                 {
                     throw new BizException("上传文件格式不支持！");

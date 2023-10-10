@@ -1,5 +1,8 @@
 ﻿namespace AGooday.AgPay.Common.Utils
 {
+    /// <summary>
+    /// 序列号生成 工具类
+    /// </summary>
     public class SeqUtil
     {
         private const string PAY_ORDER_SEQ_PREFIX = "P";

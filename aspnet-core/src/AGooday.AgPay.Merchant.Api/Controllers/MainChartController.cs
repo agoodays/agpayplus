@@ -118,7 +118,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [PermissionAuth(PermCode.MCH.ENT_C_MAIN_PAY_COUNT)]
         public ApiRes PayCount(string queryDateRange)
         {
-            GetDateRange(queryDateRange, out string createdStart, out string createdEnd);
+            DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
             if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
             {
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd");
@@ -148,40 +148,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [PermissionAuth(PermCode.MCH.ENT_C_MAIN_PAY_TYPE_COUNT)]
         public ApiRes PayWayCount(string queryDateRange)
         {
-            GetDateRange(queryDateRange, out string createdStart, out string createdEnd);
+            DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
             if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
             {
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd");
                 createdEnd = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
             }
             return ApiRes.Ok(_payOrderService.MainPagePayTypeCount(GetCurrentMchNo(), null, createdStart, createdEnd));
-        }
-
-        private static void GetDateRange(string queryDateRange, out string createdStart, out string createdEnd)
-        {
-            createdStart = null; createdEnd = null;
-            queryDateRange = queryDateRange ?? string.Empty;
-            if (queryDateRange.Equals("today"))
-            {
-                createdStart = DateTime.Today.ToString("yyyy-MM-dd");
-                createdEnd = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
-            }
-            if (queryDateRange.Equals("yesterday"))
-            {
-                createdStart = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
-                createdEnd = DateTime.Today.ToString("yyyy-MM-dd");
-            }
-            if (queryDateRange.Contains("near2now"))
-            {
-                int day = Convert.ToInt32(queryDateRange.Split("_")[1]);
-                createdStart = DateTime.Today.AddDays(-(day - 1)).ToString("yyyy-MM-dd");
-                createdEnd = DateTime.Today.AddDays(1).ToString("yyyy-MM-dd");
-            }
-            if (queryDateRange.Contains("customDateTime"))
-            {
-                createdStart = Convert.ToDateTime(queryDateRange.Split("_")[1]).ToString("yyyy-MM-dd");
-                createdEnd = Convert.ToDateTime(queryDateRange.Split("_")[2]).AddDays(1).ToString("yyyy-MM-dd");
-            }
         }
     }
 }

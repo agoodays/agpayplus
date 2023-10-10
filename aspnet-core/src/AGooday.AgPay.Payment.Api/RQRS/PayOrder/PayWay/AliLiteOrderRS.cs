@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Common.Constants;
-using Newtonsoft.Json;
+using AGooday.AgPay.Common.Utils;
 
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 {
@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 
         public override string BuildPayData()
         {
-            return JsonConvert.SerializeObject(new { alipayTradeNo = AlipayTradeNo });
+            return JsonUtil.NewJson("alipayTradeNo", AlipayTradeNo).ToString();
         }
     }
 }
