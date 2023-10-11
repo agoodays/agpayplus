@@ -49,18 +49,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
             // 调起上游接口：
             // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
             // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
-            var response = ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayUnifiedOrderAsync(request).Result;
+            var client = (WechatTenpayClient)wxServiceWrapper.Client;
+            var response = client.ExecuteCreatePayUnifiedOrderAsync(request).Result;
             if (response.IsSuccessful())
             {
-                var payInfo = new Dictionary<string, string>();
-                payInfo.Add("appId", response.AppId);
-                payInfo.Add("timeStamp", DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
-                payInfo.Add("nonceStr", Guid.NewGuid().ToString("N"));
-                payInfo.Add("package", $"prepay_id={response.PrepayId}");
-                payInfo.Add("signType", "MD5");
-                var paySign = WxPayKit.Sign(payInfo, wxServiceWrapper.Config.MchKey);
-                payInfo.Add("paySign", paySign);
-
+                //var payInfo = new Dictionary<string, string>();
+                //payInfo.Add("appId", response.AppId);
+                //payInfo.Add("timeStamp", DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
+                //payInfo.Add("nonceStr", Guid.NewGuid().ToString("N"));
+                //payInfo.Add("package", $"prepay_id={response.PrepayId}");
+                //payInfo.Add("signType", "MD5");
+                //var paySign = WxPayKit.Sign(payInfo, wxServiceWrapper.Config.MchKey);
+                //payInfo.Add("paySign", paySign);
+                // 下面的参数字典可直接以 JSON 格式返回给客户端，客户端反序列化后再原样传递给 wx.chooseWXPay() 方法即可
+                var payInfo = client.GenerateParametersForJsapiGetBrandPayRequest(request.AppId, response.PrepayId, request.SignType);
                 res.PayInfo = JsonConvert.SerializeObject(payInfo);
                 channelRetMsg.ChannelState = ChannelState.WAITING;
             }

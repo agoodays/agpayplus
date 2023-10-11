@@ -2,7 +2,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.WxPay;
 using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
@@ -39,6 +38,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
+            var client = (WechatTenpayClient)wxServiceWrapper.Client;
             // 微信统一下单请求对象
             CreatePayTransactionJsapiResponse response;
             if (mchAppConfigContext.IsIsvSubMch())
@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                 // 调起上游接口：
                 // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
                 // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
-                response = ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayPartnerTransactionJsapiAsync(request).Result;
+                response = client.ExecuteCreatePayPartnerTransactionJsapiAsync(request).Result;
             }
             else
             {
@@ -128,23 +128,24 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                 // 调起上游接口：
                 // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
                 // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
-                response = ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayTransactionJsapiAsync(request).Result;
+                response = client.ExecuteCreatePayTransactionJsapiAsync(request).Result;
             }
             if (response.IsSuccessful())
             {
                 var appid = wxServiceWrapper.Config.AppId;
-                var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
-                var nonceStr = Guid.NewGuid().ToString("N");
-                var payInfo = new Dictionary<string, string>();
-                payInfo.Add("appId", appid);
-                payInfo.Add("timeStamp", timestamp);
-                payInfo.Add("nonceStr", nonceStr);
-                payInfo.Add("package", $"prepay_id={response.PrepayId}");
-                payInfo.Add("signType", "RSA");
-                string beforeSign = $"{appid}\n{timestamp}\n{nonceStr}\nprepay_id={response.PrepayId}\n";
-                var paySign = WxPayV3Util.RSASign(beforeSign, wxServiceWrapper.Config.MchPrivateKey);
-                payInfo.Add("paySign", paySign);// 签名以后在增加prepayId参数
-                payInfo.Add("prepayId", response.PrepayId);
+                //var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+                //var nonceStr = Guid.NewGuid().ToString("N");
+                //var payInfo = new Dictionary<string, string>();
+                //payInfo.Add("appId", appid);
+                //payInfo.Add("timeStamp", timestamp);
+                //payInfo.Add("nonceStr", nonceStr);
+                //payInfo.Add("package", $"prepay_id={response.PrepayId}");
+                //payInfo.Add("signType", "RSA");
+                //string beforeSign = $"{appid}\n{timestamp}\n{nonceStr}\nprepay_id={response.PrepayId}\n";
+                //var paySign = WxPayV3Util.RSASign(beforeSign, wxServiceWrapper.Config.MchPrivateKey);
+                //payInfo.Add("paySign", paySign);// 签名以后在增加prepayId参数
+                //payInfo.Add("prepayId", response.PrepayId);
+                var payInfo = client.GenerateParametersForJsapiPayRequest( appid, response.PrepayId);
                 res.PayInfo = JsonConvert.SerializeObject(payInfo);
                 channelRetMsg.ChannelState = ChannelState.WAITING;
             }

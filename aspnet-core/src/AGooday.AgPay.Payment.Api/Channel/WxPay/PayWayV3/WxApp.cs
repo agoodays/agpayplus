@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.WxPay;
-using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
@@ -38,6 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
 
             // 微信统一下单请求对象
             string subMchAppId = string.Empty, subMerchantId = string.Empty;
+            var client = (WechatTenpayClient)wxServiceWrapper.Client;
             CreatePayTransactionAppResponse response;
             if (mchAppConfigContext.IsIsvSubMch())
             {
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                 // 调起上游接口：
                 // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
                 // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
-                response = ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayPartnerTransactionAppAsync(request).Result;
+                response = client.ExecuteCreatePayPartnerTransactionAppAsync(request).Result;
             }
             else
             {
@@ -114,7 +114,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                 // 调起上游接口：
                 // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
                 // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
-                response = ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayTransactionAppAsync(request).Result;
+                response = client.ExecuteCreatePayTransactionAppAsync(request).Result;
             }
             if (response.IsSuccessful())
             {
@@ -125,20 +125,21 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                     wxAppId = subMchAppId;
                     partnerId = subMerchantId;
                 }
-                var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
-                var nonceStr = Guid.NewGuid().ToString("N");
-                var payInfo = new Dictionary<string, string>();
-                payInfo.Add("prepayid", response.PrepayId);
-                payInfo.Add("partnerid", partnerId);
-                string packageValue = "Sign=WXPay";
-                payInfo.Add("package", packageValue);
-                payInfo.Add("timeStamp", DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
-                payInfo.Add("nonceStr", Guid.NewGuid().ToString("N"));
-                payInfo.Add("appId", wxAppId);
-                string beforeSign = $"{wxAppId}\n{timestamp}\n{nonceStr}\nprepay_id={response.PrepayId}\n";
-                var paySign = WxPayV3Util.RSASign(beforeSign, wxServiceWrapper.Config.MchPrivateKey);
-                payInfo.Add("sign", paySign);// 签名以后在增加prepayId参数
-                payInfo.Add("prepayId", response.PrepayId);
+                //var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+                //var nonceStr = Guid.NewGuid().ToString("N");
+                //var payInfo = new Dictionary<string, string>();
+                //payInfo.Add("prepayid", response.PrepayId);
+                //payInfo.Add("partnerid", partnerId);
+                //string packageValue = "Sign=WXPay";
+                //payInfo.Add("package", packageValue);
+                //payInfo.Add("timeStamp", DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
+                //payInfo.Add("nonceStr", Guid.NewGuid().ToString("N"));
+                //payInfo.Add("appId", wxAppId);
+                //string beforeSign = $"{wxAppId}\n{timestamp}\n{nonceStr}\nprepay_id={response.PrepayId}\n";
+                //var paySign = WxPayV3Util.RSASign(beforeSign, wxServiceWrapper.Config.MchPrivateKey);
+                //payInfo.Add("sign", paySign);// 签名以后在增加prepayId参数
+                //payInfo.Add("prepayId", response.PrepayId);
+                var payInfo = client.GenerateParametersForAppPayRequest(partnerId,wxAppId, response.PrepayId);
                 res.PayInfo = JsonConvert.SerializeObject(payInfo);
                 channelRetMsg.ChannelState = ChannelState.WAITING;
             }
