@@ -43,8 +43,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             });
             #endregion
             #region DivisionService
-            //services.AddSingleton<IDivisionService, AliPayDivisionService>();
-            //services.AddSingleton<IDivisionService, WxPayDivisionService>();
+            //services.AddScoped<IDivisionService, AliPayDivisionService>();
+            //services.AddScoped<IDivisionService, WxPayDivisionService>();
             services.AddScoped<AliPayDivisionService>();
             services.AddScoped<WxPayDivisionService>();
             services.AddSingleton(provider =>
@@ -187,9 +187,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             });
             #endregion
             #region ChannelRefundNoticeService
-            //services.AddSingleton<AliPayChannelRefundNoticeService>();
-            services.AddSingleton<WxPayChannelRefundNoticeService>();
-            //services.AddSingleton<YsfPayChannelRefundNoticeService>();
+            //services.AddScoped<AliPayChannelRefundNoticeService>();
+            services.AddScoped<WxPayChannelRefundNoticeService>();
+            //services.AddScoped<YsfPayChannelRefundNoticeService>();
             services.AddScoped<SxfPayChannelNoticeService>();
             services.AddScoped<LesPayChannelRefundNoticeService>();
             services.AddScoped<HkrtPayChannelRefundNoticeService>();
