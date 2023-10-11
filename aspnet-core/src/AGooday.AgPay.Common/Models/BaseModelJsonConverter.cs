@@ -12,6 +12,8 @@ namespace AGooday.AgPay.Common.Models
     /// <typeparam name="T"></typeparam>
     public class BaseModelJsonConverter<T> : JsonConverter<T> where T : BaseModel
     {
+        private const string API_EXTEND_FIELD_NAME = "ext";
+
         public override bool CanWrite => false;
 
         public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer)
@@ -24,7 +26,7 @@ namespace AGooday.AgPay.Common.Models
             // 填充基本属性
             foreach (var property in objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (property.Name.Equals("Ext", StringComparison.OrdinalIgnoreCase))
+                if (property.Name.Equals(API_EXTEND_FIELD_NAME, StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 var propertyValue = jsonObject.GetValue(property.Name, StringComparison.OrdinalIgnoreCase);
@@ -36,7 +38,7 @@ namespace AGooday.AgPay.Common.Models
             }
 
             // 填充扩展属性
-            var extValue = jsonObject.GetValue("ext", StringComparison.OrdinalIgnoreCase);
+            var extValue = jsonObject.GetValue(API_EXTEND_FIELD_NAME, StringComparison.OrdinalIgnoreCase);
             if (extValue is JObject extObject)
             {
                 foreach (var property in extObject.Properties())
