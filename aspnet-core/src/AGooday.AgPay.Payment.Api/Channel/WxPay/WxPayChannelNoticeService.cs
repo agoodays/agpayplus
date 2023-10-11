@@ -171,24 +171,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                 }
                 else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))
                 {
-                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
-                    var timestamp = request.Headers["Wechatpay-Timestamp"].FirstOrDefault();
-                    var nonce = request.Headers["Wechatpay-Nonce"].FirstOrDefault();
-                    var signature = request.Headers["Wechatpay-Signature"].FirstOrDefault();
-                    var serialNumber = request.Headers["Wechatpay-Serial"].FirstOrDefault();
-                    string callbackJson = GetReqParamFromBody();
-                    // 验证参数
-                    bool valid = client.VerifyEventSignature(
-                        callbackTimestamp: timestamp,
-                        callbackNonce: nonce,
-                        callbackBody: callbackJson,
-                        callbackSignature: signature,
-                        callbackSerialNumber: serialNumber, out Exception error);
-                    if (!valid)
-                    {
-                        log.LogError(error, "error");
-                        throw ResponseException.BuildText("ERROR");
-                    }
                     // 获取回调参数
                     string channelState = string.Empty;
                     string channelOrderId = string.Empty;

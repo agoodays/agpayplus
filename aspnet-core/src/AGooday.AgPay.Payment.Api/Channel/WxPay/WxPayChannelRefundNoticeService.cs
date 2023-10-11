@@ -79,10 +79,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     throw new BizException("商户类型错误");
                 }
 
+                var wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
                 if (CS.PAY_IF_VERSION.WX_V3.Equals(apiVersion)) // V3接口回调
                 {
                     // 验签 && 获取订单回调数据
-                    var wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
                     var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
                     /* 微信商户平台发来的通知内容 */
                     var timestamp = request.Headers["Wechatpay-Timestamp"].FirstOrDefault();
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     }
                     /* 将 JSON 反序列化得到通知对象 */
                     var callbackModel = client.DeserializeEvent(callbackJson);
-                    if ("TRANSACTION.SUCCESS".Equals(callbackModel.EventType))
+                    if ("REFUND.SUCCESS".Equals(callbackModel.EventType))
                     {
                         /* 根据事件类型，解密得到支付通知敏感数据 */
                         if (mchAppConfigContext.IsIsvSubMch())
@@ -130,7 +130,15 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                 }
                 else if (CS.PAY_IF_VERSION.WX_V2.Equals(apiVersion)) // V2接口回调
                 {
-                    string callbackXml = GetReqParamFromBody();
+                    // 验签 && 获取订单回调数据
+                    var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
+                    string callbackXml = GetReqParamFromBody(); 
+                    bool valid = client.VerifyEventSignature(callbackXml, out Exception error);
+                    if (!valid)
+                    {
+                        log.LogError(error, "error");
+                        throw ResponseException.BuildText("ERROR");
+                    }
                     if (string.IsNullOrWhiteSpace(callbackXml))
                     {
                         return null;
@@ -160,24 +168,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                 channelResult.ChannelState = ChannelState.WAITING; // Default payment in progress
                 if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))
                 {
-                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
-                    var timestamp = request.Headers["Wechatpay-Timestamp"].FirstOrDefault();
-                    var nonce = request.Headers["Wechatpay-Nonce"].FirstOrDefault();
-                    var signature = request.Headers["Wechatpay-Signature"].FirstOrDefault();
-                    var serialNumber = request.Headers["Wechatpay-Serial"].FirstOrDefault();
-                    string callbackJson = GetReqParamFromBody();
-                    // 验证参数
-                    bool valid = client.VerifyEventSignature(
-                        callbackTimestamp: timestamp,
-                        callbackNonce: nonce,
-                        callbackBody: callbackJson,
-                        callbackSignature: signature,
-                        callbackSerialNumber: serialNumber, out Exception error);
-                    if (!valid)
-                    {
-                        log.LogError(error, "error");
-                        throw ResponseException.BuildText("ERROR");
-                    }
                     // 获取回调参数
                     string refundStatus = string.Empty;
                     string channelOrderId = string.Empty;

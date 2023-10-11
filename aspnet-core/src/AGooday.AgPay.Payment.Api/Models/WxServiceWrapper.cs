@@ -1,17 +1,17 @@
 ﻿using AGooday.AgPay.Application.Params.WxPay;
-using SKIT.FlurlHttpClient;
-using SKIT.FlurlHttpClient.Wechat.TenpayV3.Settings;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Payment.Api.Utils;
+using SKIT.FlurlHttpClient;
+using SKIT.FlurlHttpClient.Wechat.TenpayV3.Settings;
 using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Models
 {
-    using WechatTenpayClientV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClient;
     using WechatTenpayClientOptionsV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClientOptions;
-    using WechatTenpayClientV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClient;
     using WechatTenpayClientOptionsV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClientOptions;
+    using WechatTenpayClientV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClient;
+    using WechatTenpayClientV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClient;
 
     /// <summary>
     /// wxService 包装类
