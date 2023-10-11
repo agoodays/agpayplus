@@ -66,5 +66,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
             //channelRetMsg.ChannelErrCode= AppendErrCode(wxPayException.ReturnCode, wxPayException.ErrCode);
             //channelRetMsg.ChannelErrMsg= AppendErrMsg("OK".Equals(wxPayException.ReturnMsg, StringComparison.OrdinalIgnoreCase) ? null : wxPayException.ReturnMsg, wxPayException.ErrCodeDes);
         }
+
+        public static string FailResp(string msg)
+        {
+            return GenerateXml("FAIL", msg);
+        }
+
+        public static string SuccessResp(string msg)
+        {
+            return GenerateXml("SUCCESS", msg);
+        }
+
+        public static string GenerateXml(string code, string msg)
+        {
+            return $"<xml><return_code><![CDATA[{code}]]></return_code><return_msg><![CDATA[{msg}]]></return_msg></xml>";
+        }
     }
 }

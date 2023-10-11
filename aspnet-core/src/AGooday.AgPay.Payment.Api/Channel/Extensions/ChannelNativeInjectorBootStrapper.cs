@@ -188,7 +188,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             #endregion
             #region ChannelRefundNoticeService
             //services.AddSingleton<AliPayChannelRefundNoticeService>();
-            //services.AddSingleton<WxPayChannelRefundNoticeService>();
+            services.AddSingleton<WxPayChannelRefundNoticeService>();
             //services.AddSingleton<YsfPayChannelRefundNoticeService>();
             services.AddScoped<SxfPayChannelNoticeService>();
             services.AddScoped<LesPayChannelRefundNoticeService>();
@@ -202,8 +202,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                     {
                         //case CS.IF_CODE.ALIPAY:
                         //    return provider.GetService<AliPayChannelRefundNoticeService>();
-                        //case CS.IF_CODE.WXPAY:
-                        //    return provider.GetService<WxPayChannelRefundNoticeService>();
+                        case CS.IF_CODE.WXPAY:
+                            return provider.GetService<WxPayChannelRefundNoticeService>();
                         //case CS.IF_CODE.YSFPAY:
                         //    return provider.GetService<YsfPayChannelRefundNoticeService>();
                         case CS.IF_CODE.SXFPAY:
