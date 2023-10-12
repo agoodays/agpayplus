@@ -1,9 +1,17 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Params.WxPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.Transfer;
+using AGooday.AgPay.Payment.Api.Services;
+using SKIT.FlurlHttpClient.Wechat.TenpayV2;
+using SKIT.FlurlHttpClient.Wechat.TenpayV2.Models;
+using SKIT.FlurlHttpClient.Wechat.TenpayV3;
+using SKIT.FlurlHttpClient.Wechat.TenpayV3.Models;
+using WechatTenpayClientV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClient;
+using WechatTenpayClientV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClient;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 {
@@ -12,6 +20,15 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     /// </summary>
     public class WxPayTransferService : ITransferService
     {
+        private readonly ILogger<WxPayTransferService> log;
+        private readonly ConfigContextQueryService configContextQueryService;
+
+        public WxPayTransferService(ILogger<WxPayTransferService> log, ConfigContextQueryService configContextQueryService)
+        {
+            this.log = log;
+            this.configContextQueryService = configContextQueryService;
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.WXPAY;
@@ -45,12 +62,164 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 
         public ChannelRetMsg Transfer(TransferOrderRQ bizRQ, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
         {
-            throw new NotImplementedException();
+            try
+            {
+                WxServiceWrapper wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+
+                if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion))  // V2
+                {
+                    CreatePayMarketingTransfersPromotionTransferRequest request = new CreatePayMarketingTransfersPromotionTransferRequest();
+
+                    request.AppId = wxServiceWrapper.Config.AppId;  // 商户账号appid
+                    request.MerchantId = wxServiceWrapper.Config.MchId;  // 商户号
+
+                    request.PartnerTradeNumber = transferOrder.TransferId;  // 商户订单号
+                    request.OpenId = transferOrder.AccountNo;  // openid
+                    request.Amount = (int)transferOrder.Amount;  // 付款金额，单位为分
+                    request.ClientIp = transferOrder.ClientIp;
+                    request.Description = transferOrder.TransferDesc;  // 付款备注
+                    if (!string.IsNullOrEmpty(transferOrder.AccountName))
+                    {
+                        request.UserName = transferOrder.AccountName;
+                        request.CheckNameType = "FORCE_CHECK";
+                    }
+                    else
+                    {
+                        request.CheckNameType = "NO_CHECK";
+                    }
+
+                    var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
+                    var result = client.ExecuteCreatePayMarketingTransfersPromotionTransferAsync(request).Result;
+                    return ChannelRetMsg.Waiting();
+                }
+                else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))  // V3
+                {
+                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    if (mchAppConfigContext.IsIsvSubMch()) // 特约商户
+                    {
+                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+
+                        CreatePartnerTransferBatchRequest request = new CreatePartnerTransferBatchRequest();
+                        request.AppId = wxServiceWrapper.Config.AppId;
+                        request.SubAppId = isvsubMchParams.SubMchAppId;
+                        request.SubMerchantId = isvsubMchParams.SubMchId;
+                        request.OutBatchNumber = transferOrder.TransferId;
+                        request.BatchName = transferOrder.AccountName;
+                        request.BatchRemark = transferOrder.TransferDesc;
+                        request.TotalAmount = (int)transferOrder.Amount;
+                        request.TotalNumber = 1;
+                        CreatePartnerTransferBatchRequest.Types.TransferDetail transferDetail = new CreatePartnerTransferBatchRequest.Types.TransferDetail();
+                        transferDetail.OutDetailNumber = transferOrder.TransferId;
+                        transferDetail.OpenId = transferOrder.AccountNo;
+                        transferDetail.TransferAmount = (int)transferOrder.Amount;  // 付款金额，单位为分
+                        transferDetail.UserName = transferOrder.AccountName;
+                        transferDetail.TransferRemark = transferOrder.TransferDesc;
+                        request.TransferDetailList.Add(transferDetail);
+                        var result = client.ExecuteCreatePartnerTransferBatchAsync(request).Result;
+                    }
+                    else
+                    {
+                        CreateTransferBatchRequest request = new CreateTransferBatchRequest();
+                        request.AppId = wxServiceWrapper.Config.AppId;
+                        request.OutBatchNumber = transferOrder.TransferId;
+                        request.BatchName = transferOrder.AccountName;
+                        request.BatchRemark = transferOrder.TransferDesc;
+                        request.TotalAmount = (int)transferOrder.Amount;
+                        request.TotalNumber = 1;
+                        CreateTransferBatchRequest.Types.TransferDetail transferDetail = new CreateTransferBatchRequest.Types.TransferDetail();
+                        transferDetail.OutDetailNumber = transferOrder.TransferId;
+                        transferDetail.OpenId = transferOrder.AccountNo;
+                        transferDetail.TransferAmount = (int)transferOrder.Amount;  // 付款金额，单位为分
+                        transferDetail.UserName = transferOrder.AccountName;
+                        transferDetail.TransferRemark = transferOrder.TransferDesc;
+                        request.TransferDetailList.Add(transferDetail);
+
+                        var result = client.ExecuteCreateTransferBatchAsync(request).Result;
+                    }
+                    return ChannelRetMsg.Waiting();
+                }
+                else
+                {
+                    return ChannelRetMsg.SysError("请选择微信V2或V3模式");
+                }
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, "转账异常：");
+                return ChannelRetMsg.Waiting();
+            }
         }
 
         public ChannelRetMsg Query(TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
         {
-            throw new NotImplementedException();
+            try
+            {
+                WxServiceWrapper wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+
+                if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion))  // V2
+                {
+                    GetPayMarketingTransfersTransferInfoRequest request = new GetPayMarketingTransfersTransferInfoRequest();
+                    request.AppId = wxServiceWrapper.Config.AppId;  // 商户账号appid
+                    request.MerchantId = wxServiceWrapper.Config.MchId;  // 商户号
+                    request.PartnerTradeNumber = transferOrder.TransferId;
+
+                    var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
+                    var result = client.ExecuteGetPayMarketingTransfersTransferInfoAsync(request).Result;
+                    // SUCCESS,明确成功
+                    if ("SUCCESS".Equals(result.Status, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return ChannelRetMsg.ConfirmSuccess(result.PaymentNumber);
+                    }
+                    else if ("FAILED".Equals(result.Status, StringComparison.OrdinalIgnoreCase))  // FAILED,明确失败
+                    {
+                        return ChannelRetMsg.ConfirmFail(result.Status, result.FailReason);
+                    }
+                    else
+                    {
+                        return ChannelRetMsg.Waiting();
+                    }
+                }
+                else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))  // V3
+                {
+                    GetTransferBatchDetailByOutDetailNumberRequest request = new GetTransferBatchDetailByOutDetailNumberRequest();
+                    request.OutBatchNumber = transferOrder.TransferId;
+                    request.OutDetailNumber = transferOrder.TransferId;
+
+                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    GetTransferBatchDetailByOutDetailNumberResponse result;
+                    if (mchAppConfigContext.IsIsvSubMch()) // 特约商户
+                    {
+                        result = client.ExecuteGetPartnerTransferBatchDetailByOutDetailNumberAsync((GetPartnerTransferBatchDetailByOutDetailNumberRequest)request).Result;
+                    }
+                    else
+                    {
+                        result = client.ExecuteGetTransferBatchDetailByOutDetailNumberAsync(request).Result;
+                    }
+
+                    // SUCCESS,明确成功
+                    if ("SUCCESS".Equals(result.DetailStatus, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return ChannelRetMsg.ConfirmSuccess(result.DetailId);
+                    }
+                    else if ("FAIL".Equals(result.DetailStatus, StringComparison.OrdinalIgnoreCase))  // FAIL,明确失败
+                    {
+                        return ChannelRetMsg.ConfirmFail(result.DetailStatus, result.FailReason);
+                    }
+                    else
+                    {
+                        return ChannelRetMsg.Waiting();
+                    }
+                }
+                else
+                {
+                    return ChannelRetMsg.SysError("请选择微信V2或V3模式");
+                }
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, "转账状态查询异常：");
+                return ChannelRetMsg.Waiting();
+            }
         }
     }
 }
