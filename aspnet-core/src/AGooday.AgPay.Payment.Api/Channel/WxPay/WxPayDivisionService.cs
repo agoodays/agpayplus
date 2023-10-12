@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Params.WxPay;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Models;
@@ -187,6 +188,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
         }
 
+        /// <summary>
+        /// 调用订单的完结接口 (分账对象不存在时)
+        /// </summary>
+        /// <param name="payOrder"></param>
+        /// <param name="mchAppConfigContext"></param>
+        /// <returns></returns>
         private ChannelRetMsg DivisionFinish(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             SetProfitSharingOrderUnfrozenRequest request = new SetProfitSharingOrderUnfrozenRequest();
@@ -224,7 +231,62 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 
         public Dictionary<long, ChannelRetMsg> QueryDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext)
         {
-            throw new NotImplementedException();
+            // 创建返回结果
+            Dictionary<long, ChannelRetMsg> resultMap = new Dictionary<long, ChannelRetMsg>();
+            try
+            {
+                WxServiceWrapper wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+
+                // 得到所有的 accNo 与 recordId map
+                Dictionary<string, long> accnoAndRecordIdSet = new Dictionary<string, long>();
+                foreach (PayOrderDivisionRecordDto record in recordList)
+                {
+                    accnoAndRecordIdSet.Add(record.AccNo, record.RecordId);
+                }
+
+                if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion)) // V2
+                {
+                    throw new BizException("V2暂不支持");
+                }
+                else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))
+                {
+                    GetProfitSharingOrderByOutOrderNumberRequest request = new GetProfitSharingOrderByOutOrderNumberRequest();
+                    request.OutOrderNumber = recordList.First().BatchOrderId;
+                    request.TransactionId = payOrder.ChannelOrderNo;
+
+                    // 特约商户
+                    if (mchAppConfigContext.IsIsvSubMch())
+                    {
+                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                        request.SubMerchantId = isvsubMchParams.SubMchId;
+                    }
+                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    GetProfitSharingOrderByOutOrderNumberResponse response = client.ExecuteGetProfitSharingOrderByOutOrderNumberAsync(request).Result;
+                    foreach (var receiver in response.ReceiverList)
+                    {
+                        // 我方系统的分账接收记录ID
+                        if (accnoAndRecordIdSet.TryGetValue(receiver.Account, out long recordId))
+                        {
+                            // 仅返回分账记录为最终态的结果 处理中的分账单不做返回处理
+                            if ("SUCCESS".Equals(receiver.Result))
+                            {
+                                resultMap.Add(recordId, ChannelRetMsg.ConfirmSuccess(null));
+                            }
+                            else if ("CLOSED".Equals(receiver.Result))
+                            {
+                                resultMap.Add(recordId, ChannelRetMsg.ConfirmFail(null, null, receiver.FailReason));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, "微信分账失败");
+                throw new BizException(e.Message);
+            }
+
+            return resultMap;
         }
     }
 }
