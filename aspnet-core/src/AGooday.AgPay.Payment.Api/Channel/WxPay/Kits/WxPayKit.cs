@@ -17,21 +17,26 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
     {
         public static IServiceProvider ServiceProvider { get; set; }
 
-        /** 放置 isv特殊信息 **/
+        /// <summary>
+        /// 放置 isv特殊信息
+        /// </summary>
+        /// <param name="mchAppConfigContext"></param>
+        /// <param name="req"></param>
         public static void PutApiIsvInfo(MchAppConfigContext mchAppConfigContext, WechatTenpayRequest req)
         {
             //不是特约商户， 无需放置此值
-            if(!mchAppConfigContext.IsIsvSubMch()){
-                return ;
+            if (!mchAppConfigContext.IsIsvSubMch())
+            {
+                return;
             }
 
             ConfigContextQueryService configContextQueryService = ServiceProvider.GetService<ConfigContextQueryService>();
 
             WxPayIsvSubMchParams isvsubMchParams =
-                    (WxPayIsvSubMchParams) configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
 
-            //req.SubMchId= isvsubMchParams.SubMchId;
-            //req.SubAppId= isvsubMchParams.SubMchAppId;
+            //req.SubMchId = isvsubMchParams.SubMchId;
+            //req.SubAppId = isvsubMchParams.SubMchAppId;
         }
         public static string Sign(Dictionary<string, string> dictionary, string key)
         {
