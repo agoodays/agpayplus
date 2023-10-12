@@ -46,8 +46,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     //不是特约商户，无需放置此值
                     if (mchAppConfigContext.IsIsvSubMch())
                     {
-                        WxPayIsvSubMchParams isvsubMchParams =
-                            (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
 
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                         request.SubAppId = isvsubMchParams.SubMchAppId;
@@ -88,6 +87,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     else
                     {
                         ClosePayTransactionRequest request = new ClosePayTransactionRequest();
+                        request.MerchantId = wxServiceWrapper.Config.MchId;
+                        request.OutTradeNumber = payOrder.PayOrderId;
                         result = client.ExecuteClosePayTransactionAsync(request).Result;
                     }
 
