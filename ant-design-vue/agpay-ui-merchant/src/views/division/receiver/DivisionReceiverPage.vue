@@ -2,22 +2,17 @@
   <page-header-wrapper>
     <a-card>
       <div v-if="$access('ENT_DIVISION_RECEIVER_LIST')" class="table-page-search-wrapper">
-
         <a-form layout="inline" class="table-head-ground">
-
           <div class="table-layer">
-
             <a-form-item label="" class="table-head-layout" :wrapper-col="{span: 16}">
               <a-select v-model="searchData.appId" placeholder="选择应用">
                 <a-select-option key="" >全部应用</a-select-option>
                 <a-select-option v-for="(item) in mchAppList" :key="item.appId" >{{ item.appName }} [{{ item.appId }}]</a-select-option>
               </a-select>
             </a-form-item>
-
             <ag-text-up placeholder="分账接收者ID[精准]" :msg="searchData.receiverId" v-model="searchData.receiverId" />
             <ag-text-up placeholder="接收者账号别名[模糊]" :msg="searchData.receiverAlias" v-model="searchData.receiverAlias" />
             <ag-text-up placeholder="组ID[精准]" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
-
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="账号状态（本系统）" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -25,7 +20,6 @@
                 <a-select-option value="0">暂停分账</a-select-option>
               </a-select>
             </a-form-item>
-
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -46,7 +40,7 @@
       >
         <template slot="topLeftSlot">
           <div>
-            <a-button v-if="$access('ENT_DIVISION_RECEIVER_ADD')" type="danger" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
+            <a-button v-if="$access('ENT_DIVISION_RECEIVER_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
           </div>
         </template>
         <!-- 渠道类型 -->
@@ -69,16 +63,12 @@
           </AgTableColumns>
         </template>
       </AgTable>
-
       <!-- 新增收款账号页面  -->
       <ReceiverAdd ref="receiverAdd" :callbackFunc="searchFunc"/>
-
       <!-- 修改 页面组件  -->
       <ReceiverEdit ref="receiverEdit" :callbackFunc="searchFunc"/>
     </a-card>
-
   </page-header-wrapper>
-
 </template>
 <script>
 import AgTable from '@/components/AgTable/AgTable'
@@ -128,33 +118,24 @@ export default {
     })
   },
   methods: {
-
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_DIVISION_RECEIVER, params)
     },
-
     searchFunc: function () { // 点击【查询】按钮点击事件
       this.btnLoading = true // 打开查询按钮上的loading
       this.$refs.infoTable.refTable(true)
     },
-
     addFunc: function () { // 业务通用【新增】 函数
       if (this.mchAppList.length <= 0) {
         return this.$message.error('当前商户无任何应用，请先创建应用后再试。')
       }
-      if (!this.searchData.appId) {
-        return this.$message.error('请先选择应用。')
-      }
-
       // 打开弹层
-      this.$refs.receiverAdd.show(this.mchAppList.filter((item) => item.appId === this.searchData.appId)[0])
+      this.$refs.receiverAdd.show()
     },
-
     editFunc: function (recordId) { // 业务通用【修改】 函数
       this.$refs.receiverEdit.show(recordId)
     }
-
   }
 }
 </script>

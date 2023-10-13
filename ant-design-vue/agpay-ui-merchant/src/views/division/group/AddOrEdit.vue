@@ -1,34 +1,28 @@
 <template>
-  <a-modal v-model="isShow" :title=" isAdd ? '新增菜单' : '修改菜单' " @ok="handleOkFunc" :confirmLoading="confirmLoading">
-
+  <a-modal v-model="isShow" :title=" isAdd ? '新增账号组' : '修改账号组' " @ok="handleOkFunc" :confirmLoading="confirmLoading">
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 6}" :wrapper-col="{span: 15}" :rules="rules">
-
       <a-form-model-item label="组名称：" prop="receiverGroupName">
         <a-input v-model="saveObject.receiverGroupName" />
       </a-form-model-item>
-
       <a-form-model-item label="自动分账组" prop="autoDivisionFlag">
         <a-radio-group v-model="saveObject.autoDivisionFlag">
           <a-radio :value="1">是</a-radio> <a-radio :value="0">否</a-radio>
         </a-radio-group>
-        <hr/>
-        <p style="color: indianred">1. 自动分账组: 当订单分账模式为自动分账，该组下的所有正常分账状态的账号将作为订单分账对象</p>
-        <p style="color: indianred">2. 每个商户仅有一个默认分账组， 当该组更新为自动分账时，其他组将改为否</p>
+        <div class="agpay-tip-text">
+          <p style="line-height:20px">1. 自动分账组: 当订单分账模式为自动分账，该组下的所有正常分账状态的账号将作为订单分账对象</p>
+          <p style="line-height:20px">2. 每个商户仅有一个默认分账组， 当该组更新为自动分账时，其他组将改为否</p>
+        </div>
       </a-form-model-item>
     </a-form-model>
-
   </a-modal>
-
 </template>
 
 <script>
 import { API_URL_DIVISION_RECEIVER_GROUP, req } from '@/api/manage'
 export default {
-
   props: {
     callbackFunc: { type: Function, default: () => () => ({}) }
   },
-
   data () {
     return {
       confirmLoading: false, // 显示确定按钮loading图标
@@ -66,7 +60,6 @@ export default {
         that.isShow = true // 立马展示弹层信息
       }
     },
-
     handleOkFunc: function () { // 点击【确认】按钮事件
       const that = this
       this.$refs.infoFormModel.validate(valid => {
@@ -94,3 +87,26 @@ export default {
   }
 }
 </script>
+<style lang="less">
+  .agpay-tip-text:before {
+    content: "";
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-bottom-color: #ffeed8;
+    position: absolute;
+    top: -20px;
+    left: 30px;
+  }
+  .agpay-tip-text {
+    font-size: 10px !important;
+    border-radius: 5px;
+    background: #ffeed8;
+    color: #c57000 !important;
+    padding: 5px 10px;
+    display: inline-block;
+    max-width: 100%;
+    position: relative;
+    margin-top: 15px;
+  }
+</style>

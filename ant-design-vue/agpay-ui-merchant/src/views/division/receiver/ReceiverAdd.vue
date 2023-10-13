@@ -1,29 +1,59 @@
 <template>
   <a-drawer
-    v-if="visible"
     :visible="visible"
+    title="绑定分账接收者账号"
     @close="onClose"
+    class="drawer-width"
     :closable="true"
     :maskClosable="false"
-    :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
+    :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="80%"
   >
-
-    <a-descriptions title="绑定分账接收者账号">
-      <a-descriptions-item label="当前应用">
-        <span style="color: red">{{ appInfo.appName }} [{{ appInfo.appId }}]</span>
-      </a-descriptions-item>
-
-      <a-descriptions-item label="选择要加入到的账号分组">
-        <a-select style="width: 210px" placeholder="账号分组" v-model="selectedReceiverGroupId">
-          <a-select-option v-for="(item) in allReceiverGroup" :key="item.receiverGroupId" :value="item.receiverGroupId">{{ item.receiverGroupName }}</a-select-option>
-        </a-select>
-      </a-descriptions-item>
-    </a-descriptions>
-    <a-divider></a-divider>
-
-    <a-card title="微信账号" v-show="appSupportIfCodes.indexOf('wxpay') >= 0">
+    <a-form-model>
+      <a-row justify="space-between" style="margin-left: -20px; margin-right: -20px; row-gap: 0px;">
+        <a-col :span="6" style="padding-left: 20px; padding-right: 20px;">
+          <a-form-model-item label="选择商户应用">
+            <div style="display: flex;">
+              <a-select v-model="appId" placeholder="应用ID" @change="changeAppId">
+                <a-select-option v-for="(item) in mchAppList" :key="item.appId">{{ item.appName }} [{{ item.appId }}]</a-select-option>
+              </a-select>
+            </div>
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="8" style="padding-left: 20px; padding-right: 20px;">
+          <a-form-model-item label="选择要加入到的账号分组">
+            <div style="display: flex;">
+              <a-select v-model="selectedReceiverGroupId" placeholder="账号分组">
+                <a-select-option v-for="(item) in allReceiverGroup" :key="item.receiverGroupId">{{ item.receiverGroupName }}</a-select-option>
+              </a-select>
+              <a-button
+                v-if="$access('ENT_DIVISION_RECEIVER_GROUP_ADD')"
+                type="primary"
+                icon="plus"
+                @click="addGroupFunc"
+                class="mg-b-30"
+                style="margin-bottom: 0px;margin-left: 20px;">新建</a-button>
+            </div>
+          </a-form-model-item>
+        </a-col>
+      </a-row>
+    </a-form-model>
+    <a-divider style="margin-bottom: 10px;margin-top: 0px" />
+    <a-form v-show="!!appId">
+      <a-row justify="space-between" type="flex" style="margin-left: -20px; margin-right: -20px; row-gap: 0px;">
+        <a-col :span="6" style="padding-left: 20px; padding-right: 20px;">
+          <a-form-item label="选择接口">
+            <a-select v-model="ifCode" placeholder="账号所属接口">
+              <a-select-option v-for="(item) in appSupportIfCodes" :key="item.ifCode" >
+                <span><img class="icon" :src="item.icon" alt=""></span> {{ item.ifName }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
+    <a-card title="微信账号" v-show="ifCode==='wxpay'">
       <a slot="extra" href="#">
         <a-button style="background: green; color: white" icon="wechat" @click="addReceiverRow('wxpay')">添加【微信官方】分账接收账号</a-button>
       </a>
@@ -100,7 +130,7 @@
     </a-card>
 
     <br />
-    <a-card title="支付宝账号" v-show="appSupportIfCodes.indexOf('alipay') >= 0">
+    <a-card title="支付宝账号" v-show="ifCode==='alipay'">
       <a slot="extra" href="#">
         <a-button style="background: dodgerblue; color: white" icon="alipay-circle" @click="addReceiverRow('alipay')" >添加【支付宝官方】分账接收账号</a-button>
       </a>
@@ -181,6 +211,7 @@
       <a-button icon="close" @click="onClose">关闭</a-button>
     </div>
 
+    <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="getReceiverGroup" />
     <ChannelUserModal ref="channelUserModal" @changeChannelUserId="changeChannelUserIdFunc($event)"/>
   </a-drawer>
 </template>
@@ -190,7 +221,8 @@
 // eslint-disable-next-line no-unused-vars
 import { genRowKey } from '@/utils/util'
 import ChannelUserModal from '@/components/ChannelUser/ChannelUserModal'
-import { API_URL_DIVISION_RECEIVER, API_URL_DIVISION_RECEIVER_GROUP, req, getIfCodeByAppId } from '@/api/manage'
+import InfoAddOrEdit from '../group/AddOrEdit'
+import { API_URL_MCH_APP, API_URL_DIVISION_RECEIVER, API_URL_DIVISION_RECEIVER_GROUP, req, getIfCodeByAppId } from '@/api/manage'
 
 // eslint-disable-next-line no-unused-vars
 const accTableColumns = [
@@ -220,7 +252,7 @@ const defaultReceiverTemplate = {
 }
 
 export default {
-  components: { ChannelUserModal },
+  components: { InfoAddOrEdit, ChannelUserModal },
   props: {
     callbackFunc: {
       type: Function,
@@ -230,23 +262,42 @@ export default {
   data () {
     return {
       visible: false, // 是否显示抽屉
-      appInfo: null, // 应用app信息
+      appId: null, // 应用app信息
+      ifCode: null, // 应用app信息
+      selectedReceiverGroupId: '', // 当前选择的分组ID
       accTableColumns: accTableColumns, // 表头模板（微信支付宝公用）
 
+      mchAppList: [], // 商户app列表
       allReceiverGroup: [], // 当前商户所有的接收账号的分组情况
-      selectedReceiverGroupId: '', // 当前选择的分组ID
       appSupportIfCodes: [], // 应用支持的支付方式
       receiverTableData: [] // 微信支付的分账用户列表集合
     }
   },
   methods: {
     // 弹层打开事件
-    show (appInfo) {
+    show () {
       const that = this // 提前保留this
 
       this.appSupportIfCodes = [] // 初始化
       this.receiverTableData = [] // 置空表格
 
+      // 请求接口，获取所有的appid，只有此处进行pageSize=-1传参
+      req.list(API_URL_MCH_APP, { pageSize: -1 }).then(res => {
+        that.mchAppList = res.records
+
+        // 默认选中第一个 & 更新列表
+        if (that.mchAppList && that.mchAppList.length > 0) {
+          that.appId = that.mchAppList[0].appId + ''
+          that.changeAppId(that.appId)
+        }
+      })
+
+      that.getReceiverGroup()
+
+      this.visible = true // 显示弹层
+    },
+    getReceiverGroup: function () {
+      const that = this // 提前保留this
       // 请求接口，获取所有分组信息，只有此处进行pageSize=-1传参
       req.list(API_URL_DIVISION_RECEIVER_GROUP, { pageSize: -1 }).then(res => {
         that.allReceiverGroup = res.records
@@ -254,15 +305,17 @@ export default {
           that.selectedReceiverGroupId = that.allReceiverGroup[0].receiverGroupId
         }
       })
-
+    },
+    addGroupFunc: function () {
+      this.$refs.infoAddOrEdit.show()
+    },
+    // 变更 appId的事件
+    changeAppId (value) {
+      const that = this // 提前保留this
       // 查询支持的分账接口
-      getIfCodeByAppId(appInfo.appId).then((res) => {
+      getIfCodeByAppId(value).then((res) => {
         that.appSupportIfCodes = res
       })
-
-      this.appInfo = appInfo // 应用信息
-
-      this.visible = true // 显示弹层
     },
     // 抽屉关闭
     onClose () {
@@ -284,26 +337,22 @@ export default {
         record.relationTypeName = ''
       }
     },
-
     // 显示获取用户ID的弹层
     showChannelUserModal (ifCode, record) {
-      this.$refs.channelUserModal.showModal(this.appInfo.appId, ifCode, record)
+      this.$refs.channelUserModal.showModal(this.appId, ifCode, record)
     },
-
     // 接收到当前渠道用户ID信息
     changeChannelUserIdFunc ({ channelUserId, extObject }) {
       console.log(channelUserId, extObject)
       extObject.accNo = channelUserId
     },
-
     // 添加一行账号信息
     addReceiverRow (ifCode) {
       if (!this.selectedReceiverGroupId) {
         return this.$message.error('请选选择要加入的分组')
       }
-      this.receiverTableData.push(Object.assign({}, defaultReceiverTemplate, { rowKey: genRowKey(), ifCode: ifCode, appId: this.appInfo.appId }))
+      this.receiverTableData.push(Object.assign({}, defaultReceiverTemplate, { rowKey: genRowKey(), ifCode: ifCode, appId: this.appId }))
     },
-
     // 单条绑定 返回是否成功
     reqBatchBindReceiver (i) {
       const that = this
@@ -354,3 +403,10 @@ export default {
   }
 }
 </script>
+<style lang="less">
+  .icon {
+    width: 15px;
+    height: 14px;
+    margin-bottom: 3px
+  }
+</style>
