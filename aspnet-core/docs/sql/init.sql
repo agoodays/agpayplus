@@ -552,6 +552,24 @@ INSERT INTO t_sys_entitlement VALUES('ENT_ORDER', '订单管理', 'transaction',
         INSERT INTO t_sys_entitlement VALUES('ENT_MCH_NOTIFY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_NOTIFY', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_MCH_NOTIFY_RESEND', '按钮：重发通知', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_NOTIFY', '0', 'MGR', NOW(), NOW());
 
+-- 分账管理
+INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION', '分账管理', 'apartment', '', 'RouteView', 'ML', 0, 1,  'ROOT', '55', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_GROUP', '账号组管理', 'team', '/divisionReceiverGroup', 'DivisionReceiverGroupPage', 'ML', 0, 1,  'ENT_DIVISION', '10', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_GROUP_LIST', '页面：数据列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER_GROUP', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_GROUP_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER_GROUP', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_GROUP_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER_GROUP', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_GROUP_EDIT', '按钮：修改', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER_GROUP', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_GROUP_DELETE', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER_GROUP', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER', '收款账号管理', 'trademark', '/divisionReceiver', 'DivisionReceiverPage', 'ML', 0, 1,  'ENT_DIVISION', '20', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_LIST', '页面：数据列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_ADD', '按钮：新增收款账号', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_DELETE', '按钮：删除收款账号', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECEIVER_EDIT', '按钮：修改账号信息', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECEIVER', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECORD', '分账记录', 'unordered-list', '/divisionRecord', 'DivisionRecordPage', 'ML', 0, 1,  'ENT_DIVISION', '30', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECORD_LIST', '页面：数据列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECORD', '0', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECORD_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECORD', '0', 'MGR', NOW(), NOW());
+
 -- 支付配置菜单
 INSERT INTO t_sys_entitlement VALUES('ENT_PC', '支付配置', 'file-done', '', 'RouteView', 'ML', 0, 1,  'ROOT', '60', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_PC_IF_DEFINE', '支付接口', 'interaction', '/ifdefines', 'IfDefinePage', 'ML', 0, 1,  'ENT_PC', '10', 'MGR', NOW(), NOW());

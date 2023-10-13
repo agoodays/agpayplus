@@ -89,6 +89,23 @@
             public const string ENT_MCH_APP_EDIT = "ENT_MCH_APP_EDIT";
             public const string ENT_MCH_APP_DEL = "ENT_MCH_APP_DEL";
             public const string ENT_MCH_PAY_PASSAGE_LIST = "ENT_MCH_PAY_PASSAGE_LIST";
+            public const string ENT_DIVISION = "ENT_DIVISION";
+            public const string ENT_DIVISION_RECORD_VIEW = "ENT_DIVISION_RECORD_VIEW";
+            public const string ENT_DIVISION_RECORD_LIST = "ENT_DIVISION_RECORD_LIST";
+            public const string ENT_DIVISION_RECORD_RESEND = "ENT_DIVISION_RECORD_RESEND";
+            public const string ENT_DIVISION_RECEIVER_GROUP_VIEW = "ENT_DIVISION_RECEIVER_GROUP_VIEW";
+            public const string ENT_DIVISION_RECEIVER_GROUP_LIST = "ENT_DIVISION_RECEIVER_GROUP_LIST";
+            public const string ENT_DIVISION_RECEIVER_GROUP_EDIT = "ENT_DIVISION_RECEIVER_GROUP_EDIT";
+            public const string ENT_DIVISION_RECEIVER_GROUP_ADD = "ENT_DIVISION_RECEIVER_GROUP_ADD";
+            public const string ENT_DIVISION_RECEIVER_GROUP_DELETE = "ENT_DIVISION_RECEIVER_GROUP_DELETE";
+            public const string ENT_DIVISION_RECEIVER_VIEW = "ENT_DIVISION_RECEIVER_VIEW";
+            public const string ENT_DIVISION_RECEIVER_LIST = "ENT_DIVISION_RECEIVER_LIST";
+            public const string ENT_DIVISION_RECEIVER_EDIT = "ENT_DIVISION_RECEIVER_EDIT";
+            public const string ENT_DIVISION_RECEIVER_DELETE = "ENT_DIVISION_RECEIVER_DELETE";
+            public const string ENT_DIVISION_RECEIVER_ADD = "ENT_DIVISION_RECEIVER_ADD";
+            public const string ENT_DIVISION_RECORD = "ENT_DIVISION_RECORD";
+            public const string ENT_DIVISION_RECEIVER_GROUP = "ENT_DIVISION_RECEIVER_GROUP";
+            public const string ENT_DIVISION_RECEIVER = "ENT_DIVISION_RECEIVER";
             public const string ENT_MCH_APP_ADD = "ENT_MCH_APP_ADD";
             public const string ENT_MCH_INFO = "ENT_MCH_INFO";
             public const string ENT_MCH_APP = "ENT_MCH_APP";
@@ -247,7 +264,6 @@
         public static class MCH
         {
             public const string ENT_COMMONS = "ENT_COMMONS";
-            public const string ENT_DIVISION = "ENT_DIVISION";
             public const string ENT_SYS_CONFIG = "ENT_SYS_CONFIG";
             public const string ENT_MCH_CONFIG = "ENT_MCH_CONFIG";
             public const string ENT_MCH_CONFIG_EDIT = "ENT_MCH_CONFIG_EDIT";
@@ -306,6 +322,7 @@
             public const string ENT_MCH_APP_DEL = "ENT_MCH_APP_DEL";
             public const string ENT_MCH_APP_ADD = "ENT_MCH_APP_ADD";
             public const string ENT_MCH_PAY_PASSAGE_LIST = "ENT_MCH_PAY_PASSAGE_LIST";
+            public const string ENT_DIVISION = "ENT_DIVISION";
             public const string ENT_DIVISION_RECORD_VIEW = "ENT_DIVISION_RECORD_VIEW";
             public const string ENT_DIVISION_RECORD_LIST = "ENT_DIVISION_RECORD_LIST";
             public const string ENT_DIVISION_RECORD_RESEND = "ENT_DIVISION_RECORD_RESEND";

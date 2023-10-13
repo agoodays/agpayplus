@@ -23,12 +23,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<MchPayInterfaceConfigController> _logger;
+        private readonly IPayInterfaceDefineService _payIfDefineService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly ISysConfigService _sysConfigService;
 
         public MchPayInterfaceConfigController(IMQSender mqSender, ILogger<MchPayInterfaceConfigController> logger, RedisUtil client,
+            IPayInterfaceDefineService payIfDefineService,
             IPayInterfaceConfigService payIfConfigService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
@@ -40,6 +42,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         {
             this.mqSender = mqSender;
             _logger = logger;
+            _payIfDefineService = payIfDefineService;
             _payIfConfigService = payIfConfigService;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
@@ -147,6 +150,29 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, mchApp.MchNo, dto.InfoId));
 
             return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 查询当前应用支持的支付接口
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <returns></returns>
+        [HttpGet, Route("ifCodes/{appId}"), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_ADD)]
+        public ApiRes GetIfCodeByAppId(string appId)
+        {
+            var mchApp = _mchAppService.GetById(appId);
+            if (mchApp == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+
+            var ifCodes = _payIfConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP, appId)
+                .Select(s => s.IfCode).ToList();
+
+            var result = _payIfDefineService.GetByIfCodes(ifCodes)
+                .Select(s => new { s.IfCode, s.IfName, s.BgColor, s.Icon });
+            return ApiRes.Ok(result);
         }
 
         [HttpGet, Route("alipayIsvsubMchAuthUrls/{mchAppId}"), AllowAnonymous, NoLog]
