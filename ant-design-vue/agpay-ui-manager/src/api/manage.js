@@ -160,6 +160,40 @@ export function getEntTree (sysType) {
   return request.request({ url: '/api/sysEnts/showTree?sysType=' + sysType, method: 'GET' })
 }
 
+/** 查询当前应用支持的支付接口 **/
+export function getIfCodeByAppId (appId) {
+  return request.request({
+    url: '/api/mch/payConfigs/ifCodes/' + appId,
+    method: 'GET'
+  }, true, true, true)
+}
+
+/** 获取渠道用户ID二维码地址 **/
+export function getChannelUserQrImgUrl (ifCode, appId, extParam) {
+  return request.request({
+    url: '/api/mchChannel/channelUserId',
+    method: 'GET',
+    params: { ifCode, appId, extParam }
+  })
+}
+
+/** 获取到webSocket的前缀 （ws://localhost） **/
+export function getWebSocketPrefix () {
+  // 获取网站域名 +  端口号
+  let domain = document.location.protocol + '//' + document.location.host
+
+  // 判断api_base_url 是否设置
+  if (process.env.VUE_APP_API_BASE_URL && process.env.VUE_APP_API_BASE_URL !== '/') {
+    domain = process.env.VUE_APP_API_BASE_URL
+  }
+
+  if (domain.startsWith('https:')) {
+    return 'wss://' + domain.replace('https://', '')
+  } else {
+    return 'ws://' + domain.replace('http://', '')
+  }
+}
+
 /** 退款接口 */
 export function payOrderRefund (payOrderId, refundAmount, refundReason) {
   return request.request({

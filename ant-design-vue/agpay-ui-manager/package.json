@@ -31,6 +31,7 @@
     "mockjs2": "1.0.8",
     "moment": "^2.24.0",
     "nprogress": "^0.2.0",
+    "reconnectingwebsocket": "^1.0.0",
     "store": "^2.0.12",
     "v-viewer": "^1.6.4",
     "vcolorpicker": "^1.1.0",
