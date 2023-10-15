@@ -15,6 +15,7 @@ using AGooday.AgPay.Manager.Api.Logs;
 using AGooday.AgPay.Manager.Api.Middlewares;
 using AGooday.AgPay.Manager.Api.Models;
 using AGooday.AgPay.Manager.Api.MQ;
+using AGooday.AgPay.Manager.Api.WebSockets;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -190,7 +191,16 @@ services.AddHostedService<MQReceiverHostedService>();
 OSSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
+//加入 WebSocket 处理服务
+builder.Services.AddSingleton<WsChannelUserIdServer>();
+
 var app = builder.Build();
+
+//加入 WebSocket 功能
+app.UseWebSockets(new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(30)
+});
 
 // Configure the HTTP request pipeline.
 app.UseCalculateExecutionTime();

@@ -1,9 +1,9 @@
-﻿using AGooday.AgPay.Merchant.Api.Attributes;
-using AGooday.AgPay.Merchant.Api.WebSockets;
+﻿using AGooday.AgPay.Manager.Api.Attributes;
+using AGooday.AgPay.Manager.Api.WebSockets;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
+namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
     [Route("api/anon/channelUserIdCallback")]
     [ApiController, AllowAnonymous, NoLog]

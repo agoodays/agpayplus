@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
         }
 
         [HttpGet, Route("channelUserId")]
-        [PermissionAuth(PermCode.MCH.ENT_MCH_TRANSFER_CHANNEL_USER)]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_TRANSFER_CHANNEL_USER, PermCode.MCH.ENT_DIVISION_RECEIVER_ADD)]
         public ApiRes ChannelUserId(string appId, string ifCode, string extParam)
         {
             var mchApp = _mchAppService.GetById(appId);
