@@ -39,6 +39,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             _mchDivisionReceiverGroupService = mchDivisionReceiverGroupService;
         }
 
+        /// <summary>
+        /// 账号组列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_GROUP_LIST)]
         public ApiPageRes<MchDivisionReceiverGroupDto> List([FromQuery] MchDivisionReceiverGroupQueryDto dto)
@@ -47,6 +52,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             return ApiPageRes<MchDivisionReceiverGroupDto>.Pages(data);
         }
 
+        /// <summary>
+        /// 账号组详情
+        /// </summary>
+        /// <param name="recordId">账号组ID</param>
+        /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_GROUP_VIEW)]
         public ApiRes Detail(long recordId)
@@ -97,7 +107,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <summary>
         /// 更新分账账号组
         /// </summary>
-        /// <param name="record"></param>
+        /// <param name="record">账号组ID</param>
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新分账账号组")]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_GROUP_EDIT)]
@@ -124,7 +134,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <summary>
         /// 删除分账账号组
         /// </summary>
-        /// <param name="recordId"></param>
+        /// <param name="recordId">账号组ID</param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpDelete, Route("{recordId}"), MethodLog("删除分账账号组")]

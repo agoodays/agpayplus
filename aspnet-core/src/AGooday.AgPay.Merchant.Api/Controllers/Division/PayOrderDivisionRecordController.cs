@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 {
     /// <summary>
-    /// 商户分账接收者账号组
+    /// 分账记录
     /// </summary>
     [Route("api/division/records")]
     [ApiController, Authorize]
@@ -37,6 +37,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             this.mqSender = mqSender;
         }
 
+        /// <summary>
+        /// 分账记录列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_LIST)]
         public ApiPageRes<PayOrderDivisionRecordDto> List([FromQuery] PayOrderDivisionRecordQueryDto dto)
@@ -46,6 +51,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             return ApiPageRes<PayOrderDivisionRecordDto>.Pages(data);
         }
 
+        /// <summary>
+        /// 分账记录详情
+        /// </summary>
+        /// <param name="recordId">分账记录ID</param>
+        /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_VIEW)]
         public ApiRes Detail(long recordId)
@@ -58,7 +68,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             return ApiRes.Ok(record);
         }
 
-
+        /// <summary>
+        /// 分账接口重试
+        /// </summary>
+        /// <param name="recordId">分账记录ID</param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
         [HttpPost, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_RESEND)]
         public ApiRes Resend(long recordId)
