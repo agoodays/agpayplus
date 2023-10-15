@@ -183,7 +183,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 // 解析订单号 和 请求参数
-                Dictionary<string, object> mutablePair = payNotifyService.ParseParams(Request, urlOrderId, IChannelNoticeService.NoticeTypeEnum.DO_RETURN);
+                Dictionary<string, object> mutablePair = payNotifyService.ParseParams(Request, urlOrderId, IChannelNoticeService.NoticeTypeEnum.DO_NOTIFY);
                 if (mutablePair == null)
                 {
                     // 解析数据失败， 响应已处理
