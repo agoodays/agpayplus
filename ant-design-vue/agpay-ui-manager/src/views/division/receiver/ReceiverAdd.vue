@@ -287,6 +287,7 @@ export default {
     },
     reset () {
       const that = this // 提前保留this
+      that.mchNo = null
       that.appId = null
       that.ifCode = null
       that.selectedReceiverGroupId = null
