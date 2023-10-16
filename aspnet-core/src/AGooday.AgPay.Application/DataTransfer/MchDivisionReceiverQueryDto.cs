@@ -47,7 +47,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 支付接口代码
         /// </summary>
-        [BindNever]
         public string IfCode { get; set; }
 
         /// <summary>
@@ -89,7 +88,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 分账状态（本系统状态，并不调用上游关联关系）: 1-正常分账, 0-暂停分账
         /// </summary>
-        public byte State { get; set; }
+        public byte? State { get; set; }
 
         /// <summary>
         /// 上游绑定返回信息，一般用作查询绑定异常时的记录

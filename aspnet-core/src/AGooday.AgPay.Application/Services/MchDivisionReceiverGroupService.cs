@@ -92,6 +92,7 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.ReceiverGroupName) || w.ReceiverGroupName.Equals(dto.ReceiverGroupName))
                 && (dto.ReceiverGroupId.Equals(0) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
+                && (!dto.AutoDivisionFlag.HasValue || w.AutoDivisionFlag.Equals(dto.AutoDivisionFlag))
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<MchDivisionReceiverGroup>.Create<MchDivisionReceiverGroupDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;

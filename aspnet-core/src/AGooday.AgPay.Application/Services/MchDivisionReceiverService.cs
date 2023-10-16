@@ -103,8 +103,9 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.ReceiverAlias) || w.ReceiverAlias.Equals(dto.ReceiverAlias))
                 && (dto.ReceiverGroupId.Equals(0) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
                 && (string.IsNullOrWhiteSpace(dto.ReceiverGroupName) || w.ReceiverGroupName.Equals(dto.ReceiverGroupName))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
+                && (!dto.State.HasValue || w.State.Equals(dto.State))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+                && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<MchDivisionReceiver>.Create<MchDivisionReceiverDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;

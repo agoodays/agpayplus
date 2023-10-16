@@ -295,6 +295,46 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
+        public List<PayInterfaceDefineDto> GetPayIfConfigsByMchNo(string mchNo)
+        {
+            // 支付定义列表
+            var defineList = _payInterfaceDefineRepository.GetAll()
+            .Where(w => w.State.Equals(CS.YES));
+            MchInfo mchInfo = _mchInfoRepository.GetById(mchNo);
+            if (mchInfo == null || mchInfo.State != CS.YES)
+            {
+                throw new BizException("商户不存在");
+            }
+
+            defineList = defineList.Where(w => ((mchInfo.Type.Equals(CS.MCH_TYPE_NORMAL) && w.IsMchMode.Equals(CS.YES))// 支持普通商户模式
+            || (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB) && w.IsIsvMode.Equals(CS.YES)))// 支持服务商模式
+            );
+
+            var isvPayConfigMap = new Dictionary<string, PayInterfaceConfigDto>();// 服务商支付参数配置集合
+            if (mchInfo.Type == CS.MCH_TYPE_ISVSUB)
+            {
+                // 商户类型为特约商户，服务商应已经配置支付参数
+                var isvConfigList = _payInterfaceConfigRepository.GetAll().Where(w => w.State.Equals(CS.YES)
+                && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
+                );
+
+                foreach (var isvConfig in isvConfigList)
+                {
+                    var config = _mapper.Map<PayInterfaceConfigDto>(isvConfig);
+                    config.MchType = mchInfo.Type;
+                    isvPayConfigMap.Add(config.IfCode, config);
+                }
+            }
+            var results = defineList.ToList()
+                .Where(w => mchInfo.Type != CS.MCH_TYPE_ISVSUB || (mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.TryGetValue(w.IfCode, out _)))
+                .Select(define =>
+                {
+                    var entity = _mapper.Map<PayInterfaceDefineDto>(define);
+                    return entity;
+                }).ToList();
+            return results;
+        }
+
         /// <summary>
         /// 查询商户app使用已正确配置了通道信息
         /// </summary>

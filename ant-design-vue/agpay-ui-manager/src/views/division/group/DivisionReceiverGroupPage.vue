@@ -7,6 +7,13 @@
             <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
             <ag-text-up :placeholder="'组ID'" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
             <ag-text-up :placeholder="'组名称'" :msg="searchData.receiverGroupName" v-model="searchData.receiverGroupName" />
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="searchData.autoDivisionFlag" placeholder="是否自动分账组" default-value="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="1">是</a-select-option>
+                <a-select-option value="0">否</a-select-option>
+              </a-select>
+            </a-form-item>
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -54,14 +61,14 @@ import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '组ID', width: '100px' },
-  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: '140px' },
-  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: '140px' },
-  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: '140px' },
-  { key: 'autoDivisionFlag', dataIndex: 'autoDivisionFlag', title: '自动分账组', width: '80px', customRender: (text, record, index) => text === 1 ? '是' : '否' },
-  { key: 'createdBy', dataIndex: 'createdBy', title: '创建人', width: '120px' },
-  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: '200px' },
-  { key: 'op', title: '操作', width: '200px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '组ID', width: 100 },
+  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: 140 },
+  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140 },
+  { key: 'autoDivisionFlag', dataIndex: 'autoDivisionFlag', title: '自动分账组', width: 120, customRender: (text, record, index) => text === 1 ? '是' : '否' },
+  { key: 'createdBy', dataIndex: 'createdBy', title: '创建人', width: 120 },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
+  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

@@ -16,6 +16,14 @@
                 <a-select-option value="0">暂停分账</a-select-option>
               </a-select>
             </a-form-item>
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="searchData.ifCode" placeholder="支付接口">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option v-for="(item) in ifDefineList" :key="item.ifCode" >
+                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"><img class="icon" :src="item.icon" alt=""></span> {{ item.ifName }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchFunc" icon="search" :loading="btnLoading">查询</a-button>
               <a-button style="margin-left: 8px;" @click="() => this.searchData = {}" icon="reload">重置</a-button>
@@ -27,7 +35,7 @@
       <!-- 列表渲染 -->
       <AgTable
         ref="infoTable"
-        :initData="false"
+        :initData="true"
         :reqTableDataFunc="reqTableDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
@@ -41,16 +49,14 @@
         </template>
         <!-- 渠道类型 -->
         <template slot="ifCodeSlot" slot-scope="{record}">
-          <template v-if="record.ifCode === 'wxpay'" ><span style="color: green"><a-icon type="wechat" /> 微信</span></template>
-          <template v-else-if="record.ifCode == 'alipay'" ><span style="color: dodgerblue"><a-icon type="alipay-circle" /> 支付宝</span></template>
-          <template v-else >{{record.ifCode}}</template>
+          <span class="icon-style" :style="{ backgroundColor: ifDefineList.find(f => f.ifCode === record.ifCode).bgColor }">
+            <img class="icon" :src="ifDefineList.find(f => f.ifCode === record.ifCode).icon" alt="">
+          </span> {{ ifDefineList.find(f => f.ifCode === record.ifCode).ifName }}
         </template>
 
         <!-- 状态（本系统） -->
         <template slot="stateSlot" slot-scope="{record}">
-          <div v-if="record.state == 0" ><a-badge status="error" text="暂停分账" /></div>
-          <div v-else-if="record.state == 1" ><a-badge status="processing" text="正常分账" /></div>
-          <div v-else ><a-badge status="warning" text="未知" /></div>
+          <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'暂停分账':'正常分账'" />
         </template>
 
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
@@ -69,7 +75,7 @@
 <script>
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_DIVISION_RECEIVER, req } from '@/api/manage'
+import { API_URL_DIVISION_RECEIVER, API_URL_IFDEFINES_LIST, req } from '@/api/manage'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import ReceiverAdd from './ReceiverAdd'
 import ReceiverEdit from './ReceiverEdit'
@@ -77,13 +83,13 @@ import ReceiverEdit from './ReceiverEdit'
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'receiverId', dataIndex: 'receiverId', title: '接收方绑定ID', width: '125px' },
-  { key: 'ifCode', title: '支付接口', width: '140px', scopedSlots: { customRender: 'ifCodeSlot' } },
+  { key: 'ifCode', title: '支付接口', width: '200px', scopedSlots: { customRender: 'ifCodeSlot' } },
   { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名', width: '140px' },
   { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: '140px' },
   { key: 'accNo', dataIndex: 'accNo', title: '分账接收账号', width: '200px' },
   { key: 'accName', dataIndex: 'accName', title: '分账接收账号名称', width: '230px' },
   { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '分账关系类型', width: '140px' },
-  { key: 'state', dataIndex: 'state', title: '状态', width: '80px', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'state', dataIndex: 'state', title: '状态', width: '120px', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
   { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间', width: '200px' },
   { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', width: '160px', customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
   { key: 'op', title: '操作', width: '200px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
@@ -97,15 +103,24 @@ export default {
       searchData: { appId: '' },
       btnLoading: false,
 
-      mchAppList: [] // 商户app列表
+      ifDefineList: []
     }
   },
   mounted () {
+    this.reqIfDefineListFunc()
   },
   methods: {
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_DIVISION_RECEIVER, params)
+    },
+    // 请求支付接口定义数据
+    reqIfDefineListFunc: function () {
+      const that = this // 提前保留this
+      req.list(API_URL_IFDEFINES_LIST, { 'state': 1 }).then(res => {
+        console.log(res)
+        that.ifDefineList = res
+      })
     },
     searchFunc: function () { // 点击【查询】按钮点击事件
       this.btnLoading = true // 打开查询按钮上的loading
@@ -121,3 +136,15 @@ export default {
   }
 }
 </script>
+<style lang="less">
+  .icon-style {
+    border-radius: 5px;
+    padding-left: 2px;
+    padding-right: 2px
+  }
+  .icon {
+    width: 15px;
+    height: 14px;
+    margin-bottom: 3px
+  }
+</style>

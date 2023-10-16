@@ -21,6 +21,7 @@ namespace AGooday.AgPay.Application.Interfaces
         List<PayInterfaceDefineDto> SelectAllPayIfConfigListByIsvNo(string infoType, string infoId);
         List<PayInterfaceDefineDto> SelectAllPayIfConfigListByAppId(string appId);
         List<PayInterfaceDefineDto> PayIfConfigList(string infoType, string configMode, string infoId, string ifName, string ifCode);
+        List<PayInterfaceDefineDto> GetPayIfConfigsByMchNo(string mchNo);
         /// <summary>
         /// 根据 账户类型、账户号、接口类型 获取支付参数配置
         /// </summary>

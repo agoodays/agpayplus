@@ -26,8 +26,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 自动分账组（当订单分账模式为自动分账，改组将完成分账逻辑） 0-否 1-是
         /// </summary>
-        [BindNever]
-        public byte AutoDivisionFlag { get; set; }
+        public byte? AutoDivisionFlag { get; set; }
 
         /// <summary>
         /// 创建者用户ID

@@ -10,7 +10,6 @@ using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {

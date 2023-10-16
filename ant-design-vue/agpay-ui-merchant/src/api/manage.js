@@ -121,6 +121,8 @@ export const API_URL_DIVISION_RECEIVER = '/api/divisionReceivers'
 /** 分账记录管理 **/
 export const API_URL_PAY_ORDER_DIVISION_RECORD_LIST = '/api/division/records'
 
+export const API_URL_IFDEFINES_LIST = '/api/payIfDefines'
+
 /** 商户配置 **/
 export const API_URL_MCH_CONFIG = 'api/mchConfig'
 

@@ -40,9 +40,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_LIST)]
-        public ApiRes List()
+        public ApiRes List(byte? state)
         {
-            var data = _payIfDefineService.GetAll().OrderByDescending(o => o.CreatedAt);
+            var data = _payIfDefineService.GetAll()
+                .Where(w => !state.HasValue || w.State.Equals(state))
+                .OrderByDescending(o => o.CreatedAt);
             return ApiRes.Ok(data);
         }
 
