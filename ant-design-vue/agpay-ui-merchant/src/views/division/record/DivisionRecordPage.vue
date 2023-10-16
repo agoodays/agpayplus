@@ -4,15 +4,8 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
-                @change="onChange"
-                :show-time="{ format: 'HH:mm:ss' }"
-                format="YYYY-MM-DD HH:mm:ss"
-                :disabled-date="disabledDate"
-              >
-                <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
+            <a-form-item label="" class="table-head-layout">
+              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
             </a-form-item>
             <ag-text-up placeholder="分账接受者ID" :msg="searchData.receiverId" v-model="searchData.receiverId" />
             <ag-text-up placeholder="分账账号组ID" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
@@ -76,6 +69,7 @@
 </template>
 <script>
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_PAY_ORDER_DIVISION_RECORD_LIST, req, resendDivision } from '@/api/manage'
@@ -84,29 +78,31 @@ import Detail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'calDivisionAmount', title: '分账金额', scopedSlots: { customRender: 'amountSlot' } },
-  { key: 'batchOrderId', dataIndex: 'batchOrderId', title: '分账批次号' },
-  { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
-  { key: 'ifCode', dataIndex: 'ifCode', title: '接口代码' },
-  { key: 'payOrderAmount', dataIndex: 'payOrderAmount', title: '订单金额', customRender: (text) => (text / 100).toFixed(2) },
-  { key: 'payOrderDivisionAmount', dataIndex: 'payOrderDivisionAmount', title: '分账基数', customRender: (text) => (text / 100).toFixed(2) },
-  { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名' },
-  { key: 'accNo', dataIndex: 'accNo', title: '接收账号' },
-  { key: 'accName', dataIndex: 'accName', title: '账号姓名' },
-  { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '分账关系类型' },
-  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '分账比例', customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
-  { key: 'state', title: '分账状态', scopedSlots: { customRender: 'stateSlot' } },
-  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期' },
+  { key: 'calDivisionAmount', title: '分账金额', width: 108, scopedSlots: { customRender: 'amountSlot' } },
+  { key: 'batchOrderId', dataIndex: 'batchOrderId', title: '分账批次号', width: 120 },
+  { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号', width: 220 },
+  { key: 'ifCode', dataIndex: 'ifCode', title: '接口代码', width: 220 },
+  { key: 'payOrderAmount', dataIndex: 'payOrderAmount', title: '订单金额', width: 108, customRender: (text) => (text / 100).toFixed(2) },
+  { key: 'payOrderDivisionAmount', dataIndex: 'payOrderDivisionAmount', title: '分账基数', width: 108, customRender: (text) => (text / 100).toFixed(2) },
+  { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名', width: 120 },
+  { key: 'accNo', dataIndex: 'accNo', title: '接收账号', width: 120 },
+  { key: 'accName', dataIndex: 'accName', title: '账号姓名', width: 120 },
+  { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '分账关系类型', width: 120 },
+  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '分账比例', width: 108, customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
+  { key: 'state', title: '分账状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
   { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {
-  components: { AgTable, AgTableColumns, AgTextUp, Detail },
+  components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, Detail },
   data () {
     return {
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {},
+      searchData: {
+        queryDateRange: 'today'
+      },
       createdStart: '', // 选择开始时间
       createdEnd: '' // 选择结束时间
     }

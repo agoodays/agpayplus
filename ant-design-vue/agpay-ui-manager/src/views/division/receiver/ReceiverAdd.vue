@@ -13,6 +13,11 @@
     <a-form-model>
       <a-row justify="space-between" style="margin-left: -20px; margin-right: -20px; row-gap: 0px;">
         <a-col :span="6" style="padding-left: 20px; padding-right: 20px;">
+          <a-form-model-item label="商户号">
+            <a-input v-model="mchNo" placeholder="商户号" @change="changeMchNo"/>
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="6" style="padding-left: 20px; padding-right: 20px;">
           <a-form-model-item label="选择商户应用">
             <div style="display: flex;">
               <a-select v-model="appId" placeholder="应用ID" @change="changeAppId">
@@ -262,9 +267,10 @@ export default {
   data () {
     return {
       visible: false, // 是否显示抽屉
+      mchNo: null, // 商户号
       appId: null, // 应用app信息
       ifCode: null, // 应用app信息
-      selectedReceiverGroupId: '', // 当前选择的分组ID
+      selectedReceiverGroupId: null, // 当前选择的分组ID
       accTableColumns: accTableColumns, // 表头模板（微信支付宝公用）
 
       mchAppList: [], // 商户app列表
@@ -276,13 +282,34 @@ export default {
   methods: {
     // 弹层打开事件
     show () {
+      this.reset()
+      this.visible = true // 显示弹层
+    },
+    reset () {
       const that = this // 提前保留this
-
-      this.appSupportIfCodes = [] // 初始化
-      this.receiverTableData = [] // 置空表格
-
+      that.appId = null
+      that.ifCode = null
+      that.selectedReceiverGroupId = null
+      that.mchAppList = []
+      that.allReceiverGroup = []
+      that.appSupportIfCodes = [] // 初始化
+      that.receiverTableData = [] // 置空表格
+    },
+    // 变更 mchNo的事件
+    changeMchNo (e) {
+      const that = this // 提前保留this
+      const value = e.target.value
+      if (!value) {
+        that.reset()
+        return
+      }
+      that.getMchApp(value)
+      that.getReceiverGroup(value)
+    },
+    getMchApp: function (mchNo) {
+      const that = this // 提前保留this
       // 请求接口，获取所有的appid，只有此处进行pageSize=-1传参
-      req.list(API_URL_MCH_APP, { pageSize: -1 }).then(res => {
+      req.list(API_URL_MCH_APP, { pageSize: -1, mchNo: mchNo }).then(res => {
         that.mchAppList = res.records
 
         // 默认选中第一个 & 更新列表
@@ -291,15 +318,11 @@ export default {
           that.changeAppId(that.appId)
         }
       })
-
-      that.getReceiverGroup()
-
-      this.visible = true // 显示弹层
     },
-    getReceiverGroup: function () {
+    getReceiverGroup: function (mchNo) {
       const that = this // 提前保留this
       // 请求接口，获取所有分组信息，只有此处进行pageSize=-1传参
-      req.list(API_URL_DIVISION_RECEIVER_GROUP, { pageSize: -1 }).then(res => {
+      req.list(API_URL_DIVISION_RECEIVER_GROUP, { pageSize: -1, mchNo: mchNo }).then(res => {
         that.allReceiverGroup = res.records
         if (that.allReceiverGroup && that.allReceiverGroup.length > 0) { // 默认选中第一个 & 更新列表
           that.selectedReceiverGroupId = that.allReceiverGroup[0].receiverGroupId

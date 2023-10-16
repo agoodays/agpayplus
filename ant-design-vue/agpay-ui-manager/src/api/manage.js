@@ -106,6 +106,14 @@ export const API_URL_PAY_ORDER_LIST = '/api/payOrder'
 export const API_URL_REFUND_ORDER_LIST = '/api/refundOrder'
 /** 商户通知管理 **/
 export const API_URL_MCH_NOTIFY_LIST = '/api/mchNotify'
+
+/** 分账组管理 **/
+export const API_URL_DIVISION_RECEIVER_GROUP = '/api/divisionReceiverGroups'
+/** 分账账号管理 **/
+export const API_URL_DIVISION_RECEIVER = '/api/divisionReceivers'
+/** 分账记录管理 **/
+export const API_URL_PAY_ORDER_DIVISION_RECORD_LIST = '/api/division/records'
+
 /** 系统日志 **/
 export const API_URL_SYS_LOG = 'api/sysLog'
 /** 系统配置 **/

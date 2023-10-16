@@ -1,14 +1,17 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Division
 {
@@ -49,6 +52,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         public ApiPageRes<MchDivisionReceiverGroupDto> List([FromQuery] MchDivisionReceiverGroupQueryDto dto)
         {
             var data = _mchDivisionReceiverGroupService.GetPaginatedData(dto);
+            foreach (var item in data)
+            {
+                var mchInfo = _mchInfoService.GetById(item.MchNo);
+                if (mchInfo != null)
+                {
+                    item.AddExt("mchName", mchInfo.MchName);
+                }
+            }
             return ApiPageRes<MchDivisionReceiverGroupDto>.Pages(data);
         }
 

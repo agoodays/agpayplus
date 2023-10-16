@@ -1,9 +1,11 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using AGooday.AgPay.Common.Models;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 分账账号组
     /// </summary>
-    public class MchDivisionReceiverGroupDto
+    public class MchDivisionReceiverGroupDto : BaseModel
     {
         /// <summary>
         /// 组ID

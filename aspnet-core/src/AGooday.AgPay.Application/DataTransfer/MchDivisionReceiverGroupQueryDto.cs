@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// <summary>
     /// 分账账号组
     /// </summary>
-    public class MchDivisionReceiverGroupQueryDto : PageQuery
+    public class MchDivisionReceiverGroupQueryDto : DatePageQuery
     {
         /// <summary>
         /// 组ID

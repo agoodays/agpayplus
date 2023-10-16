@@ -4,12 +4,8 @@
       <div v-if="$access('ENT_DIVISION_RECEIVER_LIST')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" :wrapper-col="{span: 16}">
-              <a-select v-model="searchData.appId" placeholder="选择应用">
-                <a-select-option key="" >全部应用</a-select-option>
-                <a-select-option v-for="(item) in mchAppList" :key="item.appId" >{{ item.appName }} [{{ item.appId }}]</a-select-option>
-              </a-select>
-            </a-form-item>
+            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+            <ag-text-up placeholder="应用ID[精准]" :msg="searchData.appId" v-model="searchData.appId" />
             <ag-text-up placeholder="分账接收者ID[精准]" :msg="searchData.receiverId" v-model="searchData.receiverId" />
             <ag-text-up placeholder="接收者账号别名[模糊]" :msg="searchData.receiverAlias" v-model="searchData.receiverAlias" />
             <ag-text-up placeholder="组ID[精准]" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
@@ -73,23 +69,23 @@
 <script>
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_DIVISION_RECEIVER, API_URL_MCH_APP, req } from '@/api/manage'
+import { API_URL_DIVISION_RECEIVER, req } from '@/api/manage'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import ReceiverAdd from './ReceiverAdd'
 import ReceiverEdit from './ReceiverEdit'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'receiverId', dataIndex: 'receiverId', title: '绑定ID' },
-  { key: 'ifCode', title: '渠道类型', scopedSlots: { customRender: 'ifCodeSlot' } },
-  { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名' },
-  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称' },
-  { key: 'accNo', dataIndex: 'accNo', title: '分账接收账号' },
-  { key: 'accName', dataIndex: 'accName', title: '分账接收账号名称' },
-  { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '分账关系类型' },
-  { key: 'state', dataIndex: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
-  { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间' },
-  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
+  { key: 'receiverId', dataIndex: 'receiverId', title: '接收方绑定ID', width: '125px' },
+  { key: 'ifCode', title: '支付接口', width: '140px', scopedSlots: { customRender: 'ifCodeSlot' } },
+  { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名', width: '140px' },
+  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: '140px' },
+  { key: 'accNo', dataIndex: 'accNo', title: '分账接收账号', width: '200px' },
+  { key: 'accName', dataIndex: 'accName', title: '分账接收账号名称', width: '230px' },
+  { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '分账关系类型', width: '140px' },
+  { key: 'state', dataIndex: 'state', title: '状态', width: '80px', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间', width: '200px' },
+  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', width: '160px', customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
   { key: 'op', title: '操作', width: '200px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
@@ -105,17 +101,6 @@ export default {
     }
   },
   mounted () {
-    const that = this // 提前保留this
-    // 请求接口，获取所有的appid，只有此处进行pageSize=-1传参
-    req.list(API_URL_MCH_APP, { pageSize: -1 }).then(res => {
-      that.mchAppList = res.records
-
-      // 默认选中第一个 & 更新列表
-      if (that.mchAppList && that.mchAppList.length > 0) {
-        that.searchData.appId = that.mchAppList[0].appId + ''
-        that.searchFunc()
-      }
-    })
   },
   methods: {
     // 请求table接口数据
@@ -127,9 +112,6 @@ export default {
       this.$refs.infoTable.refTable(true)
     },
     addFunc: function () { // 业务通用【新增】 函数
-      if (this.mchAppList.length <= 0) {
-        return this.$message.error('当前商户无任何应用，请先创建应用后再试。')
-      }
       // 打开弹层
       this.$refs.receiverAdd.show()
     },

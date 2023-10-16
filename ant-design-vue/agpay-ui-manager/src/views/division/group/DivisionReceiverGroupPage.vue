@@ -4,6 +4,7 @@
       <div v-if="$access('ENT_DIVISION_RECEIVER_GROUP_LIST')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
+            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
             <ag-text-up :placeholder="'组ID'" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
             <ag-text-up :placeholder="'组名称'" :msg="searchData.receiverGroupName" v-model="searchData.receiverGroupName" />
             <span class="table-page-search-submitButtons">
@@ -53,11 +54,13 @@ import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '组ID' },
-  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称' },
-  { key: 'autoDivisionFlag', dataIndex: 'autoDivisionFlag', title: '自动分账组', customRender: (text, record, index) => text === 1 ? '是' : '否' },
-  { key: 'createdBy', dataIndex: 'createdBy', title: '创建人' },
-  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间' },
+  { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '组ID', width: '100px' },
+  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: '140px' },
+  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: '140px' },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: '140px' },
+  { key: 'autoDivisionFlag', dataIndex: 'autoDivisionFlag', title: '自动分账组', width: '80px', customRender: (text, record, index) => text === 1 ? '是' : '否' },
+  { key: 'createdBy', dataIndex: 'createdBy', title: '创建人', width: '120px' },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: '200px' },
   { key: 'op', title: '操作', width: '200px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 

@@ -1,6 +1,9 @@
 <template>
   <a-modal v-model="isShow" :title=" isAdd ? '新增账号组' : '修改账号组' " @ok="handleOkFunc" :confirmLoading="confirmLoading">
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 6}" :wrapper-col="{span: 15}" :rules="rules">
+      <a-form-model-item label="商户号" prop="mchNo">
+        <a-input v-model="saveObject.mchNo" placeholder="请输入" :disabled="!isAdd" />
+      </a-form-model-item>
       <a-form-model-item label="组名称：" prop="receiverGroupName">
         <a-input v-model="saveObject.receiverGroupName" />
       </a-form-model-item>
