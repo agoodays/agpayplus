@@ -59,7 +59,7 @@
       <!-- 签名配置板块 -->
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
-          <a-divider orientation="left" color="rgb(26, 102, 255)">
+          <a-divider orientation="left" style="color: rgb(26, 102, 255);">
             签名配置
 <!--            <a-tag color="rgb(26, 102, 255)">
               签名配置

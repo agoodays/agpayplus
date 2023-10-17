@@ -47,18 +47,20 @@
             <a-button v-if="$access('ENT_DIVISION_RECEIVER_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
           </div>
         </template>
+        <template slot="receiverIdSlot" slot-scope="{record}">
+          <b v-if="!$access('ENT_DIVISION_RECEIVER_VIEW')">{{ record.receiverId }}</b>
+          <a v-if="$access('ENT_DIVISION_RECEIVER_VIEW')" @click="detailFunc(record.receiverId)"><b>{{ record.receiverId }}</b></a>
+        </template>
         <!-- 渠道类型 -->
         <template slot="ifCodeSlot" slot-scope="{record}">
           <span class="icon-style" :style="{ backgroundColor: ifDefineList.find(f => f.ifCode === record.ifCode).bgColor }">
             <img class="icon" :src="ifDefineList.find(f => f.ifCode === record.ifCode).icon" alt="">
           </span> {{ ifDefineList.find(f => f.ifCode === record.ifCode).ifName }}[{{ ifDefineList.find(f => f.ifCode === record.ifCode).ifCode }}]
         </template>
-
         <!-- 状态（本系统） -->
         <template slot="stateSlot" slot-scope="{record}">
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'暂停分账':'正常分账'" />
         </template>
-
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a v-if="$access('ENT_DIVISION_RECEIVER_EDIT')" @click="editFunc(record.receiverId)">修改</a>
@@ -69,6 +71,7 @@
       <ReceiverAdd ref="receiverAdd" :callbackFunc="searchFunc"/>
       <!-- 修改 页面组件  -->
       <ReceiverEdit ref="receiverEdit" :callbackFunc="searchFunc"/>
+      <Detail ref="recordDetail" />
     </a-card>
   </page-header-wrapper>
 </template>
@@ -79,15 +82,16 @@ import { API_URL_DIVISION_RECEIVER, API_URL_IFDEFINES_LIST, req } from '@/api/ma
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import ReceiverAdd from './ReceiverAdd'
 import ReceiverEdit from './ReceiverEdit'
+import Detail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'receiverId', dataIndex: 'receiverId', title: '接收方绑定ID', width: 125 },
+  { key: 'receiverId', title: '接收方绑定ID', width: 125, scopedSlots: { customRender: 'receiverIdSlot' } },
   { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名', width: 140 },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
   { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140 },
   { key: 'appId', dataIndex: 'appId', title: '应用ID', width: 225 },
-  { key: 'ReceiverGroupId', dataIndex: 'ReceiverGroupId', title: '组ID', width: 140 },
+  { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '组ID', width: 100 },
   { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: 140 },
   { key: 'ifCode', title: '支付接口', width: 200, scopedSlots: { customRender: 'ifCodeSlot' } },
   { key: 'accNo', dataIndex: 'accNo', title: '分账接收账号', width: 200 },
@@ -102,7 +106,7 @@ const tableColumns = [
 ]
 
 export default {
-  components: { AgTable, AgTableColumns, AgTextUp, ReceiverAdd, ReceiverEdit },
+  components: { AgTable, AgTableColumns, AgTextUp, ReceiverAdd, ReceiverEdit, Detail },
   data () {
     return {
       tableColumns: tableColumns,
@@ -135,6 +139,9 @@ export default {
     addFunc: function () { // 业务通用【新增】 函数
       // 打开弹层
       this.$refs.receiverAdd.show()
+    },
+    detailFunc: function (recordId) {
+      this.$refs.recordDetail.show(recordId)
     },
     editFunc: function (recordId) { // 业务通用【修改】 函数
       this.$refs.receiverEdit.show(recordId)
