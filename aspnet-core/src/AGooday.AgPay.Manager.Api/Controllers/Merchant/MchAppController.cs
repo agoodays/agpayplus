@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 //var jitem = JObject.FromObject(item);
                 //jitem["mchType"] = mchInfos.First(s => s.MchNo == item.MchNo).Type;
                 //records.Add(jitem);
-                item.AddExt("mchType", mchInfos.First(s => s.MchNo == item.MchNo).Type);
+                item.AddExt("mchType", mchInfos?.FirstOrDefault(s => s.MchNo == item.MchNo)?.Type);
             }
             return ApiPageRes<MchAppDto>.Pages(data);
         }

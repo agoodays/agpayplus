@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             var mchInfos = _mchInfoService.GetByMchNos(mchNos);
             foreach (var item in data)
             {
-                item.AddExt("mchName", mchInfos.First(s => s.MchNo == item.MchNo).MchName);
+                item.AddExt("mchName", mchInfos?.FirstOrDefault(s => s.MchNo == item.MchNo)?.MchName);
             }
             return ApiPageRes<PayOrderDivisionRecordDto>.Pages(data);
         }
