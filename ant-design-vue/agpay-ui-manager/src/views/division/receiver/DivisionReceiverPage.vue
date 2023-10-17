@@ -20,7 +20,7 @@
               <a-select v-model="searchData.ifCode" placeholder="支付接口">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option v-for="(item) in ifDefineList" :key="item.ifCode" >
-                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"><img class="icon" :src="item.icon" alt=""></span> {{ item.ifName }}
+                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"><img class="icon" :src="item.icon" alt=""></span> {{ item.ifName }}[{{ item.ifCode }}]
                 </a-select-option>
               </a-select>
             </a-form-item>
@@ -51,7 +51,7 @@
         <template slot="ifCodeSlot" slot-scope="{record}">
           <span class="icon-style" :style="{ backgroundColor: ifDefineList.find(f => f.ifCode === record.ifCode).bgColor }">
             <img class="icon" :src="ifDefineList.find(f => f.ifCode === record.ifCode).icon" alt="">
-          </span> {{ ifDefineList.find(f => f.ifCode === record.ifCode).ifName }}
+          </span> {{ ifDefineList.find(f => f.ifCode === record.ifCode).ifName }}[{{ ifDefineList.find(f => f.ifCode === record.ifCode).ifCode }}]
         </template>
 
         <!-- 状态（本系统） -->
@@ -82,17 +82,23 @@ import ReceiverEdit from './ReceiverEdit'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'receiverId', dataIndex: 'receiverId', title: '接收方绑定ID', width: '125px' },
-  { key: 'ifCode', title: '支付接口', width: '200px', scopedSlots: { customRender: 'ifCodeSlot' } },
-  { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名', width: '140px' },
-  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: '140px' },
-  { key: 'accNo', dataIndex: 'accNo', title: '分账接收账号', width: '200px' },
-  { key: 'accName', dataIndex: 'accName', title: '分账接收账号名称', width: '230px' },
-  { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '分账关系类型', width: '140px' },
-  { key: 'state', dataIndex: 'state', title: '状态', width: '120px', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
-  { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间', width: '200px' },
-  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', width: '160px', customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
-  { key: 'op', title: '操作', width: '200px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'receiverId', dataIndex: 'receiverId', title: '接收方绑定ID', width: 125 },
+  { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名', width: 140 },
+  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140 },
+  { key: 'appId', dataIndex: 'appId', title: '应用ID', width: 225 },
+  { key: 'ReceiverGroupId', dataIndex: 'ReceiverGroupId', title: '组ID', width: 140 },
+  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: 140 },
+  { key: 'ifCode', title: '支付接口', width: 200, scopedSlots: { customRender: 'ifCodeSlot' } },
+  { key: 'accNo', dataIndex: 'accNo', title: '分账接收账号', width: 200 },
+  { key: 'accName', dataIndex: 'accName', title: '分账接收账号名称', width: 260 },
+  { key: 'channelAccNo', dataIndex: 'channelAccNo', title: '渠道账号', width: 230 },
+  { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '分账关系类型', width: 140 },
+  { key: 'state', dataIndex: 'state', title: '状态', width: 120, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', width: 160, customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
+  { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间', width: 200 },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
+  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

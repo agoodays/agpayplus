@@ -1,9 +1,11 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using AGooday.AgPay.Common.Models;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 商户分账接收者账号绑定关系表
     /// </summary>
-    public class MchDivisionReceiverDto
+    public class MchDivisionReceiverDto : BaseModel
     {
         /// <summary>
         /// 分账接收者ID
@@ -36,7 +38,7 @@
         public string IsvNo { get; set; }
 
         /// <summary>
-        /// 应用iD
+        /// 应用ID
         /// </summary>
         public string AppId { get; set; }
 
@@ -79,6 +81,11 @@
         /// 分账状态（本系统状态，并不调用上游关联关系）: 1-正常分账, 0-暂停分账
         /// </summary>
         public byte State { get; set; }
+
+        /// <summary>
+        /// 渠道账号信息
+        /// </summary>
+        public string ChannelAccNo { get; set; }
 
         /// <summary>
         /// 上游绑定返回信息，一般用作查询绑定异常时的记录

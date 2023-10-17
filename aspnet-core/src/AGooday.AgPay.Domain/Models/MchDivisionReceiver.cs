@@ -114,21 +114,28 @@ namespace AGooday.AgPay.Domain.Models
         /// 分账状态（本系统状态，并不调用上游关联关系）: 1-正常分账, 0-暂停分账
         /// </summary>
         [Comment("分账状态（本系统状态，并不调用上游关联关系）: 1-正常分账, 0-暂停分账")]
-        [Required, Column("state", TypeName = "tinyint(6)")]
+        [Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
+
+        /// <summary>
+        /// 渠道账号信息
+        /// </summary>
+        [Comment("渠道账号信息")]
+        [Column("channel_acc_no", TypeName = "text")]
+        public string ChannelAccNo { get; set; }
 
         /// <summary>
         /// 上游绑定返回信息，一般用作查询绑定异常时的记录
         /// </summary>
         [Comment("上游绑定返回信息，一般用作查询绑定异常时的记录")]
-        [Required, Column("channel_bind_result", TypeName = "text")]
+        [Column("channel_bind_result", TypeName = "text")]
         public string ChannelBindResult { get; set; }
 
         /// <summary>
         /// 渠道特殊信息
         /// </summary>
         [Comment("渠道特殊信息")]
-        [Required, Column("channel_ext_info", TypeName = "text")]
+        [Column("channel_ext_info", TypeName = "text")]
         public string ChannelExtInfo { get; set; }
 
         /// <summary>

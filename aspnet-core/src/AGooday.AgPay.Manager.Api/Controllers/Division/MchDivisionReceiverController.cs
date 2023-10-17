@@ -55,6 +55,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         public ApiPageRes<MchDivisionReceiverDto> List([FromQuery] MchDivisionReceiverQueryDto dto)
         {
             var data = _mchDivisionReceiverService.GetPaginatedData(dto);
+            var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
+            var mchInfos = _mchInfoService.GetByMchNos(mchNos);
+            foreach (var item in data)
+            {
+                item.AddExt("mchName", mchInfos.First(s => s.MchNo == item.MchNo).MchName);
+            }
             return ApiPageRes<MchDivisionReceiverDto>.Pages(data);
         }
 

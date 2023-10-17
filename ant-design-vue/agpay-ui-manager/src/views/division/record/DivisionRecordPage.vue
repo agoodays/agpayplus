@@ -13,7 +13,6 @@
             <ag-text-up placeholder="分账接受者ID" :msg="searchData.receiverId" v-model="searchData.receiverId" />
             <ag-text-up placeholder="分账账号组ID" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
             <ag-text-up placeholder="分账接收账号" :msg="searchData.accNo" v-model="searchData.accNo"/>
-
             <a-form-item label="" class="table-head-layout">
               <a-select v-model="searchData.state" placeholder="分账状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
@@ -23,7 +22,14 @@
                 <a-select-option value="3">已受理</a-select-option>
               </a-select>
             </a-form-item>
-
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="searchData.ifCode" placeholder="支付接口">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option v-for="(item) in ifDefineList" :key="item.ifCode" >
+                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"><img class="icon" :src="item.icon" alt=""></span> {{ item.ifName }}[{{ item.ifCode }}]
+                </a-select-option>
+              </a-select>
+            </a-form-item>
             <span class="table-page-search-submitButtons">
               <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">搜索</a-button>
               <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
@@ -73,7 +79,7 @@ import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_PAY_ORDER_DIVISION_RECORD_LIST, req, resendDivision } from '@/api/manage'
+import { API_URL_PAY_ORDER_DIVISION_RECORD_LIST, API_URL_IFDEFINES_LIST, req, resendDivision } from '@/api/manage'
 import moment from 'moment'
 import Detail from './Detail'
 
@@ -104,6 +110,7 @@ export default {
       searchData: {
         queryDateRange: 'today'
       },
+      ifDefineList: [],
       createdStart: '', // 选择开始时间
       createdEnd: '' // 选择结束时间
     }
@@ -111,6 +118,7 @@ export default {
   computed: {
   },
   mounted () {
+    this.reqIfDefineListFunc()
   },
   methods: {
     queryFunc () {
@@ -120,6 +128,14 @@ export default {
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_PAY_ORDER_DIVISION_RECORD_LIST, params)
+    },
+    // 请求支付接口定义数据
+    reqIfDefineListFunc: function () {
+      const that = this // 提前保留this
+      req.list(API_URL_IFDEFINES_LIST, { 'state': 1 }).then(res => {
+        console.log(res)
+        that.ifDefineList = res
+      })
     },
     searchFunc: function () { // 点击【查询】按钮点击事件
       this.$refs.infoTable.refTable(true)

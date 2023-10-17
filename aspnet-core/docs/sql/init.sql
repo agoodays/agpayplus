@@ -441,6 +441,7 @@ CREATE TABLE `t_mch_division_receiver` (
   `relation_type_name` VARCHAR(30) NOT NULL COMMENT '当选择自定义时，需要录入该字段。 否则为对应的名称',
   `division_profit` DECIMAL(20,6) COMMENT '分账比例',
   `state` TINYINT(6) NOT NULL COMMENT '分账状态（本系统状态，并不调用上游关联关系）: 1-正常分账, 0-暂停分账',
+  `channel_acc_no` TEXT COMMENT '渠道账号信息',
   `channel_bind_result` TEXT COMMENT '上游绑定返回信息，一般用作查询账号异常时的记录',
   `channel_ext_info` TEXT COMMENT '渠道特殊信息',
   `bind_success_time` DATETIME DEFAULT NULL COMMENT '绑定成功时间',

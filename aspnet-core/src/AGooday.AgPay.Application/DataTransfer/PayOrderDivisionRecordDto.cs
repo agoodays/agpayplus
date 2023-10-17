@@ -1,9 +1,11 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using AGooday.AgPay.Common.Models;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 分账记录表
     /// </summary>
-    public class PayOrderDivisionRecordDto
+    public class PayOrderDivisionRecordDto : BaseModel
     {
         /// <summary>
         /// 分账记录ID

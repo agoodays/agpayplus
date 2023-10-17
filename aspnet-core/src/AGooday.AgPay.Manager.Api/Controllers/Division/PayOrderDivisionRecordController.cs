@@ -23,9 +23,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
     {
         private readonly IMQSender mqSender;
         private readonly ILogger<PayOrderDivisionRecordController> _logger;
+        private readonly IMchInfoService _mchInfoService;
         private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
 
-        public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger,
+        public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger, 
+            IMchInfoService mchInfoService,
             IPayOrderDivisionRecordService payOrderDivisionRecordService, RedisUtil client,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
@@ -33,6 +35,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             _logger = logger;
+            _mchInfoService = mchInfoService;
             _payOrderDivisionRecordService = payOrderDivisionRecordService;
             this.mqSender = mqSender;
         }
@@ -47,6 +50,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         public ApiPageRes<PayOrderDivisionRecordDto> List([FromQuery] PayOrderDivisionRecordQueryDto dto)
         {
             var data = _payOrderDivisionRecordService.GetPaginatedData(dto);
+            var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
+            var mchInfos = _mchInfoService.GetByMchNos(mchNos);
+            foreach (var item in data)
+            {
+                item.AddExt("mchName", mchInfos.First(s => s.MchNo == item.MchNo).MchName);
+            }
             return ApiPageRes<PayOrderDivisionRecordDto>.Pages(data);
         }
 

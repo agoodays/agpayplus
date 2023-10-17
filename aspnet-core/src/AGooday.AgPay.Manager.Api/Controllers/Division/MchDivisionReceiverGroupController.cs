@@ -52,13 +52,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         public ApiPageRes<MchDivisionReceiverGroupDto> List([FromQuery] MchDivisionReceiverGroupQueryDto dto)
         {
             var data = _mchDivisionReceiverGroupService.GetPaginatedData(dto);
+            var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
+            var mchInfos = _mchInfoService.GetByMchNos(mchNos);
             foreach (var item in data)
             {
-                var mchInfo = _mchInfoService.GetById(item.MchNo);
-                if (mchInfo != null)
-                {
-                    item.AddExt("mchName", mchInfo.MchName);
-                }
+                item.AddExt("mchName", mchInfos.First(s => s.MchNo == item.MchNo).MchName);
             }
             return ApiPageRes<MchDivisionReceiverGroupDto>.Pages(data);
         }

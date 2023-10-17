@@ -51,7 +51,7 @@
           <a-form-item label="选择接口">
             <a-select v-model="ifCode" placeholder="账号所属接口">
               <a-select-option v-for="(item) in appSupportIfCodes" :key="item.ifCode" >
-                <span class="icon-style" :style="{ backgroundColor: item.bgColor }"><img class="icon" :src="item.icon" alt=""></span> {{ item.ifName }}
+                <span class="icon-style" :style="{ backgroundColor: item.bgColor }"><img class="icon" :src="item.icon" alt=""></span> {{ item.ifName }}[{{ item.ifCode }}]
               </a-select-option>
             </a-select>
           </a-form-item>
