@@ -21,33 +21,33 @@ namespace AGooday.AgPay.Components.OSS.Services
             this.logger = logger;
             this.sysConfigService = sysConfigService;
             AliyunOssConfig.Oss = JsonConvert.DeserializeObject<AliyunOssConfig.OssConfig>(sysConfigService.GetDBOssConfig().AliyunOssConfig);
-            this.ossClient = new OssClient(AliyunOssConfig.Oss.Endpoint, AliyunOssConfig.Oss.AccessKeyId, AliyunOssConfig.Oss.AccessKeySecret);
+            ossClient = new OssClient(AliyunOssConfig.Oss.Endpoint, AliyunOssConfig.Oss.AccessKeyId, AliyunOssConfig.Oss.AccessKeySecret);
         }
 
-        public async Task<string> Upload2PreviewUrl(OssSavePlaceEnum ossSavePlaceEnum, IFormFile multipartFile, string saveDirAndFileName)
+        public Task<string> Upload2PreviewUrlAsync(OssSavePlaceEnum ossSavePlaceEnum, IFormFile multipartFile, string saveDirAndFileName)
         {
             try
             {
                 if (multipartFile.Length > 0)
                 {
-                    this.ossClient.PutObject(ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? AliyunOssConfig.Oss.PublicBucketName : AliyunOssConfig.Oss.PrivateBucketName
+                    ossClient.PutObject(ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? AliyunOssConfig.Oss.PublicBucketName : AliyunOssConfig.Oss.PrivateBucketName
                         , saveDirAndFileName, multipartFile.OpenReadStream());
 
                     if (ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC)
                     {
                         // 文档：https://help.aliyun.com/document_detail/32084.html，https://www.alibabacloud.com/help/zh/doc-detail/39607.htm
                         // example: https://BucketName.Endpoint/ObjectName
-                        return $"https://{AliyunOssConfig.Oss.PublicBucketName}.{AliyunOssConfig.Oss.Endpoint}/{saveDirAndFileName}";
+                        return Task.FromResult($"https://{AliyunOssConfig.Oss.PublicBucketName}.{AliyunOssConfig.Oss.Endpoint}/{saveDirAndFileName}");
                     }
 
-                    return saveDirAndFileName;
+                    return Task.FromResult(saveDirAndFileName);
                 }
             }
             catch (Exception e)
             {
                 logger.LogError(e.Message, e);
             }
-            return null;
+            return Task.FromResult<string>(null);
         }
 
         public bool DownloadFile(OssSavePlaceEnum ossSavePlaceEnum, string source, string target)
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             {
                 string bucket = ossSavePlaceEnum == OssSavePlaceEnum.PRIVATE ? AliyunOssConfig.Oss.PrivateBucketName : AliyunOssConfig.Oss.PublicBucketName;
                 //this.ossClient.GetObject(new GetObjectRequest(bucket, source),File.Open(target, FileMode.OpenOrCreate));
-                var ossObject = this.ossClient.GetObject(new GetObjectRequest(bucket, source));
+                var ossObject = ossClient.GetObject(new GetObjectRequest(bucket, source));
                 WriteToFile(target, ossObject.Content);
 
                 return true;

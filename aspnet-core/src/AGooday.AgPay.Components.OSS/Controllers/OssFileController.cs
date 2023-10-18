@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
 
         /** 上传文件 （单文件上传） */
         [HttpPost, Route("{bizType}")]
-        public async Task<ApiRes> SingleFileUpload([FromForm] IFormFile file, string bizType)
+        public async Task<ApiRes> SingleFileUploadAsync([FromForm] IFormFile file, string bizType)
         {
             if (file == null)
             {
@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
 
                 // 新文件地址 (xxx/xxx.jpg 格式)
                 string saveDirAndFileName = Path.Combine(bizType, $"{Guid.NewGuid().ToString("N")}{Path.GetExtension(file.FileName)}");
-                string url = await ossService.Upload2PreviewUrl(ossFileConfig.OssSavePlaceEnum, file, saveDirAndFileName);
+                string url = await ossService.Upload2PreviewUrlAsync(ossFileConfig.OssSavePlaceEnum, file, saveDirAndFileName);
                 return ApiRes.Ok(url);
             }
             catch (BizException biz)

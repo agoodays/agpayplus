@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             var sysUser = GetCurrentUser().SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
-            _mchInfoService.Create(dto);
+            _mchInfoService.CreateAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();
@@ -81,9 +81,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpDelete, Route("{mchNo}"), MethodLog("删除商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_DEL)]
-        public async Task<ApiRes> Delete(string mchNo)
+        public async Task<ApiRes> DeleteAsync(string mchNo)
         {
-            await _mchInfoService.Remove(mchNo);
+            await _mchInfoService.RemoveAsync(mchNo);
             return ApiRes.Ok();
         }
 
@@ -94,9 +94,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{mchNo}"), MethodLog("更新商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_EDIT)]
-        public async Task<ApiRes> Update(string mchNo, MchInfoModifyDto dto)
+        public async Task<ApiRes> UpdateAsync(string mchNo, MchInfoModifyDto dto)
         {
-            await _mchInfoService.Modify(dto);
+            await _mchInfoService.ModifyAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();

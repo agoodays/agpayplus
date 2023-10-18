@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新增商户信息")]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_INFO_ADD)]
-        public async Task<ApiRes> Add(MchInfoCreateDto dto)
+        public async Task<ApiRes> AddAsync(MchInfoCreateDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.CreatedBy = sysUser.Realname;
@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             dto.Type = CS.MCH_TYPE_ISVSUB;
             dto.AgentNo = agentInfo.AgentNo;
             dto.IsvNo = agentInfo.IsvNo;
-            await _mchInfoService.Create(dto);
+            await _mchInfoService.CreateAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();
@@ -92,9 +92,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpDelete, Route("{mchNo}"), MethodLog("删除商户信息")]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_INFO_DEL)]
-        public async Task<ApiRes> Delete(string mchNo)
+        public async Task<ApiRes> DeleteAsync(string mchNo)
         {
-            await _mchInfoService.Remove(mchNo);
+            await _mchInfoService.RemoveAsync(mchNo);
             return ApiRes.Ok();
         }
 
@@ -105,9 +105,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{mchNo}"), MethodLog("更新商户信息")]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_INFO_EDIT)]
-        public async Task<ApiRes> Update(string mchNo, MchInfoModifyDto dto)
+        public async Task<ApiRes> UpdateAsync(string mchNo, MchInfoModifyDto dto)
         {
-            await _mchInfoService.Modify(dto);
+            await _mchInfoService.ModifyAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();

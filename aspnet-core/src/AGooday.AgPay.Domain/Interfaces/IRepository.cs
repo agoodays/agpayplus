@@ -11,29 +11,48 @@
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="obj"></param>
-        void Add(TEntity obj);
+        /// <param name="entity"></param>
+        void Add(TEntity entity);
+        /// <summary>
+        /// 添加
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         Task AddAsync(TEntity entity);
         /// <summary>
         /// 根据id获取对象
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">主键ID</param>
         /// <returns></returns>
         TEntity GetById(TPrimaryKey id);
-
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
         Task<TEntity> GetByIdAsync(TPrimaryKey id);
         /// <summary>
         /// 获取列表
         /// </summary>
         /// <returns></returns>
         IQueryable<TEntity> GetAll();
+        /// <summary>
+        /// 获取列表
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <returns></returns>
+        IQueryable<TEntity> GetAllAsNoTracking();
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         IQueryable<T> GetAll<T>() where T : class;
-        Task<IEnumerable<TEntity>> ListAsync();
         /// <summary>
         /// 根据对象进行更新
         /// </summary>
-        /// <param name="obj"></param>
-        void Update(TEntity obj);
+        /// <param name="entity"></param>
+        void Update(TEntity entity);
         /// <summary>
         /// 根据id删除
         /// </summary>
@@ -42,14 +61,24 @@
         /// <summary>
         /// 保存或更新
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="entity"></param>
         /// <param name="id"></param>
-        void SaveOrUpdate(TEntity obj, TPrimaryKey? id);
+        void SaveOrUpdate(TEntity entity, TPrimaryKey? id);
         /// <summary>
         /// 保存
         /// </summary>
         /// <returns></returns>
         int SaveChanges();
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        Task<int> SaveChangesAsync();
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
         bool SaveChanges(out int count);
     }
     public interface IRepository<TEntity> : IDisposable
@@ -58,8 +87,8 @@
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="obj"></param>
-        void Add(TEntity obj);
+        /// <param name="entity"></param>
+        void Add(TEntity entity);
         Task AddAsync(TEntity entity);
         /// <summary>
         /// 根据id获取对象
@@ -67,20 +96,35 @@
         /// <param name="id"></param>
         /// <returns></returns>
         TEntity GetById<TPrimaryKey>(TPrimaryKey id);
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id"></param>
+        /// <returns></returns>
         Task<TEntity> GetByIdAsync<TPrimaryKey>(TPrimaryKey id);
         /// <summary>
         /// 获取列表
         /// </summary>
         /// <returns></returns>
         IQueryable<TEntity> GetAll();
+        /// <summary>
+        /// 获取列表
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <returns></returns>
+        IQueryable<TEntity> GetAllAsNoTracking();
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         IQueryable<T> GetAll<T>() where T : class;
-        Task<IEnumerable<TEntity>> ListAsync();
         /// <summary>
         /// 根据对象进行更新
         /// </summary>
-        /// <param name="obj"></param>
-        void Update(TEntity obj);
+        /// <param name="entity"></param>
+        void Update(TEntity entity);
         /// <summary>
         /// 根据id删除
         /// </summary>
@@ -90,14 +134,24 @@
         /// 保存或更新
         /// </summary>
         /// <typeparam name="TPrimaryKey"></typeparam>
-        /// <param name="obj"></param>
+        /// <param name="entity"></param>
         /// <param name="id"></param>
-        void SaveOrUpdate<TPrimaryKey>(TEntity obj, TPrimaryKey id);
+        void SaveOrUpdate<TPrimaryKey>(TEntity entity, TPrimaryKey id);
         /// <summary>
         /// 保存
         /// </summary>
         /// <returns></returns>
         int SaveChanges();
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        Task<int> SaveChangesAsync();
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
         bool SaveChanges(out int count);
     }
     public interface IRepository : IDisposable

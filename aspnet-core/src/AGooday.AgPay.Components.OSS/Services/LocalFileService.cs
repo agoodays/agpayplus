@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             this.sysConfigService = sysConfigService;
         }
 
-        public async Task<string> Upload2PreviewUrl(OssSavePlaceEnum ossSavePlaceEnum, IFormFile multipartFile, string saveDirAndFileName)
+        public async Task<string> Upload2PreviewUrlAsync(OssSavePlaceEnum ossSavePlaceEnum, IFormFile multipartFile, string saveDirAndFileName)
         {
             try
             {

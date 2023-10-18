@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("添加操作员信息")]
         [PermissionAuth(PermCode.AGENT.ENT_UR_USER_ADD)]
-        public async Task<ApiRes> Add(SysUserCreateDto dto)
+        public async Task<ApiRes> AddAsync(SysUserCreateDto dto)
         {
             //_cache.Remove("ErrorData");
             dto.IsAdmin = CS.NO;
@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
             dto.BelongInfoId = GetCurrentAgentNo();
             dto.CreatedAt = DateTime.Now;
             dto.UpdatedAt = DateTime.Now;
-            await _sysUserService.Create(dto);
+            await _sysUserService.CreateAsync(dto);
             //var errorData = _cache.Get("ErrorData");
             //if (errorData == null)
             // 是否存在消息通知
@@ -86,10 +86,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除操作员")]
         [PermissionAuth(PermCode.AGENT.ENT_UR_USER_DELETE)]
-        public async Task<ApiRes> Delete(long recordId)
+        public async Task<ApiRes> DeleteAsync(long recordId)
         {
             var currentUserId = 0;
-            await _sysUserService.Remove(recordId, currentUserId, CS.SYS_TYPE.AGENT);
+            await _sysUserService.RemoveAsync(recordId, currentUserId, CS.SYS_TYPE.AGENT);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
             {
@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("修改操作员信息")]
         [PermissionAuth(PermCode.AGENT.ENT_UR_USER_EDIT)]
-        public async Task<ApiRes> Update(long recordId, SysUserModifyDto dto)
+        public async Task<ApiRes> UpdateAsync(long recordId, SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
             if (!dto.SysUserId.HasValue || dto.SysUserId.Value <= 0)
@@ -117,7 +117,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
                 sysUser.State = dto.State.Value;
                 CopyUtil.CopyProperties(sysUser, dto);
             }
-            await _sysUserService.Modify(dto);
+            await _sysUserService.ModifyAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
             {

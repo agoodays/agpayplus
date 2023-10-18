@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
             var sysUser = GetCurrentUser().SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
-            _agentInfoService.Create(dto);
+            _agentInfoService.CreateAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();
@@ -83,7 +83,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         [PermissionAuth(PermCode.MGR.ENT_AGENT_INFO_DEL)]
         public ApiRes Delete(string agentNo)
         {
-            _agentInfoService.Remove(agentNo);
+            _agentInfoService.RemoveAsync(agentNo);
             return ApiRes.Ok();
         }
 
@@ -94,9 +94,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         /// <returns></returns>
         [HttpPut, Route("{agentNo}"), MethodLog("更新代理商信息")]
         [PermissionAuth(PermCode.MGR.ENT_AGENT_INFO_EDIT)]
-        public async Task<ApiRes> Update(string agentNo, AgentInfoModifyDto dto)
+        public async Task<ApiRes> UpdateAsync(string agentNo, AgentInfoModifyDto dto)
         {
-            await _agentInfoService.Modify(dto);
+            await _agentInfoService.ModifyAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();

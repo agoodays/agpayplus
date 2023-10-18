@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Components.OSS.Services
         /// <param name="multipartFile"></param>
         /// <param name="saveDirAndFileName"></param>
         /// <returns></returns>
-        Task<string> Upload2PreviewUrl(OssSavePlaceEnum ossSavePlaceEnum, IFormFile multipartFile, string saveDirAndFileName);
+        Task<string> Upload2PreviewUrlAsync(OssSavePlaceEnum ossSavePlaceEnum, IFormFile multipartFile, string saveDirAndFileName);
 
         /// <summary>
         /// 将文件下载到本地

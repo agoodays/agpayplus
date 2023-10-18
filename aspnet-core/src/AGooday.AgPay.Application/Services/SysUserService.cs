@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository.SaveChanges();
         }
 
-        public async Task Create(SysUserCreateDto dto)
+        public async Task CreateAsync(SysUserCreateDto dto)
         {
             var command = _mapper.Map<CreateSysUserCommand>(dto);
             await Bus.SendCommand(command);
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository.SaveChanges();
         }
 
-        public async Task Remove(long sysUserId, long currentUserId, string sysType)
+        public async Task RemoveAsync(long sysUserId, long currentUserId, string sysType)
         {
             var command = new RemoveSysUserCommand()
             {
@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository.SaveChanges();
         }
 
-        public async Task Modify(SysUserModifyDto dto)
+        public async Task ModifyAsync(SysUserModifyDto dto)
         {
             var command = _mapper.Map<ModifySysUserCommand>(dto);
             await Bus.SendCommand(command);
@@ -192,12 +192,6 @@ namespace AGooday.AgPay.Application.Services
             });
             var records = PaginatedList<SysUserListDto>.Create(result, dto.PageNumber, dto.PageSize);
             return records;
-        }
-
-        public async Task<IEnumerable<SysUserDto>> ListAsync()
-        {
-            var sysUsers = await _sysUserRepository.ListAsync();
-            return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
     }
 }

@@ -62,13 +62,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新增代理商信息")]
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_INFO_ADD)]
-        public async Task<ApiRes> Add(AgentInfoCreateDto dto)
+        public async Task<ApiRes> AddAsync(AgentInfoCreateDto dto)
         {
             var agentNo = GetCurrentAgentNo();
             var agentInfo = _agentInfoService.GetById(agentNo);
             dto.Pid = agentInfo.AgentNo;
             dto.IsvNo = agentInfo.IsvNo;
-            await _agentInfoService.Create(dto);
+            await _agentInfoService.CreateAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();
@@ -83,9 +83,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         /// <returns></returns>
         [HttpDelete, Route("{agentNo}"), MethodLog("删除代理商信息")]
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_INFO_DEL)]
-        public async Task<ApiRes> Delete(string agentNo)
+        public async Task<ApiRes> DeleteAsync(string agentNo)
         {
-            await _agentInfoService.Remove(agentNo);
+            await _agentInfoService.RemoveAsync(agentNo);
             return ApiRes.Ok();
         }
 
@@ -96,9 +96,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         /// <returns></returns>
         [HttpPut, Route("{agentNo}"), MethodLog("更新代理商信息")]
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_INFO_EDIT)]
-        public async Task<ApiRes> Update(string agentNo, AgentInfoModifyDto dto)
+        public async Task<ApiRes> UpdateAsync(string agentNo, AgentInfoModifyDto dto)
         {
-            await _agentInfoService.Modify(dto);
+            await _agentInfoService.ModifyAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();

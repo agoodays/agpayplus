@@ -60,13 +60,13 @@ namespace AGooday.AgPay.Application.Services
             return _mchInfoRepository.SaveChanges(out int _);
         }
 
-        public async Task Create(MchInfoCreateDto dto)
+        public async Task CreateAsync(MchInfoCreateDto dto)
         {
             var command = _mapper.Map<CreateMchInfoCommand>(dto);
             await Bus.SendCommand(command);
         }
 
-        public async Task Remove(string recordId)
+        public async Task RemoveAsync(string recordId)
         {
             //_mchInfoRepository.Remove(recordId);
             //_mchInfoRepository.SaveChanges();
@@ -93,7 +93,7 @@ namespace AGooday.AgPay.Application.Services
             return _mchInfoRepository.SaveChanges(out int _);
         }
 
-        public async Task Modify(MchInfoModifyDto dto)
+        public async Task ModifyAsync(MchInfoModifyDto dto)
         {
             var command = _mapper.Map<ModifyMchInfoCommand>(dto);
             await Bus.SendCommand(command);

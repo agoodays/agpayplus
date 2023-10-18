@@ -24,11 +24,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="obj"></param>
-        public virtual void Add(TEntity obj)
+        /// <param name="entity"></param>
+        public virtual void Add(TEntity entity)
         {
-            DbSet.Add(obj);
+            DbSet.Add(entity);
         }
+        /// <summary>
+        /// 添加
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public virtual async Task AddAsync(TEntity entity)
         {
             await DbSet.AddAsync(entity);
@@ -36,12 +41,17 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 根据id获取对象
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">主键ID</param>
         /// <returns></returns>
         public virtual TEntity GetById(TPrimaryKey id)
         {
             return DbSet.Find(id);
         }
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
         public virtual async Task<TEntity> GetByIdAsync(TPrimaryKey id)
         {
             return await DbSet.FindAsync(id);
@@ -54,26 +64,36 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet;
         }
+        /// <summary>
+        /// 获取列表
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <returns></returns>
+        public virtual IQueryable<TEntity> GetAllAsNoTracking()
+        {
+            return DbSet.AsNoTracking();
+        }
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public virtual IQueryable<T> GetAll<T>() where T : class
         {
             return Db.Set<T>();
         }
-        public virtual async Task<IEnumerable<TEntity>> ListAsync()
-        {
-            return await DbSet.AsNoTracking().ToListAsync();
-        }
         /// <summary>
         /// 根据对象进行更新
         /// </summary>
-        /// <param name="obj"></param>
-        public virtual void Update(TEntity obj)
+        /// <param name="entity"></param>
+        public virtual void Update(TEntity entity)
         {
-            DbSet.Update(obj);
+            DbSet.Update(entity);
         }
         /// <summary>
         /// 根据id删除
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">主键ID</param>
         public virtual void Remove(TPrimaryKey id)
         {
             DbSet.Remove(DbSet.Find(id));
@@ -81,13 +101,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 保存或更新
         /// </summary>
-        /// <returns></returns>
-        public virtual void SaveOrUpdate(TEntity obj, TPrimaryKey? id)
+        /// <param name="entity"></param>
+        /// <param name="id">主键ID</param>
+        public virtual void SaveOrUpdate(TEntity entity, TPrimaryKey? id)
         {
             if (id != null)
-                Update(obj);
+                Update(entity);
             else
-                Add(obj);
+                Add(entity);
         }
         /// <summary>
         /// 保存
@@ -96,6 +117,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public int SaveChanges()
         {
             return Db.SaveChanges();
+        }
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> SaveChangesAsync()
+        {
+            return await Db.SaveChangesAsync();
         }
         /// <summary>
         /// 保存
@@ -129,11 +158,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="obj"></param>
-        public virtual void Add(TEntity obj)
+        /// <param name="entity"></param>
+        public virtual void Add(TEntity entity)
         {
-            DbSet.Add(obj);
+            DbSet.Add(entity);
         }
+        /// <summary>
+        /// 添加
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public virtual async Task AddAsync(TEntity entity)
         {
             await DbSet.AddAsync(entity);
@@ -141,12 +175,19 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 根据id获取对象
         /// </summary>
-        /// <param name="id"></param>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id">主键ID</param>
         /// <returns></returns>
         public virtual TEntity GetById<TPrimaryKey>(TPrimaryKey id)
         {
             return DbSet.Find(id);
         }
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
         public virtual async Task<TEntity> GetByIdAsync<TPrimaryKey>(TPrimaryKey id)
         {
             return await DbSet.FindAsync(id);
@@ -159,13 +200,23 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet;
         }
+        /// <summary>
+        /// 获取列表
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <returns></returns>
+        public virtual IQueryable<TEntity> GetAllAsNoTracking()
+        {
+            return DbSet.AsNoTracking();
+        }
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public virtual IQueryable<T> GetAll<T>() where T : class
         {
             return Db.Set<T>();
-        }
-        public virtual async Task<IEnumerable<TEntity>> ListAsync()
-        {
-            return await DbSet.AsNoTracking().ToListAsync();
         }
         /// <summary>
         /// 根据对象进行更新
@@ -178,7 +229,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 根据id删除
         /// </summary>
-        /// <param name="id"></param>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id">主键ID</param>
         public virtual void Remove<TPrimaryKey>(TPrimaryKey id)
         {
             DbSet.Remove(DbSet.Find(id));
@@ -202,6 +254,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public int SaveChanges()
         {
             return Db.SaveChanges();
+        }
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> SaveChangesAsync()
+        {
+            return await Db.SaveChangesAsync();
         }
         /// <summary>
         /// 保存
