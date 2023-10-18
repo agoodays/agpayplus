@@ -106,6 +106,13 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public async Task<MchInfoDto> GetByIdAsync(string recordId)
+        {
+            var entity = await _mchInfoRepository.GetByIdAsync(recordId);
+            var dto = _mapper.Map<MchInfoDto>(entity);
+            return dto;
+        }
+
         public IEnumerable<MchInfoDto> GetByMchNos(List<string> mchNos)
         {
             var mchInfos = _mchInfoRepository.GetAll().Where(w => mchNos.Contains(w.MchNo));

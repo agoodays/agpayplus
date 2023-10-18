@@ -61,12 +61,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新增商户信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_ADD)]
-        public ApiRes Add(MchInfoCreateDto dto)
+        public async Task<ApiRes> AddAsync(MchInfoCreateDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
-            _mchInfoService.CreateAsync(dto);
+            await _mchInfoService.CreateAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();
@@ -111,14 +111,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("{mchNo}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_VIEW, PermCode.MGR.ENT_MCH_INFO_EDIT)]
-        public ApiRes Detail(string mchNo)
+        public async Task<ApiRes> DetailAsync(string mchNo)
         {
-            var mchInfo = _mchInfoService.GetById(mchNo);
+            var mchInfo = await _mchInfoService.GetByIdAsync(mchNo);
             if (mchInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var sysUser = _sysUserService.GetById(mchInfo.InitUserId.Value);
+            var sysUser = await _sysUserService.GetByIdAsync(mchInfo.InitUserId.Value);
             if (sysUser != null)
             {
                 mchInfo.AddExt("loginUsername", sysUser.LoginUsername);

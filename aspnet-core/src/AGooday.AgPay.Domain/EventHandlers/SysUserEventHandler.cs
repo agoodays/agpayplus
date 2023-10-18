@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Domain.Events.SysUsers;
+﻿using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Domain.Events.SysUsers;
 using MediatR;
 
 namespace AGooday.AgPay.Domain.EventHandlers
@@ -8,8 +9,10 @@ namespace AGooday.AgPay.Domain.EventHandlers
     {
         public Task Handle(SysUserCreatedEvent notification, CancellationToken cancellationToken)
         {
-            // 恭喜您，注册成功，欢迎加入我们。
-
+            if (notification.IsNotify.Equals(CS.YES))
+            {
+                // 发送开通提醒
+            }
             return Task.CompletedTask;
         }
     }

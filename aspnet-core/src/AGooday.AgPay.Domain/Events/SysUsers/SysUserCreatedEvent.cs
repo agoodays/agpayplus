@@ -2,7 +2,6 @@
 {
     public class SysUserCreatedEvent : SysUserEvent
     {
-
         /// <summary>
         /// 登录密码
         /// </summary>

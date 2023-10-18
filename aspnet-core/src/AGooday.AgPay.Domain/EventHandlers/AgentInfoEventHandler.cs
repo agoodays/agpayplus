@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Domain.Events.AgentInfos;
+﻿using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Domain.Events.AgentInfos;
 using MediatR;
 
 namespace AGooday.AgPay.Domain.EventHandlers
@@ -8,12 +9,11 @@ namespace AGooday.AgPay.Domain.EventHandlers
     {
         public Task Handle(AgentInfoCreatedEvent notification, CancellationToken cancellationToken)
         {
-            if (notification.IsNotify.Equals(1))
+            if (notification.IsNotify.Equals(CS.YES))
             {
                 // 发送开通提醒
-                return Task.CompletedTask;
             }
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }
