@@ -132,12 +132,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
             foreach (var receiver in receiverList)
             {
-                if (receiver.ReceiverId != null)
+                if (receiver.ReceiverId.HasValue)
                 {
                     receiverIdSet.Add(receiver.ReceiverId.Value);
                 }
 
-                if (receiver.ReceiverGroupId != null)
+                if (receiver.ReceiverGroupId.HasValue)
                 {
                     receiverGroupIdSet.Add(receiver.ReceiverGroupId.Value);
                 }
@@ -147,14 +147,14 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                     throw new BizException("分账用户组： receiverId 和 与receiverGroupId 必填一项");
                 }
 
-                if (receiver.DivisionProfit != null)
+                if (receiver.DivisionProfit.HasValue)
                 {
-                    if (receiver.DivisionProfit?.CompareTo(Decimal.Zero) < 0)
+                    if (receiver.DivisionProfit.Value.CompareTo(Decimal.Zero) <= 0)
                     {
                         throw new BizException($"分账用户receiverId=[{receiver.ReceiverId}], receiverGroupId=[{receiver.ReceiverGroupId}] 分账比例不得小于0%");
                     }
 
-                    if (receiver.DivisionProfit?.CompareTo(Decimal.One) > 0)
+                    if (receiver.DivisionProfit.Value.CompareTo(Decimal.One) > 0)
                     {
                         throw new BizException($"分账用户receiverId=[{receiver.ReceiverId}], receiverGroupId=[{receiver.ReceiverGroupId}] 分账比例不得高于100%");
                     }

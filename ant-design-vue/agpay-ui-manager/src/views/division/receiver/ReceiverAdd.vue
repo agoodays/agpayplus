@@ -105,17 +105,7 @@
         <!-- 分账关系 -->
         <template slot="relationTypeSlot" slot-scope="record">
           <a-select style="width: 110px" labelInValue placeholder="分账关系类型" :defaultValue="{key: 'PARTNER'}" @change="changeRelationType(record, $event)">
-            <a-select-option key="PARTNER">合作伙伴</a-select-option>
-            <a-select-option key="SERVICE_PROVIDER">服务商</a-select-option>
-            <a-select-option key="STORE">门店</a-select-option>
-            <a-select-option key="STAFF">员工</a-select-option>
-            <a-select-option key="STORE_OWNER">店主</a-select-option>
-            <a-select-option key="HEADQUARTER">总部</a-select-option>
-            <a-select-option key="BRAND">品牌方</a-select-option>
-            <a-select-option key="DISTRIBUTOR">分销商</a-select-option>
-            <a-select-option key="USER">用户</a-select-option>
-            <a-select-option key="SUPPLIER">供应商</a-select-option>
-            <a-select-option key="CUSTOM">自定义</a-select-option>
+            <a-select-option v-for="option in relationOptions" :key="option.key" :value="option.key">{{ option.label }}</a-select-option>
           </a-select>
         </template>
 
@@ -182,17 +172,7 @@
         <!-- 分账关系 -->
         <template slot="relationTypeSlot" slot-scope="record">
           <a-select style="width: 110px" labelInValue placeholder="分账关系类型" :defaultValue="{key: 'PARTNER'}" @change="changeRelationType(record, $event)">
-            <a-select-option key="PARTNER">合作伙伴</a-select-option>
-            <a-select-option key="SERVICE_PROVIDER">服务商</a-select-option>
-            <a-select-option key="STORE">门店</a-select-option>
-            <a-select-option key="STAFF">员工</a-select-option>
-            <a-select-option key="STORE_OWNER">店主</a-select-option>
-            <a-select-option key="HEADQUARTER">总部</a-select-option>
-            <a-select-option key="BRAND">品牌方</a-select-option>
-            <a-select-option key="DISTRIBUTOR">分销商</a-select-option>
-            <a-select-option key="USER">用户</a-select-option>
-            <a-select-option key="SUPPLIER">供应商</a-select-option>
-            <a-select-option key="CUSTOM">自定义</a-select-option>
+            <a-select-option v-for="option in relationOptions" :key="option.key" :value="option.key">{{ option.label }}</a-select-option>
           </a-select>
         </template>
 
@@ -256,6 +236,20 @@ const defaultReceiverTemplate = {
   divisionProfit: ''
 }
 
+const relationOptions = [
+  { key: 'PARTNER', label: '合作伙伴' },
+  { key: 'SERVICE_PROVIDER', label: '服务商' },
+  { key: 'STORE', label: '门店' },
+  { key: 'STAFF', label: '员工' },
+  { key: 'STORE_OWNER', label: '店主' },
+  { key: 'HEADQUARTER', label: '总部' },
+  { key: 'BRAND', label: '品牌方' },
+  { key: 'DISTRIBUTOR', label: '分销商' },
+  { key: 'USER', label: '用户' },
+  { key: 'SUPPLIER', label: '供应商' },
+  { key: 'CUSTOM', label: '自定义' }
+]
+
 export default {
   components: { InfoAddOrEdit, ChannelUserModal },
   props: {
@@ -271,6 +265,7 @@ export default {
       appId: null, // 应用app信息
       ifCode: null, // 应用app信息
       selectedReceiverGroupId: null, // 当前选择的分组ID
+      relationOptions: relationOptions,
       accTableColumns: accTableColumns, // 表头模板（微信支付宝公用）
 
       mchAppList: [], // 商户app列表

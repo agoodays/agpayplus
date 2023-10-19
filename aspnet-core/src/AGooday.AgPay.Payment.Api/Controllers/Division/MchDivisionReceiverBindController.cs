@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                     throw new BizException("商户分账账号组不存在，请检查或进入商户平台进行创建操作");
                 }
                 var divisionProfit = Convert.ToDecimal(bizRQ.DivisionProfit);
-                if (divisionProfit.CompareTo(Decimal.Zero) <= 0 || divisionProfit.CompareTo(Decimal.One) > 1)
+                if (divisionProfit.CompareTo(Decimal.Zero) <= 0 || divisionProfit.CompareTo(Decimal.One) > 0)
                 {
                     throw new BizException("账号分账比例有误, 配置值为[0.0001~1.0000]");
                 }
@@ -164,47 +164,31 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
         private string GetRelationTypeName(string relationType)
         {
-            if ("PARTNER".Equals(relationType))
+            switch (relationType)
             {
-                return "合作伙伴";
+                case "PARTNER":
+                    return "合作伙伴";
+                case "SERVICE_PROVIDER":
+                    return "服务商";
+                case "STORE":
+                    return "门店";
+                case "STAFF":
+                    return "员工";
+                case "STORE_OWNER":
+                    return "店主";
+                case "HEADQUARTER":
+                    return "总部";
+                case "BRAND":
+                    return "品牌方";
+                case "DISTRIBUTOR":
+                    return "分销商";
+                case "USER":
+                    return "用户";
+                case "SUPPLIER":
+                    return "供应商";
+                default:
+                    return null;
             }
-            else if ("SERVICE_PROVIDER".Equals(relationType))
-            {
-                return "服务商";
-            }
-            else if ("STORE".Equals(relationType))
-            {
-                return "门店";
-            }
-            else if ("STAFF".Equals(relationType))
-            {
-                return "员工";
-            }
-            else if ("STORE_OWNER".Equals(relationType))
-            {
-                return "店主";
-            }
-            else if ("HEADQUARTER".Equals(relationType))
-            {
-                return "总部";
-            }
-            else if ("BRAND".Equals(relationType))
-            {
-                return "品牌方";
-            }
-            else if ("DISTRIBUTOR".Equals(relationType))
-            {
-                return "分销商";
-            }
-            else if ("USER".Equals(relationType))
-            {
-                return "用户";
-            }
-            else if ("SUPPLIER".Equals(relationType))
-            {
-                return "供应商";
-            }
-            return null;
         }
     }
 }
