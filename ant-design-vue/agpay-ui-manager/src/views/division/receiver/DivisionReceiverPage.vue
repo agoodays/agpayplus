@@ -128,7 +128,6 @@ export default {
     reqIfDefineListFunc: function () {
       const that = this // 提前保留this
       req.list(API_URL_IFDEFINES_LIST, { 'state': 1 }).then(res => {
-        console.log(res)
         that.ifDefineList = res
       })
     },
