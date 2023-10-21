@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ApiRes == null)
                 {
-                    _logger.LogError("{0}, 处理回调事件异常  notifyResult data error, notifyResult ={1}", logPrefix, notifyResult);
+                    _logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult}");
                     throw new BizException("处理回调事件异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 

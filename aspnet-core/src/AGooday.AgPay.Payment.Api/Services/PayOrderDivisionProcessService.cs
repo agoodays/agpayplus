@@ -151,14 +151,12 @@ namespace AGooday.AgPay.Payment.Api.Services
                 {
                     //分账成功
                     payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_SUCCESS, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelOriginResponse);
-
                 }
                 // 分账失败 ( 明确分账成功 )
                 else if (channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
                 {
                     //分账失败
                     payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
-
                 }
                 // 已受理
                 else if (channelRetMsg.ChannelState == ChannelState.WAITING)

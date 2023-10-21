@@ -162,7 +162,9 @@ namespace AGooday.AgPay.Application.Services
             }
             var recordIds = records.Select(s => s.RecordId);
 
-            var updateRecords = _payOrderDivisionRecordRepository.GetAll().Where(w => recordIds.Contains(w.RecordId) && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_WAIT));
+            var updateRecords = _payOrderDivisionRecordRepository.GetAll()
+                .Where(w => recordIds.Contains(w.RecordId) 
+                && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_WAIT));
             foreach (var updateRecord in updateRecords)
             {
                 updateRecord.State = state;
