@@ -73,11 +73,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.PpPay.PayWay
             };
             purchaseUnitRequest.Items = new List<Item>()
             {
-                new Item(){
-                    Name=payOrder.Subject,
-                    Description=payOrder.Body,
-                    Sku=payOrder.PayOrderId,
-                    UnitAmount=new Money(){
+                new Item()
+                {
+                    Name = payOrder.Subject,
+                    Description = payOrder.Body,
+                    Sku = payOrder.PayOrderId,
+                    UnitAmount = new Money()
+                    {
                         CurrencyCode = currency,
                         Value = amountStr,
                     },
