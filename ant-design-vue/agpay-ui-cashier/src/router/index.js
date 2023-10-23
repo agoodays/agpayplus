@@ -34,7 +34,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode: 'hash', //history 需要nginx适配    hash：是#的格式。
+  mode: 'history', //history 需要nginx适配    hash：是#的格式。
   base: "",
   routes
 })

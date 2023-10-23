@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Application
         /// <returns></returns>
         public string GenUniJsapiPayUrl(string payOrderId)
         {
-            return $"{PaySiteUrl}/cashier/index.html#/hub/{AgPayUtil.AesEncode(payOrderId)}";
+            return $"{PaySiteUrl}/hub/{AgPayUtil.AesEncode(payOrderId)}";
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Application
         /// <returns></returns>
         public string GenOauth2RedirectUrlEncode(string payOrderId)
         {
-            return URLUtil.EncodeAll($"{PaySiteUrl}/cashier/index.html#/oauth2Callback/{AgPayUtil.AesEncode(payOrderId)}");
+            return URLUtil.EncodeAll($"{PaySiteUrl}/oauth2Callback/{AgPayUtil.AesEncode(payOrderId)}");
         }
 
         /// <summary>

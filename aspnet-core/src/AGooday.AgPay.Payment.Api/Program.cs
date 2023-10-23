@@ -238,6 +238,18 @@ app.UseAuthorization();
 
 app.UseExceptionHandling();
 
-app.MapControllers();
+app.UseRouting().UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+
+    // 配置默认路由，将所有非 API 路由重定向到 Vue 单页面应用程序的入口页
+    endpoints.MapFallbackToFile("/cashier/index.html");
+
+    //// 配置 Vue 单页面应用程序的路由
+    //endpoints.MapGet("/", async context =>
+    //{
+    //    context.Response.Redirect("/cashier/index.html");
+    //});
+});
 
 app.Run();
