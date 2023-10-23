@@ -8,6 +8,7 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using static AGooday.AgPay.Payment.Api.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 {
@@ -70,7 +71,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 // 解析订单号 和 请求参数
-                Dictionary<string, object> mutablePair = refundNotifyService.ParseParams(Request, urlOrderId, IChannelRefundNoticeService.NoticeTypeEnum.DO_NOTIFY);
+                Dictionary<string, object> mutablePair = refundNotifyService.ParseParams(Request, urlOrderId, NoticeTypeEnum.DO_NOTIFY);
                 if (mutablePair == null)
                 {
                     // 解析数据失败， 响应已处理
@@ -102,7 +103,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(refundOrder.MchNo, refundOrder.AppId);
 
                 //调起接口的回调判断
-                ChannelRetMsg notifyResult = refundNotifyService.DoNotice(Request, mutablePair.First().Value, refundOrder, mchAppConfigContext, IChannelRefundNoticeService.NoticeTypeEnum.DO_NOTIFY);
+                ChannelRetMsg notifyResult = refundNotifyService.DoNotice(Request, mutablePair.First().Value, refundOrder, mchAppConfigContext, NoticeTypeEnum.DO_NOTIFY);
 
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)

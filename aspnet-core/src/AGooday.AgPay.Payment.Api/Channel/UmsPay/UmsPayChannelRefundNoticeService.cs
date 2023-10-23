@@ -4,6 +4,7 @@ using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
+using static AGooday.AgPay.Payment.Api.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
 {
@@ -24,12 +25,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             return CS.IF_CODE.YSFPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, IChannelRefundNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             throw new NotImplementedException();
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, IChannelRefundNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             throw new NotImplementedException();
         }

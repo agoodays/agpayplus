@@ -10,6 +10,7 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json.Linq;
+using static AGooday.AgPay.Payment.Api.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
 {
@@ -30,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
             return CS.IF_CODE.HKRTPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, IChannelRefundNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -47,7 +48,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, IChannelRefundNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {

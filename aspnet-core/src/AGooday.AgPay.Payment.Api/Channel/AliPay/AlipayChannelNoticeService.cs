@@ -10,6 +10,7 @@ using AGooday.AgPay.Payment.Api.Utils;
 using Aop.Api.Util;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using static AGooday.AgPay.Payment.Api.Channel.IChannelNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {
@@ -30,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             return CS.IF_CODE.ALIPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, IChannelNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -45,7 +46,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, IChannelNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {

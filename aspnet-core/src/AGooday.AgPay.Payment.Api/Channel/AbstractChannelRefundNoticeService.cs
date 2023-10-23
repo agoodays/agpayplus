@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
+using static AGooday.AgPay.Payment.Api.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Channel
 {
@@ -97,7 +98,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
         }
 
         public abstract string GetIfCode();
-        public abstract Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, IChannelRefundNoticeService.NoticeTypeEnum noticeTypeEnum);
-        public abstract ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, IChannelRefundNoticeService.NoticeTypeEnum noticeTypeEnum);
+        public abstract Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum);
+        public abstract ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum);
     }
 }

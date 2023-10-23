@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.PpPay
 {
     public class PpPayChannelNoticeService : AbstractChannelNoticeService
     {
-        public PpPayChannelNoticeService(ILogger<AbstractChannelNoticeService> logger,
+        public PpPayChannelNoticeService(ILogger<PpPayChannelNoticeService> logger,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, configContextQueryService)
@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.PpPay
         {
             // 同步和异步需要不同的解析方案
             // 异步需要从 webhook 中读取，所以这里读取方式不太一样
-            if (noticeTypeEnum == IChannelNoticeService.NoticeTypeEnum.DO_NOTIFY)
+            if (noticeTypeEnum == NoticeTypeEnum.DO_NOTIFY)
             {
                 JObject paramsObj = JObject.Parse(GetReqParamJSON().ToString());
                 string orderId = paramsObj.SelectToken("resource.purchase_units[0].invoice_id")?.ToString();

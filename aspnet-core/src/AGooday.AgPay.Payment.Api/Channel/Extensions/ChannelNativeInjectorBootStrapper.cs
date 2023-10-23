@@ -5,6 +5,7 @@ using AGooday.AgPay.Payment.Api.Channel.HkrtPay;
 using AGooday.AgPay.Payment.Api.Channel.HkrtPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.LesPay;
 using AGooday.AgPay.Payment.Api.Channel.LesPay.Extensions;
+using AGooday.AgPay.Payment.Api.Channel.PpPay;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.UmsPay;
@@ -85,6 +86,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<AliPayPaymentService>();
             services.AddScoped<WxPayPaymentService>();
             services.AddScoped<YsfPayPaymentService>();
+            services.AddScoped<PpPayPaymentService>();
             services.AddScoped<SxfPayPaymentService>();
             services.AddScoped<LesPayPaymentService>();
             services.AddScoped<HkrtPayPaymentService>();
@@ -101,6 +103,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<WxPayPaymentService>();
                         case CS.IF_CODE.YSFPAY:
                             return provider.GetService<YsfPayPaymentService>();
+                        case CS.IF_CODE.PPPAY:
+                            return provider.GetService<PpPayPaymentService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayPaymentService>();
                         case CS.IF_CODE.LESPAY:
@@ -120,6 +124,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<AliPayRefundService>();
             services.AddScoped<WxPayRefundService>();
             services.AddScoped<YsfPayRefundService>();
+            services.AddScoped<PpPayRefundService>();
             services.AddScoped<SxfPayRefundService>();
             services.AddScoped<LesPayRefundService>();
             services.AddScoped<HkrtPayRefundService>();
@@ -136,6 +141,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<WxPayRefundService>();
                         case CS.IF_CODE.YSFPAY:
                             return provider.GetService<YsfPayRefundService>();
+                        case CS.IF_CODE.PPPAY:
+                            return provider.GetService<PpPayRefundService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayRefundService>();
                         case CS.IF_CODE.LESPAY:
@@ -155,6 +162,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<AliPayChannelNoticeService>();
             services.AddScoped<WxPayChannelNoticeService>();
             services.AddScoped<YsfPayChannelNoticeService>();
+            services.AddScoped<PpPayChannelNoticeService>();
             services.AddScoped<SxfPayChannelNoticeService>();
             services.AddScoped<LesPayChannelNoticeService>();
             services.AddScoped<HkrtPayChannelNoticeService>();
@@ -171,6 +179,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<WxPayChannelNoticeService>();
                         case CS.IF_CODE.YSFPAY:
                             return provider.GetService<YsfPayChannelNoticeService>();
+                        case CS.IF_CODE.PPPAY:
+                            return provider.GetService<PpPayChannelNoticeService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayChannelNoticeService>();
                         case CS.IF_CODE.LESPAY:
@@ -190,6 +200,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             //services.AddScoped<AliPayChannelRefundNoticeService>();
             services.AddScoped<WxPayChannelRefundNoticeService>();
             //services.AddScoped<YsfPayChannelRefundNoticeService>();
+            services.AddScoped<PpPayChannelNoticeService>();
             services.AddScoped<SxfPayChannelNoticeService>();
             services.AddScoped<LesPayChannelRefundNoticeService>();
             services.AddScoped<HkrtPayChannelRefundNoticeService>();
@@ -206,6 +217,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<WxPayChannelRefundNoticeService>();
                         //case CS.IF_CODE.YSFPAY:
                         //    return provider.GetService<YsfPayChannelRefundNoticeService>();
+                        case CS.IF_CODE.PPPAY:
+                            return provider.GetService<PpPayChannelRefundNoticeService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayChannelRefundNoticeService>();
                         case CS.IF_CODE.LESPAY:
@@ -251,6 +264,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<AliPayPayOrderQueryService>();
             services.AddScoped<WxPayPayOrderQueryService>();
             services.AddScoped<YsfPayPayOrderQueryService>();
+            services.AddScoped<PpPayPayOrderQueryService>();
             services.AddScoped<SxfPayPayOrderQueryService>();
             services.AddScoped<LesPayPayOrderQueryService>();
             services.AddScoped<HkrtPayPayOrderQueryService>();
@@ -267,6 +281,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
                             return provider.GetService<WxPayPayOrderQueryService>();
                         case CS.IF_CODE.YSFPAY:
                             return provider.GetService<YsfPayPayOrderQueryService>();
+                        case CS.IF_CODE.PPPAY:
+                            return provider.GetService<PpPayPayOrderQueryService>();
                         case CS.IF_CODE.SXFPAY:
                             return provider.GetService<SxfPayPayOrderQueryService>();
                         case CS.IF_CODE.LESPAY:

@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.PpPay
 {
     public class PpPayChannelRefundNoticeService : AbstractChannelRefundNoticeService
     {
-        public PpPayChannelRefundNoticeService(ILogger<AbstractChannelRefundNoticeService> logger,
+        public PpPayChannelRefundNoticeService(ILogger<PpPayChannelRefundNoticeService> logger,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, configContextQueryService)

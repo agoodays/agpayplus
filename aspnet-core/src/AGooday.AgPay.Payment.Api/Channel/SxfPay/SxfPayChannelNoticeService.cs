@@ -9,6 +9,7 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json.Linq;
+using static AGooday.AgPay.Payment.Api.Channel.IChannelNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 {
@@ -17,7 +18,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
     /// </summary>
     public class SxfPayChannelNoticeService : AbstractChannelNoticeService
     {
-        public SxfPayChannelNoticeService(ILogger<AbstractChannelNoticeService> logger,
+        public SxfPayChannelNoticeService(ILogger<SxfPayChannelNoticeService> logger,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, configContextQueryService)
@@ -29,7 +30,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             return CS.IF_CODE.SXFPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, IChannelNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -44,7 +45,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, IChannelNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {

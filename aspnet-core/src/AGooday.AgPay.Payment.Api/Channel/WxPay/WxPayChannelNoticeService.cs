@@ -14,6 +14,7 @@ using SKIT.FlurlHttpClient.Wechat.TenpayV2;
 using SKIT.FlurlHttpClient.Wechat.TenpayV2.Events;
 using SKIT.FlurlHttpClient.Wechat.TenpayV3;
 using SKIT.FlurlHttpClient.Wechat.TenpayV3.Events;
+using static AGooday.AgPay.Payment.Api.Channel.IChannelNoticeService;
 using WechatTenpayClientV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClient;
 using WechatTenpayClientV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClient;
 
@@ -42,7 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             return CS.IF_CODE.WXPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, IChannelNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -132,7 +133,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, IChannelNoticeService.NoticeTypeEnum noticeTypeEnum)
+        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
