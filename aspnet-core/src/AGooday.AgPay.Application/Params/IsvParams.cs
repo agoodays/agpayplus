@@ -7,7 +7,8 @@
     {
         public static IsvParams Factory(string ifCode, string paramsStr)
         {
-            return ParamsHelper.GetParams<IsvParams>(ifCode, paramsStr);
+            //return ParamsHelper.GetParams<IsvParams>(ifCode, paramsStr);
+            return paramsStr.GetParams<IsvParams>(ifCode);
         }
 
         /// <summary>
