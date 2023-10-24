@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel;
 
 namespace AGooday.AgPay.Payment.Api.Utils
@@ -21,17 +22,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
         /// <returns></returns>
         public static IPaymentService GetRealPayWayService(IPaymentService service, string wayCode)
         {
-            try
-            {
-                var serviceName = $"{service.GetType().Namespace}.{PAYWAY_PACKAGE_NAME}.{RenameUtil.SnakeCaseToUpperCamelCase(wayCode.ToLower())}";
-                IPaymentService paymentService = ServiceProvider.GetServices<IPaymentService>()
-                    .FirstOrDefault(f => $"{f.GetType().Namespace}.{f.GetType().Name}".Equals(serviceName, StringComparison.OrdinalIgnoreCase));
-                return paymentService;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return GetRealPayWayService(service, PAYWAY_PACKAGE_NAME, wayCode);
         }
 
         /// <summary>
@@ -42,11 +33,20 @@ namespace AGooday.AgPay.Payment.Api.Utils
         /// <returns></returns>
         public static IPaymentService GetRealPayWayV3Service(IPaymentService service, string wayCode)
         {
+            return GetRealPayWayService(service, PAYWAYV3_PACKAGE_NAME, wayCode);
+        }
+
+        private static IPaymentService GetRealPayWayService(IPaymentService service, string packageName, string wayCode)
+        {
             try
             {
-                var serviceName = $"{service.GetType().Namespace}.{PAYWAYV3_PACKAGE_NAME}.{RenameUtil.SnakeCaseToUpperCamelCase(wayCode.ToLower())}";
+                var serviceName = $"{service.GetType().Namespace}.{packageName}.{RenameUtil.SnakeCaseToUpperCamelCase(wayCode.ToLower())}";
                 IPaymentService paymentService = ServiceProvider.GetServices<IPaymentService>()
                     .FirstOrDefault(f => $"{f.GetType().Namespace}.{f.GetType().Name}".Equals(serviceName, StringComparison.OrdinalIgnoreCase));
+                if (paymentService == null)
+                {
+                    throw new BizException("支付接口不支持该支付方式");
+                }
                 return paymentService;
             }
             catch (Exception)
