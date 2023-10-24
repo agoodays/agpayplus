@@ -18,9 +18,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
     /// <summary>
     /// 支付宝 小程序支付
     /// </summary>
-    public class AliJsapi : AliPayPaymentService
+    public class AliLite : AliPayPaymentService
     {
-        public AliJsapi(IServiceProvider serviceProvider,
+        public AliLite(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
+            AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
 
             AlipayTradeCreateRequest req = new AlipayTradeCreateRequest();
             AlipayTradeCreateModel model = new AlipayTradeCreateModel();
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
             AlipayTradeCreateResponse alipayResp = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(req);
 
             // 构造函数响应数据
-            AliJsapiOrderRS res = ApiResBuilder.BuildSuccess<AliJsapiOrderRS>();
+            AliLiteOrderRS res = ApiResBuilder.BuildSuccess<AliLiteOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
+            AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
             if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
             {
                 throw new BizException("[buyerUserId]不可为空");
