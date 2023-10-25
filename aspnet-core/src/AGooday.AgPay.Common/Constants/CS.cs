@@ -206,17 +206,35 @@
         #endregion
 
         #region 费率类型: SINGLE-单笔费率, LEVEL-阶梯费率
+        /// <summary>
+        /// 单笔费率
+        /// </summary>
         public const string FEE_TYPE_SINGLE = "SINGLE";
+        /// <summary>
+        /// 阶梯费率
+        /// </summary>
         public const string FEE_TYPE_LEVEL = "LEVEL";
         #endregion
 
         #region 阶梯模式: 模式: NORMAL-普通模式, UNIONPAY-银联模式
+        /// <summary>
+        /// 普通模式
+        /// </summary>
         public const string LEVEL_MODE_NORMAL = "NORMAL";
+        /// <summary>
+        /// 银联模式
+        /// </summary>
         public const string LEVEL_MODE_UNIONPAY = "UNIONPAY";
         #endregion
 
         #region 银行卡类型: DEBIT-借记卡（储蓄卡）, CREDIT-贷记卡（信用卡）
+        /// <summary>
+        /// 借记卡（储蓄卡）
+        /// </summary>
         public const string BANK_CARD_TYPE_DEBIT = "DEBIT";
+        /// <summary>
+        /// 贷记卡（信用卡）
+        /// </summary>
         public const string BANK_CARD_TYPE_CREDIT = "CREDIT";
         #endregion
 
@@ -301,6 +319,9 @@
         /// </summary>
         public static List<string> ALLOW_UPLOAD_IMG_SUFFIX = new List<string>() { "jpg" ,"png" ,"jpeg" ,"gif" ,"mp4" };
 
+        /// <summary>
+        /// Token 有效期
+        /// </summary>
         public const int TOKEN_TIME = 60 * 60 * 2; //单位：s,  两小时
 
         /// <summary>
@@ -314,6 +335,12 @@
         /// 缓存key: 当前用户所有用户的token集合  example: TOKEN_1001_HcNheNDqHzhTIrT0lUXikm7xU5XY4Q
         /// </summary>
         public const string CACHE_KEY_TOKEN = "Token:TOKEN_{0}_{1}";
+        /// <summary>
+        /// 获取Token缓存key
+        /// </summary>
+        /// <param name="sysUserId"></param>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
         public static string GetCacheKeyToken(long sysUserId, string uuid)
         {
             return string.Format(CACHE_KEY_TOKEN, sysUserId, uuid);
@@ -323,6 +350,11 @@
         /// 图片验证码 缓存key
         /// </summary>
         private const string CACHE_KEY_IMG_CODE = "ImgCode:img_code_{0}";
+        /// <summary>
+        /// 获取图片验证码缓存key
+        /// </summary>
+        /// <param name="imgToken"></param>
+        /// <returns></returns>
         public static string GetCacheKeyImgCode(string imgToken)
         {
             return string.Format(CACHE_KEY_IMG_CODE, imgToken);
@@ -332,6 +364,11 @@
         /// 短信验证码 缓存key
         /// </summary>
         private const string CACHE_KEY_SMS_CODE = "SmsCode:sms_code_{0}";
+        /// <summary>
+        /// 获取短信验证码缓存key
+        /// </summary>
+        /// <param name="smsToken"></param>
+        /// <returns></returns>
         public static string GetCacheKeySmsCode(string smsToken)
         {
             return string.Format(CACHE_KEY_SMS_CODE, smsToken);
@@ -343,15 +380,36 @@
         /// </summary>
         public interface AUTH_TYPE
         {
-            public const byte LOGIN_USER_NAME = 1; //登录用户名
-            public const byte TELPHONE = 2; //手机号
-            public const byte EMAIL = 3; //邮箱
+            /// <summary>
+            /// 登录用户名
+            /// </summary>
+            public const byte LOGIN_USER_NAME = 1;  //登录用户名
+            /// <summary>
+            /// 手机号
+            /// </summary>
+            public const byte TELPHONE = 2;         //手机号
+            /// <summary>
+            /// 邮箱
+            /// </summary>
+            public const byte EMAIL = 3;            //邮箱
 
-            public const byte WX_UNION_ID = 10; //微信unionId
-            public const byte WX_MINI = 11; //微信小程序
-            public const byte WX_MP = 12; //微信公众号
+            /// <summary>
+            /// 微信unionId
+            /// </summary>
+            public const byte WX_UNION_ID = 10;     //微信unionId
+            /// <summary>
+            /// 微信小程序
+            /// </summary>
+            public const byte WX_MINI = 11;         //微信小程序
+            /// <summary>
+            /// 微信公众号
+            /// </summary>
+            public const byte WX_MP = 12;           //微信公众号
 
-            public const byte QQ = 20; //QQ
+            /// <summary>
+            /// QQ
+            /// </summary>
+            public const byte QQ = 20;              //QQ
         }
 
         /// <summary>
@@ -359,9 +417,18 @@
         /// </summary>
         public interface ENT_TYPE
         {
-            public const string MENU_LEFT = "ML";  //左侧显示菜单
+            /// <summary>
+            /// 左侧显示菜单
+            /// </summary>
+            public const string MENU_LEFT = "ML";   //左侧显示菜单
+            /// <summary>
+            /// 其他菜单
+            /// </summary>
             public const string MENU_OTHER = "MO";  //其他菜单
-            public const string PAGE_OR_BTN = "PB";  //页面 or 按钮
+            /// <summary>
+            /// 页面 or 按钮
+            /// </summary>
+            public const string PAGE_OR_BTN = "PB"; //页面 or 按钮
         }
 
         /// <summary>
@@ -369,14 +436,41 @@
         /// </summary>
         public interface IF_CODE
         {
+            /// <summary>
+            /// 支付宝官方支付
+            /// </summary>
             public const string ALIPAY = "alipay";   // 支付宝官方支付
+            /// <summary>
+            /// 微信官方支付
+            /// </summary>
             public const string WXPAY = "wxpay";     // 微信官方支付
+            /// <summary>
+            /// 云闪付开放平台
+            /// </summary>
             public const string YSFPAY = "ysfpay";   // 云闪付开放平台
+            /// <summary>
+            /// 小新支付
+            /// </summary>
             public const string XXPAY = "xxpay";     // 小新支付
+            /// <summary>
+            /// Paypal 支付
+            /// </summary>
             public const string PPPAY = "pppay";     // Paypal 支付
+            /// <summary>
+            /// 随行付支付
+            /// </summary>
             public const string SXFPAY = "sxfpay";   // 随行付支付
+            /// <summary>
+            /// 乐刷支付
+            /// </summary>
             public const string LESPAY = "lespay";   // 乐刷支付
+            /// <summary>
+            /// 海科融通支付
+            /// </summary>
             public const string HKRTPAY = "hkrtpay"; // 海科融通支付
+            /// <summary>
+            /// 银联商务支付
+            /// </summary>
             public const string UMSPAY = "umspay";   // 银联商务支付
         }
 
@@ -385,37 +479,110 @@
         /// </summary>
         public interface PAY_WAY_CODE
         {
-            // 特殊支付方式
-            public const string QR_CASHIER = "QR_CASHIER"; //  ( 通过二维码跳转到收银台完成支付， 已集成获取用户ID的实现。  )
-            public const string AUTO_BAR = "AUTO_BAR"; // 条码聚合支付（自动分类条码类型）
+            #region 特殊支付方式
+            /// <summary>
+            /// 通过二维码跳转到收银台完成支付，已集成获取用户ID的实现。
+            /// </summary>
+            public const string QR_CASHIER = "QR_CASHIER";  // 聚合二维码支付( 通过二维码跳转到收银台完成支付，已集成获取用户ID的实现。)
+            /// <summary>
+            /// 条码聚合支付（自动分类条码类型） 
+            /// </summary>
+            public const string AUTO_BAR = "AUTO_BAR";      // 条码聚合支付（自动分类条码类型） 
+            #endregion
 
-            public const string ALI_BAR = "ALI_BAR";  //支付宝条码支付
-            public const string ALI_JSAPI = "ALI_JSAPI";  //支付宝服务窗支付
-            public const string ALI_APP = "ALI_APP";  //支付宝 app支付
-            public const string ALI_PC = "ALI_PC";  //支付宝 电脑网站支付
-            public const string ALI_WAP = "ALI_WAP";  //支付宝 wap支付
-            public const string ALI_QR = "ALI_QR";  //支付宝 二维码付款
-            public const string ALI_LITE = "ALI_LITE";  //支付宝 小程序
+            /// <summary>
+            /// 支付宝条码支付
+            /// </summary>
+            public const string ALI_BAR = "ALI_BAR";        //支付宝条码支付
+            /// <summary>
+            /// 支付宝服务窗支付
+            /// </summary>
+            public const string ALI_JSAPI = "ALI_JSAPI";    //支付宝服务窗支付
+            /// <summary>
+            /// 支付宝 app支付
+            /// </summary>
+            public const string ALI_APP = "ALI_APP";        //支付宝 app支付
+            /// <summary>
+            /// 付宝 电脑网站支付
+            /// </summary>
+            public const string ALI_PC = "ALI_PC";          //支付宝 电脑网站支付
+            /// <summary>
+            /// 支付宝 wap支付
+            /// </summary>
+            public const string ALI_WAP = "ALI_WAP";        //支付宝 wap支付
+            /// <summary>
+            /// 支付宝 二维码付款
+            /// </summary>
+            public const string ALI_QR = "ALI_QR";          //支付宝 二维码付款
+            /// <summary>
+            /// 支付宝 小程序
+            /// </summary>
+            public const string ALI_LITE = "ALI_LITE";      //支付宝 小程序
 
-            public const string UP_APP = "UP_APP";  //银联App支付
-            public const string UP_B2B = "UP_B2B";  //银联企业网银支付
-            public const string UP_BAR = "UP_BAR";  //银联二维码(被扫)
-            public const string UP_JSAPI = "UP_JSAPI";  //银联Js支付
-            public const string UP_PC = "UP_PC";  //银联网关支付
-            public const string UP_QR = "UP_QR";  //银联二维码(主扫)
-            public const string UP_WAP = "UP_WAP";  //银联手机网站支付
+            /// <summary>
+            /// 银联App支付
+            /// </summary>
+            public const string UP_APP = "UP_APP";          //银联App支付
+            /// <summary>
+            /// 银联企业网银支付
+            /// </summary>
+            public const string UP_B2B = "UP_B2B";          //银联企业网银支付
+            public const string UP_BAR = "UP_BAR";          //银联二维码(被扫)
+            /// <summary>
+            /// 银联Js支付
+            /// </summary>
+            public const string UP_JSAPI = "UP_JSAPI";      //银联Js支付
+            /// <summary>
+            /// 银联网关支付
+            /// </summary>
+            public const string UP_PC = "UP_PC";            //银联网关支付
+            /// <summary>
+            /// 银联二维码(主扫)
+            /// </summary>
+            public const string UP_QR = "UP_QR";            //银联二维码(主扫)
+            /// <summary>
+            /// 银联手机网站支付
+            /// </summary>
+            public const string UP_WAP = "UP_WAP";          //银联手机网站支付
 
-            public const string YSF_BAR = "YSF_BAR";  //云闪付条码支付
-            public const string YSF_JSAPI = "YSF_JSAPI";  //云闪付服务窗支付
+            /// <summary>
+            /// 云闪付条码支付
+            /// </summary>
+            public const string YSF_BAR = "YSF_BAR";        //云闪付条码支付
+            /// <summary>
+            /// 云闪付服务窗支付
+            /// </summary>
+            public const string YSF_JSAPI = "YSF_JSAPI";    //云闪付服务窗支付
 
-            public const string WX_APP = "WX_APP";  //微信app支付
-            public const string WX_JSAPI = "WX_JSAPI";  //微信jsapi支付
-            public const string WX_LITE = "WX_LITE";  //微信小程序支付
-            public const string WX_BAR = "WX_BAR";  //微信条码支付
-            public const string WX_H5 = "WX_H5";  //微信H5支付
-            public const string WX_NATIVE = "WX_NATIVE";  //微信扫码支付
+            /// <summary>
+            /// 微信app支付
+            /// </summary>
+            public const string WX_APP = "WX_APP";          //微信app支付
+            /// <summary>
+            /// 微信jsapi支付
+            /// </summary>
+            public const string WX_JSAPI = "WX_JSAPI";      //微信jsapi支付
+            /// <summary>
+            /// 微信小程序支付
+            /// </summary>
+            public const string WX_LITE = "WX_LITE";        //微信小程序支付
+            /// <summary>
+            /// 微信条码支付
+            /// </summary>
+            public const string WX_BAR = "WX_BAR";          //微信条码支付
+            /// <summary>
+            /// 微信H5支付
+            /// </summary>
+            public const string WX_H5 = "WX_H5";            //微信H5支付
+            /// <summary>
+            /// 微信扫码支付
+            /// </summary>
+            public const string WX_NATIVE = "WX_NATIVE";    //微信扫码支付
 
-            public const string PP_PC = "PP_PC"; // Paypal 支付
+            /// <summary>
+            /// Paypal 支付
+            /// </summary>
+            public const string PP_PC = "PP_PC";            // Paypal 支付
         }
 
         /// <summary>
@@ -423,15 +590,39 @@
         /// </summary>
         public interface PAY_DATA_TYPE
         {
-            public const string PAY_URL = "payurl";  //跳转链接的方式  redirectUrl
-            public const string FORM = "form";  //表单提交
-            public const string WX_APP = "wxapp";  //微信app参数
-            public const string ALI_APP = "aliapp";  //支付宝app参数
-            public const string YSF_APP = "ysfapp";  //云闪付app参数
-            public const string CODE_URL = "codeUrl";  //二维码URL
-            public const string CODE_IMG_URL = "codeImgUrl";  //二维码图片显示URL
-            public const string NONE = "none";  //无参数
-            //public const string QR_CONTENT = "qrContent";  //二维码实际内容
+            /// <summary>
+            /// 跳转链接的方式  redirectUrl
+            /// </summary>
+            public const string PAY_URL = "payurl";             //跳转链接的方式  redirectUrl
+            /// <summary>
+            /// 表单提交
+            /// </summary>
+            public const string FORM = "form";                  //表单提交
+            /// <summary>
+            /// 微信app参数
+            /// </summary>
+            public const string WX_APP = "wxapp";               //微信app参数
+            /// <summary>
+            /// 支付宝app参数
+            /// </summary>
+            public const string ALI_APP = "aliapp";             //支付宝app参数
+            /// <summary>
+            /// 云闪付app参数
+            /// </summary>
+            public const string YSF_APP = "ysfapp";             //云闪付app参数
+            /// <summary>
+            /// 二维码URL
+            /// </summary>
+            public const string CODE_URL = "codeUrl";           //二维码URL
+            /// <summary>
+            /// 二维码图片显示URL
+            /// </summary>
+            public const string CODE_IMG_URL = "codeImgUrl";    //二维码图片显示URL
+            /// <summary>
+            /// 无参数
+            /// </summary>
+            public const string NONE = "none";                  //无参数
+            //public const string QR_CONTENT = "qrContent";       //二维码实际内容
         }
 
         /// <summary>
@@ -439,7 +630,13 @@
         /// </summary>
         public interface PAY_IF_VERSION
         {
+            /// <summary>
+            /// 微信接口版本V2
+            /// </summary>
             public const string WX_V2 = "V2";  //微信接口版本V2
+            /// <summary>
+            /// 微信接口版本V3
+            /// </summary>
             public const string WX_V3 = "V3";  //微信接口版本V3
         }
     }
