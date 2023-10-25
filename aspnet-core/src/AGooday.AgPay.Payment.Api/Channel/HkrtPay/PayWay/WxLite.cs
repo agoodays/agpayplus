@@ -16,11 +16,11 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 {
     /// <summary>
-    /// 海科融通 微信jsapi
+    /// 海科融通 微信 小程序支付
     /// </summary>
-    public class WxJsapi : HkrtPayPaymentService
+    public class WxLite : HkrtPayPaymentService
     {
-        public WxJsapi(IServiceProvider serviceProvider,
+        public WxLite(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -30,9 +30,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【海科融通(wechatJs)jsapi支付】";
-            WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
+            WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
             JObject reqParams = new JObject();
-            WxJsapiOrderRS res = ApiResBuilder.BuildSuccess<WxJsapiOrderRS>();
+            WxLiteOrderRS res = ApiResBuilder.BuildSuccess<WxLiteOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
+            WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
             if (string.IsNullOrWhiteSpace(bizRQ.Openid))
             {
                 throw new BizException("[openId]不可为空");

@@ -1,7 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params.WxPay;
-using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
@@ -16,11 +14,11 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 {
     /// <summary>
-    /// 海科融通 微信jsapi
+    /// 海科融通 支付宝 小程序支付
     /// </summary>
-    public class WxJsapi : HkrtPayPaymentService
+    public class AliLite : HkrtPayPaymentService
     {
-        public WxJsapi(IServiceProvider serviceProvider,
+        public AliLite(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -29,10 +27,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【海科融通(wechatJs)jsapi支付】";
-            WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
+            string logPrefix = "【海科融通(alipayJs)jsapi支付】";
+            AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
             JObject reqParams = new JObject();
-            WxJsapiOrderRS res = ApiResBuilder.BuildSuccess<WxJsapiOrderRS>();
+            AliLiteOrderRS res = ApiResBuilder.BuildSuccess<AliLiteOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
@@ -40,11 +38,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
             //微信JSAPI、微信小程序、支付宝JSAPI、支付宝小程序、银联JSAPI支付必填
-            reqParams.Add("userid", bizRQ.Openid);
-
-            // 获取微信官方配置 的appId
-            WxPayIsvParams wxpayIsvParams = (WxPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.WXPAY);
-            reqParams.Add("appid", wxpayIsvParams.AppId); //用户ID
+            reqParams.Add("userid", bizRQ.BuyerUserId);
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/api/v1/pay/polymeric/jsapipay", reqParams, logPrefix, mchAppConfigContext);
@@ -61,22 +55,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
                     {
                         string trade_no = resJSON.GetValue("trade_no").ToString();//交易订单号 SaaS平台的交易订单编号
                         string channel_trade_no = resJSON.GetValue("channel_trade_no").ToString();//凭证条码订单号 仅支付宝和微信会返回(v1.24增加)
-                        string appId = resJSON.GetValue("appid").ToString();//微信 appId
-                        string timeStamp = resJSON.GetValue("timestamp").ToString();//微信 timeStamp
-                        string nonceStr = resJSON.GetValue("noncestr").ToString();//微信 nonceStr
-                        string package = resJSON.GetValue("package").ToString();//微信 package
-                        string signType = resJSON.GetValue("signtype").ToString();//微信 signType
-                        string paySign = resJSON.GetValue("paysign").ToString();//微信 paySign
-                        JObject payInfo = new JObject
-                        {
-                            { "appId", appId },
-                            { "timeStamp", timeStamp },
-                            { "nonceStr", nonceStr },
-                            { "package", package },
-                            { "signType", signType },
-                            { "paySign", paySign }
-                        };
-                        res.PayInfo = payInfo.ToString();
+                        resJSON.TryGetString("alipay_no", out string alipay_no);//预下单订单号 支付宝交易下单成功后会返回
+                        res.AlipayTradeNo = alipay_no;
                         channelRetMsg.ChannelOrderId = trade_no;
                         channelRetMsg.ChannelState = ChannelState.WAITING;
                     }
@@ -103,10 +83,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.Openid))
+            AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
+            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
             {
-                throw new BizException("[openId]不可为空");
+                throw new BizException("[buyerUserId]不可为空");
             }
 
             return null;
