@@ -16,7 +16,7 @@ using Aop.Api.Response;
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
 {
     /// <summary>
-    /// 支付宝 小程序支付
+    /// 支付宝 jsapi
     /// </summary>
     public class AliJsapi : AliPayPaymentService
     {
