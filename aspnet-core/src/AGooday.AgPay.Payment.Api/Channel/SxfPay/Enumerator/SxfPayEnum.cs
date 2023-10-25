@@ -179,6 +179,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.Enumerator
                 case CS.PAY_WAY_CODE.WX_NATIVE:
                 case CS.PAY_WAY_CODE.ALI_JSAPI:
                 case CS.PAY_WAY_CODE.ALI_WAP:
+                case CS.PAY_WAY_CODE.ALI_LITE:
                 case CS.PAY_WAY_CODE.YSF_JSAPI:
                     payWay = PayWay.JSAPI;
                     break;
