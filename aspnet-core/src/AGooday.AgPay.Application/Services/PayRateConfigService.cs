@@ -28,12 +28,14 @@ namespace AGooday.AgPay.Application.Services
         private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
         private readonly IPayRateConfigRepository _payRateConfigRepository;
         private readonly IPayRateLevelConfigRepository _payRateLevelConfigRepository;
+        // 注入工作单元
+        private readonly IUnitOfWork _uow;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public PayRateConfigService(IMapper mapper, IMediatorHandler bus,
+        public PayRateConfigService(IUnitOfWork uow, IMapper mapper, IMediatorHandler bus, 
             IPayRateConfigRepository payRateConfigRepository,
             IPayRateLevelConfigRepository payRateLevelConfigRepository,
             IIsvInfoRepository isvInfoRepository,
@@ -43,6 +45,7 @@ namespace AGooday.AgPay.Application.Services
             IPayWayRepository payWayRepository,
             IPayInterfaceDefineRepository payInterfaceDefineRepository)
         {
+            _uow = uow;
             _mapper = mapper;
             Bus = bus;
             _payRateConfigRepository = payRateConfigRepository;
@@ -424,41 +427,51 @@ namespace AGooday.AgPay.Application.Services
 
         public bool SaveOrUpdate(PayRateConfigSaveDto dto)
         {
-            var checkResult = PayRateConfigCheck(dto);
-            if (!checkResult.IsPassed)
+            try
             {
-                throw new BizException(checkResult.Message);
+                _uow.BeginTransaction();
+                var checkResult = PayRateConfigCheck(dto);
+                if (!checkResult.IsPassed)
+                {
+                    throw new BizException(checkResult.Message);
+                }
+                var infoId = dto.InfoId;
+                var ifCode = dto.IfCode;
+                var configMode = dto.ConfigMode;
+                var delPayWayCodes = dto.DelPayWayCodes;
+                var infoType = string.Empty;
+                switch (configMode)
+                {
+                    case CS.CONFIG_MODE.MGR_ISV:
+                        infoType = CS.INFO_TYPE.ISV;
+                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.ISVCOST, infoType, delPayWayCodes, dto.ISVCOST);
+                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
+                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
+                        break;
+                    case CS.CONFIG_MODE.MGR_AGENT:
+                    case CS.CONFIG_MODE.AGENT_SELF:
+                    case CS.CONFIG_MODE.AGENT_SUBAGENT:
+                        infoType = CS.INFO_TYPE.AGENT;
+                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.AGENTRATE, infoType, delPayWayCodes, dto.AGENTRATE);
+                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
+                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
+                        break;
+                    case CS.CONFIG_MODE.MGR_MCH:
+                    case CS.CONFIG_MODE.AGENT_MCH:
+                    case CS.CONFIG_MODE.MCH_SELF_APP1:
+                    case CS.CONFIG_MODE.MCH_SELF_APP2:
+                        infoType = CS.INFO_TYPE.MCH_APP;
+                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.MCHRATE, infoType, delPayWayCodes, dto.MCHRATE);
+                        break;
+                    default:
+                        break;
+                }
+                _uow.CommitTransaction();
             }
-            var infoId = dto.InfoId;
-            var ifCode = dto.IfCode;
-            var configMode = dto.ConfigMode;
-            var delPayWayCodes = dto.DelPayWayCodes;
-            var infoType = string.Empty;
-            switch (configMode)
+            catch (Exception)
             {
-                case CS.CONFIG_MODE.MGR_ISV:
-                    infoType = CS.INFO_TYPE.ISV;
-                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.ISVCOST, infoType, delPayWayCodes, dto.ISVCOST);
-                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
-                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
-                    break;
-                case CS.CONFIG_MODE.MGR_AGENT:
-                case CS.CONFIG_MODE.AGENT_SELF:
-                case CS.CONFIG_MODE.AGENT_SUBAGENT:
-                    infoType = CS.INFO_TYPE.AGENT;
-                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.AGENTRATE, infoType, delPayWayCodes, dto.AGENTRATE);
-                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
-                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
-                    break;
-                case CS.CONFIG_MODE.MGR_MCH:
-                case CS.CONFIG_MODE.AGENT_MCH:
-                case CS.CONFIG_MODE.MCH_SELF_APP1:
-                case CS.CONFIG_MODE.MCH_SELF_APP2:
-                    infoType = CS.INFO_TYPE.MCH_APP;
-                    SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.MCHRATE, infoType, delPayWayCodes, dto.MCHRATE);
-                    break;
-                default:
-                    break;
+                _uow.RollbackTransaction();
+                throw;
             }
 
             return true;
@@ -697,7 +710,7 @@ namespace AGooday.AgPay.Application.Services
                         {
                             continue;
                         }
-                        if (!PARENTRATE[i].FeeType.Equals(mainFee.FeeType))
+                        if (!PARENTRATE.FirstOrDefault(f => f.WayCode.Equals(wayCode)).FeeType.Equals(mainFee.FeeType))
                         {
                             return (false, $"[{wayCode}]的费率计算方式与[服务商底价]的配置不一致");
                         }
@@ -793,7 +806,7 @@ namespace AGooday.AgPay.Application.Services
                             {
                                 continue;
                             }
-                            if (!PARENTRATE[i].FeeType.Equals(mainFee.FeeType))
+                            if (!PARENTRATE.FirstOrDefault(f => f.WayCode.Equals(wayCode)).FeeType.Equals(mainFee.FeeType))
                             {
                                 return (false, $"[{wayCode}]的费率计算方式与[服务商底价]的配置不一致");
                             }
