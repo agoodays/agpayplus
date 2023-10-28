@@ -63,7 +63,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
                     string bizMsg = respData.GetValue("bizMsg").ToString(); //业务响应信息
                     if ("0000".Equals(bizCode))
                     {
-                        string mno = respData.GetValue("mno").ToString();//商户编号
                         string uuid = respData.GetValue("uuid").ToString();//天阙平台订单号
                         /*落单号
                         仅供退款使用

@@ -9,7 +9,6 @@ using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Ocsp;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
 {
@@ -58,7 +57,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
                     string bizMsg = respData.GetValue("bizMsg").ToString(); //业务响应信息
                     if ("0000".Equals(bizCode))
                     {
-                        string mno = respData.GetValue("mno").ToString();//商户编号
                         string uuid = respData.GetValue("uuid").ToString();//天阙平台订单号
                         /*落单号
                         仅供退款使用

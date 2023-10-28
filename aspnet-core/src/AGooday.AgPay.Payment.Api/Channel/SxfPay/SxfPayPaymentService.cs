@@ -76,7 +76,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         PAYING 支付中*/
                         string tranSts = respData.GetValue("tranSts").ToString();
                         string uuid = respData.GetValue("uuid").ToString();//天阙平台订单号
-                        string mno = respData.GetValue("mno").ToString();//商户编号
                         /*落单号
                         仅供退款使用
                         消费者账单中的条形码订单号*/
@@ -91,7 +90,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         switch (orderStatus)
                         {
                             case SxfPayEnum.OrderStatus.SUCCESS:
-                                channelRetMsg.ChannelMchNo = mno;
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelUserId = buyerId;
                                 channelRetMsg.PlatformOrderId = transactionId;
