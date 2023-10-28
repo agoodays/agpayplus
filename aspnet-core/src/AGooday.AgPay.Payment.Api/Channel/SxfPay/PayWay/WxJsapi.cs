@@ -52,6 +52,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("code").ToString(); //请求响应码
             string msg = resJSON.GetValue("msg").ToString(); //响应信息
+            string orgId = resJSON.GetValue("orgId").ToString(); //天阙平台机构编号
+            channelRetMsg.ChannelIsvNo = orgId;
             try
             {
                 if ("0000".Equals(code))
@@ -61,6 +63,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
                     string bizMsg = respData.GetValue("bizMsg").ToString(); //业务响应信息
                     if ("0000".Equals(bizCode))
                     {
+                        string mno = respData.GetValue("mno").ToString();//商户编号
                         string uuid = respData.GetValue("uuid").ToString();//天阙平台订单号
                         /*落单号
                         仅供退款使用

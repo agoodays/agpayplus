@@ -159,11 +159,18 @@ namespace AGooday.AgPay.Domain.Models
         public decimal MchFeeRate { get; set; }
 
         /// <summary>
-        /// 商户手续费,单位分
+        /// 商户手续费(实际手续费),单位分
         /// </summary>
-        [Comment("商户手续费,单位分")]
+        [Comment("商户手续费(实际手续费),单位分")]
         [Required, Column("mch_fee_amount", TypeName = "bigint")]
         public long MchFeeAmount { get; set; }
+
+        /// <summary>
+        /// 收单手续费,单位分
+        /// </summary>
+        [Comment("收单手续费,单位分")]
+        [Required, Column("mch_order_fee_amount", TypeName = "bigint")]
+        public long MchOrderFeeAmount { get; set; }
 
         /// <summary>
         /// 三位货币代码,人民币:cny
@@ -222,6 +229,20 @@ namespace AGooday.AgPay.Domain.Models
         public string BuyerRemark { get; set; }
 
         /// <summary>
+        /// 渠道商户号
+        /// </summary>
+        [Comment("渠道商户号")]
+        [Required, Column("channel_mch_no", TypeName = "varchar(64)")]
+        public string ChannelMchNo { get; set; }
+
+        /// <summary>
+        /// 渠道服务商机构号
+        /// </summary>
+        [Comment("渠道服务商机构号")]
+        [Required, Column("channel_isv_no", TypeName = "varchar(64)")]
+        public string ChannelIsvNo { get; set; }
+
+        /// <summary>
         /// 特定渠道发起额外参数
         /// </summary>
         [Comment("特定渠道发起额外参数")]
@@ -241,6 +262,20 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("渠道订单号")]
         [Column("channel_order_no", TypeName = "varchar(64)")]
         public string ChannelOrderNo { get; set; }
+
+        /// <summary>
+        /// 用户支付凭证交易单号 微信/支付宝流水号
+        /// </summary>
+        [Comment("用户支付凭证交易单号 微信/支付宝流水号")]
+        [Column("platform_order_no", TypeName = "varchar(64)")]
+        public string PlatformOrderNo { get; set; }
+
+        /// <summary>
+        /// 用户支付凭证商户单号
+        /// </summary>
+        [Comment("用户支付凭证商户单号")]
+        [Column("platform_mch_order_no", TypeName = "varchar(64)")]
+        public string PlatformMchOrderNo { get; set; }
 
         /// <summary>
         /// 退款状态: 0-未发生实际退款, 1-部分退款, 2-全额退款

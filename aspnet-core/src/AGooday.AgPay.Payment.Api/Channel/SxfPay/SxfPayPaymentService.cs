@@ -15,6 +15,7 @@ using AGooday.AgPay.Payment.Api.Utils;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Ocsp;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 {
@@ -57,6 +58,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("code").ToString(); //请求响应码
             string msg = resJSON.GetValue("msg").ToString(); //响应信息
+            string orgId = resJSON.GetValue("orgId").ToString(); //天阙平台机构编号
+            channelRetMsg.ChannelIsvNo = orgId;
             try
             {
                 if ("0000".Equals(code))
@@ -73,6 +76,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         PAYING 支付中*/
                         string tranSts = respData.GetValue("tranSts").ToString();
                         string uuid = respData.GetValue("uuid").ToString();//天阙平台订单号
+                        string mno = respData.GetValue("mno").ToString();//商户编号
                         /*落单号
                         仅供退款使用
                         消费者账单中的条形码订单号*/
@@ -87,6 +91,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         switch (orderStatus)
                         {
                             case SxfPayEnum.OrderStatus.SUCCESS:
+                                channelRetMsg.ChannelMchNo = mno;
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelUserId = buyerId;
                                 channelRetMsg.PlatformOrderId = transactionId;

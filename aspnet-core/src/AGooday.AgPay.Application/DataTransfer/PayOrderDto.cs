@@ -113,9 +113,14 @@ namespace AGooday.AgPay.Application.DataTransfer
         public decimal MchFeeRate { get; set; }
 
         /// <summary>
-        /// 商户手续费,单位分
+        /// 商户手续费(实际手续费),单位分
         /// </summary>
         public long MchFeeAmount { get; set; }
+
+        /// <summary>
+        /// 收单手续费,单位分
+        /// </summary>
+        public long MchOrderFeeAmount { get; set; }
 
         /// <summary>
         /// 三位货币代码,人民币:cny
@@ -158,6 +163,16 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string BuyerRemark { get; set; }
 
         /// <summary>
+        /// 渠道商户号
+        /// </summary>
+        public string ChannelMchNo { get; set; }
+
+        /// <summary>
+        /// 渠道服务商机构号
+        /// </summary>
+        public string ChannelIsvNo { get; set; }
+
+        /// <summary>
         /// 特定渠道发起额外参数
         /// </summary>
         public string ChannelExtra { get; set; }
@@ -171,6 +186,16 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 渠道订单号
         /// </summary>
         public string ChannelOrderNo { get; set; }
+
+        /// <summary>
+        /// 用户支付凭证交易单号 微信/支付宝流水号
+        /// </summary>
+        public string PlatformOrderNo { get; set; }
+
+        /// <summary>
+        /// 用户支付凭证商户单号
+        /// </summary>
+        public string PlatformMchOrderNo { get; set; }
 
         /// <summary>
         /// 退款状态: 0-未发生实际退款, 1-部分退款, 2-全额退款

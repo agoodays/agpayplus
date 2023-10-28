@@ -46,6 +46,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("code").ToString(); //请求响应码
             string msg = resJSON.GetValue("msg").ToString(); //响应信息
+            string orgId = resJSON.GetValue("orgId").ToString(); //天阙平台机构编号
+            channelRetMsg.ChannelIsvNo = orgId;
             try
             {
                 if ("0000".Equals(code))

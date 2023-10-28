@@ -13,6 +13,16 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         public ChannelState? ChannelState { get; set; }
 
         /// <summary>
+        /// 渠道商户号
+        /// </summary>
+        public string ChannelMchNo { get; set; }
+
+        /// <summary>
+        /// 渠道服务商机构号
+        /// </summary>
+        public string ChannelIsvNo { get; set; }
+
+        /// <summary>
         /// 渠道订单号
         /// </summary>
         public string ChannelOrderId { get; set; }

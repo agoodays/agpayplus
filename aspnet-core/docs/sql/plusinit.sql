@@ -131,6 +131,14 @@ ALTER TABLE `t_pay_order`
   ADD COLUMN `agent_name` VARCHAR(64) NULL COMMENT '代理商名称' AFTER `agent_no`,
   ADD COLUMN `agent_short_name` VARCHAR(32) NULL COMMENT '代理商简称' AFTER `agent_name`;
 
+ALTER TABLE `t_pay_order`   
+  CHANGE `mch_fee_amount` `mch_fee_amount` BIGINT(20) NOT NULL COMMENT '商户手续费(实际手续费),单位分',
+  ADD COLUMN `mch_order_fee_amount` BIGINT(20) NULL COMMENT '收单手续费,单位分' AFTER `mch_fee_amount`,
+  ADD COLUMN `channel_mch_no` VARCHAR(64) NULL COMMENT '渠道商户号' AFTER `buyer_remark`,
+  ADD COLUMN `channel_isv_no` VARCHAR(64) NULL COMMENT '渠道服务商机构号' AFTER `channel_mch_no`,
+  ADD COLUMN `platform_order_no` VARCHAR(64) NULL COMMENT '用户支付凭证交易单号 微信/支付宝流水号' AFTER `channel_order_no`,
+  ADD COLUMN `platform_mch_order_no` VARCHAR(64) NULL COMMENT '用户支付凭证商户单号' AFTER `platform_order_no`;
+
 ALTER TABLE `t_refund_order`   
   CHANGE `mch_name` `mch_name` VARCHAR(64) NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
   ADD COLUMN `mch_short_name` VARCHAR(32) NULL COMMENT '商户简称' AFTER `mch_name`,
