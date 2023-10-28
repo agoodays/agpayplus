@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
             //其他状态, 表示下单失败
             else
             {
-                res.OrderState = (byte)PayOrderState.STATE_FAIL;  //支付失败
+                channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;  //支付失败
                 channelRetMsg.ChannelErrCode = AliPayKit.AppendErrCode(alipayResp.Code, alipayResp.SubCode);
                 channelRetMsg.ChannelErrMsg = AliPayKit.AppendErrMsg(alipayResp.Msg, alipayResp.SubMsg);
             }

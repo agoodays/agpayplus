@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             #region ChannelUserService
             services.AddScoped<AliPayChannelUserService>();
             services.AddScoped<WxPayChannelUserService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, IChannelUserService> funcFactory = ifCode =>
                 {
@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             //services.AddScoped<IDivisionService, WxPayDivisionService>();
             services.AddScoped<AliPayDivisionService>();
             services.AddScoped<WxPayDivisionService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, IDivisionService> funcFactory = ifCode =>
                 {
@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             #endregion
             #region DivisionRecordChannelNotifyService
             services.AddScoped<AliPayDivisionRecordChannelNotifyService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, AbstractDivisionRecordChannelNotifyService> funcFactory = ifCode =>
                 {
@@ -91,7 +91,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<LesPayPaymentService>();
             services.AddScoped<HkrtPayPaymentService>();
             services.AddScoped<UmsPayPaymentService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, IPaymentService> funcFactory = ifCode =>
                 {
@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<LesPayRefundService>();
             services.AddScoped<HkrtPayRefundService>();
             services.AddScoped<UmsPayRefundService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, IRefundService> funcFactory = ifCode =>
                 {
@@ -167,7 +167,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<LesPayChannelNoticeService>();
             services.AddScoped<HkrtPayChannelNoticeService>();
             services.AddScoped<UmsPayChannelNoticeService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, IChannelNoticeService> funcFactory = ifCode =>
                 {
@@ -205,7 +205,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<LesPayChannelRefundNoticeService>();
             services.AddScoped<HkrtPayChannelRefundNoticeService>();
             services.AddScoped<UmsPayChannelRefundNoticeService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, IChannelRefundNoticeService> funcFactory = ifCode =>
                 {
@@ -239,7 +239,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<WxPayPayOrderCloseService>();
             services.AddScoped<YsfPayPayOrderCloseService>();
             services.AddScoped<UmsPayPayOrderCloseService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, IPayOrderCloseService> funcFactory = ifCode =>
                 {
@@ -269,7 +269,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             services.AddScoped<LesPayPayOrderQueryService>();
             services.AddScoped<HkrtPayPayOrderQueryService>();
             services.AddScoped<UmsPayPayOrderQueryService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, IPayOrderQueryService> funcFactory = ifCode =>
                 {
@@ -301,7 +301,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             #region TransferService
             services.AddScoped<AliPayTransferService>();
             services.AddScoped<WxPayTransferService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, ITransferService> funcFactory = ifCode =>
                 {
@@ -320,7 +320,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.Extensions
             #endregion
             #region TransferNoticeService
             services.AddScoped<AliPayTransferNoticeService>();
-            services.AddSingleton(provider =>
+            services.AddScoped(provider =>
             {
                 Func<string, ITransferNoticeService> funcFactory = ifCode =>
                 {
