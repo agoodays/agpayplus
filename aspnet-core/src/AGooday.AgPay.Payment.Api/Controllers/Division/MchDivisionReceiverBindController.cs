@@ -1,8 +1,10 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Payment.Api.Authorization;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Division;
@@ -54,6 +56,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         /// <param name="bizRQ"></param>
         /// <returns></returns>
         [HttpPost, Route("api/division/receiver/bind")]
+        [PermissionAuth(PermCode.PAY.API_DIVISION_BIND)]
         public ApiRes Bind()
         {
             //获取参数 & 验签

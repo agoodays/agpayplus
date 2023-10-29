@@ -346,5 +346,22 @@
             public const string ENT_C_MAIN_PAY_TREND_COUNT = "ENT_C_MAIN_PAY_TREND_COUNT";
             public const string ENT_ARTICLE_NOTICEINFO = "ENT_ARTICLE_NOTICEINFO";
         }
+
+        public static class PAY
+        {
+            public const string API_PAY_ORDER = "API_PAY_ORDER";
+            public const string API_PAY_ORDER_QUERY = "API_PAY_ORDER_QUERY";
+            public const string API_PAY_ORDER_CLOSE = "API_PAY_ORDER_CLOSE";
+            public const string API_CHANNEL_USER = "API_CHANNEL_USER";
+            public const string API_REFUND_ORDER = "API_REFUND_ORDER";
+            public const string API_REFUND_ORDER_QUERY = "API_REFUND_ORDER_QUERY";
+            public const string API_TRANS_ORDER = "API_TRANS_ORDER";
+            public const string API_TRANS_ORDER_QUERY = "API_TRANS_ORDER_QUERY";
+            public const string API_TRANS_BALANCE_QUERY = "API_TRANS_BALANCE_QUERY";
+            public const string API_DIVISION_BIND = "API_DIVISION_BIND";
+            public const string API_DIVISION_EXEC = "API_DIVISION_EXEC";
+            public const string API_DIVISION_CHANNEL_BALANCE = "API_DIVISION_CHANNEL_BALANCE";
+            public const string API_DIVISION_CHANNEL_CASHOUT = "API_DIVISION_CHANNEL_CASHOUT";
+        }
     }
 }

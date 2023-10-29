@@ -1,0 +1,51 @@
+﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Text;
+
+namespace AGooday.AgPay.Payment.Api.Authorization
+{
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    public class PermissionAuth : Attribute, IAuthorizationFilter
+    {
+        public PermissionAuth(params string[] name)
+        {
+            Name = name;
+        }
+
+        public string[] Name { get; set; }
+
+        public void OnAuthorization(AuthorizationFilterContext context)
+        {
+            string mchNo = GetMchNoFromRequest(context.HttpContext.Request);
+            var sysConfigService = context.HttpContext.RequestServices.GetRequiredService<ISysConfigService>();
+            var configVal = sysConfigService.GetByGroupKey("mchApiEnt", CS.SYS_TYPE.MCH, mchNo)
+                .Where(w => w.ConfigKey.Equals("mchApiEntList")).FirstOrDefault().ConfigVal;
+            var merchantPermissions = JsonConvert.DeserializeObject<List<string>>(configVal);
+            if (!merchantPermissions.Intersect(Name).Any())
+            {
+                throw new UnauthorizeException();
+                //context.Result = new ForbidResult();
+            }
+        }
+
+        private string GetMchNoFromRequest(HttpRequest request)
+        {
+            // 从请求体中获取 mchNo，请求体是 JSON 格式，mchNo 是 JSON 对象中的一个属性
+
+            using (StreamReader reader = new StreamReader(request.Body, Encoding.UTF8))
+            {
+                string requestBody = reader.ReadToEnd();
+
+                // 使用适当的 JSON 解析库解析请求体，并获取 mchNo
+                JObject json = JObject.Parse(requestBody);
+                string mchNo = json["mchNo"].ToString();
+
+                return mchNo;
+            }
+        }
+    }
+}

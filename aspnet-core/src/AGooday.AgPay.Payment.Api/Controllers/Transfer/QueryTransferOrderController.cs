@@ -1,8 +1,10 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Authorization;
 using AGooday.AgPay.Payment.Api.Controllers.Refund;
 using AGooday.AgPay.Payment.Api.RQRS.Transfer;
 using AGooday.AgPay.Payment.Api.Services;
@@ -31,6 +33,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         }
 
         [HttpPost, Route("/api/transfer/query")]
+        [PermissionAuth(PermCode.PAY.API_TRANS_ORDER_QUERY)]
         public ApiRes QueryTransferOrder()
         {
             //获取参数 & 验签

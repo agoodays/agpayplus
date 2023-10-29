@@ -1,8 +1,10 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Authorization;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
@@ -27,8 +29,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             this.payOrderService = payOrderService;
         }
 
-        [HttpPost]
-        [Route("query")]
+        [HttpPost, Route("query")]
+        [PermissionAuth(PermCode.PAY.API_PAY_ORDER_QUERY)]
         public ActionResult<ApiRes> QueryOrder()
         {
             //获取参数 & 验签

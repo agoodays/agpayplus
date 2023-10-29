@@ -1,7 +1,9 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Payment.Api.Authorization;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
@@ -32,8 +34,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
         /// 统一下单接口
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
-        [Route("api/pay/aliBarOrder")]
+        [HttpPost, Route("api/pay/aliBarOrder")]
+        [PermissionAuth(PermCode.PAY.API_PAY_ORDER)]
         public ActionResult<ApiRes> AliBarOrder()
         {
             //获取参数 & 验证

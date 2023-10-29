@@ -1,8 +1,10 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Payment.Api.Authorization;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Controllers.PayOrder;
 using AGooday.AgPay.Payment.Api.Models;
@@ -43,6 +45,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("jump")]
+        [PermissionAuth(PermCode.PAY.API_CHANNEL_USER)]
         public ActionResult Jump()
         {
             //获取请求数据

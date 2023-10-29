@@ -50,9 +50,8 @@ namespace AGooday.AgPay.Payment.Api.Middlewares
                     //errorResponse.Msg = ex.Message;
                     break;
                 case UnauthorizeException ex:
-                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    errorResponse.Code = ApiCode.SUCCESS.GetCode();
-                    errorResponse.Msg = "登录失效";
+                    errorResponse.Code = (int)HttpStatusCode.Unauthorized;
+                    errorResponse.Msg = "无访问权限";
                     break;
                 case BizException ex:
                     errorResponse = ApiRes.CustomFail(ex.Message);// 自定义的异常错误信息类型

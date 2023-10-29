@@ -1,9 +1,11 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Authorization;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Exceptions;
 using AGooday.AgPay.Payment.Api.Models;
@@ -48,6 +50,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         /// </summary>
         /// <returns></returns>
         [HttpPost, Route("/api/transferOrder")]
+        [PermissionAuth(PermCode.PAY.API_TRANS_ORDER)]
         public ApiRes TransferOrder()
         {
             TransferOrderDto transferOrder = null;

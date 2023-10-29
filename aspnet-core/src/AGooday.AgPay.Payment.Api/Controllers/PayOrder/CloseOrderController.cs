@@ -1,9 +1,11 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Authorization;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
@@ -43,8 +45,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// 关闭订单
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
-        [Route("close")]
+        [HttpPost, Route("close")]
+        [PermissionAuth(PermCode.PAY.API_PAY_ORDER_CLOSE)]
         public ApiRes QueryOrder()
         {
             //获取参数 & 验签
