@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -42,7 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Authorization
 
                 // 使用适当的 JSON 解析库解析请求体，并获取 mchNo
                 JObject json = JObject.Parse(requestBody);
-                string mchNo = json["mchNo"].ToString();
+                json.TryGetString("mchNo", out string mchNo);
 
                 return mchNo;
             }

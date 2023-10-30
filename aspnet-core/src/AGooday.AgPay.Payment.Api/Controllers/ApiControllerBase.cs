@@ -148,7 +148,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
                 stream.Seek(0, SeekOrigin.Begin);
                 using (var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true))
                 {
-                    body = reader.ReadToEndAsync().Result;
+                    body = reader.ReadToEnd();
                 }
                 stream.Seek(0, SeekOrigin.Begin);
             }

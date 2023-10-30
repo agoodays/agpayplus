@@ -137,7 +137,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// <returns></returns>
         private ApiRes PackageAlipayPayPackage(PayOrderDto payOrder)
         {
-
             string channelUserId = GetReqParamJson().GetValue("channelUserId").ToString();
             AliJsapiOrderRQ rq = new AliJsapiOrderRQ();
             rq.BuyerUserId = channelUserId;
