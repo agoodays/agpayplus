@@ -35,9 +35,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4.Infrastructure Layer", "4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5.Project.Common Layer", "5.Project.Common Layer", "{9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Manager.Api", "src\AGooday.AgPay.Manager.Api\AGooday.AgPay.Manager.Api.csproj", "{2B4DD36C-DF5A-430A-97BB-DB18FE850DF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Manager.Api", "src\AGooday.AgPay.Manager.Api\AGooday.AgPay.Manager.Api.csproj", "{2B4DD36C-DF5A-430A-97BB-DB18FE850DF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Payment.Api", "src\AGooday.AgPay.Payment.Api\AGooday.AgPay.Payment.Api.csproj", "{7912E57C-2D8E-49FC-8726-DEB0920C9D87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Payment.Api", "src\AGooday.AgPay.Payment.Api\AGooday.AgPay.Payment.Api.csproj", "{7912E57C-2D8E-49FC-8726-DEB0920C9D87}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Notice.Core", "src\AGooday.AgPay.Notice.Core\AGooday.AgPay.Notice.Core.csproj", "{9CAC3DCD-B2E9-4D7F-A5CF-1AC500372CCC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Notice.Email", "src\AGooday.AgPay.Notice.Email\AGooday.AgPay.Notice.Email.csproj", "{FB971EE3-AA1E-475A-B8B1-50CA819F7A98}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{FDF5C7A4-32BC-40E7-82AE-C9B862014B86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Notice.UnitTests", "test\AGooday.AgPay.Notice.UnitTests\AGooday.AgPay.Notice.UnitTests.csproj", "{F83215F9-BF88-4BD7-A673-68E2B6025758}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +101,18 @@ Global
 		{7912E57C-2D8E-49FC-8726-DEB0920C9D87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7912E57C-2D8E-49FC-8726-DEB0920C9D87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7912E57C-2D8E-49FC-8726-DEB0920C9D87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CAC3DCD-B2E9-4D7F-A5CF-1AC500372CCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CAC3DCD-B2E9-4D7F-A5CF-1AC500372CCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CAC3DCD-B2E9-4D7F-A5CF-1AC500372CCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CAC3DCD-B2E9-4D7F-A5CF-1AC500372CCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB971EE3-AA1E-475A-B8B1-50CA819F7A98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB971EE3-AA1E-475A-B8B1-50CA819F7A98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB971EE3-AA1E-475A-B8B1-50CA819F7A98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB971EE3-AA1E-475A-B8B1-50CA819F7A98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F83215F9-BF88-4BD7-A673-68E2B6025758}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F83215F9-BF88-4BD7-A673-68E2B6025758}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F83215F9-BF88-4BD7-A673-68E2B6025758}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F83215F9-BF88-4BD7-A673-68E2B6025758}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +135,9 @@ Global
 		{9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090} = {99A7EA44-AC97-420B-B147-E4BF005F2E55}
 		{2B4DD36C-DF5A-430A-97BB-DB18FE850DF7} = {4B86342C-F3B2-4A75-B2C6-05E30BAB670F}
 		{7912E57C-2D8E-49FC-8726-DEB0920C9D87} = {4B86342C-F3B2-4A75-B2C6-05E30BAB670F}
+		{9CAC3DCD-B2E9-4D7F-A5CF-1AC500372CCC} = {9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}
+		{FB971EE3-AA1E-475A-B8B1-50CA819F7A98} = {9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}
+		{F83215F9-BF88-4BD7-A673-68E2B6025758} = {FDF5C7A4-32BC-40E7-82AE-C9B862014B86}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACDADF0F-3F17-4DE0-A322-714493E80E85}
