@@ -175,8 +175,8 @@ OSSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
 //加入 WebSocket 处理服务
-builder.Services.AddSingleton<WsChannelUserIdServer>();
-builder.Services.AddSingleton<WsPayOrderServer>();
+services.AddSingleton<WsChannelUserIdServer>();
+services.AddSingleton<WsPayOrderServer>();
 
 var app = builder.Build();
 

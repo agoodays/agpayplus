@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Notice.Email
             MimeMessage mimeMessage = new MimeMessage();
             var fromMailAddress = new MailboxAddress(option.FromName ?? option.FromAddress, option.FromAddress);
             mimeMessage.From.Add(fromMailAddress);
-            foreach (var toMailAddress in option.ToAddress.Select(MailboxAddress.Parse))
+            foreach (var toMailAddress in (input.ToAddress ?? option.ToAddress).Select(MailboxAddress.Parse))
             {
                 mimeMessage.To.Add(toMailAddress);
             }

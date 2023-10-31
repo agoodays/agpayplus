@@ -15,6 +15,7 @@
     <ProjectReference Include="..\AGooday.AgPay.Common\AGooday.AgPay.Common.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Components.MQ\AGooday.AgPay.Components.MQ.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Domain.Core\AGooday.AgPay.Domain.Core.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Notice.Email\AGooday.AgPay.Notice.Email.csproj" />
   </ItemGroup>
 
 </Project>

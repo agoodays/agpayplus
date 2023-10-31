@@ -1,7 +1,10 @@
-﻿namespace AGooday.AgPay.Notice.Email
+﻿using AGooday.AgPay.Notice.Core;
+
+namespace AGooday.AgPay.Notice.Email
 {
-    public class EmailSendRequest
+    public class EmailSendRequest : NoticeSendRequest
     {
+        public List<string> ToAddress { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
         public byte[] Attachments { get; set; }

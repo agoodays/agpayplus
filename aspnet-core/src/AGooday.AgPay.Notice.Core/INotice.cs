@@ -3,6 +3,12 @@
     public interface INotice
     {
         /// <summary>
+        /// 推送消息
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<NoticeSendResponse> SendAsync(NoticeSendRequest request);
+        /// <summary>
         /// 推送异常消息
         /// </summary>
         /// <param name="title">标题</param>

@@ -7,6 +7,8 @@ namespace AGooday.AgPay.Notice.Email
 {
     internal class EmailProvider : IEmailProvider
     {
+        private List<string> ToAddress;
+
         private readonly EmailOptions _emailOptions;
         private readonly NoticeOptions _noticeOptions;
 
@@ -16,6 +18,18 @@ namespace AGooday.AgPay.Notice.Email
             _noticeOptions = noticeOptions.Value;
         }
 
+        public void SetToAddress(List<string> toAddress)
+        {
+            ToAddress = toAddress;
+        }
+
+        public Task<NoticeSendResponse> SendAsync(NoticeSendRequest request)
+        {
+            var rq = (EmailSendRequest)request;
+            rq.ToAddress ??= ToAddress;
+            return SendBaseAsync((EmailSendRequest)request);
+        }
+
         /// <summary>
         /// 发送异常消息
         /// </summary>
@@ -23,6 +37,7 @@ namespace AGooday.AgPay.Notice.Email
         {
             var request = new EmailSendRequest
             {
+                ToAddress = ToAddress,
                 Subject = title,
                 Body = $"{exception.Message}{Environment.NewLine}{exception}"
             };
@@ -37,6 +52,7 @@ namespace AGooday.AgPay.Notice.Email
         {
             var request = new EmailSendRequest
             {
+                ToAddress = ToAddress,
                 Subject = title,
                 Body = message
             };
