@@ -29,7 +29,6 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         private readonly IPayOrderRepository _payOrderRepository;
         private readonly IMchPayPassageRepository _mchPayPassageRepository;
         private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
-        private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
 
         // 用来进行DTO
         private readonly IMapper _mapper;
