@@ -9,6 +9,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.Extensions
             services.AddScoped<IPaymentService, AliApp>();
             services.AddScoped<IPaymentService, AliBar>();
             services.AddScoped<IPaymentService, AliJsapi>();
+            services.AddScoped<IPaymentService, AliLite>();
             services.AddScoped<IPaymentService, AliPc>();
             services.AddScoped<IPaymentService, AliQr>();
             services.AddScoped<IPaymentService, AliWap>();
