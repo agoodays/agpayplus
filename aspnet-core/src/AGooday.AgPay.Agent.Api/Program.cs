@@ -172,6 +172,8 @@ services.AddMediatR(typeof(Program));//目的是为了扫描Handler的实现对象并添加到IO
 // 单写一层用来添加依赖项，从展示层 Presentation 中隔离
 NativeInjectorBootStrapper.RegisterServices(services);
 
+services.AddNotice(builder.Configuration);
+
 #region RabbitMQ
 services.AddTransient<RabbitMQSender>();
 services.AddSingleton<IMQSender>(provider =>

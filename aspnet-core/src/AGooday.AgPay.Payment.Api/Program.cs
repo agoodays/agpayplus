@@ -112,9 +112,12 @@ services.Configure<MvcOptions>(options =>
 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 //services.AddSingleton<RequestIpUtil>();
 services.AddSingleton<RequestKit>();
+
 // .NET Core 原生依赖注入
 // 单写一层用来添加依赖项，从展示层 Presentation 中隔离
 NativeInjectorBootStrapper.RegisterServices(services);
+
+services.AddNotice(builder.Configuration);
 
 #region RabbitMQ
 services.AddTransient<RabbitMQSender>();
