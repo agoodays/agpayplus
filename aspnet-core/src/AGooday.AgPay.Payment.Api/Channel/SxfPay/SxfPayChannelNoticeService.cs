@@ -76,6 +76,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                 string bizMsg = jsonParams.GetValue("bizMsg").ToString(); //业务响应信息
                 if ("0000".Equals(bizCode))
                 {
+                    jsonParams.TryGetString("mno", out string mno);//商户编号
+                    jsonParams.TryGetString("orgId", out string orgId);//机构号
                     string uuid = jsonParams.GetValue("uuid").ToString();//天阙平台订单号
                     /*落单号
                     仅供退款使用
@@ -87,6 +89,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                     支付宝渠道：买家支付宝用户号buyer_user_id
                     微信渠道：微信平台的sub_openid*/
                     jsonParams.TryGetString("buyerId", out string buyerId);
+                    result.ChannelMchNo = mno;
+                    result.ChannelIsvNo = orgId;
                     result.ChannelOrderId = uuid;
                     result.ChannelUserId = buyerId;
                     result.PlatformOrderId = transactionId;

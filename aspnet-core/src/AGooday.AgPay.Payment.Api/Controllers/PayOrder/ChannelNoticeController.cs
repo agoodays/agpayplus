@@ -232,12 +232,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     //明确成功
                     if (ChannelState.CONFIRM_SUCCESS == notifyResult.ChannelState)
                     {
-                        updateOrderSuccess = payOrderService.UpdateIng2Success(payOrderId, notifyResult.ChannelOrderId, notifyResult.ChannelUserId);
+                        updateOrderSuccess = payOrderService.UpdateIng2Success(payOrderId, notifyResult.ChannelMchNo, notifyResult.ChannelIsvNo, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.PlatformOrderId, notifyResult.PlatformMchOrderId);
                     }
                     //明确失败
                     else if (ChannelState.CONFIRM_FAIL == notifyResult.ChannelState)
                     {
-                        updateOrderSuccess = payOrderService.UpdateIng2Fail(payOrderId, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.ChannelErrCode, notifyResult.ChannelErrMsg);
+                        updateOrderSuccess = payOrderService.UpdateIng2Fail(payOrderId, notifyResult.ChannelMchNo, notifyResult.ChannelIsvNo, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.PlatformOrderId, notifyResult.PlatformMchOrderId, notifyResult.ChannelErrCode, notifyResult.ChannelErrMsg);
                     }
                 }
 

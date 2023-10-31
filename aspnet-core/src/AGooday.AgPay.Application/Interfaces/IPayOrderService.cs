@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="channelOrderNo"></param>
         /// <param name="channelUserId"></param>
         /// <returns></returns>
-        bool UpdateIng2Success(string payOrderId, string channelOrderNo, string channelUserId);
+        bool UpdateIng2Success(string payOrderId, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderId, string platformMchOrderId);
         /// <summary>
         /// 更新订单状态  【支付中】 --》 【订单关闭】
         /// </summary>
@@ -47,18 +47,22 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="channelErrCode"></param>
         /// <param name="channelErrMsg"></param>
         /// <returns></returns>
-        bool UpdateIng2Fail(string payOrderId, string channelOrderNo, string channelUserId, string channelErrCode, string channelErrMsg);
+        bool UpdateIng2Fail(string payOrderId, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo, string channelErrCode, string channelErrMsg);
         /// <summary>
         /// 更新订单状态 【支付中】 --》 【支付成功/支付失败】
         /// </summary>
         /// <param name="payOrderId"></param>
         /// <param name="updateState"></param>
+        /// <param name="channelMchNo"></param>
+        /// <param name="channelIsvNo"></param>
         /// <param name="channelOrderNo"></param>
         /// <param name="channelUserId"></param>
+        /// <param name="platformOrderNo"></param>
+        /// <param name="platformMchOrderNo"></param>
         /// <param name="channelErrCode"></param>
         /// <param name="channelErrMsg"></param>
         /// <returns></returns>
-        bool UpdateIng2SuccessOrFail(string payOrderId, byte updateState, string channelOrderNo, string channelUserId, string channelErrCode, string channelErrMsg);
+        bool UpdateIng2SuccessOrFail(string payOrderId, byte updateState, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo, string channelErrCode, string channelErrMsg);
         /// <summary>
         /// 更新订单为 超时状态
         /// </summary>

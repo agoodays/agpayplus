@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.WxPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
@@ -52,7 +53,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("code").ToString(); //请求响应码
             string msg = resJSON.GetValue("msg").ToString(); //响应信息
-            string orgId = resJSON.GetValue("orgId").ToString(); //天阙平台机构编号
+            reqParams.TryGetString("mno", out string mno); // 商户号
+            resJSON.TryGetString("orgId", out string orgId); //天阙平台机构编号
+            channelRetMsg.ChannelMchNo = mno;
             channelRetMsg.ChannelIsvNo = orgId;
             try
             {

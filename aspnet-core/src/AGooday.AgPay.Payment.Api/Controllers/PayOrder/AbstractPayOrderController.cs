@@ -416,7 +416,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
 
             isSuccess = _payOrderService.UpdateIng2SuccessOrFail(payOrder.PayOrderId, payOrder.State,
-                    channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
+                    channelRetMsg.ChannelMchNo, channelRetMsg.ChannelIsvNo, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.PlatformOrderId, channelRetMsg.PlatformMchOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
             if (!isSuccess)
             {
                 throw new BizException("更新订单异常!");

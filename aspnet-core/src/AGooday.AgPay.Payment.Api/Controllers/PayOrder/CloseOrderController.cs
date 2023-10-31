@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <returns></returns>
         [HttpPost, Route("close")]
         [PermissionAuth(PermCode.PAY.API_PAY_ORDER_CLOSE)]
-        public ApiRes QueryOrder()
+        public ApiRes CloseOrder()
         {
             //获取参数 & 验签
             ClosePayOrderRQ rq = GetRQByWithMchSign<ClosePayOrderRQ>();

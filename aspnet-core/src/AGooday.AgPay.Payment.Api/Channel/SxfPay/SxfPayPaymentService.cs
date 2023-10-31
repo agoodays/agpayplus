@@ -15,7 +15,6 @@ using AGooday.AgPay.Payment.Api.Utils;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Ocsp;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 {
@@ -58,7 +57,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("code").ToString(); //请求响应码
             string msg = resJSON.GetValue("msg").ToString(); //响应信息
-            string orgId = resJSON.GetValue("orgId").ToString(); //天阙平台机构编号
+            reqParams.TryGetString("mno", out string mno); // 商户号
+            resJSON.TryGetString("orgId",out string orgId); //天阙平台机构编号
+            channelRetMsg.ChannelMchNo = mno;
             channelRetMsg.ChannelIsvNo = orgId;
             try
             {

@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 // 查询成功
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
-                    if (payOrderService.UpdateIng2Success(payOrderId, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId))
+                    if (payOrderService.UpdateIng2Success(payOrderId, channelRetMsg.ChannelMchNo, channelRetMsg.ChannelIsvNo, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.PlatformOrderId, channelRetMsg.PlatformMchOrderId))
                     {
                         //订单支付成功，其他业务逻辑
                         payOrderProcessService.ConfirmSuccess(payOrder);
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 else if (channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
                 {
                     //1. 更新支付订单表为失败状态
-                    payOrderService.UpdateIng2Fail(payOrderId, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
+                    payOrderService.UpdateIng2Fail(payOrderId, channelRetMsg.ChannelMchNo, channelRetMsg.ChannelIsvNo, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.PlatformOrderId, channelRetMsg.PlatformMchOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
                 }
 
                 return channelRetMsg;
@@ -133,7 +133,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 return channelRetMsg;
             }
             catch (Exception e)
-            {  
+            {
                 //继续下一次迭代查询
                 log.LogError(e, $"退款补单：error refundOrderId = {refundOrder.RefundOrderId}");
                 return null;
