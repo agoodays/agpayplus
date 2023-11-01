@@ -310,6 +310,8 @@
             public const string ENT_MCH_PAY_PASSAGE_CONFIG = "ENT_MCH_PAY_PASSAGE_CONFIG";
             public const string ENT_MCH_PAY_CONFIG_VIEW = "ENT_MCH_PAY_CONFIG_VIEW";
             public const string ENT_MCH_PAY_CONFIG_ADD = "ENT_MCH_PAY_CONFIG_ADD";
+            public const string ENT_MCH_OAUTH2_CONFIG_ADD = "ENT_MCH_OAUTH2_CONFIG_ADD";
+            public const string ENT_MCH_OAUTH2_CONFIG_VIEW = "ENT_MCH_OAUTH2_CONFIG_VIEW";
             public const string ENT_MCH_MAIN_NUMBER_COUNT = "ENT_MCH_MAIN_NUMBER_COUNT";
             public const string ENT_MCH_MAIN_PAY_COUNT = "ENT_MCH_MAIN_PAY_COUNT";
             public const string ENT_MCH_MAIN_PAY_TYPE_COUNT = "ENT_MCH_MAIN_PAY_TYPE_COUNT";
@@ -325,6 +327,12 @@
             public const string ENT_MCH_APP_EDIT = "ENT_MCH_APP_EDIT";
             public const string ENT_MCH_APP_DEL = "ENT_MCH_APP_DEL";
             public const string ENT_MCH_APP_ADD = "ENT_MCH_APP_ADD";
+            public const string ENT_MCH_STORE = "ENT_MCH_STORE";
+            public const string ENT_MCH_STORE_VIEW = "ENT_MCH_STORE_VIEW";
+            public const string ENT_MCH_STORE_LIST = "ENT_MCH_STORE_LIST";
+            public const string ENT_MCH_STORE_ADD = "ENT_MCH_STORE_ADD";
+            public const string ENT_MCH_STORE_EDIT = "ENT_MCH_STORE_EDIT";
+            public const string ENT_MCH_STORE_DEL = "ENT_MCH_STORE_DEL";
             public const string ENT_MCH_PAY_PASSAGE_LIST = "ENT_MCH_PAY_PASSAGE_LIST";
             public const string ENT_DIVISION = "ENT_DIVISION";
             public const string ENT_DIVISION_RECORD_VIEW = "ENT_DIVISION_RECORD_VIEW";

@@ -135,7 +135,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, Route("mchPassage"), MethodLog("更新商户支付通道")]
-        [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_ADD)]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_PASSAGE_ADD)]
         public ApiRes SetMchPassage(string appId, string wayCode, string ifCode, byte state)
         {
             try

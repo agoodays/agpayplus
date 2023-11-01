@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_LIST)]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_LIST)]
         public ApiPageRes<MchStoreListDto> List([FromQuery] MchStoreQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新建门店")]
-        [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_ADD)]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_ADD)]
         public ApiRes Add(MchStoreDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="recordId"></param>
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除门店")]
-        [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_DEL)]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_DEL)]
         public ApiRes Delete(long recordId)
         {
             var mchStore = _mchStoreService.GetById(recordId);
@@ -107,7 +107,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新门店信息")]
-        [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_EDIT)]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_EDIT)]
         public ApiRes Update(long recordId, MchStoreDto dto)
         {
             if (!dto.StoreId.HasValue || dto.StoreId.Value <= 0) // 应用分配
@@ -133,7 +133,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <param name="recordId"></param>
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_VIEW, PermCode.MGR.ENT_MCH_STORE_EDIT)]
+        [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_VIEW, PermCode.MCH.ENT_MCH_STORE_EDIT)]
         public ApiRes Detail(long recordId)
         {
             var mchStore = _mchStoreService.GetById(recordId);
