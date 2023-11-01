@@ -68,6 +68,9 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG', '系统配置', 'setting'
     
 INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECORD_RESEND', '按钮：重试', 'no-icon', '', '', 'PB', 0, 1,  'ENT_DIVISION_RECORD', '0', 'MCH', NOW(), NOW());
 
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_OAUTH2_CONFIG_VIEW', '按钮：oauth2配置详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APP', '0', 'MCH', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_OAUTH2_CONFIG_ADD', '按钮：oauth2配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APP', '0', 'MCH', NOW(), NOW());
+
 #####  ----------  修改表结构  ----------  #####
 
 ALTER TABLE `t_mch_info`   
