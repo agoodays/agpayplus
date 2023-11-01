@@ -55,6 +55,12 @@ INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_PAY_TREND_COUNT', '趋势图统
 
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG_PAGE', '按钮：商户配置信息', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
 
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_OAUTH2_CONFIG_VIEW', '按钮：oauth2配置详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_MCH_OAUTH2_CONFIG_ADD', '按钮：oauth2配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
+
+INSERT INTO t_sys_entitlement VALUES('ENT_ISV_OAUTH2_CONFIG_VIEW', '按钮：oauth2配置详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ISV_INFO', '0', 'MGR', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_ISV_OAUTH2_CONFIG_ADD', '按钮：oauth2配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ISV_INFO', '0', 'MGR', NOW(), NOW());
+
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_INFO', '商户信息', 'user', '/info', 'MchInfoPage', 'ML', 0, 1,  'ENT_MCH_CENTER', '0', 'MCH', NOW(), NOW());
 
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CONFIG', '系统配置', 'setting', '/config', 'MchConfigPage', 'ML', 0, 1,  'ENT_SYS_CONFIG', '30', 'MCH', NOW(), NOW());

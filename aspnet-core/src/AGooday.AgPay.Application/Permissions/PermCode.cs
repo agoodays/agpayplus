@@ -73,6 +73,8 @@
             public const string ENT_MCH_PAY_PASSAGE_CONFIG = "ENT_MCH_PAY_PASSAGE_CONFIG";
             public const string ENT_MCH_PAY_CONFIG_ADD = "ENT_MCH_PAY_CONFIG_ADD";
             public const string ENT_MCH_PAY_CONFIG_VIEW = "ENT_MCH_PAY_CONFIG_VIEW";
+            public const string ENT_MCH_OAUTH2_CONFIG_ADD = "ENT_MCH_OAUTH2_CONFIG_ADD";
+            public const string ENT_MCH_OAUTH2_CONFIG_VIEW = "ENT_MCH_OAUTH2_CONFIG_VIEW";
             public const string ENT_MCH_NOTIFY_VIEW = "ENT_MCH_NOTIFY_VIEW";
             public const string ENT_MCH_NOTIFY_RESEND = "ENT_MCH_NOTIFY_RESEND";
             public const string ENT_NOTIFY_LIST = "ENT_NOTIFY_LIST";
@@ -126,6 +128,8 @@
             public const string ENT_AGENT_INFO_ADD = "ENT_AGENT_INFO_ADD";
             public const string ENT_ISV_PAY_CONFIG_ADD = "ENT_ISV_PAY_CONFIG_ADD";
             public const string ENT_ISV_PAY_CONFIG_VIEW = "ENT_ISV_PAY_CONFIG_VIEW";
+            public const string ENT_ISV_OAUTH2_CONFIG_ADD = "ENT_ISV_OAUTH2_CONFIG_ADD";
+            public const string ENT_ISV_OAUTH2_CONFIG_VIEW = "ENT_ISV_OAUTH2_CONFIG_VIEW";
             public const string ENT_ISV_INFO_EDIT = "ENT_ISV_INFO_EDIT";
             public const string ENT_ISV_PAY_CONFIG_LIST = "ENT_ISV_PAY_CONFIG_LIST";
             public const string ENT_ISV_LIST = "ENT_ISV_LIST";
