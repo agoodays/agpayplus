@@ -32,6 +32,7 @@ namespace AGooday.AgPay.Application.Interfaces
         PayInterfaceConfigDto GetByInfoIdAndIfCode(string infoType, string infoId, string ifCode);
         IEnumerable<PayInterfaceConfigDto> GetByInfoIdAndIfCodes(string infoType, List<string> infoIds, string ifCode);
         IEnumerable<PayInterfaceConfigDto> GetByInfoId(string infoType, string infoId);
+        IEnumerable<PayInterfaceConfigDto> GetPayOauth2ConfigByInfoId(string infoType, string infoId);
         /// <summary>
         /// 查询商户app使用已正确配置了通道信息
         /// </summary>

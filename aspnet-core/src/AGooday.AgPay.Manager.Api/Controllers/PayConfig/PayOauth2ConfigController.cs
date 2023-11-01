@@ -7,6 +7,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +35,52 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
             _payIfConfigService = payIfConfigService;
+        }
+
+        /// <summary>
+        /// 查询配置条目
+        /// </summary>
+        /// <param name="infoId"></param>
+        /// <param name="configMode"></param>
+        /// <returns></returns>
+        [HttpGet, Route("diyList"), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_OAUTH2_CONFIG_VIEW)]
+        public ApiRes List(string configMode, string infoId)
+        {
+            string infoType = GetInfoType(configMode);
+            var data = _payIfConfigService.GetPayOauth2ConfigByInfoId(infoType, infoId);
+            var result = data.GroupBy(g => new { g.InfoId, g.Remark })
+                .Select(s => new { s.Key.InfoId, s.Key.Remark });
+            return ApiRes.Ok(result);
+        }
+
+        [HttpPost, Route("diyList"), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_OAUTH2_CONFIG_ADD)]
+        public ApiRes Save(PayOauth2ConfigRequest model)
+        {
+            string infoType = GetInfoType(model.ConfigMode);
+            var data = _payIfConfigService.GetByInfoId(infoType, model.CopySourceInfoId);
+            data ??= new List<PayInterfaceConfigDto>()
+            {
+                new PayInterfaceConfigDto() { InfoType = infoType, InfoId = model.InfoId, IfCode = CS.IF_CODE.WXPAY, Remark = model.Remark },
+            };
+            var infoId = $"{model.InfoId}_LIST_{DateTime.Now:yyyyMMddHHmmss}";
+            //添加更新者信息
+            long userId = GetCurrentUser().SysUser.SysUserId;
+            string realName = GetCurrentUser().SysUser.Realname;
+            foreach (var item in data)
+            {
+                item.InfoId = infoId;
+                item.Remark = model.Remark;
+                item.CreatedUid = userId;
+                item.CreatedBy = realName;
+                item.CreatedAt = DateTime.Now;
+                item.UpdatedUid = userId;
+                item.UpdatedBy = realName;
+                item.UpdatedAt = DateTime.Now;
+                _payIfConfigService.Add(item);
+            }
+            return ApiRes.Ok();
         }
 
         /// <summary>
