@@ -43,6 +43,7 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_ISV_INFO_EDIT')" @click="editFunc(record.isvNo)">修改</a-button>
+            <a-button type="link" v-if="$access('ENT_ISV_OAUTH2_CONFIG_VIEW')" @click="payOauth2ConfigFunc(record.isvNo)">Oauth2配置</a-button>
             <a-button type="link" v-if="$access('ENT_ISV_PAY_CONFIG_LIST')" @click="payConfigFunc(record.isvNo)">支付配置</a-button>
             <a-button type="link" v-if="$access('ENT_ISV_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.isvNo)">支付配置(旧版)</a-button>
             <a-button type="link" v-if="$access('ENT_ISV_INFO_DEL')" style="color: red" @click="delFunc(record.isvNo)">删除</a-button>
@@ -54,6 +55,8 @@
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
     <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" />
+    <!-- 支付配置组件  -->
+    <AgPayOauth2ConfigDrawer ref="payOauth2Config" :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'" :config-mode="'mgrIsv'" />
     <!-- 支付参数配置页面组件  -->
     <IsvPayIfConfigList ref="isvPayIfConfigList" />
   </page-header-wrapper>
@@ -64,6 +67,7 @@ import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgPayConfigDrawer from '@/components/AgPayConfig/AgPayConfigDrawer'
+import AgPayOauth2ConfigDrawer from '@/components/AgPayOauth2Config/AgPayOauth2ConfigDrawer'
 import { API_URL_ISV_LIST, req } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import IsvPayIfConfigList from './IsvPayIfConfigList'
@@ -84,6 +88,7 @@ export default {
     AgTable,
     AgTableColumns,
     AgPayConfigDrawer,
+    AgPayOauth2ConfigDrawer,
     InfoAddOrEdit,
     IsvPayIfConfigList,
     AgTextUp
@@ -133,6 +138,9 @@ export default {
     },
     payConfigFunc: function (recordId) { // 支付配置
       this.$refs.payConfig.show(recordId)
+    },
+    payOauth2ConfigFunc: function (recordId) { // 支付配置
+      this.$refs.payOauth2Config.show(recordId)
     },
     showPayIfConfigList: function (recordId) { // 支付参数配置
       this.$refs.isvPayIfConfigList.show(recordId)
