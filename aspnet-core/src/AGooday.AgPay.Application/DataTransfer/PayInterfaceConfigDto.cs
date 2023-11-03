@@ -35,12 +35,12 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 结算周期（自然日）
         /// </summary>
-        public byte? SettHoldDay { get; set; }
+        public byte SettHoldDay { get; set; }
 
         /// <summary>
         /// 支付接口费率
         /// </summary>
-        public decimal IfRate { get; set; }
+        public decimal? IfRate { get; set; }
 
         /// <summary>
         /// 是否开启进件: 0-关闭, 1-开启

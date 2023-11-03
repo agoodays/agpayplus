@@ -55,8 +55,9 @@
 
 <script>
 export default {
-  name: 'IsvOauth2ConfigPage',
+  name: 'Oauth2ConfigPage',
   props: {
+    configMode: { type: String, default: null },
     ifParams: { type: Object, default: () => ({}) }
   },
   data () {

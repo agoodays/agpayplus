@@ -2,7 +2,7 @@
   <a-form-model ref="infoFormModel" :model="ifParams" layout="vertical" :rules="rules">
     <a-row :gutter="24">
       <a-collapse v-model="activeKey" accordion :bordered="false">
-        <a-collapse-panel key="1" header="服务商三方应用参数配置">
+        <a-collapse-panel key="1" :header="configMode === 'mgrIsv' ? '服务商三方应用参数配置' : '商户应用参数配置'">
           <a-col span="24">
             <a-form-model-item label="环境配置" prop="sandbox">
               <a-radio-group v-model="ifParams.sandbox" @change="updateIfParams('sandbox', $event.target.value)">
@@ -34,7 +34,7 @@
           </a-col>
           <a-col span="24">
             <a-form-model-item label="接口签名方式(推荐使用RSA2)" prop="signType">
-              <a-radio-group v-model="ifParams.signType" defaultValue="RSA" @change="updateIfParams('signType', $event.target.value)">
+              <a-radio-group v-model="ifParams.signType" @change="updateIfParams('signType', $event.target.value)">
                 <a-radio value="RSA">RSA</a-radio>
                 <a-radio value="RSA2">RSA2</a-radio>
               </a-radio-group>
@@ -42,7 +42,7 @@
           </a-col>
           <a-col span="24">
             <a-form-model-item label="公钥证书" prop="useCert">
-              <a-radio-group v-model="ifParams.useCert" defaultValue="1" @change="updateIfParams('useCert', $event.target.value)">
+              <a-radio-group v-model="ifParams.useCert" @change="updateIfParams('useCert', $event.target.value)">
                 <a-radio value="1">使用证书（请使用RSA2私钥）</a-radio>
                 <a-radio value="0">不使用证书</a-radio>
               </a-radio-group>
@@ -97,7 +97,7 @@
             </a-form-model-item>
           </a-col>
         </a-collapse-panel>
-        <a-collapse-panel key="2" :disabled="false">
+        <a-collapse-panel key="2">
           <template slot="header">
             小程序参数配置<span style="color: rebeccapurple;">（当使用小程序静态码时需配置如下参数）</span>
           </template>
@@ -137,7 +137,7 @@
           </a-col>
           <a-col span="24">
             <a-form-model-item label="接口签名方式(推荐使用RSA2)" prop="liteParams.signType">
-              <a-radio-group v-model="ifParams.liteParams.signType" defaultValue="RSA" @change="updateIfParamsLiteParams('signType', $event.target.value)">
+              <a-radio-group v-model="ifParams.liteParams.signType" @change="updateIfParamsLiteParams('signType', $event.target.value)">
                 <a-radio value="RSA">RSA</a-radio>
                 <a-radio value="RSA2">RSA2</a-radio>
               </a-radio-group>
@@ -145,7 +145,7 @@
           </a-col>
           <a-col span="24">
             <a-form-model-item label="公钥证书" prop="liteParams.useCert">
-              <a-radio-group v-model="ifParams.liteParams.useCert" defaultValue="1" @change="updateIfParamsLiteParams('useCert', $event.target.value)">
+              <a-radio-group v-model="ifParams.liteParams.useCert" @change="updateIfParamsLiteParams('useCert', $event.target.value)">
                 <a-radio value="1">使用证书（请使用RSA2私钥）</a-radio>
                 <a-radio value="0">不使用证书</a-radio>
               </a-radio-group>
@@ -210,15 +210,16 @@ import AgUpload from '@/components/AgUpload/AgUpload'
 import { upload } from '@/api/manage'
 
 export default {
-  name: 'IsvOauth2ConfigPage',
+  name: 'Oauth2ConfigPage',
   components: {
     AgUpload
   },
   props: {
+    configMode: { type: String, default: null },
     ifParams: { type: Object, default: () => ({ liteParams: {} }) }
   },
   data () {
-    this.ifParams.liteParams = {}
+    this.ifParams.liteParams = this.ifParams.liteParams || {}
     return {
       action: upload.cert, // 上传文件地址
       activeKey: 1,

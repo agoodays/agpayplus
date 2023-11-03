@@ -55,7 +55,7 @@
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
     <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" />
-    <!-- 支付配置组件  -->
+    <!-- Oauth2配置组件  -->
     <AgPayOauth2ConfigDrawer ref="payOauth2Config" :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'" :config-mode="'mgrIsv'" />
     <!-- 支付参数配置页面组件  -->
     <IsvPayIfConfigList ref="isvPayIfConfigList" />

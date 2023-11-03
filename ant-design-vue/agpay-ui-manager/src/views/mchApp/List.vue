@@ -16,7 +16,6 @@
           <a-form-item label="" class="table-head-layout">
             <a-select v-model="searchData.state" placeholder="状态" default-value="">
               <a-select-option value="">全部</a-select-option>
-
               <a-select-option value="0">禁用</a-select-option>
               <a-select-option value="1">启用</a-select-option>
             </a-select>
@@ -50,6 +49,7 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_APP_EDIT')" @click="editFunc(record.appId)">修改</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_OAUTH2_CONFIG_VIEW')" @click="payOauth2ConfigFunc(record.appId, record.mchType)">Oauth2配置</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="payConfigFunc(record.appId, record.mchType)">支付配置</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.appId)">支付配置(旧版)</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_APP_DEL')" style="color: red" @click="delFunc(record.appId)">删除</a-button>
@@ -61,6 +61,8 @@
     <MchAppAddOrEdit ref="mchAppAddOrEdit" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
     <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_MCH_PAY_CONFIG_ADD'" :config-mode="'mgrMch'" />
+    <!-- Oauth2配置组件  -->
+    <AgPayOauth2ConfigDrawer ref="payOauth2Config" :perm-code="'ENT_MCH_OAUTH2_CONFIG_ADD'" :config-mode="'mgrMch'" />
     <!-- 支付参数配置页面组件  -->
     <MchPayIfConfigList ref="mchPayIfConfigList" />
   </page-header-wrapper>
@@ -72,6 +74,7 @@ import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgPayConfigDrawer from '@/components/AgPayConfig/AgPayConfigDrawer'
+import AgPayOauth2ConfigDrawer from '@/components/AgPayOauth2Config/AgPayOauth2ConfigDrawer'
 import { API_URL_MCH_APP, req } from '@/api/manage'
 import MchAppAddOrEdit from './AddOrEdit'
 import MchPayIfConfigList from './MchPayIfConfigList'
@@ -89,7 +92,7 @@ const tableColumns = [
 
 export default {
   name: 'MchAppPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgPayConfigDrawer, AgTextUp, MchAppAddOrEdit, MchPayIfConfigList },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgPayConfigDrawer, AgPayOauth2ConfigDrawer, AgTextUp, MchAppAddOrEdit, MchPayIfConfigList },
   data () {
     return {
       isShowMore: false,
@@ -140,6 +143,9 @@ export default {
     },
     payConfigFunc: function (recordId, mchType) { // 支付配置
       this.$refs.payConfig.show(recordId, mchType === 2)
+    },
+    payOauth2ConfigFunc: function (recordId, mchType) { // 支付配置
+      this.$refs.payOauth2Config.show(recordId, mchType === 2)
     },
     showPayIfConfigList: function (recordId) { // 支付参数配置
       this.$refs.mchPayIfConfigList.show(recordId)

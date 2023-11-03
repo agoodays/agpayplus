@@ -6,7 +6,7 @@
     :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
     :body-style="{ padding: '24px', overflowY: 'auto' }"
     width="80%">
-    <div>
+    <div v-show="configMode==='mgrIsv'">
       <div style="margin-bottom: 20px;">
         <label>选择配置的条目：</label>
         <a-select v-model="diyListSelectedInfoId" @change="getSavedConfigs" placeholder="" style="width: 380px;margin-right: 20px;">
@@ -36,18 +36,17 @@
         <a-button type="danger" icon="check" :style="{ marginLeft: '20px' }" @click="onSave">保存</a-button>
         <a-button type="primary" icon="close" :style="{ marginLeft: '8px' }" @click="diyAddMode='init'">取消</a-button>
       </div>
+      <a-divider/>
     </div>
-    <a-divider/>
     <a-tabs type="card" v-model="currentIfCode" @change="onIfCodeChange">
-      <a-tab-pane v-for="item in tabData" :key="item.code" :tab="item.name">
-        <a-card style="padding: 30px;">
-          <component :ref="item.code+'CurrentComponentRef'" :is="currentComponent" :if-params="ifParams" @update-if-params="handleUpdateIfParams"/>
-          <div style="display: flex; justify-content: space-around; flex-direction: row;">
-            <a-button type="primary" icon="check" @click="onSubmit" :loading="btnLoading">保存</a-button>
-          </div>
-        </a-card>
-      </a-tab-pane>
+      <a-tab-pane v-for="item in tabData" :key="item.code" :tab="item.name"/>
     </a-tabs>
+    <a-card style="padding: 30px;">
+      <component ref="currentComponentRef" :is="currentComponent" :config-mode="configMode" :if-params="ifParams" @update-if-params="handleUpdateIfParams"/>
+      <div style="display: flex; justify-content: space-around; flex-direction: row;">
+        <a-button type="primary" icon="check" @click="onSubmit" :loading="btnLoading">保存</a-button>
+      </div>
+    </a-card>
   </a-drawer>
 </template>
 
@@ -89,7 +88,6 @@ export default {
       this.getDiyList()
       this.$nextTick(() => {
         // DOM 更新周期结束后执行该回调函数
-        this.getSavedConfigs()
         this.onIfCodeChange()
       })
     },
@@ -118,6 +116,7 @@ export default {
     },
     onIfCodeChange () {
       const that = this
+      that.getSavedConfigs()
       that.getCurrentComponent().then(module => {
         that.currentComponent = module.default || module
       }).catch(() => {
@@ -137,6 +136,12 @@ export default {
         if (res) {
           that.saveObject = res
           that.ifParams = JSON.parse(res.ifParams || '{}')
+          if (that.currentIfCode === 'alipay') {
+            that.ifParams.liteParams = this.ifParams.liteParams || {}
+          }
+          if (this.isIsvSubMch) {
+            this.ifParams.isUseSubmchAccount = this.ifParams.isUseSubmchAccount || 0
+          }
         }
         that.$forceUpdate()
       })
@@ -160,8 +165,9 @@ export default {
     },
     onSubmit () {
       const that = this
-      const currentComponentRef = this.$refs[`${this.currentIfCode}CurrentComponentRef`][0]
-      currentComponentRef.validate(valid => {
+      console.log(that.saveObject)
+      console.log(that.ifParams)
+      this.$refs.currentComponentRef.validate(valid => {
         if (!valid) return
         // 验证通过
         // 支付参数配置不能为空
