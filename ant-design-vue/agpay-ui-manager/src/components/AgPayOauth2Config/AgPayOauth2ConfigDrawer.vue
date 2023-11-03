@@ -102,7 +102,6 @@ export default {
       this.addDiyListIsCopyCurrentFlag = true
       this.currentIfCode = 'wxpay'
       this.saveObject = {}
-      this.ifParams = {}
     },
     getCurrentComponent () {
       switch (this.currentIfCode) {
