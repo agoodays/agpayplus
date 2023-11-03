@@ -94,7 +94,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
         {
             string infoType = GetInfoType(configMode);
-            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
+            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode); 
+            payInterfaceConfig = payInterfaceConfig ?? new PayInterfaceConfigDto()
+            {
+                InfoType = infoType,
+                InfoId = infoId,
+                IfCode = ifCode,
+                State = CS.YES
+            };
             switch (infoType)
             {
                 case CS.INFO_TYPE.ISV_OAUTH2:
