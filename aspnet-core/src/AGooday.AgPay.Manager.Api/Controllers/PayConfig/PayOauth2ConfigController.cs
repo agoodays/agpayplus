@@ -20,6 +20,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         private readonly ILogger<PayOauth2ConfigController> _logger;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
+        private readonly IAgentInfoService _agentInfoService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
         public PayOauth2ConfigController(ILogger<PayOauth2ConfigController> logger, RedisUtil client,
@@ -27,13 +28,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService,
+            IMchInfoService mchInfoService, 
+            IAgentInfoService agentInfoService,
             IPayInterfaceConfigService payIfConfigService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             _logger = logger;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
+            _agentInfoService = agentInfoService;
             _payIfConfigService = payIfConfigService;
         }
 
@@ -44,13 +47,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <param name="configMode"></param>
         /// <returns></returns>
         [HttpGet, Route("diyList"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_ISV_OAUTH2_CONFIG_VIEW)]
+        [PermissionAuth(PermCode.MGR.ENT_ISV_OAUTH2_CONFIG_VIEW, PermCode.MGR.ENT_AGENT_PAY_CONFIG_VIEW)]
         public ApiRes List(string configMode, string infoId)
         {
+            List<object> result = new List<object>();
+            if (configMode.Equals(CS.CONFIG_MODE.MGR_AGENT))
+            {
+                var agentInfo = _agentInfoService.GetById(infoId);
+                infoId = agentInfo.IsvNo;
+                result.Add(new { InfoId = infoId, Remark = "服务商默认" });
+            }
             string infoType = GetInfoType(configMode);
-            var data = _payIfConfigService.GetPayOauth2ConfigByInfoId(infoType, infoId);
-            var result = data.GroupBy(g => new { g.InfoId, g.Remark })
+            var data = _payIfConfigService.GetPayOauth2ConfigByInfoId(infoType, infoId)
+                .GroupBy(g => new { g.InfoId, g.Remark })
                 .Select(s => new { s.Key.InfoId, s.Key.Remark });
+            result.AddRange(data);
             return ApiRes.Ok(result);
         }
 
@@ -70,6 +81,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             string realName = GetCurrentUser().SysUser.Realname;
             foreach (var item in data)
             {
+                item.Id = null;
                 item.InfoId = infoId;
                 item.Remark = model.Remark;
                 item.CreatedUid = userId;
@@ -193,6 +205,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             switch (configMode)
             {
                 case CS.CONFIG_MODE.MGR_ISV:
+                case CS.CONFIG_MODE.MGR_AGENT:
                     infoType = CS.INFO_TYPE.ISV_OAUTH2;
                     break;
                 case CS.CONFIG_MODE.MGR_MCH:

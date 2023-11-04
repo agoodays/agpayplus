@@ -1,7 +1,7 @@
 ﻿using AGooday.AgPay.Common.Extensions;
 using Newtonsoft.Json;
 
-namespace AGooday.AgPay.Application.Params.AliPay
+namespace AGooday.AgPay.Application.Params.WxPay
 {
     /// <summary>
     /// 微信 isv oauth2参数定义
@@ -43,6 +43,10 @@ namespace AGooday.AgPay.Application.Params.AliPay
 
         public override string DeSenData()
         {
+            if (!string.IsNullOrWhiteSpace(AppSecret))
+            {
+                AppSecret = AppSecret.Mask();
+            }
             if (!string.IsNullOrWhiteSpace(LiteAppSecret))
             {
                 LiteAppSecret = LiteAppSecret.Mask();

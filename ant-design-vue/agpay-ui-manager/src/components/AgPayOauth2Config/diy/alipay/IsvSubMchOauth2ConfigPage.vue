@@ -36,12 +36,12 @@
       </a-col>
       <a-col span="24">
         <a-form-model-item label="应用私钥" prop="liteParams.privateKey">
-          <a-input v-model="ifParams.liteParams.privateKey" type="textarea" @input="updateIfParamsLiteParams('privateKey', $event.target.value)" placeholder="请输入应用私钥" />
+          <a-input v-model="ifParams.liteParams.privateKey" type="textarea" @input="updateIfParamsLiteParams('privateKey', $event.target.value)" :placeholder="ifParams.liteParams.privateKey_ph" />
         </a-form-model-item>
       </a-col>
       <a-col span="24">
         <a-form-model-item label="支付宝公钥" prop="liteParams.alipayPublicKey">
-          <a-input v-model="ifParams.liteParams.alipayPublicKey" type="textarea" @input="updateIfParamsLiteParams('alipayPublicKey', $event.target.value)" placeholder="请输入支付宝公钥" />
+          <a-input v-model="ifParams.liteParams.alipayPublicKey" type="textarea" @input="updateIfParamsLiteParams('alipayPublicKey', $event.target.value)" :placeholder="ifParams.liteParams.alipayPublicKey_ph" />
           <p style="color: rebeccapurple;">当使用小程序静态码时需配置该参数</p>
         </a-form-model-item>
       </a-col>
@@ -124,11 +124,21 @@ export default {
   },
   props: {
     configMode: { type: String, default: null },
-    ifParams: { type: Object, default: () => ({ liteParams: {} }) }
+    formData: { type: Object, default: () => ({ liteParams: {} }) }
   },
   data () {
-    this.ifParams.liteParams = this.ifParams.liteParams || {}
+    this.formData.liteParams = this.formData.liteParams || {}
+    this.formData.liteParams.privateKey_ph = this.formData.liteParams.privateKey ? this.formData.liteParams.privateKey : '请输入应用私钥'
+    if (this.formData.liteParams.privateKey) {
+      this.formData.liteParams.privateKey = ''
+    }
+    this.formData.liteParams.alipayPublicKey_ph = this.formData.liteParams.alipayPublicKey ? this.formData.liteParams.alipayPublicKey : '请输入支付宝公钥'
+    if (this.formData.liteParams.alipayPublicKey) {
+      this.formData.liteParams.alipayPublicKey = ''
+    }
+    this.$emit('update-if-params', { ...this.formData })
     return {
+      ifParams: this.formData,
       action: upload.cert, // 上传文件地址
       rules: {}
     }
@@ -161,6 +171,20 @@ export default {
           [key]: value
         }
       })
+    },
+    handleStarParams () {
+      const ifParams = JSON.parse(JSON.stringify(this.ifParams) || '{}')
+      if (ifParams.liteParams.privateKey === '') {
+        ifParams.liteParams.privateKey = undefined
+      }
+      ifParams.liteParams.privateKey_ph = undefined
+
+      if (ifParams.liteParams.alipayPublicKey === '') {
+        ifParams.liteParams.alipayPublicKey = undefined
+      }
+      ifParams.liteParams.alipayPublicKey_ph = undefined
+
+      return ifParams
     },
     validate: function validate (callback) {
       return this.$refs.infoFormModel.validate(callback)

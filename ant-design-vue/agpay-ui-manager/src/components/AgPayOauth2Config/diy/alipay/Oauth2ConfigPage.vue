@@ -23,12 +23,12 @@
           </a-col>
           <a-col span="24">
             <a-form-model-item label="应用私钥" prop="privateKey">
-              <a-input v-model="ifParams.privateKey" type="textarea" @input="updateIfParams('privateKey', $event.target.value)" placeholder="请输入应用私钥" />
+              <a-input v-model="ifParams.privateKey" type="textarea" @input="updateIfParams('privateKey', $event.target.value)" :placeholder="ifParams.privateKey_ph" />
             </a-form-model-item>
           </a-col>
           <a-col span="24">
             <a-form-model-item label="支付宝公钥" prop="alipayPublicKey">
-              <a-input v-model="ifParams.alipayPublicKey" type="textarea" @input="updateIfParams('alipayPublicKey', $event.target.value)" placeholder="请输入支付宝公钥" />
+              <a-input v-model="ifParams.alipayPublicKey" type="textarea" @input="updateIfParams('alipayPublicKey', $event.target.value)" :placeholder="ifParams.alipayPublicKey_ph" />
               <p style="color: rebeccapurple;">当使用小程序静态码时需配置该参数</p>
             </a-form-model-item>
           </a-col>
@@ -126,12 +126,12 @@
           </a-col>
           <a-col span="24">
             <a-form-model-item label="应用私钥" prop="liteParams.privateKey">
-              <a-input v-model="ifParams.liteParams.privateKey" type="textarea" @input="updateIfParamsLiteParams('privateKey', $event.target.value)" placeholder="请输入应用私钥" />
+              <a-input v-model="ifParams.liteParams.privateKey" type="textarea" @input="updateIfParamsLiteParams('privateKey', $event.target.value)" :placeholder="ifParams.liteParams.privateKey_ph" />
             </a-form-model-item>
           </a-col>
           <a-col span="24">
             <a-form-model-item label="支付宝公钥" prop="liteParams.alipayPublicKey">
-              <a-input v-model="ifParams.liteParams.alipayPublicKey" type="textarea" @input="updateIfParamsLiteParams('alipayPublicKey', $event.target.value)" placeholder="请输入支付宝公钥" />
+              <a-input v-model="ifParams.liteParams.alipayPublicKey" type="textarea" @input="updateIfParamsLiteParams('alipayPublicKey', $event.target.value)" :placeholder="ifParams.liteParams.alipayPublicKey_ph" />
               <p style="color: rebeccapurple;">当使用小程序静态码时需配置该参数</p>
             </a-form-model-item>
           </a-col>
@@ -216,21 +216,43 @@ export default {
   },
   props: {
     configMode: { type: String, default: null },
-    ifParams: { type: Object, default: () => ({ liteParams: {} }) }
+    formData: { type: Object, default: () => ({ liteParams: {} }) }
   },
   data () {
-    this.ifParams.liteParams = this.ifParams.liteParams || {}
+    this.formData.liteParams = this.formData.liteParams || {}
+    const rules = {
+      sandbox: [{ required: true, trigger: 'blur', message: '请选择环境' }],
+      pid: [{ required: true, trigger: 'blur', message: '请输入合作伙伴身份（PID）' }],
+      appId: [{ required: true, trigger: 'blur', message: '请输入应用AppID' }],
+      signType: [{ required: true, trigger: 'blur', message: '请选择接口签名方式' }],
+      useCert: [{ required: true, trigger: 'blur', message: '请选择是否使用证书' }]
+    }
+    this.formData.privateKey_ph = this.formData.privateKey ? this.formData.privateKey : '请输入应用私钥'
+    if (this.formData.privateKey) {
+      this.formData.privateKey = ''
+    } else {
+      rules.privateKey = [{ required: true, trigger: 'blur', message: '请输入应用私钥' }]
+    }
+    this.formData.alipayPublicKey_ph = this.formData.alipayPublicKey ? this.formData.alipayPublicKey : '请输入支付宝公钥'
+    if (this.formData.alipayPublicKey) {
+      this.formData.alipayPublicKey = ''
+    } else {
+      rules.alipayPublicKey = [{ required: true, trigger: 'blur', message: '请输入支付宝公钥' }]
+    }
+    this.formData.liteParams.privateKey_ph = this.formData.liteParams.privateKey ? this.formData.liteParams.privateKey : '请输入应用私钥'
+    if (this.formData.liteParams.privateKey) {
+      this.formData.liteParams.privateKey = ''
+    }
+    this.formData.liteParams.alipayPublicKey_ph = this.formData.liteParams.alipayPublicKey ? this.formData.liteParams.alipayPublicKey : '请输入支付宝公钥'
+    if (this.formData.liteParams.alipayPublicKey) {
+      this.formData.liteParams.alipayPublicKey = ''
+    }
+    this.$emit('update-if-params', { ...this.formData })
     return {
+      ifParams: this.formData,
       action: upload.cert, // 上传文件地址
       activeKey: 1,
-      rules: {
-        sandbox: [{ required: true, trigger: 'blur', message: '请选择环境' }],
-        pid: [{ required: true, trigger: 'blur', message: '请输入合作伙伴身份（PID）' }],
-        appId: [{ required: true, trigger: 'blur', message: '请输入应用AppID' }],
-        privateKey: [{ required: true, trigger: 'blur', message: '请输入应用私钥' }],
-        signType: [{ required: true, trigger: 'blur', message: '请选择接口签名方式' }],
-        useCert: [{ required: true, trigger: 'blur', message: '请选择是否使用证书' }]
-      }
+      rules: rules
     }
   },
   methods: {
@@ -261,6 +283,30 @@ export default {
           [key]: value
         }
       })
+    },
+    handleStarParams () {
+      const ifParams = JSON.parse(JSON.stringify(this.ifParams) || '{}')
+      if (ifParams.privateKey === '') {
+        ifParams.privateKey = undefined
+      }
+      ifParams.privateKey_ph = undefined
+
+      if (ifParams.alipayPublicKey === '') {
+        ifParams.alipayPublicKey = undefined
+      }
+      ifParams.alipayPublicKey_ph = undefined
+
+      if (ifParams.liteParams.privateKey === '') {
+        ifParams.liteParams.privateKey = undefined
+      }
+      ifParams.liteParams.privateKey_ph = undefined
+
+      if (ifParams.liteParams.alipayPublicKey === '') {
+        ifParams.liteParams.alipayPublicKey = undefined
+      }
+      ifParams.liteParams.alipayPublicKey_ph = undefined
+
+      return ifParams
     },
     validate: function validate (callback) {
       return this.$refs.infoFormModel.validate(callback)

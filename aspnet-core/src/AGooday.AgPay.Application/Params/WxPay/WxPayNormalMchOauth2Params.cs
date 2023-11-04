@@ -47,6 +47,10 @@ namespace AGooday.AgPay.Application.Params.WxPay
             {
                 AppSecret = AppSecret.Mask();
             }
+            if (!string.IsNullOrWhiteSpace(LiteAppSecret))
+            {
+                LiteAppSecret = LiteAppSecret.Mask();
+            }
             return JsonConvert.SerializeObject(this);
         }
     }

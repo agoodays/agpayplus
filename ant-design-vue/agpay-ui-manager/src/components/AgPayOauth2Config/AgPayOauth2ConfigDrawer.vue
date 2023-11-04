@@ -11,7 +11,7 @@
         <label>选择配置的条目：</label>
         <a-select v-model="diyListSelectedInfoId" @change="getSavedConfigs" placeholder="" style="width: 380px;margin-right: 20px;">
           <a-select-option :value="infoId">默认</a-select-option>
-          <a-select-option v-for="item in diyList" :value="item.infoId" :key="item.infoId">
+          <a-select-option v-for="(item, key) in diyList" :value="item.infoId" :key="key">
             {{ item.remark + " [ ID: " + item.infoId + " ]" }}
           </a-select-option>
         </a-select>
@@ -38,11 +38,11 @@
       </div>
       <a-divider/>
     </div>
-    <a-tabs type="card" v-model="currentIfCode" @change="onIfCodeChange">
+    <a-tabs type="card" v-model="currentIfCode" @change="getSavedConfigs">
       <a-tab-pane v-for="item in tabData" :key="item.code" :tab="item.name"/>
     </a-tabs>
     <a-card style="padding: 30px;">
-      <component ref="currentComponentRef" :is="currentComponent" :config-mode="configMode" :if-params="ifParams" @update-if-params="handleUpdateIfParams"/>
+      <component ref="currentComponentRef" :is="currentComponent" :config-mode="configMode" :form-data="ifParams" @update-if-params="handleUpdateIfParams"/>
       <div style="display: flex; justify-content: space-around; flex-direction: row;">
         <a-button type="primary" icon="check" @click="onSubmit" :loading="btnLoading">保存</a-button>
       </div>
@@ -88,7 +88,7 @@ export default {
       this.getDiyList()
       this.$nextTick(() => {
         // DOM 更新周期结束后执行该回调函数
-        this.onIfCodeChange()
+        this.getSavedConfigs()
       })
     },
     onClose () {
@@ -102,6 +102,7 @@ export default {
       this.addDiyListIsCopyCurrentFlag = true
       this.currentIfCode = 'wxpay'
       this.saveObject = {}
+      this.currentComponent = null
     },
     getCurrentComponent () {
       switch (this.currentIfCode) {
@@ -113,16 +114,16 @@ export default {
           return Promise.reject(new Error('Unknown variable dynamic import: ' + this.currentIfCode))
       }
     },
-    onIfCodeChange () {
-      const that = this
-      that.getSavedConfigs()
-      that.getCurrentComponent().then(module => {
-        that.currentComponent = module.default || module
-      }).catch(() => {
-        that.currentComponent = null
-        that.$message.error('当前渠道不支持Oauth2配置！')
-      })
-    },
+    // onIfCodeChange () {
+    //   const that = this
+    //   that.getSavedConfigs()
+    //   that.getCurrentComponent().then(module => {
+    //     that.currentComponent = module.default || module
+    //   }).catch(() => {
+    //     that.currentComponent = null
+    //     that.$message.error('当前渠道不支持Oauth2配置！')
+    //   })
+    // },
     getDiyList () {
       req.get(API_URL_PAYOAUTH2CONFIGS + '/diyList', { 'configMode': this.configMode, 'infoId': this.infoId }).then(res => {
         this.diyList = res
@@ -130,18 +131,25 @@ export default {
     },
     getSavedConfigs () {
       const that = this
+      that.currentComponent = null
       const params = Object.assign({}, { configMode: that.configMode, infoId: that.diyListSelectedInfoId, ifCode: that.currentIfCode })
       req.get(API_URL_PAYOAUTH2CONFIGS + '/savedConfigs', params).then(res => {
         if (res) {
           that.saveObject = res
           that.ifParams = JSON.parse(res.ifParams || '{}')
           if (that.currentIfCode === 'alipay') {
-            that.ifParams.liteParams = this.ifParams.liteParams || {}
+            that.ifParams.liteParams = that.ifParams.liteParams || {}
           }
-          if (this.isIsvSubMch) {
-            this.ifParams.isUseSubmchAccount = this.ifParams.isUseSubmchAccount || 0
+          if (that.isIsvSubMch) {
+            that.ifParams.isUseSubmchAccount = that.ifParams.isUseSubmchAccount || 0
           }
         }
+        that.getCurrentComponent().then(module => {
+          that.currentComponent = module.default || module
+        }).catch(() => {
+          that.currentComponent = null
+          that.$message.error('当前渠道不支持Oauth2配置！')
+        })
         that.$forceUpdate()
       })
     },
@@ -164,8 +172,6 @@ export default {
     },
     onSubmit () {
       const that = this
-      console.log(that.saveObject)
-      console.log(that.ifParams)
       this.$refs.currentComponentRef.validate(valid => {
         if (!valid) return
         // 验证通过
@@ -174,8 +180,8 @@ export default {
           this.$message.error('参数不能为空！')
           return
         }
-
-        that.saveObject.ifParams = JSON.stringify(that.ifParams)
+        const ifParams = this.$refs.currentComponentRef.handleStarParams()
+        that.saveObject.ifParams = JSON.stringify(ifParams)
         that.btnLoading = true
         req.add(API_URL_PAYOAUTH2CONFIGS + '/configParams', that.saveObject).then(res => {
           that.$message.success('保存成功')

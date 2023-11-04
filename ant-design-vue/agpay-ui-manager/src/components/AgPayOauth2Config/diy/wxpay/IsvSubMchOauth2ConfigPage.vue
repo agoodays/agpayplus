@@ -18,7 +18,7 @@
       </a-col>
       <a-col span="12">
         <a-form-model-item label="特约商户的小程序appSecret" prop="appSecret">
-          <a-input v-model="ifParams.appSecret" @input="updateIfParams('appSecret', $event.target.value)" placeholder="请输入小程序AppSecret" />
+          <a-input v-model="ifParams.appSecret" @input="updateIfParams('appSecret', $event.target.value)" :placeholder="ifParams.appSecret_ph" />
         </a-form-model-item>
       </a-col>
       <a-col span="24">
@@ -49,14 +49,22 @@ export default {
   name: 'MchOauth2ConfigPage',
   props: {
     configMode: { type: String, default: null },
-    ifParams: { type: Object, default: () => ({}) }
+    formData: { type: Object, default: () => ({}) }
   },
   data () {
+    const rules = {
+      appId: [{ required: true, trigger: 'blur', message: '请输入应用AppID' }]
+    }
+    this.formData.appSecret_ph = this.formData.appSecret ? this.formData.appSecret : '请输入应用AppSecret'
+    if (this.formData.appSecret) {
+      this.formData.appSecret = ''
+    } else {
+      rules.appSecret = [{ required: true, trigger: 'blur', message: '请输入应用AppSecret' }]
+    }
+    this.$emit('update-if-params', { ...this.formData })
     return {
-      rules: {
-        appId: [{ required: true, trigger: 'blur', message: '请输入应用AppID' }],
-        appSecret: [{ required: true, trigger: 'blur', message: '请输入应用AppSecret' }]
-      }
+      ifParams: this.formData,
+      rules: rules
     }
   },
   methods: {
@@ -65,6 +73,14 @@ export default {
         ...this.ifParams,
         [key]: value
       })
+    },
+    handleStarParams () {
+      const ifParams = JSON.parse(JSON.stringify(this.ifParams) || '{}')
+      if (ifParams.appSecret === '') {
+        ifParams.appSecret = undefined
+      }
+      ifParams.appSecret_ph = undefined
+      return ifParams
     },
     validate: function validate (callback) {
       return this.$refs.infoFormModel.validate(callback)

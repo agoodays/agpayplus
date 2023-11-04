@@ -1,8 +1,7 @@
-﻿using AGooday.AgPay.Application.Params.AliPay;
-using AGooday.AgPay.Common.Extensions;
+﻿using AGooday.AgPay.Common.Extensions;
 using Newtonsoft.Json;
 
-namespace AGooday.AgPay.Application.Params.WxPay
+namespace AGooday.AgPay.Application.Params.AliPay
 {
     /// <summary>
     /// 支付宝 oauth2 配置参数
