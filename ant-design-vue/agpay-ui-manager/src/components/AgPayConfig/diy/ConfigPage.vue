@@ -1,6 +1,6 @@
 <template>
   <div>
-    <BasePage ref="infoFormModel" :form-data="saveObject" @update-form-data="handleUpdateFormData"/>
+    <BasePage ref="infoFormModel" :form-data="saveObject" :diy-list="diyList" @update-form-data="handleUpdateFormData"/>
     <a-divider orientation="left" v-if="ifDefineArray?.length && saveObject.infoType != 'AGENT'">
       <a-tag color="#FF4B33">
         {{ saveObject.ifCode }} {{ saveObject.infoType === 'ISV' ? '服务商'
@@ -60,6 +60,7 @@ export default {
     ifDefine: { type: Object, default: null },
     permCode: { type: String, default: '' },
     configMode: { type: String, default: null },
+    diyList: { type: Array, default: () => ([]) },
     callbackFunc: { type: Function, default: () => ({}) }
   },
   data () {
@@ -104,6 +105,7 @@ export default {
       req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(res => {
         if (res) {
           that.saveObject = res
+          that.saveObject.oauth2InfoId = res.oauth2InfoId || ''
           that.saveObject.cashoutParams = JSON.parse(res.cashoutParams || '{}')
           that.ifParams = JSON.parse(res.ifParams || '{}')
         }
@@ -184,15 +186,14 @@ export default {
               return
             }
             // 脱敏数据为空时，删除该key
+            const ifParams = JSON.parse(JSON.stringify(that.ifParams) || '{}')
             this.ifDefineArray.forEach(item => {
-              if (item.star === '1' && that.ifParams[item.name] === '') {
-                that.ifParams[item.name] = undefined
+              if (item.star === '1' && ifParams[item.name] === '') {
+                ifParams[item.name] = undefined
               }
-              that.ifParams[item.name + '_ph'] = undefined
+              ifParams[item.name + '_ph'] = undefined
             })
-            const ifParams = JSON.stringify(that.ifParams)
-
-            that.submitRequest(ifParams)
+            that.submitRequest(JSON.stringify(ifParams))
           })
         } else {
           that.submitRequest()

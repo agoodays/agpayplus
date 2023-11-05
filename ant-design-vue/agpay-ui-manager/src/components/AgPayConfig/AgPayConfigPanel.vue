@@ -44,6 +44,7 @@
           :if-define="ifDefine"
           :perm-code="permCode"
           :config-mode="configMode"
+          :diy-list="diyList"
           :callbackFunc="refIfCodeList"
           v-if="paramsAndRateTabVal === 'paramsTab'"
         />
@@ -188,7 +189,7 @@ import AgUpload from '@/components/AgUpload/AgUpload'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgTableColState from '@/components/AgTable/AgTableColState'
-import { API_URL_PAYCONFIGS_LIST, API_URL_MCH_PAYPASSAGE_LIST, getAvailablePayInterfaceList, req } from '@/api/manage'
+import { API_URL_PAYCONFIGS_LIST, API_URL_MCH_PAYPASSAGE_LIST, API_URL_PAYOAUTH2CONFIGS, getAvailablePayInterfaceList, req } from '@/api/manage'
 import AgPayPaywayRatePanel from './AgPayPaywayRatePanel'
 
 const tableColumns = [
@@ -235,6 +236,7 @@ export default {
       configComponent: null,
       appConfigComponent: null,
       ifCodeList: [],
+      diyList: [],
       ifCodeListSearchData: {},
       searchData: {},
       tableColumns: tableColumns,
@@ -305,6 +307,9 @@ export default {
       this.ifCodeListSearchData = {}
       this.ifCodeListSearchData.infoId = this.infoId
       this.refIfCodeList()
+      if (infoType === 'AGENT') {
+        this.getDiyList()
+      }
       // this.visible = true
     },
     reset: function () {
@@ -368,6 +373,11 @@ export default {
     searchIfCodeFunc () {
       this.refIfCodeList()
       this.reset()
+    },
+    getDiyList () {
+      req.get(API_URL_PAYOAUTH2CONFIGS + '/diyList', { 'configMode': this.configMode, 'infoId': this.infoId }).then(res => {
+        this.diyList = res
+      })
     },
     // 刷新card列表
     refIfCodeList () {

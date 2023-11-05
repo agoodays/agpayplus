@@ -1,6 +1,6 @@
 <template>
   <div>
-    <BasePage ref="infoFormModel" :form-data="saveObject" @update-form-data="handleUpdateFormData"/>
+    <BasePage ref="infoFormModel" :form-data="saveObject" :diy-list="diyList" @update-form-data="handleUpdateFormData"/>
     <a-divider orientation="left" v-if="saveObject.infoType != 'AGENT'">
       <a-tag color="#FF4B33">
         {{ saveObject.ifCode }} 商户参数配置
@@ -136,6 +136,7 @@ export default {
     ifDefine: { type: Object, default: null },
     permCode: { type: String, default: '' },
     configMode: { type: String, default: null },
+    diyList: { type: Array, default: () => ([]) },
     callbackFunc: { type: Function, default: () => ({}) }
   },
   data () {
@@ -265,6 +266,7 @@ export default {
       req.get(API_URL_PAYCONFIGS_LIST + '/interfaceSavedConfigs', params).then(res => {
         if (res) {
           that.saveObject = res
+          that.saveObject.oauth2InfoId = res.oauth2InfoId || ''
           that.saveObject.cashoutParams = JSON.parse(res.cashoutParams || '{}')
           that.ifParams = JSON.parse(res.ifParams || '{}')
 
@@ -301,13 +303,12 @@ export default {
               return
             }
             // 脱敏数据为空时，删除该key
-            that.clearEmptyKey('appSecret')
-            that.clearEmptyKey('key')
-            that.clearEmptyKey('apiV3Key')
-            that.clearEmptyKey('serialNo')
-            const ifParams = JSON.stringify(that.ifParams)
-
-            that.submitRequest(ifParams)
+            const ifParams = JSON.parse(JSON.stringify(that.ifParams) || '{}')
+            that.clearEmptyKey(ifParams, 'appSecret')
+            that.clearEmptyKey(ifParams, 'key')
+            that.clearEmptyKey(ifParams, 'apiV3Key')
+            that.clearEmptyKey(ifParams, 'serialNo')
+            that.submitRequest(JSON.stringify(ifParams))
           })
         } else {
           that.submitRequest()
@@ -349,11 +350,11 @@ export default {
       })
     },
     // 脱敏数据为空时，删除对应key
-    clearEmptyKey (key) {
-      if (!this.ifParams[key]) {
-        this.ifParams[key] = undefined
+    clearEmptyKey (ifParams, key) {
+      if (!ifParams[key]) {
+        ifParams[key] = undefined
       }
-      this.ifParams[key + '_ph'] = undefined
+      ifParams[key + '_ph'] = undefined
     },
     handleUpdateFormData (formData) {
       this.saveObject = formData

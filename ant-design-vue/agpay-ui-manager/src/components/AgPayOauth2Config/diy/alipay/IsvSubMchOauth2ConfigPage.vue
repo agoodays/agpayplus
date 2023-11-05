@@ -174,17 +174,16 @@ export default {
     },
     handleStarParams () {
       const ifParams = JSON.parse(JSON.stringify(this.ifParams) || '{}')
-      if (ifParams.liteParams.privateKey === '') {
-        ifParams.liteParams.privateKey = undefined
-      }
-      ifParams.liteParams.privateKey_ph = undefined
-
-      if (ifParams.liteParams.alipayPublicKey === '') {
-        ifParams.liteParams.alipayPublicKey = undefined
-      }
-      ifParams.liteParams.alipayPublicKey_ph = undefined
-
+      this.clearEmptyKey(ifParams.liteParams, 'privateKey')
+      this.clearEmptyKey(ifParams.liteParams, 'alipayPublicKey')
       return ifParams
+    },
+    // 脱敏数据为空时，删除对应key
+    clearEmptyKey (ifParams, key) {
+      if (!ifParams[key]) {
+        ifParams[key] = undefined
+      }
+      ifParams[key + '_ph'] = undefined
     },
     validate: function validate (callback) {
       return this.$refs.infoFormModel.validate(callback)

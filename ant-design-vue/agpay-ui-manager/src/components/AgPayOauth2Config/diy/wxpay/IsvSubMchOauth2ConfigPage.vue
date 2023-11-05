@@ -76,11 +76,15 @@ export default {
     },
     handleStarParams () {
       const ifParams = JSON.parse(JSON.stringify(this.ifParams) || '{}')
-      if (ifParams.appSecret === '') {
-        ifParams.appSecret = undefined
-      }
-      ifParams.appSecret_ph = undefined
+      this.clearEmptyKey(ifParams, 'appSecret')
       return ifParams
+    },
+    // 脱敏数据为空时，删除对应key
+    clearEmptyKey (ifParams, key) {
+      if (!ifParams[key]) {
+        ifParams[key] = undefined
+      }
+      ifParams[key + '_ph'] = undefined
     },
     validate: function validate (callback) {
       return this.$refs.infoFormModel.validate(callback)

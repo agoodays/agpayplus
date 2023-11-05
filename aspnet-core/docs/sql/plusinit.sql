@@ -105,8 +105,8 @@ ALTER TABLE `t_pay_interface_config`
   ADD COLUMN `is_open_applyment` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启进件: 0-关闭, 1-开启' AFTER `if_rate`,
   ADD COLUMN `is_open_cashout` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启提现: 0-关闭, 1-开启' AFTER `is_open_applyment`,
   ADD COLUMN `is_open_check_bill` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否开启对账: 0-关闭, 1-开启' AFTER `is_open_cashout`,
-  ADD COLUMN `ignore_check_bill_mch_nos` VARCHAR(4096) NULL COMMENT '对账过滤子商户' AFTER `is_open_check_bill`;
-  ;
+  ADD COLUMN `ignore_check_bill_mch_nos` VARCHAR(4096) NULL COMMENT '对账过滤子商户' AFTER `is_open_check_bill`,
+  ADD COLUMN `oauth2_info_id` VARCHAR(20) NULL COMMENT 'oauth2配置Id' AFTER `ignore_check_bill_mch_nos`;
 
 -- ALTER TABLE `t_pay_way`   
 --   ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他' AFTER `way_name`;

@@ -90,6 +90,13 @@ namespace AGooday.AgPay.Domain.Models
         public string IgnoreCheckBillMchNos { get; set; }
 
         /// <summary>
+        /// oauth2配置Id
+        /// </summary>
+        [Comment("oauth2配置Id")]
+        [Column("oauth2_info_id", TypeName = "varchar(64)")]
+        public string Oauth2InfoId { get; set; }
+
+        /// <summary>
         /// 状态: 0-停用, 1-启用
         /// </summary>
         [Comment("状态: 0-停用, 1-启用")]

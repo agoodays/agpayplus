@@ -85,7 +85,9 @@ export default {
       this.diyListSelectedInfoId = infoId
       this.isIsvSubMch = isIsvSubMch
       this.visible = true
-      this.getDiyList()
+      if (this.configMode === 'mgrIsv') {
+        this.getDiyList()
+      }
       this.$nextTick(() => {
         // DOM 更新周期结束后执行该回调函数
         this.getSavedConfigs()

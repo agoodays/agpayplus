@@ -127,6 +127,18 @@
         </a-form-model-item>
       </a-col>
     </a-row>
+    <a-row :gutter="24" v-if="formData.infoType==='AGENT'">
+      <a-col :span="12">
+        <a-form-model-item label="选择使用的oauth2条目" prop="oauth2InfoId">
+          <a-select v-model="formData.oauth2InfoId" placeholder="">
+            <a-select-option :value="''">继承服务商配置</a-select-option>
+            <a-select-option v-for="(item, key) in diyList" :value="item.infoId" :key="key">
+              {{ item.remark + " [ ID: " + item.infoId + " ]" }}
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
+      </a-col>
+    </a-row>
     <a-row :gutter="24">
       <a-col :span="24">
         <a-form-model-item label="备注" prop="remark">
@@ -141,7 +153,8 @@
 export default {
   name: 'BasePage',
   props: {
-    formData: { type: Object, default: null }
+    formData: { type: Object, default: null },
+    diyList: { type: Array, default: () => ([]) }
   },
   data () {
     return {

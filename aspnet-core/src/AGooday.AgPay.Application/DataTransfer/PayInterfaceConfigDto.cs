@@ -63,6 +63,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string IgnoreCheckBillMchNos { get; set; }
 
         /// <summary>
+        /// oauth2配置Id
+        /// </summary>
+        public string Oauth2InfoId { get; set; }
+
+        /// <summary>
         /// 状态: 0-停用, 1-启用
         /// </summary>
         public byte State { get; set; }
