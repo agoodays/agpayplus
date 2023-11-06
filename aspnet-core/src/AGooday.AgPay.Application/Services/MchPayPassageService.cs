@@ -186,7 +186,7 @@ namespace AGooday.AgPay.Application.Services
             foreach (var item in mchPayPassages.Where(w => !w.IfCode.Equals(ifCode)))
             {
                 item.State = state.Equals(CS.YES) ? CS.NO : CS.YES;
-                _mchPayPassageRepository.Update(mchPayPassage);
+                _mchPayPassageRepository.Update(item);
             }
             _mchPayPassageRepository.SaveChanges();
         }
