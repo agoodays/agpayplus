@@ -181,12 +181,17 @@ namespace AGooday.AgPay.Application.Services
             else
             {
                 mchPayPassage.State = state;
+                mchPayPassage.UpdatedAt = DateTime.Now;
                 _mchPayPassageRepository.Update(mchPayPassage);
             }
-            foreach (var item in mchPayPassages.Where(w => !w.IfCode.Equals(ifCode)))
+            if (state.Equals(CS.YES))
             {
-                item.State = state.Equals(CS.YES) ? CS.NO : CS.YES;
-                _mchPayPassageRepository.Update(item);
+                foreach (var item in mchPayPassages.Where(w => !w.IfCode.Equals(ifCode) && w.State.Equals(CS.YES)))
+                {
+                    item.State = CS.NO;
+                    item.UpdatedAt = DateTime.Now;
+                    _mchPayPassageRepository.Update(item);
+                }
             }
             _mchPayPassageRepository.SaveChanges();
         }
