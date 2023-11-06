@@ -28,7 +28,8 @@ namespace AGooday.AgPay.Payment.Api.Authorization
             var merchantPermissions = JsonConvert.DeserializeObject<List<string>>(configVal);
             if (!merchantPermissions.Intersect(Name).Any())
             {
-                throw new UnauthorizeException();
+                throw new BizException($"商户无此接口[{Name}]权限!");
+                //throw new UnauthorizeException();
                 //context.Result = new ForbidResult();
             }
         }
