@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService, 
+            IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
             IPayInterfaceConfigService payIfConfigService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         public ApiRes List(string configMode, string infoId)
         {
             List<object> result = new List<object>();
-            if (configMode.Equals(CS.CONFIG_MODE.MGR_AGENT))
+            if (configMode.Equals(CS.CONFIG_MODE.MGR_AGENT) || configMode.Equals(CS.CONFIG_MODE.AGENT_SUBAGENT))
             {
                 var agentInfo = _agentInfoService.GetById(infoId);
                 infoId = agentInfo.IsvNo;
@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
         {
             string infoType = GetInfoType(configMode);
-            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode); 
+            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
             payInterfaceConfig = payInterfaceConfig ?? new PayInterfaceConfigDto()
             {
                 InfoType = infoType,
