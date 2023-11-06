@@ -107,6 +107,7 @@ export default {
       this.currentComponent = null
     },
     getCurrentComponent () {
+      console.log(this.isIsvSubMch)
       switch (this.currentIfCode) {
         case 'wxpay':
           return import(`./diy/wxpay/${this.isIsvSubMch ? 'IsvSubMch' : ''}Oauth2ConfigPage.vue`)

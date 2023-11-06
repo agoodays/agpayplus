@@ -48,6 +48,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         {
             string infoType = GetInfoType(configMode);
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
+            payInterfaceConfig = payInterfaceConfig ?? new PayInterfaceConfigDto()
+            {
+                InfoType = infoType,
+                InfoId = infoId,
+                IfCode = ifCode,
+                State = CS.YES
+            };
             switch (infoType)
             {
                 case CS.INFO_TYPE.ISV_OAUTH2:

@@ -49,6 +49,7 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_APP_EDIT')" @click="editFunc(record.appId)">修改</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_OAUTH2_CONFIG_VIEW') && record.mchType===1" @click="payOauth2ConfigFunc(record.appId, record.mchType)">Oauth2配置</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="payConfigFunc(record.appId, record.mchType)">支付配置</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_PAY_CONFIG_LIST')" @click="showPayIfConfigList(record.appId)">支付配置(旧版)</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_PAY_TEST')">
@@ -70,6 +71,8 @@
     <MchAppAddOrEdit ref="mchAppAddOrEdit" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
     <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_MCH_PAY_CONFIG_ADD'" :config-mode="configMode" />
+    <!-- Oauth2配置组件  -->
+    <AgPayOauth2ConfigDrawer ref="payOauth2Config" :perm-code="'ENT_MCH_OAUTH2_CONFIG_ADD'" :config-mode="configMode" />
     <!-- 支付参数配置页面组件  -->
     <MchPayIfConfigList ref="mchPayIfConfigList" />
   </page-header-wrapper>
@@ -80,6 +83,7 @@ import AgTable from '@/components/AgTable/AgTable'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgPayConfigDrawer from '@/components/AgPayConfig/AgPayConfigDrawer'
+import AgPayOauth2ConfigDrawer from '@/components/AgPayOauth2Config/AgPayOauth2ConfigDrawer'
 import { API_URL_MCH_APP, req } from '@/api/manage'
 import MchAppAddOrEdit from './AddOrEdit'
 import MchPayIfConfigList from './MchPayIfConfigList'
@@ -96,7 +100,7 @@ const tableColumns = [
 
 export default {
   name: 'MchAppPage',
-  components: { AgTable, AgTableColumns, AgTextUp, AgPayConfigDrawer, MchAppAddOrEdit, MchPayIfConfigList },
+  components: { AgTable, AgTableColumns, AgTextUp, AgPayConfigDrawer, AgPayOauth2ConfigDrawer, MchAppAddOrEdit, MchPayIfConfigList },
   data () {
     return {
       btnLoading: false,
@@ -139,6 +143,14 @@ export default {
       this.$nextTick(() => {
         // DOM 更新周期结束后执行该回调函数
         this.$refs.payConfig.show(recordId, mchType === 2)
+      })
+    },
+    payOauth2ConfigFunc: function (recordId, mchType) { // 支付配置
+      this.configMode = `mchSelfApp${mchType}`
+      // 更新 configMode 后，使用 $nextTick() 方法来确保 payConfig 组件已经被更新完毕
+      this.$nextTick(() => {
+        // DOM 更新周期结束后执行该回调函数
+        this.$refs.payOauth2Config.show(recordId, mchType === 2)
       })
     },
     showPayIfConfigList: function (recordId) { // 支付参数配置
