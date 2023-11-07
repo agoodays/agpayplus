@@ -123,7 +123,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                 dto.CreatedBy = dbRecoed.CreatedBy;
                 dto.CreatedAt = dbRecoed.CreatedAt;
                 // 合并支付参数
-                dto.IfParams = StringUtil.Marge(dbRecoed.IfParams, dto.IfParams);
+                dto.IfParams = StringUtil.Merge(dbRecoed.IfParams, dto.IfParams);
             }
             else
             {

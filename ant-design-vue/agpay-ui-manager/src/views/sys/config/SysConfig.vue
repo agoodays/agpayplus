@@ -150,7 +150,7 @@
                     <a-row>
                       <a-col :span="10">
                         <a-form-model-item label="AccessKeySecret" prop="contactTel">
-                          <a-input placeholder="请填写AccessKeySecret" v-model="ossConfig.aliyunOssConfig.accessKeySecret" />
+                          <a-input :placeholder="ossConfig.aliyunOssConfigDesen.accessKeySecret?ossConfig.aliyunOssConfigDesen.accessKeySecret:'请填写AccessKeySecret'" v-model="ossConfig.aliyunOssConfig.accessKeySecret" />
                         </a-form-model-item>
                       </a-col>
                     </a-row>
@@ -180,7 +180,7 @@
                   <a-row :key="config" v-for="(item, config) in configData">
                     <a-col :span="8">
                       <a-form-model-item :label="item.configName">
-                        <a-input :type="item.type==='text'?'text':'textarea'" v-model="item.configVal" autocomplete="off" />
+                        <a-input :type="item.type==='text'?'text':'textarea'" v-model="item.configVal" :placeholder="item.configValDesen?item.configValDesen:'请填写'" autocomplete="off" />
                       </a-form-model-item>
                     </a-col>
                   </a-row>
@@ -220,7 +220,8 @@ export default {
       ossConfig: {
         ossUseType: 'localFile',
         ossPublicSiteUrl: null,
-        aliyunOssConfig: {}
+        aliyunOssConfig: {},
+        aliyunOssConfigDesen: {}
       }
     }
   },
@@ -237,8 +238,9 @@ export default {
         // that.groupKey = res[0]?.groupKey
         const ossUseType = that.configData?.find(({ configKey }) => configKey === 'ossUseType')?.configVal
         that.ossConfig.ossUseType = ossUseType?.length > 0 ? ossUseType : 'localFile'
-        const aliyunOssConfig = that.configData?.find(({ configKey }) => configKey === 'aliyunOssConfig')?.configVal
-        that.ossConfig.aliyunOssConfig = aliyunOssConfig?.length > 0 ? JSON.parse(aliyunOssConfig) : 'localFile'
+        const aliyunOssConfig = that.configData?.find(({ configKey }) => configKey === 'aliyunOssConfig')
+        that.ossConfig.aliyunOssConfig = aliyunOssConfig?.configVal?.length > 0 ? JSON.parse(aliyunOssConfig?.configVal) : {}
+        that.ossConfig.aliyunOssConfigDesen = aliyunOssConfig?.configValDesen?.length > 0 ? JSON.parse(aliyunOssConfig?.configValDesen) : {}
       })
     },
     selectTabs (key) { // 清空必填提示

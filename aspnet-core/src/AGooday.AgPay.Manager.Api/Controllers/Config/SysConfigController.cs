@@ -1,13 +1,17 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Config
 {
@@ -38,6 +42,31 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         public ApiRes GetConfigs(string groupKey)
         {
             var configList = _sysConfigService.GetByGroupKey(groupKey, CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
+
+            // 敏感数据脱敏
+            if (groupKey.Equals("ossConfig"))
+            {
+                var sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("aliyunOssConfig"));
+                if (sysConfig != null)
+                {
+                    var configVal = JObject.Parse(sysConfig.ConfigVal);
+                    configVal.TryGetString("accessKeySecret", out string accessKeySecret);
+                    configVal["accessKeySecret"] = accessKeySecret.Mask();
+                    sysConfig.AddExt("configValDesen", JsonConvert.SerializeObject(configVal));
+                    configVal.Remove("accessKeySecret");
+                    sysConfig.ConfigVal = JsonConvert.SerializeObject(configVal);
+                }
+            }
+            if (groupKey.Equals("apiMapConfig"))
+            {
+                var sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("apiMapWebSecret"));
+                if (sysConfig != null)
+                {
+                    sysConfig.AddExt("configValDesen", sysConfig.ConfigVal?.Mask());
+                    sysConfig.ConfigVal = null;
+                }
+            }
+
             return ApiRes.Ok(configList);
         }
 

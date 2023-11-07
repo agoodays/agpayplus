@@ -156,7 +156,7 @@ namespace AGooday.AgPay.Common.Utils
         /// <param name="originStr"></param>
         /// <param name="mergeStr"></param>
         /// <returns>合并后的json字符串</returns>
-        public static string Marge(string originStr, string mergeStr)
+        public static string Merge(string originStr, string mergeStr)
         {
             if (string.IsNullOrWhiteSpace(originStr) || string.IsNullOrWhiteSpace(mergeStr))
             {

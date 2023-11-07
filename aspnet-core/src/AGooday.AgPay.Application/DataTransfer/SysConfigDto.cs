@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using AGooday.AgPay.Common.Models;
 
 namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 系统配置表
     /// </summary>
-    public class SysConfigDto
+    public class SysConfigDto : BaseModel
     {
         /// <summary>
         /// 配置KEY

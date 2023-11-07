@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
@@ -176,7 +177,15 @@ namespace AGooday.AgPay.Application.Services
                 else
                 {
                     sysConfig.ConfigKey = config.Key;
-                    sysConfig.ConfigVal = config.Value;
+                    switch (config.Key)
+                    {
+                        case "aliyunOssConfig":
+                            sysConfig.ConfigVal = StringUtil.Merge(sysConfig.ConfigVal, config.Value);
+                            break;
+                        default:
+                            sysConfig.ConfigVal = config.Value;
+                            break;
+                    }
                     sysConfig.UpdatedAt = DateTime.Now;
                     _sysConfigRepository.Update(sysConfig);
                 }
