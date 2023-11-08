@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Notice.Email
                         await client.AuthenticateAsync(_emailOptions.FromAddress, _emailOptions.Password);
                         await client.SendAsync(message);
                     }
-                }, input.Subject, _noticeOptions.IntervalSeconds);
+                }, input.Subject, _emailOptions.IntervalSeconds ?? _noticeOptions.IntervalSeconds ?? 10);
 
             }
             catch (Exception ex)

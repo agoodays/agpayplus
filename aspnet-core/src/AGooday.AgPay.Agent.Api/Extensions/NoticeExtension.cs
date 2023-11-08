@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Notice.Core;
+﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Notice.Core;
 using AGooday.AgPay.Notice.Email;
 
 namespace AGooday.AgPay.Agent.Api.Extensions
@@ -29,6 +30,31 @@ namespace AGooday.AgPay.Agent.Api.Extensions
                         x.FromName = mailOptions.FromName;
                         x.Port = mailOptions.Port;
                         x.ToAddress = mailOptions.ToAddress;
+                    });
+                }
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddNotice(this IServiceCollection services, ISysConfigService sysConfigService)
+        {
+            services.AddNotice(config =>
+            {
+                var sysConfig = sysConfigService.GetDBNoticeConfig();
+                //同一消息发送间隔 默认10秒
+                config.IntervalSeconds = sysConfig.Notice.IntervalSeconds;
+
+                if (sysConfig.Notice.Mail != null)
+                {
+                    config.UseEmail(x =>
+                    {
+                        x.Password = sysConfig.Notice.Mail.Password;
+                        x.Host = sysConfig.Notice.Mail.Host;
+                        x.FromAddress = sysConfig.Notice.Mail.FromAddress;
+                        x.FromName = sysConfig.Notice.Mail.FromName;
+                        x.Port = sysConfig.Notice.Mail.Port;
+                        x.ToAddress = sysConfig.Notice.Mail.ToAddress;
                     });
                 }
             });

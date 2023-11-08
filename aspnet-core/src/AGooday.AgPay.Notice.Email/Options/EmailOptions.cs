@@ -5,6 +5,11 @@
         public const string SectionName = "Mail";
 
         /// <summary>
+        /// 同一消息发送间隔
+        /// </summary>
+        public int? IntervalSeconds { get; set; }
+
+        /// <summary>
         /// SMTP地址
         /// </summary>
         public string Host { get; set; }

@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Notice.Core
 {
-    public class NoticeOptions 
+    public class NoticeOptions
     {
 
         public const string SectionName = "Notice";
@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Notice.Core
         /// <summary>
         /// 同一消息发送间隔
         /// </summary>
-        public int IntervalSeconds { get; set; }
+        public int? IntervalSeconds { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Caching.Core.CachingOptions"/> class.

@@ -121,6 +121,28 @@ namespace AGooday.AgPay.Application.Services
             return APPLICATION_CONFIG.First().Value;
         }
 
+        public DBNoticeConfig GetDBNoticeConfig()
+        {
+            return new DBNoticeConfig()
+            {
+                Notice = new DBNoticeConfig.NoticeConfig()
+                {
+                    Mail = new DBNoticeConfig.NoticeConfig.MailConfig()
+                    {
+                        Host = "smtp.qq.com",
+                        Port = 465,
+                        FromName = "jones.xiang@foxmail.com",
+                        FromAddress = "jones.xiang@foxmail.com",
+                        Password = "ygslrbotmxsdecdh",
+                        ToAddress = new List<string>()
+                        {
+                            "1697504283@qq.com"
+                        }
+                    }
+                }
+            };
+        }
+
         /// <summary>
         /// 获取实际的数据
         /// </summary>
