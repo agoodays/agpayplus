@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Notice.Core;
 using AGooday.AgPay.Notice.Email;
+using AGooday.AgPay.Notice.Sms;
 
 namespace AGooday.AgPay.Manager.Api.Extensions
 {
@@ -29,6 +30,19 @@ namespace AGooday.AgPay.Manager.Api.Extensions
                         x.FromName = mailOptions.FromName;
                         x.Port = mailOptions.Port;
                         x.ToAddress = mailOptions.ToAddress;
+                    });
+                }
+
+                var smsConfiguration = baseConfiguration.GetSection(SmsOptions.SectionName);
+                var smsOptions = smsConfiguration.Get<SmsOptions>();
+                if (smsOptions != null)
+                {
+                    config.UseSms(x =>
+                    {
+                        x.IntervalSeconds = 0;
+                        x.SmsUseType = smsOptions.SmsUseType;
+                        x.AliyunSms = smsOptions.AliyunSms;
+                        //x.AliyunSms = smsConfiguration.GetSection(AliyunSmsOptions.SectionName).Get<AliyunSmsOptions>();
                     });
                 }
             });

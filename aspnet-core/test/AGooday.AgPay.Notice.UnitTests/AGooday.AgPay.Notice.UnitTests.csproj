@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\AGooday.AgPay.Notice.Email\AGooday.AgPay.Notice.Email.csproj" />
+    <ProjectReference Include="..\..\src\AGooday.AgPay.Notice.Sms\AGooday.AgPay.Notice.Sms.csproj" />
   </ItemGroup>
 
 </Project>
