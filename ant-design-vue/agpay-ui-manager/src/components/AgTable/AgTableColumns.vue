@@ -24,7 +24,7 @@ export default {
         slots // 子节点数组
       )
     } else {
-      const firstEL = [slots[0], slots[1]]
+      const firstEL = [slots[0]]
       const menuEL = []
       for (let i = 1; i < slots.length; i++) {
         menuEL.push(<a-menu-item>{slots[i]}</a-menu-item>)
