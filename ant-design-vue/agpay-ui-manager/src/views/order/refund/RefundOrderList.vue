@@ -334,7 +334,7 @@
     // { key: 'mchRefundNo', dataIndex: 'mchRefundNo', title: '商户退款单号' },
     { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
     { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 120 },
-    { key: 'op', title: '操作', width: 100, fixed: 'right', scopedSlots: { customRender: 'opSlot' } }
+    { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
   ]
 
   export default {

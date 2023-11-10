@@ -232,14 +232,14 @@ namespace AGooday.AgPay.Domain.Models
         /// 渠道商户号
         /// </summary>
         [Comment("渠道商户号")]
-        [Required, Column("channel_mch_no", TypeName = "varchar(64)")]
+        [Column("channel_mch_no", TypeName = "varchar(64)")]
         public string ChannelMchNo { get; set; }
 
         /// <summary>
         /// 渠道服务商机构号
         /// </summary>
         [Comment("渠道服务商机构号")]
-        [Required, Column("channel_isv_no", TypeName = "varchar(64)")]
+        [Column("channel_isv_no", TypeName = "varchar(64)")]
         public string ChannelIsvNo { get; set; }
 
         /// <summary>
