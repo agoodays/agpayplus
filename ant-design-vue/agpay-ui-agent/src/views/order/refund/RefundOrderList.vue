@@ -332,15 +332,15 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'pay', title: '退款订单号', scopedSlots: { customRender: 'refundOrderSlot' }, width: 220, fixed: 'left' },
-    { key: 'refund', title: '支付订单号', scopedSlots: { customRender: 'payOrderSlot' }, width: 220 },
-    { key: 'payAmount', title: '支付金额', ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' }, width: 100 },
-    { key: 'refundAmount', title: '退款金额', ellipsis: true, scopedSlots: { customRender: 'refundAmountSlot' }, width: 100 },
+    { key: 'pay', title: '退款订单号', width: 220, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
+    { key: 'refund', title: '支付订单号', width: 220, scopedSlots: { customRender: 'payOrderSlot' } },
+    { key: 'payAmount', title: '支付金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
+    { key: 'refundAmount', title: '退款金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'refundAmountSlot' } },
     // { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
     // { key: 'mchRefundNo', dataIndex: 'mchRefundNo', title: '商户退款单号' },
-    { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
+    { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
     { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 120 },
-    { key: 'op', title: '操作', width: 100, fixed: 'right', scopedSlots: { customRender: 'opSlot' } }
+    { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
   ]
 
   export default {

@@ -74,13 +74,13 @@ import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'agentName', fixed: 'left', width: '200px', title: '代理商名称', scopedSlots: { customRender: 'agentNameSlot' } },
-  { key: 'agentNo', dataIndex: 'agentNo', width: '140px', title: '代理商号' },
-  { key: 'contactTel', dataIndex: 'contactTel', width: '140px', title: '手机号' },
-  { key: 'mchCount', dataIndex: 'mchCount', width: '110px', title: '商户数量' },
-  { key: 'state', title: '状态', width: '100px', scopedSlots: { customRender: 'stateSlot' } },
-  { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
-  { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'agentName', title: '代理商名称', width: 200, fixed: 'left', scopedSlots: { customRender: 'agentNameSlot' } },
+  { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
+  { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
+  { key: 'mchCount', dataIndex: 'mchCount', title: '商户数量', width: 110 },
+  { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

@@ -65,13 +65,13 @@ import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'storeName', fixed: 'left', width: '200px', title: '门店名称', scopedSlots: { customRender: 'storeNameSlot' } },
-  { key: 'storeId', dataIndex: 'storeId', title: '门店编号', width: '140px' },
-  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: '140px' },
-  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: '140px' },
-  { key: 'defaultFlag', title: '默认', width: '80px', scopedSlots: { customRender: 'defaultFlagSlot' } },
-  { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
-  { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'storeName', title: '门店名称', width: 200, fixed: 'left', scopedSlots: { customRender: 'storeNameSlot' } },
+  { key: 'storeId', dataIndex: 'storeId', title: '门店编号', width: 140 },
+  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140 },
+  { key: 'defaultFlag', title: '默认', width: 80, scopedSlots: { customRender: 'defaultFlagSlot' } },
+  { key: 'createdAt', dataIndex: 'createdAt', width: 200, title: '创建日期' },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

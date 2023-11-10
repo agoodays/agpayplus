@@ -522,17 +522,17 @@ import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'orderNo', title: '订单号', scopedSlots: { customRender: 'orderSlot' }, width: 210, fixed: 'left' },
-  { key: 'amount', title: '支付金额', ellipsis: true, width: 108, scopedSlots: { customRender: 'amountSlot' } },
+  { key: 'orderNo', title: '订单号', width: 210, fixed: 'left', scopedSlots: { customRender: 'orderSlot' } },
+  { key: 'amount', title: '支付金额', width: 108, ellipsis: true, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'refundAmount', title: '退款金额', width: 108, scopedSlots: { customRender: 'refundAmountSlot' } },
-  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', customRender: (text) => '￥' + (text / 100).toFixed(2), width: 100 },
-  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', ellipsis: true, width: 100 },
+  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', width: 100, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 100, ellipsis: true },
   // { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
   // { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号' },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式', width: 120 },
-  { key: 'state', title: '支付状态', scopedSlots: { customRender: 'stateSlot' }, width: 100 },
-  { key: 'notifyState', title: '回调状态', scopedSlots: { customRender: 'notifySlot' }, width: 100 },
-  { key: 'divisionState', title: '分账状态', scopedSlots: { customRender: 'divisionStateSlot' }, width: 100 },
+  { key: 'state', title: '支付状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'notifyState', title: '回调状态', width: 100, scopedSlots: { customRender: 'notifySlot' } },
+  { key: 'divisionState', title: '分账状态', width: 100, scopedSlots: { customRender: 'divisionStateSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 120 },
   { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]

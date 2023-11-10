@@ -59,7 +59,7 @@ const tableColumns = [
   { key: 'menuUri', dataIndex: 'menuUri', title: '路径' },
   { key: 'componentName', dataIndex: 'componentName', title: '组件名称' },
   { key: 'entType', dataIndex: 'entType', title: '类型', width: 60 },
-  { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'state', title: '状态', align: 'center', scopedSlots: { customRender: 'stateSlot' } },
   { key: 'entSort', dataIndex: 'entSort', title: '排序', width: 60 },
   { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }

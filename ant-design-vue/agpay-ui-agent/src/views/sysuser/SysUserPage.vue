@@ -89,20 +89,20 @@ import RoleDist from './RoleDist'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 const tableColumns = [
-  { key: 'avatar', title: '头像', fixed: 'left', width: 65, scopedSlots: { customRender: 'avatarSlot' } },
-  { key: 'realname', dataIndex: 'realname', title: '姓名', fixed: 'left', width: 120 },
-  { key: 'sysUserId', dataIndex: 'sysUserId', title: '用户ID', fixed: 'left', width: 120 },
+  { key: 'avatar', title: '头像', width: 65, fixed: 'left', scopedSlots: { customRender: 'avatarSlot' } },
+  { key: 'realname', dataIndex: 'realname', title: '姓名', width: 120, fixed: 'left' },
+  { key: 'sysUserId', dataIndex: 'sysUserId', title: '用户ID', width: 120, fixed: 'left' },
   { key: 'sex', dataIndex: 'sex', title: '性别', width: 65, customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
   { key: 'userNo', dataIndex: 'userNo', title: '编号', width: 120 },
   { key: 'telphone', dataIndex: 'telphone', title: '手机号', width: 160 },
   { key: 'isAdmin', dataIndex: 'isAdmin', title: '超管', width: 65, customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
   { key: 'userType', title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
   { key: 'teamName', dataIndex: 'teamName', title: '团队', width: 160 },
-  { key: 'inviteCode', title: '邀请码', width: 160, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
-  { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'inviteCode', title: '邀请码', width: 160, align: 'center', scopedSlots: { customRender: 'inviteCodeSlot' } },
+  { key: 'state', title: '状态', width: 100, align: 'center', scopedSlots: { customRender: 'stateSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
   { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
-  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 const userTypeList = [
