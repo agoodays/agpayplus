@@ -64,12 +64,12 @@ import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'storeName', fixed: 'left', title: '门店名称', scopedSlots: { customRender: 'storeNameSlot' }, width: 200 },
+  { key: 'storeName', title: '门店名称', width: 200, fixed: 'left', scopedSlots: { customRender: 'storeNameSlot' } },
   { key: 'storeId', dataIndex: 'storeId', title: '门店编号', width: 140 },
-  { key: 'defaultFlag', title: '默认', scopedSlots: { customRender: 'defaultFlagSlot' }, width: 80 },
+  { key: 'defaultFlag', title: '默认', width: 80, scopedSlots: { customRender: 'defaultFlagSlot' } },
   { key: 'bindAppId', dataIndex: 'bindAppId', title: 'AppId', width: 320 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
-  { key: 'op', title: '操作', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' }, width: 260 }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

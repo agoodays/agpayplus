@@ -53,12 +53,12 @@ import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '组ID', width: '100px' },
-  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: '140px' },
-  { key: 'autoDivisionFlag', dataIndex: 'autoDivisionFlag', title: '自动分账组', width: '80px', customRender: (text, record, index) => text === 1 ? '是' : '否' },
-  { key: 'createdBy', dataIndex: 'createdBy', title: '创建人', width: '120px' },
-  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: '200px' },
-  { key: 'op', title: '操作', width: '200px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '组ID', width: 100 },
+  { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: 140 },
+  { key: 'autoDivisionFlag', dataIndex: 'autoDivisionFlag', title: '自动分账组', width: 80, customRender: (text, record, index) => text === 1 ? '是' : '否' },
+  { key: 'createdBy', dataIndex: 'createdBy', title: '创建人', width: 120 },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {
