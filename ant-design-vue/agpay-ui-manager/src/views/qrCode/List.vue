@@ -82,15 +82,15 @@ import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 
 const tableColumns = [
-  { key: 'qrcId', fixed: 'left', title: '码牌ID', scopedSlots: { customRender: 'qrcIdSlot' }, width: 180 },
+  { key: 'qrcId', fixed: 'left', title: '码牌ID', width: 180, scopedSlots: { customRender: 'qrcIdSlot' } },
   { key: 'batchId', dataIndex: 'batchId', title: '批次号', width: 135 },
-  { key: 'bindInfo', title: '绑定商户信息', scopedSlots: { customRender: 'bindInfoSlot' }, width: 280 },
+  { key: 'bindInfo', title: '绑定商户信息', width: 280, scopedSlots: { customRender: 'bindInfoSlot' } },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
-  { key: 'entryPage', title: '扫码页面', scopedSlots: { customRender: 'entryPageSlot' }, width: 140 },
-  { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 80 },
-  { key: 'fixedPayAmount', title: '固定金额', scopedSlots: { customRender: 'fixedPayAmountSlot' }, width: 120 },
+  { key: 'entryPage', title: '扫码页面', width: 140, scopedSlots: { customRender: 'entryPageSlot' } },
+  { key: 'state', title: '状态', width: 80, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'fixedPayAmount', title: '固定金额', width: 120, scopedSlots: { customRender: 'fixedPayAmountSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },
-  { key: 'op', title: '操作', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' }, width: 200 }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

@@ -77,18 +77,18 @@ import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'agentName', fixed: 'left', width: '200px', title: '代理商名称', scopedSlots: { customRender: 'agentNameSlot' } },
-  { key: 'agentNo', dataIndex: 'agentNo', width: '140px', title: '代理商号' },
-  { key: 'contactTel', dataIndex: 'contactTel', width: '140px', title: '手机号' },
-  { key: 'level', dataIndex: 'level', width: '70px', title: '等级' },
-  { key: 'pid', dataIndex: 'pid', width: '140px', title: '上级代理' },
-  { key: 'isvNo', dataIndex: 'isvNo', width: '140px', title: '服务商号' },
-  { key: 'auditProfitAmount', dataIndex: 'auditProfitAmount', width: '100px', title: '在途佣金' },
-  { key: 'balanceAmount', dataIndex: 'balanceAmount', width: '100px', title: '钱包余额' },
-  { key: 'unAmount', dataIndex: 'unAmount', width: '110px', title: '不可用金额' },
-  { key: 'state', title: '状态', width: '100px', scopedSlots: { customRender: 'stateSlot' } },
-  { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
-  { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'agentName', title: '代理商名称', width: 200, fixed: 'left', scopedSlots: { customRender: 'agentNameSlot' } },
+  { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
+  { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
+  { key: 'level', dataIndex: 'level', title: '等级', width: 70 },
+  { key: 'pid', dataIndex: 'pid', title: '上级代理', width: 140 },
+  { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
+  { key: 'auditProfitAmount', dataIndex: 'auditProfitAmount', title: '在途佣金', width: 100 },
+  { key: 'balanceAmount', dataIndex: 'balanceAmount', title: '钱包余额', width: 100 },
+  { key: 'unAmount', dataIndex: 'unAmount', title: '不可用金额', width: 110 },
+  { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

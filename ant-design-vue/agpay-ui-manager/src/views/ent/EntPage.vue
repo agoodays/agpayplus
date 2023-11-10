@@ -62,7 +62,7 @@ const tableColumns = [
   { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
   { key: 'entSort', dataIndex: 'entSort', title: '排序', width: 60 },
   { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
-  { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

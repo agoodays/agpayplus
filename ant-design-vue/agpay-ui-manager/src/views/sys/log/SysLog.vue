@@ -176,13 +176,13 @@ import { message, Modal } from 'ant-design-vue'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'userName', width: 120, title: '用户名', fixed: 'left', scopedSlots: { customRender: 'userNameSlot' } },
-  { key: 'userId', dataIndex: 'userId', width: 120, title: '用户ID' },
-  { key: 'userIp', dataIndex: 'userIp', width: 120, title: '用户IP' },
-  { key: 'sysType', width: 120, title: '所属系统', scopedSlots: { customRender: 'sysTypeSlot' } },
-  { key: 'methodRemark', dataIndex: 'methodRemark', width: 200, title: '操作描述', ellipsis: true },
-  { key: 'createdAt', dataIndex: 'createdAt', width: 200, title: '创建日期' },
-  { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'userName', title: '用户名', width: 120, fixed: 'left', scopedSlots: { customRender: 'userNameSlot' } },
+  { key: 'userId', dataIndex: 'userId', title: '用户ID', width: 120 },
+  { key: 'userIp', dataIndex: 'userIp', title: '用户IP', width: 120 },
+  { key: 'sysType', title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
+  { key: 'methodRemark', dataIndex: 'methodRemark', title: '操作描述', width: 200, ellipsis: true },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

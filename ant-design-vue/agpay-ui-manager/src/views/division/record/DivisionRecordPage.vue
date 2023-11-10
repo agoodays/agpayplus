@@ -98,7 +98,7 @@ const tableColumns = [
   { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '分账比例', width: 108, customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
   { key: 'state', title: '分账状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
-  { key: 'op', title: '操作', width: '100px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

@@ -68,7 +68,7 @@ const tableColumns = [
   { key: 'autoDivisionFlag', dataIndex: 'autoDivisionFlag', title: '自动分账组', width: 120, customRender: (text, record, index) => text === 1 ? '是' : '否' },
   { key: 'createdBy', dataIndex: 'createdBy', title: '创建人', width: 120 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

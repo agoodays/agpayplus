@@ -83,14 +83,14 @@ import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'teamId', dataIndex: 'teamId', fixed: 'left', width: '80px', title: '团队ID' },
-  { key: 'teamName', dataIndex: 'teamName', title: '团队名称', width: '200px' },
-  { key: 'teamNo', dataIndex: 'teamNo', title: '团队编号', width: '140px' },
-  { key: 'statRangeType', title: '统计周期', width: '120px', scopedSlots: { customRender: 'statRangeTypeSlot' } },
+  { key: 'teamId', dataIndex: 'teamId', title: '团队ID', width: 80, fixed: 'left' },
+  { key: 'teamName', dataIndex: 'teamName', title: '团队名称', width: 200 },
+  { key: 'teamNo', dataIndex: 'teamNo', title: '团队编号', width: 140 },
+  { key: 'statRangeType', title: '统计周期', width: 120, scopedSlots: { customRender: 'statRangeTypeSlot' } },
   { key: 'sysType', title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
   { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户', width: 140 },
-  { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
-  { key: 'op', title: '操作', width: '260px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

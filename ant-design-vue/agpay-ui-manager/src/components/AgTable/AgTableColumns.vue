@@ -17,7 +17,7 @@ export default {
       }
       return false
     })
-    if (slots.length <= 3) { // 小于等于三个直接渲染
+    if (slots.length <= 2) { // 小于等于二个直接渲染
       return createElement(
         'div',
         { style: 'display:flex; justify-content: space-evenly;' },
@@ -26,7 +26,7 @@ export default {
     } else {
       const firstEL = [slots[0], slots[1]]
       const menuEL = []
-      for (let i = 2; i < slots.length; i++) {
+      for (let i = 1; i < slots.length; i++) {
         menuEL.push(<a-menu-item>{slots[i]}</a-menu-item>)
       }
       return <div style="display:flex; justify-content: space-evenly;"> {firstEL}

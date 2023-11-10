@@ -79,31 +79,10 @@ import InfoAddOrEdit from './AddOrEdit'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  {
-    key: 'wayCode', // key为必填项，用于标志该列的唯一
-    fixed: 'left',
-    title: '支付方式代码',
-    scopedSlots: { customRender: 'wayCodeSlot' }
-  },
-  {
-    key: 'wayName',
-    dataIndex: 'wayName',
-    title: '支付方式名称'
-  },
-  {
-    key: 'wayType',
-    title: '支付类型',
-    align: 'center',
-    scopedSlots: { customRender: 'wayTypeSlot' }
-  },
-  {
-    key: 'op',
-    title: '操作',
-    width: '200px',
-    fixed: 'right',
-    align: 'center',
-    scopedSlots: { customRender: 'opSlot' }
-  }
+  { key: 'wayCode', fixed: 'left', title: '支付方式代码', scopedSlots: { customRender: 'wayCodeSlot' } },
+  { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称' },
+  { key: 'wayType', title: '支付类型', align: 'center', scopedSlots: { customRender: 'wayTypeSlot' } },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

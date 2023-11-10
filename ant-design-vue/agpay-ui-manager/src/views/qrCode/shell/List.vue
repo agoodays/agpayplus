@@ -51,19 +51,8 @@ import InfoAddOrEdit from './AddOrEdit'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 const tableColumns = [
-  {
-    key: 'shellAlias',
-    dataIndex: 'shellAlias',
-    title: '模板别名'
-  },
-  {
-    key: 'op',
-    title: '操作',
-    width: '200px',
-    fixed: 'right',
-    align: 'center',
-    scopedSlots: { customRender: 'opSlot' }
-  }
+  { key: 'shellAlias', dataIndex: 'shellAlias', title: '模板别名' },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

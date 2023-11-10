@@ -75,37 +75,11 @@ import InfoAddOrEdit from './AddOrEdit'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  {
-    key: 'roleId', // key为必填项，用于标志该列的唯一
-    title: '角色ID',
-    sorter: true,
-    fixed: 'left',
-    scopedSlots: { customRender: 'roleIdSlot' }
-  },
-  {
-    key: 'roleName',
-    dataIndex: 'roleName',
-    title: '角色名称',
-    sorter: true
-  },
-  {
-    key: 'sysType',
-    title: '所属系统',
-    scopedSlots: { customRender: 'sysTypeSlot' }
-  },
-  {
-    key: 'belongInfoId',
-    dataIndex: 'belongInfoId',
-    title: '所属代理商/商户'
-  },
-  {
-    key: 'op',
-    title: '操作',
-    width: '200px',
-    fixed: 'right',
-    align: 'center',
-    scopedSlots: { customRender: 'opSlot' }
-  }
+  { key: 'roleId', title: '角色ID', sorter: true, fixed: 'left', scopedSlots: { customRender: 'roleIdSlot' } },
+  { key: 'roleName', dataIndex: 'roleName', title: '角色名称', sorter: true },
+  { key: 'sysType', title: '所属系统', scopedSlots: { customRender: 'sysTypeSlot' } },
+  { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户' },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

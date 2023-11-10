@@ -214,10 +214,10 @@ const accTableColumns = [
   { key: 'reqBindState', title: '状态', scopedSlots: { customRender: 'reqBindStateSlot' } },
   { key: 'receiverAlias', title: '账号别名', scopedSlots: { customRender: 'receiverAliasSlot' } },
   { key: 'accType', title: '账号类型', scopedSlots: { customRender: 'accTypeSlot' } },
-  { key: 'accNo', width: '300px', title: '接收方账号', scopedSlots: { customRender: 'accNoSlot' } },
-  { key: 'accName', width: '180px', title: '接收方姓名', scopedSlots: { customRender: 'accNameSlot' } },
+  { key: 'accNo', title: '接收方账号', width: 300, scopedSlots: { customRender: 'accNoSlot' } },
+  { key: 'accName', title: '接收方姓名', width: 180, scopedSlots: { customRender: 'accNameSlot' } },
   { key: 'relationType', title: '分账关系', scopedSlots: { customRender: 'relationTypeSlot' } },
-  { key: 'relationTypeName', width: '200px', title: '关系名称', scopedSlots: { customRender: 'relationTypeNameSlot' } },
+  { key: 'relationTypeName', title: '关系名称', width: 200, scopedSlots: { customRender: 'relationTypeNameSlot' } },
   { key: 'divisionProfit', title: '默认分账比例', scopedSlots: { customRender: 'divisionProfitSlot' } },
   { key: 'op', title: '操作', scopedSlots: { customRender: 'opSlot' } }
 ]

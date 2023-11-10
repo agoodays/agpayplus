@@ -81,13 +81,13 @@ import MchPayIfConfigList from './MchPayIfConfigList'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'appId', fixed: 'left', title: '应用AppId', scopedSlots: { customRender: 'appIdSlot' }, width: 320 },
+  { key: 'appId', title: '应用AppId', width: 320, fixed: 'left', scopedSlots: { customRender: 'appIdSlot' } },
   { key: 'appName', dataIndex: 'appName', title: '应用名称', width: 200 },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
-  { key: 'state', title: '状态', scopedSlots: { customRender: 'stateSlot' }, width: 80 },
-  { key: 'defaultFlag', title: '默认', scopedSlots: { customRender: 'defaultFlagSlot' }, width: 80 },
+  { key: 'state', title: '状态', width: 80, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'defaultFlag', title: '默认', width: 80, scopedSlots: { customRender: 'defaultFlagSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
-  { key: 'op', title: '操作', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' }, width: 260 }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

@@ -204,12 +204,12 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'orderId', dataIndex: 'orderId', title: '订单ID', width: '180px', fixed: 'left' },
-    { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号', width: '200px' },
-    { key: 'state', title: '通知状态', width: '130px', scopedSlots: { customRender: 'stateSlot' } },
-    { key: 'orderType', title: '订单类型', width: '130px', scopedSlots: { customRender: 'orderTypeSlot' } },
-    { key: 'createdAt', dataIndex: 'createdAt', width: '200px', title: '创建日期' },
-    { key: 'op', title: '操作', width: '160px', fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+    { key: 'orderId', dataIndex: 'orderId', title: '订单ID', width: 180, fixed: 'left' },
+    { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号', width: 200 },
+    { key: 'state', title: '通知状态', width: 130, scopedSlots: { customRender: 'stateSlot' } },
+    { key: 'orderType', title: '订单类型', width: 130, scopedSlots: { customRender: 'orderTypeSlot' } },
+    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+    { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
   ]
 
   export default {
