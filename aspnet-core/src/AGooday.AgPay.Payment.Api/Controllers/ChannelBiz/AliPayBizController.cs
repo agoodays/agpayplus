@@ -6,7 +6,7 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Payment.Api.Channel.AliPay;
+using AGooday.AgPay.Payment.Api.Channel.AliPay.Kits;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.Services;
 using Aop.Api.Domain;

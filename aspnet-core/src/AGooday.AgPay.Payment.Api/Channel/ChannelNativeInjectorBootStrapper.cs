@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Channel.AliPay.Extensions;
+using AGooday.AgPay.Payment.Api.Channel.AliPay.Kits;
 using AGooday.AgPay.Payment.Api.Channel.HkrtPay;
 using AGooday.AgPay.Payment.Api.Channel.HkrtPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.LesPay;
@@ -17,7 +18,7 @@ using AGooday.AgPay.Payment.Api.Channel.YsfPay;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay.Extensions;
 using AGooday.AgPay.Payment.Api.Utils;
 
-namespace AGooday.AgPay.Payment.Api.Channel.Extensions
+namespace AGooday.AgPay.Payment.Api.Channel
 {
     public class ChannelNativeInjectorBootStrapper
     {

@@ -5,7 +5,7 @@ using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Extensions;
-using AGooday.AgPay.Payment.Api.Channel.Extensions;
+using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Extensions;
 using AGooday.AgPay.Payment.Api.FilterAttributes;
 using AGooday.AgPay.Payment.Api.Jobs;

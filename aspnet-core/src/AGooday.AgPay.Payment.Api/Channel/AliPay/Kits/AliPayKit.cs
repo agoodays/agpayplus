@@ -7,7 +7,7 @@ using Aop.Api;
 using Aop.Api.Domain;
 using Aop.Api.Request;
 
-namespace AGooday.AgPay.Payment.Api.Channel.AliPay
+namespace AGooday.AgPay.Payment.Api.Channel.AliPay.Kits
 {
     /// <summary>
     /// 【支付宝】支付通道工具包
