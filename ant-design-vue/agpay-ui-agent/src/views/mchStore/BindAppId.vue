@@ -13,7 +13,7 @@
           <a-form-model-item label="请选择要绑定的应用" prop="bindAppId">
             <a-select v-model="saveObject.bindAppId">
               <a-select-option key="">(空)</a-select-option>
-              <a-select-option v-for="(item) in mchAppList" :key='item.appId'>{{ item.appName }} [{{ item.appId }}]</a-select-option>
+              <a-select-option v-for="(item) in mchAppList" :key="item.appId">{{ item.appName }} [{{ item.appId }}]</a-select-option>
             </a-select>
           </a-form-model-item>
         </a-col>
