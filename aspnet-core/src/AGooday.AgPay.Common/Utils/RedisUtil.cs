@@ -56,6 +56,87 @@ namespace AGooday.AgPay.Common.Utils
             return GetConnect().GetSubscriber();
         }
 
+        /// <summary>
+        /// 根据匹配表达式获取RedisKey
+        /// </summary>
+        /// <param name="pattern">匹配表达式</param>
+        /// <returns></returns>
+        public IEnumerable<RedisKey> GetRedisKeysByPattern(string pattern)
+        {
+            var multiplexer = GetConnect();
+            var database = multiplexer.GetDatabase();
+            foreach (var endPoint in multiplexer.GetEndPoints())
+            {
+                var _server = multiplexer.GetServer(endPoint);
+                IEnumerable<RedisKey> keys = _server.Keys(database.Database, pattern);
+                return keys;
+            }
+            multiplexer.Close();
+            return null;
+        }
+
+        /// <summary>
+        /// 异步分布式锁
+        /// </summary>
+        /// <param name="lockKey">锁名称，不可重复</param>
+        /// <param name="lockFunc">任务</param>
+        /// <returns>bool</returns>
+        public async Task<bool> LockTakeAsync(string lockKey, Func<Task> lockFunc)
+        {
+            var result = false;
+
+            var database = GetDatabase();
+            //token用来标识谁拥有该锁并用来释放锁。
+            RedisValue token = Environment.MachineName;
+            //TimeSpan表示该锁的有效时间。10秒后自动释放，避免死锁。
+            if (database.LockTake(lockKey, token, TimeSpan.FromSeconds(10)))
+            {
+                try
+                {
+                    await lockFunc();
+                    result = true;
+                }
+                finally
+                {
+                    database.LockRelease(lockKey, token);//释放锁
+                    Dispose();
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 分布式锁
+        /// </summary>
+        /// <param name="lockKey">锁名称，不可重复</param>
+        /// <param name="action">委托事件</param>
+        /// <returns>bool</returns>
+        public bool LockTake(string lockKey, Action action)
+        {
+            var result = false;
+
+            var database = GetDatabase();
+            //token用来标识谁拥有该锁并用来释放锁。
+            RedisValue token = Environment.MachineName;
+            //TimeSpan表示该锁的有效时间。10秒后自动释放，避免死锁。
+            if (database.LockTake(lockKey, token, TimeSpan.FromSeconds(10)))
+            {
+                try
+                {
+                    action();
+                    result = true;
+                }
+                finally
+                {
+                    database.LockRelease(lockKey, token);//释放锁
+                    Dispose();
+                }
+            }
+
+            return result;
+        }
+
         public void Dispose()
         {
             if (_connections != null && _connections.Count > 0)
