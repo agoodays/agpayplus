@@ -92,7 +92,7 @@
                     <a-col :span="21" :offset="1" v-if="smsConfig.smsProviderKey === 'agpaydx'">
                       <a-alert type="info">
                         <template slot="message">
-                          <span>开通计全短信通道请联系官方：18888888888， <a href="#">点击链接</a> 可进行短信的开通和购买。</span>
+                          <span>开通吉日短信通道请联系官方：18888888888， <a href="#">点击链接</a> 可进行短信的开通和购买。</span>
                         </template>
                       </a-alert>
                     </a-col>
