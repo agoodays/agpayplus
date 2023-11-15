@@ -83,7 +83,7 @@
                     <a-col :span="20" :offset="1">
                       <a-form-model-item label="选择短信发送服务商">
                         <a-radio-group v-model="smsConfig.smsProviderKey">
-                          <a-radio value="agpaydx">吉日短信</a-radio>
+                          <a-radio value="agpaydx"><a-icon type="fire" theme="filled" :style="{ color: 'red' }" />吉日短信</a-radio>
                           <a-radio value="aliyundy">阿里云短信服务</a-radio>
                           <a-radio value="mocktest">模拟测试</a-radio>
                         </a-radio-group>
@@ -111,7 +111,7 @@
                       </a-col>
                       <a-col :span="10" :offset="1">
                         <a-form-model-item label="密码" prop="accountPwd">
-                          <a-input placeholder="请填写密码" v-model="smsConfig.agpaydxSmsConfig.accountPwd" />
+                          <a-input :placeholder="smsConfig.agpaydxSmsConfigDesen.accountPwd?smsConfig.agpaydxSmsConfigDesen.accountPwd:'请填写密码'" v-model="smsConfig.agpaydxSmsConfig.accountPwd" />
                         </a-form-model-item>
                       </a-col>
                     </a-row>
@@ -415,36 +415,19 @@ export default {
       groupKey: 'applicationConfig',
       smsConfig: {
         smsProviderKey: 'agpaydx',
-        agpaydxSmsConfig: { signName: '吉日付', userName: 'agooday', accountPwd: 'agooday' },
-        aliyundySmsConfig: {
-          accessKeyId: 'LTAI5tChn8DqogEzgm5FSyhZ',
-          loginMchTemplateId: 'SMS_178515044',
-          registerMchTemplateId: 'SMS_215795545',
-          accessKeySecret: 'u17oH643fd9bee4b0tChn8Dqogea5ec3aoApV',
-          signName: '吉日科技',
-          mbrTelBindTemplateId: 'SMS_215790589',
-          forgetPwdTemplateId: 'SMS_215795546',
-          accountOpenTemplateId: 'SMS_234420379'
-        },
-        aliyundySmsConfigDesen: {
-          accessKeyId: 'LTAI5tChn8DqogEzgm5FSyhZ',
-          loginMchTemplateId: 'SMS_178515044',
-          registerMchTemplateId: 'SMS_215795545',
-          accessKeySecret: 'u17oH643fd9bee4b0tChn8Dqogea5ec3aoApV',
-          signName: '吉日科技',
-          mbrTelBindTemplateId: 'SMS_215790589',
-          forgetPwdTemplateId: 'SMS_215795546',
-          accountOpenTemplateId: 'SMS_234420379'
-        },
-        mocktestSmsConfig: { mockCode: '888666' }
+        agpaydxSmsConfig: {},
+        agpaydxSmsConfigDesen: {},
+        aliyundySmsConfig: {},
+        aliyundySmsConfigDesen: {},
+        mocktestSmsConfig: {}
       },
       ocrConfig: {
         ocrType: 1,
         ocrState: 1,
-        tencentOcrConfig: { secretId: 'AKIDHK7ewxhBOKzNTJr88svhCUVFiuqVsyoN', secretKey: 'JL7cqLTAI5tChn8DqogEzgm5FSyhZQQ9blje' },
-        tencentOcrConfigDesen: { secretId: 'AKIDHK7ewxhBOKzNTJr88svhCUVFiuqVsyoN', secretKey: 'JL7cqLTAI5tChn8DqogEzgm5FSyhZQQ9blje' },
-        aliOcrConfig: { accessKeyId: 'LTAI4GEqjdMVqr6y7xTjsTo1', accessKeySecret: 'lsMY9TAI5tChn8DqogEzgm5FSyhq91sDTAI5tC' },
-        aliOcrConfigDesen: { accessKeyId: 'LTAI4GEqjdMVqr6y7xTjsTo1', accessKeySecret: 'lsMY9TAI5tChn8DqogEzgm5FSyhq91sDTAI5tC' }
+        tencentOcrConfig: {},
+        tencentOcrConfigDesen: {},
+        aliOcrConfig: {},
+        aliOcrConfigDesen: {}
       },
       ossConfig: {
         ossUseType: 'localFile',
@@ -464,13 +447,34 @@ export default {
       getConfigs(that.groupKey).then(res => {
         // console.log(res)
         that.configData = res
-        // that.groupKey = res[0]?.groupKey
-        const ossUseType = that.configData?.find(({ configKey }) => configKey === 'ossUseType')?.configVal
-        that.ossConfig.ossUseType = ossUseType?.length > 0 ? ossUseType : 'localFile'
-        const aliyunOssConfig = that.configData?.find(({ configKey }) => configKey === 'aliyunOssConfig')
-        that.ossConfig.aliyunOssConfig = aliyunOssConfig?.configVal?.length > 0 ? JSON.parse(aliyunOssConfig?.configVal) : {}
-        that.ossConfig.aliyunOssConfigDesen = aliyunOssConfig?.configValDesen?.length > 0 ? JSON.parse(aliyunOssConfig?.configValDesen) : {}
+        that.groupKey = res[0]?.groupKey
+        that.setConfigVal(that, 'ossConfig', 'ossUseType', 'localFile')
+        that.setJSONConfigDesen(that, 'ossConfig', 'aliyunOssConfig', true)
+
+        that.setConfigVal(that, 'smsConfig', 'smsProviderKey', 'agpaydx')
+        that.setJSONConfigDesen(that, 'smsConfig', 'agpaydxSmsConfig', true)
+        that.setJSONConfigDesen(that, 'smsConfig', 'aliyundySmsConfig', true)
+        that.setJSONConfigDesen(that, 'smsConfig', 'mocktestSmsConfig', false)
+
+        that.setConfigVal(that, 'ocrConfig', 'ocrType', 1)
+        that.setConfigVal(that, 'ocrConfig', 'ocrState', 1)
+        that.setJSONConfigDesen(that, 'ocrConfig', 'tencentOcrConfig', true)
+        that.setJSONConfigDesen(that, 'ocrConfig', 'aliOcrConfig', true)
       })
+    },
+    isNumber (value) {
+      return typeof value === 'number'
+    },
+    setConfigVal (obj, groupKey, key, defaultVal) {
+      const configVal = obj.configData?.find(({ configKey }) => configKey === 'ocrState')?.configVal
+      obj[groupKey][key] = configVal?.length > 0 ? (this.isNumber(defaultVal) ? +configVal : configVal) : defaultVal
+    },
+    setJSONConfigDesen (obj, groupKey, key, isDesen) {
+      const config = obj.configData?.find(({ configKey }) => configKey === key)
+      obj[groupKey][key] = config?.configVal?.length > 0 ? JSON.parse(config?.configVal) : {}
+      if (isDesen) {
+        obj[groupKey][`${key}Desen`] = config?.configValDesen?.length > 0 ? JSON.parse(config?.configValDesen) : {}
+      }
     },
     selectTabs (key) { // 清空必填提示
       if (key) {
@@ -489,7 +493,28 @@ export default {
         that.btnLoading = true // 打开按钮上的 loading
         const jsonObject = {}
         for (var i in that.configData) {
-          jsonObject[that.configData[i].configKey] = that.configData[i].configKey === 'aliyunOssConfig' ? JSON.stringify(that.ossConfig.aliyunOssConfig) : that.configData[i].configVal
+          // jsonObject[that.configData[i].configKey] = that.configData[i].configKey === 'aliyunOssConfig' ? JSON.stringify(that.ossConfig.aliyunOssConfig) : that.configData[i].configVal
+
+          const configKey = that.configData[i].configKey
+          let configVal = that.configData[i].configVal
+          switch (configKey) {
+            case 'aliyunOssConfig':
+              configVal = JSON.stringify(that.ossConfig.aliyunOssConfig)
+              break
+            case 'agpaydxSmsConfig':
+              configVal = JSON.stringify(that.smsConfig.agpaydxSmsConfig)
+              break
+            case 'aliyundySmsConfig':
+              configVal = JSON.stringify(that.smsConfig.aliyundySmsConfig)
+              break
+            case 'tencentOcrConfig':
+              configVal = JSON.stringify(that.ocrConfig.tencentOcrConfig)
+              break
+            case 'aliOcrConfig':
+              configVal = JSON.stringify(that.ocrConfig.aliOcrConfig)
+              break
+          }
+          jsonObject[configKey] = configVal
         }
         req.updateById(API_URL_SYS_CONFIG, that.groupKey, jsonObject).then(res => {
           that.$message.success('修改成功')

@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.Interfaces;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Extensions;
@@ -49,25 +50,61 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
                 var sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("aliyunOssConfig"));
                 if (sysConfig != null)
                 {
-                    var configVal = JObject.Parse(sysConfig.ConfigVal);
-                    configVal.TryGetString("accessKeySecret", out string accessKeySecret);
-                    configVal["accessKeySecret"] = accessKeySecret.Mask();
-                    sysConfig.AddExt("configValDesen", JsonConvert.SerializeObject(configVal));
-                    configVal.Remove("accessKeySecret");
-                    sysConfig.ConfigVal = JsonConvert.SerializeObject(configVal);
+                    JsonConfigValDesen(sysConfig, "accessKeySecret");
                 }
             }
             if (groupKey.Equals("apiMapConfig"))
             {
-                var sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("apiMapWebSecret"));
+                ConfigValDesen(configList);
+            }
+            if (groupKey.Equals("smsConfig"))
+            {
+                var sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("agpaydxSmsConfig"));
                 if (sysConfig != null)
                 {
-                    sysConfig.AddExt("configValDesen", sysConfig.ConfigVal?.Mask());
-                    sysConfig.ConfigVal = null;
+                    JsonConfigValDesen(sysConfig, "accountPwd");
+                }
+                sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("aliyundySmsConfig"));
+                if (sysConfig != null)
+                {
+                    JsonConfigValDesen(sysConfig, "accessKeySecret");
+                }
+            }
+            if (groupKey.Equals("ocrConfig"))
+            {
+                var sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("tencentOcrConfig"));
+                if (sysConfig != null)
+                {
+                    JsonConfigValDesen(sysConfig, "secretKey");
+                }
+                sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("aliOcrConfig"));
+                if (sysConfig != null)
+                {
+                    JsonConfigValDesen(sysConfig, "accessKeySecret");
                 }
             }
 
             return ApiRes.Ok(configList);
+        }
+
+        private static void ConfigValDesen(IEnumerable<SysConfigDto> configList)
+        {
+            var sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("apiMapWebSecret"));
+            if (sysConfig != null)
+            {
+                sysConfig.AddExt("configValDesen", sysConfig.ConfigVal?.Mask());
+                sysConfig.ConfigVal = null;
+            }
+        }
+
+        private static void JsonConfigValDesen(SysConfigDto sysConfig, string key)
+        {
+            var configVal = JObject.Parse(sysConfig.ConfigVal);
+            configVal.TryGetString(key, out string accountPwd);
+            configVal[key] = accountPwd.Mask();
+            sysConfig.AddExt("configValDesen", JsonConvert.SerializeObject(configVal));
+            configVal.Remove(key);
+            sysConfig.ConfigVal = JsonConvert.SerializeObject(configVal);
         }
 
         /// <summary>
