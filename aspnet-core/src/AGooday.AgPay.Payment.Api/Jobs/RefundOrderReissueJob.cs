@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     [DisallowConcurrentExecution]
     public class RefundOrderReissueJob : IJob
     {
-        private static int QUERY_PAGE_SIZE = 100; //每次查询数量
+        private static readonly int QUERY_PAGE_SIZE = 100; //每次查询数量
         private readonly ILogger<RefundOrderReissueJob> logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 

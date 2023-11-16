@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Manager.Api.MQ
     public class ResetAppConfigMQReceiver : ResetAppConfigMQ.IMQReceiver
     {
         private readonly ILogger<ResetAppConfigMQReceiver> log;
-        private IServiceProvider provider;
+        private readonly IServiceProvider provider;
 
         public ResetAppConfigMQReceiver(ILogger<ResetAppConfigMQReceiver> log, IServiceProvider provider)
         {

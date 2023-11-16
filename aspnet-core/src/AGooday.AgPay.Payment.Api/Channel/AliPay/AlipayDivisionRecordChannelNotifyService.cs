@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 }
 
                 // 得到所有的 accNo 与 recordId map
-                Dictionary<string, long> accnoAndRecordIdSet = new Dictionary<string, long>();
+                Dictionary<string, long?> accnoAndRecordIdSet = new Dictionary<string, long?>();
                 foreach (PayOrderDivisionRecordDto record in recordList)
                 {
                     accnoAndRecordIdSet.Add(record.AccNo, record.RecordId);
@@ -119,7 +119,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                     JObject itemJSON = (JObject)item;
 
                     // 我方系统的分账接收记录ID
-                    long recordId = accnoAndRecordIdSet.GetValueOrDefault(itemJSON.Value<string>("trans_in"));
+                    long? recordId = accnoAndRecordIdSet.GetValueOrDefault(itemJSON.Value<string>("trans_in"));
 
                     // 分账类型 && 包含该笔分账账号
                     if ("transfer".Equals(itemJSON.Value<string>("operation_type")) && recordId != null)
@@ -127,13 +127,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                         // 分账成功
                         if ("SUCCESS".Equals(itemJSON.Value<string>("state")))
                         {
-                            recordResultMap.Add(recordId, ChannelRetMsg.ConfirmSuccess(bizContentJSON.Value<string>("settle_no")));
+                            recordResultMap.Add(recordId.Value, ChannelRetMsg.ConfirmSuccess(bizContentJSON.Value<string>("settle_no")));
                         }
 
                         // 分账失败
                         if ("FAIL".Equals(itemJSON.Value<string>("state")))
                         {
-                            recordResultMap.Add(recordId, ChannelRetMsg.ConfirmFail(bizContentJSON.Value<string>("settle_no"), itemJSON.Value<string>("error_code"), itemJSON.Value<string>("error_desc")));
+                            recordResultMap.Add(recordId.Value, ChannelRetMsg.ConfirmFail(bizContentJSON.Value<string>("settle_no"), itemJSON.Value<string>("error_code"), itemJSON.Value<string>("error_desc")));
                         }
                     }
                 }

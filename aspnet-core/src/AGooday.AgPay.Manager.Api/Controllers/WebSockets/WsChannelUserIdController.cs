@@ -1,5 +1,4 @@
 ﻿using AGooday.AgPay.Manager.Api.WebSockets;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.WebSockets

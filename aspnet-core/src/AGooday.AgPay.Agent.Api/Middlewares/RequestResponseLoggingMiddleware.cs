@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Agent.Api.Middlewares
                 catch (Exception ex)
                 {
                     // 记录异常                        
-                    _logger.LogError(ex.Message + "" + ex.InnerException);
+                    _logger.LogError(ex, $"{ex.Message}{ex.InnerException}");
                 }
                 finally
                 {
