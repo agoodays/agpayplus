@@ -64,6 +64,7 @@ namespace AGooday.AgPay.Application.Services
             var dto = _mapper.Map<RefundOrderDto>(entity);
             return dto;
         }
+
         /// <summary>
         /// 查询商户订单
         /// </summary>
@@ -115,10 +116,24 @@ namespace AGooday.AgPay.Application.Services
             var records = PaginatedList<RefundOrder>.Create<RefundOrderDto>(refundOrders.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
+
+        public bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo)
+        {
+            return _refundOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchRefundNo);
+        }
+        public bool IsExistRefundingOrder(string payOrderId)
+        {
+            return _refundOrderRepository.IsExistRefundingOrder(payOrderId);
+        }
+
         public long SumSuccessRefundAmount(string payOrderId)
         {
-            return _refundOrderRepository.GetAll().Where(w => w.PayOrderId.Equals(payOrderId) && w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).Sum(s => s.RefundAmount);
+            return _refundOrderRepository.GetAll()
+                .Where(w => w.PayOrderId.Equals(payOrderId) 
+                && w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .Sum(s => s.RefundAmount);
         }
+
         /// <summary>
         /// 更新退款单状态 【退款单生成】 --》 【退款中】
         /// </summary>
@@ -162,17 +177,38 @@ namespace AGooday.AgPay.Application.Services
                 return false;
             }
             //2. 更新订单表数据（更新退款次数,退款状态,如全额退款更新支付状态为已退款）
-            var payOrder = _payOrderRepository.GetById(updateRecord.PayOrderId);
-            payOrder.RefundTimes = ++payOrder.RefundTimes; // 退款次数 +1
-            payOrder.RefundAmount = payOrder.RefundAmount + updateRecord.RefundAmount; // 退款金额累加
-            payOrder.RefundState = (byte)(payOrder.RefundAmount + updateRecord.RefundAmount >= payOrder.Amount ? PayOrderRefund.REFUND_STATE_ALL : PayOrderRefund.REFUND_STATE_SUB); // 更新是否已全额退款。 此更新需在refund_amount更新之前，否则需要去掉累加逻辑
-            payOrder.State = payOrder.RefundState.Equals(PayOrderRefund.REFUND_STATE_ALL) ? (byte)PayOrderState.STATE_REFUND : payOrder.State;
-            _payOrderRepository.Update(payOrder);
-            if (!_payOrderRepository.SaveChanges(out int _))
+            if (!UpdateRefundAmountAndCount(updateRecord.PayOrderId, updateRecord.RefundAmount))
             {
                 throw new BizException("更新订单数据异常");
             }
             return true;
+        }
+        /// <summary>
+        /// 更新订单退款金额和次数
+        /// </summary>
+        /// <param name="payOrderId"></param>
+        /// <param name="currentRefundAmount"></param>
+        /// <returns></returns>
+        /// <exception cref="BizException"></exception>
+        public bool UpdateRefundAmountAndCount(string payOrderId, long currentRefundAmount)
+        {
+            var payOrder = _payOrderRepository.GetById(payOrderId);
+            // 成功状态的可退款
+            if (payOrder.State != (byte)PayOrderState.STATE_SUCCESS)
+            {
+                throw new BizException("成功状态才可退款");
+            }
+            // 已退款金额 + 本次退款金额 小于等于订单金额
+            if (payOrder.RefundAmount + currentRefundAmount > payOrder.Amount)
+            {
+                throw new BizException("已退款金额 + 本次退款金额必须小于等于订单金额");
+            }
+            payOrder.RefundTimes = ++payOrder.RefundTimes; // 退款次数 +1
+            payOrder.RefundAmount = payOrder.RefundAmount + currentRefundAmount; // 退款金额累加
+            payOrder.RefundState = (byte)(payOrder.RefundAmount + currentRefundAmount >= payOrder.Amount ? PayOrderRefund.REFUND_STATE_ALL : PayOrderRefund.REFUND_STATE_SUB); // 更新是否已全额退款。 此更新需在refund_amount更新之前，否则需要去掉累加逻辑
+            payOrder.State = payOrder.RefundState.Equals(PayOrderRefund.REFUND_STATE_ALL) ? (byte)PayOrderState.STATE_REFUND : payOrder.State; // 更新支付状态是否已退款。 此更新需在refund_state更新之后，如果全额退款则修改支付状态为已退款
+            _payOrderRepository.Update(payOrder);
+            return _payOrderRepository.SaveChanges(out int _);
         }
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款失败】
@@ -238,14 +274,6 @@ namespace AGooday.AgPay.Application.Services
                 _refundOrderRepository.Update(refundOrder);
             }
             return _refundOrderRepository.SaveChanges();
-        }
-        public bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo)
-        {
-            return _refundOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchRefundNo);
-        }
-        public bool IsExistRefundingOrder(string payOrderId)
-        {
-            return _refundOrderRepository.IsExistRefundingOrder(payOrderId);
         }
     }
 }

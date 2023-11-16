@@ -82,6 +82,12 @@ namespace AGooday.AgPay.Application.Services
             return records;
         }
 
+        /// <summary>
+        /// 查询当前用户是否存在左侧菜单 (仅普通操作员)
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="sysType"></param>
+        /// <returns></returns>
         public bool UserHasLeftMenu(long userId, string sysType)
         {
             var result = _sysRoleEntRelaRepository.GetAll<SysUserRoleRela>()

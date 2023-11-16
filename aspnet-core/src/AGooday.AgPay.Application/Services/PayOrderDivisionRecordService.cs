@@ -113,6 +113,11 @@ namespace AGooday.AgPay.Application.Services
             return records;
         }
 
+        /// <summary>
+        /// batch_order_id 去重， 查询出所有的 分账已受理状态的订单， 支持分页
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         public PaginatedList<PayOrderDivisionRecordDto> DistinctBatchOrderIdList(PayOrderDivisionRecordQueryDto dto)
         {
             var mchInfos = _payOrderDivisionRecordRepository.GetAll()

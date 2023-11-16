@@ -19,9 +19,9 @@ namespace AGooday.AgPay.Application.Interfaces
         RefundOrderDto QueryMchOrder(string mchNo, string mchRefundNo, string refundOrderId);
         IEnumerable<RefundOrderDto> GetAll();
         PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto);
-        long SumSuccessRefundAmount(string payOrderId);
         bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo);
         bool IsExistRefundingOrder(string payOrderId);
+        long SumSuccessRefundAmount(string payOrderId);
         /// <summary>
         /// 更新退款单状态 【退款单生成】 --》 【退款中】
         /// </summary>

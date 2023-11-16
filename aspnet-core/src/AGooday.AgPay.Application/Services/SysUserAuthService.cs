@@ -103,6 +103,13 @@ namespace AGooday.AgPay.Application.Services
             return entity;
         }
 
+        /// <summary>
+        /// 根据登录信息查询用户认证信息
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <param name="identityType"></param>
+        /// <param name="sysType"></param>
+        /// <returns></returns>
         public SysUserAuthInfoDto SelectByLogin(string identifier, byte identityType, string sysType)
         {
             var entity = _sysUserAuthRepository.GetAll()

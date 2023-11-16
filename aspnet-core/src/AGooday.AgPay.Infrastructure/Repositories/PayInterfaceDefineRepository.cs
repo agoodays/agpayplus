@@ -12,6 +12,15 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
+        /// <summary>
+        /// 根据支付方式查询可用的支付接口列表
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="wayCode"></param>
+        /// <param name="appId"></param>
+        /// <param name="infoType"></param>
+        /// <param name="mchType"></param>
+        /// <returns></returns>
         public IEnumerable<T> SelectAvailablePayInterfaceList<T>(string wayCode, string appId, string infoType, byte mchType)
         {
             string sql = $@"select pid.if_code IfCode, pid.if_name IfName, pid.config_page_type ConfigPageType, pid.bg_color BgColor, pid.icon Icon, pic.if_params IfParams, pic.if_rate IfRate from t_pay_interface_define pid

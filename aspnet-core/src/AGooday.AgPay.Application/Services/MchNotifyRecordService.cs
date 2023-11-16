@@ -66,6 +66,7 @@ namespace AGooday.AgPay.Application.Services
             var mchNotifyRecords = _mchNotifyRecordRepository.GetAll();
             return _mapper.Map<IEnumerable<MchNotifyRecordDto>>(mchNotifyRecords);
         }
+
         public PaginatedList<MchNotifyRecordDto> GetPaginatedData(MchNotifyQueryDto dto)
         {
             var mchInfos = _mchNotifyRecordRepository.GetAll()
@@ -82,6 +83,7 @@ namespace AGooday.AgPay.Application.Services
             var records = PaginatedList<MchNotifyRecord>.Create<MchNotifyRecordDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
+
         /// <summary>
         /// 更改为通知中 & 增加允许重发通知次数
         /// </summary>
