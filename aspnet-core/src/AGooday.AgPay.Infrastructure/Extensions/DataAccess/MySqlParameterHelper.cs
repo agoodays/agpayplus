@@ -33,13 +33,12 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
             public object Value { get; set; }
         }
 
-
-
         public static object[] ToSqlParamsArray(this object obj, MySqlParameter[] additionalParams = null)
         {
             var result = ToSqlParamsList(obj, additionalParams);
             return result.ToArray<object>();
         }
+
         public static List<MySqlParameter> ToSqlParamsList(this object obj, MySqlParameter[] additionalParams = null)
         {
             var props = (
@@ -76,7 +75,6 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
                 result.AddRange(additionalParams);
 
             return result;
-
         }
     }
 
@@ -90,7 +88,6 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
     /// </summary>
     public sealed class TypeConvertor
     {
-
         private struct DbTypeMapEntry
         {
             public Type Type;
@@ -102,7 +99,6 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
                 this.DbType = dbType;
                 this.SqlDbType = sqlDbType;
             }
-
         };
 
         private static ArrayList _DbTypeList = new ArrayList();
@@ -158,12 +154,10 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
             dbTypeMapEntry
             = new DbTypeMapEntry(typeof(string), DbType.String, SqlDbType.VarChar);
             _DbTypeList.Add(dbTypeMapEntry);
-
         }
 
         private TypeConvertor()
         {
-
         }
 
         #endregion
