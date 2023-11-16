@@ -1,21 +1,14 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
-using AGooday.AgPay.Payment.Api.Channel.AliPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.AliPay.Kits;
 using AGooday.AgPay.Payment.Api.Channel.HkrtPay;
-using AGooday.AgPay.Payment.Api.Channel.HkrtPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.LesPay;
-using AGooday.AgPay.Payment.Api.Channel.LesPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.PpPay;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay;
-using AGooday.AgPay.Payment.Api.Channel.SxfPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.UmsPay;
-using AGooday.AgPay.Payment.Api.Channel.UmsPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.WxPay;
-using AGooday.AgPay.Payment.Api.Channel.WxPay.Extensions;
 using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay;
-using AGooday.AgPay.Payment.Api.Channel.YsfPay.Extensions;
 using AGooday.AgPay.Payment.Api.Utils;
 
 namespace AGooday.AgPay.Payment.Api.Channel
@@ -120,6 +113,15 @@ namespace AGooday.AgPay.Payment.Api.Channel
                 };
                 return funcFactory;
             });
+            PayWayUtil.PayWayServiceRegister<AliPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<WxPayPaymentService>(services);
+            PayWayUtil.PayWayV3ServiceRegister<WxPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<YsfPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<PpPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<SxfPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<LesPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<HkrtPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<UmsPayPaymentService>(services);
             #endregion
             #region RefundService
             services.AddScoped<AliPayRefundService>();
@@ -337,27 +339,29 @@ namespace AGooday.AgPay.Payment.Api.Channel
             });
             #endregion
 
-            #region AliPay
-            AliPayNativeInjectorBootStrapper.RegisterServices(services);
-            #endregion
-            #region WxPay
-            WxPayNativeInjectorBootStrapper.RegisterServices(services);
-            WxPayV3NativeInjectorBootStrapper.RegisterServices(services);
-            #endregion
-            #region YsfPay
-            YsfPayNativeInjectorBootStrapper.RegisterServices(services);
-            #endregion
-            #region SxfPay
-            SxfPayNativeInjectorBootStrapper.RegisterServices(services);
-            #endregion
-            #region LesPay
-            LesPayNativeInjectorBootStrapper.RegisterServices(services);
-            #endregion
-            #region HkrtPay
-            HkrtPayNativeInjectorBootStrapper.RegisterServices(services);
-            #endregion
-            #region UmsPay
-            UmsPayNativeInjectorBootStrapper.RegisterServices(services);
+            #region
+            //#region AliPay
+            //AliPayNativeInjectorBootStrapper.RegisterServices(services);
+            //#endregion
+            //#region WxPay
+            //WxPayNativeInjectorBootStrapper.RegisterServices(services);
+            //WxPayV3NativeInjectorBootStrapper.RegisterServices(services);
+            //#endregion
+            //#region YsfPay
+            //YsfPayNativeInjectorBootStrapper.RegisterServices(services);
+            //#endregion
+            //#region SxfPay
+            //SxfPayNativeInjectorBootStrapper.RegisterServices(services);
+            //#endregion
+            //#region LesPay
+            //LesPayNativeInjectorBootStrapper.RegisterServices(services);
+            //#endregion
+            //#region HkrtPay
+            //HkrtPayNativeInjectorBootStrapper.RegisterServices(services);
+            //#endregion
+            //#region UmsPay
+            //UmsPayNativeInjectorBootStrapper.RegisterServices(services);
+            //#endregion 
             #endregion
 
             var serviceProvider = services.BuildServiceProvider();

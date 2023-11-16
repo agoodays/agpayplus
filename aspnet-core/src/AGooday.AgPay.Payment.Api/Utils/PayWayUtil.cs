@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel;
+using System.Reflection;
 
 namespace AGooday.AgPay.Payment.Api.Utils
 {
@@ -34,6 +35,35 @@ namespace AGooday.AgPay.Payment.Api.Utils
         public static IPaymentService GetRealPayWayV3Service(IPaymentService service, string wayCode)
         {
             return GetRealPayWayService(service, PAYWAYV3_PACKAGE_NAME, wayCode);
+        }
+
+        public static void PayWayServiceRegister<T>(IServiceCollection services) where T : AbstractPaymentService
+        {
+            PayWayServiceRegister<T>(services, PAYWAY_PACKAGE_NAME);
+        }
+
+        public static void PayWayV3ServiceRegister<T>(IServiceCollection services) where T : AbstractPaymentService
+        {
+            PayWayServiceRegister<T>(services, PAYWAYV3_PACKAGE_NAME);
+        }
+
+        private static void PayWayServiceRegister<T>(IServiceCollection services, string packageName) where T : AbstractPaymentService
+        {
+            string targetNamespace = $"{typeof(T).Namespace}.{packageName}";
+
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            // 获取指定命名空间下的所有类
+            Type[] targetTypes = assembly.GetTypes()
+                // 根据命名空间和实现了 IPaymentService 接口的类型进行筛选，typeof(IPaymentService).IsAssignableFrom(type) 来筛选实现了 IPaymentService 接口的类型
+                .Where(type => type.Namespace == targetNamespace && typeof(IPaymentService).IsAssignableFrom(type))
+                .ToArray();
+
+            // 注册所有类
+            foreach (Type type in targetTypes)
+            {
+                services.AddScoped(typeof(IPaymentService), type);
+            }
         }
 
         private static IPaymentService GetRealPayWayService(IPaymentService service, string packageName, string wayCode)
