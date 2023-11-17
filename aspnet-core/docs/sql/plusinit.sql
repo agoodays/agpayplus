@@ -719,7 +719,7 @@ CREATE TABLE `t_device_config` (
 
 -- 商户会员信息表
 DROP TABLE IF EXISTS t_mbr_info;
-CREATE TABLE `t_mch_info` (
+CREATE TABLE `t_mbr_info` (
   `mbr_no` VARCHAR(64) NOT NULL COMMENT '会员号',
   `mbr_name` VARCHAR(64) NOT NULL COMMENT '会员名称',
   `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',

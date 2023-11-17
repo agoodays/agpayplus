@@ -57,9 +57,9 @@ CREATE TABLE `t_sys_user` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`sys_user_id`),
-  UNIQUE KEY(`sys_type`,`login_username`),
-  UNIQUE KEY(`sys_type`,`telphone`),
-  UNIQUE KEY(`sys_type`, `user_no`)
+  UNIQUE KEY `Uni_SysType_LoginUsername` (`sys_type`,`login_username`),
+  UNIQUE KEY `Uni_SysType_Telphone` (`sys_type`,`telphone`),
+  UNIQUE KEY `Uni_SysType_UserNo` (`sys_type`, `user_no`)
 ) ENGINE=INNODB AUTO_INCREMENT=100001 DEFAULT CHARSET=utf8mb4 COMMENT='系统用户表';
 
 -- 系统用户认证表
@@ -180,12 +180,12 @@ CREATE TABLE `t_isv_info` (
 -- 支付方式表  pay_way
 DROP TABLE IF EXISTS t_pay_way;
 CREATE TABLE `t_pay_way` (
-        `way_code` VARCHAR(20) NOT NULL COMMENT '支付方式代码  例如： wxpay_jsapi',
-        `way_name` VARCHAR(20) NOT NULL COMMENT '支付方式名称',
-        `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他'
-        `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
-        `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-        PRIMARY KEY (`way_code`)
+  `way_code` VARCHAR(20) NOT NULL COMMENT '支付方式代码  例如： wxpay_jsapi',
+  `way_name` VARCHAR(20) NOT NULL COMMENT '支付方式名称',
+  `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他',
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (`way_code`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='支付方式表';
 
 -- 支付接口定义表
@@ -294,7 +294,7 @@ CREATE TABLE `t_pay_order` (
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`pay_order_id`),
   UNIQUE KEY `Uni_MchNo_MchOrderNo` (`mch_no`, `mch_order_no`),
-  INDEX(`created_at`)
+  INDEX `Idx_CreatedAt` (`created_at`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='支付订单表';
 
 
@@ -406,7 +406,7 @@ CREATE TABLE `t_transfer_order` (
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`transfer_id`),
   UNIQUE KEY `Uni_MchNo_MchOrderNo` (`mch_no`, `mch_order_no`),
-  INDEX(`created_at`)
+  INDEX `Idx_CreatedAt` (`created_at`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='转账订单表';
 
 -- 商户分账接收者账号组
