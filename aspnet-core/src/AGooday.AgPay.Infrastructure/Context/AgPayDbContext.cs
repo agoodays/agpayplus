@@ -48,10 +48,10 @@ namespace AGooday.AgPay.Infrastructure.Context
         public DbSet<TransferOrder> TransferOrder { get; set; }
         #endregion
 
-        //public AgPayDbContext(DbContextOptions<AgPayDbContext> options)
-        //    : base(options)
-        //{
-        //}
+        public AgPayDbContext(DbContextOptions<AgPayDbContext> options)
+            : base(options)
+        {
+        }
 
         /// <summary>
         /// 重写连接数据库

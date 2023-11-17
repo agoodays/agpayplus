@@ -1,6 +1,8 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -90,6 +92,206 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             DbSet.Update(entity);
         }
+
+        public void Update(TEntity entity, Expression<Func<TEntity, object>> columnsToUpdate)
+        {
+            // 获取要更新的属性名称列表
+            var propertyNames = GetPropertyNames(columnsToUpdate);
+
+            // 根据主键查找实体
+            var entry = Db.Entry(entity);
+            var keyValues = Db.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties
+                .Select(x => entry.Property(x.Name).CurrentValue)
+                .ToArray();
+            var existingEntity = DbSet.Find(keyValues);
+
+            // 更新实体的指定属性
+            foreach (var propertyName in propertyNames)
+            {
+                var property = typeof(TEntity).GetProperty(propertyName);
+                if (property != null)
+                {
+                    var newValue = property.GetValue(entity);
+                    property.SetValue(existingEntity, newValue);
+                }
+            }
+        }
+
+        //public void Update(TEntity entity, Expression<Func<TEntity, object>> columnsToUpdate)
+        //{
+        //    DbSet.Attach(entity);
+
+        //    var entry = Db.Entry(entity);
+        //    entry.State = EntityState.Modified;
+
+        //    if (columnsToUpdate != null)
+        //    {
+        //        foreach (var property in GetPropertyNames(columnsToUpdate))
+        //        {
+        //            entry.Property(property).IsModified = true;
+        //        }
+        //    }
+        //}
+
+        public void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> columnsToUpdate)
+        {
+            var entitiesToUpdate = DbSet.Where(condition);
+
+            foreach (var entity in entitiesToUpdate)
+            {
+                var entry = Db.Entry(entity);
+                entry.State = EntityState.Modified;
+
+                if (columnsToUpdate != null)
+                {
+                    foreach (var property in GetProperties(columnsToUpdate))
+                    {
+                        entry.Property(property).IsModified = true;
+                    }
+                }
+            }
+        }
+
+        static string[] GetPropertyNames(Expression<Func<TEntity, object>> expression)
+        {
+            var memberInitExpression = expression.Body as NewExpression;
+
+            var propertyNames = memberInitExpression?.Members
+                .Select(member => member.Name)
+                .ToArray();
+
+            return propertyNames;
+        }
+
+        public void UpdateProperty(TEntity entity, Expression<Func<TEntity, object>> propertyExpression)
+        {
+            DbSet.Attach(entity);
+            var propertyInfo = GetPropertyInfo(propertyExpression);
+            Db.Entry(entity).Property(propertyInfo.Name).IsModified = true;
+        }
+
+        //public void UpdateProperty(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
+        //{
+        //    var entitiesToUpdate = DbSet.Where(condition);
+        //    foreach (var entity in entitiesToUpdate)
+        //    {
+        //        DbSet.Attach(entity);
+        //        var propertyInfo = GetPropertyInfo(propertyExpression);
+        //        var newValue = propertyExpression.Compile()(entity);
+        //        propertyInfo.SetValue(entity, newValue);
+        //        Db.Entry(entity).Property(propertyInfo.Name).IsModified = true;
+        //    }
+        //}
+
+        //public void UpdateProperty(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
+        //{
+        //    var entitiesToUpdate = DbSet.Where(condition);
+        //    var propertyInfo = GetPropertyInfo(propertyExpression);
+        //    var propertyName = propertyInfo.Name;
+        //    var newValue = propertyExpression.Compile()(null);
+
+        //    foreach (var entity in entitiesToUpdate)
+        //    {
+        //        DbSet.Attach(entity);
+        //        propertyInfo.SetValue(entity, newValue);
+        //        Db.Entry(entity).Property(propertyName).IsModified = true;
+        //    }
+        //}
+        public void UpdateProperty(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
+        {
+            var entitiesToUpdate = DbSet.Where(condition);
+            var propertiesToUpdate = GetPropertiesToUpdate(propertyExpression);
+
+            foreach (var entity in entitiesToUpdate)
+            {
+                DbSet.Attach(entity);
+
+                foreach (var propertyToUpdate in propertiesToUpdate)
+                {
+                    var propertyName = propertyToUpdate.Key;
+                    var newValue = propertyToUpdate.Value;
+
+                    var propertyInfo = typeof(TEntity).GetProperty(propertyName);
+                    propertyInfo.SetValue(entity, newValue);
+
+                    Db.Entry(entity).Property(propertyName).IsModified = true;
+                }
+            }
+        }
+
+        private Dictionary<string, object> GetPropertiesToUpdate(Expression<Func<TEntity, object>> propertyExpression)
+        {
+            var properties = new Dictionary<string, object>();
+            var body = propertyExpression.Body;
+
+            if (body is NewExpression newExpression)
+            {
+                var memberNames = newExpression.Members.Select(m => m.Name).ToList();
+                var memberValues = newExpression.Arguments.Select(arg => Expression.Lambda(arg).Compile().DynamicInvoke()).ToList();
+
+                for (var i = 0; i < memberNames.Count; i++)
+                {
+                    properties.Add(memberNames[i], memberValues[i]);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Invalid property expression");
+            }
+
+            return properties;
+        }
+
+        //private PropertyInfo GetPropertyInfo(Expression<Func<TEntity, object>> propertyExpression)
+        //{
+        //    if (propertyExpression.Body is UnaryExpression unaryExpression)
+        //    {
+        //        return (PropertyInfo)((MemberExpression)unaryExpression.Operand).Member;
+        //    }
+
+        //    return (PropertyInfo)((MemberExpression)propertyExpression.Body).Member;
+        //}
+        private PropertyInfo GetPropertyInfo(Expression<Func<TEntity, object>> propertyExpression)
+        {
+            var body = propertyExpression.Body;
+
+            if (body is UnaryExpression unaryExpression && unaryExpression.NodeType == ExpressionType.Convert)
+                body = unaryExpression.Operand;
+
+            if (body is MemberExpression memberExpression)
+            {
+                var propertyInfo = memberExpression.Member as PropertyInfo;
+                if (propertyInfo != null)
+                    return propertyInfo;
+            }
+
+            throw new ArgumentException("Invalid property expression");
+        }
+
+        private IEnumerable<string> GetProperties(Expression<Func<TEntity, object>> expression)
+        {
+            var memberInitExpression = expression.Body as MemberInitExpression;
+
+            if (memberInitExpression == null)
+            {
+                throw new ArgumentException("Invalid expression. Only member init expressions are supported.");
+            }
+
+            if (memberInitExpression.NodeType != ExpressionType.New)
+            {
+                throw new ArgumentException("Invalid expression. Only constructor member expressions are supported.");
+            }
+
+            var newExpression = memberInitExpression.NewExpression;
+
+            if (newExpression == null)
+            {
+                throw new ArgumentException("Invalid expression. Only constructor member expressions are supported.");
+            }
+
+            return newExpression.Members.Select(member => member.Name);
+        }
+
         /// <summary>
         /// 根据id删除
         /// </summary>
