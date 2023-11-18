@@ -419,10 +419,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
             return propertyNames;
         }
-        public static Dictionary<string, object> GetProperties(Expression<Func<TEntity, object>> propertyExpression)
+        public static Dictionary<string, object> GetProperties(Expression<Func<TEntity, object>> expression)
         {
             var properties = new Dictionary<string, object>();
-            var body = propertyExpression.Body;
+            var body = expression.Body;
 
             if (body is NewExpression newExpression)
             {
