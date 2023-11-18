@@ -91,11 +91,15 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             DbSet.Update(entity);
         }
-
+        /// <summary>
+        /// 更新指定实体的指定列
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="propertyExpression"></param>
         public void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression)
         {
             // 获取要更新的属性名称列表
-            var propertyNames = GetPropertyNames(propertyExpression);
+            var propertyNames = RepositoryExtension<TEntity>.GetPropertyNames(propertyExpression);
 
             // 根据主键查找实体
             var entry = Db.Entry(entity);
@@ -115,36 +119,24 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                 }
             }
         }
-
-        private string[] GetPropertyNames(Expression<Func<TEntity, object>> expression)
-        {
-            var newExpression = expression.Body as NewExpression;
-
-            if (newExpression == null)
-            {
-                throw new ArgumentException("Invalid expression. Only new expressions are supported.");
-            }
-
-            var propertyNames = newExpression?.Members
-                .Select(member => member.Name)
-                .ToArray();
-
-            return propertyNames;
-        }
-
+        /// <summary>
+        /// 更新符合条件的多个实体的指定列
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="propertyExpression"></param>
         public void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
         {
             var entitiesToUpdate = DbSet.Where(condition);
-            var propertiesToUpdate = GetPropertyNamesAndValues(propertyExpression);
+            var properties = RepositoryExtension<TEntity>.GetProperties(propertyExpression);
 
             foreach (var entity in entitiesToUpdate)
             {
                 DbSet.Attach(entity);
 
-                foreach (var propertyToUpdate in propertiesToUpdate)
+                foreach (var property in properties)
                 {
-                    var propertyName = propertyToUpdate.Key;
-                    var newValue = propertyToUpdate.Value;
+                    var propertyName = property.Key;
+                    var newValue = property.Value;
 
                     var propertyInfo = typeof(TEntity).GetProperty(propertyName);
                     propertyInfo.SetValue(entity, newValue);
@@ -153,30 +145,6 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                 }
             }
         }
-
-        private Dictionary<string, object> GetPropertyNamesAndValues(Expression<Func<TEntity, object>> propertyExpression)
-        {
-            var properties = new Dictionary<string, object>();
-            var body = propertyExpression.Body;
-
-            if (body is NewExpression newExpression)
-            {
-                var memberNames = newExpression.Members.Select(m => m.Name).ToList();
-                var memberValues = newExpression.Arguments.Select(arg => Expression.Lambda(arg).Compile().DynamicInvoke()).ToList();
-
-                for (var i = 0; i < memberNames.Count; i++)
-                {
-                    properties.Add(memberNames[i], memberValues[i]);
-                }
-            }
-            else
-            {
-                throw new ArgumentException("Invalid property expression");
-            }
-
-            return properties;
-        }
-
         /// <summary>
         /// 根据id删除
         /// </summary>
@@ -314,6 +282,60 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             DbSet.Update(obj);
         }
         /// <summary>
+        /// 更新指定实体的指定列
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="propertyExpression"></param>
+        public void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression)
+        {
+            // 获取要更新的属性名称列表
+            var propertyNames = RepositoryExtension<TEntity>.GetPropertyNames(propertyExpression);
+
+            // 根据主键查找实体
+            var entry = Db.Entry(entity);
+            var keyValues = Db.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties
+                .Select(x => entry.Property(x.Name).CurrentValue)
+                .ToArray();
+            var existingEntity = DbSet.Find(keyValues);
+
+            // 更新实体的指定属性
+            foreach (var propertyName in propertyNames)
+            {
+                var property = typeof(TEntity).GetProperty(propertyName);
+                if (property != null)
+                {
+                    var newValue = property.GetValue(entity);
+                    property.SetValue(existingEntity, newValue);
+                }
+            }
+        }
+        /// <summary>
+        /// 更新符合条件的多个实体的指定列
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="propertyExpression"></param>
+        public void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
+        {
+            var entitiesToUpdate = DbSet.Where(condition);
+            var properties = RepositoryExtension<TEntity>.GetProperties(propertyExpression);
+
+            foreach (var entity in entitiesToUpdate)
+            {
+                DbSet.Attach(entity);
+
+                foreach (var property in properties)
+                {
+                    var propertyName = property.Key;
+                    var newValue = property.Value;
+
+                    var propertyInfo = typeof(TEntity).GetProperty(propertyName);
+                    propertyInfo.SetValue(entity, newValue);
+
+                    Db.Entry(entity).Property(propertyName).IsModified = true;
+                }
+            }
+        }
+        /// <summary>
         /// 根据id删除
         /// </summary>
         /// <typeparam name="TPrimaryKey"></typeparam>
@@ -378,6 +400,46 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             Db.Dispose();
             GC.SuppressFinalize(this);
+        }
+    }
+    public static class RepositoryExtension<TEntity> where TEntity : class
+    {
+        public static string[] GetPropertyNames(Expression<Func<TEntity, object>> expression)
+        {
+            var newExpression = expression.Body as NewExpression;
+
+            if (newExpression == null)
+            {
+                throw new ArgumentException("Invalid expression. Only new expressions are supported.");
+            }
+
+            var propertyNames = newExpression?.Members
+                .Select(member => member.Name)
+                .ToArray();
+
+            return propertyNames;
+        }
+        public static Dictionary<string, object> GetProperties(Expression<Func<TEntity, object>> propertyExpression)
+        {
+            var properties = new Dictionary<string, object>();
+            var body = propertyExpression.Body;
+
+            if (body is NewExpression newExpression)
+            {
+                var memberNames = newExpression.Members.Select(m => m.Name).ToList();
+                var memberValues = newExpression.Arguments.Select(arg => Expression.Lambda(arg).Compile().DynamicInvoke()).ToList();
+
+                for (var i = 0; i < memberNames.Count; i++)
+                {
+                    properties.Add(memberNames[i], memberValues[i]);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Invalid property expression");
+            }
+
+            return properties;
         }
     }
 }

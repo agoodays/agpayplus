@@ -55,7 +55,17 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <param name="entity"></param>
         void Update(TEntity entity);
+        /// <summary>
+        /// 更新指定实体的指定列
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="propertyExpression"></param>
         void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression);
+        /// <summary>
+        /// 更新符合条件的多个实体的指定列
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="propertyExpression"></param>
         void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression);
         /// <summary>
         /// 根据id删除
@@ -129,6 +139,18 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <param name="entity"></param>
         void Update(TEntity entity);
+        /// <summary>
+        /// 更新指定实体的指定列
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="propertyExpression"></param>
+        void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression);
+        /// <summary>
+        /// 更新符合条件的多个实体的指定列
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="propertyExpression"></param>
+        void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression);
         /// <summary>
         /// 根据id删除
         /// </summary>
