@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         public void UpdatePropertyTest()
         {
             // 更新符合条件的多个实体的指定列
-            _repository.UpdateProperty(e => e.SysUserId == 801, e => new { SafeWord = "test", State = (byte)1 });
+            _repository.Update(e => e.SysUserId == 801, e => new { SafeWord = "test", State = (byte)1 });
             var reault = _repository.SaveChanges(out int count);
             Assert.IsTrue(reault);
         }

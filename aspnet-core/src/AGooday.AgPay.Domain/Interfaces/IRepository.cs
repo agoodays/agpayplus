@@ -55,10 +55,8 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <param name="entity"></param>
         void Update(TEntity entity);
-        void Update(TEntity entity, Expression<Func<TEntity, object>> columnsToUpdate);
-        void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> columnsToUpdate);
-        void UpdateProperty(TEntity entity, Expression<Func<TEntity, object>> propertyExpression);
-        void UpdateProperty(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression);
+        void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression);
+        void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression);
         /// <summary>
         /// 根据id删除
         /// </summary>
