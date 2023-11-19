@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 if (mutablePair == null)
                 {
                     // 解析数据失败， 响应已处理
-                    log.LogError($"{logPrefix}, mutablePair is null ", logPrefix);
+                    log.LogError($"{logPrefix}, mutablePair is null ");
                     throw new BizException("解析数据异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 

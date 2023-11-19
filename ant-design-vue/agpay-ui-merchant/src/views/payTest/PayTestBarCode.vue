@@ -1,6 +1,12 @@
 <template>
   <div>
-    <a-modal v-model="visible" title="条码支付" @cancel="handleChose" :footer="null" :width="350">
+    <a-modal
+      v-model="visible"
+      title="条码支付"
+      @cancel="handleChose"
+      :mask-closable="false"
+      :footer="null"
+      :width="350">
       <div>
         <p>请输入用户条形码:</p>
         <div style="display:flex;flex-direction:row;margin-bottom:14px;">

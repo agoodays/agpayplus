@@ -110,7 +110,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             }
             catch (Exception e)
             {
-                _logger.LogError("系统异常：{}", e);
+                _logger.LogError(e,$"系统异常：{e.Message}");
                 return ApiRes.CustomFail("系统异常");
             }
         }

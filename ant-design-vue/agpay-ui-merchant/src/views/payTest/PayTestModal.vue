@@ -1,6 +1,12 @@
 <template>
   <div>
-    <a-modal v-model="visible" title="等待支付" @ok="handleClose" :footer="null" :width="300">
+    <a-modal
+      v-model="visible"
+      title="等待支付"
+      @ok="handleClose"
+      :mask-closable="false"
+      :footer="null"
+      :width="300">
       <div style="width:100%;margin-bottom:20px;text-align:center">
         <img v-if="apiRes.payDataType == 'codeImgUrl'" :src="apiRes.payData" alt="">
         <span v-else-if="apiRes.payDataType == 'payurl'">等待用户支付 <hr> 如浏览器未正确跳转请点击： <a :href="apiRes.payData" target="_blank">支付地址</a><a-button size="small" class="copy-btn" v-clipboard:copy="apiRes.payData" v-clipboard:success="onCopy" >复制链接</a-button></span>

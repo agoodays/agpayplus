@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Payment.Api.Middlewares
                     //errorResponse.Msg = "Internal Server errors. Check Logs!";
                     break;
             }
-            _logger.LogError(exception.Message);
+            _logger.LogError(exception, exception.Message);
             var result = JsonConvert.SerializeObject(errorResponse);
             await response.WriteAsync(result);
         }

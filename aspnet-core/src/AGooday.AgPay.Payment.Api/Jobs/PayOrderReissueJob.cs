@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                             {
                                 PageNumber = currentPageIndex,
                                 PageSize = QUERY_PAGE_SIZE,
-                                State = (byte)PayOrderState.STATE_ING,                                
+                                State = (byte)PayOrderState.STATE_ING,
                                 CreatedStart = DateTime.Now.AddMinutes(-10),// 当前时间 减去10分钟。
                             };
                             var payOrders = payOrderService.GetPaginatedData(dto);
@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                         catch (Exception e)
                         {
                             //出现异常，直接退出，避免死循环。
-                            logger.LogError("error", e);
+                            logger.LogError(e, "error");
                             break;
                         }
                     }

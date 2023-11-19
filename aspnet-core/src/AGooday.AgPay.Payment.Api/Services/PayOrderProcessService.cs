@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"订单[{payOrder.PayOrderId}]自动分账逻辑异常：");
+                _logger.LogError(e, $"订单[{payOrder.PayOrderId}]自动分账逻辑异常：{e.Message}");
             }
         }
     }

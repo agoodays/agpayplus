@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                         catch (Exception e)
                         {
                             //出现异常，直接退出，避免死循环。
-                            logger.LogError("error", e);
+                            logger.LogError(e, "error");
                             break;
                         }
                     }

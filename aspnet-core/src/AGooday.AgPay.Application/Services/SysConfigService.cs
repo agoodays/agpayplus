@@ -167,6 +167,7 @@ namespace AGooday.AgPay.Application.Services
         {
             foreach (KeyValuePair<string, string> config in configs)
             {
+                var isAdd = false;
                 var sysConfig = _sysConfigRepository.GetByKey(config.Key, sysType, belongInfoId);
                 if (sysConfig == null)
                 {
@@ -182,7 +183,6 @@ namespace AGooday.AgPay.Application.Services
                         default:
                             break;
                     }
-
                     sysConfig = sysConfig ?? new SysConfig()
                     {
                         SysType = sysType,
@@ -193,22 +193,26 @@ namespace AGooday.AgPay.Application.Services
                         UpdatedAt = DateTime.Now,
                     };
                     sysConfig.BelongInfoId = belongInfoId;
-                    sysConfig.UpdatedAt = DateTime.Now;
+                    isAdd = true;
+                    _sysConfigRepository.Add(sysConfig);
+                }
+                sysConfig.ConfigKey = config.Key;
+                switch (config.Key)
+                {
+                    case "aliyunOssConfig":
+                        sysConfig.ConfigVal = StringUtil.Merge(sysConfig.ConfigVal, config.Value);
+                        break;
+                    default:
+                        sysConfig.ConfigVal = config.Value;
+                        break;
+                }
+                sysConfig.UpdatedAt = DateTime.Now;
+                if (isAdd)
+                {
                     _sysConfigRepository.Add(sysConfig);
                 }
                 else
                 {
-                    sysConfig.ConfigKey = config.Key;
-                    switch (config.Key)
-                    {
-                        case "aliyunOssConfig":
-                            sysConfig.ConfigVal = StringUtil.Merge(sysConfig.ConfigVal, config.Value);
-                            break;
-                        default:
-                            sysConfig.ConfigVal = config.Value;
-                            break;
-                    }
-                    sysConfig.UpdatedAt = DateTime.Now;
                     _sysConfigRepository.Update(sysConfig);
                 }
             }

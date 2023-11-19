@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 Dictionary<string, object> mutablePair = transferNotifyService.ParseParams(Request, urlOrderId);
                 if (mutablePair == null)
                 {
-                    _logger.LogError("{logPrefix}, mutablePair is null", logPrefix);
+                    _logger.LogError($"{logPrefix}, mutablePair is null");
                     throw new BizException("解析数据异常！"); // 需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 
@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 // 转账单不存在
                 if (transferOrder == null)
                 {
-                    _logger.LogError("{logPrefix}, 转账单不存在. transferId={transferId}", logPrefix, transferId);
+                    _logger.LogError($"{logPrefix}, 转账单不存在. transferId={transferId}");
                     return transferNotifyService.DoNotifyOrderNotExists(Request);
                 }
 

@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Payment.Api.Authorization
             var merchantPermissions = JsonConvert.DeserializeObject<List<string>>(configVal);
             if (!merchantPermissions.Intersect(Name).Any())
             {
-                throw new BizException($"商户无此接口[{Name}]权限!");
+                throw new BizException($"商户无此接口[{string.Join(",", Name)}]权限!");
                 //throw new UnauthorizeException();
                 //context.Result = new ForbidResult();
             }
@@ -37,17 +37,15 @@ namespace AGooday.AgPay.Payment.Api.Authorization
         private string GetMchNoFromRequest(HttpRequest request)
         {
             // 从请求体中获取 mchNo，请求体是 JSON 格式，mchNo 是 JSON 对象中的一个属性
+            request.EnableBuffering();
+            string requestBody = new StreamReader(request.Body, Encoding.UTF8).ReadToEnd();
+            request.Body.Position = 0;
 
-            using (StreamReader reader = new StreamReader(request.Body, Encoding.UTF8))
-            {
-                string requestBody = reader.ReadToEnd();
+            // 使用适当的 JSON 解析库解析请求体，并获取 mchNo
+            JObject json = JObject.Parse(requestBody);
+            json.TryGetString("mchNo", out string mchNo);
 
-                // 使用适当的 JSON 解析库解析请求体，并获取 mchNo
-                JObject json = JObject.Parse(requestBody);
-                json.TryGetString("mchNo", out string mchNo);
-
-                return mchNo;
-            }
+            return mchNo;
         }
     }
 }
