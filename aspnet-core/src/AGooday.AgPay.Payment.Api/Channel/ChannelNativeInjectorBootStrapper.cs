@@ -339,31 +339,6 @@ namespace AGooday.AgPay.Payment.Api.Channel
             });
             #endregion
 
-            #region
-            //#region AliPay
-            //AliPayNativeInjectorBootStrapper.RegisterServices(services);
-            //#endregion
-            //#region WxPay
-            //WxPayNativeInjectorBootStrapper.RegisterServices(services);
-            //WxPayV3NativeInjectorBootStrapper.RegisterServices(services);
-            //#endregion
-            //#region YsfPay
-            //YsfPayNativeInjectorBootStrapper.RegisterServices(services);
-            //#endregion
-            //#region SxfPay
-            //SxfPayNativeInjectorBootStrapper.RegisterServices(services);
-            //#endregion
-            //#region LesPay
-            //LesPayNativeInjectorBootStrapper.RegisterServices(services);
-            //#endregion
-            //#region HkrtPay
-            //HkrtPayNativeInjectorBootStrapper.RegisterServices(services);
-            //#endregion
-            //#region UmsPay
-            //UmsPayNativeInjectorBootStrapper.RegisterServices(services);
-            //#endregion 
-            #endregion
-
             var serviceProvider = services.BuildServiceProvider();
             PayWayUtil.ServiceProvider = serviceProvider;
             AliPayKit.ServiceProvider = serviceProvider;
