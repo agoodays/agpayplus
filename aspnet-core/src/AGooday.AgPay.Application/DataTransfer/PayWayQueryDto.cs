@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string WayName { get; set; }
 
         /// <summary>
-        /// 支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, OTHER-其他
+        /// 支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他
         /// </summary>
         public string WayType { get; set; }
     }

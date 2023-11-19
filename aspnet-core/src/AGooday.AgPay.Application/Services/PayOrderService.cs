@@ -406,18 +406,21 @@ namespace AGooday.AgPay.Application.Services
         public List<PayTypeCountDto> PayTypeCount(string mchNo, string agentNo, byte? state, byte? refundState, DateTime? dayStart, DateTime? dayEnd)
         {
             var result = _payOrderRepository.GetAll()
-                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
-                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
-                && (state.Equals(null) || w.State.Equals(state))
-                && (refundState.Equals(null) || w.RefundState.Equals(refundState))
-                && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
-                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable()
-                .GroupBy(g => g.WayCode, (key, group) => new { WayCode = key, Items = group.AsEnumerable() })
+                .Join(_payWayRepository.GetAll(),
+                po => po.WayCode, pw => pw.WayCode,
+                (po, pw) => new { po, pw })
+                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.po.MchNo.Equals(mchNo))
+                && (string.IsNullOrWhiteSpace(agentNo) || w.po.AgentNo.Equals(agentNo))
+                && (state.Equals(null) || w.po.State.Equals(state))
+                && (refundState.Equals(null) || w.po.RefundState.Equals(refundState))
+                && (dayEnd.Equals(null) || w.po.CreatedAt < dayEnd)
+                && (dayStart.Equals(null) || w.po.CreatedAt >= dayStart)).AsEnumerable()
+                .GroupBy(g => g.pw.WayType, (key, group) => new { WayType = key, Items = group.AsEnumerable() })
                 .Select(s => new PayTypeCountDto
                 {
-                    WayCode = s.WayCode,
+                    WayType = s.WayType,
                     TypeCount = s.Items.Count(),
-                    TypeAmount = Decimal.Round((s.Items.Sum(s => s.Amount) - s.Items.Sum(s => s.RefundAmount)) / 100M, 2, MidpointRounding.AwayFromZero)
+                    TypeAmount = Decimal.Round((s.Items.Sum(s => s.po.Amount) - s.Items.Sum(s => s.po.RefundAmount)) / 100M, 2, MidpointRounding.AwayFromZero)
                 }).ToList();
             return result;
         }
@@ -726,33 +729,24 @@ namespace AGooday.AgPay.Application.Services
             // 统计列表
             var payCountMap = PayTypeCount(mchNo, agentNo, (byte)PayOrderState.STATE_SUCCESS, null, dayStart, dayEnd);
 
-            // 得到所有支付方式
-            var payWayList = _payWayRepository.GetAll();
-
             // 支付方式名称标注
             foreach (var payCount in payCountMap)
             {
-                var payWay = payWayList.FirstOrDefault(f => f.WayCode.Equals(payCount.WayCode));
-                if (payWay != null)
-                {
-                    payCount.TypeName = payWay.WayName;
-                }
-                else
-                {
-                    payCount.TypeName = payCount.WayCode;
-                }
+                payCount.TypeName = payCount.WayType.ToEnum<PayWayType>().GetDescriptionOrDefault( "未知");
             }
 
             // 生成虚拟数据
             if (payCountMap?.Count <= 0)
             {
+                // 得到所有支付方式
+                var payWayList = _payWayRepository.GetAll();
                 payCountMap = new List<PayTypeCountDto>();
-                foreach (var payWay in payWayList)
+                foreach (var wayType in payWayList.Select(s=>s.WayType).Distinct())
                 {
                     payCountMap.Add(new PayTypeCountDto()
                     {
-                        WayCode = payWay.WayCode,
-                        TypeName = payWay.WayName,
+                        WayType = wayType,
+                        TypeName = wayType.ToEnum<PayWayType>().GetDescriptionOrDefault( "未知"),
                         TypeCount = Random.Shared.Next(0, 100),
                         TypeAmount = Decimal.Round(Random.Shared.Next(10000, 100000) / 100M, 2, MidpointRounding.AwayFromZero),
                     });
@@ -760,7 +754,7 @@ namespace AGooday.AgPay.Application.Services
             }
 
             // 返回数据列
-            return payCountMap;
+            return payCountMap.OrderBy(o => (int)Enum.Parse(typeof(PayWayType), o.WayType)).ToList();
         }
 
         /// <summary>

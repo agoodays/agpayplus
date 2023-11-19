@@ -130,6 +130,43 @@ namespace AGooday.AgPay.Common.Enumerator
     }
 
     /// <summary>
+    /// 支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他
+    /// </summary>
+    public enum PayWayType
+    {
+        /// <summary>
+        /// 支付类型： WECHAT-微信
+        /// </summary>
+        [Description("微信")]
+        WECHAT,
+        /// <summary>
+        /// 支付类型： ALIPAY-支付宝
+        /// </summary>
+        [Description("支付宝")]
+        ALIPAY,
+        /// <summary>
+        /// 支付类型： YSFPAY-支付宝
+        /// </summary>
+        [Description("云闪付")]
+        YSFPAY,
+        /// <summary>
+        /// 支付类型： UNIONPAY-银联
+        /// </summary>
+        [Description("银联")]
+        UNIONPAY,
+        /// <summary>
+        /// 支付类型： DCEPPAY-数字人民币
+        /// </summary>
+        [Description("数字人民币")]
+        DCEPPAY,
+        /// <summary>
+        /// 支付类型：OTHER-其他
+        /// </summary>
+        [Description("其他")]
+        OTHER,
+    }
+
+    /// <summary>
     /// 订单类型:1-支付,2-退款, 3-转账
     /// </summary>
     public enum MchNotifyRecordType
