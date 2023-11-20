@@ -194,6 +194,7 @@ namespace AGooday.AgPay.Application.Services
             //同时更新， 未确定 --》 已确定的其他信息。  如支付接口的确认、 费率的计算。
             updateRecord.IfCode = payOrder.IfCode;
             updateRecord.WayCode = payOrder.WayCode;
+            updateRecord.WayType = payOrder.WayType;
             updateRecord.MchFeeRate = payOrder.MchFeeRate;
             updateRecord.MchFeeAmount = payOrder.MchFeeAmount;
             updateRecord.ChannelUser = payOrder.ChannelUser;
@@ -406,21 +407,18 @@ namespace AGooday.AgPay.Application.Services
         public List<PayTypeCountDto> PayTypeCount(string mchNo, string agentNo, byte? state, byte? refundState, DateTime? dayStart, DateTime? dayEnd)
         {
             var result = _payOrderRepository.GetAll()
-                .Join(_payWayRepository.GetAll(),
-                po => po.WayCode, pw => pw.WayCode,
-                (po, pw) => new { po, pw })
-                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.po.MchNo.Equals(mchNo))
-                && (string.IsNullOrWhiteSpace(agentNo) || w.po.AgentNo.Equals(agentNo))
-                && (state.Equals(null) || w.po.State.Equals(state))
-                && (refundState.Equals(null) || w.po.RefundState.Equals(refundState))
-                && (dayEnd.Equals(null) || w.po.CreatedAt < dayEnd)
-                && (dayStart.Equals(null) || w.po.CreatedAt >= dayStart)).AsEnumerable()
-                .GroupBy(g => g.pw.WayType, (key, group) => new { WayType = key, Items = group.AsEnumerable() })
+                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
+                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
+                && (state.Equals(null) || w.State.Equals(state))
+                && (refundState.Equals(null) || w.RefundState.Equals(refundState))
+                && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable()
+                .GroupBy(g => g.WayType, (key, group) => new { WayType = key, Items = group.AsEnumerable() })
                 .Select(s => new PayTypeCountDto
                 {
                     WayType = s.WayType,
                     TypeCount = s.Items.Count(),
-                    TypeAmount = Decimal.Round((s.Items.Sum(s => s.po.Amount) - s.Items.Sum(s => s.po.RefundAmount)) / 100M, 2, MidpointRounding.AwayFromZero)
+                    TypeAmount = Decimal.Round((s.Items.Sum(s => s.Amount) - s.Items.Sum(s => s.RefundAmount)) / 100M, 2, MidpointRounding.AwayFromZero)
                 }).ToList();
             return result;
         }

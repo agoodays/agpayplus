@@ -29,6 +29,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         protected readonly PayOrderProcessService _payOrderProcessService;
         protected readonly ILogger<AbstractPayOrderController> _logger;
         protected readonly IMchPayPassageService _mchPayPassageService;
+        protected readonly IPayWayService _payWayService;
         protected readonly IPayOrderService _payOrderService;
         protected readonly ISysConfigService _sysConfigService;
 
@@ -39,6 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             RequestKit requestKit,
             ILogger<AbstractPayOrderController> logger,
             IMchPayPassageService mchPayPassageService,
+            IPayWayService payWayService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService)
             : base(requestKit, configContextQueryService)
@@ -47,6 +49,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             _payOrderProcessService = payOrderProcessService;
             _logger = logger;
             _mchPayPassageService = mchPayPassageService;
+            _payWayService = payWayService;
             _payOrderService = payOrderService;
             _sysConfigService = sysConfigService;
             this.mqSender = mqSender;
@@ -88,7 +91,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                         throw new BizException("订单状态异常");
                     }
 
+                    var wayType = _payWayService.GetWayTypeByWayCode(wayCode);
                     payOrder.WayCode = wayCode; // 需要将订单更新 支付方式
+                    payOrder.WayType = wayType; // 需要将订单更新 支付类型
                     payOrder.ChannelUser = bizRQ.GetChannelUserId(); //更新渠道用户信息
                     bizRQ.MchNo = payOrder.MchNo;
                     bizRQ.AppId = payOrder.AppId;
@@ -233,6 +238,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
         private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, string ifCode, MchPayPassageDto mchPayPassage)
         {
+            var wayType = _payWayService.GetWayTypeByWayCode(rq.WayCode);
             PayOrderDto payOrder = new PayOrderDto();
             payOrder.PayOrderId = SeqUtil.GenPayOrderId(); //生成订单ID
             payOrder.MchNo = mchInfo.MchNo; //商户号
@@ -243,6 +249,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrder.AppId = mchApp.AppId; //商户应用appId
             payOrder.IfCode = ifCode; //接口代码
             payOrder.WayCode = rq.WayCode; //支付方式
+            payOrder.WayType = wayType; //支付类型
             payOrder.Amount = rq.Amount; //订单金额
 
             if (mchPayPassage != null)

@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
     {
         private readonly Func<string, IChannelUserService> _channelUserServiceFactory;
         private readonly PayMchNotifyService _payMchNotifyService;
-        public QrCashierController(IMQSender mqSender, 
+        public QrCashierController(IMQSender mqSender,
             Func<string, IChannelUserService> channelUserServiceFactory,
             Func<string, IPaymentService> paymentServiceFactory,
             ConfigContextQueryService configContextQueryService,
@@ -34,9 +34,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             RequestKit requestKit,
             ILogger<AbstractPayOrderController> logger,
             IMchPayPassageService mchPayPassageService,
+            IPayWayService payWayService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService)
-            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payOrderService, sysConfigService)
+            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payWayService, payOrderService, sysConfigService)
         {
             _channelUserServiceFactory = channelUserServiceFactory;
             _payMchNotifyService = payMchNotifyService;

@@ -145,6 +145,13 @@ namespace AGooday.AgPay.Domain.Models
         public string WayCode { get; set; }
 
         /// <summary>
+        /// 支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他
+        /// </summary>
+        [Comment("支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他")]
+        [Required, Column("way_type", TypeName = "varchar(20)")]
+        public string WayType { get; set; }
+
+        /// <summary>
         /// 支付接口代码
         /// </summary>
         [Comment("支付接口代码")]

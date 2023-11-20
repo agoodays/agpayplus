@@ -33,9 +33,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             RequestKit requestKit,
             ILogger<AbstractPayOrderController> logger,
             IMchPayPassageService mchPayPassageService,
+            IPayWayService payWayService,
             IPayOrderService payOrderService,
             ISysConfigService sysConfigService)
-            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payOrderService, sysConfigService)
+            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payWayService, payOrderService, sysConfigService)
         {
             _channelUserServiceFactory = channelUserServiceFactory;
         }

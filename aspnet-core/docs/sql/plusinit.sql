@@ -157,6 +157,9 @@ ALTER TABLE `t_pay_order`
   ADD COLUMN `channel_isv_no` VARCHAR(64) NULL COMMENT '渠道服务商机构号' AFTER `channel_mch_no`,
   ADD COLUMN `platform_order_no` VARCHAR(64) NULL COMMENT '用户支付凭证交易单号 微信/支付宝流水号' AFTER `channel_order_no`,
   ADD COLUMN `platform_mch_order_no` VARCHAR(64) NULL COMMENT '用户支付凭证商户单号' AFTER `platform_order_no`;
+  
+ALTER TABLE `t_pay_order`   
+  ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他' AFTER `way_code`;
 
 ALTER TABLE `t_refund_order`   
   CHANGE `mch_name` `mch_name` VARCHAR(64) NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
@@ -171,12 +174,33 @@ ALTER TABLE `t_refund_order`
   ADD COLUMN `app_name` VARCHAR(64) NULL COMMENT '应用名称' AFTER `app_id`,
   ADD COLUMN `store_id` VARCHAR(64) NULL COMMENT '门店ID' AFTER `app_name`,
   ADD COLUMN `store_name` VARCHAR(64) NULL COMMENT '门店名称' AFTER `store_id`;
+  
+ALTER TABLE `t_refund_order`   
+  ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他' AFTER `way_code`;
 
 ALTER TABLE `t_mch_notify_record`   
   ADD COLUMN `req_method` VARCHAR(10) NOT NULL COMMENT '通知请求方法' AFTER `notify_url`,
   ADD COLUMN `req_media_type` VARCHAR(10) NOT NULL COMMENT '通知请求媒体类型' AFTER `req_method`
   ADD COLUMN `req_body` TEXT NULL COMMENT '通知请求正文' AFTER `req_media_type`;
-  
+
+/**
+
+SELECT po.way_code,po.way_type,IFNULL(pw.way_type,'OTHER') FROM `t_pay_order` po LEFT JOIN `t_pay_way` pw ON po.way_code = pw.way_code
+WHERE po.way_type = ''
+
+UPDATE `t_pay_order` po LEFT JOIN `t_pay_way` pw ON po.way_code = pw.way_code
+SET po.way_type = IFNULL(pw.way_type,'OTHER')
+WHERE po.way_type = ''
+
+SELECT ro.way_code,ro.way_type,IFNULL(pw.way_type,'OTHER') FROM `t_refund_order` ro LEFT JOIN `t_pay_way` pw ON ro.way_code = pw.way_code
+WHERE ro.way_type = ''
+
+UPDATE `t_refund_order` ro LEFT JOIN `t_pay_way` pw ON ro.way_code = pw.way_code
+SET ro.way_type = IFNULL(pw.way_type,'OTHER')
+WHERE ro.way_type = ''
+
+**/
+
 #####  ----------  代理商-表结构DDL+初始化DML  ----------  #####
 
 -- 代理商信息表

@@ -22,9 +22,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     [ApiController]
     public class UnifiedOrderController : AbstractPayOrderController
     {
-        private readonly IPayWayService payWayService;
-        private readonly ConfigContextQueryService configContextQueryService;
-
         public UnifiedOrderController(IMQSender mqSender,
             Func<string, IPaymentService> paymentServiceFactory,
             ConfigContextQueryService configContextQueryService,
@@ -32,13 +29,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             RequestKit requestKit,
             ILogger<UnifiedOrderController> logger,
             IMchPayPassageService mchPayPassageService,
+            IPayWayService payWayService,
             IPayOrderService payOrderService,
-            ISysConfigService sysConfigService,
-            IPayWayService payWayService)
-            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payOrderService, sysConfigService)
+            ISysConfigService sysConfigService)
+            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payWayService, payOrderService, sysConfigService)
         {
-            this.payWayService = payWayService;
-            this.configContextQueryService = configContextQueryService;
         }
 
         /// <summary>
@@ -74,7 +69,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 res.PayData = bizRes.BuildPayData();
             }
 
-            return ApiRes.OkWithSign(res, rq.SignType, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(res, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
         }
         private UnifiedOrderRQ BuildBizRQ(UnifiedOrderRQ rq)
         {
@@ -95,7 +90,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 rq.WayCode = wayCode.Trim();
             }
 
-            if (!payWayService.IsExistPayWayCode(wayCode))
+            if (!_payWayService.IsExistPayWayCode(wayCode))
             {
                 throw new BizException("不支持的支付方式");
             }

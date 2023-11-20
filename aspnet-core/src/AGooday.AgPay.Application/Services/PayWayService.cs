@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -59,6 +60,12 @@ namespace AGooday.AgPay.Application.Services
             var entity = _payWayRepository.GetById(recordId);
             var dto = _mapper.Map<PayWayDto>(entity);
             return dto;
+        }
+
+        public string GetWayTypeByWayCode(string wayCode)
+        {
+            var entity = _payWayRepository.GetById(wayCode);
+            return entity?.WayType ?? PayWayType.OTHER.ToString();
         }
 
         public bool IsExistPayWayCode(string wayCode)

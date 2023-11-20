@@ -186,6 +186,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             refundOrder.MchType = mchInfo.Type; //商户类型
             refundOrder.MchRefundNo = rq.MchRefundNo; //商户退款单号
             refundOrder.WayCode = payOrder.WayCode; //支付方式代码
+            refundOrder.WayType = payOrder.WayType; //支付类型
             refundOrder.IfCode = payOrder.IfCode; //支付接口代码
             refundOrder.PayAmount = payOrder.Amount; //支付金额,单位分
             refundOrder.RefundAmount = rq.RefundAmount; //退款金额,单位分
