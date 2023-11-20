@@ -31,11 +31,15 @@
         public interface SMS_TYPE
         {
             /// <summary>
-            /// 注册
+            /// 登录验证码
+            /// </summary>
+            public const string AUTH = "auth";
+            /// <summary>
+            /// 注册验证码
             /// </summary>
             public const string REGISTER = "register";
             /// <summary>
-            /// 找回密码
+            /// 找回密码验证码
             /// </summary>
             public const string RETRIEVE = "retrieve";
         }

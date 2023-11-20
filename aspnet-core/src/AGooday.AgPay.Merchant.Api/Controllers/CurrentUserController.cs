@@ -112,8 +112,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [HttpPut, Route("modifyPwd"), MethodLog("修改密码")]
         public ApiRes ModifyPwd(ModifyPwd model)
         {
+            var currentUser = GetCurrentUser();
             string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码
-            var user = _sysUserAuthService.GetUserAuthInfoById(model.SysUserId);
+            var user = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             bool verified = BCryptUtil.VerifyHash(currentUserPwd, user.Credential);
             //验证当前密码是否正确
             if (!verified)
@@ -126,7 +127,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            _sysUserAuthService.ResetAuthInfo(model.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MCH);
+            _sysUserAuthService.ResetAuthInfo(user.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MCH);
             return Logout();
         }
 

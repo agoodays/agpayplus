@@ -30,11 +30,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
+        private readonly ISysConfigService _sysConfigService;
         private readonly ISysLogService _sysLogService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
+
+        private const string AUTH_METHOD_REMARK = "登录认证"; //用户信息认证方法描述
 
         public AuthController(ILogger<AuthController> logger, IOptions<JwtSettings> jwtSettings, IMemoryCache cache, RedisUtil client,
             INotificationHandler<DomainNotification> notifications,
@@ -42,6 +45,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             ISysUserAuthService sysUserAuthService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService, 
+            ISysConfigService sysConfigService,
             ISysLogService sysLogService)
         {
             _logger = logger;
@@ -50,6 +54,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             _sysUserAuthService = sysUserAuthService;
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
+            _sysConfigService = sysConfigService;
             _sysLogService = sysLogService;
             _cache = cache;
             _redis = client.GetDatabase();
@@ -62,7 +67,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route("auth/validate"), MethodLog("登录认证")]
+        [HttpPost, Route("auth/validate"), MethodLog(AUTH_METHOD_REMARK)]
         public ApiRes Validate(Validate model)
         {
             string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理
@@ -142,7 +147,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             // 删除图形验证码缓存数据
             _redis.KeyDelete(CS.GetCacheKeyImgCode(vercodeToken));
 
-            var lastLoginTime = _sysLogService.GetLastSysLog(auth.SysUserId, "登录认证", auth.SysType)?.CreatedAt;
+            var lastLoginTime = _sysLogService.GetLastSysLog(auth.SysUserId, AUTH_METHOD_REMARK, auth.SysType)?.CreatedAt;
             if (lastLoginTime != null)
             {
                 var data = new Dictionary<string, object>();
@@ -177,6 +182,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             _redis.StringSet(CS.GetCacheKeyImgCode(vercodeToken), code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
 
             return ApiRes.Ok(new { imageBase64Data, vercodeToken, expireTime = CS.VERCODE_CACHE_TIME });
+        }
+
+        /// <summary>
+        /// 获取站点信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("siteInfos"), NoLog]
+        public ApiRes SiteInfos()
+        {
+            var configList = _sysConfigService.GetKeyValueByGroupKey("oemConfig", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
+            return ApiRes.Ok(configList);
         }
 
         /// <summary>
@@ -217,9 +233,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             string phone = Base64Util.DecodeBase64(model.phone);
             string code = Base64Util.DecodeBase64(model.code);
             string newPwd = Base64Util.DecodeBase64(model.newPwd);
+            string codeToken = CS.GetCacheKeySmsCode($"{phone}_{CS.SMS_TYPE.RETRIEVE}");
 
 #if !DEBUG
-            string cacheCode = _redis.StringGet(CS.GetCacheKeySmsCode($"{phone}_{CS.SMS_TYPE.RETRIEVE}"));
+            string cacheCode = _redis.StringGet(codeToken);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
@@ -249,6 +266,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 throw new BizException("新密码与原密码相同！");
             }
             _sysUserAuthService.ResetAuthInfo(sysUser.SysUserId, null, null, newPwd, CS.SYS_TYPE.MGR);
+            // 删除短信验证码缓存数据
+            _redis.KeyDelete(CS.GetCacheKeySmsCode(codeToken));
             return ApiRes.Ok();
         }
     }
