@@ -520,7 +520,7 @@ ALTER TABLE `t_sys_user`
   ADD COLUMN `is_team_leader` TINYINT NULL COMMENT '是否队长:  0-否 1-是' AFTER `team_id`;
 
 ALTER TABLE `t_sys_user`   
-  ADD UNIQUE INDEX `invite_code` (`invite_code`);
+  ADD UNIQUE INDEX `Uni_InviteCode` (`invite_code`);
   
 ALTER TABLE `t_sys_user`   
   ADD COLUMN `safe_word` VARCHAR(32) NULL COMMENT '预留信息' AFTER `realname`;
@@ -675,9 +675,9 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE', '设备配置', 'appstore', 
 
 #####  ----------  供应商、设备-表结构DDL+初始化DML  ----------  #####
 
--- 供应商定义表
-DROP TABLE IF EXISTS t_provider_define;
-CREATE TABLE `t_provider_define` (
+-- 设备供应商定义表
+DROP TABLE IF EXISTS t_device_provider_define;
+CREATE TABLE `t_device_provider_define` (
   `provider_code` VARCHAR(20) NOT NULL COMMENT '供应商代码 全小写 zgwl',
   `provider_name` VARCHAR(20) NOT NULL COMMENT '供应商名称',
 --   `provider_type` TINYINT(6) NOT NULL COMMENT '供应商类型:1-云音响 2-云打印',
@@ -691,24 +691,24 @@ CREATE TABLE `t_provider_define` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`provider_code`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='供应商定义表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='设备供应商定义表';
 
--- 设备配置参数表
-DROP TABLE IF EXISTS t_device_config;
-CREATE TABLE `t_device_config` (
+-- 设备厂商配置参数表
+DROP TABLE IF EXISTS t_device_provider_config;
+CREATE TABLE `t_device_provider_config` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `device_type` TINYINT(6) NOT NULL COMMENT '设备类型:1-云音响 2-云打印',
   `provider_code` VARCHAR(20) NOT NULL COMMENT '供应商代码',
-  `provider_params` VARCHAR(4096) NOT NULL COMMENT '接口配置参数,json字符串',
+  `provider_params` VARCHAR(4096) NOT NULL COMMENT '设备供应商配置参数,json字符串',
   `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
   `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `Uni_DeviceType_Provider` (`device_type`, `provider`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='设备配置参数表';
+  UNIQUE KEY `Uni_DeviceType_Provider` (`device_type`, `provider_code`)
+) ENGINE=INNODB AUTO_INCREMENT=1001 DEFAULT CHARSET=utf8mb4 COMMENT='设备厂商配置参数表';
 
-INSERT INTO t_provider_define (provider_code, provider_name, config_page_type, provider_params, isvsub_mch_params, device_types, icon, bg_color, state, remark)
+INSERT INTO t_device_provider_define (provider_code, provider_name, config_page_type, provider_params, isvsub_mch_params, device_types, icon, bg_color, state, remark)
 VALUES ('zgwl', '智谷联', 1,
         '[{"name":"accessKeyId","desc":"AccessKeyId","type":"text","verify":"required","star":"1"},{"name":"accessKeySecret","desc":"AccessKeySecret","type":"text","verify":"required","star":"1"},{"name":"instanceId","desc":"实例ID","type":"text","verify":"required"},{"name":"endPoint","desc":"公网接入点","type":"text","verify":"required"},{"name":"topic","desc":"Topic","type":"text","verify":"required"},{"name":"groupId","desc":"GroupId","type":"text","verify":"required"}]',
         '[1, 2]'
@@ -716,11 +716,13 @@ VALUES ('zgwl', '智谷联', 1,
 
 -- 设备信息表
 DROP TABLE IF EXISTS t_device_info;
-CREATE TABLE `t_device_config` (
+CREATE TABLE `t_device_info` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `device_no` VARCHAR(64) NOT NULL COMMENT '设备号',
   `device_name` VARCHAR(64) NOT NULL COMMENT '设备名称',
-  `device_config_id` BIGINT(20) NOT NULL COMMENT '设备配置参数ID',
+  `config_id` BIGINT(20) NOT NULL COMMENT '关联设备厂商配置参数ID',
+  `device_type` TINYINT(6) NOT NULL COMMENT '设备类型:1-云音响 2-云打印',
+  `provider_code` VARCHAR(20) NOT NULL COMMENT '供应商代码',
   `batch_id` VARCHAR(64) NULL COMMENT '批次号',
   `bind_state` TINYINT NOT NULL COMMENT '绑定状态: 0-未绑定, 1-已绑定',
   `bind_type` TINYINT NOT NULL COMMENT '绑定类型: 0-门店, 1-码牌', 
@@ -735,8 +737,8 @@ CREATE TABLE `t_device_config` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `Uni_DeviceNo` (`device_no`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='设备信息表';
+  UNIQUE KEY `Uni_ProviderCode_DeviceType_DeviceNo` (`provider_code`, `device_type`, `device_no`)
+) ENGINE=INNODB AUTO_INCREMENT=1001 DEFAULT CHARSET=utf8mb4 COMMENT='设备信息表';
 
 
 #####  ----------  商家会员-表结构DDL+初始化DML  ----------  #####
