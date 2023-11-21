@@ -58,8 +58,8 @@
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a v-if="$access('ENT_PC_WAY_EDIT')" @click="editFunc(record.wayCode)">修改</a>
-            <a style="color: red" v-if="$access('ENT_PC_WAY_DEL')" @click="delFunc(record.wayCode)">删除</a>
+            <a-button type="link" v-if="$access('ENT_PC_WAY_EDIT')" @click="editFunc(record.wayCode)">修改</a-button>
+            <a-button type="link" style="color: red" v-if="$access('ENT_PC_WAY_DEL')" @click="delFunc(record.wayCode)">删除</a-button>
           </AgTableColumns>
         </template>
       </AgTable>

@@ -34,8 +34,8 @@
         <template slot="roleIdSlot" slot-scope="{record}"><b>{{ record.roleId }}</b></template> <!-- 自定义插槽 -->
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a v-if="$access('ENT_UR_ROLE_EDIT')" @click="editFunc(record.roleId)">修改</a>
-            <a style="color: red" v-if="$access('ENT_UR_ROLE_DEL')" @click="delFunc(record.roleId)">删除</a>
+            <a-button type="link" v-if="$access('ENT_UR_ROLE_EDIT')" @click="editFunc(record.roleId)">修改</a-button>
+            <a-button type="link" style="color: red" v-if="$access('ENT_UR_ROLE_DEL')" @click="delFunc(record.roleId)">删除</a-button>
           </AgTableColumns>
         </template>
       </AgTable>
@@ -56,26 +56,9 @@ import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  {
-    key: 'roleId', // key为必填项，用于标志该列的唯一
-    title: '角色ID',
-    sorter: true,
-    scopedSlots: { customRender: 'roleIdSlot' }
-  },
-  {
-    key: 'roleName',
-    dataIndex: 'roleName',
-    title: '角色名称',
-    sorter: true
-  },
-  {
-    key: 'op',
-    title: '操作',
-    width: '200px',
-    fixed: 'right',
-    align: 'center',
-    scopedSlots: { customRender: 'opSlot' }
-  }
+  { key: 'roleId', title: '角色ID', sorter: true, scopedSlots: { customRender: 'roleIdSlot' } },
+  { key: 'roleName', dataIndex: 'roleName', title: '角色名称', sorter: true },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

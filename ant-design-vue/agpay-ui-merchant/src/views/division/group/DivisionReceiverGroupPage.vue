@@ -31,8 +31,8 @@
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a v-if="$access('ENT_DIVISION_RECEIVER_GROUP_EDIT')" @click="editFunc(record.receiverGroupId)">修改</a>
-            <a style="color: red" v-if="$access('ENT_DIVISION_RECEIVER_GROUP_DELETE')" @click="delFunc(record.receiverGroupId)">删除</a>
+            <a-button type="link" v-if="$access('ENT_DIVISION_RECEIVER_GROUP_EDIT')" @click="editFunc(record.receiverGroupId)">修改</a-button>
+            <a-button type="link" style="color: red" v-if="$access('ENT_DIVISION_RECEIVER_GROUP_DELETE')" @click="delFunc(record.receiverGroupId)">删除</a-button>
           </AgTableColumns>
         </template>
       </AgTable>

@@ -32,8 +32,8 @@
         <template slot="roleIdSlot" slot-scope="{record}"><b>{{ record.roleId }}</b></template> <!-- 自定义插槽 -->
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a v-if="$access('ENT_UR_ROLE_EDIT')" @click="editFunc(record.roleId)">修改</a>
-            <a style="color: red" v-if="$access('ENT_UR_ROLE_DEL')" @click="delFunc(record.roleId)">删除</a>
+            <a-button type="link" v-if="$access('ENT_UR_ROLE_EDIT')" @click="editFunc(record.roleId)">修改</a-button>
+            <a-button type="link" style="color: red" v-if="$access('ENT_UR_ROLE_DEL')" @click="delFunc(record.roleId)">删除</a-button>
           </AgTableColumns>
         </template>
       </AgTable>

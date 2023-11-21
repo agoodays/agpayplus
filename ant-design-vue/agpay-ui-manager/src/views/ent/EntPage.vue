@@ -34,7 +34,7 @@
         </template>
         <template slot="opSlot" slot-scope="record">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a v-if="$access('ENT_UR_ROLE_ENT_EDIT')" @click="editFunc(record.entId)">修改</a>
+            <a-button type="link" v-if="$access('ENT_UR_ROLE_ENT_EDIT')" @click="editFunc(record.entId)">修改</a-button>
           </AgTableColumns>
         </template>
       </a-table>
