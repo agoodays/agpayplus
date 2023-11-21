@@ -11,7 +11,7 @@
         /// </summary>
         public string code { get; set; }
         /// <summary>
-        /// 登录类型： APP-app登录， lite-小程序登录
+        /// 登录类型： WEB-web登录， APP-app登录， LITE-小程序登录
         /// </summary>
         public string lt { get; set; }
     }

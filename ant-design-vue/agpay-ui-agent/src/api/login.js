@@ -7,7 +7,8 @@ export function login ({ username, password, vercode, vercodeToken }) {
     ia: Base64.encode(username), // 账号
     ip: Base64.encode(password), // 密码
     vc: Base64.encode(vercode), // 验证码值
-    vt: Base64.encode(vercodeToken) // 验证码token
+    vt: Base64.encode(vercodeToken), // 验证码token
+    lt: Base64.encode('WEB') // 登录类型
   }
   return request.request({
     url: '/api/anon/auth/validate',
