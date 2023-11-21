@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Domain.Queries.SysUsers
         /// <summary>
         /// 当前用户ID
         /// </summary>
-        public long CurrentUserId { get; set; }
+        public long? CurrentUserId { get; set; }
 
         /// <summary>
         /// 系统用户ID

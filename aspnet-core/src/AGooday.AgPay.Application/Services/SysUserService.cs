@@ -157,7 +157,7 @@ namespace AGooday.AgPay.Application.Services
             //return (_UsersRepository.GetAll()).ProjectTo<SysUserVM>(_mapper.ConfigurationProvider);
         }
 
-        public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long currentUserId)
+        public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long? currentUserId)
         {
             var sysUsers = (from u in _sysUserRepository.GetAll()
                             join ut in _sysUserTeamRepository.GetAll() on u.TeamId equals ut.TeamId into temp
@@ -167,7 +167,7 @@ namespace AGooday.AgPay.Application.Services
                             && (string.IsNullOrWhiteSpace(dto.Realname) || u.Realname.Contains(dto.Realname))
                             && (dto.UserType.Equals(0) || u.UserType.Equals(dto.UserType))
                             && (dto.SysUserId.Equals(0) || u.SysUserId.Equals(dto.SysUserId))
-                            && !u.SysUserId.Equals(currentUserId)
+                            && (currentUserId == null || !u.SysUserId.Equals(currentUserId))
                             select new { u, team }).AsNoTracking().ToList().Select(s =>
                             {
                                 var item = _mapper.Map<SysUserListDto>(s.u);
@@ -179,7 +179,7 @@ namespace AGooday.AgPay.Application.Services
             return records;
         }
 
-        public async Task<PaginatedList<SysUserListDto>> GetPaginatedDataAsync(SysUserQueryDto dto, long currentUserId)
+        public async Task<PaginatedList<SysUserListDto>> GetPaginatedDataAsync(SysUserQueryDto dto, long? currentUserId)
         {
             var query = _mapper.Map<SysUserQuery>(dto);
             query.CurrentUserId = currentUserId;

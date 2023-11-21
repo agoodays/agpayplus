@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Application.Interfaces
         SysUserDto GetByTelphone(string telphone, string sysType);
         IEnumerable<SysUserDto> GetAll();
         IEnumerable<SysUserDto> GetByIds(List<long> recordIds);
-        PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long currentUserId);
-        Task<PaginatedList<SysUserListDto>> GetPaginatedDataAsync(SysUserQueryDto dto, long currentUserId);
+        PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long? currentUserId);
+        Task<PaginatedList<SysUserListDto>> GetPaginatedDataAsync(SysUserQueryDto dto, long? currentUserId);
     }
 }
