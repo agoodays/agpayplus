@@ -1,3 +1,4 @@
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
@@ -47,7 +48,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService,
             ISysConfigService sysConfigService,
-            IMchInfoService mchInfoService, 
+            IMchInfoService mchInfoService,
             ISysLogService sysLogService)
         {
             _logger = logger;
@@ -77,9 +78,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             string ipassport = Base64Util.DecodeBase64(model.ip); //密码 i passport, 已做base64处理
             string vercode = Base64Util.DecodeBase64(model.vc); //验证码 vercode, 已做base64处理
             string vercodeToken = Base64Util.DecodeBase64(model.vt); //验证码token, vercode token , 已做base64处理
-
+            string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
 #if !DEBUG
-            string cacheCode = _redis.StringGet(CS.GetCacheKeyImgCode(vercodeToken));
+            string cacheCode = _redis.StringGet(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode))
             {
                 throw new BizException("验证码有误！");
@@ -109,7 +110,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
                 //没有该用户信息
                 throw new BizException("用户名/密码错误！");
             }
+            return Auth(auth, codeCacheKey);
+        }
 
+        private ApiRes Auth(SysUserAuthInfoDto auth, string codeCacheKey)
+        {
             //非超级管理员 && 不包含左侧菜单 进行错误提示
             if (auth.IsAdmin != CS.YES && !_sysRoleEntRelaService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
             {
@@ -150,8 +155,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             });
             _redis.StringSet(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
 
-            // 删除图形验证码缓存数据
-            _redis.KeyDelete(CS.GetCacheKeyImgCode(vercodeToken));
+            // 删除验证码缓存数据
+            _redis.KeyDelete(codeCacheKey);
 
             var lastLoginTime = _sysLogService.GetLastSysLog(auth.SysUserId, AUTH_METHOD_REMARK, auth.SysType)?.CreatedAt;
             if (lastLoginTime != null)
@@ -185,7 +190,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
 
             //redis
             string vercodeToken = Guid.NewGuid().ToString("N");
-            _redis.StringSet(CS.GetCacheKeyImgCode(vercodeToken), code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
+            string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
+            _redis.StringSet(codeCacheKey, code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
 
             return ApiRes.Ok(new { imageBase64Data, vercodeToken, expireTime = CS.VERCODE_CACHE_TIME });
         }
@@ -201,9 +207,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         {
             string phone = Base64Util.DecodeBase64(model.phone);
             string code = Base64Util.DecodeBase64(model.code);
-            string codeToken = CS.GetCacheKeySmsCode($"{phone}_{CS.SMS_TYPE.AUTH}");
+            string smsCodeToken = $"{CS.SYS_TYPE.MCH.ToLower()}_{CS.SMS_TYPE.AUTH}_{phone}";
+            string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 #if !DEBUG
-            string cacheCode = _redis.StringGet(codeToken);
+            string cacheCode = _redis.StringGet(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
@@ -221,59 +228,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
                 //没有该用户信息
                 throw new BizException("未绑定手机号！");
             }
-
-            //非超级管理员 && 不包含左侧菜单 进行错误提示
-            if (auth.IsAdmin != CS.YES && !_sysRoleEntRelaService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
-            {
-                throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
-            }
-
-            var mch = _mchInfoService.GetById(auth.BelongInfoId);
-            auth.ShortName = mch.MchShortName;
-
-            //生成token
-            string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());
-            var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
-            authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.IsAdmin, auth.SysType));
-
-            // 返回前端 accessToken
-            TokenModelJwt tokenModel = new TokenModelJwt();
-            tokenModel.SysUserId = auth.SysUserId.ToString();
-            tokenModel.AvatarUrl = auth.AvatarUrl;
-            tokenModel.Realname = auth.Realname;
-            tokenModel.LoginUsername = auth.LoginUsername;
-            tokenModel.Telphone = auth.Telphone;
-            tokenModel.UserNo = auth.UserNo.ToString();
-            tokenModel.Sex = auth.Sex.ToString();
-            tokenModel.State = auth.State.ToString();
-            tokenModel.IsAdmin = auth.IsAdmin.ToString();
-            tokenModel.SysType = auth.SysType;
-            tokenModel.BelongInfoId = auth.BelongInfoId;
-            tokenModel.CreatedAt = auth.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
-            tokenModel.UpdatedAt = auth.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss");
-            tokenModel.CacheKey = cacheKey;
-            var accessToken = JwtBearerAuthenticationExtension.IssueJwt(_jwtSettings, tokenModel);
-
-            var currentUser = JsonConvert.SerializeObject(new CurrentUser
-            {
-                CacheKey = cacheKey,
-                SysUser = auth,
-                Authorities = authorities
-            });
-            _redis.StringSet(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
-
-            // 删除短信验证码缓存数据
-            _redis.KeyDelete(CS.GetCacheKeySmsCode(codeToken));
-
-            var lastLoginTime = _sysLogService.GetLastSysLog(auth.SysUserId, AUTH_METHOD_REMARK, auth.SysType)?.CreatedAt;
-            if (lastLoginTime != null)
-            {
-                var data = new Dictionary<string, object>();
-                data.Add(CS.ACCESS_TOKEN_NAME, accessToken);
-                data.Add("lastLoginTime", lastLoginTime);
-                return ApiRes.Ok(data);
-            }
-            return ApiRes.Ok4newJson(CS.ACCESS_TOKEN_NAME, accessToken);
+            return Auth(auth, codeCacheKey);
         }
 
         /// <summary>
@@ -287,10 +242,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             string phone = Base64Util.DecodeBase64(model.phone);
             string code = Base64Util.DecodeBase64(model.code);
             string confirmPwd = Base64Util.DecodeBase64(model.confirmPwd);
-            string codeToken = CS.GetCacheKeySmsCode($"{phone}_{CS.SMS_TYPE.REGISTER}");
+            string smsCodeToken = $"{CS.SYS_TYPE.MCH.ToLower()}_{CS.SMS_TYPE.REGISTER}_{phone}";
+            string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 
 #if !DEBUG
-            string cacheCode = _redis.StringGet(codeToken);
+            string cacheCode = _redis.StringGet(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
@@ -302,7 +258,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
 #endif
 
             // 删除短信验证码缓存数据
-            _redis.KeyDelete(CS.GetCacheKeySmsCode(codeToken));
+            _redis.KeyDelete(codeCacheKey);
             return ApiRes.Ok();
         }
 
@@ -354,8 +310,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             var code = VerificationCodeUtil.RandomVerificationCode(6);
 
             //redis
-            string smsCodeToken = $"{model.phone}_{model.smsType}";
-            _redis.StringSet(CS.GetCacheKeySmsCode(smsCodeToken), code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
+            string smsCodeToken = $"{CS.SYS_TYPE.MCH.ToLower()}_{model.smsType}_{model.phone}";
+            string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
+            _redis.StringSet(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
 
             return ApiRes.Ok();
         }
@@ -371,10 +328,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             string phone = Base64Util.DecodeBase64(model.phone);
             string code = Base64Util.DecodeBase64(model.code);
             string newPwd = Base64Util.DecodeBase64(model.newPwd);
-            string codeToken = CS.GetCacheKeySmsCode($"{phone}_{CS.SMS_TYPE.RETRIEVE}");
+            string smsCodeToken = $"{CS.SYS_TYPE.MCH.ToLower()}_{CS.SMS_TYPE.RETRIEVE}_{phone}";
+            string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 
 #if !DEBUG
-            string cacheCode = _redis.StringGet(codeToken);
+            string cacheCode = _redis.StringGet(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
@@ -405,7 +363,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             }
             _sysUserAuthService.ResetAuthInfo(sysUser.SysUserId, null, null, newPwd, CS.SYS_TYPE.MCH);
             // 删除短信验证码缓存数据
-            _redis.KeyDelete(CS.GetCacheKeySmsCode(codeToken));
+            _redis.KeyDelete(codeCacheKey);
             return ApiRes.Ok();
         }
     }
