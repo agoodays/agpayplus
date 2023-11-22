@@ -91,7 +91,7 @@ namespace AGooday.AgPay.Application.Services
                 ).OrderByDescending(o => o.UpdatedAt);
             if (!string.IsNullOrEmpty(dto.SortField) && !string.IsNullOrEmpty(dto.SortOrder))
             {
-                sysRoles = sysRoles.OrderBy(dto.SortField, dto.SortOrder.Equals("descend"));
+                sysRoles = sysRoles.OrderBy(dto.SortField, dto.SortOrder.Equals(PageQuery.DESCEND, StringComparison.OrdinalIgnoreCase));
             }
             var records = PaginatedList<SysRole>.Create<SysRoleDto>(sysRoles, _mapper, dto.PageNumber, dto.PageSize);
             return records;
