@@ -7,7 +7,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using static AGooday.AgPay.Application.DataTransfer.PayRateConfigSaveDto;
@@ -96,9 +95,9 @@ namespace AGooday.AgPay.Application.Services
                 default:
                     break;
             }
-            var payWays = _payWayRepository.GetAll().Where(w => wayCodes.Contains(w.WayCode))
+            var payWays = _payWayRepository.GetAllAsNoTracking().Where(w => wayCodes.Contains(w.WayCode))
                 .OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayWay>.Create<PayWayDto>(payWays.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<PayWay>.Create<PayWayDto>(payWays, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

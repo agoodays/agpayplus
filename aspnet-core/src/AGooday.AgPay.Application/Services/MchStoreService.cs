@@ -6,7 +6,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -80,15 +79,15 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<MchStoreListDto> GetPaginatedData(MchStoreQueryDto dto, string agentNo = null)
         {
-            var mchStores = _mchStoreRepository.GetAll()
-                .Join(_mchInfoRepository.GetAll(),
+            var mchStores = _mchStoreRepository.GetAllAsNoTracking()
+                .Join(_mchInfoRepository.GetAllAsNoTracking(),
                 ms => ms.MchNo, mi => mi.MchNo,
                 (ms, mi) => new { ms, mi })
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.ms.MchNo.Equals(dto.MchNo))
                 && (dto.StoreId.Equals(0) || w.ms.StoreId.Equals(dto.StoreId))
                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.ms.StoreName.Contains(dto.StoreName))
-                && (string.IsNullOrWhiteSpace(agentNo) || w.mi.AgentNo.Equals(agentNo))
-                ).AsNoTracking().ToList().Select(s =>
+                && (string.IsNullOrWhiteSpace(agentNo) || w.mi.AgentNo.Equals(agentNo))).ToList()
+                .Select(s =>
                 {
                     var item = _mapper.Map<MchStoreListDto>(s.ms);
                     item.MchName = s.mi.MchName;

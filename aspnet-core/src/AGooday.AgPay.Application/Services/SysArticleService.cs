@@ -5,7 +5,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -70,14 +69,13 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<SysArticleDto> GetPaginatedData(SysArticleQueryDto dto, string agentNo = null)
         {
-            var sysLogs = _sysArticleRepository.GetAll()
+            var sysLogs = _sysArticleRepository.GetAllAsNoTracking()
                 .Where(w => (dto.ArticleId.Equals(0) || w.ArticleId.Equals(dto.ArticleId))
                 && (string.IsNullOrWhiteSpace(dto.Title) || w.Title.Contains(dto.Title) || w.Subtitle.Contains(dto.Title))
                 && (dto.ArticleType.Equals(0) || w.ArticleType.Equals(dto.ArticleType))
                 //&& (string.IsNullOrWhiteSpace(dto.ArticleRange) || EF.Functions.JsonContains(w.ArticleRange, new string[] { dto.ArticleRange }))// w.ArticleRange.Contains(dto.ArticleRange))
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd))
-                .AsNoTracking().ToList()
                 .Where(w => string.IsNullOrWhiteSpace(dto.ArticleRange) || w.ArticleRange.Contains(dto.ArticleRange))
                 .OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<SysArticle>.Create<SysArticleDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);

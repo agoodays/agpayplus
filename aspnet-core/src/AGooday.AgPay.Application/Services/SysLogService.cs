@@ -5,7 +5,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -84,14 +83,14 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<SysLogDto> GetPaginatedData(SysLogQueryDto dto)
         {
-            var sysLogs = _sysLogRepository.GetAll()
+            var sysLogs = _sysLogRepository.GetAllAsNoTracking()
                 .Where(w => (dto.UserId.Equals(0) || w.UserId.Equals(dto.UserId))
                 && (string.IsNullOrWhiteSpace(dto.UserName) || w.UserName.Contains(dto.UserName))
                 && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysLog>.Create<SysLogDto>(sysLogs.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysLog>.Create<SysLogDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

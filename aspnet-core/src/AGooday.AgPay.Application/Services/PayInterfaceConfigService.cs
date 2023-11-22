@@ -6,7 +6,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -94,7 +93,7 @@ namespace AGooday.AgPay.Application.Services
 
         public bool Remove(string infoType, string infoId)
         {
-            var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().AsNoTracking()
+            var payInterfaceConfig = _payInterfaceConfigRepository.GetAllAsNoTracking()
                 .Where(w => w.InfoId.Equals(infoId) && w.InfoType.Equals(infoType)).FirstOrDefault();
             _payInterfaceConfigRepository.Remove(payInterfaceConfig.Id);
             return _payInterfaceConfigRepository.SaveChanges(out int _);
@@ -110,7 +109,7 @@ namespace AGooday.AgPay.Application.Services
         public PayInterfaceConfigDto GetByInfoIdAndIfCode(string infoType, string infoId, string ifCode)
         {
             // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
-            var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().AsNoTracking().Where(w => w.InfoId.Equals(infoId)
+            var payInterfaceConfig = _payInterfaceConfigRepository.GetAllAsNoTracking().Where(w => w.InfoId.Equals(infoId)
             && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode)).FirstOrDefault();
             return _mapper.Map<PayInterfaceConfigDto>(payInterfaceConfig);
         }
@@ -118,7 +117,7 @@ namespace AGooday.AgPay.Application.Services
         public IEnumerable<PayInterfaceConfigDto> GetByInfoIdAndIfCodes(string infoType, List<string> infoIds, string ifCode)
         {
             // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
-            var payInterfaceConfig = _payInterfaceConfigRepository.GetAll().AsNoTracking().Where(w => infoIds.Contains(w.InfoId)
+            var payInterfaceConfig = _payInterfaceConfigRepository.GetAllAsNoTracking().Where(w => infoIds.Contains(w.InfoId)
             && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode));
             return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfig);
         }

@@ -6,7 +6,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -69,7 +68,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<MchNotifyRecordDto> GetPaginatedData(MchNotifyQueryDto dto)
         {
-            var mchInfos = _mchNotifyRecordRepository.GetAll()
+            var mchNotifyRecords = _mchNotifyRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.OrderId) || w.OrderId.Equals(dto.OrderId))
@@ -80,7 +79,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchNotifyRecord>.Create<MchNotifyRecordDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<MchNotifyRecord>.Create<MchNotifyRecordDto>(mchNotifyRecords, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

@@ -7,7 +7,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -108,22 +107,22 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<AgentInfoDto> GetParents(string agentNo)
         {
-            var agentInfos = _agentInfoRepository.GetAll();
+            var agentInfos = _agentInfoRepository.GetAllAsNoTracking();
             var source = GetParents(agentInfos.ToList(), agentNo);
             return _mapper.Map<IEnumerable<AgentInfoDto>>(source);
         }
 
         public PaginatedList<AgentInfoDto> GetPaginatedData(AgentInfoQueryDto dto)
         {
-            IOrderedQueryable<AgentInfo> agentInfos = GetAgentInfos(dto);
-            var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(agentInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var agentInfos = GetAgentInfos(dto);
+            var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(agentInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
         public PaginatedList<AgentInfoDto> GetPaginatedData(string agentNo, AgentInfoQueryDto dto)
         {
-            IOrderedQueryable<AgentInfo> agentInfos = GetAgentInfos(dto);
-            var subAgentInfos = GetSons(agentInfos.AsNoTracking(), agentNo).Where(w => w.AgentNo != agentNo);
+            var agentInfos = GetAgentInfos(dto);
+            var subAgentInfos = GetSons(agentInfos, agentNo).Where(w => w.AgentNo != agentNo);
             var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(subAgentInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
@@ -133,11 +132,11 @@ namespace AGooday.AgPay.Application.Services
             var agentNos = new List<string>();
             if (!string.IsNullOrWhiteSpace(dto.LoginUsername))
             {
-                agentNos = _sysUserRepository.GetAll().Where(w => w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.LoginUsername.Equals(dto.LoginUsername))
-                    .Select(s => s.BelongInfoId).AsNoTracking().ToList();
+                agentNos = _sysUserRepository.GetAllAsNoTracking().Where(w => w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.LoginUsername.Equals(dto.LoginUsername))
+                    .Select(s => s.BelongInfoId).ToList();
             }
 
-            var agentInfos = _agentInfoRepository.GetAll()
+            var agentInfos = _agentInfoRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (!agentNos.Any() || agentNos.Contains(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.Pid) || w.Pid.Equals(dto.Pid))
@@ -150,17 +149,17 @@ namespace AGooday.AgPay.Application.Services
         }
 
         #region 获取所有下级
-        private IEnumerable<AgentInfo> GetSons(IQueryable<AgentInfo> list, string pid)
+        private IQueryable<AgentInfo> GetSons(IQueryable<AgentInfo> source, string pid)
         {
-            var query = list.Where(p => p.AgentNo == pid).ToList();
-            var list2 = query.Concat(GetSonList(list, pid));
-            return list2;
+            var query = source.Where(p => p.AgentNo == pid);
+            var newSource = query.Concat(GetSonSource(source, pid));
+            return newSource;
         }
 
-        private IEnumerable<AgentInfo> GetSonList(IQueryable<AgentInfo> list, string pid)
+        private IQueryable<AgentInfo> GetSonSource(IQueryable<AgentInfo> source, string pid)
         {
-            var query = list.Where(p => p.Pid == pid).ToList();
-            return query.ToList().Concat(query.ToList().SelectMany(t => GetSonList(list, t.AgentNo)));
+            var query = source.Where(p => p.Pid == pid);
+            return query.Concat(query.SelectMany(t => GetSonSource(source, t.AgentNo)));
         }
         #endregion
 

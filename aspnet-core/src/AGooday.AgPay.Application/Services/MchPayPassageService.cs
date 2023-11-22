@@ -6,7 +6,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -198,7 +197,7 @@ namespace AGooday.AgPay.Application.Services
 
         public void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo)
         {
-            var _smchPayPassages = _mchPayPassageRepository.GetAll().AsNoTracking()
+            var _smchPayPassages = _mchPayPassageRepository.GetAllAsNoTracking()
                 .Where(w => w.MchNo.Equals(mchNo) && mchPayPassages.Select(s => s.Id).Contains(w.Id));
             foreach (var payPassage in mchPayPassages)
             {

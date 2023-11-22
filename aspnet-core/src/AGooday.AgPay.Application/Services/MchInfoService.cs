@@ -6,7 +6,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -133,7 +132,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<MchInfoDto> GetPaginatedData(MchInfoQueryDto dto)
         {
-            var mchInfos = _mchInfoRepository.GetAll()
+            var mchInfos = _mchInfoRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
@@ -141,7 +140,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.Type.Equals(0) || w.Type.Equals(dto.Type))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchInfo>.Create<MchInfoDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<MchInfo>.Create<MchInfoDto>(mchInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

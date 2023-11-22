@@ -6,7 +6,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -76,9 +75,9 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<SysRoleEntRelaDto> GetPaginatedData(SysRoleEntRelaQueryDto dto)
         {
-            var sysRoleEntRelas = _sysRoleEntRelaRepository.GetAll()
+            var sysRoleEntRelas = _sysRoleEntRelaRepository.GetAllAsNoTracking()
                 .Where(w => string.IsNullOrWhiteSpace(dto.RoleId) || w.RoleId.Equals(dto.RoleId));
-            var records = PaginatedList<SysRoleEntRela>.Create<SysRoleEntRelaDto>(sysRoleEntRelas.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysRoleEntRela>.Create<SysRoleEntRelaDto>(sysRoleEntRelas, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
@@ -90,14 +89,14 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public bool UserHasLeftMenu(long userId, string sysType)
         {
-            var result = _sysRoleEntRelaRepository.GetAll<SysUserRoleRela>()
-                .Join(_sysRoleEntRelaRepository.GetAll(),
+            var result = _sysRoleEntRelaRepository.GetAllAsNoTracking<SysUserRoleRela>()
+                .Join(_sysRoleEntRelaRepository.GetAllAsNoTracking(),
                 ur => ur.RoleId, re => re.RoleId,
                 (ur, re) => new { ur.UserId, re.EntId })
                 .Join(_sysRoleEntRelaRepository.GetAll<SysEntitlement>(),
                     ue => ue.EntId, ent => ent.EntId,
                     (ue, ent) => new { ue.UserId, ent.EntId, ent.EntType, ent.SysType, ent.State })
-                .AsNoTracking().Any(w => w.UserId.Equals(userId) 
+                .Any(w => w.UserId.Equals(userId)
                 && w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE) && w.EntType.Equals(CS.ENT_TYPE.MENU_LEFT));
 
             return result;

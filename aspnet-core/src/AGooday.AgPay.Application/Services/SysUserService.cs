@@ -8,8 +8,6 @@ using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Domain.Queries;
 using AGooday.AgPay.Domain.Queries.SysUsers;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -26,7 +24,7 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysUserService(IMapper mapper, IMediatorHandler bus, IConfiguration configuration,
+        public SysUserService(IMapper mapper, IMediatorHandler bus,
             ISysUserRepository sysUserRepository,
             ISysUserTeamRepository sysUserTeamRepository)
         {
@@ -159,8 +157,8 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long? currentUserId)
         {
-            var sysUsers = (from u in _sysUserRepository.GetAll()
-                            join ut in _sysUserTeamRepository.GetAll() on u.TeamId equals ut.TeamId into temp
+            var sysUsers = (from u in _sysUserRepository.GetAllAsNoTracking()
+                            join ut in _sysUserTeamRepository.GetAllAsNoTracking() on u.TeamId equals ut.TeamId into temp
                             from team in temp.DefaultIfEmpty()
                             where (string.IsNullOrWhiteSpace(dto.SysType) || u.SysType.Equals(dto.SysType))
                             && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || u.BelongInfoId.Contains(dto.BelongInfoId))
@@ -168,7 +166,7 @@ namespace AGooday.AgPay.Application.Services
                             && (dto.UserType.Equals(0) || u.UserType.Equals(dto.UserType))
                             && (dto.SysUserId.Equals(0) || u.SysUserId.Equals(dto.SysUserId))
                             && (currentUserId == null || !u.SysUserId.Equals(currentUserId))
-                            select new { u, team }).AsNoTracking().ToList().Select(s =>
+                            select new { u, team }).ToList().Select(s =>
                             {
                                 var item = _mapper.Map<SysUserListDto>(s.u);
                                 item.TeamName = s.team?.TeamName;

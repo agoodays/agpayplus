@@ -8,7 +8,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -95,7 +94,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<PayOrderDivisionRecordDto> GetPaginatedData(PayOrderDivisionRecordQueryDto dto)
         {
-            var mchInfos = _payOrderDivisionRecordRepository.GetAll()
+            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (dto.ReceiverId.Equals(0) || w.ReceiverId.Equals(dto.ReceiverId))
@@ -109,7 +108,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(payOrderDivisionRecords, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
@@ -120,7 +119,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public PaginatedList<PayOrderDivisionRecordDto> DistinctBatchOrderIdList(PayOrderDivisionRecordQueryDto dto)
         {
-            var mchInfos = _payOrderDivisionRecordRepository.GetAll()
+            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (dto.ReceiverId.Equals(0) || w.ReceiverId.Equals(dto.ReceiverId))
@@ -133,7 +132,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 ).DistinctBy(d => new { d.BatchOrderId, d.PayOrderId }).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(payOrderDivisionRecords, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

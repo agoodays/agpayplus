@@ -84,6 +84,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return Db.Set<T>();
         }
         /// <summary>
+        /// 获取列表
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public virtual IQueryable<T> GetAllAsNoTracking<T>() where T : class
+        {
+            return Db.Set<T>();
+        }
+        /// <summary>
         /// 根据对象进行更新
         /// </summary>
         /// <param name="entity"></param>
@@ -272,6 +282,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public virtual IQueryable<T> GetAll<T>() where T : class
         {
             return Db.Set<T>();
+        }
+        /// <summary>
+        /// 获取列表
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public virtual IQueryable<T> GetAllAsNoTracking<T>() where T : class
+        {
+            return Db.Set<T>().AsNoTracking();
         }
         /// <summary>
         /// 根据对象进行更新

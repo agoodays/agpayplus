@@ -6,7 +6,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -87,7 +86,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<TransferOrderDto> GetPaginatedData(TransferOrderQueryDto dto)
         {
-            var mchInfos = _transferOrderRepository.GetAll()
+            var transferOrders = _transferOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (dto.MchType.Equals(0) || w.MchType.Equals(dto.MchType))
@@ -101,7 +100,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<TransferOrder>.Create<TransferOrderDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<TransferOrder>.Create<TransferOrderDto>(transferOrders, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
         /// <summary>

@@ -6,7 +6,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -75,12 +74,12 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<IsvInfoDto> GetPaginatedData(IsvInfoQueryDto dto)
         {
-            var isvInfos = _isvInfoRepository.GetAll()
+            var isvInfos = _isvInfoRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
         public bool IsExistIsvNo(string isvNo)

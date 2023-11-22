@@ -5,7 +5,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -89,7 +88,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<T> GetPaginatedData<T>(QrCodeQueryDto dto)
         {
-            var QrCodes = _qrCodeShellRepository.GetAll()
+            var QrCodes = _qrCodeShellRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.QrcId) || w.QrcId.Equals(dto.QrcId))
                 && (string.IsNullOrWhiteSpace(dto.BatchId) || w.MchNo.Equals(dto.BatchId))
                 && (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
@@ -99,7 +98,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<QrCode>.Create<T>(QrCodes.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<QrCode>.Create<T>(QrCodes, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

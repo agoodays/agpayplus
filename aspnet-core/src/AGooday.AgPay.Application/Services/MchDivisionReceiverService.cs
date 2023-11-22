@@ -6,7 +6,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -96,7 +95,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<MchDivisionReceiverDto> GetPaginatedData(MchDivisionReceiverQueryDto dto)
         {
-            var mchInfos = _mchDivisionReceiverRepository.GetAll()
+            var mchDivisionReceivers = _mchDivisionReceiverRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (dto.ReceiverId.Equals(0) || w.ReceiverId.Equals(dto.ReceiverId))
@@ -107,7 +106,7 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchDivisionReceiver>.Create<MchDivisionReceiverDto>(mchInfos.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<MchDivisionReceiver>.Create<MchDivisionReceiverDto>(mchDivisionReceivers, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

@@ -51,6 +51,13 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <returns></returns>
         IQueryable<T> GetAll<T>() where T : class;
         /// <summary>
+        /// 获取列表
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        IQueryable<T> GetAllAsNoTracking<T>() where T : class;
+        /// <summary>
         /// 根据对象进行更新
         /// </summary>
         /// <param name="entity"></param>
@@ -134,6 +141,13 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         IQueryable<T> GetAll<T>() where T : class;
+        /// <summary>
+        /// 获取列表
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        IQueryable<T> GetAllAsNoTracking<T>() where T : class;
         /// <summary>
         /// 根据对象进行更新
         /// </summary>

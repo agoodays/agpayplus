@@ -1,13 +1,9 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
-using System.Xml.Linq;
 
 namespace AGooday.AgPay.Application.Services
 {

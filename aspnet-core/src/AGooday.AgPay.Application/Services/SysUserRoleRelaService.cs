@@ -5,7 +5,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -78,9 +77,9 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaQueryDto dto)
         {
-            var sysUserRoleRelas = _sysUserRoleRelaRepository.GetAll()
+            var sysUserRoleRelas = _sysUserRoleRelaRepository.GetAllAsNoTracking()
                 .Where(w => dto.UserId.Equals(0) || w.UserId.Equals(dto.UserId));
-            var records = PaginatedList<SysUserRoleRela>.Create<SysUserRoleRelaDto>(sysUserRoleRelas.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysUserRoleRela>.Create<SysUserRoleRelaDto>(sysUserRoleRelas, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

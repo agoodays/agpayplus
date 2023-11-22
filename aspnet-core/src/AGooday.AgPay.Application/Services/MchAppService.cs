@@ -5,7 +5,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -87,7 +86,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto, string agentNo = null)
         {
-            var mchApps = _mchAppRepository.GetAll()
+            var mchApps = _mchAppRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.AppName) || w.AppName.Contains(dto.AppName))
@@ -96,12 +95,12 @@ namespace AGooday.AgPay.Application.Services
 
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
-                var mchNos = _mchInfoRepository.GetAll()
+                var mchNos = _mchInfoRepository.GetAllAsNoTracking()
                     .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                     && w.AgentNo.Equals(agentNo)).Select(s => s.MchNo);
                 mchApps = mchApps.Where(w => mchNos.Contains(w.MchNo)).OrderByDescending(o => o.CreatedAt);
             }
-            var records = PaginatedList<MchApp>.Create<MchAppDto>(mchApps.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<MchApp>.Create<MchAppDto>(mchApps, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

@@ -5,7 +5,6 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -67,14 +66,14 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<SysUserTeamDto> GetPaginatedData(SysUserTeamQueryDto dto)
         {
-            var sysUsers = _sysUserTeamRepository.GetAll()
+            var sysUsers = _sysUserTeamRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Contains(dto.SysType))
                 && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Contains(dto.BelongInfoId))
                 && (string.IsNullOrWhiteSpace(dto.TeamName) || w.TeamName.Contains(dto.TeamName))
                 && (string.IsNullOrWhiteSpace(dto.TeamNo) || w.TeamNo.Contains(dto.TeamNo))
                 && (dto.TeamId.Equals(0) || w.TeamId.Equals(dto.TeamId))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysUserTeam>.Create<SysUserTeamDto>(sysUsers.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysUserTeam>.Create<SysUserTeamDto>(sysUsers, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

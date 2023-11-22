@@ -8,9 +8,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using System.Data;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -104,7 +102,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto)
         {
-            var payOrders = _payOrderRepository.GetAll()
+            var payOrders = _payOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
@@ -120,13 +118,13 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayOrder>.Create<PayOrderDto>(payOrders.AsNoTracking(), _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<PayOrder>.Create<PayOrderDto>(payOrders, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
         public JObject Statistics(PayOrderQueryDto dto)
         {
-            var payOrders = _payOrderRepository.GetAll()
+            var payOrders = _payOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
@@ -140,7 +138,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.DivisionState.Equals(null) || w.DivisionState.Equals(dto.DivisionState))
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
                 && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
-                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)).AsNoTracking();
+                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart));
             var allPayAmount = payOrders.Sum(s => s.Amount);
             var allPayCount = payOrders.Count();
             var failPayAmount = payOrders.Where(w => !w.State.Equals(PayOrderState.STATE_SUCCESS)).Sum(s => s.Amount);
