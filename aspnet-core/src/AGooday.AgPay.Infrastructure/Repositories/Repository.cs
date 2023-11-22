@@ -126,6 +126,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                 {
                     var newValue = property.GetValue(entity);
                     property.SetValue(existingEntity, newValue);
+
+                    Db.Entry(existingEntity).Property(propertyName).IsModified = true;
                 }
             }
         }

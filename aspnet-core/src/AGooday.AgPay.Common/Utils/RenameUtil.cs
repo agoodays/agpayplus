@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Common.Utils
             //    }
             //}
             //return builder.ToString();
-            return Regex.Replace("CamelClassName", "([A-Z])", "_$1").ToLower().TrimStart('_');
+            return Regex.Replace(str, "([A-Z])", "_$1").ToLower().TrimStart('_');
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Reflection.Emit;
 namespace AGooday.AgPay.Infrastructure.Extensions
 {
     /// <summary>
-    /// 把datatable转换为对象集合列表List&lt;T&gt;
+    /// 把datatable转换为对象集合列表List<T>
     /// </summary>
     public static class DataTableConvert
     {
