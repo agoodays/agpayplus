@@ -54,8 +54,8 @@ import InfoAddOrEdit from './AddOrEdit'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'roleId', title: '角色ID', fixed: 'left', sorter: true, scopedSlots: { customRender: 'roleIdSlot' } },
-  { key: 'roleName', dataIndex: 'roleName', title: '角色名称', sorter: true },
+  { key: 'roleId', title: '角色ID', width: 130, fixed: 'left', sorter: true, scopedSlots: { customRender: 'roleIdSlot' } },
+  { key: 'roleName', dataIndex: 'roleName', title: '角色名称', width: 160, sorter: true },
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
