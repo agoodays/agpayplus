@@ -141,6 +141,24 @@ services.AddSwaggerGen(options =>
         Scheme = JwtBearerDefaults.AuthenticationScheme,
     });
     options.OperationFilter<SwaggerSecurityScheme>();
+    //注册全局认证（所有的接口都可以使用认证）
+    //options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    //{
+    //    {
+    //        new OpenApiSecurityScheme
+    //        {
+    //            Reference = new OpenApiReference
+    //            {
+    //                Type = ReferenceType.SecurityScheme,
+    //                Id = JwtBearerDefaults.AuthenticationScheme
+    //            },
+    //            Scheme = "oauth2",
+    //            Name = JwtBearerDefaults.AuthenticationScheme,
+    //            In = ParameterLocation.Header,
+    //        },
+    //        new List<string>()
+    //    }
+    //});
 });
 
 // Adding MediatR for Domain Events
@@ -201,12 +219,14 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+// 认证 监测用户是否登录
 app.UseAuthentication();
 app.UseCors("CorsPolicy");
 
 var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 AuthContextService.Configure(httpContextAccessor);
 
+// 授权 监测有没有权限访问后续页面
 app.UseAuthorization();
 
 app.UseExceptionHandling();

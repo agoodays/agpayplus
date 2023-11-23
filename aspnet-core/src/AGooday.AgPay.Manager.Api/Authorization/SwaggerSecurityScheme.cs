@@ -5,8 +5,11 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AGooday.AgPay.Manager.Api.Authorization
 {
-    //https://www.cnblogs.com/shanfeng1000/p/13476831.html
-    //https://skalinets.github.io/swagger-authorization.html
+    /// <summary>
+    /// 过滤部分不需要认证接口
+    /// https://www.cnblogs.com/shanfeng1000/p/13476831.html
+    /// https://skalinets.github.io/swagger-authorization.html
+    /// </summary>
     public class SwaggerSecurityScheme : IOperationFilter
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)

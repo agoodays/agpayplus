@@ -142,6 +142,7 @@ services.AddSwaggerGen(options =>
         Scheme = JwtBearerDefaults.AuthenticationScheme,
     });
     options.OperationFilter<SwaggerSecurityScheme>();
+    //注册全局认证（所有的接口都可以使用认证）
     //options.AddSecurityRequirement(new OpenApiSecurityRequirement()
     //{
     //    {
@@ -205,7 +206,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-// 鉴权 监测用户是否登录
+// 认证 监测用户是否登录
 app.UseAuthentication();
 app.UseCors("CorsPolicy");
 

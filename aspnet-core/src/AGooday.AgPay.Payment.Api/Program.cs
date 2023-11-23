@@ -237,6 +237,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+// 授权 监测有没有权限访问后续页面
 app.UseAuthorization();
 
 app.UseExceptionHandling();
