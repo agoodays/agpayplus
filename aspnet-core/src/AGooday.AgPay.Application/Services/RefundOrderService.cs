@@ -205,7 +205,7 @@ namespace AGooday.AgPay.Application.Services
             payOrder.RefundTimes = ++payOrder.RefundTimes; // 退款次数 +1
             payOrder.RefundAmount = payOrder.RefundAmount + currentRefundAmount; // 退款金额累加
             payOrder.RefundState = (byte)(payOrder.RefundAmount + currentRefundAmount >= payOrder.Amount ? PayOrderRefund.REFUND_STATE_ALL : PayOrderRefund.REFUND_STATE_SUB); // 更新是否已全额退款。 此更新需在refund_amount更新之前，否则需要去掉累加逻辑
-            payOrder.State = payOrder.RefundState.Equals(PayOrderRefund.REFUND_STATE_ALL) ? (byte)PayOrderState.STATE_REFUND : payOrder.State; // 更新支付状态是否已退款。 此更新需在refund_state更新之后，如果全额退款则修改支付状态为已退款
+            payOrder.State = payOrder.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_ALL) ? (byte)PayOrderState.STATE_REFUND : payOrder.State; // 更新支付状态是否已退款。 此更新需在refund_state更新之后，如果全额退款则修改支付状态为已退款
             _payOrderRepository.Update(payOrder);
             return _payOrderRepository.SaveChanges(out int _);
         }

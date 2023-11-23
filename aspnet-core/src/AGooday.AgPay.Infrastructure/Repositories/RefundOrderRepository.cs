@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public bool IsExistRefundingOrder(string payOrderId)
         {
-            return DbSet.AsNoTracking().Any(c => c.PayOrderId.Equals(payOrderId) && c.State.Equals(RefundOrderState.STATE_ING));
+            return DbSet.AsNoTracking().Any(c => c.PayOrderId.Equals(payOrderId) && c.State.Equals((byte)RefundOrderState.STATE_ING));
         }
     }
 }
