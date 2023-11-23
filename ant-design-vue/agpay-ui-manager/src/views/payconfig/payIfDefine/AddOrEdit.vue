@@ -456,5 +456,9 @@ export default {
     /deep/ .box.open {
       z-index: 3;
     }
+
+    /deep/ .bd h3:nth-of-type(3) {
+      cursor: pointer;
+    }
   }
 </style>
