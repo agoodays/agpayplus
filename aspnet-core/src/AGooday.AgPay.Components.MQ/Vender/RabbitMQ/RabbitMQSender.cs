@@ -8,6 +8,9 @@ using System.Text;
 
 namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 {
+    /// <summary>
+    /// https://github.com/whuanle/learnrabbitmq
+    /// </summary>
     public class RabbitMQSender : IMQSender
     {
         private IConnection connection;

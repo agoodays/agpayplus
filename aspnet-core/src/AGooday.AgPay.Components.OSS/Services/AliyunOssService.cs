@@ -45,7 +45,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
+                logger.LogError(e, e.Message);
             }
             return Task.FromResult<string>(null);
         }
@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
+                logger.LogError(e, e.Message);
                 return false;
             }
         }

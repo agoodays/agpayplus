@@ -113,8 +113,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     // 继续发送MQ 延迟发送
                     mchNotifyRecordService.UpdateNotifyResult(notifyId, (byte)MchNotifyRecordState.STATE_ING, res);
                     // 通知延时次数
-                    //        1   2  3  4   5   6
-                    //        0  30 60 90 120 150
+                    //        1   2   3   4   5   6
+                    //        0   30  60  90  120 150
                     mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId), currentCount * 30);
 
                     return;
