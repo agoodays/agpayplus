@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Payment.Api.Models
             {
                 Order order;
 
-                channelRetMsg.ChannelOrderId = ppOrderId + "," + "null";
+                channelRetMsg.ChannelOrderId = $"{ppOrderId},null";
 
                 if (ppCatptId == null && isCapture)
                 {
@@ -150,7 +150,7 @@ namespace AGooday.AgPay.Payment.Api.Models
 
                 ChannelRetMsg result = new ChannelRetMsg();
                 result.IsNeedQuery = true;
-                result.ChannelOrderId = ppOrderId + "," + ppCatptId;
+                result.ChannelOrderId = $"{ppOrderId},{ppCatptId}";
                 result.ChannelUserId = orderUserId;
                 result.ChannelAttach = orderJsonStr;
                 result.ResponseEntity = TextResp("SUCCESS");

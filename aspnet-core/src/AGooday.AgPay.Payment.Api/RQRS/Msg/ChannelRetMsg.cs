@@ -150,7 +150,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// <returns></returns>
         public static ChannelRetMsg SysError(string channelErrMsg)
         {
-            return new ChannelRetMsg(Msg.ChannelState.SYS_ERROR, null, null, "系统：" + channelErrMsg);
+            return new ChannelRetMsg(Msg.ChannelState.SYS_ERROR, null, null, $"系统：{channelErrMsg}");
         }
 
         /// <summary>

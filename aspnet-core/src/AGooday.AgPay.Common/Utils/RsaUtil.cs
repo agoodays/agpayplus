@@ -172,7 +172,7 @@ namespace AGooday.AgPay.Common.Utils
             RSACryptoServiceProvider rsa = GetRsaPublicProvider(publicKey);
 
             var encoding = string.IsNullOrEmpty(charset) ? Encoding.UTF8 : Encoding.GetEncoding(charset);
-            encoding = Encoding.UTF8;
+            //encoding = Encoding.UTF8;
 
             var dataBytes = encoding.GetBytes(data);
 
@@ -188,7 +188,7 @@ namespace AGooday.AgPay.Common.Utils
 
             byte[] source = rsa.Decrypt(dataBytes, false);
             var encoding = string.IsNullOrEmpty(charset) ? Encoding.UTF8 : Encoding.GetEncoding(charset);
-            encoding = Encoding.UTF8;
+            //encoding = Encoding.UTF8;
             var result = encoding.GetString(source);
 
             return result;
@@ -343,7 +343,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                throw e;
+                throw;
             }
             finally
             {
@@ -458,7 +458,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                throw e;
+                throw;
             }
             finally
             {

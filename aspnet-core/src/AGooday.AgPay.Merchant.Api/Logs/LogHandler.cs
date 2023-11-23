@@ -66,12 +66,11 @@ namespace AGooday.AgPay.Merchant.Api.Logs
                 {
                     model.MethodRemark = ((MethodLogAttribute)context.ActionDescriptor.EndpointMetadata.First(m => m.GetType() == typeof(MethodLogAttribute))).Remark;
                 }
-                ObjectResult result = actionExecutedContext.Result as ObjectResult;
-                if (result != null)
+                if (actionExecutedContext.Result is ObjectResult result)
                 {
                     var controllername = ((ControllerActionDescriptor)context.ActionDescriptor).ControllerName;
                     var actionname = ((ControllerActionDescriptor)context.ActionDescriptor).ActionName;
-                    if (controllername.EndsWith("Auth") && actionname.EndsWith("Validate"))
+                    if (controllername.EndsWith("Auth") && (actionname.EndsWith("Validate") || actionname.EndsWith("PhoneCode")))
                     {
                         var jwtStr = (result.Value as ApiRes).Data.ToKeyValue().Values.First();
                         var tokenModelJwt = JwtBearerAuthenticationExtension.SerializeJwt(jwtStr);
@@ -104,7 +103,7 @@ namespace AGooday.AgPay.Merchant.Api.Logs
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        private string GetAbsoluteUri(HttpRequest request)
+        private static string GetAbsoluteUri(HttpRequest request)
         {
             return new StringBuilder()
              .Append(request.Scheme)
@@ -121,7 +120,7 @@ namespace AGooday.AgPay.Merchant.Api.Logs
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        private string GetrelativeUri(HttpRequest request)
+        private static string GetrelativeUri(HttpRequest request)
         {
             return request.Path;
         }

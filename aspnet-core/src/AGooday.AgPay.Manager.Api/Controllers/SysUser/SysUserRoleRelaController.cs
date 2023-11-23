@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
         public ApiRes Relas(long sysUserId, List<string> entIds)
         {
-            if (entIds.Count() > 0)
+            if (entIds.Count > 0)
             {
                 _sysUserRoleRelaService.SaveUserRole(sysUserId, entIds);
                 RefAuthentication(new List<long> { sysUserId });

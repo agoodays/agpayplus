@@ -145,7 +145,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                     }
                     // 分账金额
                     reqReceiver.Amount = AmountUtil.ConvertCent2Dollar(record.CalDivisionAmount);
-                    reqReceiver.Desc = "[" + payOrder.PayOrderId + "]订单分账";
+                    reqReceiver.Desc = $"[{payOrder.PayOrderId}]订单分账";
                     reqReceiverList.Add(reqReceiver);
                 }
 
@@ -257,8 +257,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 }
                 else
                 {
-                    log.LogError($"支付宝分账查询响应异常, alipayResp:{0}", JsonConvert.SerializeObject(alipayResp));
-                    throw new BizException("支付宝分账查询响应异常：" + alipayResp.SubMsg);
+                    log.LogError($"支付宝分账查询响应异常, alipayResp:{JsonConvert.SerializeObject(alipayResp)}");
+                    throw new BizException($"支付宝分账查询响应异常：{alipayResp.SubMsg}");
                 }
             }
             catch (Exception e)

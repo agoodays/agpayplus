@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
         private static readonly MethodInfo isDBNullMethod = typeof(DataRow).GetMethod("IsNull", new Type[] { typeof(int) });
 
         //使用字典存储实体的类型以及与之对应的Emit生成的转换方法
-        private static Dictionary<Type, Delegate> rowMapMethods = new Dictionary<Type, Delegate>();
+        private static readonly Dictionary<Type, Delegate> rowMapMethods = new Dictionary<Type, Delegate>();
 
         /// <summary>
         /// 将DataTable转换成泛型对象列表
@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             //从rowMapMethods查找当前T类对应的转换方法，没有则使用Emit构造一个。
             if (!rowMapMethods.ContainsKey(typeof(T)))
             {
-                DynamicMethod method = new DynamicMethod("DynamicCreateEntity_" + typeof(T).Name, typeof(T), new Type[] { typeof(DataRow) }, typeof(T), true);
+                DynamicMethod method = new DynamicMethod($"DynamicCreateEntity_{typeof(T).Name}", typeof(T), new Type[] { typeof(DataRow) }, typeof(T), true);
                 ILGenerator generator = method.GetILGenerator();
                 LocalBuilder result = generator.DeclareLocal(typeof(T));
                 generator.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));

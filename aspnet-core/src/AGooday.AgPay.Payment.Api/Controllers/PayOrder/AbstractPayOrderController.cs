@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 只有新订单模式，进行校验
                 if (isNewOrder && _payOrderService.IsExistOrderByMchOrderNo(mchNo, bizRQ.MchOrderNo))
                 {
-                    throw new BizException("商户订单[" + bizRQ.MchOrderNo + "]已存在");
+                    throw new BizException($"商户订单[{bizRQ.MchOrderNo}]已存在");
                 }
 
                 if (!string.IsNullOrWhiteSpace(bizRQ.NotifyUrl) && !StringUtil.IsAvailableUrl(bizRQ.NotifyUrl))
@@ -275,8 +275,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrder.ReturnUrl = rq.ReturnUrl; //页面跳转地址
 
             // 分账模式
-            payOrder.DivisionMode = rq.DivisionMode ?? (byte)PayOrderDivision.DIVISION_MODE_FORBID;
-            payOrder.DivisionState = payOrder.DivisionState ?? (byte)PayOrderDivision.DIVISION_STATE_UNHAPPEN;
+            payOrder.DivisionMode ??= (byte)PayOrderDivision.DIVISION_MODE_FORBID;
+            payOrder.DivisionState ??= (byte)PayOrderDivision.DIVISION_STATE_UNHAPPEN;
 
             var nowDate = DateTime.Now;
 
@@ -446,8 +446,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
             if (payOrder.State == (byte)PayOrderState.STATE_FAIL)
             {
-                bizRS.ErrCode = bizRS.ChannelRetMsg != null ? bizRS.ChannelRetMsg.ChannelErrCode : null;
-                bizRS.ErrMsg = bizRS.ChannelRetMsg != null ? bizRS.ChannelRetMsg.ChannelErrMsg : null;
+                bizRS.ErrCode = bizRS.ChannelRetMsg?.ChannelErrCode;
+                bizRS.ErrMsg = bizRS.ChannelRetMsg?.ChannelErrMsg;
             }
 
             return ApiRes.OkWithSign(bizRS, bizRQ.SignType, _configContextQueryService.QueryMchApp(bizRQ.MchNo, bizRQ.AppId).AppSecret);

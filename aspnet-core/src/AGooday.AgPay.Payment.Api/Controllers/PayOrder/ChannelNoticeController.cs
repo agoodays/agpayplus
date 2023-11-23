@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 if (payNotifyService == null)
                 {
                     log.LogError($"{logPrefix}, interface not exists ");
-                    return this.ToReturnPage("[" + ifCode + "] interface not exists");
+                    return this.ToReturnPage($"[{ifCode}] interface not exists");
                 }
 
                 // 解析订单号 和 请求参数

@@ -321,7 +321,7 @@
         /// <summary>
         /// 允许上传的的图片文件格式，需要与 WebSecurityConfig对应
         /// </summary>
-        public static List<string> ALLOW_UPLOAD_IMG_SUFFIX = new List<string>() { "jpg" ,"png" ,"jpeg" ,"gif" ,"mp4" };
+        public static List<string> ALLOW_UPLOAD_IMG_SUFFIX = new List<string>() { "jpg", "png", "jpeg", "gif", "mp4" };
 
         /// <summary>
         /// Token 有效期

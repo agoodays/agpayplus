@@ -125,7 +125,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         private void CheckReceiverList(List<PayOrderDivisionMQ.CustomerDivisionReceiver> receiverList, string ifCode, string mchNo, string appId)
         {
-            if (receiverList == null || receiverList.Count() == 0)
+            if (receiverList == null || receiverList.Count == 0)
             {
                 return;
             }
@@ -168,7 +168,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             {
                 int receiverCount = _mchDivisionReceiverService.GetCount(receiverIdSet, mchNo, appId, ifCode);
 
-                if (receiverCount != receiverIdSet.Count())
+                if (receiverCount != receiverIdSet.Count)
                 {
                     throw new BizException("分账[用户]中包含不存在或渠道不可用账号，请更改");
                 }
@@ -178,7 +178,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             {
                 int receiverGroupCount = _mchDivisionReceiverService.GetCount(receiverGroupIdSet, mchNo);
 
-                if (receiverGroupCount != receiverGroupIdSet.Count())
+                if (receiverGroupCount != receiverGroupIdSet.Count)
                 {
                     throw new BizException("分账[账号组]中包含不存在或不可用组，请更改");
                 }

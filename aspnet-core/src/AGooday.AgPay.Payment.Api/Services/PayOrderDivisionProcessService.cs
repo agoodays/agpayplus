@@ -55,10 +55,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         public ChannelRetMsg ProcessPayOrderDivision(string payOrderId, byte? useSysAutoDivisionReceivers, List<PayOrderDivisionMQ.CustomerDivisionReceiver> receiverList, bool? isResend)
         {
             // 是否重发分账接口（ 当分账失败， 列表允许再次发送请求 ）
-            if (isResend == null)
-            {
-                isResend = false;
-            }
+            isResend ??= false;
 
             string logPrefix = $"订单[{payOrderId}]执行分账";
 
@@ -167,7 +164,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             catch (Exception e)
             {
                 log.LogError(e, $"{logPrefix}, 调用分账接口异常");
-                payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, null, "系统异常：" + e.Message);
+                payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, null, $"系统异常：{e.Message}");
 
                 channelRetMsg = ChannelRetMsg.ConfirmFail(null, null, e.Message);
             }

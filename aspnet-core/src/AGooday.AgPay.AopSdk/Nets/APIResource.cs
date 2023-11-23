@@ -13,7 +13,7 @@ namespace AGooday.AgPay.AopSdk.Nets
     {
         public const string CHARSET = "utf-8";
 
-        private static HttpClient httpClient = new HttpClient();
+        private static readonly HttpClient httpClient = new HttpClient();
 
         public enum RequestMethod
         {

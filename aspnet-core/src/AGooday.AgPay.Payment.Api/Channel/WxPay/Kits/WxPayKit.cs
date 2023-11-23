@@ -40,15 +40,15 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
         }
         public static string Sign(Dictionary<string, string> dictionary, string key)
         {
-            var json = string.Join("&", dictionary.OrderBy(o => o.Key)
-                .Select(s => $"{s.Key}={s.Value}")) + "&key=" + key;
+            var json = $"{string.Join("&", dictionary.OrderBy(o => o.Key)
+                .Select(s => $"{s.Key}={s.Value}"))}&key={key}";
             var bytes = Encoding.UTF8.GetBytes(json);
             MD5 md5 = MD5.Create();
             byte[] temp = md5.ComputeHash(bytes);
             string sign = "";
             foreach (byte b in temp)
             {
-                sign = sign + b.ToString("X").PadLeft(2, '0');
+                sign += b.ToString("X").PadLeft(2, '0');
             }
             return sign.ToUpper();
         }
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
         {
             if (StringUtil.IsAllNotNullOrWhiteSpace(msg, subMsg))
             {
-                return msg + "【" + subMsg + "】";
+                return $"{msg}【{subMsg}】";
             }
             return StringUtil.DefaultIfEmpty(subMsg, msg);
         }

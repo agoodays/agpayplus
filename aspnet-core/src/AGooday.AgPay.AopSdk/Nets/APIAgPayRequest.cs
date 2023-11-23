@@ -58,7 +58,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             }
         }
 
-        private string BuildURL(APIResource.RequestMethod method, string spec, Dictionary<string, object> @params)
+        private static string BuildURL(APIResource.RequestMethod method, string spec, Dictionary<string, object> @params)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(spec);
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.AopSdk.Nets
                 string queryString = CreateQuery(@params);
                 if (!string.IsNullOrWhiteSpace(queryString))
                 {
-                    sb.Append("?");
+                    sb.Append('?');
                     sb.Append(queryString);
                 }
             }
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             {
                 if (queryStringBuffer.Length > 0)
                 {
-                    queryStringBuffer.Append("&");
+                    queryStringBuffer.Append('&');
                 }
                 queryStringBuffer.Append(UrlEncodePair(entry.Key, entry.Value));
             }
@@ -155,7 +155,7 @@ namespace AGooday.AgPay.AopSdk.Nets
                 {
                     var arr = (JArray)value;
                     var flatNestedMap = new JObject();
-                    int size = arr.Count();
+                    int size = arr.Count;
                     for (int i = 0; i < size; i++)
                     {
                         flatNestedMap.Add($"{key}[{i:d}]", arr[i]);
@@ -223,7 +223,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             //throw new ArithmeticException("请设置正确的签名类型");
         }
 
-        public static string GenUrl(string url, string uri)
+        private static string GenUrl(string url, string uri)
         {
             if (!url.EndsWith("/")) url += "/";
             return url += uri;

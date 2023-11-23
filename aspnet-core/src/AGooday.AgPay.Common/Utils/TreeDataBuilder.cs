@@ -17,41 +17,41 @@ namespace AGooday.AgPay.Common.Utils
         /// <summary>
         /// 所有数据集合
         /// </summary>
-        private JArray nodes { get; set; }
+        private JArray Nodes { get; set; }
 
         /// <summary>
         /// 默认数据中的主键key
         /// </summary>
-        private string idName = "id";
+        private readonly string idName = "id";
 
         /// <summary>
         /// 默认数据中的父级id的key
         /// </summary>
-        private string pidName = "pid";
+        private readonly string pidName = "pid";
 
         /// <summary>
         /// 默认数据中的子类对象key
         /// </summary>
-        private string childrenName = "children";
+        private readonly string childrenName = "children";
 
         /// <summary>
         /// 排序字段， 默认按照ID排序
         /// </summary>
-        private string sortName = "id";
+        private readonly string sortName = "id";
 
         /// <summary>
         /// 默认按照升序排序
         /// </summary>
-        private bool isAscSort = true;
+        private readonly bool isAscSort = true;
 
         public TreeDataBuilder(JArray nodes)
         {
-            this.nodes = nodes;
+            this.Nodes = nodes;
         }
 
         public TreeDataBuilder(JArray nodes, string idName, string pidName, string childrenName)
         {
-            this.nodes = nodes;
+            this.Nodes = nodes;
             this.idName = idName;
             this.sortName = idName;  //排序字段，按照idName
             this.pidName = pidName;
@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Common.Utils
         /// <param name="isAscSort"></param>
         public TreeDataBuilder(JArray nodes, string idName, string pidName, string childrenName, string sortName, bool isAscSort)
         {
-            this.nodes = nodes;
+            this.Nodes = nodes;
             this.idName = idName;
             this.pidName = pidName;
             this.childrenName = childrenName;
@@ -117,7 +117,7 @@ namespace AGooday.AgPay.Common.Utils
         private void BuildChildNodes(JObject node)
         {
             List<JObject> children = GetChildNodes(node);
-            if (children.Count() > 0)
+            if (children.Count > 0)
             {
                 foreach (JObject child in children)
                 {
@@ -137,7 +137,7 @@ namespace AGooday.AgPay.Common.Utils
         private List<JObject> GetChildNodes(JObject currentNode)
         {
             List<JObject> childNodes = new List<JObject>();
-            foreach (JObject n in nodes)
+            foreach (JObject n in Nodes.Cast<JObject>())
             {
                 if (currentNode[idName].Equals(n[pidName]))
                 {
@@ -155,7 +155,7 @@ namespace AGooday.AgPay.Common.Utils
         private bool IsRootNode(JObject node)
         {
             bool isRootNode = true;
-            foreach (JObject n in nodes)
+            foreach (JObject n in Nodes.Cast<JObject>())
             {
                 if (node[pidName] != null && node[pidName].Equals(n[idName]))
                 {
@@ -173,7 +173,7 @@ namespace AGooday.AgPay.Common.Utils
         private List<JObject> GetRootNodes()
         {
             List<JObject> rootNodes = new List<JObject>();
-            foreach (JObject n in nodes)
+            foreach (JObject n in Nodes.Cast<JObject>())
             {
                 if (IsRootNode(n))
                 {

@@ -144,7 +144,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
                 // 固定前两行，第一列，`FreezePanes()`方法的第一个参数设置为3，表示从第三行开始向下滚动时会被冻结，第二个参数设置为3，表示从第二行开始向右滚动时会被冻结
                 worksheet.View.FreezePanes(3, 2);
                 // 将每个订单添加到工作表中
-                for (int i = 0; i < payOrders.Count(); i++)
+                for (int i = 0; i < payOrders.Count; i++)
                 {
                     var order = payOrders[i];
                     var orderJO = JObject.FromObject(order);
@@ -152,20 +152,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
                     {
                         var excelHeader = excelHeaders[j];
                         var value = orderJO[excelHeader.Key];
-                        switch (excelHeader.Key)
+                        value = excelHeader.Key switch
                         {
-                            case "state":
-                                value = order.State.ToEnum<PayOrderState>()?.GetDescription() ?? "未知";
-                                break;
-                            case "amount":
-                            case "refundAmount":
-                            case "mchFeeAmount":
-                                value = Convert.ToDecimal(value) / 100;
-                                break;
-                            default:
-                                value = Convert.ToString(value);
-                                break;
-                        }
+                            "state" => order.State.ToEnum<PayOrderState>()?.GetDescription() ?? "未知",
+                            "amount" or "refundAmount" or "mchFeeAmount" => Convert.ToDecimal(value) / 100,
+                            _ => Convert.ToString(value),
+                        };
                         worksheet.Cells[i + 3, j + 1].Value = value;
                     }
                 }
@@ -179,7 +171,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
 
                 // 设置单元格样式，例如居中对齐和加粗字体
                 var cols = excelHeaders.Count + 1;
-                var rows = payOrders.Count() + 3;
+                var rows = payOrders.Count + 3;
                 for (int i = 1; i < rows; i++)
                 {
                     worksheet.Row(i).Height = 25;

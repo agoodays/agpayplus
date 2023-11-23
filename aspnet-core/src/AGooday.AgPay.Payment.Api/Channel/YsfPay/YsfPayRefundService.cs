@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
             string orderType = YsfHttpUtil.GetOrderTypeByCommon(refundOrder.WayCode);
-            string logPrefix = "【云闪付(" + orderType + ")退款查询】";
+            string logPrefix = $"【云闪付({orderType})退款查询】";
             try
             {
                 reqParams.Add("orderNo", refundOrder.RefundOrderId); // 退款订单号
@@ -107,7 +107,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
             string orderType = YsfHttpUtil.GetOrderTypeByCommon(payOrder.WayCode);
-            string logPrefix = "【云闪付(" + orderType + ")退款】";
+            string logPrefix = $"【云闪付({orderType})退款】";
             try
             {
                 reqParams.Add("origOrderNo", payOrder.PayOrderId); // 原交易订单号

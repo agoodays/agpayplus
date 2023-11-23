@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             try
             {
                 var paramsJson = GetReqParamJSON();
-                log.LogInformation($"【支付宝转账】回调通知参数：{paramsJson.ToString()}");
+                log.LogInformation($"【支付宝转账】回调通知参数：{paramsJson}");
 
                 var bizContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(paramsJson["biz_content"].ToString());
 

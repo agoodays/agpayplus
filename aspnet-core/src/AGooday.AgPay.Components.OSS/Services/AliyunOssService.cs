@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Components.OSS.Services
         private readonly ISysConfigService sysConfigService;
         private readonly ILogger<AliyunOssService> logger;
         // ossClient 初始化
-        private OssClient ossClient = null;
+        private readonly OssClient ossClient = null;
 
         public AliyunOssService(ILogger<AliyunOssService> logger, ISysConfigService sysConfigService)
         {
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             }
         }
 
-        private void WriteToFile(string filePath, Stream stream)
+        private static void WriteToFile(string filePath, Stream stream)
         {
             using (var requestStream = stream)
             {

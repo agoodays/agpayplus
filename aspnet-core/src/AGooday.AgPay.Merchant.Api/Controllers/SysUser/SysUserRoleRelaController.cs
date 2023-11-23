@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (entIds.Count() > 0)
+            if (entIds.Count > 0)
             {
                 _sysUserRoleRelaService.SaveUserRole(sysUserId, entIds);
                 RefAuthentication(new List<long> { sysUserId });

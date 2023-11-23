@@ -95,8 +95,8 @@ namespace AGooday.AgPay.Common.Utils
         public static string GetHmacSha256(string message, string secret)
         {
             string str;
-            message = message ?? "";
-            secret = secret ?? "";
+            message ??= "";
+            secret ??= "";
             byte[] bytes = Encoding.UTF8.GetBytes(secret);
             byte[] numArray = Encoding.UTF8.GetBytes(message);
             using (HMACSHA256 hMACSHA256 = new HMACSHA256(bytes))
@@ -173,7 +173,7 @@ namespace AGooday.AgPay.Common.Utils
         public static string GetMD5(string encypStr, string charset = "utf-8")
         {
             string mD5;
-            charset = charset ?? "utf-8";
+            charset ??= "utf-8";
             try
             {
                 mD5 = EnDecryptUtil.GetMD5(encypStr, Encoding.GetEncoding(charset));

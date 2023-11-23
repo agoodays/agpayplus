@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         public ApiPageRes<MchPayPassagePayWayDto> List(string appId, [FromQuery] PayWayQueryDto dto)
         {
             var payWays = _payWayService.GetPaginatedData<MchPayPassagePayWayDto>(dto);
-            if (payWays?.Count() > 0)
+            if (payWays?.Count > 0)
             {
                 // 支付方式代码集合
                 var wayCodes = payWays.Select(s => s.WayCode).ToList();
@@ -125,7 +125,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }
-            payPassage.Rate = payPassage.Rate * 100;
+            payPassage.Rate *= 100;
             return ApiRes.Ok(payPassage);
         }
 
@@ -166,7 +166,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             try
             {
                 List<MchPayPassageDto> mchPayPassages = JsonConvert.DeserializeObject<List<MchPayPassageDto>>(model.reqParams);
-                if (!(mchPayPassages?.Count() > 0))
+                if (!(mchPayPassages?.Count > 0))
                 {
                     throw new BizException("操作失败");
                 }

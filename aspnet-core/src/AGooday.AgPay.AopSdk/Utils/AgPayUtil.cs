@@ -5,7 +5,7 @@ namespace AGooday.AgPay.AopSdk.Utils
 {
     public class AgPayUtil
     {
-        private static string encodingCharset = "utf-8";
+        private static readonly string encodingCharset = "utf-8";
 
         public static string Sign(Dictionary<string, object> map, string signType, string key)
         {
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.AopSdk.Utils
         public static string GetSign(Dictionary<string, object> map, string key)
         {
             var result = GetStrSort(map);
-            result += "key=" + key;
+            result += $"key={key}";
             result = Md5(result, encodingCharset).ToUpper();
             return result;
         }

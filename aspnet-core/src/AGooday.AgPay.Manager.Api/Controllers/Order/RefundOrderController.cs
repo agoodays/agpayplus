@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 // 固定前两行，第一列，`FreezePanes()`方法的第一个参数设置为3，表示从第三行开始向下滚动时会被冻结，第二个参数设置为3，表示从第二行开始向右滚动时会被冻结
                 worksheet.View.FreezePanes(3, 2);
                 // 将每个订单添加到工作表中
-                for (int i = 0; i < refundOrders.Count(); i++)
+                for (int i = 0; i < refundOrders.Count; i++)
                 {
                     var refundOrder = refundOrders[i];
                     var refundOrderJO = JObject.FromObject(refundOrder);
@@ -102,19 +102,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                     {
                         var excelHeader = excelHeaders[j];
                         var value = refundOrderJO[excelHeader.Key];
-                        switch (excelHeader.Key)
+                        value = excelHeader.Key switch
                         {
-                            case "state":
-                                value = refundOrder.State.ToEnum<RefundOrderState>()?.GetDescription() ?? "未知";
-                                break;
-                            case "payAmount":
-                            case "refundAmount":
-                                value = Convert.ToDecimal(value) / 100;
-                                break;
-                            default:
-                                value = Convert.ToString(value);
-                                break;
-                        }
+                            "state" => refundOrder.State.ToEnum<RefundOrderState>()?.GetDescription() ?? "未知",
+                            "payAmount" or "refundAmount" => Convert.ToDecimal(value) / 100,
+                            _ => Convert.ToString(value),
+                        };
                         worksheet.Cells[i + 3, j + 1].Value = value;
                     }
                 }
@@ -128,7 +121,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
 
                 // 设置单元格样式，例如居中对齐和加粗字体
                 var cols = excelHeaders.Count + 1;
-                var rows = refundOrders.Count() + 3;
+                var rows = refundOrders.Count + 3;
                 for (int i = 1; i < rows; i++)
                 {
                     worksheet.Row(i).Height = 25;

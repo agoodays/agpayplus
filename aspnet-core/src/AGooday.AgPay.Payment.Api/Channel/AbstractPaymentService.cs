@@ -47,22 +47,22 @@ namespace AGooday.AgPay.Payment.Api.Channel
 
         protected string GetNotifyUrl()
         {
-            return _sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/pay/notify/" + GetIfCode();
+            return $"{_sysConfigService.GetDBApplicationConfig().PaySiteUrl}/api/pay/notify/{GetIfCode()}";
         }
 
         protected string GetNotifyUrl(string payOrderId)
         {
-            return _sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/pay/notify/" + GetIfCode() + "/" + payOrderId;
+            return $"{_sysConfigService.GetDBApplicationConfig().PaySiteUrl}/api/pay/notify/{GetIfCode()}/{payOrderId}";
         }
 
         protected string GetReturnUrl()
         {
-            return _sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/pay/return/" + GetIfCode();
+            return $"{_sysConfigService.GetDBApplicationConfig().PaySiteUrl}/api/pay/return/{GetIfCode()}";
         }
 
         protected string GetReturnUrl(string payOrderId)
         {
-            return _sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/pay/return/" + GetIfCode() + "/" + payOrderId;
+            return $"{_sysConfigService.GetDBApplicationConfig().PaySiteUrl}/api/pay/return/{GetIfCode()}/{payOrderId}";
         }
     }
 }

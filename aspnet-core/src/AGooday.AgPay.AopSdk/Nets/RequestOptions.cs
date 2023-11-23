@@ -5,16 +5,16 @@
     /// </summary>
     public class RequestOptions
     {
-        private string uri;
-        private string version;
-        private string signType;
+        private readonly string uri;
+        private readonly string version;
+        private readonly string signType;
 
-        private string apiKey;
+        private readonly string apiKey;
 
-        private int connectTimeout;
-        private int readTimeout;
-        private int maxNetworkRetries;
-        private string acceptLanguage;
+        private readonly int connectTimeout;
+        private readonly int readTimeout;
+        private readonly int maxNetworkRetries;
+        private readonly string acceptLanguage;
 
         public static RequestOptions GetDefault(string uri, string version)
         {
@@ -231,7 +231,7 @@
             }
             if (apiUri.StartsWith("/"))
             {
-                throw new InvalidRequestOptionsException("接口URI(" + apiUri + ")不能以'/'开头");
+                throw new InvalidRequestOptionsException($"接口URI({apiUri})不能以'/'开头");
             }
             return apiUri;
         }

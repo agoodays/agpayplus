@@ -87,7 +87,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     catch (Exception e)
                     {
                         log.LogError(e, "http error");
-                        res = "连接[" + notifyUrl + "]异常:【" + e.Message + "】";
+                        res = $"连接[{notifyUrl}]异常:【{e.Message}】";
                     }
 
                     //支付订单 & 第一次通知: 更新为已通知

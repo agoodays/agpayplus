@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
             }
         };
 
-        private static ArrayList _DbTypeList = new ArrayList();
+        private static readonly ArrayList _DbTypeList = new ArrayList();
 
         #region Constructors
 
@@ -245,7 +245,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
             if (retObj == null)
             {
                 throw
-                new ApplicationException("Referenced an unsupported Type " + type.ToString());
+                new ApplicationException($"Referenced an unsupported Type {type}");
             }
 
             return (DbTypeMapEntry)retObj;
@@ -266,7 +266,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
             if (retObj == null)
             {
                 throw
-                new ApplicationException("Referenced an unsupported DbType " + dbType.ToString());
+                new ApplicationException($"Referenced an unsupported DbType {dbType}");
             }
 
             return (DbTypeMapEntry)retObj;

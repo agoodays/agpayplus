@@ -10,7 +10,7 @@ namespace AGooday.AgPay.AopSdk.Request
     public class PayOrderQueryRequest : IAgPayRequest<PayOrderQueryResponse>
     {
         private string ApiVersion = AgPay.VERSION;
-        private string ApiUri = "api/pay/query";
+        private readonly string ApiUri = "api/pay/query";
         private RequestOptions Options;
         private AgPayObject BizModel = null;
 

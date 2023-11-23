@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Common.Utils
         }
         public static Bitmap DrawImage(string code, int? imageWidth = null, int imageHeight = 32, int fontSize = 15)
         {
-            imageWidth = imageWidth ?? code.Length * 18;
+            imageWidth ??= code.Length * 18;
             Color[] colors = {
                 Color.LightSalmon, Color.Aqua, Color.LightSkyBlue, Color.Aquamarine,
                 Color.Lime, Color.MediumOrchid, Color.Chartreuse, Color.Chocolate,

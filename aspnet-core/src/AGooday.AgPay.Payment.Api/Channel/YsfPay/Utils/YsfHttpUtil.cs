@@ -81,13 +81,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils
 
         public static string DoPostJson(string url, Dictionary<string, object> headers, JObject reqParams)
         {
-            if (headers == null)
-            {
-                headers = new Dictionary<string, object>();
-            }
+            headers ??= new Dictionary<string, object>();
             if (!headers.ContainsKey("Content-Type"))
             {
-                headers.Add("Content-Type", "application/json; charset=" + DEFAULT_CHARSET);
+                headers.Add("Content-Type", $"application/json; charset={DEFAULT_CHARSET}");
             }
             return DoPostStr(url, headers, JsonConvert.SerializeObject(reqParams));
         }

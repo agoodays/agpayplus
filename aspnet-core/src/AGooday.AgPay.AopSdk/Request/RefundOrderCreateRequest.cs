@@ -10,7 +10,7 @@ namespace AGooday.AgPay.AopSdk.Request
     public class RefundOrderCreateRequest : IAgPayRequest<RefundOrderCreateResponse>
     {
         private string ApiVersion = AgPay.VERSION;
-        private string ApiUri = "api/refund/refundOrder";
+        private readonly string ApiUri = "api/refund/refundOrder";
         private RequestOptions Options;
         private AgPayObject BizModel = null;
 

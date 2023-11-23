@@ -118,7 +118,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.PpPay.PayWay
 
                     // 设置返回实体
                     channelRetMsg.ChannelAttach = JsonConvert.SerializeObject(order);
-                    channelRetMsg.ChannelOrderId = tradeNo + "," + "null"; // 拼接订单ID
+                    channelRetMsg.ChannelOrderId = $"{tradeNo},null"; // 拼接订单ID
                     channelRetMsg = paypalWrapper.DispatchCode(status, channelRetMsg); // 处理状态码
 
                     // 设置支付链接

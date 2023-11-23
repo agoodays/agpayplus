@@ -109,7 +109,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 // 校验退款单号是否重复
                 if (_refundOrderService.IsExistOrderByMchOrderNo(mchNo, rq.MchRefundNo))
                 {
-                    throw new BizException("商户退款订单号[" + rq.MchRefundNo + "]已存在");
+                    throw new BizException($"商户退款订单号[{rq.MchRefundNo}]已存在");
                 }
 
                 if (!string.IsNullOrWhiteSpace(rq.NotifyUrl) && !StringUtil.IsAvailableUrl(rq.NotifyUrl))

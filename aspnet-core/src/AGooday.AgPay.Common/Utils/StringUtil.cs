@@ -117,6 +117,7 @@ namespace AGooday.AgPay.Common.Utils
             System.Text.Encoding chs = System.Text.Encoding.GetEncoding(charset);
             return chs.GetString(bytes);
         }
+
         /// <summary>
         /// 对字符加星号处理：除前面几位和后面几位外，其他的字符以星号代替
         /// </summary>
@@ -142,7 +143,7 @@ namespace AGooday.AgPay.Common.Utils
             string starStr = "";
             for (int i = 0; i < starNum; i++)
             {
-                starStr = starStr + "*";
+                starStr += "*";
             }
             return content.SubstringUp(0, frontNum) + starStr
                     + content.SubstringUp(content.Length - endNum, content.Length);
@@ -192,13 +193,13 @@ namespace AGooday.AgPay.Common.Utils
         {
             if (begin < 0 || begin > end || end > length)
             {
-                throw new ArgumentException("begin " + begin + ", end " + end + ", length " + length);
+                throw new ArgumentException($"begin {begin}, end {end}, length {length}");
             }
         }
 
         public static string GetUUID()
         {
-            return Guid.NewGuid().ToString("N") + Thread.CurrentThread.ManagedThreadId;
+            return Guid.NewGuid().ToString("N") + Environment.CurrentManagedThreadId;
         }
 
         public static string GetUUID(int endAt)

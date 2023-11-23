@@ -14,17 +14,17 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <summary>
         /// <商户ID, 商户配置项>
         /// </summary>
-        private static Dictionary<string, MchInfoConfigContext> mchInfoConfigContextMap = new Dictionary<string, MchInfoConfigContext>();
+        private static readonly Dictionary<string, MchInfoConfigContext> mchInfoConfigContextMap = new Dictionary<string, MchInfoConfigContext>();
 
         /// <summary>
         /// <应用ID, 商户配置上下文>
         /// </summary>
-        private static Dictionary<string, MchAppConfigContext> mchAppConfigContextMap = new Dictionary<string, MchAppConfigContext>();
+        private static readonly Dictionary<string, MchAppConfigContext> mchAppConfigContextMap = new Dictionary<string, MchAppConfigContext>();
 
         /// <summary>
         /// <服务商号, 服务商配置上下文>
         /// </summary>
-        private static Dictionary<string, IsvConfigContext> isvConfigContextMap = new Dictionary<string, IsvConfigContext>();
+        private static readonly Dictionary<string, IsvConfigContext> isvConfigContextMap = new Dictionary<string, IsvConfigContext>();
 
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
@@ -341,7 +341,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
         }
 
-        private bool IsCache()
+        private static bool IsCache()
         {
             return SysConfigService.IS_USE_CACHE;
         }

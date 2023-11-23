@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Agent.Api.Authorization
 {
     public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionAuthorizationRequirement>
     {
-        private IDatabase _redis;
+        private readonly IDatabase _redis;
 
         public PermissionAuthorizationHandler(RedisUtil client)
         {

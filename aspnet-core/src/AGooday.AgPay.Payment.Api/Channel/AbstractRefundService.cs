@@ -28,12 +28,12 @@ namespace AGooday.AgPay.Payment.Api.Channel
 
         protected string GetNotifyUrl()
         {
-            return _sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/refund/notify/" + GetIfCode();
+            return $"{_sysConfigService.GetDBApplicationConfig().PaySiteUrl}/api/refund/notify/{GetIfCode()}";
         }
 
         protected string GetNotifyUrl(string refundOrderId)
         {
-            return _sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/refund/notify/" + GetIfCode() + "/" + refundOrderId;
+            return $"{_sysConfigService.GetDBApplicationConfig().PaySiteUrl}/api/refund/notify/{GetIfCode()}/{refundOrderId}";
         }
     }
 }

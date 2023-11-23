@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         private readonly ISysUserService _sysUserService;
         private readonly ISysEntitlementService _sysEntService;
         private readonly ISysUserAuthService _sysUserAuthService;
-        private IMemoryCache _cache;
+        private readonly IMemoryCache _cache;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 

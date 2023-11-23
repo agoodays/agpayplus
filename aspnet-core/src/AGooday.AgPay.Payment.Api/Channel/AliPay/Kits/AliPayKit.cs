@@ -135,7 +135,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.Kits
             string result = null;
             if (StringUtil.IsAllNotNullOrWhiteSpace(msg, subMsg))
             {
-                result = msg + "【" + subMsg + "】";
+                result =  $"msg【{subMsg}】";
             }
             else
             {
