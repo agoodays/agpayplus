@@ -184,12 +184,20 @@
       <div class="statistics-list" style="padding-bottom: 55px;">
         <div class="item">
           <div class="title">创建订单</div>
-          <div class="amount">
-            <span>
-              <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
-              <span>元</span>
-            </span>
-          </div>
+          <a-tooltip placement="top">
+            <template #title>
+              <span>
+                <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
+                <span>元</span>
+              </span>
+            </template>
+            <div class="amount">
+              <span>
+                <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
+                <span>元</span>
+              </span>
+            </div>
+          </a-tooltip>
           <div class="detail">
             <span>{{ countData.allPayCount }}笔</span>
           </div>
@@ -200,12 +208,20 @@
         </div>
         <div class="item">
           <div class="title">成交订单</div>
-          <div class="amount">
-            <span>
-              <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
-              <span>元</span>
-            </span>
-          </div>
+          <a-tooltip placement="top">
+            <template #title>
+              <span>
+                <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
+                <span>元</span>
+              </span>
+            </template>
+            <div class="amount">
+              <span>
+                <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
+                <span>元</span>
+              </span>
+            </div>
+          </a-tooltip>
           <div class="detail">
             <span>{{ countData.payCount }}笔</span>
           </div>
@@ -216,12 +232,20 @@
         </div>
         <div class="item">
           <div class="title">未付款订单</div>
-          <div class="amount">
-            <span>
-              <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
-              <span>元</span>
-            </span>
-          </div>
+          <a-tooltip placement="top">
+            <template #title>
+              <span>
+                <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
+                <span>元</span>
+              </span>
+            </template>
+            <div class="amount">
+              <span>
+                <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
+                <span>元</span>
+              </span>
+            </div>
+          </a-tooltip>
           <div class="detail">
             <span>{{ countData.failPayCount }}笔</span>
           </div>
@@ -724,7 +748,11 @@ export default {
   }
 
   .statistics-list .item .amount {
-    margin-bottom: 10px
+    margin-bottom: 10px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .statistics-list .item .amount .amount-num {
