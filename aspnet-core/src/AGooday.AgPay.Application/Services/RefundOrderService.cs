@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Application.Services
             var refundOrders = _refundOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.MchType.Equals(0) || w.MchType.Equals(dto.MchType))
+                && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
                 && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
                 && (string.IsNullOrWhiteSpace(dto.RefundOrderId) || w.RefundOrderId.Equals(dto.RefundOrderId))
                 && (string.IsNullOrWhiteSpace(dto.MchRefundNo) || w.MchRefundNo.Equals(dto.MchRefundNo))
@@ -109,8 +109,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId)
                 || w.RefundOrderId.Equals(dto.UnionOrderId) || w.MchRefundNo.Equals(dto.UnionOrderId)
                 || w.ChannelPayOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))// 三合一订单
-                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
-                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
+                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<RefundOrder>.Create<RefundOrderDto>(refundOrders, _mapper, dto.PageNumber, dto.PageSize);
             return records;

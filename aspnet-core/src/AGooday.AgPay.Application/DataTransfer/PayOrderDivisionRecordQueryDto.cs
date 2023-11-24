@@ -94,12 +94,12 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 账号快照》 分账接收者ID
         /// </summary>
-        public long ReceiverId { get; set; }
+        public long? ReceiverId { get; set; }
 
         /// <summary>
         /// 账号快照》 组ID（便于商户接口使用）
         /// </summary>
-        public long ReceiverGroupId { get; set; }
+        public long? ReceiverGroupId { get; set; }
 
         /// <summary>
         /// 账号快照》 分账接收者别名

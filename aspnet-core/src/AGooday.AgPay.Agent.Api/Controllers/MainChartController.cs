@@ -86,9 +86,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers
             DateTime? day = DateTime.Today;
             switch (queryDateRange)
             {
-                case "yesterday":
+                case DateUtil.YESTERDAY:
                     day?.AddDays(-1); break;
-                case "today":
+                case DateUtil.TODAY:
                 default:
                     break;
             }

@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Application.Services
             IMchPayPassageRepository mchPayPassageRepository,
             IPayInterfaceDefineRepository payInterfaceDefineRepository,
             IPayInterfaceConfigRepository payInterfaceConfigRepository,
-            IPayRateConfigRepository payRateConfigRepository, 
+            IPayRateConfigRepository payRateConfigRepository,
             IPayRateLevelConfigRepository payRateLevelConfigRepository)
         {
             _mapper = mapper;
@@ -93,7 +93,7 @@ namespace AGooday.AgPay.Application.Services
         public IEnumerable<MchPayPassageDto> GetByAppId(string appId, List<string> wayCodes)
         {
             var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId)
-            && (wayCodes.Count.Equals(0) || wayCodes.Contains(w.WayCode)));
+            && (wayCodes.Count == 0 || wayCodes.Contains(w.WayCode)));
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 
@@ -144,7 +144,7 @@ namespace AGooday.AgPay.Application.Services
                 var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
                 foreach (var item in result)
                 {
-                    item.IfRate = item.IfRate ?? item.IfRate * 100; 
+                    item.IfRate = item.IfRate ?? item.IfRate * 100;
                     item.PayWayFee = _payRateConfigService.GetPayRateConfigItem(configType, infoType, appId, item.IfCode, wayCode);
                     var payPassage = mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).FirstOrDefault();
                     if (payPassage != null)

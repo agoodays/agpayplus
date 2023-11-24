@@ -7,7 +7,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 系统用户ID
         /// </summary>
-        public long SysUserId { get; set; }
+        public long? SysUserId { get; set; }
 
         /// <summary>
         /// 真实姓名
@@ -27,6 +27,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员
         /// </summary>
-        public byte UserType { get; set; }
+        public byte? UserType { get; set; }
     }
 }

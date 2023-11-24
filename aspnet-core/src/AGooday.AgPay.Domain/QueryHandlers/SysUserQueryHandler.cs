@@ -38,8 +38,8 @@ namespace AGooday.AgPay.Domain.QueryHandlers
                             where (string.IsNullOrWhiteSpace(request.SysType) || u.SysType.Equals(request.SysType))
                             && (string.IsNullOrWhiteSpace(request.BelongInfoId) || u.BelongInfoId.Contains(request.BelongInfoId))
                             && (string.IsNullOrWhiteSpace(request.Realname) || u.Realname.Contains(request.Realname))
-                            && (request.UserType.Equals(0) || u.UserType.Equals(request.UserType))
-                            && (request.SysUserId.Equals(0) || u.SysUserId.Equals(request.SysUserId))
+                            && (request.UserType.Equals(null) || u.UserType.Equals(request.UserType))
+                            && (request.SysUserId.Equals(null) || u.SysUserId.Equals(request.SysUserId))
                             && (request.CurrentUserId == null || !u.SysUserId.Equals(request.CurrentUserId))
                             select new { u, team }).OrderByDescending(o => o.u.CreatedAt).ToList()
                             .Select(s =>

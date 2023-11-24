@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
         /// </summary>
         [BindNever]
-        public byte MchType { get; set; }
+        public byte? MchType { get; set; }
 
         /// <summary>
         /// 商户退款单号（商户系统的订单号）

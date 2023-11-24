@@ -137,7 +137,7 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.MchName) || w.MchName.Contains(dto.MchName) || w.MchShortName.Contains(dto.MchName))
-                && (dto.Type.Equals(0) || w.Type.Equals(dto.Type))
+                && (dto.Type.Equals(null) || w.Type.Equals(dto.Type))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<MchInfo>.Create<MchInfoDto>(mchInfos, _mapper, dto.PageNumber, dto.PageSize);

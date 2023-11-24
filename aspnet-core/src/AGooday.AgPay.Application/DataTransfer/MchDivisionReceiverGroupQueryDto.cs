@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 组ID
         /// </summary>
-        public long ReceiverGroupId { get; set; }
+        public long? ReceiverGroupId { get; set; }
 
         /// <summary>
         /// 组名称

@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 系统用户ID
         /// </summary>
-        public long UserId { get; set; }
+        public long? UserId { get; set; }
 
         /// <summary>
         /// 用户姓名

@@ -10,6 +10,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 用户ID
         /// </summary>
-        public long UserId { get; set; }
+        public long? UserId { get; set; }
     }
 }

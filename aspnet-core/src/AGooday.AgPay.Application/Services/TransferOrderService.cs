@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Application.Services
             var transferOrders = _transferOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.MchType.Equals(0) || w.MchType.Equals(dto.MchType))
+                && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
                 && (string.IsNullOrWhiteSpace(dto.TransferId) || w.TransferId.Equals(dto.TransferId))
                 && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
                 && (string.IsNullOrWhiteSpace(dto.ChannelOrderNo) || w.ChannelOrderNo.Equals(dto.ChannelOrderNo))
@@ -97,8 +97,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.TransferId.Equals(dto.UnionOrderId)
                 || w.MchOrderNo.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
-                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
-                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
+                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<TransferOrder>.Create<TransferOrderDto>(transferOrders, _mapper, dto.PageNumber, dto.PageSize);
             return records;

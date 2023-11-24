@@ -97,16 +97,16 @@ namespace AGooday.AgPay.Application.Services
             var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.ReceiverId.Equals(0) || w.ReceiverId.Equals(dto.ReceiverId))
-                && (dto.ReceiverGroupId.Equals(0) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
+                && (dto.ReceiverId.Equals(null) || w.ReceiverId.Equals(dto.ReceiverId))
+                && (dto.ReceiverGroupId.Equals(null) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
                 && (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId))
                 && (string.IsNullOrWhiteSpace(dto.PayOrderId) || w.PayOrderId.Equals(dto.PayOrderId))
                 && (string.IsNullOrWhiteSpace(dto.AccNo) || w.AccNo.Equals(dto.AccNo))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
-                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
+                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(payOrderDivisionRecords, _mapper, dto.PageNumber, dto.PageSize);
             return records;
@@ -122,15 +122,15 @@ namespace AGooday.AgPay.Application.Services
             var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.ReceiverId.Equals(0) || w.ReceiverId.Equals(dto.ReceiverId))
-                && (dto.ReceiverGroupId.Equals(0) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
+                && (dto.ReceiverId.Equals(null) || w.ReceiverId.Equals(dto.ReceiverId))
+                && (dto.ReceiverGroupId.Equals(null) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
                 && (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId))
                 && (string.IsNullOrWhiteSpace(dto.PayOrderId) || w.PayOrderId.Equals(dto.PayOrderId))
                 && (string.IsNullOrWhiteSpace(dto.AccNo) || w.AccNo.Equals(dto.AccNo))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
-                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
+                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 ).DistinctBy(d => new { d.BatchOrderId, d.PayOrderId }).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(payOrderDivisionRecords, _mapper, dto.PageNumber, dto.PageSize);
             return records;

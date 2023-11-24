@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 分账接收者ID
         /// </summary>
-        public long ReceiverId { get; set; }
+        public long? ReceiverId { get; set; }
 
         /// <summary>
         /// 接收者账号别名
@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 组ID（便于商户接口使用）
         /// </summary>
-        public long ReceiverGroupId { get; set; }
+        public long? ReceiverGroupId { get; set; }
 
         /// <summary>
         /// 组名称

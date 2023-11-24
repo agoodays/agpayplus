@@ -163,8 +163,8 @@ namespace AGooday.AgPay.Application.Services
                             where (string.IsNullOrWhiteSpace(dto.SysType) || u.SysType.Equals(dto.SysType))
                             && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || u.BelongInfoId.Contains(dto.BelongInfoId))
                             && (string.IsNullOrWhiteSpace(dto.Realname) || u.Realname.Contains(dto.Realname))
-                            && (dto.UserType.Equals(0) || u.UserType.Equals(dto.UserType))
-                            && (dto.SysUserId.Equals(0) || u.SysUserId.Equals(dto.SysUserId))
+                            && (dto.UserType.Equals(null) || u.UserType.Equals(dto.UserType))
+                            && (dto.SysUserId.Equals(null) || u.SysUserId.Equals(dto.SysUserId))
                             && (currentUserId == null || !u.SysUserId.Equals(currentUserId))
                             select new { u, team }).ToList().Select(s =>
                             {

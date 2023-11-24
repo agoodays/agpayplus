@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 文章ID
         /// </summary>
-        public long ArticleId { get; set; }
+        public long? ArticleId { get; set; }
 
         /// <summary>
         /// 文章标题
@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 文章类型: 1-公告
         /// </summary>
-        public byte ArticleType { get; set; }
+        public byte? ArticleType { get; set; }
 
         /// <summary>
         /// 文章范围

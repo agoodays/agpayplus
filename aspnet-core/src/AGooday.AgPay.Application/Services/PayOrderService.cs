@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public PayOrderService(IPayOrderRepository payOrderRepository, 
+        public PayOrderService(IPayOrderRepository payOrderRepository,
             IRefundOrderRepository refundOrderRepository,
             IMchInfoRepository mchInfoRepository,
             IAgentInfoRepository agentInfoRepository,
@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.MchType.Equals(0) || w.MchType.Equals(dto.MchType))
+                && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
                 && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
                 && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
@@ -115,8 +115,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Equals(dto.StoreName))
                 && (dto.DivisionState.Equals(null) || w.DivisionState.Equals(dto.DivisionState))
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
-                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
-                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
+                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayOrder>.Create<PayOrderDto>(payOrders, _mapper, dto.PageNumber, dto.PageSize);
             return records;
@@ -128,7 +128,7 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.MchType.Equals(0) || w.MchType.Equals(dto.MchType))
+                && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
                 && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
                 && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
@@ -137,8 +137,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Equals(dto.StoreName))
                 && (dto.DivisionState.Equals(null) || w.DivisionState.Equals(dto.DivisionState))
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
-                && (dto.CreatedEnd == null || w.CreatedAt < dto.CreatedEnd)
-                && (dto.CreatedStart == null || w.CreatedAt >= dto.CreatedStart));
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
+                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart));
             var allPayAmount = payOrders.Sum(s => s.Amount);
             var allPayCount = payOrders.Count();
             var failPayAmount = payOrders.Where(w => !w.State.Equals((byte)PayOrderState.STATE_SUCCESS)).Sum(s => s.Amount);
@@ -443,8 +443,9 @@ namespace AGooday.AgPay.Application.Services
                     PayAmount = (s.Items.Sum(s => s.Amount) - s.Items.Sum(s => s.RefundAmount)),
                     RefundAmount = s.Items.Sum(s => s.RefundAmount)
                 }).ToList();
-            var result = ordercounts.Select(s => (s.GroupDate, Decimal.Round(s.PayAmount / 100M, 2, MidpointRounding.AwayFromZero), Decimal.Round(s.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero)))
-                .ToList();
+            var result = ordercounts.Select(s =>
+            (s.GroupDate, Decimal.Round(s.PayAmount / 100M, 2, MidpointRounding.AwayFromZero), Decimal.Round(s.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero))
+            ).ToList();
             return result;
         }
 
@@ -728,7 +729,7 @@ namespace AGooday.AgPay.Application.Services
             // 支付方式名称标注
             foreach (var payCount in payCountMap)
             {
-                payCount.TypeName = payCount.WayType.ToEnum<PayWayType>().GetDescriptionOrDefault( "未知");
+                payCount.TypeName = payCount.WayType.ToEnum<PayWayType>().GetDescriptionOrDefault("未知");
             }
 
             // 生成虚拟数据
@@ -737,12 +738,12 @@ namespace AGooday.AgPay.Application.Services
                 // 得到所有支付方式
                 var payWayList = _payWayRepository.GetAll();
                 payCountMap = new List<PayTypeCountDto>();
-                foreach (var wayType in payWayList.Select(s=>s.WayType).Distinct())
+                foreach (var wayType in payWayList.Select(s => s.WayType).Distinct())
                 {
                     payCountMap.Add(new PayTypeCountDto()
                     {
                         WayType = wayType,
-                        TypeName = wayType.ToEnum<PayWayType>().GetDescriptionOrDefault( "未知"),
+                        TypeName = wayType.ToEnum<PayWayType>().GetDescriptionOrDefault("未知"),
                         TypeCount = Random.Shared.Next(0, 100),
                         TypeAmount = Decimal.Round(Random.Shared.Next(10000, 100000) / 100M, 2, MidpointRounding.AwayFromZero),
                     });
@@ -761,7 +762,9 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="payOrderList"></param>
         /// <param name="refundOrderList"></param>
         /// <returns></returns>
-        public List<Dictionary<string, object>> GetReturnList(int daySpace, DateTime endDay, List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> payOrderList, List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> refundOrderList)
+        private static List<Dictionary<string, object>> GetReturnList(int daySpace, DateTime endDay,
+            List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> payOrderList,
+            List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> refundOrderList)
         {
             List<KeyValuePair<string, string>> dayList = new List<KeyValuePair<string, string>>();
             // 先判断间隔天数 根据天数设置空的list
@@ -770,8 +773,6 @@ namespace AGooday.AgPay.Application.Services
                 KeyValuePair<string, string> map = new KeyValuePair<string, string>("date", endDay.AddDays(-i).ToString("MM-dd"));
                 dayList.Add(map);
             }
-            // 日期倒序排列
-            dayList.OrderBy(s => s.Value);
 
             List<Dictionary<string, object>> payListMap = new List<Dictionary<string, object>>(); // 收款的列
             List<Dictionary<string, object>> refundListMap = new List<Dictionary<string, object>>(); // 退款的列

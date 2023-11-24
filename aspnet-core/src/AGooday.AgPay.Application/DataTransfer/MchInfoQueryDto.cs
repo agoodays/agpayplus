@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
         /// </summary>
-        public byte Type { get; set; }
+        public byte? Type { get; set; }
 
         /// <summary>
         /// 商户级别: M0商户-简单模式（页面简洁，仅基础收款功能）, M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）

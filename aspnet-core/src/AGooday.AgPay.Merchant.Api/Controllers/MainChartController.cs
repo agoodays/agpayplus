@@ -83,13 +83,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             DateTime? day = DateTime.Today;
             switch (queryDateRange)
             {
-                case "yesterday":
+                case DateUtil.YESTERDAY:
                     day?.AddDays(-1); break;
-                case "today":
+                case DateUtil.TODAY:
                 default:
                     break;
             }
-            return ApiRes.Ok(_payOrderService.MainPagePayDayCount(null, GetCurrentMchNo(), day));
+            return ApiRes.Ok(_payOrderService.MainPagePayDayCount(GetCurrentMchNo(), null, day));
         }
 
         /// <summary>

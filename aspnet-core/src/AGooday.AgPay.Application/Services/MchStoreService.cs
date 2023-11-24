@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Application.Services
                 ms => ms.MchNo, mi => mi.MchNo,
                 (ms, mi) => new { ms, mi })
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.ms.MchNo.Equals(dto.MchNo))
-                && (dto.StoreId.Equals(0) || w.ms.StoreId.Equals(dto.StoreId))
+                && (dto.StoreId.Equals(null) || w.ms.StoreId.Equals(dto.StoreId))
                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.ms.StoreName.Contains(dto.StoreName))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.mi.AgentNo.Equals(agentNo))).ToList()
                 .Select(s =>

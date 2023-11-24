@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 订单类型:1-支付,2-退款
         /// </summary>
-        public byte OrderType { get; set; }
+        public byte? OrderType { get; set; }
 
         /// <summary>
         /// 商户订单号
@@ -40,16 +40,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 通知状态,1-通知中,2-通知成功,3-通知失败
         /// </summary>
-        public byte State { get; set; }
-
-        /// <summary>
-        /// 开始时间
-        /// </summary>
-        public DateTime? CreatedStart { get; set; }
-
-        /// <summary>
-        /// 结束时间
-        /// </summary>
-        public DateTime? CreatedEnd { get; set; }
+        public byte? State { get; set; }
     }
 }

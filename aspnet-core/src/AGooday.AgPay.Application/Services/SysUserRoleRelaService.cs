@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Application.Services
         public PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaQueryDto dto)
         {
             var sysUserRoleRelas = _sysUserRoleRelaRepository.GetAllAsNoTracking()
-                .Where(w => dto.UserId.Equals(0) || w.UserId.Equals(dto.UserId));
+                .Where(w => dto.UserId.Equals(null) || w.UserId.Equals(dto.UserId));
             var records = PaginatedList<SysUserRoleRela>.Create<SysUserRoleRelaDto>(sysUserRoleRelas, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }

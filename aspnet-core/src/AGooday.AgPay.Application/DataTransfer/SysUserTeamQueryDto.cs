@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 团队ID
         /// </summary>
-        public long TeamId { get; set; }
+        public long? TeamId { get; set; }
 
         /// <summary>
         /// 团队名称

@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
         /// </summary>
         [BindNever]
-        public byte MchType { get; set; }
+        public byte? MchType { get; set; }
 
         /// <summary>
         /// 商户订单号
@@ -160,15 +160,5 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// </summary>
         [BindNever]
         public DateTime UpdatedAt { get; set; }
-
-        /// <summary>
-        /// 开始时间
-        /// </summary>
-        public DateTime? CreatedStart { get; set; }
-
-        /// <summary>
-        /// 结束时间
-        /// </summary>
-        public DateTime? CreatedEnd { get; set; }
     }
 }

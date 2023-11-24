@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Contains(dto.BelongInfoId))
                 && (string.IsNullOrWhiteSpace(dto.TeamName) || w.TeamName.Contains(dto.TeamName))
                 && (string.IsNullOrWhiteSpace(dto.TeamNo) || w.TeamNo.Contains(dto.TeamNo))
-                && (dto.TeamId.Equals(0) || w.TeamId.Equals(dto.TeamId))
+                && (dto.TeamId.Equals(null) || w.TeamId.Equals(dto.TeamId))
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<SysUserTeam>.Create<SysUserTeamDto>(sysUsers, _mapper, dto.PageNumber, dto.PageSize);
             return records;
