@@ -115,8 +115,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Equals(dto.StoreName))
                 && (dto.DivisionState.Equals(null) || w.DivisionState.Equals(dto.DivisionState))
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayOrder>.Create<PayOrderDto>(payOrders, _mapper, dto.PageNumber, dto.PageSize);
             return records;
@@ -137,8 +137,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Equals(dto.StoreName))
                 && (dto.DivisionState.Equals(null) || w.DivisionState.Equals(dto.DivisionState))
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart));
+                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
             var allPayAmount = payOrders.Sum(s => s.Amount);
             var allPayCount = payOrders.Count();
             var failPayAmount = payOrders.Where(w => !w.State.Equals((byte)PayOrderState.STATE_SUCCESS)).Sum(s => s.Amount);
@@ -385,8 +385,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 && (state.Equals(null) || w.State.Equals(state))
                 && (refundState.Equals(null) || w.RefundState.Equals(refundState))
-                && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
-                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable();
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable();
             var amount = payorders.Sum(s => s.Amount);
             var refundAmount = payorders.Sum(s => s.RefundAmount);
             var payCount = payorders.Count();
@@ -409,8 +409,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 && (state.Equals(null) || w.State.Equals(state))
                 && (refundState.Equals(null) || w.RefundState.Equals(refundState))
-                && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
-                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable()
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
                 .GroupBy(g => g.WayType, (key, group) => new { WayType = key, Items = group.AsEnumerable() })
                 .Select(s => new PayTypeCountDto
                 {
@@ -434,8 +434,8 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 && (new List<byte> { 2, 5 }).Contains(w.State)
-                && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
-                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable()
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
                 .GroupBy(g => g.CreatedAt.ToString("MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
                 .Select(s => new
                 {
@@ -469,7 +469,7 @@ namespace AGooday.AgPay.Application.Services
             {
                 DateTime date = today.AddDays(-i);
                 DateTime dayStart = date;
-                DateTime dayEnd = date.AddDays(1);
+                DateTime dayEnd = date.AddDays(1).AddSeconds(-1);
                 // 每日交易金额查询
                 var dayAmount = PayCount(mchNo, agentNo, (byte)PayOrderState.STATE_SUCCESS, null, dayStart, dayEnd);
                 payAmount = dayAmount.PayAmount;
@@ -586,16 +586,21 @@ namespace AGooday.AgPay.Application.Services
             int isvCount = isvInfos.Count();
             if (string.IsNullOrWhiteSpace(mchNo))
             {
+#if DEBUG
+                // 生成虚拟数据
                 isvSubMchCount = isvSubMchCount < 10 ? Random.Shared.Next(0, 500) : isvSubMchCount;
                 normalMchCount = normalMchCount < 10 ? Random.Shared.Next(0, 500) : normalMchCount;
+                agentCount = agentCount < 10 ? Random.Shared.Next(0, 500) : agentCount;
+                agentCount = isvCount < 10 ? Random.Shared.Next(0, 500) : isvCount; 
+#endif
                 mchCount = isvSubMchCount + normalMchCount;
                 json.Add("isvSubMchCount", isvSubMchCount);
                 json.Add("normalMchCount", normalMchCount);
                 json.Add("totalMch", mchCount);
-                json.Add("totalAgent", agentCount < 10 ? Random.Shared.Next(0, 500) : isvSubMchCount);
+                json.Add("totalAgent", agentCount);
                 if (string.IsNullOrWhiteSpace(agentNo))
                 {
-                    json.Add("totalIsv", isvCount < 10 ? Random.Shared.Next(0, 500) : isvCount);
+                    json.Add("totalIsv", isvCount);
                 }
             }
             return json;
@@ -610,17 +615,17 @@ namespace AGooday.AgPay.Application.Services
         public JObject MainPagePayDayCount(string mchNo, string agentNo, DateTime? day)
         {
             DateTime? dayStart = day;
-            DateTime? dayEnd = day?.AddDays(1);
+            DateTime? dayEnd = day?.AddDays(1).AddSeconds(-1);
             JObject json = new JObject();
             int allCount = 0;
             var payorders = _payOrderRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 //&& w.State.Equals((byte)PayOrderState.STATE_SUCCESS)
-                && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
-                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable();
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable();
             allCount += payorders.Count();
-            payorders = payorders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable();
+            payorders = payorders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
             var payAmount = payorders.Sum(s => s.Amount);
             var payCount = payorders.Count();
 
@@ -628,20 +633,21 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 //&& w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)
-                && (dayEnd.Equals(null) || w.CreatedAt < dayEnd)
-                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)).AsEnumerable();
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable();
             allCount += refundOrder.Count();
             refundOrder = refundOrder.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable();
             var refundAmount = refundOrder.Sum(s => s.RefundAmount);
             var refundCount = refundOrder.Count();
 
+#if DEBUG
             // 生成虚拟数据
             payAmount = payAmount <= 0 ? Random.Shared.Next(0, 1000000) : payAmount;
             payCount = payCount <= 0 ? Random.Shared.Next(0, 1000) : payCount;
             refundAmount = refundAmount <= 0 ? Random.Shared.Next(0, 500000) : refundAmount;
-            refundCount = refundCount <= 0 ? Random.Shared.Next(0, 500) : refundCount;
+            refundCount = refundCount <= 0 ? Random.Shared.Next(0, 500) : refundCount; 
+#endif
             allCount = payCount + refundCount;
-
             json.Add("dayCount", JObject.FromObject(new
             {
                 allCount = allCount,
@@ -679,18 +685,16 @@ namespace AGooday.AgPay.Application.Services
         public List<Dictionary<string, object>> MainPagePayCount(string mchNo, string agentNo, string createdStart, string createdEnd)
         {
             int daySpace = 6; // 默认最近七天（含当天）
-            if (DateTime.TryParse(createdStart, out DateTime dayStart) && DateTime.TryParse(createdEnd, out DateTime dayEnd))
-            {
-                dayStart = dayStart.Date;
-                dayEnd = dayEnd.Date;
-                // 计算两时间间隔天数
-                daySpace = dayEnd.AddSeconds(-1).Subtract(dayStart).Days;
-            }
-            else
+            if (!DateTime.TryParse(createdStart, out DateTime dayStart) || !DateTime.TryParse(createdEnd, out DateTime dayEnd))
             {
                 DateTime today = DateTime.Today;
                 dayStart = today.AddDays(-daySpace);
-                dayEnd = today.AddDays(1);
+                dayEnd = today.AddDays(1).AddSeconds(-1);
+            }
+            else
+            {
+                // 计算两时间间隔天数
+                daySpace = dayEnd.Subtract(dayStart).Days;
             }
 
             // 查询收款的记录
@@ -698,7 +702,7 @@ namespace AGooday.AgPay.Application.Services
             // 查询退款的记录
             var refundOrderList = SelectOrderCount(mchNo, agentNo, dayStart, dayEnd);
             // 生成前端返回参数类型
-            var returnList = GetReturnList(daySpace, dayEnd.AddDays(-1), payOrderList, refundOrderList);
+            var returnList = GetReturnList(daySpace, dayEnd, payOrderList, refundOrderList);
             return returnList;
         }
 
@@ -712,16 +716,11 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public List<PayTypeCountDto> MainPagePayTypeCount(string mchNo, string agentNo, string createdStart, string createdEnd)
         {
-            if (DateTime.TryParse(createdStart, out DateTime dayStart) && DateTime.TryParse(createdEnd, out DateTime dayEnd))
-            {
-                dayStart = dayStart.Date;
-                dayEnd = dayEnd.Date;
-            }
-            else
+            if (!DateTime.TryParse(createdStart, out DateTime dayStart) || !DateTime.TryParse(createdEnd, out DateTime dayEnd))
             {
                 DateTime today = DateTime.Today; // 当前日期
                 dayStart = today.AddDays(-6); // 一周前日期
-                dayEnd = today.AddDays(1);
+                dayEnd = today.AddDays(1).AddSeconds(-1);
             }
             // 统计列表
             var payCountMap = PayTypeCount(mchNo, agentNo, (byte)PayOrderState.STATE_SUCCESS, null, dayStart, dayEnd);
@@ -732,6 +731,7 @@ namespace AGooday.AgPay.Application.Services
                 payCount.TypeName = payCount.WayType.ToEnum<PayWayType>().GetDescriptionOrDefault("未知");
             }
 
+#if DEBUG
             // 生成虚拟数据
             if (payCountMap?.Count <= 0)
             {
@@ -748,7 +748,8 @@ namespace AGooday.AgPay.Application.Services
                         TypeAmount = Decimal.Round(Random.Shared.Next(10000, 100000) / 100M, 2, MidpointRounding.AwayFromZero),
                     });
                 }
-            }
+            } 
+#endif
 
             // 返回数据列
             return payCountMap.OrderBy(o => (int)Enum.Parse(typeof(PayWayType), o.WayType)).ToList();

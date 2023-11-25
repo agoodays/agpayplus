@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.UserName) || w.UserName.Contains(dto.UserName))
                 && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd))
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<SysLog>.Create<SysLogDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
             return records;

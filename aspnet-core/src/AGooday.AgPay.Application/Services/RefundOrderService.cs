@@ -109,8 +109,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId)
                 || w.RefundOrderId.Equals(dto.UnionOrderId) || w.MchRefundNo.Equals(dto.UnionOrderId)
                 || w.ChannelPayOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))// 三合一订单
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<RefundOrder>.Create<RefundOrderDto>(refundOrders, _mapper, dto.PageNumber, dto.PageSize);
             return records;

@@ -37,6 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                     {
                         try
                         {
+                            //查询条件： 支付中的订单 & （ 订单创建时间 + 10分钟 >= 当前时间 ）
                             var dto = new PayOrderQueryDto()
                             {
                                 PageNumber = currentPageIndex,

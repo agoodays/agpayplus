@@ -97,8 +97,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.TransferId.Equals(dto.UnionOrderId)
                 || w.MchOrderNo.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<TransferOrder>.Create<TransferOrderDto>(transferOrders, _mapper, dto.PageNumber, dto.PageSize);
             return records;

@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                 PageNumber = currentPageIndex,
                                 PageSize = QUERY_PAGE_SIZE,
                                 State = (byte)PayOrderDivisionRecordState.STATE_ACCEPT,
-                                CreatedStart = DateTime.Now.AddMinutes(-5), // 当前时间 减去10分钟。
+                                CreatedStart = DateTime.Now.AddMinutes(-5), // 当前时间 减去5分钟。
                             };
                             var pageRecordList = payOrderDivisionRecordService.DistinctBatchOrderIdList(dto);
 

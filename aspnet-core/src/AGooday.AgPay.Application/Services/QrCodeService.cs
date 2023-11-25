@@ -95,8 +95,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<QrCode>.Create<T>(QrCodes, _mapper, dto.PageNumber, dto.PageSize);
             return records;

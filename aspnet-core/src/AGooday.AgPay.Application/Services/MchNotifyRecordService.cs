@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.OrderType.Equals(null) || w.OrderType.Equals(dto.OrderType))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd))
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<MchNotifyRecord>.Create<MchNotifyRecordDto>(mchNotifyRecords, _mapper, dto.PageNumber, dto.PageSize);
             return records;

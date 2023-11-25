@@ -105,8 +105,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(payOrderDivisionRecords, _mapper, dto.PageNumber, dto.PageSize);
             return records;
@@ -129,8 +129,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AccNo) || w.AccNo.Equals(dto.AccNo))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt < dto.CreatedEnd)
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
                 ).DistinctBy(d => new { d.BatchOrderId, d.PayOrderId }).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(payOrderDivisionRecords, _mapper, dto.PageNumber, dto.PageSize);
             return records;
