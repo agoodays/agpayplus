@@ -115,6 +115,14 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <returns></returns>
         JObject MainPagePayDayCount(string mchNo, string agentNo, DateTime? day);
         /// <summary>
+        /// 近期交易统计
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="agentNo"></param>
+        /// <param name="recentDay"></param>
+        /// <returns></returns>
+        JObject MainPagePayTrendCount(string mchNo, string agentNo, int recentDay);
+        /// <summary>
         /// 首页支付统计
         /// </summary>
         /// <param name="mchNo"></param>
@@ -122,7 +130,8 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="createdStart"></param>
         /// <param name="createdEnd"></param>
         /// <returns></returns>
-        List<Dictionary<string, object>> MainPagePayCount(string mchNo, string agentNo, string createdStart, string createdEnd);
+        JObject MainPagePayCount(string mchNo, string agentNo, string createdStart, string createdEnd);
+        List<Dictionary<string, object>> MainPagePayCountObsolete(string mchNo, string agentNo, string createdStart, string createdEnd);
         /// <summary>
         /// 首页支付类型统计
         /// </summary>

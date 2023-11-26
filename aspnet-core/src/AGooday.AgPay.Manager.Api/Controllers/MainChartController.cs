@@ -75,15 +75,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_TREND_COUNT)]
         public ApiRes PayTrendCount(int recentDay)
         {
-            // 生成虚拟数据
-            List<string> dateList = new List<string>();
-            List<string> payAmountList = new List<string>();
-            for (int i = recentDay - 1; i >= 0; i--)
-            {
-                dateList.Add(DateTime.Now.AddDays(-i).ToString("MM-dd"));
-                payAmountList.Add((Random.Shared.Next(10000, 1000000) / 100.00).ToString("0.00"));
-            }
-            return ApiRes.Ok(new { dateList, payAmountList });
+            return ApiRes.Ok(_payOrderService.MainPagePayTrendCount(null, null, recentDay));
         }
 
         /// <summary>
@@ -105,27 +97,24 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         [PermissionAuth(PermCode.MGR.ENT_C_MAIN_PAY_COUNT)]
         public ApiRes PayCount(string queryDateRange)
         {
-            // 生成虚拟数据
             DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
             if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
             {
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
                 createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
             }
-            List<string> resDateArr = new List<string>();
-            List<string> resPayAmountArr = new List<string>();
-            List<string> resPayCountArr = new List<string>();
-            List<string> resRefAmountArr = new List<string>();
+            return ApiRes.Ok(_payOrderService.MainPagePayCount(null, null, createdStart, createdEnd));
+        }
 
-            for (DateTime dt = Convert.ToDateTime(createdStart); dt <= Convert.ToDateTime(createdEnd); dt = dt.AddDays(1))
+        private ApiRes PayCountObsolete(string queryDateRange)
+        {
+            DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
+            if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
             {
-                resDateArr.Add(dt.ToString("yyyy-MM-dd"));
-                resPayAmountArr.Add((Random.Shared.Next(10000, 1000000) / 100.00).ToString("0.00"));
-                resPayCountArr.Add(Random.Shared.Next(100, 1000).ToString());
-                resRefAmountArr.Add((Random.Shared.Next(5000, 500000) / 100.00).ToString("0.00"));
+                createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
+                createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
             }
-            return ApiRes.Ok(new { resDateArr, resPayAmountArr, resPayCountArr, resRefAmountArr });
-            //return ApiRes.Ok(_payOrderService.MainPagePayCount(null, null, createdStart, createdEnd));
+            return ApiRes.Ok(_payOrderService.MainPagePayCountObsolete(null, null, createdStart, createdEnd));
         }
 
         /// <summary>
