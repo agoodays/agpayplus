@@ -233,23 +233,9 @@ export function getPayTrendCount (parameter) {
   })
 }
 
-export function getPayAmountWeek () {
-  return request.request({
-    url: API_URL_MAIN_STATISTIC + '/payAmountWeek',
-    method: 'GET'
-  })
-}
-
 export function getIsvAndMchCount () {
   return request.request({
     url: API_URL_MAIN_STATISTIC + '/isvAndMchCount',
-    method: 'GET'
-  })
-}
-
-export function getNumCount () {
-  return request.request({
-    url: API_URL_MAIN_STATISTIC + '/numCount',
     method: 'GET'
   })
 }

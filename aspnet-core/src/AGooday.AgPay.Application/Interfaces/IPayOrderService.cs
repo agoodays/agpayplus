@@ -87,20 +87,6 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <returns></returns>
         long CalMchIncomeAmount(PayOrderDto payOrder);
         /// <summary>
-        /// 首页支付周统计
-        /// </summary>
-        /// <param name="mchNo"></param>
-        /// <param name="agentNo"></param>
-        /// <returns></returns>
-        JObject MainPageWeekCount(string mchNo, string agentNo);
-        /// <summary>
-        /// 首页统计总数量
-        /// </summary>
-        /// <param name="mchNo"></param>
-        /// <param name="agentNo"></param>
-        /// <returns></returns>
-        JObject MainPageNumCount(string mchNo, string agentNo);
-        /// <summary>
         /// 服务商/代理商/商户统计
         /// </summary>
         /// <param name="mchNo"></param>
@@ -131,7 +117,6 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="createdEnd"></param>
         /// <returns></returns>
         JObject MainPagePayCount(string mchNo, string agentNo, string createdStart, string createdEnd);
-        List<Dictionary<string, object>> MainPagePayCountObsolete(string mchNo, string agentNo, string createdStart, string createdEnd);
         /// <summary>
         /// 首页支付类型统计
         /// </summary>

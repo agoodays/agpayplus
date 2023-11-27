@@ -20,7 +20,7 @@ export const asyncRouteDefine = {
 
   'CurrentUserInfo': { defaultPath: '/current/userinfo', component: () => import('@/views/current/UserinfoPage') }, // 用户设置
 
-  'MainPage': { defaultPath: '/main', component: () => import('@/views/dashboard/Analysis2') },
+  'MainPage': { defaultPath: '/main', component: () => import('@/views/dashboard/Analysis') },
   'SysUserPage': { defaultPath: '/users', component: () => import('@/views/sysuser/SysUserPage') },
   'RolePage': { defaultPath: '/roles', component: () => import('@/views/role/RolePage') },
   'MchConfigPage': { defaultPath: '/config', component: () => import('@/views/mchConfig/MchConfig') }, // 系统配置

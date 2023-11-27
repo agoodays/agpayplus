@@ -369,30 +369,6 @@ namespace AGooday.AgPay.Application.Services
         }
 
         /// <summary>
-        /// 交易统计
-        /// </summary>
-        /// <param name="mchNo"></param>
-        /// <param name="agentNo"></param>
-        /// <param name="state"></param>
-        /// <param name="refundState"></param>
-        /// <param name="dayStart"></param>
-        /// <param name="dayEnd"></param>
-        /// <returns></returns>
-        public (decimal PayAmount, int PayCount) PayCount(string mchNo, string agentNo, byte? state, byte? refundState, DateTime? dayStart, DateTime? dayEnd)
-        {
-            var payorders = _payOrderRepository.GetAll()
-                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
-                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
-                && (state.Equals(null) || w.State.Equals(state))
-                && (refundState.Equals(null) || w.RefundState.Equals(refundState))
-                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
-                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable();
-            var amount = payorders.Sum(s => s.Amount);
-            var refundAmount = payorders.Sum(s => s.RefundAmount);
-            var payCount = payorders.Count();
-            return (Decimal.Round((amount - refundAmount) / 100M, 2, MidpointRounding.AwayFromZero), payCount);
-        }
-        /// <summary>
         /// 支付方式统计
         /// </summary>
         /// <param name="mchNo"></param>
@@ -402,7 +378,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="dayStart"></param>
         /// <param name="dayEnd"></param>
         /// <returns></returns>
-        public List<PayTypeCountDto> PayTypeCount(string mchNo, string agentNo, byte? state, byte? refundState, DateTime? dayStart, DateTime? dayEnd)
+        private List<PayTypeCountDto> PayTypeCount(string mchNo, string agentNo, byte? state, byte? refundState, DateTime? dayStart, DateTime? dayEnd)
         {
             var result = _payOrderRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
@@ -420,34 +396,6 @@ namespace AGooday.AgPay.Application.Services
                 }).ToList();
             return result;
         }
-        /// <summary>
-        /// 成功、退款订单统计
-        /// </summary>
-        /// <param name="mchNo"></param>
-        /// <param name="agentNo"></param>
-        /// <param name="dayStart"></param>
-        /// <param name="dayEnd"></param>
-        /// <returns></returns>
-        public List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> SelectOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
-        {
-            var ordercounts = _payOrderRepository.GetAll()
-                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
-                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
-                && (new List<byte> { (byte)PayOrderState.STATE_SUCCESS, (byte)PayOrderState.STATE_REFUND }).Contains(w.State)
-                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
-                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
-                .GroupBy(g => g.CreatedAt.ToString("MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
-                .Select(s => new
-                {
-                    GroupDate = s.GroupDate,
-                    PayAmount = (s.Items.Sum(s => s.Amount) - s.Items.Sum(s => s.RefundAmount)),
-                    RefundAmount = s.Items.Sum(s => s.RefundAmount)
-                }).ToList();
-            var result = ordercounts.Select(s =>
-            (s.GroupDate, Decimal.Round(s.PayAmount / 100M, 2, MidpointRounding.AwayFromZero), Decimal.Round(s.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero))
-            ).ToList();
-            return result;
-        }
 
         /// <summary>
         /// 成功、退款订单统计
@@ -457,7 +405,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="dayStart"></param>
         /// <param name="dayEnd"></param>
         /// <returns></returns>
-        public List<(string GroupDate, decimal PayAmount, int PayCount, decimal RefundAmount)> SelectPayOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
+        private List<(string GroupDate, decimal PayAmount, int PayCount, decimal RefundAmount)> SelectOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
         {
             var ordercounts = _payOrderRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
@@ -477,106 +425,6 @@ namespace AGooday.AgPay.Application.Services
             (s.GroupDate, Decimal.Round(s.PayAmount / 100M, 2, MidpointRounding.AwayFromZero), s.PayCount, Decimal.Round(s.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero))
             ).ToList();
             return result;
-        }
-
-        /// <summary>
-        /// 首页支付周统计
-        /// </summary>
-        /// <param name="mchNo"></param>
-        /// <param name="agentNo"></param>
-        /// <returns></returns>
-        public JObject MainPageWeekCount(string mchNo, string agentNo)
-        {
-            JObject json = new JObject();
-            List<decimal> array = new List<decimal>();
-            decimal payAmount = 0M; // 当日金额
-            decimal payWeek = payAmount; // 周总收益
-            decimal todayAmount = 0M; // 今日金额
-            int todayPayCount = 0; // 今日交易笔数
-            decimal yesterdayAmount = 0M;    // 昨日金额
-            DateTime today = DateTime.Today;
-            for (int i = 0; i < 7; i++)
-            {
-                DateTime date = today.AddDays(-i);
-                DateTime dayStart = date;
-                DateTime dayEnd = date.AddDays(1).AddSeconds(-1);
-                // 每日交易金额查询
-                var dayAmount = PayCount(mchNo, agentNo, (byte)PayOrderState.STATE_SUCCESS, null, dayStart, dayEnd);
-                payAmount = dayAmount.PayAmount;
-                // 今天
-                if (i == 0)
-                {
-                    todayAmount = dayAmount.PayAmount;
-                    todayPayCount = dayAmount.PayCount;
-                }
-                // 昨天
-                if (i == 1)
-                {
-                    yesterdayAmount = dayAmount.PayAmount;
-                }
-                payWeek += payAmount;
-                array.Add(payAmount);
-            }
-
-            json.Add("dataArray", JArray.FromObject(array.OrderByDescending(o => o)));// 倒序排列
-            json.Add("todayAmount", todayAmount);
-            json.Add("todayPayCount", todayPayCount);
-            json.Add("payWeek", payWeek);
-            json.Add("yesterdayAmount", yesterdayAmount);
-            return json;
-        }
-
-        /// <summary>
-        /// 首页统计总数量
-        /// </summary>
-        /// <param name="mchNo"></param>
-        /// <param name="agentNo"></param>
-        /// <returns></returns>
-        public JObject MainPageNumCount(string mchNo, string agentNo)
-        {
-            JObject json = new JObject();
-            // 商户总数
-            var mchInfos = _mchInfoRepository.GetAll()
-                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
-                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo)));
-            int isvSubMchCount = mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_ISVSUB)).Count();
-            int normalMchCount = mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_NORMAL)).Count();
-            int mchCount = mchInfos.Count();
-
-            int agentCount = 0;
-
-            if (string.IsNullOrWhiteSpace(agentNo))
-            {
-                // 代理商总数
-                var agentInfos = _agentInfoRepository.GetAll()
-                    .Where(w => (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo)));
-                agentCount = agentInfos.Count();
-            }
-            else
-            {
-                var subAgentInfos = GetSons(_agentInfoRepository.GetAll(), agentNo);
-                agentCount = subAgentInfos.Count();
-            }
-
-            // 服务商总数
-            var isvInfos = _isvInfoRepository.GetAll();
-            int isvCount = isvInfos.Count();
-            // 总交易金额
-            var payCountMap = PayCount(mchNo, agentNo, (byte)PayOrderState.STATE_SUCCESS, null, null, null);
-            if (string.IsNullOrWhiteSpace(mchNo))
-            {
-                json.Add("isvSubMchCount", isvSubMchCount);
-                json.Add("normalMchCount", normalMchCount);
-                json.Add("totalMch", mchCount);
-                json.Add("totalAgent", agentCount);
-                if (string.IsNullOrWhiteSpace(agentNo))
-                {
-                    json.Add("totalIsv", isvCount);
-                }
-            }
-            json.Add("totalAmount", payCountMap.PayAmount);
-            json.Add("totalCount", payCountMap.PayCount);
-            return json;
         }
 
         /// <summary>
@@ -716,7 +564,7 @@ namespace AGooday.AgPay.Application.Services
             // 查询支付的记录
             var dayStart = DateTime.Today.AddDays(-(recentDay - 1));
             var dayEnd = DateTime.Today.AddDays(1).AddSeconds(-1);
-            var payOrderList = SelectPayOrderCount(mchNo, agentNo, dayStart, dayEnd);
+            var payOrderList = SelectOrderCount(mchNo, agentNo, dayStart, dayEnd);
             // 生成前端返回参数类型
             List<string> dateList = new List<string>();
             List<string> payAmountList = new List<string>();
@@ -759,7 +607,7 @@ namespace AGooday.AgPay.Application.Services
             }
 
             // 查询支付的记录
-            var payOrderList = SelectPayOrderCount(mchNo, agentNo, dayStart, dayEnd);
+            var payOrderList = SelectOrderCount(mchNo, agentNo, dayStart, dayEnd);
             // 生成前端返回参数类型
             List<string> resDateArr = new List<string>();
             List<string> resPayAmountArr = new List<string>();
@@ -786,29 +634,6 @@ namespace AGooday.AgPay.Application.Services
             result.Add("resPayCountArr", JToken.FromObject(resPayCountArr));
             result.Add("resRefAmountArr", JToken.FromObject(resRefAmountArr));
             return result;
-        }
-        public List<Dictionary<string, object>> MainPagePayCountObsolete(string mchNo, string agentNo, string createdStart, string createdEnd)
-        {
-            int daySpace = 6; // 默认最近七天（含当天）
-            if (!DateTime.TryParse(createdStart, out DateTime dayStart) || !DateTime.TryParse(createdEnd, out DateTime dayEnd))
-            {
-                DateTime today = DateTime.Today;
-                dayStart = today.AddDays(-daySpace);
-                dayEnd = today.AddDays(1).AddSeconds(-1);
-            }
-            else
-            {
-                // 计算两时间间隔天数
-                daySpace = dayEnd.Subtract(dayStart).Days;
-            }
-
-            // 查询收款的记录
-            var payOrderList = SelectOrderCount(mchNo, agentNo, dayStart, dayEnd);
-            // 查询退款的记录
-            var refundOrderList = SelectOrderCount(mchNo, agentNo, dayStart, dayEnd);
-            // 生成前端返回参数类型
-            var returnList = GetReturnList(daySpace, dayEnd, payOrderList, refundOrderList);
-            return returnList;
         }
 
         /// <summary>
@@ -858,65 +683,6 @@ namespace AGooday.AgPay.Application.Services
 
             // 返回数据列
             return payCountMap.OrderBy(o => (int)Enum.Parse(typeof(PayWayType), o.WayType)).ToList();
-        }
-
-        /// <summary>
-        /// 生成首页交易统计数据类型
-        /// </summary>
-        /// <param name="daySpace"></param>
-        /// <param name="createdStart"></param>
-        /// <param name="payOrderList"></param>
-        /// <param name="refundOrderList"></param>
-        /// <returns></returns>
-        private static List<Dictionary<string, object>> GetReturnList(int daySpace, DateTime endDay,
-            List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> payOrderList,
-            List<(string GroupDate, decimal PayAmount, decimal RefundAmount)> refundOrderList)
-        {
-            List<KeyValuePair<string, string>> dayList = new List<KeyValuePair<string, string>>();
-            // 先判断间隔天数 根据天数设置空的list
-            for (int i = 0; i <= daySpace; i++)
-            {
-                KeyValuePair<string, string> map = new KeyValuePair<string, string>("date", endDay.AddDays(-i).ToString("MM-dd"));
-                dayList.Add(map);
-            }
-
-            List<Dictionary<string, object>> payListMap = new List<Dictionary<string, object>>(); // 收款的列
-            List<Dictionary<string, object>> refundListMap = new List<Dictionary<string, object>>(); // 退款的列
-            foreach (var dayMap in dayList.OrderBy(s => s.Value))// 日期升序排列
-            {
-                var date = dayMap.Value;
-
-                // 为收款列和退款列赋值默认参数【payAmount字段切记不可为string，否则前端图表解析不出来】
-                Dictionary<string, object> payMap = new Dictionary<string, object>();
-                payMap.Add("date", date);
-                payMap.Add("type", "收款");
-                payMap.Add("payAmount", 0);
-
-                Dictionary<string, object> refundMap = new Dictionary<string, object>();
-                refundMap.Add("date", date);
-                refundMap.Add("type", "退款");
-                refundMap.Add("payAmount", 0);
-                foreach (var payOrderMap in payOrderList)
-                {
-                    if (date.Equals(payOrderMap.GroupDate))
-                    {
-                        payMap.Remove("payAmount");
-                        payMap.TryAdd("payAmount", payOrderMap.PayAmount);
-                    }
-                }
-                payListMap.Add(payMap);
-                foreach (var refundOrderMap in refundOrderList)
-                {
-                    if (date.Equals(refundOrderMap.GroupDate))
-                    {
-                        refundMap.Remove("payAmount");
-                        refundMap.TryAdd("payAmount", refundOrderMap.RefundAmount);
-                    }
-                }
-                refundListMap.Add(refundMap);
-            }
-            payListMap.AddRange(refundListMap);
-            return payListMap;
         }
     }
 }

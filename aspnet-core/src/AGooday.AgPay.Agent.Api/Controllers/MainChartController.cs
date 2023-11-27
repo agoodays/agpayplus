@@ -54,28 +54,6 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         }
 
         /// <summary>
-        /// 周交易总金额
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet, Route("payAmountWeek")]
-        [PermissionAuth(PermCode.AGENT.ENT_C_MAIN_PAY_AMOUNT_WEEK)]
-        public ApiRes PayAmountWeek()
-        {
-            return ApiRes.Ok(_payOrderService.MainPageWeekCount(null, GetCurrentAgentNo()));
-        }
-
-        /// <summary>
-        /// 商户总数量、服务商总数量、总交易金额、总交易笔数
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet, Route("numCount")]
-        [PermissionAuth(PermCode.AGENT.ENT_C_MAIN_NUMBER_COUNT)]
-        public ApiRes NumCount()
-        {
-            return ApiRes.Ok(_payOrderService.MainPageNumCount(null, GetCurrentAgentNo()));
-        }
-
-        /// <summary>
         /// 今日/昨日交易统计
         /// </summary>
         /// <returns></returns>
@@ -134,24 +112,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers
             return ApiRes.Ok(_payOrderService.MainPagePayCount(null, GetCurrentAgentNo(), createdStart, createdEnd));
         }
 
-        private ApiRes PayCountObsolete(string queryDateRange)
-        {
-            DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
-            if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
-            {
-                createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
-                createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
-            }
-            return ApiRes.Ok(_payOrderService.MainPagePayCountObsolete(null, GetCurrentAgentNo(), createdStart, createdEnd));
-        }
-
         /// <summary>
         /// 支付方式统计
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("payTypeCount")]
         [PermissionAuth(PermCode.AGENT.ENT_C_MAIN_PAY_TYPE_COUNT)]
-        public ApiRes PayWayCount(string queryDateRange)
+        public ApiRes PayTypeCount(string queryDateRange)
         {
             DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
             if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))

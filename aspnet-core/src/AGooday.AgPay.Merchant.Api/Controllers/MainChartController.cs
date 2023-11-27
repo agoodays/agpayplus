@@ -53,26 +53,6 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         }
 
         /// <summary>
-        /// 周交易总金额
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet, Route("payAmountWeek")]
-        public ApiRes PayAmountWeek()
-        {
-            return ApiRes.Ok(_payOrderService.MainPageWeekCount(GetCurrentMchNo(), null));
-        }
-
-        /// <summary>
-        /// 商户总数量、服务商总数量、总交易金额、总交易笔数
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet, Route("numCount")]
-        public ApiRes NumCount()
-        {
-            return ApiRes.Ok(_payOrderService.MainPageNumCount(GetCurrentMchNo(), null));
-        }
-
-        /// <summary>
         /// 今日/昨日交易统计
         /// </summary>
         /// <returns></returns>
@@ -120,24 +100,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             return ApiRes.Ok(_payOrderService.MainPagePayCount(GetCurrentMchNo(), null, createdStart, createdEnd));
         }
 
-        private ApiRes PayCountObsolete(string queryDateRange)
-        {
-            DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
-            if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
-            {
-                createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
-                createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
-            }
-            return ApiRes.Ok(_payOrderService.MainPagePayCountObsolete(GetCurrentMchNo(), null, createdStart, createdEnd));
-        }
-
         /// <summary>
         /// 支付方式统计
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("payTypeCount")]
         [PermissionAuth(PermCode.MCH.ENT_C_MAIN_PAY_TYPE_COUNT)]
-        public ApiRes PayWayCount(string queryDateRange)
+        public ApiRes PayTypeCount(string queryDateRange)
         {
             DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
             if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
