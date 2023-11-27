@@ -14,7 +14,6 @@
     "@amap/amap-jsapi-loader": "^1.0.1",
     "@ant-design-vue/pro-layout": "^1.0.7",
     "@antv/data-set": "^0.10.2",
-    "@antv/g2plot": "^2.4.25",
     "@antv/util": "^2.0.13",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^1.0.2",
