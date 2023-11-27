@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Payment.Api.Services
     {
         private readonly ILogger<PayOrderDivisionProcessService> log;
         private readonly IMQSender mqSender;
-        protected readonly Func<string, IDivisionService> _divisionServiceFactory;
+        private readonly Func<string, IDivisionService> divisionServiceFactory;
         private readonly IPayOrderService payOrderService;
         private readonly IMchDivisionReceiverService mchDivisionReceiverService;
         private readonly IMchDivisionReceiverGroupService mchDivisionReceiverGroupService;
@@ -27,6 +27,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
         public PayOrderDivisionProcessService(ILogger<PayOrderDivisionProcessService> logger,
             IMQSender mqSender,
+            Func<string, IDivisionService> divisionServiceFactory,
             IPayOrderService payOrderService,
             IMchDivisionReceiverService mchDivisionReceiverService,
             IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
@@ -35,6 +36,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         {
             log = logger;
             this.mqSender = mqSender;
+            this.divisionServiceFactory = divisionServiceFactory;
             this.payOrderService = payOrderService;
             this.mchDivisionReceiverService = mchDivisionReceiverService;
             this.mchDivisionReceiverGroupService = mchDivisionReceiverGroupService;
@@ -135,7 +137,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             try
             {
                 //调用渠道侧分账接口
-                IDivisionService divisionService = _divisionServiceFactory(payOrder.IfCode);
+                IDivisionService divisionService = divisionServiceFactory(payOrder.IfCode);
                 if (divisionService == null)
                 {
                     throw new BizException("通道无此分账接口");
@@ -185,7 +187,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="payOrderDivisionAmount"></param>
         /// <param name="subDivisionAmount"></param>
         /// <returns></returns>
-        private PayOrderDivisionRecordDto GenRecord(string batchOrderId, PayOrderDto payOrder, MchDivisionReceiverDto receiver, long payOrderDivisionAmount, long subDivisionAmount)
+        private static PayOrderDivisionRecordDto GenRecord(string batchOrderId, PayOrderDto payOrder, MchDivisionReceiverDto receiver, long payOrderDivisionAmount, long subDivisionAmount)
         {
             PayOrderDivisionRecordDto record = new PayOrderDivisionRecordDto();
             record.MchNo = payOrder.MchNo;

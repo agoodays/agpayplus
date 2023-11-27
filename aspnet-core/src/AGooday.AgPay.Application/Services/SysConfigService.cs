@@ -197,15 +197,11 @@ namespace AGooday.AgPay.Application.Services
                     _sysConfigRepository.Add(sysConfig);
                 }
                 sysConfig.ConfigKey = config.Key;
-                switch (config.Key)
+                sysConfig.ConfigVal = config.Key switch
                 {
-                    case "aliyunOssConfig":
-                        sysConfig.ConfigVal = StringUtil.Merge(sysConfig.ConfigVal, config.Value);
-                        break;
-                    default:
-                        sysConfig.ConfigVal = config.Value;
-                        break;
-                }
+                    "aliyunOssConfig" => StringUtil.Merge(sysConfig.ConfigVal, config.Value),
+                    _ => config.Value,
+                };
                 sysConfig.UpdatedAt = DateTime.Now;
                 if (isAdd)
                 {

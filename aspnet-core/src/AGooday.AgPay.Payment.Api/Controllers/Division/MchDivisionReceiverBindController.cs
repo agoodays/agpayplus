@@ -151,47 +151,29 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             receiver.AccNo = bizRQ.AccNo; //账号
             receiver.AccName = bizRQ.AccName; //账号名称
             receiver.RelationType = bizRQ.RelationType; //关系
-
-            receiver.RelationTypeName = GetRelationTypeName(bizRQ.RelationType); //关系名称
-
-            if (receiver.RelationTypeName == null)
-            {
-                receiver.RelationTypeName = bizRQ.RelationTypeName;
-            }
-
+            receiver.RelationTypeName = GetRelationTypeName(bizRQ.RelationType) ?? bizRQ.RelationTypeName; //关系名称
             receiver.DivisionProfit = divisionProfit; //分账比例
             receiver.ChannelExtInfo = bizRQ.ChannelExtInfo; //渠道信息
 
             return receiver;
         }
 
-        private string GetRelationTypeName(string relationType)
+        private static string GetRelationTypeName(string relationType)
         {
-            switch (relationType)
+            return relationType switch
             {
-                case "PARTNER":
-                    return "合作伙伴";
-                case "SERVICE_PROVIDER":
-                    return "服务商";
-                case "STORE":
-                    return "门店";
-                case "STAFF":
-                    return "员工";
-                case "STORE_OWNER":
-                    return "店主";
-                case "HEADQUARTER":
-                    return "总部";
-                case "BRAND":
-                    return "品牌方";
-                case "DISTRIBUTOR":
-                    return "分销商";
-                case "USER":
-                    return "用户";
-                case "SUPPLIER":
-                    return "供应商";
-                default:
-                    return null;
-            }
+                "PARTNER" => "合作伙伴",
+                "SERVICE_PROVIDER" => "服务商",
+                "STORE" => "门店",
+                "STAFF" => "员工",
+                "STORE_OWNER" => "店主",
+                "HEADQUARTER" => "总部",
+                "BRAND" => "品牌方",
+                "DISTRIBUTOR" => "分销商",
+                "USER" => "用户",
+                "SUPPLIER" => "供应商",
+                _ => null,
+            };
         }
     }
 }

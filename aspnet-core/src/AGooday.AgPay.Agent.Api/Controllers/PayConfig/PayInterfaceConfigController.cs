@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
             string infoType = GetInfoType(configMode);
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
             var payIfDefine = _payIfDefineService.GetById(ifCode);
-            payInterfaceConfig = payInterfaceConfig ?? new PayInterfaceConfigDto()
+            payInterfaceConfig ??= new PayInterfaceConfigDto()
             {
                 InfoType = infoType,
                 InfoId = infoId,

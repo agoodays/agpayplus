@@ -24,15 +24,12 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, IChannelUserService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayChannelUserService>();
-                        case CS.IF_CODE.WXPAY:
-                            return provider.GetService<WxPayChannelUserService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayChannelUserService>(),
+                        CS.IF_CODE.WXPAY => provider.GetService<WxPayChannelUserService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -46,15 +43,12 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, IDivisionService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayDivisionService>();
-                        case CS.IF_CODE.WXPAY:
-                            return provider.GetService<WxPayDivisionService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayDivisionService>(),
+                        CS.IF_CODE.WXPAY => provider.GetService<WxPayDivisionService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -65,13 +59,11 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, AbstractDivisionRecordChannelNotifyService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayDivisionRecordChannelNotifyService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayDivisionRecordChannelNotifyService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -89,27 +81,18 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, IPaymentService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayPaymentService>();
-                        case CS.IF_CODE.WXPAY:
-                            return provider.GetService<WxPayPaymentService>();
-                        case CS.IF_CODE.YSFPAY:
-                            return provider.GetService<YsfPayPaymentService>();
-                        case CS.IF_CODE.PPPAY:
-                            return provider.GetService<PpPayPaymentService>();
-                        case CS.IF_CODE.SXFPAY:
-                            return provider.GetService<SxfPayPaymentService>();
-                        case CS.IF_CODE.LESPAY:
-                            return provider.GetService<LesPayPaymentService>();
-                        case CS.IF_CODE.HKRTPAY:
-                            return provider.GetService<HkrtPayPaymentService>();
-                        case CS.IF_CODE.UMSPAY:
-                            return provider.GetService<UmsPayPaymentService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayPaymentService>(),
+                        CS.IF_CODE.WXPAY => provider.GetService<WxPayPaymentService>(),
+                        CS.IF_CODE.YSFPAY => provider.GetService<YsfPayPaymentService>(),
+                        CS.IF_CODE.PPPAY => provider.GetService<PpPayPaymentService>(),
+                        CS.IF_CODE.SXFPAY => provider.GetService<SxfPayPaymentService>(),
+                        CS.IF_CODE.LESPAY => provider.GetService<LesPayPaymentService>(),
+                        CS.IF_CODE.HKRTPAY => provider.GetService<HkrtPayPaymentService>(),
+                        CS.IF_CODE.UMSPAY => provider.GetService<UmsPayPaymentService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -136,27 +119,18 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, IRefundService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayRefundService>();
-                        case CS.IF_CODE.WXPAY:
-                            return provider.GetService<WxPayRefundService>();
-                        case CS.IF_CODE.YSFPAY:
-                            return provider.GetService<YsfPayRefundService>();
-                        case CS.IF_CODE.PPPAY:
-                            return provider.GetService<PpPayRefundService>();
-                        case CS.IF_CODE.SXFPAY:
-                            return provider.GetService<SxfPayRefundService>();
-                        case CS.IF_CODE.LESPAY:
-                            return provider.GetService<LesPayRefundService>();
-                        case CS.IF_CODE.HKRTPAY:
-                            return provider.GetService<HkrtPayRefundService>();
-                        case CS.IF_CODE.UMSPAY:
-                            return provider.GetService<UmsPayRefundService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayRefundService>(),
+                        CS.IF_CODE.WXPAY => provider.GetService<WxPayRefundService>(),
+                        CS.IF_CODE.YSFPAY => provider.GetService<YsfPayRefundService>(),
+                        CS.IF_CODE.PPPAY => provider.GetService<PpPayRefundService>(),
+                        CS.IF_CODE.SXFPAY => provider.GetService<SxfPayRefundService>(),
+                        CS.IF_CODE.LESPAY => provider.GetService<LesPayRefundService>(),
+                        CS.IF_CODE.HKRTPAY => provider.GetService<HkrtPayRefundService>(),
+                        CS.IF_CODE.UMSPAY => provider.GetService<UmsPayRefundService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -174,27 +148,18 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, IChannelNoticeService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayChannelNoticeService>();
-                        case CS.IF_CODE.WXPAY:
-                            return provider.GetService<WxPayChannelNoticeService>();
-                        case CS.IF_CODE.YSFPAY:
-                            return provider.GetService<YsfPayChannelNoticeService>();
-                        case CS.IF_CODE.PPPAY:
-                            return provider.GetService<PpPayChannelNoticeService>();
-                        case CS.IF_CODE.SXFPAY:
-                            return provider.GetService<SxfPayChannelNoticeService>();
-                        case CS.IF_CODE.LESPAY:
-                            return provider.GetService<LesPayChannelNoticeService>();
-                        case CS.IF_CODE.HKRTPAY:
-                            return provider.GetService<HkrtPayChannelNoticeService>();
-                        case CS.IF_CODE.UMSPAY:
-                            return provider.GetService<UmsPayChannelNoticeService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayChannelNoticeService>(),
+                        CS.IF_CODE.WXPAY => provider.GetService<WxPayChannelNoticeService>(),
+                        CS.IF_CODE.YSFPAY => provider.GetService<YsfPayChannelNoticeService>(),
+                        CS.IF_CODE.PPPAY => provider.GetService<PpPayChannelNoticeService>(),
+                        CS.IF_CODE.SXFPAY => provider.GetService<SxfPayChannelNoticeService>(),
+                        CS.IF_CODE.LESPAY => provider.GetService<LesPayChannelNoticeService>(),
+                        CS.IF_CODE.HKRTPAY => provider.GetService<HkrtPayChannelNoticeService>(),
+                        CS.IF_CODE.UMSPAY => provider.GetService<UmsPayChannelNoticeService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -212,27 +177,18 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, IChannelRefundNoticeService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        //case CS.IF_CODE.ALIPAY:
-                        //    return provider.GetService<AliPayChannelRefundNoticeService>();
-                        case CS.IF_CODE.WXPAY:
-                            return provider.GetService<WxPayChannelRefundNoticeService>();
-                        //case CS.IF_CODE.YSFPAY:
-                        //    return provider.GetService<YsfPayChannelRefundNoticeService>();
-                        case CS.IF_CODE.PPPAY:
-                            return provider.GetService<PpPayChannelRefundNoticeService>();
-                        case CS.IF_CODE.SXFPAY:
-                            return provider.GetService<SxfPayChannelRefundNoticeService>();
-                        case CS.IF_CODE.LESPAY:
-                            return provider.GetService<LesPayChannelRefundNoticeService>();
-                        case CS.IF_CODE.HKRTPAY:
-                            return provider.GetService<HkrtPayChannelRefundNoticeService>();
-                        case CS.IF_CODE.UMSPAY:
-                            return provider.GetService<UmsPayChannelRefundNoticeService>();
-                        default:
-                            return null;
-                    }
+                        //CS.IF_CODE.ALIPAY => provider.GetService<AliPayChannelRefundNoticeService>(),
+                        CS.IF_CODE.WXPAY => provider.GetService<WxPayChannelRefundNoticeService>(),
+                        //CS.IF_CODE.YSFPAY => provider.GetService<YsfPayChannelRefundNoticeService>(),
+                        CS.IF_CODE.PPPAY => provider.GetService<PpPayChannelRefundNoticeService>(),
+                        CS.IF_CODE.SXFPAY => provider.GetService<SxfPayChannelRefundNoticeService>(),
+                        CS.IF_CODE.LESPAY => provider.GetService<LesPayChannelRefundNoticeService>(),
+                        CS.IF_CODE.HKRTPAY => provider.GetService<HkrtPayChannelRefundNoticeService>(),
+                        CS.IF_CODE.UMSPAY => provider.GetService<UmsPayChannelRefundNoticeService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -246,19 +202,14 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, IPayOrderCloseService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayPayOrderCloseService>();
-                        case CS.IF_CODE.WXPAY:
-                            return provider.GetService<WxPayPayOrderCloseService>();
-                        case CS.IF_CODE.YSFPAY:
-                            return provider.GetService<YsfPayPayOrderCloseService>();
-                        case CS.IF_CODE.UMSPAY:
-                            return provider.GetService<UmsPayPayOrderCloseService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayPayOrderCloseService>(),
+                        CS.IF_CODE.WXPAY => provider.GetService<WxPayPayOrderCloseService>(),
+                        CS.IF_CODE.YSFPAY => provider.GetService<YsfPayPayOrderCloseService>(),
+                        CS.IF_CODE.UMSPAY => provider.GetService<UmsPayPayOrderCloseService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -276,27 +227,18 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, IPayOrderQueryService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayPayOrderQueryService>();
-                        case CS.IF_CODE.WXPAY:
-                            return provider.GetService<WxPayPayOrderQueryService>();
-                        case CS.IF_CODE.YSFPAY:
-                            return provider.GetService<YsfPayPayOrderQueryService>();
-                        case CS.IF_CODE.PPPAY:
-                            return provider.GetService<PpPayPayOrderQueryService>();
-                        case CS.IF_CODE.SXFPAY:
-                            return provider.GetService<SxfPayPayOrderQueryService>();
-                        case CS.IF_CODE.LESPAY:
-                            return provider.GetService<LesPayPayOrderQueryService>();
-                        case CS.IF_CODE.HKRTPAY:
-                            return provider.GetService<HkrtPayPayOrderQueryService>();
-                        case CS.IF_CODE.UMSPAY:
-                            return provider.GetService<UmsPayPayOrderQueryService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayPayOrderQueryService>(),
+                        CS.IF_CODE.WXPAY => provider.GetService<WxPayPayOrderQueryService>(),
+                        CS.IF_CODE.YSFPAY => provider.GetService<YsfPayPayOrderQueryService>(),
+                        CS.IF_CODE.PPPAY => provider.GetService<PpPayPayOrderQueryService>(),
+                        CS.IF_CODE.SXFPAY => provider.GetService<SxfPayPayOrderQueryService>(),
+                        CS.IF_CODE.LESPAY => provider.GetService<LesPayPayOrderQueryService>(),
+                        CS.IF_CODE.HKRTPAY => provider.GetService<HkrtPayPayOrderQueryService>(),
+                        CS.IF_CODE.UMSPAY => provider.GetService<UmsPayPayOrderQueryService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -308,15 +250,12 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, ITransferService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayTransferService>();
-                        case CS.IF_CODE.WXPAY:
-                            return provider.GetService<WxPayTransferService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayTransferService>(),
+                        CS.IF_CODE.WXPAY => provider.GetService<WxPayTransferService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });
@@ -327,13 +266,11 @@ namespace AGooday.AgPay.Payment.Api.Channel
             {
                 Func<string, ITransferNoticeService> funcFactory = ifCode =>
                 {
-                    switch (ifCode)
+                    return ifCode switch
                     {
-                        case CS.IF_CODE.ALIPAY:
-                            return provider.GetService<AliPayTransferNoticeService>();
-                        default:
-                            return null;
-                    }
+                        CS.IF_CODE.ALIPAY => provider.GetService<AliPayTransferNoticeService>(),
+                        _ => null,
+                    };
                 };
                 return funcFactory;
             });

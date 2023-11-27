@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         // 注入总线
         private readonly IMediatorHandler Bus;
         private readonly IMQSender mqSender;
-        private IMemoryCache Cache;
+        private readonly IMemoryCache Cache;
 
         public MchInfoCommandHandler(IUnitOfWork uow, IMediatorHandler bus, IMapper mapper, IMQSender mqSender, IMemoryCache cache,
             IMchInfoRepository mchInfoRepository,

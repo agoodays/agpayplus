@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Common.Models
     {
         public void BindDateRange()
         {
-            QueryDateRange = QueryDateRange ?? string.Empty;
+            QueryDateRange ??= string.Empty;
             DateUtil.GetQueryDateRange(QueryDateRange, out string createdStart, out string createdEnd);
             CreatedStart = string.IsNullOrWhiteSpace(createdStart) ? CreatedStart : Convert.ToDateTime(createdStart);
             CreatedEnd = string.IsNullOrWhiteSpace(createdEnd) ? CreatedEnd : Convert.ToDateTime(createdEnd);

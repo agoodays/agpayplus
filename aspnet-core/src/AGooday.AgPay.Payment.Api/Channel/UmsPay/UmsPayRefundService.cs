@@ -41,7 +41,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
 
         public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
-            JObject reqParams = new JObject();
             string logPrefix = $"【银联商务({refundOrder.WayCode})退款查询】";
 
             try
@@ -234,7 +233,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
 
         public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            JObject reqParams = new JObject();
             string logPrefix = $"【银联商务({payOrder.WayCode})订单退款】";
 
             try

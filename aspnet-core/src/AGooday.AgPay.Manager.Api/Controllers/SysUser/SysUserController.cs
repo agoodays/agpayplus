@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     {
         private readonly ILogger<SysUserController> _logger;
         private readonly ISysUserService _sysUserService;
-        private IMemoryCache _cache;
+        private readonly IMemoryCache _cache;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 

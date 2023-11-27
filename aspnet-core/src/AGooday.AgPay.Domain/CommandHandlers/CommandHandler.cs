@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         // 注入中介处理接口（目前用不到，在领域事件中用来发布事件）
         private readonly IMediatorHandler _bus;
         // 注入缓存，用来存储错误信息（目前是错误方法，以后用领域通知替换）
-        private IMemoryCache _cache;
+        private readonly IMemoryCache _cache;
 
         /// <summary>
         /// 构造函数注入

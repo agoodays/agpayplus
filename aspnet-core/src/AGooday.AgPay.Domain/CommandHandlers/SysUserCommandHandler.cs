@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
         // 注入总线
         private readonly IMediatorHandler Bus;
-        private IMemoryCache Cache;
+        private readonly IMemoryCache Cache;
 
         public SysUserCommandHandler(IUnitOfWork uow, IMediatorHandler bus, IMapper mapper, IMemoryCache cache,
             ISysUserRepository sysUserRepository,
@@ -42,6 +42,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         {
             _mapper = mapper;
             Cache = cache;
+            Bus = bus;
             _sysUserRepository = sysUserRepository;
             _sysUserAuthRepository = sysUserAuthRepository;
             _sysUserRoleRelaRepository = sysUserRoleRelaRepository;

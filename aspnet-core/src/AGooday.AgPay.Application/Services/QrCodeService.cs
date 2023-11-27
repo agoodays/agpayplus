@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Application.Services
             for (int i = 1; i <= dto.AddNum; i++)
             {
                 var m = _mapper.Map<QrCode>(dto);
-                m.QrcId = $"{dto.BatchId}{i.ToString("D4")}";
+                m.QrcId = $"{dto.BatchId}{i:D4}";
                 m.QrUrl = $"https://www.example.com/{m.QrcId}";
                 _qrCodeShellRepository.Add(m);
             }

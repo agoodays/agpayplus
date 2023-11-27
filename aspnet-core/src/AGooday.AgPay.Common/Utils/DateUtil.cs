@@ -9,8 +9,8 @@
 
         public static void GetQueryDateRange(string queryDateRange, out string createdStart, out string createdEnd)
         {
+            queryDateRange ??= string.Empty;
             createdStart = null; createdEnd = null;
-            queryDateRange = queryDateRange ?? string.Empty;
             if (queryDateRange.Equals(TODAY))
             {
                 createdStart = DateTime.Today.ToString("yyyy-MM-dd HH:mm:ss");
