@@ -255,6 +255,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<SysUser>().HasIndex(c => new { c.SysType, c.LoginUsername }, "Uni_SysType_LoginUsername").IsUnique(true);
             modelBuilder.Entity<SysUser>().HasIndex(c => new { c.SysType, c.Telphone }, "Uni_SysType_Telphone").IsUnique(true);
             modelBuilder.Entity<SysUser>().HasIndex(c => new { c.SysType, c.UserNo }, "Uni_SysType_UserNo").IsUnique(true);
+            modelBuilder.Entity<SysUser>().HasIndex(c => new { c.InviteCode }, "Uni_InviteCode").IsUnique(true);
             modelBuilder.Entity<TransferOrder>().HasIndex(c => new { c.MchNo, c.MchOrderNo }, "Uni_MchNo_MchOrderNo").IsUnique(true);
             modelBuilder.Entity<TransferOrder>().HasIndex(c => new { c.CreatedAt }, "Idx_CreatedAt");
 
