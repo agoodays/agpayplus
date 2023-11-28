@@ -2,7 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils;
+using AGooday.AgPay.Payment.Api.Channel.YsfPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.Refund;
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
-            string orderType = YsfHttpUtil.GetOrderTypeByCommon(refundOrder.WayCode);
+            string orderType = YsfPayEnum.GetOrderTypeByCommon(refundOrder.WayCode);
             string logPrefix = $"【云闪付({orderType})退款查询】";
             try
             {
@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
-            string orderType = YsfHttpUtil.GetOrderTypeByCommon(payOrder.WayCode);
+            string orderType = YsfPayEnum.GetOrderTypeByCommon(payOrder.WayCode);
             string logPrefix = $"【云闪付({orderType})退款】";
             try
             {

@@ -1,7 +1,4 @@
 ﻿using AGooday.AgPay.Common.Constants;
-using Aop.Api.Domain;
-using static QRCoder.PayloadGenerator;
-using static SKIT.FlurlHttpClient.Wechat.Api.Models.ComponentTCBBatchCreateContainerServiceVersionResponse.Types;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.Enumerator
 {

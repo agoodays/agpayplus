@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.YsfPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
+using AGooday.AgPay.Payment.Api.Channel.YsfPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
@@ -108,7 +109,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         /// <param name="returnUrl"></param>
         public static void JsapiParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
-            string orderType = YsfHttpUtil.GetOrderTypeByJSapi(payOrder.WayCode);
+            string orderType = YsfPayEnum.GetOrderTypeByJSapi(payOrder.WayCode);
             reqParams.Add("orderType", orderType); //订单类型： alipayJs-支付宝， wechatJs-微信支付， upJs-银联二维码
             YsfPublicParams(reqParams, payOrder);
             reqParams.Add("backUrl", notifyUrl); //交易通知地址
@@ -122,7 +123,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         /// <param name="payOrder"></param>
         public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder)
         {
-            string orderType = YsfHttpUtil.GetOrderTypeByBar(payOrder.WayCode);
+            string orderType = YsfPayEnum.GetOrderTypeByBar(payOrder.WayCode);
             reqParams.Add("orderType", orderType); //订单类型： alipay-支付宝， wechat-微信支付， -unionpay银联二维码
             YsfPublicParams(reqParams, payOrder);
             // TODO 终端编号暂时写死

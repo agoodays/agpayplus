@@ -7,7 +7,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.Utils
     {
         public static string GetAuthorization(string appid, string appkey, string timestamp, string nonce, string body)
         {
-            SHA256 sha256 = new SHA256CryptoServiceProvider();
+            SHA256 sha256 = SHA256.Create();
             byte[] retVal = sha256.ComputeHash(Encoding.UTF8.GetBytes(body));
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < retVal.Length; i++)

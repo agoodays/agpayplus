@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils
 {
     public class YsfSignUtil
     {
-        private static ILog logger = LogManager.GetLogger(typeof(YsfSignUtil));
+        private static readonly ILog logger = LogManager.GetLogger(typeof(YsfSignUtil));
 
         public static string SignBy256(JObject jobjParams, string isvPrivateCertFile, string isvPrivateCertPwd)
         {

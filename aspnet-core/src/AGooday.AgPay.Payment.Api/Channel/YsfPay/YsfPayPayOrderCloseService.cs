@@ -1,7 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils;
+using AGooday.AgPay.Payment.Api.Channel.YsfPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using Newtonsoft.Json.Linq;
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         public ChannelRetMsg Close(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
-            string orderType = YsfHttpUtil.GetOrderTypeByCommon(payOrder.WayCode);
+            string orderType = YsfPayEnum.GetOrderTypeByCommon(payOrder.WayCode);
             string logPrefix = $"【云闪付({orderType})关闭订单】";
 
             try

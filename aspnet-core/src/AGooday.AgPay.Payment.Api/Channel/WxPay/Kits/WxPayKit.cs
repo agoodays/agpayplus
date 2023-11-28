@@ -43,8 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
             var json = $"{string.Join("&", dictionary.OrderBy(o => o.Key)
                 .Select(s => $"{s.Key}={s.Value}"))}&key={key}";
             var bytes = Encoding.UTF8.GetBytes(json);
-            MD5 md5 = MD5.Create();
-            byte[] temp = md5.ComputeHash(bytes);
+            byte[] temp = MD5.HashData(bytes);
             string sign = "";
             foreach (byte b in temp)
             {
