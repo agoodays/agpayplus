@@ -33,17 +33,20 @@ namespace AGooday.AgPay.Common.Utils
             var response = new Response();
             try
             {
+                StringContent content = null;
                 HttpResponseMessage httpResponse = null;
                 switch (request.Method)
                 {
                     case "POST":
-                        httpResponse = client.PostAsync(request.Url, new StringContent(request.Content, Encoding.UTF8, request.ContentType)).Result;
+                        content = new StringContent(request.Content, Encoding.UTF8, request.ContentType);
+                        httpResponse = client.PostAsync(request.Url, content).Result;
                         break;
                     case "GET":
                         httpResponse = client.GetAsync(request.Url).Result;
                         break;
                     case "PUT":
-                        httpResponse = client.PutAsync(request.Url, new StringContent(request.Content, Encoding.UTF8, request.ContentType)).Result;
+                        content = new StringContent(request.Content, Encoding.UTF8, request.ContentType);
+                        httpResponse = client.PutAsync(request.Url, content).Result;
                         break;
                     case "DELETE":
                         httpResponse = client.DeleteAsync(request.Url).Result;
@@ -103,17 +106,20 @@ namespace AGooday.AgPay.Common.Utils
             var response = new Response();
             try
             {
+                StringContent content = null;
                 HttpResponseMessage httpResponse = null;
                 switch (request.Method)
                 {
                     case "POST":
-                        httpResponse = await client.PostAsync(request.Url, new StringContent(request.Content, encoding, request.ContentType));
+                        content = new StringContent(request.Content, encoding, request.ContentType);
+                        httpResponse = await client.PostAsync(request.Url, content);
                         break;
                     case "GET":
                         httpResponse = await client.GetAsync(request.Url);
                         break;
                     case "PUT":
-                        httpResponse = await client.PutAsync(request.Url, new StringContent(request.Content, encoding, request.ContentType));
+                        content = new StringContent(request.Content, encoding, request.ContentType);
+                        httpResponse = await client.PutAsync(request.Url, content);
                         break;
                     case "DELETE":
                         httpResponse = await client.DeleteAsync(request.Url);

@@ -80,7 +80,7 @@ namespace AGooday.AgPay.AopSdk.Utils
         public static string Md5(string str, string charset)
         {
             var buffer = Encoding.GetEncoding(charset).GetBytes(str);
-            var digestData = MD5.Create().ComputeHash(buffer);
+            var digestData = MD5.HashData(buffer);
             return ToHex(digestData);
         }
 

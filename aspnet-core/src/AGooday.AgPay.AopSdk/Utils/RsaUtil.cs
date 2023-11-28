@@ -62,10 +62,10 @@ namespace AGooday.AgPay.AopSdk.Utils
                 dataBytes = Encoding.GetEncoding(charset).GetBytes(data);
             }
 
-            HashAlgorithm hash = new SHA1CryptoServiceProvider();
+            HashAlgorithm hash = SHA1.Create();
             if ("RSA2".Equals(signType))
             {
-                hash = new SHA256CryptoServiceProvider();
+                hash = SHA256.Create();
             }
 
             byte[] signatureBytes = rsaCsp.SignData(dataBytes, hash);

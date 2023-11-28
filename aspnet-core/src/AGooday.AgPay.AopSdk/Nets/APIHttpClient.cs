@@ -8,6 +8,8 @@ namespace AGooday.AgPay.AopSdk.Nets
     /// </summary>
     public class APIHttpClient
     {
+        private static readonly HttpClient httpClient = new HttpClient();
+
         public async Task<APIAgPayResponse> RequestAsync(APIAgPayRequest request)
         {
             int responseCode = 0;
@@ -15,10 +17,11 @@ namespace AGooday.AgPay.AopSdk.Nets
 
             try
             {
-                using (var httpClient = new HttpClient())
+                var httpRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToString()), request.Url);
+
+                using (var content = new StringContent(request.Content.Content, Encoding.GetEncoding(request.Content.CharSet), request.Content.MediaType))
                 {
-                    var httpRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToString()), request.Url);
-                    httpRequest.Content = new StringContent(request.Content.Content, Encoding.GetEncoding(request.Content.CharSet), request.Content.MediaType);
+                    httpRequest.Content = content;
 
                     var response = await httpClient.SendAsync(httpRequest);
 
@@ -28,10 +31,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             }
             catch (HttpRequestException ex)
             {
-                if (ex.StatusCode.HasValue)
-                {
-                    responseCode = (int)ex.StatusCode.Value;
-                }
+                responseCode = (int)ex.StatusCode;
                 throw;
             }
             catch (Exception ex)
@@ -54,10 +54,11 @@ namespace AGooday.AgPay.AopSdk.Nets
 
             try
             {
-                using (var httpClient = new HttpClient())
+                var httpRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToString()), request.Url);
+
+                using (var content = new StringContent(request.Content.Content, Encoding.GetEncoding(request.Content.CharSet), request.Content.MediaType))
                 {
-                    var httpRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToString()), request.Url);
-                    httpRequest.Content = new StringContent(request.Content.Content, Encoding.GetEncoding(APIResource.CHARSET), request.Content.MediaType);
+                    httpRequest.Content = content;
 
                     var response = httpClient.SendAsync(httpRequest).Result;
 
@@ -67,10 +68,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             }
             catch (HttpRequestException ex)
             {
-                if (ex.StatusCode.HasValue)
-                {
-                    responseCode = (int)ex.StatusCode.Value;
-                }
+                responseCode = (int)ex.StatusCode;
                 throw;
             }
             catch (Exception ex)

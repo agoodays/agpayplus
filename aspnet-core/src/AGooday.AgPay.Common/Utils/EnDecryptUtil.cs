@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Common.Utils
         /// <returns></returns>
         private static byte[] AESEncrypt(byte[] plainBytes, string key)
         {
-            RijndaelManaged aes = new RijndaelManaged();
+            var aes = Aes.Create();
             aes.Mode = CipherMode.ECB;
             aes.Padding = PaddingMode.PKCS7;
             aes.KeySize = 128;
@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Common.Utils
         /// <returns></returns>
         private static byte[] AESDecrypt(byte[] cipherBytes, string key)
         {
-            RijndaelManaged aes = new RijndaelManaged();
+            var aes = Aes.Create();
             aes.Mode = CipherMode.ECB;
             aes.Padding = PaddingMode.PKCS7;
             aes.KeySize = 128;
@@ -152,7 +152,6 @@ namespace AGooday.AgPay.Common.Utils
         public static string GetMD5(string encypStr, Encoding encoding)
         {
             byte[] bytes;
-            MD5 mD5 = MD5.Create();
             try
             {
                 bytes = encoding.GetBytes(encypStr);
@@ -161,7 +160,7 @@ namespace AGooday.AgPay.Common.Utils
             {
                 bytes = Encoding.GetEncoding("utf-8").GetBytes(encypStr);
             }
-            return BitConverter.ToString(mD5.ComputeHash(bytes)).Replace("-", "").ToUpper();
+            return BitConverter.ToString(MD5.HashData(bytes)).Replace("-", "").ToUpper();
         }
 
         /// <summary>

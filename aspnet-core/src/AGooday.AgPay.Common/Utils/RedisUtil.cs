@@ -6,12 +6,12 @@ namespace AGooday.AgPay.Common.Utils
     public class RedisUtil
     {
         //连接字符串
-        private string _connectionString;
+        private readonly string _connectionString;
         //实例名称
-        private string _instanceName;
+        private readonly string _instanceName;
         //默认数据库
-        private int _defaultDB;
-        private ConcurrentDictionary<string, ConnectionMultiplexer> _connections;
+        private readonly int _defaultDB;
+        private readonly ConcurrentDictionary<string, ConnectionMultiplexer> _connections;
         public RedisUtil(string connectionString, string instanceName, int defaultDB = 0)
         {
             _connectionString = connectionString;
@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Common.Utils
 
         public void Dispose()
         {
-            if (_connections != null && _connections.Count > 0)
+            if (_connections != null && !_connections.IsEmpty)
             {
                 foreach (var item in _connections.Values)
                 {

@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         //目前用的是缓存方法（以后通过领域通知替换）
         protected void NotifyValidationErrors(Command message)
         {
-            List<string> errorInfo = new List<string>();
+            //List<string> errorInfo = new List<string>();
             foreach (var error in message.ValidationResult.Errors)
             {
                 //errorInfo.Add(error.ErrorMessage);
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         }
         protected void NotifyValidationErrors<T>(Command<T> message)
         {
-            List<string> errorInfo = new List<string>();
+            //List<string> errorInfo = new List<string>();
             foreach (var error in message.ValidationResult.Errors)
             {
                 //errorInfo.Add(error.ErrorMessage);
