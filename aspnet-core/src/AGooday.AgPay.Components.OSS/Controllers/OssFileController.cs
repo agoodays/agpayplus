@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
                 // 3. 判断文件大小是否超限
                 if (!ossFileConfig.IsMaxSizeLimit(file.Length))
                 {
-                    throw new BizException($"上传大小请限制在[{ ossFileConfig.MaxSize / 1024 / 1024}M]以内！");
+                    throw new BizException($"上传大小请限制在[{ossFileConfig.MaxSize / 1024 / 1024}M]以内！");
                 }
 
                 // 新文件地址 (xxx/xxx.jpg 格式)
@@ -61,14 +61,10 @@ namespace AGooday.AgPay.Components.OSS.Controllers
                 string url = await ossService.Upload2PreviewUrlAsync(ossFileConfig.OssSavePlaceEnum, file, saveDirAndFileName);
                 return ApiRes.Ok(url);
             }
-            catch (BizException biz)
-            {
-                throw biz;
-            }
             catch (Exception e)
             {
                 logger.LogError(e, $"upload error, fileName = {file.FileName}");
-                throw new BizException(ApiCode.SYSTEM_ERROR);
+                throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }
 

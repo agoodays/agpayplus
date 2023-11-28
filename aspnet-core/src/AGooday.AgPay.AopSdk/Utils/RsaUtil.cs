@@ -343,7 +343,7 @@ namespace AGooday.AgPay.AopSdk.Utils
             }
             catch (Exception e)
             {
-                throw e;
+                throw;
             }
             finally
             {
@@ -458,7 +458,7 @@ namespace AGooday.AgPay.AopSdk.Utils
             }
             catch (Exception e)
             {
-                throw e;
+                throw;
             }
             finally
             {
