@@ -2,6 +2,7 @@ using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
@@ -15,11 +16,17 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         private SysUserRepository _repository;
         private TestLoggerProvider _loggerProvider;
         private ILogger _logger;
+        private IConfiguration _configuration;
 
         [TestInitialize]
         public void Setup()
         {
-            var connectionString = "server=localhost;port=3306;uid=root;pwd=mysql*;database=agpayplusdb_unit_test";
+            _configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory()) // 配置文件的基路径
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true) // 配置文件的路径
+                .Build();
+
+            var connectionString = _configuration.GetConnectionString("Default");
             _loggerProvider = new TestLoggerProvider();
 
             //// 创建一个 LoggerFactory 实例并添加 ConsoleLoggerProvider
