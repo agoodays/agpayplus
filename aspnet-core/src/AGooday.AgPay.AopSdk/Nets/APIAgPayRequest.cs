@@ -23,11 +23,11 @@ namespace AGooday.AgPay.AopSdk.Nets
         /// <summary>
         /// 请求Body
         /// </summary>
-        public HttpContent Content { get; private set; }
+        public APIHttpContent Content { get; private set; }
         /// <summary>
         /// 请求Header
         /// </summary>
-        public HttpHeaders Headers { get; private set; }
+        public APIHttpHeaders Headers { get; private set; }
         /// <summary>
         /// 请求参数
         /// </summary>
@@ -52,7 +52,7 @@ namespace AGooday.AgPay.AopSdk.Nets
                 this.Content = BuildContent(method, @params, this.Options);
                 //this.Headers = BuildHeaders(method, this.Options);
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 throw new APIConnectionException($"请求AgPay({GenUrl(url, options.GetUri())})异常,请检查网络或重试.异常信息:{e.Message}", e);
             }
@@ -175,7 +175,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             return flatParams;
         }
 
-        private static HttpContent BuildContent(APIResource.RequestMethod method, Dictionary<string, object> @params, RequestOptions options)
+        private static APIHttpContent BuildContent(APIResource.RequestMethod method, Dictionary<string, object> @params, RequestOptions options)
         {
             if (method != APIResource.RequestMethod.POST && method != APIResource.RequestMethod.PUT)
             {
@@ -196,7 +196,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             {
                 signature = BuildAgPaySignature(@params, options);
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 throw new APIConnectionException("生成AgPay请求签名异常", e);
             }
@@ -205,7 +205,7 @@ namespace AGooday.AgPay.AopSdk.Nets
                 @params.Add(AgPay.API_SIGN_NAME, signature);
             }
 
-            return HttpContent.BuildJsonContent(@params);
+            return APIHttpContent.BuildJsonContent(@params);
         }
 
         private static string BuildAgPaySignature(Dictionary<string, object> @params, RequestOptions options)

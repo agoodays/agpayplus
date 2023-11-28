@@ -47,5 +47,21 @@ namespace AGooday.AgPay.AopSdk
 
             return base.Execute(request, RequestMethod.POST, this.ApiBase);
         }
+
+        public async Task<T> ExecuteAsync<T>(IAgPayRequest<T> request) where T : AgPayResponse
+        {
+            // 支持用户自己设置RequestOptions
+            if (request.GetRequestOptions() == null)
+            {
+                RequestOptions options = RequestOptions.Builder()
+                        .SetVersion(request.GetApiVersion())
+                        .SetUri(request.GetApiUri())
+                        .SetApiKey(this.ApiKey)
+                        .Build();
+                request.SetRequestOptions(options);
+            }
+
+            return await base.ExecuteAsync(request, RequestMethod.POST, this.ApiBase);
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace AGooday.AgPay.AopSdk.Nets
     {
         public const string CHARSET = "utf-8";
 
-        private static readonly HttpClient httpClient = new HttpClient();
+        private static readonly APIHttpClient httpClient = new APIHttpClient();
 
         public enum RequestMethod
         {
@@ -38,6 +38,21 @@ namespace AGooday.AgPay.AopSdk.Nets
             return JsonConvert.DeserializeObject<T>(responseBody);
         }
 
+        public async Task<T> ExecuteAsync<T>(IAgPayRequest<T> request, RequestMethod method, string url) where T : AgPayResponse
+        {
+            var jsonParam = JsonConvert.SerializeObject(request.GetBizModel());
+            var @params = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonParam);
+            var apiAgPayRequest = new APIAgPayRequest(method, url, @params, request.GetRequestOptions());
+            var response = await httpClient.RequestAsync(apiAgPayRequest);
+            int responseCode = response.ResponseCode;
+            string responseBody = response.ResponseBody;
+            if (responseCode != 200)
+            {
+                HandleAPIError(response);
+            }
+            return JsonConvert.DeserializeObject<T>(responseBody);
+        }
+
         private static void HandleAPIError(APIAgPayResponse response)
         {
             string rBody = response.ResponseBody;
@@ -47,7 +62,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             {
                 jsonObject = JObject.Parse(rBody);
             }
-            catch (JsonException e)
+            catch (Exception e)
             {
                 RaiseMalformedJsonError(rBody, rCode, e);
             }
