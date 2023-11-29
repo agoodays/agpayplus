@@ -81,7 +81,7 @@ services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     {
         //https://blog.poychang.net/using-newtonsoft-json-in-asp-net-core-projects/
-        options.SerializerSettings.Formatting = Formatting.Indented;
+        options.SerializerSettings.Formatting = Formatting.None;
         //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
         options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）

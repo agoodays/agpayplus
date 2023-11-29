@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             string code = resJSON.GetValue("code").ToString(); //请求响应码
             string msg = resJSON.GetValue("msg").ToString(); //响应信息
             reqParams.TryGetString("mno", out string mno); // 商户号
-            resJSON.TryGetString("orgId",out string orgId); //天阙平台机构编号
+            resJSON.TryGetString("orgId", out string orgId); //天阙平台机构编号
             channelRetMsg.ChannelMchNo = mno;
             channelRetMsg.ChannelIsvNo = orgId;
             try
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                     var respData = resJSON.GetValue("respData").ToObject<JObject>();
                     string bizCode = respData.GetValue("bizCode").ToString(); //业务响应码
                     string bizMsg = respData.GetValue("bizMsg").ToString(); //业务响应信息
-                    if ("0000".Equals(bizCode))
+                    if ("0000".Equals(bizCode) || "2002".Equals(bizCode))
                     {
                         /*订单状态
                         取值范围：
@@ -76,7 +76,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         FAIL 交易失败
                         PAYING 支付中*/
                         string tranSts = respData.GetValue("tranSts").ToString();
-                        string uuid = respData.GetValue("uuid").ToString();//天阙平台订单号
+                        respData.TryGetString("uuid", out string uuid);//天阙平台订单号
                         /*落单号
                         仅供退款使用
                         消费者账单中的条形码订单号*/
@@ -163,7 +163,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             var reqParams = new JObject();//reqData
             reqParams.Add("orgId", isvParams.OrgId); //天阙平台机构编号
             reqParams.Add("reqId", Guid.NewGuid().ToString("N")); //合作方系统生成的唯一请求ID，最大长度32位
-            reqParams.Add("reqData", reqData.ToString()); //每个接口的业务参数
+            reqParams.Add("reqData", reqData.ToString(Formatting.None)); //每个接口的业务参数
             reqParams.Add("timestamp", DateTime.Now.ToString("yyyyMMddHHmmss")); //请求时间戳，格式：yyyyMMddHHmmss
             reqParams.Add("version", "1.0"); //接口版本号，默认值：1.0
             reqParams.Add("signType", "RSA"); //签名类型，默认值：RSA

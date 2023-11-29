@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Common.Utils
             var keyvalues = keyValuePairs.Where(w => !w.Key.Equals("sign") && !string.IsNullOrEmpty(w.Value.ToString()))
                 .OrderBy(o => o.Key)
                 .Select(s => $"{s.Key}={s.Value}");
-            return string.Join("&", keyvalues).Replace("\\", string.Empty);
+            return string.Join("&", keyvalues).Replace("\\", string.Empty).Replace(" ", string.Empty).Replace("\r", string.Empty).Replace("\n", string.Empty);
         }
 
         private static string GetStrSort(Dictionary<string, object> map)

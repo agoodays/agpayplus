@@ -5,6 +5,8 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -73,10 +75,10 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => (dto.ArticleId.Equals(null) || w.ArticleId.Equals(dto.ArticleId))
                 && (string.IsNullOrWhiteSpace(dto.Title) || w.Title.Contains(dto.Title) || w.Subtitle.Contains(dto.Title))
                 && (dto.ArticleType.Equals(null) || w.ArticleType.Equals(dto.ArticleType))
-                //&& (string.IsNullOrWhiteSpace(dto.ArticleRange) || EF.Functions.JsonContains(w.ArticleRange, new string[] { dto.ArticleRange }))// w.ArticleRange.Contains(dto.ArticleRange))
+                && (string.IsNullOrWhiteSpace(dto.ArticleRange) || EF.Functions.JsonContains(w.ArticleRange,
+                JArray.FromObject(new string[] { dto.ArticleRange }).ToString(Newtonsoft.Json.Formatting.None)))// w.ArticleRange.Contains(dto.ArticleRange))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
-                .Where(w => string.IsNullOrWhiteSpace(dto.ArticleRange) || w.ArticleRange.Contains(dto.ArticleRange))
                 .OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<SysArticle>.Create<SysArticleDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
             return records;

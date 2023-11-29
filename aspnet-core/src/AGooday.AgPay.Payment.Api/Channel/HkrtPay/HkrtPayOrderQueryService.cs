@@ -4,7 +4,6 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.HkrtPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using Aop.Api.Domain;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
