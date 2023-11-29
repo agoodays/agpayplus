@@ -157,7 +157,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                     var respData = resJSON.GetValue("respData").ToObject<JObject>();
                     string bizCode = respData.GetValue("bizCode").ToString(); //业务响应码
                     string bizMsg = respData.GetValue("bizMsg").ToString(); //业务响应信息
-                    if ("0000".Equals(bizCode))
+                    if ("0000".Equals(bizCode) || "0002".Equals(bizCode))
                     {
                         /*订单状态
                         取值范围：
