@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Common.Utils
         /// <returns></returns>
         public static string GetSha1(string encypStr)
         {
-            byte[] numArray = SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(encypStr));
+            byte[] numArray = SHA1.HashData(Encoding.UTF8.GetBytes(encypStr));
             StringBuilder stringBuilder = new StringBuilder();
             byte[] numArray1 = numArray;
             for (int i = 0; i < (int)numArray1.Length; i++)

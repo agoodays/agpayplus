@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 
             // 调起上游接口
             log.Info($"{logPrefix} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = YsfHttpUtil.DoPostJson(GetYsfpayHost4env(isvParams) + apiUri, null, reqParams);
+            string resText = YsfHttpUtil.DoPostJson(GetYsfpayHost4env(isvParams) + apiUri, reqParams);
             log.Info($"{logPrefix} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))

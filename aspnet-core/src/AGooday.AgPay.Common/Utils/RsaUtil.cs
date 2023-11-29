@@ -128,24 +128,26 @@ namespace AGooday.AgPay.Common.Utils
 
         public static bool VerifyWithMd5(string data, string publicKeyJava, string signature)
         {
-            RSACryptoServiceProvider rsaCsp = DecodePublicKey(publicKeyJava);
-            var result = rsaCsp.VerifyData(Encoding.UTF8.GetBytes(data), "MD5", Convert.FromBase64String(signature));
+            RSA rsa = DecodePublicKey(publicKeyJava);
+            byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+            byte[] signatureBytes = Convert.FromBase64String(signature);
+            bool result = rsa.VerifyData(dataBytes, signatureBytes, HashAlgorithmName.MD5, RSASignaturePadding.Pkcs1);
             return result;
         }
 
         //public static bool Verify(string data, string publicKey, string signature, string charset = "utf-8", string signType = "RSA")
         //{
         //    //RSACryptoServiceProvider rsaCsp = GetRsaPublicProvider(publicKey);
-        //    RSACryptoServiceProvider rsaCsp = DecodePublicKey(publicKey);
+        //    RSA rsa = DecodePublicKey(publicKey);
 
         //    var encoding = string.IsNullOrEmpty(charset) ? Encoding.UTF8 : Encoding.GetEncoding(charset);
         //    var dataBytes = encoding.GetBytes(data);
 
-        //    HashAlgorithm hash = signType== "RSA2" ? new SHA256CryptoServiceProvider() as HashAlgorithm 
-        //        : new SHA1CryptoServiceProvider() as HashAlgorithm;
+        //    HashAlgorithmName hashAlgorithmName = signType == "RSA2" ? HashAlgorithmName.SHA256 : HashAlgorithmName.SHA1;
 
         //    byte[] signatureBytes = Convert.FromBase64String(signature);
-        //    return rsaCsp.VerifyData(dataBytes, hash, signatureBytes);
+        //    bool result = rsa.VerifyData(dataBytes, signatureBytes, hashAlgorithmName, RSASignaturePadding.Pkcs1);
+        //    return result;
         //}
 
         //public static string Encrypt(string data, string privateKey, string charset = "utf-8", string signType = "RSA")
@@ -172,8 +174,6 @@ namespace AGooday.AgPay.Common.Utils
             RSACryptoServiceProvider rsa = GetRsaPublicProvider(publicKey);
 
             var encoding = string.IsNullOrEmpty(charset) ? Encoding.UTF8 : Encoding.GetEncoding(charset);
-            //encoding = Encoding.UTF8;
-
             var dataBytes = encoding.GetBytes(data);
 
             var temp = rsa.Encrypt(dataBytes, false);
@@ -188,7 +188,6 @@ namespace AGooday.AgPay.Common.Utils
 
             byte[] source = rsa.Decrypt(dataBytes, false);
             var encoding = string.IsNullOrEmpty(charset) ? Encoding.UTF8 : Encoding.GetEncoding(charset);
-            //encoding = Encoding.UTF8;
             var result = encoding.GetString(source);
 
             return result;
@@ -266,8 +265,7 @@ namespace AGooday.AgPay.Common.Utils
 
         public static RSACryptoServiceProvider GetRsaPublicProvider(string pubilcKey)
         {
-            RsaKeyParameters p =
-                PublicKeyFactory.CreateKey(Convert.FromBase64String(pubilcKey)) as RsaKeyParameters;
+            RsaKeyParameters p = PublicKeyFactory.CreateKey(Convert.FromBase64String(pubilcKey)) as RsaKeyParameters;
             RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
 
             RSAParameters rsaParams = new RSAParameters
@@ -426,11 +424,11 @@ namespace AGooday.AgPay.Common.Utils
         }
 
         /// <summary>
-        /// 根据公钥的Byte[]，生成RSACryptoServiceProvider
+        /// 根据公钥，生成RSA
         /// </summary>
-        /// <param name="publickey">公钥Byte[]</param>
+        /// <param name="publickey">公钥</param>
         /// <returns></returns>
-        private static RSACryptoServiceProvider DecodePublicKey(string publicKey)
+        private static RSA DecodePublicKey(string publicKey)
         {
             byte[] keyData = Convert.FromBase64String(publicKey);
             if (keyData.Length < 162)
@@ -447,21 +445,13 @@ namespace AGooday.AgPay.Common.Utils
                 para.Modulus = pemModulus;
                 para.Exponent = pemPublicExponent;
 
-                CspParameters CspParameters = new CspParameters();
-                CspParameters.Flags = CspProviderFlags.UseMachineKeyStore;
-
-                int bitLen = 1024;
-
-                RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(bitLen, CspParameters);
-                RSA.ImportParameters(para);
-                return RSA;
+                RSA rsa = RSA.Create();
+                rsa.ImportParameters(para);
+                return rsa;
             }
             catch (Exception e)
             {
                 throw;
-            }
-            finally
-            {
             }
         }
 

@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Application.Params.UmsPay
         /// <summary>
         /// 网关地址
         /// </summary>
-        public static string PROD_SERVER_URL = "https://api-mop.chinaums.com";
-        public static string SANDBOX_SERVER_URL = "https://test-api-open.chinaums.com";
+        public const string PROD_SERVER_URL = "https://api-mop.chinaums.com";
+        public const string SANDBOX_SERVER_URL = "https://test-api-open.chinaums.com";
     }
 }

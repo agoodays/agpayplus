@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 using System.Text;
 
 namespace AGooday.AgPay.Common.Utils
@@ -88,7 +89,7 @@ namespace AGooday.AgPay.Common.Utils
         public static string UnHex(string hex, string charset)
         {
             if (hex == null)
-                throw new ArgumentNullException("hex");
+                throw new ArgumentNullException(nameof(hex));
             hex = hex.Replace(",", "");
             hex = hex.Replace("\n", "");
             hex = hex.Replace("\\", "");
@@ -96,7 +97,7 @@ namespace AGooday.AgPay.Common.Utils
             if (hex.Length % 2 != 0)
             {
                 hex += "20";//空格
-                throw new ArgumentException("hex is not a valid number!", "hex");
+                throw new ArgumentException("hex is not a valid number!", nameof(hex));
             }
             // 需要将 hex 转换成 byte 数组。
             byte[] bytes = new byte[hex.Length / 2];
@@ -105,16 +106,15 @@ namespace AGooday.AgPay.Common.Utils
                 try
                 {
                     // 每两个字符是一个 byte。
-                    bytes[i] = byte.Parse(hex.Substring(i * 2, 2),
-                    System.Globalization.NumberStyles.HexNumber);
+                    bytes[i] = byte.Parse(hex.Substring(i * 2, 2), NumberStyles.HexNumber);
                 }
                 catch
                 {
                     // Rethrow an exception with custom message.
-                    throw new ArgumentException("hex is not a valid hex number!", "hex");
+                    throw new ArgumentException("hex is not a valid hex number!", nameof(hex));
                 }
             }
-            System.Text.Encoding chs = System.Text.Encoding.GetEncoding(charset);
+            Encoding chs = Encoding.GetEncoding(charset);
             return chs.GetString(bytes);
         }
 
@@ -181,7 +181,7 @@ namespace AGooday.AgPay.Common.Utils
         {
             int length = value.Length;
             CheckBoundsBeginEnd(beginIndex, endIndex, length);
-            int subLen = endIndex - beginIndex;
+            //int subLen = endIndex - beginIndex;
             if (beginIndex == 0 && endIndex == length)
             {
                 return value;

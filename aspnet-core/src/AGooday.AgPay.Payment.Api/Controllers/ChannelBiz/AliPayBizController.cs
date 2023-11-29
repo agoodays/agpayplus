@@ -138,7 +138,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
             }
             catch (Exception e)
             {
-                log.LogError("error", e);
+                log.LogError(e,"error");
                 errMsg = !string.IsNullOrWhiteSpace(e.Message) ? e.Message : "系统异常！";
             }
             ViewBag.ErrMsg = errMsg;
@@ -152,7 +152,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
             JObject reqJSON = GetReqParamJson();
 
             // 获取到报文信息，然后转发到对应的ctrl
-            log.LogInformation("支付宝应用网关接收消息参数：{0}", reqJSON);
+            log.LogInformation($"支付宝应用网关接收消息参数：{reqJSON}");
 
             // 分账交易通知
             if ("alipay.trade.order.settle.notify".Equals(reqJSON.GetValue("msg_method").ToString()))

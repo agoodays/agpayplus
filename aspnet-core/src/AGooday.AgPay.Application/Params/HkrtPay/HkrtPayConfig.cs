@@ -8,7 +8,7 @@
         /// <summary>
         /// 网关地址
         /// </summary>
-        public static string PROD_SERVER_URL = "http://39.96.106.181:8080";
-        public static string SANDBOX_SERVER_URL = "http://47.95.131.62:8080";
+        public const string PROD_SERVER_URL = "http://39.96.106.181:8080";
+        public const string SANDBOX_SERVER_URL = "http://47.95.131.62:8080";
     }
 }

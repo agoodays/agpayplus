@@ -87,9 +87,9 @@ namespace AGooday.AgPay.Payment.Api.Models
             string alipayPublicCert, string alipayRootCert)
         {
             //避免空值
-            sandbox = sandbox ?? CS.NO;
+            sandbox ??= CS.NO;
 
-            IAopClient alipayClient = null;
+            IAopClient alipayClient;
             //证书的方式
             if (useCert == CS.YES)
             {
