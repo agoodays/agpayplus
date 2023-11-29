@@ -126,7 +126,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                 reqParams.Add("merchant_refund_id", refundOrder.RefundOrderId); // 退款订单号
                 reqParams.Add("third_order_id", payOrder.PayOrderId); // 原交易订单号
                 reqParams.Add("refund_amount", refundOrder.RefundAmount.ToString()); // 退款金额
-                reqParams.Add("notify_url ", GetNotifyUrl()); // 订单类型
+                reqParams.Add("notify_url", GetNotifyUrl()); // 订单类型
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = lesPayPaymentService.PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);

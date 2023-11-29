@@ -439,6 +439,20 @@
           </a-col>
           <a-col :sm="12">
             <a-descriptions>
+              <a-descriptions-item label="渠道服务商机构号">
+                {{ detailData.channelIsvNo }}
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
+              <a-descriptions-item label="渠道商户号">
+                {{ detailData.channelMchNo }}
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
               <a-descriptions-item label="用户标识">
                 {{ detailData.channelUser }}
               </a-descriptions-item>
@@ -448,6 +462,20 @@
             <a-descriptions>
               <a-descriptions-item label="渠道订单号">
                 {{ detailData.channelOrderNo }}
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
+              <a-descriptions-item label="用户支付凭证交易单号">
+                {{ detailData.platformOrderNo }}
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
+              <a-descriptions-item label="用户支付凭证商户单号">
+                {{ detailData.platformMchOrderNo }}
               </a-descriptions-item>
             </a-descriptions>
           </a-col>

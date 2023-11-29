@@ -144,7 +144,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
                 reqParams.Add("out_refund_no", refundOrder.RefundOrderId); // 退款订单号
                 reqParams.Add("out_trade_no", payOrder.PayOrderId); // 原交易订单号
                 reqParams.Add("refund_amount", AmountUtil.ConvertCent2Dollar(refundOrder.RefundAmount)); // 退款金额
-                reqParams.Add("notify_url ", GetNotifyUrl()); // 订单类型
+                reqParams.Add("notify_url", GetNotifyUrl()); // 订单类型
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = hkrtPayPaymentService.PackageParamAndReq("/api/v1/pay/polymeric/refund", reqParams, logPrefix, mchAppConfigContext);

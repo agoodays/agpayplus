@@ -82,6 +82,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                         {
                             case SxfPayEnum.OrderStatus.SUCCESS:
                                 channelRetMsg = ChannelRetMsg.ConfirmSuccess(uuid);  //支付成功
+                                channelRetMsg.ChannelMchNo = mno;
+                                channelRetMsg.ChannelIsvNo = orgId;
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelUserId = buyerId;
                                 channelRetMsg.PlatformOrderId = transactionId;

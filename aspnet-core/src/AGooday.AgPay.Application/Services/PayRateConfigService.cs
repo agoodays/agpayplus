@@ -893,10 +893,10 @@ namespace AGooday.AgPay.Application.Services
                 // 上级默认费率
                 READONLYPARENTDEFRATE = GetPayRateConfigItems(configType, CS.INFO_TYPE.AGENT, agentNo, ifCode);
             }
-            else
-            {
-                READONLYPARENTDEFRATE = GetPayRateConfigItems(configType, CS.INFO_TYPE.ISV, isvNo, ifCode);
-            }
+            //else
+            //{
+            //    READONLYPARENTDEFRATE = GetPayRateConfigItems(configType, CS.INFO_TYPE.ISV, isvNo, ifCode);
+            //}
             PARENTRATE = READONLYPARENTDEFRATE == null ? (READONLYPARENTAGENT == null ? (ISVCOST == null ? null : ISVCOST) : READONLYPARENTAGENT) : READONLYPARENTDEFRATE;
 
             return PARENTRATE;

@@ -113,8 +113,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
                 reqParams.Add("origOrderNo", payOrder.PayOrderId); // 原交易订单号
                 reqParams.Add("origTxnAmt", payOrder.Amount); // 原交易金额
                 reqParams.Add("orderNo", refundOrder.RefundOrderId); // 退款订单号
-                reqParams.Add("txnAmt ", refundOrder.RefundAmount); // 退款金额
-                reqParams.Add("orderType ", orderType); // 订单类型
+                reqParams.Add("txnAmt", refundOrder.RefundAmount); // 退款金额
+                reqParams.Add("orderType", orderType); // 订单类型
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = ysfpayPaymentService.PackageParamAndReq("/gateway/api/pay/refund", reqParams, logPrefix, mchAppConfigContext);

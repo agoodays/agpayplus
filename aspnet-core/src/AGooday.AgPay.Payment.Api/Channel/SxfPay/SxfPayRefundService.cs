@@ -138,7 +138,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                 reqParams.Add("ordNo", refundOrder.RefundOrderId); // 退款订单号
                 reqParams.Add("origOrderNo", payOrder.PayOrderId); // 原交易订单号
                 reqParams.Add("amt", AmountUtil.ConvertCent2Dollar(refundOrder.RefundAmount)); // 退款金额
-                reqParams.Add("notifyUrl ", GetNotifyUrl()); // 订单类型
+                reqParams.Add("notifyUrl", GetNotifyUrl()); // 订单类型
+                reqParams.Add("refundReason", refundOrder.RefundReason); // 退货原因
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = sxfpayPaymentService.PackageParamAndReq("/order/refund", reqParams, logPrefix, mchAppConfigContext);
