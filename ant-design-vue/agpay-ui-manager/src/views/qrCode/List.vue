@@ -89,7 +89,7 @@ const tableColumns = [
   { key: 'entryPage', title: '扫码页面', width: 140, scopedSlots: { customRender: 'entryPageSlot' } },
   { key: 'state', title: '状态', width: 80, scopedSlots: { customRender: 'stateSlot' } },
   { key: 'fixedPayAmount', title: '固定金额', width: 120, scopedSlots: { customRender: 'fixedPayAmountSlot' } },
-  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 

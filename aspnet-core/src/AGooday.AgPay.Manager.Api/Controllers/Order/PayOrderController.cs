@@ -247,7 +247,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 {
                     throw new BizException(response.msg);
                 }
-                return ApiRes.Ok(response);
+                return ApiRes.Ok(response.Get());
             }
             catch (AgPayException e)
             {

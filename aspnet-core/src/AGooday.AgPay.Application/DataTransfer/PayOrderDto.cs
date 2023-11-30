@@ -118,6 +118,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public decimal MchFeeRate { get; set; }
 
         /// <summary>
+        /// 商户手续费费率快照描述
+        /// </summary>
+        public string MchFeeRateDesc { get; set; }
+
+        /// <summary>
         /// 商户手续费(实际手续费),单位分
         /// </summary>
         public long MchFeeAmount { get; set; }

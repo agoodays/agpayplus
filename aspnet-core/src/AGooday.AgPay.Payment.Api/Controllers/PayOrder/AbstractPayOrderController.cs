@@ -189,6 +189,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
                     // 查询支付方式的费率，并 在更新ing时更新费率信息
                     payOrder.MchFeeRate = mchPayPassage.Rate;
+                    payOrder.MchFeeRateDesc = mchPayPassage.RateDesc;
                     payOrder.MchFeeAmount = AmountUtil.CalPercentageFee(payOrder.Amount, payOrder.MchFeeRate); //商户手续费,单位分
                 }
 
@@ -255,6 +256,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             if (mchPayPassage != null)
             {
                 payOrder.MchFeeRate = mchPayPassage.Rate; //商户手续费费率快照
+                payOrder.MchFeeRateDesc = mchPayPassage.RateDesc;
             }
             else
             {

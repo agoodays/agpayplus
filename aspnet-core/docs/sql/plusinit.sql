@@ -161,6 +161,11 @@ ALTER TABLE `t_pay_order`
 ALTER TABLE `t_pay_order`   
   ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他' AFTER `way_code`;
 
+ALTER TABLE `t_pay_order`   
+  ADD COLUMN `mch_fee_rate_desc` VARCHAR(128) NULL COMMENT '商户手续费费率快照描述' AFTER `mch_fee_rate`;
+  
+UPDATE `t_pay_order` SET `mch_fee_rate_desc` = CONCAT('单笔费率：',ROUND(`mch_fee_rate`*100, 4),'%') WHERE `way_code` != 'QR_CASHIER' AND `mch_fee_rate_desc` IS NULL
+
 ALTER TABLE `t_refund_order`   
   CHANGE `mch_name` `mch_name` VARCHAR(64) NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
   ADD COLUMN `mch_short_name` VARCHAR(32) NULL COMMENT '商户简称' AFTER `mch_name`,
