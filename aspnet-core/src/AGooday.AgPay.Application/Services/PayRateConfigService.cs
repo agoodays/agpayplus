@@ -104,7 +104,7 @@ namespace AGooday.AgPay.Application.Services
         private List<string> GetPayWayCodes(string ifCode, string isvNo, string agentNo, List<string> wayCodes)
         {
             // 服务商开通支付方式
-            var isvWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCode(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode)
+            var isvWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode)
                 .Where(w => wayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct().ToList();
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Application.Services
         private List<string> GetAgentPayWayCodes(string ifCode, List<string> wayCodes, string agentNo)
         {
             // 代理商开通支付方式
-            var agentWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCode(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode)
+            var agentWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode)
                 .Where(w => wayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct().ToList();
             var agent = _agentInfoRepository.GetById(agentNo);
             if (!string.IsNullOrWhiteSpace(agent.Pid))
@@ -367,7 +367,7 @@ namespace AGooday.AgPay.Application.Services
 
         public List<PayRateConfigDto> GetPayRateConfigs(string configType, string infoType, string infoId, string ifCode)
         {
-            var payRateConfigs = _payRateConfigRepository.GetByInfoIdAndIfCode(configType, infoType, infoId, ifCode);
+            var payRateConfigs = _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(configType, infoType, infoId, ifCode);
             var result = _mapper.Map<List<PayRateConfigDto>>(payRateConfigs);
             foreach (var item in result)
             {
@@ -877,7 +877,7 @@ namespace AGooday.AgPay.Application.Services
 
         private string GetFeeRateErrorMessage(string name, string thanName, string wayCode, decimal feeRate, decimal thanFeeRate, string modeName = "", int? levelIndex = null)
         {
-            return $"{name}异常： [{wayCode}]{(levelIndex == null ? "" : $"{modeName}的第[{++levelIndex}]阶梯")}设置费率{{{(feeRate * 100)}%}} 需要【大于等于】【{thanName}】的{(levelIndex == null ? "" : "阶梯")}配置值：{{{(thanFeeRate * 100)}%}}";
+            return $"{name}异常： [{wayCode}]{(levelIndex == null ? "" : $"{modeName}的第[{++levelIndex}]阶梯")}设置费率{{{(feeRate * 100):F4}%}} 需要【大于等于】【{thanName}】的{(levelIndex == null ? "" : "阶梯")}配置值：{{{(thanFeeRate * 100):F4}%}}";
         }
 
         private List<PayRateConfigItem> GetParentRate(string ifCode, string isvNo, string agentNo, string configType)

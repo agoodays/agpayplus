@@ -36,6 +36,11 @@
         public decimal Rate { get; set; }
 
         /// <summary>
+        /// 支付方式费率描述
+        /// </summary>
+        public string RateDesc { get; set; }
+
+        /// <summary>
         /// 风控数据
         /// </summary>
         public string RiskConfig { get; set; }

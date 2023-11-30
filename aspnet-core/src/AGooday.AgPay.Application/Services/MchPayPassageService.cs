@@ -134,14 +134,14 @@ namespace AGooday.AgPay.Application.Services
             //        IfRate = s.pic.IfRate * 100,
             //    });
             var configType = CS.CONFIG_TYPE.MCHRATE;
-            var payRateConfigs = _payRateConfigRepository.GetByInfoId(configType, infoType, appId);
+            var payRateConfigs = _payRateConfigRepository.GetByInfoIdAsNoTracking(configType, infoType, appId);
             var ifCodes = payRateConfigs.Where(w => w.WayCode.Equals(wayCode)).Select(s => s.IfCode).Distinct().ToList();
             var result = _payInterfaceDefineRepository.SelectAvailablePayInterfaceList<AvailablePayInterfaceDto>(wayCode, appId, infoType, mchType)
                 .Where(w => ifCodes.Contains(w.IfCode));
 
             if (result != null)
             {
-                var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
+                var mchPayPassages = _mchPayPassageRepository.GetAllAsNoTracking().Where(w => w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
                 foreach (var item in result)
                 {
                     item.IfRate = item.IfRate ?? item.IfRate * 100;
@@ -231,49 +231,47 @@ namespace AGooday.AgPay.Application.Services
         {
             var configType = CS.CONFIG_TYPE.MCHRATE;
             var infoType = CS.INFO_TYPE.MCH_APP;
-            var payRateConfigs = _payRateConfigRepository.GetByInfoId(configType, infoType, appId);
+            var payRateConfigs = _payRateConfigRepository.GetByInfoIdAsNoTracking(configType, infoType, appId);
             var ifCodes = payRateConfigs.Where(w => w.WayCode.Equals(wayCode)).Select(s => s.IfCode).Distinct().ToList();
 
-            var entity = _mchPayPassageRepository.GetAll().Where(w => w.State.Equals(CS.YES)
-            && w.MchNo.Equals(mchNo)
-            && w.AppId.Equals(appId)
-            && ifCodes.Contains(w.IfCode)
-            && w.WayCode.Equals(wayCode)).FirstOrDefault();
+            var entity = _mchPayPassageRepository.GetAllAsNoTracking().Where(w => w.State.Equals(CS.YES)
+            && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && ifCodes.Contains(w.IfCode) && w.WayCode.Equals(wayCode)).FirstOrDefault();
 
             if (entity == null)
             {
                 return null;
             }
-
-            var payRateConfig = payRateConfigs.FirstOrDefault(w => w.IfCode.Equals(entity.IfCode) && w.WayCode.Equals(wayCode));
-            if (payRateConfig.FeeRate.Equals(CS.FEE_TYPE_SINGLE))
+            var dto = _mapper.Map<MchPayPassageDto>(entity);
+            var payRateConfig = payRateConfigs.FirstOrDefault(w => w.IfCode.Equals(dto.IfCode) && w.WayCode.Equals(wayCode));
+            if (payRateConfig.FeeType.Equals(CS.FEE_TYPE_SINGLE))
             {
-                entity.Rate = payRateConfig.FeeRate.Value;
+                dto.Rate = payRateConfig.FeeRate.Value;
+                dto.RateDesc = $"单笔费率：{dto.Rate * 100:F4}%";
             }
             if (payRateConfig.FeeType.Equals(CS.FEE_TYPE_LEVEL))
             {
                 var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(payRateConfig.Id);
+                PayRateLevelConfig payRateLevelConfig = null;
                 if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_NORMAL))
                 {
-                    var payRateLevelConfig = payRateLevelConfigs.FirstOrDefault(w => string.IsNullOrEmpty(w.BankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
-                    if (payRateLevelConfig == null)
-                    {
-                        return null;
-                    }
-                    entity.Rate = payRateLevelConfig.FeeRate.Value;
+                    payRateLevelConfig = payRateLevelConfigs.FirstOrDefault(w => string.IsNullOrEmpty(w.BankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
                 }
 
                 if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY))
                 {
-                    var payRateLevelConfig = payRateLevelConfigs.FirstOrDefault(w => w.BankCardType.Equals(bankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
-                    if (payRateLevelConfig == null)
-                    {
-                        return null;
-                    }
-                    entity.Rate = payRateLevelConfig.FeeRate.Value;
+                    payRateLevelConfig = payRateLevelConfigs.FirstOrDefault(w => w.BankCardType.Equals(bankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
                 }
+
+                if (payRateLevelConfig == null)
+                {
+                    return null;
+                }
+
+                dto.Rate = payRateLevelConfig.FeeRate.Value;
+
+                var modeName = (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY) ? (payRateLevelConfig.BankCardType.Equals(CS.BANK_CARD_TYPE_DEBIT) ? "借记卡" : (payRateLevelConfig.BankCardType.Equals(CS.BANK_CARD_TYPE_CREDIT) ? "贷记卡" : "")) : "阶梯");
+                dto.RateDesc = $"({payRateLevelConfig.MinAmount / 100M:F2}元-{payRateLevelConfig.MaxAmount / 100M:F2}元]{modeName}费率: {dto.Rate * 100:F4}%, 保底{payRateLevelConfig.MinFee / 100M:F2}元, 封顶{payRateLevelConfig.MaxFee / 100M:F2}元";
             }
-            var dto = _mapper.Map<MchPayPassageDto>(entity);
             return dto;
         }
 
