@@ -1,7 +1,7 @@
 
 #####  ↓↓↓↓↓↓↓↓↓↓  系统配置初始化DML  ↓↓↓↓↓↓↓↓↓↓  #####
 
-UPDATE `t_sys_config` SET `group_key` = 'ossConfig' WHERE `config_key` = 'ossPublicSiteUrl' AND `group_key` = 'applicationConfig'
+UPDATE `t_sys_config` SET `group_key` = 'ossConfig' WHERE `config_key` = 'ossPublicSiteUrl' AND `group_key` = 'applicationConfig';
 INSERT INTO `t_sys_config` VALUES ('apiMapWebKey', '[高德地图商户端web配置]Key', '高德地图Key', 'apiMapConfig', '高德地图商户端web配置', '6cebea39ba50a4c9bc565baaf57d1c8b', 'text', 0, '2023-02-11 18:30:00');
 INSERT INTO `t_sys_config` VALUES ('apiMapWebSecret', '[高德地图商户端web配置]秘钥', '高德地图Key', 'apiMapConfig', '高德地图商户端web配置', 'dccbb5a56d2a1850eda2b6e67f8f2f13', 'text', 0, '2023-02-11 18:30:00');
 INSERT INTO `t_sys_config` VALUES ('apiMapWebServiceKey', '[高德地图商户端web服务]Key', '商户端web服务key', 'apiMapConfig', '高德地图商户端web配置', '1e558c3dc1ce7ab2a0b332d78fcd4c16', 'text', 0, '2023-02-11 18:30:00');
@@ -20,7 +20,7 @@ ALTER TABLE `t_sys_config`
   ADD COLUMN `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 0(平台)' AFTER `sys_type`;
 
 -- SELECT GROUP_CONCAT(CONCAT('''',group_key,'''')) FROM `t_sys_config`;
-UPDATE `t_sys_config` SET `sys_type` = 'MGR', belong_info_id = 0 WHERE `group_key` IN ('agentTreatyConfig','agentTreatyConfig','applicationConfig','ossConfig','apiMapConfig','apiMapConfig','apiMapConfig','mchTreatyConfig','mchTreatyConfig','applicationConfig','applicationConfig','ossConfig','ossConfig','applicationConfig')
+UPDATE `t_sys_config` SET `sys_type` = 'MGR', belong_info_id = 0 WHERE `group_key` IN ('agentTreatyConfig','agentTreatyConfig','applicationConfig','ossConfig','apiMapConfig','apiMapConfig','apiMapConfig','mchTreatyConfig','mchTreatyConfig','applicationConfig','applicationConfig','ossConfig','ossConfig','applicationConfig');
 
 ALTER TABLE `t_sys_config`   
   DROP PRIMARY KEY,
@@ -97,8 +97,8 @@ ALTER TABLE `t_mch_app`
   CHANGE `app_secret` `app_secret` VARCHAR(128) NOT NULL COMMENT '应用MD5私钥',
   ADD COLUMN `app_rsa2_public_key` VARCHAR(448) NULL COMMENT 'RSA2应用公钥' AFTER `app_secret`;
   
--- select * from `t_mch_app` WHERE JSON_TYPE(app_sign_type) = 'NULL'
-UPDATE `t_mch_app` SET `app_sign_type` = '["MD5"]' WHERE JSON_TYPE(app_sign_type) = 'NULL'
+-- select * from `t_mch_app` WHERE JSON_TYPE(app_sign_type) = 'NULL';
+UPDATE `t_mch_app` SET `app_sign_type` = '["MD5"]' WHERE JSON_TYPE(app_sign_type) = 'NULL';
 
 ALTER TABLE `t_pay_interface_define`
   ADD COLUMN `is_support_applyment` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否支持进件: 0-不支持, 1-支持' AFTER `config_page_type`,
@@ -164,7 +164,7 @@ ALTER TABLE `t_pay_order`
 ALTER TABLE `t_pay_order`   
   ADD COLUMN `mch_fee_rate_desc` VARCHAR(128) NULL COMMENT '商户手续费费率快照描述' AFTER `mch_fee_rate`;
   
-UPDATE `t_pay_order` SET `mch_fee_rate_desc` = CONCAT('单笔费率：',ROUND(`mch_fee_rate`*100, 4),'%') WHERE `way_code` != 'QR_CASHIER' AND `mch_fee_rate_desc` IS NULL
+UPDATE `t_pay_order` SET `mch_fee_rate_desc` = CONCAT('单笔费率：',ROUND(`mch_fee_rate`*100, 4),'%') WHERE `way_code` != 'QR_CASHIER' AND `mch_fee_rate_desc` IS NULL;
 
 ALTER TABLE `t_refund_order`   
   CHANGE `mch_name` `mch_name` VARCHAR(64) NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
@@ -191,18 +191,18 @@ ALTER TABLE `t_mch_notify_record`
 /**
 
 SELECT po.way_code,po.way_type,IFNULL(pw.way_type,'OTHER') FROM `t_pay_order` po LEFT JOIN `t_pay_way` pw ON po.way_code = pw.way_code
-WHERE po.way_type = ''
+WHERE po.way_type = '';
 
 UPDATE `t_pay_order` po LEFT JOIN `t_pay_way` pw ON po.way_code = pw.way_code
 SET po.way_type = IFNULL(pw.way_type,'OTHER')
-WHERE po.way_type = ''
+WHERE po.way_type = '';
 
 SELECT ro.way_code,ro.way_type,IFNULL(pw.way_type,'OTHER') FROM `t_refund_order` ro LEFT JOIN `t_pay_way` pw ON ro.way_code = pw.way_code
-WHERE ro.way_type = ''
+WHERE ro.way_type = '';
 
 UPDATE `t_refund_order` ro LEFT JOIN `t_pay_way` pw ON ro.way_code = pw.way_code
 SET ro.way_type = IFNULL(pw.way_type,'OTHER')
-WHERE ro.way_type = ''
+WHERE ro.way_type = '';
 
 **/
 
