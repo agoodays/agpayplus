@@ -173,6 +173,13 @@ namespace AGooday.AgPay.Domain.Models
         public long RefundAmount { get; set; }
 
         /// <summary>
+        /// 手续费退还金额,单位分
+        /// </summary>
+        [Comment("手续费退还金额,单位分")]
+        [Required, Column("refund_fee_amount", TypeName = "bigint")]
+        public long RefundFeeAmount { get; set; }
+
+        /// <summary>
         /// 三位货币代码,人民币:cny
         /// </summary>
         [Comment("三位货币代码,人民币:cny")]

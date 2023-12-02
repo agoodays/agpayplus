@@ -54,6 +54,7 @@
       >
         <template slot="payAmountSlot" slot-scope="{record}"><b>￥{{ record.payAmount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundAmountSlot" slot-scope="{record}"><b>￥{{ record.refundAmount/100 }}</b></template> <!-- 自定义插槽 -->
+        <template slot="refundFeeAmountSlot" slot-scope="{record}"><b>￥{{ record.refundFeeAmount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
           <div><a-tag
             :key="record.state"
@@ -193,6 +194,15 @@
           </a-col>
           <a-col :sm="12">
             <a-descriptions>
+              <a-descriptions-item label="手续费退还金额">
+                <a-tag color="green">
+                  {{ detailData.refundFeeAmount/100 }}
+                </a-tag>
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
               <a-descriptions-item label="订单状态">
                 <a-tag :color="detailData.state === 0?'blue':detailData.state === 1?'orange':detailData.state === 2?'green':'volcano'">
                   {{ detailData.state === 0?'订单生成':detailData.state === 1?'退款中':detailData.state === 2?'退款成功':detailData.state === 3?'退款失败':detailData.state === 4?'任务关闭':'未知' }}
@@ -325,10 +335,11 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
+    { key: 'pay', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
+    { key: 'refund', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
     { key: 'payAmount', title: '支付金额', width: 100, scopedSlots: { customRender: 'payAmountSlot' } },
     { key: 'refundAmount', title: '退款金额', width: 100, scopedSlots: { customRender: 'refundAmountSlot' } },
-    { key: 'pay', title: '退款订单号', width: 260, scopedSlots: { customRender: 'refundOrderSlot' } },
-    { key: 'refund', title: '支付订单号', width: 260, scopedSlots: { customRender: 'payOrderSlot' } },
+    { key: 'refundFeeAmount', title: '手续费退还金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'refundFeeAmountSlot' } },
     // { key: 'refundOrderId', dataIndex: 'refundOrderId', title: '退款订单号' },
     // { key: 'mchRefundNo', dataIndex: 'mchRefundNo', title: '商户退款单号' },
     // { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },

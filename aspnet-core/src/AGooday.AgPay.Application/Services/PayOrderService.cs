@@ -201,6 +201,7 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.WayType = payOrder.WayType;
             updateRecord.MchFeeRate = payOrder.MchFeeRate;
             updateRecord.MchFeeAmount = payOrder.MchFeeAmount;
+            updateRecord.MchOrderFeeAmount = payOrder.MchOrderFeeAmount;
             updateRecord.ChannelUser = payOrder.ChannelUser;
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);

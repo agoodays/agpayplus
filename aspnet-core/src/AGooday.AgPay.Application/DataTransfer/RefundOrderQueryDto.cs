@@ -73,7 +73,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 支付接口代码
         /// </summary>
-        [BindNever]
         public string IfCode { get; set; }
 
         /// <summary>

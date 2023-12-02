@@ -142,7 +142,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 if (isNewOrder && CS.PAY_WAY_CODE.QR_CASHIER.Equals(wayCode))
                 {
                     //生成订单
-                    payOrder = GenPayOrder(bizRQ, mchInfo, mchApp, null, null);
+                    payOrder = GenPayOrder(bizRQ, mchInfo, mchApp, null, null, null);
                     string payOrderId = payOrder.PayOrderId;
                     //订单入库 订单状态： 生成状态  此时没有和任何上游渠道产生交互。
                     _payOrderService.Add(payOrder);
@@ -181,7 +181,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 //生成订单
                 if (isNewOrder)
                 {
-                    payOrder = GenPayOrder(bizRQ, mchInfo, mchApp, ifCode, mchPayPassage);
+                    payOrder = GenPayOrder(bizRQ, mchInfo, mchApp, ifCode, mchPayPassage, paymentService);
                 }
                 else
                 {
@@ -190,7 +190,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     // 查询支付方式的费率，并 在更新ing时更新费率信息
                     payOrder.MchFeeRate = mchPayPassage.Rate;
                     payOrder.MchFeeRateDesc = mchPayPassage.RateDesc;
-                    payOrder.MchFeeAmount = AmountUtil.CalPercentageFee(payOrder.Amount, payOrder.MchFeeRate); //商户手续费,单位分
+                    //payOrder.MchFeeAmount = AmountUtil.CalPercentageFee(payOrder.Amount, payOrder.MchFeeRate); //商户手续费,单位分
+                    payOrder.MchFeeAmount = paymentService.CalculateFeeAmount(payOrder.Amount, payOrder.MchFeeRate);
+                    payOrder.MchOrderFeeAmount = payOrder.MchFeeAmount;
                 }
 
                 //预先校验
@@ -237,7 +239,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
         }
 
-        private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, string ifCode, MchPayPassageDto mchPayPassage)
+        private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
         {
             var wayType = _payWayService.GetWayTypeByWayCode(rq.WayCode);
             PayOrderDto payOrder = new PayOrderDto();
@@ -263,7 +265,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 payOrder.MchFeeRate = Decimal.Zero; //预下单模式， 按照0计算入库， 后续进行更新
             }
 
-            payOrder.MchFeeAmount = AmountUtil.CalPercentageFee(payOrder.Amount, payOrder.MchFeeRate); //商户手续费,单位分
+            //payOrder.MchFeeAmount = AmountUtil.CalPercentageFee(payOrder.Amount, payOrder.MchFeeRate); //商户手续费,单位分
+            payOrder.MchFeeAmount = paymentService?.CalculateFeeAmount(payOrder.Amount, payOrder.MchFeeRate) ?? 0;
+            payOrder.MchOrderFeeAmount = payOrder.MchFeeAmount;
 
             payOrder.Currency = rq.Currency; //币种
             payOrder.State = (byte)PayOrderState.STATE_INIT; //订单状态, 默认订单生成状态

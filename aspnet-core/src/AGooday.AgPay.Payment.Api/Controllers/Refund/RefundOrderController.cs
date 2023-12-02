@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                     throw new BizException("当前通道不支持退款！");
                 }
 
-                refundOrder = GenRefundOrder(rq, payOrder, mchInfo, mchApp);
+                refundOrder = GenRefundOrder(rq, payOrder, mchInfo, mchApp, refundService);
 
                 //退款单入库 退款单状态：生成状态  此时没有和任何上游渠道产生交互。
                 _refundOrderService.Add(refundOrder);
@@ -172,7 +172,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             }
         }
 
-        private RefundOrderDto GenRefundOrder(RefundOrderRQ rq, PayOrderDto payOrder, MchInfoDto mchInfo, MchAppDto mchApp)
+        private RefundOrderDto GenRefundOrder(RefundOrderRQ rq, PayOrderDto payOrder, MchInfoDto mchInfo, MchAppDto mchApp, IRefundService refundService)
         {
             DateTime nowTime = DateTime.Now;
             RefundOrderDto refundOrder = new RefundOrderDto();
@@ -190,6 +190,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             refundOrder.IfCode = payOrder.IfCode; //支付接口代码
             refundOrder.PayAmount = payOrder.Amount; //支付金额,单位分
             refundOrder.RefundAmount = rq.RefundAmount; //退款金额,单位分
+            refundOrder.RefundFeeAmount = refundService.CalculateFeeAmount(refundOrder.RefundAmount, payOrder); //退款手续费,单位分
             refundOrder.Currency = rq.Currency; //三位货币代码,人民币:cny
             refundOrder.State = (byte)RefundOrderState.STATE_INIT; //退款状态:0-订单生成,1-退款中,2-退款成功,3-退款失败
             refundOrder.ClientIp = string.IsNullOrWhiteSpace(rq.ClientIp) ? GetClientIp() : rq.ClientIp; //客户端IP

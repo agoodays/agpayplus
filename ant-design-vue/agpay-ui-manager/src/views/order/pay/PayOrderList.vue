@@ -156,7 +156,7 @@
           </a-tag>
         </template>
         <template slot="ifCodeSlot" slot-scope="{record}">
-          <span v-if="record.ifCode">
+          <span v-if="record.ifCode" :title="record.ifName+'['+record.ifCode+']'">
             <span class="icon-style" :style="{ backgroundColor: record.bgColor }"><img class="icon" :src="record.icon" alt=""></span> {{ record.ifName }}[{{ record.ifCode }}]
           </span>
         </template>
@@ -321,6 +321,13 @@
           </a-col>
           <a-col :sm="12">
             <a-descriptions>
+              <a-descriptions-item label="代理商号">
+                {{ detailData.agentNo }}
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
               <a-descriptions-item label="商户号">
                 {{ detailData.mchNo }}
               </a-descriptions-item>
@@ -350,7 +357,10 @@
             </a-descriptions>
           </a-col>
           <a-col :sm="12">
-            <a-descriptions><a-descriptions-item label="手续费"><a-tag color="pink">{{ detailData.mchFeeAmount/100 }}</a-tag></a-descriptions-item></a-descriptions>
+            <a-descriptions><a-descriptions-item label="实际手续费"><a-tag color="pink">{{ detailData.mchFeeAmount/100 }}</a-tag></a-descriptions-item></a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions><a-descriptions-item label="收单手续费"><a-tag color="pink">{{ detailData.mchOrderFeeAmount/100 }}</a-tag></a-descriptions-item></a-descriptions>
           </a-col>
           <a-col :sm="12">
 <!--            <a-descriptions><a-descriptions-item label="商家费率">{{ (detailData.mchFeeRate*100).toFixed(2) }}%</a-descriptions-item></a-descriptions>-->
@@ -603,9 +613,10 @@ const tableColumns = [
   // { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号' },
   { key: 'amount', title: '支付金额', width: 108, ellipsis: true, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'refundAmount', title: '退款金额', width: 108, scopedSlots: { customRender: 'refundAmountSlot' } },
-  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', width: 100, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '实际手续费', width: 110, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'mchOrderFeeAmount', dataIndex: 'mchOrderFeeAmount', title: '收单手续费', width: 110, customRender: (text) => '￥' + (text / 100).toFixed(2) },
   { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 100, ellipsis: true },
-  { key: 'ifCode', title: '支付接口', width: 260, scopedSlots: { customRender: 'ifCodeSlot' } },
+  { key: 'ifCode', title: '支付接口', width: 180, ellipsis: true, scopedSlots: { customRender: 'ifCodeSlot' } },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式', width: 120 },
   { key: 'state', title: '支付状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
   { key: 'notifyState', title: '回调状态', width: 100, scopedSlots: { customRender: 'notifySlot' } },

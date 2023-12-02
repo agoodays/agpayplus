@@ -32,6 +32,14 @@ namespace AGooday.AgPay.Payment.Api.Channel
         string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder);
 
         /// <summary>
+        /// 计算手续费
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        long CalculateFeeAmount(long amount, decimal rate);
+
+        /// <summary>
         /// 调起支付接口，并响应数据；  内部处理普通商户和服务商模式
         /// </summary>
         /// <param name="bizRQ"></param>

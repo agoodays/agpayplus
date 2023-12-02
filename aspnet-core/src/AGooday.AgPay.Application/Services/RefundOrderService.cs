@@ -101,6 +101,7 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
+                && (string.IsNullOrWhiteSpace(dto.IfCode) || w.WayCode.Equals(dto.IfCode))
                 && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
                 && (string.IsNullOrWhiteSpace(dto.RefundOrderId) || w.RefundOrderId.Equals(dto.RefundOrderId))
                 && (string.IsNullOrWhiteSpace(dto.MchRefundNo) || w.MchRefundNo.Equals(dto.MchRefundNo))
@@ -176,7 +177,7 @@ namespace AGooday.AgPay.Application.Services
                 return false;
             }
             //2. 更新订单表数据（更新退款次数,退款状态,如全额退款更新支付状态为已退款）
-            if (!UpdateRefundAmountAndCount(updateRecord.PayOrderId, updateRecord.RefundAmount))
+            if (!UpdateRefundAmountAndCount(updateRecord.PayOrderId, updateRecord.RefundAmount, updateRecord.RefundFeeAmount))
             {
                 throw new BizException("更新订单数据异常");
             }
@@ -189,7 +190,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="currentRefundAmount"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public bool UpdateRefundAmountAndCount(string payOrderId, long currentRefundAmount)
+        public bool UpdateRefundAmountAndCount(string payOrderId, long currentRefundAmount, long currentRefundFeeAmount)
         {
             var payOrder = _payOrderRepository.GetById(payOrderId);
             // 成功状态的可退款
@@ -203,8 +204,9 @@ namespace AGooday.AgPay.Application.Services
                 throw new BizException("已退款金额 + 本次退款金额必须小于等于订单金额");
             }
             payOrder.RefundTimes = ++payOrder.RefundTimes; // 退款次数 +1
-            payOrder.RefundAmount = payOrder.RefundAmount + currentRefundAmount; // 退款金额累加
             payOrder.RefundState = (byte)(payOrder.RefundAmount + currentRefundAmount >= payOrder.Amount ? PayOrderRefund.REFUND_STATE_ALL : PayOrderRefund.REFUND_STATE_SUB); // 更新是否已全额退款。 此更新需在refund_amount更新之前，否则需要去掉累加逻辑
+            payOrder.RefundAmount = payOrder.RefundAmount + currentRefundAmount; // 退款金额累加
+            payOrder.MchFeeAmount = payOrder.MchFeeAmount - currentRefundFeeAmount;
             payOrder.State = payOrder.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_ALL) ? (byte)PayOrderState.STATE_REFUND : payOrder.State; // 更新支付状态是否已退款。 此更新需在refund_state更新之后，如果全额退款则修改支付状态为已退款
             _payOrderRepository.Update(payOrder);
             return _payOrderRepository.SaveChanges(out int _);

@@ -297,6 +297,13 @@
           </a-col>
           <a-col :sm="12">
             <a-descriptions>
+              <a-descriptions-item label="代理商号">
+                {{ detailData.agentNo }}
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
               <a-descriptions-item label="商户号">
                 {{ detailData.mchNo }}
               </a-descriptions-item>
@@ -342,7 +349,10 @@
             </a-descriptions>
           </a-col>
           <a-col :sm="12">
-            <a-descriptions><a-descriptions-item label="手续费"><a-tag color="pink">{{ detailData.mchFeeAmount/100 }}</a-tag></a-descriptions-item></a-descriptions>
+            <a-descriptions><a-descriptions-item label="实际手续费"><a-tag color="pink">{{ detailData.mchFeeAmount/100 }}</a-tag></a-descriptions-item></a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions><a-descriptions-item label="收单手续费"><a-tag color="pink">{{ detailData.mchOrderFeeAmount/100 }}</a-tag></a-descriptions-item></a-descriptions>
           </a-col>
           <a-col :sm="12">
 <!--            <a-descriptions><a-descriptions-item label="商家费率">{{ (detailData.mchFeeRate*100).toFixed(2) }}%</a-descriptions-item></a-descriptions>-->
@@ -547,7 +557,8 @@ const tableColumns = [
   // { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号' },
   { key: 'amount', title: '支付金额', width: 100, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'refundAmount', title: '退款金额', width: 100, scopedSlots: { customRender: 'refundAmountSlot' } },
-  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', width: 100, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '实际手续费', width: 110, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'mchOrderFeeAmount', dataIndex: 'mchOrderFeeAmount', title: '收单手续费', width: 110, customRender: (text) => '￥' + (text / 100).toFixed(2) },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式', width: 150 },
   { key: 'state', title: '支付状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
   { key: 'divisionState', title: '分账状态', width: 100, align: 'center', scopedSlots: { customRender: 'divisionStateSlot' } },

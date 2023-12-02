@@ -1,9 +1,11 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using AGooday.AgPay.Common.Models;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 退款订单表
     /// </summary>
-    public class RefundOrderDto
+    public class RefundOrderDto : BaseModel
     {
         /// <summary>
         /// 退款订单号（支付系统生成订单号）
@@ -109,6 +111,11 @@
         /// 退款金额,单位分
         /// </summary>
         public long RefundAmount { get; set; }
+
+        /// <summary>
+        /// 手续费退还金额,单位分
+        /// </summary>
+        public long RefundFeeAmount { get; set; }
 
         /// <summary>
         /// 三位货币代码,人民币:cny

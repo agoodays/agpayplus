@@ -22,12 +22,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     {
         private readonly ILogger<RefundOrderController> _logger;
         private readonly IRefundOrderService _refundOrderService;
+        private readonly IPayInterfaceDefineService _payIfDefineService;
 
         public RefundOrderController(ILogger<RefundOrderController> logger,
-            IRefundOrderService refundOrderService)
+            IRefundOrderService refundOrderService,
+            IPayInterfaceDefineService payIfDefineService)
         {
             _logger = logger;
             _refundOrderService = refundOrderService;
+            _payIfDefineService = payIfDefineService;
         }
 
         /// <summary>
@@ -41,6 +44,19 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         {
             dto.BindDateRange();
             var refundOrders = _refundOrderService.GetPaginatedData(dto);
+            var ifDefines = _payIfDefineService.GetAll();
+
+            foreach (var refundOrder in refundOrders)
+            {
+                // 存入支付方式名称
+                var ifDefine = ifDefines.FirstOrDefault(f => f.IfCode.Equals(refundOrder.IfCode));
+                if (ifDefine != null)
+                {
+                    refundOrder.AddExt("ifName", ifDefine.IfName);
+                    refundOrder.AddExt("bgColor", ifDefine.BgColor);
+                    refundOrder.AddExt("icon", ifDefine.Icon);
+                }
+            }
             return ApiPageRes<RefundOrderDto>.Pages(refundOrders);
         }
 

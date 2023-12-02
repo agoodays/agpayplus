@@ -30,6 +30,14 @@
             </a-select>
           </a-form-item>
           <a-form-item v-if="isShowMore" label="" class="table-head-layout">
+            <a-select v-model="searchData.ifCode" placeholder="支付接口">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option v-for="(item) in ifDefineList" :key="item.ifCode" >
+                <span class="icon-style" :style="{ backgroundColor: item.bgColor }"><img class="icon" :src="item.icon" alt=""></span> {{ item.ifName }}[{{ item.ifCode }}]
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item v-if="isShowMore" label="" class="table-head-layout">
             <a-select v-model="searchData.mchType" placeholder="商户类型" default-value="">
               <a-select-option value="">全部</a-select-option>
               <a-select-option value="1">普通商户</a-select-option>
@@ -55,6 +63,7 @@
       >
         <template slot="payAmountSlot" slot-scope="{record}"><b>￥{{ record.payAmount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundAmountSlot" slot-scope="{record}"><b>￥{{ record.refundAmount/100 }}</b></template> <!-- 自定义插槽 -->
+        <template slot="refundFeeAmountSlot" slot-scope="{record}"><b>￥{{ record.refundFeeAmount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
           <a-tag
             :key="record.state"
@@ -63,7 +72,11 @@
             {{ record.state === 0?'订单生成':record.state === 1?'退款中':record.state === 2?'退款成功':record.state === 3?'退款失败':record.state === 4?'任务关闭':'未知' }}
           </a-tag>
         </template>
-
+        <template slot="ifCodeSlot" slot-scope="{record}">
+          <span v-if="record.ifCode" :title="record.ifName+'['+record.ifCode+']'">
+            <span class="icon-style" :style="{ backgroundColor: record.bgColor }"><img class="icon" :src="record.icon" alt=""></span> {{ record.ifName }}[{{ record.ifCode }}]
+          </span>
+        </template>
         <template slot="payOrderSlot" slot-scope="{record}">
           <div class="order-list">
             <p><span style="color:#729ED5;background:#e7f5f7">支付</span>{{ record.payOrderId }}</p>
@@ -187,6 +200,15 @@
               <a-descriptions-item label="退款金额">
                 <a-tag color="green">
                   {{ detailData.refundAmount/100 }}
+                </a-tag>
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
+              <a-descriptions-item label="手续费退还金额">
+                <a-tag color="green">
+                  {{ detailData.refundFeeAmount/100 }}
                 </a-tag>
               </a-descriptions-item>
             </a-descriptions>
@@ -321,15 +343,17 @@
   import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
   import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
   import AgTableColumns from '@/components/AgTable/AgTableColumns'
-  import { API_URL_REFUND_ORDER_LIST, req } from '@/api/manage'
+  import { API_URL_REFUND_ORDER_LIST, API_URL_IFDEFINES_LIST, req } from '@/api/manage'
   import moment from 'moment'
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'pay', title: '退款订单号', width: 220, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
-    { key: 'refund', title: '支付订单号', width: 220, scopedSlots: { customRender: 'payOrderSlot' } },
+    { key: 'pay', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
+    { key: 'refund', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
+    { key: 'ifCode', title: '支付接口', width: 160, ellipsis: true, scopedSlots: { customRender: 'ifCodeSlot' } },
     { key: 'payAmount', title: '支付金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
     { key: 'refundAmount', title: '退款金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'refundAmountSlot' } },
+    { key: 'refundFeeAmount', title: '手续费退还金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'refundFeeAmountSlot' } },
     // { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
     // { key: 'mchRefundNo', dataIndex: 'mchRefundNo', title: '商户退款单号' },
     { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
@@ -345,6 +369,7 @@
         isShowMore: false,
         btnLoading: false,
         tableColumns: tableColumns,
+        ifDefineList: [],
         searchData: {
           queryDateRange: 'today'
         },
@@ -358,6 +383,7 @@
     computed: {
     },
     mounted () {
+      this.initIfDefineList()
     },
     methods: {
       handleSearchFormData (searchData) {
@@ -422,6 +448,13 @@
       changeStr2ellipsis (orderNo, baseLength) {
         const halfLengh = parseInt(baseLength / 2)
         return orderNo.substring(0, halfLengh - 1) + '...' + orderNo.substring(orderNo.length - halfLengh, orderNo.length)
+      },
+      // 请求支付接口定义数据
+      initIfDefineList: function () {
+        const that = this // 提前保留this
+        req.list(API_URL_IFDEFINES_LIST, { 'state': 1 }).then(res => {
+          that.ifDefineList = res
+        })
       }
     }
   }
@@ -446,5 +479,17 @@
         margin-right: 2px;
       }
     }
+  }
+
+  .icon-style {
+    border-radius: 5px;
+    padding-left: 2px;
+    padding-right: 2px
+  }
+
+  .icon {
+    width: 15px;
+    height: 14px;
+    margin-bottom: 3px
   }
 </style>

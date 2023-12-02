@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
@@ -29,6 +30,11 @@ namespace AGooday.AgPay.Payment.Api.Channel
         public abstract bool IsSupport(string wayCode);
         public abstract AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
         public abstract string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder);
+
+        public virtual long CalculateFeeAmount(long amount, decimal rate)
+        {
+            return AmountUtil.CalPercentageFee(amount, rate);
+        }
 
         /// <summary>
         /// 订单分账（一般用作 如微信订单将在下单处做标记）
