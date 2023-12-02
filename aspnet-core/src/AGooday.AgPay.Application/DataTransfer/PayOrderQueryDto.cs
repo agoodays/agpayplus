@@ -69,7 +69,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 支付接口代码
         /// </summary>
-        [BindNever]
         public string IfCode { get; set; }
 
         /// <summary>
@@ -145,6 +144,16 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 渠道订单号
         /// </summary>
         public string ChannelOrderNo { get; set; }
+
+        /// <summary>
+        /// 用户支付凭证交易单号 微信/支付宝流水号
+        /// </summary>
+        public string PlatformOrderNo { get; set; }
+
+        /// <summary>
+        /// 用户支付凭证商户单号
+        /// </summary>
+        public string PlatformMchOrderNo { get; set; }
 
         /// <summary>
         /// 退款状态: 0-未发生实际退款, 1-部分退款, 2-全额退款

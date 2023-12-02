@@ -30,17 +30,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         private readonly ILogger<PayOrderController> _logger;
         private readonly IPayOrderService _payOrderService;
         private readonly IPayWayService _payWayService;
+        private readonly IPayInterfaceDefineService _payIfDefineService;
         private readonly ISysConfigService _sysConfigService;
         private readonly IMchAppService _mchAppService;
 
         public PayOrderController(ILogger<PayOrderController> logger,
             IPayOrderService payOrderService,
             IPayWayService payWayService,
+            IPayInterfaceDefineService payIfDefineService,
             ISysConfigService sysConfigService,
             IMchAppService mchAppService)
         {
             _logger = logger;
             _payOrderService = payOrderService;
+            _payIfDefineService = payIfDefineService;
             _payWayService = payWayService;
             _sysConfigService = sysConfigService;
             _mchAppService = mchAppService;
@@ -65,12 +68,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 {
                     payWayNameMap.Add(c.WayCode, c.WayName);
                 });
+            var ifDefines = _payIfDefineService.GetAll();
 
             foreach (var payOrder in payOrders)
             {
                 // 存入支付方式名称
                 payOrder.AddExt("wayName", payWayNameMap.ContainsKey(payOrder.WayCode) ? payWayNameMap[payOrder.WayCode] : payOrder.WayCode);
+                var ifDefine = ifDefines.FirstOrDefault(f => f.IfCode.Equals(payOrder.IfCode));
+                if (ifDefine != null)
+                {
+                    payOrder.AddExt("ifName", ifDefine.IfName);
+                    payOrder.AddExt("bgColor", ifDefine.BgColor);
+                    payOrder.AddExt("icon", ifDefine.Icon);
+                }
             }
+
             return ApiPageRes<PayOrderDto>.Pages(payOrders);
         }
 

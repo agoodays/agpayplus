@@ -13,17 +13,40 @@
           <a-form-item label="" class="table-head-layout">
             <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
-          <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-<!--          <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
-<!--          <ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="orderNoType" @change="orderNoTypeChange">
+              <a-select-option :value="'payOrderId'">支付订单号</a-select-option>
+              <a-select-option :value="'mchOrderNo'">商户订单号</a-select-option>
+              <a-select-option :value="'channelOrderNo'" >渠道订单号</a-select-option>
+              <a-select-option :value="'platformOrderNo'">用户支付凭证交易单号</a-select-option>
+              <a-select-option :value="'platformMchOrderNo'">用户支付凭证商户单号</a-select-option>
+            </a-select>
+          </a-form-item>
+<!--            <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />-->
+          <ag-text-up v-show="orderNoType==='payOrderId'" :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />
+          <ag-text-up v-show="orderNoType==='mchOrderNo'" :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />
+          <ag-text-up v-show="orderNoType==='channelOrderNo'" :placeholder="'渠道订单号'" :msg="searchData.channelOrderNo" v-model="searchData.channelOrderNo" />
+          <ag-text-up v-show="orderNoType==='platformOrderNo'" :placeholder="'用户支付凭证交易单号'" :msg="searchData.platformOrderNo" v-model="searchData.platformOrderNo" />
+          <ag-text-up v-show="orderNoType==='platformMchOrderNo'" :placeholder="'用户支付凭证商户单号'" :msg="searchData.platformMchOrderNo" v-model="searchData.platformMchOrderNo" />
           <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
-          <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
-          <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+          <ag-text-up :placeholder="'门店ID'" :msg="searchData.storeId" v-model="searchData.storeId"/>
+          <ag-text-up v-if="isShowMore" :placeholder="'门店名称'" :msg="searchData.storeName" v-model="searchData.storeName"/>
+          <ag-text-up v-if="isShowMore" :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
+          <ag-text-up v-if="isShowMore" :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
+          <ag-text-up v-if="isShowMore" :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
           <a-form-item v-if="isShowMore && $access('ENT_PAY_ORDER_SEARCH_PAY_WAY')" label="" class="table-head-layout">
             <a-select v-model="searchData.wayCode" placeholder="支付方式" default-value="">
               <a-select-option value="">全部</a-select-option>
               <a-select-option :key="item.wayCode" v-for="item in payWayList" :value="item.wayCode">
                 {{ item.wayName }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item v-if="isShowMore" label="" class="table-head-layout">
+            <a-select v-model="searchData.ifCode" placeholder="支付接口">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option v-for="(item) in ifDefineList" :key="item.ifCode" >
+                <span class="icon-style" :style="{ backgroundColor: item.bgColor }"><img class="icon" :src="item.icon" alt=""></span> {{ item.ifName }}[{{ item.ifCode }}]
               </a-select-option>
             </a-select>
           </a-form-item>
@@ -131,6 +154,11 @@
           >
             {{ record.state === 0?'订单生成':record.state === 1?'支付中':record.state === 2?'支付成功':record.state === 3?'支付失败':record.state === 4?'已撤销':record.state === 5?'已退款':record.state === 6?'订单关闭':'未知' }}
           </a-tag>
+        </template>
+        <template slot="ifCodeSlot" slot-scope="{record}">
+          <span v-if="record.ifCode">
+            <span class="icon-style" :style="{ backgroundColor: record.bgColor }"><img class="icon" :src="record.icon" alt=""></span> {{ record.ifName }}[{{ record.ifCode }}]
+          </span>
         </template>
         <template slot="divisionStateSlot" slot-scope="{record}">
           <span v-if="record.divisionState == 0"> - </span>
@@ -565,7 +593,7 @@ import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_PAY_ORDER_LIST, API_URL_PAYWAYS_LIST, req } from '@/api/manage'
+import { API_URL_PAY_ORDER_LIST, API_URL_PAYWAYS_LIST, API_URL_IFDEFINES_LIST, req } from '@/api/manage'
 import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
@@ -577,6 +605,7 @@ const tableColumns = [
   { key: 'refundAmount', title: '退款金额', width: 108, scopedSlots: { customRender: 'refundAmountSlot' } },
   { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '手续费', width: 100, customRender: (text) => '￥' + (text / 100).toFixed(2) },
   { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 100, ellipsis: true },
+  { key: 'ifCode', title: '支付接口', width: 260, scopedSlots: { customRender: 'ifCodeSlot' } },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式', width: 120 },
   { key: 'state', title: '支付状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
   { key: 'notifyState', title: '回调状态', width: 100, scopedSlots: { customRender: 'notifySlot' } },
@@ -593,6 +622,8 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
+      orderNoType: 'payOrderId',
+      ifDefineList: [],
       searchData: {
         queryDateRange: 'today'
       },
@@ -621,11 +652,16 @@ export default {
     if (this.$access('ENT_PAY_ORDER_SEARCH_PAY_WAY')) {
       this.initPayWay()
     }
+    this.initIfDefineList()
     this.countFunc()
   },
   methods: {
     handleSearchFormData (searchData) {
       this.searchData = searchData
+      // if (!Object.keys(searchData).length) {
+      //   this.searchData.queryDateRange = 'today'
+      // }
+      // this.$forceUpdate()
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore
@@ -704,9 +740,23 @@ export default {
         that.payWayList = res.records
       })
     },
+    // 请求支付接口定义数据
+    initIfDefineList: function () {
+      const that = this // 提前保留this
+      req.list(API_URL_IFDEFINES_LIST, { 'state': 1 }).then(res => {
+        that.ifDefineList = res
+      })
+    },
     changeStr2ellipsis (orderNo, baseLength) {
       const halfLengh = parseInt(baseLength / 2)
       return orderNo.substring(0, halfLengh - 1) + '...' + orderNo.substring(orderNo.length - halfLengh, orderNo.length)
+    },
+    orderNoTypeChange () {
+      this.searchData.payOrderId = null
+      this.searchData.mchOrderNo = null
+      this.searchData.channelOrderNo = null
+      this.searchData.platformOrderNo = null
+      this.searchData.platformMchOrderNo = null
     }
   }
 }
@@ -755,6 +805,18 @@ export default {
     align-items: center;
     justify-content: center;
     padding: 10px 0
+  }
+
+  .icon-style {
+    border-radius: 5px;
+    padding-left: 2px;
+    padding-right: 2px
+  }
+
+  .icon {
+    width: 15px;
+    height: 14px;
+    margin-bottom: 3px
   }
 
   .data-statistics {

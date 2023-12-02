@@ -7,9 +7,21 @@
             <a-form-item label="" class="table-head-layout">
               <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
             </a-form-item>
-            <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-<!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
-<!--            <ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="orderNoType" @change="orderNoTypeChange">
+                <a-select-option :value="'payOrderId'">支付订单号</a-select-option>
+                <a-select-option :value="'mchOrderNo'">商户订单号</a-select-option>
+                <a-select-option :value="'channelOrderNo'" >渠道订单号</a-select-option>
+                <a-select-option :value="'platformOrderNo'">用户支付凭证交易单号</a-select-option>
+                <a-select-option :value="'platformMchOrderNo'">用户支付凭证商户单号</a-select-option>
+              </a-select>
+            </a-form-item>
+<!--            <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />-->
+            <ag-text-up v-show="orderNoType==='payOrderId'" :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />
+            <ag-text-up v-show="orderNoType==='mchOrderNo'" :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />
+            <ag-text-up v-show="orderNoType==='channelOrderNo'" :placeholder="'渠道订单号'" :msg="searchData.channelOrderNo" v-model="searchData.channelOrderNo" />
+            <ag-text-up v-show="orderNoType==='platformOrderNo'" :placeholder="'用户支付凭证交易单号'" :msg="searchData.platformOrderNo" v-model="searchData.platformOrderNo" />
+            <ag-text-up v-show="orderNoType==='platformMchOrderNo'" :placeholder="'用户支付凭证商户单号'" :msg="searchData.platformMchOrderNo" v-model="searchData.platformMchOrderNo" />
             <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
             <a-form-item v-if="$access('ENT_PAY_ORDER_SEARCH_PAY_WAY')" label="" class="table-head-layout">
               <a-select v-model="searchData.wayCode" placeholder="支付方式" default-value="">
@@ -551,6 +563,7 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
+      orderNoType: 'payOrderId',
       searchData: {
         queryDateRange: 'today'
       },
@@ -658,6 +671,13 @@ export default {
     changeStr2ellipsis (orderNo, baseLength) {
       const halfLengh = parseInt(baseLength / 2)
       return orderNo.substring(0, halfLengh - 1) + '...' + orderNo.substring(orderNo.length - halfLengh, orderNo.length)
+    },
+    orderNoTypeChange () {
+      this.searchData.payOrderId = null
+      this.searchData.mchOrderNo = null
+      this.searchData.channelOrderNo = null
+      this.searchData.platformOrderNo = null
+      this.searchData.platformMchOrderNo = null
     }
   }
 }
