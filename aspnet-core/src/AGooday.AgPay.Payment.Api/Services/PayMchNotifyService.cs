@@ -67,6 +67,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string reqMethod = "POST";
                 string extParams = GetExtParams(dbPayOrder.MchNo, out string reqMediaType);
                 string notifyUrl = CreateNotifyUrl(dbPayOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
+                var nowDate = DateTime.Now;
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbPayOrder.PayOrderId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_PAY_ORDER;
@@ -80,7 +81,10 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchNotifyRecord.ReqBody = reqBody;
                 mchNotifyRecord.ResResult = string.Empty;
                 mchNotifyRecord.NotifyCount = 0;
+                mchNotifyRecord.NotifyCountLimit = 6;
                 mchNotifyRecord.State = (byte)MchNotifyRecordState.STATE_ING; // 通知中
+                mchNotifyRecord.CreatedAt = nowDate;
+                mchNotifyRecord.UpdatedAt = nowDate;
 
                 try
                 {
@@ -132,6 +136,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string reqMethod = "POST";
                 string extParams = GetExtParams(dbRefundOrder.MchNo, out string reqMediaType);
                 string notifyUrl = CreateNotifyUrl(dbRefundOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
+                var nowDate = DateTime.Now;
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbRefundOrder.RefundOrderId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
@@ -142,9 +147,12 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchNotifyRecord.NotifyUrl = notifyUrl;
                 mchNotifyRecord.ReqMethod = reqMethod;
                 mchNotifyRecord.ReqBody = reqBody;
-                mchNotifyRecord.ResResult = "";
+                mchNotifyRecord.ResResult = string.Empty;
                 mchNotifyRecord.NotifyCount = 0;
+                mchNotifyRecord.NotifyCountLimit = 6;
                 mchNotifyRecord.State = (byte)MchNotifyRecordState.STATE_ING; // 通知中
+                mchNotifyRecord.CreatedAt = nowDate;
+                mchNotifyRecord.UpdatedAt = nowDate;
 
                 try
                 {
@@ -196,6 +204,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string reqMethod = "POST";
                 string extParams = GetExtParams(dbTransferOrder.MchNo, out string reqMediaType);
                 string notifyUrl = CreateNotifyUrl(dbTransferOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
+                var nowDate = DateTime.Now;
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbTransferOrder.TransferId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_TRANSFER_ORDER;
@@ -206,9 +215,12 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchNotifyRecord.NotifyUrl = notifyUrl;
                 mchNotifyRecord.ReqMethod = reqMethod;
                 mchNotifyRecord.ReqBody = reqBody;
-                mchNotifyRecord.ResResult = "";
+                mchNotifyRecord.ResResult = string.Empty;
                 mchNotifyRecord.NotifyCount = 0;
+                mchNotifyRecord.NotifyCountLimit = 6;
                 mchNotifyRecord.State = (byte)MchNotifyRecordState.STATE_ING; // 通知中
+                mchNotifyRecord.CreatedAt = nowDate;
+                mchNotifyRecord.UpdatedAt = nowDate;
 
                 try
                 {

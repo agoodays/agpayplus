@@ -48,6 +48,13 @@ namespace AGooday.AgPay.Domain.Models
         public string MchNo { get; set; }
 
         /// <summary>
+        /// 代理商号
+        /// </summary>
+        [Comment("代理商号")]
+        [Column("agent_no", TypeName = "varchar(64)")]
+        public string AgentNo { get; set; }
+
+        /// <summary>
         /// 服务商号
         /// </summary>
         [Comment("服务商号")]
@@ -121,8 +128,8 @@ namespace AGooday.AgPay.Domain.Models
         /// 最后一次通知时间
         /// </summary>
         [Comment("最后一次通知时间")]
-        [Required, Column("last_notify_time")]
-        public DateTime LastNotifyTime { get; set; }
+        [Column("last_notify_time")]
+        public DateTime? LastNotifyTime { get; set; }
 
         /// <summary>
         /// 创建时间
