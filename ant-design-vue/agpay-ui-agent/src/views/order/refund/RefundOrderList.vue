@@ -202,7 +202,7 @@
           <a-col :sm="12">
             <a-descriptions>
               <a-descriptions-item label="手续费退还金额">
-                <a-tag color="green">
+                <a-tag color="pink">
                   {{ detailData.refundFeeAmount/100 }}
                 </a-tag>
               </a-descriptions-item>
@@ -342,8 +342,8 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'pay', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
-    { key: 'refund', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
+    { key: 'refund', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
+    { key: 'pay', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
     { key: 'payAmount', title: '支付金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
     { key: 'refundAmount', title: '退款金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'refundAmountSlot' } },
     { key: 'refundFeeAmount', title: '手续费退还金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'refundFeeAmountSlot' } },

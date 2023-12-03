@@ -112,17 +112,17 @@
       </a-col>
     </a-row>
     <a-divider />
-    <a-col :sm="12">
+    <a-col :sm="24">
       <a-descriptions>
         <a-descriptions-item label="渠道订单号">{{ detailData.channelOrderNo }}</a-descriptions-item>
       </a-descriptions>
     </a-col>
-    <a-col :sm="12">
+    <a-col :sm="24">
       <a-descriptions>
         <a-descriptions-item label="渠道错误码">{{ detailData.errCode }}</a-descriptions-item>
       </a-descriptions>
     </a-col>
-    <a-col :sm="12">
+    <a-col :sm="24">
       <a-descriptions>
         <a-descriptions-item label="渠道错误描述">{{ detailData.errMsg }}</a-descriptions-item>
       </a-descriptions>

@@ -73,9 +73,14 @@
           </a-tag>
         </template>
         <template slot="ifCodeSlot" slot-scope="{record}">
-          <span v-if="record.ifCode" :title="record.ifName+'['+record.ifCode+']'">
-            <span class="icon-style" :style="{ backgroundColor: record.bgColor }"><img class="icon" :src="record.icon" alt=""></span> {{ record.ifName }}[{{ record.ifCode }}]
-          </span>
+          <a-tooltip placement="bottom" style="font-weight: normal;">
+            <template slot="title">
+              <span class="icon-style" :style="{ backgroundColor: record.bgColor }"><img class="icon" :src="record.icon" alt=""></span> {{ record.ifName }}[{{ record.ifCode }}]
+            </template>
+            <span v-if="record.ifCode">
+              <span class="icon-style" :style="{ backgroundColor: record.bgColor }"><img class="icon" :src="record.icon" alt=""></span> {{ record.ifName }}[{{ record.ifCode }}]
+            </span>
+          </a-tooltip>
         </template>
         <template slot="payOrderSlot" slot-scope="{record}">
           <div class="order-list">
@@ -207,7 +212,7 @@
           <a-col :sm="12">
             <a-descriptions>
               <a-descriptions-item label="手续费退还金额">
-                <a-tag color="green">
+                <a-tag color="pink">
                   {{ detailData.refundFeeAmount/100 }}
                 </a-tag>
               </a-descriptions-item>
@@ -281,21 +286,21 @@
           </a-col>
         </a-row>
         <a-divider />
-        <a-col :sm="12">
+        <a-col :sm="24">
           <a-descriptions>
             <a-descriptions-item label="渠道订单号">
               {{ detailData.channelOrderNo }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
-        <a-col :sm="12">
+        <a-col :sm="24">
           <a-descriptions>
             <a-descriptions-item label="渠道错误码">
               {{ detailData.errCode }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
-        <a-col :sm="12">
+        <a-col :sm="24">
           <a-descriptions>
             <a-descriptions-item label="渠道错误描述">
               {{ detailData.errMsg }}
@@ -348,8 +353,8 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'pay', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
-    { key: 'refund', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
+    { key: 'refund', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
+    { key: 'pay', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
     { key: 'ifCode', title: '支付接口', width: 160, ellipsis: true, scopedSlots: { customRender: 'ifCodeSlot' } },
     { key: 'payAmount', title: '支付金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
     { key: 'refundAmount', title: '退款金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'refundAmountSlot' } },

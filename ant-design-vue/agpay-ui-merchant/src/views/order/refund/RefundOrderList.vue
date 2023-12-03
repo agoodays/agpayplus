@@ -195,7 +195,7 @@
           <a-col :sm="12">
             <a-descriptions>
               <a-descriptions-item label="手续费退还金额">
-                <a-tag color="green">
+                <a-tag color="pink">
                   {{ detailData.refundFeeAmount/100 }}
                 </a-tag>
               </a-descriptions-item>
@@ -269,21 +269,21 @@
           </a-col>
         </a-row>
         <a-divider />
-        <a-col :sm="12">
+        <a-col :sm="24">
           <a-descriptions>
             <a-descriptions-item label="渠道订单号">
               {{ detailData.channelOrderNo }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
-        <a-col :sm="12">
+        <a-col :sm="24">
           <a-descriptions>
             <a-descriptions-item label="渠道错误码">
               {{ detailData.errCode }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
-        <a-col :sm="12">
+        <a-col :sm="24">
           <a-descriptions>
             <a-descriptions-item label="渠道错误描述">
               {{ detailData.errMsg }}
@@ -335,8 +335,8 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'pay', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
-    { key: 'refund', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
+    { key: 'refund', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
+    { key: 'pay', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
     { key: 'payAmount', title: '支付金额', width: 100, scopedSlots: { customRender: 'payAmountSlot' } },
     { key: 'refundAmount', title: '退款金额', width: 100, scopedSlots: { customRender: 'refundAmountSlot' } },
     { key: 'refundFeeAmount', title: '手续费退还金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'refundFeeAmountSlot' } },
@@ -432,24 +432,24 @@
   }
 </script>
 <style lang="less" scoped>
-.order-list {
-  -webkit-text-size-adjust:none;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
+  .order-list {
+    -webkit-text-size-adjust:none;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
 
-  p {
-    white-space:nowrap;
-    span {
-      display: inline-block;
-      font-weight: 800;
-      height: 16px;
-      line-height: 16px;
-      width: 35px;
-      border-radius: 5px;
-      text-align: center;
-      margin-right: 2px;
+    p {
+      white-space:nowrap;
+      span {
+        display: inline-block;
+        font-weight: 800;
+        height: 16px;
+        line-height: 16px;
+        width: 35px;
+        border-radius: 5px;
+        text-align: center;
+        margin-right: 2px;
+      }
     }
   }
-}
 </style>

@@ -156,9 +156,14 @@
           </a-tag>
         </template>
         <template slot="ifCodeSlot" slot-scope="{record}">
-          <span v-if="record.ifCode" :title="record.ifName+'['+record.ifCode+']'">
-            <span class="icon-style" :style="{ backgroundColor: record.bgColor }"><img class="icon" :src="record.icon" alt=""></span> {{ record.ifName }}[{{ record.ifCode }}]
-          </span>
+          <a-tooltip placement="bottom" style="font-weight: normal;">
+            <template slot="title">
+              <span class="icon-style" :style="{ backgroundColor: record.bgColor }"><img class="icon" :src="record.icon" alt=""></span> {{ record.ifName }}[{{ record.ifCode }}]
+            </template>
+            <span v-if="record.ifCode">
+              <span class="icon-style" :style="{ backgroundColor: record.bgColor }"><img class="icon" :src="record.icon" alt=""></span> {{ record.ifName }}[{{ record.ifCode }}]
+            </span>
+          </a-tooltip>
         </template>
         <template slot="divisionStateSlot" slot-scope="{record}">
           <span v-if="record.divisionState == 0"> - </span>

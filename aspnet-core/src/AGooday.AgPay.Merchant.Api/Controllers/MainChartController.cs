@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             switch (queryDateRange)
             {
                 case DateUtil.YESTERDAY:
-                    day?.AddDays(-1); break;
+                    day = day?.AddDays(-1); break;
                 case DateUtil.TODAY:
                 default:
                     break;
