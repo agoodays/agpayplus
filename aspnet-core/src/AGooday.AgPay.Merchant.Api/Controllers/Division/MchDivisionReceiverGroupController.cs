@@ -60,25 +60,25 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <summary>
         /// 新增分账账号组
         /// </summary>
-        /// <param name="record"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新增分账账号组")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_ADD)]
-        public ApiRes Add(MchDivisionReceiverGroupDto record)
+        public ApiRes Add(MchDivisionReceiverGroupDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
-            record.MchNo = sysUser.BelongInfoId;
-            record.CreatedBy = sysUser.Realname;
-            record.CreatedUid = sysUser.SysUserId;
+            dto.MchNo = sysUser.BelongInfoId;
+            dto.CreatedBy = sysUser.Realname;
+            dto.CreatedUid = sysUser.SysUserId;
 
-            var result = _mchDivisionReceiverGroupService.Add(record);
+            var result = _mchDivisionReceiverGroupService.Add(dto);
             if (result)
             {
                 // 更新其他组为非默认分账组
-                if (record.AutoDivisionFlag == CS.YES)
+                if (dto.AutoDivisionFlag == CS.YES)
                 {
-                    _mchDivisionReceiverGroupService.GetByMchNo(record.MchNo)
-                        .Where(w => !w.ReceiverGroupId.Equals(record.ReceiverGroupId))
+                    _mchDivisionReceiverGroupService.GetByMchNo(dto.MchNo)
+                        .Where(w => !w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
                         .ToList().ForEach(w =>
                         {
                             w.AutoDivisionFlag = CS.NO;
@@ -92,21 +92,21 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <summary>
         /// 更新分账账号组
         /// </summary>
-        /// <param name="record"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新分账账号组")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_EDIT)]
-        public ApiRes Update(long recordId, MchDivisionReceiverGroupDto record)
+        public ApiRes Update(long recordId, MchDivisionReceiverGroupDto dto)
         {
-            record.MchNo = GetCurrentMchNo();
-            var result = _mchDivisionReceiverGroupService.Update(record);
+            dto.MchNo = GetCurrentMchNo();
+            var result = _mchDivisionReceiverGroupService.Update(dto);
             if (result)
             {
                 // 更新其他组为非默认分账组
-                if (record.AutoDivisionFlag == CS.YES)
+                if (dto.AutoDivisionFlag == CS.YES)
                 {
-                    _mchDivisionReceiverGroupService.GetByMchNo(record.MchNo)
-                        .Where(w => !w.ReceiverGroupId.Equals(record.ReceiverGroupId))
+                    _mchDivisionReceiverGroupService.GetByMchNo(dto.MchNo)
+                        .Where(w => !w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
                         .ToList().ForEach(w =>
                         {
                             w.AutoDivisionFlag = CS.NO;
@@ -132,7 +132,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (_mchDivisionReceiverService.IsExistUseReceiverGroup(record.ReceiverGroupId))
+            if (_mchDivisionReceiverService.IsExistUseReceiverGroup(record.ReceiverGroupId.Value))
             {
                 throw new BizException("该组存在账号，无法删除");
             }

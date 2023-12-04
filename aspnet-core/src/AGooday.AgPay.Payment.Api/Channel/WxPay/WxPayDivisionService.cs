@@ -241,7 +241,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                 Dictionary<string, long> accnoAndRecordIdSet = new Dictionary<string, long>();
                 foreach (PayOrderDivisionRecordDto record in recordList)
                 {
-                    accnoAndRecordIdSet.Add(record.AccNo, record.RecordId);
+                    accnoAndRecordIdSet.Add(record.AccNo, record.RecordId.Value);
                 }
 
                 if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion)) // V2

@@ -36,7 +36,9 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<MchStore>(dto);
             _mchStoreRepository.Add(m);
-            return _mchStoreRepository.SaveChanges(out int _);
+            var result = _mchStoreRepository.SaveChanges(out int _);
+            dto.StoreId = m.StoreId;
+            return result;
         }
 
         public bool Remove(long recordId)

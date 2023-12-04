@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 码牌模板ID
         /// </summary>
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// 样式代码: shellA, shellB

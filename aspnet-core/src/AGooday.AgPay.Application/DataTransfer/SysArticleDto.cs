@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 文章ID
         /// </summary>
-        public long ArticleId { get; set; }
+        public long? ArticleId { get; set; }
 
         /// <summary>
         /// 文章标题

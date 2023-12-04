@@ -16,6 +16,7 @@ namespace AGooday.AgPay.Domain.Models
         /// </summary>
         [Comment("码牌模板ID")]
         [Key, Required, Column("id", TypeName = "bigint")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long Id { get; set; }
 
         /// <summary>

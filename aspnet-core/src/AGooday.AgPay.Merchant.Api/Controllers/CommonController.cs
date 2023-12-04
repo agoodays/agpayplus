@@ -114,8 +114,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                         continue;
                     }
                     var auth = sysUserMap.Where(w => w.SysUserId.Equals(sysUserId)).First();
-                    var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
-                    authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.IsAdmin, auth.SysType));
+                    var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId.Value).ToList();
+                    authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId.Value, auth.IsAdmin, auth.SysType));
                     currentUser.Authorities = authorities;
                     currentUserJson = JsonConvert.SerializeObject(currentUser);
                     //保存token  失效时间不变

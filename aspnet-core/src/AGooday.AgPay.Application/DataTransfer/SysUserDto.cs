@@ -8,7 +8,7 @@
         /// <summary>
         /// 系统用户ID
         /// </summary>
-        public long SysUserId { get; set; }
+        public long? SysUserId { get; set; }
 
         /// <summary>
         /// 登录用户名

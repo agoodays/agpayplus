@@ -37,7 +37,9 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<MchDivisionReceiver>(dto);
             _mchDivisionReceiverRepository.Add(m);
-            return _mchDivisionReceiverRepository.SaveChanges(out int _);
+            var result = _mchDivisionReceiverRepository.SaveChanges(out int _);
+            dto.ReceiverId = m.ReceiverId;
+            return result;
         }
 
         public bool Remove(long recordId)

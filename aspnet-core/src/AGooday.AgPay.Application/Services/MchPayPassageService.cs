@@ -55,6 +55,7 @@ namespace AGooday.AgPay.Application.Services
             var m = _mapper.Map<MchPayPassage>(dto);
             _mchPayPassageRepository.Add(m);
             _mchPayPassageRepository.SaveChanges();
+            dto.Id = m.Id;
         }
 
         public void Remove(long recordId)

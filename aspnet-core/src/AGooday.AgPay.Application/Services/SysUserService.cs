@@ -44,6 +44,7 @@ namespace AGooday.AgPay.Application.Services
             var m = _mapper.Map<SysUser>(dto);
             _sysUserRepository.Add(m);
             _sysUserRepository.SaveChanges();
+            dto.SysUserId = m.SysUserId;
         }
 
         public async Task CreateAsync(SysUserCreateDto dto)

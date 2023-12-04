@@ -38,7 +38,9 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<SysArticle>(dto);
             _sysArticleRepository.Add(m);
-            return _sysArticleRepository.SaveChanges(out int _);
+            var result = _sysArticleRepository.SaveChanges(out int _);
+            dto.ArticleId = m.ArticleId;
+            return result;
         }
 
         public bool Remove(long recordId)

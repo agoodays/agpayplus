@@ -51,6 +51,7 @@ namespace AGooday.AgPay.Application.Services
             var m = _mapper.Map<PayInterfaceConfig>(dto);
             _payInterfaceConfigRepository.Add(m);
             _payInterfaceConfigRepository.SaveChanges();
+            dto.Id = m.Id;
         }
 
         public void Remove(long recordId)

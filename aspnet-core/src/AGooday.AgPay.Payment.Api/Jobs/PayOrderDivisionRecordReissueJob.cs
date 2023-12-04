@@ -102,14 +102,14 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                     //// 处理查询结果
                                     foreach (var record in recordList)
                                     {
-                                        ChannelRetMsg channelRetMsg = queryDivision.GetValueOrDefault(record.RecordId);
+                                        ChannelRetMsg channelRetMsg = queryDivision.GetValueOrDefault(record.RecordId.Value);
 
                                         // 响应状态为分账成功或失败时，更新该记录状态
                                         if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS || channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
                                         {
                                             byte state = (byte)(ChannelState.CONFIRM_SUCCESS == channelRetMsg.ChannelState ? PayOrderDivisionRecordState.STATE_SUCCESS : PayOrderDivisionRecordState.STATE_FAIL);
                                             // 更新记录状态
-                                            payOrderDivisionRecordService.UpdateRecordSuccessOrFailBySingleItem(record.RecordId, state, channelRetMsg.ChannelErrMsg);
+                                            payOrderDivisionRecordService.UpdateRecordSuccessOrFailBySingleItem(record.RecordId.Value, state, channelRetMsg.ChannelErrMsg);
                                         }
                                     }
                                 }

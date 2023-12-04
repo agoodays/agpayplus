@@ -41,7 +41,9 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<PayOrderDivisionRecord>(dto);
             _payOrderDivisionRecordRepository.Add(m);
-            return _payOrderDivisionRecordRepository.SaveChanges(out int _);
+            var result = _payOrderDivisionRecordRepository.SaveChanges(out int _);
+            dto.RecordId = m.RecordId;
+            return result;
         }
 
         public bool Remove(long recordId)
@@ -167,7 +169,7 @@ namespace AGooday.AgPay.Application.Services
             var recordIds = records.Select(s => s.RecordId);
 
             var updateRecords = _payOrderDivisionRecordRepository.GetAll()
-                .Where(w => recordIds.Contains(w.RecordId) 
+                .Where(w => recordIds.Contains(w.RecordId)
                 && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_WAIT));
             foreach (var updateRecord in updateRecords)
             {

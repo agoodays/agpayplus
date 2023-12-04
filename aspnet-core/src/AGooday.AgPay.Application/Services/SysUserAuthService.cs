@@ -41,6 +41,7 @@ namespace AGooday.AgPay.Application.Services
             var m = _mapper.Map<SysUserAuth>(dto);
             _sysUserAuthRepository.Add(m);
             _sysUserAuthRepository.SaveChanges();
+            dto.AuthId = m.AuthId;
         }
 
         public void Remove(long recordId)

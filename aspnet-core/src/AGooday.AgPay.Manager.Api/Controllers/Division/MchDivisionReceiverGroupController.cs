@@ -155,7 +155,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (_mchDivisionReceiverService.IsExistUseReceiverGroup(record.ReceiverGroupId))
+            if (_mchDivisionReceiverService.IsExistUseReceiverGroup(record.ReceiverGroupId.Value))
             {
                 throw new BizException("该组存在账号，无法删除");
             }

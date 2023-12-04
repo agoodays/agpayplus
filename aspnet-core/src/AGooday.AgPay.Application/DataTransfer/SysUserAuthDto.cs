@@ -8,7 +8,7 @@
         /// <summary>
         /// ID
         /// </summary>
-        public long AuthId { get; set; }
+        public long? AuthId { get; set; }
 
         /// <summary>
         /// user_id

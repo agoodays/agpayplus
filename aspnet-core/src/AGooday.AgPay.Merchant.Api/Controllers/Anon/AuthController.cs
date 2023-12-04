@@ -361,7 +361,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             {
                 throw new BizException("新密码与原密码相同！");
             }
-            _sysUserAuthService.ResetAuthInfo(sysUser.SysUserId, null, null, newPwd, CS.SYS_TYPE.MCH);
+            _sysUserAuthService.ResetAuthInfo(sysUser.SysUserId.Value, null, null, newPwd, CS.SYS_TYPE.MCH);
             // 删除短信验证码缓存数据
             _redis.KeyDelete(codeCacheKey);
             return ApiRes.Ok();

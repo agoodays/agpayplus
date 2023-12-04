@@ -37,6 +37,7 @@ namespace AGooday.AgPay.Application.Services
             var m = _mapper.Map<SysLog>(dto);
             _sysLogRepository.Add(m);
             _sysLogRepository.SaveChanges();
+            dto.SysLogId = m.SysLogId;
         }
 
         public void Remove(long recordId)

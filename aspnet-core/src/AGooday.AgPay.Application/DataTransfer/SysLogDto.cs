@@ -8,7 +8,7 @@
         /// <summary>
         /// ID
         /// </summary>
-        public int SysLogId { get; set; }
+        public long? SysLogId { get; set; }
 
         /// <summary>
         /// 系统用户ID

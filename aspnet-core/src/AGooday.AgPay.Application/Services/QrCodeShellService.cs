@@ -36,7 +36,9 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<QrCodeShell>(dto);
             _qrCodeShellRepository.Add(m);
-            return _qrCodeShellRepository.SaveChanges(out int _);
+            var result = _qrCodeShellRepository.SaveChanges(out int _);
+            dto.Id = m.Id;
+            return result;
         }
 
         public bool Remove(long recordId)

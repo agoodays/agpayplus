@@ -33,7 +33,9 @@ namespace AGooday.AgPay.Application.Services
         {
             var m = _mapper.Map<SysUserTeam>(dto);
             _sysUserTeamRepository.Add(m);
-            return _sysUserTeamRepository.SaveChanges(out int _);
+            var result = _sysUserTeamRepository.SaveChanges(out int _);
+            dto.TeamId = m.TeamId;
+            return result;
         }
 
         public bool Remove(long recordId)

@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 分账记录ID
         /// </summary>
-        public long RecordId { get; set; }
+        public long? RecordId { get; set; }
 
         /// <summary>
         /// 商户号
