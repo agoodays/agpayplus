@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
 {
@@ -33,7 +34,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             {
                 return Content("app is not exists");
             }
-            var jsonparams = JObject.FromObject(payOrderNotify);
+            var jsonparams = GetReqParamJson();
             jsonparams.Remove("sign");
 
             if (!AgPayUtil.GetSign(jsonparams, mchApp.AppSecret).Equals(payOrderNotify.Sign, StringComparison.OrdinalIgnoreCase))
@@ -50,6 +51,29 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             await _wsPayOrderServer.SendMsgByOrderId(payOrderNotify.PayOrderId, msg.ToString(Formatting.None));
 
             return Content("SUCCESS");
+        }
+
+        /// <summary>
+        /// 获取json格式的请求参数
+        /// </summary>
+        /// <returns></returns>
+        private JObject GetReqParamJson()
+        {
+            Request.EnableBuffering();
+
+            string body = "";
+            var stream = Request.Body;
+            if (stream != null)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                using (var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true))
+                {
+                    body = reader.ReadToEnd();
+                }
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
+            return JObject.Parse(body);
         }
     }
 }

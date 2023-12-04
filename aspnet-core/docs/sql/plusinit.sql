@@ -188,9 +188,12 @@ ALTER TABLE `t_refund_order`
 
 ALTER TABLE `t_mch_notify_record`   
   ADD COLUMN `req_method` VARCHAR(10) NOT NULL COMMENT '通知请求方法' AFTER `notify_url`,
-  ADD COLUMN `req_media_type` VARCHAR(10) NOT NULL COMMENT '通知请求媒体类型' AFTER `req_method`
+  ADD COLUMN `req_media_type` VARCHAR(64) NOT NULL COMMENT '通知请求媒体类型' AFTER `req_method`
   ADD COLUMN `req_body` TEXT NULL COMMENT '通知请求正文' AFTER `req_media_type`;
 
+ALTER TABLE `t_mch_notify_record`   
+  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_no`;
+  
 /**
 
 SELECT po.way_code,po.way_type,IFNULL(pw.way_type,'OTHER') FROM `t_pay_order` po LEFT JOIN `t_pay_way` pw ON po.way_code = pw.way_code

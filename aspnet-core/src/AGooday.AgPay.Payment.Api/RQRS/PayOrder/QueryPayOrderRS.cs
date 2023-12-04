@@ -105,7 +105,10 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
                 return null;
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PayOrderDto, QueryPayOrderRS>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<PayOrderDto, QueryPayOrderRS>()
+                .ForMember(dest => dest.SuccessTime, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            );
             var mapper = config.CreateMapper();
             var result = mapper.Map<PayOrderDto, QueryPayOrderRS>(payOrder);
             result.SuccessTime = payOrder.SuccessTime == null ? null : new DateTimeOffset(payOrder.SuccessTime.Value).ToUnixTimeSeconds();

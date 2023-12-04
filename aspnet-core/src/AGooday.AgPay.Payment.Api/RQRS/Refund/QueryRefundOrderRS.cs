@@ -90,7 +90,10 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Refund
                 return null;
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<RefundOrderDto, QueryRefundOrderRS>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<RefundOrderDto, QueryRefundOrderRS>()
+                .ForMember(dest => dest.SuccessTime, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            );
             var mapper = config.CreateMapper();
             var result = mapper.Map<RefundOrderDto, QueryRefundOrderRS>(refundOrder);
             result.SuccessTime = refundOrder.SuccessTime == null ? null : new DateTimeOffset(refundOrder.SuccessTime.Value).ToUnixTimeSeconds();

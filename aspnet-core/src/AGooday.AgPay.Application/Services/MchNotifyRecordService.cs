@@ -38,6 +38,7 @@ namespace AGooday.AgPay.Application.Services
             var m = _mapper.Map<MchNotifyRecord>(dto);
             _mchNotifyRecordRepository.Add(m);
             _mchNotifyRecordRepository.SaveChanges();
+            dto.NotifyId = m.NotifyId;
         }
 
         public void Remove(long recordId)
@@ -151,6 +152,7 @@ namespace AGooday.AgPay.Application.Services
             notify.State = state;
             notify.NotifyCount += 1;
             notify.ResResult = resResult;
+            notify.LastNotifyTime = DateTime.Now;
             _mchNotifyRecordRepository.Update(notify);
             return _mchNotifyRecordRepository.SaveChanges();
         }

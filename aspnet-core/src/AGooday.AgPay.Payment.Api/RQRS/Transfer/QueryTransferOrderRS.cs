@@ -115,7 +115,10 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Transfer
                 return null;
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<TransferOrderDto, QueryTransferOrderRS>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<TransferOrderDto, QueryTransferOrderRS>()
+                .ForMember(dest => dest.SuccessTime, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            );
             var mapper = config.CreateMapper();
             var result = mapper.Map<TransferOrderDto, QueryTransferOrderRS>(record);
             result.SuccessTime = record.SuccessTime == null ? null : new DateTimeOffset(record.SuccessTime.Value).ToUnixTimeSeconds();

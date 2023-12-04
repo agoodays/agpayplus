@@ -581,9 +581,9 @@ namespace AGooday.AgPay.Application.Services
                 dateList.Add(dt.ToString("MM-dd"));
 #if DEBUG
                 // 生成虚拟数据
-                item.PayAmount = item.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) : item.PayAmount;
+                item.PayAmount = item.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) / 100M : item.PayAmount;
 #endif
-                payAmountList.Add((item.PayAmount / 100M).ToString("0.00"));
+                payAmountList.Add(item.PayAmount.ToString("0.00"));
             }
             JObject result = new JObject();
             result.Add("dateList", JToken.FromObject(dateList));
@@ -625,14 +625,14 @@ namespace AGooday.AgPay.Application.Services
                 var item = payOrderList.FirstOrDefault(x => x.GroupDate.Equals(dt.ToString("yyyy-MM-dd")));
 #if DEBUG
                 // 生成虚拟数据
-                item.PayAmount = item.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) : item.PayAmount;
+                item.PayAmount = item.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) / 100M : item.PayAmount;
                 item.PayCount = item.PayCount <= 0 ? Random.Shared.Next(0, 1000) : item.PayCount;
-                item.RefundAmount = item.RefundAmount <= 0 ? Random.Shared.Next(0, 500000) : item.RefundAmount;
+                item.RefundAmount = item.RefundAmount <= 0 ? Random.Shared.Next(0, 500000) / 100M : item.RefundAmount;
 #endif
                 resDateArr.Add(dt.ToString("yyyy-MM-dd"));
-                resPayAmountArr.Add((item.PayAmount / 100M).ToString("0.00"));
+                resPayAmountArr.Add(item.PayAmount.ToString("0.00"));
                 resPayCountArr.Add(item.PayCount.ToString());
-                resRefAmountArr.Add((item.RefundAmount / 100M).ToString("0.00"));
+                resRefAmountArr.Add(item.RefundAmount.ToString("0.00"));
             }
 
             JObject result = new JObject();
