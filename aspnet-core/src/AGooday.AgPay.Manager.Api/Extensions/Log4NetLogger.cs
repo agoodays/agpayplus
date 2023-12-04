@@ -41,13 +41,13 @@ namespace AGooday.AgPay.Manager.Api.Extensions
                 {
                     case LogLevel.Trace:
                     case LogLevel.Debug:
-                        _log.Debug(message);
+                        _log.Debug(message, exception);
                         break;
                     case LogLevel.Information:
-                        _log.Info(message);
+                        _log.Info(message, exception);
                         break;
                     case LogLevel.Warning:
-                        _log.Warn(message);
+                        _log.Warn(message, exception);
                         break;
                     case LogLevel.Error:
                         _log.Error(message, exception);
