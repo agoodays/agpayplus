@@ -26,6 +26,13 @@ namespace AGooday.AgPay.Domain.Models
         public string MchNo { get; set; }
 
         /// <summary>
+        /// 代理商号
+        /// </summary>
+        [Comment("代理商号")]
+        [Column("agent_no", TypeName = "varchar(64)")]
+        public string AgentNo { get; set; }
+
+        /// <summary>
         /// 服务商号
         /// </summary>
         [Comment("服务商号")]

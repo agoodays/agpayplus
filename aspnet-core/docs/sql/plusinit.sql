@@ -186,6 +186,9 @@ ALTER TABLE `t_refund_order`
 ALTER TABLE `t_refund_order`   
   ADD COLUMN `refund_fee_amount` BIGINT(20) NOT NULL COMMENT '手续费退还金额,单位分' AFTER `refund_amount`;
 
+ALTER TABLE `t_transfer_order`   
+  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_no`;
+  
 ALTER TABLE `t_mch_notify_record`   
   ADD COLUMN `req_method` VARCHAR(10) NOT NULL COMMENT '通知请求方法' AFTER `notify_url`,
   ADD COLUMN `req_media_type` VARCHAR(64) NOT NULL COMMENT '通知请求媒体类型' AFTER `req_method`

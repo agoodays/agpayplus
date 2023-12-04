@@ -71,8 +71,9 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbPayOrder.PayOrderId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_PAY_ORDER;
-                mchNotifyRecord.MchNo = dbPayOrder.MchNo;
                 mchNotifyRecord.MchOrderNo = dbPayOrder.MchOrderNo; //商户订单号
+                mchNotifyRecord.MchNo = dbPayOrder.MchNo;
+                mchNotifyRecord.AgentNo = dbPayOrder.AgentNo;
                 mchNotifyRecord.IsvNo = dbPayOrder.IsvNo;
                 mchNotifyRecord.AppId = dbPayOrder.AppId;
                 mchNotifyRecord.NotifyUrl = notifyUrl;
@@ -140,8 +141,9 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbRefundOrder.RefundOrderId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_REFUND_ORDER;
-                mchNotifyRecord.MchNo = dbRefundOrder.MchNo;
                 mchNotifyRecord.MchOrderNo = dbRefundOrder.MchRefundNo; //商户订单号
+                mchNotifyRecord.MchNo = dbRefundOrder.MchNo;
+                mchNotifyRecord.AgentNo = dbRefundOrder.AgentNo;
                 mchNotifyRecord.IsvNo = dbRefundOrder.IsvNo;
                 mchNotifyRecord.AppId = dbRefundOrder.AppId;
                 mchNotifyRecord.NotifyUrl = notifyUrl;
@@ -208,8 +210,9 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchNotifyRecord = new MchNotifyRecordDto();
                 mchNotifyRecord.OrderId = dbTransferOrder.TransferId;
                 mchNotifyRecord.OrderType = (byte)MchNotifyRecordType.TYPE_TRANSFER_ORDER;
-                mchNotifyRecord.MchNo = dbTransferOrder.MchNo;
                 mchNotifyRecord.MchOrderNo = dbTransferOrder.MchOrderNo; //商户订单号
+                mchNotifyRecord.MchNo = dbTransferOrder.MchNo;
+                mchNotifyRecord.AgentNo = dbTransferOrder.AgentNo;
                 mchNotifyRecord.IsvNo = dbTransferOrder.IsvNo;
                 mchNotifyRecord.AppId = dbTransferOrder.AppId;
                 mchNotifyRecord.NotifyUrl = notifyUrl;

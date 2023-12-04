@@ -245,8 +245,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             PayOrderDto payOrder = new PayOrderDto();
             payOrder.PayOrderId = SeqUtil.GenPayOrderId(); //生成订单ID
             payOrder.MchNo = mchInfo.MchNo; //商户号
+            payOrder.AgentNo = mchInfo.AgentNo; //代理商号
             payOrder.IsvNo = mchInfo.IsvNo; //服务商号
-            payOrder.MchName = mchInfo.MchShortName; //商户名称（简称）
+            payOrder.MchName = mchInfo.MchName; //商户名称
+            payOrder.MchShortName = mchInfo.MchShortName; //商户简称
             payOrder.MchType = mchInfo.Type; //商户类型
             payOrder.MchOrderNo = rq.MchOrderNo; //商户订单号
             payOrder.AppId = mchApp.AppId; //商户应用appId

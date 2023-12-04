@@ -180,9 +180,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             refundOrder.PayOrderId = payOrder.PayOrderId; //支付订单号
             refundOrder.ChannelPayOrderNo = payOrder.ChannelOrderNo; //渠道支付单号
             refundOrder.MchNo = mchInfo.MchNo; //商户号
+            refundOrder.AgentNo = mchInfo.AgentNo; //代理商号
             refundOrder.IsvNo = mchInfo.IsvNo; //服务商号
             refundOrder.AppId = mchApp.AppId; //商户应用ID
-            refundOrder.MchName = mchInfo.MchShortName; //商户名称
+            refundOrder.MchName = mchInfo.MchName; //商户名称
+            refundOrder.MchShortName = mchInfo.MchShortName; //商户简称
             refundOrder.MchType = mchInfo.Type; //商户类型
             refundOrder.MchRefundNo = rq.MchRefundNo; //商户退款单号
             refundOrder.WayCode = payOrder.WayCode; //支付方式代码
