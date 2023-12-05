@@ -113,8 +113,8 @@ namespace AGooday.AgPay.Domain.Models
         /// 门店ID
         /// </summary>
         [Comment("门店ID")]
-        [Column("store_id", TypeName = "varchar(64)")]
-        public string StoreId { get; set; }
+        [Column("store_id", TypeName = "bigint")]
+        public long? StoreId { get; set; }
 
         /// <summary>
         /// 门店名称

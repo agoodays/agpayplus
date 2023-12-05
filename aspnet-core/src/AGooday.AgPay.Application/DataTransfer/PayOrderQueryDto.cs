@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 门店ID
         /// </summary>
-        public string StoreId { get; set; }
+        public long? StoreId { get; set; }
 
         /// <summary>
         /// 门店名称

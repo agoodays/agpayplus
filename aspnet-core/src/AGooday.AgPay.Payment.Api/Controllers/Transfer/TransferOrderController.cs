@@ -153,10 +153,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             TransferOrderDto transferOrder = new TransferOrderDto();
             transferOrder.TransferId = SeqUtil.GenTransferId(); //生成转账订单号
             transferOrder.MchNo = mchInfo.MchNo; //商户号
+            transferOrder.MchName = mchInfo.MchName; //商户名称（简称）
+            transferOrder.MchShortName = mchInfo.MchShortName; //商户简称
             transferOrder.AgentNo = mchInfo.AgentNo; //代理商号
             transferOrder.IsvNo = mchInfo.IsvNo; //服务商号
             transferOrder.AppId = mchApp.AppId; //商户应用appId
-            transferOrder.MchName = mchInfo.MchShortName; //商户名称（简称）
             transferOrder.MchType = mchInfo.Type; //商户类型
             transferOrder.MchOrderNo = rq.MchOrderNo; //商户订单号
             transferOrder.IfCode = ifCode; //接口代码

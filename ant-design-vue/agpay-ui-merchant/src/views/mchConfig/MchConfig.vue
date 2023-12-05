@@ -257,7 +257,7 @@ const orderNotifyParamsData = [
   { key: 'lng', name: '经度' },
   { key: 'lat', name: '纬度' },
   { key: 'qrcId', name: '码牌ID' },
-  { key: 'wayCodeType', name: '支付方式代码分类' },
+  { key: 'wayType', name: '支付方式分类' },
   { key: 'mchFeeRate', name: '商户手续费费率快照' },
   { key: 'mchFeeAmount', name: '商户手续费,单位分' },
   { key: 'channelUser', name: '渠道用户标识' },

@@ -26,6 +26,20 @@ namespace AGooday.AgPay.Domain.Models
         public string MchNo { get; set; }
 
         /// <summary>
+        /// 商户名称
+        /// </summary>
+        [Comment("商户名称")]
+        [Required, Column("mch_name", TypeName = "varchar(64)")]
+        public string MchName { get; set; }
+
+        /// <summary>
+        /// 商户简称
+        /// </summary>
+        [Comment("商户简称")]
+        [Column("mch_short_name", TypeName = "varchar(32)")]
+        public string MchShortName { get; set; }
+
+        /// <summary>
         /// 代理商号
         /// </summary>
         [Comment("代理商号")]
@@ -45,13 +59,6 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("应用ID")]
         [Required, Column("app_id", TypeName = "varchar(64)")]
         public string AppId { get; set; }
-
-        /// <summary>
-        /// 商户名称
-        /// </summary>
-        [Comment("商户名称")]
-        [Required, Column("mch_name", TypeName = "varchar(30)")]
-        public string MchName { get; set; }
 
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)

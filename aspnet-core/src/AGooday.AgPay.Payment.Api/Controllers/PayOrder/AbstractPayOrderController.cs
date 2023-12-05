@@ -97,6 +97,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     payOrder.ChannelUser = bizRQ.GetChannelUserId(); //更新渠道用户信息
                     bizRQ.MchNo = payOrder.MchNo;
                     bizRQ.AppId = payOrder.AppId;
+                    bizRQ.StoreId = payOrder.StoreId;
+                    bizRQ.QrcId = payOrder.QrcId;
                     bizRQ.MchOrderNo = payOrder.MchOrderNo;
                     bizRQ.WayCode = wayCode;
                     bizRQ.Amount = payOrder.Amount;
@@ -245,13 +247,16 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             PayOrderDto payOrder = new PayOrderDto();
             payOrder.PayOrderId = SeqUtil.GenPayOrderId(); //生成订单ID
             payOrder.MchNo = mchInfo.MchNo; //商户号
-            payOrder.AgentNo = mchInfo.AgentNo; //代理商号
-            payOrder.IsvNo = mchInfo.IsvNo; //服务商号
             payOrder.MchName = mchInfo.MchName; //商户名称
             payOrder.MchShortName = mchInfo.MchShortName; //商户简称
+            payOrder.AgentNo = mchInfo.AgentNo; //代理商号
+            payOrder.IsvNo = mchInfo.IsvNo; //服务商号
             payOrder.MchType = mchInfo.Type; //商户类型
             payOrder.MchOrderNo = rq.MchOrderNo; //商户订单号
             payOrder.AppId = mchApp.AppId; //商户应用appId
+            payOrder.AppName = mchApp.AppName; //商户应用名称
+            payOrder.StoreId = rq.StoreId; //商户门店ID
+            payOrder.QrcId = rq.QrcId; //商户码牌ID
             payOrder.IfCode = ifCode; //接口代码
             payOrder.WayCode = rq.WayCode; //支付方式
             payOrder.WayType = wayType; //支付类型

@@ -55,6 +55,16 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder
         public string Body { get; set; }
 
         /// <summary>
+        /// 商品门店ID	
+        /// </summary>
+        public long? StoreId { get; set; }
+
+        /// <summary>
+        /// 商品码牌ID	
+        /// </summary>
+        public string QrcId { get; set; }
+
+        /// <summary>
         /// 异步通知地址
         /// </summary>
         public string NotifyUrl { get; set; }

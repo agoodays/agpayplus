@@ -49,6 +49,18 @@ namespace AGooday.AgPay.AopSdk.Models
         /// </summary>
         [JsonProperty("body")]
         public string Body { get; set; }
+
+        /// <summary>
+        /// 门店ID
+        /// </summary>
+        [JsonProperty("storeId")]
+        public long? StoreId { get; set; }
+
+        /// <summary>
+        /// 二维码ID
+        /// </summary>
+        [JsonProperty("qrcId")]
+        public string QrcId { get; set; }
         /// <summary>
         /// 异步通知地址
         /// </summary>

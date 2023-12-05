@@ -78,6 +78,16 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string AppName { get; set; }
 
         /// <summary>
+        /// 门店ID
+        /// </summary>
+        public long? StoreId { get; set; }
+
+        /// <summary>
+        /// 门店名称
+        /// </summary>
+        public string StoreName { get; set; }
+
+        /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)
         /// </summary>
         public byte MchType { get; set; }

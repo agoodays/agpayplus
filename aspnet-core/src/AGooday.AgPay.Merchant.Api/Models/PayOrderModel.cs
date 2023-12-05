@@ -3,6 +3,7 @@
     public class PayOrderModel
     {
         public string AppId { get; set; }
+        public long? StoreId { get; set; }
         public decimal Amount { get; set; }
         public string MchOrderNo { get; set; }
         public string WayCode { get; set; }

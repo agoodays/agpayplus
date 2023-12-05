@@ -16,6 +16,16 @@
         public string MchNo { get; set; }
 
         /// <summary>
+        /// 商户名称
+        /// </summary>
+        public string MchName { get; set; }
+
+        /// <summary>
+        /// 商户简称
+        /// </summary>
+        public string MchShortName { get; set; }
+
+        /// <summary>
         /// 代理商号
         /// </summary>
         public string AgentNo { get; set; }
@@ -29,11 +39,6 @@
         /// 应用ID
         /// </summary>
         public string AppId { get; set; }
-
-        /// <summary>
-        /// 商户名称
-        /// </summary>
-        public string MchName { get; set; }
 
         /// <summary>
         /// 类型: 1-普通商户, 2-特约商户(服务商模式)

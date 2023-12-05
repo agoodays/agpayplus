@@ -87,6 +87,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             request.SetBizModel(model);
             model.MchNo = GetCurrentMchNo(); // 商户号
             model.AppId = payOrder.AppId;
+            model.StoreId = payOrder.StoreId;
             model.MchOrderNo = payOrder.MchOrderNo;
             model.WayCode = payOrder.WayCode;
             model.Amount = AmountUtil.ConvertDollar2Cent(payOrder.Amount);
