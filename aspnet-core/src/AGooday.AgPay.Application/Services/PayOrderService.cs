@@ -147,13 +147,17 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
             var allPayAmount = payOrders.Sum(s => s.Amount);
             var allPayCount = payOrders.Count();
-            var failPayAmount = payOrders.Where(w => !w.State.Equals((byte)PayOrderState.STATE_SUCCESS)).Sum(s => s.Amount);
-            var failPayCount = payOrders.Where(w => !w.State.Equals((byte)PayOrderState.STATE_SUCCESS)).Count();
-            var mchFeeAmount = payOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS)).Sum(s => s.MchFeeAmount);
-            var payAmount = payOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS)).Sum(s => s.Amount);
-            var payCount = payOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS)).Count();
-            var refundAmount = payOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount);
-            var refundCount = payOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_REFUND)).Count();
+            var failPay = payOrders.Where(w => !(w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)));
+            var failPayAmount = failPay.Sum(s => s.Amount);
+            var failPayCount = failPay.Count();
+            // 成交金额: 支付成功的订单金额，包含部分退款及全额退款的订单
+            var pay = payOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+            var mchFeeAmount = pay.Sum(s => s.MchFeeAmount);
+            var payAmount = pay.Sum(s => s.Amount);
+            var payCount = pay.Count();
+            var refund = payOrders.Where(w => w.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_SUB) || w.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_ALL));
+            var refundAmount = refund.Sum(s => s.Amount);
+            var refundCount = refund.Count();
             JObject json = new JObject();
             json.Add("allPayAmount", Decimal.Round(allPayAmount / 100M, 2, MidpointRounding.AwayFromZero));
             json.Add("allPayCount", allPayCount);
@@ -435,6 +439,65 @@ namespace AGooday.AgPay.Application.Services
         }
 
         /// <summary>
+        /// 支付订单统计
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="agentNo"></param>
+        /// <param name="dayStart"></param>
+        /// <param name="dayEnd"></param>
+        /// <returns></returns>
+        private List<(string GroupDate, decimal PayAmount, int PayCount)> SelectPayOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
+        {
+            var payOrders = _payOrderRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
+                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
+                && (new List<byte> { (byte)PayOrderState.STATE_SUCCESS, (byte)PayOrderState.STATE_REFUND }).Contains(w.State)
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
+                .GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
+                .Select(s => new
+                {
+                    GroupDate = s.GroupDate,
+                    PayAmount = s.Items.Sum(s => s.Amount),
+                    PayCount = s.Items.Count()
+                }).ToList();
+
+            var result = payOrders.Select(s =>
+                (s.GroupDate, Decimal.Round(s.PayAmount / 100M, 2, MidpointRounding.AwayFromZero), s.PayCount)
+            ).ToList();
+            return result;
+        }
+        /// <summary>
+        /// 退款订单统计
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="agentNo"></param>
+        /// <param name="dayStart"></param>
+        /// <param name="dayEnd"></param>
+        /// <returns></returns>
+        private List<(string GroupDate, decimal RefundAmount, int RefundCount)> SelectRefundOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
+        {
+            var refundOrders = _refundOrderRepository.GetAll()
+                .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
+                && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
+                && (new List<byte> { (byte)RefundOrderState.STATE_SUCCESS }).Contains(w.State)
+                && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
+                .GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
+                .Select(s => new
+                {
+                    GroupDate = s.GroupDate,
+                    RefundCount = s.Items.Count(),
+                    RefundAmount = s.Items.Sum(s => s.RefundAmount)
+                }).ToList();
+
+            var result = refundOrders.Select(s =>
+                (s.GroupDate, Decimal.Round(s.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero), s.RefundCount)
+            ).ToList();
+            return result;
+        }
+
+        /// <summary>
         /// 服务商/代理商/商户统计
         /// </summary>
         /// <param name="mchNo"></param>
@@ -510,9 +573,9 @@ namespace AGooday.AgPay.Application.Services
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
                 && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable();
             allCount += payorders.Count();
-            payorders = payorders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
-            var payAmount = payorders.Sum(s => s.Amount);
-            var payCount = payorders.Count();
+            var pay = payorders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+            var payAmount = pay.Sum(s => s.Amount);
+            var payCount = pay.Count();
 
             var refundOrder = _refundOrderRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
@@ -521,9 +584,9 @@ namespace AGooday.AgPay.Application.Services
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
                 && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable();
             allCount += refundOrder.Count();
-            refundOrder = refundOrder.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable();
-            var refundAmount = refundOrder.Sum(s => s.RefundAmount);
-            var refundCount = refundOrder.Count();
+            var refund = refundOrder.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable();
+            var refundAmount = refund.Sum(s => s.RefundAmount);
+            var refundCount = refund.Count();
 
 #if DEBUG
             // 生成虚拟数据
@@ -571,7 +634,7 @@ namespace AGooday.AgPay.Application.Services
             // 查询支付的记录
             var dayStart = DateTime.Today.AddDays(-(recentDay - 1));
             var dayEnd = DateTime.Today.AddDays(1).AddSeconds(-1);
-            var payOrderList = SelectOrderCount(mchNo, agentNo, dayStart, dayEnd);
+            var payOrderList = SelectPayOrderCount(mchNo, agentNo, dayStart, dayEnd);
             // 生成前端返回参数类型
             List<string> dateList = new List<string>();
             List<string> payAmountList = new List<string>();
@@ -614,7 +677,8 @@ namespace AGooday.AgPay.Application.Services
             }
 
             // 查询支付的记录
-            var payOrderList = SelectOrderCount(mchNo, agentNo, dayStart, dayEnd);
+            var payOrderList = SelectPayOrderCount(mchNo, agentNo, dayStart, dayEnd);
+            var refundOrderList = SelectRefundOrderCount(mchNo, agentNo, dayStart, dayEnd);
             // 生成前端返回参数类型
             List<string> resDateArr = new List<string>();
             List<string> resPayAmountArr = new List<string>();
@@ -622,17 +686,18 @@ namespace AGooday.AgPay.Application.Services
             List<string> resRefAmountArr = new List<string>();
             for (DateTime dt = Convert.ToDateTime(dayStart); dt <= Convert.ToDateTime(dayEnd); dt = dt.AddDays(1))
             {
-                var item = payOrderList.FirstOrDefault(x => x.GroupDate.Equals(dt.ToString("yyyy-MM-dd")));
+                var pay = payOrderList.FirstOrDefault(x => x.GroupDate.Equals(dt.ToString("yyyy-MM-dd")));
+                var refund = refundOrderList.FirstOrDefault(x => x.GroupDate.Equals(dt.ToString("yyyy-MM-dd")));
 #if DEBUG
                 // 生成虚拟数据
-                item.PayAmount = item.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) / 100M : item.PayAmount;
-                item.PayCount = item.PayCount <= 0 ? Random.Shared.Next(0, 1000) : item.PayCount;
-                item.RefundAmount = item.RefundAmount <= 0 ? Random.Shared.Next(0, 500000) / 100M : item.RefundAmount;
+                pay.PayAmount = pay.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) / 100M : pay.PayAmount;
+                pay.PayCount = pay.PayCount <= 0 ? Random.Shared.Next(0, 1000) : pay.PayCount;
+                refund.RefundAmount = refund.RefundAmount <= 0 ? Random.Shared.Next(0, 500000) / 100M : refund.RefundAmount;
 #endif
                 resDateArr.Add(dt.ToString("yyyy-MM-dd"));
-                resPayAmountArr.Add(item.PayAmount.ToString("0.00"));
-                resPayCountArr.Add(item.PayCount.ToString());
-                resRefAmountArr.Add(item.RefundAmount.ToString("0.00"));
+                resPayAmountArr.Add(pay.PayAmount.ToString("0.00"));
+                resPayCountArr.Add(pay.PayCount.ToString());
+                resRefAmountArr.Add(refund.RefundAmount.ToString("0.00"));
             }
 
             JObject result = new JObject();

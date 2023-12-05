@@ -86,10 +86,8 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH_OAUTH2_CONFIG_ADD', '按钮：oaut
 ALTER TABLE `t_mch_info`   
   ADD COLUMN `mch_level` VARCHAR(8) DEFAULT 'M0' NOT NULL COMMENT '商户级别: M0商户-简单模式（页面简洁，仅基础收款功能）, M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）' AFTER `type`,
   ADD COLUMN `refund_mode` JSON NULL COMMENT '退款方式[\"plat\", \"api\"],平台退款、接口退款，平台退款方式必须包含接口退款。' AFTER `mch_level`,
-  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `refund_mode`;
-
-ALTER TABLE `t_mch_info`   
-  ADD COLUMN `sipw` VARCHAR(128) NOT NULL COMMENT '支付密码' AFTER `refund_mode`;
+  ADD COLUMN `sipw` VARCHAR(128) NOT NULL COMMENT '支付密码' AFTER `refund_mode`,
+  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `sipw`;
 
 ALTER TABLE `t_mch_app`   
   ADD COLUMN `default_flag` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否默认: 0-否, 1-是' AFTER `state`,
@@ -133,7 +131,11 @@ ALTER TABLE `t_pay_interface_config`
 -- UPDATE `t_pay_way` SET `way_type` = 'OTHER' WHERE `way_code` LIKE 'PP_%';
 
 ALTER TABLE `t_pay_order`   
+  CHANGE `mch_name` `mch_name` VARCHAR(64) NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
+  CHANGE `mch_short_name` `mch_short_name` VARCHAR(32) NULL COMMENT '商户简称'  AFTER `mch_name`,
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_no`,
+  ADD COLUMN `agent_name` VARCHAR(64) NULL COMMENT '代理商名称' AFTER `agent_no`,
+  ADD COLUMN `agent_short_name` VARCHAR(32) NULL COMMENT '代理商简称' AFTER `agent_name`
   ADD COLUMN `isv_name` VARCHAR(64) NULL COMMENT '服务商名称' AFTER `isv_no`,
   ADD COLUMN `isv_short_name` VARCHAR(32) NULL COMMENT '服务商简称' AFTER `isv_name`,
   ADD COLUMN `qrc_id` VARCHAR(64) NULL COMMENT '二维码' AFTER `app_id`,
@@ -142,27 +144,15 @@ ALTER TABLE `t_pay_order`
   ADD COLUMN `store_name` VARCHAR(64) NULL COMMENT '门店名称' AFTER `store_id`,
   ADD COLUMN `mch_short_name` VARCHAR(32) NULL COMMENT '商户简称' AFTER `mch_name`,
   ADD COLUMN `seller_remark` VARCHAR(256) NULL COMMENT '买家备注' AFTER `body`,
-  ADD COLUMN `buyer_remark` VARCHAR(256) NULL COMMENT '卖家备注' AFTER `seller_remark`;
-
-ALTER TABLE `t_pay_order`   
-  CHANGE `mch_name` `mch_name` VARCHAR(64) NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
-  CHANGE `mch_short_name` `mch_short_name` VARCHAR(32) NULL COMMENT '商户简称'  AFTER `mch_name`,
-  ADD COLUMN `agent_name` VARCHAR(64) NULL COMMENT '代理商名称' AFTER `agent_no`,
-  ADD COLUMN `agent_short_name` VARCHAR(32) NULL COMMENT '代理商简称' AFTER `agent_name`;
-
-ALTER TABLE `t_pay_order`   
+  ADD COLUMN `buyer_remark` VARCHAR(256) NULL COMMENT '卖家备注' AFTER `seller_remark`,
   CHANGE `mch_fee_amount` `mch_fee_amount` BIGINT(20) NOT NULL COMMENT '商户手续费(实际手续费),单位分',
+  ADD COLUMN `mch_fee_rate_desc` VARCHAR(128) NULL COMMENT '商户手续费费率快照描述' AFTER `mch_fee_rate`,
   ADD COLUMN `mch_order_fee_amount` BIGINT(20) NOT NULL COMMENT '收单手续费,单位分' AFTER `mch_fee_amount`,
   ADD COLUMN `channel_mch_no` VARCHAR(64) NULL COMMENT '渠道商户号' AFTER `buyer_remark`,
   ADD COLUMN `channel_isv_no` VARCHAR(64) NULL COMMENT '渠道服务商机构号' AFTER `channel_mch_no`,
   ADD COLUMN `platform_order_no` VARCHAR(64) NULL COMMENT '用户支付凭证交易单号 微信/支付宝流水号' AFTER `channel_order_no`,
-  ADD COLUMN `platform_mch_order_no` VARCHAR(64) NULL COMMENT '用户支付凭证商户单号' AFTER `platform_order_no`;
-  
-ALTER TABLE `t_pay_order`   
+  ADD COLUMN `platform_mch_order_no` VARCHAR(64) NULL COMMENT '用户支付凭证商户单号' AFTER `platform_order_no`,
   ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他' AFTER `way_code`;
-
-ALTER TABLE `t_pay_order`   
-  ADD COLUMN `mch_fee_rate_desc` VARCHAR(128) NULL COMMENT '商户手续费费率快照描述' AFTER `mch_fee_rate`;
   
 -- UPDATE `t_pay_order` SET `mch_fee_rate_desc` = CONCAT('单笔费率：',ROUND(`mch_fee_rate`*100, 4),'%') WHERE `way_code` != 'QR_CASHIER' AND `mch_fee_rate_desc` IS NULL;
 
@@ -178,12 +168,8 @@ ALTER TABLE `t_refund_order`
   CHANGE `app_id` `app_id` VARCHAR(64) NOT NULL COMMENT '应用ID'  AFTER `isv_short_name`,
   ADD COLUMN `app_name` VARCHAR(64) NULL COMMENT '应用名称' AFTER `app_id`,
   ADD COLUMN `store_id` BIGINT NULL COMMENT '门店ID' AFTER `app_name`,
-  ADD COLUMN `store_name` VARCHAR(64) NULL COMMENT '门店名称' AFTER `store_id`;
-  
-ALTER TABLE `t_refund_order`   
-  ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他' AFTER `way_code`;
-
-ALTER TABLE `t_refund_order`   
+  ADD COLUMN `store_name` VARCHAR(64) NULL COMMENT '门店名称' AFTER `store_id`,
+  ADD COLUMN `way_type` VARCHAR(20) NOT NULL COMMENT '支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他' AFTER `way_code`,
   ADD COLUMN `refund_fee_amount` BIGINT(20) NOT NULL COMMENT '手续费退还金额,单位分' AFTER `refund_amount`;
 
 ALTER TABLE `t_transfer_order`   
@@ -192,12 +178,10 @@ ALTER TABLE `t_transfer_order`
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_short_name`;
   
 ALTER TABLE `t_mch_notify_record`   
+  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_no`,
   ADD COLUMN `req_method` VARCHAR(10) NOT NULL COMMENT '通知请求方法' AFTER `notify_url`,
   ADD COLUMN `req_media_type` VARCHAR(64) NOT NULL COMMENT '通知请求媒体类型' AFTER `req_method`
   ADD COLUMN `req_body` TEXT NULL COMMENT '通知请求正文' AFTER `req_media_type`;
-
-ALTER TABLE `t_mch_notify_record`   
-  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_no`;
   
 /**
 
