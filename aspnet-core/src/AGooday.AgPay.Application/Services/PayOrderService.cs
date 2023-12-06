@@ -389,13 +389,12 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="dayStart"></param>
         /// <param name="dayEnd"></param>
         /// <returns></returns>
-        private List<PayTypeCountDto> PayTypeCount(string mchNo, string agentNo, byte? state, byte? refundState, DateTime? dayStart, DateTime? dayEnd)
+        private List<PayTypeCountDto> PayTypeCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
         {
             var result = _payOrderRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
-                && (state.Equals(null) || w.State.Equals(state))
-                && (refundState.Equals(null) || w.RefundState.Equals(refundState))
+                && (new List<byte> { (byte)PayOrderState.STATE_SUCCESS, (byte)PayOrderState.STATE_REFUND }).Contains(w.State)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
                 && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
                 .GroupBy(g => g.WayType, (key, group) => new { WayType = key, Items = group.AsEnumerable() })
@@ -403,7 +402,7 @@ namespace AGooday.AgPay.Application.Services
                 {
                     WayType = s.WayType,
                     TypeCount = s.Items.Count(),
-                    TypeAmount = Decimal.Round((s.Items.Sum(s => s.Amount) - s.Items.Sum(s => s.RefundAmount)) / 100M, 2, MidpointRounding.AwayFromZero)
+                    TypeAmount = Decimal.Round(s.Items.Sum(s => s.Amount) / 100M, 2, MidpointRounding.AwayFromZero)
                 }).ToList();
             return result;
         }
@@ -725,7 +724,7 @@ namespace AGooday.AgPay.Application.Services
                 dayEnd = today.AddDays(1).AddSeconds(-1);
             }
             // 统计列表
-            var payCountMap = PayTypeCount(mchNo, agentNo, (byte)PayOrderState.STATE_SUCCESS, null, dayStart, dayEnd);
+            var payCountMap = PayTypeCount(mchNo, agentNo, dayStart, dayEnd);
 
             // 支付方式名称标注
             foreach (var payCount in payCountMap)

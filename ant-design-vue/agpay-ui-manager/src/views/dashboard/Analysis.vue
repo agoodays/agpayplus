@@ -9,11 +9,11 @@
               <div :class="{ 'amount-date-active': todayOrYesterday === 'today' }" @click="getPayDayCount('today')">今日交易</div>
               <div :class="{ 'amount-date-active': todayOrYesterday === 'yesterday' }" @click="getPayDayCount('yesterday')">昨日交易</div>
             </div>
-            <p>交易金额(元)</p>
+            <p>成交金额(元)</p>
             <p style="font-size: 50px; margin-bottom: 35px; color: rgb(255, 255, 255);">{{ mainChart.dayCount.payAmount.toFixed(2) }}</p>
             <div class="amount-list">
               <div>
-                <p>交易笔数(笔)</p>
+                <p>成交笔数(笔)</p>
                 <span>{{ mainChart.dayCount.payCount }}</span>
               </div>
               <div>
@@ -119,7 +119,7 @@
         <div class="personal-line"></div>
         <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 0 }">
           <div class="msg">
-            <span>预留信息：<a style="color: rgb(38, 145, 255); margin-right: 5px;" @click="handleToSettings">{{ safeWord || '未设置' }}</a>
+            <span>预留信息： <a style="color: rgb(38, 145, 255); margin-right: 5px;" @click="handleToSettings">{{ safeWord || '未设置' }}</a>
               <a-tooltip placement="right">
                 <template slot="title">
                   此信息为你在本站预留的个性信息，用以鉴别假冒、钓鱼网站。如未看到此信息，请立即停止访问并修改密码。如需修改内容请前往个人中心
@@ -218,14 +218,14 @@
         safeWord: store.state.user.safeWord, // 安全词
         isPayType: true, // 支付方式是否存在数据
         isPayCount: true, // 交易统计是否存在数据
-        ispayAmount: true, // 今日交易金额是否存在数据
+        ispayAmount: true, // 今日成交金额是否存在数据
         agDate: undefined, // 自定义日期选择框所用状态
         agDatePie: undefined, // 自定义日期选择框所用状态-支付方式
         isAdmin: store.state.user.isAdmin, // 是否为超级管理员
         mainTips: { // 主页提示
           isvSubMchTipIsShow: false,
           normalMchTipIsShow: false,
-          recentAmountTip: '近期交易金额', // 今日交易提示文字
+          recentAmountTip: '近期成交金额', // 趋势提示文字
           totalAgentTip: '代理商数量', // 代理商数量提示文字
           totalIsvTip: '服务商数量', // 服务商数量提示文字
           totalMchTip: '商户数量', // 商户数量提示文字
@@ -320,9 +320,9 @@
           that.skeletonClose(that)
         }
         if (this.$access('ENT_C_MAIN_PAY_TREND_COUNT')) {
-          // 近期交易金额
+          // 近期成交金额
           getPayTrendCount(that.recentDay).then(res => {
-            // console.log('近期交易金额', res)
+            // console.log('近期成交金额', res)
             // res.length === 0 ? this.ispayAmount = false : this.ispayAmount = true
             that.ispayAmount = true
             that.loadPayAmount(res)
@@ -562,7 +562,7 @@
             }
           },
           legend: {
-            data: ['交易金额', '支付(成功)笔数', '退款金额']
+            data: ['成交金额', '支付(成功)笔数', '退款金额']
           },
           xAxis: [
             {
@@ -590,7 +590,7 @@
           ],
           series: [
             {
-              name: '交易金额',
+              name: '成交金额',
               type: 'line',
               stack: 'Total',
               smooth: true,
@@ -689,7 +689,7 @@
           ],
           series: [
             {
-              name: '交易金额',
+              name: '成交金额',
               data: data.resPayAmountArr
             },
             {
@@ -729,9 +729,9 @@
       recentDayChange() {
         const that = this
         if (this.$access('ENT_C_MAIN_PAY_TREND_COUNT')) {
-          // 近期交易金额
+          // 近期成交金额
           getPayTrendCount(that.recentDay).then(res => {
-            // console.log('近期交易金额', res)
+            // console.log('近期成交金额', res)
             that.loadPayAmount(res)
           }).catch((err) => {
             console.error(err)

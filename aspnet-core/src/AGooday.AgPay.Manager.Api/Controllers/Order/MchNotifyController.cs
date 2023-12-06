@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <param name="notifyId"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route("{notifyId}")]
+        [HttpPost, Route("resend/{notifyId}")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_NOTIFY_RESEND)]
         public ApiRes Resend(long notifyId)
         {

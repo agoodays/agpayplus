@@ -162,11 +162,11 @@ namespace AGooday.AgPay.Application.Services
                             join ut in _sysUserTeamRepository.GetAllAsNoTracking() on u.TeamId equals ut.TeamId into temp
                             from team in temp.DefaultIfEmpty()
                             where (string.IsNullOrWhiteSpace(dto.SysType) || u.SysType.Equals(dto.SysType))
-                            && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || u.BelongInfoId.Contains(dto.BelongInfoId))
+                            && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || u.BelongInfoId.Equals(dto.BelongInfoId))
                             && (string.IsNullOrWhiteSpace(dto.Realname) || u.Realname.Contains(dto.Realname))
                             && (dto.UserType.Equals(null) || u.UserType.Equals(dto.UserType))
                             && (dto.SysUserId.Equals(null) || u.SysUserId.Equals(dto.SysUserId))
-                            && (currentUserId == null || !u.SysUserId.Equals(currentUserId))
+                            && (currentUserId.Equals(null) || !u.SysUserId.Equals(currentUserId))
                             select new { u, team }).ToList().Select(s =>
                             {
                                 var item = _mapper.Map<SysUserListDto>(s.u);

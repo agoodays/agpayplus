@@ -40,12 +40,10 @@
       <AgTable
         @btnLoadClose="btnLoading=false"
         ref="infoTable"
-        :closable="true"
         :initData="true"
         :reqTableDataFunc="reqTableDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
-        :rowSelection="rowSelection"
         rowKey="orderId"
       >
         <template slot="stateSlot" slot-scope="{record}">
@@ -147,6 +145,24 @@
               </a-descriptions-item>
             </a-descriptions>
           </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
+              <a-descriptions-item label="Http发送方式">
+                <a-tag :color="'green'">
+                  {{ detailData.reqMethod }}
+                </a-tag>
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
+              <a-descriptions-item label="Http媒体类型">
+                <a-tag :color="'green'">
+                  {{ detailData.reqMediaType }}
+                </a-tag>
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
           <a-col :sm="24">
             <a-descriptions>
               <a-descriptions-item label="最后通知时间">
@@ -179,6 +195,16 @@
             </a-form-model-item>
           </a-col>
           <a-col :sm="24">
+            <a-form-model-item label="请求Body">
+              <a-input
+                type="textarea"
+                disabled="disabled"
+                style="height: 100px;color: black"
+                v-model="detailData.reqBody"
+              />
+            </a-form-model-item>
+          </a-col>
+          <a-col :sm="24">
             <a-form-model-item label="响应结果">
               <a-input
                 type="textarea"
@@ -204,7 +230,7 @@
 
   // eslint-disable-next-line no-unused-vars
   const tableColumns = [
-    { key: 'orderId', dataIndex: 'orderId', title: '订单ID', width: 180, fixed: 'left' },
+    { key: 'orderId', dataIndex: 'orderId', title: '订单ID', width: 210, fixed: 'left' },
     { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号', width: 200 },
     { key: 'state', title: '通知状态', width: 130, scopedSlots: { customRender: 'stateSlot' } },
     { key: 'orderType', title: '订单类型', width: 130, scopedSlots: { customRender: 'orderTypeSlot' } },
@@ -223,7 +249,6 @@
         searchData: {
           queryDateRange: 'today'
         },
-        selectedIds: [], // 选中的数据
         createdStart: '', // 选择开始时间
         createdEnd: '', // 选择结束时间
         visible: false,
@@ -231,17 +256,6 @@
       }
     },
     computed: {
-      rowSelection () {
-        const that = this
-        return {
-          onChange: (selectedRowKeys, selectedRows) => {
-            that.selectedIds = [] // 清空选中数组
-            selectedRows.forEach(function (data) { // 赋值选中参数
-              that.selectedIds.push(data.payOrderId)
-            })
-          }
-        }
-      }
     },
     mounted () {
     },
