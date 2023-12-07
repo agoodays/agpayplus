@@ -28,7 +28,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         private readonly ILogger<AuthController> _logger;
         private readonly JwtSettings _jwtSettings;
         private readonly ISysUserService _sysUserService;
-        private readonly ISysUserAuthService _sysUserAuthService;
+        private readonly ISysUserAuthService _sysUserAuthService; 
+        private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly ISysConfigService _sysConfigService;
@@ -45,6 +46,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             INotificationHandler<DomainNotification> notifications,
             ISysUserService sysUserService,
             ISysUserAuthService sysUserAuthService,
+            ISysUserLoginAttemptService sysUserLoginAttemptService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService,
             ISysConfigService sysConfigService,
@@ -55,6 +57,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             _jwtSettings = jwtSettings.Value;
             _sysUserService = sysUserService;
             _sysUserAuthService = sysUserAuthService;
+            _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
             _sysConfigService = sysConfigService;
@@ -72,7 +75,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("auth/validate"), MethodLog(AUTH_METHOD_REMARK)]
-        public ApiRes Validate(Validate model)
+        public async Task<ApiRes> Validate(Validate model)
         {
             string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理
             string ipassport = Base64Util.DecodeBase64(model.ip); //密码 i passport, 已做base64处理
@@ -102,18 +105,48 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
                 throw new BizException("用户名/密码错误！");
             }
 
+            int maxLoginAttempts = 5;
+            int failedAttempts = 0;
+            DateTime? lastLoginTime = null;
+            var loginErrorMessage = "密码输入错误次数超限，请稍后再试！";
+            if (maxLoginAttempts > 0)
+            {
+                (failedAttempts, lastLoginTime) = await _sysUserLoginAttemptService.GetFailedLoginAttemptsAsync(auth.SysUserId, TimeSpan.FromMinutes(15));
+                if (failedAttempts >= maxLoginAttempts)
+                {
+                    throw new BizException(loginErrorMessage);
+                }
+            }
+
             //https://jasonwatmore.com/post/2022/01/16/net-6-hash-and-verify-passwords-with-bcrypt
             //https://bcrypt.online/
             bool verified = BCryptUtil.VerifyHash(ipassport, auth.Credential);
+            var loginAttempt = new SysUserLoginAttemptDto()
+            {
+                UserId = auth.SysUserId,
+                IdentityType = auth.IdentityType,
+                Identifier = auth.Identifier,
+                IpAddress = string.Empty,
+                SysType = CS.SYS_TYPE.MCH,
+                AttemptTime = DateTime.Now,
+                Success = false
+            };
             if (!verified)
             {
+                await _sysUserLoginAttemptService.RecordLoginAttemptAsync(loginAttempt);
+                ++failedAttempts;
+                loginErrorMessage = failedAttempts >= maxLoginAttempts ? loginErrorMessage : $"用户名/密码错误，还可尝试{maxLoginAttempts - failedAttempts}次，失败将锁定15分钟！";
                 //没有该用户信息
-                throw new BizException("用户名/密码错误！");
+                throw new BizException(loginErrorMessage);
             }
-            return Auth(auth, codeCacheKey);
+            loginAttempt.Success = true;
+            await _sysUserLoginAttemptService.RecordLoginAttemptAsync(loginAttempt);
+            // 登录成功，清除登录尝试记录
+            await _sysUserLoginAttemptService.ClearFailedLoginAttemptsAsync(auth.SysUserId);
+            return Auth(auth, codeCacheKey, lastLoginTime);
         }
 
-        private ApiRes Auth(SysUserAuthInfoDto auth, string codeCacheKey)
+        private ApiRes Auth(SysUserAuthInfoDto auth, string codeCacheKey, DateTime? lastLoginTime = null)
         {
             //非超级管理员 && 不包含左侧菜单 进行错误提示
             if (auth.IsAdmin != CS.YES && !_sysRoleEntRelaService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
@@ -158,7 +191,6 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             // 删除验证码缓存数据
             _redis.KeyDelete(codeCacheKey);
 
-            var lastLoginTime = _sysLogService.GetLastSysLog(auth.SysUserId, AUTH_METHOD_REMARK, auth.SysType)?.CreatedAt;
             if (lastLoginTime != null)
             {
                 var data = new Dictionary<string, object>();
@@ -203,7 +235,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("auth/phoneCode"), MethodLog(AUTH_METHOD_REMARK)]
-        public ApiRes PhoneCode(PhoneCode model)
+        public async Task<ApiRes> PhoneCode(PhoneCode model)
         {
             string phone = Base64Util.DecodeBase64(model.phone);
             string code = Base64Util.DecodeBase64(model.code);
@@ -228,7 +260,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
                 //没有该用户信息
                 throw new BizException("未绑定手机号！");
             }
-            return Auth(auth, codeCacheKey);
+            (int failedAttempts, DateTime? lastLoginTime) = await _sysUserLoginAttemptService.GetFailedLoginAttemptsAsync(auth.SysUserId, TimeSpan.FromMinutes(15));
+            return Auth(auth, codeCacheKey, lastLoginTime);
         }
 
         /// <summary>

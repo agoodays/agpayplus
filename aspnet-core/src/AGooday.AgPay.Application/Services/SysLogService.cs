@@ -69,13 +69,6 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public SysLogDto GetLastSysLog(long userId, string methodRemark, string sysType)
-        {
-            var entity = _sysLogRepository.GetLastSysLog(userId, methodRemark, sysType);
-            var dto = _mapper.Map<SysLogDto>(entity);
-            return dto;
-        }
-
         public IEnumerable<SysLogDto> GetAll()
         {
             var sysLogs = _sysLogRepository.GetAll();

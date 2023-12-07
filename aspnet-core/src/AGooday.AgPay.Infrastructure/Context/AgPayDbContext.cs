@@ -44,6 +44,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         public DbSet<SysUser> SysUser { get; set; }
         public DbSet<SysUserTeam> SysUserTeam { get; set; }
         public DbSet<SysUserAuth> SysUserAuth { get; set; }
+        public DbSet<SysUserLoginAttempt> SysUserLoginAttempt { get; set; }
         public DbSet<SysUserRoleRela> SysUserRoleRela { get; set; }
         public DbSet<TransferOrder> TransferOrder { get; set; }
         #endregion
@@ -238,6 +239,8 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<SysUserTeam>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<SysUserTeam>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<SysUserAuth>().Property(c => c.IdentityType).HasDefaultValue(0);
+            modelBuilder.Entity<SysUserLoginAttempt>().Property(c => c.IdentityType).HasDefaultValue(1);
+            modelBuilder.Entity<SysUserLoginAttempt>().Property(c => c.AttemptTime).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<TransferOrder>().Property(c => c.Currency).HasDefaultValue("cny");
             modelBuilder.Entity<TransferOrder>().Property(c => c.State).HasDefaultValue(0);
             modelBuilder.Entity<TransferOrder>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");

@@ -59,6 +59,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<ISysRoleEntRelaService, SysRoleEntRelaService>();
             services.AddScoped<ISysRoleService, SysRoleService>();
             services.AddScoped<ISysUserAuthService, SysUserAuthService>();
+            services.AddScoped<ISysUserLoginAttemptService, SysUserLoginAttemptService>();
             services.AddScoped<ISysUserRoleRelaService, SysUserRoleRelaService>();
             services.AddScoped<ISysUserService, SysUserService>();
             services.AddScoped<ISysUserTeamService, SysUserTeamService>();
@@ -124,6 +125,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<ISysRoleEntRelaRepository, SysRoleEntRelaRepository>();
             services.AddScoped<ISysRoleRepository, SysRoleRepository>();
             services.AddScoped<ISysUserAuthRepository, SysUserAuthRepository>();
+            services.AddScoped<ISysUserLoginAttemptRepository, SysUserLoginAttemptRepository>();
             services.AddScoped<ISysUserRoleRelaRepository, SysUserRoleRelaRepository>();
             services.AddScoped<ISysUserRepository, SysUserRepository>();
             services.AddScoped<ISysUserTeamRepository, SysUserTeamRepository>();

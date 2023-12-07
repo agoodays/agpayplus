@@ -10,11 +10,5 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
-
-        public SysLog GetLastSysLog(long userId, string methodRemark, string sysType)
-        {
-            return DbSet.OrderByDescending(o => o.CreatedAt)
-                .FirstOrDefault(w => w.UserId.Equals(userId) && w.MethodRemark.Equals(methodRemark) && w.SysType.Equals(sysType));
-        }
     }
 }

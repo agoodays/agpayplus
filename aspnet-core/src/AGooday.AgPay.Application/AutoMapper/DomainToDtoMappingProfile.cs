@@ -62,6 +62,7 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysRole, SysRoleDto>();
             CreateMap<SysRoleEntRela, SysRoleEntRelaDto>();
             CreateMap<SysUserAuth, SysUserAuthDto>();
+            CreateMap<SysUserLoginAttempt, SysUserLoginAttemptDto>();
             CreateMap<SysUserRoleRela, SysUserRoleRelaDto>();
 
             CreateMap<SysUser, SysUserDto>();
