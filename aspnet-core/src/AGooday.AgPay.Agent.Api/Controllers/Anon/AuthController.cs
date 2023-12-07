@@ -126,7 +126,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
                 UserId = auth.SysUserId,
                 IdentityType = auth.IdentityType,
                 Identifier = auth.Identifier,
-                IpAddress = string.Empty,
+                IpAddress = IpUtil.GetIP(Request),
                 SysType = CS.SYS_TYPE.AGENT,
                 AttemptTime = DateTime.Now,
                 Success = false
