@@ -55,12 +55,12 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public long FindMchAdminUserId(string mchNo)
         {
-            return DbSet.First(w => w.BelongInfoId.Equals(mchNo) && w.SysType.Equals(CS.SYS_TYPE.MCH) && w.IsAdmin.Equals(CS.YES)).SysUserId;
+            return DbSet.First(w => w.BelongInfoId.Equals(mchNo) && w.SysType.Equals(CS.SYS_TYPE.MCH) && w.UserType.Equals(CS.USER_TYPE.ADMIN)).SysUserId;
         }
 
         public long FindAgentAdminUserId(string agentNo)
         {
-            return DbSet.First(w => w.BelongInfoId.Equals(agentNo) && w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.IsAdmin.Equals(CS.YES)).SysUserId;
+            return DbSet.First(w => w.BelongInfoId.Equals(agentNo) && w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.UserType.Equals(CS.USER_TYPE.ADMIN)).SysUserId;
         }
 
         public void Remove(SysUser sysUser)

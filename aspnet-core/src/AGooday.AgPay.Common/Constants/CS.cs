@@ -279,6 +279,33 @@
         public const string DEFAULT_FEMALE_AVATAR_URL = "https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_f.png";
 
         /// <summary>
+        /// 用户类型
+        /// </summary>
+        public interface USER_TYPE
+        {
+            /// <summary>
+            /// 超级管理员
+            /// </summary>
+            public const byte ADMIN = 1;
+            /// <summary>
+            /// 普通操作员
+            /// </summary>
+            public const byte OPERATOR = 2;
+            /// <summary>
+            /// 商户拓展员
+            /// </summary>
+            public const byte MCH_EXT = 3;
+            /// <summary>
+            /// 店长
+            /// </summary>
+            public const byte STORE_MANAGER = 11;
+            /// <summary>
+            /// 店员
+            /// </summary>
+            public const byte CLERK = 12;
+        }
+
+        /// <summary>
         /// 密码类型
         /// </summary>
         public interface PASSWORD_TYPE

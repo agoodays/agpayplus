@@ -65,7 +65,6 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         public async Task<ApiRes> AddAsync(SysUserCreateDto dto)
         {
             //_cache.Remove("ErrorData");
-            dto.IsAdmin = CS.NO;
             dto.SysType = CS.SYS_TYPE.MCH;
             dto.BelongInfoId = GetCurrentMchNo();
             dto.CreatedAt = DateTime.Now;
@@ -92,7 +91,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             var currentUserId = 0;
             //判断是否删除商户默认超管
             var dbRecord = _sysUserService.GetById(recordId, GetCurrentMchNo());
-            if (dbRecord != null && dbRecord.SysType == CS.SYS_TYPE.MCH && dbRecord.IsAdmin == CS.YES)
+            if (dbRecord != null && dbRecord.SysType == CS.SYS_TYPE.MCH && dbRecord.InitUser)
             {
                 return ApiRes.CustomFail("系统不允许删除商户默认用户！");
             }

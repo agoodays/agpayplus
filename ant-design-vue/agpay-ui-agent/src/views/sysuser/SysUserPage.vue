@@ -102,7 +102,6 @@ const tableColumns = [
   { key: 'sex', dataIndex: 'sex', title: '性别', width: 65, customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
   { key: 'userNo', dataIndex: 'userNo', title: '编号', width: 125 },
   { key: 'telphone', dataIndex: 'telphone', title: '手机号', width: 160 },
-  { key: 'isAdmin', dataIndex: 'isAdmin', title: '超管', width: 65, customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
   { key: 'userType', title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
   { key: 'teamName', dataIndex: 'teamName', title: '团队', width: 160 },
   { key: 'inviteCode', title: '邀请码', width: 160, align: 'center', scopedSlots: { customRender: 'inviteCodeSlot' } },

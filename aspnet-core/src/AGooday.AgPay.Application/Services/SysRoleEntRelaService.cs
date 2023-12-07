@@ -106,12 +106,12 @@ namespace AGooday.AgPay.Application.Services
         /// 根据人查询出所有权限ID集合
         /// </summary>
         /// <param name="userId"></param>
-        /// <param name="isAdmin"></param>
+        /// <param name="userType"></param>
         /// <param name="sysType"></param>
         /// <returns></returns>
-        public IEnumerable<string> SelectEntIdsByUserId(long userId, byte isAdmin, string sysType)
+        public IEnumerable<string> SelectEntIdsByUserId(long userId, byte userType, string sysType)
         {
-            if (isAdmin == CS.YES)
+            if (userType == CS.USER_TYPE.ADMIN)
             {
                 var result = _sysEntitlementRepository.GetAll()
                     .Where(w => w.SysType.Equals(sysType) && w.State == CS.PUB_USABLE)

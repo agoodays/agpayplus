@@ -20,11 +20,6 @@ namespace AGooday.AgPay.Domain.Events.SysUsers
         public string Realname { get; set; }
 
         /// <summary>
-        /// 预留信息
-        /// </summary>
-        public string SafeWord { get; set; }
-
-        /// <summary>
         /// 手机号
         /// </summary>
         public string Telphone { get; set; }
@@ -50,19 +45,14 @@ namespace AGooday.AgPay.Domain.Events.SysUsers
         public string UserNo { get; set; }
 
         /// <summary>
-        /// 是否超管（超管拥有全部权限） 0-否 1-是
+        /// 预留信息
         /// </summary>
-        public byte IsAdmin { get; set; }
+        public string SafeWord { get; set; }
 
         /// <summary>
-        /// 状态 0-停用 1-启用
+        /// 初始用户
         /// </summary>
-        public byte State { get; set; }
-
-        /// <summary>
-        /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
-        /// </summary>
-        public string SysType { get; set; }
+        public bool InitUser { get; set; }
 
         /// <summary>
         /// 用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员
@@ -83,6 +73,16 @@ namespace AGooday.AgPay.Domain.Events.SysUsers
         /// 是否队长:  0-否 1-是
         /// </summary>
         public byte? IsTeamLeader { get; set; }
+
+        /// <summary>
+        /// 状态 0-停用 1-启用
+        /// </summary>
+        public byte State { get; set; }
+
+        /// <summary>
+        /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
+        /// </summary>
+        public string SysType { get; set; }
 
         /// <summary>
         /// 所属商户ID / 0(平台)

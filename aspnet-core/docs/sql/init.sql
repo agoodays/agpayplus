@@ -102,7 +102,7 @@ CREATE TABLE `t_sys_config` (
 -- 系统操作日志表
 DROP TABLE IF EXISTS `t_sys_log`;
 CREATE TABLE `t_sys_log` (
-  `sys_log_id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `sys_log_id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `user_id` BIGINT(20) DEFAULT NULL COMMENT '系统用户ID',
   `user_name` VARCHAR(32) DEFAULT NULL COMMENT '用户姓名',
   `browser` VARCHAR(60) NOT NULL DEFAULT '' COMMENT '浏览器',

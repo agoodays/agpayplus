@@ -230,9 +230,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<SysRole>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<SysUser>().Property(c => c.Sex).HasDefaultValue(1);
             modelBuilder.Entity<SysUser>().Property(c => c.InitUser).HasDefaultValue(false);
-            modelBuilder.Entity<SysUser>().Property(c => c.IsAdmin).HasDefaultValue(1);
             modelBuilder.Entity<SysUser>().Property(c => c.State).HasDefaultValue(1);
-            modelBuilder.Entity<SysUser>().Property(c => c.UserType).HasDefaultValue(1);
             modelBuilder.Entity<SysUser>().Property(c => c.BelongInfoId).HasDefaultValue(0);
             modelBuilder.Entity<SysUser>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<SysUser>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");

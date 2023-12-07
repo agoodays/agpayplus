@@ -34,13 +34,6 @@ namespace AGooday.AgPay.Domain.Models
         public string Realname { get; set; }
 
         /// <summary>
-        /// 预留信息
-        /// </summary>
-        [Comment("预留信息")]
-        [Column("safe_word", TypeName = "varchar(32)")]
-        public string SafeWord { get; set; }
-
-        /// <summary>
         /// 手机号
         /// </summary>
         [Comment("手机号")]
@@ -69,32 +62,18 @@ namespace AGooday.AgPay.Domain.Models
         public string UserNo { get; set; }
 
         /// <summary>
+        /// 预留信息
+        /// </summary>
+        [Comment("预留信息")]
+        [Column("safe_word", TypeName = "varchar(32)")]
+        public string SafeWord { get; set; }
+
+        /// <summary>
         /// 初始用户
         /// </summary>
         [Comment("初始用户")]
         [Required, Column("init_user", TypeName = "tinyint(1)")]
         public bool InitUser { get; set; }
-
-        /// <summary>
-        /// 是否超管（超管拥有全部权限） 0-否 1-是
-        /// </summary>
-        [Comment("是否超管（超管拥有全部权限） 0-否 1-是")]
-        [Required, Column("is_admin", TypeName = "tinyint(6)")]
-        public byte IsAdmin { get; set; }
-
-        /// <summary>
-        /// 状态 0-停用 1-启用
-        /// </summary>
-        [Comment("状态 0-停用 1-启用")]
-        [Required, Column("state", TypeName = "tinyint(6)")]
-        public byte State { get; set; }
-
-        /// <summary>
-        /// 所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心
-        /// </summary>
-        [Comment("所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心")]
-        [Required, Column("sys_type", TypeName = "varchar(8)")]
-        public string SysType { get; set; }
 
         /// <summary>
         /// 用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员
@@ -123,6 +102,20 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("是否队长:  0-否 1-是")]
         [Column("is_team_leader", TypeName = "tinyint(6)")]
         public byte? IsTeamLeader { get; set; }
+
+        /// <summary>
+        /// 状态 0-停用 1-启用
+        /// </summary>
+        [Comment("状态 0-停用 1-启用")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
+        public byte State { get; set; }
+
+        /// <summary>
+        /// 所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心
+        /// </summary>
+        [Comment("所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心")]
+        [Required, Column("sys_type", TypeName = "varchar(8)")]
+        public string SysType { get; set; }
 
         /// <summary>
         /// 所属商户ID / 所属代理商ID / 0(平台)

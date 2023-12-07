@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             //生成token
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());
             var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
-            authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.IsAdmin, auth.SysType));
+            authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.UserType, auth.SysType));
 
             // 返回前端 accessToken
             TokenModelJwt tokenModel = new TokenModelJwt();

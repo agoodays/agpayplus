@@ -510,16 +510,14 @@ CREATE TABLE `t_sys_user_team` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='团队信息表';
   
 ALTER TABLE `t_sys_user`   
-  ADD COLUMN `safe_word` VARCHAR(32) NULL COMMENT '预留信息' AFTER `realname`,
   CHANGE `sex` `sex` TINYINT DEFAULT 0 NOT NULL COMMENT '性别: 0-未知, 1-男, 2-女',
-  ADD COLUMN `init_user` BOOLEAN DEFAULT FALSE NOT NULL COMMENT '初始用户' AFTER `user_no`,
-  CHANGE `is_admin` `is_admin` TINYINT DEFAULT 0 NOT NULL COMMENT '是否超管（超管拥有全部权限）: 0-否 1-是',
-  CHANGE `sys_type` `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
-  ADD COLUMN `user_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员' AFTER `sys_type`,
+  ADD COLUMN `safe_word` VARCHAR(32) NULL COMMENT '预留信息' AFTER `user_no`,
+  ADD COLUMN `init_user` TINYINT(1) DEFAULT 0 NOT NULL COMMENT '初始用户' AFTER `safe_word`,
+  CHANGE `is_admin` `user_type` TINYINT NOT NULL COMMENT '用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员',
   ADD COLUMN `invite_code` VARCHAR(20) NULL COMMENT '邀请码' AFTER `user_type`,
   ADD COLUMN `team_id` BIGINT NULL COMMENT '团队ID' AFTER `invite_code`,
---   ADD COLUMN `team_name` VARCHAR(32) NULL COMMENT '团队名称' AFTER `team_id`,
-  ADD COLUMN `is_team_leader` TINYINT NULL COMMENT '是否队长:  0-否 1-是' AFTER `team_id`;
+  ADD COLUMN `is_team_leader` TINYINT NULL COMMENT '是否队长:  0-否 1-是' AFTER `team_id`,
+  CHANGE `sys_type` `sys_type` VARCHAR(8) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心';
 
 ALTER TABLE `t_sys_user`   
   ADD UNIQUE INDEX `Uni_InviteCode` (`invite_code`);

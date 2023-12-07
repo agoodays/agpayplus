@@ -54,15 +54,6 @@
         </a-col>
 
         <a-col :span="10">
-          <a-form-model-item label="是否为超级管理员" prop="isAdmin">
-            <a-radio-group v-model="saveObject.isAdmin">
-              <a-radio :value="1">是</a-radio>
-              <a-radio :value="0">否</a-radio>
-            </a-radio-group>
-          </a-form-model-item>
-        </a-col>
-
-        <a-col :span="10">
           <a-form-model-item label="状态" prop="state">
             <a-radio-group v-model="saveObject.state">
               <a-radio :value="1">启用</a-radio>
@@ -289,7 +280,6 @@ export default {
 
       // 数据恢复为默认数据
       this.saveObject = {
-        isAdmin: 1,
         state: 1,
         sex: 1,
         userType: 1,

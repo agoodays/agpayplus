@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                     }
                     var auth = sysUserMap.Where(w => w.SysUserId.Equals(sysUserId)).First();
                     var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId.Value).ToList();
-                    authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId.Value, auth.IsAdmin, auth.SysType));
+                    authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId.Value, auth.UserType, auth.SysType));
                     currentUser.Authorities = authorities;
                     currentUserJson = JsonConvert.SerializeObject(currentUser);
                     //保存token  失效时间不变

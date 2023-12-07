@@ -126,7 +126,6 @@ const tableColumns = [
   { key: 'telphone', dataIndex: 'telphone', title: '手机号', width: 160 },
   { key: 'sysType', title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
   { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户', width: 140 },
-  { key: 'isAdmin', dataIndex: 'isAdmin', title: '超管', width: 65, customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
   { key: 'userType', title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
   { key: 'teamName', dataIndex: 'teamName', title: '团队', width: 160 },
   { key: 'inviteCode', title: '邀请码', width: 160, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },

@@ -65,7 +65,6 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         public async Task<ApiRes> AddAsync(SysUserCreateDto dto)
         {
             //_cache.Remove("ErrorData");
-            dto.IsAdmin = CS.NO;
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = GetCurrentAgentNo();
             dto.CreatedAt = DateTime.Now;

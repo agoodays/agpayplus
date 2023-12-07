@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 sysUser.Sex = CS.SEX_MALE;
                 sysUser.AvatarUrl = CS.DEFAULT_MALE_AVATAR_URL;//默认头像
                 sysUser.InitUser = true;
-                sysUser.IsAdmin = CS.YES;
+                sysUser.UserType = CS.USER_TYPE.ADMIN;
                 sysUser.State = agentInfo.State;
                 sysUser.InviteCode = StringUtil.GetUUID(6); //6位随机数
 
