@@ -69,6 +69,13 @@ namespace AGooday.AgPay.Domain.Models
         public string UserNo { get; set; }
 
         /// <summary>
+        /// 初始用户
+        /// </summary>
+        [Comment("初始用户")]
+        [Required, Column("init_user", TypeName = "tinyint(1)")]
+        public bool InitUser { get; set; }
+
+        /// <summary>
         /// 是否超管（超管拥有全部权限） 0-否 1-是
         /// </summary>
         [Comment("是否超管（超管拥有全部权限） 0-否 1-是")]

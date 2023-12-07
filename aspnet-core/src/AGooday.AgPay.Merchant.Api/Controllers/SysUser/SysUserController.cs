@@ -50,7 +50,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         {
             dto.SysType = CS.SYS_TYPE.MCH;
             dto.BelongInfoId = GetCurrentMchNo();
-            var data = _sysUserService.GetPaginatedData(dto, GetCurrentUserId());
+            long? currentUserId = null;//GetCurrentUserId();
+            var data = _sysUserService.GetPaginatedData(dto, currentUserId);
             return ApiPageRes<SysUserListDto>.Pages(data);
         }
 

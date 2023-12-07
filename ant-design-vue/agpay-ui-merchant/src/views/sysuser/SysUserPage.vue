@@ -42,6 +42,13 @@
           <a-avatar size="default" :src="record.avatarUrl" />
         </template>
 
+        <template slot="realnameSlot" slot-scope="{record}">
+          <span>
+            {{ record.realname }}
+            <a-tag v-if="record.initUser" :color="'green'">初始</a-tag>
+          </span>
+        </template>
+
         <template slot="userTypeSlot" slot-scope="{record}">
           <span>{{ getUserTypeName(record.userType) }}</span>
         </template>
@@ -58,7 +65,7 @@
 
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a-button type="link"v-if="$access('ENT_UR_USER_UPD_ROLE')" @click="roleDist(record.sysUserId)" >变更角色</a-button>
+            <a-button type="link"v-if="$access('ENT_UR_USER_UPD_ROLE') && record.userType===2" @click="roleDist(record.sysUserId)" >变更角色</a-button>
             <a-button type="link" v-if="$access('ENT_UR_USER_EDIT')" @click="editFunc(record.sysUserId)">修改</a-button>
             <a-button type="link" v-if="$access('ENT_UR_USER_DELETE')" style="color: red" @click="delFunc(record.sysUserId)">删除</a-button>
           </AgTableColumns>
@@ -90,10 +97,10 @@ import RoleDist from './RoleDist'
 
 const tableColumns = [
   { key: 'avatar', title: '头像', width: 65, fixed: 'left', scopedSlots: { customRender: 'avatarSlot' } },
-  { key: 'realname', dataIndex: 'realname', title: '姓名', width: 120, fixed: 'left' },
+  { key: 'realname', title: '姓名', width: 135, fixed: 'left', scopedSlots: { customRender: 'realnameSlot' } },
   { key: 'sysUserId', dataIndex: 'sysUserId', title: '用户ID', width: 120, fixed: 'left' },
   { key: 'sex', dataIndex: 'sex', title: '性别', width: 65, customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
-  { key: 'userNo', dataIndex: 'userNo', title: '编号', width: 120 },
+  { key: 'userNo', dataIndex: 'userNo', title: '编号', width: 125 },
   { key: 'telphone', dataIndex: 'telphone', title: '手机号', width: 160 },
   { key: 'isAdmin', dataIndex: 'isAdmin', title: '超管', width: 65, customRender: (text, record, index) => { return record.isAdmin === 1 ? '是' : '否' } },
   { key: 'userType', title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },

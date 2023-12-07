@@ -50,7 +50,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = GetCurrentAgentNo();
-            var data = _sysUserService.GetPaginatedData(dto, GetCurrentUserId());
+            long? currentUserId = null;//GetCurrentUserId();
+            var data = _sysUserService.GetPaginatedData(dto, currentUserId);
             return ApiPageRes<SysUserListDto>.Pages(data);
         }
 

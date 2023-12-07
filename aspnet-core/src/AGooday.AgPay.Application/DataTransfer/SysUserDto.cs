@@ -46,6 +46,11 @@
         public string UserNo { get; set; }
 
         /// <summary>
+        /// 初始用户
+        /// </summary>
+        public bool InitUser { get; set; }
+
+        /// <summary>
         /// 是否超管（超管拥有全部权限） 0-否 1-是
         /// </summary>
         public byte IsAdmin { get; set; }

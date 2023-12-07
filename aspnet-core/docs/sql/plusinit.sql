@@ -510,7 +510,9 @@ CREATE TABLE `t_sys_user_team` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='团队信息表';
   
 ALTER TABLE `t_sys_user`   
+  ADD COLUMN `safe_word` VARCHAR(32) NULL COMMENT '预留信息' AFTER `realname`,
   CHANGE `sex` `sex` TINYINT DEFAULT 0 NOT NULL COMMENT '性别: 0-未知, 1-男, 2-女',
+  ADD COLUMN `init_user` BOOLEAN DEFAULT FALSE NOT NULL COMMENT '初始用户' AFTER `user_no`,
   CHANGE `is_admin` `is_admin` TINYINT DEFAULT 0 NOT NULL COMMENT '是否超管（超管拥有全部权限）: 0-否 1-是',
   CHANGE `sys_type` `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
   ADD COLUMN `user_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员' AFTER `sys_type`,
@@ -521,9 +523,6 @@ ALTER TABLE `t_sys_user`
 
 ALTER TABLE `t_sys_user`   
   ADD UNIQUE INDEX `Uni_InviteCode` (`invite_code`);
-  
-ALTER TABLE `t_sys_user`   
-  ADD COLUMN `safe_word` VARCHAR(32) NULL COMMENT '预留信息' AFTER `realname`;
   
 INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM', '团队管理', 'team', '/teams', 'SysUserTeamPage', 'ML', 0, 1, 'ENT_UR', 15, 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_LIST', '页面：团队列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());

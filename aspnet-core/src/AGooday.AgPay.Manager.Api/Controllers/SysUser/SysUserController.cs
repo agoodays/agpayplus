@@ -53,7 +53,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         //}
         public async Task<ApiPageRes<SysUserListDto>> List([FromQuery] SysUserQueryDto dto)
         {
-            var data = await _sysUserService.GetPaginatedDataAsync(dto, GetCurrentUserId());
+            long? currentUserId = null;//GetCurrentUserId();
+            var data = await _sysUserService.GetPaginatedDataAsync(dto, currentUserId);
             return ApiPageRes<SysUserListDto>.Pages(data);
         }
 
