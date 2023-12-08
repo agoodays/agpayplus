@@ -23,18 +23,21 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
     {
         private readonly ILogger<SysUserController> _logger;
         private readonly ISysUserService _sysUserService;
+        private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly IMemoryCache _cache;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
         public SysUserController(ILogger<SysUserController> logger, IMemoryCache cache, INotificationHandler<DomainNotification> notifications, RedisUtil client,
-            ISysUserService sysUserService,
+            ISysUserService sysUserService, 
+            ISysUserLoginAttemptService sysUserLoginAttemptService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             _logger = logger;
             _sysUserService = sysUserService;
+            _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _cache = cache;
             _notifications = (DomainNotificationHandler)notifications;
         }
@@ -152,6 +155,19 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             return ApiRes.Ok(sysUser);
+        }
+
+        /// <summary>
+        /// 解除登录限制
+        /// </summary>
+        /// <param name="recordId">系统用户ID</param>
+        /// <returns></returns>
+        [HttpDelete, Route("loginLimit/{recordId}"), MethodLog("解除登录限制")]
+        [PermissionAuth(PermCode.AGENT.ENT_UR_USER_LOGIN_LIMIT_DELETE)]
+        public async Task<ApiRes> RelieveLoginLimitAsync(long recordId)
+        {
+            await _sysUserLoginAttemptService.ClearFailedLoginAttemptsAsync(recordId);
+            return ApiRes.Ok();
         }
     }
 }

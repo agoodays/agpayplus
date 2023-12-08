@@ -201,7 +201,7 @@ WHERE ro.way_type = '';
 
 **/
 
-#####  ----------  系统用户登录尝试记录-表结构DDL  ----------  #####
+#####  ----------  系统用户登录尝试记录-表结构DDL+初始化DML  ----------  #####
 
 -- 系统用户登录尝试记录表
 DROP TABLE IF EXISTS `t_sys_user_login_attempt`;
@@ -211,12 +211,17 @@ CREATE TABLE `t_sys_user_login_attempt` (
   `identity_type` TINYINT(6) NOT NULL COMMENT '登录类型: 1-登录账号 2-手机号 3-邮箱  10-微信  11-QQ 12-支付宝 13-微博',
   `identifier` VARCHAR(128) NOT NULL COMMENT '认证标识 ( 用户名 | open_id )',
   `ip_address` VARCHAR(128) NOT NULL COMMENT 'IP地址',
-  `success` TINYINT(1) NOT NULL COMMENT '登录成功',
-  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统： MGR-运营平台, MCH-商户中心',
+  `success` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '登录成功',
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, MCH-商户中心',
   `attempt_time` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '尝试时间',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `Idx_UserId_SysType` (`user_id`, `sys_type`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='系统用户登录尝试记录表';
 
+INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LOGIN_LIMIT_DELETE', '按钮： 解除登录限制', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LOGIN_LIMIT_DELETE', '按钮： 解除登录限制', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'AGENT', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LOGIN_LIMIT_DELETE', '按钮： 解除登录限制', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
+            
 #####  ----------  代理商-表结构DDL+初始化DML  ----------  #####
 
 -- 代理商信息表

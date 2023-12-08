@@ -67,6 +67,7 @@
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_UR_USER_UPD_ROLE') && record.userType===2" @click="roleDist(record.sysUserId)" >变更角色</a-button>
             <a-button type="link" v-if="$access('ENT_UR_USER_EDIT')" @click="editFunc(record.sysUserId)">修改</a-button>
+            <a-button type="link" v-if="$access('ENT_UR_USER_LOGIN_LIMIT_DELETE')" style="color: red" @click="relieveFunc(record.sysUserId)">解除登录限制</a-button>
             <a-button type="link" v-if="$access('ENT_UR_USER_DELETE')" style="color: red" @click="delFunc(record.sysUserId)">删除</a-button>
           </AgTableColumns>
         </template>
@@ -161,20 +162,25 @@ export default {
     reqTableDataFunc: (params) => {
       return req.list(API_URL_SYS_USER_LIST, params)
     },
-
     searchFunc: function () { // 点击【查询】按钮点击事件
       this.btnLoading = true // 打开查询按钮的loading
       this.$refs.infoTable.refTable(true)
     },
-
     addFunc: function () { // 业务通用【新增】 函数
       this.$refs.infoAddOrEdit.show()
     },
-
     editFunc: function (recordId) { // 业务通用【修改】 函数
       this.$refs.infoAddOrEdit.show(recordId)
     },
-
+    relieveFunc: function (recordId) { // 业务通用【解除登录限制】 函数
+      const that = this
+      this.$infoBox.confirmDanger('确认解除吗？', '', () => {
+        return req.delById(API_URL_SYS_USER_LIST + '/loginLimit', recordId).then(res => {
+          that.$message.success('解除成功！')
+          that.$refs.infoTable.refTable(false)
+        })
+      })
+    },
     delFunc: function (recordId) { // 业务通用【删除】 函数
       const that = this
       this.$infoBox.confirmDanger('确认删除？', '', () => {
@@ -184,7 +190,6 @@ export default {
         })
       })
     },
-
     roleDist: function (recordId) { // 【分配权限】 按钮点击事件
       this.$refs.roleDist.show(recordId)
     },

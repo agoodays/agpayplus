@@ -75,7 +75,7 @@
             <img :src="greetImg" alt="">
             <div>
               <p>{{ mainTips.helloTitle }}</p>
-              <span v-if="isAdmin === 1">操作员</span>
+              <span v-if="isAdmin === 1">超管</span>
               <span v-else>操作员</span>
             </div>
           </div>-->

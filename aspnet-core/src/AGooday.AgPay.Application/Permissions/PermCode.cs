@@ -18,6 +18,7 @@
             public const string ENT_UR_USER_VIEW = "ENT_UR_USER_VIEW";
             public const string ENT_UR_USER_EDIT = "ENT_UR_USER_EDIT";
             public const string ENT_UR_USER_DELETE = "ENT_UR_USER_DELETE";
+            public const string ENT_UR_USER_LOGIN_LIMIT_DELETE = "ENT_UR_USER_LOGIN_LIMIT_DELETE";
             public const string ENT_UR_USER_UPD_ROLE = "ENT_UR_USER_UPD_ROLE";
             public const string ENT_UR_ROLE_ENT_LIST = "ENT_UR_ROLE_ENT_LIST";
             public const string ENT_UR_ROLE_ENT_EDIT = "ENT_UR_ROLE_ENT_EDIT";
@@ -184,6 +185,7 @@
             public const string ENT_UR_USER_LIST = "ENT_UR_USER_LIST";
             public const string ENT_UR_USER_VIEW = "ENT_UR_USER_VIEW";
             public const string ENT_UR_USER_EDIT = "ENT_UR_USER_EDIT";
+            public const string ENT_UR_USER_LOGIN_LIMIT_DELETE = "ENT_UR_USER_LOGIN_LIMIT_DELETE";
             public const string ENT_UR_USER_DELETE = "ENT_UR_USER_DELETE";
             public const string ENT_UR_USER_UPD_ROLE = "ENT_UR_USER_UPD_ROLE";
             public const string ENT_UR_ROLE_SEARCH = "ENT_UR_ROLE_SEARCH";
@@ -278,6 +280,7 @@
             public const string ENT_UR_USER_DELETE = "ENT_UR_USER_DELETE";
             public const string ENT_UR_USER_ADD = "ENT_UR_USER_ADD";
             public const string ENT_UR_USER_EDIT = "ENT_UR_USER_EDIT";
+            public const string ENT_UR_USER_LOGIN_LIMIT_DELETE = "ENT_UR_USER_LOGIN_LIMIT_DELETE";
             public const string ENT_UR_USER_LIST = "ENT_UR_USER_LIST";
             public const string ENT_UR_USER_SEARCH = "ENT_UR_USER_SEARCH";
             public const string ENT_UR_USER_UPD_ROLE = "ENT_UR_USER_UPD_ROLE";

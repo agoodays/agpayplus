@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("auth/validate"), MethodLog(AUTH_METHOD_REMARK)]
-        public async Task<ApiRes> Validate(Validate model)
+        public async Task<ApiRes> ValidateAsync(Validate model)
         {
             string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理
             string ipassport = Base64Util.DecodeBase64(model.ip); //密码 i passport, 已做base64处理
@@ -103,17 +103,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 throw new BizException("用户名/密码错误！");
             }
 
+            int limitMinute = 15;
             int maxLoginAttempts = 5;
-            int failedAttempts = 0;
-            DateTime? lastLoginTime = null;
             var loginErrorMessage = "密码输入错误次数超限，请稍后再试！";
-            if (maxLoginAttempts > 0)
+            (int failedAttempts, DateTime? lastLoginTime) = await _sysUserLoginAttemptService.GetFailedLoginAttemptsAsync(auth.SysUserId, TimeSpan.FromMinutes(15));
+            if (failedAttempts >= maxLoginAttempts && maxLoginAttempts > 0)
             {
-                (failedAttempts, lastLoginTime) = await _sysUserLoginAttemptService.GetFailedLoginAttemptsAsync(auth.SysUserId, TimeSpan.FromMinutes(15));
-                if (failedAttempts >= maxLoginAttempts)
-                {
-                    throw new BizException(loginErrorMessage);
-                }
+                throw new BizException(loginErrorMessage);
             }
 
             //https://jasonwatmore.com/post/2022/01/16/net-6-hash-and-verify-passwords-with-bcrypt
@@ -133,7 +129,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             {
                 await _sysUserLoginAttemptService.RecordLoginAttemptAsync(loginAttempt);
                 ++failedAttempts;
-                loginErrorMessage = failedAttempts >= maxLoginAttempts ? loginErrorMessage : $"用户名/密码错误，还可尝试{maxLoginAttempts - failedAttempts}次，失败将锁定15分钟！";
+                loginErrorMessage = maxLoginAttempts > 0 ? failedAttempts >= maxLoginAttempts ? loginErrorMessage : $"用户名/密码错误，还可尝试{maxLoginAttempts - failedAttempts}次，失败将锁定{limitMinute}分钟！" : "用户名/密码错误！";
                 //没有该用户信息
                 throw new BizException(loginErrorMessage);
             }
