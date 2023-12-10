@@ -3,7 +3,6 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services

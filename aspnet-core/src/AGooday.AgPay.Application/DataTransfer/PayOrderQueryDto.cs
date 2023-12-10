@@ -8,7 +8,6 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// </summary>
     public class PayOrderQueryDto : DatePageQuery
     {
-
         /// <summary>
         /// 支付订单号
         /// </summary>

@@ -1,7 +1,9 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -14,16 +16,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
     /// </summary>
     [Route("/api/statistic")]
     [ApiController, Authorize]
-    public class StatisticController : ControllerBase
+    public class StatisticController : CommonController
     {
         private readonly ILogger<StatisticController> _logger;
-        private readonly IPayOrderService _payOrderService;
+        private readonly IStatisticService _statisticService;
 
         public StatisticController(ILogger<StatisticController> logger,
-            IPayOrderService payOrderService)
+            IStatisticService statisticService, RedisUtil client,
+            ISysUserService sysUserService,
+            ISysRoleEntRelaService sysRoleEntRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             _logger = logger;
-            _payOrderService = payOrderService;
+            _statisticService = statisticService;
         }
 
         /// <summary>
@@ -32,11 +38,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
-        public ApiPageRes<StatisticResultDto> List([FromQuery] StatisticQueryDto dto)
+        [PermissionAuth(PermCode.MGR.ENT_ORDER_STATISTIC)]
+        public ApiPageRes<StatisticResultDto> Statistics([FromQuery] StatisticQueryDto dto)
         {
+            ChickAuth(dto.Method);
             dto.BindDateRange();
-            return ApiPageRes<StatisticResultDto>.Pages(null);
+            var result = _statisticService.Statistics(dto);
+            return ApiPageRes<StatisticResultDto>.Pages(result);
         }
 
         /// <summary>
@@ -45,12 +53,25 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("total"), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
-        public ApiRes Total([FromQuery] PayOrderQueryDto dto)
+        [PermissionAuth(PermCode.MGR.ENT_ORDER_STATISTIC)]
+        public ApiRes Total([FromQuery] StatisticQueryDto dto)
         {
+            ChickAuth(dto.Method);
             dto.BindDateRange();
-            var statistics = _payOrderService.Statistics(dto);
+            var statistics = _statisticService.Total(dto);
             return ApiRes.Ok(statistics);
+        }
+
+        private void ChickAuth(string method)
+        {
+            if (method.Equals("transaction", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_TRANSACTION))
+            {
+                throw new BizException("当前用户未分配该菜单权限！");
+            }
+            if (method.Equals("mch", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH))
+            {
+                throw new BizException("当前用户未分配该菜单权限！");
+            }
         }
     }
 }

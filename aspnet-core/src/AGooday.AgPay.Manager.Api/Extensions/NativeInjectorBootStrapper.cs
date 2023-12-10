@@ -70,6 +70,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<ISysUserService, SysUserService>();
             services.AddScoped<ISysUserTeamService, SysUserTeamService>();
             services.AddScoped<ITransferOrderService, TransferOrderService>();
+            services.AddScoped<IStatisticService, StatisticService>();
 
             // 命令总线Domain Bus (Mediator) 中介总线接口
             services.AddScoped<IMediatorHandler, InMemoryBus>();
