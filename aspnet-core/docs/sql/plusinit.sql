@@ -759,7 +759,7 @@ CREATE TABLE `t_device_info` (
 ) ENGINE=INNODB AUTO_INCREMENT=1001 DEFAULT CHARSET=utf8mb4 COMMENT='设备信息表';
 
 
-#####  ----------  商家会员-表结构DDL+初始化DML  ----------  #####
+#####  ----------  商户会员-表结构DDL+初始化DML  ----------  #####
 
 -- 商户会员信息表
 DROP TABLE IF EXISTS t_mbr_info;
@@ -781,10 +781,10 @@ CREATE TABLE `t_mbr_info` (
   PRIMARY KEY (`mbr_no`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='商户会员信息表';
 
--- 商户会员账户交易表
-DROP TABLE IF EXISTS t_mbr_trade;
-CREATE TABLE `t_mbr_trade` (
-  `trade_id` VARCHAR(30) NOT NULL COMMENT '会员交易单号',
+-- 商户会员帐单表
+DROP TABLE IF EXISTS t_mbr_bill;
+CREATE TABLE `t_mbr_bill` (
+  `mbr_bill_id` VARCHAR(30) NOT NULL COMMENT '会员帐单单号',
   `mbr_no` VARCHAR(64) NOT NULL COMMENT '会员号',
   `mbr_name` VARCHAR(64) NOT NULL COMMENT '会员名称',
   `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
@@ -796,13 +796,13 @@ CREATE TABLE `t_mbr_trade` (
   `remark` VARCHAR(128) COMMENT '交易备注',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-  PRIMARY KEY (`trade_id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='商户会员账户交易表';
+  PRIMARY KEY (`mbr_bill_id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='商户会员帐单表';
 
--- 商户会员充值记录表
-DROP TABLE IF EXISTS t_mbr_recharge_record;
-CREATE TABLE `t_mbr_recharge_record` (
-  `recharge_record_id` VARCHAR(30) NOT NULL COMMENT '充值记录ID',
+-- 商户会员充值订单表
+DROP TABLE IF EXISTS t_mbr_recharge_order;
+CREATE TABLE `t_mbr_recharge_order` (
+  `recharge_order_id` VARCHAR(30) NOT NULL COMMENT '充值单号',
   `mbr_no` VARCHAR(64) NOT NULL COMMENT '会员号',
   `mbr_name` VARCHAR(64) NOT NULL COMMENT '会员名称',
   `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
@@ -824,7 +824,7 @@ CREATE TABLE `t_mbr_recharge_record` (
   `success_time` DATETIME DEFAULT NULL COMMENT '订单支付成功时间',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-  PRIMARY KEY (`recharge_record_id`)
+  PRIMARY KEY (`recharge_order_id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='商户会员充值记录表';
 
 -- 商户充值规则表
@@ -843,29 +843,29 @@ CREATE TABLE `t_mbr_recharge_rule` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1001 COMMENT='商户充值规则表';
 
 -- 会员配置
-INSERT INTO `t_sys_config` VALUES ('mbrMaxBalance', '会员最大储值余额(元), 0表示依据系统配置', '会员最大储值余额(元), 0表示依据系统配置', 'memberConfig', '会员配置', '1', 'text', 'MCH', 'M0000000000', 0, '2023-08-10 16:30:00');
-INSERT INTO `t_sys_config` VALUES ('memberCustomAmountState', '充值自定义金额', '充值自定义金额', 'memberConfig', '会员配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-08-10 16:30:00');
-INSERT INTO `t_sys_config` VALUES ('memberModelState', '会员模块状态开关', '会员模块状态开关', 'memberConfig', '会员配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-08-10 16:30:00');
-INSERT INTO `t_sys_config` VALUES ('memberPayState', '会员支付开关', '会员支付开关', 'memberConfig', '会员配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-08-10 16:30:00');
+INSERT INTO `t_sys_config` VALUES ('mbrMaxBalance', '会员最大储值余额(元), 0表示依据系统配置', '会员最大储值余额(元), 0表示依据系统配置', 'mbrConfig', '会员配置', '1', 'text', 'MCH', 'M0000000000', 0, '2023-08-10 16:30:00');
+INSERT INTO `t_sys_config` VALUES ('mbrCustomAmountState', '充值自定义金额', '充值自定义金额', 'mbrConfig', '会员配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-08-10 16:30:00');
+INSERT INTO `t_sys_config` VALUES ('mbrModelState', '会员模块状态开关', '会员模块状态开关', 'mbrConfig', '会员配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-08-10 16:30:00');
+INSERT INTO `t_sys_config` VALUES ('mbrPayState', '会员支付开关', '会员支付开关', 'mbrConfig', '会员配置', '1', 'radio', 'MCH', 'M0000000000', 0, '2023-08-10 16:30:00');
 
 -- 会员权限
-INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MEMBER', '会员中心', 'team', '', 'RouteView', 'ML', 0, 1, 'ROOT', 15, 'MCH', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_CONFIG', '会员配置', 'setting', '/member/memberConfig', 'MemberConfigPage', 'ML', 0, 1, 'ENT_MCH_MEMBER', 5, 'MCH', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER', '会员管理', 'user', '/member/memberInfo', 'MemberPage', 'ML', 0, 1, 'ENT_MCH_MEMBER', 10, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER', 0, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER', 0, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER', 0, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER', 0, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_MANUAL', '按钮：调账', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER', 0, 'MCH', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_RECHARGE_RULE', '充值规则', 'profile', '/member/rechargeRule', 'RechargeRulePage', 'ML', 0, 1, 'ENT_MCH_MEMBER', 20, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_RECHARGE_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER_RECHARGE_RULE', 0, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_RECHARGE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER_RECHARGE_RULE', 0, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_RECHARGE_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER_RECHARGE_RULE', 0, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_RECHARGE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER_RECHARGE_RULE', 0, 'MCH', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_ACCOUNT_TRADE', '账户流水', 'exception', '/member/account', 'MemberAccountPage', 'ML', 0, 1, 'ENT_MCH_MEMBER', 30, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_ACCOUNT_TRADE_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER_ACCOUNT_TRADE', 0, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_RECHARGE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER_ACCOUNT_TRADE', 0, 'MCH', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_RECHARGE_RECORD', '充值记录', 'transaction', '/member/recharge', 'MemberRechargePage', 'ML', 0, 1, 'ENT_MCH_MEMBER', 40, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_RECHARGE_RECORD_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER_RECHARGE_RECORD', 0, 'MCH', NOW(), NOW());
-        INSERT INTO t_sys_entitlement VALUES ('ENT_MEMBER_RECHARGE_RECORD_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MEMBER_RECHARGE_RECORD', 0, 'MCH', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR', '会员中心', 'team', '', 'RouteView', 'ML', 0, 1, 'ROOT', 15, 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_CONFIG', '会员配置', 'setting', '/mbr/mbrConfig', 'MbrConfigPage', 'ML', 0, 1, 'ENT_MCH_MBR', 5, 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_INFO', '会员管理', 'user', '/mbr/mbrInfo', 'MbrPage', 'ML', 0, 1, 'ENT_MCH_MBR', 10, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_INFO', 0, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_INFO', 0, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_INFO', 0, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_INFO', 0, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_INFO_MANUAL', '按钮：调账', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_INFO', 0, 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_RECHARGE_RULE', '充值规则', 'profile', '/mbr/rechargeRule', 'RechargeRulePage', 'ML', 0, 1, 'ENT_MCH_MBR', 20, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_RECHARGE_RULE_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_RECHARGE_RULE', 0, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_RECHARGE_RULE_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_RECHARGE_RULE', 0, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_RECHARGE_RULE_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_RECHARGE_RULE', 0, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_RECHARGE_RULE_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_RECHARGE_RULE', 0, 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_BILL', '会员账单', 'exception', '/mbr/account', 'MbrBillPage', 'ML', 0, 1, 'ENT_MCH_MBR', 30, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_BILL_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_BILL', 0, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_BILL_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_BILL', 0, 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_RECHARGE_ORDER', '充值记录', 'transaction', '/mbr/recharge', 'MbrRechargePage', 'ML', 0, 1, 'ENT_MCH_MBR', 40, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_RECHARGE_ORDER_LIST', '页面：列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_RECHARGE_ORDER', 0, 'MCH', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_MCH_MBR_RECHARGE_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_MBR_RECHARGE_ORDER', 0, 'MCH', NOW(), NOW());
 
