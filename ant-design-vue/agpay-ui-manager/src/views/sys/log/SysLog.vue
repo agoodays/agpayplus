@@ -186,7 +186,7 @@ const tableColumns = [
 ]
 
 export default {
-  name: 'IsvListPage',
+  name: 'SysLog',
   components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
   data () {
     return {

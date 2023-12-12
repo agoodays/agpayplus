@@ -81,6 +81,10 @@ INSERT INTO t_sys_entitlement VALUES('ENT_DIVISION_RECORD_RESEND', '按钮：重
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_OAUTH2_CONFIG_VIEW', '按钮：oauth2配置详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APP', '0', 'MCH', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_OAUTH2_CONFIG_ADD', '按钮：oauth2配置', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APP', '0', 'MCH', NOW(), NOW());
 
+-- 数据统计
+INSERT INTO t_sys_entitlement VALUES('ENT_ORDER_STATISTIC', '数据统计', 'bar-chart', '', 'RouteView', 'ML', 0, 1,  'ROOT', '53', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_TRANSACTION', '交易报表', 'account-book', '/statistic/transaction', 'TransactionPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '10', 'MGR', NOW(), NOW());
+        
 #####  ----------  修改表结构  ----------  #####
 
 ALTER TABLE `t_mch_info`   

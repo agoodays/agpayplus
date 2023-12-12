@@ -239,7 +239,7 @@
   ]
 
   export default {
-    name: 'IsvListPage',
+    name: 'MchNotifyList',
     components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
     data () {
       return {

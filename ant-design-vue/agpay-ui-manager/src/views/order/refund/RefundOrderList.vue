@@ -367,7 +367,7 @@
   ]
 
   export default {
-    name: 'IsvListPage',
+    name: 'RefundOrderList',
     components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
     data () {
       return {

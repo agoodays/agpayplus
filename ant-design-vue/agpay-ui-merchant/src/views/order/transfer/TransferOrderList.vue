@@ -112,7 +112,7 @@
   ]
 
   export default {
-    name: 'IsvListPage',
+    name: 'TransferOrderList',
     components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, TransferOrderDetail },
     data () {
       return {

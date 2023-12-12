@@ -27,7 +27,8 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public StatisticService(IMapper mapper, IMediatorHandler bus, IPayOrderRepository payOrderRepository,
+        public StatisticService(IMapper mapper, IMediatorHandler bus, 
+            IPayOrderRepository payOrderRepository,
             IRefundOrderRepository refundOrderRepository,
             IMchInfoRepository mchInfoRepository,
             IAgentInfoRepository agentInfoRepository,
@@ -61,7 +62,7 @@ namespace AGooday.AgPay.Application.Services
             JObject json = new JObject();
             json.Add("allAmount", Decimal.Round(allAmount / 100M, 2, MidpointRounding.AwayFromZero));
             json.Add("allCount", allCount);
-            json.Add("payAmount", Decimal.Round(fee / 100M, 2, MidpointRounding.AwayFromZero));
+            json.Add("payAmount", Decimal.Round(payAmount / 100M, 2, MidpointRounding.AwayFromZero));
             json.Add("payCount", payCount);
             json.Add("fee", Decimal.Round(fee / 100M, 2, MidpointRounding.AwayFromZero));
             json.Add("refundAmount", Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero));
@@ -88,18 +89,18 @@ namespace AGooday.AgPay.Application.Services
             {
                 case "day":
                     format = "yyyy-MM-dd";
-                    dto.CreatedStart ??= DateTime.Now.AddDays(-1);
-                    dto.CreatedEnd ??= DateTime.Now.AddMonths(-1);
+                    dto.CreatedStart ??= DateTime.Today.AddMonths(-1);
+                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
                     break;
                 case "month":
                     format = "yyyy-MM";
-                    dto.CreatedStart ??= DateTime.Now.AddDays(-1);
-                    dto.CreatedEnd ??= DateTime.Now.AddYears(-1);
+                    dto.CreatedStart ??= DateTime.Today.AddYears(-1);
+                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
                     break;
                 case "year":
                     format = "yyyy";
-                    dto.CreatedStart ??= DateTime.Now.AddDays(-1);
-                    dto.CreatedEnd ??= DateTime.Now.AddYears(-1);
+                    dto.CreatedStart ??= DateTime.Today.AddYears(-1);
+                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
                     break;
                 default:
                     break;
@@ -107,7 +108,7 @@ namespace AGooday.AgPay.Application.Services
 
             SelectOrderCount(dto, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
 
-            var payRecords = payOrders.GroupBy(g => g.CreatedAt.ToString(format)).AsEnumerable()
+            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.CreatedAt.ToString(format))
                 .Select(s =>
                 {
                     var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
@@ -123,7 +124,7 @@ namespace AGooday.AgPay.Application.Services
                     };
                 });
 
-            var refundRecords = refundOrders.GroupBy(g => g.CreatedAt.ToString(format)).AsEnumerable()
+            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.CreatedAt.ToString(format))
                 .Select(s =>
                 {
                     var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));

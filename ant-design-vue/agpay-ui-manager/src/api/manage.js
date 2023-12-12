@@ -20,6 +20,11 @@ export const req = {
   },
 
   // 通用列表查询统计接口
+  total: (url, params) => {
+    return request.request({ url: url + '/total', method: 'GET', params: params }, true, true, false)
+  },
+
+  // 通用列表查询统计接口
   count: (url, params) => {
     return request.request({ url: url + '/count', method: 'GET', params: params }, true, true, false)
   },
@@ -106,6 +111,9 @@ export const API_URL_PAY_ORDER_LIST = '/api/payOrder'
 export const API_URL_REFUND_ORDER_LIST = '/api/refundOrder'
 /** 商户通知管理 **/
 export const API_URL_MCH_NOTIFY_LIST = '/api/mchNotify'
+
+/** 数据统计 **/
+export const API_URL_ORDER_STATISTIC = '/api/statistic'
 
 /** 分账组管理 **/
 export const API_URL_DIVISION_RECEIVER_GROUP = '/api/divisionReceiverGroups'

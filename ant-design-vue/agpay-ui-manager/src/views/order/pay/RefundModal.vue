@@ -56,11 +56,9 @@
 <script>
 import { API_URL_PAY_ORDER_LIST, req, payOrderRefund } from '@/api/manage'
 export default {
-
   props: {
     callbackFunc: { type: Function, default: () => () => ({}) }
   },
-
   data () {
     return {
       recordId: '',

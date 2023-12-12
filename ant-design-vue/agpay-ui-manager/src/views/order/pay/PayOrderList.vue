@@ -631,7 +631,7 @@ const tableColumns = [
 ]
 
 export default {
-  name: 'IsvListPage',
+  name: 'PayOrderList',
   components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, RefundModal },
   data () {
     return {
