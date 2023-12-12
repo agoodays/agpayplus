@@ -119,6 +119,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                         {
                             "state" => Convert.ToDecimal(order.PayAmount - order.Fee) / 100,
                             "payAmount" or "refundAmount" => Convert.ToDecimal(value) / 100,
+                            "round"  => $"{value}%",
                             _ => Convert.ToString(value),
                         };
                         worksheet.Cells[i + 3, j + 1].Value = value;
