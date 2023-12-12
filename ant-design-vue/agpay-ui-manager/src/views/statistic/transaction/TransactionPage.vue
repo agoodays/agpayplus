@@ -10,6 +10,24 @@
         @set-is-show-more="setIsShowMore"
         @query-func="queryFunc">
         <template slot="formItem">
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.queryDateType" @change="queryDateTypeChange" placeholder="" default-value="">
+              <a-select-option value="day">日报</a-select-option>
+              <a-select-option value="month">月报</a-select-option>
+              <a-select-option value="year">年报</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
+            <a-range-picker
+              @change="onChange"
+              :show-time="{ format: 'HH:mm:ss' }"
+              format="YYYY-MM-DD HH:mm:ss"
+              :mode="dateRangeMode"
+              :disabled-date="disabledDate"
+            >
+              <a-icon slot="suffixIcon" type="sync" />
+            </a-range-picker>
+          </a-form-item>
           <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
           <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
           <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
@@ -83,9 +101,14 @@
             </div>
           </div>
         </template>
-        <template slot="payAmountSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">￥{{ record.payAmount/100 }}</b></template> <!-- 自定义插槽 -->
-        <template slot="amountSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">￥{{ (record.payAmount-record.fee)/100 }}</b></template> <!-- 自定义插槽 -->
-        <template slot="refundAmountSlot" slot-scope="{record}"><b style="color: rgb(255, 104, 72)">￥{{ record.refundAmount/100 }}</b></template> <!-- 自定义插槽 -->
+        <template slot="payAmountSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">￥{{ (record.payAmount/100).toFixed(2) }}</b></template> <!-- 自定义插槽 -->
+        <template slot="amountSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">￥{{ ((record.payAmount-record.fee)/100).toFixed(2) }}</b></template> <!-- 自定义插槽 -->
+        <template slot="feeSlot" slot-scope="{record}"><b style="color: rgb(255, 104, 72)">￥{{ (record.fee/100).toFixed(2) }}</b></template> <!-- 自定义插槽 -->
+        <template slot="refundAmountSlot" slot-scope="{record}"><b style="color: rgb(255, 104, 72)">￥{{ (record.refundAmount/100).toFixed(2) }}</b></template> <!-- 自定义插槽 -->
+        <template slot="refundFeeSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">￥{{ (record.refundFee/100).toFixed(2) }}</b></template> <!-- 自定义插槽 -->
+        <template slot="refundCountSlot" slot-scope="{record}"><b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b></template> <!-- 自定义插槽 -->
+        <template slot="countSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b></template> <!-- 自定义插槽 -->
+        <template slot="roundSlot" slot-scope="{record}"><b style="color: rgb(255, 136, 0)">{{ record.round.toFixed(2) }}%</b></template> <!-- 自定义插槽 -->
         <template slot="opSlot">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_STATISTIC_MCH')" @click="detailFunc">详情</a-button>
@@ -108,10 +131,12 @@ const tableColumns = [
   { key: 'groupDate', dataIndex: 'groupDate', title: '日期', width: 100, fixed: 'left' },
   { key: 'payAmount', title: '成交金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
   { key: 'amount', title: '实收金额', width: 110, scopedSlots: { customRender: 'amountSlot' } },
-  { key: 'fee', dataIndex: 'fee', title: '手续费', width: 110, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'fee', title: '手续费', width: 110, scopedSlots: { customRender: 'feeSlot' } },
   { key: 'refundAmount', title: '退款金额', width: 110, scopedSlots: { customRender: 'refundAmountSlot' } },
-  { key: 'refundFee', dataIndex: 'refundFee', title: '手续费回退', width: 110, customRender: (text) => '￥' + (text / 100).toFixed(2) },
-  { key: 'refundCount', dataIndex: 'refundCount', title: '退款笔数', width: 110 },
+  { key: 'refundFee', title: '手续费回退', width: 110, scopedSlots: { customRender: 'refundFeeSlot' } },
+  { key: 'refundCount', title: '退款笔数', width: 110, scopedSlots: { customRender: 'refundCountSlot' } },
+  { key: 'count', title: '成交/总笔数', width: 110, scopedSlots: { customRender: 'countSlot' } },
+  { key: 'round', title: '成功率', width: 110, scopedSlots: { customRender: 'roundSlot' } },
   { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
@@ -141,12 +166,9 @@ export default {
         refundFeeAmount: 0.00,
         round: 0.00
       },
+      dateRangeMode: 'year', // 选择开始时间
       createdStart: '', // 选择开始时间
-      createdEnd: '', // 选择结束时间
-      visible: false,
-      detailVisible: false,
-      detailData: {},
-      payWayList: []
+      createdEnd: '' // 选择结束时间
     }
   },
   computed: {
@@ -216,11 +238,21 @@ export default {
       this.searchData.createdStart = dateString[0] // 开始时间
       this.searchData.createdEnd = dateString[1] // 结束时间
     },
+    queryDateTypeChange (value) {
+      switch (value) {
+        case 'day':
+          this.dateRangeMode = 'date'
+          break
+        case 'month':
+          this.dateRangeMode = 'month'
+          break
+        case 'year':
+          this.dateRangeMode = 'year'
+          break
+      }
+    },
     disabledDate (current) { // 今日之后日期不可选
       return current && current > moment().endOf('day')
-    },
-    onClose () {
-      this.visible = false
     }
   }
 }
