@@ -119,7 +119,7 @@ export default {
     }
     return {
       optionValue: optionValue,
-      optionOriginValue: optionValue,
+      optionOriginValue: optionValue === 'customDateTime' ? '' : optionValue,
       dateRangeValue,
       setDateRangeValue,
       dateRangeTip,
