@@ -84,6 +84,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH_OAUTH2_CONFIG_ADD', '按钮：oaut
 -- 数据统计
 INSERT INTO t_sys_entitlement VALUES('ENT_ORDER_STATISTIC', '数据统计', 'bar-chart', '', 'RouteView', 'ML', 0, 1,  'ROOT', '53', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_TRANSACTION', '交易报表', 'account-book', '/statistic/transaction', 'TransactionPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '10', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_MCH', '商户统计', 'line-chart', '/statistic/mch', 'MchCountPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '20', 'MGR', NOW(), NOW());
         
 #####  ----------  修改表结构  ----------  #####
 

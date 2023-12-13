@@ -114,8 +114,8 @@ export default {
     isShowTableTop: { type: Boolean, default: true }, // 显示表格顶部操作， 默认false
     autoRefresh: { type: Boolean, default: false }, // 自动刷新， 默认false
     isShowAutoRefresh: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
-    isShowDownload: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
-    isEnableDataStatistics: { type: Boolean, default: false }, // 是否显示自动刷新， 默认false
+    isShowDownload: { type: Boolean, default: false }, // 是否显示数据导出， 默认false
+    isEnableDataStatistics: { type: Boolean, default: false }, // 是否显示数据统计， 默认false
     initData: { type: Boolean, default: true }, // 初始化列表数据， 默认true
     tableColumns: { type: Array, default: null }, // 表格数组列
     reqTableDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
@@ -156,7 +156,9 @@ export default {
     if (this.initData) { // 是否自动加载数据
       this.refTable(true)
     }
-    this.startCountdown()
+    if (this.isShowAutoRefresh) { // 是否自动刷新数据
+      this.startCountdown()
+    }
   },
   methods: {
     startCountdown () {

@@ -10,7 +10,8 @@ export default {
   name: 'AgTableColumns', // 定义组件名称
   render (createElement, context) {
     const slots = []
-    this.$slots.default.map(item => {
+    // eslint-disable-next-line no-unused-expressions
+    this.$slots.default?.map(item => {
       if (item.tag) {
         slots.push(item)
       }

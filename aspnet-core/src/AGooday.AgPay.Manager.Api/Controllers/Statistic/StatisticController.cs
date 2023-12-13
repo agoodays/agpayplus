@@ -81,16 +81,25 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
             string fileName = $"交易报表.xlsx";
             // 5.0之后的epplus需要指定 商业证书 或者非商业证书。低版本不需要此行代码
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            List<dynamic> excelHeaders = new List<dynamic>() {
-                new { Key = "groupDate", Width = 23d, Value = $"日期" },
-                new { Key = "payAmount", Width = 26d, Value = $"交易金额" },
-                new { Key = "amount", Width = 26d, Value = $"实收金额" },
-                new { Key = "refundAmount", Width = 26d, Value = $"退款金额" },
-                new { Key = "refundCount", Width = 26d, Value = $"退款笔数" },
-                new { Key = "payCount", Width = 26d, Value = $"支付成功笔数" },
-                new { Key = "allCount", Width = 26d, Value = $"总交易笔数" },
-                new { Key = "round", Width = 26d, Value = $"成功率" }
+            List<dynamic> excelHeaders = dto.Method switch
+            {
+                "transaction" => new List<dynamic>() { new { Key = "groupDate", Width = 20d, Value = $"日期" } },
+                "mch" => new List<dynamic>() {
+                    new { Key = "mchName", Width = 20d, Value = $"商户名称" },
+                    new { Key = "mchNo", Width = 20d, Value = $"商户号" }
+                },
+                _ => throw new NotImplementedException()
             };
+            excelHeaders.AddRange(new List<dynamic>() {
+                new { Key = "groupDate", Width = 20d, Value = $"日期" },
+                new { Key = "payAmount", Width = 20d, Value = $"交易金额" },
+                new { Key = "amount", Width = 20d, Value = $"实收金额" },
+                new { Key = "refundAmount", Width = 20d, Value = $"退款金额" },
+                new { Key = "refundCount", Width = 20d, Value = $"退款笔数" },
+                new { Key = "payCount", Width = 20d, Value = $"支付成功笔数" },
+                new { Key = "allCount", Width = 20d, Value = $"总交易笔数" },
+                new { Key = "round", Width = 20d, Value = $"成功率" }
+            });
             // 创建新的 Excel 文件
             using (var package = new ExcelPackage())
             {
@@ -109,17 +118,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 // 将每个订单添加到工作表中
                 for (int i = 0; i < result.Count; i++)
                 {
-                    var order = result[i];
-                    var orderJO = JObject.FromObject(order);
+                    var item = result[i];
+                    var orderJO = JObject.FromObject(item);
                     for (int j = 0; j < excelHeaders.Count; j++)
                     {
                         var excelHeader = excelHeaders[j];
                         var value = orderJO[excelHeader.Key];
                         value = excelHeader.Key switch
                         {
-                            "state" => Convert.ToDecimal(order.PayAmount - order.Fee) / 100,
-                            "payAmount" or "refundAmount" => Convert.ToDecimal(value) / 100,
-                            "round"  => $"{value}%",
+                            "payAmount" or "refundAmount" => (Convert.ToDecimal(value) / 100).ToString("0.00"),
+                            "amount" => (Convert.ToDecimal(item.PayAmount - item.Fee) / 100).ToString("0.00"),
+                            "round" => $"{value:0.00}%",
                             _ => Convert.ToString(value),
                         };
                         worksheet.Cells[i + 3, j + 1].Value = value;
@@ -140,6 +149,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 {
                     worksheet.Row(i).Height = 25;
                 }
+                worksheet.Cells[1, 1, 1, cols].Style.Font.Size = 12;
                 worksheet.Cells[1, 1, 1, cols].Style.Font.Bold = true;
                 worksheet.Cells[1, 1, 1, cols].Merge = true;
                 worksheet.Cells[1, 1, rows, cols].Style.WrapText = true;// 自动换行

@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public StatisticService(IMapper mapper, IMediatorHandler bus, 
+        public StatisticService(IMapper mapper, IMediatorHandler bus,
             IPayOrderRepository payOrderRepository,
             IRefundOrderRepository refundOrderRepository,
             IMchInfoRepository mchInfoRepository,
@@ -47,6 +47,23 @@ namespace AGooday.AgPay.Application.Services
 
         public JObject Total(StatisticQueryDto dto)
         {
+            switch (dto.QueryDateType)
+            {
+                case "day":
+                    dto.CreatedStart ??= DateTime.Today.AddMonths(-1);
+                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
+                    break;
+                case "month":
+                    dto.CreatedStart ??= DateTime.Today.AddYears(-1);
+                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
+                    break;
+                case "year":
+                    dto.CreatedStart ??= DateTime.Today.AddYears(-1);
+                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
+                    break;
+                default:
+                    break;
+            }
             SelectOrderCount(dto, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
             var allAmount = payOrders.Sum(s => s.Amount);
             var allCount = payOrders.Count();
@@ -68,7 +85,7 @@ namespace AGooday.AgPay.Application.Services
             json.Add("refundAmount", Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero));
             json.Add("refundCount", refundCount);
             json.Add("refundFeeAmount", Decimal.Round(refundFeeAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("round", payCount / Convert.ToDecimal(allCount));
+            json.Add("round", Math.Round(allCount > 0 ? payCount / Convert.ToDecimal(allCount) : 0M, 2, MidpointRounding.AwayFromZero));
             return json;
         }
 
@@ -147,7 +164,7 @@ namespace AGooday.AgPay.Application.Services
                     AllCount = s.p.AllCount,
                     PayAmount = s.p.PayAmount,
                     PayCount = s.p.PayCount,
-                    Round = s.p.PayCount / Convert.ToDecimal(s.p.AllCount),
+                    Round = Math.Round(s.p.AllCount > 0 ? s.p.PayCount / Convert.ToDecimal(s.p.AllCount) : 0M, 2, MidpointRounding.AwayFromZero),
                     Fee = s.p.Fee,
                     RefundAmount = s.r.RefundAmount,
                     RefundCount = s.r.RefundCount,
@@ -162,7 +179,7 @@ namespace AGooday.AgPay.Application.Services
         {
             SelectOrderCount(dto, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
 
-            var payRecords = payOrders.GroupBy(g => new { g.MchNo, g.MchName }).AsEnumerable()
+            var payRecords = payOrders.AsEnumerable().GroupBy(g => new { g.MchNo, g.MchName })
                 .Select(s =>
                 {
                     var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
@@ -179,7 +196,7 @@ namespace AGooday.AgPay.Application.Services
                     };
                 });
 
-            var refundRecords = refundOrders.GroupBy(g => new { g.MchNo, g.MchName }).AsEnumerable()
+            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => new { g.MchNo, g.MchName })
                 .Select(s =>
                 {
                     var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
@@ -195,8 +212,8 @@ namespace AGooday.AgPay.Application.Services
                 });
 
             var records = payRecords
-                .Join(refundRecords, p => p.MchNo, r => r.MchNo, (p, r) => new { p, r })
-                .Select(s => new StatisticResultDto()
+                .GroupJoin(refundRecords, p => p.MchNo, r => r.MchNo, (p, r) => new { p, r })
+                .SelectMany(x => x.r.DefaultIfEmpty(), (s, r) => new StatisticResultDto()
                 {
                     MchNo = s.p.MchNo,
                     MchName = s.p.MchName,
@@ -204,11 +221,11 @@ namespace AGooday.AgPay.Application.Services
                     AllCount = s.p.AllCount,
                     PayAmount = s.p.PayAmount,
                     PayCount = s.p.PayCount,
-                    Round = s.p.PayCount / Convert.ToDecimal(s.p.AllCount),
+                    Round = Math.Round(s.p.AllCount > 0 ? (decimal)s.p.PayCount / s.p.AllCount : 0M, 2, MidpointRounding.AwayFromZero),
                     Fee = s.p.Fee,
-                    RefundAmount = s.r.RefundAmount,
-                    RefundCount = s.r.RefundCount,
-                    RefundFee = s.r.RefundFee,
+                    RefundAmount = r?.RefundAmount ?? 0,
+                    RefundCount = r?.RefundCount ?? 0,
+                    RefundFee = r?.RefundFee ?? 0
                 });
 
             var result = PaginatedList<StatisticResultDto>.Create(records, dto.PageNumber, dto.PageSize);

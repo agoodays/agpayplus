@@ -11,24 +11,10 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <a-form-item label="" class="table-head-layout">
-            <a-select v-model="searchData.queryDateType" @change="queryDateTypeChange" placeholder="" default-value="">
-              <a-select-option value="day">日报</a-select-option>
-              <a-select-option value="month">月报</a-select-option>
-              <a-select-option value="year">年报</a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <a-range-picker
-              @change="onChange"
-              style="width: 100%"
-              :show-time="{ format: 'HH:mm:ss' }"
-              format="YYYY-MM-DD HH:mm:ss"
-              :disabled-date="disabledDate"
-            >
-              <a-icon slot="suffixIcon" type="sync" />
-            </a-range-picker>
+            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
           <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <ag-text-up :placeholder="'商户名称'" :msg="searchData.mchName" v-model="searchData.mchName" />
           <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
           <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
         </template>
@@ -46,7 +32,7 @@
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
-        rowKey="groupDate"
+        rowKey="mchNo"
         :tableRowCrossColor="true"
       >
         <template slot="dataStatisticsSlot">
@@ -111,7 +97,7 @@
         <template slot="roundSlot" slot-scope="{record}"><b style="color: rgb(255, 136, 0)">{{ record.round.toFixed(2) }}%</b></template> <!-- 自定义插槽 -->
         <template slot="opSlot">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a-button type="link" v-if="$access('ENT_STATISTIC_MCH')" @click="detailFunc">详情</a-button>
+            <a-button type="link" v-if="$access('ENT_STATISTIC_MCH')" @click="detailFunc">明细</a-button>
           </AgTableColumns>
         </template>
       </AgTable>
@@ -119,16 +105,17 @@
   </page-header-wrapper>
 </template>
 <script>
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
-import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'groupDate', dataIndex: 'groupDate', title: '日期', width: 120, fixed: 'left' },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 100, ellipsis: true },
+  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
   { key: 'payAmount', title: '成交金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
   { key: 'amount', title: '实收金额', width: 110, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'fee', title: '手续费', width: 110, scopedSlots: { customRender: 'feeSlot' } },
@@ -141,17 +128,16 @@ const tableColumns = [
 ]
 
 export default {
-  name: 'TransactionPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgTextUp },
+  name: 'MchCountPage',
+  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
   data () {
     return {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
       searchData: {
-        method: 'transaction',
-        queryDateType: 'day',
-        queryDateRange: ''
+        method: 'mch',
+        queryDateRange: 'today'
       },
       totalData: {
         allAmount: 0.00,
@@ -163,10 +149,7 @@ export default {
         refundCount: 0,
         refundFeeAmount: 0.00,
         round: 0.00
-      },
-      dateRangeMode: 'date', // 选择开始时间
-      createdStart: '', // 选择开始时间
-      createdEnd: '' // 选择结束时间
+      }
     }
   },
   computed: {
@@ -229,28 +212,7 @@ export default {
       })
     },
     detailFunc: function () {
-      console.log('详情')
-    },
-    moment,
-    onChange (date, dateString) {
-      this.searchData.createdStart = dateString[0] // 开始时间
-      this.searchData.createdEnd = dateString[1] // 结束时间
-    },
-    queryDateTypeChange (value) {
-      switch (value) {
-        case 'day':
-          this.dateRangeMode = 'date'
-          break
-        case 'month':
-          this.dateRangeMode = 'month'
-          break
-        case 'year':
-          this.dateRangeMode = 'year'
-          break
-      }
-    },
-    disabledDate (current) { // 今日之后日期不可选
-      return current && current > moment().endOf('day')
+      console.log('明细')
     }
   }
 }
