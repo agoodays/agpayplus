@@ -103,7 +103,8 @@ export default {
         dateRangeTip.value = ''
       }
     }
-    setDateRangeValue(this.value)
+    const [optionValue, startDate, endDate] = this.value.split('_')
+    setDateRangeValue(optionValue, startDate, endDate)
     const dateRangeTipIsShow = ref(false)
     const handleHoverChange = visible => {
       if (dateRangeTip.value.length > 0) {
@@ -117,8 +118,8 @@ export default {
       dateRangeOpen.value = open
     }
     return {
-      optionValue: this.value,
-      optionOriginValue: this.value,
+      optionValue: optionValue,
+      optionOriginValue: optionValue,
       dateRangeValue,
       setDateRangeValue,
       dateRangeTip,

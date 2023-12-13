@@ -78,7 +78,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
             // 从数据库中检索需要导出的数据
             var result = _statisticService.Statistics(dto);
 
-            string fileName = $"交易报表.xlsx";
+            string title = dto.Method switch
+            {
+                "transaction" => "交易报表",
+                "mch" => "商户统计",
+                _ => throw new NotImplementedException()
+            };
+            string fileName = $"{title}.xlsx";
             // 5.0之后的epplus需要指定 商业证书 或者非商业证书。低版本不需要此行代码
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             List<dynamic> excelHeaders = dto.Method switch
@@ -104,8 +110,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
             using (var package = new ExcelPackage())
             {
                 // 添加工作表，并设置标题行
-                var worksheet = package.Workbook.Worksheets.Add("交易报表");
-                worksheet.Cells[1, 1].Value = $"交易报表";
+                var worksheet = package.Workbook.Worksheets.Add(title);
+                worksheet.Cells[1, 1].Value = title;
 
                 for (int i = 0; i < excelHeaders.Count; i++)
                 {

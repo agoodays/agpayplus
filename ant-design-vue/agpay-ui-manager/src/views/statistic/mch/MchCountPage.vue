@@ -111,6 +111,7 @@ import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
+import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
@@ -131,13 +132,22 @@ export default {
   name: 'MchCountPage',
   components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
   data () {
+    let queryDateRange = 'today'
+    if (this.$route.query.queryDate) {
+      // 解析时间范围
+      const [startTimestamp, endTimestamp] = this.$route.query.queryDate.split('_').map(Number)
+      // 转换为日期对象
+      const startDate = moment(startTimestamp)
+      const endDate = moment(endTimestamp)
+      queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
+    }
     return {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
       searchData: {
         method: 'mch',
-        queryDateRange: 'today'
+        queryDateRange: queryDateRange
       },
       totalData: {
         allAmount: 0.00,

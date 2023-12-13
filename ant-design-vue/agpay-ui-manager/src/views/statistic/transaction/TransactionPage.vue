@@ -19,10 +19,10 @@
           </a-form-item>
           <a-form-item label="" class="table-head-layout">
             <a-range-picker
+              v-model="dateRangeValue"
               @change="onChange"
               style="width: 100%"
-              :show-time="{ format: 'HH:mm:ss' }"
-              format="YYYY-MM-DD HH:mm:ss"
+              format="YYYY-MM-DD"
               :disabled-date="disabledDate"
             >
               <a-icon slot="suffixIcon" type="sync" />
@@ -144,6 +144,10 @@ export default {
   name: 'TransactionPage',
   components: { AgSearchForm, AgTable, AgTableColumns, AgTextUp },
   data () {
+    // 计算开始时间和结束时间
+    const startDate = moment().subtract(1, 'month').startOf('day')
+    const endDate = moment().startOf('day').subtract(1, 'days')
+    const queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
     return {
       isShowMore: false,
       btnLoading: false,
@@ -151,7 +155,7 @@ export default {
       searchData: {
         method: 'transaction',
         queryDateType: 'day',
-        queryDateRange: ''
+        queryDateRange: queryDateRange
       },
       totalData: {
         allAmount: 0.00,
@@ -164,9 +168,8 @@ export default {
         refundFeeAmount: 0.00,
         round: 0.00
       },
-      dateRangeMode: 'date', // 选择开始时间
-      createdStart: '', // 选择开始时间
-      createdEnd: '' // 选择结束时间
+      dateRangeMode: 'date',
+      dateRangeValue: [startDate, endDate]
     }
   },
   computed: {
@@ -229,17 +232,23 @@ export default {
       })
     },
     detailFunc: function () {
-      console.log('详情')
+      // 获取开始时间和结束时间的时间戳
+      const startTimestamp = this.dateRangeValue[0].valueOf() // 或者使用 startDate.unix() 获取秒级时间戳
+      const endTimestamp = this.dateRangeValue[1].valueOf() // 或者使用 endDate.unix() 获取秒级时间戳
+      this.$router.push({
+        path: '/statistic/mch',
+        query: { queryDate: `${startTimestamp}_${endTimestamp}` }
+      })
     },
     moment,
-    onChange (date, dateString) {
-      this.searchData.createdStart = dateString[0] // 开始时间
-      this.searchData.createdEnd = dateString[1] // 结束时间
-    },
     queryDateTypeChange (value) {
+      let startDate = moment().subtract(1, 'year').startOf('day')
+      let endDate = moment().startOf('day').subtract(1, 'days')
       switch (value) {
         case 'day':
           this.dateRangeMode = 'date'
+          startDate = moment().subtract(1, 'month').startOf('day')
+          endDate = moment().startOf('day').subtract(1, 'days')
           break
         case 'month':
           this.dateRangeMode = 'month'
@@ -248,6 +257,16 @@ export default {
           this.dateRangeMode = 'year'
           break
       }
+      this.searchData.queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
+      this.dateRangeValue = [startDate, endDate]
+    },
+    onChange (date, dateString) {
+      const startDate = dateString[0] // 开始时间
+      const endDate = dateString[1] // 结束时间
+      const start = moment(startDate)
+      const end = moment(endDate)
+      this.dateRangeValue = [start, end]
+      this.searchData.queryDateRange = `customDateTime_${start.format('YYYY-MM-DD')} 00:00:00_${end.format('YYYY-MM-DD')} 23:59:59`
     },
     disabledDate (current) { // 今日之后日期不可选
       return current && current > moment().endOf('day')
