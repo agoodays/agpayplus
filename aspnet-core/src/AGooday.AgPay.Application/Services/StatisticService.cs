@@ -169,7 +169,8 @@ namespace AGooday.AgPay.Application.Services
                     RefundAmount = s.r.RefundAmount,
                     RefundCount = s.r.RefundCount,
                     RefundFee = s.r.RefundFee,
-                });
+                })
+                .OrderByDescending(o => o.GroupDate);
 
             var result = PaginatedList<StatisticResultDto>.Create(records, dto.PageNumber, dto.PageSize);
             return result;

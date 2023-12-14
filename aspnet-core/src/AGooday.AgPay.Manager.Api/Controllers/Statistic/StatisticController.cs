@@ -97,7 +97,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 _ => throw new NotImplementedException()
             };
             excelHeaders.AddRange(new List<dynamic>() {
-                new { Key = "groupDate", Width = 20d, Value = $"日期" },
                 new { Key = "payAmount", Width = 20d, Value = $"交易金额" },
                 new { Key = "amount", Width = 20d, Value = $"实收金额" },
                 new { Key = "refundAmount", Width = 20d, Value = $"退款金额" },

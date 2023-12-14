@@ -104,7 +104,8 @@ export default {
       }
     }
     const [optionValue, startDate, endDate] = this.value.split('_')
-    setDateRangeValue(optionValue, startDate, endDate)
+    const _optionValue = optionValue === 'customDateTime' ? optionValue : this.value
+    setDateRangeValue(_optionValue, startDate, endDate)
     const dateRangeTipIsShow = ref(false)
     const handleHoverChange = visible => {
       if (dateRangeTip.value.length > 0) {
@@ -118,8 +119,8 @@ export default {
       dateRangeOpen.value = open
     }
     return {
-      optionValue: optionValue,
-      optionOriginValue: optionValue === 'customDateTime' ? '' : optionValue,
+      optionValue: _optionValue,
+      optionOriginValue: _optionValue === 'customDateTime' ? '' : _optionValue,
       dateRangeValue,
       setDateRangeValue,
       dateRangeTip,

@@ -22,7 +22,7 @@
               v-model="dateRangeValue"
               @change="onChange"
               style="width: 100%"
-              format="YYYY-MM-DD"
+              :format="'YYYY-MM-DD'"
               :disabled-date="disabledDate"
             >
               <a-icon slot="suffixIcon" type="sync" />
@@ -109,9 +109,9 @@
         <template slot="refundCountSlot" slot-scope="{record}"><b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b></template> <!-- 自定义插槽 -->
         <template slot="countSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b></template> <!-- 自定义插槽 -->
         <template slot="roundSlot" slot-scope="{record}"><b style="color: rgb(255, 136, 0)">{{ record.round.toFixed(2) }}%</b></template> <!-- 自定义插槽 -->
-        <template slot="opSlot">  <!-- 操作列插槽 -->
+        <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a-button type="link" v-if="$access('ENT_STATISTIC_MCH')" @click="detailFunc">详情</a-button>
+            <a-button type="link" v-if="$access('ENT_STATISTIC_MCH')" @click="detailFunc(record.groupDate)">详情</a-button>
           </AgTableColumns>
         </template>
       </AgTable>
@@ -168,6 +168,7 @@ export default {
         refundFeeAmount: 0.00,
         round: 0.00
       },
+      dateFormat: 'YYYY-MM-DD',
       dateRangeMode: 'date',
       dateRangeValue: [startDate, endDate]
     }
@@ -231,10 +232,12 @@ export default {
         that.totalData = res
       })
     },
-    detailFunc: function () {
+    detailFunc: function (groupDate) {
+      const startDate = moment(groupDate, 'YYYY-MM-DD').startOf(this.searchData.queryDateType)
+      const endDate = moment(groupDate, 'YYYY-MM-DD').endOf(this.searchData.queryDateType)
       // 获取开始时间和结束时间的时间戳
-      const startTimestamp = this.dateRangeValue[0].valueOf() // 或者使用 startDate.unix() 获取秒级时间戳
-      const endTimestamp = this.dateRangeValue[1].valueOf() // 或者使用 endDate.unix() 获取秒级时间戳
+      const startTimestamp = startDate.valueOf() // 或者使用 startDate.unix() // 获取秒级时间戳
+      const endTimestamp = endDate.valueOf() // 或者使用 endDate.unix() // 获取秒级时间戳
       this.$router.push({
         path: '/statistic/mch',
         query: { queryDate: `${startTimestamp}_${endTimestamp}` }
@@ -242,18 +245,20 @@ export default {
     },
     moment,
     queryDateTypeChange (value) {
-      let startDate = moment().subtract(1, 'year').startOf('day')
-      let endDate = moment().startOf('day').subtract(1, 'days')
+      let startDate = moment().subtract(1, 'year').startOf('month')
+      const endDate = moment().startOf('day').subtract(1, 'days')
       switch (value) {
         case 'day':
+          this.dateFormat = 'YYYY-MM-DD'
           this.dateRangeMode = 'date'
           startDate = moment().subtract(1, 'month').startOf('day')
-          endDate = moment().startOf('day').subtract(1, 'days')
           break
         case 'month':
+          this.dateFormat = 'YYYY-MM'
           this.dateRangeMode = 'month'
           break
         case 'year':
+          this.dateFormat = 'YYYY'
           this.dateRangeMode = 'year'
           break
       }
@@ -265,8 +270,8 @@ export default {
       const endDate = dateString[1] // 结束时间
       const start = moment(startDate)
       const end = moment(endDate)
-      this.dateRangeValue = [start, end]
-      this.searchData.queryDateRange = `customDateTime_${start.format('YYYY-MM-DD')} 00:00:00_${end.format('YYYY-MM-DD')} 23:59:59`
+      this.dateRangeValue = !startDate || !startDate ? dateString : [start, end]
+      this.searchData.queryDateRange = !startDate || !startDate ? '' : `customDateTime_${start.format('YYYY-MM-DD')} 00:00:00_${end.format('YYYY-MM-DD')} 23:59:59`
     },
     disabledDate (current) { // 今日之后日期不可选
       return current && current > moment().endOf('day')
