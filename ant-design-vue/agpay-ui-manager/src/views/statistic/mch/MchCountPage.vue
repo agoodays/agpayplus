@@ -81,7 +81,7 @@
               <div class="item">
                 <div class="title">支付成功率</div>
                 <div class="amount" style="color: rgb(250, 173, 20);">
-                  <span class="amount-num">{{ totalData.round.toFixed(2) }}%</span>
+                  <span class="amount-num">{{ (totalData.round*100).toFixed(2) }}%</span>
                 </div>
               </div>
             </div>
@@ -94,7 +94,7 @@
         <template slot="refundFeeSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">￥{{ (record.refundFee/100).toFixed(2) }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundCountSlot" slot-scope="{record}"><b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b></template> <!-- 自定义插槽 -->
         <template slot="countSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b></template> <!-- 自定义插槽 -->
-        <template slot="roundSlot" slot-scope="{record}"><b style="color: rgb(255, 136, 0)">{{ record.round.toFixed(2) }}%</b></template> <!-- 自定义插槽 -->
+        <template slot="roundSlot" slot-scope="{record}"><b style="color: rgb(255, 136, 0)">{{ (record.round*100).toFixed(2) }}%</b></template> <!-- 自定义插槽 -->
         <template slot="opSlot">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_STATISTIC_MCH')" @click="detailFunc">明细</a-button>
