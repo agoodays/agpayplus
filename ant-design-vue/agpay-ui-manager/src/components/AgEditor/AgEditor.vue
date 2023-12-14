@@ -37,12 +37,20 @@
 
 <script>
 import { upload } from '@/api/manage'
+import appConfig from '@/config/appConfig'
+import storage from '@/utils/agpayStorageWrapper'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 // import { onBeforeUnmount, ref, shallowRef, onMounted } from 'vue'
 import { onBeforeUnmount, shallowRef } from 'vue'
 // import { onBeforeUnmount, computed, shallowRef } from 'vue'
 // import { onBeforeUnmount, ref, watch, shallowRef } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+
+function getHeaders () {
+  const headers = {}
+  headers[appConfig.ACCESS_TOKEN_NAME] = `Bearer ${storage.getToken()}` // token
+  return headers
+}
 
 export default {
   name: 'AgEditor',
@@ -56,6 +64,7 @@ export default {
           // 自定义插入图片
           uploadImage: {
             server: upload.form,
+            headers: getHeaders(),
             fieldName: 'file',
             customInsert: (res, insertFn) => {
               // res 即服务端的返回结果
@@ -69,14 +78,15 @@ export default {
           },
           uploadVideo: {
             server: upload.form,
+            headers: getHeaders(),
             fieldName: 'file',
             // 自定义插入视频
             customInsert: (res, insertFn) => {
               // res 即服务端的返回结果
               // 从 res 中找到 url poster ，然后插入视频
               insertFn(
-                  res.data // 视频 src ，必须
-                  , res.data // 视频封面图片 url ，可选
+                  res.data, // 视频 src ，必须
+                  res.data // 视频封面图片 url ，可选
               )
             }
           }

@@ -74,6 +74,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
         public IActionResult Export(string bizType, [FromQuery] StatisticQueryDto dto)
         {
+            ChickAuth(dto.Method);
             dto.BindDateRange();
             // 从数据库中检索需要导出的数据
             var result = _statisticService.Statistics(dto);
