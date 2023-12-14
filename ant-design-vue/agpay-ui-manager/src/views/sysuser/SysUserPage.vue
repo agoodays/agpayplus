@@ -137,7 +137,7 @@ const tableColumns = [
 ]
 
 const userTypeList = [
-  { userTypeName: '全部', userType: null },
+  { userTypeName: '全部', userType: '' },
   { userTypeName: '超级管理员', userType: 1 },
   { userTypeName: '普通操作员', userType: 2 },
   { userTypeName: '商户拓展员', userType: 3 },
@@ -151,7 +151,7 @@ export default {
     return {
       tableColumns: tableColumns,
       searchData: {
-        userType: null,
+        userType: '',
         sysType: 'MGR'
       },
       userTypeOptions: userTypeList,
