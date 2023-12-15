@@ -66,14 +66,32 @@ export default {
             server: upload.form,
             headers: getHeaders(),
             fieldName: 'file',
-            customInsert: (res, insertFn) => {
-              // res 即服务端的返回结果
-              // 从 res 中找到 url alt href ，然后插入图片
-              insertFn(
-                  res.data, // 图片 src ，必须
-                  res.data, // 图片描述文字，非必须
-                  res.data // 图片的链接，非必须
-              )
+            // customInsert: (res, insertFn) => {
+            //   // res 即服务端的返回结果
+            //   // 从 res 中找到 url alt href ，然后插入图片
+            //   insertFn(
+            //       res.data, // 图片 src ，必须
+            //       res.data, // 图片描述文字，非必须
+            //       res.data // 图片的链接，非必须
+            //   )
+            // },
+            customUpload: (file, insertFn) => {
+              upload.getFormParams(upload.form, file.name, file.size).then(res => {
+                const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
+                const formParams = isLocalFile ? res.formParams : {
+                  OSSAccessKeyId: res.formParams.ossAccessKeyId,
+                  key: res.formParams.key,
+                  Signature: res.formParams.signature,
+                  policy: res.formParams.policy,
+                  success_action_status: res.formParams.successActionStatus
+                }
+                const data = Object.assign(formParams, { file: file })
+                const formActionUrl = isLocalFile ? upload.form : res.formActionUrl
+                upload.singleFile(formActionUrl, data).then((response) => {
+                  const ossFileUrl = isLocalFile ? response : res.ossFileUrl
+                  insertFn(ossFileUrl, file.name, ossFileUrl)
+                })
+              })
             }
           },
           uploadVideo: {
@@ -81,13 +99,31 @@ export default {
             headers: getHeaders(),
             fieldName: 'file',
             // 自定义插入视频
-            customInsert: (res, insertFn) => {
-              // res 即服务端的返回结果
-              // 从 res 中找到 url poster ，然后插入视频
-              insertFn(
-                  res.data, // 视频 src ，必须
-                  res.data // 视频封面图片 url ，可选
-              )
+            // customInsert: (res, insertFn) => {
+            //   // res 即服务端的返回结果
+            //   // 从 res 中找到 url poster ，然后插入视频
+            //   insertFn(
+            //       res.data, // 视频 src ，必须
+            //       res.data // 视频封面图片 url ，可选
+            //   )
+            // },
+            customUpload: (file, insertFn) => {
+              upload.getFormParams(upload.form, file.name, file.size).then(res => {
+                const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
+                const formParams = isLocalFile ? res.formParams : {
+                  OSSAccessKeyId: res.formParams.ossAccessKeyId,
+                  key: res.formParams.key,
+                  Signature: res.formParams.signature,
+                  policy: res.formParams.policy,
+                  success_action_status: res.formParams.successActionStatus
+                }
+                const data = Object.assign(formParams, { file: file })
+                const formActionUrl = isLocalFile ? upload.form : res.formActionUrl
+                upload.singleFile(formActionUrl, data).then((response) => {
+                  const ossFileUrl = isLocalFile ? response : res.ossFileUrl
+                  insertFn(ossFileUrl, ossFileUrl)
+                })
+              })
             }
           }
         }
