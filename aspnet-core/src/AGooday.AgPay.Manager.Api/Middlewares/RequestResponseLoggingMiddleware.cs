@@ -18,6 +18,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
         {
             // 过滤，只有接口
             if (context.Request.Path.Value.StartsWith("/api")
+                && !context.Request.Path.Value.Contains("/ossFiles")
                 && !context.Request.Path.Value.Contains("/localOssFiles")
                 && !context.Request.Path.Value.Contains("/auth/vercode")
                 && !context.Request.Path.Value.Contains("/qrc/view")

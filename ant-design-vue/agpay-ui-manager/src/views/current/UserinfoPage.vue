@@ -46,17 +46,15 @@
                     :action="action"
                     :accept="accept"
                     :showUploadList="false"
+                    :custom-request="customRequest"
                     :before-upload="beforeUpload"
-                    @change="handleChange"
                     @preview="imgPreview($event)"
                   >
-                    <a-button style="marginLeft:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '更换头像' }} </a-button>
+                    <a-button style="margin-left: 5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '更换头像' }} </a-button>
                   </a-upload>
                 </div>
               </div>
-
             </a-col>
-
           </a-row>
           <!-- 图片裁剪组件 <avatar-modal ref="modal" @ok="setavatar"/> -->
         </div>
@@ -170,7 +168,6 @@ export default {
     }
   },
   computed: {
-
   },
   created () {
     this.detail()
@@ -272,6 +269,35 @@ export default {
       this.childKey = key
       this.$route.params.childKey = key
     },
+    customRequest ({ file, onSuccess, onError, onProgress }) {
+      this.loading = true
+      upload.getFormParams(upload.avatar, file.name, file.size).then(res => {
+        const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
+        const formParams = isLocalFile ? res.formParams : {
+          OSSAccessKeyId: res.formParams.ossAccessKeyId,
+          key: res.formParams.key,
+          Signature: res.formParams.signature,
+          policy: res.formParams.policy,
+          success_action_status: res.formParams.successActionStatus
+        }
+        const data = Object.assign(formParams, { file: file })
+        const formActionUrl = isLocalFile ? upload.avatar : res.formActionUrl
+        upload.singleFile(formActionUrl, data).then((response) => {
+          // 上传成功回调
+          // onSuccess(response)
+          this.loading = false
+          const ossFileUrl = isLocalFile ? response : res.ossFileUrl
+          this.uploadSuccess(ossFileUrl)
+        }).catch((error) => {
+          // 上传失败回调
+          // onError(error)
+          this.loading = false
+          this.$message.error(error.msg)
+        })
+      }).catch(() => {
+        this.loading = false
+      })
+    },
     // 上传回调
     handleChange (info) {
       // 限制文件数量
@@ -284,6 +310,7 @@ export default {
         return file
       }) */
       const res = info.file.response
+      // console.log(res)
 
       if (info.file.status === 'uploading') {
         this.loading = true

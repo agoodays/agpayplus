@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Constants;
+using AGooday.AgPay.Components.OSS.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -15,6 +16,17 @@ namespace AGooday.AgPay.Components.OSS.Services
         {
             this.logger = logger;
             this.sysConfigService = sysConfigService;
+        }
+
+        public Task<UploadFormParams> GetUploadFormParamsAsync(OssSavePlaceEnum ossSavePlaceEnum, string bizType, string saveDirAndFileName)
+        {
+            var result = new UploadFormParams();
+            result.FormParams = new FormParams()
+            {
+                BizType = bizType
+            };
+            result.FormActionUrl = "LOCAL_SINGLE_FILE_URL";
+            return Task.FromResult(result);
         }
 
         public async Task<string> Upload2PreviewUrlAsync(OssSavePlaceEnum ossSavePlaceEnum, IFormFile multipartFile, string saveDirAndFileName)

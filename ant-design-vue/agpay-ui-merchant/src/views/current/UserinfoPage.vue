@@ -52,12 +52,11 @@
                     @change="handleChange"
                     @preview="imgPreview($event)"
                   >
-                    <a-button style="marginLeft:5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '更换头像' }} </a-button>
+                    <a-button style="margin-left: 5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '更换头像' }} </a-button>
                   </a-upload>
                 </div>
               </div>
             </a-col>
-
           </a-row>
           <avatar-modal ref="modal" @ok="setavatar"/>
         </div>

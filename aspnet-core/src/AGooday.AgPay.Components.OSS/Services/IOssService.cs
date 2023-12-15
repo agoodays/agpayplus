@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Components.OSS.Constants;
+using AGooday.AgPay.Components.OSS.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace AGooday.AgPay.Components.OSS.Services
@@ -8,6 +9,15 @@ namespace AGooday.AgPay.Components.OSS.Services
     /// </summary>
     public interface IOssService
     {
+        /// <summary>
+        /// 获取上传表单参数
+        /// </summary>
+        /// <param name="ossSavePlaceEnum"></param>
+        /// <param name="bizType"></param>
+        /// <param name="saveDirAndFileName"></param>
+        /// <returns></returns>
+        Task<UploadFormParams> GetUploadFormParamsAsync(OssSavePlaceEnum ossSavePlaceEnum, string bizType, string saveDirAndFileName);
+
         /// <summary>
         /// 上传文件 & 生成下载/预览URL
         /// </summary>
