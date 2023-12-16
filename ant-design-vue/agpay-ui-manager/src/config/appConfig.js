@@ -40,6 +40,7 @@ export const asyncRouteDefine = {
   'MchNotifyListPage': { defaultPath: '/notify', component: () => import('@/views/order/notify/MchNotifyList') }, // 商户通知列表
   'TransactionPage': { defaultPath: '/statistic/transaction', component: () => import('@/views/statistic/transaction/TransactionPage') }, // 交易报表
   'MchCountPage': { defaultPath: '/statistic/mch', component: () => import('@/views/statistic/mch/MchCountPage') }, // 商户统计
+  'AgentCountPage': { defaultPath: '/statistic/agent', component: () => import('@/views/statistic/agent/AgentCountPage') }, // 代理商统计
   'DivisionReceiverGroupPage': { defaultPath: '/divisionReceiverGroup', component: () => import('@/views/division/group/DivisionReceiverGroupPage') }, // 分账账号组管理
   'DivisionReceiverPage': { defaultPath: '/divisionReceiver', component: () => import('@/views/division/receiver/DivisionReceiverPage') }, // 分账账号管理
   'DivisionRecordPage': { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/DivisionRecordPage') }, // 分账记录

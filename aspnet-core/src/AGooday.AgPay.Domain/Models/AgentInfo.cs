@@ -255,5 +255,8 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("更新时间")]
         [Required, Column("updated_at", TypeName = "timestamp(6)")]
         public DateTime UpdatedAt { get; set; }
+
+        public virtual AgentInfo ParentAgent { get; set; }
+        public virtual ICollection<AgentInfo> SubAgents { get; set; }
     }
 }

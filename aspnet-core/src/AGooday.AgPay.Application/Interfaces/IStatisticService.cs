@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IStatisticService
     {
-        PaginatedList<StatisticResultDto> Statistics(StatisticQueryDto dto);
-        JObject Total(StatisticQueryDto dto);
+        PaginatedList<StatisticResultDto> Statistics(string agentNo, StatisticQueryDto dto);
+        JObject Total(string agentNo, StatisticQueryDto dto);
     }
 }

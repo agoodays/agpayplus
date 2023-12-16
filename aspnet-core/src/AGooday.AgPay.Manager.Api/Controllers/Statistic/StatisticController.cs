@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         {
             ChickAuth(dto.Method);
             dto.BindDateRange();
-            var result = _statisticService.Statistics(dto);
+            var result = _statisticService.Statistics(null, dto);
             return ApiPageRes<StatisticResultDto>.Pages(result);
         }
 
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         {
             ChickAuth(dto.Method);
             dto.BindDateRange();
-            var statistics = _statisticService.Total(dto);
+            var statistics = _statisticService.Total(null, dto);
             return ApiRes.Ok(statistics);
         }
 
@@ -77,12 +77,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
             ChickAuth(dto.Method);
             dto.BindDateRange();
             // 从数据库中检索需要导出的数据
-            var result = _statisticService.Statistics(dto);
+            var result = _statisticService.Statistics(null, dto);
 
             string title = dto.Method switch
             {
                 "transaction" => "交易报表",
                 "mch" => "商户统计",
+                "agent" => "代理商统计",
                 _ => throw new NotImplementedException()
             };
             string fileName = $"{title}.xlsx";
@@ -94,6 +95,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 "mch" => new List<dynamic>() {
                     new { Key = "mchName", Width = 20d, Value = $"商户名称" },
                     new { Key = "mchNo", Width = 20d, Value = $"商户号" }
+                },
+                "agent" => new List<dynamic>() {
+                    new { Key = "agentName", Width = 20d, Value = $"代理商名称" },
+                    new { Key = "agentNo", Width = 20d, Value = $"代理商号" }
                 },
                 _ => throw new NotImplementedException()
             };
@@ -178,6 +183,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 throw new BizException("当前用户未分配该菜单权限！");
             }
             if (method.Equals("mch", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH))
+            {
+                throw new BizException("当前用户未分配该菜单权限！");
+            }
+            if (method.Equals("agent", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_AGENT))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }

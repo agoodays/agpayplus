@@ -128,7 +128,9 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<AgentInfo>().Property(c => c.BalanceAmount).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.AuditProfitAmount).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-            modelBuilder.Entity<AgentInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<AgentInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)"); 
+            modelBuilder.Entity<AgentInfo>().HasMany(a => a.SubAgents)
+                .WithOne(a => a.ParentAgent).HasForeignKey(a => a.Pid);
             modelBuilder.Entity<IsvInfo>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<IsvInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<IsvInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
