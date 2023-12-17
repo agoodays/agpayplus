@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Application.Services
 
             IEnumerable<AgentInfo> agents = _agentInfoRepository.GetAllOrSubAgents(agentNo);
             var agentNos = agentNo == null ? null : agents.Select(s => s.AgentNo);
-            SelectOrderCount(dto, agentNos, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
+            SelectOrderCount(dto, agentNos, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
             var allAmount = payOrders.Sum(s => s.Amount);
             var allCount = payOrders.Count();
             // 成交金额: 支付成功的订单金额，包含部分退款及全额退款的订单
@@ -99,6 +99,7 @@ namespace AGooday.AgPay.Application.Services
                 "transaction" => TransactionStatistics(agentNo, dto),
                 "mch" => MchStatistics(agentNo, dto),
                 "agent" => AgentStatistics(agentNo, dto),
+                "isv" => IsvStatistics(dto),
                 _ => throw new NotImplementedException()
             };
         }
@@ -129,7 +130,7 @@ namespace AGooday.AgPay.Application.Services
 
             IEnumerable<AgentInfo> agents = _agentInfoRepository.GetSubAgents(agentNo);
             var agentNos = agents?.Select(s => s.AgentNo);
-            SelectOrderCount(dto, agentNos, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
+            SelectOrderCount(dto, agentNos, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
 
             var payRecords = payOrders.AsEnumerable().GroupBy(g => g.CreatedAt.ToString(format))
                 .Select(s =>
@@ -186,7 +187,7 @@ namespace AGooday.AgPay.Application.Services
         {
             IEnumerable<AgentInfo> agents = _agentInfoRepository.GetAllOrSubAgents(agentNo);
             var agentNos = agentNo == null ? null : agents.Select(s => s.AgentNo);
-            SelectOrderCount(dto, agentNos, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
+            SelectOrderCount(dto, agentNos, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
 
             var payRecords = payOrders.AsEnumerable().GroupBy(g => new { g.MchNo, g.MchName })
                 .Select(s =>
@@ -244,10 +245,9 @@ namespace AGooday.AgPay.Application.Services
         private PaginatedList<StatisticResultDto> AgentStatistics(string agentNo, StatisticQueryDto dto)
         {
             IEnumerable<AgentInfo> agents = _agentInfoRepository.GetAllOrSubAgents(agentNo);
-            var agentNos = agentNo == null ? null : agents.Select(s => s.AgentNo);
             var agentInfos = PaginatedList<AgentInfo>.Create(agents, dto.PageNumber, dto.PageSize);
-
-            SelectOrderCount(dto, agentNos, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
+            var agentNos = agentNo == null ? null : agentInfos.Select(s => s.AgentNo);
+            SelectOrderCount(dto, agentNos, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
 
             var payRecords = payOrders.AsEnumerable().GroupBy(g => g.AgentNo)
                 .Select(s =>
@@ -305,7 +305,72 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        private void SelectOrderCount(StatisticQueryDto dto, IEnumerable<string> agentNos, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders)
+        private PaginatedList<StatisticResultDto> IsvStatistics(StatisticQueryDto dto)
+        {
+            var isvs = _isvInfoRepository.GetAllAsNoTracking()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
+                ).OrderByDescending(o => o.CreatedAt);
+            var isvInfos = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvs, _mapper, dto.PageNumber, dto.PageSize);
+            var isvNos = isvInfos.Select(s => s.IsvNo);
+            SelectOrderCount(dto, null, isvNos, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
+
+            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.IsvNo)
+                .Select(s =>
+                {
+                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        IsvNo = s.Key,
+                        AllAmount = s.Sum(s => s.Amount),
+                        AllCount = s.Count(),
+                        PayAmount = pay.Sum(s => s.Amount),
+                        PayCount = pay.Count(),
+                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
+                    };
+                });
+
+            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.IsvNo)
+                .Select(s =>
+                {
+                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        IsvNo = s.Key,
+                        RefundAmount = refund.Sum(s => s.RefundAmount),
+                        RefundCount = refund.Count(),
+                        RefundFee = refund.Sum(s => s.RefundFeeAmount),
+                    };
+                });
+
+            var records = isvInfos
+                .Select(s =>
+                {
+                    var pay = payRecords?.Where(w => s.IsvNo.Equals(w.IsvNo))?.FirstOrDefault();
+                    var refund = refundRecords?.Where(w => s.IsvNo.Equals(w.IsvNo))?.FirstOrDefault();
+
+                    return new StatisticResultDto()
+                    {
+                        IsvNo = s.IsvNo,
+                        IsvName = s.IsvName,
+                        AllAmount = pay?.AllAmount ?? 0,
+                        AllCount = pay?.AllCount ?? 0,
+                        PayAmount = pay?.PayAmount ?? 0,
+                        PayCount = pay?.PayCount ?? 0,
+                        Round = Math.Round((pay?.AllCount ?? 0) > 0 ? (decimal)pay?.PayCount / (pay?.AllCount ?? 0) : 0M, 2, MidpointRounding.AwayFromZero),
+                        Fee = pay?.Fee ?? 0,
+                        RefundAmount = refund?.RefundAmount ?? 0,
+                        RefundCount = refund?.RefundCount ?? 0,
+                        RefundFee = refund?.RefundFee ?? 0
+                    };
+                });
+            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), isvInfos.TotalCount, dto.PageNumber, dto.PageSize);
+            return result;
+        }
+
+        private void SelectOrderCount(StatisticQueryDto dto, IEnumerable<string> agentNos, IEnumerable<string> isvNos, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders)
         {
             payOrders = _payOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
@@ -313,6 +378,7 @@ namespace AGooday.AgPay.Application.Services
                 && (agentNos == null || agentNos.Contains(w.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Equals(dto.AgentName))
+                && (isvNos == null || isvNos.Contains(w.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Equals(dto.IsvName))
                 && (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))
@@ -328,6 +394,7 @@ namespace AGooday.AgPay.Application.Services
                 && (agentNos == null || agentNos.Contains(w.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Equals(dto.AgentName))
+                && (isvNos == null || isvNos.Contains(w.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Equals(dto.IsvName))
                 && (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))

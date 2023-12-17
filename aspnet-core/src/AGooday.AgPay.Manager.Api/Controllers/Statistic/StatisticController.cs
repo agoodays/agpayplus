@@ -84,6 +84,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 "transaction" => "交易报表",
                 "mch" => "商户统计",
                 "agent" => "代理商统计",
+                "isv" => "服务商统计",
                 _ => throw new NotImplementedException()
             };
             string fileName = $"{title}.xlsx";
@@ -99,6 +100,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 "agent" => new List<dynamic>() {
                     new { Key = "agentName", Width = 20d, Value = $"代理商名称" },
                     new { Key = "agentNo", Width = 20d, Value = $"代理商号" }
+                },
+                "isv" => new List<dynamic>() {
+                    new { Key = "isvName", Width = 20d, Value = $"服务商名称" },
+                    new { Key = "isvNo", Width = 20d, Value = $"服务商号" }
                 },
                 _ => throw new NotImplementedException()
             };
@@ -187,6 +192,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 throw new BizException("当前用户未分配该菜单权限！");
             }
             if (method.Equals("agent", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_AGENT))
+            {
+                throw new BizException("当前用户未分配该菜单权限！");
+            }
+            if (method.Equals("isv", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_ISV))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
