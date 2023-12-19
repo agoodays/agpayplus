@@ -19,6 +19,7 @@ namespace AGooday.AgPay.Application.Services
         private readonly IPayOrderRepository _payOrderRepository;
         private readonly IRefundOrderRepository _refundOrderRepository;
         private readonly IMchInfoRepository _mchInfoRepository;
+        private readonly IMchStoreRepository _mchStoreRepository;
         private readonly IAgentInfoRepository _agentInfoRepository;
         private readonly IIsvInfoRepository _isvInfoRepository;
         private readonly IPayWayRepository _payWayRepository;
@@ -31,6 +32,7 @@ namespace AGooday.AgPay.Application.Services
             IPayOrderRepository payOrderRepository,
             IRefundOrderRepository refundOrderRepository,
             IMchInfoRepository mchInfoRepository,
+            IMchStoreRepository mchStoreRepository,
             IAgentInfoRepository agentInfoRepository,
             IIsvInfoRepository isvInfoRepository,
             IPayWayRepository payWayRepository)
@@ -40,6 +42,7 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository = payOrderRepository;
             _refundOrderRepository = refundOrderRepository;
             _mchInfoRepository = mchInfoRepository;
+            _mchStoreRepository = mchStoreRepository;
             _agentInfoRepository = agentInfoRepository;
             _isvInfoRepository = isvInfoRepository;
             _payWayRepository = payWayRepository;
@@ -98,6 +101,7 @@ namespace AGooday.AgPay.Application.Services
             {
                 "transaction" => TransactionStatistics(agentNo, dto),
                 "mch" => MchStatistics(agentNo, dto),
+                "store" => StoreStatistics(dto),
                 "agent" => AgentStatistics(agentNo, dto),
                 "isv" => IsvStatistics(dto),
                 _ => throw new NotImplementedException()
@@ -251,6 +255,71 @@ namespace AGooday.AgPay.Application.Services
                     };
                 });
             var result = new PaginatedList<StatisticResultDto>(records?.ToList(), mchInfos.TotalCount, dto.PageNumber, dto.PageSize);
+            return result;
+        }
+
+        private PaginatedList<StatisticResultDto> StoreStatistics(StatisticQueryDto dto)
+        {
+            var stores = _mchStoreRepository.GetAllAsNoTracking()
+                .Where(w => (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))
+                && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Contains(dto.StoreName))
+                ).OrderByDescending(o => o.CreatedAt);
+            var mchStores = PaginatedList<MchStore>.Create<MchStoreDto>(stores, _mapper, dto.PageNumber, dto.PageSize);
+
+            SelectOrderCount(dto, null, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
+
+            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.StoreId)
+                .Select(s =>
+                {
+                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        StoreId = s.Key,
+                        AllAmount = s.Sum(s => s.Amount),
+                        AllCount = s.Count(),
+                        PayAmount = pay.Sum(s => s.Amount),
+                        PayCount = pay.Count(),
+                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
+                    };
+                });
+
+            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.StoreId)
+                .Select(s =>
+                {
+                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        StoreId = s.Key,
+                        RefundAmount = refund.Sum(s => s.RefundAmount),
+                        RefundCount = refund.Count(),
+                        RefundFee = refund.Sum(s => s.RefundFeeAmount),
+                    };
+                });
+
+            var records = mchStores
+                .Select(s =>
+                {
+                    var pay = payRecords?.Where(w => s.StoreId.Equals(w.StoreId))?.FirstOrDefault();
+                    var refund = refundRecords?.Where(w => s.StoreId.Equals(w.StoreId))?.FirstOrDefault();
+
+                    return new StatisticResultDto()
+                    {
+                        StoreId = s.StoreId,
+                        StoreName = s.StoreName,
+                        AllAmount = pay?.AllAmount ?? 0,
+                        AllCount = pay?.AllCount ?? 0,
+                        PayAmount = pay?.PayAmount ?? 0,
+                        PayCount = pay?.PayCount ?? 0,
+                        Round = Math.Round((pay?.AllCount ?? 0) > 0 ? (decimal)pay?.PayCount / (pay?.AllCount ?? 0) : 0M, 2, MidpointRounding.AwayFromZero),
+                        Fee = pay?.Fee ?? 0,
+                        RefundAmount = refund?.RefundAmount ?? 0,
+                        RefundCount = refund?.RefundCount ?? 0,
+                        RefundFee = refund?.RefundFee ?? 0
+                    };
+                });
+            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), mchStores.TotalCount, dto.PageNumber, dto.PageSize);
             return result;
         }
 

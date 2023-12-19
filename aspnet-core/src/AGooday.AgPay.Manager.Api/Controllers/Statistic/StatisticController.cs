@@ -83,6 +83,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
             {
                 "transaction" => "交易报表",
                 "mch" => "商户统计",
+                "store" => "门店统计",
                 "agent" => "代理商统计",
                 "isv" => "服务商统计",
                 _ => throw new NotImplementedException()
@@ -96,6 +97,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 "mch" => new List<dynamic>() {
                     new { Key = "mchName", Width = 20d, Value = $"商户名称" },
                     new { Key = "mchNo", Width = 20d, Value = $"商户号" }
+                },
+                "store" => new List<dynamic>() {
+                    new { Key = "storeName", Width = 20d, Value = $"门店名称" },
+                    new { Key = "storeId", Width = 20d, Value = $"门店ID" }
                 },
                 "agent" => new List<dynamic>() {
                     new { Key = "agentName", Width = 20d, Value = $"代理商名称" },
@@ -188,6 +193,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 throw new BizException("当前用户未分配该菜单权限！");
             }
             if (method.Equals("mch", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH))
+            {
+                throw new BizException("当前用户未分配该菜单权限！");
+            }
+            if (method.Equals("store", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_STORE))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }

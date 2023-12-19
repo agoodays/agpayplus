@@ -85,6 +85,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH_OAUTH2_CONFIG_ADD', '按钮：oaut
 INSERT INTO t_sys_entitlement VALUES('ENT_ORDER_STATISTIC', '数据统计', 'bar-chart', '', 'RouteView', 'ML', 0, 1,  'ROOT', '53', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_TRANSACTION', '交易报表', 'account-book', '/statistic/transaction', 'TransactionPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '10', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_MCH', '商户统计', 'line-chart', '/statistic/mch', 'MchCountPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '20', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_MCH_STORE', '门店统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_STATISTIC_MCH', '10', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_AGENT', '代理商统计', 'area-chart', '/statistic/agent', 'AgentCountPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '30', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_ISV', '服务商统计', 'fund', '/statistic/isv', 'IsvCountPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '40', 'MGR', NOW(), NOW());
         
