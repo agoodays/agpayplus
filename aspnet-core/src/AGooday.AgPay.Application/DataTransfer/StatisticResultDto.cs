@@ -1,11 +1,9 @@
-﻿using AGooday.AgPay.Common.Models;
-
-namespace AGooday.AgPay.Application.DataTransfer
+﻿namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 统计结果
     /// </summary>
-    public class StatisticResultDto : BaseModel
+    public class StatisticResultDto
     {
         public string GroupDate { get; set; }
 

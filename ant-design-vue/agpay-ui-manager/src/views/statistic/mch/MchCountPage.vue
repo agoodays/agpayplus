@@ -95,13 +95,20 @@
         <template slot="refundCountSlot" slot-scope="{record}"><b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b></template> <!-- 自定义插槽 -->
         <template slot="countSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b></template> <!-- 自定义插槽 -->
         <template slot="roundSlot" slot-scope="{record}"><b style="color: rgb(255, 136, 0)">{{ (record.round*100).toFixed(2) }}%</b></template> <!-- 自定义插槽 -->
-        <template slot="opSlot">  <!-- 操作列插槽 -->
+        <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a-button type="link" v-if="$access('ENT_STATISTIC_MCH')" @click="detailFunc">明细</a-button>
+            <a-button
+              type="link"
+              v-if="$access('ENT_STATISTIC_MCH_STORE')
+                || $access('ENT_STATISTIC_MCH_WAY_CODE')
+                || $access('ENT_STATISTIC_MCH_WAY_TYPE')"
+              @click="detailFunc(record.mchNo)">明细</a-button>
           </AgTableColumns>
         </template>
       </AgTable>
     </a-card>
+    <!-- 详细页面组件  -->
+    <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
   </page-header-wrapper>
 </template>
 <script>
@@ -112,6 +119,7 @@ import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
 import moment from 'moment'
+import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
@@ -130,7 +138,7 @@ const tableColumns = [
 
 export default {
   name: 'MchCountPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, InfoDetail },
   data () {
     let queryDateRange = 'today'
     if (this.$route.query.queryDate) {
@@ -162,6 +170,7 @@ export default {
         isvNo: isvNo,
         queryDateRange: queryDateRange
       },
+      detailQueryDateRange: queryDateRange,
       totalData: {
         allAmount: 0.00,
         allCount: 0,
@@ -193,6 +202,7 @@ export default {
     },
     queryFunc () {
       this.btnLoading = true
+      this.detailQueryDateRange = this.searchData.queryDateRange
       this.totalFunc()
       this.$refs.infoTable.refTable(true)
     },
@@ -234,8 +244,8 @@ export default {
         that.totalData = res
       })
     },
-    detailFunc: function () {
-      console.log('明细')
+    detailFunc: function (mchNo) { // 门店详情页
+      this.$refs.infoDetail.show(mchNo, this.detailQueryDateRange)
     }
   }
 }

@@ -263,6 +263,7 @@ namespace AGooday.AgPay.Application.Services
             var stores = _mchStoreRepository.GetAllAsNoTracking()
                 .Where(w => (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))
                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Contains(dto.StoreName))
+                && (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Contains(dto.MchNo))
                 ).OrderByDescending(o => o.CreatedAt);
             var mchStores = PaginatedList<MchStore>.Create<MchStoreDto>(stores, _mapper, dto.PageNumber, dto.PageSize);
 

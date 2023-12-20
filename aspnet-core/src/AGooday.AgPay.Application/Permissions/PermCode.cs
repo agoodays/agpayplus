@@ -171,8 +171,8 @@
             public const string ENT_STATISTIC_TRANSACTION = "ENT_STATISTIC_TRANSACTION";
             public const string ENT_STATISTIC_MCH = "ENT_STATISTIC_MCH";
             public const string ENT_STATISTIC_MCH_STORE = "ENT_STATISTIC_MCH_STORE";
-            public const string ENT_STATISTIC_MCH_TYPE = "ENT_STATISTIC_MCH_TYPE";
-            public const string ENT_STATISTIC_MCH_WAY = "ENT_STATISTIC_MCH_WAY";
+            public const string ENT_STATISTIC_MCH_WAY_CODE = "ENT_STATISTIC_MCH_WAY_CODE";
+            public const string ENT_STATISTIC_MCH_WAY_TYPE = "ENT_STATISTIC_MCH_WAY_TYPE";
             public const string ENT_STATISTIC_AGENT = "ENT_STATISTIC_AGENT";
             public const string ENT_STATISTIC_ISV = "ENT_STATISTIC_ISV";
             public const string ENT_STATISTIC_CHANNEL = "ENT_STATISTIC_CHANNEL";
