@@ -84,6 +84,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 "transaction" => "交易报表",
                 "mch" => "商户统计",
                 "store" => "门店统计",
+                "wayCode" => "支付方式统计",
+                "wayType" => "支付类型统计",
                 "agent" => "代理商统计",
                 "isv" => "服务商统计",
                 _ => throw new NotImplementedException()
@@ -101,6 +103,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 "store" => new List<dynamic>() {
                     new { Key = "storeName", Width = 20d, Value = $"门店名称" },
                     new { Key = "storeId", Width = 20d, Value = $"门店ID" }
+                },
+                "wayCode" => new List<dynamic>() {
+                    new { Key = "wayName", Width = 20d, Value = $"支付方式名称" },
+                    new { Key = "wayCode", Width = 20d, Value = $"支付方式代码" }
+                },
+                "wayType" => new List<dynamic>() {
+                    new { Key = "wayTypeName", Width = 20d, Value = $"支付类型名称" },
+                    new { Key = "wayType", Width = 20d, Value = $"支付类型代码" }
                 },
                 "agent" => new List<dynamic>() {
                     new { Key = "agentName", Width = 20d, Value = $"代理商名称" },
@@ -197,6 +207,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 throw new BizException("当前用户未分配该菜单权限！");
             }
             if (method.Equals("store", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_STORE))
+            {
+                throw new BizException("当前用户未分配该菜单权限！");
+            }
+            if (method.Equals("wayCode", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_CODE))
+            {
+                throw new BizException("当前用户未分配该菜单权限！");
+            }
+            if (method.Equals("wayType", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_TYPE))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }

@@ -214,7 +214,7 @@ export default {
       req.export(API_URL_ORDER_STATISTIC, 'excel', params).then(res => {
         // 将响应体中的二进制数据转换为Blob对象
         const blob = new Blob([res])
-        const fileName = '商户统计.xlsx' // 要保存的文件名称
+        const fileName = '门店统计.xlsx' // 要保存的文件名称
         if ('download' in document.createElement('a')) {
           // 非IE下载
           // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件

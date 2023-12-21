@@ -10,18 +10,24 @@
       <a-tab-pane v-if="topTabData.some(tab => tab === 'store')" :key="'store'" tab="门店统计">
         <StoreCountPage v-if="visible" :mch-no="mchNo" :query-date-range="queryDateRange"/>
       </a-tab-pane>
-      <a-tab-pane v-if="topTabData.some(tab => tab === 'wayCode')" :key="'wayCode'" tab="支付方式统计">支付方式统计</a-tab-pane>
-      <a-tab-pane v-if="topTabData.some(tab => tab === 'wayType')" :key="'wayType'" tab="支付类型统计">支付类型统计</a-tab-pane>
+      <a-tab-pane v-if="topTabData.some(tab => tab === 'wayCode')" :key="'wayCode'" tab="支付方式统计">
+        <WayCodeCountPage v-if="visible" :mch-no="mchNo" :query-date-range="queryDateRange"/>
+      </a-tab-pane>
+      <a-tab-pane v-if="topTabData.some(tab => tab === 'wayType')" :key="'wayType'" tab="支付类型统计">
+        <WayTypeCountPage v-if="visible" :mch-no="mchNo" :query-date-range="queryDateRange"/>
+      </a-tab-pane>
     </a-tabs>
   </a-drawer>
 </template>
 
 <script>
 import StoreCountPage from './StoreCountPage'
+import WayCodeCountPage from './WayCodeCountPage'
+import WayTypeCountPage from './WayTypeCountPage'
 
 export default {
   name: 'Detail',
-  components: { StoreCountPage },
+  components: { StoreCountPage, WayCodeCountPage, WayTypeCountPage },
   data () {
     return {
       visible: false, // 是否显示弹层/抽屉

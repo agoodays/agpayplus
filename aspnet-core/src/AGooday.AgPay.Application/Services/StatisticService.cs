@@ -102,6 +102,8 @@ namespace AGooday.AgPay.Application.Services
                 "transaction" => TransactionStatistics(agentNo, dto),
                 "mch" => MchStatistics(agentNo, dto),
                 "store" => StoreStatistics(dto),
+                "wayCode" => WayCodeStatistics(dto),
+                "wayType" => WayTypeStatistics(dto),
                 "agent" => AgentStatistics(agentNo, dto),
                 "isv" => IsvStatistics(dto),
                 _ => throw new NotImplementedException()
@@ -321,6 +323,131 @@ namespace AGooday.AgPay.Application.Services
                     };
                 });
             var result = new PaginatedList<StatisticResultDto>(records?.ToList(), mchStores.TotalCount, dto.PageNumber, dto.PageSize);
+            return result;
+        }
+
+        private PaginatedList<StatisticResultDto> WayCodeStatistics(StatisticQueryDto dto)
+        {
+            var ways = _payWayRepository.GetAllAsNoTracking()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
+                //&& (string.IsNullOrWhiteSpace(dto.WayName) || w.WayName.Contains(dto.WayName))
+                ).OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
+            var payWays = PaginatedList<PayWay>.Create<PayWayDto>(ways, _mapper, dto.PageNumber, dto.PageSize);
+
+            SelectOrderCount(dto, null, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
+
+            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.WayCode)
+                .Select(s =>
+                {
+                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        WayCode = s.Key,
+                        AllAmount = s.Sum(s => s.Amount),
+                        AllCount = s.Count(),
+                        PayAmount = pay.Sum(s => s.Amount),
+                        PayCount = pay.Count(),
+                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
+                    };
+                });
+
+            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.WayCode)
+                .Select(s =>
+                {
+                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        WayCode = s.Key,
+                        RefundAmount = refund.Sum(s => s.RefundAmount),
+                        RefundCount = refund.Count(),
+                        RefundFee = refund.Sum(s => s.RefundFeeAmount),
+                    };
+                });
+
+            var records = payWays
+                .Select(s =>
+                {
+                    var pay = payRecords?.Where(w => s.WayCode.Equals(w.WayCode))?.FirstOrDefault();
+                    var refund = refundRecords?.Where(w => s.WayCode.Equals(w.WayCode))?.FirstOrDefault();
+
+                    return new StatisticResultDto()
+                    {
+                        WayCode = s.WayCode,
+                        WayName = s.WayName,
+                        AllAmount = pay?.AllAmount ?? 0,
+                        AllCount = pay?.AllCount ?? 0,
+                        PayAmount = pay?.PayAmount ?? 0,
+                        PayCount = pay?.PayCount ?? 0,
+                        Round = Math.Round((pay?.AllCount ?? 0) > 0 ? (decimal)pay?.PayCount / (pay?.AllCount ?? 0) : 0M, 2, MidpointRounding.AwayFromZero),
+                        Fee = pay?.Fee ?? 0,
+                        RefundAmount = refund?.RefundAmount ?? 0,
+                        RefundCount = refund?.RefundCount ?? 0,
+                        RefundFee = refund?.RefundFee ?? 0
+                    };
+                });
+            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), payWays.TotalCount, dto.PageNumber, dto.PageSize);
+            return result;
+        }
+
+        private PaginatedList<StatisticResultDto> WayTypeStatistics(StatisticQueryDto dto)
+        {
+            SelectOrderCount(dto, null, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
+
+            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.WayType)
+                .Select(s =>
+                {
+                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        WayType = s.Key,
+                        AllAmount = s.Sum(s => s.Amount),
+                        AllCount = s.Count(),
+                        PayAmount = pay.Sum(s => s.Amount),
+                        PayCount = pay.Count(),
+                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
+                    };
+                });
+
+            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.WayType)
+                .Select(s =>
+                {
+                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        WayType = s.Key,
+                        RefundAmount = refund.Sum(s => s.RefundAmount),
+                        RefundCount = refund.Count(),
+                        RefundFee = refund.Sum(s => s.RefundFeeAmount),
+                    };
+                });
+
+            var records = Enum.GetValues(typeof(PayWayType)).Cast<PayWayType>()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.WayType) || w.ToString().Equals(dto.WayType)))
+                .Select(s =>
+                {
+                    var pay = payRecords?.Where(w => s.ToString().Equals(w.WayType))?.FirstOrDefault();
+                    var refund = refundRecords?.Where(w => s.ToString().Equals(w.WayType))?.FirstOrDefault();
+
+                    return new StatisticResultDto()
+                    {
+                        WayType = s.ToString(),
+                        WayTypeName = s.GetDescriptionOrDefault("未知"),
+                        AllAmount = pay?.AllAmount ?? 0,
+                        AllCount = pay?.AllCount ?? 0,
+                        PayAmount = pay?.PayAmount ?? 0,
+                        PayCount = pay?.PayCount ?? 0,
+                        Round = Math.Round((pay?.AllCount ?? 0) > 0 ? (decimal)pay?.PayCount / (pay?.AllCount ?? 0) : 0M, 2, MidpointRounding.AwayFromZero),
+                        Fee = pay?.Fee ?? 0,
+                        RefundAmount = refund?.RefundAmount ?? 0,
+                        RefundCount = refund?.RefundCount ?? 0,
+                        RefundFee = refund?.RefundFee ?? 0
+                    };
+                });
+            var result = PaginatedList<StatisticResultDto>.Create(records, dto.PageNumber, dto.PageSize);
             return result;
         }
 
