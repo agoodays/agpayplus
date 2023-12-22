@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -58,12 +58,9 @@
         </template>
       </AgTable>
     </a-card>
-
     <!-- 新增 / 修改 页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="queryFunc" />
-
-  </page-header-wrapper>
-
+  </div>
 </template>
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'

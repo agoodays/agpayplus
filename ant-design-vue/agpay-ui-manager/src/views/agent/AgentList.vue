@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -62,7 +62,7 @@
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
     <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'mgrAgent'" />
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>

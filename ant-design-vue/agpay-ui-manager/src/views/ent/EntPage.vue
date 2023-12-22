@@ -1,7 +1,6 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
-
       <div class="table-page-search-wrapper">
         <a-form layout="inline" style="margin-bottom:30px">
           <a-row :gutter="16">
@@ -21,7 +20,6 @@
           </a-row>
         </a-form>
       </div>
-
       <a-table
         :columns="tableColumns"
         :data-source="dataSource"
@@ -39,12 +37,9 @@
         </template>
       </a-table>
     </a-card>
-
     <!-- 新增 / 修改 页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="refTable" />
-
-  </page-header-wrapper>
-
+  </div>
 </template>
 <script>
 import { getEntTree, API_URL_ENT_LIST, reqLoad } from '@/api/manage'

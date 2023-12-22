@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -73,7 +73,7 @@
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
     <!-- 新增页面组件  -->
     <MchConfig ref="mchConfig" :callbackFunc="searchFunc"/>
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'

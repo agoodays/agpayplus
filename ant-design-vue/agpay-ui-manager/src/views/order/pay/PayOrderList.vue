@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -599,7 +599,7 @@
         </a-row>
       </a-drawer>
     </template>
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
 import RefundModal from './RefundModal' // 退款弹出框

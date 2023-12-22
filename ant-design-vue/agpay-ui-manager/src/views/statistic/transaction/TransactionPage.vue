@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -116,7 +116,7 @@
         </template>
       </AgTable>
     </a-card>
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件

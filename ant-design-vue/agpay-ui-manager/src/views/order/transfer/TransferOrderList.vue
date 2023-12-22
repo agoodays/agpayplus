@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -86,10 +86,9 @@
         </template>
       </AgTable>
     </a-card>
-
     <!-- 订单详情 页面组件  -->
     <TransferOrderDetail ref="transferOrderDetail" />
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
   import AgSearchForm from '@/components/AgSearch/AgSearchForm'

@@ -340,7 +340,7 @@ ul, ol {
 // 内容区域去掉最外层的magin 24px ,改为 padding 15px
 .ant-pro-basicLayout-content {
   margin: 0 ;
-  padding: 15px;
+  padding: 5px 15px;
 }
 
 // 表格页面的间距
@@ -456,6 +456,15 @@ ul, ol {
   }
 }
 
+.ant-page-header.has-breadcrumb {
+  padding-top: 14px;
+}
+
+.ant-pro-sider-menu-sider.light .ant-pro-sider-menu-logo {
+  -webkit-box-shadow: 0 0 0 0 #fff !important;
+  box-shadow: 0 0 0 0 #fff !important;
+}
+
 .ant-menu {
   padding: 0 15px !important;
   border: none !important;
@@ -485,18 +494,26 @@ ul, ol {
   background-color: @ag-theme !important;
 }
 
-.ant-menu-item-selected > a, .ant-menu-item-selected > a:hover {
+.ant-menu-item-selected > a,
+.ant-menu-item-selected > a:hover {
    color: #ffffff !important;
 }
 
-//.ant-menu-item:hover, .ant-menu-item-active, .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open, .ant-menu-submenu-active, .ant-menu-submenu-title:hover {
+//.ant-menu-item:hover,
+//.ant-menu-item-active,
+//.ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open,
+//.ant-menu-submenu-active, .ant-menu-submenu-title:hover {
 //  color: @ag-theme !important;
 //}
-//
-//.ant-menu-item:active, .ant-menu-submenu-title:active {
+
+//.ant-menu-item:active,
+//.ant-menu-submenu-title:active {
 //  background: #e6f0ff !important;
 //}
 
-body .ant-menu-inline-collapsed > .ant-menu-item, body .ant-menu-inline-collapsed > .ant-menu-item-group > .ant-menu-item-group-list > .ant-menu-item, body .ant-menu-inline-collapsed > .ant-menu-item-group > .ant-menu-item-group-list > .ant-menu-submenu > .ant-menu-submenu-title, body .ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title {
+body .ant-menu-inline-collapsed > .ant-menu-item,
+body .ant-menu-inline-collapsed > .ant-menu-item-group > .ant-menu-item-group-list > .ant-menu-item,
+body .ant-menu-inline-collapsed > .ant-menu-item-group > .ant-menu-item-group-list > .ant-menu-submenu > .ant-menu-submenu-title,
+body .ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title {
   padding: 0 15px !important;
 }

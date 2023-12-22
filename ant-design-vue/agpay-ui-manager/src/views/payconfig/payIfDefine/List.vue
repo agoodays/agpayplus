@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <AgCard
       ref="infoCard"
       :reqCardListFunc="reqCardListFunc"
@@ -32,10 +32,9 @@
         </div>
       </div>
     </AgCard>
-
     <!-- 新增页面组件  -->
     <PayIfDefineAddOrEdit ref="payIfDefineAddOrEdit" :callbackFunc="refCardList"/>
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>

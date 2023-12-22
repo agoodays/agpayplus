@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -95,7 +95,7 @@
         <template slot="roundSlot" slot-scope="{record}"><b style="color: rgb(255, 136, 0)">{{ (record.round*100).toFixed(2) }}%</b></template> <!-- 自定义插槽 -->
       </AgTable>
     </a-card>
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'

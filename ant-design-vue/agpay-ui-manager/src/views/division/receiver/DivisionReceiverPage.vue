@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <div v-if="$access('ENT_DIVISION_RECEIVER_LIST')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
@@ -73,7 +73,7 @@
       <ReceiverEdit ref="receiverEdit" :callbackFunc="searchFunc"/>
       <Detail ref="recordDetail" />
     </a-card>
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
 import AgTable from '@/components/AgTable/AgTable'

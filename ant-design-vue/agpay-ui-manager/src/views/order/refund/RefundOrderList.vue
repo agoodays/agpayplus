@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -340,7 +340,7 @@
         </a-col>
       </a-drawer>
     </template>
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
   import AgSearchForm from '@/components/AgSearch/AgSearchForm'

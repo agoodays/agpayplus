@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -109,7 +109,7 @@
     </a-card>
     <!-- 详细页面组件  -->
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'

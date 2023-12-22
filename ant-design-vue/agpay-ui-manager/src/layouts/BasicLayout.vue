@@ -26,10 +26,13 @@
           增加 Header 左侧内容区自定义
     -->
     <template v-slot:headerContentRender>
-      <div class="ant-pro-global-header-trigger" @click="routeReload()">
-        <a-tooltip title="刷新页面">
-          <a-icon type="reload" style="font-size: 18px;cursor: pointer;" />
-        </a-tooltip>
+      <div class="custom-header">
+        <div class="refresh" @click="routeReload()">
+          <a-tooltip title="刷新页面">
+            <a-icon type="reload" />
+          </a-tooltip>
+        </div>
+        <page-header-wrapper/>
       </div>
     </template>
 
@@ -156,4 +159,16 @@ export default {
 
 <style lang="less">
 @import "./BasicLayout.less";
+
+.custom-header {
+  display: flex;
+  height: 100%;
+  align-items: center
+}
+
+.custom-header .refresh {
+  padding: 0;
+  font-size: 18px;
+  cursor: pointer;
+}
 </style>

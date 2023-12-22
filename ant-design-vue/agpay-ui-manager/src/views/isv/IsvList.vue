@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -59,7 +59,7 @@
     <AgPayOauth2ConfigDrawer ref="payOauth2Config" :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'" :config-mode="'mgrIsv'" />
     <!-- 支付参数配置页面组件  -->
     <IsvPayIfConfigList ref="isvPayIfConfigList" />
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'

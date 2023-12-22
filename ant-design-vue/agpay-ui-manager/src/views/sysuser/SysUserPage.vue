@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         v-if="$access('ENT_UR_USER_SEARCH')"
@@ -94,18 +94,13 @@
         </template>
       </AgTable>
     </a-card>
-
     <!-- 新增 / 修改 页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="queryFunc"/>
-
     <!-- 邀请码窗口  -->
     <InviteCode ref="inviteCode"/>
-
     <!-- 分配角色 页面组件  -->
     <RoleDist ref="roleDist"/>
-
-  </page-header-wrapper>
-
+  </div>
 </template>
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'

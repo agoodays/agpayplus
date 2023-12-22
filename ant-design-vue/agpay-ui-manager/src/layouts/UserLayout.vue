@@ -1,5 +1,4 @@
 <template>
-
   <div id="userLayout" :class="['user-layout-wrapper']">
     <div class="container">
       <div class="user-layout-lang">

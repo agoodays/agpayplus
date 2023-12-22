@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
@@ -37,11 +37,9 @@
         </template>
       </AgTable>
     </a-card>
-
     <!-- 新增页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
-  </page-header-wrapper>
-
+  </div>
 </template>
 <script>
 import AgTable from '@/components/AgTable/AgTable'

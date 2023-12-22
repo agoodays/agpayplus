@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgSearchForm
         :searchData="searchData"
@@ -101,7 +101,7 @@
         </template>
       </AgTable>
     </a-card>
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
