@@ -23,6 +23,7 @@ namespace AGooday.AgPay.Application.Services
         private readonly IAgentInfoRepository _agentInfoRepository;
         private readonly IIsvInfoRepository _isvInfoRepository;
         private readonly IPayWayRepository _payWayRepository;
+        private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
@@ -35,7 +36,8 @@ namespace AGooday.AgPay.Application.Services
             IMchStoreRepository mchStoreRepository,
             IAgentInfoRepository agentInfoRepository,
             IIsvInfoRepository isvInfoRepository,
-            IPayWayRepository payWayRepository)
+            IPayWayRepository payWayRepository, 
+            IPayInterfaceDefineRepository payInterfaceDefineRepository)
         {
             _mapper = mapper;
             Bus = bus;
@@ -46,6 +48,7 @@ namespace AGooday.AgPay.Application.Services
             _agentInfoRepository = agentInfoRepository;
             _isvInfoRepository = isvInfoRepository;
             _payWayRepository = payWayRepository;
+            _payInterfaceDefineRepository = payInterfaceDefineRepository;
         }
 
         public JObject Total(string agentNo, StatisticQueryDto dto)
@@ -106,6 +109,7 @@ namespace AGooday.AgPay.Application.Services
                 "wayType" => WayTypeStatistics(dto),
                 "agent" => AgentStatistics(agentNo, dto),
                 "isv" => IsvStatistics(dto),
+                "channel" => ChannelStatistics(dto),
                 _ => throw new NotImplementedException()
             };
         }
@@ -580,6 +584,71 @@ namespace AGooday.AgPay.Application.Services
                     };
                 });
             var result = new PaginatedList<StatisticResultDto>(records?.ToList(), isvInfos.TotalCount, dto.PageNumber, dto.PageSize);
+            return result;
+        }
+
+        private PaginatedList<StatisticResultDto> ChannelStatistics(StatisticQueryDto dto)
+        {
+            var payIfDefines = _payInterfaceDefineRepository.GetAllAsNoTracking()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
+                && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IfName.Equals(dto.IfName))
+                ).OrderByDescending(o => o.CreatedAt);
+            var payInterfaceDefines = PaginatedList<PayInterfaceDefine>.Create<PayInterfaceDefineDto>(payIfDefines, _mapper, dto.PageNumber, dto.PageSize);
+
+            SelectOrderCount(dto, null, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
+
+            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.IfCode)
+                .Select(s =>
+                {
+                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        IfCode = s.Key,
+                        AllAmount = s.Sum(s => s.Amount),
+                        AllCount = s.Count(),
+                        PayAmount = pay.Sum(s => s.Amount),
+                        PayCount = pay.Count(),
+                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
+                    };
+                });
+
+            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.IfCode)
+                .Select(s =>
+                {
+                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+
+                    return new StatisticResultDto()
+                    {
+                        IfCode = s.Key,
+                        RefundAmount = refund.Sum(s => s.RefundAmount),
+                        RefundCount = refund.Count(),
+                        RefundFee = refund.Sum(s => s.RefundFeeAmount),
+                    };
+                });
+
+            var records = payInterfaceDefines
+                .Select(s =>
+                {
+                    var pay = payRecords?.Where(w => s.IfCode.Equals(w.IfCode))?.FirstOrDefault();
+                    var refund = refundRecords?.Where(w => s.IfCode.Equals(w.IfCode))?.FirstOrDefault();
+
+                    return new StatisticResultDto()
+                    {
+                        IfCode = s.IfCode,
+                        IfName = s.IfName,
+                        AllAmount = pay?.AllAmount ?? 0,
+                        AllCount = pay?.AllCount ?? 0,
+                        PayAmount = pay?.PayAmount ?? 0,
+                        PayCount = pay?.PayCount ?? 0,
+                        Round = Math.Round((pay?.AllCount ?? 0) > 0 ? (decimal)pay?.PayCount / (pay?.AllCount ?? 0) : 0M, 2, MidpointRounding.AwayFromZero),
+                        Fee = pay?.Fee ?? 0,
+                        RefundAmount = refund?.RefundAmount ?? 0,
+                        RefundCount = refund?.RefundCount ?? 0,
+                        RefundFee = refund?.RefundFee ?? 0
+                    };
+                });
+            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), payInterfaceDefines.TotalCount, dto.PageNumber, dto.PageSize);
             return result;
         }
 

@@ -30,7 +30,7 @@
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
-        rowKey="mchNo"
+        rowKey="isvNo"
         :tableRowCrossColor="true"
       >
         <template slot="dataStatisticsSlot">
@@ -127,7 +127,7 @@ const tableColumns = [
 ]
 
 export default {
-  name: 'isvCountPage',
+  name: 'IsvCountPage',
   components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
   data () {
     let queryDateRange = 'today'

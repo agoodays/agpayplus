@@ -42,6 +42,7 @@ export const asyncRouteDefine = {
   'MchCountPage': { defaultPath: '/statistic/mch', component: () => import('@/views/statistic/mch/MchCountPage') }, // 商户统计
   'AgentCountPage': { defaultPath: '/statistic/agent', component: () => import('@/views/statistic/agent/AgentCountPage') }, // 代理商统计
   'IsvCountPage': { defaultPath: '/statistic/isv', component: () => import('@/views/statistic/isv/IsvCountPage') }, // 服务商统计
+  'ChannelCountPage': { defaultPath: '/statistic/channel', component: () => import('@/views/statistic/channel/ChannelCountPage') }, // 通道统计
   'DivisionReceiverGroupPage': { defaultPath: '/divisionReceiverGroup', component: () => import('@/views/division/group/DivisionReceiverGroupPage') }, // 分账账号组管理
   'DivisionReceiverPage': { defaultPath: '/divisionReceiver', component: () => import('@/views/division/receiver/DivisionReceiverPage') }, // 分账账号管理
   'DivisionRecordPage': { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/DivisionRecordPage') }, // 分账记录

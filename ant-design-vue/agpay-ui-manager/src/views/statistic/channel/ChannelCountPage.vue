@@ -13,9 +13,8 @@
           <a-form-item label="" class="table-head-layout">
             <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
-          <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
-          <ag-text-up :placeholder="'代理商名称'" :msg="searchData.agentName" v-model="searchData.agentName" />
-          <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
+          <ag-text-up :placeholder="'通道代码'" :msg="searchData.ifCode" v-model="searchData.ifCode" />
+          <ag-text-up :placeholder="'通道名称'" :msg="searchData.ifName" v-model="searchData.ifName" />
         </template>
       </AgSearchForm>
       <!-- 列表渲染 -->
@@ -31,7 +30,7 @@
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
-        rowKey="agentNo"
+        rowKey="ifCode"
         :tableRowCrossColor="true"
       >
         <template slot="dataStatisticsSlot">
@@ -94,11 +93,6 @@
         <template slot="refundCountSlot" slot-scope="{record}"><b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b></template> <!-- 自定义插槽 -->
         <template slot="countSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b></template> <!-- 自定义插槽 -->
         <template slot="roundSlot" slot-scope="{record}"><b style="color: rgb(255, 136, 0)">{{ (record.round*100).toFixed(2) }}%</b></template> <!-- 自定义插槽 -->
-        <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
-          <AgTableColumns>
-            <a-button type="link" v-if="$access('ENT_STATISTIC_MCH')" @click="detailFunc(record.agentNo)">商户统计</a-button>
-          </AgTableColumns>
-        </template>
       </AgTable>
     </a-card>
   </page-header-wrapper>
@@ -113,8 +107,8 @@ import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'agentName', dataIndex: 'agentName', title: '代理商名称', width: 100, ellipsis: true },
-  { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
+  { key: 'ifName', dataIndex: 'ifName', title: '通道名称', width: 100, ellipsis: true },
+  { key: 'ifCode', dataIndex: 'ifCode', title: '通道代码', width: 140 },
   { key: 'payAmount', title: '成交金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
   { key: 'amount', title: '实收金额', width: 110, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'fee', title: '手续费', width: 110, scopedSlots: { customRender: 'feeSlot' } },
@@ -123,31 +117,21 @@ const tableColumns = [
   { key: 'refundCount', title: '退款笔数', width: 110, scopedSlots: { customRender: 'refundCountSlot' } },
   { key: 'count', title: '成交/总笔数', width: 120, scopedSlots: { customRender: 'countSlot' } },
   { key: 'round', title: '成功率', width: 110, scopedSlots: { customRender: 'roundSlot' } },
-  { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {
-  name: 'AgentCountPage',
+  name: 'ChannelCountPage',
   components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
   data () {
-    let queryDateRange = 'today'
-    if (this.$route.query.hasOwnProperty('queryDateRange')) {
-      queryDateRange = this.$route.query.queryDateRange
-    }
-    let isvNo = ''
-    if (this.$route.query.isvNo) {
-      isvNo = this.$route.query.isvNo
-    }
     return {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
       searchData: {
-        method: 'agent',
-        isvNo: isvNo,
-        queryDateRange: queryDateRange
+        method: 'channel',
+        queryDateRange: 'today'
       },
-      detailQueryDateRange: queryDateRange,
       totalData: {
         allAmount: 0.00,
         allCount: 0,
@@ -179,7 +163,6 @@ export default {
     },
     queryFunc () {
       this.btnLoading = true
-      this.detailQueryDateRange = this.searchData.queryDateRange
       this.totalFunc()
       this.$refs.infoTable.refTable(true)
     },
@@ -191,7 +174,7 @@ export default {
       req.export(API_URL_ORDER_STATISTIC, 'excel', params).then(res => {
         // 将响应体中的二进制数据转换为Blob对象
         const blob = new Blob([res])
-        const fileName = '代理商统计.xlsx' // 要保存的文件名称
+        const fileName = '服务商统计.xlsx' // 要保存的文件名称
         if ('download' in document.createElement('a')) {
           // 非IE下载
           // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
@@ -219,12 +202,6 @@ export default {
       const that = this
       req.total(API_URL_ORDER_STATISTIC, this.searchData).then(res => {
         that.totalData = res
-      })
-    },
-    detailFunc: function (agentNo) {
-      this.$router.push({
-        path: '/statistic/mch',
-        query: { agentNo: agentNo, queryDateRange: this.detailQueryDateRange }
       })
     }
   }

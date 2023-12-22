@@ -38,6 +38,16 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string IsvName { get; set; }
 
         /// <summary>
+        /// 通道代码
+        /// </summary>
+        public string IfCode { get; set; }
+
+        /// <summary>
+        /// 通道名称
+        /// </summary>
+        public string IfName { get; set; }
+
+        /// <summary>
         /// 门店ID
         /// </summary>
         public long? StoreId { get; set; }

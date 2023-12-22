@@ -90,6 +90,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_ORDER_STATISTIC', '数据统计', 'bar
     INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_MCH_WAY_TYPE', '支付类型统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_STATISTIC_MCH', '30', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_AGENT', '代理商统计', 'area-chart', '/statistic/agent', 'AgentCountPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '30', 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_ISV', '服务商统计', 'fund', '/statistic/isv', 'IsvCountPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '40', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_STATISTIC_CHANNEL', '通道统计', 'project', '/statistic/channel', 'ChannelCountPage', 'ML', 0, 1,  'ENT_ORDER_STATISTIC', '50', 'MGR', NOW(), NOW());
         
 #####  ----------  修改表结构  ----------  #####
 
