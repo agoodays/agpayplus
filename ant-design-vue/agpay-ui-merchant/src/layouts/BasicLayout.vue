@@ -26,16 +26,21 @@
           增加 Header 左侧内容区自定义
     -->
     <template v-slot:headerContentRender>
-      <div class="ant-pro-global-header-trigger" @click="routeReload()">
-        <a-tooltip title="刷新页面">
-          <a-icon type="reload" style="font-size: 18px;cursor: pointer;" />
-        </a-tooltip>
+      <div class="custom-header">
+        <div class="refresh" @click="routeReload()">
+          <a-tooltip title="刷新页面">
+            <a-icon type="reload" />
+          </a-tooltip>
+        </div>
+        <page-header-wrapper/>
       </div>
-      <a-button type="link" @click="openQuickCashier">快捷收银</a-button>
     </template>
 
     <template v-slot:rightContentRender>
       <right-content :top-menu="settings.layout === 'topmenu'" :is-mobile="isMobile" :theme="settings.theme" />
+      <div class="ant-pro-global-header-index-right ant-pro-global-header-index-light">
+        <a-button type="link" @click="openQuickCashier">快捷收银</a-button>
+      </div>
     </template>
     <!-- custom footer / 自定义Footer -->
     <template v-slot:footerRender>
@@ -152,4 +157,16 @@ export default {
 
 <style lang="less">
 @import "./BasicLayout.less";
+
+.custom-header {
+  display: flex;
+  height: 100%;
+  align-items: center
+}
+
+.custom-header .refresh {
+  padding: 0;
+  font-size: 18px;
+  cursor: pointer;
+}
 </style>

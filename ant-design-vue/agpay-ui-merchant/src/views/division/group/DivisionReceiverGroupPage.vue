@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <div v-if="$access('ENT_DIVISION_RECEIVER_GROUP_LIST')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
@@ -37,12 +37,9 @@
         </template>
       </AgTable>
     </a-card>
-
     <!-- 新增 / 修改 页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc" />
-
-  </page-header-wrapper>
-
+  </div>
 </template>
 <script>
 import AgTable from '@/components/AgTable/AgTable'

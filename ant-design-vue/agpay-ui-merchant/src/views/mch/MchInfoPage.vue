@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <div class="content">
       <a-card :bordered="false" class="mch-info" style="padding: 30px;">
         <div class="title">
@@ -56,7 +56,7 @@
         </a-form-model>
       </a-card>
     </div>
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>

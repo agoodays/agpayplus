@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
@@ -75,7 +75,7 @@
     <AgPayOauth2ConfigDrawer ref="payOauth2Config" :perm-code="'ENT_MCH_OAUTH2_CONFIG_ADD'" :config-mode="configMode" />
     <!-- 支付参数配置页面组件  -->
     <MchPayIfConfigList ref="mchPayIfConfigList" />
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>
