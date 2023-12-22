@@ -1,37 +1,22 @@
 <template>
   <div>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <a-form-item label="" class="table-head-layout" style="max-width:350px;min-width:300px">
-              <a-range-picker
-                @change="onChange"
-                :show-time="{ format: 'HH:mm:ss' }"
-                format="YYYY-MM-DD HH:mm:ss"
-                :disabled-date="disabledDate"
-                :ranges="{
-                  今天: [moment().startOf('day'), moment()],
-                  昨天: [moment().startOf('day').subtract(1,'days'), moment().endOf('day').subtract(1, 'days')],
-                  最近三天: [moment().startOf('day').subtract(2, 'days'), moment().endOf('day')],
-                  最近一周: [moment().startOf('day').subtract(1, 'weeks'), moment()],
-                  本月: [moment().startOf('month'), moment()],
-                  本年: [moment().startOf('year'), moment()]
-                }"
-              >
-                <a-icon slot="suffixIcon" type="sync" />
-              </a-range-picker>
-            </a-form-item>
-            <ag-text-up :placeholder="'公告ID'" :msg="searchData.articleId" v-model="searchData.articleId"/>
-            <ag-text-up :placeholder="'公告标题'" :msg="searchData.title" v-model="searchData.title"/>
-            <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = { articleType: 1 }">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <a-form-item label="" class="table-head-layout">
+            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
+          </a-form-item>
+          <ag-text-up :placeholder="'公告ID'" :msg="searchData.articleId" v-model="searchData.articleId" />
+          <ag-text-up :placeholder="'公告标题'" :msg="searchData.title" v-model="searchData.title" />
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -40,9 +25,9 @@
         :reqTableDataFunc="reqTableDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
-        rowKey="articleId"
-      >
-        <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
+        rowKey="articleId">
+        <template slot="opSlot" slot-scope="{record}">
+          <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_ARTICLE_NOTICEINFO')" @click="detailFunc(record.articleId)">详情</a-button>
           </AgTableColumns>
@@ -54,7 +39,9 @@
   </div>
 </template>
 <script>
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import { API_URL_ARTICLE_LIST, req } from '@/api/manage'
@@ -73,9 +60,10 @@ const tableColumns = [
 
 export default {
   name: 'NoticePage',
-  components: { AgTable, AgTextUp, AgTableColumns, InfoDetail },
+  components: { AgSearchForm, AgTable, AgDateRangePicker, AgTextUp, AgTableColumns, InfoDetail },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
       searchData: {
@@ -86,6 +74,12 @@ export default {
   mounted () {
   },
   methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)

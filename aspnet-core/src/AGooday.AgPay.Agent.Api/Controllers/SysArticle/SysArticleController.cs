@@ -35,6 +35,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysArticle
         [PermissionAuth(PermCode.AGENT.ENT_ARTICLE_NOTICEINFO)]
         public ApiPageRes<SysArticleDto> List([FromQuery] SysArticleQueryDto dto)
         {
+            dto.BindDateRange();
             dto.ArticleRange = "AGENT";
             var data = _sysArticleService.GetPaginatedData(dto);
             return ApiPageRes<SysArticleDto>.Pages(data);
