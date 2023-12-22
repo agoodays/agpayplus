@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <div v-if="$access('ENT_UR_ROLE_SEARCH')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
@@ -38,12 +38,9 @@
         </template>
       </AgTable>
     </a-card>
-
     <!-- 新增 / 修改 页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc" />
-
-  </page-header-wrapper>
-
+  </div>
 </template>
 <script>
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件

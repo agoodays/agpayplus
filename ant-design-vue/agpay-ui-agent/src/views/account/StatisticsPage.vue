@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <div class="content">
       <a-card :bordered="false" class="agent-info" style="padding: 30px;">
         <div class="title">
@@ -163,7 +163,7 @@
         </div>
       </a-card>
     </div>
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>

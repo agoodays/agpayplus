@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
@@ -63,7 +63,7 @@
     <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_MCH_PAY_CONFIG_ADD'" :config-mode="'agentMch'" />
     <!-- 支付参数配置页面组件  -->
     <MchPayIfConfigList ref="mchPayIfConfigList" />
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>

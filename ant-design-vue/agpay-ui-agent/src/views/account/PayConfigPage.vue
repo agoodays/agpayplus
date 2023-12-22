@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <AgPayConfigPanel
         ref="payConfig"
@@ -7,7 +7,7 @@
         :config-mode="'agentSelf'"
         :info-id="infoId"/>
     </a-card>
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>

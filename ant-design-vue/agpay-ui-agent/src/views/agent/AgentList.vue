@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
@@ -60,7 +60,7 @@
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
     <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'agentSubagent'" />
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>

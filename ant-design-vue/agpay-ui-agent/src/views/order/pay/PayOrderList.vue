@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+  <div>
     <a-card>
       <div class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
@@ -558,7 +558,7 @@
         </a-row>
       </a-drawer>
     </template>
-  </page-header-wrapper>
+  </div>
 </template>
 <script>
 import RefundModal from './RefundModal' // 退款弹出框
