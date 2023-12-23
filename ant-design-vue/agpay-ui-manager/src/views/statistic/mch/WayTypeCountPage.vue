@@ -114,8 +114,8 @@ import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'wayTypeName', dataIndex: 'wayTypeName', title: '支付方式名称', width: 140, ellipsis: true },
-  { key: 'wayType', dataIndex: 'wayType', title: '支付方式代码', width: 140 },
+  { key: 'wayTypeName', dataIndex: 'wayTypeName', title: '支付类型名称', width: 140, ellipsis: true },
+  { key: 'wayType', dataIndex: 'wayType', title: '支付类型代码', width: 140 },
   { key: 'payAmount', title: '成交金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
   { key: 'amount', title: '实收金额', width: 110, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'fee', title: '手续费', width: 110, scopedSlots: { customRender: 'feeSlot' } },
