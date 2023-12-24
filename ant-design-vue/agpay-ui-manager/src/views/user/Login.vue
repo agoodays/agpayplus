@@ -1,9 +1,9 @@
 <template>
   <div class="main">
+    <div class="desc">运营平台登录</div>
     <a-form class="user-layout-login" ref="formLogin" :form="form" @submit="handleSubmit">
       <!-- 错误提示信息 -->
       <a-alert v-if="showLoginErrorInfo" type="error" showIcon style="margin-bottom: 24px;" :message="showLoginErrorInfo" />
-
       <a-form-item>
         <a-input
           @focus="usernameIcon = require('@/assets/svg/select-user.svg')"
@@ -19,7 +19,6 @@
           <img :src="usernameIcon" slot="prefix" class="user" alt="user" >
         </a-input>
       </a-form-item>
-
       <a-form-item>
         <a-input-password
           @focus="passwordIcon = require('@/assets/svg/select-lock.svg')"
@@ -35,30 +34,32 @@
           <img :src="passwordIcon" slot="prefix" class="user" alt="user">
         </a-input-password>
       </a-form-item>
-
-      <div class="code">
-        <a-form-item>
-          <a-input
-            @focus="vercodeIcon = require('@/assets/svg/select-code.svg')"
-            @blur="vercodeIcon = require('@/assets/svg/code.svg')"
-            class="code-input"
-            size="large"
-            type="text"
-            placeholder="请输入人机验证码"
-            v-decorator="[
-              'usercode',
-              {rules: [{ required: true, message: '请输入人机验证码' }], validateTrigger: 'blur'}
-            ]"
-          >
-            <img :src="vercodeIcon" slot="prefix" class="user" alt="user" />
-          </a-input>
-        </a-form-item>
-        <div class="code-img" style="position: relative;background:#ddd">
-          <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()"/>
-          <div class="vercode-mask" v-show="isOverdue" @click="refVercode()">已过期 请刷新</div>
+      <div class="code-body">
+        <div class="code-layout">
+          <div class="code code-layout-item">
+            <a-form-item>
+              <a-input
+                @focus="vercodeIcon = require('@/assets/svg/select-code.svg')"
+                @blur="vercodeIcon = require('@/assets/svg/code.svg')"
+                class="code-input"
+                size="large"
+                type="text"
+                placeholder="图形验证码"
+                v-decorator="[
+                  'usercode',
+                  {rules: [{ required: true, message: '请输入验证码' }], validateTrigger: 'blur'}
+                ]"
+              >
+                <img :src="vercodeIcon" slot="prefix" class="user" alt="user" />
+              </a-input>
+            </a-form-item>
+            <div class="code-img" style="position: relative;background:#ddd">
+              <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()"/>
+              <div class="vercode-mask" v-show="isOverdue" @click="refVercode()">已过期 请刷新</div>
+            </div>
+          </div>
         </div>
       </div>
-
       <a-form-item>
         <!-- 自动登录 -->
         <!-- <a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">自动登录</a-checkbox> -->
@@ -66,7 +67,6 @@
         <!-- 忘记密码 -->
         <a class="forge-password" style="float: right;" href="/forget">忘记密码?</a>
       </a-form-item>
-
       <a-form-item class="submit">
         <a-button
           size="large"
@@ -175,19 +175,16 @@ export default {
   label {
     font-size: 14px;
   }
-
   .forge-password {
     font-size: 14px;
     color: @ag-theme;
   }
-
   button.login-button {
     padding: 0 15px;
     font-size: 16px;
     height: 40px;
     width: 100%;
   }
-
   .user-login-other {
     text-align: left;
     margin-top: 24px;
@@ -214,20 +211,21 @@ export default {
     display: flex;
     justify-content: space-between;
     .code-input {
-      width: 216px;
+      //width: 216px;
     }
     .code-img {
-      width: 137px;
+      width: 120px;
       height: 40px;
+      margin-left: 10px;
       background-color: #ddd;
       img{
-        width: 137px;
+        width: 120px;
         height: 40px;
       }
     }
   }
   .submit {
-    margin-top: 50px;
+    margin-bottom: 0;
   }
 }
 .vercode-mask {

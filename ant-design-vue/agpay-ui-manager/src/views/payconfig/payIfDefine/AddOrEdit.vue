@@ -10,7 +10,7 @@
     <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
         <a-col :span="24">
-          <p class="jee-drawer-title">基本配置</p>
+          <p class="ag-drawer-title">基本配置</p>
         </a-col>
         <a-col :span="12">
           <a-form-model-item label="接口代码" prop="ifCode">
@@ -168,7 +168,7 @@
           <a-divider orientation="left"/>
         </a-col>
         <a-col :span="24">
-          <p class="jee-drawer-title">支付方式</p>
+          <p class="ag-drawer-title">支付方式</p>
         </a-col>
       </a-row>
       <a-row :gutter="16">
@@ -191,7 +191,7 @@
           <a-divider orientation="left"/>
         </a-col>
         <a-col :span="24">
-          <p class="jee-drawer-title">页面展示</p>
+          <p class="ag-drawer-title">页面展示</p>
         </a-col>
       </a-row>
       <a-row :gutter="16">
@@ -427,7 +427,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .jee-drawer-title {
+  .ag-drawer-title {
     font-size: 16px;
     font-weight: 600;
     width: 100%;
