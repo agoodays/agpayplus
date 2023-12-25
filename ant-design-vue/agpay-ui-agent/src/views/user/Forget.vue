@@ -1,41 +1,40 @@
 <template>
   <div class="main">
+    <div class="desc">找回密码</div>
     <a-form-model class="user-layout-login" ref="infoFormModel" :model="saveObject" :rules="rules">
       <!-- 错误提示信息 -->
       <a-alert v-if="showForgetErrorInfo" type="error" showIcon style="margin-bottom: 24px;" :message="showForgetErrorInfo" />
-
       <a-form-model-item prop="phone">
         <a-input size="large" type="text" placeholder="请输入手机号" v-model="saveObject.phone"/>
       </a-form-model-item>
-      <div class="code">
-        <a-form-model-item prop="code">
-          <a-input class="code-input" size="large" type="text" placeholder="请输入验证码" v-model="saveObject.code"/>
-        </a-form-model-item>
-        <div style="position: relative;">
-          <a-button
-            size="large"
-            type="primary"
-            class="login-button"
-            @click="sendCode()"
-            :disabled="this.codeExpireTime > 0"
-          >
-            {{ this.codeExpireTime > 0 ? `${this.codeExpireTime}秒后重新发送` : '发送短信验证码' }}
-          </a-button>
+      <div class="code-body">
+        <div class="code-layout">
+          <div class="code code-layout-item">
+            <a-form-model-item prop="code">
+              <a-input class="code-input" size="large" type="text" placeholder="请输入验证码" v-model="saveObject.code"/>
+            </a-form-model-item>
+            <div style="position: relative;">
+              <a-button
+                type="primary"
+                @click="sendCode()"
+                style="height: 40px; margin-left: 10px;"
+                :disabled="this.codeExpireTime > 0"
+              >
+                {{ this.codeExpireTime > 0 ? `${this.codeExpireTime}秒后重新发送` : '发送短信验证码' }}
+              </a-button>
+            </div>
+          </div>
         </div>
       </div>
-
       <a-form-model-item prop="password">
         <a-input-password size="large" placeholder="请输入新密码" v-model="saveObject.password"/>
       </a-form-model-item>
-
       <a-form-model-item prop="confirmPwd">
         <a-input-password size="large" placeholder="请输入确认新密码" v-model="saveObject.confirmPwd"/>
       </a-form-model-item>
-
       <a-form-model-item>
         <a class="forge-password" style="float: right;" href="/login" >去登录 >></a>
       </a-form-model-item>
-
       <a-form-model-item class="submit">
         <a-button
           size="large"
@@ -204,7 +203,7 @@ export default {
     display: flex;
     justify-content: space-between;
     .code-input {
-      width: 216px;
+      //width: 216px;
     }
     .code-img {
       width: 137px;
@@ -217,7 +216,7 @@ export default {
     }
   }
   .submit {
-    margin-top: 50px;
+    margin-bottom: 0;
   }
 }
 .vercode-mask {

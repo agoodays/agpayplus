@@ -4,6 +4,7 @@ import Vue from 'vue'
 import {
   ConfigProvider,
   Layout,
+  Carousel,
   Input,
   InputNumber,
   Button,
@@ -70,6 +71,7 @@ import * as echarts from 'echarts'
 
 Vue.use(ConfigProvider)
 Vue.use(Layout)
+Vue.use(Carousel)
 Vue.use(Input)
 Vue.use(InputNumber)
 Vue.use(Button)
