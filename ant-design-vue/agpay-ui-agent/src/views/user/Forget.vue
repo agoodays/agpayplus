@@ -160,6 +160,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.user-layout-content .main .desc {
+  margin-bottom: 50px;
+}
 .user-layout-login {
   label {
     font-size: 14px;

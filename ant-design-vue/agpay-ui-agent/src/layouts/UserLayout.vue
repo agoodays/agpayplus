@@ -4,15 +4,21 @@
       <img src="~@/assets/logo.svg" style="height: 30px;">
       <img src="@/assets/svg/agpay.svg" alt="agpay" style="width:90px;margin: 5px 0 0 5px">
     </div>
-    <div class="content-body">
+    <div class="content-body" style="background: url(https://jeepaypublic.oss-cn-beijing.aliyuncs.com/oem/7c9a0ccc-ff3a-47f1-a358-6e5a63333073.jpg) center top / cover no-repeat;">
       <div class="content-main" style="justify-content: space-between;">
         <div class="banner-content">
-          <a-carousel :autoplay="true">
+          <a-carousel :autoplay="true" v-if="$route.meta.layout === 'userLayout'">
             <div>
-              <img src="https://jeepaypublic.oss-cn-beijing.aliyuncs.com/notice/1909c6c5-829c-4a30-bb29-795676083d25.png" style="width: 100%; display: inline-block;">
+              <img src="https://jeepaypublic.oss-cn-beijing.aliyuncs.com/notice/1909c6c5-829c-4a30-bb29-795676083d25.png">
             </div>
             <div>
-              <img src="https://jeepaypublic.oss-cn-beijing.aliyuncs.com/oem/44c40c37-c1ca-4d98-bb54-b9b38f78ff18.png" style="width: 100%; display: inline-block;">
+              <img src="https://jeepaypublic.oss-cn-beijing.aliyuncs.com/oem/44c40c37-c1ca-4d98-bb54-b9b38f78ff18.png">
+            </div>
+            <div>
+              <img src="https://www.jeequan.com/jee/images/index/jeepay.jpg">
+            </div>
+            <div>
+              <img src="https://www.jeequan.com/jee/images/index/beian.jpg" style="width: 100%; height: 100%; object-fit: cover; display: inline-block;">
             </div>
           </a-carousel>
         </div>
@@ -43,7 +49,7 @@
           </div>-->
         </div>
       </div>
-      <div class="content-footer">
+      <div class="content-footer" v-if="$route.meta.layout === 'userLayout'">
         <div class="footer-info">
           <div>
             <span>Copyright &copy; {{ currentYear }} 吉日科技 版权所有</span>
@@ -123,6 +129,41 @@ export default {
   border-radius: 16px;
 }
 
+.banner-content .slick-slide {
+  text-align: center;
+  height: var(--banner-height);
+  line-height: 160px;
+  overflow: hidden
+}
+
+.banner-content .slick-slide div {
+  height: 500px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit:cover;
+    display: inline-block;
+  }
+}
+
+.banner-content .slick-arrow.custom-slick-arrow {
+  width: 30px;
+  height: 30px;
+  font-size: 30px;
+  color: #111;
+  opacity: .3;
+  z-index: 1
+}
+
+.banner-content .custom-slick-arrow:before {
+  display: none
+}
+
+.banner-content .custom-slick-arrow:hover {
+  opacity: .5
+}
+
 .user-layout-content {
   transition: .3s ease
 }
@@ -134,6 +175,7 @@ export default {
 .user-layout-content .main {
   padding: 50px 30px;
   box-sizing: border-box;
+  min-width: 360px;
   width: 100%;
   height: 100%;
   display: flex;
@@ -156,8 +198,19 @@ export default {
   font-size: 20px;
   letter-spacing: .04em;
   color: @ag-theme;
-  margin-bottom: 50px;
   text-align: center;
+}
+
+.user-layout-content .main .tab-box {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px
+}
+
+.tab .operation-class {
+   color: #b0afb3;
 }
 
 .user-layout-content .main .input-item {
