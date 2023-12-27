@@ -53,7 +53,7 @@
         </span>
       </a-form-model-item>
 
-      <a-form-model-item>
+      <a-form-model-item class="submit">
         <a-button
           size="large"
           type="primary"
@@ -196,6 +196,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.user-layout-content .main .desc {
+  margin-bottom: 20px;
+}
+
 .user-layout-login {
   label {
     font-size: 14px;

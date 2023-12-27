@@ -1,10 +1,30 @@
 <template>
   <div class="main">
-    <a-form class="user-layout-login" ref="formLogin" :form="form" @submit="handleSubmit">
+    <div class="tab-box">
+      <div class="desc">商户登录</div>
+      <div class="tab">
+        <a class="operation-class" v-if="loginMethod !== 'password'" @click="loginMethod = 'password'">密码登录</a>
+        <span style="margin: 0px 10px;" v-if="loginMethod=== 'qrcode'">|</span>
+        <a class="operation-class" v-if="loginMethod !== 'message'" @click="loginMethod = 'message'">短信登录</a>
+        <span style="margin: 0px 10px;" v-if="loginMethod !== 'qrcode'">|</span>
+        <a class="operation-class" v-if="loginMethod !== 'qrcode'" @click="loginMethod = 'qrcode'">扫码登录</a>
+      </div>
+    </div>
+    <div v-if="loginMethod === 'qrcode'" class="qr-wrapper">
+      <vue-qr text="JEEPAY_LOGIN_QR_75c86a33f88b472e8bda6b8e783fba1f" :size="200" margin="0"></vue-qr>
+      <div class="qr-tips">二维码过期请刷新
+        <div class="tips-img">
+          <img src="@/assets/svg/refresh.svg">
+        </div>
+      </div>
+      <div class="qr-mantle"></div>
+    </div>
+    <div v-if="loginMethod === 'qrcode'" class="qr-footer">请使用商户通APP扫码登录</div>
+    <a-form v-if="loginMethod !== 'qrcode'"  class="user-layout-login" ref="formLogin" :form="form" @submit="handleSubmit">
       <!-- 错误提示信息 -->
       <a-alert v-if="showLoginErrorInfo" type="error" showIcon style="margin-bottom: 24px;" :message="showLoginErrorInfo" />
 
-      <a-form-item>
+      <a-form-item v-if="loginMethod === 'password'">
         <a-input
           @focus="usernameIcon = require('@/assets/svg/select-user.svg')"
           @blur="usernameIcon = require('@/assets/svg/user.svg')"
@@ -20,7 +40,7 @@
         </a-input>
       </a-form-item>
 
-      <a-form-item>
+      <a-form-item v-if="loginMethod === 'password'">
         <a-input-password
           @focus="passwordIcon = require('@/assets/svg/select-lock.svg')"
           @blur="passwordIcon = require('@/assets/svg/lock.svg')"
@@ -36,26 +56,51 @@
         </a-input-password>
       </a-form-item>
 
-      <div class="code">
-        <a-form-item>
-          <a-input
-            @focus="vercodeIcon = require('@/assets/svg/select-code.svg')"
-            @blur="vercodeIcon = require('@/assets/svg/code.svg')"
-            class="code-input"
-            size="large"
-            type="text"
-            placeholder="请输入人机验证码"
-            v-decorator="[
-              'usercode',
-              {rules: [{ required: true, message: '请输入人机验证码' }], validateTrigger: 'blur'}
-            ]"
-          >
-            <img :src="vercodeIcon" slot="prefix" class="user" alt="user" />
-          </a-input>
-        </a-form-item>
-        <div class="code-img" style="position: relative;background:#ddd">
-          <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()"/>
-          <div class="vercode-mask" v-show="isOverdue" @click="refVercode()">已过期 请刷新</div>
+      <a-form-item v-if="loginMethod === 'message'">
+        <a-input
+          size="large"
+          type="mobile"
+          placeholder="手机号"
+          v-decorator="[
+            'mobile',
+            {rules: [{ required: true, pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号！' }], validateTrigger: 'blur'}
+          ]"/>
+      </a-form-item>
+
+      <div class="code-body">
+        <div class="code-layout">
+          <div class="code code-layout-item">
+            <a-form-item>
+              <a-input
+                @focus="vercodeIcon = require('@/assets/svg/select-code.svg')"
+                @blur="vercodeIcon = require('@/assets/svg/code.svg')"
+                class="code-input"
+                size="large"
+                type="text"
+                :placeholder="loginMethod === 'password'?'图形':''+'验证码'"
+                v-decorator="[
+                  'usercode',
+                  {rules: [{ required: true, message: '请输入人机验证码' }], validateTrigger: 'blur'}
+                ]"
+              >
+                <img v-if="loginMethod === 'password'" :src="vercodeIcon" slot="prefix" class="user" alt="user" />
+              </a-input>
+            </a-form-item>
+            <div v-if="loginMethod === 'password'" class="code-img" style="position: relative;background:#ddd">
+              <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()"/>
+              <div class="vercode-mask" v-show="isOverdue" @click="refVercode()">已过期 请刷新</div>
+            </div>
+            <div v-if="loginMethod === 'message'" style="position: relative;">
+              <a-button
+                type="primary"
+                @click="sendCode()"
+                style="height: 40px; margin-left: 10px;"
+                :disabled="this.codeExpireTime > 0"
+              >
+                {{ this.codeExpireTime > 0 ? `${this.codeExpireTime}秒后重新发送` : '发送短信验证码' }}
+              </a-button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -84,14 +129,18 @@
 
 <script>
 import { mapActions } from 'vuex'
+import vueQr from 'vue-qr'
 import { timeFix } from '@/utils/util'
-import { vercode } from '@/api/login'
+import { sendcode, vercode } from '@/api/login'
 
 export default {
   components: {
+    vueQr
   },
   data () {
     return {
+      loginMethod: 'password',
+      codeExpireTime: 0,
       isOverdue: false, // 设置过期样式
       isAutoLogin: true, // 是否是自动登录
       loginBtnLoadingFlag: false, // 登录按钮是否显示 加载状态
@@ -154,6 +203,26 @@ export default {
         })
       }, 1000)
       this.showLoginErrorInfo = ''
+    },
+    sendCode () { // 发送验证码
+      const { form: { validateFields } } = this
+      const that = this
+      validateFields(['mobile'], { force: true }, (err, values) => {
+        if (!err) {
+          // 获取图形验证码
+          sendcode({ phone: values.mobile, smsType: 'auth' }).then(res => {
+            that.codeExpireTime = 60
+            if (this.timer) clearInterval(this.timer) // 如果多次点击则清除已有的定时器
+            // 超过60秒提示过期刷新
+            this.timer = setInterval(() => {
+              that.codeExpireTime--
+              if (that.codeExpireTime <= 0) {
+                clearInterval(this.timer)
+              }
+            }, 1000)
+          })
+        }
+      })
     },
     refVercode () { // 刷新图片验证码
       const that = this
@@ -222,22 +291,23 @@ export default {
     display: flex;
     justify-content: space-between;
     .code-input {
-      width: 216px;
+      //width: 216px;
     }
     .code-img {
-      width: 137px;
+      width: 120px;
       height: 40px;
       background-color: #ddd;
       img{
-        width: 137px;
+        width: 120px;
         height: 40px;
       }
     }
   }
   .submit {
-    margin-top: 50px;
+    margin-bottom: 0;
   }
 }
+
 .vercode-mask {
   position: absolute;
   left: 0;
@@ -252,5 +322,55 @@ export default {
   &:hover {
     cursor: pointer;
   }
+}
+
+.qr-wrapper {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  border-radius: 5px;
+  overflow: hidden
+}
+
+.qr-wrapper .qr-tips {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 9999999999;
+  font-size: 16px;
+  white-space: nowrap;
+  letter-spacing: 2px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  color: #fff
+}
+
+.qr-wrapper .qr-tips .tips-img {
+  width: 30px;
+  height: 30px;
+  margin: 15px auto
+}
+
+.qr-wrapper .qr-tips .tips-img img {
+  width: 100%;
+  height: 100%
+}
+
+.qr-wrapper .qr-mantle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 999999;
+  width: 100%;
+  height: 100%;
+  background-color: #000000b3
+}
+
+.qr-footer {
+  margin: 15px 0;
+  font-size: 16px;
+  color: @ag-theme;
+  text-align: center
 }
 </style>

@@ -18,9 +18,9 @@ const constantRouterMap = [
     path: '/',
     component: UserLayout,
     children: [
-      { path: 'login', name: 'login', component: () => import('@/views/user/Login') },
-      { path: 'forget', name: 'forget', component: () => import('@/views/user/Forget') },
-      { path: 'register', name: 'register', component: () => import('@/views/user/Register') }
+      { path: 'login', name: 'login', component: () => import('@/views/user/Login'), meta: { layout: 'userLayout' } },
+      { path: 'forget', name: 'forget', component: () => import('@/views/user/Forget'), meta: { layout: 'forgetLayout' } },
+      { path: 'register', name: 'register', component: () => import('@/views/user/Register'), meta: { layout: 'registerLayout' } }
     ]
   }
 ]

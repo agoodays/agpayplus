@@ -1,32 +1,70 @@
 <template>
   <div id="userLayout" :class="['user-layout-wrapper']">
-    <div class="container">
-      <div class="user-layout-lang">
-      </div>
-      <div class="user-layout-content">
-        <div class="top">
-          <div class="header">
-            <a href="/">
-              <img src="~@/assets/logo.svg" class="logo" alt="logo">
-            </a>
-          </div>
-          <div class="desc">
-            <img src="~@/assets/svg/operate.svg" class="logo" alt="logo">
-            <span>商户系统</span>
-          </div>
+    <div class="content-header">
+      <img src="~@/assets/logo.svg" style="height: 30px;">
+      <img src="@/assets/svg/agpay.svg" alt="agpay" style="width:90px;margin: 5px 0 0 5px">
+    </div>
+    <div class="content-body" style="background: url(https://jeepaypublic.oss-cn-beijing.aliyuncs.com/oem/7c9a0ccc-ff3a-47f1-a358-6e5a63333073.jpg) center top / cover no-repeat;">
+      <div class="content-main" style="justify-content: space-between;">
+        <div class="banner-content">
+          <a-carousel :autoplay="true" v-if="$route.meta.layout === 'userLayout'">
+            <div>
+              <img src="https://jeepaypublic.oss-cn-beijing.aliyuncs.com/notice/bfeff7ad-a766-49b3-9017-97a9a2d68645.png">
+            </div>
+            <div>
+              <img src="https://jeepaypublic.oss-cn-beijing.aliyuncs.com/oem/44c40c37-c1ca-4d98-bb54-b9b38f78ff18.png">
+            </div>
+            <div>
+              <img src="https://www.jeequan.com/jee/images/index/jeepay.jpg">
+            </div>
+            <div>
+              <img src="https://www.jeequan.com/jee/images/index/beian.jpg" style="width: 100%; height: 100%; object-fit: cover; display: inline-block;">
+            </div>
+          </a-carousel>
         </div>
+        <div class="user-layout-content">
+          <!--          <div class="top">
+                      <div class="header">
+                        <a href="/">
+                          <img src="~@/assets/logo.svg" class="logo" alt="logo">
+                        </a>
+                      </div>
+                      <div class="desc">
+                        <img src="~@/assets/svg/operate.svg" class="logo" alt="logo">
+                        <span>商户系统</span>
+                      </div>
+                    </div>-->
 
-        <router-view />
+          <router-view />
 
-        <div class="footer">
-<!--          <div class="links">
-            <a href="_self">帮助</a>
-            <a href="_self">隐私</a>
-            <a href="_self">条款</a>
+          <!--          <div class="footer">
+                      <div class="links">
+                        <a href="_self">帮助</a>
+                        <a href="_self">隐私</a>
+                        <a href="_self">条款</a>
+                      </div>
+                      <div class="copyright">
+                        Copyright &copy; 2021 agooday.com
+                      </div>
+                    </div>-->
+        </div>
+      </div>
+      <div class="content-footer" v-if="$route.meta.layout === 'userLayout'">
+        <div class="footer-info">
+          <div>
+            <span>Copyright &copy; {{ currentYear }} 吉日科技 版权所有</span>
           </div>
-          <div class="copyright">
-            Copyright &copy; 2021 agooday.com
-          </div>-->
+          <div class="top-list">
+            <div class="t-list-item">
+              <img src="https://beian.miit.gov.cn/favicon.ico" alt=""> ICP备案：鄂ICP备19941223号-9
+            </div>
+            <div class="t-list-item">
+              <img src="https://www.pcac.org.cn/eportal/fileDir/pcac/resource/cms/favicon.ico" alt=""> 中国支付清算协会备案编码：W2016091300000019
+            </div>
+            <div class="t-list-item">
+              <img src="https://ythzxfw.miit.gov.cn/favicon.ico" alt=""> 电信增值业务许可证编号：鄂A2-20160913
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -38,6 +76,11 @@ export default {
   name: 'UserLayout',
   components: {
   },
+  computed: {
+    currentYear () {
+      return new Date().getFullYear()
+    }
+  },
   mounted () {
     document.body.classList.add('userLayout')
   },
@@ -47,131 +90,211 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
-#userLayout.user-layout-wrapper {
-  height: 100%;
+<style lang="less">
+.content-header {
+  display: flex;
+  align-items: center;
+  position: fixed;
+  z-index: 100;
+  padding: 0 50px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background-color: #ffffffd9;
+  backdrop-filter: blur(50px) saturate(180%)
+}
 
-  &.mobile {
-    .container {
-      .main {
-        max-width: 368px;
-        width: 98%;
-      }
-    }
-  }
+.content-body {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  object-fit: cover;
+  padding: 0 10vw;
+  padding-top: 80px;
+  background: url(~@/assets/svg/background.svg) center top / cover no-repeat;
+  min-height: 100vh
+}
 
-  .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+.content-body .content-main {
+  flex-grow: 1;
+  display: flex;
+  align-items: center
+}
+
+.content-body .content-main .banner-content {
+  width: 50vw
+}
+
+.banner-content .slick-list {
+  border-radius: 16px;
+}
+
+.banner-content .slick-slide {
+  text-align: center;
+  height: var(--banner-height);
+  line-height: 160px;
+  overflow: hidden
+}
+
+.banner-content .slick-slide div {
+  height: 500px;
+
+  img {
     width: 100%;
-    min-height: 100%;
-    background: #f0f2f5 url(~@/assets/images/background.png) no-repeat 50%;
-    background-size: cover;
-    //padding: 50px 0 84px;
-    position: relative;
-
-    .user-layout-lang {
-      width: 100%;
-      // height: 40px;
-      // line-height: 44px;
-      height: 0;
-      text-align: right;
-    }
-
-    .user-layout-content {
-
-      .top {
-        text-align: center;
-
-        .header {
-          height: 44px;
-          line-height: 44px;
-          margin-bottom:80px;
-
-          .badge {
-            position: absolute;
-            display: inline-block;
-            line-height: 1;
-            vertical-align: middle;
-            margin-left: -12px;
-            margin-top: -10px;
-            opacity: 0.8;
-          }
-
-          .logo {
-            height: 44px;
-            vertical-align: top;
-            border-style: none;
-          }
-
-          .title {
-            font-size: 33px;
-            color: rgba(0, 0, 0, .85);
-            font-family: Avenir, 'Helvetica Neue', Arial, Helvetica, sans-serif;
-            font-weight: 600;
-            position: relative;
-            top: 2px;
-          }
-        }
-        .desc {
-          font-size: 14px;
-          color: rgba(0, 0, 0, 0.45);
-          margin-bottom: 40px;
-          font-size: 20px;
-          font-family: PingFang SC, PingFang SC-Medium;
-          font-weight: 500;
-          color: #252626;
-          letter-spacing: 1px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 28px;
-          line-height: 28px;
-
-          span {
-            margin-left: 10px;
-          }
-        }
-      }
-
-      .main {
-        min-width: 260px;
-        width: 368px;
-        margin: 0 auto;
-      }
-
-      .footer {
-        // position: absolute;
-        width: 100%;
-        bottom: 0;
-        padding: 0 16px;
-        margin: 48px 0 24px;
-        text-align: center;
-
-        .links {
-          margin-bottom: 8px;
-          font-size: 14px;
-          a {
-            color: rgba(0, 0, 0, 0.45);
-            transition: all 0.3s;
-            &:not(:last-child) {
-              margin-right: 40px;
-            }
-          }
-        }
-        .copyright {
-          color: rgba(0, 0, 0, 0.45);
-          font-size: 14px;
-        }
-      }
-    }
-
-    a {
-      text-decoration: none;
-    }
-
+    height: 100%;
+    object-fit:cover;
+    display: inline-block;
   }
+}
+
+.banner-content .slick-arrow.custom-slick-arrow {
+  width: 30px;
+  height: 30px;
+  font-size: 30px;
+  color: #111;
+  opacity: .3;
+  z-index: 1
+}
+
+.banner-content .custom-slick-arrow:before {
+  display: none
+}
+
+.banner-content .custom-slick-arrow:hover {
+  opacity: .5
+}
+
+.user-layout-content {
+  transition: .3s ease
+}
+
+.user-layout-content input {
+  height: 40px !important
+}
+
+.user-layout-content .main {
+  padding: 50px 30px;
+  box-sizing: border-box;
+  min-width: 360px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: #fff;
+  box-shadow: 0 30px 60px -35px #0000001a;
+  border: 1px solid #e7eaf3;
+  align-items: center;
+  border-radius: 15px;
+  transition: all .3s,border 0s ease
+}
+
+.user-layout-content .main .ant-form {
+  max-width: 300px
+}
+
+.user-layout-content .main .desc {
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: .04em;
+  color: @ag-theme;
+  text-align: center;
+}
+
+.user-layout-content .main .tab-box {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px
+}
+
+.tab .operation-class {
+  color: #b0afb3;
+}
+
+.user-layout-content .main .input-item {
+  height: 65px;
+  margin: 0!important
+}
+
+.user-layout-content .footer {
+  width: 100%;
+  bottom: 0;
+  padding: 0 16px;
+  margin: 48px 0 24px;
+  text-align: center
+}
+
+.user-layout-content .footer .links {
+  margin-bottom: 8px;
+  font-size: 14px
+}
+
+.user-layout-content .footer .links a {
+  color: #00000073;
+  transition: all .3s
+}
+
+.user-layout-content .footer .links a:not(:last-child) {
+  margin-right: 40px
+}
+
+.user-layout-content .footer .copyright {
+  color: #00000073;
+  font-size: 14px
+}
+
+.code-body {
+  //padding-top: 20px;
+  width: 300px;
+  overflow-x: hidden
+}
+
+.code-layout {
+  display: flex;
+  width: 600px;
+  transition: .3s
+}
+
+.code-layout .code-layout-item {
+  width: 50%
+}
+
+.footer-info {
+  padding-bottom: 25px;
+  color: #b3b3b3;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  text-align: center
+}
+
+.footer-info span {
+  cursor: pointer
+}
+
+.footer-info img {
+  margin-right: 5px;
+  width: 20px;
+  height: 20px
+}
+
+.footer-info .top-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px
+}
+
+.footer-info .top-list .t-list-item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  margin-left: 30px;
+  cursor: pointer
+}
+
+.footer-info a {
+  color: #b3b3b3
 }
 </style>
