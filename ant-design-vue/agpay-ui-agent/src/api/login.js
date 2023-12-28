@@ -2,16 +2,26 @@ import request from '@/http/request'
 import { Base64 } from 'js-base64'
 
 // 登录认证接口
-export function login ({ username, password, vercode, vercodeToken }) {
-  const data = {
-    ia: Base64.encode(username), // 账号
-    ip: Base64.encode(password), // 密码
-    vc: Base64.encode(vercode), // 验证码值
-    vt: Base64.encode(vercodeToken), // 验证码token
-    lt: Base64.encode('WEB') // 登录类型
+export function login ({ loginMethod, username, password, mobile, vercode, vercodeToken }) {
+  let data, url
+  if (loginMethod === 'message') {
+    data = {
+      phone: Base64.encode(mobile), // 手机号
+      code: Base64.encode(vercode) // 验证码值
+    }
+    url = '/api/anon/auth/phoneCode'
+  } else {
+    data = {
+      ia: Base64.encode(username), // 账号
+      ip: Base64.encode(password), // 密码
+      vc: Base64.encode(vercode), // 验证码值
+      vt: Base64.encode(vercodeToken), // 验证码token
+      lt: Base64.encode('WEB') // 登录类型
+    }
+    url = '/api/anon/auth/validate'
   }
   return request.request({
-    url: '/api/anon/auth/validate',
+    url: url,
     method: 'post',
     data: data
   }, true, false, false)

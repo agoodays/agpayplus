@@ -162,8 +162,10 @@ export default {
       that.form.validateFields({ force: true }, (err, values) => {
         if (!err) {
           const loginParams = { ...values }
+          loginParams.loginMethod = that.loginMethod
           loginParams.username = values.username
           loginParams.password = values.password
+          loginParams.mobile = values.mobile
           loginParams.vercode = values.usercode
           loginParams.vercodeToken = that.vercodeToken
           that.loginBtnLoadingFlag = true // 登录按钮显示加载loading

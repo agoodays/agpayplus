@@ -244,7 +244,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 throw new BizException("用户不存在！");
             }
 
-            var code = VerificationCodeUtil.RandomVerificationCode(6);
+            var code = SmsVerificationCodeGenerator.GenerateCode(4);
 
             //redis
             string smsCodeToken = $"{CS.SYS_TYPE.MGR.ToLower()}_{model.smsType}_{model.phone}";

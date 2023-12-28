@@ -326,17 +326,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
                 throw new BizException("当前用户已存在！");
             }
 
-            if (model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) && !_sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.AGENT))
+            if ((model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) || model.smsType.Equals(CS.SMS_TYPE.AUTH))
+                && !_sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.MCH))
             {
                 throw new BizException("用户不存在！");
             }
 
-            if (model.smsType.Equals(CS.SMS_TYPE.AUTH) && !_sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.AGENT))
-            {
-                throw new BizException("用户不存在！");
-            }
-
-            var code = VerificationCodeUtil.RandomVerificationCode(6);
+            var code = SmsVerificationCodeGenerator.GenerateCode(4);
 
             //redis
             string smsCodeToken = $"{CS.SYS_TYPE.AGENT.ToLower()}_{model.smsType}_{model.phone}";
