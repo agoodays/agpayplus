@@ -30,10 +30,10 @@
           @blur="usernameIcon = require('@/assets/svg/user.svg')"
           size="large"
           type="text"
-          placeholder="请输入账户"
+          placeholder="登录名/手机号"
           v-decorator="[
             'username',
-            {rules: [{ required: true, message: '请输入帐户名' }], validateTrigger: 'change'}
+            {rules: [{ required: true, message: '请输入登录名/手机号' }], validateTrigger: 'change'}
           ]"
         >
           <img :src="usernameIcon" slot="prefix" class="user" alt="user" >
@@ -45,7 +45,7 @@
           @focus="passwordIcon = require('@/assets/svg/select-lock.svg')"
           @blur="passwordIcon = require('@/assets/svg/lock.svg')"
           size="large"
-          placeholder="请输入密码"
+          placeholder="密码"
           v-decorator="[
             'password',
             {rules: [{ required: true, message: '请输入密码' }], validateTrigger: 'change'}
@@ -77,10 +77,10 @@
                 class="code-input"
                 size="large"
                 type="text"
-                :placeholder="loginMethod === 'password'?'图形':''+'验证码'"
+                :placeholder="(loginMethod === 'password'?'图形':'')+'验证码'"
                 v-decorator="[
                   'usercode',
-                  {rules: [{ required: true, message: '请输入人机验证码' }], validateTrigger: 'blur'}
+                  {rules: [{ required: true, message: '请输入验证码' }], validateTrigger: 'blur'}
                 ]"
               >
                 <img v-if="loginMethod === 'password'" :src="vercodeIcon" slot="prefix" class="user" alt="user" />
