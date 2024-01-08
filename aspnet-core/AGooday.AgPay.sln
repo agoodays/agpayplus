@@ -49,7 +49,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Notice.UnitTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Notice.Sms", "src\AGooday.AgPay.Notice.Sms\AGooday.AgPay.Notice.Sms.csproj", "{585A540D-84A2-40AD-860E-6E110FA65514}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Infrastructure.UnitTests", "test\AGooday.AgPay.Infrastructure.UnitTests\AGooday.AgPay.Infrastructure.UnitTests.csproj", "{AABE2E15-BD72-485E-BAA3-6D976DD981EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Infrastructure.UnitTests", "test\AGooday.AgPay.Infrastructure.UnitTests\AGooday.AgPay.Infrastructure.UnitTests.csproj", "{AABE2E15-BD72-485E-BAA3-6D976DD981EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Components.SMS", "src\AGooday.AgPay.Components.SMS\AGooday.AgPay.Components.SMS.csproj", "{9E17570A-77BC-4F1F-BE21-FBD8A6D59106}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,6 +127,10 @@ Global
 		{AABE2E15-BD72-485E-BAA3-6D976DD981EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AABE2E15-BD72-485E-BAA3-6D976DD981EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AABE2E15-BD72-485E-BAA3-6D976DD981EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E17570A-77BC-4F1F-BE21-FBD8A6D59106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E17570A-77BC-4F1F-BE21-FBD8A6D59106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E17570A-77BC-4F1F-BE21-FBD8A6D59106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E17570A-77BC-4F1F-BE21-FBD8A6D59106}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,6 +158,7 @@ Global
 		{F83215F9-BF88-4BD7-A673-68E2B6025758} = {FDF5C7A4-32BC-40E7-82AE-C9B862014B86}
 		{585A540D-84A2-40AD-860E-6E110FA65514} = {9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}
 		{AABE2E15-BD72-485E-BAA3-6D976DD981EE} = {FDF5C7A4-32BC-40E7-82AE-C9B862014B86}
+		{9E17570A-77BC-4F1F-BE21-FBD8A6D59106} = {9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACDADF0F-3F17-4DE0-A322-714493E80E85}
