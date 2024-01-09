@@ -20,12 +20,12 @@ namespace AGooday.AgPay.Components.SMS.Services
         {
             this.logger = logger;
             var dbSmsConfig = sysConfigService.GetDBSmsConfig();
-            smsConfig = (AliyundySmsConfig)smsConfig.GetSmsConfig(dbSmsConfig.SmsProviderKey, dbSmsConfig.AliyundySmsConfig);
+            smsConfig = (AliyundySmsConfig)AbstractSmsConfig.GetSmsConfig(dbSmsConfig.SmsProviderKey, dbSmsConfig.AliyundySmsConfig);
             Config config = new()
             {
                 AccessKeyId = smsConfig.AccessKeyId,
                 AccessKeySecret = smsConfig.AccessKeySecret,
-                Endpoint = "dysmsapi.aliyuncs.com",// Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
+                Endpoint = smsConfig.Endpoint
             };
             client = new Client(config);
         }

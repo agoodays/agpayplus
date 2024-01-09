@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.SMS.Extensions;
+using AGooday.AgPay.Components.SMS.Models;
 using AGooday.AgPay.Components.SMS.Services;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Merchant.Api.Attributes;

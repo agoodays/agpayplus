@@ -3,6 +3,10 @@
     public class AliyundySmsConfig : AbstractSmsConfig
     {
         /// <summary>
+        /// Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
+        /// </summary>
+        public string Endpoint { get; set; } = "dysmsapi.aliyuncs.com";
+        /// <summary>
         /// id
         /// </summary>
         public string AccessKeyId { get; set; }

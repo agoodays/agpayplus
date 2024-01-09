@@ -333,7 +333,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             }
 
             if ((model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) || model.smsType.Equals(CS.SMS_TYPE.AUTH))
-                && !_sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.MCH))
+                && !_sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.AGENT))
             {
                 throw new BizException("用户不存在！");
             }

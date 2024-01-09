@@ -5,7 +5,7 @@ namespace AGooday.AgPay.Components.SMS.Models
 {
     public abstract class AbstractSmsConfig
     {
-        public AbstractSmsConfig GetSmsConfig(string smsProviderKey, string configVal)
+        public static AbstractSmsConfig GetSmsConfig(string smsProviderKey, string configVal)
         {
             if (CS.SMS_PROVIDER.ALIYUNDY.Equals(smsProviderKey))
             {
