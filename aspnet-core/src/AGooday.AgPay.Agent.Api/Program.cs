@@ -15,6 +15,7 @@ using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Controllers;
 using AGooday.AgPay.Components.OSS.Extensions;
+using AGooday.AgPay.Components.SMS.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -189,6 +190,10 @@ services.AddHostedService<MQReceiverHostedService>();
 
 #region OSS
 OSSNativeInjectorBootStrapper.RegisterServices(services);
+#endregion
+
+#region SMS
+SMSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
 var app = builder.Build();

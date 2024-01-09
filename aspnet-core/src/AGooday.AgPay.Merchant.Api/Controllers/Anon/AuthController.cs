@@ -4,6 +4,8 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.SMS.Extensions;
+using AGooday.AgPay.Components.SMS.Services;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Extensions;
@@ -35,6 +37,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         private readonly ISysConfigService _sysConfigService;
         private readonly IMchInfoService _mchInfoService;
         private readonly ISysLogService _sysLogService;
+        private readonly ISmsService smsService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         // 将领域通知处理程序注入Controller
@@ -51,7 +54,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             ISysUserRoleRelaService sysUserRoleRelaService,
             ISysConfigService sysConfigService,
             IMchInfoService mchInfoService,
-            ISysLogService sysLogService)
+            ISysLogService sysLogService,
+            ISmsServiceFactory smsServiceFactory)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
@@ -63,6 +67,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             _sysConfigService = sysConfigService;
             _mchInfoService = mchInfoService;
             _sysLogService = sysLogService;
+            this.smsService = smsServiceFactory.GetService();
             _cache = cache;
             _redis = client.GetDatabase();
             _notifications = (DomainNotificationHandler)notifications;
@@ -338,7 +343,14 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             string smsCodeToken = $"{CS.SYS_TYPE.MCH.ToLower()}_{model.smsType}_{model.phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
             _redis.StringSet(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
-
+#if !DEBUG
+            smsService.SendVercode(new SmsBizVercodeModel()
+            {
+                Mobile = model.phone,
+                Vercode = code,
+                SmsType = model.smsType
+            }); 
+#endif
             return ApiRes.Ok();
         }
 

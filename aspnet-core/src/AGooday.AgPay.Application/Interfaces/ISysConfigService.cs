@@ -8,6 +8,7 @@ namespace AGooday.AgPay.Application.Interfaces
         DBApplicationConfig GetDBApplicationConfig();
         DBNoticeConfig GetDBNoticeConfig();
         DBOssConfig GetDBOssConfig();
+        DBSmsConfig GetDBSmsConfig();
         int UpdateByConfigKey(Dictionary<string, string> configs, string groupKey, string sysType, string belongInfoId);
         IEnumerable<SysConfigDto> GetByGroupKey(string groupKey, string sysType, string belongInfoId);
         Dictionary<string, string> GetKeyValueByGroupKey(string groupKey, string sysType, string belongInfoId);

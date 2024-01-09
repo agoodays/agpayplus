@@ -4,6 +4,8 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.SMS.Extensions;
+using AGooday.AgPay.Components.SMS.Services;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Extensions;
@@ -34,6 +36,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly ISysConfigService _sysConfigService;
         private readonly ISysLogService _sysLogService;
+        private readonly ISmsService smsService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         // 将领域通知处理程序注入Controller
@@ -49,7 +52,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService,
             ISysConfigService sysConfigService,
-            ISysLogService sysLogService)
+            ISysLogService sysLogService,
+            ISmsServiceFactory smsServiceFactory)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
@@ -60,6 +64,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             _sysUserRoleRelaService = sysUserRoleRelaService;
             _sysConfigService = sysConfigService;
             _sysLogService = sysLogService;
+            this.smsService = smsServiceFactory.GetService();
             _cache = cache;
             _redis = client.GetDatabase();
             _notifications = (DomainNotificationHandler)notifications;
@@ -250,7 +255,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             string smsCodeToken = $"{CS.SYS_TYPE.MGR.ToLower()}_{model.smsType}_{model.phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
             _redis.StringSet(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
-
+#if !DEBUG
+            smsService.SendVercode(new SmsBizVercodeModel()
+            {
+                Mobile = model.phone,
+                Vercode = code,
+                SmsType = model.smsType
+            }); 
+#endif
             return ApiRes.Ok();
         }
 

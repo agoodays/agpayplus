@@ -5,6 +5,7 @@ using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Extensions;
+using AGooday.AgPay.Components.SMS.Extensions;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Extensions;
 using AGooday.AgPay.Payment.Api.FilterAttributes;
@@ -190,6 +191,10 @@ services.AddHostedService<QuartzHostedService>();
 
 #region OSS
 OSSNativeInjectorBootStrapper.RegisterServices(services);
+#endregion
+
+#region SMS
+SMSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
 services.AddSingleton<ChannelCertConfigKit>(serviceProvider =>

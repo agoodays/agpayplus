@@ -52,6 +52,10 @@ namespace AGooday.AgPay.Application.Services
             { "ossConfig", null }
         };
 
+        private static Dictionary<string, DBSmsConfig> SMS_CONFIG = new Dictionary<string, DBSmsConfig> {
+            { "smsConfig", null }
+        };
+
         public void InitDBConfig(string groupKey)
         {
             // 若当前系统不缓存，则直接返回
@@ -161,6 +165,26 @@ namespace AGooday.AgPay.Application.Services
                 InitDBConfig(OSS_CONFIG.First().Key);
             }
             return OSS_CONFIG.First().Value;
+        }
+
+        /// <summary>
+        /// 获取实际的数据
+        /// </summary>
+        /// <returns></returns>
+        public DBSmsConfig GetDBSmsConfig()
+        {
+            // 查询DB
+            if (!IS_USE_CACHE)
+            {
+                return JsonConvert.DeserializeObject<DBSmsConfig>(SelectByGroupKey(SMS_CONFIG.First().Key));
+            }
+
+            // 缓存数据
+            if (SMS_CONFIG.First().Value == null)
+            {
+                InitDBConfig(SMS_CONFIG.First().Key);
+            }
+            return SMS_CONFIG.First().Value;
         }
 
         public int UpdateByConfigKey(Dictionary<string, string> configs, string groupKey, string sysType, string belongInfoId)

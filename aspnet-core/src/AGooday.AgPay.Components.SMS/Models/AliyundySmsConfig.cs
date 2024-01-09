@@ -23,7 +23,7 @@
         /// </summary>
         public string RegisterMchTemplateId { get; set; }
         /// <summary>
-        /// 商户登灵模板ID
+        /// 商户登录模板ID
         /// </summary>
         public string LoginMchTemplateId { get; set; }
         /// <summary>

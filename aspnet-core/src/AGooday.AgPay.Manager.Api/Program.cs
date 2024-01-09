@@ -7,6 +7,7 @@ using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Controllers;
 using AGooday.AgPay.Components.OSS.Extensions;
+using AGooday.AgPay.Components.SMS.Extensions;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.Extensions.AuthContext;
@@ -192,6 +193,10 @@ services.AddHostedService<MQReceiverHostedService>();
 
 #region OSS
 OSSNativeInjectorBootStrapper.RegisterServices(services);
+#endregion
+
+#region SMS
+SMSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
 //加入 WebSocket 处理服务
