@@ -283,7 +283,6 @@ namespace AGooday.AgPay.Payment.Api.Services
             var isvInfo = _isvInfoService.GetById(isvNo);
             if (isvInfo == null)
             {
-
                 foreach (var appId in mchAppIdList)
                 {
                     //将更新已存在缓存的商户配置信息 （每个商户下存储的为同一个 服务商配置的对象指针）

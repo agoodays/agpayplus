@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params.WxPay;
-using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Application.Params.UmsPay;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
@@ -42,9 +41,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
             reqParams.Add("subOpenId", bizRQ.Openid);//用户ID
 
             // 获取微信官方配置的 appId
-            WxPayIsvParams wxpayIsvParams = (WxPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.WXPAY);
+            UmsPayIsvSubMchParams umspayIsvParams = (UmsPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             // 微信子商户appId
-            reqParams.Add("subAppId", wxpayIsvParams.AppId);
+            reqParams.Add("subAppId", umspayIsvParams.SubMchAppId);
 
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求

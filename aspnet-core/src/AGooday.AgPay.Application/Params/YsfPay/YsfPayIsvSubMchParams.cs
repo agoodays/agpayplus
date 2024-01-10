@@ -9,5 +9,7 @@
         /// 商户编号
         /// </summary>
         public string MerId { get; set; }
+
+        public string SubMchAppId { get; set; }
     }
 }

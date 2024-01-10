@@ -7,6 +7,10 @@
         /// </summary>
         public string MerchantId { get; set; }
 
+        public string SubMchAppId { get; set; }
+
+        public string SubMchLiteAppId { get; set; }
+
         /// <summary>
         /// 是否禁止信用卡（默认为不禁用）
         /// </summary>
