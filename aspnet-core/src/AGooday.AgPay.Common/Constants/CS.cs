@@ -518,6 +518,10 @@
             /// 银联商务支付
             /// </summary>
             public const string UMSPAY = "umspay";   // 银联商务支付
+            /// <summary>
+            /// 利楚扫呗支付
+            /// </summary>
+            public const string LCSWPAY = "lcswpay"; // 利楚扫呗支付
         }
 
         /// <summary>
