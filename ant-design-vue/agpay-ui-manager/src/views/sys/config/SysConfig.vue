@@ -466,7 +466,7 @@ export default {
       return typeof value === 'number'
     },
     setConfigVal (obj, groupKey, key, defaultVal) {
-      const configVal = obj.configData?.find(({ configKey }) => configKey === 'ocrState')?.configVal
+      const configVal = obj.configData?.find(({ configKey }) => configKey === key)?.configVal
       obj[groupKey][key] = configVal?.length > 0 ? (this.isNumber(defaultVal) ? +configVal : configVal) : defaultVal
     },
     setJSONConfigDesen (obj, groupKey, key, isDesen) {

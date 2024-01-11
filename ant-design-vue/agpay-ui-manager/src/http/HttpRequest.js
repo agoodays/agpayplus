@@ -46,12 +46,15 @@ class HttpRequest {
     // 响应拦截
     instance.interceptors.response.use(res => {
       this.destroy(url, showLoading)
-
       if (showLoading) {
         store.commit('hideLoading') // 报错关闭loading组件
       }
 
       const resData = res.data // 接口实际返回数据 格式为：{code: '', msg: '', data: ''}， res.data 是axios封装对象的返回数据；
+
+      if (!resData) {
+        return resData
+      }
 
       if (res.config.responseType) {
         return resData

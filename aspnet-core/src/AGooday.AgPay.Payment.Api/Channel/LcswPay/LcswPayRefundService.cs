@@ -8,7 +8,6 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.Refund;
 using AGooday.AgPay.Payment.Api.Services;
 using Newtonsoft.Json.Linq;
-using System;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
 {

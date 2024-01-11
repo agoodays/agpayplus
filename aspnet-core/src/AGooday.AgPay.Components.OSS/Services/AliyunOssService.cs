@@ -43,9 +43,10 @@ namespace AGooday.AgPay.Components.OSS.Services
             byte[] accessKeySecretBytes = Encoding.UTF8.GetBytes(AliyunOssConfig.Oss.AccessKeySecret);
             using (HMACSHA1 hmacSha1 = new HMACSHA1(accessKeySecretBytes))
             {
-                byte[] signatureBytes = hmacSha1.ComputeHash(policyBytes);
+                byte[] signatureBytes = hmacSha1.ComputeHash(Encoding.UTF8.GetBytes(policy));
                 signature = Convert.ToBase64String(signatureBytes);
             }
+            saveDirAndFileName = saveDirAndFileName.Replace('\\', '/');
             result.FormParams = new FormParams()
             {
                 OssAccessKeyId = AliyunOssConfig.Oss.AccessKeyId,

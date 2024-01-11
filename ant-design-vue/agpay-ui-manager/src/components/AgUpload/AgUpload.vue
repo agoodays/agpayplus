@@ -120,7 +120,7 @@ export default {
 
     const customRequest = ({ file, onSuccess, onError, onProgress }) => {
       loading.value = true
-      upload.getFormParams(upload.avatar, file.name, file.size).then(res => {
+      upload.getFormParams(props.action, file.name, file.size).then(res => {
         const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
         const formParams = isLocalFile ? res.formParams : {
           OSSAccessKeyId: res.formParams.ossAccessKeyId,
@@ -130,7 +130,7 @@ export default {
           success_action_status: res.formParams.successActionStatus
         }
         const data = Object.assign(formParams, { file: file })
-        const formActionUrl = isLocalFile ? upload.avatar : res.formActionUrl
+        const formActionUrl = isLocalFile ? props.action : res.formActionUrl
         upload.singleFile(formActionUrl, data).then((response) => {
           // 上传成功回调
           // onSuccess(response)
