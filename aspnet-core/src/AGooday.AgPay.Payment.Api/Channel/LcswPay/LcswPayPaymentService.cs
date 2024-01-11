@@ -57,19 +57,19 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
             //请求 & 响应成功， 判断业务逻辑
             string returnCode = resJSON.GetValue("return_code").ToString(); //请求响应码
             string returnMsg = resJSON.GetValue("return_msg").ToString(); //响应信息
-            reqParams.TryGetString("merchant_no", out string merchantNo); // 商户号
+            resJSON.TryGetString("merchant_no", out string merchantNo); // 商户号
             channelRetMsg.ChannelMchNo = merchantNo;
             try
             {
                 if ("01".Equals(returnCode))
                 {
-                    reqParams.TryGetString("result_code", out string resultCode); // 业务结果
+                    resJSON.TryGetString("result_code", out string resultCode); // 业务结果
                     if ("01".Equals(resultCode) || "02".Equals(resultCode) || "03".Equals(resultCode))
                     {
-                        reqParams.TryGetString("out_trade_no", out string outTradeNo);// 平台唯一订单号
-                        reqParams.TryGetString("channel_trade_no", out string channelTradeNo);// 微信/支付宝流水号
-                        reqParams.TryGetString("channel_order_no", out string channelOrderNo);// 银行渠道订单号，微信支付时显示在支付成功页面的条码，可用作扫码查询和扫码退款时匹配
-                        reqParams.TryGetString("user_id", out string userId);// 付款方用户id，服务商appid下的“微信openid”、“支付宝账户”
+                        resJSON.TryGetString("out_trade_no", out string outTradeNo);// 平台唯一订单号
+                        resJSON.TryGetString("channel_trade_no", out string channelTradeNo);// 微信/支付宝流水号
+                        resJSON.TryGetString("channel_order_no", out string channelOrderNo);// 银行渠道订单号，微信支付时显示在支付成功页面的条码，可用作扫码查询和扫码退款时匹配
+                        resJSON.TryGetString("user_id", out string userId);// 付款方用户id，服务商appid下的“微信openid”、“支付宝账户”
                         switch (resultCode)
                         {
                             case "01":
@@ -81,6 +81,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
                                 break;
                             case "02":
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                                channelRetMsg.ChannelErrCode = resultCode;
+                                channelRetMsg.ChannelErrMsg = returnMsg;
                                 break;
                             case "03":
                                 channelRetMsg.ChannelState = ChannelState.WAITING;

@@ -49,22 +49,22 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
             //请求 & 响应成功， 判断业务逻辑
             string returnCode = resJSON.GetValue("return_code").ToString(); //请求响应码
             string returnMsg = resJSON.GetValue("return_msg").ToString(); //响应信息
-            reqParams.TryGetString("merchant_no", out string merchantNo); // 商户号
+            resJSON.TryGetString("merchant_no", out string merchantNo); // 商户号
             channelRetMsg.ChannelMchNo = merchantNo;
             try
             {
                 if ("01".Equals(returnCode))
                 {
-                    reqParams.TryGetString("result_code", out string resultCode); // 业务结果
+                    resJSON.TryGetString("result_code", out string resultCode); // 业务结果
                     if ("01".Equals(resultCode))
                     {
-                        reqParams.TryGetString("out_trade_no", out string outTradeNo);// 平台唯一订单号
-                        string appId = reqParams.GetValue("appId").ToString();//微信 AppId
-                        string timeStamp = reqParams.GetValue("timeStamp").ToString();//微信 TimeStamp
-                        string nonceStr = reqParams.GetValue("nonceStr").ToString();//微信 NonceStr
-                        string package = reqParams.GetValue("package_str").ToString();//微信 Package
-                        string signType = reqParams.GetValue("signType").ToString();//微信 SignType
-                        string paySign = reqParams.GetValue("paySign").ToString();//微信 Sign
+                        resJSON.TryGetString("out_trade_no", out string outTradeNo);// 平台唯一订单号
+                        string appId = resJSON.GetValue("appId").ToString();//微信 AppId
+                        string timeStamp = resJSON.GetValue("timeStamp").ToString();//微信 TimeStamp
+                        string nonceStr = resJSON.GetValue("nonceStr").ToString();//微信 NonceStr
+                        string package = resJSON.GetValue("package_str").ToString();//微信 Package
+                        string signType = resJSON.GetValue("signType").ToString();//微信 SignType
+                        string paySign = resJSON.GetValue("paySign").ToString();//微信 Sign
                         JObject payInfo = new JObject
                         {
                             { "appId", appId },

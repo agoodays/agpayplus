@@ -2,6 +2,7 @@
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Channel.AliPay.Kits;
 using AGooday.AgPay.Payment.Api.Channel.HkrtPay;
+using AGooday.AgPay.Payment.Api.Channel.LcswPay;
 using AGooday.AgPay.Payment.Api.Channel.LesPay;
 using AGooday.AgPay.Payment.Api.Channel.PpPay;
 using AGooday.AgPay.Payment.Api.Channel.SxfPay;
@@ -77,6 +78,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddScoped<LesPayPaymentService>();
             services.AddScoped<HkrtPayPaymentService>();
             services.AddScoped<UmsPayPaymentService>();
+            services.AddScoped<LcswPayPaymentService>();
             services.AddScoped(provider =>
             {
                 Func<string, IPaymentService> funcFactory = ifCode =>
@@ -91,6 +93,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
                         CS.IF_CODE.LESPAY => provider.GetService<LesPayPaymentService>(),
                         CS.IF_CODE.HKRTPAY => provider.GetService<HkrtPayPaymentService>(),
                         CS.IF_CODE.UMSPAY => provider.GetService<UmsPayPaymentService>(),
+                        CS.IF_CODE.LCSWPAY => provider.GetService<LcswPayPaymentService>(),
                         _ => null,
                     };
                 };
@@ -105,6 +108,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             PayWayUtil.PayWayServiceRegister<LesPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<HkrtPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<UmsPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<LcswPayPaymentService>(services);
             #endregion
             #region RefundService
             services.AddScoped<AliPayRefundService>();
@@ -115,6 +119,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddScoped<LesPayRefundService>();
             services.AddScoped<HkrtPayRefundService>();
             services.AddScoped<UmsPayRefundService>();
+            services.AddScoped<LcswPayRefundService>();
             services.AddScoped(provider =>
             {
                 Func<string, IRefundService> funcFactory = ifCode =>
@@ -129,6 +134,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
                         CS.IF_CODE.LESPAY => provider.GetService<LesPayRefundService>(),
                         CS.IF_CODE.HKRTPAY => provider.GetService<HkrtPayRefundService>(),
                         CS.IF_CODE.UMSPAY => provider.GetService<UmsPayRefundService>(),
+                        CS.IF_CODE.LCSWPAY => provider.GetService<LcswPayRefundService>(),
                         _ => null,
                     };
                 };
@@ -144,6 +150,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddScoped<LesPayChannelNoticeService>();
             services.AddScoped<HkrtPayChannelNoticeService>();
             services.AddScoped<UmsPayChannelNoticeService>();
+            services.AddScoped<LcswPayChannelNoticeService>();
             services.AddScoped(provider =>
             {
                 Func<string, IChannelNoticeService> funcFactory = ifCode =>
@@ -158,6 +165,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
                         CS.IF_CODE.LESPAY => provider.GetService<LesPayChannelNoticeService>(),
                         CS.IF_CODE.HKRTPAY => provider.GetService<HkrtPayChannelNoticeService>(),
                         CS.IF_CODE.UMSPAY => provider.GetService<UmsPayChannelNoticeService>(),
+                        CS.IF_CODE.LCSWPAY => provider.GetService<LcswPayChannelNoticeService>(),
                         _ => null,
                     };
                 };
@@ -198,6 +206,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddScoped<WxPayPayOrderCloseService>();
             services.AddScoped<YsfPayPayOrderCloseService>();
             services.AddScoped<UmsPayPayOrderCloseService>();
+            services.AddScoped<LcswPayPayOrderCloseService>();
             services.AddScoped(provider =>
             {
                 Func<string, IPayOrderCloseService> funcFactory = ifCode =>
@@ -208,6 +217,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
                         CS.IF_CODE.WXPAY => provider.GetService<WxPayPayOrderCloseService>(),
                         CS.IF_CODE.YSFPAY => provider.GetService<YsfPayPayOrderCloseService>(),
                         CS.IF_CODE.UMSPAY => provider.GetService<UmsPayPayOrderCloseService>(),
+                        CS.IF_CODE.LCSWPAY => provider.GetService<LcswPayPayOrderCloseService>(),
                         _ => null,
                     };
                 };
@@ -223,6 +233,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddScoped<LesPayPayOrderQueryService>();
             services.AddScoped<HkrtPayPayOrderQueryService>();
             services.AddScoped<UmsPayPayOrderQueryService>();
+            services.AddScoped<LcswPayPayOrderQueryService>();
             services.AddScoped(provider =>
             {
                 Func<string, IPayOrderQueryService> funcFactory = ifCode =>
@@ -237,6 +248,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
                         CS.IF_CODE.LESPAY => provider.GetService<LesPayPayOrderQueryService>(),
                         CS.IF_CODE.HKRTPAY => provider.GetService<HkrtPayPayOrderQueryService>(),
                         CS.IF_CODE.UMSPAY => provider.GetService<UmsPayPayOrderQueryService>(),
+                        CS.IF_CODE.LCSWPAY => provider.GetService<LcswPayPayOrderQueryService>(),
                         _ => null,
                     };
                 };

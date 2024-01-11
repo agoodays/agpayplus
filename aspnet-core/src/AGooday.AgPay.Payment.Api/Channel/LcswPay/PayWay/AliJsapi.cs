@@ -45,17 +45,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
             //请求 & 响应成功， 判断业务逻辑
             string returnCode = resJSON.GetValue("return_code").ToString(); //请求响应码
             string returnMsg = resJSON.GetValue("return_msg").ToString(); //响应信息
-            reqParams.TryGetString("merchant_no", out string merchantNo); // 商户号
+            resJSON.TryGetString("merchant_no", out string merchantNo); // 商户号
             channelRetMsg.ChannelMchNo = merchantNo;
             try
             {
                 if ("01".Equals(returnCode))
                 {
-                    reqParams.TryGetString("result_code", out string resultCode); // 业务结果
+                    resJSON.TryGetString("result_code", out string resultCode); // 业务结果
                     if ("01".Equals(resultCode))
                     {
-                        reqParams.TryGetString("out_trade_no", out string outTradeNo);// 平台唯一订单号
-                        string aliTradeNo = reqParams.GetValue("ali_trade_no").ToString();// 支付宝JSAPI支付返回字段用于调起支付宝JSAPI
+                        resJSON.TryGetString("out_trade_no", out string outTradeNo);// 平台唯一订单号
+                        string aliTradeNo = resJSON.GetValue("ali_trade_no").ToString();// 支付宝JSAPI支付返回字段用于调起支付宝JSAPI
                         res.AlipayTradeNo = aliTradeNo;
                         channelRetMsg.ChannelOrderId = outTradeNo;
                         channelRetMsg.ChannelState = ChannelState.WAITING;
