@@ -132,16 +132,16 @@ export default {
         const data = Object.assign(formParams, { file: file })
         const formActionUrl = isLocalFile ? props.action : res.formActionUrl
         upload.singleFile(formActionUrl, data).then((response) => {
-          // 上传成功回调
-          // onSuccess(response)
           loading.value = false
           const ossFileUrl = isLocalFile ? response : res.ossFileUrl
           fileList.value = getDefaultFileList([ossFileUrl])
+          // 上传成功回调
+          onSuccess({ code: 0, msg: 'SUCCESS', data: ossFileUrl })
         }).catch((error) => {
-          // 上传失败回调
-          // onError(error)
           loading.value = false
-          this.$message.error(error.msg)
+          // this.$message.error(error.msg)
+          // 上传失败回调
+          onError(error)
         })
       }).catch(() => {
         loading.value = false
