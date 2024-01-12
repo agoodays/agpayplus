@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
                     else
                     {
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
-                        channelRetMsg.ChannelErrCode = returnCode;
+                        channelRetMsg.ChannelErrCode = resultCode;
                         channelRetMsg.ChannelErrMsg = returnMsg;
                     }
                 }
