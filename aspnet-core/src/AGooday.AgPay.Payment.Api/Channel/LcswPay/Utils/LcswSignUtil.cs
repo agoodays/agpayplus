@@ -15,9 +15,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.Utils
 
         public static bool Verify(JObject resParams, string key)
         {
-            string sign = resParams.GetValue("key_sign").ToString();
-            var flag = sign.Equals(Sign(resParams, key));
-            return flag;
+            resParams.TryGetString("key_sign", out string sign).ToString();
+            var flag = sign?.Equals(Sign(resParams, key));
+            return flag ?? true;
         }
 
         /// <summary>

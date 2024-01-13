@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
             reqParams.Add("pay_ver", "201");
             reqParams.Add("pay_type", payType);
             reqParams.Add("service_id", "011");
-            reqParams.Add("notifyUrl", GetNotifyUrl()); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
+            reqParams.Add("notify_url", GetNotifyUrl()); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
             LcswPublicParams(reqParams, payOrder);
 
             // 发送请求
@@ -81,8 +81,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
                 }
                 else
                 {
-                    channelRetMsg.ChannelState = ChannelState.WAITING;
-                    channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    channelRetMsg.ChannelErrCode = returnCode;
+                    channelRetMsg.ChannelErrMsg = returnMsg;
                 }
             }
             catch (Exception e)

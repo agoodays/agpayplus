@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
             reqParams.Add("pay_ver", "201");
             reqParams.Add("pay_type", "000");
             reqParams.Add("service_id", "016");
-            reqParams.Add("notifyUrl", GetNotifyUrl()); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
+            reqParams.Add("notify_url", GetNotifyUrl()); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
             LcswPublicParams(reqParams, payOrder);
 
             // 发送请求
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
                     resJSON.TryGetString("result_code", out string resultCode); // 业务结果
                     if ("01".Equals(resultCode))
                     {
-                        string outTradeNo = resJSON.GetValue("out_trade_no").ToString();//平台唯一订单号
+                        resJSON.TryGetString("out_trade_no", out string outTradeNo).ToString();//平台唯一订单号
                         string qrUrl = resJSON.GetValue("qr_url").ToString();
                         //二维码地址
                         if (CS.PAY_DATA_TYPE.CODE_IMG_URL.Equals(bizRQ.PayDataType))
@@ -80,8 +80,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
                 }
                 else
                 {
-                    channelRetMsg.ChannelState = ChannelState.WAITING;
-                    channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    channelRetMsg.ChannelErrCode = returnCode;
+                    channelRetMsg.ChannelErrMsg = returnMsg;
                 }
             }
             catch (Exception e)

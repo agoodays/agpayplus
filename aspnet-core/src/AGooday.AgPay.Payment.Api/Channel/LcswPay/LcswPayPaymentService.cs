@@ -179,6 +179,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
             reqParams.Add("service_id", "012");
             reqParams.Add("payType", payType);
             reqParams.Add("notify_url", notifyUrl);
+            reqParams.Add("terminal_ip", payOrder.ClientIp); //商户发起交易的IP地址
             LcswPublicParams(reqParams, payOrder);
         }
 
@@ -196,6 +197,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
             reqParams.Add("service_id", "015");
             reqParams.Add("payType", payType);
             reqParams.Add("notify_url", notifyUrl);
+            reqParams.Add("terminal_ip", payOrder.ClientIp); //商户发起交易的IP地址
             LcswPublicParams(reqParams, payOrder);
         }
 
@@ -210,6 +212,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
             reqParams.Add("pay_ver", "202");
             reqParams.Add("pay_type", payType);
             reqParams.Add("service_id", "010");
+            reqParams.Add("terminal_ip", payOrder.ClientIp); //商户发起交易的IP地址
             LcswPublicParams(reqParams, payOrder);
         }
 
@@ -224,7 +227,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
             reqParams.Add("terminal_time", payOrder.CreatedAt.Value.ToString("yyyyMMddHHmmss"));
             reqParams.Add("total_fee", payOrder.Amount.ToString()); //订单总金额 金额不能为零或负数
             reqParams.Add("order_body", payOrder.Body); //商品描述,不能包含回车换行等特殊字符
-            reqParams.Add("terminal_ip", payOrder.ClientIp); //商户发起交易的IP地址
+            //reqParams.Add("terminal_ip", payOrder.ClientIp); //商户发起交易的IP地址
         }
     }
 }
