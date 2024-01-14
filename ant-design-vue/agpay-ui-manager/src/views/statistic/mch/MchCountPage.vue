@@ -123,7 +123,7 @@ import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 100, ellipsis: true },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 200, fixed: 'left', ellipsis: true },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
   { key: 'payAmount', title: '成交金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
   { key: 'amount', title: '实收金额', width: 110, scopedSlots: { customRender: 'amountSlot' } },

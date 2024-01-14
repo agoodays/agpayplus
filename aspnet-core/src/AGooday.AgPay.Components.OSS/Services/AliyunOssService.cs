@@ -66,6 +66,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             {
                 if (multipartFile.Length > 0)
                 {
+                    saveDirAndFileName = saveDirAndFileName.Replace('\\', '/');
                     ossClient.PutObject(ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? AliyunOssConfig.Oss.PublicBucketName : AliyunOssConfig.Oss.PrivateBucketName
                         , saveDirAndFileName, multipartFile.OpenReadStream());
 

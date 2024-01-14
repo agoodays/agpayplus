@@ -61,7 +61,7 @@ const tableColumns = [
   { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '组ID', width: 100 },
   { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: 140 },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
-  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140 },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140, ellipsis: true },
   { key: 'autoDivisionFlag', dataIndex: 'autoDivisionFlag', title: '自动分账组', width: 120, customRender: (text, record, index) => text === 1 ? '是' : '否' },
   { key: 'createdBy', dataIndex: 'createdBy', title: '创建人', width: 120 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },

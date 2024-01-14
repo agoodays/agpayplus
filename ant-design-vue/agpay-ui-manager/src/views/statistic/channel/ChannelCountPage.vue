@@ -107,8 +107,8 @@ import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'ifName', dataIndex: 'ifName', title: '通道名称', width: 100, ellipsis: true },
-  { key: 'ifCode', dataIndex: 'ifCode', title: '通道代码', width: 140 },
+  { key: 'ifName', dataIndex: 'ifName', title: '通道名称', width: 140, ellipsis: true },
+  { key: 'ifCode', dataIndex: 'ifCode', title: '通道代码', width: 100 },
   { key: 'payAmount', title: '成交金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
   { key: 'amount', title: '实收金额', width: 110, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'fee', title: '手续费', width: 110, scopedSlots: { customRender: 'feeSlot' } },
@@ -116,8 +116,7 @@ const tableColumns = [
   { key: 'refundFee', title: '手续费回退', width: 110, scopedSlots: { customRender: 'refundFeeSlot' } },
   { key: 'refundCount', title: '退款笔数', width: 110, scopedSlots: { customRender: 'refundCountSlot' } },
   { key: 'count', title: '成交/总笔数', width: 120, scopedSlots: { customRender: 'countSlot' } },
-  { key: 'round', title: '成功率', width: 110, scopedSlots: { customRender: 'roundSlot' } },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'round', title: '成功率', width: 110, scopedSlots: { customRender: 'roundSlot' } }
 ]
 
 export default {

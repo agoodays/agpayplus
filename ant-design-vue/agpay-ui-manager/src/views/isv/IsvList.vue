@@ -36,7 +36,7 @@
             <a-button icon="plus" v-if="$access('ENT_ISV_INFO_ADD')" type="primary" @click="addFunc" class="mg-b-30">新建</a-button>
           </div>
         </template>
-        <template slot="isvNameSlot" slot-scope="{record}"><b>{{ record.isvName }}</b></template> <!-- 自定义插槽 -->
+        <template slot="isvNameSlot" slot-scope="{record}"><b :title="record.isvName">{{ record.isvName }}</b></template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />
         </template>
@@ -74,7 +74,7 @@ import IsvPayIfConfigList from './IsvPayIfConfigList'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'isvName', title: '服务商名称', width: 200, fixed: 'left', scopedSlots: { customRender: 'isvNameSlot' } },
+  { key: 'isvName', title: '服务商名称', width: 160, fixed: 'left', ellipsis: true, scopedSlots: { customRender: 'isvNameSlot' } },
   { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
   { key: 'state', title: '服务商状态', width: 140, scopedSlots: { customRender: 'stateSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },

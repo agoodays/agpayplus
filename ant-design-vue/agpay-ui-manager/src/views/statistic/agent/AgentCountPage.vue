@@ -113,7 +113,7 @@ import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'agentName', dataIndex: 'agentName', title: '代理商名称', width: 100, ellipsis: true },
+  { key: 'agentName', dataIndex: 'agentName', title: '代理商名称', width: 160, fixed: 'left', ellipsis: true },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
   { key: 'payAmount', title: '成交金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
   { key: 'amount', title: '实收金额', width: 110, scopedSlots: { customRender: 'amountSlot' } },

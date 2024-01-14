@@ -113,7 +113,7 @@ import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'isvName', dataIndex: 'isvName', title: '服务商名称', width: 100, ellipsis: true },
+  { key: 'isvName', dataIndex: 'isvName', title: '服务商名称', width: 160, fixed: 'left', ellipsis: true },
   { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
   { key: 'payAmount', title: '成交金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
   { key: 'amount', title: '实收金额', width: 110, scopedSlots: { customRender: 'amountSlot' } },
@@ -123,7 +123,7 @@ const tableColumns = [
   { key: 'refundCount', title: '退款笔数', width: 110, scopedSlots: { customRender: 'refundCountSlot' } },
   { key: 'count', title: '成交/总笔数', width: 120, scopedSlots: { customRender: 'countSlot' } },
   { key: 'round', title: '成功率', width: 110, scopedSlots: { customRender: 'roundSlot' } },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 180, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {

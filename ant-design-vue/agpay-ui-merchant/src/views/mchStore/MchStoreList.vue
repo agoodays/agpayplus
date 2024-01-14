@@ -30,8 +30,8 @@
           </div>
         </template>
         <template slot="storeNameSlot" slot-scope="{record}">
-          <b v-if="!$access('ENT_MCH_STORE_VIEW')">{{ record.storeName }}</b>
-          <a v-if="$access('ENT_MCH_STORE_VIEW')" @click="detailFunc(record.storeId)"><b>{{ record.storeName }}</b></a>
+          <b :title="record.storeName" v-if="!$access('ENT_MCH_STORE_VIEW')">{{ record.storeName }}</b>
+          <a :title="record.storeName" v-if="$access('ENT_MCH_STORE_VIEW')" @click="detailFunc(record.storeId)"><b>{{ record.storeName }}</b></a>
         </template> <!-- 自定义插槽 -->
         <template slot="defaultFlagSlot" slot-scope="{record}">
           <a-badge :status="record.defaultFlag === 0?'error':'processing'" :text="record.defaultFlag === 0?'否':'是'" />
@@ -64,7 +64,7 @@ import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'storeName', title: '门店名称', width: 200, fixed: 'left', scopedSlots: { customRender: 'storeNameSlot' } },
+  { key: 'storeName', title: '门店名称', width: 200, fixed: 'left', ellipsis: true, scopedSlots: { customRender: 'storeNameSlot' } },
   { key: 'storeId', dataIndex: 'storeId', title: '门店编号', width: 140 },
   { key: 'defaultFlag', title: '默认', width: 80, scopedSlots: { customRender: 'defaultFlagSlot' } },
   { key: 'bindAppId', dataIndex: 'bindAppId', title: 'AppId', width: 320 },

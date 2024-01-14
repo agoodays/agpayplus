@@ -89,7 +89,7 @@ const tableColumns = [
   { key: 'receiverId', title: '接收方绑定ID', width: 125, scopedSlots: { customRender: 'receiverIdSlot' } },
   { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名', width: 140 },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
-  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140 },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140, ellipsis: true },
   { key: 'appId', dataIndex: 'appId', title: '应用ID', width: 225 },
   { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '组ID', width: 100 },
   { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '组名称', width: 140 },

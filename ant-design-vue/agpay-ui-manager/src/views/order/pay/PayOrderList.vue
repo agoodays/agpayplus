@@ -620,7 +620,7 @@ const tableColumns = [
   { key: 'refundAmount', title: '退款金额', width: 108, scopedSlots: { customRender: 'refundAmountSlot' } },
   { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '实际手续费', width: 110, customRender: (text) => '￥' + (text / 100).toFixed(2) },
   { key: 'mchOrderFeeAmount', dataIndex: 'mchOrderFeeAmount', title: '收单手续费', width: 110, customRender: (text) => '￥' + (text / 100).toFixed(2) },
-  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 100, ellipsis: true },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140, ellipsis: true },
   { key: 'ifCode', title: '支付接口', width: 180, ellipsis: true, scopedSlots: { customRender: 'ifCodeSlot' } },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式', width: 120 },
   { key: 'state', title: '支付状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },

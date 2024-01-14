@@ -39,8 +39,8 @@
           </div>
         </template>
         <template slot="agentNameSlot" slot-scope="{record}">
-          <b v-if="!$access('ENT_AGENT_INFO_VIEW')">{{ record.agentName }}</b>
-          <a v-if="$access('ENT_AGENT_INFO_VIEW')" @click="detailFunc(record.agentNo)"><b>{{ record.agentName }}</b></a>
+          <b :title="record.agentName" v-if="!$access('ENT_AGENT_INFO_VIEW')">{{ record.agentName }}</b>
+          <a :title="record.agentName" v-if="$access('ENT_AGENT_INFO_VIEW')" @click="detailFunc(record.agentNo)"><b>{{ record.agentName }}</b></a>
         </template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />
@@ -74,7 +74,7 @@ import InfoDetail from './Detail'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'agentName', title: '代理商名称', width: 200, fixed: 'left', scopedSlots: { customRender: 'agentNameSlot' } },
+  { key: 'agentName', title: '代理商名称', width: 160, fixed: 'left', ellipsis: true, scopedSlots: { customRender: 'agentNameSlot' } },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
   { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
   { key: 'mchCount', dataIndex: 'mchCount', title: '商户数量', width: 110 },

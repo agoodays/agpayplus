@@ -45,8 +45,8 @@
           </div>
         </template>
         <template slot="mchNameSlot" slot-scope="{record}">
-          <b v-if="!$access('ENT_MCH_INFO_VIEW')">{{ record.mchName }}</b>
-          <a v-if="$access('ENT_MCH_INFO_VIEW')" @click="detailFunc(record.mchNo)"><b>{{ record.mchName }}</b></a>
+          <b :title="record.mchName" v-if="!$access('ENT_MCH_INFO_VIEW')">{{ record.mchName }}</b>
+          <a :title="record.mchName" v-if="$access('ENT_MCH_INFO_VIEW')" @click="detailFunc(record.mchNo)"><b>{{ record.mchName }}</b></a>
         </template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
           <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />
@@ -87,7 +87,7 @@ import MchConfig from './MchConfig'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
-  { key: 'mchName', title: '商户名称', width: 200, fixed: 'left', scopedSlots: { customRender: 'mchNameSlot' } },
+  { key: 'mchName', title: '商户名称', width: 200, fixed: 'left', ellipsis: true, scopedSlots: { customRender: 'mchNameSlot' } },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
   { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
