@@ -111,7 +111,7 @@
                       </a-col>
                       <a-col :span="10" :offset="1">
                         <a-form-model-item label="密码" prop="accountPwd">
-                          <a-input :placeholder="smsConfig.agpaydxSmsConfigDesen.accountPwd?smsConfig.agpaydxSmsConfigDesen.accountPwd:'请填写密码'" v-model="smsConfig.agpaydxSmsConfig.accountPwd" />
+                          <a-input :placeholder="smsConfig.agpaydxSmsConfigDesen.accountPwd?smsConfig.agpaydxSmsConfigDesen.accountPwd:'请填写密码'" v-model="smsConfig.agpaydxSmsConfigDesen.accountPwd" />
                         </a-form-model-item>
                       </a-col>
                     </a-row>
@@ -122,7 +122,7 @@
                         </a-form-model-item>
                       </a-col>
                       <a-col :span="10" :offset="1" style="padding-left: 10px;padding-right: 10px;">
-                        <a-form-model-item label="短信余额（条）" prop="accountPwd">
+                        <a-form-model-item label="短信余额（条）" prop="smsCount">
                           <div class="ant-form-item-control-input">
                             <div class="ant-form-item-control-input-content">
                               <span><span style="color: blue;"><b>8888</b></span> 条 </span>

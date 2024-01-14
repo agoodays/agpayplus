@@ -302,7 +302,7 @@ export default {
         isOpenCheckBill: 0,
         isSupportCashout: 0,
         isOpenCashout: 0,
-        bgColor: '#ff0000'
+        bgColor: '#1a53ff'
       }
 
       if (this.$refs.infoFormModel !== undefined) {

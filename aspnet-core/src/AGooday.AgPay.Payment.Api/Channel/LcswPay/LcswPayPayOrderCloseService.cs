@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
                 //请求 & 响应成功， 判断业务逻辑
                 string returnCode = resJSON.GetValue("return_code").ToString(); //请求响应码
                 string returnMsg = resJSON.GetValue("return_msg").ToString(); //响应信息
-                reqParams.TryGetString("result_code", out string resultCode); // 业务结果
+                resJSON.TryGetString("result_code", out string resultCode); // 业务结果
                 if (("01").Equals(returnCode) && ("01").Equals(resultCode))
                 {
                     return ChannelRetMsg.ConfirmSuccess(null);  //关单成功

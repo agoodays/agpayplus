@@ -72,8 +72,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
                 var okResponse = JsonResp(resJSON);
                 result.ResponseEntity = okResponse;
 
-                string returnCode = resJSON.GetValue("return_code").ToString(); //请求响应码
-                string returnMsg = resJSON.GetValue("return_msg").ToString(); //响应信息
+                string returnCode = jsonParams.GetValue("return_code").ToString(); //请求响应码
+                string returnMsg = jsonParams.GetValue("return_msg").ToString(); //响应信息
                 jsonParams.TryGetString("merchant_no", out string merchantNo); // 商户号
                 if ("01".Equals(returnCode))
                 {

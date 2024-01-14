@@ -223,7 +223,9 @@ namespace AGooday.AgPay.Application.Services
                 sysConfig.ConfigKey = config.Key;
                 sysConfig.ConfigVal = config.Key switch
                 {
-                    "aliyunOssConfig" => StringUtil.Merge(sysConfig.ConfigVal, config.Value),
+                    "aliyunOssConfig" or
+                    "agpaydxSmsConfig" or "aliyundySmsConfig" or
+                    "tencentOcrConfig" or "aliOcrConfig" => StringUtil.Merge(sysConfig.ConfigVal, config.Value),
                     _ => config.Value,
                 };
                 sysConfig.UpdatedAt = DateTime.Now;
