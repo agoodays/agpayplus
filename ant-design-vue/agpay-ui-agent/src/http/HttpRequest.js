@@ -53,6 +53,10 @@ class HttpRequest {
 
       const resData = res.data // 接口实际返回数据 格式为：{code: '', msg: '', data: ''}， res.data 是axios封装对象的返回数据；
 
+      if (!resData) {
+        return resData
+      }
+
       if (res.config.responseType) {
         return resData
       }

@@ -46,6 +46,7 @@
                     :action="action"
                     :accept="accept"
                     :showUploadList="false"
+                    :custom-request="customRequest"
                     :before-upload="beforeUpload"
                     @change="handleChange"
                     @preview="imgPreview($event)"
@@ -269,6 +270,35 @@ export default {
     selectChildTabs (key) {
       this.childKey = key
       this.$route.params.childKey = key
+    },
+    customRequest ({ file, onSuccess, onError, onProgress }) {
+      this.loading = true
+      upload.getFormParams(upload.avatar, file.name, file.size).then(res => {
+        const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
+        const formParams = isLocalFile ? res.formParams : {
+          OSSAccessKeyId: res.formParams.ossAccessKeyId,
+          key: res.formParams.key,
+          Signature: res.formParams.signature,
+          policy: res.formParams.policy,
+          success_action_status: res.formParams.successActionStatus
+        }
+        const data = Object.assign(formParams, { file: file })
+        const formActionUrl = isLocalFile ? upload.avatar : res.formActionUrl
+        upload.singleFile(formActionUrl, data).then((response) => {
+          // 上传成功回调
+          // onSuccess(response)
+          this.loading = false
+          const ossFileUrl = isLocalFile ? response : res.ossFileUrl
+          this.uploadSuccess(ossFileUrl)
+        }).catch((error) => {
+          // 上传失败回调
+          // onError(error)
+          this.loading = false
+          this.$message.error(error.msg)
+        })
+      }).catch(() => {
+        this.loading = false
+      })
     },
     // 上传回调
     handleChange (info) {

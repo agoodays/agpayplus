@@ -10,6 +10,7 @@
       :before-upload="beforeUpload"
       :file-list="fileList"
       :list-type="listType"
+      :custom-request="customRequest"
       @change="handleChange"
       @preview="handlePreview"
     >
@@ -20,6 +21,7 @@
 
 <script>
 import { ref, watch } from 'vue'
+import { upload } from '@/api/manage'
 import appConfig from '@/config/appConfig'
 import storage from '@/utils/agpayStorageWrapper'
 import 'viewerjs/dist/viewer.css'
@@ -116,11 +118,42 @@ export default {
       }
     }
 
+    const customRequest = ({ file, onSuccess, onError, onProgress }) => {
+      loading.value = true
+      upload.getFormParams(props.action, file.name, file.size).then(res => {
+        const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
+        const formParams = isLocalFile ? res.formParams : {
+          OSSAccessKeyId: res.formParams.ossAccessKeyId,
+          key: res.formParams.key,
+          Signature: res.formParams.signature,
+          policy: res.formParams.policy,
+          success_action_status: res.formParams.successActionStatus
+        }
+        const data = Object.assign(formParams, { file: file })
+        const formActionUrl = isLocalFile ? props.action : res.formActionUrl
+        upload.singleFile(formActionUrl, data).then((response) => {
+          loading.value = false
+          const ossFileUrl = isLocalFile ? response : res.ossFileUrl
+          fileList.value = getDefaultFileList([ossFileUrl])
+          // 上传成功回调
+          onSuccess({ code: 0, msg: 'SUCCESS', data: ossFileUrl })
+        }).catch((error) => {
+          loading.value = false
+          // this.$message.error(error.msg)
+          // 上传失败回调
+          onError(error)
+        })
+      }).catch(() => {
+        loading.value = false
+      })
+    }
+
     return {
       loading, // 上传状态
       headers: getHeaders(), // 放入token
       fileList,
-      handleChange
+      handleChange,
+      customRequest
     }
   },
   created () {

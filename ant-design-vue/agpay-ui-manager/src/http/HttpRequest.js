@@ -46,6 +46,7 @@ class HttpRequest {
     // 响应拦截
     instance.interceptors.response.use(res => {
       this.destroy(url, showLoading)
+
       if (showLoading) {
         store.commit('hideLoading') // 报错关闭loading组件
       }

@@ -48,6 +48,7 @@
                     :showUploadList="false"
                     :custom-request="customRequest"
                     :before-upload="beforeUpload"
+                    @change="handleChange"
                     @preview="imgPreview($event)"
                   >
                     <a-button style="margin-left: 5px;"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '更换头像' }} </a-button>
@@ -283,16 +284,14 @@ export default {
         const data = Object.assign(formParams, { file: file })
         const formActionUrl = isLocalFile ? upload.avatar : res.formActionUrl
         upload.singleFile(formActionUrl, data).then((response) => {
-          // 上传成功回调
-          // onSuccess(response)
           this.loading = false
           const ossFileUrl = isLocalFile ? response : res.ossFileUrl
-          this.uploadSuccess(ossFileUrl)
+          // 上传成功回调
+          onSuccess({ code: 0, msg: 'SUCCESS', data: ossFileUrl })
         }).catch((error) => {
+          // this.$message.error(error.msg)
           // 上传失败回调
-          // onError(error)
-          this.loading = false
-          this.$message.error(error.msg)
+          onError(error)
         })
       }).catch(() => {
         this.loading = false

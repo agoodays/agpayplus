@@ -131,7 +131,21 @@ export const API_URL_MCH_CONFIG = 'api/mchConfig'
 export const upload = {
   avatar: request.baseUrl + '/api/ossFiles/avatar',
   cert: request.baseUrl + '/api/ossFiles/cert',
-  form: request.baseUrl + '/api/ossFiles/form'
+  form: request.baseUrl + '/api/ossFiles/form',
+  /** 获取上传表单参数 */
+  getFormParams: (url, fileName, fileSize) => {
+    return request.request({ baseURL: url, method: 'GET', params: { fileName, fileSize } })
+  },
+  /** 上传单个文件 */
+  singleFile: (url, data) => {
+    const formData = new FormData()
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        formData.append(key, data[key])
+      }
+    }
+    return request.request({ baseURL: url, method: 'POST', data: formData })
+  }
 }
 
 const api = {
