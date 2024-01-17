@@ -577,6 +577,9 @@
             /// 银联企业网银支付
             /// </summary>
             public const string UP_B2B = "UP_B2B";          //银联企业网银支付
+            /// <summary>
+            /// 银联二维码(被扫)
+            /// </summary>
             public const string UP_BAR = "UP_BAR";          //银联二维码(被扫)
             /// <summary>
             /// 银联Js支付

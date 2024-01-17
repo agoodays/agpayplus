@@ -24,7 +24,7 @@
                 return $"{PAY_ORDER_SEQ_PREFIX}{IdWorker.Singleton.NextId()}";
             }
             Random rd = new Random();
-            return $"{PAY_ORDER_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(maxValue: 9999):d4}";
+            return $"{PAY_ORDER_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
         }
 
         /// <summary>

@@ -14,13 +14,13 @@ namespace AGooday.AgPay.AopSdk.UnitTests
         public void Setup()
         {
             var appSecret = "i6tdmci8taaxis88hvxcrwyqrwy0w61wpulkusb5wn2thb1o5yjtn6dnpm1sye2tygkx92tl37jwllhhlxjszhm2aqcks6y9fkp2bdn5a5bfiyjsikjoixjpd3jgzhr1";
-            //agPayClient = new AgPayClient("https://localhost:9819", appSecret);
-            agPayClient = new AgPayClient("http://localhost:5000", appSecret);
+            agPayClient = new AgPayClient("https://localhost:9819", appSecret);
         }
 
         [TestMethod]
         public void UnifiedOrderTest()
         {
+            Random rd = new Random();
             var now = DateTime.Now;
             PayOrderCreateRequest request = new PayOrderCreateRequest();
             PayOrderCreateReqModel model = new PayOrderCreateReqModel();
@@ -28,7 +28,7 @@ namespace AGooday.AgPay.AopSdk.UnitTests
             model.MchNo = "M1642776153";
             model.AppId = "61eac65a9bbe8a4c3c2dd637";
             //model.StoreId = null;
-            model.MchOrderNo = $"PT{now:yyyyMMddHHmmss}";
+            model.MchOrderNo = $"PT{now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
             model.WayCode = "WX_BAR";
             model.Amount = 1;
             model.Currency = "CNY";
@@ -66,8 +66,8 @@ namespace AGooday.AgPay.AopSdk.UnitTests
             request.SetBizModel(model);
             model.MchNo = "M1642776153";
             model.AppId = "61eac65a9bbe8a4c3c2dd637";
-            model.PayOrderId = "";
-            model.MchOrderNo = "PT20240116124517";
+            model.PayOrderId = "P945002155549528064";
+            model.MchOrderNo = "PT202401171422000922866";
 
             try
             {
@@ -86,15 +86,16 @@ namespace AGooday.AgPay.AopSdk.UnitTests
         [TestMethod]
         public void RefundOrderTest()
         {
+            Random rd = new Random();
             var now = DateTime.Now;
             RefundOrderCreateRequest request = new RefundOrderCreateRequest();
             RefundOrderCreateReqModel model = new RefundOrderCreateReqModel();
             request.SetBizModel(model);
             model.MchNo = "M1642776153";
             model.AppId = "61eac65a9bbe8a4c3c2dd637";
-            model.PayOrderId = "";
-            model.MchOrderNo = "PT20240116124517";
-            model.MchRefundNo = $"RT{now:yyyyMMddHHmmss}";
+            model.PayOrderId = "P945002155549528064";
+            model.MchOrderNo = "PT202401171422000922866";
+            model.MchRefundNo = $"RT{now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
             model.RefundAmount = 1;
             model.RefundReason = "ÍË¿î²âÊÔ";
             model.Currency = "CNY";
@@ -124,7 +125,7 @@ namespace AGooday.AgPay.AopSdk.UnitTests
             model.MchNo = "M1642776153";
             model.AppId = "61eac65a9bbe8a4c3c2dd637";
             model.RefundOrderId = "";
-            model.MchRefundNo = "RT20240116131622";
+            model.MchRefundNo = "RT202401171424576135370";
 
             try
             {
