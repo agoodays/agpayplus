@@ -120,6 +120,17 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         }
 
         /// <summary>
+        /// 获取参数
+        /// </summary>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true), Route("param")]
+        public async Task<ActionResult> ParamAsync()
+        {
+            var param = await GetReqParamToJsonAsync();
+            return Ok(param);
+        }
+
+        /// <summary>
         /// 根据UA获取支付接口
         /// </summary>
         /// <returns></returns>
@@ -133,7 +144,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 return null;
             }
 
-            if (ua.Contains("Alipay"))
+            if (ua.Contains("AlipayClient"))
             {
                 return CS.IF_CODE.ALIPAY;  //支付宝服务窗支付
             }

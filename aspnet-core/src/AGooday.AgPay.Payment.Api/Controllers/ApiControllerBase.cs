@@ -156,6 +156,85 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             return JObject.Parse(body);
         }
 
+        protected async Task<JObject> GetReqParamToJsonAsync()
+        {
+            Request.EnableBuffering();
+            var request = Request;
+
+            // 获取 URL 参数
+            var urlParameters = GetUrlParameters(request.Query);
+            //var urlParameters = request.Query.ToDictionary(x => x.Key, x => GetQueryParameterValue(x.Value));
+
+            // 获取请求体参数（JSON 格式）
+            var requestBody = await ReadRequestBodyAsync(request.Body);
+            var requestBodyJson = !string.IsNullOrEmpty(requestBody) && !request.HasFormContentType ? JObject.Parse(requestBody) : new JObject();
+
+            // 获取表单参数
+            var formParameters = request.HasFormContentType ? GetFormParameters(request.Form) : new Dictionary<string, JToken>();
+
+            // 合并所有参数
+            var allParameters = new JObject();
+            allParameters.Merge(JObject.FromObject(urlParameters));
+            allParameters.Merge(requestBodyJson);
+            allParameters.Merge(JObject.FromObject(formParameters));
+
+            return allParameters;
+        }
+
+        private static async Task<string> ReadRequestBodyAsync(Stream body)
+        {
+            using (var reader = new StreamReader(body, Encoding.UTF8, true, 1024, true))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+
+        private static Dictionary<string, JToken> GetUrlParameters(IQueryCollection formCollection)
+        {
+            var parameters = new Dictionary<string, JToken>();
+            foreach (var keyValuePair in formCollection)
+            {
+                if (keyValuePair.Value.Count > 1)
+                {
+                    parameters[keyValuePair.Key] = JToken.Parse(JsonConvert.SerializeObject(keyValuePair.Value));
+                }
+                else
+                {
+                    parameters[keyValuePair.Key] = JToken.FromObject(keyValuePair.Value.FirstOrDefault());
+                }
+            }
+            return parameters;
+        }
+
+        private static JToken GetQueryParameterValue(string[] values)
+        {
+            if (values.Length > 1)
+            {
+                return JToken.FromObject(values);
+            }
+            else
+            {
+                return JToken.FromObject(values[0]);
+            }
+        }
+
+        private static Dictionary<string, JToken> GetFormParameters(IFormCollection formCollection)
+        {
+            var parameters = new Dictionary<string, JToken>();
+            foreach (var keyValuePair in formCollection)
+            {
+                if (keyValuePair.Value.Count > 1)
+                {
+                    parameters[keyValuePair.Key] = JToken.Parse(JsonConvert.SerializeObject(keyValuePair.Value));
+                }
+                else
+                {
+                    parameters[keyValuePair.Key] = JToken.FromObject(keyValuePair.Value.FirstOrDefault());
+                }
+            }
+            return parameters;
+        }
+
         /// <summary>
         /// 获取客户端ip地址
         /// </summary>
