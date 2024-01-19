@@ -304,7 +304,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 }
 
                 // 推送mq删除redis用户认证信息
-                if (removeCacheUserIdList.Any())
+                if (removeCacheUserIdList.Count != 0)
                 {
                     mqSender.Send(CleanMchLoginAuthCacheMQ.Build(removeCacheUserIdList));
                 }

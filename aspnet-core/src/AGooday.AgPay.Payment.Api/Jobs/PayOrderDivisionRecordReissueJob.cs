@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
 
                             logger.LogInformation($"处理分账补单任务, 共计{pageRecordList.TotalCount}条");
 
-                            if (pageRecordList == null || !pageRecordList.Any())
+                            if (pageRecordList == null || pageRecordList.Count == 0)
                             {
                                 //本次查询无结果, 不再继续查询;
                                 break;
@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                         State = (byte)PayOrderDivisionRecordState.STATE_ACCEPT,
                                     });
 
-                                    if (recordList == null || !recordList.Any())
+                                    if (recordList == null || recordList.Count == 0)
                                     {
                                         continue;
                                     }

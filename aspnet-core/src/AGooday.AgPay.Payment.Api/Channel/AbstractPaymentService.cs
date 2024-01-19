@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
         protected bool IsDivisionOrder(PayOrderDto payOrder)
         {
             //订单分账， 将冻结商户资金。
-            if (payOrder.DivisionMode != null && ((byte)PayOrderDivision.DIVISION_MODE_AUTO == payOrder.DivisionMode || (byte)PayOrderDivision.DIVISION_MODE_MANUAL == payOrder.DivisionMode))
+            if (payOrder.DivisionMode != null && ((byte)PayOrderDivisionMode.DIVISION_MODE_AUTO == payOrder.DivisionMode || (byte)PayOrderDivisionMode.DIVISION_MODE_MANUAL == payOrder.DivisionMode))
             {
                 return true;
             }

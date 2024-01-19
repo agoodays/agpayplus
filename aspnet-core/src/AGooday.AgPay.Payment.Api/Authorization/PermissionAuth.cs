@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Payment.Api.Authorization
             }
         }
 
-        private string GetMchNoFromRequest(HttpRequest request)
+        private static string GetMchNoFromRequest(HttpRequest request)
         {
             // 从请求体中获取 mchNo，请求体是 JSON 格式，mchNo 是 JSON 对象中的一个属性
             request.EnableBuffering();

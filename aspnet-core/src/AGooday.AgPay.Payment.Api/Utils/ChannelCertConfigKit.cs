@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
             {
                 new FileInfo(certFile.FullName + ".notexists").Create();
             }
-            catch (IOException e)
+            catch (IOException)
             {
             }
 

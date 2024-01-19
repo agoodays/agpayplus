@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                         request.SubAppId = isvsubMchParams.SubMchAppId;
                     }
 
-                    if (!recordList.Any())
+                    if (recordList.Count == 0)
                     {
                         request.OutOrderNumber = SeqUtil.GenDivisionBatchId(); // 随机生成一个订单号
                     }
@@ -153,7 +153,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     }
 
                     //不存在接收账号时，订单完结（解除冻结金额）
-                    if (!request.ReceiverList.Any())
+                    if (request.ReceiverList.Count == 0)
                     {
                         return this.DivisionFinish(payOrder, mchAppConfigContext);
                     }

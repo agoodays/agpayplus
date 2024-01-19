@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
                 }
                 return ChannelRetMsg.Waiting(); //支付中
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return ChannelRetMsg.Waiting(); //支付中
             }

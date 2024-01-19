@@ -124,7 +124,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
                     channelRetMsg.ChannelErrMsg = returnMsg;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }

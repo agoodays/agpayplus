@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                     channelRetMsg.ChannelErrMsg = msg;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }

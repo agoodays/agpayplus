@@ -339,7 +339,7 @@ namespace AGooday.AgPay.Common.Utils
                 RSACryptoServiceProvider rsacsp = DecodePrivateKey(rsaprivkey, rsaType);
                 return rsacsp;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }
@@ -449,7 +449,7 @@ namespace AGooday.AgPay.Common.Utils
                 rsa.ImportParameters(para);
                 return rsa;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }

@@ -162,7 +162,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="channelRespResult"></param>
         public void UpdateRecordSuccessOrFail(List<PayOrderDivisionRecordDto> records, byte state, string channelBatchOrderId, string channelRespResult)
         {
-            if (records == null || !records.Any())
+            if (records == null || records.Count == 0)
             {
                 return;
             }
@@ -188,9 +188,9 @@ namespace AGooday.AgPay.Application.Services
         public void UpdateResendState(string payOrderId)
         {
             var updateRecord = _payOrderRepository.GetAll()
-                .Where(w => w.PayOrderId.Equals(payOrderId) && w.DivisionState == (byte)PayOrderDivision.DIVISION_STATE_FINISH)
+                .Where(w => w.PayOrderId.Equals(payOrderId) && w.DivisionState == (byte)PayOrderDivisionState.DIVISION_STATE_FINISH)
                 .FirstOrDefault();
-            updateRecord.DivisionState = (byte)PayOrderDivision.DIVISION_STATE_WAIT_TASK;
+            updateRecord.DivisionState = (byte)PayOrderDivisionState.DIVISION_STATE_WAIT_TASK;
             _payOrderRepository.Update(updateRecord);
             _payOrderRepository.SaveChanges(out int payOrderUpdateRow);
 

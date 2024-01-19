@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
                     log.LogInformation($"{logPrefix} >>> 请求失败, {respMsg}");
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }
@@ -141,7 +141,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
                     log.LogInformation($"{logPrefix} >>> 退款失败, {respMsg}");
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }

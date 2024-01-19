@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
 
         // payOrderId 与 WsPayOrderServer 存储关系, ConcurrentHashMap保证线程安全
         //REF: https://radu-matei.com/blog/aspnet-core-websockets-middleware/
-        ConcurrentDictionary<string, ISet<WsPayOrderServer>> wsOrderIdMap = new ConcurrentDictionary<string, ISet<WsPayOrderServer>>();
+        private readonly ConcurrentDictionary<string, ISet<WsPayOrderServer>> wsOrderIdMap = new ConcurrentDictionary<string, ISet<WsPayOrderServer>>();
 
         //与某个客户端的连接会话，需要通过它来给客户端发送数据
         private WebSocket ClientSession;

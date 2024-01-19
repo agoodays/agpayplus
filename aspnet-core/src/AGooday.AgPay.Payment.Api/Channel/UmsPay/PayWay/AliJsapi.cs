@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
                         break;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelErrCode = errCode;
                 channelRetMsg.ChannelErrMsg = errInfo;

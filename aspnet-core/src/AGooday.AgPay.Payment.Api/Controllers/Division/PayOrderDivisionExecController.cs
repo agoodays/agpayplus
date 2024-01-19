@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                     throw new BizException("订单不存在");
                 }
 
-                if (payOrder.State != (byte)PayOrderState.STATE_SUCCESS || payOrder.DivisionState != (byte)PayOrderDivision.DIVISION_STATE_UNHAPPEN || payOrder.DivisionMode != (byte)PayOrderDivision.DIVISION_MODE_MANUAL)
+                if (payOrder.State != (byte)PayOrderState.STATE_SUCCESS || payOrder.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_UNHAPPEN || payOrder.DivisionMode != (byte)PayOrderDivisionMode.DIVISION_MODE_MANUAL)
                 {
                     throw new BizException("当前订单状态不支持分账");
                 }

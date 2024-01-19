@@ -271,7 +271,7 @@ namespace AGooday.AgPay.Common.Enumerator
         REFUND_STATE_ALL = 2,
     }
 
-    public enum PayOrderDivision
+    public enum PayOrderDivisionMode
     {
         /// <summary>
         /// 该笔订单不允许分账
@@ -288,7 +288,10 @@ namespace AGooday.AgPay.Common.Enumerator
         /// </summary>
         [Description("手动分账")]
         DIVISION_MODE_MANUAL = 2,
+    }
 
+    public enum PayOrderDivisionState
+    {
         /// <summary>
         /// 未发生分账
         /// </summary>

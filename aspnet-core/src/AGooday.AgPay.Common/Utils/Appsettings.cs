@@ -8,8 +8,8 @@ namespace AGooday.AgPay.Common.Utils
     /// </summary>
     public class Appsettings
     {
-        static IConfiguration Configuration { get; set; }
-        static string contentPath { get; set; }
+        private static IConfiguration Configuration { get; set; }
+        public static string ContentPath { get; set; }
 
         public Appsettings(string contentPath)
         {
@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Common.Utils
 
             // 如果你把配置文件 是 根据环境变量来分开了，可以这样写
             // Path = $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json";
-
+            ContentPath = contentPath;
             Configuration = new ConfigurationBuilder()
                .SetBasePath(contentPath)
                // 这样的话，可以直接读目录里的json文件，而不是 bin 文件夹下的，所以不用修改复制属性
@@ -30,11 +30,11 @@ namespace AGooday.AgPay.Common.Utils
         /// </summary>
         /// <param name="sections">节点配置</param>
         /// <returns></returns>
-        public static string app(params string[] sections)
+        public static string App(params string[] sections)
         {
             try
             {
-                if (sections.Any())
+                if (sections.Length != 0)
                 {
                     return Configuration[string.Join(":", sections)];
                 }
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Common.Utils
         /// <typeparam name="T"></typeparam>
         /// <param name="sections"></param>
         /// <returns></returns>
-        public static List<T> app<T>(params string[] sections)
+        public static List<T> App<T>(params string[] sections)
         {
             List<T> list = new List<T>();
             // 引用 Microsoft.Extensions.Configuration.Binder 包

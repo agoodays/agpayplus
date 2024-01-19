@@ -288,8 +288,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrder.ReturnUrl = rq.ReturnUrl; //页面跳转地址
 
             // 分账模式
-            payOrder.DivisionMode ??= (byte)PayOrderDivision.DIVISION_MODE_FORBID;
-            payOrder.DivisionState ??= (byte)PayOrderDivision.DIVISION_STATE_UNHAPPEN;
+            payOrder.DivisionMode ??= (byte)PayOrderDivisionMode.DIVISION_MODE_FORBID;
+            payOrder.DivisionState ??= (byte)PayOrderDivisionState.DIVISION_STATE_UNHAPPEN;
 
             var nowDate = DateTime.Now;
 

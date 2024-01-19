@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
                     channelRetMsg.ChannelState = ChannelState.WAITING;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelErrCode = respCode;
                 channelRetMsg.ChannelErrMsg = respMsg;

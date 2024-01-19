@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Domain.Core.Notifications
         // 判断在当前总线对象周期中，是否存在通知信息
         public virtual bool HasNotifications()
         {
-            return GetNotifications().Any();
+            return GetNotifications().Count != 0;
         }
 
         // 手动回收（清空通知）

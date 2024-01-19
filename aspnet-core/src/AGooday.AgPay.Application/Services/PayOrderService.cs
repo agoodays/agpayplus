@@ -354,11 +354,11 @@ namespace AGooday.AgPay.Application.Services
         public bool UpdateDivisionState(PayOrderDto payOrder)
         {
             var updateRecord = _payOrderRepository.GetById(payOrder.PayOrderId);
-            if (updateRecord.DivisionState != (byte)PayOrderDivision.DIVISION_STATE_UNHAPPEN)
+            if (updateRecord.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_UNHAPPEN)
             {
                 return false;
             }
-            updateRecord.DivisionState = (byte)PayOrderDivision.DIVISION_STATE_WAIT_TASK;
+            updateRecord.DivisionState = (byte)PayOrderDivisionState.DIVISION_STATE_WAIT_TASK;
             _payOrderRepository.Update(updateRecord);
             return _payOrderRepository.SaveChanges(out int _);
         }
@@ -607,14 +607,14 @@ namespace AGooday.AgPay.Application.Services
         }
 
         #region 获取所有下级代理商
-        private IEnumerable<AgentInfo> GetSons(IQueryable<AgentInfo> list, string pid)
+        private static IEnumerable<AgentInfo> GetSons(IQueryable<AgentInfo> list, string pid)
         {
             var query = list.Where(p => p.AgentNo == pid).ToList();
             var list2 = query.Concat(GetSonList(list, pid));
             return list2;
         }
 
-        private IEnumerable<AgentInfo> GetSonList(IQueryable<AgentInfo> list, string pid)
+        private static IEnumerable<AgentInfo> GetSonList(IQueryable<AgentInfo> list, string pid)
         {
             var query = list.Where(p => p.Pid == pid).ToList();
             return query.ToList().Concat(query.ToList().SelectMany(t => GetSonList(list, t.AgentNo)));

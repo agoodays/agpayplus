@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public PayRateConfigService(IUnitOfWork uow, IMapper mapper, IMediatorHandler bus, 
+        public PayRateConfigService(IUnitOfWork uow, IMapper mapper, IMediatorHandler bus,
             IPayRateConfigRepository payRateConfigRepository,
             IPayRateLevelConfigRepository payRateLevelConfigRepository,
             IIsvInfoRepository isvInfoRepository,
@@ -131,8 +131,8 @@ namespace AGooday.AgPay.Application.Services
 
         public Dictionary<string, Dictionary<string, PayRateConfigDto>> GetByInfoIdAndIfCode(string configMode, string infoId, string ifCode)
         {
-            var infoType = string.Empty;
-            var isvNo = string.Empty;
+            string isvNo;
+            string infoType;
             Dictionary<string, Dictionary<string, PayRateConfigDto>> rateConfig = new Dictionary<string, Dictionary<string, PayRateConfigDto>>();
             switch (configMode)
             {
@@ -152,7 +152,7 @@ namespace AGooday.AgPay.Application.Services
                     rateConfig.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, GetPayRateConfig(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode)); if (!configMode.Equals(CS.CONFIG_MODE.AGENT_SELF))
                     {
                         isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_AGENT) ? agent.IsvNo : string.Empty;
-                        GetReadOnlyRate(ifCode, rateConfig, agent.IsvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
+                        GetReadOnlyRate(ifCode, rateConfig, isvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
                     }
                     break;
                 case CS.CONFIG_MODE.MGR_MCH:
@@ -209,9 +209,9 @@ namespace AGooday.AgPay.Application.Services
 
         public JObject GetByInfoIdAndIfCodeJson(string configMode, string infoId, string ifCode)
         {
+            string isvNo;
+            string infoType;
             JObject result = new JObject();
-            var infoType = string.Empty;
-            var isvNo = string.Empty;
             switch (configMode)
             {
                 case CS.CONFIG_MODE.MGR_ISV:
@@ -875,14 +875,14 @@ namespace AGooday.AgPay.Application.Services
             return payRateConfigs.Join(mchInfos, r => r.InfoId, a => a.MchNo, (r, a) => r);
         }
 
-        private string GetFeeRateErrorMessage(string name, string thanName, string wayCode, decimal feeRate, decimal thanFeeRate, string modeName = "", int? levelIndex = null)
+        private static string GetFeeRateErrorMessage(string name, string thanName, string wayCode, decimal feeRate, decimal thanFeeRate, string modeName = "", int? levelIndex = null)
         {
             return $"{name}异常： [{wayCode}]{(levelIndex == null ? "" : $"{modeName}的第[{++levelIndex}]阶梯")}设置费率{{{(feeRate * 100):F4}%}} 需要【大于等于】【{thanName}】的{(levelIndex == null ? "" : "阶梯")}配置值：{{{(thanFeeRate * 100):F4}%}}";
         }
 
         private List<PayRateConfigItem> GetParentRate(string ifCode, string isvNo, string agentNo, string configType)
         {
-            List<PayRateConfigItem> ISVCOST = null, READONLYPARENTAGENT = null, READONLYPARENTDEFRATE = null, PARENTRATE = null;
+            List<PayRateConfigItem> ISVCOST, READONLYPARENTAGENT = null, READONLYPARENTDEFRATE = null, PARENTRATE;
 
             // 服务商底价
             ISVCOST = GetPayRateConfigItems(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode);
@@ -897,12 +897,12 @@ namespace AGooday.AgPay.Application.Services
             //{
             //    READONLYPARENTDEFRATE = GetPayRateConfigItems(configType, CS.INFO_TYPE.ISV, isvNo, ifCode);
             //}
-            PARENTRATE = READONLYPARENTDEFRATE == null ? (READONLYPARENTAGENT == null ? (ISVCOST == null ? null : ISVCOST) : READONLYPARENTAGENT) : READONLYPARENTDEFRATE;
+            PARENTRATE = READONLYPARENTDEFRATE ?? READONLYPARENTAGENT ?? ISVCOST;
 
             return PARENTRATE;
         }
 
-        private decimal? GetFeeRate(List<PayRateConfigItem> configItem, string wayCode, string bankCardType = null, int? levelIndex = null)
+        private static decimal? GetFeeRate(List<PayRateConfigItem> configItem, string wayCode, string bankCardType = null, int? levelIndex = null)
         {
             decimal? feeRate = null;
             if (configItem == null || !configItem.Any(w => w.WayCode.Equals(wayCode)))

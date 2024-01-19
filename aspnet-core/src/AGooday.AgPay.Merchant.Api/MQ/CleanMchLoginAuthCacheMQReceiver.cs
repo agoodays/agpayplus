@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Merchant.Api.MQ
             // 字符串转List<Long>
             List<long> userIdList = payload.UserIdList;
             // 删除redis用户缓存
-            if (userIdList == null || !userIdList.Any())
+            if (userIdList == null || userIdList.Count == 0)
             {
                 log.LogInformation("用户ID为空");
                 return;

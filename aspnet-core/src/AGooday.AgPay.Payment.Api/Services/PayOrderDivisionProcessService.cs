@@ -71,14 +71,14 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
 
             // 订单不是成功状态 || 分账状态不正确
-            if (payOrder.State != (byte)PayOrderState.STATE_SUCCESS || (payOrder.DivisionState != (byte)PayOrderDivision.DIVISION_STATE_WAIT_TASK && payOrder.DivisionState != (byte)PayOrderDivision.DIVISION_STATE_UNHAPPEN))
+            if (payOrder.State != (byte)PayOrderState.STATE_SUCCESS || (payOrder.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_WAIT_TASK && payOrder.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_UNHAPPEN))
             {
                 log.LogError($"{logPrefix}, 订单状态或分账状态不正确");
                 throw new BizException("订单状态或分账状态不正确");
             }
 
             //更新订单为： 分账任务处理中
-            payOrder.DivisionState = (byte)PayOrderDivision.DIVISION_STATE_ING;
+            payOrder.DivisionState = (byte)PayOrderDivisionState.DIVISION_STATE_ING;
             bool updPayOrder = payOrderService.Update(payOrder);
             if (!updPayOrder)
             {
@@ -124,7 +124,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                     PayOrderDivisionRecordDto record = GenRecord(batchOrderId, payOrder, receiver, payOrderDivisionAmount, subDivisionAmount);
 
                     //剩余金额
-                    subDivisionAmount = subDivisionAmount - record.CalDivisionAmount;
+                    subDivisionAmount -= record.CalDivisionAmount;
 
                     //入库保存
                     payOrderDivisionRecordService.Add(record);
@@ -172,9 +172,9 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
 
             //更新 支付订单主表状态  分账任务已结束。
-            payOrder.DivisionState = (byte)PayOrderDivision.DIVISION_STATE_FINISH;
+            payOrder.DivisionState = (byte)PayOrderDivisionState.DIVISION_STATE_FINISH;
             payOrder.DivisionLastTime = DateTime.Now;
-            if (payOrder.DivisionState.Equals((byte)PayOrderDivision.DIVISION_STATE_ING))
+            if (payOrder.DivisionState.Equals((byte)PayOrderDivisionState.DIVISION_STATE_ING))
                 payOrderService.Update(payOrder);
             return channelRetMsg;
         }
@@ -257,7 +257,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
             //全部分账账号
             List<MchDivisionReceiverDto> allMchReceiver = mchDivisionReceiverService.GetPaginatedData(queryWrapper);
-            if (!allMchReceiver.Any())
+            if (allMchReceiver.Count == 0)
             {
                 return allMchReceiver;
             }
@@ -271,7 +271,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             //以下为 自定义列表
 
             // 自定义列表未定义
-            if (customerDivisionReceiverList == null || !customerDivisionReceiverList.Any())
+            if (customerDivisionReceiverList == null || customerDivisionReceiverList.Count == 0)
             {
                 return new List<MchDivisionReceiverDto>();
             }

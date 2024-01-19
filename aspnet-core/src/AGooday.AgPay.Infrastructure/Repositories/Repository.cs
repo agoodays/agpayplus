@@ -428,9 +428,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
     {
         public static string[] GetPropertyNames(Expression<Func<TEntity, object>> expression)
         {
-            var newExpression = expression.Body as NewExpression;
-
-            if (newExpression == null)
+            if (expression.Body is not NewExpression newExpression)
             {
                 throw new ArgumentException("Invalid expression. Only new expressions are supported.");
             }

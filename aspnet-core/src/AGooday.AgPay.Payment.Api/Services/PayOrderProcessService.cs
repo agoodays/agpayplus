@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             try
             {
                 //默认不分账  || 其他非【自动分账】逻辑时， 不处理
-                if (payOrder == null || payOrder.DivisionMode == null || payOrder.DivisionMode != (byte)PayOrderDivision.DIVISION_MODE_AUTO)
+                if (payOrder == null || payOrder.DivisionMode == null || payOrder.DivisionMode != (byte)PayOrderDivisionMode.DIVISION_MODE_AUTO)
                 {
                     return;
                 }

@@ -103,10 +103,7 @@ namespace AGooday.AgPay.Agent.Api.Middlewares
     {
         public static IApplicationBuilder UseRequestResponseLogging(this IApplicationBuilder app)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
+            ArgumentNullException.ThrowIfNull(app);
 
             return app.UseMiddleware<RequestResponseLoggingMiddleware>();
         }

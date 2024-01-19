@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
                     channelRetMsg.IsNeedQuery = true; // 开启轮询查单
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelErrCode = return_code;
                 channelRetMsg.ChannelErrMsg = return_msg;

@@ -16,11 +16,11 @@ namespace AGooday.AgPay.Common.Utils
         /// <returns></returns>
         public static string GetFileSuffix(string fullFileName, bool appendDot)
         {
-            if (fullFileName == null || fullFileName.IndexOf(".") < 0 || fullFileName.Length <= 1)
+            if (fullFileName == null || fullFileName.IndexOf('.') < 0 || fullFileName.Length <= 1)
             {
                 return "";
             }
-            return (appendDot ? "." : "") + fullFileName.Substring(fullFileName.LastIndexOf(".") + 1);
+            return string.Concat(appendDot ? "." : "", fullFileName.AsSpan(fullFileName.LastIndexOf('.') + 1));
         }
 
 

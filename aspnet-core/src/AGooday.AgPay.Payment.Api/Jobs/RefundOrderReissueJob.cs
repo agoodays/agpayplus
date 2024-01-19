@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                             };
                             var refundOrders = refundOrderService.GetPaginatedData(dto);
 
-                            if (refundOrders == null || !refundOrders.Any())
+                            if (refundOrders == null || refundOrders.Count == 0)
                             {
                                 //本次查询无结果, 不再继续查询;
                                 break;

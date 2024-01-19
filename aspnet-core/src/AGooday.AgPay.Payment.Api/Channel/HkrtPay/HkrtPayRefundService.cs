@@ -126,7 +126,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
                     channelRetMsg.ChannelErrMsg = return_msg;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }

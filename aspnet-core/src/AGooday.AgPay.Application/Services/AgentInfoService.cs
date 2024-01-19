@@ -138,7 +138,7 @@ namespace AGooday.AgPay.Application.Services
 
             var agentInfos = _agentInfoRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                && (!agentNos.Any() || agentNos.Contains(dto.AgentNo))
+                && (agentNos.Count == 0 || agentNos.Contains(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.Pid) || w.Pid.Equals(dto.Pid))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.AgentName))
@@ -149,14 +149,14 @@ namespace AGooday.AgPay.Application.Services
         }
 
         #region 获取所有下级
-        private IQueryable<AgentInfo> GetSons(IQueryable<AgentInfo> source, string pid)
+        private static IQueryable<AgentInfo> GetSons(IQueryable<AgentInfo> source, string pid)
         {
             var query = source.Where(p => p.AgentNo == pid);
             var newSource = query.Concat(GetSonSource(source, pid));
             return newSource;
         }
 
-        private IQueryable<AgentInfo> GetSonSource(IQueryable<AgentInfo> source, string pid)
+        private static IQueryable<AgentInfo> GetSonSource(IQueryable<AgentInfo> source, string pid)
         {
             var query = source.Where(p => p.Pid == pid);
             return query.Concat(query.SelectMany(t => GetSonSource(source, t.AgentNo)));
@@ -164,12 +164,12 @@ namespace AGooday.AgPay.Application.Services
         #endregion
 
         #region 获取所有上级
-        private IEnumerable<AgentInfo> GetFatherList(IList<AgentInfo> list, string Id)
+        private static IEnumerable<AgentInfo> GetFatherList(IList<AgentInfo> list, string Id)
         {
             var query = list.Where(p => p.AgentNo == Id).ToList();
             return query.ToList().Concat(query.ToList().SelectMany(t => GetFatherList(list, t.Pid)));
         }
-        private IEnumerable<AgentInfo> GetParents(IEnumerable<AgentInfo> list, string agentNo)
+        private static IEnumerable<AgentInfo> GetParents(IEnumerable<AgentInfo> list, string agentNo)
         {
             var query = list.Where(p => p.AgentNo.Equals(agentNo));
             return query.Concat(query.SelectMany(t => GetParents(list, t.Pid)));

@@ -11,7 +11,7 @@
         private const string TRANSFER_ID_SEQ_PREFIX = "T";
         private const string DIVISION_BATCH_ID_SEQ_PREFIX = "D";
 
-        private static bool IS_USE_MP_ID = true;
+        private static readonly bool IS_USE_MP_ID = true;
 
         /// <summary>
         /// 生成支付订单号

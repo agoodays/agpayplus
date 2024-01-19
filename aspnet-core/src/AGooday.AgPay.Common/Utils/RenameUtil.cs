@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Common.Utils
             var result = splits.Select(s =>
             {
                 if (s.Length > 0)
-                    return s.Substring(0, 1).ToUpper() + s.Substring(1);
+                    return string.Concat(s.Substring(0, 1).ToUpper(), s.AsSpan(1));
                 else
                     return "";
             }).ToArray();

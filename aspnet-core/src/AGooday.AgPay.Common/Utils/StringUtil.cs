@@ -88,15 +88,14 @@ namespace AGooday.AgPay.Common.Utils
         /// 编码,如"utf-8","gb2312"
         public static string UnHex(string hex, string charset)
         {
-            if (hex == null)
-                throw new ArgumentNullException(nameof(hex));
+            ArgumentNullException.ThrowIfNull(hex);
             hex = hex.Replace(",", "");
             hex = hex.Replace("\n", "");
             hex = hex.Replace("\\", "");
             hex = hex.Replace(" ", "");
             if (hex.Length % 2 != 0)
             {
-                hex += "20";//空格
+                //hex += "20";//空格
                 throw new ArgumentException("hex is not a valid number!", nameof(hex));
             }
             // 需要将 hex 转换成 byte 数组。

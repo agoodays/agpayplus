@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             string infoType = GetInfoType(configMode);
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
             var payIfDefine = _payIfDefineService.GetById(ifCode);
-            payInterfaceConfig = payInterfaceConfig ?? new PayInterfaceConfigDto()
+            payInterfaceConfig ??= new PayInterfaceConfigDto()
             {
                 InfoType = infoType,
                 InfoId = infoId,
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 State = CS.YES
             };
             // 费率转换为百分比数值
-            payInterfaceConfig.IfRate = payInterfaceConfig.IfRate * 100;
+            payInterfaceConfig.IfRate *= 100;
             List<byte> isSupportApplyments = new List<byte>() { payIfDefine.IsSupportApplyment };
             List<byte> isSupportCheckBills = new List<byte>() { payIfDefine.IsSupportCheckBill };
             List<byte> isSupportCashouts = new List<byte>() { payIfDefine.IsSupportCashout };
@@ -186,7 +186,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_ADD, PermCode.MGR.ENT_AGENT_PAY_CONFIG_ADD, PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
         {
-            dto.IfRate = dto.IfRate / 100;// 存入真实费率
+            dto.IfRate /= 100;// 存入真实费率
             //添加更新者信息
             long userId = GetCurrentUser().SysUser.SysUserId;
             string realName = GetCurrentUser().SysUser.Realname;

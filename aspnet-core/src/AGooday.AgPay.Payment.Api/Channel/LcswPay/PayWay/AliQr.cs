@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
                     channelRetMsg.ChannelErrMsg = returnMsg;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelErrCode = returnCode;
                 channelRetMsg.ChannelErrMsg = returnMsg;

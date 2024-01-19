@@ -5,23 +5,23 @@ namespace AGooday.AgPay.Common.DB
 {
     public class BaseDBConfig
     {
-        private static string defaultConnection = Appsettings.app(new string[] { "ConnectionStrings", "DefaultConnection" });
-        private static string defaultConnectionFile = Appsettings.app(new string[] { "ConnectionStrings", "DefaultConnectionFile" });
+        private static readonly string defaultConnection = Appsettings.App(["ConnectionStrings", "DefaultConnection"]);
+        private static readonly string defaultConnectionFile = Appsettings.App(["ConnectionStrings", "DefaultConnectionFile"]);
 
-        private static string sqliteConnection = Appsettings.app(new string[] { "AppSettings", "Sqlite", "SqliteConnection" });
-        private static bool isSqliteEnabled = (Appsettings.app(new string[] { "AppSettings", "Sqlite", "Enabled" })).ObjToBool();
+        private static readonly string sqliteConnection = Appsettings.App(["AppSettings", "Sqlite", "SqliteConnection"]);
+        private static readonly bool isSqliteEnabled = Appsettings.App(["AppSettings", "Sqlite", "Enabled"]).ObjToBool();
 
-        private static string sqlServerConnection = Appsettings.app(new string[] { "AppSettings", "SqlServer", "SqlServerConnection" });
-        private static string sqlServerConnectionFile = Appsettings.app(new string[] { "AppSettings", "SqlServer", "SqlServerConnectionFile" });
-        private static bool isSqlServerEnabled = (Appsettings.app(new string[] { "AppSettings", "SqlServer", "Enabled" })).ObjToBool();
+        private static readonly string sqlServerConnection = Appsettings.App(["AppSettings", "SqlServer", "SqlServerConnection"]);
+        private static readonly string sqlServerConnectionFile = Appsettings.App(["AppSettings", "SqlServer", "SqlServerConnectionFile"]);
+        private static readonly bool isSqlServerEnabled = (Appsettings.App(["AppSettings", "SqlServer", "Enabled"])).ObjToBool();
 
-        private static string mySqlConnection = Appsettings.app(new string[] { "AppSettings", "MySql", "MySqlConnection" });
-        private static string mySqlConnectionFile = Appsettings.app(new string[] { "AppSettings", "MySql", "MySqlConnectionFile" });
-        private static bool isMySqlEnabled = (Appsettings.app(new string[] { "AppSettings", "MySql", "Enabled" })).ObjToBool();
+        private static readonly string mySqlConnection = Appsettings.App(["AppSettings", "MySql", "MySqlConnection"]);
+        private static readonly string mySqlConnectionFile = Appsettings.App(["AppSettings", "MySql", "MySqlConnectionFile"]);
+        private static readonly bool isMySqlEnabled = Appsettings.App(["AppSettings", "MySql", "Enabled"]).ObjToBool();
 
-        private static string oracleConnection = Appsettings.app(new string[] { "AppSettings", "Oracle", "OracleConnection" });
-        private static string oracleConnectionFile = Appsettings.app(new string[] { "AppSettings", "Oracle", "OracleConnectionFile" });
-        private static bool IsOracleEnabled = (Appsettings.app(new string[] { "AppSettings", "Oracle", "Enabled" })).ObjToBool();
+        private static readonly string oracleConnection = Appsettings.App(["AppSettings", "Oracle", "OracleConnection"]);
+        private static readonly string oracleConnectionFile = Appsettings.App(["AppSettings", "Oracle", "OracleConnectionFile"]);
+        private static readonly bool isOracleEnabled = Appsettings.App(["AppSettings", "Oracle", "Enabled"]).ObjToBool();
 
         public static DataBaseType DbType = InitDbType();
 
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Common.DB
             {
                 return DataBaseType.MySql;
             }
-            else if (IsOracleEnabled)
+            else if (isOracleEnabled)
             {
                 return DataBaseType.Oracle;
             }
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Common.DB
                 DbType = DataBaseType.MySql;
                 return DifDBConnOfSecurity(@$"{mySqlConnectionFile}", mySqlConnection);
             }
-            else if (IsOracleEnabled)
+            else if (isOracleEnabled)
             {
                 DbType = DataBaseType.Oracle;
                 return DifDBConnOfSecurity(@$"{oracleConnectionFile}", oracleConnection);

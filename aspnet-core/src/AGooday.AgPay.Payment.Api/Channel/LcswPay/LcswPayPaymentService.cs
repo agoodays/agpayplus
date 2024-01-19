@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
                     channelRetMsg.IsNeedQuery = true; // 开启轮询查单
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelErrCode = returnCode;
                 channelRetMsg.ChannelErrMsg = returnMsg;

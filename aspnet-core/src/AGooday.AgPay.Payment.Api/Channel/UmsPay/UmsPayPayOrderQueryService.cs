@@ -29,7 +29,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
 
         public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            JObject reqParams = new JObject();
             string logPrefix = $"【银联商务({payOrder.WayCode})查单】";
 
             try
@@ -115,7 +114,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                         break;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelErrCode = errCode;
                 channelRetMsg.ChannelErrMsg = errInfo;
@@ -194,7 +193,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                         break;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelErrCode = errCode;
                 channelRetMsg.ChannelErrMsg = errInfo;
@@ -262,7 +261,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
                         break;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelErrCode = errCode;
                 channelRetMsg.ChannelErrMsg = errInfo;

@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
                     channelRetMsg.IsNeedQuery = true; // 开启轮询查单
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 channelRetMsg.ChannelErrCode = resp_code;
                 channelRetMsg.ChannelErrMsg = resp_msg;
