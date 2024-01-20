@@ -17,7 +17,6 @@ using AGooday.AgPay.Manager.Api.Middlewares;
 using AGooday.AgPay.Manager.Api.Models;
 using AGooday.AgPay.Manager.Api.MQ;
 using AGooday.AgPay.Manager.Api.WebSockets;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -171,7 +170,7 @@ services.AddSwaggerGen(options =>
 // 引用包 MediatR.Extensions.Microsoft.DependencyInjection
 //services.AddMediatR(typeof(MyxxxHandler));//单单注入某一个处理程序
 //或
-services.AddMediatR(typeof(Program));//目的是为了扫描Handler的实现对象并添加到IOC的容器中
+services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());//目的是为了扫描Handler的实现对象并添加到IOC的容器中
 
 // .NET Core 原生依赖注入
 // 单写一层用来添加依赖项，从展示层 Presentation 中隔离

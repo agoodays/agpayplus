@@ -14,17 +14,18 @@ namespace AGooday.AgPay.Infrastructure.Bus
         //构造函数注入
         private readonly IMediator _mediator;
         //注入服务工厂
-        private readonly ServiceFactory _serviceFactory;
+        //private readonly ServiceFactory _serviceFactory;
         private static readonly ConcurrentDictionary<Type, object> _requestHandlers = new ConcurrentDictionary<Type, object>();
         //// 事件仓储服务
         //private readonly IEventStoreService _eventStoreService;
 
-        public InMemoryBus(IMediator mediator, ServiceFactory serviceFactory
+        public InMemoryBus(IMediator mediator
+            //, ServiceFactory serviceFactory
             //, IEventStoreService eventStoreService
             )
         {
             _mediator = mediator;
-            _serviceFactory = serviceFactory;
+            //_serviceFactory = serviceFactory;
             //_eventStoreService = eventStoreService;
         }
 

@@ -15,9 +15,9 @@ using Microsoft.Extensions.Caching.Memory;
 namespace AGooday.AgPay.Domain.CommandHandlers
 {
     public class AgentInfoCommandHandler : CommandHandler,
-        IRequestHandler<CreateAgentInfoCommand, Unit>,
-        IRequestHandler<ModifyAgentInfoCommand, Unit>,
-        IRequestHandler<RemoveAgentInfoCommand, Unit>
+        IRequestHandler<CreateAgentInfoCommand>,
+        IRequestHandler<ModifyAgentInfoCommand>,
+        IRequestHandler<RemoveAgentInfoCommand>
     {
         // 注入仓储接口
         private readonly IAgentInfoRepository _agentInfoRepository;
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _mchInfoRepository = mchInfoRepository;
         }
 
-        public Task<Unit> Handle(CreateAgentInfoCommand request, CancellationToken cancellationToken)
+        public Task Handle(CreateAgentInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             var agentInfo = _mapper.Map<AgentInfo>(request);
@@ -79,12 +79,12 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (pagentInfo == null || pagentInfo.State == CS.NO)
                 {
                     Bus.RaiseEvent(new DomainNotification("", "上级代理商不可用！"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
                 if (!agentInfo.IsvNo.Equals(pagentInfo.IsvNo))
                 {
                     Bus.RaiseEvent(new DomainNotification("", "上级代理商/服务商信息有误！"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
                 agentInfo.Level = (byte)(pagentInfo.Level + 1);
             }
@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (isvInfo == null || isvInfo.State == CS.NO)
                 {
                     Bus.RaiseEvent(new DomainNotification("", "服务商号不可用！"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
             }
             #endregion
@@ -131,19 +131,19 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 {
                     // 引发错误事件
                     Bus.RaiseEvent(new DomainNotification("", "登录名已经被使用！"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
                 // 手机号不可重复
                 if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
                 {
                     Bus.RaiseEvent(new DomainNotification("", "联系人手机号已存在！"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
                 // 员工号不可重复
                 if (_sysUserRepository.IsExistUserNo(sysUser.UserNo, sysUser.SysType))
                 {
                     Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
                 #endregion
 
@@ -189,7 +189,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!Commit())
                 {
                     Bus.RaiseEvent(new DomainNotification("", "添加代理商失败"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
 
                 CommitTransaction();
@@ -209,13 +209,13 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 RollbackTransaction();
                 Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
-            return Task.FromResult(new Unit());
+            return Task.CompletedTask;
         }
 
-        public Task<Unit> Handle(ModifyAgentInfoCommand request, CancellationToken cancellationToken)
+        public Task Handle(ModifyAgentInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -223,7 +223,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             request.UpdatedAt = DateTime.Now;
@@ -254,7 +254,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     if (_sysUserRepository.IsExistTelphone(request.ContactTel, request.ContactTel))
                     {
                         Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
-                        return Task.FromResult(new Unit());
+                        return Task.CompletedTask;
                     }
                     sysUserAuth.Identifier = request.ContactTel;
                     _sysUserAuthRepository.Update(sysUserAuth);
@@ -287,7 +287,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!Commit())
                 {
                     Bus.RaiseEvent(new DomainNotification("", "修改当前代理商失败"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
 
                 CommitTransaction();
@@ -296,13 +296,13 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 RollbackTransaction();
                 Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
-            return Task.FromResult(new Unit());
+            return Task.CompletedTask;
         }
 
-        public Task<Unit> Handle(RemoveAgentInfoCommand request, CancellationToken cancellationToken)
+        public Task Handle(RemoveAgentInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -310,7 +310,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             // 0.当前代理商是否存在
@@ -319,14 +319,14 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 // 引发错误事件
                 Bus.RaiseEvent(new DomainNotification("", "该代理商不存在！"));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             // 1.查询当前服务商下是否存在商户
             if (_mchInfoRepository.IsExistMchByAgentNo(request.AgentNo))
             {
                 Bus.RaiseEvent(new DomainNotification("", "该代理商下存在商户，不可删除"));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             try
@@ -351,7 +351,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!Commit())
                 {
                     Bus.RaiseEvent(new DomainNotification("", "删除当前代理商失败"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
 
                 CommitTransaction();
@@ -364,10 +364,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 RollbackTransaction();
                 Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
-            return Task.FromResult(new Unit());
+            return Task.CompletedTask;
         }
     }
 }

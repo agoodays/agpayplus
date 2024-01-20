@@ -18,9 +18,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
     /// IRequestHandler 也是通过结构类型Unit来处理不需要返回值的情况。
     /// </summary>
     public class SysUserCommandHandler : CommandHandler,
-        IRequestHandler<CreateSysUserCommand, Unit>,
-        IRequestHandler<RemoveSysUserCommand, Unit>,
-        IRequestHandler<ModifySysUserCommand, Unit>
+        IRequestHandler<CreateSysUserCommand>,
+        IRequestHandler<RemoveSysUserCommand>,
+        IRequestHandler<ModifySysUserCommand>
     {
         // 注入仓储接口
         private readonly ISysUserRepository _sysUserRepository;
@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _sysUserRoleRelaRepository = sysUserRoleRelaRepository;
         }
 
-        public Task<Unit> Handle(CreateSysUserCommand request, CancellationToken cancellationToken)
+        public Task Handle(CreateSysUserCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             var sysUser = _mapper.Map<SysUser>(request);
@@ -68,19 +68,19 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 // 引发错误事件
                 Bus.RaiseEvent(new DomainNotification("", "该用户名已经被使用！"));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
             // 手机号不可重复
             if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
             {
                 Bus.RaiseEvent(new DomainNotification("", "手机号已存在！"));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
             // 员工号不可重复
             if (_sysUserRepository.IsExistUserNo(sysUser.UserNo, sysUser.SysType))
             {
                 Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
             #endregion
 
@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!Commit())
                 {
                     Bus.RaiseEvent(new DomainNotification("", "添加用户失败"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
 
                 CommitTransaction();
@@ -153,13 +153,13 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 RollbackTransaction();
                 Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
-            return Task.FromResult(new Unit());
+            return Task.CompletedTask;
         }
 
-        public Task<Unit> Handle(RemoveSysUserCommand request, CancellationToken cancellationToken)
+        public Task Handle(RemoveSysUserCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -167,7 +167,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
             //查询该操作员信息
             SysUser sysUser;
@@ -183,14 +183,14 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 // 引发错误事件
                 Bus.RaiseEvent(new DomainNotification("", "该操作员不存在！"));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
             //判断是否自己删除自己
             if (sysUser.SysUserId.Equals(request.CurrentSysUserId))
             {
                 // 引发错误事件
                 Bus.RaiseEvent(new DomainNotification("", "系统不允许删除当前登陆用户！"));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             try
@@ -208,7 +208,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!Commit())
                 {
                     Bus.RaiseEvent(new DomainNotification("", "删除用户失败"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
                 CommitTransaction();
             }
@@ -216,13 +216,13 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 RollbackTransaction();
                 Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
-            return Task.FromResult(new Unit());
+            return Task.CompletedTask;
         }
 
-        public Task<Unit> Handle(ModifySysUserCommand request, CancellationToken cancellationToken)
+        public Task Handle(ModifySysUserCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -230,7 +230,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             //查询该操作员信息
@@ -239,7 +239,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 // 引发错误事件
                 Bus.RaiseEvent(new DomainNotification("", "该用户不存在！"));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             //判断是否自己禁用自己
@@ -247,7 +247,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 // 引发错误事件
                 Bus.RaiseEvent(new DomainNotification("", "系统不允许禁用当前登陆用户！"));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
             try
@@ -266,7 +266,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     if (_sysUserRepository.IsExistTelphone(request.Telphone, request.SysType))
                     {
                         Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
-                        return Task.FromResult(new Unit());
+                        return Task.CompletedTask;
                     }
                     _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, request.Telphone, null);
                 }
@@ -277,7 +277,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     if (_sysUserRepository.IsExistLoginUsername(request.LoginUsername, request.SysType))
                     {
                         Bus.RaiseEvent(new DomainNotification("", "该登录用户名已关联其他用户！"));
-                        return Task.FromResult(new Unit());
+                        return Task.CompletedTask;
                     }
                     _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, request.LoginUsername, null, null);
                 }
@@ -289,7 +289,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!Commit())
                 {
                     Bus.RaiseEvent(new DomainNotification("", "修改当前用户失败"));
-                    return Task.FromResult(new Unit());
+                    return Task.CompletedTask;
                 }
 
                 CommitTransaction();
@@ -298,10 +298,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 RollbackTransaction();
                 Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.FromResult(new Unit());
+                return Task.CompletedTask;
             }
 
-            return Task.FromResult(new Unit());
+            return Task.CompletedTask;
         }
     }
 }

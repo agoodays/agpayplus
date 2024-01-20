@@ -20,14 +20,14 @@ namespace AGooday.AgPay.Domain.QueryHandlers
             _sysUserTeamRepository = sysUserTeamRepository;
         }
 
-        public async Task<SysUser> Handle(GetByIdQuery<SysUser, long> request, CancellationToken cancellationToken)
+        public Task<SysUser> Handle(GetByIdQuery<SysUser, long> request, CancellationToken cancellationToken)
         {
             if (request.Id <= 0)
             {
                 throw new ArgumentException(nameof(request.Id));
             }
 
-            return await _sysUserRepository.GetByIdAsync(request.Id);
+            return _sysUserRepository.GetByIdAsync(request.Id);
         }
 
         public Task<IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>> Handle(SysUserQuery request, CancellationToken cancellationToken)

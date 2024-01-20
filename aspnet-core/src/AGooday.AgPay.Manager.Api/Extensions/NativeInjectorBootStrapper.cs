@@ -84,20 +84,20 @@ namespace AGooday.AgPay.Manager.Api.Extensions
 
             // 领域层 - 领域命令
             // 将命令模型和命令处理程序匹配
-            services.AddScoped<IRequestHandler<CreateSysUserCommand, Unit>, SysUserCommandHandler>();
-            services.AddScoped<IRequestHandler<RemoveSysUserCommand, Unit>, SysUserCommandHandler>();
-            services.AddScoped<IRequestHandler<ModifySysUserCommand, Unit>, SysUserCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateSysUserCommand>, SysUserCommandHandler>();
+            services.AddScoped<IRequestHandler<RemoveSysUserCommand>, SysUserCommandHandler>();
+            services.AddScoped<IRequestHandler<ModifySysUserCommand>, SysUserCommandHandler>();
 
             services.AddScoped<IRequestHandler<GetByIdQuery<SysUser, long>, SysUser>, SysUserQueryHandler>();
             services.AddScoped<IRequestHandler<SysUserQuery, IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>>, SysUserQueryHandler>();
 
-            services.AddScoped<IRequestHandler<CreateAgentInfoCommand, Unit>, AgentInfoCommandHandler>();
-            services.AddScoped<IRequestHandler<RemoveAgentInfoCommand, Unit>, AgentInfoCommandHandler>();
-            services.AddScoped<IRequestHandler<ModifyAgentInfoCommand, Unit>, AgentInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateAgentInfoCommand>, AgentInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<RemoveAgentInfoCommand>, AgentInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<ModifyAgentInfoCommand>, AgentInfoCommandHandler>();
 
-            services.AddScoped<IRequestHandler<CreateMchInfoCommand, Unit>, MchInfoCommandHandler>();
-            services.AddScoped<IRequestHandler<RemoveMchInfoCommand, Unit>, MchInfoCommandHandler>();
-            services.AddScoped<IRequestHandler<ModifyMchInfoCommand, Unit>, MchInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateMchInfoCommand>, MchInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<RemoveMchInfoCommand>, MchInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<ModifyMchInfoCommand>, MchInfoCommandHandler>();
 
             // 领域层 - Memory缓存
             services.AddSingleton<IMemoryCache>(factory =>

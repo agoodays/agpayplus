@@ -14,7 +14,6 @@ using AGooday.AgPay.Payment.Api.Middlewares;
 using AGooday.AgPay.Payment.Api.MQ;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -97,7 +96,7 @@ services.AddSwaggerGen();
 // 引用包 MediatR.Extensions.Microsoft.DependencyInjection
 //services.AddMediatR(typeof(MyxxxHandler));//单单注入某一个处理程序
 //或
-services.AddMediatR(typeof(Program));//目的是为了扫描Handler的实现对象并添加到IOC的容器中
+services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());//目的是为了扫描Handler的实现对象并添加到IOC的容器中
 
 services.Configure<ApiBehaviorOptions>(options =>
 {
