@@ -52,6 +52,10 @@ namespace AGooday.AgPay.Application.Services
             { "ossConfig", null }
         };
 
+        private static Dictionary<string, DBOcrConfig> OCR_CONFIG = new Dictionary<string, DBOcrConfig> {
+            { "ocrConfig", null }
+        };
+
         private static Dictionary<string, DBSmsConfig> SMS_CONFIG = new Dictionary<string, DBSmsConfig> {
             { "smsConfig", null }
         };
@@ -165,6 +169,26 @@ namespace AGooday.AgPay.Application.Services
                 InitDBConfig(OSS_CONFIG.First().Key);
             }
             return OSS_CONFIG.First().Value;
+        }
+
+        /// <summary>
+        /// 获取实际的数据
+        /// </summary>
+        /// <returns></returns>
+        public DBOcrConfig GetDBOcrConfig()
+        {
+            // 查询DB
+            if (!IS_USE_CACHE)
+            {
+                return JsonConvert.DeserializeObject<DBOcrConfig>(SelectByGroupKey(OCR_CONFIG.First().Key));
+            }
+
+            // 缓存数据
+            if (OCR_CONFIG.First().Value == null)
+            {
+                InitDBConfig(OCR_CONFIG.First().Key);
+            }
+            return OCR_CONFIG.First().Value;
         }
 
         /// <summary>
