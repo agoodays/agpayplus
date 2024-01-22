@@ -48,10 +48,10 @@ namespace AGooday.AgPay.Merchant.Api.Logs
                 var realname = _context.HttpContext.User.FindFirstValue(ClaimAttributes.Realname);
                 model.UserId = string.IsNullOrWhiteSpace(sysUserId) ? null : Convert.ToInt64(sysUserId);
                 model.UserName = string.IsNullOrWhiteSpace(realname) ? null : realname;
-                string ua = context.HttpContext.Request.Headers["User-Agent"];
+                string ua = context.HttpContext.Request.Headers.UserAgent;
                 var clientInfo = UAParser.Parser.GetDefault().Parse(ua);
                 var device = clientInfo.Device.Family;
-                device = device.ToLower() == "other" ? "" : device;
+                device = device.Equals("other", StringComparison.CurrentCultureIgnoreCase) ? "" : device;
                 model.Browser = clientInfo.UA.Family;
                 model.Os = clientInfo.OS.Family;
                 model.Device = device;

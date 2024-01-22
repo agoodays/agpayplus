@@ -183,10 +183,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers
 
         private static async Task<string> ReadRequestBodyAsync(Stream body)
         {
-            using (var reader = new StreamReader(body, Encoding.UTF8, true, 1024, true))
-            {
-                return await reader.ReadToEndAsync();
-            }
+            using var reader = new StreamReader(body, Encoding.UTF8, true, 1024, true);
+            return await reader.ReadToEndAsync();
         }
 
         private static Dictionary<string, JToken> GetUrlParameters(IQueryCollection formCollection)

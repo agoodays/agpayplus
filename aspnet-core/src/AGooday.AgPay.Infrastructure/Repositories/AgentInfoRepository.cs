@@ -193,7 +193,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return GetSubAgentsRecursive(query.ToList());
         }
 
-        private List<AgentInfo> GetSubAgentsRecursive(List<AgentInfo> agents)
+        private static List<AgentInfo> GetSubAgentsRecursive(List<AgentInfo> agents)
         {
             var subAgents = new List<AgentInfo>();
 
@@ -225,7 +225,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return GetParentAgentsRecursive(query.ToList());
         }
 
-        private List<AgentInfo> GetParentAgentsRecursive(List<AgentInfo> agents)
+        private static List<AgentInfo> GetParentAgentsRecursive(List<AgentInfo> agents)
         {
             var parentAgents = new List<AgentInfo>();
 

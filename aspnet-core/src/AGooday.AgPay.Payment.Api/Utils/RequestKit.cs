@@ -85,14 +85,14 @@ namespace AGooday.AgPay.Payment.Api.Utils
                 string name = entry.Key;
                 string value = entry.Value;
 
-                if (!name.Contains("["))
+                if (!name.Contains('['))
                 {
                     returnObject[name] = value;
                     continue;
                 }
 
-                string mainKey = name.Substring(0, name.IndexOf("["));
-                string subKey = name.Substring(name.IndexOf("[") + 1, name.IndexOf("]") - name.IndexOf("[") - 1);
+                string mainKey = name.Substring(0, name.IndexOf('['));
+                string subKey = name.Substring(name.IndexOf('[') + 1, name.IndexOf(']') - name.IndexOf('[') - 1);
                 JObject subJson = new JObject();
                 if (returnObject[mainKey] != null)
                 {
@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
 
             //有contentType  && json格式，  get请求不转换
             if (!string.IsNullOrEmpty(contentType) &&
-                contentType.ToLower().Contains("application/json") &&
+                contentType.Contains("application/json", StringComparison.CurrentCultureIgnoreCase) &&
                 !_httpContextAccessor.HttpContext.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
             {
                 //application/json 需要转换为json格式；
@@ -148,15 +148,15 @@ namespace AGooday.AgPay.Payment.Api.Utils
             // 获取客户端 IP 地址
             var request = _httpContextAccessor.HttpContext.Request;
             var ipAddress = request.Headers["X-Forwarded-For"].ToString();
-            if (string.IsNullOrEmpty(ipAddress) || ipAddress.ToLower() == "unknown")
+            if (string.IsNullOrEmpty(ipAddress) || ipAddress.Equals("unknown", StringComparison.CurrentCultureIgnoreCase))
             {
                 ipAddress = request.Headers["Proxy-Client-IP"].ToString();
             }
-            if (string.IsNullOrEmpty(ipAddress) || ipAddress.ToLower() == "unknown")
+            if (string.IsNullOrEmpty(ipAddress) || ipAddress.Equals("unknown", StringComparison.CurrentCultureIgnoreCase))
             {
                 ipAddress = request.Headers["WL-Proxy-Client-IP"].ToString();
             }
-            if (string.IsNullOrEmpty(ipAddress) || ipAddress.ToLower() == "unknown")
+            if (string.IsNullOrEmpty(ipAddress) || ipAddress.Equals("unknown", StringComparison.CurrentCultureIgnoreCase))
             {
                 ipAddress = request.HttpContext.Connection.RemoteIpAddress.ToString();
             }
@@ -164,9 +164,9 @@ namespace AGooday.AgPay.Payment.Api.Utils
             // 对于通过多个代理的情况，第一个 IP 为客户端真实 IP，多个 IP 按照逗号分割
             if (!string.IsNullOrEmpty(ipAddress) && ipAddress.Length > 15)
             {
-                if (ipAddress.IndexOf(",") > 0)
+                if (ipAddress.IndexOf(',') > 0)
                 {
-                    ipAddress = ipAddress.Substring(0, ipAddress.IndexOf(","));
+                    ipAddress = ipAddress.Substring(0, ipAddress.IndexOf(','));
                 }
             }
             return ipAddress;

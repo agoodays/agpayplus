@@ -19,13 +19,13 @@ namespace AGooday.AgPay.Common.Utils
             }
 
             StringBuilder sb = new StringBuilder(url);
-            if (url.IndexOf("?") < 0)
+            if (url.IndexOf('?') < 0)
             {
-                sb.Append("?");
+                sb.Append('?');
             }
 
             //是否包含query条件
-            bool isHasCondition = url.IndexOf("=") >= 0;
+            bool isHasCondition = url.Contains('=');
 
             foreach (var item in param)
             {
@@ -33,13 +33,13 @@ namespace AGooday.AgPay.Common.Utils
                 {
                     if (isHasCondition)
                     {
-                        sb.Append("&"); //包含了查询条件， 那么应当拼接&符号
+                        sb.Append('&'); //包含了查询条件， 那么应当拼接&符号
                     }
                     else
                     {
                         isHasCondition = true; //变更为： 已存在query条件
                     }
-                    sb.Append(item.Key).Append("=").Append(HttpUtility.UrlEncode(item.Value.ToString(), Encoding.UTF8));
+                    sb.Append(item.Key).Append('=').Append(HttpUtility.UrlEncode(item.Value.ToString(), Encoding.UTF8));
                 }
             }
 

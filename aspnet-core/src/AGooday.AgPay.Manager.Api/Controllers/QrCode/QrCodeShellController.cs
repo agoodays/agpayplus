@@ -19,11 +19,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
     [Route("api/qrc/shell")]
     public class QrCodeShellController : ControllerBase
     {
-        private readonly IWebHostEnvironment _env; 
+        private readonly IWebHostEnvironment _env;
         private readonly ILogger<QrCodeController> _logger;
         private readonly IQrCodeShellService _qrCodeShellService;
 
-        public QrCodeShellController(IWebHostEnvironment env, ILogger<QrCodeController> logger, 
+        public QrCodeShellController(IWebHostEnvironment env, ILogger<QrCodeController> logger,
             IQrCodeShellService qrCodeShellService)
         {
             _env = env;
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新码牌模板")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
-        public ApiRes Update(QrCodeShellDto dto)
+        public ApiRes Update(long recordId, QrCodeShellDto dto)
         {
             bool result = _qrCodeShellService.Update(dto);
             if (!result)

@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// <returns></returns>
         private string GetIfCodeByUA()
         {
-            string ua = Request.Headers["User-Agent"].FirstOrDefault();
+            string ua = Request.Headers.UserAgent.FirstOrDefault();
 
             // 无法识别扫码客户端
             if (string.IsNullOrEmpty(ua))
