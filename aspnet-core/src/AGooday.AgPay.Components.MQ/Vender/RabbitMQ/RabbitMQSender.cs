@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Components.MQ.Constant;
+﻿using AGooday.AgPay.Components.MQ.Constants;
 using AGooday.AgPay.Components.MQ.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

@@ -1,4 +1,4 @@
-﻿namespace AGooday.AgPay.Components.MQ.Constant
+﻿namespace AGooday.AgPay.Components.MQ.Constants
 {
     /// <summary>
     /// 定义MQ消息类型

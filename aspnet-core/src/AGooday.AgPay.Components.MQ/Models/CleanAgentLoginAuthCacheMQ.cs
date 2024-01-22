@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Components.MQ.Constant;
+﻿using AGooday.AgPay.Components.MQ.Constants;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Components.MQ.Models

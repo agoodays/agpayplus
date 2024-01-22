@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Components.MQ.Constant;
+﻿using AGooday.AgPay.Components.MQ.Constants;
 using AGooday.AgPay.Components.MQ.Models;
 
 namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive

@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Components.MQ.Constant;
+﻿using AGooday.AgPay.Components.MQ.Constants;
 
 namespace AGooday.AgPay.Components.MQ.Vender
 {
