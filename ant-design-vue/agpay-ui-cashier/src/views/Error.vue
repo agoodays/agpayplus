@@ -17,7 +17,6 @@ export default {
     }
   },
   components: {
-
   },
   mounted() {
     this.msg = this.$route.params.errInfo || '请重新扫码进入！'

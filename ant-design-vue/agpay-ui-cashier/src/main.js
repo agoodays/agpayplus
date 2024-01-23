@@ -15,7 +15,7 @@ Vue.config.productionTip = false
  */
 router.beforeEach((to, from, next) => {
 
-    console.log("进入路由守卫",from, to)
+    console.log("进入路由守卫", from, to)
 
     // from: 当前导航正要离开的路由
     // to: 即将要进入的目标路由对象

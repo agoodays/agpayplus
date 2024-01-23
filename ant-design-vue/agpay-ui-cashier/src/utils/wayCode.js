@@ -10,7 +10,7 @@ import config from '@/config'
 
 const getToPageRouteName = function () {
     const payWay = getPayWay();
-    return  payWay? payWay.routeName : null
+    return  payWay ? payWay.routeName : null
 }
 
 const getPayWay = function () {
@@ -25,12 +25,16 @@ const getPayWay = function () {
         return config.payWay.ALIPAY;
     }
 
+    if(userAgent.indexOf("unionpay") >= 0){
+        return config.payWay.YSFPAY;
+    }
+
     return null;
 
 }
 
 
-export default { getToPageRouteName: getToPageRouteName,
+export default {
+    getToPageRouteName: getToPageRouteName,
     getPayWay: getPayWay
-
 }

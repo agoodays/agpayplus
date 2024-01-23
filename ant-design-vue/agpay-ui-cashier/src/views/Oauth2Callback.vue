@@ -7,7 +7,7 @@
 
 <script>
 
-import {getChannelUserId} from '@/api/api'
+import { getChannelUserId } from '@/api/api'
 import wayCodeUtils from '@/utils/wayCode'
 import channelUserIdUtil from '@/utils/channelUserId'
 import config from "@/config";
@@ -22,9 +22,9 @@ export default {
       //设置channelUserId
       channelUserIdUtil.setChannelUserId(res);
 
-      this.$router.push({name: wayCodeUtils.getPayWay().routeName})
+      this.$router.push({ name: wayCodeUtils.getPayWay().routeName })
     }).catch(res => {
-      that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})
+      that.$router.push({ name: config.errorPageRouteName, params: { errInfo: res.msg } })
     });
   },
   methods: {
@@ -33,14 +33,14 @@ export default {
         return {};
       }
 
-      var pairs = window.location.search.substring(1).split("&"),
+      let pairs = window.location.search.substring(1).split("&"),
           result = {},
           pair,
           i;
-      for ( i in pairs ) {
-        if ( pairs[i] === "" ) continue;
+      for (i in pairs) {
+        if (pairs[i] === "") continue;
         pair = pairs[i].split("=");
-        result[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
+        result[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
       }
       return result;
     }
