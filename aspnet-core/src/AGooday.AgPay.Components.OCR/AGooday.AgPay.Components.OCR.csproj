@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="TencentCloudSDK.Ocr" Version="3.0.942" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AGooday.AgPay.Application\AGooday.AgPay.Application.csproj" />
   </ItemGroup>
 

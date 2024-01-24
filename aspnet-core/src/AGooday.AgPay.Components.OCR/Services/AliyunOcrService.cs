@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             ocrConfig = (AliyunOcrConfig)AbstractOcrConfig.GetOcrConfig(dbOcrConfig.OcrType, dbOcrConfig.AliOcrConfig);
         }
 
-        public Task<string> RecognizeTextAsync(string imagePath, string type)
+        public Task<Dictionary<string, string>> RecognizeCardTextAsync(string imagePath, string type)
         {
             throw new NotImplementedException();
         }
