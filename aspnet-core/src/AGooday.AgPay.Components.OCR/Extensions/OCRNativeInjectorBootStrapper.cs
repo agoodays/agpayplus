@@ -11,6 +11,7 @@ namespace AGooday.AgPay.Components.OCR.Extensions
         {
             services.AddKeyedScoped<IOcrService, AliyunOcrService>(OcrTypeEnum.Aliyun);
             services.AddKeyedScoped<IOcrService, TencentOcrService>(OcrTypeEnum.Tencent);
+            services.AddScoped<IOcrServiceFactory, OcrServiceFactory>();
         }
     }
 

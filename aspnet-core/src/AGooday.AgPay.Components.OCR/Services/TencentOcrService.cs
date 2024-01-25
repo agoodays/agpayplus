@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             ocrConfig = (TencentOcrConfig)AbstractOcrConfig.GetOcrConfig(dbSmsConfig.OcrType, dbSmsConfig.TencentOcrConfig);
         }
 
-        public Task<string> RecognizeTextAsync(string imagePath, string type)
+        public Task<string> RecognizeTextAsync(string imageUrl, string type)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                 {
                     // 构造请求对象
                     GeneralBasicOCRRequest req = new GeneralBasicOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的图片URL
+                    req.ImageUrl = imageUrl; // 要识别的图片URL
 
                     // 发送请求并获取识别结果
                     GeneralBasicOCRResponse resp = client.GeneralBasicOCRSync(req);
@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                 {
                     // 构造请求对象
                     GeneralAccurateOCRRequest req = new GeneralAccurateOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的图片URL
+                    req.ImageUrl = imageUrl; // 要识别的图片URL
 
                     // 发送请求并获取识别结果
                     GeneralAccurateOCRResponse resp = client.GeneralAccurateOCRSync(req);
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                 {
                     // 构造请求对象
                     GeneralHandwritingOCRRequest req = new GeneralHandwritingOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的图片URL
+                    req.ImageUrl = imageUrl; // 要识别的图片URL
 
                     // 发送请求并获取识别结果
                     GeneralHandwritingOCRResponse resp = client.GeneralHandwritingOCRSync(req);
@@ -87,7 +87,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             }
         }
 
-        public Task<Dictionary<string, string>> RecognizeCardTextAsync(string imagePath, string type)
+        public Task<CardOCRResult> RecognizeCardTextAsync(string imageUrl, string type)
         {
             try
             {
@@ -106,42 +106,61 @@ namespace AGooday.AgPay.Components.OCR.Services
                 OcrClient client = new OcrClient(cred, "ap-guangzhou", clientProfile);
 
                 // 处理识别结果
-                Dictionary<string, string> map = new Dictionary<string, string>();
+                CardOCRResult result = new CardOCRResult();
 
                 if (type.Equals("IdCard"))
                 {
                     // 构造请求对象
                     IDCardOCRRequest req = new IDCardOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的身份证图片URL
+                    req.ImageUrl = imageUrl; // 要识别的身份证图片URL
 
                     // 发送请求并获取识别结果
                     IDCardOCRResponse resp = client.IDCardOCRSync(req);
-                    resp.ToMap(map, type);
+                    result.IdCardName = resp.Name;
+                    result.IdCardSex = resp.Sex;
+                    result.IdCardNation = resp.Nation;
+                    result.IdCardBirth = resp.Birth;
+                    result.IdCardAddress = resp.Address;
+                    result.IdCardIdNum = resp.IdNum;
+                    result.IdCardAuthority = resp.Authority;
+                    result.IdCardValidDate = resp.ValidDate;
                 }
 
                 if (type.Equals("BankCard"))
                 {
                     // 构造请求对象
                     BankCardOCRRequest req = new BankCardOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的银行卡图片URL
+                    req.ImageUrl = imageUrl; // 要识别的银行卡图片URL
 
                     // 发送请求并获取识别结果
                     BankCardOCRResponse resp = client.BankCardOCRSync(req);
-                    resp.ToMap(map, type);
+                    result.BankCardCardNo = resp.CardNo;
+                    result.BankCardBankInfo = resp.BankInfo;
+                    result.BankCardValidDate = resp.ValidDate;
+                    result.BankCardCardType = resp.CardType;
                 }
 
                 if (type.Equals("BizLicense"))
                 {
                     // 构造请求对象
                     BizLicenseOCRRequest req = new BizLicenseOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的营业执照图片URL
+                    req.ImageUrl = imageUrl; // 要识别的营业执照图片URL
 
                     // 发送请求并获取识别结果
                     BizLicenseOCRResponse resp = client.BizLicenseOCRSync(req);
-                    resp.ToMap(map, type);
+                    result.BizLicenseRegNum = resp.RegNum;
+                    result.BizLicenseName = resp.Name;
+                    result.BizLicenseCapital = resp.Capital;
+                    result.BizLicensePerson = resp.Person;
+                    result.BizLicenseAddress = resp.Address;
+                    result.BizLicenseBusiness = resp.Business;
+                    result.BizLicenseType = resp.Type;
+                    result.BizLicensePeriod = resp.Period;
+                    result.BizLicenseComposingForm = resp.ComposingForm;
+                    result.BizLicenseRegistrationDate = resp.RegistrationDate;
                 }
 
-                return Task.FromResult(map);
+                return Task.FromResult(result);
             }
             catch (Exception ex)
             {

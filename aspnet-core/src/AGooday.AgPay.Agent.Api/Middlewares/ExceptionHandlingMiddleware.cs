@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Agent.Api.Middlewares
                     errorResponse.Msg = "登录失效";
                     break;
                 case BizException ex:
-                    errorResponse = ApiRes.CustomFail(ex.Message);// 自定义的异常错误信息类型
+                    errorResponse = ex.ApiRes;// 自定义的异常错误信息类型
                     //response.StatusCode = (int)HttpStatusCode.OK;
                     //errorResponse.Msg = ex.Message;
                     break;

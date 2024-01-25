@@ -4,7 +4,7 @@ namespace AGooday.AgPay.Common.Exceptions
 {
     public class BizException : Exception
     {
-        private ApiRes ApiRes;
+        public ApiRes ApiRes { get; private set; }
 
         /// <summary>
         /// 业务自定义异常

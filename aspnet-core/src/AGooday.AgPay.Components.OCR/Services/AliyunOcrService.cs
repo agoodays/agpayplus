@@ -32,13 +32,14 @@ namespace AGooday.AgPay.Components.OCR.Services
             };
             // Endpoint 请参考 https://api.aliyun.com/product/ocr-api
             config.Endpoint = ocrConfig.Endpoint;
+            client = new Client(config);
         }
 
-        public Task<string> RecognizeTextAsync(string imagePath, string type)
+        public Task<string> RecognizeTextAsync(string imageUrl, string type)
         {
             RecognizeGeneralRequest request = new RecognizeGeneralRequest
             {
-                Url = imagePath,
+                Url = imageUrl,
             };
             try
             {
@@ -58,72 +59,72 @@ namespace AGooday.AgPay.Components.OCR.Services
             }
         }
 
-        public Task<Dictionary<string, string>> RecognizeCardTextAsync(string imagePath, string type)
+        public Task<CardOCRResult> RecognizeCardTextAsync(string imageUrl, string type)
         {
             try
             {
                 // 处理识别结果
-                Dictionary<string, string> map = new Dictionary<string, string>();
+                CardOCRResult result = new CardOCRResult();
 
                 if (type.Equals("IdCard"))
                 {
                     RecognizeIdcardRequest request = new RecognizeIdcardRequest
                     {
-                        Url = imagePath,
+                        Url = imageUrl,
                     };
                     // 复制代码运行请自行打印 API 的返回值
                     RecognizeIdcardResponse response = client.RecognizeIdcardWithOptions(request, new RuntimeOptions());
                     var resp = JsonConvert.DeserializeObject<AliyunIDCardOCRResponse>(response.Body.Data);
-                    map.Add("IdCardName", resp.Face.Data.Name);
-                    map.Add("IdCardSex", resp.Face.Data.Sex);
-                    map.Add("IdCardNation", resp.Face.Data.Ethnicity);
-                    map.Add("IdCardBirth", resp.Face.Data.BirthDate);
-                    map.Add("IdCardAddress", resp.Face.Data.Address);
-                    map.Add("IdCardIdNum", resp.Face.Data.IdNumber);
+                    result.IdCardName = resp.Face.Data.Name;
+                    result.IdCardSex = resp.Face.Data.Sex;
+                    result.IdCardNation = resp.Face.Data.Ethnicity;
+                    result.IdCardBirth = resp.Face.Data.BirthDate;
+                    result.IdCardAddress = resp.Face.Data.Address;
+                    result.IdCardIdNum = resp.Face.Data.IdNumber;
 
-                    map.Add("IdCardAuthority", resp.Back.Data.IssueAuthority);
-                    map.Add("IdCardValidDate", resp.Back.Data.ValidPeriod);
+                    result.IdCardAuthority = resp.Back.Data.IssueAuthority;
+                    result.IdCardValidDate = resp.Back.Data.ValidPeriod;
                 }
 
                 if (type.Equals("BankCard"))
                 {
                     RecognizeBankCardRequest request = new RecognizeBankCardRequest
                     {
-                        Url = imagePath,
+                        Url = imageUrl,
                     };
                     // 复制代码运行请自行打印 API 的返回值
                     RecognizeBankCardResponse response = client.RecognizeBankCardWithOptions(request, new RuntimeOptions());
                     var resp = JsonConvert.DeserializeObject<AliyunBankCardOCRResponse>(response.Body.Data);
-                    map.Add("BankCardCardNo", resp.Data.CardNumber);
-                    map.Add("BankCardBankInfo", resp.Data.BankName);
-                    map.Add("BankCardValidDate", resp.Data.ValidToDate);
-                    map.Add("BankCardCardType", resp.Data.CardType);
+                    result.BankCardCardNo = resp.Data.CardNumber;
+                    result.BankCardBankInfo = resp.Data.BankName;
+                    result.BankCardValidDate = resp.Data.ValidToDate;
+                    result.BankCardCardType = resp.Data.CardType;
                 }
 
                 if (type.Equals("BizLicense"))
                 {
                     RecognizeBankCardRequest request = new RecognizeBankCardRequest
                     {
-                        Url = imagePath,
+                        Url = imageUrl,
                     };
                     // 复制代码运行请自行打印 API 的返回值
                     RecognizeBankCardResponse response = client.RecognizeBankCardWithOptions(request, new RuntimeOptions());
                     var resp = JsonConvert.DeserializeObject<AliyunBizLicenseOCRResponse>(response.Body.Data);
-                    map.Add("BizLicenseRegNum", resp.Data.CreditCode);
-                    map.Add("BizLicenseName", resp.Data.CompanyName);
-                    map.Add("BizLicenseCapital", resp.Data.RegisteredCapital);
-                    map.Add("BizLicensePerson", resp.Data.LegalPerson);
-                    map.Add("BizLicenseAddress", resp.Data.BusinessAddress);
-                    map.Add("BizLicenseBusiness", resp.Data.BusinessScope);
-                    map.Add("BizLicenseType", resp.Data.CompanyType);
-                    map.Add("BizLicensePeriod", resp.Data.ValidPeriod);
-                    map.Add("BizLicenseComposingForm", resp.Data.CompanyForm);
-                    map.Add("BizLicenseRegistrationDate", resp.Data.RegistrationDate);
-                    map.Add("BizLicenseValidFromDate", resp.Data.ValidFromDate);
-                    map.Add("BizLicenseValidToDate", resp.Data.ValidToDate);
+                    result.BizLicenseRegNum = resp.Data.CreditCode;
+                    result.BizLicenseName = resp.Data.CompanyName;
+                    result.BizLicenseCapital = resp.Data.RegisteredCapital;
+                    result.BizLicensePerson = resp.Data.LegalPerson;
+                    result.BizLicenseAddress = resp.Data.BusinessAddress;
+                    result.BizLicenseBusiness = resp.Data.BusinessScope;
+                    result.BizLicenseType = resp.Data.CompanyType;
+                    result.BizLicensePeriod = resp.Data.ValidPeriod;
+                    result.BizLicenseComposingForm = resp.Data.CompanyForm;
+                    result.BizLicenseRegistrationDate = resp.Data.RegistrationDate;
+                    result.BizLicenseValidFromDate = resp.Data.ValidFromDate;
+                    result.BizLicenseValidToDate = resp.Data.ValidToDate;
                 }
 
-                return Task.FromResult(map);
+                return Task.FromResult(result);
 
             }
             catch (Exception ex)

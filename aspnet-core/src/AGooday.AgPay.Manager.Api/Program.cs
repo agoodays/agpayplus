@@ -4,6 +4,8 @@ using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
+using AGooday.AgPay.Components.OCR.Controllers;
+using AGooday.AgPay.Components.OCR.Extensions;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Controllers;
 using AGooday.AgPay.Components.OSS.Extensions;
@@ -112,13 +114,14 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 };
 
 services.AddControllers(options =>
-{
-    ////添加全局异常过滤器
-    //options.Filters.Add<GlobalExceptionsFilter>();
-    //日志过滤器
-    options.Filters.Add<LogActionFilter>();
-})
+    {
+        ////添加全局异常过滤器
+        //options.Filters.Add<GlobalExceptionsFilter>();
+        //日志过滤器
+        options.Filters.Add<LogActionFilter>();
+    })
     .AddApplicationPart(typeof(OssFileController).Assembly)
+    .AddApplicationPart(typeof(OcrController).Assembly)
     //.AddNewtonsoftJson();
     .AddNewtonsoftJson(options =>
     {
@@ -192,6 +195,10 @@ services.AddHostedService<MQReceiverHostedService>();
 
 #region OSS
 OSSNativeInjectorBootStrapper.RegisterServices(services);
+#endregion
+
+#region OCR
+OCRNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
 #region SMS
