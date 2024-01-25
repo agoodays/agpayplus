@@ -33,8 +33,8 @@ namespace AGooday.AgPay.Components.OCR.Controllers
         {
             try
             {
-                var formParams = await ocrService.RecognizeTextAsync(imageUrl, type);
-                return ApiRes.Ok(formParams);
+                var text = await ocrService.RecognizeTextAsync(imageUrl, type);
+                return ApiRes.Ok(text);
             }
             catch (Exception e)
             {
@@ -55,8 +55,8 @@ namespace AGooday.AgPay.Components.OCR.Controllers
         {
             try
             {
-                var formParams = await ocrService.RecognizeCardTextAsync(imageUrl, type);
-                return ApiRes.Ok(formParams);
+                var text = await ocrService.RecognizeCardTextAsync(imageUrl, type);
+                return ApiRes.Ok(text);
             }
             catch (Exception e)
             {

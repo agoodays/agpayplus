@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Components.OCR.Constants;
 using AGooday.AgPay.Components.OCR.Models;
 using Microsoft.Extensions.Logging;
 using TencentCloud.Common;
@@ -15,36 +16,36 @@ namespace AGooday.AgPay.Components.OCR.Services
     {
         private readonly ILogger<TencentOcrService> logger;
         private readonly TencentOcrConfig ocrConfig;
+        private readonly OcrClient client;
 
         public TencentOcrService(ILogger<TencentOcrService> logger, ISysConfigService sysConfigService)
         {
             this.logger = logger;
             var dbSmsConfig = sysConfigService.GetDBOcrConfig();
             ocrConfig = (TencentOcrConfig)AbstractOcrConfig.GetOcrConfig(dbSmsConfig.OcrType, dbSmsConfig.TencentOcrConfig);
+            // 设置腾讯云API访问密钥
+            Credential cred = new Credential()
+            {
+                SecretId = ocrConfig.SecretId,
+                SecretKey = ocrConfig.SecretKey
+            };
+
+            // 实例化OCR客户端
+            ClientProfile clientProfile = new ClientProfile();
+            HttpProfile httpProfile = new HttpProfile();
+            httpProfile.Endpoint = ocrConfig.Endpoint; // OCR服务的API地址
+            clientProfile.HttpProfile = httpProfile;
+            client = new OcrClient(cred, "ap-guangzhou", clientProfile);
         }
 
         public Task<string> RecognizeTextAsync(string imageUrl, string type)
         {
             try
             {
-                // 设置腾讯云API访问密钥
-                Credential cred = new Credential()
-                {
-                    SecretId = ocrConfig.SecretId,
-                    SecretKey = ocrConfig.SecretKey
-                };
-
-                // 实例化OCR客户端
-                ClientProfile clientProfile = new ClientProfile();
-                HttpProfile httpProfile = new HttpProfile();
-                httpProfile.Endpoint = ocrConfig.Endpoint; // OCR服务的API地址
-                clientProfile.HttpProfile = httpProfile;
-                OcrClient client = new OcrClient(cred, "ap-guangzhou", clientProfile);
-
                 // 处理识别结果
                 List<string> detectedTexts = new List<string>();
 
-                if (type.Equals("GeneralBasic"))
+                if (type.Equals(OcrTypeCS.GENERAL_BASIC, StringComparison.OrdinalIgnoreCase))
                 {
                     // 构造请求对象
                     GeneralBasicOCRRequest req = new GeneralBasicOCRRequest();
@@ -55,7 +56,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                     detectedTexts = resp.TextDetections.Select(s => s.DetectedText).ToList();
                 }
 
-                if (type.Equals("GeneralAccurate"))
+                if (type.Equals(OcrTypeCS.GENERAL_ACCURATE, StringComparison.OrdinalIgnoreCase))
                 {
                     // 构造请求对象
                     GeneralAccurateOCRRequest req = new GeneralAccurateOCRRequest();
@@ -66,7 +67,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                     detectedTexts = resp.TextDetections.Select(s => s.DetectedText).ToList();
                 }
 
-                if (type.Equals("GeneralHandwriting"))
+                if (type.Equals(OcrTypeCS.GENERAL_HANDWRITING, StringComparison.OrdinalIgnoreCase))
                 {
                     // 构造请求对象
                     GeneralHandwritingOCRRequest req = new GeneralHandwritingOCRRequest();
@@ -77,7 +78,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                     detectedTexts = resp.TextDetections.Select(s => s.DetectedText).ToList();
                 }
 
-                return Task.FromResult(string.Join(" ", detectedTexts));
+                return Task.FromResult(string.Join("\n", detectedTexts));
             }
             catch (Exception ex)
             {
@@ -91,24 +92,10 @@ namespace AGooday.AgPay.Components.OCR.Services
         {
             try
             {
-                // 设置腾讯云API访问密钥
-                Credential cred = new Credential()
-                {
-                    SecretId = ocrConfig.SecretId,
-                    SecretKey = ocrConfig.SecretKey
-                };
-
-                // 实例化OCR客户端
-                ClientProfile clientProfile = new ClientProfile();
-                HttpProfile httpProfile = new HttpProfile();
-                httpProfile.Endpoint = ocrConfig.Endpoint; // OCR服务的API地址
-                clientProfile.HttpProfile = httpProfile;
-                OcrClient client = new OcrClient(cred, "ap-guangzhou", clientProfile);
-
                 // 处理识别结果
                 CardOCRResult result = new CardOCRResult();
 
-                if (type.Equals("IdCard"))
+                if (type.Equals(OcrTypeCS.ID_CARD, StringComparison.OrdinalIgnoreCase))
                 {
                     // 构造请求对象
                     IDCardOCRRequest req = new IDCardOCRRequest();
@@ -126,7 +113,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                     result.IdCardValidDate = resp.ValidDate;
                 }
 
-                if (type.Equals("BankCard"))
+                if (type.Equals(OcrTypeCS.BANK_CARD, StringComparison.OrdinalIgnoreCase))
                 {
                     // 构造请求对象
                     BankCardOCRRequest req = new BankCardOCRRequest();
@@ -140,7 +127,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                     result.BankCardCardType = resp.CardType;
                 }
 
-                if (type.Equals("BizLicense"))
+                if (type.Equals(OcrTypeCS.BIZ_LICENSE, StringComparison.OrdinalIgnoreCase))
                 {
                     // 构造请求对象
                     BizLicenseOCRRequest req = new BizLicenseOCRRequest();

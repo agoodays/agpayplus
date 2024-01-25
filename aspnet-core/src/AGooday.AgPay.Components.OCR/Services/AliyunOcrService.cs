@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Components.OCR.Constants;
 using AGooday.AgPay.Components.OCR.Models;
 using AlibabaCloud.OpenApiClient.Models;
 using AlibabaCloud.SDK.Ocr_api20210707;
@@ -37,24 +38,56 @@ namespace AGooday.AgPay.Components.OCR.Services
 
         public Task<string> RecognizeTextAsync(string imageUrl, string type)
         {
-            RecognizeGeneralRequest request = new RecognizeGeneralRequest
-            {
-                Url = imageUrl,
-            };
             try
             {
-                // 复制代码运行请自行打印 API 的返回值
-                RecognizeGeneralResponse response = client.RecognizeGeneralWithOptions(request, new RuntimeOptions());
+                if (type.Equals(OcrTypeCS.GENERAL_BASIC, StringComparison.OrdinalIgnoreCase))
+                {
+                    RecognizeGeneralRequest request = new RecognizeGeneralRequest
+                    {
+                        Url = imageUrl,
+                    };
+                    // 复制代码运行请自行打印 API 的返回值
+                    RecognizeGeneralResponse response = client.RecognizeGeneralWithOptions(request, new RuntimeOptions());
 
-                // 处理识别结果
-                var resp = JsonConvert.DeserializeObject<AliyunGeneralOCRResponse>(response.Body.Data);
-                return Task.FromResult(resp.Data.Content);
+                    // 处理识别结果
+                    var resp = JsonConvert.DeserializeObject<AliyunGeneralOCRResponse>(response.Body.Data);
+                    return Task.FromResult(resp.Data.Content);
+                }
 
+                if (type.Equals(OcrTypeCS.GENERAL_ACCURATE, StringComparison.OrdinalIgnoreCase))
+                {
+                    RecognizeAdvancedRequest request = new RecognizeAdvancedRequest
+                    {
+                        Url = imageUrl,
+                    };
+                    // 复制代码运行请自行打印 API 的返回值
+                    RecognizeAdvancedResponse response = client.RecognizeAdvancedWithOptions(request, new RuntimeOptions());
+
+                    // 处理识别结果
+                    var resp = JsonConvert.DeserializeObject<AliyunGeneralOCRResponse>(response.Body.Data);
+                    return Task.FromResult(resp.Data.Content);
+                }
+
+                if (type.Equals(OcrTypeCS.GENERAL_HANDWRITING, StringComparison.OrdinalIgnoreCase))
+                {
+                    RecognizeHandwritingRequest request = new RecognizeHandwritingRequest
+                    {
+                        Url = imageUrl,
+                    };
+                    // 复制代码运行请自行打印 API 的返回值
+                    RecognizeHandwritingResponse response = client.RecognizeHandwritingWithOptions(request, new RuntimeOptions());
+
+                    // 处理识别结果
+                    var resp = JsonConvert.DeserializeObject<AliyunGeneralOCRResponse>(response.Body.Data);
+                    return Task.FromResult(resp.Data.Content);
+                }
+
+                return Task.FromResult(string.Empty);
             }
             catch (Exception ex)
             {
                 // 处理异常
-                logger.LogError(ex, $"OCR异常，请求报文：{JsonConvert.SerializeObject(request)}");
+                logger.LogError(ex, $"OCR异常");
                 throw;
             }
         }
@@ -66,7 +99,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                 // 处理识别结果
                 CardOCRResult result = new CardOCRResult();
 
-                if (type.Equals("IdCard"))
+                if (type.Equals(OcrTypeCS.ID_CARD, StringComparison.OrdinalIgnoreCase))
                 {
                     RecognizeIdcardRequest request = new RecognizeIdcardRequest
                     {
@@ -86,7 +119,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                     result.IdCardValidDate = resp.Back.Data.ValidPeriod;
                 }
 
-                if (type.Equals("BankCard"))
+                if (type.Equals(OcrTypeCS.BANK_CARD, StringComparison.OrdinalIgnoreCase))
                 {
                     RecognizeBankCardRequest request = new RecognizeBankCardRequest
                     {
@@ -101,7 +134,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                     result.BankCardCardType = resp.Data.CardType;
                 }
 
-                if (type.Equals("BizLicense"))
+                if (type.Equals(OcrTypeCS.BIZ_LICENSE, StringComparison.OrdinalIgnoreCase))
                 {
                     RecognizeBankCardRequest request = new RecognizeBankCardRequest
                     {
