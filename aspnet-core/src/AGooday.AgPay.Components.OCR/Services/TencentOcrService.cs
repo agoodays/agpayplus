@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             ocrConfig = (TencentOcrConfig)AbstractOcrConfig.GetOcrConfig(dbSmsConfig.OcrType, dbSmsConfig.TencentOcrConfig);
         }
 
-        public Task<Dictionary<string, string>> RecognizeTextAsync(string imagePath, string type)
+        public Task<string> RecognizeTextAsync(string imagePath, string type)
         {
             try
             {
@@ -37,47 +37,47 @@ namespace AGooday.AgPay.Components.OCR.Services
                 // 实例化OCR客户端
                 ClientProfile clientProfile = new ClientProfile();
                 HttpProfile httpProfile = new HttpProfile();
-                httpProfile.Endpoint = "ocr.tencentcloudapi.com"; // OCR服务的API地址
+                httpProfile.Endpoint = ocrConfig.Endpoint; // OCR服务的API地址
                 clientProfile.HttpProfile = httpProfile;
                 OcrClient client = new OcrClient(cred, "ap-guangzhou", clientProfile);
 
                 // 处理识别结果
-                Dictionary<string, string> map = new Dictionary<string, string>();
+                List<string> detectedTexts = new List<string>();
 
                 if (type.Equals("GeneralBasic"))
                 {
                     // 构造请求对象
                     GeneralBasicOCRRequest req = new GeneralBasicOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的身份证图片URL
+                    req.ImageUrl = imagePath; // 要识别的图片URL
 
                     // 发送请求并获取识别结果
                     GeneralBasicOCRResponse resp = client.GeneralBasicOCRSync(req);
-                    resp.ToMap(map, type);
+                    detectedTexts = resp.TextDetections.Select(s => s.DetectedText).ToList();
                 }
 
                 if (type.Equals("GeneralAccurate"))
                 {
                     // 构造请求对象
                     GeneralAccurateOCRRequest req = new GeneralAccurateOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的身份证图片URL
+                    req.ImageUrl = imagePath; // 要识别的图片URL
 
                     // 发送请求并获取识别结果
                     GeneralAccurateOCRResponse resp = client.GeneralAccurateOCRSync(req);
-                    resp.ToMap(map, type);
+                    detectedTexts = resp.TextDetections.Select(s => s.DetectedText).ToList();
                 }
 
                 if (type.Equals("GeneralHandwriting"))
                 {
                     // 构造请求对象
                     GeneralHandwritingOCRRequest req = new GeneralHandwritingOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的身份证图片URL
+                    req.ImageUrl = imagePath; // 要识别的图片URL
 
                     // 发送请求并获取识别结果
                     GeneralHandwritingOCRResponse resp = client.GeneralHandwritingOCRSync(req);
-                    resp.ToMap(map, type);
+                    detectedTexts = resp.TextDetections.Select(s => s.DetectedText).ToList();
                 }
 
-                return Task.FromResult(map);
+                return Task.FromResult(string.Join(" ", detectedTexts));
             }
             catch (Exception ex)
             {
@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                 // 实例化OCR客户端
                 ClientProfile clientProfile = new ClientProfile();
                 HttpProfile httpProfile = new HttpProfile();
-                httpProfile.Endpoint = "ocr.tencentcloudapi.com"; // OCR服务的API地址
+                httpProfile.Endpoint = ocrConfig.Endpoint; // OCR服务的API地址
                 clientProfile.HttpProfile = httpProfile;
                 OcrClient client = new OcrClient(cred, "ap-guangzhou", clientProfile);
 
@@ -123,7 +123,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                 {
                     // 构造请求对象
                     BankCardOCRRequest req = new BankCardOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的身份证图片URL
+                    req.ImageUrl = imagePath; // 要识别的银行卡图片URL
 
                     // 发送请求并获取识别结果
                     BankCardOCRResponse resp = client.BankCardOCRSync(req);
@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                 {
                     // 构造请求对象
                     BizLicenseOCRRequest req = new BizLicenseOCRRequest();
-                    req.ImageUrl = imagePath; // 要识别的身份证图片URL
+                    req.ImageUrl = imagePath; // 要识别的营业执照图片URL
 
                     // 发送请求并获取识别结果
                     BizLicenseOCRResponse resp = client.BizLicenseOCRSync(req);
@@ -146,7 +146,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             catch (Exception ex)
             {
                 // 处理异常
-                logger.LogError(ex, $"Ocr异常");
+                logger.LogError(ex, $"OCR异常");
                 throw;
             }
         }
