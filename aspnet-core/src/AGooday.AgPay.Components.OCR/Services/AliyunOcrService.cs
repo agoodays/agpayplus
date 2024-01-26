@@ -13,15 +13,14 @@ namespace AGooday.AgPay.Components.OCR.Services
     /// <summary>
     /// API 概览：https://help.aliyun.com/document_detail/442328.html
     /// </summary>
-    public class AliyunOcrService : IOcrService
+    public class AliyunOcrService : AbstractOcrService
     {
-        private readonly ILogger<AliyunOcrService> logger;
         private readonly AliyunOcrConfig ocrConfig;
         private readonly Client client;
 
         public AliyunOcrService(ILogger<AliyunOcrService> logger, ISysConfigService sysConfigService)
+            : base(logger)
         {
-            this.logger = logger;
             var dbOcrConfig = sysConfigService.GetDBOcrConfig();
             ocrConfig = (AliyunOcrConfig)AbstractOcrConfig.GetOcrConfig(dbOcrConfig.OcrType, dbOcrConfig.AliOcrConfig);
             Config config = new Config
@@ -36,7 +35,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             client = new Client(config);
         }
 
-        public Task<string> RecognizeTextAsync(string imageUrl, string type)
+        public override Task<string> RecognizeTextAsync(string imageUrl, string type)
         {
             try
             {
@@ -92,7 +91,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             }
         }
 
-        public Task<CardOCRResult> RecognizeCardTextAsync(string imageUrl, string type)
+        public override Task<CardOCRResult> RecognizeCardTextAsync(string imageUrl, string type)
         {
             try
             {
@@ -108,15 +107,15 @@ namespace AGooday.AgPay.Components.OCR.Services
                     // 复制代码运行请自行打印 API 的返回值
                     RecognizeIdcardResponse response = client.RecognizeIdcardWithOptions(request, new RuntimeOptions());
                     var resp = JsonConvert.DeserializeObject<AliyunIDCardOCRResponse>(response.Body.Data);
-                    result.IdCardName = resp.Face.Data.Name;
-                    result.IdCardSex = resp.Face.Data.Sex;
-                    result.IdCardNation = resp.Face.Data.Ethnicity;
-                    result.IdCardBirth = resp.Face.Data.BirthDate;
-                    result.IdCardAddress = resp.Face.Data.Address;
-                    result.IdCardIdNum = resp.Face.Data.IdNumber;
+                    result.IdCardName = resp.Data.Face?.Data.Name;
+                    result.IdCardSex = resp.Data.Face?.Data.Sex;
+                    result.IdCardNation = resp.Data.Face?.Data.Ethnicity;
+                    result.IdCardBirth = ConvertDateToFormat(resp.Data.Face?.Data.BirthDate, "yyyy年MM月dd日");
+                    result.IdCardAddress = resp.Data.Face?.Data.Address;
+                    result.IdCardIdNum = resp.Data.Face?.Data.IdNumber;
 
-                    result.IdCardAuthority = resp.Back.Data.IssueAuthority;
-                    result.IdCardValidDate = resp.Back.Data.ValidPeriod;
+                    result.IdCardAuthority = resp.Data.Back?.Data.IssueAuthority;
+                    result.IdCardValidDate = resp.Data.Back?.Data.ValidPeriod;
                 }
 
                 if (type.Equals(OcrTypeCS.BANK_CARD, StringComparison.OrdinalIgnoreCase))

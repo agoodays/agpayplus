@@ -2,6 +2,7 @@
 using AGooday.AgPay.Components.OCR.Constants;
 using AGooday.AgPay.Components.OCR.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using TencentCloud.Common;
 using TencentCloud.Common.Profile;
 using TencentCloud.Ocr.V20181119;
@@ -12,16 +13,18 @@ namespace AGooday.AgPay.Components.OCR.Services
     /// <summary>
     /// API 概览：https://cloud.tencent.com/document/api/866/33515
     /// </summary>
-    public class TencentOcrService : IOcrService
+    public class TencentOcrService : AbstractOcrService
     {
-        private readonly ILogger<TencentOcrService> logger;
         private readonly TencentOcrConfig ocrConfig;
+        private readonly JsonSerializerSettings globalSettings;
         private readonly OcrClient client;
 
         public TencentOcrService(ILogger<TencentOcrService> logger, ISysConfigService sysConfigService)
+            : base(logger)
         {
-            this.logger = logger;
             var dbSmsConfig = sysConfigService.GetDBOcrConfig();
+            // 获取全局默认配置
+            globalSettings = JsonConvert.DefaultSettings?.Invoke() ?? new JsonSerializerSettings();
             ocrConfig = (TencentOcrConfig)AbstractOcrConfig.GetOcrConfig(dbSmsConfig.OcrType, dbSmsConfig.TencentOcrConfig);
             // 设置腾讯云API访问密钥
             Credential cred = new Credential()
@@ -38,10 +41,12 @@ namespace AGooday.AgPay.Components.OCR.Services
             client = new OcrClient(cred, "ap-guangzhou", clientProfile);
         }
 
-        public Task<string> RecognizeTextAsync(string imageUrl, string type)
+        public override Task<string> RecognizeTextAsync(string imageUrl, string type)
         {
             try
             {
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings();
+
                 // 处理识别结果
                 List<string> detectedTexts = new List<string>();
 
@@ -86,12 +91,18 @@ namespace AGooday.AgPay.Components.OCR.Services
                 logger.LogError(ex, $"Ocr异常");
                 throw;
             }
+            finally
+            {
+                JsonConvert.DefaultSettings = () => globalSettings;
+            }
         }
 
-        public Task<CardOCRResult> RecognizeCardTextAsync(string imageUrl, string type)
+        public override Task<CardOCRResult> RecognizeCardTextAsync(string imageUrl, string type)
         {
             try
             {
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings();
+
                 // 处理识别结果
                 CardOCRResult result = new CardOCRResult();
 
@@ -103,14 +114,14 @@ namespace AGooday.AgPay.Components.OCR.Services
 
                     // 发送请求并获取识别结果
                     IDCardOCRResponse resp = client.IDCardOCRSync(req);
-                    result.IdCardName = resp.Name;
-                    result.IdCardSex = resp.Sex;
-                    result.IdCardNation = resp.Nation;
-                    result.IdCardBirth = resp.Birth;
-                    result.IdCardAddress = resp.Address;
-                    result.IdCardIdNum = resp.IdNum;
-                    result.IdCardAuthority = resp.Authority;
-                    result.IdCardValidDate = resp.ValidDate;
+                    result.IdCardName = ConvertEmptyStringToNull(resp.Name);
+                    result.IdCardSex = ConvertEmptyStringToNull(resp.Sex);
+                    result.IdCardNation = ConvertEmptyStringToNull(resp.Nation);
+                    result.IdCardBirth = ConvertEmptyStringToNull(ConvertDateToFormat(resp.Birth, "yyyy/MM/dd"));
+                    result.IdCardAddress = ConvertEmptyStringToNull(resp.Address);
+                    result.IdCardIdNum = ConvertEmptyStringToNull(resp.IdNum);
+                    result.IdCardAuthority = ConvertEmptyStringToNull(resp.Authority);
+                    result.IdCardValidDate = ConvertEmptyStringToNull(resp.ValidDate);
                 }
 
                 if (type.Equals(OcrTypeCS.BANK_CARD, StringComparison.OrdinalIgnoreCase))
@@ -154,6 +165,10 @@ namespace AGooday.AgPay.Components.OCR.Services
                 // 处理异常
                 logger.LogError(ex, $"OCR异常");
                 throw;
+            }
+            finally
+            {
+                JsonConvert.DefaultSettings = () => globalSettings;
             }
         }
     }
