@@ -21,9 +21,14 @@
             <a-range-picker
               v-model="dateRangeValue"
               @change="onChange"
+              @panelChange="onPanelChange"
               style="width: 100%"
-              :format="'YYYY-MM-DD'"
+              :format="dateFormat"
+              :placeholder="[`开始${dateRangeMode==='date'? '日期' : (dateRangeMode==='month' ? '月份' : '年份')}`, `结束${dateRangeMode==='date'? '日期' : (dateRangeMode==='month' ? '月份' : '年份')}`]"
+              :mode="[dateRangeMode, dateRangeMode]"
               :disabled-date="disabledDate"
+              :open="dateRangeOpen"
+              @openChange="dateRangeOpen = !dateRangeOpen"
             >
               <a-icon slot="suffixIcon" type="sync" />
             </a-range-picker>
@@ -170,6 +175,7 @@ export default {
       },
       dateFormat: 'YYYY-MM-DD',
       dateRangeMode: 'date',
+      dateRangeOpen: false,
       dateRangeValue: [startDate, endDate]
     }
   },
@@ -245,13 +251,14 @@ export default {
     },
     moment,
     queryDateTypeChange (value) {
+      this.queryDateType = value
       let startDate = moment().subtract(1, 'year').startOf('month')
-      const endDate = moment().startOf('day').subtract(1, 'days')
+      let endDate = moment().startOf('day').subtract(1, 'days')
       switch (value) {
         case 'day':
           this.dateFormat = 'YYYY-MM-DD'
           this.dateRangeMode = 'date'
-          startDate = moment().subtract(1, 'month').startOf('day')
+          startDate = moment().subtract(1, 'month')
           break
         case 'month':
           this.dateFormat = 'YYYY-MM'
@@ -262,16 +269,27 @@ export default {
           this.dateRangeMode = 'year'
           break
       }
+      startDate = startDate.startOf(this.queryDateType)
+      endDate = endDate.endOf(this.queryDateType)
       this.searchData.queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
       this.dateRangeValue = [startDate, endDate]
+    },
+    onPanelChange (value, mode) {
+      this.dateRangeValue = value
+      if (mode[1] === 'date' || !mode[1]) {
+        this.dateRangeOpen = false
+        const startDate = value[0].startOf(this.queryDateType)
+        const endDate = value[1].endOf(this.queryDateType)
+        this.searchData.queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
+      }
     },
     onChange (date, dateString) {
       const startDate = dateString[0] // 开始时间
       const endDate = dateString[1] // 结束时间
       const start = moment(startDate)
       const end = moment(endDate)
-      this.dateRangeValue = !startDate || !startDate ? dateString : [start, end]
-      this.searchData.queryDateRange = !startDate || !startDate ? '' : `customDateTime_${start.format('YYYY-MM-DD')} 00:00:00_${end.format('YYYY-MM-DD')} 23:59:59`
+      this.dateRangeValue = !startDate || !endDate ? dateString : [start, end]
+      this.searchData.queryDateRange = !startDate || !endDate ? '' : `customDateTime_${start.format('YYYY-MM-DD')} 00:00:00_${end.format('YYYY-MM-DD')} 23:59:59`
     },
     disabledDate (current) { // 今日之后日期不可选
       return current && current > moment().endOf('day')
