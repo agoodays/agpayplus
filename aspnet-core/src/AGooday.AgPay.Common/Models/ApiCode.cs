@@ -45,9 +45,9 @@
         /// </summary>
         public static ApiCode SYS_PERMISSION_ERROR => Init(5004, "权限错误，当前用户不支持此操作");
 
-        private int code;
+        private readonly int code;
 
-        private string msg;
+        private readonly string msg;
 
         public ApiCode(int code, string msg)
         {
