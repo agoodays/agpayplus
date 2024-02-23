@@ -276,11 +276,11 @@ export default {
     },
     onPanelChange (value, mode) {
       this.dateRangeValue = value
+      const startDate = value[0].startOf(this.queryDateType)
+      const endDate = value[1].endOf(this.queryDateType)
+      this.searchData.queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
       if (mode[1] === 'date' || !mode[1]) {
         this.dateRangeOpen = false
-        const startDate = value[0].startOf(this.queryDateType)
-        const endDate = value[1].endOf(this.queryDateType)
-        this.searchData.queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
       }
     },
     onChange (date, dateString) {
