@@ -223,15 +223,15 @@ CREATE TABLE `t_sys_user_login_attempt` (
   `identifier` VARCHAR(128) NOT NULL COMMENT '认证标识 ( 用户名 | open_id )',
   `ip_address` VARCHAR(128) NOT NULL COMMENT 'IP地址',
   `success` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '登录成功',
-  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, MCH-商户中心',
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
   `attempt_time` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '尝试时间',
   PRIMARY KEY (`id`),
   INDEX `Idx_UserId_SysType` (`user_id`, `sys_type`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='系统用户登录尝试记录表';
 
-INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LOGIN_LIMIT_DELETE', '按钮： 解除登录限制', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
-INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LOGIN_LIMIT_DELETE', '按钮： 解除登录限制', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'AGENT', NOW(), NOW());
-INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LOGIN_LIMIT_DELETE', '按钮： 解除登录限制', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LOGIN_LIMIT_DELETE', '按钮：解除登录限制', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LOGIN_LIMIT_DELETE', '按钮：解除登录限制', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'AGENT', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LOGIN_LIMIT_DELETE', '按钮：解除登录限制', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
             
 #####  ----------  代理商-表结构DDL+初始化DML  ----------  #####
 
@@ -271,12 +271,33 @@ CREATE TABLE `t_agent_info` (
   `un_amount` INT NOT NULL DEFAULT '0' COMMENT '不可用金额', 
   `balance_amount` INT NOT NULL DEFAULT '0' COMMENT '钱包余额', 
   `audit_profit_amount` INT NOT NULL DEFAULT '0' COMMENT '在途佣金', 
+  `freeze_amount` INT NOT NULL DEFAULT '0' COMMENT '冻结金额', 
   `created_uid` BIGINT DEFAULT NULL COMMENT '创建者用户ID',
   `created_by` VARCHAR(64) DEFAULT NULL COMMENT '创建者姓名',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (agent_no)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='代理商信息表';
+
+-- 账户帐单表
+DROP TABLE IF EXISTS t_account_bill;
+CREATE TABLE `t_account_bill` (
+  `bill_id` VARCHAR(30) NOT NULL COMMENT '帐单单号',
+  `info_id` VARCHAR(64) NOT NULL COMMENT 'PLATFORM_PROFIT-运营平台利润账户, PLATFORM_INACCOUNT-运营平台入账账户, 代理商号',
+  `info_name` VARCHAR(64) NOT NULL COMMENT '运营平台, 代理商名称',
+  `info_type` VARCHAR(64) NOT NULL COMMENT 'PLATFORM-运营平台, AGENT-代理商',
+  `before_balance` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动前余额,单位分',
+  `change_amount` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动金额,单位分',
+  `after_balance` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动后余额,单位分',
+  `biz_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '业务类型: 1-订单佣金计算, 2-退款轧差, 3-佣金提现, 4-人工调账',
+  `account_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '账户类型: 1-钱包账户, 2-在途账户',
+  `rela_biz_order_type` VARCHAR(30) NOT NULL COMMENT '关联订单类型: 1-支付订单, 2-退款订单, 3-提现申请订单',
+  `rela_biz_order_id` VARCHAR(30) NOT NULL COMMENT '关联订单号',
+  `remark` VARCHAR(128) COMMENT '帐单备注',
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (`bill_id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='账户帐单表';
 
 -- 代理商管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '35', 'MGR', NOW(), NOW());
@@ -400,18 +421,18 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_ORDER', '订单管理', 'transaction'
 INSERT INTO t_sys_entitlement VALUES ('ENT_SYS_CONFIG', '系统管理', 'setting', '', 'RouteView', 'ML', 0, 1, 'ROOT', 200, 'AGENT', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES ('ENT_UR', '用户角色管理', 'team', '', 'RouteView', 'ML', 0, 1, 'ENT_SYS_CONFIG', 10, 'AGENT', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER', '操作员管理', 'contacts', '/users', 'SysUserPage', 'ML', 0, 1, 'ENT_UR', 10, 'AGENT', NOW(), NOW());
-            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_VIEW', '按钮： 详情', '', 'no-icon', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
-            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_UPD_ROLE', '按钮： 角色分配', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_VIEW', '按钮：详情', '', 'no-icon', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_UPD_ROLE', '按钮：角色分配', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_SEARCH', '按钮：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_LIST', '页面：操作员列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
-            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_EDIT', '按钮： 修改基本信息', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
-            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_DELETE', '按钮： 删除操作员', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_EDIT', '按钮：修改基本信息', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_DELETE', '按钮：删除操作员', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES ('ENT_UR_USER_ADD', '按钮：添加操作员', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_USER', 0, 'AGENT', NOW(), NOW());
 
         INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE', '角色管理', 'user', '/roles', 'RolePage', 'ML', 0, 1, 'ENT_UR', 20, 'AGENT', NOW(), NOW());
-            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_EDIT', '按钮： 修改基本信息', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
-            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_DIST', '按钮： 分配权限', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
-            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_DEL', '按钮： 删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_EDIT', '按钮：修改基本信息', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_DIST', '按钮：分配权限', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_ADD', '按钮：添加角色', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());		
             INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_SEARCH', '页面：搜索', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES ('ENT_UR_ROLE_LIST', '页面：角色列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_ROLE', 0, 'AGENT', NOW(), NOW());
@@ -800,11 +821,11 @@ CREATE TABLE `t_mbr_bill` (
   `mbr_name` VARCHAR(64) NOT NULL COMMENT '会员名称',
   `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
   `mbr_tel` VARCHAR(32) COMMENT '手机号',
-  `before_amount` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动前余额,单位分',
-  `change_balance` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动金额,单位分',
+  `before_balance` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动前余额,单位分',
+  `change_amount` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动金额,单位分',
   `after_balance` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动后余额,单位分',
   `biz_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '业务类型: 0-, 1-支付充值, 2-现金充值, 3-会员消费, 4-消费退款, 5-人工调账',
-  `remark` VARCHAR(128) COMMENT '交易备注',
+  `remark` VARCHAR(128) COMMENT '帐单备注',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`mbr_bill_id`)

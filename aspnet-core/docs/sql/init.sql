@@ -15,7 +15,7 @@ CREATE TABLE `t_sys_entitlement` (
   `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态 0-停用, 1-启用',
   `pid` VARCHAR(32) NOT NULL COMMENT '父ID',
   `ent_sort` INT(11) NOT NULL DEFAULT 0 COMMENT '排序字段, 规则：正序',
-  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统： MGR-运营平台, MCH-商户中心',
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`ent_id`, `sys_type`)
@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `t_sys_role`;
 CREATE TABLE `t_sys_role` (
   `role_id` VARCHAR(32) NOT NULL COMMENT '角色ID, ROLE_开头',
   `role_name` VARCHAR(32) NOT NULL COMMENT '角色名称',
-  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统： MGR-运营平台, MCH-商户中心',
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
   `belong_info_id` VARCHAR(64) NOT NULL DEFAULT '0' COMMENT '所属商户ID / 0(平台)',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`role_id`)
@@ -52,7 +52,7 @@ CREATE TABLE `t_sys_user` (
   `user_no` VARCHAR(32) COMMENT '员工编号',
   `is_admin` TINYINT(6) NOT NULL DEFAULT 0 COMMENT '是否超管（超管拥有全部权限） 0-否 1-是',
   `state` TINYINT(6) NOT NULL DEFAULT 0 COMMENT '状态 0-停用 1-启用',
-  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统： MGR-运营平台, MCH-商户中心',
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
   `belong_info_id` VARCHAR(64) NOT NULL DEFAULT '0' COMMENT '所属商户ID / 0(平台)',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
@@ -110,7 +110,7 @@ CREATE TABLE `t_sys_log` (
   `device` VARCHAR(60) NOT NULL DEFAULT '' COMMENT '设备',
   `browser_info` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '浏览器信息',
   `user_ip` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '用户IP',
-  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统： MGR-运营平台, MCH-商户中心',
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
   `method_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '方法名',
   `method_remark` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '方法描述',
   `req_url` VARCHAR(256) NOT NULL DEFAULT '' COMMENT '请求地址',
