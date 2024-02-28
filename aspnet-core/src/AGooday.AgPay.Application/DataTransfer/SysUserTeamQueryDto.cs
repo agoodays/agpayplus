@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string TeamNo { get; set; }
 
         /// <summary>
-        /// 所属代理商/商户
+        /// 所属商户ID / 代理商ID / 0(平台)
         /// </summary>
         public string BelongInfoId { get; set; }
 

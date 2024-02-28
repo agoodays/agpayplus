@@ -48,9 +48,9 @@ namespace AGooday.AgPay.Domain.Models
         public string SysType { get; set; }
 
         /// <summary>
-        /// 所属商户ID / 所属代理商ID / 0(平台)
+        /// 所属商户ID / 代理商ID / 0(平台)
         /// </summary>
-        [Comment("所属商户ID / 所属代理商ID / 0(平台)")]
+        [Comment("所属商户ID / 代理商ID / 0(平台)")]
         [Required, Column("belong_info_id", TypeName = "varchar(64)")]
         public string BelongInfoId { get; set; }
 

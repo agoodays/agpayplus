@@ -61,6 +61,13 @@ namespace AGooday.AgPay.Domain.Models
         public string Sipw { get; set; }
 
         /// <summary>
+        /// 顶级代理商号
+        /// </summary>
+        [Comment("顶级代理商号")]
+        [Column("top_agent_no", TypeName = "varchar(64)")]
+        public string TopAgentNo { get; set; }
+
+        /// <summary>
         /// 代理商号
         /// </summary>
         [Comment("代理商号")]

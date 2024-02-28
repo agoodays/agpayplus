@@ -23,12 +23,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly IMQSender mqSender;
         private readonly ILogger<MchInfoController> _logger;
         private readonly IMchInfoService _mchInfoService;
+        private readonly IAgentInfoService _agentInfoService;
         private readonly ISysUserService _sysUserService;
 
         private readonly DomainNotificationHandler _notifications;
 
         public MchInfoController(IMQSender mqSender, ILogger<MchInfoController> logger, INotificationHandler<DomainNotification> notifications,
-            IMchInfoService mchInfoService, RedisUtil client,
+            IMchInfoService mchInfoService, IAgentInfoService agentInfoService, RedisUtil client,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService)
@@ -37,6 +38,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             this.mqSender = mqSender;
             _logger = logger;
             _mchInfoService = mchInfoService;
+            _agentInfoService = agentInfoService;
             _sysUserService = sysUserService;
             _notifications = (DomainNotificationHandler)notifications;
         }
@@ -66,6 +68,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             var sysUser = GetCurrentUser().SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
+            if (!string.IsNullOrWhiteSpace(dto.AgentNo))
+            {
+                var agentNo = dto.AgentNo;
+                var agentInfos = _agentInfoService.GetParents(agentNo);
+                var topAgentInfo = agentInfos.OrderBy(x => x.Level).FirstOrDefault();
+                var agentInfo = agentInfos.FirstOrDefault(f => f.AgentNo.Equals(agentNo));
+                dto.TopAgentNo = topAgentInfo.AgentNo;
+                dto.AgentNo = agentInfo.AgentNo;
+            }
             await _mchInfoService.CreateAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

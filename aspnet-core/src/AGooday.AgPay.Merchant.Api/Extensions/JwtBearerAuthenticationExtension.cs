@@ -179,7 +179,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions
         /// </summary>
         public string SysType { get; set; }
         /// <summary>
-        /// 所属商户ID / 0(平台)
+        /// 所属商户ID / 代理商ID / 0(平台)
         /// </summary>
         public string BelongInfoId { get; set; }
         /// <summary>

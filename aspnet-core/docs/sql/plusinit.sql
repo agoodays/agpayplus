@@ -17,7 +17,7 @@ INSERT INTO `t_sys_config` VALUES ('agentServiceAgreement', '用户服务协议'
 
 ALTER TABLE `t_sys_config`   
   ADD COLUMN `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心' AFTER `type`,
-  ADD COLUMN `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 0(平台)' AFTER `sys_type`;
+  ADD COLUMN `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 代理商ID / 0(平台)' AFTER `sys_type`;
 
 -- SELECT GROUP_CONCAT(CONCAT('''',group_key,'''')) FROM `t_sys_config`;
 UPDATE `t_sys_config` SET `sys_type` = 'MGR', belong_info_id = 0 WHERE `group_key` IN ('agentTreatyConfig','agentTreatyConfig','applicationConfig','ossConfig','apiMapConfig','apiMapConfig','apiMapConfig','mchTreatyConfig','mchTreatyConfig','applicationConfig','applicationConfig','ossConfig','ossConfig','applicationConfig');
@@ -98,7 +98,8 @@ ALTER TABLE `t_mch_info`
   ADD COLUMN `mch_level` VARCHAR(8) DEFAULT 'M0' NOT NULL COMMENT '商户级别: M0商户-简单模式（页面简洁，仅基础收款功能）, M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）' AFTER `type`,
   ADD COLUMN `refund_mode` JSON NULL COMMENT '退款方式[\"plat\", \"api\"],平台退款、接口退款，平台退款方式必须包含接口退款。' AFTER `mch_level`,
   ADD COLUMN `sipw` VARCHAR(128) NOT NULL COMMENT '支付密码' AFTER `refund_mode`,
-  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `sipw`;
+  ADD COLUMN `top_agent_no` VARCHAR(64) NULL COMMENT '顶级代理商号' AFTER `sipw`;
+  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `top_agent_no`;
 
 ALTER TABLE `t_mch_app`   
   ADD COLUMN `default_flag` TINYINT(6) DEFAULT 0 NOT NULL COMMENT '是否默认: 0-否, 1-是' AFTER `state`,
@@ -552,9 +553,9 @@ CREATE TABLE `t_sys_user_team` (
   `team_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '团队ID',
   `team_name` VARCHAR(32) NOT NULL COMMENT '团队名称', 
   `team_no` VARCHAR(64) NOT NULL COMMENT '团队编号', 
-  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
   `stat_range_type` VARCHAR(20) NOT NULL COMMENT '统计周期: year-年, quarter-季度, month-月, week-周', 
-  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
+  `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
+  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 代理商ID / 0(平台)', 
   `created_uid` BIGINT DEFAULT NULL COMMENT '创建者用户ID',
   `created_by` VARCHAR(64) DEFAULT NULL COMMENT '创建者姓名',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
@@ -671,7 +672,7 @@ CREATE TABLE `t_qr_code_shell` (
   `shell_img_view_url` VARCHAR(255) COMMENT '模板预览图Url',
 --   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
   `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
-  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
+  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 代理商ID / 0(平台)', 
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (id)
@@ -700,7 +701,7 @@ CREATE TABLE `t_qr_code` (
   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
   -- `qrc_belong_type` INT NOT NULL DEFAULT '1' COMMENT '获取方式: 1-自制, 2-下发',
   `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
-  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
+  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 代理商ID / 0(平台)', 
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (qrc_id)
@@ -783,7 +784,7 @@ CREATE TABLE `t_device_info` (
   `state` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '状态: 0-停用, 1-启用',
   `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
   `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
-  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '归属信息ID', 
+  `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 代理商ID / 0(平台)', 
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`id`),

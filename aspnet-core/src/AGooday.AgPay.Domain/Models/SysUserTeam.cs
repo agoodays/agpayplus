@@ -34,13 +34,6 @@ namespace AGooday.AgPay.Domain.Models
         public string TeamNo { get; set; }
 
         /// <summary>
-        /// 所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心
-        /// </summary>
-        [Comment("所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心")]
-        [Required, Column("sys_type", TypeName = "varchar(8)")]
-        public string SysType { get; set; }
-
-        /// <summary>
         /// 统计周期: year-年, quarter-季度, month-月, week-周
         /// </summary>
         [Comment("统计周期: year-年, quarter-季度, month-月, week-周")]
@@ -48,9 +41,16 @@ namespace AGooday.AgPay.Domain.Models
         public string StatRangeType { get; set; }
 
         /// <summary>
-        /// 所属商户ID / 所属代理商ID / 0(平台)
+        /// 所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心
         /// </summary>
-        [Comment("所属商户ID / 所属代理商ID / 0(平台)")]
+        [Comment("所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心")]
+        [Required, Column("sys_type", TypeName = "varchar(8)")]
+        public string SysType { get; set; }
+
+        /// <summary>
+        /// 所属商户ID / 代理商ID / 0(平台)
+        /// </summary>
+        [Comment("所属商户ID / 代理商ID / 0(平台)")]
         [Required, Column("belong_info_id", TypeName = "varchar(64)")]
         public string BelongInfoId { get; set; }
 

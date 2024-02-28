@@ -44,6 +44,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string Sipw { get; set; }
 
         /// <summary>
+        /// 顶级代理商号
+        /// </summary>
+        public string TopAgentNo { get; set; }
+
+        /// <summary>
         /// 代理商号
         /// </summary>
         public string AgentNo { get; set; }

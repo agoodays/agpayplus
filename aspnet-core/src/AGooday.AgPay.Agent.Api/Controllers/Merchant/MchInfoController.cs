@@ -72,9 +72,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             var agentNo = sysUser.BelongInfoId;
-            var agentInfo = _agentInfoService.GetById(agentNo);
+            var agentInfos = _agentInfoService.GetParents(agentNo);
+            var topAgentInfo = agentInfos.OrderBy(x => x.Level).FirstOrDefault();
+            var agentInfo = agentInfos.FirstOrDefault(f=>f.AgentNo.Equals(agentNo));
             dto.RefundMode = JArray.Parse("[\"plat\", \"api\"]");
             dto.Type = CS.MCH_TYPE_ISVSUB;
+            dto.TopAgentNo = topAgentInfo.AgentNo;
             dto.AgentNo = agentInfo.AgentNo;
             dto.IsvNo = agentInfo.IsvNo;
             await _mchInfoService.CreateAsync(dto);
