@@ -164,6 +164,9 @@ namespace AGooday.AgPay.Common.Utils
         }
     }
 
+    /// <summary>
+    /// https://learn.microsoft.com/zh-cn/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only
+    /// </summary>
     public static class DrawQrCode
     {
         public static Bitmap GenerateStyleAImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", string iconPath = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
