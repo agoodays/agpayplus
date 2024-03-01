@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
+﻿using SkiaSharp;
 
 namespace AGooday.AgPay.Common.Utils
 {
@@ -16,77 +15,87 @@ namespace AGooday.AgPay.Common.Utils
             }
             return code;
         }
-        public static Bitmap DrawImage(string code, int? imageWidth = null, int imageHeight = 32, int fontSize = 15)
+
+        public static SKBitmap DrawImage(string code, int? imageWidth = null, int imageHeight = 32, int fontSize = 15)
         {
-            imageWidth ??= code.Length * 18;
-            Color[] colors = {
-                Color.LightSalmon, Color.Aqua, Color.LightSkyBlue, Color.Aquamarine,
-                Color.Lime, Color.MediumOrchid, Color.Chartreuse, Color.Chocolate,
-                Color.MediumPurple, Color.MediumSeaGreen, Color.CornflowerBlue, Color.MediumTurquoise,
-                Color.MediumSpringGreen, Color.OrangeRed, Color.DarkOrange, Color.Orchid,
-                Color.DarkOrchid, Color.DarkViolet, Color.DeepPink, Color.DeepSkyBlue,
-                Color.DodgerBlue, Color.ForestGreen, Color.Red, Color.Green,
-                Color.GreenYellow, Color.HotPink, Color.SpringGreen, Color.LawnGreen,
-                Color.Tomato, Color.Yellow, Color.YellowGreen, Color.Gold
+            var width = imageWidth ?? code.Length * 18;
+            var colors = new SKColor[] {
+                SKColors.LightSalmon, SKColors.Aqua, SKColors.LightSkyBlue, SKColors.Aquamarine,
+                SKColors.Lime, SKColors.MediumOrchid, SKColors.Chartreuse, SKColors.Chocolate,
+                SKColors.MediumPurple, SKColors.MediumSeaGreen, SKColors.CornflowerBlue, SKColors.MediumTurquoise,
+                SKColors.MediumSpringGreen, SKColors.OrangeRed, SKColors.DarkOrange, SKColors.Orchid,
+                SKColors.DarkOrchid, SKColors.DarkViolet, SKColors.DeepPink, SKColors.DeepSkyBlue,
+                SKColors.DodgerBlue, SKColors.ForestGreen, SKColors.Red, SKColors.Green,
+                SKColors.GreenYellow, SKColors.HotPink, SKColors.SpringGreen, SKColors.LawnGreen,
+                SKColors.Tomato, SKColors.Yellow, SKColors.YellowGreen, SKColors.Gold
             };
             string[] fonts = { "Verdana", "Microsoft Sans Serif", "Comic Sans MS", "Arial", "宋体" };
-            Random random = new Random();
-            // 创建一个 Bitmap 图片类型对象
-            Bitmap bitmap = new Bitmap(imageWidth.Value, imageHeight);
-            // 创建一个图形画笔
-            Graphics graphics = Graphics.FromImage(bitmap);
-            // 将图片背景填充成白色
-            graphics.Clear(Color.White);
-            // 绘制验证码噪点
-            for (int i = 0; i < random.Next(60, 80); i++)
+            var random = new Random();
+
+            // 创建一个 SKBitmap 对象
+            var bitmap = new SKBitmap(width, imageHeight);
+            using (var canvas = new SKCanvas(bitmap))
             {
-                int pointX = random.Next(bitmap.Width);
-                int pointY = random.Next(bitmap.Height);
-                graphics.DrawLine(new Pen(Color.LightGray, 1), pointX, pointY, pointX + 1, pointY);
+                // 将图片背景填充成白色
+                canvas.Clear(SKColors.White);
+
+                // 绘制验证码噪点
+                for (int i = 0; i < random.Next(60, 80); i++)
+                {
+                    int pointX = random.Next(width);
+                    int pointY = random.Next(imageHeight);
+                    canvas.DrawLine(pointX, pointY, pointX + 1, pointY, new SKPaint() { Color = SKColors.LightGray });
+                }
+
+                // 绘制随机线条 1 条
+                canvas.DrawLine(
+                    new SKPoint(random.Next(width), random.Next(imageHeight)),
+                    new SKPoint(random.Next(width), random.Next(imageHeight)),
+                    new SKPaint() { Color = colors[random.Next(colors.Length)], StrokeWidth = random.Next(3) });
+
+                // 绘制验证码
+                for (int i = 0; i < code.Length; i++)
+                {
+                    float x = (width - fontSize * code.Length) / 2 + fontSize * i + random.Next(fontSize / 2);
+                    float y = (imageHeight + fontSize) / 2 + random.Next(-fontSize / 4, fontSize / 4);
+                    canvas.DrawText(code.Substring(i, 1),
+                        x,
+                        y,
+                        new SKPaint() { Color = colors[random.Next(colors.Length)], TextSize = fontSize, Typeface = SKTypeface.FromFamilyName(fonts[random.Next(fonts.Length)], SKFontStyle.Bold) });
+                }
+
+                // 绘制验证码噪点
+                for (int i = 0; i < random.Next(30, 50); i++)
+                {
+                    int pointX = random.Next(width);
+                    int pointY = random.Next(imageHeight);
+                    canvas.DrawLine(pointX, pointY, pointX, pointY + 1, new SKPaint() { Color = colors[random.Next(colors.Length)], StrokeWidth = 1 });
+                }
+
+                // 绘制随机线条 1 条
+                canvas.DrawLine(
+                    new SKPoint(random.Next(width), random.Next(imageHeight)),
+                    new SKPoint(random.Next(width), random.Next(imageHeight)),
+                    new SKPaint() { Color = colors[random.Next(colors.Length)], StrokeWidth = random.Next(3) });
             }
-            // 绘制随机线条 1 条
-            graphics.DrawLine(
-                    new Pen(colors[random.Next(colors.Length)], random.Next(3)),
-                    new Point(
-                        random.Next(bitmap.Width),
-                        random.Next(bitmap.Height)),
-                    new Point(random.Next(bitmap.Width),
-                    random.Next(bitmap.Height)));
-            // 绘制验证码
-            for (int i = 0; i < code.Length; i++)
-            {
-                graphics.DrawString(
-                    code.Substring(i, 1),
-                    new Font(fonts[random.Next(fonts.Length)], fontSize, FontStyle.Bold),
-                    new SolidBrush(colors[random.Next(colors.Length)]),
-                    16 * i + 1,
-                    random.Next(0, 5)
-                    );
-            }
-            // 绘制验证码噪点
-            for (int i = 0; i < random.Next(30, 50); i++)
-            {
-                int pointX = random.Next(bitmap.Width);
-                int pointY = random.Next(bitmap.Height);
-                graphics.DrawLine(new Pen(colors[random.Next(colors.Length)], 1), pointX, pointY, pointX, pointY + 1);
-            }
-            // 绘制随机线条 1 条
-            graphics.DrawLine(
-                    new Pen(colors[random.Next(colors.Length)], random.Next(3)),
-                    new Point(
-                        random.Next(bitmap.Width),
-                        random.Next(bitmap.Height)),
-                    new Point(random.Next(bitmap.Width),
-                    random.Next(bitmap.Height)));
             return bitmap;
         }
-        public static string BitmapToBase64Str(Bitmap bitmap)
+
+        public static string BitmapToBase64String(SKBitmap bitmap)
         {
-            using (MemoryStream memoryStream = new MemoryStream())
+            using (var image = SKImage.FromBitmap(bitmap))
+            using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 100))
             {
-                bitmap.Save(memoryStream, ImageFormat.Jpeg);
-                byte[] bytes = memoryStream.ToArray();
-                return Convert.ToBase64String(memoryStream.ToArray());
+                return Convert.ToBase64String(data.ToArray());
+            }
+        }
+
+        public static string BitmapToImageBase64String(SKBitmap bitmap)
+        {
+            using (var image = SKImage.FromBitmap(bitmap))
+            using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 100))
+            {
+                return $"data:image/jpeg;base64,{Convert.ToBase64String(data.ToArray())}";
             }
         }
     }

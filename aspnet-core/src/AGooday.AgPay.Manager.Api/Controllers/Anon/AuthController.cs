@@ -211,7 +211,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             //}
             var code = VerificationCodeUtil.RandomVerificationCode(6);
             var bitmap = VerificationCodeUtil.DrawImage(code, 137, 40, 20);
-            var imageBase64Data = $"data:image/jpg;base64,{VerificationCodeUtil.BitmapToBase64Str(bitmap)}";
+            //var imageBase64Data = $"data:image/jpg;base64,{VerificationCodeUtil.BitmapToBase64String(bitmap)}";
+            var imageBase64Data = VerificationCodeUtil.BitmapToImageBase64String(bitmap);
 
             //redis
             string vercodeToken = Guid.NewGuid().ToString("N");
