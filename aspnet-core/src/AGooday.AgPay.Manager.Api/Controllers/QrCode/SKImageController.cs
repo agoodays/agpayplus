@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkiaSharp;
 using SkiaSharp.QrCode;
+using SkiaSharp.QrCode.Models;
+using System.Drawing;
+using System.Net;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 {
@@ -316,22 +320,39 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                     DrawLogo(canvas, Path.Combine(_env.WebRootPath, "images", "jeepay_blue.png"), logoRect);
 
                     // 在下部分绘制多个logo
-                    float logoSize = (lowerRect.Height - spacing * 2) / 4;
-                    float totalLogoWidth = logoSize * 4 + spacing * 2;
+                    var logoPaths = new[] {
+                        Path.Combine(_env.WebRootPath, "images", "wxpay.png"),
+                        Path.Combine(_env.WebRootPath, "images", "alipay.png"),
+                        Path.Combine(_env.WebRootPath, "images", "ysfpay.png"),
+                        Path.Combine(_env.WebRootPath, "images", "unionpay.png")
+                    };
+
+                    float logoSize = (lowerRect.Height - spacing * 2) / logoPaths.Length;
+                    float totalLogoWidth = logoSize * logoPaths.Length + spacing * 2;
                     float startX = (imageWidth - totalLogoWidth) / 2;
                     float logoY = lowerRect.Top + spacing;
 
-                    DrawLogo(canvas, Path.Combine(_env.WebRootPath, "images", "wxpay.png"), new SKRect(startX, logoY, startX + logoSize, logoY + logoSize));
-                    startX += logoSize + spacing;
+                    foreach (var logoPath in logoPaths)
+                    {
+                        DrawLogo(canvas, logoPath, new SKRect(startX, logoY, startX + logoSize, logoY + logoSize));
+                        startX += logoSize + spacing;
+                    }
 
-                    DrawLogo(canvas, Path.Combine(_env.WebRootPath, "images", "alipay.png"), new SKRect(startX, logoY, startX + logoSize, logoY + logoSize));
-                    startX += logoSize + spacing;
-
-                    DrawLogo(canvas, Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), new SKRect(startX, logoY, startX + logoSize, logoY + logoSize));
-                    startX += logoSize + spacing;
-
-                    DrawLogo(canvas, Path.Combine(_env.WebRootPath, "images", "unionpay.png"), new SKRect(startX, logoY, startX + logoSize, logoY + logoSize));
-                    startX += logoSize + spacing;
+                    var qrCodeContent = "Your QR Code content";
+                    var qrCodeColor = SKColors.Black;
+                    var qrCodeIconData = new IconData
+                    {
+                        Icon = SKBitmap.Decode(Path.Combine(_env.WebRootPath, "images", "wxpay.png")),
+                        IconSizePercent = 10,
+                    };
+                    var qrCodeImage = GenerateQrCode2(qrCodeContent, qrCodeColor, qrCodeIconData);
+                    var qrCodeSkImage = SKImage.FromBitmap(qrCodeImage);
+                    float childWidth = middleRect.Width * 0.97f;
+                    float childHeight = middleRect.Height * 0.97f;
+                    float childX = middleRect.Left + (middleRect.Width - childWidth) / 2;
+                    float childY = middleRect.Top + (middleRect.Height - childHeight) / 2;
+                    var qrCodeRect = new SKRect(childX, childY, childX + childWidth, childY + childHeight);
+                    canvas.DrawImage(qrCodeSkImage, qrCodeRect);
 
                     // 保存图像文件
                     using (var image = SKImage.FromBitmap(bitmap))
@@ -432,6 +453,113 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             return SKBitmap.Decode(Path.Combine(_env.WebRootPath, "images", "ysfpay.png"));
         }
 
+
+        [HttpGet("GenerateImage5")]
+        public IActionResult GenerateImage5()
+        {
+            // 设置图形尺寸和边距
+            int width = 1190;
+            int height = 1684;
+            int margin = 60;
+            int spacing = 20;
+            int topMargin = 30;
+            int bottomMargin = 30;
+
+            // 创建位图对象
+            using (var bitmap = new SKBitmap(width, height))
+            {
+                // 创建绘图上下文
+                using (var canvas = new SKCanvas(bitmap))
+                {
+                    // 设置背景颜色
+                    canvas.Clear(SKColors.White);
+
+                    // 计算上中下三个部分的高度
+                    int topHeight = (int)((height - topMargin - bottomMargin) * 0.2);
+                    int middleHeight = (int)((height - topMargin - bottomMargin) * 0.5);
+                    int bottomHeight = (int)((height - topMargin - bottomMargin) * 0.3);
+
+                    // 计算中间部分的宽度
+                    int middleWidth = width - 2 * margin;
+
+                    // 创建矩形路径和画笔
+                    var rect = new SKRect(margin, topMargin, width - margin, topMargin + topHeight);
+                    var paint = new SKPaint();
+                    paint.IsAntialias = true;
+
+                    // 绘制上部分红色矩形（直角）
+                    paint.Color = SKColors.Red;
+                    canvas.DrawRect(rect, paint);
+
+                    // 绘制中部分蓝色矩形（圆角）
+                    rect = new SKRect(margin, topMargin + topHeight + spacing, width - margin, topMargin + topHeight + spacing + middleHeight);
+                    paint.Color = SKColors.Blue;
+                    canvas.DrawRoundRect(rect, 20, 20, paint);
+
+                    // 绘制下部分绿色矩形（圆角）
+                    rect = new SKRect(margin, topMargin + topHeight + spacing + middleHeight + spacing, width - margin, height - bottomMargin);
+                    paint.Color = SKColors.Green;
+                    canvas.DrawRoundRect(rect, 20, 20, paint);
+
+                    // 居中绘制品牌logo
+                    var brandLogoPath = Path.Combine(_env.WebRootPath, "images", "jeepay_blue.png"); // 品牌logo的路径
+                    var brandLogoImage = SKImage.FromEncodedData(brandLogoPath);
+                    var brandLogoRect = new SKRect(
+                        (width - brandLogoImage.Width) / 2,
+                        (topMargin - brandLogoImage.Height) / 2,
+                        (width + brandLogoImage.Width) / 2,
+                        (topMargin + brandLogoImage.Height) / 2
+                    );
+                    canvas.DrawImage(brandLogoImage, brandLogoRect);
+
+                    // 水平居中绘制多个logo
+                    var logoPaths = new[] {
+                        Path.Combine(_env.WebRootPath, "images", "wxpay.png"),
+                        Path.Combine(_env.WebRootPath, "images", "alipay.png"),
+                        Path.Combine(_env.WebRootPath, "images", "ysfpay.png"),
+                        Path.Combine(_env.WebRootPath, "images", "unionpay.png")
+                    }; // 多个logo的路径
+                    var totalLogoWidth = logoPaths.Length * brandLogoImage.Width + (logoPaths.Length - 1) * spacing;
+                    var startX = (middleWidth - totalLogoWidth) / 2 + margin;
+                    var startY = topMargin + topHeight + spacing + (middleHeight - brandLogoImage.Height) / 2;
+                    foreach (var logoPath in logoPaths)
+                    {
+                        var logoImage = SKImage.FromEncodedData(logoPath);
+                        var logoRect = new SKRect(startX, startY, startX + logoImage.Width, startY + logoImage.Height);
+                        canvas.DrawImage(logoImage, logoRect);
+                        startX += logoImage.Width + spacing;
+                    }
+
+                    // 在中间部分绘制二维码
+                    var qrCodeContent = "Your QR Code content";
+                    var qrCodeColor = SKColors.Black;
+                    var qrCodeIconData = new IconData
+                    {
+                        Icon = SKBitmap.Decode(Path.Combine(_env.WebRootPath, "images", "wxpay.png")),
+                        IconSizePercent = 10,
+                    };
+                    var qrCodeImage = GenerateQrCode2(qrCodeContent, qrCodeColor, qrCodeIconData);
+                    var qrCodeSkImage = SKImage.FromBitmap(qrCodeImage);
+                    var qrCodeRect = new SKRect(
+                        (width - qrCodeSkImage.Width) / 2,
+                        topMargin + topHeight + spacing + (middleHeight - qrCodeSkImage.Height) / 2,
+                        (width + qrCodeSkImage.Width) / 2,
+                        topMargin + topHeight + spacing + (middleHeight + qrCodeSkImage.Height / 2));
+                    canvas.DrawImage(qrCodeSkImage, qrCodeRect);
+                }
+
+                using (var image = SKImage.FromBitmap(bitmap))
+                using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
+                using (var stream = new MemoryStream())
+                {
+                    data.SaveTo(stream);
+
+                    // 返回生成的图像
+                    return File(stream.ToArray(), "image/png");
+                }
+            }
+        }
+
         [HttpGet, AllowAnonymous, Route("qrcode.png")]
         public IActionResult GetQRCode()
         {
@@ -457,6 +585,97 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                     return File(stream.ToArray(), "image/png");
                 }
             }
+        }
+
+        [HttpGet, AllowAnonymous, Route("qrcode2.png")]
+        public IActionResult GetQRCode2()
+        {
+            var icon = new IconData
+            {
+                Icon = SKBitmap.Decode(Path.Combine(_env.WebRootPath, "images", "wxpay.png")),
+                IconSizePercent = 10,
+            };
+            var actual = GenerateQrCode("https://www.example.com", SKColor.Parse("000000"), icon);
+            using (var stream = new MemoryStream(actual))
+            {
+                // 返回生成的码牌图片
+                return File(stream.ToArray(), "image/png");
+            }
+        }
+
+        private byte[] GenerateQrCode(string content, SKColor? codeColor, IconData iconData, bool useRect = false)
+        {
+            // Generate QrCode
+            using var generator = new QRCodeGenerator();
+            var qr = generator.CreateQrCode(content, ECCLevel.L);
+
+            // Render to canvas
+            var info = new SKImageInfo(512, 512);
+            using var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            if (useRect)
+            {
+                canvas.Render(qr, new SKRect(0, 0, info.Width, info.Height), SKColor.Empty, codeColor.Value, iconData);
+            }
+            else
+            {
+                canvas.Render(qr, info.Width, info.Height, SKColor.Empty, codeColor.Value, iconData);
+            }
+
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+
+            return data.ToArray();
+        }
+
+        private SKBitmap GenerateQrCode2(string content, SKColor? codeColor, IconData iconData, bool useRect = false)
+        {
+            // Generate QrCode
+            using var generator = new QRCodeGenerator();
+            var qr = generator.CreateQrCode(content, ECCLevel.L);
+
+            // Render to canvas
+            var info = new SKImageInfo(512, 512);
+            using var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            if (useRect)
+            {
+                canvas.Render(qr, new SKRect(0, 0, info.Width, info.Height), SKColor.Empty, codeColor.Value, iconData);
+            }
+            else
+            {
+                canvas.Render(qr, info.Width, info.Height, SKColor.Empty, codeColor.Value, iconData);
+            }
+
+            using (var image = surface.Snapshot())
+            {
+                return SKBitmap.FromImage(image);
+            }
+        }
+
+        private byte[] GenerateQrCode(string content, SKColor codeColor, SKColor backgroundColor, IconData iconData, bool useRect = false)
+        {
+            // Generate QrCode
+            using var generator = new QRCodeGenerator();
+            var qr = generator.CreateQrCode(content, ECCLevel.L);
+
+            // Render to canvas
+            var info = new SKImageInfo(512, 512);
+            using var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            if (useRect)
+            {
+                canvas.Render(qr, new SKRect(0, 0, info.Width, info.Height), SKColor.Empty, codeColor, backgroundColor, iconData);
+            }
+            else
+            {
+                canvas.Render(qr, info.Width, info.Height, SKColor.Empty, codeColor, backgroundColor, iconData);
+            }
+
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+
+            return data.ToArray();
         }
 
         [HttpGet, AllowAnonymous, Route("styleb.png")]
