@@ -1,12 +1,10 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkiaSharp;
 using SkiaSharp.QrCode;
 using SkiaSharp.QrCode.Models;
-using System.Drawing;
-using System.Net;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 {
@@ -36,6 +34,96 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 
                 // 返回生成的图像
                 return File(stream.ToArray(), "image/png");
+            }
+        }
+
+        [HttpGet, AllowAnonymous, Route("nostyle.png")]
+        public IActionResult NoStyle()
+        {
+            using (var stream = new MemoryStream(SKQrCodeBuilder.Generate(iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"))))
+            {
+                // 返回生成的码牌图片
+                return File(stream.ToArray(), "image/png");
+            }
+        }
+
+        [HttpGet, AllowAnonymous, Route("stylea.png")]
+        public IActionResult StyleA()
+        {
+            var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay.png");
+
+            var payTypes = new List<QrCodePayType>() {
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "unionpay.png"), Alias = "银联", Name="unionpay"  },
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), Alias = "云闪付", Name="ysfpay" },
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "wxpay.png"), Alias = "微信", Name="wxpay"  },
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
+            };
+
+            var buffer = SKDrawQrCode.GenerateStyleAImage(title: "吉日支付", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
+            using (var stream = new MemoryStream(buffer))
+            {
+                // 返回生成的码牌图片
+                return File(stream.ToArray(), "image/png");
+            }
+        }
+
+        [HttpGet, AllowAnonymous, Route("styleb.png")]
+        public IActionResult StyleB()
+        {
+            var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay_blue.png");
+
+            var payTypes = new List<QrCodePayType>() {
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "unionpay.png"), Alias = "银联", Name="unionpay"  },
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), Alias = "云闪付", Name="ysfpay" },
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "wxpay.png"), Alias = "微信", Name="wxpay"  },
+                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
+            };
+
+            var buffer = SKDrawQrCode.GenerateStyleBImage(title: "吉日支付", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
+            using (var stream = new MemoryStream(buffer))
+            {
+                // 返回生成的码牌图片
+                return File(stream.ToArray(), "image/png");
+            }
+        }
+
+        [HttpGet("GenerateImage1")]
+        public IActionResult GenerateImage1()
+        {
+            int width = 800;
+            int height = 600;
+
+            using (var bitmap = new SKBitmap(width, height))
+            {
+                using (var canvas = new SKCanvas(bitmap))
+                {
+                    canvas.Clear(SKColors.White);
+
+                    // 创建同时具有直角和圆角的矩形路径
+                    var path = new SKPath();
+                    var rect = new SKRect(100, 100, 400, 300);
+                    float cornerRadius = 20;
+                    path.AddRoundRect(rect, cornerRadius, cornerRadius, SKPathDirection.Clockwise);
+
+                    // 绘制矩形路径
+                    var paint = new SKPaint
+                    {
+                        Color = SKColors.Blue,
+                        IsAntialias = true
+                    };
+                    canvas.DrawPath(path, paint);
+
+                    // 保存图像文件
+                    using (var image = SKImage.FromBitmap(bitmap))
+                    using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
+                    using (var stream = new MemoryStream())
+                    {
+                        data.SaveTo(stream);
+
+                        // 返回生成的图像
+                        return File(stream.ToArray(), "image/png");
+                    }
+                }
             }
         }
 
@@ -678,7 +766,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             return data.ToArray();
         }
 
-        [HttpGet, AllowAnonymous, Route("styleb.png")]
+        [HttpGet, AllowAnonymous, Route("qrcodeb.png")]
         public IActionResult GetQRCodeB()
         {
             // 创建码牌画布
