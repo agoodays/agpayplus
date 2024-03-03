@@ -21,7 +21,8 @@ namespace AGooday.AgPay.Common.Utils
             }
 
             // 提高亮度
-            lightness = Math.Min(lightness + 0.45f, 1.0f);
+            float randomLightness = (float)(lightness + (1 - lightness) * (new Random().NextDouble()));
+            lightness = Math.Min(lightness + 0.45f, lightness < 0.9f ? 0.9f : randomLightness);
 
             // 将 HSL 颜色模型转换回 RGB 颜色模型
             SKColor newColor = HSLToColor(hue, saturation, lightness);
