@@ -164,7 +164,8 @@ export default {
             { imgUrl: '', name: 'ysfpay', alias: '云闪付' },
             { imgUrl: '', name: 'unionpay', alias: '银联' }
           ],
-          bgColor: '#1a53ff'
+          bgColor: '#1a53ff',
+          customBgColor: '#000000'
         }
       }, // 数据对象
       recordId: null, // 更新对象ID
@@ -191,7 +192,8 @@ export default {
             { imgUrl: '', name: 'ysfpay', alias: '云闪付' },
             { imgUrl: '', name: 'unionpay', alias: '银联' }
           ],
-          bgColor: '#1a53ff'
+          bgColor: '#1a53ff',
+          customBgColor: '#000000'
         }
       } // 数据初始化
       if (this.$refs.infoFormModel !== undefined) {
@@ -274,15 +276,17 @@ export default {
       const that = this
       this.$refs.infoFormModel.validate(valid => {
         if (valid) { // 验证通过
+          const params = { ...that.saveObject }
+          params.shellImgViewUrl = undefined
           // 请求接口
           if (that.isAdd) {
-            req.add(API_URL_QRC_SHELL_LIST, that.saveObject).then(res => {
+            req.add(API_URL_QRC_SHELL_LIST, params).then(res => {
               that.$message.success('新增成功')
               that.visible = false
               that.callbackFunc() // 刷新列表
             })
           } else {
-            req.updateById(API_URL_QRC_SHELL_LIST, that.recordId, that.saveObject).then(res => {
+            req.updateById(API_URL_QRC_SHELL_LIST, that.recordId, params).then(res => {
               that.$message.success('修改成功')
               that.visible = false
               that.callbackFunc() // 刷新列表

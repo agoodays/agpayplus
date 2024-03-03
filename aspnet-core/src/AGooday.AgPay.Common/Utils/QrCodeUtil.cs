@@ -1,14 +1,13 @@
 ﻿using AGooday.AgPay.Common.Models;
-using QRCoder;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
+using SkiaSharp;
+using SkiaSharp.QrCode;
+using SkiaSharp.QrCode.Models;
 
 namespace AGooday.AgPay.Common.Utils
 {
     public static class ColorAdjuster
     {
-        public static Color LightenColor(Color color, float hueShift)
+        public static SKColor LightenColor(SKColor color, float hueShift)
         {
             // 将给定颜色转换为 HSL 颜色模型
             float hue, saturation, lightness;
@@ -25,44 +24,52 @@ namespace AGooday.AgPay.Common.Utils
             lightness = Math.Min(lightness + 0.45f, 1.0f);
 
             // 将 HSL 颜色模型转换回 RGB 颜色模型
-            Color newColor = HSLToColor(hue, saturation, lightness);
+            SKColor newColor = HSLToColor(hue, saturation, lightness);
 
             return newColor;
         }
 
-        public static Bitmap ChangeColor(string imgPath, string originColor, string targetColor)
+        public static SKBitmap ChangeColor(string imgPath, string originColor, string targetColor)
         {
-            // 加载图片
-            Bitmap bitmap = new Bitmap(Image.FromFile(imgPath));
-            Color color = ColorTranslator.FromHtml(originColor);
-
-            // 遍历图片的每一个像素
-            for (int x = 0; x < bitmap.Width; x++)
+            using (var originalBitmap = QrCodeBuilder.GetSKBitmapAsync(imgPath).Result)
             {
-                for (int y = 0; y < bitmap.Height; y++)
-                {
-                    // 获取当前像素的颜色
-                    Color pixelColor = bitmap.GetPixel(x, y);
+                // 创建一个新的位图对象，作为更新后的图像
+                SKBitmap updatedBitmap = new SKBitmap(originalBitmap.Width, originalBitmap.Height);
 
-                    // 如果当前像素是白色，将其替换为蓝色
-                    if (pixelColor.R == color.R && pixelColor.G == color.G && pixelColor.B == color.B)
+                var oldColor = SKColor.Parse(originColor);
+                var newColor = SKColor.Parse(targetColor);
+                // 遍历图像的每个像素
+                for (int x = 0; x < originalBitmap.Width; x++)
+                {
+                    for (int y = 0; y < originalBitmap.Height; y++)
                     {
-                        //Color newColor = Color.FromArgb(pixelColor.A, 0, 0, 255);
-                        Color newColor = ColorTranslator.FromHtml(targetColor);
-                        bitmap.SetPixel(x, y, newColor);
+                        // 获取当前像素的颜色
+                        SKColor pixelColor = originalBitmap.GetPixel(x, y);
+
+                        // 检查是否与旧颜色匹配
+                        if (pixelColor == oldColor)
+                        {
+                            // 替换为新颜色
+                            updatedBitmap.SetPixel(x, y, newColor);
+                        }
+                        else
+                        {
+                            // 保留原始颜色
+                            updatedBitmap.SetPixel(x, y, pixelColor);
+                        }
                     }
                 }
-            }
 
-            return bitmap;
+                return updatedBitmap;
+            }
         }
 
         // 将 RGB 颜色模型转换为 HSL 颜色模型
-        public static void ColorToHSL(Color color, out float hue, out float saturation, out float lightness)
+        public static void ColorToHSL(SKColor color, out float hue, out float saturation, out float lightness)
         {
-            float r = color.R / 255f;
-            float g = color.G / 255f;
-            float b = color.B / 255f;
+            float r = color.Red / 255f;
+            float g = color.Green / 255f;
+            float b = color.Blue / 255f;
 
             // 找出 RGB 三原色中的最大值和最小值
             float max = Math.Max(r, Math.Max(g, b));
@@ -105,7 +112,7 @@ namespace AGooday.AgPay.Common.Utils
         }
 
         // 将 HSL 颜色模型转换为 RGB 颜色模型
-        public static Color HSLToColor(float hue, float saturation, float lightness)
+        public static SKColor HSLToColor(float hue, float saturation, float lightness)
         {
             float r, g, b;
 
@@ -123,7 +130,7 @@ namespace AGooday.AgPay.Common.Utils
                 b = HueToRGB(p, q, hue - 1f / 3f);
             }
 
-            return Color.FromArgb((int)(r * 255), (int)(g * 255), (int)(b * 255));
+            return new SKColor((byte)(r * 255), (byte)(g * 255), (byte)(b * 255));
         }
 
         // 辅助函数，将色相值转换为 RGB 颜色模型中的值
@@ -140,264 +147,169 @@ namespace AGooday.AgPay.Common.Utils
 
     public static class QrCodeBuilder
     {
-        public static Bitmap Generate(string plainText, int pixel)
+        public static byte[] Generate(string content)
         {
-            var generator = new QRCodeGenerator();
-            var qrCodeData = generator.CreateQrCode(plainText, QRCodeGenerator.ECCLevel.L);
-            var qrCode = new QRCode(qrCodeData);
-
-            var bitmap = qrCode.GetGraphic(pixel);
-            //var bitmap = qrCode.GetGraphic(pixel, Color.Black, Color.White, null, 15, 6, false);
-
-            return bitmap;
+            int width = 1080, height = 1080;
+            return GenerateQrCode(content, SKColors.Black, ECCLevel.Q, width, height);
         }
 
-        public static Bitmap Generate(string content = "https://www.example.com", Bitmap icon = null)
+        public static byte[] Generate(string content = "https://www.example.com", string iconPath = null)
         {
-            // 创建二维码对象
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
-            QRCode qrCode = new QRCode(qrCodeData);
+            int width = 1080, height = 1080, iconSizePercent = 16;
+            int iconWidth = width / 100 * iconSizePercent;
+            int iconHeight = height / 100 * iconSizePercent;
 
-            Bitmap qrCodeImage = qrCode.GetGraphic(30, Color.Black, Color.White, icon);
-            return qrCodeImage;
-        }
-    }
-
-    /// <summary>
-    /// https://learn.microsoft.com/zh-cn/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only
-    /// </summary>
-    public static class DrawQrCode
-    {
-        public static Bitmap GenerateStyleAImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", string iconPath = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
-        {
-            int leftMargin = (int)(width * 0.1);
-            int topMargin = (int)(width * 0.3);
-            int bottomMargin = (int)(width * 0.1);
-
-            // 创建位图对象
-            Bitmap image = new Bitmap(width, height);
-
-            // 创建画布对象
-            Graphics graphics = Graphics.FromImage(image);
-            Color bgColor = ColorTranslator.FromHtml(backgroundColor);
-            graphics.Clear(bgColor);
-
-            if (string.IsNullOrWhiteSpace(logoPath) && !string.IsNullOrWhiteSpace(title))
+            if (string.IsNullOrWhiteSpace(iconPath))
             {
-                graphics.DrawTitleText(title, Brushes.White, width, topMargin);
+                return GenerateQrCode(content, SKColors.Black, ECCLevel.Q, width, height);
             }
-
-            if (!string.IsNullOrWhiteSpace(logoPath))
+            else
             {
-                graphics.DrawMainLogo(logoPath, width, topMargin);
-            }
+                using (var image = GetSKBitmapAsync(iconPath).Result)
+                {
+                    using (var bitmap = new SKBitmap(iconWidth, iconHeight))
+                    {
+                        using (var canvas = new SKCanvas(bitmap))
+                        {
+                            canvas.Clear(SKColors.Transparent);
 
-            // 创建中间的白色圆角矩形
-            int middleWidth = width - leftMargin * 2;
-            int middleHeight = height - topMargin - bottomMargin;
-            int middleX = leftMargin;
-            int middleY = topMargin;
-            Rectangle middleRectangle = new Rectangle(x: middleX, middleY, middleWidth, middleHeight);
-            // 绘制中间白色圆角矩形
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            graphics.FillRoundedRectangle(Brushes.White, middleRectangle, cornerRadius);
-            //graphics.DrawRoundedRectangle(Pens.White, middleRectangle, cornerRadius);
+                            // 创建圆角路径
+                            var path = new SKPath();
+                            var rect = new SKRect(0, 0, iconWidth, iconHeight);
+                            float cornerRadius = iconWidth * 0.1f;
+                            path.AddRoundRect(rect, cornerRadius, cornerRadius);
 
-            // 在画布上绘制二维码
-            Bitmap icon = null;
-            if (iconPath != null)
-            {
-                icon= new Bitmap(GetImageAsync(iconPath).Result);
-            }
-            Bitmap qrCode = QrCodeBuilder.Generate(content, icon);
-            // 计算二维码位置和大小
-            int qrSize = width - (leftMargin * 2) - cornerRadius;
-            int qrLeft = (width - qrSize) / 2;
-            int qrTop = middleRectangle.Top + (middleRectangle.Width - qrSize) / 2;
-            graphics.DrawImage(qrCode, qrLeft, qrTop, qrSize, qrSize);
+                            // 在剪切区域内绘制图像
+                            canvas.ClipPath(path);
+                            canvas.DrawBitmap(image, rect);
+                        }
 
-            Rectangle bottomRect = new Rectangle(leftMargin, (topMargin + middleRectangle.Width), width - leftMargin * 2, height - (topMargin + middleRectangle.Width) - bottomMargin);
-            GraphicsPath bottomPath = new GraphicsPath();
-            int diameter = cornerRadius * 2;
-            Rectangle arcRect = new Rectangle(bottomRect.X, bottomRect.Y, diameter, diameter);
-            bottomPath.AddLine(bottomRect.Left, bottomRect.Top, bottomRect.Right, bottomRect.Top); // 直线段
-            arcRect.X = bottomRect.Right - diameter;
-            bottomPath.AddLine(bottomRect.Right, bottomRect.Top, bottomRect.Right, bottomRect.Bottom); // 直线段 
-            arcRect.Y = bottomRect.Bottom - diameter;
-            bottomPath.AddArc(arcRect, 0, 90); // 右下角
-            arcRect.X = bottomRect.X;
-            bottomPath.AddArc(arcRect, 90, 90); // 左下角
-            bottomPath.CloseFigure();
-            Color color = ColorAdjuster.LightenColor(bgColor, 0);
-            SolidBrush brush = new SolidBrush(color);
-            graphics.FillPath(brush, bottomPath);
+                        var icon = new IconData
+                        {
+                            Icon = bitmap,
+                            IconSizePercent = iconSizePercent,
+                        };
 
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                // 在画布上绘制文字
-                SizeF textSize = graphics.MeasureString(text, new Font("Arial", 36));
-                int textLeft = (int)((bottomPath.GetBounds().Width - textSize.Width) / 2 + bottomPath.GetBounds().X);
-                int textTop = (int)(bottomPath.GetBounds().Bottom + (middleRectangle.Width - bottomPath.GetBounds().Bottom - textSize.Height) / 2);
-                graphics.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
-            }
-
-            payTypes = payTypes.Where(w => !string.IsNullOrWhiteSpace(w.ImgUrl)).ToList();
-            int payLogoWidth = (int)(width * 0.1);
-            int payLogoHeight = (int)(width * 0.1);
-            int payTypeCount = payTypes.Count;
-            int padding = ((width - leftMargin * 2) - (int)(payTypeCount * (width * 0.1))) / (payTypeCount + 1); // 每个LOGO之间间距
-            int index = 0;
-            foreach (var item in payTypes)
-            {
-                string payLogoPath = item.ImgUrl;
-                Image payLogo = GetImageAsync(payLogoPath).Result;
-
-                int payLogoLeft = (leftMargin + padding) + (payLogoWidth + padding) * index;
-
-                int payLogoTop = (int)(topMargin + middleRectangle.Width) + (int)(height - (topMargin + middleRectangle.Width + bottomMargin) - payLogoHeight) / 2;
-
-                graphics.DrawImage(payLogo, payLogoLeft, payLogoTop, payLogoWidth, payLogoHeight);
-
-                index++;
-            }
-
-            graphics.Dispose();
-
-            // 将图像保存到文件
-            //image.Save(outputPath, ImageFormat.Png);
-            return image;
-        }
-
-        public static Bitmap GenerateStyleBImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", string iconPath = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
-        {
-            int leftMargin = (int)(width * 0.1);
-            int topMargin = (int)(width * 0.1);
-
-            // 创建位图对象
-            Bitmap image = new Bitmap(width, height);
-
-            // 创建画布对象
-            Graphics graphics = Graphics.FromImage(image);
-
-            // 设置画布背景色为红色
-            Color bgColor = ColorTranslator.FromHtml(backgroundColor);
-            graphics.Clear(bgColor);
-
-            Color color = ColorAdjuster.LightenColor(bgColor, 0);
-            SolidBrush brush = new SolidBrush(color);
-
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            int diameter = cornerRadius * 2;
-            // 分割成上下两部分
-            Rectangle topRect = new Rectangle(leftMargin, topMargin, width - leftMargin * 2, (int)((height - topMargin * 2) * 0.8));
-            graphics.FillRoundedRectangle(Brushes.White, topRect, cornerRadius);
-
-            Rectangle bottomRect = new Rectangle(leftMargin, topRect.Bottom + ((int)(leftMargin / 2)), width - leftMargin * 2, (int)(height - (topRect.Bottom + ((int)(leftMargin / 2)) + topMargin)));
-            graphics.FillRoundedRectangle(brush, bottomRect, cornerRadius);
-
-            // 在画布上绘制二维码
-            Bitmap icon = null;
-            if (iconPath != null)
-            {
-                icon = new Bitmap(GetImageAsync(iconPath).Result);
-            }
-            Bitmap qrCode = QrCodeBuilder.Generate(content, icon);
-            // 计算二维码位置和大小
-            int qrSize = width - (leftMargin * 2) - cornerRadius;
-            int qrLeft = (width - qrSize) / 2;
-            int qrTop = diameter + topRect.Top + (topRect.Height - qrSize) / 2;
-            graphics.DrawImage(qrCode, qrLeft, qrTop, qrSize, qrSize);
-
-            // 释放二维码资源
-            qrCode.Dispose();
-
-
-            if (string.IsNullOrWhiteSpace(logoPath) && !string.IsNullOrWhiteSpace(title))
-            {
-                graphics.DrawTitleText(title, Brushes.Black, width, qrTop - topMargin + cornerRadius, topMargin);
-            }
-
-            if (!string.IsNullOrWhiteSpace(logoPath))
-            {
-                graphics.DrawMainLogo(logoPath, width, qrTop - topMargin + cornerRadius, topMargin);
-            }
-
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                // 在画布上绘制文字
-                SizeF textSize = graphics.MeasureString(text, new Font("Arial", 36));
-                int textLeft = (int)((bottomRect.Width - textSize.Width) / 2 + bottomRect.X);
-                int textTop = (int)(topRect.Bottom - diameter);
-                graphics.DrawString(text, new Font("Arial", 36), Brushes.Black, textLeft, textTop);
-            }
-
-            payTypes = payTypes.Where(w => !string.IsNullOrWhiteSpace(w.ImgUrl)).ToList();
-            int payLogoWidth = (int)(width * 0.1);
-            int payLogoHeight = (int)(width * 0.1);
-            int payTypeCount = payTypes.Count;
-            int padding = ((width - leftMargin * 2) - (int)(payTypeCount * (width * 0.1))) / (payTypeCount + 1); // 每个LOGO之间间距
-            int index = 0;
-            foreach (var item in payTypes)
-            {
-                string payLogoPath = item.ImgUrl;
-                Image payLogo = GetImageAsync(payLogoPath).Result;
-
-                int payLogoLeft = (leftMargin + padding) + (payLogoWidth + padding) * index;
-
-                int payLogoTop = bottomRect.Top + (int)((bottomRect.Bottom - bottomRect.Top - payLogoHeight) / 2);
-
-                graphics.DrawImage(payLogo, payLogoLeft, payLogoTop, payLogoWidth, payLogoHeight);
-
-                index++;
-            }
-
-            graphics.Dispose();
-
-            // 将图像保存到文件
-            //image.Save(outputPath, ImageFormat.Png);
-            return image;
-        }
-
-        public static string BitmapToBase64Str(Bitmap bitmap)
-        {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                bitmap.Save(memoryStream, ImageFormat.Jpeg);
-                byte[] bytes = memoryStream.ToArray();
-                return Convert.ToBase64String(memoryStream.ToArray());
+                        return GenerateQrCode(content, SKColors.Black, icon, ECCLevel.Q, width, height);
+                    }
+                }
             }
         }
 
-        private static void DrawTitleText(this Graphics graphics, string title, Brush brush, int width, int height, int topMargin = 0)
+        public static byte[] GenerateQrCode(string content, SKColor? codeColor, ECCLevel eccLevel = ECCLevel.L, int width = 512, int height = 512, bool useRect = false)
         {
-            // 绘制大标题文本
-            Font font = new Font("Arial", 48, FontStyle.Bold);
-            SizeF titleSize = graphics.MeasureString(title, font);
-            PointF textPos = new PointF((width - titleSize.Width) / 2, topMargin + (height - titleSize.Height) / 2);
-            graphics.DrawString(title, font, brush, textPos);
+            // Generate QrCode
+            using var generator = new QRCodeGenerator();
+            var qr = generator.CreateQrCode(content, eccLevel);
+
+            // Render to canvas
+            var info = new SKImageInfo(width, height);
+            using var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            if (!codeColor.HasValue)
+            {
+                canvas.Render(qr, info.Width, info.Height);
+            }
+            else
+            {
+                if (useRect)
+                {
+                    canvas.Render(qr, new SKRect(0, 0, info.Width, info.Height), SKColor.Empty, codeColor.Value);
+                }
+                else
+                {
+                    canvas.Render(qr, info.Width, info.Height, SKColor.Empty, codeColor.Value);
+                }
+            }
+
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+
+            return data.ToArray();
         }
 
-        private static void DrawMainLogo(this Graphics graphics, string logoPath, int width, int height, int topMargin = 0)
+        public static byte[] GenerateQrCode(string content, SKColor codeColor, SKColor backgroundColor, ECCLevel eccLevel = ECCLevel.L, int width = 512, int height = 512, bool useRect = false)
         {
-            // 加载logo图片
-            Image logo = GetImageAsync(logoPath).Result;
-            // 计算logo的位置和大小
-            int logoWidth = logo.Width > (width - (width * 0.1)) ? (int)(width - (width * 0.1)) : logo.Width;
-            int logoHeight = logo.Height > height ? height : logo.Height;
-            int logoLeft = (width - logoWidth) / 2;
-            int logoTop = topMargin + (height - logoHeight) / 2;
-            // 在画布上绘制logo
-            graphics.DrawImage(logo, logoLeft, logoTop, logoWidth, logoHeight);
+            // Generate QrCode
+            using var generator = new QRCodeGenerator();
+            var qr = generator.CreateQrCode(content, eccLevel);
+
+            // Render to canvas
+            var info = new SKImageInfo(width, height);
+            using var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            if (useRect)
+            {
+                canvas.Render(qr, new SKRect(0, 0, info.Width, info.Height), SKColor.Empty, codeColor, backgroundColor);
+            }
+            else
+            {
+                canvas.Render(qr, info.Width, info.Height, SKColor.Empty, codeColor, backgroundColor);
+            }
+
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+
+            return data.ToArray();
         }
 
-        private static async Task<Image> GetImageAsync(string path)
+        public static byte[] GenerateQrCode(string content, SKColor? codeColor, IconData iconData, ECCLevel eccLevel = ECCLevel.L, int width = 512, int height = 512, bool useRect = false)
+        {
+            // Generate QrCode
+            using var generator = new QRCodeGenerator();
+            var qr = generator.CreateQrCode(content, eccLevel);
+
+            // Render to canvas
+            var info = new SKImageInfo(width, height);
+            using var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            if (useRect)
+            {
+                canvas.Render(qr, new SKRect(0, 0, info.Width, info.Height), SKColor.Empty, codeColor.Value, iconData);
+            }
+            else
+            {
+                canvas.Render(qr, info.Width, info.Height, SKColor.Empty, codeColor.Value, iconData);
+            }
+
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+
+            return data.ToArray();
+        }
+
+        public static byte[] GenerateQrCode(string content, SKColor codeColor, SKColor backgroundColor, IconData iconData, ECCLevel eccLevel = ECCLevel.L, int width = 512, int height = 512, bool useRect = false)
+        {
+            // Generate QrCode
+            using var generator = new QRCodeGenerator();
+            var qr = generator.CreateQrCode(content, eccLevel);
+
+            // Render to canvas
+            var info = new SKImageInfo(width, height);
+            using var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            if (useRect)
+            {
+                canvas.Render(qr, new SKRect(0, 0, info.Width, info.Height), SKColor.Empty, codeColor, backgroundColor, iconData);
+            }
+            else
+            {
+                canvas.Render(qr, info.Width, info.Height, SKColor.Empty, codeColor, backgroundColor, iconData);
+            }
+
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+
+            return data.ToArray();
+        }
+
+        public static async Task<SKBitmap> GetSKBitmapAsync(string path)
         {
             Uri uriResult;
             bool isUrl = Uri.TryCreate(path, UriKind.Absolute, out uriResult)
                          && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
 
-            Image img;
+            SKBitmap bitmap;
 
             if (isUrl)
             {
@@ -407,57 +319,401 @@ namespace AGooday.AgPay.Common.Utils
                 using (HttpResponseMessage response = await client.GetAsync(path))
                 using (Stream stream = await response.Content.ReadAsStreamAsync())
                 {
-                    img = Image.FromStream(stream);
+                    bitmap = SKBitmap.Decode(stream);
                 }
             }
             else
             {
                 // logoPath 不是一个 URL 地址
                 // 可以使用 Image.FromFile 方法从磁盘上的文件加载图像
-                img = Image.FromFile(path);
+                bitmap = SKBitmap.Decode(path);
             }
 
             // 在这里使用图像对象 logo
-            return img;
+            return bitmap;
+        }
+    }
+
+    public static class DrawQrCode
+    {
+        public static byte[] GenerateStyleAImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", string iconPath = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
+        {
+            using (var bitmap = new SKBitmap(width, height))
+            {
+                using (var canvas = new SKCanvas(bitmap))
+                {
+                    var bgColor = SKColor.Parse(backgroundColor);
+                    // 清空画布绘制背景色
+                    canvas.Clear(bgColor);
+
+                    int leftMargin = (int)(width * 0.1);
+                    int topMargin = (int)(width * 0.3);
+                    int bottomMargin = (int)(width * 0.1);
+
+                    // 创建中间的白色圆角矩形
+                    int middleWidth = width - (leftMargin * 2);
+                    int middleHeight = height - topMargin - bottomMargin;
+                    int middleLeft = leftMargin;
+                    int middleTop = topMargin;
+                    int middleRight = middleLeft + middleWidth;
+                    int middleBottom = middleTop + middleHeight;
+
+                    using (var paint = new SKPaint { Color = SKColors.White, IsAntialias = true })
+                    {
+                        var rect = new SKRect(middleLeft, middleTop, middleRight, middleBottom - cornerRadius);
+                        canvas.DrawRoundRect(rect, cornerRadius, cornerRadius, paint);
+                    }
+
+                    SKColor color = ColorAdjuster.LightenColor(bgColor, 0);
+                    using (var paint = new SKPaint { Color = color, IsAntialias = true })
+                    {
+                        var rect = new SKRect(middleLeft, middleTop + middleWidth, middleRight, middleBottom);
+                        canvas.DrawRoundRect(rect, cornerRadius, cornerRadius, paint);
+                    }
+
+                    using (var paint = new SKPaint { Color = color, IsAntialias = true })
+                    {
+                        var rect = new SKRect(middleLeft, middleTop + middleWidth, middleRight, middleBottom - cornerRadius);
+                        canvas.DrawRoundRect(rect, 0, 0, paint);
+                    }
+
+                    if (string.IsNullOrWhiteSpace(logoPath) && !string.IsNullOrWhiteSpace(title))
+                    {
+                        var fontManager = SKFontManager.Default;
+                        var typeface = fontManager.MatchCharacter(null, SKFontStyle.Bold, null, '汉');
+                        // 创建画笔对象
+                        using (var paint = new SKPaint
+                        {
+                            TextSize = 48,
+                            IsAntialias = true,
+                            Color = SKColors.White,
+                            TextAlign = SKTextAlign.Center,
+                            Typeface = typeface
+                        })
+                        {
+                            // 在画布上绘制文本
+                            canvas.DrawText(title, width / 2, topMargin / 2, paint);
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(logoPath))
+                    {
+                        // 在画布上绘制Logo图片
+                        using (var logoBitmap = QrCodeBuilder.GetSKBitmapAsync(logoPath).Result)
+                        {
+                            int logoX = (width - logoBitmap.Width) / 2;
+                            int logoY = (topMargin - logoBitmap.Height) / 2;
+                            canvas.DrawBitmap(logoBitmap, logoX, logoY);
+                        }
+                    }
+
+                    // 绘制二维码
+                    var qrCodeByte = QrCodeBuilder.Generate(content, iconPath);
+                    using (var stream = new MemoryStream(qrCodeByte))
+                    using (var qrCodeImage = SKBitmap.Decode(stream))
+                    {
+                        using (var qrCodeSkBitmap = new SKBitmap(middleWidth, middleWidth))
+                        {
+                            using (var qrCodeCanvas = new SKCanvas(qrCodeSkBitmap))
+                            {
+                                qrCodeCanvas.Clear(SKColors.Transparent);
+
+                                // 创建圆角路径
+                                var path = new SKPath();
+                                var qrCodeRect = new SKRect(0, 0, middleWidth, middleWidth);
+                                path.AddRoundRect(qrCodeRect, cornerRadius, cornerRadius);
+
+                                // 在剪切区域内绘制图像
+                                qrCodeCanvas.ClipPath(path);
+                                qrCodeCanvas.DrawBitmap(qrCodeImage, qrCodeRect);
+                            }
+
+                            var qrCodeSkImage = SKImage.FromBitmap(qrCodeSkBitmap);
+                            var rect = new SKRect(middleLeft, middleTop, middleRight, middleTop + middleWidth);
+                            canvas.DrawImage(qrCodeSkImage, rect);
+                        }
+                    }
+
+                    // 创建画笔对象
+                    using (var paint = new SKPaint
+                    {
+                        TextSize = 48,
+                        IsAntialias = true,
+                        Color = SKColors.Black,
+                        TextAlign = SKTextAlign.Center,
+                        Typeface = SKTypeface.FromFamilyName("Arial")
+                    })
+                    {
+                        // 在画布上绘制文本
+                        canvas.DrawText(text, width / 2, topMargin + middleWidth - cornerRadius / 2, paint);
+                    }
+
+                    payTypes = payTypes.Where(w => !string.IsNullOrWhiteSpace(w.ImgUrl)).ToList();
+                    int payLogoWidth = (int)(width * 0.1);
+                    int payTypeCount = payTypes.Count;
+                    int payLogoPadding = ((width - leftMargin * 2) - (int)(payTypeCount * (width * 0.1))) / (payTypeCount + 1); // 每个LOGO之间间距
+                    bool isExistAlias = payTypes.Any(a => !string.IsNullOrWhiteSpace(a.Alias));
+                    int index = 0;
+                    foreach (var item in payTypes)
+                    {
+                        int payLogoLeft = (leftMargin + payLogoPadding) + (payLogoWidth + payLogoPadding) * index;
+                        int payLogoTop = (topMargin + middleWidth) + (height - (topMargin + middleWidth + bottomMargin) - payLogoWidth) / 2;
+
+                        int payLogoRight = payLogoLeft + payLogoWidth;
+
+                        int textHeight = 50;
+
+                        int payLogoHeight = payLogoWidth + (isExistAlias ? textHeight : 0);
+                        int payLogoBottom = payLogoTop + payLogoHeight;
+
+                        string payLogoPath = item.ImgUrl;
+                        using (var payLogoOriginImage = QrCodeBuilder.GetSKBitmapAsync(payLogoPath).Result)
+                        {
+                            using (var payLogoBitmap = new SKBitmap(payLogoWidth, payLogoHeight))
+                            {
+                                using (var pagLogoCanvas = new SKCanvas(payLogoBitmap))
+                                {
+                                    pagLogoCanvas.Clear(SKColors.Transparent);
+
+                                    var pagLogoOriginRect = new SKRect(0, 0, payLogoWidth, payLogoWidth);
+                                    pagLogoCanvas.DrawBitmap(payLogoOriginImage, pagLogoOriginRect);
+
+                                    if (!string.IsNullOrWhiteSpace(item.Alias))
+                                    {
+                                        var fontManager = SKFontManager.Default;
+                                        var typeface = fontManager.MatchCharacter('汉');
+                                        // 创建画笔对象
+                                        using (var paint = new SKPaint
+                                        {
+                                            TextSize = 25,
+                                            IsAntialias = true,
+                                            Color = SKColors.White,
+                                            TextAlign = SKTextAlign.Center,
+                                            Typeface = typeface,
+                                        })
+                                        {
+                                            // 在画布上绘制文本
+                                            pagLogoCanvas.DrawText(item.Alias, payLogoWidth / 2, payLogoWidth + (payLogoHeight - payLogoWidth) / 2, paint);
+                                        }
+                                    }
+                                }
+
+                                payLogoTop -= isExistAlias ? textHeight / 2 : 0;
+                                payLogoBottom -= isExistAlias ? textHeight / 2 : 0;
+                                var payLogoImage = SKImage.FromBitmap(payLogoBitmap);
+                                var pagLogoRect = new SKRect(payLogoLeft, payLogoTop, payLogoRight, payLogoBottom);
+                                canvas.DrawImage(payLogoImage, pagLogoRect);
+                            }
+
+                            //var payLogoImage = SKImage.FromBitmap(payLogoOriginImage);
+                            //var pagLogoRect = new SKRect(payLogoLeft, payLogoTop, payLogoRight, payLogoBottom);
+                            //canvas.DrawImage(payLogoImage, pagLogoRect);
+                        }
+
+                        index++;
+                    }
+                }
+
+                // 将绘制的图像保存到内存流中
+                using (var image = SKImage.FromBitmap(bitmap))
+                using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 100))
+                {
+                    return data.ToArray();
+                }
+            }
         }
 
-        private static void FillRoundedRectangle(this Graphics graphics, Brush brush, Rectangle rectangle, int cornerRadius)
+        public static byte[] GenerateStyleBImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", string iconPath = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
         {
-            GraphicsPath path = CreateRoundedRectangle(rectangle, cornerRadius);
-            graphics.FillPath(brush, path);
+            using (var bitmap = new SKBitmap(width, height))
+            {
+                using (var canvas = new SKCanvas(bitmap))
+                {
+                    var bgColor = SKColor.Parse(backgroundColor);
+                    // 清空画布绘制背景色
+                    canvas.Clear(bgColor);
+
+                    int leftMargin = (int)(width * 0.1);
+                    int topMargin = (int)(width * 0.1);
+                    int bottomMargin = (int)(width * 0.1);
+
+                    // 创建中间的白色圆角矩形
+                    int middleWidth = width - (leftMargin * 2);
+                    int middleHeight = (int)((height - topMargin * 2) * 0.8);
+                    int middleLeft = leftMargin;
+                    int middleTop = topMargin;
+                    int middleRight = middleLeft + middleWidth;
+                    int middleBottom = middleTop + middleHeight;
+
+                    using (var paint = new SKPaint { Color = SKColors.White, IsAntialias = true })
+                    {
+                        var rect = new SKRect(middleLeft, middleTop, middleRight, middleBottom);
+                        canvas.DrawRoundRect(rect, cornerRadius, cornerRadius, paint);
+                    }
+
+                    SKColor color = ColorAdjuster.LightenColor(bgColor, 0);
+                    var padding = leftMargin / 2;
+                    var bottomHeight = height - (middleBottom + padding + bottomMargin);
+                    using (var paint = new SKPaint { Color = color, IsAntialias = true })
+                    {
+                        var rect = new SKRect(middleLeft, middleBottom + padding, middleRight, middleBottom + padding + bottomHeight);
+                        canvas.DrawRoundRect(rect, cornerRadius, cornerRadius, paint);
+                    }
+
+                    if (string.IsNullOrWhiteSpace(logoPath) && !string.IsNullOrWhiteSpace(title))
+                    {
+                        var fontManager = SKFontManager.Default;
+                        var typeface = fontManager.MatchCharacter(null, SKFontStyle.Bold, null, '汉');
+                        // 创建画笔对象
+                        using (var paint = new SKPaint
+                        {
+                            TextSize = 48,
+                            IsAntialias = true,
+                            Color = SKColors.Blue,
+                            TextAlign = SKTextAlign.Center,
+                            Typeface = typeface
+                        })
+                        {
+                            // 在画布上绘制文本
+                            canvas.DrawText(title, width / 2, middleTop + (middleHeight - middleWidth) / 2 + cornerRadius, paint);
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(logoPath))
+                    {
+                        // 在画布上绘制Logo图片
+                        using (var logoBitmap = QrCodeBuilder.GetSKBitmapAsync(logoPath).Result)
+                        {
+                            int logoX = (width - logoBitmap.Width) / 2;
+                            int logoY = middleTop + (middleHeight - middleWidth - logoBitmap.Height) / 2 + cornerRadius;
+                            canvas.DrawBitmap(logoBitmap, logoX, logoY);
+                        }
+                    }
+
+                    // 绘制二维码
+                    var qrCodeByte = QrCodeBuilder.Generate(content, iconPath);
+                    using (var stream = new MemoryStream(qrCodeByte))
+                    using (var qrCodeImage = SKBitmap.Decode(stream))
+                    {
+                        using (var qrCodeSkBitmap = new SKBitmap(middleWidth, middleWidth))
+                        {
+                            using (var qrCodeCanvas = new SKCanvas(qrCodeSkBitmap))
+                            {
+                                qrCodeCanvas.Clear(SKColors.Transparent);
+
+                                // 创建圆角路径
+                                var path = new SKPath();
+                                var qrCodeRect = new SKRect(0, 0, middleWidth, middleWidth);
+                                path.AddRoundRect(qrCodeRect, cornerRadius, cornerRadius);
+
+                                // 在剪切区域内绘制图像
+                                qrCodeCanvas.ClipPath(path);
+                                qrCodeCanvas.DrawBitmap(qrCodeImage, qrCodeRect);
+                            }
+
+                            var qrCodeSkImage = SKImage.FromBitmap(qrCodeSkBitmap);
+                            var rect = new SKRect(middleLeft, middleBottom - middleWidth, middleRight, middleBottom);
+                            canvas.DrawImage(qrCodeSkImage, rect);
+                        }
+                    }
+
+                    // 创建画笔对象
+                    using (var paint = new SKPaint
+                    {
+                        TextSize = 48,
+                        IsAntialias = true,
+                        Color = SKColors.Black,
+                        TextAlign = SKTextAlign.Center,
+                        Typeface = SKTypeface.FromFamilyName("Arial")
+                    })
+                    {
+                        // 在画布上绘制文本
+                        canvas.DrawText(text, width / 2, middleBottom - cornerRadius / 2, paint);
+                    }
+
+                    payTypes = payTypes.Where(w => !string.IsNullOrWhiteSpace(w.ImgUrl)).ToList();
+                    int payLogoWidth = (int)(width * 0.1);
+                    int payTypeCount = payTypes.Count;
+                    int payLogoPadding = ((width - leftMargin * 2) - (int)(payTypeCount * (width * 0.1))) / (payTypeCount + 1); // 每个LOGO之间间距
+                    bool isExistAlias = payTypes.Any(a => !string.IsNullOrWhiteSpace(a.Alias));
+                    int index = 0;
+                    foreach (var item in payTypes)
+                    {
+                        int textHeight = 50;
+                        int payLogoHeight = payLogoWidth + (isExistAlias ? textHeight : 0);
+
+                        int payLogoLeft = (leftMargin + payLogoPadding) + (payLogoWidth + payLogoPadding) * index;
+                        int payLogoTop = middleBottom + padding + (bottomHeight - payLogoHeight) / 2;
+
+                        int payLogoRight = payLogoLeft + payLogoWidth;
+
+                        int payLogoBottom = payLogoTop + payLogoHeight;
+
+                        string payLogoPath = item.ImgUrl;
+                        using (var payLogoOriginImage = QrCodeBuilder.GetSKBitmapAsync(payLogoPath).Result)
+                        {
+                            using (var payLogoBitmap = new SKBitmap(payLogoWidth, payLogoHeight))
+                            {
+                                using (var pagLogoCanvas = new SKCanvas(payLogoBitmap))
+                                {
+                                    pagLogoCanvas.Clear(SKColors.Transparent);
+
+                                    var pagLogoOriginRect = new SKRect(0, 0, payLogoWidth, payLogoWidth);
+                                    pagLogoCanvas.DrawBitmap(payLogoOriginImage, pagLogoOriginRect);
+
+                                    if (!string.IsNullOrWhiteSpace(item.Alias))
+                                    {
+                                        var fontManager = SKFontManager.Default;
+                                        var typeface = fontManager.MatchCharacter('汉');
+                                        // 创建画笔对象
+                                        using (var paint = new SKPaint
+                                        {
+                                            TextSize = 25,
+                                            IsAntialias = true,
+                                            Color = SKColors.White,
+                                            TextAlign = SKTextAlign.Center,
+                                            Typeface = typeface,
+                                        })
+                                        {
+                                            // 在画布上绘制文本
+                                            pagLogoCanvas.DrawText(item.Alias, payLogoWidth / 2, payLogoWidth + (payLogoHeight - payLogoWidth) / 2, paint);
+                                        }
+                                    }
+                                }
+
+                                payLogoTop += isExistAlias ? textHeight / 4 : 0;
+                                payLogoBottom += isExistAlias ? textHeight / 4 : 0;
+                                var payLogoImage = SKImage.FromBitmap(payLogoBitmap);
+                                var pagLogoRect = new SKRect(payLogoLeft, payLogoTop, payLogoRight, payLogoBottom);
+                                canvas.DrawImage(payLogoImage, pagLogoRect);
+                            }
+
+                            //var payLogoImage = SKImage.FromBitmap(payLogoOriginImage);
+                            //var pagLogoRect = new SKRect(payLogoLeft, payLogoTop, payLogoRight, payLogoBottom);
+                            //canvas.DrawImage(payLogoImage, pagLogoRect);
+                        }
+
+                        index++;
+                    }
+                }
+
+                // 将绘制的图像保存到内存流中
+                using (var image = SKImage.FromBitmap(bitmap))
+                using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 100))
+                {
+                    return data.ToArray();
+                }
+            }
         }
 
-        private static void DrawRoundedRectangle(this Graphics graphics, Pen pen, Rectangle rectangle, int cornerRadius)
+        public static string BitmapToBase64String(byte[] inArray)
         {
-            GraphicsPath path = CreateRoundedRectangle(rectangle, cornerRadius);
-            graphics.DrawPath(pen, path);
+            return Convert.ToBase64String(inArray);
         }
 
-        private static GraphicsPath CreateRoundedRectangle(Rectangle rectangle, int cornerRadius)
+        public static string BitmapToImageBase64String(byte[] inArray)
         {
-            GraphicsPath path = new GraphicsPath();
-
-            int diameter = cornerRadius * 2;
-            Rectangle arcRectangle = new Rectangle(rectangle.X, rectangle.Y, diameter, diameter);
-
-            // Top-left corner
-            path.AddArc(arcRectangle, 180, 90);
-
-            // Top-right corner
-            arcRectangle.X = rectangle.Right - diameter;
-            path.AddArc(arcRectangle, 270, 90);
-
-            // Bottom-right corner
-            arcRectangle.Y = rectangle.Bottom - diameter;
-            path.AddArc(arcRectangle, 0, 90);
-
-            // Bottom-left corner
-            arcRectangle.X = rectangle.Left;
-            path.AddArc(arcRectangle, 90, 90);
-
-            path.CloseFigure();
-
-            return path;
+            return $"data:image/jpeg;base64,{Convert.ToBase64String(inArray)}";
         }
     }
 }

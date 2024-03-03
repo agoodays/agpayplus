@@ -35,6 +35,8 @@ namespace AGooday.AgPay.Application.Services
         public bool Add(QrCodeShellDto dto)
         {
             var m = _mapper.Map<QrCodeShell>(dto);
+            m.CreatedAt = DateTime.Now;
+            m.UpdatedAt = DateTime.Now;
             _qrCodeShellRepository.Add(m);
             var result = _qrCodeShellRepository.SaveChanges(out int _);
             dto.Id = m.Id;
@@ -50,6 +52,7 @@ namespace AGooday.AgPay.Application.Services
         public bool Update(QrCodeShellDto dto)
         {
             var m = _mapper.Map<QrCodeShell>(dto);
+            m.UpdatedAt = DateTime.Now;
             _qrCodeShellRepository.Update(m);
             return _qrCodeShellRepository.SaveChanges(out int _);
         }

@@ -29,6 +29,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public JObject ConfigInfo { get; set; }
 
         /// <summary>
+        /// 状态: 0-停用, 1-启用
+        /// </summary>
+        public byte State { get; set; }
+
+        /// <summary>
         /// 所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心
         /// </summary>
         public string SysType { get; set; }

@@ -9,7 +9,6 @@ using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Drawing;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 {
@@ -132,21 +131,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         public ApiRes View(string recordId)
         {
             var qrCode = _qrCodeService.GetById(recordId);
-            Bitmap bitmap = null;
+            byte[] inArray = null;
             if (qrCode.QrcShellId.HasValue)
             {
                 var qrCodeShell = _qrCodeShellService.GetById(qrCode.QrcShellId.Value);
-                bitmap = GetBitmap(qrCodeShell, qrCode.QrUrl, $"No.{qrCode.QrcId}");
+                inArray = GetBitmap(qrCodeShell, qrCode.QrUrl, $"No.{qrCode.QrcId}");
             }
             else
             {
-                bitmap = QrCodeBuilder.Generate(qrCode.QrUrl);
+                inArray = QrCodeBuilder.Generate(qrCode.QrUrl);
             }
-            var imageBase64Data = bitmap == null ? "" : $"data:image/png;base64,{DrawQrCode.BitmapToBase64Str(bitmap)}";
+            var imageBase64Data = inArray == null ? "" : DrawQrCode.BitmapToImageBase64String(inArray);
             return ApiRes.Ok(imageBase64Data);
         }
 
-        private Bitmap GetBitmap(QrCodeShellDto dto, string content, string text)
+        private byte[] GetBitmap(QrCodeShellDto dto, string content, string text)
         {
             var configInfo = JsonConvert.DeserializeObject<QrCodeConfigInfo>(dto.ConfigInfo.ToString());
             var logoPath = configInfo.LogoImgUrl;
@@ -158,19 +157,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             }
             text = configInfo.ShowIdFlag ? text : string.Empty;
             var iconPath = configInfo.QrInnerImgUrl;
-            Bitmap bitmap = null;
             switch (dto.StyleCode)
             {
                 case CS.STYLE_CODE.A:
-                    bitmap = DrawQrCode.GenerateStyleAImage(backgroundColor: backgroundColor, title: "", content: content, logoPath: logoPath, iconPath: iconPath, text: text, payTypes: configInfo.PayTypeList);
-                    break;
+                    return DrawQrCode.GenerateStyleAImage(backgroundColor: backgroundColor, title: "", content: content, logoPath: logoPath, iconPath: iconPath, text: text, payTypes: configInfo.PayTypeList);
                 case CS.STYLE_CODE.B:
-                    bitmap = DrawQrCode.GenerateStyleBImage(backgroundColor: backgroundColor, title: "", content: content, logoPath: logoPath, iconPath: iconPath, text: text, payTypes: configInfo.PayTypeList);
-                    break;
+                    return DrawQrCode.GenerateStyleBImage(backgroundColor: backgroundColor, title: "", content: content, logoPath: logoPath, iconPath: iconPath, text: text, payTypes: configInfo.PayTypeList);
                 default:
                     break;
             }
-            return bitmap;
+            return null;
         }
     }
 }

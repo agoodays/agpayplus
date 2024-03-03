@@ -8,7 +8,7 @@
       :footer="null"
       :width="300">
       <div style="width:100%;margin-bottom:20px;text-align:center">
-        <img v-if="apiRes.payDataType == 'codeImgUrl'" :src="apiRes.payData" alt="">
+        <img width="252" height="252" v-if="apiRes.payDataType == 'codeImgUrl'" :src="apiRes.payData" alt="">
         <span v-else-if="apiRes.payDataType == 'payurl'">等待用户支付 <hr> 如浏览器未正确跳转请点击： <a :href="apiRes.payData" target="_blank">支付地址</a><a-button size="small" class="copy-btn" v-clipboard:copy="apiRes.payData" v-clipboard:success="onCopy" >复制链接</a-button></span>
         <span v-else>等待用户支付,请稍后</span>
       </div>
@@ -38,11 +38,9 @@ export default {
     }
   },
   methods: {
-
     onCopy () {
       this.$message.success('复制成功')
     },
-
     // 二维码以及条码弹窗
     showModal (wayCode, apiRes) {
       const that = this
@@ -125,6 +123,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .describe {
+  text-align: center;
   img {
     width: 30px;
     height: 25px;

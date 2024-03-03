@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -56,6 +57,9 @@ namespace AGooday.AgPay.Application.Services
         public bool Add(QrCodeDto dto)
         {
             var m = _mapper.Map<QrCode>(dto);
+            m.State = CS.YES;
+            m.CreatedAt = DateTime.Now;
+            m.UpdatedAt = DateTime.Now;
             _qrCodeShellRepository.Add(m);
             return _qrCodeShellRepository.SaveChanges(out int _);
         }
@@ -69,6 +73,7 @@ namespace AGooday.AgPay.Application.Services
         public bool Update(QrCodeDto dto)
         {
             var m = _mapper.Map<QrCode>(dto);
+            m.UpdatedAt = DateTime.Now;
             _qrCodeShellRepository.Update(m);
             return _qrCodeShellRepository.SaveChanges(out int _);
         }

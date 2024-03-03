@@ -1,5 +1,4 @@
 ﻿using AGooday.AgPay.Common.Utils;
-using System.Drawing;
 
 namespace AGooday.AgPay.Payment.Api.Services
 {
@@ -7,9 +6,9 @@ namespace AGooday.AgPay.Payment.Api.Services
     {
         #region  QRCode
 
-        public Bitmap GetQRCode(string plainText, int pixel)
+        public byte[] GetQRCode(string plainText)
         {
-            var bitmap = QrCodeBuilder.Generate(plainText, pixel);
+            var bitmap = QrCodeBuilder.Generate(plainText);
 
             return bitmap;
         }

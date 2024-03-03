@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Drawing.Imaging;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.ScanImg
 {
@@ -20,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ScanImg
         }
 
         [HttpGet, Route("imgs/{aesStr}.png")]
-        public IActionResult QrImgs(string aesStr, int pixel = 5)
+        public IActionResult QrImgs(string aesStr)
         {
             string plainText = aesStr;
             try
@@ -32,16 +31,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ScanImg
             {
                 return BadRequest("parameter is null");
             }
-            if (pixel <= 0)
+
+            var buffer = _qrCode.GetQRCode(plainText);
+            using (var stream = new MemoryStream(buffer))
             {
-                return BadRequest("pixel <= 0");
+                // 返回生成的码牌图片
+                return File(stream.ToArray(), "image/png");
             }
-
-            var bitmap = _qrCode.GetQRCode(plainText, pixel);
-            var ms = new MemoryStream();
-            bitmap.Save(ms, ImageFormat.Png);
-
-            return File(ms.GetBuffer(), "image/png");
         }
     }
 }
