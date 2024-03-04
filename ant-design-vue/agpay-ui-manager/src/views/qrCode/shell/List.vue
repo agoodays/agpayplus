@@ -28,6 +28,11 @@
             <a-button v-if="$access('ENT_DEVICE_QRC_SHELL_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
           </div>
         </template>
+
+        <template slot="shellImgViewUrlSlot" slot-scope="{record}">
+          <img width="119" :src="record.shellImgViewUrl" v-if="$access('ENT_DEVICE_QRC_SHELL_VIEW')" @click="onPreview(record.id)" />
+          <img width="119" :src="record.shellImgViewUrl" v-else>
+        </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_DEVICE_QRC_SHELL_VIEW')" @click="onPreview(record.id)">详情</a-button>
@@ -49,6 +54,7 @@ import InfoAddOrEdit from './AddOrEdit'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
 const tableColumns = [
+  { key: 'shellImgViewUrl', title: '模板预览图', width: 151, fixed: 'left', scopedSlots: { customRender: 'shellImgViewUrlSlot' } },
   { key: 'shellAlias', dataIndex: 'shellAlias', title: '模板别名' },
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
