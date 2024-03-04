@@ -151,7 +151,7 @@
                         </a-form-model-item>
                       </a-col>
                       <a-col :span="10" :offset="1">
-                        <a-form-model-item label="signName" prop="signName">
+                        <a-form-model-item label="短信签名" prop="signName">
                           <a-input placeholder="请填写[短信签名]" v-model="smsConfig.aliyundySmsConfig.signName" />
                         </a-form-model-item>
                       </a-col>
