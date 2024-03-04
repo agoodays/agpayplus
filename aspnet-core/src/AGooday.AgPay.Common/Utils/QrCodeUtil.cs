@@ -569,7 +569,7 @@ namespace AGooday.AgPay.Common.Utils
                         {
                             TextSize = 48,
                             IsAntialias = true,
-                            Color = SKColors.Blue,
+                            Color = bgColor,
                             TextAlign = SKTextAlign.Center,
                             Typeface = typeface
                         })

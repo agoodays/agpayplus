@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 {
-    [ApiController, AllowAnonymous]
+    [ApiController]
     [Route("api/qrc/shell")]
     public class QrCodeShellController : ControllerBase
     {
@@ -176,7 +176,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                 new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
             };
 
-            var buffer = DrawQrCode.GenerateStyleAImage(title: "", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
+            var buffer = DrawQrCode.GenerateStyleAImage(title: "吉日科技", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
             using (var stream = new MemoryStream(buffer))
             {
                 // 返回生成的码牌图片
@@ -196,7 +196,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                 new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
             };
 
-            var buffer = DrawQrCode.GenerateStyleBImage(title: "", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
+            var buffer = DrawQrCode.GenerateStyleBImage(title: "吉日科技", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
             using (var stream = new MemoryStream(buffer))
             {
                 // 返回生成的码牌图片
