@@ -3,7 +3,7 @@
 ```
 数据库脚本位置根目录 aspnet-core/docs/sql 文件夹 目前仅提供了 MySql 脚本。
 
-后端技术：.Net8、EFCore8、Web API、Swagger、WebSocket、AutoMapper、FluentValidation、Log4Net、MediatR、Redis、RabbitMQ、Quartz.NET
+后端技术：.Net8、EFCore8、Web API、Swagger、WebSocket、AutoMapper、FluentValidation、Log4Net、MediatR、Redis、RabbitMQ、Quartz.NET、SkiaSharp
 
 前端技术：Vue2.x、Antd Of Vue 2.x
 
