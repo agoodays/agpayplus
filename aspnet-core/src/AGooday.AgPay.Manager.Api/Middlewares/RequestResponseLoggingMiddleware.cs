@@ -23,6 +23,10 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                 && !context.Request.Path.Value.Contains("/auth/vercode")
                 && !context.Request.Path.Value.Contains("/qrc/view")
                 && !context.Request.Path.Value.Contains("/qrc/shell/view")
+                && !context.Request.Path.Value.Contains("/qrc/shell/imgview")
+                && !context.Request.Path.Value.Contains("/qrc/shell/nostyle.png")
+                && !context.Request.Path.Value.Contains("/qrc/shell/stylea.png")
+                && !context.Request.Path.Value.Contains("/qrc/shell/styleb.png")
                 && !context.Request.Path.Value.Contains("/export/"))
             {
                 context.TraceIdentifier = Guid.NewGuid().ToString("N");

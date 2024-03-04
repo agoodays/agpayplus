@@ -25,7 +25,7 @@
         <a-select v-model="saveObject.qrcShellId" placeholder="请选择模板">
           <a-select-option value="" key="">无</a-select-option>
           <a-select-option v-for="d in shellList" :value="d.id" :key="d.id">
-            {{ d.shellAlias }}
+            <span class="icon-style"><img class="icon" :src="d.shellImgViewUrl" alt=""></span> {{ d.shellAlias }}
           </a-select-option>
         </a-select>
       </a-form-model-item>
@@ -220,6 +220,18 @@ export default {
 </script>
 
 <style lang="less">
+  .icon-style {
+    border-radius: 5px;
+    padding-left: 2px;
+    padding-right: 2px
+  }
+
+  .icon {
+    width: 18.37px;
+    height: 26px;
+    margin-bottom: 3px
+  }
+
   .agpay-tip-text:before {
     content: "";
     width: 0;

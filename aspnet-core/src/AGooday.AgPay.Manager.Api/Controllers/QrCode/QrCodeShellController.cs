@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Application;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
@@ -19,13 +20,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<QrCodeController> _logger;
         private readonly IQrCodeShellService _qrCodeShellService;
+        protected readonly ISysConfigService _sysConfigService;
 
         public QrCodeShellController(IWebHostEnvironment env, ILogger<QrCodeController> logger,
-            IQrCodeShellService qrCodeShellService)
+            IQrCodeShellService qrCodeShellService,
+            ISysConfigService sysConfigService)
         {
             _env = env;
             _logger = logger;
             _qrCodeShellService = qrCodeShellService;
+            _sysConfigService = sysConfigService;
         }
 
         /// <summary>
@@ -54,6 +58,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             bool result = _qrCodeShellService.Add(dto);
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+            dto.ShellImgViewUrl = dbApplicationConfig.GenShellImgViewUrl(dto.Id.ToString());
+            _qrCodeShellService.Update(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -87,6 +94,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
         public ApiRes Update(long recordId, QrCodeShellDto dto)
         {
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+            dto.ShellImgViewUrl = dbApplicationConfig.GenShellImgViewUrl(recordId.ToString());
             bool result = _qrCodeShellService.Update(dto);
             if (!result)
             {
@@ -116,6 +125,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_VIEW, PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
         public ApiRes View(QrCodeShellDto dto)
         {
+            var inArray = GetQrCodeShellImage(dto);
+            var imageBase64Data = inArray == null ? "" : DrawQrCode.BitmapToImageBase64String(inArray);
+            return ApiRes.Ok(imageBase64Data);
+        }
+
+        private byte[] GetQrCodeShellImage(QrCodeShellDto dto)
+        {
             var configInfo = JsonConvert.DeserializeObject<QrCodeConfigInfo>(dto.ConfigInfo.ToString());
             var logoPath = configInfo.LogoImgUrl;
 
@@ -138,8 +154,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                 default:
                     break;
             }
-            var imageBase64Data = inArray == null ? "" : DrawQrCode.BitmapToImageBase64String(inArray);
-            return ApiRes.Ok(imageBase64Data);
+            return inArray;
         }
 
         [HttpGet, Route("view/{recordId}")]
@@ -148,6 +163,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         {
             var qrCodeShell = _qrCodeShellService.GetById(recordId);
             return View(qrCodeShell);
+        }
+
+        [HttpGet, AllowAnonymous, Route("imgview/{key}.png")]
+        public ActionResult ImgView(string key)
+        {
+            var qrCodeShell = _qrCodeShellService.GetById(Convert.ToInt64(AgPayUtil.AesDecode(key)));
+            var buffer = GetQrCodeShellImage(qrCodeShell);
+            using (var stream = new MemoryStream(buffer))
+            {
+                // 返回生成的码牌图片
+                return File(stream.ToArray(), "image/png");
+            }
         }
 
         [HttpGet, AllowAnonymous, Route("nostyle.png")]

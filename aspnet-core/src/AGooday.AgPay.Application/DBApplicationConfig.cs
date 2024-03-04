@@ -11,6 +11,16 @@ namespace AGooday.AgPay.Application
         public string MgrSiteUrl { get; set; }
 
         /// <summary>
+        /// 生成  【jsapi统一收银台跳转地址】
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public string GenShellImgViewUrl(string recordId)
+        {
+            return $"{MgrSiteUrl}/api/qrc/shell/imgview/{AgPayUtil.AesEncode(recordId)}.png";
+        }
+
+        /// <summary>
         /// 商户系统地址
         /// </summary>
         public string MchSiteUrl { get; set; }
