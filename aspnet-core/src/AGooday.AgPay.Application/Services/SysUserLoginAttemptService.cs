@@ -45,6 +45,11 @@ namespace AGooday.AgPay.Application.Services
             return await _sysUserLoginAttemptRepository.GetFailedLoginAttemptsAsync(userId, timeWindow);
         }
 
+        public async Task<DateTime?> GetLastLoginTimeAsync(long userId)
+        {
+            return await _sysUserLoginAttemptRepository.GetLastLoginTimeAsync(userId);
+        }
+
         public async Task ClearFailedLoginAttemptsAsync(long userId)
         {
             await _sysUserLoginAttemptRepository.ClearFailedLoginAttemptsAsync(userId);

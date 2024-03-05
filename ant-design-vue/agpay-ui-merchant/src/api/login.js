@@ -17,6 +17,14 @@ export function login ({ username, password, vercode, vercodeToken }) {
   }, true, true, false)
 }
 
+export function qrCodeLogin (params) {
+  return request.request({
+    url: '/api/anon/auth/qrcodeStatus',
+    method: 'get',
+    params: params
+  }, true, true, false)
+}
+
 // 获取图形验证码信息接口
 export function vercode () {
   return request.request({ url: '/api/anon/auth/vercode', method: 'get' }, true, true, true)

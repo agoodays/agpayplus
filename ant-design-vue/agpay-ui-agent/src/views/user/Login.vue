@@ -11,7 +11,7 @@
       </div>
     </div>
     <div v-if="loginMethod === 'qrcode'" class="qr-wrapper">
-      <vue-qr text="JEEPAY_LOGIN_QR_75c86a33f88b472e8bda6b8e783fba1f" :size="200" margin="0"></vue-qr>
+      <vue-qr text="AGPAY_LOGIN_QR_75c86a33f88b472e8bda6b8e783fba1f" :size="200" margin="0"></vue-qr>
       <div class="qr-tips">二维码过期请刷新
         <div class="tips-img">
           <img src="@/assets/svg/refresh.svg">
@@ -276,7 +276,7 @@ export default {
     display: flex;
     justify-content: space-between;
     .code-input {
-      //width: 216px;
+      // width: 216px;
     }
     .code-img {
       width: 120px;

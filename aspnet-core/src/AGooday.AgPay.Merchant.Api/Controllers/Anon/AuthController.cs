@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         private readonly ILogger<AuthController> _logger;
         private readonly JwtSettings _jwtSettings;
         private readonly ISysUserService _sysUserService;
-        private readonly ISysUserAuthService _sysUserAuthService; 
+        private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
@@ -240,6 +240,29 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         }
 
         /// <summary>
+        /// 获取二维码内容或获取二维码状态 
+        /// 二维码状态：waiting-待扫描，scanned-已扫描，expired-已过期，confirmed-已确认，canceled-已取消
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("auth/qrcodeStatus"), NoLog]
+        public ApiRes QrCodeStatus(string qrcodeNo)
+        {
+            if (string.IsNullOrWhiteSpace(qrcodeNo))
+            {
+                qrcodeNo = $"AGPAY_LOGIN_QR_{Guid.NewGuid().ToString("N")}";
+                string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
+                _redis.StringSet(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.WAITING }), new TimeSpan(0, 0, CS.LOGIN_QR_CACHE_TIME)); //登录二维码缓存时间: 1分钟
+                return ApiRes.Ok(new { qrcodeNo });
+            }
+            else
+            {
+                string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
+                string qrcodeStatus = _redis.StringGet(loginQRCacheKey);
+                return ApiRes.Ok(string.IsNullOrWhiteSpace(qrcodeStatus) ? new { qrcodeStatus = CS.QR_CODE_STATUS.EXPIRED } : JsonConvert.DeserializeObject(qrcodeStatus));
+            }
+        }
+
+        /// <summary>
         /// 图片验证码
         /// </summary>
         /// <returns></returns>
@@ -333,7 +356,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
                 throw new BizException("当前用户已存在！");
             }
 
-            if ((model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) || model.smsType.Equals(CS.SMS_TYPE.AUTH)) 
+            if ((model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) || model.smsType.Equals(CS.SMS_TYPE.AUTH))
                 && !_sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.MCH))
             {
                 throw new BizException("用户不存在！");

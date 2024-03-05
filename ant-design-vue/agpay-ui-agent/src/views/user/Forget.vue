@@ -206,7 +206,7 @@ export default {
     display: flex;
     justify-content: space-between;
     .code-input {
-      //width: 216px;
+      // width: 216px;
     }
     .code-img {
       width: 137px;

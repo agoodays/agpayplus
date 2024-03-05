@@ -18,8 +18,8 @@
           <a-button
             size="large"
             type="primary"
-            class="login-button"
             @click="sendCode()"
+            style="height: 40px; margin-left: 10px;"
             :disabled="this.codeExpireTime > 0"
           >
             {{ this.codeExpireTime > 0 ? `${this.codeExpireTime}秒后重新发送` : '发送短信验证码' }}
@@ -243,7 +243,7 @@ export default {
     display: flex;
     justify-content: space-between;
     .code-input {
-      width: 216px;
+      // width: 216px;
     }
     .code-img {
       width: 137px;

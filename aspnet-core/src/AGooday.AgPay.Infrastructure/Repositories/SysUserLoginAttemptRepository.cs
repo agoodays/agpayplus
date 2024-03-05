@@ -34,13 +34,17 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             DateTime attemptTime = DateTime.Now - timeWindow;
 
             int failedAttempts = await DbSet.CountAsync(w => w.UserId.Equals(userId) && !w.Success && w.AttemptTime >= attemptTime);
-
-            DateTime? lastLoginTime = (await DbSet
-                .Where(w => w.UserId.Equals(userId) && w.Success)
-                .OrderByDescending(l => l.AttemptTime)
-                .FirstOrDefaultAsync())?.AttemptTime;
+            DateTime? lastLoginTime = await GetLastLoginTimeAsync(userId);
 
             return (failedAttempts, lastLoginTime);
+        }
+
+        public async Task<DateTime?> GetLastLoginTimeAsync(long userId)
+        {
+            return (await DbSet
+                            .Where(w => w.UserId.Equals(userId) && w.Success)
+                            .OrderByDescending(l => l.AttemptTime)
+                            .FirstOrDefaultAsync())?.AttemptTime;
         }
 
         public async Task ClearFailedLoginAttemptsAsync(long userId)

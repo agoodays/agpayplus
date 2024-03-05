@@ -11,6 +11,11 @@
         public const int VERCODE_CACHE_TIME = 60;
 
         /// <summary>
+        /// 登录二维码缓存时间，单位：s
+        /// </summary>
+        public const int LOGIN_QR_CACHE_TIME = 60;
+
+        /// <summary>
         /// 短信验证码缓存时间，单位：s
         /// </summary>
         public const int SMSCODE_CACHE_TIME = 60;
@@ -375,6 +380,33 @@
         /// </summary>
         public const string ACCESS_TOKEN_NAME = "authorization";
 
+        /// <summary>
+        /// 二维码状态：waiting-待扫描，scanned-已扫描，expired-已过期，confirmed-已确认，canceled-已取消
+        /// </summary>
+        public interface QR_CODE_STATUS
+        {
+            /// <summary>
+            /// 待扫描
+            /// </summary>
+            public const string WAITING = "waiting";
+            /// <summary>
+            /// 已扫描
+            /// </summary>
+            public const string SCANNED = "scanned";
+            /// <summary>
+            /// 已过期
+            /// </summary>
+            public const string EXPIRED = "expired";
+            /// <summary>
+            /// 已确认
+            /// </summary>
+            public const string CONFIRMED = "confirmed";
+            /// <summary>
+            /// 已取消
+            /// </summary>
+            public const string CANCELED = "canceled";
+        }
+
         #region 缓存Key
         /** ！！不同系统请放置不同的redis库 ！！ **/
         /// <summary>
@@ -404,6 +436,20 @@
         public static string GetCacheKeyImgCode(string imgToken)
         {
             return string.Format(CACHE_KEY_IMG_CODE, imgToken);
+        }
+
+        /// <summary>
+        /// 登录二维码 缓存key
+        /// </summary>
+        private const string CACHE_KEY_LOGIN_QR = "LoginQR:login_qr_{0}";
+        /// <summary>
+        /// 获取登录二维码缓存key
+        /// </summary>
+        /// <param name="qrcodeNo"></param>
+        /// <returns></returns>
+        public static string GetCacheKeyLoginQR(string qrcodeNo)
+        {
+            return string.Format(CACHE_KEY_LOGIN_QR, qrcodeNo);
         }
 
         /// <summary>
