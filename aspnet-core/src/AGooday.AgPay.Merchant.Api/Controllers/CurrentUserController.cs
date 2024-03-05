@@ -44,10 +44,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             _sysUserService = sysUserService;
             _sysEntService = sysEntService;
             _sysUserAuthService = sysUserAuthService;
+            _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _cache = cache;
             _redis = client.GetDatabase();
             _notifications = (DomainNotificationHandler)notifications;
-            _sysUserLoginAttemptService = sysUserLoginAttemptService;
         }
 
         /// <summary>

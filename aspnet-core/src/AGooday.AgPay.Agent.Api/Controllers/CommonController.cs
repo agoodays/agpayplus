@@ -4,12 +4,14 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 
 namespace AGooday.AgPay.Agent.Api.Controllers
 {
+    [Authorize]
     public abstract class CommonController : ControllerBase
     {
         private readonly ILogger<CommonController> _logger;

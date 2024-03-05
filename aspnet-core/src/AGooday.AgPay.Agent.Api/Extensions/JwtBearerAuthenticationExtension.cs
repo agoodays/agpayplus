@@ -127,6 +127,19 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             }
             return tokenModelJwt;
         }
+
+        public static string GetTokenFromAuthorizationHeader(string authorizationHeader)
+        {
+            var jwtBearer = $"{JwtBearerDefaults.AuthenticationScheme} ";
+            if (authorizationHeader.StartsWith(jwtBearer))
+            {
+                // 移除 "Bearer " 前缀以获取实际的 JWT
+                return authorizationHeader.Substring(jwtBearer.Length);
+            }
+
+            // 无效的授权头格式
+            throw new Exception("Invalid Authorization header format");
+        }
     }
 
     /// <summary>

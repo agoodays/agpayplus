@@ -249,7 +249,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         {
             if (string.IsNullOrWhiteSpace(qrcodeNo))
             {
-                qrcodeNo = $"AGPAY_LOGIN_QR_{Guid.NewGuid().ToString("N")}";
+                qrcodeNo = CS.LOGIN_QR_CODE_NO;
                 string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
                 _redis.StringSet(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.WAITING }), new TimeSpan(0, 0, CS.LOGIN_QR_CACHE_TIME)); //登录二维码缓存时间: 1分钟
                 return ApiRes.Ok(new { qrcodeNo });

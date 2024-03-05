@@ -3,21 +3,23 @@
     <div class="tab-box">
       <div class="desc">代理商登录</div>
       <div class="tab">
-        <a class="operation-class" v-if="loginMethod !== 'password'" @click="loginMethod = 'password'">密码登录</a>
+        <a class="operation-class" v-if="loginMethod !== 'password'" @click="switchLoginMethod('password')">密码登录</a>
         <span style="margin: 0px 10px;" v-if="loginMethod=== 'qrcode'">|</span>
-        <a class="operation-class" v-if="loginMethod !== 'message'" @click="loginMethod = 'message'">短信登录</a>
+        <a class="operation-class" v-if="loginMethod !== 'message'" @click="switchLoginMethod('message')">短信登录</a>
         <span style="margin: 0px 10px;" v-if="loginMethod !== 'qrcode'">|</span>
-        <a class="operation-class" v-if="loginMethod !== 'qrcode'" @click="loginMethod = 'qrcode'">扫码登录</a>
+        <a class="operation-class" v-if="loginMethod !== 'qrcode'" @click="switchLoginMethod('qrcode')">扫码登录</a>
       </div>
     </div>
     <div v-if="loginMethod === 'qrcode'" class="qr-wrapper">
-      <vue-qr text="AGPAY_LOGIN_QR_75c86a33f88b472e8bda6b8e783fba1f" :size="200" margin="0"></vue-qr>
-      <div class="qr-tips">二维码过期请刷新
+      <vue-qr v-if="!!qrcodeNo" :text="qrcodeNo" :size="200" margin="0"></vue-qr>
+      <div v-if="!!qrcodeStatus && qrcodeStatus !== 'waiting'" class="qr-tips">
+        {{ qrcodeStatus === 'scanned' ? '扫码成功请确认登录' : (qrcodeStatus === 'expired' ? '二维码过期请刷新' : (qrcodeStatus === 'confirmed' ? '登录成功' : (qrcodeStatus === 'canceled' ? '用户取消登录请刷新' : ''))) }}
         <div class="tips-img">
-          <img src="@/assets/svg/refresh.svg">
+          <img v-if="qrcodeStatus === 'scanned' || qrcodeStatus === 'confirmed'" src="@/assets/svg/success.svg">
+          <img v-else src="@/assets/svg/refresh.svg" @click='getQrcodeNo'>
         </div>
       </div>
-      <div class="qr-mantle"></div>
+      <div v-if="!!qrcodeStatus && qrcodeStatus !== 'waiting'" class="qr-mantle"></div>
     </div>
     <div v-if="loginMethod === 'qrcode'" class="qr-footer">请使用展业宝APP扫码登录</div>
     <a-form v-if="loginMethod !== 'qrcode'" class="user-layout-login" ref="formLogin" :form="form" @submit="handleSubmit">
@@ -128,7 +130,7 @@
 import { mapActions } from 'vuex'
 import vueQr from 'vue-qr'
 import { timeFix } from '@/utils/util'
-import { sendcode, vercode } from '@/api/login'
+import { sendcode, vercode, qrCodeLogin } from '@/api/login'
 
 export default {
   components: {
@@ -146,6 +148,8 @@ export default {
       usernameIcon: require('@/assets/svg/user.svg'), // 三个icon图标
       passwordIcon: require('@/assets/svg/lock.svg'),
       vercodeIcon: require('@/assets/svg/code.svg'),
+      qrcodeNo: null,
+      qrcodeStatus: null,
       vercodeImgSrc: '', // 验证码图片
       vercodeToken: '' // 验证码验证token
     }
@@ -154,7 +158,7 @@ export default {
     this.refVercode()
   },
   methods: {
-    ...mapActions(['Login', 'Logout']),
+    ...mapActions(['Login', 'QrCodeLogin', 'Logout']),
     // handler
     handleSubmit (e) {
       e.preventDefault() // 通知 Web 浏览器不要执行与事件关联的默认动作
@@ -179,6 +183,53 @@ export default {
             })
         }
       })
+    },
+    switchLoginMethod (loginMethod) {
+      this.loginMethod = loginMethod
+      if (loginMethod === 'qrcode') {
+        this.getQrcodeNo()
+      } else {
+        this.stopPolling()
+      }
+    },
+    getQrcodeNo () {
+      this.qrcodeNo = null
+      this.qrcodeStatus = null
+      // 向后端请求获取二维码编号
+      qrCodeLogin().then(data => {
+        this.qrcodeNo = data.qrcodeNo
+        // 获取到二维码后开始轮询
+        this.startPolling()
+      })
+    },
+    getQrcodeStatus () {
+      const that = this
+      // 向后端请求获取二维码状态
+      const loginParams = { qrcodeNo: this.qrcodeNo }
+      that.QrCodeLogin({ loginParams: loginParams, isSaveStorage: that.isAutoLogin })
+          .then((res) => {
+            that.qrcodeStatus = res.qrcodeStatus
+            if (that.qrcodeStatus === 'confirmed' || that.qrcodeStatus === 'canceled' || that.qrcodeStatus === 'expired') {
+              // 登录成功，停止轮询
+              that.stopPolling()
+            }
+            if (this.qrcodeStatus === 'confirmed') {
+              that.loginSuccess(res)
+            }
+          })
+          .catch(err => {
+            that.showLoginErrorInfo = (err.msg || JSON.stringify(err))
+          })
+    },
+    startPolling () {
+      // 启动定时器，每隔一段时间获取二维码状态
+      this.intervalId = setInterval(() => {
+        this.getQrcodeStatus()
+      }, 2000) // 时间间隔为2秒，可以根据需求调整
+    },
+    stopPolling () {
+      // 停止定时器
+      clearInterval(this.intervalId)
     },
     loginSuccess (res) {
       const redirect = this.$route.query.redirect
@@ -234,6 +285,10 @@ export default {
         }, 1000)
       })
     }
+  },
+  beforeDestroy () {
+    // 组件销毁前停止定时器
+    this.stopPolling()
   }
 }
 </script>
@@ -340,7 +395,8 @@ export default {
 
 .qr-wrapper .qr-tips .tips-img img {
   width: 100%;
-  height: 100%
+  height: 100%;
+  cursor: pointer;
 }
 
 .qr-wrapper .qr-mantle {

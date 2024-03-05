@@ -1,5 +1,5 @@
 import storage from '@/utils/agpayStorageWrapper'
-import { login, logout } from '@/api/login'
+import { login, qrCodeLogin, logout } from '@/api/login'
 import appConfig from '@/config/appConfig'
 
 const user = {
@@ -55,6 +55,20 @@ const user = {
         login(loginParams).then(bizData => {
           storage.setToken(bizData[appConfig.ACCESS_TOKEN_NAME], isSaveStorage)
           commit('SET_TOKEN', bizData[appConfig.ACCESS_TOKEN_NAME])
+          resolve(bizData) // 返回登录响应结果
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
+    QrCodeLogin ({ commit }, { loginParams, isSaveStorage }) {
+      return new Promise((resolve, reject) => {
+        qrCodeLogin(loginParams).then(bizData => {
+          if (bizData.qrcodeStatus === 'confirmed') {
+            storage.setToken(bizData[appConfig.ACCESS_TOKEN_NAME], isSaveStorage)
+            commit('SET_TOKEN', bizData[appConfig.ACCESS_TOKEN_NAME])
+          }
           resolve(bizData) // 返回登录响应结果
         }).catch(error => {
           reject(error)

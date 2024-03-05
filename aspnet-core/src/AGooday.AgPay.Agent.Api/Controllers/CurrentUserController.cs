@@ -1,4 +1,5 @@
 using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Extensions;
 using AGooday.AgPay.Agent.Api.Models;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
@@ -25,6 +26,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         private readonly ISysUserService _sysUserService;
         private readonly ISysEntitlementService _sysEntService;
         private readonly ISysUserAuthService _sysUserAuthService;
+        private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly IMemoryCache _cache;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
@@ -34,18 +36,25 @@ namespace AGooday.AgPay.Agent.Api.Controllers
             ISysEntitlementService sysEntService,
             ISysUserAuthService sysUserAuthService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
+            ISysUserRoleRelaService sysUserRoleRelaService, 
+            ISysUserLoginAttemptService sysUserLoginAttemptService)
             : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
         {
             _logger = logger;
             _sysUserService = sysUserService;
             _sysEntService = sysEntService;
             _sysUserAuthService = sysUserAuthService;
+            _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _cache = cache;
             _redis = client.GetDatabase();
             _notifications = (DomainNotificationHandler)notifications;
         }
 
+        /// <summary>
+        /// 当前用户信息
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="UnauthorizeException"></exception>
         [HttpGet, Route("user"), NoLog]
         public ApiRes CurrentUserInfo()
         {
@@ -81,6 +90,72 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                 throw new UnauthorizeException();
                 //throw new BizException("登录失效");
                 //return ApiRes.CustomFail("登录失效");
+            }
+        }
+
+        /// <summary>
+        /// 当前用户扫码
+        /// </summary>
+        /// <param name="qrcodeNo"></param>
+        /// <returns></returns>
+        [HttpGet, Route("user/scan"), NoLog]
+        public async Task<ApiRes> ScanAsync(string qrcodeNo)
+        {
+            string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
+            if (!_redis.KeyExists(loginQRCacheKey))
+            {
+                return ApiRes.CustomFail("二维码无效，请刷新二维码后重新扫描");
+            }
+            string data = await _redis.StringGetAsync(loginQRCacheKey);
+            var qrcodeInfo = JsonConvert.DeserializeObject<dynamic>(string.IsNullOrWhiteSpace(data) ? "{}" : data);
+            if (string.IsNullOrWhiteSpace(data) || qrcodeInfo.qrcodeStatus != CS.QR_CODE_STATUS.WAITING)
+            {
+                return ApiRes.CustomFail("二维码状态无效，请刷新二维码后重新扫描");
+            }
+            var cacheExpiry = _redis.KeyTimeToLive(loginQRCacheKey);
+            await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.SCANNED }), cacheExpiry);
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 当前用户确认登录
+        /// </summary>
+        /// <param name="qrcodeNo"></param>
+        /// <param name="isConfirm"></param>
+        /// <returns></returns>
+        [HttpGet, Route("user/confirmLogin"), NoLog]
+        public async Task<ApiRes> ConfirmLoginAsync(string qrcodeNo, bool isConfirm = true)
+        {
+            string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
+            if (!_redis.KeyExists(loginQRCacheKey))
+            {
+                return ApiRes.CustomFail("二维码无效，请刷新二维码后重新扫描");
+            }
+            string qrcodeData = await _redis.StringGetAsync(loginQRCacheKey);
+            var qrcodeInfo = JsonConvert.DeserializeObject<dynamic>(string.IsNullOrWhiteSpace(qrcodeData) ? "{}" : qrcodeData);
+            if (string.IsNullOrWhiteSpace(qrcodeData) || qrcodeInfo.qrcodeStatus != CS.QR_CODE_STATUS.SCANNED)
+            {
+                return ApiRes.CustomFail("二维码状态无效，请刷新二维码后重新扫描");
+            }
+            var cacheExpiry = await _redis.KeyTimeToLiveAsync(loginQRCacheKey);
+            if (isConfirm)
+            {
+                // 获取授权头的值
+                var authorizationHeader = Request.Headers.Authorization;
+                var accessToken = JwtBearerAuthenticationExtension.GetTokenFromAuthorizationHeader(authorizationHeader);
+                var currentUser = GetCurrentUser();
+                var lastLoginTime = await _sysUserLoginAttemptService.GetLastLoginTimeAsync(currentUser.SysUser.SysUserId);
+                var qrcode = new Dictionary<string, object>();
+                qrcode.Add(CS.ACCESS_TOKEN_NAME, accessToken);
+                qrcode.Add("lastLoginTime", lastLoginTime);
+                qrcode.Add("qrcodeStatus", CS.QR_CODE_STATUS.CONFIRMED);
+                await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(qrcode), cacheExpiry);
+                return ApiRes.Ok();
+            }
+            else
+            {
+                await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.CANCELED }), cacheExpiry);
+                return ApiRes.Ok();
             }
         }
 

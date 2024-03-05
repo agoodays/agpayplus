@@ -240,6 +240,29 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         }
 
         /// <summary>
+        /// 获取二维码内容或获取二维码状态 
+        /// 二维码状态：waiting-待扫描，scanned-已扫描，expired-已过期，confirmed-已确认，canceled-已取消
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("auth/qrcodeStatus"), NoLog]
+        public ApiRes QrCodeStatus(string qrcodeNo)
+        {
+            if (string.IsNullOrWhiteSpace(qrcodeNo))
+            {
+                qrcodeNo = CS.LOGIN_QR_CODE_NO;
+                string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
+                _redis.StringSet(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.WAITING }), new TimeSpan(0, 0, CS.LOGIN_QR_CACHE_TIME)); //登录二维码缓存时间: 1分钟
+                return ApiRes.Ok(new { qrcodeNo });
+            }
+            else
+            {
+                string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
+                string qrcodeStatus = _redis.StringGet(loginQRCacheKey);
+                return ApiRes.Ok(string.IsNullOrWhiteSpace(qrcodeStatus) ? new { qrcodeStatus = CS.QR_CODE_STATUS.EXPIRED } : JsonConvert.DeserializeObject(qrcodeStatus));
+            }
+        }
+
+        /// <summary>
         /// 图片验证码
         /// </summary>
         /// <returns></returns>

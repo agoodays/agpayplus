@@ -421,7 +421,7 @@
         /// <returns></returns>
         public static string GetCacheKeyToken(long sysUserId, string uuid)
         {
-            return string.Format(CACHE_KEY_TOKEN, sysUserId, uuid);
+            return string.Format(CACHE_KEY_TOKEN, sysUserId, arg1: uuid);
         }
 
         /// <summary>
@@ -438,6 +438,10 @@
             return string.Format(CACHE_KEY_IMG_CODE, imgToken);
         }
 
+        /// <summary>
+        /// 登录二维码内容
+        /// </summary>
+        public static string LOGIN_QR_CODE_NO => $"AGPAY_LOGIN_QR_{Guid.NewGuid().ToString("N")}";
         /// <summary>
         /// 登录二维码 缓存key
         /// </summary>

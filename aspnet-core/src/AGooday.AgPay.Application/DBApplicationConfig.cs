@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application
         public string MgrSiteUrl { get; set; }
 
         /// <summary>
-        /// 生成  【jsapi统一收银台跳转地址】
+        /// 生成码牌模板图片显示URL
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
