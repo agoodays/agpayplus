@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新码牌")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
-        public ApiRes Update(QrCodeDto dto)
+        public ApiRes Update(string recordId, QrCodeDto dto)
         {
             bool result = _qrCodeService.Update(dto);
             if (!result)
@@ -131,7 +131,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         public ApiRes View(string recordId)
         {
             var qrCode = _qrCodeService.GetById(recordId);
-            byte[] inArray = null;
+            byte[] inArray;
             if (qrCode.QrcShellId.HasValue)
             {
                 var qrCodeShell = _qrCodeShellService.GetById(qrCode.QrcShellId.Value);

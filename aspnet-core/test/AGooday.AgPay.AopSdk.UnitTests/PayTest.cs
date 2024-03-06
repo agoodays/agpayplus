@@ -60,7 +60,6 @@ namespace AGooday.AgPay.AopSdk.UnitTests
         [TestMethod]
         public void QueryTest()
         {
-            var now = DateTime.Now;
             PayOrderQueryRequest request = new PayOrderQueryRequest();
             PayOrderQueryReqModel model = new PayOrderQueryReqModel();
             request.SetBizModel(model);
@@ -118,7 +117,6 @@ namespace AGooday.AgPay.AopSdk.UnitTests
         [TestMethod]
         public void RefundQueryTest()
         {
-            var now = DateTime.Now;
             RefundOrderQueryRequest request = new RefundOrderQueryRequest();
             RefundOrderQueryReqModel model = new RefundOrderQueryReqModel();
             request.SetBizModel(model);
