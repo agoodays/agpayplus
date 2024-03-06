@@ -104,10 +104,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_DEL)]
         public ApiRes Delete(string appId)
         {
-            var mchApp = _mchAppService.GetById(appId);
             _mchAppService.Remove(appId);
 
             // 推送mq到目前节点进行更新数据
+            var mchApp = _mchAppService.GetById(appId);
             mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, mchApp.MchNo, appId));
 
             return ApiRes.Ok();
@@ -154,10 +154,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <summary>
         /// 获取支付网关系统公钥
         /// </summary>
-        /// <param name="appId"></param>
         /// <returns></returns>
         [HttpGet, Route("sysRSA2PublicKey"), AllowAnonymous, NoLog]
-        public ApiRes SysRSA2PublicKey(string appId)
+        public ApiRes SysRSA2PublicKey()
         {
             return ApiRes.Ok(_sysRSA2Config.PublicKey);
         }

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Text.RegularExpressions;
 
 namespace AGooday.AgPay.Manager.Api.Middlewares
 {
@@ -38,18 +37,16 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                     // 存储请求数据
                     await RequestDataLog(context);
 
-                    using (var ms = new MemoryStream())
-                    {
-                        context.Response.Body = ms;
+                    using var ms = new MemoryStream();
+                    context.Response.Body = ms;
 
-                        await _next(context);
+                    await _next(context);
 
-                        // 存储响应数据
-                        ResponseDataLog(context, ms);
+                    // 存储响应数据
+                    ResponseDataLog(context, ms);
 
-                        ms.Position = 0;
-                        await ms.CopyToAsync(originalBody);
-                    }
+                    ms.Position = 0;
+                    await ms.CopyToAsync(originalBody);
                 }
                 catch (Exception ex)
                 {
@@ -91,8 +88,8 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             var responseBody = new StreamReader(ms).ReadToEnd();
 
             // 去除 Html
-            var reg = "<[^>]+>";
-            var isHtml = Regex.IsMatch(responseBody, reg);
+            //var reg = "<[^>]+>";
+            //var isHtml = Regex.IsMatch(responseBody, reg);
 
             if (!string.IsNullOrEmpty(responseBody))
             {

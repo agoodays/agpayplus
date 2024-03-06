@@ -45,11 +45,11 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     errorResponse.Msg = ex.Message;
                     break;
-                case KeyNotFoundException ex:
-                    //response.StatusCode = (int)HttpStatusCode.NotFound;
-                    //errorResponse.Msg = ex.Message;
-                    break;
-                case UnauthorizeException ex:
+                //case KeyNotFoundException ex:
+                //    //response.StatusCode = (int)HttpStatusCode.NotFound;
+                //    //errorResponse.Msg = ex.Message;
+                //    break;
+                case UnauthorizeException:
                     response.StatusCode = (int)HttpStatusCode.Unauthorized;
                     errorResponse.Code = ApiCode.SUCCESS.GetCode();
                     errorResponse.Msg = "登录失效";

@@ -90,10 +90,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_STORE_DEL)]
         public ApiRes Delete(long recordId)
         {
-            var mchStore = _mchStoreService.GetById(recordId);
             _mchStoreService.Remove(recordId);
 
             //// 推送mq到目前节点进行更新数据
+            //var mchStore = _mchStoreService.GetById(recordId);
             //mqSender.Send(ResetIsvMchStoreInfoConfigMQ.Build(ResetIsvMchStoreInfoConfigMQ.RESET_TYPE_MCH_STORE, null, mchStore.MchNo, recordId));
 
             return ApiRes.Ok();

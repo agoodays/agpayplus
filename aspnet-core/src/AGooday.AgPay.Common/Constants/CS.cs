@@ -368,7 +368,7 @@
         /// <summary>
         /// 允许上传的的图片文件格式，需要与 WebSecurityConfig对应
         /// </summary>
-        public static List<string> ALLOW_UPLOAD_IMG_SUFFIX = ["jpg", "png", "jpeg", "gif", "mp4"];
+        public static List<string> ALLOW_UPLOAD_IMG_SUFFIX => ["jpg", "png", "jpeg", "gif", "mp4"];
 
         /// <summary>
         /// Token 有效期
@@ -419,10 +419,7 @@
         /// <param name="sysUserId"></param>
         /// <param name="uuid"></param>
         /// <returns></returns>
-        public static string GetCacheKeyToken(long sysUserId, string uuid)
-        {
-            return string.Format(CACHE_KEY_TOKEN, sysUserId, arg1: uuid);
-        }
+        public static string GetCacheKeyToken(long sysUserId, string uuid) => string.Format(CACHE_KEY_TOKEN, sysUserId, arg1: uuid);
 
         /// <summary>
         /// 图片验证码 缓存key
@@ -433,15 +430,12 @@
         /// </summary>
         /// <param name="imgToken"></param>
         /// <returns></returns>
-        public static string GetCacheKeyImgCode(string imgToken)
-        {
-            return string.Format(CACHE_KEY_IMG_CODE, imgToken);
-        }
+        public static string GetCacheKeyImgCode(string imgToken) => string.Format(CACHE_KEY_IMG_CODE, imgToken);
 
         /// <summary>
         /// 登录二维码内容
         /// </summary>
-        public static string LOGIN_QR_CODE_NO => $"AGPAY_LOGIN_QR_{Guid.NewGuid().ToString("N")}";
+        public static string LOGIN_QR_CODE_NO => $"AGPAY_LOGIN_QR_{Guid.NewGuid():N}";
         /// <summary>
         /// 登录二维码 缓存key
         /// </summary>
@@ -451,10 +445,7 @@
         /// </summary>
         /// <param name="qrcodeNo"></param>
         /// <returns></returns>
-        public static string GetCacheKeyLoginQR(string qrcodeNo)
-        {
-            return string.Format(CACHE_KEY_LOGIN_QR, qrcodeNo);
-        }
+        public static string GetCacheKeyLoginQR(string qrcodeNo) => string.Format(CACHE_KEY_LOGIN_QR, qrcodeNo);
 
         /// <summary>
         /// 短信验证码 缓存key
@@ -465,10 +456,7 @@
         /// </summary>
         /// <param name="smsToken"></param>
         /// <returns></returns>
-        public static string GetCacheKeySmsCode(string smsToken)
-        {
-            return string.Format(CACHE_KEY_SMS_CODE, smsToken);
-        }
+        public static string GetCacheKeySmsCode(string smsToken) => string.Format(CACHE_KEY_SMS_CODE, smsToken);
         #endregion
 
         /// <summary>

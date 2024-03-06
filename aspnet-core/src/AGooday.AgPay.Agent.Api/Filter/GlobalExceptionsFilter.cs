@@ -34,8 +34,7 @@ namespace AGooday.AgPay.Agent.Api.Filter
 
             //输出错误日志信息
             //_logger.LogError(json.Message + WriteLog(json.Message, context.Exception));
-            _logger.LogError(errorResponse.Msg + string.Format("\r\n【自定义错误】：{0} \r\n【异常类型】：{1} \r\n【异常信息】：{2} \r\n【堆栈调用】：{3}",
-                new object[] { errorResponse.Msg, context.Exception.GetType().Name, context.Exception.Message, context.Exception.StackTrace }));
+            _logger.LogError(context.Exception, $"\r\n【自定义错误】：{errorResponse.Msg} \r\n【异常类型】：{context.Exception.GetType().Name} \r\n【异常信息】：{context.Exception.Message} \r\n【堆栈调用】：{context.Exception.StackTrace}");
         }
     }
 

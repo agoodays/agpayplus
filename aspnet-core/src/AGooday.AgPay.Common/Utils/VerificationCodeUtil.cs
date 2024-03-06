@@ -4,6 +4,25 @@ namespace AGooday.AgPay.Common.Utils
 {
     public class VerificationCodeUtil
     {
+        /// <summary>
+        ///  随机生成验证码
+        /// </summary>
+        /// <param name="len"></param>
+        /// <returns></returns>
+        public static string GenerateValidateCode(int len)
+        {
+            // 可选字符集  
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            // 创建一个新的随机数生成器  
+            Random random = new();
+
+            // 生成验证码  
+            string code = new string(Enumerable.Repeat(chars, len)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+            return code;
+        }
+
         public static string RandomVerificationCode(int lengths)
         {
             string[] chars = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "P", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
@@ -83,20 +102,16 @@ namespace AGooday.AgPay.Common.Utils
 
         public static string BitmapToBase64String(SKBitmap bitmap)
         {
-            using (var image = SKImage.FromBitmap(bitmap))
-            using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 100))
-            {
-                return Convert.ToBase64String(data.ToArray());
-            }
+            using var image = SKImage.FromBitmap(bitmap);
+            using var data = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+            return Convert.ToBase64String(data.ToArray());
         }
 
         public static string BitmapToImageBase64String(SKBitmap bitmap)
         {
-            using (var image = SKImage.FromBitmap(bitmap))
-            using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 100))
-            {
-                return $"data:image/jpeg;base64,{Convert.ToBase64String(data.ToArray())}";
-            }
+            using var image = SKImage.FromBitmap(bitmap);
+            using var data = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+            return $"data:image/jpeg;base64,{Convert.ToBase64String(data.ToArray())}";
         }
     }
 }

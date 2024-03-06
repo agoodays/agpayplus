@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Common
         //    }
         //}
 
-        private ActionResult ImgView(string path, string format)
+        private FileContentResult ImgView(string path, string format)
         {
             path = Path.Combine(LocalOssConfig.Oss.FilePublicPath.Replace("/", @"\"), path.Replace("/", @"\"));//Directory.GetCurrentDirectory(), 
             using (var sw = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -87,18 +87,18 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Common
             }
         }
 
-        private string GetFormat(string path)
+        private static string GetFormat(string path)
         {
             return path.Split('.').Length > 0 ? path.Split('.').Last() : string.Empty;
         }
 
-        private bool IsImage(string format)
+        private static bool IsImage(string format)
         {
             var formats = new List<string> { "jpg", "tiff", "gif", "jfif", "png", "tif", "ico", "jpeg", "wbmp", "fax", "net", "jpe" };
             return !string.IsNullOrEmpty(format) && formats.Contains(format.ToLower());
         }
 
-        private string GetContentType(string format)
+        private static string GetContentType(string format)
         {
             var contentType = $"image/{format}";
             switch (format)
