@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Common.Constants;
+﻿using AGooday.AgPay.Components.SMS.Constants;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Components.SMS.Models
@@ -7,7 +7,7 @@ namespace AGooday.AgPay.Components.SMS.Models
     {
         public static AbstractSmsConfig GetSmsConfig(string smsProviderKey, string configVal)
         {
-            if (CS.SMS_PROVIDER.ALIYUNDY.Equals(smsProviderKey))
+            if (SmsProviderCS.ALIYUNDY.Equals(smsProviderKey))
             {
                 return JsonConvert.DeserializeObject<AliyundySmsConfig>(configVal);
             }

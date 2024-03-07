@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Components.SMS.Constants;
 using AGooday.AgPay.Components.SMS.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Components.SMS.Extensions
     {
         public static void RegisterServices(IServiceCollection services)
         {
-            services.AddScoped<AliyundySmsService>();
+            services.AddKeyedScoped<AliyundySmsService>(SmsProviderCS.ALIYUNDY);
             services.AddScoped<ISmsServiceFactory, SmsServiceFactory>();
         }
     }
@@ -34,13 +34,7 @@ namespace AGooday.AgPay.Components.SMS.Extensions
         public ISmsService GetService()
         {
             var smsProviderKey = GetSmsProviderKey();
-            switch (smsProviderKey)
-            {
-                case CS.SMS_PROVIDER.ALIYUNDY:
-                    return _serviceProvider.GetService<AliyundySmsService>();
-                default:
-                    throw new Exception($"Invalid service: {smsProviderKey}");
-            }
+            return _serviceProvider.GetRequiredKeyedService<ISmsService>(smsProviderKey);
         }
 
         public string GetSmsProviderKey()

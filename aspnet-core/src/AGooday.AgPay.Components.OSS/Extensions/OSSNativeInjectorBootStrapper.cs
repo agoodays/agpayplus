@@ -9,8 +9,8 @@ namespace AGooday.AgPay.Components.OSS.Extensions
     {
         public static void RegisterServices(IServiceCollection services)
         {
-            services.AddScoped<LocalFileService>();
-            services.AddScoped<AliyunOssService>();
+            services.AddKeyedScoped<LocalFileService>(OssUseTypeCS.LOCAL_FILE);
+            services.AddKeyedScoped<AliyunOssService>(OssUseTypeCS.ALIYUN_OSS);
             services.AddScoped<IOssServiceFactory, OssServiceFactory>();
         }
     }
@@ -35,15 +35,7 @@ namespace AGooday.AgPay.Components.OSS.Extensions
         public IOssService GetService()
         {
             var ossUseType = GetOssUseType();
-            switch (ossUseType)
-            {
-                case OssUseTypeCS.LOCAL_FILE:
-                    return _serviceProvider.GetService<LocalFileService>();
-                case OssUseTypeCS.ALIYUN_OSS:
-                    return _serviceProvider.GetService<AliyunOssService>();
-                default:
-                    throw new Exception($"Invalid service: {ossUseType}");
-            }
+            return _serviceProvider.GetRequiredKeyedService<IOssService>(ossUseType);
         }
 
         public string GetOssUseType()

@@ -10,8 +10,7 @@ namespace AGooday.AgPay.Common.Utils
         public static SKColor LightenColor(SKColor color, float hueShift)
         {
             // 将给定颜色转换为 HSL 颜色模型
-            float hue, saturation, lightness;
-            ColorToHSL(color, out hue, out saturation, out lightness);
+            ColorToHSL(color, out float hue, out float saturation, out float lightness);
 
             // 降低色相
             hue -= hueShift;
@@ -305,8 +304,7 @@ namespace AGooday.AgPay.Common.Utils
 
         public static async Task<SKBitmap> GetSKBitmapAsync(string path)
         {
-            Uri uriResult;
-            bool isUrl = Uri.TryCreate(path, UriKind.Absolute, out uriResult)
+            bool isUrl = Uri.TryCreate(path, UriKind.Absolute, out Uri uriResult)
                          && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
 
             SKBitmap bitmap;
