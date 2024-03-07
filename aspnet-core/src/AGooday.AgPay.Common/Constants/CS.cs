@@ -299,11 +299,11 @@
             /// <summary>
             /// 商户拓展员
             /// </summary>
-            public const byte MCH_EXT = 3;
+            public const byte Expand = 3;
             /// <summary>
             /// 店长
             /// </summary>
-            public const byte STORE_MANAGER = 11;
+            public const byte DIRECTOR = 11;
             /// <summary>
             /// 店员
             /// </summary>

@@ -576,6 +576,10 @@ ALTER TABLE `t_sys_user`
 ALTER TABLE `t_sys_user`   
   ADD UNIQUE INDEX `Uni_InviteCode` (`invite_code`);
   
+ALTER TABLE `t_sys_user`   
+  ADD COLUMN `ent_rules` JSON NULL COMMENT '权限配置规则 ["USER_TYPE_11_INIT", "STORE"]' AFTER `user_type`,
+  ADD COLUMN `bind_store_ids` JSON NULL COMMENT '绑定门店ID [1001, 1002]' AFTER `ent_rules`;
+  
 INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM', '团队管理', 'team', '/teams', 'SysUserTeamPage', 'ML', 0, 1, 'ENT_UR', 15, 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_LIST', '页面：团队列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());
     INSERT INTO t_sys_entitlement VALUES ('ENT_UR_TEAM_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1, 'ENT_UR_TEAM', 0, 'MGR', NOW(), NOW());

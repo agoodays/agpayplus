@@ -5,6 +5,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -138,6 +139,8 @@ namespace AGooday.AgPay.Application.Services
                     SafeWord = s.ur.SafeWord,
                     IsAdmin = s.ur.UserType.Equals(CS.USER_TYPE.ADMIN) ? CS.YES : CS.NO,
                     UserType = s.ur.UserType,
+                    EntRules = JsonConvert.DeserializeObject<List<string>>(s.ur.EntRules),
+                    BindStoreIds = JsonConvert.DeserializeObject<List<long>>(s.ur.BindStoreIds),
                     InviteCode = s.ur.InviteCode,
                     TeamId = s.ur.TeamId,
                     IsTeamLeader = s.ur.IsTeamLeader,

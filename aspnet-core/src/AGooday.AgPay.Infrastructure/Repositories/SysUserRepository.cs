@@ -38,6 +38,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return DbSet.AsNoTracking().FirstOrDefault(w => w.SysUserId.Equals(recordId));
         }
 
+        public IQueryable<SysUser> GetByBelongInfoIdAsNoTracking(string belongInfoId)
+        {
+            return DbSet.AsNoTracking().Where(w => w.BelongInfoId.Equals(belongInfoId));
+        }
+
         public SysUser GetByUserId(long sysUserId)
         {
             return DbSet.Single(w => w.SysUserId.Equals(sysUserId));

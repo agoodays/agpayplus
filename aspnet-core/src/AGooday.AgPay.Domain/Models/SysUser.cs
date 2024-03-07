@@ -83,6 +83,20 @@ namespace AGooday.AgPay.Domain.Models
         public byte UserType { get; set; }
 
         /// <summary>
+        /// 权限配置规则 ["USER_TYPE_11_INIT", "STORE"]
+        /// </summary>
+        [Comment("权限配置规则 [\"USER_TYPE_11_INIT\", \"STORE\"]")]
+        [Column("ent_rules", TypeName = "json")]
+        public string EntRules { get; set; }
+
+        /// <summary>
+        /// 绑定门店ID [1001, 1002]
+        /// </summary>
+        [Comment("绑定门店ID [1001, 1002]")]
+        [Column("bind_store_ids", TypeName = "json")]
+        public string BindStoreIds { get; set; }
+
+        /// <summary>
         /// 邀请码
         /// </summary>
         [Comment("邀请码")]

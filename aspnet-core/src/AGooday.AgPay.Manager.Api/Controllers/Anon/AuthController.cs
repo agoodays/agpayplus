@@ -35,6 +35,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
+        private readonly ISysEntitlementService _sysEntService;
         private readonly ISysConfigService _sysConfigService;
         private readonly ISysLogService _sysLogService;
         private readonly ISmsService smsService;
@@ -52,6 +53,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             ISysUserLoginAttemptService sysUserLoginAttemptService,
             ISysRoleEntRelaService sysRoleEntRelaService,
             ISysUserRoleRelaService sysUserRoleRelaService,
+            ISysEntitlementService sysEntService,
             ISysConfigService sysConfigService,
             ISysLogService sysLogService,
             ISmsServiceFactory smsServiceFactory)
@@ -63,6 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
+            _sysEntService = sysEntService;
             _sysConfigService = sysConfigService;
             _sysLogService = sysLogService;
             this.smsService = smsServiceFactory.GetService();
@@ -147,13 +150,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             //非超级管理员 && 不包含左侧菜单 进行错误提示
             if (auth.IsAdmin != CS.YES && !_sysRoleEntRelaService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
             {
-                throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
+                if (auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
+                {
+                    throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
+                }
+            }
+            var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
+            authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.UserType, auth.SysType));
+            if (auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
+            {
+                authorities = _sysEntService.GetBySysType(CS.SYS_TYPE.MGR, null).Select(s => s.EntId).ToList();
             }
 
             //生成token
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());
-            var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
-            authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.UserType, auth.SysType));
 
             // 返回前端 accessToken
             TokenModelJwt tokenModel = new TokenModelJwt();

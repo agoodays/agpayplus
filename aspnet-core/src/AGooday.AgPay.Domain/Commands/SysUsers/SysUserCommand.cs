@@ -55,6 +55,16 @@ namespace AGooday.AgPay.Domain.Commands.SysUsers
         public byte UserType { get; set; }
 
         /// <summary>
+        /// 权限配置规则 ["USER_TYPE_11_INIT", "STORE"]
+        /// </summary>
+        public string EntRules { get; set; }
+
+        /// <summary>
+        /// 绑定门店ID [1001, 1002]
+        /// </summary>
+        public string BindStoreIds { get; set; }
+
+        /// <summary>
         /// 邀请码
         /// </summary>
         public string InviteCode { get; set; }

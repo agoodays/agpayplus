@@ -13,6 +13,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void ModifyCurrentUserInfo(ModifyCurrentUserInfoDto user);
         Task ModifyAsync(SysUserModifyDto dto);
         SysUserDto GetByKeyAsNoTracking(long recordId);
+        IEnumerable<SysUserDto> GetByBelongInfoIdAsNoTracking(string belongInfoId);
         SysUserDto GetById(long recordId);
         Task<SysUserDto> GetByIdAsync(long recordId);
         SysUserDto GetById(long recordId, string belongInfoId);

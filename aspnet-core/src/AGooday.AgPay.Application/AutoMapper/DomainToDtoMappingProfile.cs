@@ -4,6 +4,7 @@ using AGooday.AgPay.Domain.Events.MchInfos;
 using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.AutoMapper
@@ -65,9 +66,15 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysUserLoginAttempt, SysUserLoginAttemptDto>();
             CreateMap<SysUserRoleRela, SysUserRoleRelaDto>();
 
-            CreateMap<SysUser, SysUserDto>();
-            CreateMap<SysUser, SysUserListDto>();
-            CreateMap<SysUser, SysUserCreatedEvent>();
+            CreateMap<SysUser, SysUserDto>()
+                .ForMember(d => d.EntRules, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.EntRules) ? null : JsonConvert.DeserializeObject<List<string>>(s.EntRules)))
+                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.BindStoreIds) ? null : JsonConvert.DeserializeObject<List<long>>(s.BindStoreIds)));
+            CreateMap<SysUser, SysUserListDto>()
+                .ForMember(d => d.EntRules, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.EntRules) ? null : JsonConvert.DeserializeObject<List<string>>(s.EntRules)))
+                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.BindStoreIds) ? null : JsonConvert.DeserializeObject<List<long>>(s.BindStoreIds)));
+            CreateMap<SysUser, SysUserCreatedEvent>()
+                .ForMember(d => d.EntRules, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.EntRules) ? null : JsonConvert.DeserializeObject<List<string>>(s.EntRules)))
+                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.BindStoreIds) ? null : JsonConvert.DeserializeObject<List<long>>(s.BelongInfoId)));
 
             CreateMap<SysUserTeam, SysUserTeamDto>();
 

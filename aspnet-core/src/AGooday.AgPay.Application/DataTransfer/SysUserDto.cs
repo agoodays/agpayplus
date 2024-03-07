@@ -1,4 +1,7 @@
-﻿namespace AGooday.AgPay.Application.DataTransfer
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+
+namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 系统用户表
@@ -54,6 +57,16 @@
         /// 用户类型: 1-超级管理员, 2-普通操作员, 3-商户拓展员, 11-店长, 12-店员
         /// </summary>
         public byte UserType { get; set; }
+
+        /// <summary>
+        /// 权限配置规则 ["USER_TYPE_11_INIT", "STORE"]
+        /// </summary>
+        public List<string> EntRules { get; set; }
+
+        /// <summary>
+        /// 绑定门店ID [1001, 1002]
+        /// </summary>
+        public List<long> BindStoreIds { get; set; }
 
         /// <summary>
         /// 邀请码

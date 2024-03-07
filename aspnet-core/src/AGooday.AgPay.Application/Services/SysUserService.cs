@@ -107,6 +107,12 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public IEnumerable<SysUserDto> GetByBelongInfoIdAsNoTracking(string belongInfoId)
+        {
+            var entitys = _sysUserRepository.GetByBelongInfoIdAsNoTracking(belongInfoId);
+            return _mapper.Map<IEnumerable<SysUserDto>>(entitys);
+        }
+
         public SysUserDto GetById(long recordId)
         {
             var entity = _sysUserRepository.GetById(recordId);

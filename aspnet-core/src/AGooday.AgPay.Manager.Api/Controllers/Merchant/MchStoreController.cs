@@ -23,11 +23,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly ILogger<MchStoreController> _logger;
         private readonly IMchStoreService _mchStoreService;
         private readonly IMchInfoService _mchInfoService;
+        private readonly ISysUserService _sysUserService;
         private readonly ISysConfigService _sysConfigService;
 
         public MchStoreController(IMQSender mqSender, ILogger<MchStoreController> logger,
             IMchStoreService mchStoreService,
-            IMchInfoService mchInfoService, 
+            IMchInfoService mchInfoService,
             ISysConfigService sysConfigService, RedisUtil client,
             ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
@@ -38,6 +39,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             _logger = logger;
             _mchStoreService = mchStoreService;
             _mchInfoService = mchInfoService;
+            _sysUserService = sysUserService;
             _sysConfigService = sysConfigService;
         }
 
@@ -51,6 +53,29 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         public ApiPageRes<MchStoreListDto> List([FromQuery] MchStoreQueryDto dto)
         {
             var data = _mchStoreService.GetPaginatedData(dto);
+            return ApiPageRes<MchStoreListDto>.Pages(data);
+        }
+
+        /// <summary>
+        /// 绑定门店列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet, Route("bindStoreList"), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_UR_USER_ADD, PermCode.MGR.ENT_UR_USER_EDIT)]
+        public ApiPageRes<MchStoreListDto> BindStoreList([FromQuery] MchStoreBindQueryDto dto)
+        {
+            var data = _mchStoreService.GetPaginatedData(dto);
+            if (dto.UserType.Equals(CS.USER_TYPE.DIRECTOR))
+            {
+                var bindStoreIds = _sysUserService.GetByBelongInfoIdAsNoTracking(dto.MchNo)
+                     .Where(w => w.UserType.Equals(dto.UserType))
+                     .SelectMany(s => s.BindStoreIds).Distinct();
+                foreach (var item in data.Where(s => bindStoreIds.Contains(s.StoreId.Value)))
+                {
+                    item.AddExt("hasDirector", true);
+                }
+            }
             return ApiPageRes<MchStoreListDto>.Pages(data);
         }
 
