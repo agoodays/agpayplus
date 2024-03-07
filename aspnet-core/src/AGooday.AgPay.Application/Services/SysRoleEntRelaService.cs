@@ -111,12 +111,23 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public IEnumerable<string> SelectEntIdsByUserId(long userId, byte userType, string sysType)
         {
+            return SelectEntsByUserId(userId, userType, sysType).Select(s => s.EntId);
+        }
+
+        /// <summary>
+        /// 根据人查询出所有权限集合
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="userType"></param>
+        /// <param name="sysType"></param>
+        /// <returns></returns>
+        public IEnumerable<SysEntitlementDto> SelectEntsByUserId(long userId, byte userType, string sysType)
+        {
             if (userType == CS.USER_TYPE.ADMIN)
             {
                 var result = _sysEntitlementRepository.GetAll()
-                    .Where(w => w.SysType.Equals(sysType) && w.State == CS.PUB_USABLE)
-                    .Select(s => s.EntId);
-                return result;
+                    .Where(w => w.SysType.Equals(sysType) && w.State == CS.PUB_USABLE);
+                return _mapper.Map<IEnumerable<SysEntitlementDto>>(result);
             }
             else
             {
@@ -126,10 +137,10 @@ namespace AGooday.AgPay.Application.Services
                     (ur, re) => new { ur.UserId, re.EntId })
                     .Join(_sysUserRoleRelaRepository.GetAll<SysEntitlement>(),
                         ue => ue.EntId, ent => ent.EntId,
-                        (ue, ent) => new { ue.UserId, ent.EntId, ent.SysType, ent.State })
-                    .Where(w => w.UserId.Equals(userId) && w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE))
-                    .Select(s => s.EntId);
-                return result;
+                        (ue, ent) => new { ue.UserId, ent })
+                    .Where(w => w.UserId.Equals(userId) && w.ent.SysType.Equals(sysType) && w.ent.State.Equals(CS.PUB_USABLE))
+                    .Select(s => s.ent);
+                return _mapper.Map<IEnumerable<SysEntitlementDto>>(result);
             }
         }
 

@@ -35,6 +35,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
+        private readonly ISysEntitlementService _sysEntService;
         private readonly ISysConfigService _sysConfigService;
         private readonly IAgentInfoService _agentInfoService;
         private readonly ISysLogService _sysLogService;
@@ -52,7 +53,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             ISysUserAuthService sysUserAuthService,
             ISysUserLoginAttemptService sysUserLoginAttemptService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
+            ISysUserRoleRelaService sysUserRoleRelaService, 
+            ISysEntitlementService sysEntService,
             ISysConfigService sysConfigService,
             IAgentInfoService agentInfoService,
             ISysLogService sysLogService,
@@ -65,6 +67,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
             _sysRoleEntRelaService = sysRoleEntRelaService;
+            _sysEntService = sysEntService;
             _sysConfigService = sysConfigService;
             _agentInfoService = agentInfoService;
             _sysLogService = sysLogService;
@@ -153,16 +156,40 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             //非超级管理员 && 不包含左侧菜单 进行错误提示
             if (auth.IsAdmin != CS.YES && !_sysRoleEntRelaService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
             {
+                if (auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
+                {
+                    throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
+                }
+            }
+
+            var authorities = new List<string>();
+            var ents = new List<SysEntitlementDto>();
+            if (auth.UserType.Equals(CS.USER_TYPE.ADMIN) || auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
+            {
+                authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
+                ents = _sysRoleEntRelaService.SelectEntsByUserId(auth.SysUserId, auth.UserType, auth.SysType)
+                    .ToList();
+            }
+
+            if (auth.UserType.Equals(CS.USER_TYPE.Expand))
+            {
+                ents = _sysEntService.GetBySysType(auth.SysType, null)
+                    .Where(w => w.MatchRule != null && w.MatchRule.EpUserEnt.Value)
+                    .ToList();
+            }
+
+            if (ents.Count <= 0)
+            {
                 throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
             }
+
+            authorities.AddRange(ents.Select(s => s.EntId));
 
             var agent = _agentInfoService.GetById(auth.BelongInfoId);
             auth.ShortName = agent.AgentShortName;
 
             //生成token
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());
-            var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
-            authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.UserType, auth.SysType));
 
             // 返回前端 accessToken
             TokenModelJwt tokenModel = new TokenModelJwt();

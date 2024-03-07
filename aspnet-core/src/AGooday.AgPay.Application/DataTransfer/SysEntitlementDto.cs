@@ -80,7 +80,7 @@
             /// <summary>
             /// 拓展员
             /// </summary>
-            public bool EpUserEnt { get; set; }
+            public bool? EpUserEnt { get; set; }
 
             /// <summary>
             /// 用户权限规则
@@ -98,12 +98,17 @@
             /// <summary>
             /// 便捷收银台配置
             /// </summary>
-            public bool MchSelfCashierEnt { get; set; }
+            public bool? MchSelfCashierEnt { get; set; }
+
+            /// <summary>
+            /// 商户会员
+            /// </summary>
+            public bool? MchMemberEnt { get; set; }
 
             /// <summary>
             /// 商户类型: 1-普通商户, 2-特约商户(服务商模式)
             /// </summary>
-            public byte MchType { get; set; }
+            public byte? MchType { get; set; }
 
             /// <summary>
             /// 商户级别
@@ -111,7 +116,7 @@
             /// M0商户-简单模式（页面简洁，仅基础收款功能）
             /// M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）
             /// </summary>
-            public List<string> MchLevel { get; set; }
+            public List<string> MchLevelArray { get; set; }
         }
     }
 }

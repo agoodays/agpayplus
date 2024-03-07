@@ -13,6 +13,7 @@ namespace AGooday.AgPay.Application.Interfaces
         PaginatedList<SysRoleEntRelaDto> GetPaginatedData(SysRoleEntRelaQueryDto dto);
         bool UserHasLeftMenu(long userId, string sysType);
         IEnumerable<string> SelectEntIdsByUserId(long userId, byte userType, string sysType);
+        IEnumerable<SysEntitlementDto> SelectEntsByUserId(long userId, byte userType, string sysType);
         void ResetRela(string roleId, List<string> entIdList);
     }
 }

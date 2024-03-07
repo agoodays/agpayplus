@@ -164,16 +164,30 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
 
             var mch = _mchInfoService.GetById(auth.BelongInfoId);
             auth.ShortName = mch.MchShortName;
-
-            var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
-            authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.UserType, auth.SysType));
+            var authorities = new List<string>();
+            var ents = new List<SysEntitlementDto>();
+            if (auth.UserType.Equals(CS.USER_TYPE.ADMIN) || auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
+            {
+                authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
+                ents = _sysRoleEntRelaService.SelectEntsByUserId(auth.SysUserId, auth.UserType, auth.SysType)
+                    .Where(w => w.MatchRule == null || w.MatchRule.MchType == null || w.MatchRule.MchType.Equals(mch.Type) || w.MatchRule.MchLevelArray.Contains(mch.MchLevel))
+                    .ToList();
+            }
 
             if (auth.UserType.Equals(CS.USER_TYPE.DIRECTOR) || auth.UserType.Equals(CS.USER_TYPE.CLERK))
             {
-                authorities = _sysEntService.GetBySysType(CS.SYS_TYPE.MGR, null)
+                ents = _sysEntService.GetBySysType(auth.SysType, null)
                     .Where(w => w.MatchRule != null && w.MatchRule.UserEntRules.Any(a => auth.EntRules.Contains(a)))
-                    .Select(s => s.EntId).ToList();
+                    .Where(w => w.MatchRule == null || w.MatchRule.MchType == null || w.MatchRule.MchType.Equals(mch.Type) || w.MatchRule.MchLevelArray.Contains(mch.MchLevel))
+                    .ToList();
             }
+
+            if (ents.Count <= 0)
+            {
+                throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
+            }
+
+            authorities.AddRange(ents.Select(s => s.EntId));
 
             //生成token
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());

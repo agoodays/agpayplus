@@ -155,15 +155,29 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                     throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
                 }
             }
-            var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
-            authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.UserType, auth.SysType));
+
+            var authorities = new List<string>();
+            var ents = new List<SysEntitlementDto>();
+            if (auth.UserType.Equals(CS.USER_TYPE.ADMIN) || auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
+            {
+                authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
+                ents = _sysRoleEntRelaService.SelectEntsByUserId(auth.SysUserId, auth.UserType, auth.SysType)
+                    .ToList();
+            }
 
             if (auth.UserType.Equals(CS.USER_TYPE.Expand))
             {
-                authorities = _sysEntService.GetBySysType(CS.SYS_TYPE.MGR, null)
-                    .Where(w => w.MatchRule != null && w.MatchRule.EpUserEnt)
-                    .Select(s => s.EntId).ToList();
+                ents = _sysEntService.GetBySysType(auth.SysType, null)
+                    .Where(w => w.MatchRule != null && w.MatchRule.EpUserEnt.Value)
+                    .ToList();
             }
+
+            if (ents.Count <= 0)
+            {
+                throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
+            }
+
+            authorities.AddRange(ents.Select(s => s.EntId));
 
             //生成token
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());
