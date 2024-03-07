@@ -61,6 +61,13 @@ namespace AGooday.AgPay.Domain.Models
         public byte QuickJump { get; set; }
 
         /// <summary>
+        /// 权限匹配规则
+        /// </summary>
+        [Comment("权限匹配规则")]
+        [Column("match_rule", TypeName = "json")]
+        public string MatchRule { get; set; }
+
+        /// <summary>
         /// 状态 0-停用, 1-启用
         /// </summary>
         [Comment("状态 0-停用, 1-启用")]

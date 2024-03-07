@@ -63,12 +63,12 @@ namespace AGooday.AgPay.Domain.Events.SysUsers
         /// <summary>
         /// 权限配置规则 ["USER_TYPE_11_INIT", "STORE"]
         /// </summary>
-        public JArray EntRules { get; set; }
+        public List<string> EntRules { get; set; }
 
         /// <summary>
         /// 绑定门店ID [1001, 1002]
         /// </summary>
-        public JArray BindStoreIds { get; set; }
+        public List<long> BindStoreIds { get; set; }
 
         /// <summary>
         /// 邀请码

@@ -157,9 +157,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             }
             var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
             authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId, auth.UserType, auth.SysType));
-            if (auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
+
+            if (auth.UserType.Equals(CS.USER_TYPE.Expand))
             {
-                authorities = _sysEntService.GetBySysType(CS.SYS_TYPE.MGR, null).Select(s => s.EntId).ToList();
+                authorities = _sysEntService.GetBySysType(CS.SYS_TYPE.MGR, null)
+                    .Where(w => w.MatchRule != null && w.MatchRule.EpUserEnt)
+                    .Select(s => s.EntId).ToList();
             }
 
             //Éú³Étoken
