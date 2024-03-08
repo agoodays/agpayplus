@@ -25,9 +25,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// </summary>
     [Route("/api/payOrder")]
     [ApiController, Authorize]
-    public class PayOrderController : ControllerBase
+    public class PayOrderController : CommonController
     {
-        private readonly ILogger<PayOrderController> _logger;
         private readonly IPayOrderService _payOrderService;
         private readonly IPayWayService _payWayService;
         private readonly IPayInterfaceDefineService _payIfDefineService;
@@ -39,9 +38,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             IPayWayService payWayService,
             IPayInterfaceDefineService payIfDefineService,
             ISysConfigService sysConfigService,
-            IMchAppService mchAppService)
+            IMchAppService mchAppService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _payOrderService = payOrderService;
             _payIfDefineService = payIfDefineService;
             _payWayService = payWayService;

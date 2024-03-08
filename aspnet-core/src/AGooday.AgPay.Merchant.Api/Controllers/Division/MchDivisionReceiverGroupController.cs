@@ -19,19 +19,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
     [ApiController, Authorize]
     public class MchDivisionReceiverGroupController : CommonController
     {
-        private readonly ILogger<MchDivisionReceiverGroupController> _logger;
         private readonly IMchDivisionReceiverService _mchDivisionReceiverService;
         private readonly IMchDivisionReceiverGroupService _mchDivisionReceiverGroupService;
 
         public MchDivisionReceiverGroupController(ILogger<MchDivisionReceiverGroupController> logger,
             IMchDivisionReceiverService mchDivisionReceiverService,
-            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _mchDivisionReceiverService = mchDivisionReceiverService;
             _mchDivisionReceiverGroupService = mchDivisionReceiverGroupService;
         }

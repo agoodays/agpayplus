@@ -19,20 +19,16 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
     public class PayRateConfigController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<PayInterfaceConfigController> _logger;
         private readonly IPayRateConfigService _payRateConfigService;
 
-        public PayRateConfigController(IMQSender mqSender,
+        public PayRateConfigController(ILogger<PayInterfaceConfigController> logger, 
+            IMQSender mqSender,
             IPayRateConfigService payRateConfigService,
-            ILogger<PayInterfaceConfigController> logger,
             RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _payRateConfigService = payRateConfigService;
         }
 

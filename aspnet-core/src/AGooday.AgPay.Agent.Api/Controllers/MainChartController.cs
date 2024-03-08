@@ -16,23 +16,20 @@ namespace AGooday.AgPay.Agent.Api.Controllers
     [ApiController, Authorize, NoLog]
     public class MainChartController : CommonController
     {
-        private readonly ILogger<MainChartController> _logger;
-        private readonly IPayOrderService _payOrderService;
-        private readonly ISysUserService _sysUserService;
         private readonly IAgentInfoService _agentInfoService;
+        private readonly IPayOrderService _payOrderService;
+        private readonly IAuthService _authService;
 
-        public MainChartController(ILogger<MainChartController> logger, RedisUtil client,
-            IPayOrderService payOrderService,
+        public MainChartController(ILogger<MainChartController> logger,
             IAgentInfoService agentInfoService,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IPayOrderService payOrderService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
-            _payOrderService = payOrderService;
-            _sysUserService = sysUserService;
+            _authService = authService;
             _agentInfoService = agentInfoService;
+            _payOrderService = payOrderService;
         }
 
         /// <summary>
@@ -43,7 +40,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_CURRENT_INFO)]
         public ApiRes AgentInfo()
         {
-            var sysUser = _sysUserService.GetById(GetCurrentUser().SysUser.SysUserId);
+            var sysUser = _authService.GetUserById(GetCurrentUser().SysUser.SysUserId);
             var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
             //var jobj = JObject.FromObject(agentInfo);
             //jobj.Add("loginUsername", sysUser.LoginUsername);

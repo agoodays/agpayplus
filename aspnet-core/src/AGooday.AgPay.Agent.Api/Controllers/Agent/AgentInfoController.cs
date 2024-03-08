@@ -21,21 +21,20 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
     public class AgentInfoController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<AgentInfoController> _logger;
         private readonly IAgentInfoService _agentInfoService;
         private readonly ISysUserService _sysUserService;
 
         private readonly DomainNotificationHandler _notifications;
 
-        public AgentInfoController(IMQSender mqSender, ILogger<AgentInfoController> logger, INotificationHandler<DomainNotification> notifications,
-            IAgentInfoService agentInfoService, RedisUtil client,
+        public AgentInfoController(IMQSender mqSender, ILogger<AgentInfoController> logger, 
+            INotificationHandler<DomainNotification> notifications,
+            IAgentInfoService agentInfoService, 
+            RedisUtil client,
             ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _agentInfoService = agentInfoService;
             _sysUserService = sysUserService;
             _notifications = (DomainNotificationHandler)notifications;

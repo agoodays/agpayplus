@@ -15,19 +15,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 {
     [ApiController]
     [Route("api/qrc/shell")]
-    public class QrCodeShellController : ControllerBase
+    public class QrCodeShellController : CommonController
     {
         private readonly IWebHostEnvironment _env;
-        private readonly ILogger<QrCodeController> _logger;
         private readonly IQrCodeShellService _qrCodeShellService;
         protected readonly ISysConfigService _sysConfigService;
 
-        public QrCodeShellController(IWebHostEnvironment env, ILogger<QrCodeController> logger,
+        public QrCodeShellController(ILogger<QrCodeController> logger,
+            IWebHostEnvironment env,
             IQrCodeShellService qrCodeShellService,
-            ISysConfigService sysConfigService)
+            ISysConfigService sysConfigService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             _env = env;
-            _logger = logger;
             _qrCodeShellService = qrCodeShellService;
             _sysConfigService = sysConfigService;
         }

@@ -17,19 +17,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     [ApiController, Authorize, NoLog]
     public class MchChannelController : CommonController
     {
-        private readonly ILogger<MchChannelController> _logger;
         private readonly ISysConfigService _sysConfigService;
         private readonly IMchAppService _mchAppService;
 
         public MchChannelController(ILogger<MchChannelController> logger,
             IMchAppService mchAppService,
-            ISysConfigService sysConfigService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            ISysConfigService sysConfigService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _sysConfigService = sysConfigService;
             _mchAppService = mchAppService;
         }

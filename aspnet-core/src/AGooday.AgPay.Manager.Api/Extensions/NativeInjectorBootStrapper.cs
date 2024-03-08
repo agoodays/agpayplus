@@ -40,6 +40,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
         public static void RegisterServices(IServiceCollection services)
         {
             // 注入 应用层Application
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAgentInfoService, AgentInfoService>();
             services.AddScoped<IIsvInfoService, IsvInfoService>();
             services.AddScoped<IMchAppService, MchAppService>();

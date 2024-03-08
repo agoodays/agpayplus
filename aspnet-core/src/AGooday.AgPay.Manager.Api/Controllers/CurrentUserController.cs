@@ -20,29 +20,28 @@ namespace AGooday.AgPay.Manager.Api.Controllers
     [ApiController]
     public class CurrentUserController : CommonController
     {
-        private readonly ILogger<CurrentUserController> _logger;
         private readonly IDatabase _redis;
         private readonly ISysUserService _sysUserService;
-        private readonly ISysEntitlementService _sysEntService;
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly IMemoryCache _cache;
+        private readonly IAuthService _authService;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
-        public CurrentUserController(ILogger<CurrentUserController> logger, IMemoryCache cache, INotificationHandler<DomainNotification> notifications, RedisUtil client,
+        public CurrentUserController(ILogger<CurrentUserController> logger,
+            IMemoryCache cache,
             ISysUserService sysUserService,
-            ISysEntitlementService sysEntService,
             ISysUserAuthService sysUserAuthService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            INotificationHandler<DomainNotification> notifications,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _sysUserService = sysUserService;
-            _sysEntService = sysEntService;
             _sysUserAuthService = sysUserAuthService;
             _cache = cache;
             _redis = client.GetDatabase();
+            _authService = authService;
             _notifications = (DomainNotificationHandler)notifications;
         }
 
@@ -59,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                 var entIds = currentUser.Authorities.ToList();
 
                 //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-                var sysEnts = _sysEntService.GetBySysType(CS.SYS_TYPE.MGR, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
+                var sysEnts = _authService.GetEntsBySysType(CS.SYS_TYPE.MGR, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
 
                 //递归转换为树状结构
                 //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
@@ -96,7 +95,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             var currentUser = GetCurrentUser();
             dto.SysUserId = currentUser.SysUser.SysUserId;
             _sysUserService.ModifyCurrentUserInfo(dto);
-            var userinfo = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
+            var userinfo = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             currentUser.SysUser = userinfo;
             //保存redis最新数据
             var currentUserJson = JsonConvert.SerializeObject(currentUser);
@@ -115,7 +114,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         {
             var currentUser = GetCurrentUser();
             string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码currentUser
-            var user = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
+            var user = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             bool verified = BCryptUtil.VerifyHash(currentUserPwd, user.Credential);
             //验证当前密码是否正确
             if (!verified)

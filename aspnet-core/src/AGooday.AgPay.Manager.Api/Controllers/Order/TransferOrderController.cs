@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -18,15 +19,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// </summary>
     [Route("/api/transferOrders")]
     [ApiController, Authorize, NoLog]
-    public class TransferOrderController : ControllerBase
+    public class TransferOrderController : CommonController
     {
-        private readonly ILogger<TransferOrderController> _logger;
         private readonly ITransferOrderService _transferOrderService;
 
         public TransferOrderController(ILogger<TransferOrderController> logger,
-            ITransferOrderService transferOrderService)
+            ITransferOrderService transferOrderService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _transferOrderService = transferOrderService;
         }
 

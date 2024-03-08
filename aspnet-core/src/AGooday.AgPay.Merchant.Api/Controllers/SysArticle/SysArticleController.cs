@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -14,15 +15,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysArticle
     /// </summary>
     [Route("api/sysArticles")]
     [ApiController, Authorize]
-    public class SysArticleController : ControllerBase
+    public class SysArticleController : CommonController
     {
-        private readonly ILogger<SysArticleController> _logger;
         private readonly ISysArticleService _sysArticleService;
 
         public SysArticleController(ILogger<SysArticleController> logger,
-            ISysArticleService sysArticleService)
+            ISysArticleService sysArticleService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _sysArticleService = sysArticleService;
         }
 

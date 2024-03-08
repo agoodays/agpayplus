@@ -33,14 +33,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         private readonly ISysUserService _sysUserService;
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
-        private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
-        private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
-        private readonly ISysEntitlementService _sysEntService;
         private readonly ISysConfigService _sysConfigService;
-        private readonly ISysLogService _sysLogService;
         private readonly ISmsService smsService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
+        private readonly IAuthService _authService;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
@@ -51,26 +48,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             ISysUserService sysUserService,
             ISysUserAuthService sysUserAuthService,
             ISysUserLoginAttemptService sysUserLoginAttemptService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
-            ISysEntitlementService sysEntService,
             ISysConfigService sysConfigService,
-            ISysLogService sysLogService,
-            ISmsServiceFactory smsServiceFactory)
+            ISmsServiceFactory smsServiceFactory, 
+            IAuthService authService)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
             _sysUserService = sysUserService;
             _sysUserAuthService = sysUserAuthService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
-            _sysRoleEntRelaService = sysRoleEntRelaService;
-            _sysUserRoleRelaService = sysUserRoleRelaService;
-            _sysEntService = sysEntService;
             _sysConfigService = sysConfigService;
-            _sysLogService = sysLogService;
             this.smsService = smsServiceFactory.GetService();
             _cache = cache;
             _redis = client.GetDatabase();
+            _authService = authService;
             _notifications = (DomainNotificationHandler)notifications;
         }
 
@@ -104,7 +95,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 identityType = CS.AUTH_TYPE.TELPHONE; //手机号登录
             }
 
-            var auth = _sysUserAuthService.SelectByLogin(account, identityType, CS.SYS_TYPE.MGR);
+            var auth = _authService.LoginAuth(account, identityType, CS.SYS_TYPE.MGR);
 
             if (auth == null)
             {
@@ -148,7 +139,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             await _sysUserLoginAttemptService.ClearFailedLoginAttemptsAsync(auth.SysUserId);
 
             //非超级管理员 && 不包含左侧菜单 进行错误提示
-            if (auth.IsAdmin != CS.YES && !_sysRoleEntRelaService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
+            if (auth.IsAdmin != CS.YES && !_authService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
             {
                 if (auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
                 {
@@ -156,28 +147,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 }
             }
 
-            var authorities = new List<string>();
-            var ents = new List<SysEntitlementDto>();
-            if (auth.UserType.Equals(CS.USER_TYPE.ADMIN) || auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
-            {
-                authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
-                ents = _sysRoleEntRelaService.SelectEntsByUserId(auth.SysUserId, auth.UserType, auth.SysType)
-                    .ToList();
-            }
-
-            if (auth.UserType.Equals(CS.USER_TYPE.Expand))
-            {
-                ents = _sysEntService.GetBySysType(auth.SysType, null)
-                    .Where(w => w.MatchRule != null && w.MatchRule.EpUserEnt.Value)
-                    .ToList();
-            }
+            auth.GetEnts(_authService, out List<string> authorities, out List<SysEntitlementDto> ents);
 
             if (ents.Count <= 0)
             {
                 throw new BizException("当前用户未分配任何菜单权限，请联系管理员进行分配后再登录！");
             }
-
-            authorities.AddRange(ents.Select(s => s.EntId));
 
             //生成token
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());

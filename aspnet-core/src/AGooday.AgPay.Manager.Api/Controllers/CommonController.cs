@@ -1,7 +1,9 @@
-﻿using AGooday.AgPay.Application.Interfaces;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.Extensions.AuthContext;
 using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -14,26 +16,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers
     [Authorize]
     public abstract class CommonController : ControllerBase
     {
-        private readonly ILogger<CommonController> _logger;
+        protected readonly ILogger<CommonController> _logger;
         private readonly int defaultDB;
         private readonly IDatabase redis;
         private readonly IServer redisServer;
-        private readonly ISysUserService _sysUserService;
-        private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
-        private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
+        private readonly IAuthService _authService;
 
-        public CommonController(ILogger<CommonController> logger, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
+        public CommonController(ILogger<CommonController> logger, 
+            RedisUtil client,
+            IAuthService authService)
         {
             _logger = logger;
             defaultDB = client.GetDefaultDB();
             redis = client.GetDatabase();
             redisServer = client.GetServer();
-            _sysUserService = sysUserService;
-            _sysRoleEntRelaService = sysRoleEntRelaService;
-            _sysUserRoleRelaService = sysUserRoleRelaService;
+            _authService = authService;
         }
 
         protected CurrentUser GetCurrentUser()
@@ -87,7 +84,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         /// <param name="sysUserIdList"></param>
         protected void RefAuthentication(List<long> sysUserIdList)
         {
-            var sysUserMap = _sysUserService.GetByIds(sysUserIdList);
+            var sysUserMap = _authService.GetUserByIds(sysUserIdList);
             sysUserIdList.ForEach(sysUserId =>
             {
                 var redisKeys = redisServer.Keys(defaultDB, CS.GetCacheKeyToken(sysUserId, "*"));
@@ -100,19 +97,28 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                         redis.KeyDelete(key);
                         continue;
                     }
-                    string currentUserJson = redis.StringGet(AuthContextService.CurrentUser.CacheKey);
+                    string currentUserJson = redis.StringGet(key);
                     var currentUser = JsonConvert.DeserializeObject<CurrentUser>(currentUserJson);
                     if (currentUser == null)
                     {
                         continue;
                     }
-                    var auth = sysUserMap.Where(w => w.SysUserId.Equals(sysUserId)).First();
-                    var authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId.Value).ToList();
-                    authorities.AddRange(_sysRoleEntRelaService.SelectEntIdsByUserId(auth.SysUserId.Value, auth.UserType, auth.SysType));
+                    var auth = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
+                    var authorities = new List<string>();
+                    var ents = new List<SysEntitlementDto>();
+                    auth?.GetEnts(_authService, out authorities, out ents);
+                    if (auth == null || ents?.Count <= 0)
+                    {
+                        // 当前用户未分配任何菜单权限，需要删除Redis
+                        redis.KeyDelete(key);
+                        continue;
+                    }
+                    currentUser.SysUser = auth;
                     currentUser.Authorities = authorities;
                     currentUserJson = JsonConvert.SerializeObject(currentUser);
                     //保存token  失效时间不变
-                    redis.StringSet(key, currentUserJson);
+                    var cacheExpiry = redis.KeyTimeToLive(key);
+                    redis.StringSet(key, currentUserJson, cacheExpiry, When.Exists);
                 }
             });
         }

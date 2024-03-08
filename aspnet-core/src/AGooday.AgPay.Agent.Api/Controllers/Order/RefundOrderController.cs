@@ -21,17 +21,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
     [ApiController, Authorize, NoLog]
     public class RefundOrderController : CommonController
     {
-        private readonly ILogger<RefundOrderController> _logger;
         private readonly IRefundOrderService _refundOrderService;
 
         public RefundOrderController(ILogger<RefundOrderController> logger,
-            IRefundOrderService refundOrderService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IRefundOrderService refundOrderService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _refundOrderService = refundOrderService;
         }
 

@@ -24,7 +24,6 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
     [ApiController, Authorize, NoLog]
     public class MchTransferController : CommonController
     {
-        private readonly ILogger<MchTransferController> _logger;
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IPayInterfaceDefineService _payIfDefineService;
         private readonly ISysConfigService _sysConfigService;
@@ -34,13 +33,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
             IPayInterfaceConfigService payIfConfigService,
             IPayInterfaceDefineService payIfDefineService,
             IMchAppService mchAppService,
-            ISysConfigService sysConfigService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            ISysConfigService sysConfigService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _payIfConfigService = payIfConfigService;
             _payIfDefineService = payIfDefineService;
             _mchAppService = mchAppService;

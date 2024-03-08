@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -15,9 +16,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
     /// </summary>
     [Route("/api/payWays")]
     [ApiController, Authorize]
-    public class PayWayController : ControllerBase
+    public class PayWayController : CommonController
     {
-        private readonly ILogger<PayWayController> _logger;
         private readonly IPayWayService _payWayService;
         private readonly IMchPayPassageService _mchPayPassageService;
         private readonly IPayOrderService _payOrderService;
@@ -25,9 +25,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         public PayWayController(ILogger<PayWayController> logger,
             IPayWayService payWayService,
             IMchPayPassageService mchPayPassageService,
-            IPayOrderService payOrderService)
+            IPayOrderService payOrderService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _payWayService = payWayService;
             _mchPayPassageService = mchPayPassageService;
             _payOrderService = payOrderService;

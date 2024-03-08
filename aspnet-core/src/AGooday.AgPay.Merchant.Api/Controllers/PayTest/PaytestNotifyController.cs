@@ -13,15 +13,18 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
 {
     [Route("api/anon/paytestNotify")]
     [ApiController, AllowAnonymous, NoLog]
-    public class PayTestNotifyController : ControllerBase
+    public class PayTestNotifyController : CommonController
     {
-        private readonly ILogger<PayTestNotifyController> _logger;
         private readonly IMchAppService _mchAppService;
         private readonly WsPayOrderServer _wsPayOrderServer;
 
-        public PayTestNotifyController(ILogger<PayTestNotifyController> logger, IMchAppService mchAppService, WsPayOrderServer wsPayOrderServer)
+        public PayTestNotifyController(ILogger<PayTestNotifyController> logger, 
+            IMchAppService mchAppService,
+            WsPayOrderServer wsPayOrderServer,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _mchAppService = mchAppService;
             _wsPayOrderServer = wsPayOrderServer;
         }

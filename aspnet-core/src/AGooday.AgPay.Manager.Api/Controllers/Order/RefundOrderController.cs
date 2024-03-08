@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -18,17 +19,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// </summary>
     [Route("/api/refundOrder")]
     [ApiController, Authorize, NoLog]
-    public class RefundOrderController : ControllerBase
+    public class RefundOrderController : CommonController
     {
-        private readonly ILogger<RefundOrderController> _logger;
         private readonly IRefundOrderService _refundOrderService;
         private readonly IPayInterfaceDefineService _payIfDefineService;
 
         public RefundOrderController(ILogger<RefundOrderController> logger,
             IRefundOrderService refundOrderService,
-            IPayInterfaceDefineService payIfDefineService)
+            IPayInterfaceDefineService payIfDefineService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _refundOrderService = refundOrderService;
             _payIfDefineService = payIfDefineService;
         }

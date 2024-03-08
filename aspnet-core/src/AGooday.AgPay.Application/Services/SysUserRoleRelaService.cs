@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="roleId"></param>
         /// <returns></returns>
-        public IEnumerable<long> SelectRoleIdsByRoleId(string roleId)
+        public IEnumerable<long> SelectUserIdsByRoleId(string roleId)
         {
             return _sysUserRoleRelaRepository.GetAll()
                 .Where(w => w.RoleId.Equals(roleId))

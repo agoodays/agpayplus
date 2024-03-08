@@ -21,22 +21,23 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     public class MchInfoController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<MchInfoController> _logger;
         private readonly IMchInfoService _mchInfoService;
         private readonly IAgentInfoService _agentInfoService;
         private readonly ISysUserService _sysUserService;
 
         private readonly DomainNotificationHandler _notifications;
 
-        public MchInfoController(IMQSender mqSender, ILogger<MchInfoController> logger, INotificationHandler<DomainNotification> notifications,
-            IMchInfoService mchInfoService, IAgentInfoService agentInfoService, RedisUtil client,
+        public MchInfoController(ILogger<MchInfoController> logger, 
+            IMQSender mqSender,
+            IMchInfoService mchInfoService, 
+            IAgentInfoService agentInfoService,
             ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            INotificationHandler<DomainNotification> notifications, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _mchInfoService = mchInfoService;
             _agentInfoService = agentInfoService;
             _sysUserService = sysUserService;

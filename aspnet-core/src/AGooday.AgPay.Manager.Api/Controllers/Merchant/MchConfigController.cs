@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
@@ -13,18 +14,19 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 {
     [Route("/api/mchConfig")]
     [ApiController, Authorize]
-    public class MchConfigController : ControllerBase
+    public class MchConfigController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<MchConfigController> _logger;
         private readonly ISysConfigService _sysConfigService;
 
-        public MchConfigController(IMQSender mqSender,
-            ILogger<MchConfigController> logger,
-            ISysConfigService sysConfigService)
+        public MchConfigController(ILogger<MchConfigController> logger,
+            IMQSender mqSender,
+            ISysConfigService sysConfigService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _sysConfigService = sysConfigService;
         }
 

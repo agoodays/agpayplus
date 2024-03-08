@@ -19,17 +19,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
     [ApiController, Authorize]
     public class SysArticleController : CommonController
     {
-        private readonly ILogger<SysArticleController> _logger;
         private readonly ISysArticleService _sysArticleService;
 
-        public SysArticleController(IMQSender mqSender, ILogger<SysArticleController> logger,
-            ISysArticleService sysArticleService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+        public SysArticleController(ILogger<SysArticleController> logger,
+            ISysArticleService sysArticleService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _sysArticleService = sysArticleService;
         }
 
@@ -78,6 +75,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         public ApiRes Delete(long recordId)
         {
             var sysArticle = _sysArticleService.GetById(recordId);
+            if (sysArticle == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
             _sysArticleService.Remove(recordId);
 
             return ApiRes.Ok();

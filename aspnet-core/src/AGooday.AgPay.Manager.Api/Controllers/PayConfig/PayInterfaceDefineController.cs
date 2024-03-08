@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -16,9 +17,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
     /// </summary>
     [Route("/api/payIfDefines")]
     [ApiController, Authorize]
-    public class PayInterfaceDefineController : ControllerBase
+    public class PayInterfaceDefineController : CommonController
     {
-        private readonly ILogger<PayInterfaceDefineController> _logger;
         private readonly IPayInterfaceDefineService _payIfDefineService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IPayOrderService _payOrderService;
@@ -26,9 +26,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         public PayInterfaceDefineController(ILogger<PayInterfaceDefineController> logger,
             IPayInterfaceDefineService payIfDefineService,
             IPayInterfaceConfigService payIfConfigService,
-            IPayOrderService payOrderService)
+            IPayOrderService payOrderService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _payIfDefineService = payIfDefineService;
             _payIfConfigService = payIfConfigService;
             _payOrderService = payOrderService;

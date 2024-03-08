@@ -10,8 +10,6 @@ namespace AGooday.AgPay.Application.Interfaces
         SysUserAuthDto GetById(long recordId);
         SysUserAuthDto GetByIdentifier(byte identityType, string identifier, string sysType);
         IEnumerable<SysUserAuthDto> GetAll();
-        SysUserAuthInfoDto GetUserAuthInfoById(long userId);
-        SysUserAuthInfoDto SelectByLogin(string identifier, byte identityType, string sysType);
         void ResetAuthInfo(long resetUserId, string authLoginUserName, string telphone, string newPwd, string sysType);
     }
 }

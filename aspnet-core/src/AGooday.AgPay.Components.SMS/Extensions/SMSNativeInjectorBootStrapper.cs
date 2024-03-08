@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Components.SMS.Extensions
     {
         public static void RegisterServices(IServiceCollection services)
         {
-            services.AddKeyedScoped<AliyundySmsService>(SmsProviderCS.ALIYUNDY);
+            services.AddKeyedScoped<ISmsService, AliyundySmsService>(SmsProviderCS.ALIYUNDY);
             services.AddScoped<ISmsServiceFactory, SmsServiceFactory>();
         }
     }

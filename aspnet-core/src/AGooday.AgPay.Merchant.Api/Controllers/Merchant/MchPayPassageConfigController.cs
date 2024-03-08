@@ -21,7 +21,6 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
     [ApiController, Authorize]
     public class MchPayPassageConfigController : CommonController
     {
-        private readonly ILogger<MchPayInterfaceConfigController> _logger;
         private readonly IMchPayPassageService _mchPayPassageService;
         private readonly IPayWayService _payWayService;
         private readonly IMchAppService _mchAppService;
@@ -31,13 +30,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             IMchPayPassageService mchPayPassageServic,
             IPayWayService payWayService,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IMchInfoService mchInfoService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _mchPayPassageService = mchPayPassageServic;
             _payWayService = payWayService;
             _mchAppService = mchAppService;

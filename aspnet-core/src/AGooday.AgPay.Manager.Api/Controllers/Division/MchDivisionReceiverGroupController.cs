@@ -22,7 +22,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
     [ApiController, Authorize]
     public class MchDivisionReceiverGroupController : CommonController
     {
-        private readonly ILogger<MchDivisionReceiverGroupController> _logger;
         private readonly IMchInfoService _mchInfoService;
         private readonly IMchDivisionReceiverService _mchDivisionReceiverService;
         private readonly IMchDivisionReceiverGroupService _mchDivisionReceiverGroupService;
@@ -30,13 +29,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         public MchDivisionReceiverGroupController(ILogger<MchDivisionReceiverGroupController> logger, 
             IMchInfoService mchInfoService,
             IMchDivisionReceiverService mchDivisionReceiverService,
-            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _mchInfoService = mchInfoService;
             _mchDivisionReceiverService = mchDivisionReceiverService;
             _mchDivisionReceiverGroupService = mchDivisionReceiverGroupService;

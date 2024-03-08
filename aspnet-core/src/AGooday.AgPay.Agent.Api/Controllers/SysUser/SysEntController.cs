@@ -18,17 +18,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
     [ApiController, Authorize]
     public class SysEntController : CommonController
     {
-        private readonly ILogger<SysEntController> _logger;
         private readonly ISysEntitlementService _sysEntService;
 
-        public SysEntController(ILogger<SysEntController> logger, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysEntitlementService sysEntService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+        public SysEntController(ILogger<SysEntController> logger,
+            ISysEntitlementService sysEntService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _sysEntService = sysEntService;
         }
 
@@ -39,7 +36,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route("showTree"), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_UR_ROLE_DIST)]
-        public ApiRes ShowTree(string sysType)
+        public ApiRes ShowTree()
         {
             //查询全部数据
             var sysEnt = _sysEntService.GetBySysType(CS.SYS_TYPE.AGENT, null);

@@ -15,20 +15,18 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
     [ApiController, NoLog]
     public class MainChartController : CommonController
     {
-        private readonly ILogger<MainChartController> _logger;
         private readonly IPayOrderService _payOrderService;
         private readonly ISysUserService _sysUserService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MainChartController(ILogger<MainChartController> logger, RedisUtil client,
+        public MainChartController(ILogger<MainChartController> logger,
             IPayOrderService payOrderService,
             IMchInfoService mchInfoService,
             ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _payOrderService = payOrderService;
             _mchInfoService = mchInfoService;
             _sysUserService = sysUserService;

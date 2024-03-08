@@ -14,17 +14,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 {
     [ApiController, Authorize]
     [Route("api/qrc")]
-    public class QrCodeController : ControllerBase
+    public class QrCodeController : CommonController
     {
         private readonly IWebHostEnvironment _env;
-        private readonly ILogger<QrCodeController> _logger;
         private readonly IQrCodeService _qrCodeService;
         private readonly IQrCodeShellService _qrCodeShellService;
 
-        public QrCodeController(IWebHostEnvironment env, ILogger<QrCodeController> logger, IQrCodeService qrCodeService, IQrCodeShellService qrCodeShellService)
+        public QrCodeController(ILogger<QrCodeController> logger,
+            IWebHostEnvironment env,
+            IQrCodeService qrCodeService, 
+            IQrCodeShellService qrCodeShellService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             _env = env;
-            _logger = logger;
             _qrCodeService = qrCodeService;
             _qrCodeShellService = qrCodeShellService;
         }

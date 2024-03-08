@@ -4,7 +4,6 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -19,19 +18,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     [ApiController, Authorize]
     public class SysUserTeamController : CommonController
     {
-        private readonly IMQSender mqSender;
-        private readonly ILogger<SysUserTeamController> _logger;
         private readonly ISysUserTeamService _mchStoreService;
 
-        public SysUserTeamController(IMQSender mqSender, ILogger<SysUserTeamController> logger,
-            ISysUserTeamService mchStoreService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+        public SysUserTeamController(ILogger<SysUserTeamController> logger,
+            ISysUserTeamService mchStoreService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
-            _logger = logger;
             _mchStoreService = mchStoreService;
         }
 
@@ -81,6 +75,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         public ApiRes Delete(long recordId)
         {
             var mchStore = _mchStoreService.GetById(recordId);
+            if (mchStore == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
             _mchStoreService.Remove(recordId);
             return ApiRes.Ok();
         }

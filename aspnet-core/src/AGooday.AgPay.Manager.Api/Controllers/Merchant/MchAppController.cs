@@ -23,21 +23,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     public class MchAppController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<MchAppController> _logger;
         private readonly SysRSA2Config _sysRSA2Config;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MchAppController(IMQSender mqSender, ILogger<MchAppController> logger, IOptions<SysRSA2Config> sysRSA2Config,
+        public MchAppController(ILogger<MchAppController> logger, 
+            IMQSender mqSender,
+            IOptions<SysRSA2Config> sysRSA2Config,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IMchInfoService mchInfoService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _sysRSA2Config = sysRSA2Config.Value;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;

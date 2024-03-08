@@ -14,14 +14,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers
     /// </summary>
     [Route("api/mainChart")]
     [ApiController, Authorize, NoLog]
-    public class MainChartController : ControllerBase
+    public class MainChartController : CommonController
     {
-        private readonly ILogger<MainChartController> _logger;
         private readonly IPayOrderService _payOrderService;
 
-        public MainChartController(ILogger<MainChartController> logger, IPayOrderService payOrderService)
+        public MainChartController(ILogger<MainChartController> logger,
+            IPayOrderService payOrderService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _payOrderService = payOrderService;
         }
 

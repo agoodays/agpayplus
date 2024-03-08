@@ -18,18 +18,19 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
 {
     [Route("/api/sysConfigs")]
     [ApiController, Authorize]
-    public class SysConfigController : ControllerBase
+    public class SysConfigController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<SysConfigController> _logger;
         private readonly ISysConfigService _sysConfigService;
 
-        public SysConfigController(IMQSender mqSender,
-            ILogger<SysConfigController> logger,
-            ISysConfigService sysConfigService)
+        public SysConfigController(ILogger<SysConfigController> logger,
+            IMQSender mqSender,
+            ISysConfigService sysConfigService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _sysConfigService = sysConfigService;
         }
 

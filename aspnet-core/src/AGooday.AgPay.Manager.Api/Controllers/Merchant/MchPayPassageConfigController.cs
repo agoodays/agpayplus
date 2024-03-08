@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Models;
@@ -18,9 +19,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     /// </summary>
     [Route("/api/mch/payPassages")]
     [ApiController, Authorize]
-    public class MchPayPassageConfigController : ControllerBase
+    public class MchPayPassageConfigController : CommonController
     {
-        private readonly ILogger<MchPayInterfaceConfigController> _logger;
         private readonly IMchPayPassageService _mchPayPassageService;
         private readonly IPayWayService _payWayService;
         private readonly IMchAppService _mchAppService;
@@ -30,9 +30,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             IMchPayPassageService mchPayPassageServic,
             IPayWayService payWayService,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService)
+            IMchInfoService mchInfoService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _mchPayPassageService = mchPayPassageServic;
             _payWayService = payWayService;
             _mchAppService = mchAppService;

@@ -22,28 +22,26 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
     public class IsvInfoController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<IsvInfoController> _logger;
         private readonly IIsvInfoService _isvInfoService;
-        private readonly IMchInfoService _mchInfoService;
         private readonly IAgentInfoService _agentInfoService;
+        private readonly IMchInfoService _mchInfoService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
-        public IsvInfoController(IMQSender mqSender, ILogger<IsvInfoController> logger, RedisUtil client,
+        public IsvInfoController(ILogger<IsvInfoController> logger, 
+            IMQSender mqSender,
             IIsvInfoService isvInfoService,
-            IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
-            ISysUserService sysUserService,
-            IPayInterfaceConfigService payInterfaceConfigService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IMchInfoService mchInfoService,
+            IPayInterfaceConfigService payInterfaceConfigService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _isvInfoService = isvInfoService;
+            _agentInfoService = agentInfoService;
             _mchInfoService = mchInfoService;
             _payInterfaceConfigService = payInterfaceConfigService;
-            _agentInfoService = agentInfoService;
         }
 
         /// <summary>

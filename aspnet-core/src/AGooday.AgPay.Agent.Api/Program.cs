@@ -106,7 +106,8 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
     Formatting = Formatting.None,//格式化
     DateFormatString = "yyyy-MM-dd HH:mm:ss",
-    ContractResolver = new CamelCasePropertyNamesContractResolver()
+    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+    NullValueHandling = NullValueHandling.Ignore
 };
 
 services.AddControllers(options =>
@@ -125,6 +126,7 @@ services.AddControllers(options =>
         //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
         options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key 首字符小写（大驼峰转小驼峰）
+        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
         options.SerializerSettings.Converters.Add(new BaseModelJsonConverter<BaseModel>());
     });
 

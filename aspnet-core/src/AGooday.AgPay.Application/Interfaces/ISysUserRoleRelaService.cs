@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
         void SaveUserRole(long userId, List<string> roleIds);
         SysUserRoleRelaDto GetById(string recordId);
         IEnumerable<string> SelectRoleIdsByUserId(long userId);
-        IEnumerable<long> SelectRoleIdsByRoleId(string roleId);
+        IEnumerable<long> SelectUserIdsByRoleId(string roleId);
         IEnumerable<SysUserRoleRelaDto> GetAll();
         PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaQueryDto dto);
     }

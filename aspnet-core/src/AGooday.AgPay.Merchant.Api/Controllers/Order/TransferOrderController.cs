@@ -21,17 +21,14 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
     [ApiController, Authorize, NoLog]
     public class TransferOrderController : CommonController
     {
-        private readonly ILogger<TransferOrderController> _logger;
         private readonly ITransferOrderService _transferOrderService;
 
         public TransferOrderController(ILogger<TransferOrderController> logger,
-            ITransferOrderService transferOrderService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            ITransferOrderService transferOrderService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _transferOrderService = transferOrderService;
         }
 

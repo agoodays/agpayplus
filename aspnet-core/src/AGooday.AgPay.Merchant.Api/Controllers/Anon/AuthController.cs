@@ -33,15 +33,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         private readonly ISysUserService _sysUserService;
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
-        private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
-        private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
-        private readonly ISysEntitlementService _sysEntService;
         private readonly ISysConfigService _sysConfigService;
-        private readonly IMchInfoService _mchInfoService;
-        private readonly ISysLogService _sysLogService;
         private readonly ISmsService smsService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
+        private readonly IAuthService _authService;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
@@ -52,28 +48,20 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             ISysUserService sysUserService,
             ISysUserAuthService sysUserAuthService,
             ISysUserLoginAttemptService sysUserLoginAttemptService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
-            ISysEntitlementService sysEntService,
             ISysConfigService sysConfigService,
-            IMchInfoService mchInfoService,
-            ISysLogService sysLogService,
-            ISmsServiceFactory smsServiceFactory)
+            ISmsServiceFactory smsServiceFactory, 
+            IAuthService authService)
         {
             _logger = logger;
             _jwtSettings = jwtSettings.Value;
             _sysUserService = sysUserService;
             _sysUserAuthService = sysUserAuthService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
-            _sysRoleEntRelaService = sysRoleEntRelaService;
-            _sysUserRoleRelaService = sysUserRoleRelaService;
-            _sysEntService = sysEntService;
             _sysConfigService = sysConfigService;
-            _mchInfoService = mchInfoService;
-            _sysLogService = sysLogService;
             this.smsService = smsServiceFactory.GetService();
             _cache = cache;
             _redis = client.GetDatabase();
+            _authService = authService;
             _notifications = (DomainNotificationHandler)notifications;
         }
 
@@ -106,7 +94,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
                 identityType = CS.AUTH_TYPE.TELPHONE; //手机号登录
             }
 
-            var auth = _sysUserAuthService.SelectByLogin(account, identityType, CS.SYS_TYPE.MCH);
+            var auth = _authService.LoginAuth(account, identityType, CS.SYS_TYPE.MCH);
 
             if (auth == null)
             {
@@ -154,7 +142,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
         private ApiRes Auth(SysUserAuthInfoDto auth, string codeCacheKey, DateTime? lastLoginTime = null)
         {
             //非超级管理员 && 不包含左侧菜单 进行错误提示
-            if (auth.IsAdmin != CS.YES && !_sysRoleEntRelaService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
+            if (auth.IsAdmin != CS.YES && !_authService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
             {
                 if (auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
                 {
@@ -162,25 +150,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
                 }
             }
 
-            var mch = _mchInfoService.GetById(auth.BelongInfoId);
-            auth.ShortName = mch.MchShortName;
-            var authorities = new List<string>();
-            var ents = new List<SysEntitlementDto>();
-            if (auth.UserType.Equals(CS.USER_TYPE.ADMIN) || auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
-            {
-                authorities = _sysUserRoleRelaService.SelectRoleIdsByUserId(auth.SysUserId).ToList();
-                ents = _sysRoleEntRelaService.SelectEntsByUserId(auth.SysUserId, auth.UserType, auth.SysType)
-                    .Where(w => w.MatchRule == null || w.MatchRule.MchType == null || w.MatchRule.MchType.Equals(mch.Type) || w.MatchRule.MchLevelArray.Contains(mch.MchLevel))
-                    .ToList();
-            }
-
-            if (auth.UserType.Equals(CS.USER_TYPE.DIRECTOR) || auth.UserType.Equals(CS.USER_TYPE.CLERK))
-            {
-                ents = _sysEntService.GetBySysType(auth.SysType, null)
-                    .Where(w => w.MatchRule != null && w.MatchRule.UserEntRules.Any(a => auth.EntRules.Contains(a)))
-                    .Where(w => w.MatchRule == null || w.MatchRule.MchType == null || w.MatchRule.MchType.Equals(mch.Type) || w.MatchRule.MchLevelArray.Contains(mch.MchLevel))
-                    .ToList();
-            }
+            auth.GetEnts(_authService, out List<string> authorities, out List<SysEntitlementDto> ents);
 
             if (ents.Count <= 0)
             {
@@ -256,7 +226,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             }
 #endif
             byte identityType = CS.AUTH_TYPE.TELPHONE;
-            var auth = _sysUserAuthService.SelectByLogin(phone, identityType, CS.SYS_TYPE.MCH);
+            var auth = _authService.LoginAuth(phone, identityType, CS.SYS_TYPE.MCH);
 
             if (auth == null)
             {

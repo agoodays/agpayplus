@@ -18,12 +18,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
     {
         private readonly IAgentInfoService _agentInfoService;
 
-        public AgentConfigController(IAgentInfoService agentInfoService,
-            ILogger<AgentConfigController> logger, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+        public AgentConfigController(ILogger<AgentConfigController> logger,
+            IAgentInfoService agentInfoService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             _agentInfoService = agentInfoService;
         }

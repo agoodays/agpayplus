@@ -13,7 +13,6 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
     [ApiController, Authorize]
     public class PayInterfaceDefineController : CommonController
     {
-        private readonly ILogger<PayInterfaceDefineController> _logger;
         private readonly IPayInterfaceDefineService _payIfDefineService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
@@ -21,12 +20,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
             IPayInterfaceDefineService payIfDefineService,
             IPayInterfaceConfigService payIfConfigService,
             RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _payIfDefineService = payIfDefineService;
             _payIfConfigService = payIfConfigService;
         }

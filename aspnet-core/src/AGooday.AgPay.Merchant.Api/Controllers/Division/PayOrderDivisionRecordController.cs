@@ -22,19 +22,17 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
     public class PayOrderDivisionRecordController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<PayOrderDivisionRecordController> _logger;
         private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
 
-        public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger,
-            IPayOrderDivisionRecordService payOrderDivisionRecordService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService, IMQSender mqSender)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+        public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger, 
+            IMQSender mqSender,
+            IPayOrderDivisionRecordService payOrderDivisionRecordService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
-            _payOrderDivisionRecordService = payOrderDivisionRecordService;
             this.mqSender = mqSender;
+            _payOrderDivisionRecordService = payOrderDivisionRecordService;
         }
 
         /// <summary>

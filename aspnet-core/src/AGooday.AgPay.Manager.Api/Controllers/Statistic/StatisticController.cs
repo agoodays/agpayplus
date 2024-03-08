@@ -21,17 +21,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
     [ApiController, Authorize]
     public class StatisticController : CommonController
     {
-        private readonly ILogger<StatisticController> _logger;
         private readonly IStatisticService _statisticService;
 
         public StatisticController(ILogger<StatisticController> logger,
-            IStatisticService statisticService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IStatisticService statisticService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _statisticService = statisticService;
         }
 

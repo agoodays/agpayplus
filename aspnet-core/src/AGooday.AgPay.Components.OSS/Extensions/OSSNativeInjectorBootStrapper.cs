@@ -9,8 +9,8 @@ namespace AGooday.AgPay.Components.OSS.Extensions
     {
         public static void RegisterServices(IServiceCollection services)
         {
-            services.AddKeyedScoped<LocalFileService>(OssUseTypeCS.LOCAL_FILE);
-            services.AddKeyedScoped<AliyunOssService>(OssUseTypeCS.ALIYUN_OSS);
+            services.AddKeyedScoped<IOssService, LocalFileService>(OssUseTypeCS.LOCAL_FILE);
+            services.AddKeyedScoped<IOssService, AliyunOssService>(OssUseTypeCS.ALIYUN_OSS);
             services.AddScoped<IOssServiceFactory, OssServiceFactory>();
         }
     }

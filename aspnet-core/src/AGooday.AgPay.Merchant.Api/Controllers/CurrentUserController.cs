@@ -21,32 +21,31 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
     [Route("api/current")]
     public class CurrentUserController : CommonController
     {
-        private readonly ILogger<CurrentUserController> _logger;
         private readonly IDatabase _redis;
         private readonly ISysUserService _sysUserService;
-        private readonly ISysEntitlementService _sysEntService;
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly IMemoryCache _cache;
+        private readonly IAuthService _authService;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
-        public CurrentUserController(ILogger<CurrentUserController> logger, IMemoryCache cache, INotificationHandler<DomainNotification> notifications, RedisUtil client,
+        public CurrentUserController(ILogger<CurrentUserController> logger,
+            IMemoryCache cache,
             ISysUserService sysUserService,
-            ISysEntitlementService sysEntService,
             ISysUserAuthService sysUserAuthService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
-            ISysUserLoginAttemptService sysUserLoginAttemptService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            ISysUserLoginAttemptService sysUserLoginAttemptService,
+            INotificationHandler<DomainNotification> notifications,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _sysUserService = sysUserService;
-            _sysEntService = sysEntService;
             _sysUserAuthService = sysUserAuthService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _cache = cache;
             _redis = client.GetDatabase();
+            _authService = authService;
             _notifications = (DomainNotificationHandler)notifications;
         }
 
@@ -68,7 +67,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 var entIds = currentUser.Authorities.ToList();
 
                 //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-                var sysEnts = _sysEntService.GetBySysType(CS.SYS_TYPE.MCH, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
+                var sysEnts = _authService.GetEntsBySysType(CS.SYS_TYPE.MCH, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
 
                 //递归转换为树状结构
                 //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
@@ -113,7 +112,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 return ApiRes.CustomFail("二维码状态无效，请刷新二维码后重新扫描");
             }
             var cacheExpiry = _redis.KeyTimeToLive(loginQRCacheKey);
-            await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.SCANNED }), cacheExpiry);
+            await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.SCANNED }), cacheExpiry, When.Exists);
             return ApiRes.Ok();
         }
 
@@ -170,7 +169,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             var currentUser = GetCurrentUser();
             dto.SysUserId = currentUser.SysUser.SysUserId;
             _sysUserService.ModifyCurrentUserInfo(dto);
-            var userinfo = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
+            var userinfo = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             currentUser.SysUser = userinfo;
             //保存redis最新数据
             var currentUserJson = JsonConvert.SerializeObject(currentUser);
@@ -189,7 +188,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         {
             var currentUser = GetCurrentUser();
             string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码
-            var user = _sysUserAuthService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
+            var user = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             bool verified = BCryptUtil.VerifyHash(currentUserPwd, user.Credential);
             //验证当前密码是否正确
             if (!verified)

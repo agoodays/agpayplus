@@ -21,21 +21,21 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
     [Route("api/sysUsers")]
     public class SysUserController : CommonController
     {
-        private readonly ILogger<SysUserController> _logger;
         private readonly ISysUserService _sysUserService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly IMemoryCache _cache;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
-        public SysUserController(ILogger<SysUserController> logger, IMemoryCache cache, INotificationHandler<DomainNotification> notifications, RedisUtil client,
-            ISysUserService sysUserService, 
+        public SysUserController(ILogger<SysUserController> logger, 
+            IMemoryCache cache, 
+            ISysUserService sysUserService,
             ISysUserLoginAttemptService sysUserLoginAttemptService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            INotificationHandler<DomainNotification> notifications,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _sysUserService = sysUserService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _cache = cache;

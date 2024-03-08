@@ -17,19 +17,16 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Config
     public class SysConfigController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<SysConfigController> _logger;
         private readonly ISysConfigService _sysConfigService;
 
-        public SysConfigController(IMQSender mqSender,
-            ILogger<SysConfigController> logger,
-            ISysConfigService sysConfigService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+        public SysConfigController(ILogger<SysConfigController> logger,
+            IMQSender mqSender,
+            ISysConfigService sysConfigService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _sysConfigService = sysConfigService;
         }
 

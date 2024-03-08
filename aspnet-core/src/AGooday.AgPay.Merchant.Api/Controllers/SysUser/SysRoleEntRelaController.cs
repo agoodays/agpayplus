@@ -19,19 +19,18 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
     [ApiController, Authorize]
     public class SysRoleEntRelaController : CommonController
     {
-        private readonly ILogger<SysRoleEntRelaController> _logger;
         private readonly ISysRoleService _sysRoleService;
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
 
-        public SysRoleEntRelaController(ILogger<SysRoleEntRelaController> logger, RedisUtil client,
+        public SysRoleEntRelaController(ILogger<SysRoleEntRelaController> logger,
             ISysRoleService sysRoleService,
-            ISysUserService sysUserService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            ISysUserRoleRelaService sysUserRoleRelaService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
             _sysRoleService = sysRoleService;
@@ -70,7 +69,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
                 _sysRoleEntRelaService.ResetRela(roleId, entIds);
 
                 //查询到该角色的人员， 将redis更新
-                var sysUserIdList = _sysUserRoleRelaService.SelectRoleIdsByRoleId(roleId).ToList();
+                var sysUserIdList = _sysUserRoleRelaService.SelectUserIdsByRoleId(roleId).ToList();
                 RefAuthentication(sysUserIdList);
             }
             return ApiRes.Ok();

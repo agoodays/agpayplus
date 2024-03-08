@@ -22,24 +22,22 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
     public class MchPayInterfaceConfigController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<MchPayInterfaceConfigController> _logger;
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly ISysConfigService _sysConfigService;
 
-        public MchPayInterfaceConfigController(IMQSender mqSender, ILogger<MchPayInterfaceConfigController> logger, RedisUtil client,
+        public MchPayInterfaceConfigController(ILogger<MchPayInterfaceConfigController> logger,
+            IMQSender mqSender,
             IPayInterfaceConfigService payIfConfigService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
-            ISysConfigService sysConfigService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            ISysConfigService sysConfigService,
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _payIfConfigService = payIfConfigService;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;

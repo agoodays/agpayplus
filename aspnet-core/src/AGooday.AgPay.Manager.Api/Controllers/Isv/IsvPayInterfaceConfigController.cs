@@ -22,18 +22,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
     public class IsvPayInterfaceConfigController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<IsvPayInterfaceConfigController> _logger;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
-        public IsvPayInterfaceConfigController(IMQSender mqSender, ILogger<IsvPayInterfaceConfigController> logger, RedisUtil client,
+        public IsvPayInterfaceConfigController(ILogger<IsvPayInterfaceConfigController> logger, 
+            IMQSender mqSender,
             IPayInterfaceConfigService payIfConfigService,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _payIfConfigService = payIfConfigService;
         }
 

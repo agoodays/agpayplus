@@ -20,23 +20,22 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     public class MchStoreController : CommonController
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<MchStoreController> _logger;
         private readonly IMchStoreService _mchStoreService;
         private readonly IMchInfoService _mchInfoService;
         private readonly ISysUserService _sysUserService;
         private readonly ISysConfigService _sysConfigService;
 
-        public MchStoreController(IMQSender mqSender, ILogger<MchStoreController> logger,
+        public MchStoreController(ILogger<MchStoreController> logger, 
+            IMQSender mqSender,
             IMchStoreService mchStoreService,
             IMchInfoService mchInfoService,
-            ISysConfigService sysConfigService, RedisUtil client,
+            ISysConfigService sysConfigService,
             ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
             this.mqSender = mqSender;
-            _logger = logger;
             _mchStoreService = mchStoreService;
             _mchInfoService = mchInfoService;
             _sysUserService = sysUserService;

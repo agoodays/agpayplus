@@ -27,7 +27,6 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
     [ApiController, Authorize]
     public class PayOrderController : CommonController
     {
-        private readonly ILogger<PayOrderController> _logger;
         private readonly IPayOrderService _payOrderService;
         private readonly IPayWayService _payWayService;
         private readonly ISysConfigService _sysConfigService;
@@ -37,13 +36,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
             IPayOrderService payOrderService,
             IPayWayService payWayService,
             ISysConfigService sysConfigService,
-            IMchAppService mchAppService, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IMchAppService mchAppService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _payOrderService = payOrderService;
             _payWayService = payWayService;
             _sysConfigService = sysConfigService;
@@ -74,7 +71,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
             foreach (var payOrder in payOrders)
             {
                 // 存入支付方式名称
-                payOrder.AddExt("wayName", payWayNameMap.ContainsKey(payOrder.WayCode) ? payWayNameMap[payOrder.WayCode] : payOrder.WayCode);
+                payOrder.AddExt("wayName", payWayNameMap.TryGetValue(payOrder.WayCode, out string wayName) ? wayName : payOrder.WayCode);
             }
             return ApiPageRes<PayOrderDto>.Pages(payOrders);
         }

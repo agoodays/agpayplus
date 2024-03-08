@@ -17,23 +17,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
     [ApiController, Authorize]
     public class PayOauth2ConfigController : CommonController
     {
-        private readonly ILogger<PayOauth2ConfigController> _logger;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly IAgentInfoService _agentInfoService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
-        public PayOauth2ConfigController(ILogger<PayOauth2ConfigController> logger, RedisUtil client,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
+        public PayOauth2ConfigController(ILogger<PayOauth2ConfigController> logger,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
-            IPayInterfaceConfigService payIfConfigService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            IPayInterfaceConfigService payIfConfigService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
             _agentInfoService = agentInfoService;

@@ -26,24 +26,18 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
     [ApiController, Authorize, NoLog]
     public class PayTestController : CommonController
     {
-        private readonly ILogger<PayTestController> _logger;
-        private readonly IPayOrderService _payOrderService;
         private readonly IMchAppService _mchAppService;
         private readonly IMchPayPassageService _mchPayPassageService;
         private readonly ISysConfigService _sysConfigService;
 
-        public PayTestController(ILogger<PayTestController> logger, RedisUtil client,
-            IPayOrderService payOrderService,
+        public PayTestController(ILogger<PayTestController> logger,
             IMchAppService mchAppService,
             IMchPayPassageService mchPayPassageService,
             ISysConfigService sysConfigService,
-            ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
-            _payOrderService = payOrderService;
             _mchAppService = mchAppService;
             _mchPayPassageService = mchPayPassageService;
             _sysConfigService = sysConfigService;

@@ -11,7 +11,6 @@ namespace AGooday.AgPay.Application.Interfaces
         SysEntitlementDto GetByKeyAsNoTracking(string entId, string sysType);
         SysEntitlementDto GetByKey(string entId, string sysType);
         IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId);
-        IEnumerable<SysEntitlementDto> GetBySysType(string sysType, List<string> entIds, List<string> entTypes);
         IEnumerable<SysEntitlementDto> GetAll();
     }
 }

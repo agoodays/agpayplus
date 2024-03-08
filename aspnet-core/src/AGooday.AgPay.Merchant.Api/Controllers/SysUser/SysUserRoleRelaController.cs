@@ -17,17 +17,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
     [ApiController, Authorize]
     public class SysUserRoleRelaController : CommonController
     {
-        private readonly ILogger<SysUserRoleRelaController> _logger;
         private readonly ISysUserService _sysUserService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
 
-        public SysUserRoleRelaController(ILogger<SysUserRoleRelaController> logger, RedisUtil client,
+        public SysUserRoleRelaController(ILogger<SysUserRoleRelaController> logger,
             ISysUserService sysUserService,
-            ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService)
-            : base(logger, client, sysUserService, sysRoleEntRelaService, sysUserRoleRelaService)
+            ISysUserRoleRelaService sysUserRoleRelaService, 
+            RedisUtil client,
+            IAuthService authService)
+            : base(logger, client, authService)
         {
-            _logger = logger;
             _sysUserService = sysUserService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
         }

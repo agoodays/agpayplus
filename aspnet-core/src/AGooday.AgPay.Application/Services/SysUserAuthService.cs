@@ -16,20 +16,15 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ISysUserAuthRepository _sysUserAuthRepository;
-        private readonly ISysUserRepository _sysUserRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysUserAuthService(IMapper mapper, IMediatorHandler bus,
-            ISysUserAuthRepository sysUserAuthRepository,
-            ISysUserRepository sysUserRepository)
+        public SysUserAuthService(IMapper mapper, IMediatorHandler bus)
         {
             _mapper = mapper;
             Bus = bus;
-            _sysUserAuthRepository = sysUserAuthRepository;
-            _sysUserRepository = sysUserRepository;
         }
 
         public void Dispose()
@@ -76,85 +71,6 @@ namespace AGooday.AgPay.Application.Services
         {
             var sysUserAuths = _sysUserAuthRepository.GetAll();
             return _mapper.Map<IEnumerable<SysUserAuthDto>>(sysUserAuths);
-        }
-
-        public SysUserAuthInfoDto GetUserAuthInfoById(long userId)
-        {
-            var entity = _sysUserAuthRepository.GetAll()
-                .Join(_sysUserAuthRepository.GetAll<SysUser>(),
-                ua => ua.UserId, ur => ur.SysUserId,
-                (ua, ur) => new { ua, ur })
-                .Where(w => w.ua.UserId == userId)
-                .Select(s => new SysUserAuthInfoDto
-                {
-                    SysUserId = s.ur.SysUserId,
-                    LoginUsername = s.ur.LoginUsername,
-                    Realname = s.ur.Realname,
-                    Telphone = s.ur.Telphone,
-                    Sex = s.ur.Sex,
-                    AvatarUrl = s.ur.AvatarUrl,
-                    UserNo = s.ur.UserNo,
-                    SafeWord = s.ur.SafeWord,
-                    IsAdmin = s.ur.UserType.Equals(CS.USER_TYPE.ADMIN) ? CS.YES : CS.NO,
-                    UserType = s.ur.UserType,
-                    InviteCode = s.ur.InviteCode,
-                    TeamId = s.ur.TeamId,
-                    IsTeamLeader = s.ur.IsTeamLeader,
-                    State = s.ur.State,
-                    SysType = s.ur.SysType,
-                    BelongInfoId = s.ur.BelongInfoId,
-                    CreatedAt = s.ur.CreatedAt,
-                    UpdatedAt = s.ur.UpdatedAt,
-                    IdentityType = s.ua.IdentityType,
-                    Identifier = s.ua.Identifier,
-                    Credential = s.ua.Credential
-                })
-                .FirstOrDefault();
-            return entity;
-        }
-
-        /// <summary>
-        /// 根据登录信息查询用户认证信息
-        /// </summary>
-        /// <param name="identifier"></param>
-        /// <param name="identityType"></param>
-        /// <param name="sysType"></param>
-        /// <returns></returns>
-        public SysUserAuthInfoDto SelectByLogin(string identifier, byte identityType, string sysType)
-        {
-            var entity = _sysUserAuthRepository.GetAll()
-                .Join(_sysUserRepository.GetAll(),
-                ua => ua.UserId, ur => ur.SysUserId,
-                (ua, ur) => new { ua, ur })
-                .Where(w => w.ua.IdentityType == identityType && w.ua.Identifier.Equals(identifier) && w.ua.SysType.Equals(sysType) && w.ur.State == CS.PUB_USABLE)
-                .Select(s => new SysUserAuthInfoDto
-                {
-                    SysUserId = s.ur.SysUserId,
-                    LoginUsername = s.ur.LoginUsername,
-                    Realname = s.ur.Realname,
-                    Telphone = s.ur.Telphone,
-                    Sex = s.ur.Sex,
-                    AvatarUrl = s.ur.AvatarUrl,
-                    UserNo = s.ur.UserNo,
-                    SafeWord = s.ur.SafeWord,
-                    IsAdmin = s.ur.UserType.Equals(CS.USER_TYPE.ADMIN) ? CS.YES : CS.NO,
-                    UserType = s.ur.UserType,
-                    EntRules = JsonConvert.DeserializeObject<List<string>>(s.ur.EntRules),
-                    BindStoreIds = JsonConvert.DeserializeObject<List<long>>(s.ur.BindStoreIds),
-                    InviteCode = s.ur.InviteCode,
-                    TeamId = s.ur.TeamId,
-                    IsTeamLeader = s.ur.IsTeamLeader,
-                    State = s.ur.State,
-                    SysType = s.ur.SysType,
-                    BelongInfoId = s.ur.BelongInfoId,
-                    CreatedAt = s.ur.CreatedAt,
-                    UpdatedAt = s.ur.UpdatedAt,
-                    IdentityType = s.ua.IdentityType,
-                    Identifier = s.ua.Identifier,
-                    Credential = s.ua.Credential
-                })
-                .FirstOrDefault();
-            return entity;
         }
 
         public void ResetAuthInfo(long resetUserId, string authLoginUserName, string telphone, string newPwd, string sysType)
