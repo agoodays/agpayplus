@@ -19,12 +19,14 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public MchStoreService(IMchStoreRepository mchStoreRepository, IMchInfoRepository mchInfoRepository, IMapper mapper, IMediatorHandler bus)
+        public MchStoreService(IMapper mapper, IMediatorHandler bus, 
+            IMchStoreRepository mchStoreRepository, 
+            IMchInfoRepository mchInfoRepository)
         {
-            _mchStoreRepository = mchStoreRepository;
-            _mchInfoRepository = mchInfoRepository;
             _mapper = mapper;
             Bus = bus;
+            _mchStoreRepository = mchStoreRepository;
+            _mchInfoRepository = mchInfoRepository;
         }
 
         public void Dispose()

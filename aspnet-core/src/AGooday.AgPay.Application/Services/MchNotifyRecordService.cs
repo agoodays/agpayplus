@@ -21,11 +21,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public MchNotifyRecordService(IMchNotifyRecordRepository mchNotifyRecordRepository, IMapper mapper, IMediatorHandler bus)
+        public MchNotifyRecordService(IMapper mapper, IMediatorHandler bus, 
+            IMchNotifyRecordRepository mchNotifyRecordRepository)
         {
-            _mchNotifyRecordRepository = mchNotifyRecordRepository;
             _mapper = mapper;
             Bus = bus;
+            _mchNotifyRecordRepository = mchNotifyRecordRepository;
         }
 
         public void Dispose()

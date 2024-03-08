@@ -21,11 +21,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public IsvInfoService(IIsvInfoRepository isvInfoRepository, IMapper mapper, IMediatorHandler bus)
+        public IsvInfoService(IMapper mapper, IMediatorHandler bus, 
+            IIsvInfoRepository isvInfoRepository)
         {
-            _isvInfoRepository = isvInfoRepository;
             _mapper = mapper;
             Bus = bus;
+            _isvInfoRepository = isvInfoRepository;
         }
 
         public void Dispose()

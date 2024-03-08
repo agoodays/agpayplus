@@ -45,7 +45,7 @@ namespace AGooday.AgPay.Application.Services
             _sysEntitlementRepository.SaveChanges();
         }
 
-        public void Update(SysEntModifyDto dto)
+        public void Update(SysEntitlementDto dto)
         {
             var renew = _mapper.Map<SysEntitlement>(dto);
             renew.UpdatedAt = DateTime.Now;
@@ -79,6 +79,14 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
                 && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId))
                 );
+            return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
+        }
+
+        public IEnumerable<SysEntitlementDto> GetByIds(string sysType, List<string> entIds)
+        {
+            var sysEnts = _sysEntitlementRepository.GetAll()
+                .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
+                && (!(entIds != null && entIds.Count > 0) || entIds.Contains(w.EntId)));
             return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
         }
 

@@ -20,11 +20,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public MchDivisionReceiverGroupService(IMchDivisionReceiverGroupRepository mchDivisionReceiverGroupRepository, IMapper mapper, IMediatorHandler bus)
+        public MchDivisionReceiverGroupService(IMapper mapper, IMediatorHandler bus, 
+            IMchDivisionReceiverGroupRepository mchDivisionReceiverGroupRepository)
         {
-            _mchDivisionReceiverGroupRepository = mchDivisionReceiverGroupRepository;
             _mapper = mapper;
             Bus = bus;
+            _mchDivisionReceiverGroupRepository = mchDivisionReceiverGroupRepository;
         }
 
         public void Dispose()

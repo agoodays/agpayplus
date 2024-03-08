@@ -19,11 +19,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public PayInterfaceDefineService(IPayInterfaceDefineRepository payInterfaceDefineRepository, IMapper mapper, IMediatorHandler bus)
+        public PayInterfaceDefineService(IMapper mapper, IMediatorHandler bus, 
+            IPayInterfaceDefineRepository payInterfaceDefineRepository)
         {
-            _payInterfaceDefineRepository = payInterfaceDefineRepository;
             _mapper = mapper;
             Bus = bus;
+            _payInterfaceDefineRepository = payInterfaceDefineRepository;
         }
 
         public void Dispose()

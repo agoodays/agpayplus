@@ -16,20 +16,17 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchInfoRepository _mchInfoRepository;
-        private readonly ISysUserRepository _sysUserRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
         public MchInfoService(IMapper mapper, IMediatorHandler bus,
-            IMchInfoRepository mchInfoRepository,
-            ISysUserRepository sysUserRepository)
+            IMchInfoRepository mchInfoRepository)
         {
             _mapper = mapper;
             Bus = bus;
             _mchInfoRepository = mchInfoRepository;
-            _sysUserRepository = sysUserRepository;
         }
 
         public void Dispose()

@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Newtonsoft.Json;
 
@@ -22,11 +23,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysConfigService(ISysConfigRepository sysConfigRepository, IMapper mapper, IMediatorHandler bus)
+        public SysConfigService(IMapper mapper, IMediatorHandler bus,
+            ISysConfigRepository sysConfigRepository)
         {
-            _sysConfigRepository = sysConfigRepository;
             _mapper = mapper;
             Bus = bus;
+            _sysConfigRepository = sysConfigRepository;
         }
 
         public void Dispose()

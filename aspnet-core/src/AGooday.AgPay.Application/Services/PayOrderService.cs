@@ -30,15 +30,17 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public PayOrderService(IPayOrderRepository payOrderRepository,
+        public PayOrderService(IMapper mapper, IMediatorHandler bus,
+            IPayOrderRepository payOrderRepository,
             IRefundOrderRepository refundOrderRepository,
             IMchInfoRepository mchInfoRepository,
             IAgentInfoRepository agentInfoRepository,
             IIsvInfoRepository isvInfoRepository,
             IPayWayRepository payWayRepository,
-            IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository,
-            IMapper mapper, IMediatorHandler bus)
+            IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository)
         {
+            _mapper = mapper;
+            Bus = bus;
             _payOrderRepository = payOrderRepository;
             _refundOrderRepository = refundOrderRepository;
             _mchInfoRepository = mchInfoRepository;
@@ -46,8 +48,6 @@ namespace AGooday.AgPay.Application.Services
             _isvInfoRepository = isvInfoRepository;
             _payWayRepository = payWayRepository;
             _payOrderDivisionRecordRepository = payOrderDivisionRecordRepository;
-            _mapper = mapper;
-            Bus = bus;
         }
 
         public void Dispose()

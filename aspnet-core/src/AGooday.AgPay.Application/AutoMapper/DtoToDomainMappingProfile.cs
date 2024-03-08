@@ -64,7 +64,6 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysConfigDto, SysConfig>();
             CreateMap<SysEntitlementDto, SysEntitlement>()
                 .ForMember(d => d.MatchRule, o => o.MapFrom(s => JsonConvert.SerializeObject(s.MatchRule)));
-            CreateMap<SysEntModifyDto, SysEntitlement>();
             CreateMap<SysLogDto, SysLog>();
 
             CreateMap<SysRoleDto, SysRole>();

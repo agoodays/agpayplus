@@ -21,11 +21,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public QrCodeService(IQrCodeRepository qrCodeShellRepository, IMapper mapper, IMediatorHandler bus)
+        public QrCodeService(IMapper mapper, IMediatorHandler bus, 
+            IQrCodeRepository qrCodeShellRepository)
         {
-            _qrCodeShellRepository = qrCodeShellRepository;
             _mapper = mapper;
             Bus = bus;
+            _qrCodeShellRepository = qrCodeShellRepository;
         }
 
         public void Dispose()

@@ -20,7 +20,8 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysUserRoleRelaService(IMapper mapper, IMediatorHandler bus, ISysUserRoleRelaRepository sysUserRoleRelaRepository)
+        public SysUserRoleRelaService(IMapper mapper, IMediatorHandler bus, 
+            ISysUserRoleRelaRepository sysUserRoleRelaRepository)
         {
             _mapper = mapper;
             Bus = bus;

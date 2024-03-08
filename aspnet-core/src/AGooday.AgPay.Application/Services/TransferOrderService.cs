@@ -21,11 +21,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public TransferOrderService(ITransferOrderRepository transferOrderRepository, IMapper mapper, IMediatorHandler bus)
+        public TransferOrderService(IMapper mapper, IMediatorHandler bus, 
+            ITransferOrderRepository transferOrderRepository)
         {
-            _transferOrderRepository = transferOrderRepository;
             _mapper = mapper;
             Bus = bus;
+            _transferOrderRepository = transferOrderRepository;
         }
 
         public void Dispose()

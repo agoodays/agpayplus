@@ -22,11 +22,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysArticleService(ISysArticleRepository sysArticleRepository, IMapper mapper, IMediatorHandler bus)
+        public SysArticleService(IMapper mapper, IMediatorHandler bus,
+            ISysArticleRepository sysArticleRepository)
         {
-            _sysArticleRepository = sysArticleRepository;
             _mapper = mapper;
             Bus = bus;
+            _sysArticleRepository = sysArticleRepository;
         }
 
         public void Dispose()

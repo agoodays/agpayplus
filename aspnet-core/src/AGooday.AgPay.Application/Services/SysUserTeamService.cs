@@ -17,11 +17,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysUserTeamService(ISysUserTeamRepository sysUserTeamRepository, IMapper mapper, IMediatorHandler bus)
+        public SysUserTeamService(IMapper mapper, IMediatorHandler bus,
+            ISysUserTeamRepository sysUserTeamRepository)
         {
-            _sysUserTeamRepository = sysUserTeamRepository;
             _mapper = mapper;
             Bus = bus;
+            _sysUserTeamRepository = sysUserTeamRepository;
         }
 
         public void Dispose()

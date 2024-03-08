@@ -6,11 +6,12 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         void Add(SysEntitlementDto dto);
         void Remove(string recordId);
-        void Update(SysEntModifyDto dto);
+        void Update(SysEntitlementDto dto);
         SysEntitlementDto GetById(string recordId);
         SysEntitlementDto GetByKeyAsNoTracking(string entId, string sysType);
         SysEntitlementDto GetByKey(string entId, string sysType);
         IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId);
+        IEnumerable<SysEntitlementDto> GetByIds(string sysType, List<string> entIds);
         IEnumerable<SysEntitlementDto> GetAll();
     }
 }

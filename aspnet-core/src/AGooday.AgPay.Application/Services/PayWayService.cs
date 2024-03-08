@@ -21,11 +21,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public PayWayService(IPayWayRepository payWayRepository, IMapper mapper, IMediatorHandler bus)
+        public PayWayService(IMapper mapper, IMediatorHandler bus, 
+            IPayWayRepository payWayRepository)
         {
-            _payWayRepository = payWayRepository;
             _mapper = mapper;
             Bus = bus;
+            _payWayRepository = payWayRepository;
         }
 
         public void Dispose()

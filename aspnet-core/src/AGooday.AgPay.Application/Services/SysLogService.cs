@@ -20,11 +20,12 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public SysLogService(ISysLogRepository sysLogRepository, IMapper mapper, IMediatorHandler bus)
+        public SysLogService(IMapper mapper, IMediatorHandler bus, 
+            ISysLogRepository sysLogRepository)
         {
-            _sysLogRepository = sysLogRepository;
             _mapper = mapper;
             Bus = bus;
+            _sysLogRepository = sysLogRepository;
         }
 
         public void Dispose()

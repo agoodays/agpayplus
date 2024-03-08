@@ -24,12 +24,14 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public PayOrderDivisionRecordService(IPayOrderRepository payOrderRepository, IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository, IMapper mapper, IMediatorHandler bus)
+        public PayOrderDivisionRecordService(IMapper mapper, IMediatorHandler bus, 
+            IPayOrderRepository payOrderRepository, 
+            IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository)
         {
-            _payOrderRepository = payOrderRepository;
-            _payOrderDivisionRecordRepository = payOrderDivisionRecordRepository;
             _mapper = mapper;
             Bus = bus;
+            _payOrderRepository = payOrderRepository;
+            _payOrderDivisionRecordRepository = payOrderDivisionRecordRepository;
         }
 
         public void Dispose()

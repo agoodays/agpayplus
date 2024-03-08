@@ -2,6 +2,7 @@
 using EmitMapper.MappingConfiguration;
 using log4net;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text.Json;
 
 namespace AGooday.AgPay.Common.Utils
@@ -131,6 +132,34 @@ namespace AGooday.AgPay.Common.Utils
             }
 
             return convert;
+        }
+
+        public static void AssignNonNullProperties<T>(T originEntity, T newEntity)
+        {
+            PropertyInfo[] properties = typeof(T).GetProperties();
+
+            foreach (PropertyInfo property in properties)
+            {
+                object newValue = property.GetValue(newEntity);
+                if (newValue != null && newValue.ToString() != string.Empty)
+                {
+                    property.SetValue(originEntity, newValue);
+                }
+            }
+        }
+
+        public static void RemoveNonNullProperties<T>(T originEntity, T newEntity)
+        {
+            PropertyInfo[] properties = typeof(T).GetProperties();
+
+            foreach (PropertyInfo property in properties)
+            {
+                object newValue = property.GetValue(newEntity);
+                if (newValue != null && newValue.ToString() != string.Empty)
+                {
+                    property.SetValue(originEntity, null);
+                }
+            }
         }
     }
 }

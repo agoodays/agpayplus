@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         private readonly ISysEntitlementService _sysEntService;
 
         public SysEntController(ILogger<SysEntController> logger,
-            ISysEntitlementService sysEntService, 
+            ISysEntitlementService sysEntService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{entId}"), MethodLog("更新资源权限")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
-        public ApiRes Update(string entId, SysEntModifyDto dto)
+        public ApiRes Update(string entId, SysEntitlementDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.EntId))
             {
@@ -58,7 +58,35 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
                 sysEnt.State = dto.State;
                 CopyUtil.CopyProperties(sysEnt, dto);
             }
+            dto.UpdatedAt = DateTime.Now;
             _sysEntService.Update(dto);
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 设置权限匹配规则
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut, Route("setMatchRule"), MethodLog("设置权限匹配规则")]
+        [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
+        public ApiRes SetMatchRule(SysEntMatchRuleSetDto dto)
+        {
+            var sysEnts = _sysEntService.GetByIds(dto.SysType, dto.EntIds);
+            foreach (var sysEnt in sysEnts)
+            {
+                if (dto.OpType.Equals("add"))
+                {
+                    CopyUtil.AssignNonNullProperties(sysEnt.MatchRule, dto.MatchRule);
+                }
+
+                if (dto.OpType.Equals("delete"))
+                {
+                    CopyUtil.RemoveNonNullProperties(sysEnt.MatchRule, dto.MatchRule);
+                }
+                sysEnt.UpdatedAt = DateTime.Now;
+                _sysEntService.Update(sysEnt);
+            }
             return ApiRes.Ok();
         }
 
