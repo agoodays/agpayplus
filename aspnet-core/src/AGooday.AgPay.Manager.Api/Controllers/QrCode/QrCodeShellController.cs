@@ -171,12 +171,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         public ActionResult ImgView(string key)
         {
             var qrCodeShell = _qrCodeShellService.GetById(Convert.ToInt64(AgPayUtil.AesDecode(key)));
-            var buffer = GetQrCodeShellImage(qrCodeShell);
-            using (var stream = new MemoryStream(buffer))
+            if (qrCodeShell != null)
             {
-                // 返回生成的码牌图片
-                return File(stream.ToArray(), "image/png");
+                var buffer = GetQrCodeShellImage(qrCodeShell);
+                using (var stream = new MemoryStream(buffer))
+                {
+                    // 返回生成的码牌图片
+                    return File(stream.ToArray(), "image/png");
+                }
             }
+            return null;
         }
 
         [HttpGet, AllowAnonymous, Route("nostyle.png")]
