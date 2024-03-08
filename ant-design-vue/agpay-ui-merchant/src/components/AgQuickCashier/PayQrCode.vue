@@ -9,7 +9,7 @@
     @cancel="handleClose">
     <div class="modal-body">
       <div>
-        <img v-if="apiRes.payDataType == 'codeImgUrl'" :src="apiRes.payData" alt="">
+        <img width="252" height="252" v-if="apiRes.payDataType == 'codeImgUrl'" :src="apiRes.payData" alt="">
         <div class="zfb-wx" style="margin-bottom: 10px;text-align: center;">
           <img src="~@/assets/svg/alipay.svg" alt="">
           <img src="~@/assets/svg/wechatpay.svg" alt="" style="margin: 0px 5px;">
