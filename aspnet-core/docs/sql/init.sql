@@ -268,7 +268,7 @@ CREATE TABLE `t_pay_order` (
   `amount` BIGINT(20) NOT NULL COMMENT '支付金额,单位分',
   `mch_fee_rate` DECIMAL(20,6) NOT NULL COMMENT '商户手续费费率快照',
   `mch_fee_amount` BIGINT(20) NOT NULL COMMENT '商户手续费,单位分',
-  `currency` VARCHAR(3) NOT NULL DEFAULT 'cny' COMMENT '三位货币代码,人民币:cny',
+  `currency` VARCHAR(3) NOT NULL DEFAULT 'cny' COMMENT '三位货币代码, 人民币: CNY',
   `state` TINYINT(6) NOT NULL DEFAULT '0' COMMENT '支付状态: 0-订单生成, 1-支付中, 2-支付成功, 3-支付失败, 4-已撤销, 5-已退款, 6-订单关闭',
   `notify_state` TINYINT(6) NOT NULL DEFAULT '0' COMMENT '向下游回调状态, 0-未发送,  1-已发送',
   `client_ip` VARCHAR(32) DEFAULT NULL COMMENT '客户端IP',

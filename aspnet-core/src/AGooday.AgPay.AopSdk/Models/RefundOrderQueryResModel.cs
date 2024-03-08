@@ -50,7 +50,7 @@ namespace AGooday.AgPay.AopSdk.Models
         public long RefundAmount { get; set; }
 
         /// <summary>
-        /// 三位货币代码,人民币:cny
+        /// 三位货币代码, 人民币: CNY
         /// </summary>
         [JsonProperty("currency")]
         public string Currency { get; set; }

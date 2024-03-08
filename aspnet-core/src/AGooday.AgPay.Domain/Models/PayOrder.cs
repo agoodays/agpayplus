@@ -187,9 +187,9 @@ namespace AGooday.AgPay.Domain.Models
         public long MchOrderFeeAmount { get; set; }
 
         /// <summary>
-        /// 三位货币代码,人民币:cny
+        /// 三位货币代码, 人民币: CNY
         /// </summary>
-        [Comment("三位货币代码,人民币:cny")]
+        [Comment("三位货币代码, 人民币: CNY")]
         [Required, Column("currency", TypeName = "varchar(3)")]
         public string Currency { get; set; }
 

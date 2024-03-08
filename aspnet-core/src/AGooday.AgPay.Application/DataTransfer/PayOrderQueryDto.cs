@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         public long MchFeeAmount { get; set; }
 
         /// <summary>
-        /// 三位货币代码,人民币:cny
+        /// 三位货币代码, 人民币: CNY
         /// </summary>
         [BindNever]
         public string Currency { get; set; }

@@ -196,7 +196,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             refundOrder.PayAmount = payOrder.Amount; //支付金额,单位分
             refundOrder.RefundAmount = rq.RefundAmount; //退款金额,单位分
             refundOrder.RefundFeeAmount = refundService.CalculateFeeAmount(refundOrder.RefundAmount, payOrder); //退款手续费,单位分
-            refundOrder.Currency = rq.Currency; //三位货币代码,人民币:cny
+            refundOrder.Currency = rq.Currency; //三位货币代码, 人民币: CNY
             refundOrder.State = (byte)RefundOrderState.STATE_INIT; //退款状态:0-订单生成,1-退款中,2-退款成功,3-退款失败
             refundOrder.ClientIp = string.IsNullOrWhiteSpace(rq.ClientIp) ? GetClientIp() : rq.ClientIp; //客户端IP
             refundOrder.RefundReason = rq.RefundReason; //退款原因
