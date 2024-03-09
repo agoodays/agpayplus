@@ -77,12 +77,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             {
                 if (dto.OpType.Equals("add"))
                 {
-                    CopyUtil.AssignNonNullProperties(sysEnt.MatchRule, dto.MatchRule);
+                    sysEnt.MatchRule = CopyUtil.AssignNonNullProperties(sysEnt.MatchRule, dto.MatchRule);
                 }
 
                 if (dto.OpType.Equals("delete"))
                 {
-                    CopyUtil.RemoveNonNullProperties(sysEnt.MatchRule, dto.MatchRule);
+                    sysEnt.MatchRule = CopyUtil.RemoveNonNullProperties(sysEnt.MatchRule, dto.MatchRule);
                 }
                 sysEnt.UpdatedAt = DateTime.Now;
                 _sysEntService.Update(sysEnt);

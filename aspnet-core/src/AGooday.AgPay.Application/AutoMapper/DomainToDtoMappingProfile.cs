@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Application.AutoMapper
                 .ForMember(dest => dest.SysType, opt => opt.Ignore())
                 .ForMember(dest => dest.BelongInfoId, opt => opt.Ignore());
             CreateMap<SysEntitlement, SysEntitlementDto>()
-                .ForMember(d => d.MatchRule, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.MatchRule) ? null : JsonConvert.DeserializeObject<List<SysEntitlementDto.EntMatchRule>>(s.MatchRule)));
+                .ForMember(d => d.MatchRule, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.MatchRule) ? null : JsonConvert.DeserializeObject<SysEntitlementDto.EntMatchRule>(s.MatchRule)));
             CreateMap<SysLog, SysLogDto>();
             CreateMap<SysRole, SysRoleDto>();
             CreateMap<SysRoleEntRela, SysRoleEntRelaDto>();

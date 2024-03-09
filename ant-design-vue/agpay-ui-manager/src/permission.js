@@ -14,7 +14,42 @@ const loginRoutePath = '/login'
 
 // 封装跳转到指定路由的函数
 function redirectToTargetRoute (path, next) {
-  next(path === '/' ? '/main' : undefined)
+  next(path === '/' ? redirectFunc() : undefined)
+}
+
+// 动态跳转路径 func
+function redirectFunc () {
+  let mainPageUri = ''
+  store.state.user.allMenuRouteTree.forEach(item => {
+    if (item.entId === 'ENT_C_MAIN') { // 当前用户是否拥有主页权限， 如果有直接跳转到该路径
+      mainPageUri = item.menuUri
+      return false
+    }
+  })
+
+  if (mainPageUri) {
+    return mainPageUri
+  }
+
+  return getOneUri(store.state.user.allMenuRouteTree)
+}
+
+// 获取到第一个uri (递归查找)
+function getOneUri (item) {
+  let result = ''
+  for (let i = 0; i < item.length; i++) {
+    if (item[i].menuUri && item[i].entType === 'ML') {
+      return item[i].menuUri
+    }
+
+    if (item[i].children) {
+      result = getOneUri(item[i].children)
+      if (result) {
+        return result
+      }
+    }
+  }
+  return result
 }
 
 // 路由守卫

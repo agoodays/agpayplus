@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId)
         {
-            var sysEnts = _sysEntitlementRepository.GetAll()
+            var sysEnts = _sysEntitlementRepository.GetAllAsNoTracking()
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
                 && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId))
                 );
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<SysEntitlementDto> GetByIds(string sysType, List<string> entIds)
         {
-            var sysEnts = _sysEntitlementRepository.GetAll()
+            var sysEnts = _sysEntitlementRepository.GetAllAsNoTracking()
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
                 && (!(entIds != null && entIds.Count > 0) || entIds.Contains(w.EntId)));
             return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);

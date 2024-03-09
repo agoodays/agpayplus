@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Application.AutoMapper
                 .ForMember(d => d.ArticleRange, o => o.MapFrom(s => JsonConvert.SerializeObject(s.ArticleRange)));
             CreateMap<SysConfigDto, SysConfig>();
             CreateMap<SysEntitlementDto, SysEntitlement>()
-                .ForMember(d => d.MatchRule, o => o.MapFrom(s => JsonConvert.SerializeObject(s.MatchRule)));
+                .ForMember(d => d.MatchRule, o => o.MapFrom(s => s.MatchRule == null ? null : JsonConvert.SerializeObject(s.MatchRule)));
             CreateMap<SysLogDto, SysLog>();
 
             CreateMap<SysRoleDto, SysRole>();
@@ -77,20 +77,20 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysUserRoleRelaDto, SysUserRoleRela>();
 
             CreateMap<SysUserDto, SysUser>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => JsonConvert.SerializeObject(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => JsonConvert.SerializeObject(s.BindStoreIds)));
+                .ForMember(d => d.EntRules, o => o.MapFrom(s => s.EntRules == null ? null : JsonConvert.SerializeObject(s.EntRules)))
+                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => s.BindStoreIds == null ? null : JsonConvert.SerializeObject(s.BindStoreIds)));
             CreateMap<SysUserCreateDto, CreateSysUserCommand>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => JsonConvert.SerializeObject(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => JsonConvert.SerializeObject(s.BindStoreIds)));
+                .ForMember(d => d.EntRules, o => o.MapFrom(s => s.EntRules == null ? null : JsonConvert.SerializeObject(s.EntRules)))
+                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => s.BindStoreIds == null ? null : JsonConvert.SerializeObject(s.BindStoreIds)));
             CreateMap<CreateSysUserCommand, SysUser>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => JsonConvert.SerializeObject(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => JsonConvert.SerializeObject(s.BindStoreIds)));
+                .ForMember(d => d.EntRules, o => o.MapFrom(s => s.EntRules == null ? null : JsonConvert.SerializeObject(s.EntRules)))
+                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => s.BindStoreIds == null ? null : JsonConvert.SerializeObject(s.BindStoreIds)));
             CreateMap<SysUserModifyDto, ModifySysUserCommand>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => JsonConvert.SerializeObject(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => JsonConvert.SerializeObject(s.BindStoreIds)));
+                .ForMember(d => d.EntRules, o => o.MapFrom(s => s.EntRules == null ? null : JsonConvert.SerializeObject(s.EntRules)))
+                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => s.BindStoreIds == null ? null : JsonConvert.SerializeObject(s.BindStoreIds)));
             CreateMap<ModifySysUserCommand, SysUser>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => JsonConvert.SerializeObject(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => JsonConvert.SerializeObject(s.BindStoreIds)));
+                .ForMember(d => d.EntRules, o => o.MapFrom(s => s.EntRules == null ? null : JsonConvert.SerializeObject(s.EntRules)))
+                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => s.BindStoreIds == null ? null : JsonConvert.SerializeObject(s.BindStoreIds)));
             CreateMap<SysUserQueryDto, SysUserQuery>();
 
             CreateMap<SysUserTeamDto, SysUserTeam>();

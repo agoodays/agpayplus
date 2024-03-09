@@ -60,5 +60,10 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 商户状态: 0-停用, 1-正常
         /// </summary>
         public byte? State { get; set; }
+
+        /// <summary>
+        /// 创建者用户ID
+        /// </summary>
+        public long? CreatedUid { get; set; }
     }
 }

@@ -2,22 +2,19 @@
   <div>
     <a-card>
       <div class="table-page-search-wrapper">
-        <a-form layout="inline" style="margin-bottom:30px">
-          <a-row :gutter="16">
-            <a-col :sm="18">
-              <a-row :gutter="16">
-                <a-col :md="6">
-                  <a-form-item label="">
-                    <a-select v-model="querySysType" placeholder="选择系统菜单" @change="refTable" class="table-head-layout">
-                      <a-select-option value="MGR">显示菜单：运营平台</a-select-option>
-                      <a-select-option value="AGENT">显示菜单：代理商系统</a-select-option>
-                      <a-select-option value="MCH">显示菜单：商户系统</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-              </a-row>
-            </a-col>
-          </a-row>
+        <a-form layout="inline" class="table-head-ground">
+          <div class="table-layer">
+            <a-form-item label="" class="table-head-layout">
+              <a-select v-model="querySysType" placeholder="选择系统菜单" @change="refTable" class="table-head-layout">
+                <a-select-option value="MGR">显示菜单：运营平台</a-select-option>
+                <a-select-option value="AGENT">显示菜单：代理商系统</a-select-option>
+                <a-select-option value="MCH">显示菜单：商户系统</a-select-option>
+              </a-select>
+            </a-form-item>
+            <span class="table-page-search-submitButtons">
+              <a-button type="primary" @click="setFunc">设置权限匹配规则</a-button>
+            </span>
+          </div>
         </a-form>
       </div>
       <a-table
@@ -39,6 +36,8 @@
     </a-card>
     <!-- 新增 / 修改 页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="refTable" />
+    <!-- 设置权限匹配规则 页面组件  -->
+    <SetEntMatchRule ref="setEntMatchRule" :callbackFunc="refTable"/>
   </div>
 </template>
 <script>
@@ -46,6 +45,7 @@ import { getEntTree, API_URL_ENT_LIST, reqLoad } from '@/api/manage'
 import AgTableColState from '@/components/AgTable/AgTableColState'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import InfoAddOrEdit from './AddOrEdit'
+import SetEntMatchRule from './SetEntMatchRule'
 
 const tableColumns = [
   { key: 'entId', dataIndex: 'entId', title: '资源权限ID', width: 360 }, // key为必填项，用于标志该列的唯一
@@ -62,7 +62,7 @@ const tableColumns = [
 
 export default {
   name: 'EntPage',
-  components: { AgTableColState, AgTableColumns, InfoAddOrEdit },
+  components: { AgTableColState, AgTableColumns, InfoAddOrEdit, SetEntMatchRule },
   data () {
     return {
       querySysType: 'MGR', // 默认查询运营平台
@@ -91,6 +91,10 @@ export default {
         that.$message.success('更新成功')
         that.refTable() // 刷新页面
       })
+    },
+
+    setFunc: function () {
+      this.$refs.setEntMatchRule.show()
     },
 
     editFunc: function (recordId) { // 业务通用【修改】 函数

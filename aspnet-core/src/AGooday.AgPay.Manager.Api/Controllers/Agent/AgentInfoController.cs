@@ -45,7 +45,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
-        [PermissionAuth(PermCode.MGR.ENT_AGENT_LIST)]
+        [PermissionAuth(PermCode.MGR.ENT_AGENT_LIST, PermCode.MGR.ENT_MCH_INFO_ADD, PermCode.MGR.ENT_MCH_INFO_EDIT, PermCode.MGR.ENT_MCH_INFO_VIEW)]
         public ApiPageRes<AgentInfoDto> List([FromQuery] AgentInfoQueryDto dto)
         {
             var data = _agentInfoService.GetPaginatedData(dto);

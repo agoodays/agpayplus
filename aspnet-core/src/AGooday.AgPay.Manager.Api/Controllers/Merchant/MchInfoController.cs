@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
@@ -27,12 +28,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 
         private readonly DomainNotificationHandler _notifications;
 
-        public MchInfoController(ILogger<MchInfoController> logger, 
+        public MchInfoController(ILogger<MchInfoController> logger,
             IMQSender mqSender,
-            IMchInfoService mchInfoService, 
+            IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
             ISysUserService sysUserService,
-            INotificationHandler<DomainNotification> notifications, 
+            INotificationHandler<DomainNotification> notifications,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)
@@ -53,6 +54,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_LIST)]
         public ApiPageRes<MchInfoDto> List([FromQuery] MchInfoQueryDto dto)
         {
+            var currentUser = GetCurrentUser().SysUser;
+            if (currentUser.UserType.Equals(CS.USER_TYPE.Expand))
+            {
+                dto.CreatedUid = currentUser.SysUserId;
+            }
             var data = _mchInfoService.GetPaginatedData(dto);
             return ApiPageRes<MchInfoDto>.Pages(data);
         }

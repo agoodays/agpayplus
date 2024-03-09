@@ -134,8 +134,9 @@ namespace AGooday.AgPay.Common.Utils
             return convert;
         }
 
-        public static void AssignNonNullProperties<T>(T originEntity, T newEntity)
+        public static T AssignNonNullProperties<T>(T originEntity, T newEntity) where T : class
         {
+            originEntity ??= Activator.CreateInstance<T>();
             PropertyInfo[] properties = typeof(T).GetProperties();
 
             foreach (PropertyInfo property in properties)
@@ -146,10 +147,13 @@ namespace AGooday.AgPay.Common.Utils
                     property.SetValue(originEntity, newValue);
                 }
             }
+
+            return originEntity;
         }
 
-        public static void RemoveNonNullProperties<T>(T originEntity, T newEntity)
+        public static T RemoveNonNullProperties<T>(T originEntity, T newEntity) where T : class
         {
+            originEntity ??= Activator.CreateInstance<T>();
             PropertyInfo[] properties = typeof(T).GetProperties();
 
             foreach (PropertyInfo property in properties)
@@ -160,6 +164,13 @@ namespace AGooday.AgPay.Common.Utils
                     property.SetValue(originEntity, null);
                 }
             }
+
+            if (properties.All(property => property.GetValue(originEntity) == null))
+            {
+                originEntity = default(T);
+            }
+
+            return originEntity;
         }
     }
 }

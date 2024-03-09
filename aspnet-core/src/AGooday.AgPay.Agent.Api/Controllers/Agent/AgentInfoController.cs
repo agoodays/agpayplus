@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
-        [PermissionAuth(PermCode.AGENT.ENT_AGENT_LIST)]
+        [PermissionAuth(PermCode.AGENT.ENT_AGENT_LIST, PermCode.MGR.ENT_MCH_INFO_ADD, PermCode.MGR.ENT_MCH_INFO_EDIT, PermCode.MGR.ENT_MCH_INFO_VIEW)]
         public ApiPageRes<AgentInfoDto> List([FromQuery] AgentInfoQueryDto dto)
         {
             dto.Pid = GetCurrentAgentNo();
