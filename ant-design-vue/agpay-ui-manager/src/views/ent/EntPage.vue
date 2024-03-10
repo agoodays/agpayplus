@@ -12,7 +12,7 @@
               </a-select>
             </a-form-item>
             <span class="table-page-search-submitButtons">
-              <a-button type="primary" @click="setFunc">设置权限匹配规则</a-button>
+              <a-button type="primary" v-if="$access('ENT_UR_ROLE_ENT_EDIT')" @click="setFunc">设置权限匹配规则</a-button>
             </span>
           </div>
         </a-form>

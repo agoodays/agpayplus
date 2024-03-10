@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions
             if (auth.UserType.Equals(CS.USER_TYPE.DIRECTOR) || auth.UserType.Equals(CS.USER_TYPE.CLERK))
             {
                 ents = authService.GetEntsBySysType(auth.SysType, null)
-                    .Where(w => w.MatchRule != null && w.MatchRule.UserEntRules.Any(a => auth.EntRules.Contains(a)))
+                    .Where(w => w.MatchRule != null && w.MatchRule.UserEntRules != null && w.MatchRule.UserEntRules.Intersect(auth.EntRules).Any())
                     .ToList();
             }
             ents = ents.Where(w => w.MatchRule == null
