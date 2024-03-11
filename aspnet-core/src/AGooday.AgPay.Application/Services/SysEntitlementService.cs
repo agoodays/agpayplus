@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
         }
 
-        public IEnumerable<SysEntitlementDto> Sons(string sysType, string pId, string entId)
+        public IEnumerable<SysEntitlementDto> GetSons(string sysType, string pId, string entId)
         {
             var sysEnts = _sysEntitlementRepository.GetAllAsNoTracking()
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
