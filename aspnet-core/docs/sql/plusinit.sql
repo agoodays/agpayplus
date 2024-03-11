@@ -278,7 +278,7 @@ CREATE TABLE `t_agent_info` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (agent_no)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='代理商信息表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='代理商信息表';
 
 -- 账户帐单表
 DROP TABLE IF EXISTS t_account_bill;
@@ -478,7 +478,7 @@ CREATE TABLE `t_mch_store` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`store_id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci AUTO_INCREMENT=1001 COMMENT='商户门店表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1001 COMMENT='商户门店表';
   
 -- 门店管理
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_STORE', '门店管理', 'profile', '/store', 'MchStorePage', 'ML', 0, 1,  'ENT_MCH', '40', 'MGR', NOW(), NOW());
@@ -543,7 +543,7 @@ CREATE TABLE `t_mch_apply` (
   `last_apply_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '上次进件时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (apply_id)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='商户进件申请表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='商户进件申请表';
 
 #####  ----------  团队-表结构DDL+初始化DML  ----------  #####
 
@@ -561,7 +561,7 @@ CREATE TABLE `t_sys_user_team` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (team_id)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='团队信息表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='团队信息表';
   
 ALTER TABLE `t_sys_user`   
   CHANGE `sex` `sex` TINYINT DEFAULT 0 NOT NULL COMMENT '性别: 0-未知, 1-男, 2-女',
@@ -571,7 +571,7 @@ ALTER TABLE `t_sys_user`
   ADD COLUMN `invite_code` VARCHAR(20) NULL COMMENT '邀请码' AFTER `user_type`,
   ADD COLUMN `team_id` BIGINT NULL COMMENT '团队ID' AFTER `invite_code`,
   ADD COLUMN `is_team_leader` TINYINT NULL COMMENT '是否队长:  0-否 1-是' AFTER `team_id`,
-  CHANGE `sys_type` `sys_type` VARCHAR(8) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心';
+  CHANGE `sys_type` `sys_type` VARCHAR(8) CHARSET utf8mb4 NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心';
 
 ALTER TABLE `t_sys_user`   
   ADD UNIQUE INDEX `Uni_InviteCode` (`invite_code`);
@@ -614,7 +614,7 @@ CREATE TABLE `t_sys_article`(
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`article_id`)
-) ENGINE=INNODB AUTO_INCREMENT=1001 CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='文章信息表';
+) ENGINE=INNODB AUTO_INCREMENT=1001 CHARSET=utf8mb4 COMMENT='文章信息表';
 
 -- 公告管理
 INSERT INTO t_sys_entitlement VALUES('ENT_ARTICLE_NOTICEINFO', '公告管理', 'message', '/notices', 'NoticeInfoPage', 'ML', 0, 1,  'ENT_SYS_CONFIG', '30', 'MGR', NOW(), NOW());
@@ -648,7 +648,7 @@ CREATE TABLE `t_pay_rate_config` (
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `Uni_InfoId_WayCode` (`config_type`,`info_type`,`info_id`,`if_code`,`way_code`)
-) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='支付费率配置表';
+) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='支付费率配置表';
 
 -- 支付费率阶梯配置表
 DROP TABLE IF EXISTS `t_pay_rate_level_config`;
@@ -665,7 +665,7 @@ CREATE TABLE `t_pay_rate_level_config` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='支付费率阶梯配置表';
+) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='支付费率阶梯配置表';
 
 #####  ----------  码牌-表结构DDL+初始化DML  ----------  #####
 
@@ -683,7 +683,7 @@ CREATE TABLE `t_qr_code_shell` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (id)
-) ENGINE=INNODB AUTO_INCREMENT=1001 CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='码牌模板信息表';
+) ENGINE=INNODB AUTO_INCREMENT=1001 CHARSET=utf8mb4 COMMENT='码牌模板信息表';
 
 -- 码牌信息表
 DROP TABLE IF EXISTS `t_qr_code`;
@@ -712,7 +712,7 @@ CREATE TABLE `t_qr_code` (
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (qrc_id)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='码牌信息表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='码牌信息表';
 
 -- 设备配置
 INSERT INTO t_sys_entitlement VALUES ('ENT_DEVICE', '设备配置', 'appstore', '', 'RouteView', 'ML', 0, 1,  'ROOT', '70', 'MGR', NOW(), NOW());

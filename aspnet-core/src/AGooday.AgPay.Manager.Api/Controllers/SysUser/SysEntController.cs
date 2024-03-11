@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -77,12 +78,45 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             {
                 if (dto.OpType.Equals("add"))
                 {
-                    sysEnt.MatchRule = CopyUtil.AssignNonNullProperties(sysEnt.MatchRule, dto.MatchRule);
+                    sysEnt.MatchRule ??= new SysEntitlementDto.EntMatchRule();
+                    if (dto.MatchRule?.EpUserEnt != null)
+                    {
+                        sysEnt.MatchRule.EpUserEnt = dto.MatchRule.EpUserEnt;
+                    }
+                    if (dto.MatchRule?.UserEntRules != null || dto.MatchRule.UserEntRules.Count > 0)
+                    {
+                        sysEnt.MatchRule.UserEntRules = sysEnt.MatchRule.UserEntRules.Union(dto.MatchRule.UserEntRules).ToList();
+                    }
+                    if (dto.MatchRule?.MchSelfCashierEnt != null)
+                    {
+                        sysEnt.MatchRule.MchSelfCashierEnt = dto.MatchRule.MchSelfCashierEnt;
+                    }
+                    if (dto.MatchRule?.MchMemberEnt != null)
+                    {
+                        sysEnt.MatchRule.MchMemberEnt = dto.MatchRule.MchMemberEnt;
+                    }
+                    if (dto.MatchRule?.MchType != null)
+                    {
+                        sysEnt.MatchRule.MchType = dto.MatchRule.MchType;
+                    }
+                    if (dto.MatchRule?.MchLevelArray != null || dto.MatchRule.MchLevelArray.Count > 0)
+                    {
+                        sysEnt.MatchRule.MchLevelArray = sysEnt.MatchRule.MchLevelArray.Union(dto.MatchRule.MchLevelArray).ToList();
+                    }
+                    sysEnt.MatchRule = sysEnt.MatchRule.GetType()
+                        .GetProperties().All(property => property.GetValue(sysEnt.MatchRule) == null) ? null : sysEnt.MatchRule;
                 }
 
                 if (dto.OpType.Equals("delete"))
                 {
-                    sysEnt.MatchRule = CopyUtil.RemoveNonNullProperties(sysEnt.MatchRule, dto.MatchRule);
+                    var sons = _sysEntService.GetSons(sysEnt.SysType, sysEnt.Pid, sysEnt.EntId);
+                    if (dto.MatchRule?.EpUserEnt != null && sysEnt.EntType.Equals(CS.ENT_TYPE.PAGE_OR_BTN))
+                    {
+                        if (!sons.Any(s => s.MatchRule?.EpUserEnt != null))
+                        {
+                            sysEnt.MatchRule.EpUserEnt = null;
+                        }
+                    }
                 }
                 sysEnt.UpdatedAt = DateTime.Now;
                 _sysEntService.Update(sysEnt);

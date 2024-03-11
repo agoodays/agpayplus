@@ -12,6 +12,7 @@ namespace AGooday.AgPay.Application.Interfaces
         SysEntitlementDto GetByKey(string entId, string sysType);
         IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId);
         IEnumerable<SysEntitlementDto> GetByIds(string sysType, List<string> entIds);
+        IEnumerable<SysEntitlementDto> GetSons(string sysType, string pId, string entId);
         IEnumerable<SysEntitlementDto> GetAll();
     }
 }
