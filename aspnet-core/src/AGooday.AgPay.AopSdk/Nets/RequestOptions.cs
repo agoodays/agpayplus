@@ -9,6 +9,7 @@
         private readonly string version;
         private readonly string signType;
 
+        private readonly string appId;
         private readonly string apiKey;
 
         private readonly int connectTimeout;
@@ -22,6 +23,7 @@
                     uri,
                     version,
                     AgPay.DEFAULT_SIGN_TYPE,
+                    AgPay.AppId,
                     AgPay.ApiKey,
                     AgPay.GetConnectTimeout(),
                     AgPay.GetReadTimeout(),
@@ -33,6 +35,7 @@
                 string uri,
                 string version,
                 string signType,
+                string appId,
                 string apiKey,
                 int connectTimeout,
                 int readTimeout,
@@ -42,6 +45,7 @@
             this.uri = uri;
             this.version = version;
             this.signType = signType;
+            this.appId = appId;
             this.apiKey = apiKey;
             this.connectTimeout = connectTimeout;
             this.readTimeout = readTimeout;
@@ -62,6 +66,11 @@
         public string GetSignType()
         {
             return signType;
+        }
+
+        public string GetAppId()
+        {
+            return appId;
         }
 
         public string GetApiKey()
@@ -99,6 +108,7 @@
             private string uri;
             private string version;
             private string signType;
+            private string appId;
             private string apiKey;
             private int connectTimeout;
             private int readTimeout;
@@ -108,6 +118,7 @@
             public RequestOptionsBuilder()
             {
                 this.signType = AgPay.DEFAULT_SIGN_TYPE;
+                this.appId = AgPay.AppId;
                 this.apiKey = AgPay.ApiKey;
                 this.connectTimeout = AgPay.GetConnectTimeout();
                 this.readTimeout = AgPay.GetReadTimeout();
@@ -145,6 +156,17 @@
             public RequestOptionsBuilder SetSignType(string signType)
             {
                 this.signType = signType;
+                return this;
+            }
+
+            public string GetAppId()
+            {
+                return appId;
+            }
+
+            public RequestOptionsBuilder SetAppId(string appId)
+            {
+                this.appId = NormalizeAppId(appId);
                 return this;
             }
 
@@ -215,6 +237,7 @@
                         NormalizeApiUri(this.uri),
                         version,
                         signType,
+                        NormalizeAppId(this.appId),
                         NormalizeApiKey(this.apiKey),
                         connectTimeout,
                         readTimeout,
@@ -246,6 +269,20 @@
             if (string.IsNullOrWhiteSpace(normalized))
             {
                 throw new InvalidRequestOptionsException("API key不能为空!");
+            }
+            return normalized;
+        }
+
+        private static string NormalizeAppId(string appId)
+        {
+            if (appId == null)
+            {
+                return null;
+            }
+            string normalized = appId.Trim();
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                throw new InvalidRequestOptionsException("appId不能为空!");
             }
             return normalized;
         }

@@ -2,6 +2,9 @@
 
 namespace AGooday.AgPay.AopSdk.Models
 {
+    /// <summary>
+    /// 支付下单请求实体类
+    /// </summary>
     public class PayOrderCreateReqModel : AgPayObject
     {
         /// <summary>

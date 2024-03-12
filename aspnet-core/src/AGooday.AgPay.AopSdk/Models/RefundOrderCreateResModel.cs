@@ -11,25 +11,25 @@ namespace AGooday.AgPay.AopSdk.Models
         /// 退款单号(网关生成)
         /// </summary>
         [JsonProperty("refundOrderId")]
-        public string RefundOrderId{get;set;}
+        public string RefundOrderId { get; set; }
 
         /// <summary>
         /// 商户发起的退款订单号
         /// </summary>
         [JsonProperty("mchRefundNo")]
-        public string MchRefundNo{get;set;}
+        public string MchRefundNo { get; set; }
 
         /// <summary>
         /// 订单支付金额
         /// </summary>
         [JsonProperty("payAmount")]
-        public long PayAmount{get;set;}
+        public long PayAmount { get; set; }
 
         /// <summary>
         /// 申请退款金额
         /// </summarY>
         [JsonProperty("refundAmount")]
-        public long RefundAmount{get;set;}
+        public long RefundAmount { get; set; }
 
         /// <summary>
         /// 退款状态
@@ -40,24 +40,24 @@ namespace AGooday.AgPay.AopSdk.Models
         /// 4-退款关闭
         /// </summary>
         [JsonProperty("state")]
-        public int State{get;set;}
+        public int State { get; set; }
 
         /// <summary>
         /// 渠道退款单号
         /// </summary>
         [JsonProperty("channelOrderNo")]
-        public string ChannelOrderNo{get;set;}
+        public string ChannelOrderNo { get; set; }
 
         /// <summary>
         /// 支付渠道错误码
         /// </summary>
         [JsonProperty("errCode")]
-        public string ErrCode{get;set;}
+        public string ErrCode { get; set; }
 
         /// <summary>
         /// 支付渠道错误信息
         /// </summary>
         [JsonProperty("errMsg")]
-        public string ErrMsg{get;set;}
+        public string ErrMsg { get; set; }
     }
 }

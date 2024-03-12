@@ -80,6 +80,51 @@ namespace AGooday.AgPay.AopSdk.Nets
             return sb.ToString();
         }
 
+        public static Uri BuildURLWithSign(string url, Dictionary<string, object> @params, RequestOptions options)
+        {
+            @params.Add(AgPay.API_VERSION_NAME, options.GetVersion());
+            @params.Add(AgPay.API_SIGN_TYPE_NAME, options.GetSignType());
+            var requestTime = CurrentTimeString();
+            @params.Add(AgPay.API_REQ_TIME_NAME, requestTime);
+            string signature;
+            try
+            {
+                signature = BuildAgPaySignature(@params, options);
+            }
+            catch (IOException e)
+            {
+                throw new APIConnectionException("生成 AgPay 请求签名异常", e);
+            }
+
+            if (signature != null)
+            {
+                @params.Add(AgPay.API_SIGN_NAME, signature);
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(GenUrl(url, options.GetUri()));
+
+            if (@params != null)
+            {
+                string queryString = CreateQuery(@params);
+                if (!string.IsNullOrEmpty(queryString))
+                {
+                    sb.Append("?");
+                    sb.Append(queryString);
+                }
+            }
+
+            try
+            {
+                return new Uri(sb.ToString());
+            }
+            catch (IOException e)
+            {
+                throw new APIConnectionException("生成 AgPay 请求URL异常", e);
+            }
+        }
+
         private static string CreateQuery(Dictionary<string, object> @params)
         {
             if (@params == null)
