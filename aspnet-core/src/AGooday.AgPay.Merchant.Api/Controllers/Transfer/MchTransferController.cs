@@ -112,9 +112,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
             try
             {
                 TransferOrderCreateResponse response = agPayClient.Execute(request);
-                if (response.code != 0)
+                if (response.Code != 0)
                 {
-                    throw new BizException(response.msg);
+                    throw new BizException(response.Msg);
                 }
                 return ApiRes.Ok(response.Get());
             }

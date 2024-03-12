@@ -9,8 +9,8 @@ namespace AGooday.AgPay.AopSdk.Response
     {
         public PayOrderQueryResModel Get()
         {
-            if (data == null) return new PayOrderQueryResModel();
-            return data.ToObject<PayOrderQueryResModel>();
+            if (Data == null) return new PayOrderQueryResModel();
+            return Data.ToObject<PayOrderQueryResModel>();
         }
     }
 }

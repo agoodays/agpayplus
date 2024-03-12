@@ -1,26 +1,26 @@
 ﻿namespace AGooday.AgPay.AopSdk
 {
-    public class AgPay
+    public abstract class AgPay
     {
-        public const string LIVE_API_BASE = "https://pay.agpay.com";
-        public const string VERSION = "1.0";
-        public const string DEFAULT_SIGN_TYPE = "MD5";
-        public const string API_VERSION_NAME = "version";
-        public const string API_SIGN_TYPE_NAME = "signType";
-        public const string API_SIGN_NAME = "sign";
-        public const string API_REQ_TIME_NAME = "reqTime";
+        public static readonly string LIVE_API_BASE = "https://pay.agpay.com";
+        public static readonly string VERSION = "1.0";
+        public static readonly string DEFAULT_SIGN_TYPE = "MD5";
+        public static readonly string API_VERSION_NAME = "version";
+        public static readonly string API_SIGN_TYPE_NAME = "signType";
+        public static readonly string API_SIGN_NAME = "sign";
+        public static readonly string API_REQ_TIME_NAME = "reqTime";
 
         /// <summary>
         /// 默认时间格式
         /// </summary>
-        public const string DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+        public static readonly string DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
         /// <summary>
         /// Date默认时区
         /// </summary>
-        public const string DATE_TIMEZONE = "GMT+8";
+        public static readonly string DATE_TIMEZONE = "GMT+8";
 
-        public static string AcceptLanguage { get; set; } = "zh-CN";
+        public static string AcceptLanguage { get; private set; } = "zh-CN";
 
         public static volatile string MchNo;
 
@@ -34,24 +34,39 @@
         /// <summary>
         /// API 地址
         /// </summary>
-        public static string ApiBase { get; set; } = LIVE_API_BASE;
+        public static string ApiBase { get; private set; } = LIVE_API_BASE;
 
         //public static volatile string privateKey;
         //public static volatile string privateKeyPath;
 
         //public static bool DEBUG = false;
 
-        public const int DEFAULT_CONNECT_TIMEOUT = 30 * 1000;
-        public const int DEFAULT_READ_TIMEOUT = 80 * 1000;
+        public static readonly int DEFAULT_CONNECT_TIMEOUT = 30 * 1000;
+        public static readonly int DEFAULT_READ_TIMEOUT = 80 * 1000;
 
-        private static int ConnectTimeout = -1;
+        private static volatile int ConnectTimeout = -1;
 
-        private static int ReadTimeout = -1;
+        private static volatile int ReadTimeout = -1;
 
         /// <summary>
         /// 设置连接失败时的最大重试次数
         /// </summary>
-        public static int MaxNetworkRetries { get; set; }= 1;
+        private static volatile int MaxNetworkRetries = 1;
+
+        public static void OverrideApiBase(string overriddenApiBase)
+        {
+            ApiBase = overriddenApiBase;
+        }
+
+        public static string GetApiBase()
+        {
+            return ApiBase;
+        }
+
+        public static void SetApiBase(string apiBase)
+        {
+            ApiBase = apiBase;
+        }
 
         /// <summary>
         /// 网络连接超时时间
@@ -96,6 +111,34 @@
         public static void SetReadTimeout(int timeout)
         {
             ReadTimeout = timeout;
+        }
+
+        /// <summary>
+        /// 连接失败时的最大重试次数
+        /// </summary>
+        /// <returns></returns>
+        public static int GetMaxNetworkRetries()
+        {
+            return MaxNetworkRetries;
+        }
+
+        /// <summary>
+        /// 设置连接失败时的最大重试次数
+        /// </summary>
+        /// <param name="numRetries"></param>
+        public static void SetMaxNetworkRetries(int numRetries)
+        {
+            MaxNetworkRetries = numRetries;
+        }
+
+        public static string GetAcceptLanguage()
+        {
+            return AcceptLanguage;
+        }
+
+        public static void SetAcceptLanguage(string acceptLanguage)
+        {
+            AcceptLanguage = acceptLanguage;
         }
     }
 }

@@ -248,9 +248,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
             try
             {
                 var response = agpayClient.Execute(request);
-                if (response.code != 0)
+                if (response.Code != 0)
                 {
-                    throw new BizException(response.msg);
+                    throw new BizException(response.Msg);
                 }
                 return ApiRes.Ok(response);
             }

@@ -16,22 +16,27 @@ namespace AGooday.AgPay.AopSdk.Nets
         /// 请求方法 (GET, POST, DELETE or PUT)
         /// </summary>
         public APIResource.RequestMethod Method { get; private set; }
+
         /// <summary>
         /// 请求URL
         /// </summary>
         public string Url { get; private set; }
+
         /// <summary>
         /// 请求Body
         /// </summary>
         public APIHttpContent Content { get; private set; }
+
         /// <summary>
         /// 请求Header
         /// </summary>
         public APIHttpHeaders Headers { get; private set; }
+
         /// <summary>
         /// 请求参数
         /// </summary>
         public Dictionary<string, object> Params { get; private set; }
+
         /// <summary>
         /// 请求选项
         /// </summary>

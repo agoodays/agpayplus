@@ -9,8 +9,8 @@ namespace AGooday.AgPay.AopSdk.Response
     {
         public RefundOrderQueryResModel Get()
         {
-            if (data == null) return new RefundOrderQueryResModel();
-            return data.ToObject<RefundOrderQueryResModel>();
+            if (Data == null) return new RefundOrderQueryResModel();
+            return Data.ToObject<RefundOrderQueryResModel>();
         }
     }
 }

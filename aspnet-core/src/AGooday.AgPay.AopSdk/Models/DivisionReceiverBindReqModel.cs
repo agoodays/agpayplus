@@ -12,11 +12,13 @@ namespace AGooday.AgPay.AopSdk.Models
         /// </summary>
         [JsonProperty("mchNo")]
         public string MchNo { get; set; }
+
         /// <summary>
         /// 应用ID
         /// </summary>
         [JsonProperty("appId")]
         public string AppId { get; set; }
+
         /// <summary>
         /// 支付接口代码
         /// </summary>

@@ -25,7 +25,7 @@
                     AgPay.ApiKey,
                     AgPay.GetConnectTimeout(),
                     AgPay.GetReadTimeout(),
-                    AgPay.MaxNetworkRetries,
+                    AgPay.GetMaxNetworkRetries(),
                     AgPay.AcceptLanguage);
         }
 
@@ -111,7 +111,7 @@
                 this.apiKey = AgPay.ApiKey;
                 this.connectTimeout = AgPay.GetConnectTimeout();
                 this.readTimeout = AgPay.GetReadTimeout();
-                this.maxNetworkRetries = AgPay.MaxNetworkRetries;
+                this.maxNetworkRetries = AgPay.GetMaxNetworkRetries();
                 this.acceptLanguage = AgPay.AcceptLanguage;
             }
 

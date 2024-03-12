@@ -9,8 +9,8 @@ namespace AGooday.AgPay.AopSdk.Response
     {
         public DivisionReceiverBindResModel Get()
         {
-            if (data == null) return new DivisionReceiverBindResModel();
-            return data.ToObject<DivisionReceiverBindResModel>();
+            if (Data == null) return new DivisionReceiverBindResModel();
+            return Data.ToObject<DivisionReceiverBindResModel>();
         }
 
         public override bool IsSuccess(string signType, string apiKey)

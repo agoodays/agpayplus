@@ -9,8 +9,8 @@ namespace AGooday.AgPay.AopSdk.Response
     {
         public PayOrderCreateResModel Get()
         {
-            if (data == null) return new PayOrderCreateResModel();
-            return data.ToObject<PayOrderCreateResModel>();
+            if (Data == null) return new PayOrderCreateResModel();
+            return Data.ToObject<PayOrderCreateResModel>();
         }
 
         public override bool IsSuccess(string signType, string apiKey)
