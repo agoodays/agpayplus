@@ -15,7 +15,10 @@ export default {
   components: {
   },
   mounted() {
+    console.log("正在跳转", this.$route.params, this.$route.query)
+
     const allQuery = Object.assign({}, this.searchToObject(), this.$route.query)
+    console.log(allQuery)
 
     const that = this;
     getChannelUserId(allQuery).then(res => {

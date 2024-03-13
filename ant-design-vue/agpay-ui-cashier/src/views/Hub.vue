@@ -17,7 +17,7 @@ export default {
   components: {
   },
   mounted() {
-    console.log("正在跳转", this.$router.params)
+    console.log("正在跳转", this.$route.params, this.$route.query)
 
     // eslint-disable-next-line no-constant-condition
     // if( true ){
