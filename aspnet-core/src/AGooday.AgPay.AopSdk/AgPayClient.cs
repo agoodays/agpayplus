@@ -45,7 +45,7 @@ namespace AGooday.AgPay.AopSdk
                     return client;
                 }
                 client = new AgPayClient();
-                clientMap[appId] = client;
+                clientMap.TryAdd(appId, client);
                 client.AppId = appId;
                 client.ApiKey = apiKey;
                 client.ApiBase = apiBase;
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.AopSdk
                     return client;
                 }
                 client = new AgPayClient();
-                clientMap[appId] = client;
+                clientMap.TryAdd(appId, client);
                 client.AppId = appId;
                 client.ApiKey = apiKey;
                 return client;
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.AopSdk
                     return client;
                 }
                 client = new AgPayClient();
-                clientMap[appId] = client;
+                clientMap.TryAdd(appId, client);
                 client.AppId = appId;
                 return client;
             }
