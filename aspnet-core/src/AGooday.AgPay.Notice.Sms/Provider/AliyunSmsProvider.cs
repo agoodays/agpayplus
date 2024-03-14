@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Notice.Sms
             }
             catch (Exception ex)
             {
-                response.ErrMsg = $"邮件发送异常:{ex.Message}";
+                response.ErrMsg = $"短信发送异常:{ex.Message}";
             }
             return response;
         }
