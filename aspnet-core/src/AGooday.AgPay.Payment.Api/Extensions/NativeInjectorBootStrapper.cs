@@ -50,6 +50,7 @@ namespace AGooday.AgPay.Payment.Api.Extensions
             services.AddScoped<IPayOrderService, PayOrderService>();
             services.AddScoped<IPayRateConfigService, PayRateConfigService>();
             services.AddScoped<IPayWayService, PayWayService>();
+            services.AddScoped<IQrCodeService, QrCodeService>();
             services.AddScoped<IRefundOrderService, RefundOrderService>();
             services.AddScoped<ISysArticleService, SysArticleService>();
             services.AddScoped<ISysConfigService, SysConfigService>();

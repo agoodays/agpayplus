@@ -715,5 +715,12 @@
             /// </summary>
             public const string WX_V3 = "V3";  //微信接口版本V3
         }
+
+        public interface TOKEN_DATA_TYPE
+        {
+            public const byte PAY_ORDER_ID = 1;  //支付订单号
+            public const byte QRC_ID = 2;  //码牌ID
+        }
+        public static string GetTokenData(byte type, string id) => $"{{type: {type}, id: '{id}'}}";
     }
 }

@@ -154,7 +154,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
                     DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
 
-                    string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(payOrderId);
+                    string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID, payOrderId));
                     if (CS.PAY_DATA_TYPE.CODE_IMG_URL.Equals(qrCashierOrderRQ.PayDataType))
                     {
                         //二维码地址

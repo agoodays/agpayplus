@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public QrCodeService(IMapper mapper, IMediatorHandler bus, 
+        public QrCodeService(IMapper mapper, IMediatorHandler bus,
             IQrCodeRepository qrCodeShellRepository)
         {
             _mapper = mapper;
@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Application.Services
             {
                 var m = _mapper.Map<QrCode>(dto);
                 m.QrcId = $"{dto.BatchId}{i:D4}";
-                m.QrUrl = $"https://www.example.com/{m.QrcId}";
+                m.QrUrl = string.Format(dto.QrUrlFormat, CS.GetTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, m.QrcId));
                 _qrCodeShellRepository.Add(m);
             }
             return _qrCodeShellRepository.SaveChanges(out int _);

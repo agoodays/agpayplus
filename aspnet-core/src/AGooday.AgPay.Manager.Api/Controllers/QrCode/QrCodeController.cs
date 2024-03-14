@@ -1,9 +1,11 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Application;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -19,18 +21,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         private readonly IWebHostEnvironment _env;
         private readonly IQrCodeService _qrCodeService;
         private readonly IQrCodeShellService _qrCodeShellService;
+        private readonly ISysConfigService _sysConfigService;
 
         public QrCodeController(ILogger<QrCodeController> logger,
             IWebHostEnvironment env,
-            IQrCodeService qrCodeService, 
+            IQrCodeService qrCodeService,
             IQrCodeShellService qrCodeShellService,
             RedisUtil client,
-            IAuthService authService)
+            IAuthService authService,
+            ISysConfigService sysConfigService)
             : base(logger, client, authService)
         {
             _env = env;
             _qrCodeService = qrCodeService;
             _qrCodeShellService = qrCodeShellService;
+            _sysConfigService = sysConfigService;
         }
 
         /// <summary>
@@ -71,6 +76,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         {
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+            dto.QrUrlFormat = dbApplicationConfig.GenQrUrlFormat();
             bool result = _qrCodeService.BatchAdd(dto);
             if (!result)
             {

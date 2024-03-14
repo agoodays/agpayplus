@@ -31,23 +31,32 @@ namespace AGooday.AgPay.Application
         public string PaySiteUrl { get; set; }
 
         /// <summary>
+        /// 生成二维码地址格式
+        /// </summary>
+        /// <returns></returns>
+        public string GenQrUrlFormat()
+        {
+            return $"{PaySiteUrl}/hub/{{0}}";
+        }
+
+        /// <summary>
         /// 生成  【jsapi统一收银台跳转地址】
         /// </summary>
-        /// <param name="payOrderId"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
-        public string GenUniJsapiPayUrl(string payOrderId)
+        public string GenUniJsapiPayUrl(string data)
         {
-            return $"{PaySiteUrl}/hub/{AgPayUtil.AesEncode(payOrderId)}";
+            return $"{PaySiteUrl}/hub/{AgPayUtil.AesEncode(data)}";
         }
 
         /// <summary>
         /// 生成  【jsapi统一收银台】oauth2获取用户ID回调地址
         /// </summary>
-        /// <param name="payOrderId"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
-        public string GenOauth2RedirectUrlEncode(string payOrderId)
+        public string GenOauth2RedirectUrlEncode(string data)
         {
-            return URLUtil.EncodeAll($"{PaySiteUrl}/oauth2Callback/{AgPayUtil.AesEncode(payOrderId)}");
+            return URLUtil.EncodeAll($"{PaySiteUrl}/oauth2Callback/{AgPayUtil.AesEncode(data)}");
         }
 
         /// <summary>
