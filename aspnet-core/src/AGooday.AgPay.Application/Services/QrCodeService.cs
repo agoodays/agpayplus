@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
@@ -49,10 +50,15 @@ namespace AGooday.AgPay.Application.Services
             {
                 var m = _mapper.Map<QrCode>(dto);
                 m.QrcId = $"{dto.BatchId}{i:D4}";
-                m.QrUrl = string.Format(dto.QrUrlFormat, CS.GetTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, m.QrcId));
+                m.QrUrl = GenQrUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, m.QrcId));
                 _qrCodeShellRepository.Add(m);
             }
             return _qrCodeShellRepository.SaveChanges(out int _);
+        }
+
+        public string GenQrUrl(string data)
+        {
+            return $"/hub/{AgPayUtil.AesEncode(data)}";
         }
 
         public bool Add(QrCodeDto dto)

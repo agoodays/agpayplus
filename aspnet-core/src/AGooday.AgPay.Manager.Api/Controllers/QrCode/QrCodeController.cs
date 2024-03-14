@@ -5,7 +5,6 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -76,8 +75,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         {
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
-            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
-            dto.QrUrlFormat = dbApplicationConfig.GenQrUrlFormat();
             bool result = _qrCodeService.BatchAdd(dto);
             if (!result)
             {
@@ -143,14 +140,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         {
             var qrCode = _qrCodeService.GetById(recordId);
             byte[] inArray;
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+            var content = $"{dbApplicationConfig.PaySiteUrl}{qrCode.QrUrl}";
             if (qrCode.QrcShellId.HasValue)
             {
                 var qrCodeShell = _qrCodeShellService.GetById(qrCode.QrcShellId.Value);
-                inArray = GetBitmap(qrCodeShell, qrCode.QrUrl, $"No.{qrCode.QrcId}");
+                inArray = GetBitmap(qrCodeShell, content, $"No.{qrCode.QrcId}");
             }
             else
             {
-                inArray = QrCodeBuilder.Generate(qrCode.QrUrl);
+                inArray = QrCodeBuilder.Generate(content);
             }
             var imageBase64Data = inArray == null ? "" : DrawQrCode.BitmapToImageBase64String(inArray);
             return ApiRes.Ok(imageBase64Data);

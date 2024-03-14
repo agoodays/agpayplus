@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Application
     public class DBApplicationConfig
     {
         /// <summary>
-        /// 运营系统地址
+        /// 运营系统地址(不包含结尾/)
         /// </summary>
         public string MgrSiteUrl { get; set; }
 
@@ -21,23 +21,14 @@ namespace AGooday.AgPay.Application
         }
 
         /// <summary>
-        /// 商户系统地址
+        /// 商户系统地址(不包含结尾/)
         /// </summary>
         public string MchSiteUrl { get; set; }
 
         /// <summary>
-        /// 支付网关地址
+        /// 支付网关地址(不包含结尾/)
         /// </summary>
         public string PaySiteUrl { get; set; }
-
-        /// <summary>
-        /// 生成二维码地址格式
-        /// </summary>
-        /// <returns></returns>
-        public string GenQrUrlFormat()
-        {
-            return $"{PaySiteUrl}/hub/{{0}}";
-        }
 
         /// <summary>
         /// 生成  【jsapi统一收银台跳转地址】

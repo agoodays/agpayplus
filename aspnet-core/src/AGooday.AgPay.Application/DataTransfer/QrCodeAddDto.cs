@@ -8,11 +8,5 @@ namespace AGooday.AgPay.Application.DataTransfer
     public class QrCodeAddDto : QrCodeDto
     {
         public int AddNum { get; set; }
-
-        /// <summary>
-        /// QrUrl 格式
-        /// </summary>
-        [BindNever]
-        public string QrUrlFormat { get; set; }
     }
 }
