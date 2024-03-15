@@ -7,12 +7,12 @@ namespace AGooday.AgPay.Common.Utils
 {
     public static class StringUtil
     {
-        public static string ToHex(byte[] bytes)
+        public static string ToHex(byte[] bytes, bool isUpper = false)
         {
             StringBuilder sb = new StringBuilder();
             foreach (byte b in bytes)
             {
-                sb.Append(b.ToString("X2"));
+                sb.Append(b.ToString(isUpper ? "X2" : "x2"));
             }
             return sb.ToString();
         }

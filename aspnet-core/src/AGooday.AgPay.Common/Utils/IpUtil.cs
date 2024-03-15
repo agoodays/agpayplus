@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Common.Utils
 
                     for (int i = 0; i < bytes.Length; i++)
                     {
-                        MACIp += bytes[i].ToString("X2");
+                        MACIp += bytes[i].ToString("x2");
 
                         if (i != bytes.Length - 1)
                         {

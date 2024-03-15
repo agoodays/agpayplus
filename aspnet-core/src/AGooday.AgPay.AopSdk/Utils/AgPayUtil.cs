@@ -84,7 +84,7 @@ namespace AGooday.AgPay.AopSdk.Utils
             return ToHex(digestData);
         }
 
-        public static string ToHex(byte[] bytes)
+        public static string ToHex(byte[] bytes, bool isUpper = false)
         {
             string hexString = string.Empty;
             if (bytes != null)
@@ -93,7 +93,7 @@ namespace AGooday.AgPay.AopSdk.Utils
 
                 for (int i = 0; i < bytes.Length; i++)
                 {
-                    output.Append(bytes[i].ToString("X2"));
+                    output.Append(bytes[i].ToString(isUpper ? "X2" : "x2"));
                 }
                 hexString = output.ToString();
             }
