@@ -48,6 +48,9 @@ INSERT INTO `t_sys_config` VALUES ('ocrState', 'OCR识别使用状态', 'OCR识�
 INSERT INTO `t_sys_config` VALUES ('tencentOcrConfig', '腾讯OCR识别参数配置', '腾讯OCR识别参数配置', 'ocrConfig', 'OCR识别参数配置', '{"secretId":"AKIDHK7ewxhBOKzNTJr88svhCUVFiuqVsyoN","secretKey":"JL7cqnTs1tUord9QQ9blfIejY6NM5Xje"}', 'text', 'MGR', '0', 0, '2023-11-11 18:30:00');
 INSERT INTO `t_sys_config` VALUES ('aliOcrConfig', '阿里OCR识别参数配置', '阿里OCR识别参数配置', 'ocrConfig', 'OCR识别参数配置', '{"accessKeyId": "LTAI4GEqjdMVqr6y7xTjsTo1","accessKeySecret": "lsMY95aWVv8Ghuoq91sDeNAU76xIYo"}', 'text', 'MGR', '0', 0, '2023-11-11 18:30:00');
 
+INSERT INTO `t_sys_config` VALUES ('loginErrorMaxLimit', '限制登录次数(xx分钟最多尝试xx次)(0表示不限制)', '限制登录次数', 'securityConfig', '安全配置', '{"limitMinute":15,"maxLoginAttempts":3}', 'text', 'MGR', '0', 0, '2024-03-17 00:00:00');
+INSERT INTO `t_sys_config` VALUES ('passwordRegexp', '密码规则', '密码规则(正则表达式)', 'securityConfig', '安全配置', '{"regexpRules":"^.{6,}$","errTips":"密码不符合规则，最少6位"}', 'text', 'MGR', '0', 0, '2024-03-17 00:00:00');
+
 #####  ----------  新增资源权限  ----------  #####
 
 INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN_ISV_MCH_COUNT', '服务商/商户统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_C_MAIN', '0', 'MGR', NOW(), NOW());

@@ -393,6 +393,33 @@
           </a-tabs>
         </div>
       </a-tab-pane>
+      <a-tab-pane key="securityConfig" tab="安全配置">
+        <div class="account-settings-info-view" v-if="['securityConfig'].indexOf(groupKey)>=0">
+          <a-form-model ref="configFormModel" layout="vertical">
+            <a-row>
+              <a-col :span="8" :offset="1">
+                <a-form-model-item label="登录失败次数限制">
+                  <a-input-number v-model="securityConfig.loginErrorMaxLimit.limitMinute" />分钟最多尝试
+                  <a-input-number v-model="securityConfig.loginErrorMaxLimit.maxLoginAttempts" />次（0次表示不限制）
+                </a-form-model-item>
+              </a-col>
+              <a-col :span="8" :offset="1">
+                <a-form-model-item label="密码规则">
+                  <a-checkbox>是否要求大小写和数字</a-checkbox>
+                  <a-checkbox>密码最少<a-input-number/>位</a-checkbox>
+                </a-form-model-item>
+              </a-col>
+            </a-row>
+            <a-row>
+              <a-col :span="19">
+                <a-form-item style="display:flex;justify-content:center">
+                  <a-button type="primary" icon="check-circle" @click="confirm($event, '安全配置')" :loading="btnLoading">确认更新</a-button>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form-model>
+        </div>
+      </a-tab-pane>
       <!--<a-tab-pane key="" tab="···">-->
       <!--<div class="account-settings-info-view" style="height: 300px">-->
       <!--</div>-->
@@ -434,6 +461,16 @@ export default {
         ossPublicSiteUrl: null,
         aliyunOssConfig: {},
         aliyunOssConfigDesen: {}
+      },
+      securityConfig: {
+        loginErrorMaxLimit: {
+          limitMinute: 5,
+          maxLoginAttempts: 5
+        },
+        passwordRegexp: {
+          regexpRules: '^.{6,}$',
+          errTips: 5
+        }
       }
     }
   },
