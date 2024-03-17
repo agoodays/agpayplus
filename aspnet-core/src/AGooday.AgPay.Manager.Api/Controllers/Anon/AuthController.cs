@@ -102,11 +102,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 //没有该用户信息
                 throw new BizException("用户名/密码错误！");
             }
-
-            int limitMinute = 15;
-            int maxLoginAttempts = 5;
+            var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
+            var loginErrorMaxLimit = JsonConvert.DeserializeObject<Dictionary<string,int>>(sysConfig.ConfigVal);
+            loginErrorMaxLimit.TryGetValue("limitMinute", out int limitMinute);
+            loginErrorMaxLimit.TryGetValue("maxLoginAttempts", out int maxLoginAttempts);
             var loginErrorMessage = "密码输入错误次数超限，请稍后再试！";
-            (int failedAttempts, DateTime? lastLoginTime) = await _sysUserLoginAttemptService.GetFailedLoginAttemptsAsync(auth.SysUserId, TimeSpan.FromMinutes(15));
+            (int failedAttempts, DateTime? lastLoginTime) = await _sysUserLoginAttemptService.GetFailedLoginAttemptsAsync(auth.SysUserId, TimeSpan.FromMinutes(limitMinute));
             if (failedAttempts >= maxLoginAttempts && maxLoginAttempts > 0)
             {
                 throw new BizException(loginErrorMessage);

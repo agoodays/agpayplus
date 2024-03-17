@@ -405,8 +405,8 @@
               </a-col>
               <a-col :span="8" :offset="1">
                 <a-form-model-item label="密码规则">
-                  <a-checkbox>是否要求大小写和数字</a-checkbox>
-                  <a-checkbox>密码最少<a-input-number/>位</a-checkbox>
+                  <a-checkbox v-model="requireUppercaseLowercaseDigits" @change="passwordRegexpChange">是否要求大小写和数字</a-checkbox>
+                  <a-checkbox v-model="requireMinimumLength" @change="passwordRegexpChange">密码最少<a-input-number v-model="minimumLength" @change="passwordMinimumLengthChange"/>位</a-checkbox>
                 </a-form-model-item>
               </a-col>
             </a-row>
@@ -462,14 +462,17 @@ export default {
         aliyunOssConfig: {},
         aliyunOssConfigDesen: {}
       },
+      requireUppercaseLowercaseDigits: false,
+      requireMinimumLength: false,
+      minimumLength: 0,
       securityConfig: {
         loginErrorMaxLimit: {
-          limitMinute: 5,
-          maxLoginAttempts: 5
+          limitMinute: 0,
+          maxLoginAttempts: 0
         },
         passwordRegexp: {
-          regexpRules: '^.{6,}$',
-          errTips: 5
+          regexpRules: '',
+          errTips: ''
         }
       }
     }
@@ -485,18 +488,37 @@ export default {
         // console.log(res)
         that.configData = res
         that.groupKey = res[0]?.groupKey
-        that.setConfigVal(that, 'ossConfig', 'ossUseType', 'localFile')
-        that.setJSONConfigDesen(that, 'ossConfig', 'aliyunOssConfig', true)
+        if (that.groupKey === 'ossConfig') {
+          that.setConfigVal(that, 'ossConfig', 'ossUseType', 'localFile')
+          that.setJSONConfigDesen(that, 'ossConfig', 'aliyunOssConfig', true)
+        }
 
-        that.setConfigVal(that, 'smsConfig', 'smsProviderKey', 'agpaydx')
-        that.setJSONConfigDesen(that, 'smsConfig', 'agpaydxSmsConfig', true)
-        that.setJSONConfigDesen(that, 'smsConfig', 'aliyundySmsConfig', true)
-        that.setJSONConfigDesen(that, 'smsConfig', 'mocktestSmsConfig', false)
+        if (that.groupKey === 'smsConfig') {
+          that.setConfigVal(that, 'smsConfig', 'smsProviderKey', 'agpaydx')
+          that.setJSONConfigDesen(that, 'smsConfig', 'agpaydxSmsConfig', true)
+          that.setJSONConfigDesen(that, 'smsConfig', 'aliyundySmsConfig', true)
+          that.setJSONConfigDesen(that, 'smsConfig', 'mocktestSmsConfig', false)
+        }
 
-        that.setConfigVal(that, 'ocrConfig', 'ocrType', 1)
-        that.setConfigVal(that, 'ocrConfig', 'ocrState', 1)
-        that.setJSONConfigDesen(that, 'ocrConfig', 'tencentOcrConfig', true)
-        that.setJSONConfigDesen(that, 'ocrConfig', 'aliOcrConfig', true)
+        if (that.groupKey === 'ocrConfig') {
+          that.setConfigVal(that, 'ocrConfig', 'ocrType', 1)
+          that.setConfigVal(that, 'ocrConfig', 'ocrState', 1)
+          that.setJSONConfigDesen(that, 'ocrConfig', 'tencentOcrConfig', true)
+          that.setJSONConfigDesen(that, 'ocrConfig', 'aliOcrConfig', true)
+        }
+
+        if (that.groupKey === 'securityConfig') {
+          that.setJSONConfigDesen(that, 'securityConfig', 'loginErrorMaxLimit', false)
+          that.setJSONConfigDesen(that, 'securityConfig', 'passwordRegexp', false)
+
+          if (that.securityConfig.passwordRegexp.regexpRules.includes('(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])')) {
+            that.requireUppercaseLowercaseDigits = true
+          }
+          that.minimumLength = that.extractMinimumLengths(that.securityConfig.passwordRegexp.regexpRules)[0]
+          if (that.minimumLength > 0) {
+            that.requireMinimumLength = true
+          }
+        }
       })
     },
     isNumber (value) {
@@ -522,6 +544,39 @@ export default {
     ossUseTypeChange (e) {
       // console.log(e.target.value)
       this.configData.find(({ configKey }) => configKey === 'ossUseType').configVal = e.target.value
+    },
+    extractMinimumLengths (regexpRules) {
+      const regex = /{(\d+),}/g
+      const matches = regexpRules.matchAll(regex)
+      const minimumLengths = []
+
+      for (const match of matches) {
+        const minimumLength = parseInt(match[1])
+        minimumLengths.push(minimumLength)
+      }
+
+      return minimumLengths
+    },
+    passwordMinimumLengthChange () {
+      this.requireMinimumLength = false
+      this.passwordRegexpChange()
+    },
+    passwordRegexpChange () {
+      const { requireUppercaseLowercaseDigits, requireMinimumLength, minimumLength } = this
+      console.log(requireMinimumLength)
+      if (requireUppercaseLowercaseDigits && requireMinimumLength) {
+        this.securityConfig.passwordRegexp.regexpRules = `^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{${minimumLength},}$`
+        this.securityConfig.passwordRegexp.errTips = `密码不符合规则，必须包含大小写字母和数字，最少${minimumLength}位`
+      } else if (requireUppercaseLowercaseDigits && !requireMinimumLength) {
+        this.securityConfig.passwordRegexp.regexpRules = '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])$'
+        this.securityConfig.passwordRegexp.errTips = '密码不符合规则，必须包含大小写字母和数字'
+      } else if (requireMinimumLength) {
+        this.securityConfig.passwordRegexp.regexpRules = `^.{${minimumLength},}$`
+        this.securityConfig.passwordRegexp.errTips = `密码不符合规则，最少${minimumLength}位`
+      } else {
+        this.securityConfig.passwordRegexp.regexpRules = ''
+        this.securityConfig.passwordRegexp.errTips = ''
+      }
     },
     confirm (e, title, content) { // 确认更新
       // console.log(e)
@@ -549,6 +604,12 @@ export default {
               break
             case 'aliOcrConfig':
               configVal = JSON.stringify(that.ocrConfig.aliOcrConfig)
+              break
+            case 'loginErrorMaxLimit':
+              configVal = JSON.stringify(that.securityConfig.loginErrorMaxLimit)
+              break
+            case 'passwordRegexp':
+              configVal = JSON.stringify(that.securityConfig.passwordRegexp)
               break
           }
           jsonObject[configKey] = configVal
