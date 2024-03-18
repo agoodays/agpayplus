@@ -5,6 +5,10 @@ namespace AGooday.AgPay.Common.UnitTests
     [TestClass]
     public class AgPayUtilTest
     {
+        /// <summary>
+        /// https://tool.lmeee.com/jiami/aes
+        /// AES加密模式：ECB 填充：pkcs7padding 密钥长度：192位 密钥：4ChT08phkz59hquD795X7w== 输出：hex
+        /// </summary>
         [TestMethod]
         public void AgPayAesTest()
         {
