@@ -272,10 +272,10 @@ CREATE TABLE `t_agent_info` (
   `idcard2_img` VARCHAR(128) DEFAULT NULL COMMENT '身份证国徽面照片',
   `idcard_in_hand_img` VARCHAR(128) DEFAULT NULL COMMENT '手持身份证照片',
   `bank_card_img` VARCHAR(128) DEFAULT NULL COMMENT '银行卡照片',
-  `un_amount` INT NOT NULL DEFAULT '0' COMMENT '不可用金额', 
-  `balance_amount` INT NOT NULL DEFAULT '0' COMMENT '钱包余额', 
-  `audit_profit_amount` INT NOT NULL DEFAULT '0' COMMENT '在途佣金', 
-  `freeze_amount` INT NOT NULL DEFAULT '0' COMMENT '冻结金额', 
+  `un_amount` BIGINT NOT NULL DEFAULT 0 COMMENT '不可用金额', 
+  `balance_amount` BIGINT NOT NULL DEFAULT 0 COMMENT '钱包余额', 
+  `audit_profit_amount` BIGINT NOT NULL DEFAULT 0 COMMENT '在途佣金', 
+  `freeze_amount` BIGINT NOT NULL DEFAULT 0 COMMENT '冻结金额', 
   `created_uid` BIGINT DEFAULT NULL COMMENT '创建者用户ID',
   `created_by` VARCHAR(64) DEFAULT NULL COMMENT '创建者姓名',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
@@ -289,15 +289,15 @@ CREATE TABLE `t_account_bill` (
   `bill_id` VARCHAR(30) NOT NULL COMMENT '帐单单号',
   `info_id` VARCHAR(64) NOT NULL COMMENT 'PLATFORM_PROFIT-运营平台利润账户, PLATFORM_INACCOUNT-运营平台入账账户, 代理商号',
   `info_name` VARCHAR(64) NOT NULL COMMENT '运营平台, 代理商名称',
-  `info_type` VARCHAR(64) NOT NULL COMMENT 'PLATFORM-运营平台, AGENT-代理商',
-  `before_balance` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动前余额,单位分',
-  `change_amount` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动金额,单位分',
-  `after_balance` BIGINT(20) NOT NULL DEFAULT 0 COMMENT '变动后余额,单位分',
+  `info_type` VARCHAR(20) NOT NULL COMMENT 'PLATFORM-运营平台, AGENT-代理商',
+  `before_balance` BIGINT NOT NULL DEFAULT 0 COMMENT '变动前余额,单位分',
+  `change_amount` BIGINT NOT NULL DEFAULT 0 COMMENT '变动金额,单位分',
+  `after_balance` BIGINT NOT NULL DEFAULT 0 COMMENT '变动后余额,单位分',
   `biz_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '业务类型: 1-订单佣金计算, 2-退款轧差, 3-佣金提现, 4-人工调账',
   `account_type` TINYINT(6) NOT NULL DEFAULT 1 COMMENT '账户类型: 1-钱包账户, 2-在途账户',
-  `rela_biz_order_type` VARCHAR(30) NOT NULL COMMENT '关联订单类型: 1-支付订单, 2-退款订单, 3-提现申请订单',
-  `rela_biz_order_id` VARCHAR(30) NOT NULL COMMENT '关联订单号',
-  `remark` VARCHAR(128) COMMENT '帐单备注',
+  `rela_biz_order_type` TINYINT(6) NOT NULL COMMENT '关联订单类型: 1-支付订单, 2-退款订单, 3-提现申请订单',
+  `rela_biz_order_id` VARCHAR(30) DEFAULT NULL COMMENT '关联订单号',
+  `remark` VARCHAR(128) DEFAULT NULL COMMENT '帐单备注',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`bill_id`)
@@ -305,7 +305,7 @@ CREATE TABLE `t_account_bill` (
 
 -- 代理商管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '35', 'MGR', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1,  'ENT_AGENT', '10', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1, 'ENT_AGENT', '10', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
  	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_LIST', '代理商支付参数配置列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'MGR', NOW(), NOW());
  	INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_PAY_CONFIG_VIEW', '代理商支付参数配置详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_PAY_CONFIG_LIST', 0, 'MGR', NOW(), NOW());
@@ -314,6 +314,14 @@ INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', ''
         INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT_INFO_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
+
+-- 佣金管理
+INSERT INTO t_sys_entitlement VALUES ('ENT_PROFIT', '佣金管理', 'wallet', '', 'RouteView', 'ML', 0, 1,  'ROOT', '45', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_PROFIT_PLATFORM', '运营佣金统计', 'account-book', '/platformProfits', 'PlatformProfitPage', 'ML', 0, 1, 'ENT_PROFIT', '10', 'MGR', NOW(), NOW());
+        INSERT INTO t_sys_entitlement VALUES ('ENT_PROFIT_PLATFORM_LIST', '页面：运营佣金统计', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PROFIT_PLATFORM', '0', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES ('ENT_ACCOUNT_BILL', '钱包流水', 'fund-view', '/accountBill', 'AccountBillPage', 'ML', 0, 1, 'ENT_PROFIT', '30', 'MGR', NOW(), NOW());
+ 	INSERT INTO t_sys_entitlement VALUES ('ENT_ACCOUNT_BILL_LIST', '页面：钱包流水列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ACCOUNT_BILL', 0, 'MGR', NOW(), NOW());
+ 	INSERT INTO t_sys_entitlement VALUES ('ENT_ACCOUNT_BILL_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_ACCOUNT_BILL', 0, 'MGR', NOW(), NOW());
 
 #####  ↓↓↓↓↓↓↓↓↓↓  代理商管理初始化DML  ↓↓↓↓↓↓↓↓↓↓  #####
 

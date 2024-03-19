@@ -138,6 +138,12 @@
             public const string ENT_ISV_INFO_DEL = "ENT_ISV_INFO_DEL";
             public const string ENT_ISV_INFO_ADD = "ENT_ISV_INFO_ADD";
             public const string ENT_ISV_INFO = "ENT_ISV_INFO";
+            public const string ENT_PROFIT = "ENT_PROFIT";
+            public const string ENT_PROFIT_PLATFORM = "ENT_PROFIT_PLATFORM";
+            public const string ENT_PROFIT_PLATFORM_LIST = "ENT_PROFIT_PLATFORM_LIST";
+            public const string ENT_ACCOUNT_BILL = "ENT_ACCOUNT_BILL";
+            public const string ENT_ACCOUNT_BILL_LIST = "ENT_ACCOUNT_BILL_LIST";
+            public const string ENT_ACCOUNT_BILL_VIEW = "ENT_ACCOUNT_BILL_VIEW";
             public const string ENT_C_USERINFO = "ENT_C_USERINFO";
             public const string ENT_C_MAIN_ISV_MCH_COUNT = "ENT_C_MAIN_ISV_MCH_COUNT";
             public const string ENT_C_MAIN_PAY_TYPE_COUNT = "ENT_C_MAIN_PAY_TYPE_COUNT";

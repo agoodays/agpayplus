@@ -211,22 +211,29 @@ namespace AGooday.AgPay.Domain.Models
         /// 不可用金额
         /// </summary>
         [Comment("不可用金额")]
-        [Required, Column("un_amount", TypeName = "int")]
-        public int UnAmount { get; set; }
+        [Required, Column("un_amount", TypeName = "bigint")]
+        public long UnAmount { get; set; }
 
         /// <summary>
         /// 钱包余额
         /// </summary>
         [Comment("钱包余额")]
-        [Required, Column("balance_amount", TypeName = "int")]
-        public int BalanceAmount { get; set; }
+        [Required, Column("balance_amount", TypeName = "bigint")]
+        public long BalanceAmount { get; set; }
 
         /// <summary>
         /// 在途佣金
         /// </summary>
         [Comment("在途佣金")]
-        [Required, Column("audit_profit_amount", TypeName = "int")]
-        public int AuditProfitAmount { get; set; }
+        [Required, Column("audit_profit_amount", TypeName = "bigint")]
+        public long AuditProfitAmount { get; set; }
+
+        /// <summary>
+        /// 冻结金额
+        /// </summary>
+        [Comment("冻结金额")]
+        [Required, Column("freeze_amount", TypeName = "bigint")]
+        public long FreezeAmount { get; set; }
 
         /// <summary>
         /// 创建者用户ID

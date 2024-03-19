@@ -163,6 +163,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public int AuditProfitAmount { get; set; }
 
         /// <summary>
+        /// 冻结金额
+        /// </summary>
+        public long FreezeAmount { get; set; }
+
+        /// <summary>
         /// 创建者用户ID
         /// </summary>
         public long CreatedUid { get; set; }

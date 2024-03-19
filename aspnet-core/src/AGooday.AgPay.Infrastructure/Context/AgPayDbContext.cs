@@ -15,6 +15,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         }
 
         #region DbSets
+        public DbSet<AccountBill> AccountBill { get; set; }
         public DbSet<AgentInfo> AgentInfo { get; set; }
         public DbSet<IsvInfo> IsvInfo { get; set; }
         public DbSet<PayRateLevelConfig> PayRateLevelConfig { get; set; }
@@ -119,6 +120,14 @@ namespace AGooday.AgPay.Infrastructure.Context
         /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AccountBill>().Property(c => c.BeforeBalance).HasDefaultValue(0);
+            modelBuilder.Entity<AccountBill>().Property(c => c.ChangeAmount).HasDefaultValue(0);
+            modelBuilder.Entity<AccountBill>().Property(c => c.AfterBalance).HasDefaultValue(0);
+            modelBuilder.Entity<AccountBill>().Property(c => c.BizType).HasDefaultValue(1);
+            modelBuilder.Entity<AccountBill>().Property(c => c.AccountType).HasDefaultValue(1);
+            modelBuilder.Entity<AccountBill>().Property(c => c.RelaBizOrderType).HasDefaultValue(1);
+            modelBuilder.Entity<AccountBill>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<AccountBill>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<AgentInfo>().Property(c => c.AgentType).HasDefaultValue(1);
             modelBuilder.Entity<AgentInfo>().Property(c => c.Level).HasDefaultValue(1);
             modelBuilder.Entity<AgentInfo>().Property(c => c.AddAgentFlag).HasDefaultValue(0);
@@ -127,6 +136,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<AgentInfo>().Property(c => c.UnAmount).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.BalanceAmount).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.AuditProfitAmount).HasDefaultValue(0);
+            modelBuilder.Entity<AgentInfo>().Property(c => c.FreezeAmount).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<AgentInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)"); 
             modelBuilder.Entity<AgentInfo>().HasMany(a => a.SubAgents)
