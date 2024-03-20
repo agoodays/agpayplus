@@ -36,6 +36,7 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Transfer
         /// 货币代码
         /// </summary>
         [Required(ErrorMessage = "货币代码不能为空")]
+        [AllowedValues("CNY", ErrorMessage = "货币代码，目前只支持人民币：CNY")]
         public string Currency { get; set; }
 
         /// <summary>

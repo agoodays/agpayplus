@@ -215,6 +215,26 @@ SET ro.way_type = IFNULL(pw.way_type,'OTHER')
 WHERE ro.way_type = '';
 
 **/
+#####  ----------  支付订单分润-表结构DDL+初始化DML  ----------  #####
+
+-- 支付订单分润表
+DROP TABLE IF EXISTS `t_pay_order_profit`;
+CREATE TABLE `t_pay_order_profit` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `info_id` VARCHAR(64) NOT NULL COMMENT 'PLATFORM_PROFIT-运营平台利润账户, PLATFORM_INACCOUNT-运营平台入账账户, 代理商号',
+  `info_name` VARCHAR(64) NOT NULL COMMENT '运营平台, 代理商名称',
+  `info_type` VARCHAR(20) NOT NULL COMMENT 'PLATFORM-运营平台, AGENT-代理商',
+  `pay_order_id` VARCHAR(30) NOT NULL COMMENT '支付订单号（与t_pay_order对应）',
+  `fee_rate` DECIMAL(20,6) NOT NULL COMMENT '费率快照',
+  `fee_rate_desc` VARCHAR(128) DEFAULT NULL COMMENT '费率快照描述',
+  `profit_amount` BIGINT NOT NULL COMMENT '分润金额(实际分润),单位分',
+  `order_profit_amount` BIGINT NOT NULL COMMENT '收单分润金额,单位分',
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Uni_InfoId_InfoType_PayOrderId` (`info_id`,`info_type`,`pay_order_id`),
+  KEY `Idx_CreatedAt` (`created_at`)
+) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='支付订单分润表'
 
 #####  ----------  系统用户登录尝试记录-表结构DDL+初始化DML  ----------  #####
 

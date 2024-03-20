@@ -31,6 +31,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         public DbSet<PayInterfaceDefine> PayInterfaceDefine { get; set; }
         public DbSet<PayOrder> PayOrder { get; set; }
         public DbSet<PayOrderDivisionRecord> PayOrderDivisionRecord { get; set; }
+        public DbSet<PayOrderProfit> PayOrderProfit { get; set; }
         public DbSet<PayRateConfig> PayRateConfig { get; set; }
         public DbSet<PayWay> PayWay { get; set; }
         public DbSet<QrCode> QrCode { get; set; }
@@ -189,7 +190,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<PayInterfaceDefine>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<PayInterfaceDefine>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayInterfaceDefine>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-            modelBuilder.Entity<PayOrder>().Property(c => c.Currency).HasDefaultValue("cny");
+            modelBuilder.Entity<PayOrder>().Property(c => c.Currency).HasDefaultValue("CNY");
             modelBuilder.Entity<PayOrder>().Property(c => c.State).HasDefaultValue(0);
             modelBuilder.Entity<PayOrder>().Property(c => c.NotifyState).HasDefaultValue(0);
             modelBuilder.Entity<PayOrder>().Property(c => c.RefundState).HasDefaultValue(0);
@@ -204,6 +205,8 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<PayOrderDivisionRecord>().Property(c => c.AccName).HasDefaultValue("");
             modelBuilder.Entity<PayOrderDivisionRecord>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayOrderDivisionRecord>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<PayOrderProfit>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<PayOrderProfit>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayRateConfig>().Property(c => c.State).HasDefaultValue(0);
             modelBuilder.Entity<PayRateConfig>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayRateConfig>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
@@ -217,7 +220,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<QrCodeShell>().Property(c => c.BelongInfoId).HasDefaultValue(0);
             modelBuilder.Entity<QrCodeShell>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<QrCodeShell>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-            modelBuilder.Entity<RefundOrder>().Property(c => c.Currency).HasDefaultValue("cny");
+            modelBuilder.Entity<RefundOrder>().Property(c => c.Currency).HasDefaultValue("CNY");
             modelBuilder.Entity<RefundOrder>().Property(c => c.State).HasDefaultValue(0);
             modelBuilder.Entity<RefundOrder>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<RefundOrder>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
@@ -253,7 +256,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<SysUserAuth>().Property(c => c.IdentityType).HasDefaultValue(0);
             modelBuilder.Entity<SysUserLoginAttempt>().Property(c => c.IdentityType).HasDefaultValue(1);
             modelBuilder.Entity<SysUserLoginAttempt>().Property(c => c.AttemptTime).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-            modelBuilder.Entity<TransferOrder>().Property(c => c.Currency).HasDefaultValue("cny");
+            modelBuilder.Entity<TransferOrder>().Property(c => c.Currency).HasDefaultValue("CNY");
             modelBuilder.Entity<TransferOrder>().Property(c => c.State).HasDefaultValue(0);
             modelBuilder.Entity<TransferOrder>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<TransferOrder>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
