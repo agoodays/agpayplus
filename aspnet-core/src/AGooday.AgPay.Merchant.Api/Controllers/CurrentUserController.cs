@@ -103,13 +103,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
             if (!_redis.KeyExists(loginQRCacheKey))
             {
-                return ApiRes.CustomFail("二维码无效，请刷新二维码后重新扫描");
+                throw new BizException("二维码无效，请刷新二维码后重新扫描");
             }
             string data = await _redis.StringGetAsync(loginQRCacheKey);
             var qrcodeInfo = JsonConvert.DeserializeObject<dynamic>(string.IsNullOrWhiteSpace(data) ? "{}" : data);
             if (string.IsNullOrWhiteSpace(data) || qrcodeInfo.qrcodeStatus != CS.QR_CODE_STATUS.WAITING)
             {
-                return ApiRes.CustomFail("二维码状态无效，请刷新二维码后重新扫描");
+                throw new BizException("二维码状态无效，请刷新二维码后重新扫描");
             }
             var cacheExpiry = _redis.KeyTimeToLive(loginQRCacheKey);
             await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.SCANNED }), cacheExpiry, When.Exists);
@@ -128,13 +128,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
             if (!_redis.KeyExists(loginQRCacheKey))
             {
-                return ApiRes.CustomFail("二维码无效，请刷新二维码后重新扫描");
+                throw new BizException("二维码无效，请刷新二维码后重新扫描");
             }
             string qrcodeData = await _redis.StringGetAsync(loginQRCacheKey);
             var qrcodeInfo = JsonConvert.DeserializeObject<dynamic>(string.IsNullOrWhiteSpace(qrcodeData) ? "{}" : qrcodeData);
             if (string.IsNullOrWhiteSpace(qrcodeData) || qrcodeInfo.qrcodeStatus != CS.QR_CODE_STATUS.SCANNED)
             {
-                return ApiRes.CustomFail("二维码状态无效，请刷新二维码后重新扫描");
+                throw new BizException("二维码状态无效，请刷新二维码后重新扫描");
             }
             var cacheExpiry = await _redis.KeyTimeToLiveAsync(loginQRCacheKey);
             if (isConfirm)

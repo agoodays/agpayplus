@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_DELETE)]
         public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var currentUserId = 0;
+            var currentUserId = GetCurrentUserId();
             await _sysUserService.RemoveAsync(recordId, currentUserId, string.Empty);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

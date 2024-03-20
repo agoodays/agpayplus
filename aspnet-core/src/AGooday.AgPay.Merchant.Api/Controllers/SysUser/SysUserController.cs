@@ -27,8 +27,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
-        public SysUserController(ILogger<SysUserController> logger, 
-            IMemoryCache cache, 
+        public SysUserController(ILogger<SysUserController> logger,
+            IMemoryCache cache,
             ISysUserService sysUserService,
             ISysUserLoginAttemptService sysUserLoginAttemptService,
             INotificationHandler<DomainNotification> notifications,
@@ -91,13 +91,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_DELETE)]
         public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var currentUserId = 0;
-            //判断是否删除商户默认超管
-            var dbRecord = _sysUserService.GetById(recordId, GetCurrentMchNo());
-            if (dbRecord != null && dbRecord.SysType == CS.SYS_TYPE.MCH && dbRecord.InitUser)
-            {
-                return ApiRes.CustomFail("系统不允许删除商户默认用户！");
-            }
+            var currentUserId = GetCurrentUserId();
             await _sysUserService.RemoveAsync(recordId, currentUserId, CS.SYS_TYPE.MCH);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
@@ -120,14 +114,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         public async Task<ApiRes> UpdateAsync(long recordId, SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
-            var dbRecord = _sysUserService.GetById(recordId, GetCurrentMchNo());
-            if (dbRecord == null)
+            var sysUser = _sysUserService.GetByKeyAsNoTracking(recordId);
+            if (sysUser == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             if (!dto.SysUserId.HasValue || dto.SysUserId.Value <= 0)
             {
-                var sysUser = _sysUserService.GetByKeyAsNoTracking(recordId);
                 sysUser.State = dto.State.Value;
                 CopyUtil.CopyProperties(sysUser, dto);
             }

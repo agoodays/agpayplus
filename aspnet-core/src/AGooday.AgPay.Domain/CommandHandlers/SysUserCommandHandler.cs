@@ -192,6 +192,12 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 Bus.RaiseEvent(new DomainNotification("", "系统不允许删除当前登陆用户！"));
                 return Task.CompletedTask;
             }
+            //判断是否删除商户默认超管（初始用户）
+            if (sysUser != null && sysUser.SysType == CS.SYS_TYPE.MCH && sysUser.InitUser)
+            {
+                Bus.RaiseEvent(new DomainNotification("", "系统不允许删除商户默认用户！"));
+                return Task.CompletedTask;
+            }
 
             try
             {
