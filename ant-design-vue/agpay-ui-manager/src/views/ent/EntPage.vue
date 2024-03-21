@@ -48,7 +48,7 @@ import InfoAddOrEdit from './AddOrEdit'
 import SetEntMatchRule from './SetEntMatchRule'
 
 const tableColumns = [
-  { key: 'entId', dataIndex: 'entId', title: '资源权限ID', width: 360 }, // key为必填项，用于标志该列的唯一
+  { key: 'entId', dataIndex: 'entId', title: '资源权限ID', width: 380 }, // key为必填项，用于标志该列的唯一
   { key: 'entName', dataIndex: 'entName', title: '资源名称', width: 200 },
   { key: 'menuIcon', dataIndex: 'menuIcon', title: '图标' },
   { key: 'menuUri', dataIndex: 'menuUri', title: '路径' },
