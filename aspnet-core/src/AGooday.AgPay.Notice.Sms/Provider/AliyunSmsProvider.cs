@@ -16,7 +16,6 @@ namespace AGooday.AgPay.Notice.Sms
 
         public Task<NoticeSendResponse> SendAsync(NoticeSendRequest request)
         {
-            var rq = (SmsSendRequest)request;
             return SendBaseAsync((SmsSendRequest)request);
         }
 

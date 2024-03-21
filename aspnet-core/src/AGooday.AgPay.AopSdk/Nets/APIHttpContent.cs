@@ -19,10 +19,7 @@ namespace AGooday.AgPay.AopSdk.Nets
 
         public static APIHttpContent BuildJsonContent(Dictionary<string, object> @params)
         {
-            if (@params == null)
-            {
-                throw new ArgumentNullException();
-            }
+            ArgumentNullException.ThrowIfNull(@params);
             return new APIHttpContent(CreateJsonString(@params), $"application/json");
         }
 

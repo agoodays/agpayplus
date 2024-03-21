@@ -16,13 +16,11 @@ namespace AGooday.AgPay.Notice.Sms
 
         public ISmsProvider GetProvider()
         {
-            switch (_smsOptions.SmsUseType)
+            return _smsOptions.SmsUseType switch
             {
-                case "aliyunSms":
-                    return _serviceProvider.GetService<AliyunSmsProvider>();
-                default:
-                    throw new Exception($"Invalid provider: {_smsOptions.SmsUseType}");
-            }
+                "aliyunSms" => _serviceProvider.GetService<AliyunSmsProvider>(),
+                _ => throw new Exception($"Invalid provider: {_smsOptions.SmsUseType}"),
+            };
         }
     }
 }

@@ -9,10 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection
             this NoticeOptions options,
             Action<SmsOptions> configure)
         {
-            if (configure == null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
+            ArgumentNullException.ThrowIfNull(configure);
 
             options.RegisterExtension(new SmsOptionsExtension(configure));
             return options;

@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             foreach (var payOrder in payOrders)
             {
                 // 存入支付方式名称
-                payOrder.AddExt("wayName", payWayNameMap.ContainsKey(payOrder.WayCode) ? payWayNameMap[payOrder.WayCode] : payOrder.WayCode);
+                payOrder.AddExt("wayName", payWayNameMap.TryGetValue(payOrder.WayCode, out string wayCode) ? wayCode : payOrder.WayCode);
                 var ifDefine = ifDefines.FirstOrDefault(f => f.IfCode.Equals(payOrder.IfCode));
                 if (ifDefine != null)
                 {

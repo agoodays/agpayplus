@@ -17,7 +17,7 @@
         /// Produces a failure response.
         /// </summary>
         /// <param name="message">Error message.</param>
-        public Response(string message) : this(false, message, default(T))
+        public Response(string message) : this(false, message, default)
         {
         }
 

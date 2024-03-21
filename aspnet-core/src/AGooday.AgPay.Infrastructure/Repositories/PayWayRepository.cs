@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public bool IsExistPayWayCode(string wayCode)
         {
-            return DbSet.AsNoTracking().Any(c => c.WayCode == wayCode.ToUpper());
+            return DbSet.AsNoTracking().Any(c => c.WayCode.Equals(wayCode, StringComparison.CurrentCultureIgnoreCase));
         }
     }
 }
