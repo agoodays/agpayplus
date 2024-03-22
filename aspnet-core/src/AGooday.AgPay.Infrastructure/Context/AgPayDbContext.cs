@@ -145,13 +145,6 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<IsvInfo>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<IsvInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<IsvInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.MinAmount).HasDefaultValue(0);
-            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.MaxAmount).HasDefaultValue(0);
-            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.MinFee).HasDefaultValue(0);
-            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.MaxFee).HasDefaultValue(0);
-            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.State).HasDefaultValue(0);
-            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<MchApp>().Property(c => c.AppName).HasDefaultValue("");
             modelBuilder.Entity<MchApp>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<MchApp>().Property(c => c.DefaultFlag).HasDefaultValue(0);
@@ -210,6 +203,13 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<PayRateConfig>().Property(c => c.State).HasDefaultValue(0);
             modelBuilder.Entity<PayRateConfig>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayRateConfig>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.MinAmount).HasDefaultValue(0);
+            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.MaxAmount).HasDefaultValue(0);
+            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.MinFee).HasDefaultValue(0);
+            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.MaxFee).HasDefaultValue(0);
+            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.State).HasDefaultValue(0);
+            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<PayRateLevelConfig>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayWay>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<PayWay>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<QrCode>().Property(c => c.FixedPayAmount).HasDefaultValue(0);
@@ -266,6 +266,8 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<PayInterfaceConfig>().HasIndex(c => new { c.InfoType, c.InfoId, c.IfCode }, "Uni_InfoType_InfoId_IfCode").IsUnique(true);
             modelBuilder.Entity<PayOrder>().HasIndex(c => new { c.MchNo, c.MchOrderNo }, "Uni_MchNo_MchOrderNo").IsUnique(true);
             modelBuilder.Entity<PayOrder>().HasIndex(c => new { c.CreatedAt }, "Idx_CreatedAt");
+            modelBuilder.Entity<PayOrderProfit>().HasIndex(c => new { c.InfoId, c.InfoType, c.PayOrderId }, "Uni_InfoId_InfoType_PayOrderId").IsUnique(true);
+            modelBuilder.Entity<PayOrderProfit>().HasIndex(c => new { c.CreatedAt }, "Idx_CreatedAt");
             modelBuilder.Entity<PayRateConfig>().HasIndex(c => new { c.ConfigType, c.InfoType, c.InfoId, c.IfCode, c.WayCode }, "Uni_InfoId_WayCode").IsUnique(true);
             modelBuilder.Entity<RefundOrder>().HasIndex(c => new { c.MchNo, c.MchRefundNo }, "Uni_MchNo_MchRefundNo").IsUnique(true);
             modelBuilder.Entity<RefundOrder>().HasIndex(c => new { c.CreatedAt }, "Idx_CreatedAt");

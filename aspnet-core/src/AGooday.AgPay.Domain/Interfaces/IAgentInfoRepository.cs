@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         ICollection<AgentInfo> GetSubAgents(string agentNo);
         IEnumerable<AgentInfo> GetAllOrAllSubAgents(string currentAgentNo, Func<AgentInfo, bool> filter = null);
         ICollection<AgentInfo> GetAllSubAgents(string agentNo);
-        IQueryable<AgentInfo> GetParentAgents(string agentNo);
+        IEnumerable<AgentInfo> GetParentAgents(string agentNo);
         IEnumerable<AgentInfo> GetSubAgentsFromSql(string agentNo);
         IEnumerable<AgentInfo> GetParentAgentsFromSql(string agentNo);
     }

@@ -134,13 +134,29 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return subAgents;
         }
 
-        public IQueryable<AgentInfo> GetParentAgents(string agentNo)
+        public IEnumerable<AgentInfo> GetParentAgents(string agentNo)
         {
             // 获取当前代理商的所有上级代理商，包括上级的上级代理商
-            var parentAgents = DbSet
+            var currentAgent = DbSet
                 .Include(a => a.ParentAgent)
-                .Where(a => a.AgentNo == agentNo)
-                .Select(a => a.ParentAgent);
+                .FirstOrDefault(a => a.AgentNo == agentNo);
+
+            var parentAgents = new List<AgentInfo>();
+
+            while (currentAgent != null)
+            {
+                parentAgents.Add(currentAgent);
+                if (currentAgent.ParentAgent != null)
+                {
+                    currentAgent = DbSet
+                        .Include(a => a.ParentAgent)
+                        .FirstOrDefault(a => a.AgentNo == currentAgent.ParentAgent.AgentNo);
+                }
+                else
+                {
+                    currentAgent = null;
+                }
+            }
 
             return parentAgents;
         }
@@ -172,7 +188,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             {
                 AgentNo = agentNo
             });
-        } 
+        }
         #endregion
 
         #region 递归
@@ -241,7 +257,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             }
 
             return parentAgents;
-        } 
+        }
         #endregion
     }
 }

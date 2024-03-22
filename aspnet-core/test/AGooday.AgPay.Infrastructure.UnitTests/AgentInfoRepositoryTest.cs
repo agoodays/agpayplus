@@ -51,10 +51,16 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         }
 
         [TestMethod]
-        public void GetAllTest()
+        public void GetParentAgentsTest()
         {
             var agentInfos = _repository.GetParentAgents("A1702728742");
-            _logger.LogInformation($"Êä³öSql£º{agentInfos.ToQueryString()}");
+            Assert.IsNotNull(agentInfos);
+        }
+
+        [TestMethod]
+        public void GetAllSubAgentsTest()
+        {
+            var agentInfos = _repository.GetAllSubAgents("A1702728742");
             Assert.IsNotNull(agentInfos);
         }
 
