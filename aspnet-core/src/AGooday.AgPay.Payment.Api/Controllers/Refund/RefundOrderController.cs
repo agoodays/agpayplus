@@ -215,7 +215,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 
         /// <summary>
         /// 处理返回的渠道信息，并更新退款单状态
-        /// payOrder将对部分信息进行 赋值操作。
+        /// refundOrder将对部分信息进行 赋值操作。
         /// </summary>
         /// <param name="channelRetMsg"></param>
         /// <param name="refundOrder"></param>

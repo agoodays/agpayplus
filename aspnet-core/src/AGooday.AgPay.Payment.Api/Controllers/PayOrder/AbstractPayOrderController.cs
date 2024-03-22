@@ -318,7 +318,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
             var isvPayRateConfigs = payRateConfigs.FirstOrDefault(w => w.InfoType.Equals(CS.INFO_TYPE.ISV));
             var platformProfitRate = payOrder.MchFeeRate - isvPayRateConfigs.FeeRate.Value;
-            var platformProfitAmount = paymentService?.CalculateFeeAmount(payOrder.Amount, platformProfitRate) ?? 0;
+            var platformProfitAmount = paymentService?.CalculateProfitAmount(payOrder.Amount, platformProfitRate) ?? 0;
             var payOrderProfit = new PayOrderProfitDto();
             payOrderProfit.InfoId = "PLATFORM_INACCOUNT";
             payOrderProfit.InfoName = "运营平台";
@@ -339,7 +339,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             foreach (var agentPayRateConfig in agentPayRateConfigs)
             {
                 var profitRate = preFeeRate = agentPayRateConfig.FeeRate.Value;
-                var profitAmount = paymentService?.CalculateFeeAmount(payOrder.Amount, profitRate) ?? 0;
+                var profitAmount = paymentService?.CalculateProfitAmount(payOrder.Amount, profitRate) ?? 0;
                 payOrderProfit = new PayOrderProfitDto();
                 payOrderProfit.InfoId = agentPayRateConfig.InfoId;
                 payOrderProfit.InfoName = agentPayRateConfig.InfoName;
@@ -427,7 +427,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <exception cref="BizException"></exception>
         private void ProcessChannelMsg(ChannelRetMsg channelRetMsg, PayOrderDto payOrder)
         {
-
             //对象为空 || 上游返回状态为空， 则无需操作
             if (channelRetMsg == null || channelRetMsg.ChannelState == null)
             {

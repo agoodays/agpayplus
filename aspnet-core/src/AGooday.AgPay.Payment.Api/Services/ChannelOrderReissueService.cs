@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         }
 
         /// <summary>
-        /// 处理订单
+        /// 处理支付订单
         /// </summary>
         /// <param name="payOrder"></param>
         /// <returns></returns>

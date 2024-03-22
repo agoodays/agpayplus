@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
 {
     /// <summary>
     /// 接收MQ消息
-    /// 业务： 支付订单补单（一般用于没有回调的接口，比如微信的条码支付）
+    /// 业务：支付订单补单（一般用于没有回调的接口，比如微信的条码支付）
     /// </summary>
     public class PayOrderReissueMQReceiver : PayOrderReissueMQ.IMQReceiver
     {

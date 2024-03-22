@@ -178,7 +178,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
 
         /// <summary>
         /// 处理返回的渠道信息，并更新订单状态
-        /// TransferOrder将对部分信息进行 赋值操作。
+        /// transferOrder将对部分信息进行 赋值操作。
         /// </summary>
         /// <param name="channelRetMsg"></param>
         /// <param name="transferOrder"></param>

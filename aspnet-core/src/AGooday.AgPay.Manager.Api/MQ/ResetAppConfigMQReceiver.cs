@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Manager.Api.MQ
 {
     /// <summary>
     /// 接收MQ消息
-    /// 业务： 更新系统配置参数
+    /// 业务：更新系统配置参数
     /// </summary>
     public class ResetAppConfigMQReceiver : ResetAppConfigMQ.IMQReceiver
     {

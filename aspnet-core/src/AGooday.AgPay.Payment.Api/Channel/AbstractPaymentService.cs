@@ -36,6 +36,11 @@ namespace AGooday.AgPay.Payment.Api.Channel
             return AmountUtil.CalPercentageFee(amount, rate);
         }
 
+        public virtual long CalculateProfitAmount(long amount, decimal rate)
+        {
+            return AmountUtil.CalPercentageFee(amount, rate);
+        }
+
         /// <summary>
         /// 订单分账（一般用作 如微信订单将在下单处做标记）
         /// </summary>

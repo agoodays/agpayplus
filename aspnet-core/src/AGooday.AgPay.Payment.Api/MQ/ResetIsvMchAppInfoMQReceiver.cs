@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
 {
     /// <summary>
     /// 接收MQ消息
-    /// 业务： 更新服务商/商户/商户应用配置信息；
+    /// 业务：更新服务商/商户/商户应用配置信息；
     /// </summary>
     public class ResetIsvMchAppInfoMQReceiver : ResetIsvMchAppInfoConfigMQ.IMQReceiver
     {

@@ -8,7 +8,7 @@ namespace AGooday.AgPay.Merchant.Api.MQ
 {
     /// <summary>
     /// 接收MQ消息
-    /// 业务： 清除代理商登录信息
+    /// 业务：清除代理商登录信息
     /// </summary>
     public class CleanAgentLoginAuthCacheMQReceiver : CleanAgentLoginAuthCacheMQ.IMQReceiver
     {
