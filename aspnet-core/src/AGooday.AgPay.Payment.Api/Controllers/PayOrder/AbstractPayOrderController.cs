@@ -29,8 +29,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         protected readonly PayOrderProcessService _payOrderProcessService;
         protected readonly ILogger<AbstractPayOrderController> _logger;
         protected readonly IMchPayPassageService _mchPayPassageService;
+        protected readonly IPayRateConfigService _payRateConfigService;
         protected readonly IPayWayService _payWayService;
         protected readonly IPayOrderService _payOrderService;
+        protected readonly IPayOrderProfitService _payOrderProfitService;
         protected readonly ISysConfigService _sysConfigService;
 
         protected AbstractPayOrderController(IMQSender mqSender,
@@ -210,6 +212,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     _payOrderService.Add(payOrder);
                 }
 
+                // 生成订单分润
+                GenPayOrderProfit(payOrder, paymentService);
+
                 //调起上游支付接口
                 bizRS = (UnifiedOrderRS)paymentService.Pay(bizRQ, payOrder, mchAppConfigContext);
 
@@ -305,6 +310,65 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
             payOrder.CreatedAt = nowDate; //订单创建时间
             return payOrder;
+        }
+
+        private void GenPayOrderProfit(PayOrderDto payOrder, IPaymentService paymentService)
+        {
+            var payRateConfigs = _payRateConfigService.GetPayRateConfigInfos(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
+
+            var isvPayRateConfigs = payRateConfigs.FirstOrDefault(w => w.InfoType.Equals(CS.INFO_TYPE.ISV));
+            var platformProfitRate = payOrder.MchFeeRate - isvPayRateConfigs.FeeRate.Value;
+            var platformProfitAmount = paymentService?.CalculateFeeAmount(payOrder.Amount, platformProfitRate) ?? 0;
+            var payOrderProfit = new PayOrderProfitDto();
+            payOrderProfit.InfoId = "PLATFORM_INACCOUNT";
+            payOrderProfit.InfoName = "运营平台";
+            payOrderProfit.InfoType = "PLATFORM";
+            payOrderProfit.PayOrderId = payOrder.PayOrderId;
+            payOrderProfit.FeeRate = isvPayRateConfigs.FeeRate.Value;
+            payOrderProfit.FeeRateDesc = isvPayRateConfigs.FeeRateDesc;
+            payOrderProfit.ProfitRate = platformProfitRate;
+            payOrderProfit.ProfitAmount = platformProfitAmount;
+            payOrderProfit.OrderProfitAmount = platformProfitAmount;
+            payOrderProfit.CreatedAt = DateTime.Now;
+            _payOrderProfitService.Add(payOrderProfit);
+
+            var agentPayRateConfigs = payRateConfigs.Where(w => w.InfoType.Equals(CS.INFO_TYPE.AGENT)).OrderByDescending(o => o.AgentLevel);
+            var preFeeRate = payOrder.MchFeeRate;
+            var totalProfitAmount = 0L;
+            var totalProfitRate = 0M;
+            foreach (var agentPayRateConfig in agentPayRateConfigs)
+            {
+                var profitRate = preFeeRate = agentPayRateConfig.FeeRate.Value;
+                var profitAmount = paymentService?.CalculateFeeAmount(payOrder.Amount, profitRate) ?? 0;
+                payOrderProfit = new PayOrderProfitDto();
+                payOrderProfit.InfoId = agentPayRateConfig.InfoId;
+                payOrderProfit.InfoName = agentPayRateConfig.InfoName;
+                payOrderProfit.InfoType = agentPayRateConfig.InfoType;
+                payOrderProfit.PayOrderId = payOrder.PayOrderId;
+                payOrderProfit.FeeRate = agentPayRateConfig.FeeRate.Value;
+                payOrderProfit.FeeRateDesc = agentPayRateConfig.FeeRateDesc;
+                payOrderProfit.ProfitRate = profitRate;
+                payOrderProfit.ProfitAmount = profitAmount;
+                payOrderProfit.OrderProfitAmount = profitAmount;
+                payOrderProfit.CreatedAt = DateTime.Now;
+                _payOrderProfitService.Add(payOrderProfit);
+                preFeeRate = agentPayRateConfig.FeeRate.Value;
+                totalProfitAmount += profitAmount;
+                totalProfitRate += profitRate;
+            }
+
+            payOrderProfit = new PayOrderProfitDto();
+            payOrderProfit.InfoId = "PLATFORM_PROFIT";
+            payOrderProfit.InfoName = "运营平台";
+            payOrderProfit.InfoType = "PLATFORM";
+            payOrderProfit.PayOrderId = payOrder.PayOrderId;
+            payOrderProfit.FeeRate = isvPayRateConfigs.FeeRate.Value;
+            payOrderProfit.FeeRateDesc = isvPayRateConfigs.FeeRateDesc;
+            payOrderProfit.ProfitRate = platformProfitRate - totalProfitRate;
+            payOrderProfit.ProfitAmount = platformProfitAmount - totalProfitAmount;
+            payOrderProfit.OrderProfitAmount = platformProfitAmount - totalProfitAmount;
+            payOrderProfit.CreatedAt = DateTime.Now;
+            _payOrderProfitService.Add(payOrderProfit);
         }
 
         /// <summary>

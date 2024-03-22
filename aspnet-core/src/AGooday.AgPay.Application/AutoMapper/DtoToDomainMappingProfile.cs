@@ -51,6 +51,7 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<PayOrderDivisionRecordDto, PayOrderDivisionRecord>();
             CreateMap<PayOrderDto, PayOrder>();
             CreateMap<PayRateConfigDto, PayRateConfig>();
+            CreateMap<PayRateConfigInfoDto, PayRateConfig>();
 
             CreateMap<PayWayDto, PayWay>();
 

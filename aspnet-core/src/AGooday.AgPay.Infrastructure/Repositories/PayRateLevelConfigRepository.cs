@@ -15,5 +15,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.Where(w => w.RateConfigId.Equals(id));
         }
+
+        public IQueryable<PayRateLevelConfig> GetByRateConfigIds(List<long> ids)
+        {
+            return DbSet.Where(w => ids.Contains(w.RateConfigId));
+        }
     }
 }

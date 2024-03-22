@@ -365,7 +365,7 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public List<PayRateConfigDto> GetPayRateConfigs(string configType, string infoType, string infoId, string ifCode)
+        private List<PayRateConfigDto> GetPayRateConfigs(string configType, string infoType, string infoId, string ifCode)
         {
             var payRateConfigs = _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(configType, infoType, infoId, ifCode);
             var result = _mapper.Map<List<PayRateConfigDto>>(payRateConfigs);
@@ -921,6 +921,63 @@ namespace AGooday.AgPay.Application.Services
                 feeRate = level.LevelList[levelIndex.Value].FeeRate;
             }
             return feeRate;
+        }
+
+        public List<PayRateConfigInfoDto> GetPayRateConfigInfos(string mchNo, string ifCode, string wayCode, long amount, string bankCardType = null)
+        {
+            var mchInfo = _mchInfoRepository.GetById(mchNo);
+            if (mchInfo == null || mchInfo.Type.Equals(CS.MCH_TYPE_NORMAL))
+            {
+                return null;
+            }
+            var isvPayRateConfig = _payRateConfigRepository.GetByUniqueKey(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, mchInfo.IsvNo, ifCode, wayCode);
+            var agentInfos = _agentInfoRepository.GetParentAgentsFromSql(mchInfo.AgentNo);
+            var infoType = CS.INFO_TYPE.AGENT;
+            var configType = CS.CONFIG_TYPE.AGENTRATE;
+            var infoIds = agentInfos.Select(s => s.AgentNo).ToList();
+            var payRateConfigs = _payRateConfigRepository.GetByUniqueKeysAsNoTracking(configType, infoType, ifCode, wayCode, infoIds).ToList();
+            payRateConfigs.Add(isvPayRateConfig);
+            var ids = payRateConfigs.Select(s => s.Id).ToList();
+            var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigIds(ids);
+
+            var result = _mapper.Map<List<PayRateConfigInfoDto>>(payRateConfigs);
+            foreach (var payRateConfig in result)
+            {
+                var agentInfo = agentInfos.FirstOrDefault(f => f.AgentNo.Equals(payRateConfig.InfoId));
+                payRateConfig.InfoName = agentInfo?.AgentName;
+                payRateConfig.AgentLevel = agentInfo?.Level;
+                if (payRateConfig.FeeType.Equals(CS.FEE_TYPE_SINGLE))
+                {
+                    payRateConfig.FeeRateDesc = $"单笔费率：{payRateConfig.FeeRate.Value * 100:F4}%";
+                }
+                if (payRateConfig.FeeType.Equals(CS.FEE_TYPE_LEVEL))
+                {
+                    var _payRateLevelConfigs = payRateLevelConfigs.Where(s => s.RateConfigId.Equals(payRateConfig.Id));
+                    PayRateLevelConfig payRateLevelConfig = null;
+                    if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_NORMAL))
+                    {
+                        payRateLevelConfig = _payRateLevelConfigs.FirstOrDefault(w => string.IsNullOrEmpty(w.BankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
+                    }
+
+                    if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY))
+                    {
+                        payRateLevelConfig = _payRateLevelConfigs.FirstOrDefault(w => w.BankCardType.Equals(bankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
+                    }
+
+                    if (payRateLevelConfig == null)
+                    {
+                        return null;
+                    }
+                    var rate = payRateLevelConfig.FeeRate.Value;
+                    var modeName = (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY) ? (payRateLevelConfig.BankCardType.Equals(CS.BANK_CARD_TYPE_DEBIT) ? "借记卡" : (payRateLevelConfig.BankCardType.Equals(CS.BANK_CARD_TYPE_CREDIT) ? "贷记卡" : "")) : "阶梯");
+                    var rateDesc = $"({payRateLevelConfig.MinAmount / 100M:F2}元-{payRateLevelConfig.MaxAmount / 100M:F2}元]{modeName}费率: {rate * 100:F4}%, 保底{payRateLevelConfig.MinFee / 100M:F2}元, 封顶{payRateLevelConfig.MaxFee / 100M:F2}元";
+
+                    payRateConfig.FeeRate = rate;
+                    payRateConfig.FeeRateDesc = rateDesc;
+                }
+            }
+
+            return result;
         }
     }
 }

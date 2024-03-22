@@ -38,6 +38,11 @@
         public string FeeRateDesc { get; set; }
 
         /// <summary>
+        /// 分润点数（利润率）
+        /// </summary>
+        public decimal ProfitRate { get; set; }
+
+        /// <summary>
         /// 分润金额(实际分润),单位分
         /// </summary>
         public long ProfitAmount { get; set; }

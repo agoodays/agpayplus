@@ -62,6 +62,12 @@ namespace AGooday.AgPay.Domain.Models
         public string FeeRateDesc { get; set; }
 
         /// <summary>
+        /// 分润点数（利润率）
+        /// </summary>
+        [Required, Column("profit_rate", TypeName = "decimal(20,6)")]
+        public decimal ProfitRate { get; set; }
+
+        /// <summary>
         /// 分润金额(实际分润),单位分
         /// </summary>
         [Comment("分润金额(实际分润),单位分")]

@@ -651,6 +651,7 @@ CREATE TABLE `t_pay_order_profit` (
   `pay_order_id` VARCHAR(30) NOT NULL COMMENT '支付订单号（与t_pay_order对应）',
   `fee_rate` DECIMAL(20,6) NOT NULL COMMENT '费率快照',
   `fee_rate_desc` VARCHAR(128) DEFAULT NULL COMMENT '费率快照描述',
+  `profit_rate` DECIMAL(20,6) NOT NULL COMMENT '分润点数（利润率）',
   `profit_amount` BIGINT NOT NULL COMMENT '分润金额(实际分润),单位分',
   `order_profit_amount` BIGINT NOT NULL COMMENT '收单分润金额,单位分',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
