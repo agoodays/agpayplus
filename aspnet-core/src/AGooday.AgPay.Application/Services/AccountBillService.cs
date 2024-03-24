@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -15,22 +16,47 @@ namespace AGooday.AgPay.Application.Services
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IAccountBillRepository _accountBillRepository;
+        private readonly IPayOrderProfitRepository _payOrderProfitRepository;
         // 用来进行DTO
         private readonly IMapper _mapper;
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
         public AccountBillService(IMapper mapper, IMediatorHandler bus,
-            IAccountBillRepository accountBillRepository)
+            IAccountBillRepository accountBillRepository,
+            IPayOrderProfitRepository payOrderProfitRepository)
         {
             _mapper = mapper;
             Bus = bus;
             _accountBillRepository = accountBillRepository;
+            _payOrderProfitRepository = payOrderProfitRepository;
         }
 
         public void Dispose()
         {
             GC.SuppressFinalize(this);
+        }
+
+        public void GenAccountBill(string payOrderId)
+        {
+            var payOrderProfits = _payOrderProfitRepository.GetByPayOrderId(payOrderId).OrderBy(o => o.Id);
+            foreach (var payOrderProfit in payOrderProfits)
+            {
+                if (payOrderProfit.ProfitAmount > 0)
+                {
+                    var accountBill = new AccountBill();
+                    accountBill.InfoId = payOrderProfit.InfoId;
+                    accountBill.InfoName = payOrderProfit.InfoName;
+                    accountBill.InfoType = payOrderProfit.InfoType;
+                    accountBill.BeforeBalance = 0;
+                    accountBill.ChangeAmount = payOrderProfit.ProfitAmount;
+                    accountBill.AfterBalance = payOrderProfit.ProfitAmount;
+                    accountBill.BizType = (byte)AccountBillBizType.ORDER_PROFIT_CALCULATE;
+                    accountBill.AccountType = (byte)AccountBillAccountType.IN_TRANSIT_ACCOUNT;
+                    accountBill.RelaBizOrderType = (byte)AccountBillRelaBizOrderType.PAY_ORDER;
+                    accountBill.RelaBizOrderId = payOrderProfit.PayOrderId;
+                }
+            }
         }
 
         public bool Add(AccountBillDto dto)

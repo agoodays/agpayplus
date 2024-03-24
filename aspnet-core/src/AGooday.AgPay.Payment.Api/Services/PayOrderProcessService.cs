@@ -14,21 +14,30 @@ namespace AGooday.AgPay.Payment.Api.Services
     {
         private readonly IMQSender mqSender;
         private readonly IPayOrderService _payOrderService;
+        private readonly IAccountBillService _accountBillService;
         private readonly PayMchNotifyService _payMchNotifyService;
         private readonly ILogger<PayOrderProcessService> _logger;
 
-        public PayOrderProcessService(IMQSender mqSender, ILogger<PayOrderProcessService> logger, IPayOrderService payOrderService, PayMchNotifyService payMchNotifyService)
+        public PayOrderProcessService(IMQSender mqSender,
+            ILogger<PayOrderProcessService> logger,
+            IPayOrderService payOrderService,
+            IAccountBillService accountBillService,
+            PayMchNotifyService payMchNotifyService)
         {
             this.mqSender = mqSender;
             _logger = logger;
             _payOrderService = payOrderService;
             _payMchNotifyService = payMchNotifyService;
+            _accountBillService = accountBillService;
         }
 
         public void ConfirmSuccess(PayOrderDto payOrder)
         {
             //设置订单状态
             payOrder.State = (byte)PayOrderState.STATE_SUCCESS;
+
+            //记账
+            _accountBillService.GenAccountBill(payOrder.PayOrderId);
 
             //自动分账 处理逻辑， 不影响主订单任务
             this.UpdatePayOrderAutoDivision(payOrder);

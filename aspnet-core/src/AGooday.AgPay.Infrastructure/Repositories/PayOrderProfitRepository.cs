@@ -10,5 +10,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
+
+        public IQueryable<PayOrderProfit> GetByPayOrderId(string payOrderId)
+        {
+            return DbSet.Where(w => w.PayOrderId.Equals(payOrderId));
+        }
     }
 }

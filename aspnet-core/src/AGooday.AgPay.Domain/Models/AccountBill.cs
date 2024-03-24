@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 帐单备注
         /// </summary>
         [Comment("帐单备注")]
-        [Required, Column("remark", TypeName = "varchar(128)")]
+        [Column("remark", TypeName = "varchar(128)")]
         public string Remark { get; set; }
 
         /// <summary>

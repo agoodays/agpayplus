@@ -5,6 +5,7 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IAccountBillService : IDisposable
     {
+        void GenAccountBill(string payOrderId);
         bool Add(AccountBillDto dto);
         bool Remove(string recordId);
         bool Update(AccountBillDto dto);

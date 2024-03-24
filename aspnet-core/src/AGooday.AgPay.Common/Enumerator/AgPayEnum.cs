@@ -413,6 +413,72 @@ namespace AGooday.AgPay.Common.Enumerator
     }
 
     /// <summary>
+    /// 业务类型: 1-订单佣金计算, 2-退款轧差, 3-佣金提现, 4-人工调账
+    /// </summary>
+    public enum AccountBillBizType
+    {
+        /// <summary>
+        /// 订单佣金计算
+        /// </summary>
+        [Description("订单佣金计算")]
+        ORDER_PROFIT_CALCULATE = 1,
+        /// <summary>
+        /// 退款轧差
+        /// </summary>
+        [Description("退款轧差")]
+        REFUND_OFFSET = 2,
+        /// <summary>
+        /// 佣金提现
+        /// </summary>
+        [Description("佣金提现")]
+        PROFIT_CASHOUT = 3,
+        /// <summary>
+        /// 人工调账
+        /// </summary>
+        [Description("人工调账")]
+        MANUAL_ACCOUNT_ADJUSTMENT = 4,
+    }
+
+    /// <summary>
+    /// 账户类型: 1-钱包账户, 2-在途账户
+    /// </summary>
+    public enum AccountBillAccountType
+    {
+        /// <summary>
+        /// 钱包账户
+        /// </summary>
+        [Description("钱包账户")]
+        WALLET_ACCOUNT = 1,
+        /// <summary>
+        /// 在途账户
+        /// </summary>
+        [Description("在途账户")]
+        IN_TRANSIT_ACCOUNT = 2,
+    }
+
+    /// <summary>
+    /// 关联订单类型: 1-支付订单, 2-退款订单, 3-提现申请订单
+    /// </summary>
+    public enum AccountBillRelaBizOrderType
+    {
+        /// <summary>
+        /// 支付订单
+        /// </summary>
+        [Description("支付订单")]
+        PAY_ORDER = 1,
+        /// <summary>
+        /// 退款订单
+        /// </summary>
+        [Description("退款订单")]
+        REFUND_ORDER = 2,
+        /// <summary>
+        /// 提现申请订单
+        /// </summary>
+        [Description("提现申请订单")]
+        CASHOUT_ORDER = 3,
+    }
+
+    /// <summary>
     /// 文章类型
     /// </summary>
     public enum ArticleType
