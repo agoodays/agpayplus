@@ -65,8 +65,14 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<PayOrderProfitDto> GetAll()
         {
-            var PayOrderProfits = _payOrderProfitRepository.GetAll();
-            return _mapper.Map<IEnumerable<PayOrderProfitDto>>(PayOrderProfits);
+            var payOrderProfits = _payOrderProfitRepository.GetAll();
+            return _mapper.Map<IEnumerable<PayOrderProfitDto>>(payOrderProfits);
+        }
+
+        public IEnumerable<PayOrderProfitDto> GetByPayOrderId(string payOrderId)
+        {
+            var payOrderProfits = _payOrderProfitRepository.GetByPayOrderId(payOrderId);
+            return _mapper.Map<IQueryable<PayOrderProfitDto>>(payOrderProfits);
         }
     }
 }
