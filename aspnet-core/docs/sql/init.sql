@@ -595,7 +595,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_SYS_CONFIG', '系统管理', 'setting'
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LIST', '页面：操作员列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_SEARCH', '按钮：搜索', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_ADD', '按钮：添加操作员', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
-            INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_VIEW', '按钮： 详情', '', 'no-icon', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_VIEW', '按钮： 详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_EDIT', '按钮： 修改基本信息', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_DELETE', '按钮： 删除操作员', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_UPD_ROLE', '按钮： 角色分配', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MGR', NOW(), NOW());
@@ -695,7 +695,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_SYS_CONFIG', '系统管理', 'setting'
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_LIST', '页面：操作员列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_SEARCH', '按钮：搜索', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_ADD', '按钮：添加操作员', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
-            INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_VIEW', '按钮： 详情', '', 'no-icon', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
+            INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_VIEW', '按钮： 详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_EDIT', '按钮： 修改基本信息', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_DELETE', '按钮： 删除操作员', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
             INSERT INTO t_sys_entitlement VALUES('ENT_UR_USER_UPD_ROLE', '按钮： 角色分配', 'no-icon', '', '', 'PB', 0, 1,  'ENT_UR_USER', '0', 'MCH', NOW(), NOW());
