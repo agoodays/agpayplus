@@ -34,6 +34,14 @@ namespace AGooday.AgPay.Payment.Api.Channel
         long CalculateFeeAmount(long amount, PayOrderDto payOrder);
 
         /// <summary>
+        /// 计算手续费
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        long CalculateFeeAmount(long amount, decimal rate);
+
+        /// <summary>
         /// 计算分润金额
         /// </summary>
         /// <param name="amount"></param>

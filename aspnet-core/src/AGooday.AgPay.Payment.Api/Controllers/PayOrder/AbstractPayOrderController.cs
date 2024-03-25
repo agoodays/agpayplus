@@ -320,22 +320,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         {
             var payRateConfigs = _payRateConfigService.GetPayRateConfigInfos(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
 
-            var isvPayRateConfigs = payRateConfigs.FirstOrDefault(w => w.InfoType.Equals(CS.INFO_TYPE.ISV));
-            var platformProfitRate = payOrder.MchFeeRate - isvPayRateConfigs.FeeRate.Value;
-            var platformProfitAmount = paymentService?.CalculateProfitAmount(payOrder.Amount, platformProfitRate) ?? 0;
             var payOrderProfit = new PayOrderProfitDto();
-            payOrderProfit.InfoId = "PLATFORM_INACCOUNT";
-            payOrderProfit.InfoName = "运营平台";
-            payOrderProfit.InfoType = "PLATFORM";
-            payOrderProfit.PayOrderId = payOrder.PayOrderId;
-            payOrderProfit.FeeRate = isvPayRateConfigs.FeeRate.Value;
-            payOrderProfit.FeeRateDesc = isvPayRateConfigs.FeeRateDesc;
-            payOrderProfit.ProfitRate = platformProfitRate;
-            payOrderProfit.ProfitAmount = platformProfitAmount;
-            payOrderProfit.OrderProfitAmount = platformProfitAmount;
-            payOrderProfit.CreatedAt = DateTime.Now;
-            _payOrderProfitService.Add(payOrderProfit);
-
             var agentPayRateConfigs = payRateConfigs.Where(w => w.InfoType.Equals(CS.INFO_TYPE.AGENT)).OrderByDescending(o => o.AgentLevel);
             var preFeeRate = payOrder.MchFeeRate;
             var totalProfitAmount = 0L;
@@ -354,24 +339,38 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 payOrderProfit.ProfitRate = profitRate;
                 payOrderProfit.ProfitAmount = profitAmount;
                 payOrderProfit.OrderProfitAmount = profitAmount;
-                payOrderProfit.CreatedAt = DateTime.Now;
                 _payOrderProfitService.Add(payOrderProfit);
                 preFeeRate = agentPayRateConfig.FeeRate.Value;
                 totalProfitAmount += profitAmount;
                 totalProfitRate += profitRate;
             }
 
+            var isvPayRateConfigs = payRateConfigs.FirstOrDefault(w => w.InfoType.Equals(CS.INFO_TYPE.ISV));
+            var isvFeeAmount = paymentService?.CalculateFeeAmount(payOrder.Amount, isvPayRateConfigs.FeeRate.Value) ?? 0;
+            var platformProfitRate = payOrder.MchFeeRate - isvPayRateConfigs.FeeRate.Value;
+            var platformProfitAmount = payOrder.MchFeeAmount - isvFeeAmount;//paymentService?.CalculateProfitAmount(payOrder.Amount, platformProfitRate) ?? 0;
             payOrderProfit = new PayOrderProfitDto();
-            payOrderProfit.InfoId = "PLATFORM_PROFIT";
+            payOrderProfit.InfoId = CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_INACCOUNT;
             payOrderProfit.InfoName = "运营平台";
-            payOrderProfit.InfoType = "PLATFORM";
+            payOrderProfit.InfoType = CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM;
+            payOrderProfit.PayOrderId = payOrder.PayOrderId;
+            payOrderProfit.FeeRate = isvPayRateConfigs.FeeRate.Value;
+            payOrderProfit.FeeRateDesc = isvPayRateConfigs.FeeRateDesc;
+            payOrderProfit.ProfitRate = platformProfitRate;
+            payOrderProfit.ProfitAmount = platformProfitAmount;
+            payOrderProfit.OrderProfitAmount = platformProfitAmount;
+            _payOrderProfitService.Add(payOrderProfit);
+
+            payOrderProfit = new PayOrderProfitDto();
+            payOrderProfit.InfoId = CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_PROFIT;
+            payOrderProfit.InfoName = "运营平台";
+            payOrderProfit.InfoType = CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM;
             payOrderProfit.PayOrderId = payOrder.PayOrderId;
             payOrderProfit.FeeRate = isvPayRateConfigs.FeeRate.Value;
             payOrderProfit.FeeRateDesc = isvPayRateConfigs.FeeRateDesc;
             payOrderProfit.ProfitRate = platformProfitRate - totalProfitRate;
             payOrderProfit.ProfitAmount = platformProfitAmount - totalProfitAmount;
             payOrderProfit.OrderProfitAmount = platformProfitAmount - totalProfitAmount;
-            payOrderProfit.CreatedAt = DateTime.Now;
             _payOrderProfitService.Add(payOrderProfit);
         }
 

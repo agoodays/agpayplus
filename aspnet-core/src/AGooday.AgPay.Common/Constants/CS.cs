@@ -71,6 +71,32 @@
         public const int PUB_DISABLE = 0;
         #endregion
 
+        public interface PAY_ORDER_PROFIT_INFO_TYPE
+        {
+            /// <summary>
+            /// 运营平台
+            /// </summary>
+            public const string PLATFORM = "PLATFORM";
+            /// <summary>
+            /// <summary>
+            /// 代理商
+            /// </summary>
+            public const string AGENT = "AGENT";
+        }
+
+        public interface PAY_ORDER_PROFIT_INFO_ID
+        {
+            /// <summary>
+            /// 运营平台利润账户
+            /// </summary>
+            public const string PLATFORM_PROFIT = "PLATFORM_PROFIT";
+            /// <summary>
+            /// <summary>
+            /// 运营平台入账账户
+            /// </summary>
+            public const string PLATFORM_INACCOUNT = "PLATFORM_INACCOUNT";
+        }
+
         #region 账号类型:1-服务商 2-商户 3-商户应用
         /// <summary>
         /// 账号类型

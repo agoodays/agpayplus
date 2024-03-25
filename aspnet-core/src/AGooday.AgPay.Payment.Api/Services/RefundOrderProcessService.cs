@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel;
@@ -49,7 +50,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 updateOrderSuccess = _refundOrderService.UpdateIng2Success(refundOrderId, channelRetMsg.ChannelOrderId);
                 if (updateOrderSuccess)
                 {
-                    this.UpdatePayOrderProfit(refundOrder);
+                    this.UpdatePayOrderProfitAndGenAccountBill(refundOrder);
                     // 通知商户系统
                     if (!string.IsNullOrWhiteSpace(refundOrder.NotifyUrl))
                     {
@@ -72,40 +73,76 @@ namespace AGooday.AgPay.Payment.Api.Services
         }
 
         /// <summary>
-        /// 更新支付订单分润
+        /// 更新支付订单分润并生成账单
         /// </summary>
         /// <param name="refundOrder"></param>
-        public void UpdatePayOrderProfit(RefundOrderDto refundOrder)
+        public void UpdatePayOrderProfitAndGenAccountBill(RefundOrderDto refundOrder)
         {
             IRefundService refundService = _refundServiceFactory(refundOrder.IfCode);
             var payOrder = _payOrderService.GetById(refundOrder.PayOrderId);
             var payOrderProfits = _payOrderProfitService.GetByPayOrderId(refundOrder.PayOrderId);
             var amount = payOrder.Amount - payOrder.RefundAmount;
-            foreach (var payOrderProfit in payOrderProfits)
+            var beforeBalance = 0L;
+            var profitAmount = 0L;
+            var afterBalance = 0L;
+            var changeAmount = 0L;
+            var totalProfitAmount = 0L;
+            var agentPayOrderProfits = payOrderProfits.Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.AGENT)).OrderBy(o => o.Id);
+            foreach (var payOrderProfit in agentPayOrderProfits)
             {
-                var beforeBalance = payOrderProfit.ProfitAmount;
-                var profitAmount = refundService?.CalculateProfitAmount(amount, payOrderProfit.ProfitRate) ?? 0;
-                var afterBalance = profitAmount;
-                var changeAmount = afterBalance - beforeBalance;
+                beforeBalance = payOrderProfit.ProfitAmount;
+                profitAmount = refundService?.CalculateProfitAmount(amount, payOrderProfit.ProfitRate) ?? 0;
+                afterBalance = profitAmount;
+                changeAmount = afterBalance - beforeBalance;
                 payOrderProfit.ProfitAmount = profitAmount;
                 _payOrderProfitService.Update(payOrderProfit);
+                this.GenAccountBill(payOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+                totalProfitAmount += profitAmount;
+            }
 
-                if (payOrderProfit.ProfitAmount > 0)
-                {
-                    var accountBill = new AccountBillDto();
-                    accountBill.BillId = SeqUtil.GenBillId();
-                    accountBill.InfoId = payOrderProfit.InfoId;
-                    accountBill.InfoName = payOrderProfit.InfoName;
-                    accountBill.InfoType = payOrderProfit.InfoType;
-                    accountBill.BeforeBalance = beforeBalance;
-                    accountBill.ChangeAmount = changeAmount;
-                    accountBill.AfterBalance = afterBalance;
-                    accountBill.BizType = (byte)AccountBillBizType.REFUND_OFFSET;
-                    accountBill.AccountType = (byte)AccountBillAccountType.IN_TRANSIT_ACCOUNT;
-                    accountBill.RelaBizOrderType = (byte)AccountBillRelaBizOrderType.REFUND_ORDER;
-                    accountBill.RelaBizOrderId = refundOrder.RefundOrderId;
-                    _accountBillService.Add(accountBill);
-                }
+            var platformInaccountPayOrderProfit = payOrderProfits
+                .Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM) && w.InfoId.Equals(CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_INACCOUNT))
+                .OrderBy(o => o.Id).FirstOrDefault();
+            var isvFeeAmount = refundService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
+            var platformInaccountProfitAmount = payOrder.MchFeeAmount - isvFeeAmount;
+            beforeBalance = platformInaccountPayOrderProfit.ProfitAmount;
+            profitAmount = platformInaccountProfitAmount;
+            afterBalance = profitAmount;
+            changeAmount = afterBalance - beforeBalance;
+            platformInaccountPayOrderProfit.ProfitAmount = profitAmount;
+            _payOrderProfitService.Update(platformInaccountPayOrderProfit);
+            this.GenAccountBill(platformInaccountPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+
+            var platformProfitPayOrderProfit = payOrderProfits
+                .Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM) && w.InfoId.Equals(CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_PROFIT))
+                .OrderBy(o => o.Id).FirstOrDefault();
+            var platformProfitAmount = platformInaccountProfitAmount - totalProfitAmount;
+            beforeBalance = platformProfitPayOrderProfit.ProfitAmount;
+            profitAmount = platformProfitAmount;
+            afterBalance = profitAmount;
+            changeAmount = afterBalance - beforeBalance;
+            platformProfitPayOrderProfit.ProfitAmount = profitAmount;
+            _payOrderProfitService.Update(platformProfitPayOrderProfit);
+            this.GenAccountBill(platformProfitPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+        }
+
+        private void GenAccountBill(PayOrderProfitDto payOrderProfit, RefundOrderDto refundOrder, long beforeBalance, long afterBalance, long changeAmount)
+        {
+            if (payOrderProfit.ProfitAmount > 0)
+            {
+                var accountBill = new AccountBillDto();
+                accountBill.BillId = SeqUtil.GenBillId();
+                accountBill.InfoId = payOrderProfit.InfoId;
+                accountBill.InfoName = payOrderProfit.InfoName;
+                accountBill.InfoType = payOrderProfit.InfoType;
+                accountBill.BeforeBalance = beforeBalance;
+                accountBill.ChangeAmount = changeAmount;
+                accountBill.AfterBalance = afterBalance;
+                accountBill.BizType = (byte)AccountBillBizType.REFUND_OFFSET;
+                accountBill.AccountType = (byte)AccountBillAccountType.IN_TRANSIT_ACCOUNT;
+                accountBill.RelaBizOrderType = (byte)AccountBillRelaBizOrderType.REFUND_ORDER;
+                accountBill.RelaBizOrderId = refundOrder.RefundOrderId;
+                _accountBillService.Add(accountBill);
             }
         }
     }

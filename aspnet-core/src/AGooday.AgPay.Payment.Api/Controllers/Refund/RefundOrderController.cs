@@ -238,7 +238,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             if (ChannelState.CONFIRM_SUCCESS == channelRetMsg.ChannelState)
             {
                 this.UpdateInitOrderStateThrowException((byte)RefundOrderState.STATE_SUCCESS, refundOrder, channelRetMsg);
-                _refundOrderProcessService.UpdatePayOrderProfit(refundOrder);
+                _refundOrderProcessService.UpdatePayOrderProfitAndGenAccountBill(refundOrder);
                 _payMchNotifyService.RefundOrderNotify(refundOrder);
             }
             //明确失败
