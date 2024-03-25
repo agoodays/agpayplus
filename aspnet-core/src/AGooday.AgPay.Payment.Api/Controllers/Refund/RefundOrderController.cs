@@ -23,28 +23,31 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
     [ApiController]
     public class RefundOrderController : ApiControllerBase
     {
-        private readonly Func<string, IRefundService> _refundServiceFactory;
         private readonly ILogger<RefundOrderController> _logger;
         private readonly IPayOrderService _payOrderService;
         private readonly IRefundOrderService _refundOrderService;
         private readonly IPayOrderProfitService _payOrderProfitService;
+        private readonly Func<string, IRefundService> _refundServiceFactory;
+        private readonly RefundOrderProcessService _refundOrderProcessService;
         private readonly PayMchNotifyService _payMchNotifyService;
 
-        public RefundOrderController(Func<string, IRefundService> refundServiceFactory,
-            ILogger<RefundOrderController> logger,
+        public RefundOrderController(ILogger<RefundOrderController> logger,
             IPayOrderService payOrderService,
             IRefundOrderService refundOrderService,
             IPayOrderProfitService payOrderProfitService,
+            Func<string, IRefundService> refundServiceFactory,
             PayMchNotifyService payMchNotifyService,
+            RefundOrderProcessService refundOrderProcessService,
             ConfigContextQueryService configContextQueryService,
             RequestKit requestKit)
             : base(requestKit, configContextQueryService)
         {
-            _refundServiceFactory = refundServiceFactory;
             _logger = logger;
             _payOrderService = payOrderService;
             _refundOrderService = refundOrderService;
             _payOrderProfitService = payOrderProfitService;
+            _refundServiceFactory = refundServiceFactory;
+            _refundOrderProcessService = refundOrderProcessService;
             _payMchNotifyService = payMchNotifyService;
         }
 
@@ -146,7 +149,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 ChannelRetMsg channelRetMsg = refundService.Refund(rq, refundOrder, payOrder, mchAppConfigContext);
 
                 //处理退款单状态
-                this.ProcessChannelMsg(channelRetMsg, refundOrder, refundService);
+                this.ProcessChannelMsg(channelRetMsg, refundOrder);
 
                 RefundOrderRS bizRes = RefundOrderRS.BuildByRefundOrder(refundOrder);
                 return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
@@ -223,7 +226,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         /// <param name="channelRetMsg"></param>
         /// <param name="refundOrder"></param>
         /// <exception cref="BizException"></exception>
-        private void ProcessChannelMsg(ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder, IRefundService refundService = null)
+        private void ProcessChannelMsg(ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder)
         {
             //对象为空 || 上游返回状态为空， 则无需操作
             if (channelRetMsg == null || channelRetMsg.ChannelState == null)
@@ -235,7 +238,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             if (ChannelState.CONFIRM_SUCCESS == channelRetMsg.ChannelState)
             {
                 this.UpdateInitOrderStateThrowException((byte)RefundOrderState.STATE_SUCCESS, refundOrder, channelRetMsg);
-                this.UpdatePayOrderProfit(refundOrder, refundService);
+                _refundOrderProcessService.UpdatePayOrderProfit(refundOrder);
                 _payMchNotifyService.RefundOrderNotify(refundOrder);
             }
             //明确失败
@@ -286,19 +289,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             if (!isSuccess)
             {
                 throw new BizException("更新退款单异常!");
-            }
-        }
-
-        private void UpdatePayOrderProfit(RefundOrderDto refundOrder, IRefundService refundService)
-        {
-            var payOrder = _payOrderService.GetById(refundOrder.PayOrderId);
-            var payOrderProfits = _payOrderProfitService.GetByPayOrderId(refundOrder.PayOrderId);
-            var amount = payOrder.Amount - payOrder.RefundAmount;
-            foreach (var payOrderProfit in payOrderProfits)
-            {
-                var profitAmount = refundService?.CalculateProfitAmount(amount, payOrderProfit.ProfitRate) ?? 0;
-                payOrderProfit.ProfitRate = profitAmount;
-                _payOrderProfitService.Update(payOrderProfit);
             }
         }
     }
