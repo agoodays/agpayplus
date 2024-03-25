@@ -24,10 +24,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
             RequestKit requestKit,
             ILogger<AliBarOrderController> logger,
             IMchPayPassageService mchPayPassageService,
+            IPayRateConfigService payRateConfigService,
             IPayWayService payWayService,
             IPayOrderService payOrderService,
+            IPayOrderProfitService payOrderProfitService,
             ISysConfigService sysConfigService)
-            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payWayService, payOrderService, sysConfigService)
+            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService)
         {
         }
 

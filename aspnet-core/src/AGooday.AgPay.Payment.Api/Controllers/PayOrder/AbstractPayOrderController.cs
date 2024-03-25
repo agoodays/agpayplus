@@ -42,8 +42,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             RequestKit requestKit,
             ILogger<AbstractPayOrderController> logger,
             IMchPayPassageService mchPayPassageService,
+            IPayRateConfigService payRateConfigService,
             IPayWayService payWayService,
             IPayOrderService payOrderService,
+            IPayOrderProfitService payOrderProfitService,
             ISysConfigService sysConfigService)
             : base(requestKit, configContextQueryService)
         {
@@ -51,10 +53,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             _payOrderProcessService = payOrderProcessService;
             _logger = logger;
             _mchPayPassageService = mchPayPassageService;
+            _payRateConfigService = payRateConfigService;
             _payWayService = payWayService;
             _payOrderService = payOrderService;
             _sysConfigService = sysConfigService;
             this.mqSender = mqSender;
+            _payOrderProfitService = payOrderProfitService;
         }
 
         /// <summary>

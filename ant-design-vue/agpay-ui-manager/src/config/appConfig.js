@@ -31,6 +31,7 @@ export const asyncRouteDefine = {
   'IfDefinePage': { defaultPath: '/ifdefines', component: () => import('@/views/payconfig/payIfDefine/List') },
   'IsvListPage': { defaultPath: '/isv', component: () => import('@/views/isv/IsvList') }, // 服务商列表
   'AgentListPage': { defaultPath: '/agent', component: () => import('@/views/agent/AgentList') }, // 代理商列表
+  'AccountBillPage': { defaultPath: '/accountBill', component: () => import('@/views/accountBill/AccountBillPage') }, // 代理商列表
   'MchListPage': { defaultPath: '/mch', component: () => import('@/views/mch/MchList') }, // 商户列表
   'MchAppPage': { defaultPath: '/apps', component: () => import ('@/views/mchApp/List') }, // 商户应用列表
   'MchStorePage': { defaultPath: '/store', component: () => import ('@/views/mchStore/MchStoreList') }, // 商户门店列表

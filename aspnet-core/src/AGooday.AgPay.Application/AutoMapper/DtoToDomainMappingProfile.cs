@@ -19,6 +19,7 @@ namespace AGooday.AgPay.Application.AutoMapper
         /// </summary>
         public DtoToDomainMappingProfile()
         {
+            CreateMap<AccountBillDto, AccountBill>();
             CreateMap<AgentInfoDto, AgentInfo>();
             CreateMap<AgentInfoCreateDto, CreateAgentInfoCommand>();
             CreateMap<CreateAgentInfoCommand, AgentInfo>();
@@ -50,6 +51,7 @@ namespace AGooday.AgPay.Application.AutoMapper
                 .ForMember(d => d.WayCodes, o => o.MapFrom(s => JsonConvert.SerializeObject(s.WayCodes)));
             CreateMap<PayOrderDivisionRecordDto, PayOrderDivisionRecord>();
             CreateMap<PayOrderDto, PayOrder>();
+            CreateMap<PayOrderProfitDto, PayOrderProfit>();
             CreateMap<PayRateConfigDto, PayRateConfig>();
             CreateMap<PayRateConfigInfoDto, PayRateConfig>();
 

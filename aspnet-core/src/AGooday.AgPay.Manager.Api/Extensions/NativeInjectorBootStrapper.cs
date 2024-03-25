@@ -41,6 +41,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
         {
             // 注入 应用层Application
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAccountBillService, AccountBillService>();
             services.AddScoped<IAgentInfoService, AgentInfoService>();
             services.AddScoped<IIsvInfoService, IsvInfoService>();
             services.AddScoped<IMchAppService, MchAppService>();
@@ -54,6 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IPayInterfaceDefineService, PayInterfaceDefineService>();
             services.AddScoped<IPayOrderDivisionRecordService, PayOrderDivisionRecordService>();
             services.AddScoped<IPayOrderService, PayOrderService>();
+            services.AddScoped<IPayOrderProfitService, PayOrderProfitService>();
             services.AddScoped<IPayRateConfigService, PayRateConfigService>();
             services.AddScoped<IPayWayService, PayWayService>();
             services.AddScoped<IQrCodeService, QrCodeService>();
@@ -112,6 +114,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IAccountBillRepository, AccountBillRepository>();
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
@@ -125,6 +128,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IPayInterfaceDefineRepository, PayInterfaceDefineRepository>();
             services.AddScoped<IPayOrderDivisionRecordRepository, PayOrderDivisionRecordRepository>();
             services.AddScoped<IPayOrderRepository, PayOrderRepository>();
+            services.AddScoped<IPayOrderProfitRepository, PayOrderProfitRepository>();
             services.AddScoped<IPayRateConfigRepository, PayRateConfigRepository>();
             services.AddScoped<IPayRateLevelConfigRepository, PayRateLevelConfigRepository>();
             services.AddScoped<IPayWayRepository, PayWayRepository>();

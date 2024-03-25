@@ -100,6 +100,7 @@ export const API_URL_USER_ROLE_RELA_LIST = '/api/sysUserRoleRelas'
 /** 服务商、代理商、商户管理 **/
 export const API_URL_ISV_LIST = '/api/isvInfo'
 export const API_URL_AGENT_LIST = '/api/agentInfo'
+export const API_URL_ACCOUNT_BILL_LIST = '/api/accountBill'
 export const API_URL_MCH_LIST = '/api/mchInfo'
 /** 商户App管理 **/
 export const API_URL_MCH_APP = '/api/mchApps'

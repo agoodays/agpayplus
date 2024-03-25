@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -45,13 +44,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.AccountBill
         /// <summary>
         /// 查询账单信息
         /// </summary>
-        /// <param name="billId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet, Route("{billId}"), NoLog]
+        [HttpGet, Route("{id}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ACCOUNT_BILL_VIEW)]
-        public ApiRes Detail(string billId)
+        public ApiRes Detail(long id)
         {
-            var accountBill = _accountBillService.GetById(billId);
+            var accountBill = _accountBillService.GetById(id);
             return ApiRes.Ok(accountBill);
         }
     }

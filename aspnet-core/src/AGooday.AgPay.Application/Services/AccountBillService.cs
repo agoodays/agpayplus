@@ -71,9 +71,9 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public bool Remove(string recordId)
+        public bool Remove(long id)
         {
-            _accountBillRepository.Remove(recordId);
+            _accountBillRepository.Remove(id);
             return _accountBillRepository.SaveChanges(out int _);
         }
 
@@ -85,9 +85,9 @@ namespace AGooday.AgPay.Application.Services
             return _accountBillRepository.SaveChanges(out int _);
         }
 
-        public AccountBillDto GetById(string recordId)
+        public AccountBillDto GetById(long id)
         {
-            var entity = _accountBillRepository.GetById(recordId);
+            var entity = _accountBillRepository.GetById(id);
             var dto = _mapper.Map<AccountBillDto>(entity);
             return dto;
         }
