@@ -261,6 +261,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<TransferOrder>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<TransferOrder>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
+            modelBuilder.Entity<AccountBill>().HasIndex(c => new { c.BillId }, "Uni_BillId").IsUnique(true);
             modelBuilder.Entity<MchNotifyRecord>().HasIndex(c => new { c.OrderId, c.OrderType }, "Uni_OrderId_Type").IsUnique(true);
             modelBuilder.Entity<MchPayPassage>().HasIndex(c => new { c.AppId, c.IfCode, c.WayCode }, "Uni_AppId_IfCode_WayCode").IsUnique(true);
             modelBuilder.Entity<PayInterfaceConfig>().HasIndex(c => new { c.InfoType, c.InfoId, c.IfCode }, "Uni_InfoType_InfoId_IfCode").IsUnique(true);

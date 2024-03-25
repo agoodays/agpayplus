@@ -10,6 +10,7 @@
         private const string MHO_ORDER_SEQ_PREFIX = "M";
         private const string TRANSFER_ID_SEQ_PREFIX = "T";
         private const string DIVISION_BATCH_ID_SEQ_PREFIX = "D";
+        private const string BILL_ID_SEQ_PREFIX = "B";
 
         private static readonly bool IS_USE_MP_ID = true;
 
@@ -56,7 +57,7 @@
         }
 
         /// <summary>
-        /// 模拟生成商户订单号
+        /// 模拟生成转账订单号
         /// </summary>
         /// <returns></returns>
         public static string GenTransferId()
@@ -81,6 +82,20 @@
             }
             Random rd = new Random();
             return $"{DIVISION_BATCH_ID_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
+        }
+
+        /// <summary>
+        /// 模拟生成帐单单号
+        /// </summary>
+        /// <returns></returns>
+        public static string GenBillId()
+        {
+            if (IS_USE_MP_ID)
+            {
+                return $"{BILL_ID_SEQ_PREFIX}{IdWorker.Singleton.NextId()}";
+            }
+            Random rd = new Random();
+            return $"{BILL_ID_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
         }
 
         /// <summary>

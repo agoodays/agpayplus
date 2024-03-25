@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
@@ -45,6 +46,7 @@ namespace AGooday.AgPay.Application.Services
                 if (payOrderProfit.ProfitAmount > 0)
                 {
                     var accountBill = new AccountBill();
+                    accountBill.BillId = SeqUtil.GenBillId();
                     accountBill.InfoId = payOrderProfit.InfoId;
                     accountBill.InfoName = payOrderProfit.InfoName;
                     accountBill.InfoType = payOrderProfit.InfoType;
@@ -99,7 +101,8 @@ namespace AGooday.AgPay.Application.Services
         public PaginatedList<T> GetPaginatedData<T>(AccountBillQueryDto dto)
         {
             var AccountBills = _accountBillRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.BillId) || w.BillId.Equals(dto.BillId))
+                .Where(w => (dto.Id.Equals(null) || w.Id.Equals(dto.Id))
+                && (string.IsNullOrWhiteSpace(dto.BillId) || w.BillId.Equals(dto.BillId))
                 && (string.IsNullOrWhiteSpace(dto.InfoId) || w.InfoId.Equals(dto.InfoId))
                 && (string.IsNullOrWhiteSpace(dto.InfoType) || w.InfoType.Equals(dto.InfoType))
                 && (dto.BizType.Equals(null) || w.BizType.Equals(dto.BizType))

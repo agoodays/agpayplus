@@ -418,6 +418,7 @@ CREATE TABLE `t_agent_info` (
 -- 账户帐单表
 DROP TABLE IF EXISTS `t_account_bill`;
 CREATE TABLE `t_account_bill` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '流水号',
   `bill_id` VARCHAR(30) NOT NULL COMMENT '帐单单号',
   `info_id` VARCHAR(64) NOT NULL COMMENT 'PLATFORM_PROFIT-运营平台利润账户, PLATFORM_INACCOUNT-运营平台入账账户, 代理商号',
   `info_name` VARCHAR(64) NOT NULL COMMENT '运营平台, 代理商名称',
@@ -432,7 +433,8 @@ CREATE TABLE `t_account_bill` (
   `remark` VARCHAR(128) DEFAULT NULL COMMENT '帐单备注',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-  PRIMARY KEY (`bill_id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Uni_BillId` (`bill_id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='账户帐单表';
 
 -- 服务商信息表

@@ -6,6 +6,11 @@
     public class AccountBillDto
     {
         /// <summary>
+        /// 流水号
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
         /// 帐单单号
         /// </summary>
         public string BillId { get; set; }

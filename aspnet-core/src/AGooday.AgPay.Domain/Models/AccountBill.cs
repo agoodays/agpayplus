@@ -12,10 +12,18 @@ namespace AGooday.AgPay.Domain.Models
     public class AccountBill
     {
         /// <summary>
+        /// 流水号
+        /// </summary>
+        [Comment("流水号")]
+        [Key, Required, Column("id", TypeName = "bigint")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
+        public long Id { get; set; }
+
+        /// <summary>
         /// 帐单单号
         /// </summary>
         [Comment("帐单单号")]
-        [Key, Required, Column("bill_id", TypeName = "varchar(30)")]
+        [Required, Column("bill_id", TypeName = "varchar(30)")]
         public string BillId { get; set; }
 
         /// <summary>
