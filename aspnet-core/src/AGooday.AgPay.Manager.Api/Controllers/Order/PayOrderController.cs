@@ -28,6 +28,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     public class PayOrderController : CommonController
     {
         private readonly IPayOrderService _payOrderService;
+        private readonly IPayOrderProfitService _payOrderProfitService;
         private readonly IPayWayService _payWayService;
         private readonly IPayInterfaceDefineService _payIfDefineService;
         private readonly ISysConfigService _sysConfigService;
@@ -35,6 +36,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
 
         public PayOrderController(ILogger<PayOrderController> logger,
             IPayOrderService payOrderService,
+            IPayOrderProfitService payOrderProfitService,
             IPayWayService payWayService,
             IPayInterfaceDefineService payIfDefineService,
             ISysConfigService sysConfigService,
@@ -44,6 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             : base(logger, client, authService)
         {
             _payOrderService = payOrderService;
+            _payOrderProfitService = payOrderProfitService;
             _payIfDefineService = payIfDefineService;
             _payWayService = payWayService;
             _sysConfigService = sysConfigService;
@@ -210,6 +213,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             if (payOrder == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            if (payOrder.State.Equals((byte)PayOrderState.STATE_SUCCESS) || payOrder.State.Equals((byte)PayOrderState.STATE_REFUND))
+            {
+                var profitList = _payOrderProfitService.GetByPayOrderIdAsNoTracking(payOrder.PayOrderId)
+                    .Select(s => new { s.InfoId, s.InfoName, s.InfoType, s.ProfitAmount });
+                payOrder.AddExt("profitList", profitList);
             }
             return ApiRes.Ok(payOrder);
         }

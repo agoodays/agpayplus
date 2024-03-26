@@ -10,5 +10,6 @@ namespace AGooday.AgPay.Application.Interfaces
         PayOrderProfitDto GetById(long recordId);
         IEnumerable<PayOrderProfitDto> GetAll();
         IEnumerable<PayOrderProfitDto> GetByPayOrderIdAsNoTracking(string payOrderId);
+        IEnumerable<PayOrderProfitDto> GetByPayOrderIdsAsNoTracking(List<string> payOrderIds);
     }
 }

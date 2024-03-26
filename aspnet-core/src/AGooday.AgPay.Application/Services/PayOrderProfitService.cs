@@ -74,5 +74,11 @@ namespace AGooday.AgPay.Application.Services
             var payOrderProfits = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId);
             return _mapper.Map<IEnumerable<PayOrderProfitDto>>(payOrderProfits);
         }
+
+        public IEnumerable<PayOrderProfitDto> GetByPayOrderIdsAsNoTracking(List<string> payOrderIds)
+        {
+            var payOrderProfits = _payOrderProfitRepository.GetByPayOrderIdsAsNoTracking(payOrderIds);
+            return _mapper.Map<IEnumerable<PayOrderProfitDto>>(payOrderProfits);
+        }
     }
 }

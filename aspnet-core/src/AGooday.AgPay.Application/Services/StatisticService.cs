@@ -161,7 +161,7 @@ namespace AGooday.AgPay.Application.Services
             var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.CreatedAt.ToString(format))
                 .Select(s =>
                 {
-                    IEnumerable<RefundOrder> refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    IEnumerable<RefundOrder> refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
 
                     return new StatisticResultDto()
                     {
@@ -228,7 +228,7 @@ namespace AGooday.AgPay.Application.Services
             var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.MchNo)
                 .Select(s =>
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
 
                     return new StatisticResultDto()
                     {
@@ -294,7 +294,7 @@ namespace AGooday.AgPay.Application.Services
             var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.StoreId)
                 .Select(s =>
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
 
                     return new StatisticResultDto()
                     {
@@ -359,7 +359,7 @@ namespace AGooday.AgPay.Application.Services
             var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.WayCode)
                 .Select(s =>
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
 
                     return new StatisticResultDto()
                     {
@@ -418,7 +418,7 @@ namespace AGooday.AgPay.Application.Services
             var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.WayType)
                 .Select(s =>
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
 
                     return new StatisticResultDto()
                     {
@@ -485,7 +485,7 @@ namespace AGooday.AgPay.Application.Services
             var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.AgentNo)
                 .Select(s =>
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
 
                     return new StatisticResultDto()
                     {
@@ -551,7 +551,7 @@ namespace AGooday.AgPay.Application.Services
             var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.IsvNo)
                 .Select(s =>
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
 
                     return new StatisticResultDto()
                     {
@@ -616,7 +616,7 @@ namespace AGooday.AgPay.Application.Services
             var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.IfCode)
                 .Select(s =>
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
 
                     return new StatisticResultDto()
                     {

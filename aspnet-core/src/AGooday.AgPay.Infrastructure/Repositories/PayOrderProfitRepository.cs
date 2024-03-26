@@ -15,5 +15,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return GetAllAsNoTracking().Where(w => w.PayOrderId.Equals(payOrderId));
         }
+
+        public IQueryable<PayOrderProfit> GetByPayOrderIdsAsNoTracking(List<string> payOrderIds)
+        {
+            return GetAllAsNoTracking().Where(w => payOrderIds.Contains(w.PayOrderId));
+        }
     }
 }
