@@ -23,17 +23,17 @@
           <a-form-item label="" class="table-head-layout">
             <a-select v-model="searchData.bizType" placeholder="业务类型" default-value="">
               <a-select-option value="">全部</a-select-option>
-              <a-select-option value="1">订单佣金计算</a-select-option>
-              <a-select-option value="2">退款轧差</a-select-option>
-              <a-select-option value="3">佣金提现</a-select-option>
-              <a-select-option value="4">人工调账</a-select-option>
+              <a-select-option :value="1">订单佣金计算</a-select-option>
+              <a-select-option :value="2">退款轧差</a-select-option>
+              <a-select-option :value="3">佣金提现</a-select-option>
+              <a-select-option :value="4">人工调账</a-select-option>
             </a-select>
           </a-form-item>
           <a-form-item label="" class="table-head-layout">
             <a-select v-model="searchData.accountType" placeholder="账户类型" default-value="">
               <a-select-option value="">全部</a-select-option>
-              <a-select-option value="1">钱包账户</a-select-option>
-              <a-select-option value="2">在途账户</a-select-option>
+              <a-select-option :value="1">钱包账户</a-select-option>
+              <a-select-option :value="2">在途账户</a-select-option>
             </a-select>
           </a-form-item>
           <ag-text-up :placeholder="'角色ID'" :msg="searchData.infoId" v-model="searchData.infoId" />
@@ -168,7 +168,7 @@
           <a-col :sm="12">
             <a-descriptions>
               <a-descriptions-item label="变动后余额">
-                <a-tag color="green">
+                <a-tag color="pink">
                   {{ detailData.afterBalance/100 }}
                 </a-tag>
               </a-descriptions-item>
@@ -200,10 +200,10 @@
   const tableColumns = [
     { key: 'id', dataIndex: 'id', title: '流水号', width: 120, fixed: 'left' },
     { key: 'bizType', title: '业务类型', width: 160, scopedSlots: { customRender: 'bizTypeSlot' } },
-    { key: 'infoName', title: '角色名称', width: 130, scopedSlots: { customRender: 'infoNameSlot' } },
-    { key: 'beforeBalance', dataIndex: 'beforeBalance', title: '变动前账户余额', width: 120 },
-    { key: 'changeAmount', dataIndex: 'changeAmount', title: '变动金额', width: 120 },
-    { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 120 },
+    { key: 'infoName', title: '角色名称', width: 260, scopedSlots: { customRender: 'infoNameSlot' } },
+    { key: 'beforeBalance', dataIndex: 'beforeBalance', title: '变动前账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+    { key: 'changeAmount', dataIndex: 'changeAmount', title: '变动金额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+    { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
     { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联订单号', width: 200 },
     { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
     { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }

@@ -9,6 +9,6 @@ namespace AGooday.AgPay.Application.Interfaces
         bool Update(PayOrderProfitDto dto);
         PayOrderProfitDto GetById(long recordId);
         IEnumerable<PayOrderProfitDto> GetAll();
-        IEnumerable<PayOrderProfitDto> GetByPayOrderId(string payOrderId);
+        IEnumerable<PayOrderProfitDto> GetByPayOrderIdAsNoTracking(string payOrderId);
     }
 }

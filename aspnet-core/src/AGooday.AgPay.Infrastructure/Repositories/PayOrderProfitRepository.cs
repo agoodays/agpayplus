@@ -11,9 +11,9 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public IQueryable<PayOrderProfit> GetByPayOrderId(string payOrderId)
+        public IQueryable<PayOrderProfit> GetByPayOrderIdAsNoTracking(string payOrderId)
         {
-            return DbSet.Where(w => w.PayOrderId.Equals(payOrderId));
+            return GetAllAsNoTracking().Where(w => w.PayOrderId.Equals(payOrderId));
         }
     }
 }

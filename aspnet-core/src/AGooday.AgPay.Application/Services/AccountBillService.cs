@@ -40,7 +40,8 @@ namespace AGooday.AgPay.Application.Services
 
         public void GenAccountBill(string payOrderId)
         {
-            var payOrderProfits = _payOrderProfitRepository.GetByPayOrderId(payOrderId).OrderBy(o => o.Id);
+            var payOrderProfits = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId).OrderBy(o => o.Id);
+            var isSaveChanges = false;
             foreach (var payOrderProfit in payOrderProfits)
             {
                 if (payOrderProfit.ProfitAmount > 0)
@@ -57,7 +58,15 @@ namespace AGooday.AgPay.Application.Services
                     accountBill.AccountType = (byte)AccountBillAccountType.IN_TRANSIT_ACCOUNT;
                     accountBill.RelaBizOrderType = (byte)AccountBillRelaBizOrderType.PAY_ORDER;
                     accountBill.RelaBizOrderId = payOrderProfit.PayOrderId;
+                    accountBill.CreatedAt = DateTime.Now;
+                    accountBill.UpdatedAt = DateTime.Now;
+                    _accountBillRepository.Add(accountBill);
+                    isSaveChanges = true;
                 }
+            }
+            if (isSaveChanges)
+            {
+                _accountBillRepository.SaveChanges(out int _);
             }
         }
 

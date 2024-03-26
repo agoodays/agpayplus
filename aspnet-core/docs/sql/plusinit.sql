@@ -324,7 +324,7 @@ CREATE TABLE `t_account_bill` (
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `Uni_BillId` (`bill_id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='账户帐单表';
+) ENGINE=INNODB AUTO_INCREMENT=1001 DEFAULT CHARSET=utf8mb4 COMMENT='账户帐单表';
 
 -- 代理商管理
 INSERT INTO t_sys_entitlement VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '35', 'MGR', NOW(), NOW());

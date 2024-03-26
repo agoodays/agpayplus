@@ -311,11 +311,11 @@ export default {
 
     // 此处判断，微信，支付宝，聚合码，哪种支付方式一个都没配置，如果未配置，则不显示该板块，若等于-1 则表示不存在
     showTitle (parameterA) {
-        if (this.appPaywayList.toString().indexOf(parameterA) === -1) {
-          return false
-        } else {
-          return true
-        }
+      if (this.appPaywayList.toString().indexOf(parameterA) === -1) {
+        return false
+      } else {
+        return true
+      }
     },
     // 聚合支付标题显示
     showQtTitle () {

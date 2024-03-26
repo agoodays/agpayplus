@@ -4,6 +4,6 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IPayOrderProfitRepository : IRepository<PayOrderProfit>
     {
-        IQueryable<PayOrderProfit> GetByPayOrderId(string payOrderId);
+        IQueryable<PayOrderProfit> GetByPayOrderIdAsNoTracking(string payOrderId);
     }
 }

@@ -52,7 +52,7 @@
         </div>
       </div>
     </a-modal>
-    <PayQrCode ref="payQrCode"/>
+    <PayQrCode ref="payQrCode" @closeBarCode="$refs.payBarCode.visible = false"/>
     <PayBarCode ref="payBarCode" @authCodeChange="authCodeChange" @randomOrderNo="randomOrderNo"/>
   </div>
 </template>
@@ -218,9 +218,10 @@ export default {
 
       const that = this
       payTestOrder(that.saveObject).then(res => {
-        if (that.saveObject.wayCode === 'QR_CASHIER' && res) {
-          this.$refs.payQrCode.show(res) // 打开弹窗
-        }
+        // if (that.saveObject.wayCode === 'QR_CASHIER' && res) {
+        //   this.$refs.payQrCode.show(res) // 打开弹窗
+        // }
+        this.$refs.payQrCode.show(that.saveObject.wayCode, res) // 打开弹窗
         that.randomOrderNo() // 刷新订单号
       }).catch(() => {
         this.$refs.payBarCode.processCatch()

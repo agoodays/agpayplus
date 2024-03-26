@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         {
             IRefundService refundService = _refundServiceFactory(refundOrder.IfCode);
             var payOrder = _payOrderService.GetById(refundOrder.PayOrderId);
-            var payOrderProfits = _payOrderProfitService.GetByPayOrderId(refundOrder.PayOrderId);
+            var payOrderProfits = _payOrderProfitService.GetByPayOrderIdAsNoTracking(refundOrder.PayOrderId);
             var amount = payOrder.Amount - payOrder.RefundAmount;
             var beforeBalance = 0L;
             var profitAmount = 0L;
@@ -128,7 +128,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
         private void GenAccountBill(PayOrderProfitDto payOrderProfit, RefundOrderDto refundOrder, long beforeBalance, long afterBalance, long changeAmount)
         {
-            if (payOrderProfit.ProfitAmount > 0)
+            if (beforeBalance > 0)
             {
                 var accountBill = new AccountBillDto();
                 accountBill.BillId = SeqUtil.GenBillId();

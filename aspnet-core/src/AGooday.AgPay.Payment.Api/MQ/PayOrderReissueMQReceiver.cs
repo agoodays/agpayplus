@@ -16,11 +16,11 @@ namespace AGooday.AgPay.Payment.Api.MQ
     public class PayOrderReissueMQReceiver : PayOrderReissueMQ.IMQReceiver
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<PayOrderMchNotifyMQReceiver> log;
+        private readonly ILogger<PayOrderReissueMQReceiver> log;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public PayOrderReissueMQReceiver(IMQSender mqSender,
-            ILogger<PayOrderMchNotifyMQReceiver> log,
+            ILogger<PayOrderReissueMQReceiver> log,
             IServiceScopeFactory serviceScopeFactory)
         {
             this.mqSender = mqSender;
