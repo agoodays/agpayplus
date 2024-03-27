@@ -36,16 +36,6 @@ namespace AGooday.AgPay.Payment.Api.Channel
             return AmountUtil.CalPercentageFee(amount, payOrder.MchFeeRate);
         }
 
-        public virtual long CalculateFeeAmount(long amount, decimal rate)
-        {
-            return AmountUtil.CalPercentageFee(amount, rate);
-        }
-
-        public virtual long CalculateProfitAmount(long amount, decimal rate)
-        {
-            return AmountUtil.CalPercentageFee(amount, rate);
-        }
-
         public abstract ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext);
         public abstract ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
 

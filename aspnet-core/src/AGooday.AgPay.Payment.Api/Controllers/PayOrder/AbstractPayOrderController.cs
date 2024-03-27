@@ -327,35 +327,42 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             var totalProfitRate = 0M;
             foreach (var agentPayRateConfig in agentPayRateConfigs)
             {
-                var profitRate = preFeeRate = agentPayRateConfig.FeeRate.Value;
+                var feeRate = agentPayRateConfig.FeeRate.Value;
+                var feeAmount = paymentService?.CalculateFeeAmount(payOrder.Amount, feeRate) ?? 0;
+                var profitRate = preFeeRate - feeRate;
                 var profitAmount = paymentService?.CalculateProfitAmount(payOrder.Amount, profitRate) ?? 0;
                 payOrderProfit = new PayOrderProfitDto();
                 payOrderProfit.InfoId = agentPayRateConfig.InfoId;
                 payOrderProfit.InfoName = agentPayRateConfig.InfoName;
                 payOrderProfit.InfoType = agentPayRateConfig.InfoType;
                 payOrderProfit.PayOrderId = payOrder.PayOrderId;
-                payOrderProfit.FeeRate = agentPayRateConfig.FeeRate.Value;
+                payOrderProfit.FeeRate = feeRate;
                 payOrderProfit.FeeRateDesc = agentPayRateConfig.FeeRateDesc;
                 payOrderProfit.ProfitRate = profitRate;
+                payOrderProfit.FeeAmount = feeAmount;
+                payOrderProfit.OrderFeeAmount = feeAmount;
                 payOrderProfit.ProfitAmount = profitAmount;
                 payOrderProfit.OrderProfitAmount = profitAmount;
                 _payOrderProfitService.Add(payOrderProfit);
-                preFeeRate = agentPayRateConfig.FeeRate.Value;
+                preFeeRate = feeRate;
                 totalProfitAmount += profitAmount;
                 totalProfitRate += profitRate;
             }
 
             var isvPayRateConfigs = payRateConfigs.FirstOrDefault(w => w.InfoType.Equals(CS.INFO_TYPE.ISV));
-            var isvFeeAmount = paymentService?.CalculateFeeAmount(payOrder.Amount, isvPayRateConfigs.FeeRate.Value) ?? 0;
+            var platformFeeRate = isvPayRateConfigs.FeeRate.Value;
+            var platformFeeAmount = paymentService?.CalculateFeeAmount(payOrder.Amount, platformFeeRate) ?? 0;
             var platformProfitRate = payOrder.MchFeeRate - isvPayRateConfigs.FeeRate.Value;
-            var platformProfitAmount = payOrder.MchFeeAmount - isvFeeAmount;//paymentService?.CalculateProfitAmount(payOrder.Amount, platformProfitRate) ?? 0;
+            var platformProfitAmount = payOrder.MchFeeAmount - platformFeeAmount;//paymentService?.CalculateProfitAmount(payOrder.Amount, platformProfitRate) ?? 0;
             payOrderProfit = new PayOrderProfitDto();
             payOrderProfit.InfoId = CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_INACCOUNT;
             payOrderProfit.InfoName = "运营平台";
             payOrderProfit.InfoType = CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM;
             payOrderProfit.PayOrderId = payOrder.PayOrderId;
-            payOrderProfit.FeeRate = isvPayRateConfigs.FeeRate.Value;
+            payOrderProfit.FeeRate = platformFeeRate;
             payOrderProfit.FeeRateDesc = isvPayRateConfigs.FeeRateDesc;
+            payOrderProfit.FeeAmount = platformFeeAmount;
+            payOrderProfit.OrderFeeAmount = platformFeeAmount;
             payOrderProfit.ProfitRate = platformProfitRate;
             payOrderProfit.ProfitAmount = platformProfitAmount;
             payOrderProfit.OrderProfitAmount = platformProfitAmount;
@@ -366,8 +373,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrderProfit.InfoName = "运营平台";
             payOrderProfit.InfoType = CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM;
             payOrderProfit.PayOrderId = payOrder.PayOrderId;
-            payOrderProfit.FeeRate = isvPayRateConfigs.FeeRate.Value;
+            payOrderProfit.FeeRate = platformFeeRate;
             payOrderProfit.FeeRateDesc = isvPayRateConfigs.FeeRateDesc;
+            payOrderProfit.FeeAmount = platformFeeAmount;
+            payOrderProfit.OrderFeeAmount = platformFeeAmount;
             payOrderProfit.ProfitRate = platformProfitRate - totalProfitRate;
             payOrderProfit.ProfitAmount = platformProfitAmount - totalProfitAmount;
             payOrderProfit.OrderProfitAmount = platformProfitAmount - totalProfitAmount;

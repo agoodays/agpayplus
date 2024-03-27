@@ -6,6 +6,7 @@
       :confirm-loading="confirmLoading"
       @ok="handleOk"
       @cancel="handleCancel"
+      :maskClosable="false"
       :closable="false"
     >
       <a-row>

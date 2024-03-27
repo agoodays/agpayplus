@@ -148,6 +148,13 @@
           </a-col>
           <a-col :sm="12">
             <a-descriptions>
+              <a-descriptions-item label="代理商号">
+                {{ detailData.agentNo }}
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12">
+            <a-descriptions>
               <a-descriptions-item label="商户号">
                 {{ detailData.mchNo }}
               </a-descriptions-item>

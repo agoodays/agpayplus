@@ -18,7 +18,6 @@
         <span>{{ payText }}</span>
       </p>
     </a-modal>
-
   </div>
 </template>
 <script>

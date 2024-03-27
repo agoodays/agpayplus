@@ -279,7 +279,7 @@
         :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
       >
         <a-row justify="space-between" type="flex">
-          <a-col :sm="12">
+          <a-col :sm="12" v-if="!!detailData.isvNo">
             <a-descriptions>
               <a-descriptions-item label="服务商号">
                 {{ detailData.isvNo }}
@@ -295,7 +295,7 @@
               </a-descriptions-item>
             </a-descriptions>
           </a-col>
-          <a-col :sm="12">
+          <a-col :sm="12" v-if="!!detailData.agentNo">
             <a-descriptions>
               <a-descriptions-item label="代理商号">
                 {{ detailData.agentNo }}

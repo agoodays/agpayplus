@@ -26,7 +26,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         private readonly ILogger<RefundOrderController> _logger;
         private readonly IPayOrderService _payOrderService;
         private readonly IRefundOrderService _refundOrderService;
-        private readonly IPayOrderProfitService _payOrderProfitService;
         private readonly Func<string, IRefundService> _refundServiceFactory;
         private readonly RefundOrderProcessService _refundOrderProcessService;
         private readonly PayMchNotifyService _payMchNotifyService;
@@ -34,7 +33,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         public RefundOrderController(ILogger<RefundOrderController> logger,
             IPayOrderService payOrderService,
             IRefundOrderService refundOrderService,
-            IPayOrderProfitService payOrderProfitService,
             Func<string, IRefundService> refundServiceFactory,
             PayMchNotifyService payMchNotifyService,
             RefundOrderProcessService refundOrderProcessService,
@@ -45,7 +43,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             _logger = logger;
             _payOrderService = payOrderService;
             _refundOrderService = refundOrderService;
-            _payOrderProfitService = payOrderProfitService;
             _refundServiceFactory = refundServiceFactory;
             _refundOrderProcessService = refundOrderProcessService;
             _payMchNotifyService = payMchNotifyService;

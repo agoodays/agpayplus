@@ -62,6 +62,20 @@ namespace AGooday.AgPay.Domain.Models
         public string FeeRateDesc { get; set; }
 
         /// <summary>
+        /// 手续费(实际手续费),单位分
+        /// </summary>
+        [Comment("手续费(实际手续费),单位分")]
+        [Required, Column("fee_amount", TypeName = "bigint")]
+        public long FeeAmount { get; set; }
+
+        /// <summary>
+        /// 收单手续费,单位分
+        /// </summary>
+        [Comment("收单手续费,单位分")]
+        [Required, Column("order_fee_amount", TypeName = "bigint")]
+        public long OrderFeeAmount { get; set; }
+
+        /// <summary>
         /// 分润点数（利润率）
         /// </summary>
         [Required, Column("profit_rate", TypeName = "decimal(20,6)")]

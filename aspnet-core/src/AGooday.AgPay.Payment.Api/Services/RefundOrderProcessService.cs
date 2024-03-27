@@ -18,20 +18,20 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly IRefundOrderService _refundOrderService;
         private readonly IPayOrderProfitService _payOrderProfitService;
         private readonly IAccountBillService _accountBillService;
-        private readonly Func<string, IRefundService> _refundServiceFactory;
+        private readonly Func<string, IPaymentService> _paymentServiceFactory;
 
         public RefundOrderProcessService(PayMchNotifyService payMchNotifyService,
             IPayOrderService payOrderService,
             IRefundOrderService refundOrderService,
             IPayOrderProfitService payOrderProfitService,
-            Func<string, IRefundService> refundServiceFactory,
+            Func<string, IPaymentService> paymentServiceFactory,
             IAccountBillService accountBillService)
         {
             this.payMchNotifyService = payMchNotifyService;
             _payOrderService = payOrderService;
             _refundOrderService = refundOrderService;
             _payOrderProfitService = payOrderProfitService;
-            _refundServiceFactory = refundServiceFactory;
+            _paymentServiceFactory = paymentServiceFactory;
             _accountBillService = accountBillService;
         }
 
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="refundOrder"></param>
         public void UpdatePayOrderProfitAndGenAccountBill(RefundOrderDto refundOrder)
         {
-            IRefundService refundService = _refundServiceFactory(refundOrder.IfCode);
+            IPaymentService paymentService = _paymentServiceFactory(refundOrder.IfCode);
             var payOrder = _payOrderService.GetById(refundOrder.PayOrderId);
             var payOrderProfits = _payOrderProfitService.GetByPayOrderIdAsNoTracking(refundOrder.PayOrderId);
             var amount = payOrder.Amount - payOrder.RefundAmount;
@@ -91,9 +91,10 @@ namespace AGooday.AgPay.Payment.Api.Services
             foreach (var payOrderProfit in agentPayOrderProfits)
             {
                 beforeBalance = payOrderProfit.ProfitAmount;
-                profitAmount = refundService?.CalculateProfitAmount(amount, payOrderProfit.ProfitRate) ?? 0;
+                profitAmount = paymentService?.CalculateProfitAmount(amount, payOrderProfit.ProfitRate) ?? 0;
                 afterBalance = profitAmount;
                 changeAmount = afterBalance - beforeBalance;
+                payOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, payOrderProfit.FeeRate) ?? 0;
                 payOrderProfit.ProfitAmount = profitAmount;
                 _payOrderProfitService.Update(payOrderProfit);
                 this.GenAccountBill(payOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
@@ -103,12 +104,13 @@ namespace AGooday.AgPay.Payment.Api.Services
             var platformInaccountPayOrderProfit = payOrderProfits
                 .Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM) && w.InfoId.Equals(CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_INACCOUNT))
                 .OrderBy(o => o.Id).FirstOrDefault();
-            var isvFeeAmount = refundService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
+            var isvFeeAmount = paymentService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
             var platformInaccountProfitAmount = payOrder.MchFeeAmount - isvFeeAmount;
             beforeBalance = platformInaccountPayOrderProfit.ProfitAmount;
             profitAmount = platformInaccountProfitAmount;
             afterBalance = profitAmount;
             changeAmount = afterBalance - beforeBalance;
+            platformInaccountPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
             platformInaccountPayOrderProfit.ProfitAmount = profitAmount;
             _payOrderProfitService.Update(platformInaccountPayOrderProfit);
             this.GenAccountBill(platformInaccountPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
@@ -121,6 +123,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             profitAmount = platformProfitAmount;
             afterBalance = profitAmount;
             changeAmount = afterBalance - beforeBalance;
+            platformProfitPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformProfitPayOrderProfit.FeeRate) ?? 0;
             platformProfitPayOrderProfit.ProfitAmount = profitAmount;
             _payOrderProfitService.Update(platformProfitPayOrderProfit);
             this.GenAccountBill(platformProfitPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
@@ -128,7 +131,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
         private void GenAccountBill(PayOrderProfitDto payOrderProfit, RefundOrderDto refundOrder, long beforeBalance, long afterBalance, long changeAmount)
         {
-            if (beforeBalance > 0)
+            if (beforeBalance > 0 && changeAmount != 0)
             {
                 var accountBill = new AccountBillDto();
                 accountBill.BillId = SeqUtil.GenBillId();

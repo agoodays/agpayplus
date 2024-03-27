@@ -308,7 +308,7 @@
               </a-descriptions-item>
             </a-descriptions>
           </a-col>
-          <a-col :sm="12">
+          <a-col :sm="12" v-if="!!detailData.isvNo">
             <a-descriptions>
               <a-descriptions-item label="服务商号">
                 {{ detailData.isvNo }}
@@ -324,7 +324,7 @@
               </a-descriptions-item>
             </a-descriptions>
           </a-col>
-          <a-col :sm="12">
+          <a-col :sm="12" v-if="!!detailData.agentNo">
             <a-descriptions>
               <a-descriptions-item label="代理商号">
                 {{ detailData.agentNo }}
@@ -594,6 +594,32 @@
                 style="height: 100px;color: black"
                 v-model="detailData.extParam"
               />
+            </a-form-model-item>
+          </a-col>
+        </a-row>
+        <a-row justify="space-between" type="flex" v-if="!!detailData.profitList?.length">
+          <a-col :sm="24">
+            <a-form-model-item label="分润情况" style="display:flex">
+              <div v-for="(item, key) in detailData.profitList" :key="key">
+                <span v-if="item.infoType === 'AGENT'">
+                  代理商（{{item.infoName}}）分润：
+                  <a-tag color="green">
+                    {{ item.profitAmount/100 }}
+                  </a-tag>
+                </span>
+                <span v-if="item.infoId === 'PLATFORM_INACCOUNT'">
+                  平台三方入账 （不扣减代理商分润）：
+                  <a-tag color="green">
+                    {{ item.profitAmount/100 }}
+                  </a-tag>
+                </span>
+                <span v-if="item.infoId === 'PLATFORM_PROFIT'">
+                  平台利润：
+                  <a-tag color="green">
+                    {{ item.profitAmount/100 }}
+                  </a-tag>
+                </span>
+              </div>
             </a-form-model-item>
           </a-col>
         </a-row>

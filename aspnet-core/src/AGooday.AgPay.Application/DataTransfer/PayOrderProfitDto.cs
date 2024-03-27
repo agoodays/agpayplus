@@ -38,6 +38,16 @@
         public string FeeRateDesc { get; set; }
 
         /// <summary>
+        /// 手续费(实际手续费),单位分
+        /// </summary>
+        public long FeeAmount { get; set; }
+
+        /// <summary>
+        /// 收单手续费,单位分
+        /// </summary>
+        public long OrderFeeAmount { get; set; }
+
+        /// <summary>
         /// 分润点数（利润率）
         /// </summary>
         public decimal ProfitRate { get; set; }

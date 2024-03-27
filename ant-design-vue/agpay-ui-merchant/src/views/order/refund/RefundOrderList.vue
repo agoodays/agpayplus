@@ -123,7 +123,7 @@
               </a-descriptions-item>
             </a-descriptions>
           </a-col>
-          <a-col :sm="12">
+          <a-col :sm="12" v-if="!!detailData.isvNo">
             <a-descriptions>
               <a-descriptions-item label="服务商号">
                 {{ detailData.isvNo }}
@@ -136,6 +136,13 @@
                 <a-tag color="purple">
                   {{ detailData.refundOrderId }}
                 </a-tag>
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+          <a-col :sm="12" v-if="!!detailData.agentNo">
+            <a-descriptions>
+              <a-descriptions-item label="代理商号">
+                {{ detailData.agentNo }}
               </a-descriptions-item>
             </a-descriptions>
           </a-col>
