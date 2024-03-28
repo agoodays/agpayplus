@@ -150,7 +150,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
 
         private TransferOrderDto GenTransferOrder(TransferOrderRQ rq, MchAppConfigContext configContext, string ifCode)
         {
-            return GenTransferOrder(rq, configContext.MchInfo, configContext.MchApp, configContext.AgentConfigContext?.AgentInfo, configContext.IsvConfigContext?.IsvInfo, ifCode);
+            MchInfoDto mchInfo = configContext.MchInfo;
+            MchAppDto mchApp = configContext.MchApp;
+            AgentInfoDto agentInfo = _configContextQueryService.QueryAgentInfo(configContext);
+            IsvInfoDto isvInfo = _configContextQueryService.QueryIsvInfo(configContext);
+            return GenTransferOrder(rq, mchInfo, mchApp, agentInfo, isvInfo, ifCode);
         }
 
         private TransferOrderDto GenTransferOrder(TransferOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode)

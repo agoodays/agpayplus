@@ -16,6 +16,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly IMchStoreService _mchStoreService;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
+        private readonly IAgentInfoService _agentInfoService;
         private readonly IIsvInfoService _isvInfoService;
         private readonly IPayWayService _payWayService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
@@ -23,6 +24,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         public ConfigContextQueryService(IMchStoreService mchStoreService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
+            IAgentInfoService agentInfoService,
             IIsvInfoService isvInfoService,
             IPayWayService payWayService,
             IPayInterfaceConfigService payInterfaceConfigService,
@@ -35,6 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             _payWayService = payWayService;
             _payInterfaceConfigService = payInterfaceConfigService;
             _configContextService = configContextService;
+            _agentInfoService = agentInfoService;
         }
 
         private bool IsCache()
@@ -86,6 +89,26 @@ namespace AGooday.AgPay.Payment.Api.Services
             result.AppId = mchAppId;
 
             return result;
+        }
+
+        public AgentInfoDto QueryAgentInfo(MchAppConfigContext configContext)
+        {
+            if (IsCache())
+            {
+                return configContext.AgentConfigContext?.AgentInfo;
+            }
+
+            return _agentInfoService.GetById(configContext.MchInfo.AgentNo);
+        }
+
+        public IsvInfoDto QueryIsvInfo(MchAppConfigContext configContext)
+        {
+            if (IsCache())
+            {
+                return configContext.IsvConfigContext?.IsvInfo;
+            }
+
+            return _isvInfoService.GetById(configContext.MchInfo.IsvNo);
         }
 
         public NormalMchParams QueryNormalMchParams(string mchNo, string mchAppId, string ifCode)

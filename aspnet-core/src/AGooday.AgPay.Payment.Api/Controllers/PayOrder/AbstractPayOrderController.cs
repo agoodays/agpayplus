@@ -252,7 +252,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
         private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchAppConfigContext configContext, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
         {
-            return GenPayOrder(rq, configContext.MchInfo, configContext.MchApp, configContext.AgentConfigContext?.AgentInfo, configContext.IsvConfigContext?.IsvInfo, ifCode, mchPayPassage, paymentService);
+            MchInfoDto mchInfo = configContext.MchInfo;
+            MchAppDto mchApp = configContext.MchApp;
+            AgentInfoDto agentInfo = _configContextQueryService.QueryAgentInfo(configContext);
+            IsvInfoDto isvInfo = _configContextQueryService.QueryIsvInfo(configContext);
+            return GenPayOrder(rq, mchInfo, mchApp, agentInfo, isvInfo, ifCode, mchPayPassage, paymentService);
         }
 
         private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)

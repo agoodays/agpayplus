@@ -177,7 +177,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 
         private RefundOrderDto GenRefundOrder(RefundOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext configContext, IRefundService refundService)
         {
-            return GenRefundOrder(rq, payOrder, configContext.MchInfo, configContext.MchApp, configContext.AgentConfigContext?.AgentInfo, configContext.IsvConfigContext?.IsvInfo, refundService);
+            MchInfoDto mchInfo = configContext.MchInfo;
+            MchAppDto mchApp = configContext.MchApp;
+            AgentInfoDto agentInfo = _configContextQueryService.QueryAgentInfo(configContext);
+            IsvInfoDto isvInfo = _configContextQueryService.QueryIsvInfo(configContext);
+            return GenRefundOrder(rq, payOrder, mchInfo, mchApp, agentInfo, isvInfo, refundService);
         }
 
         private RefundOrderDto GenRefundOrder(RefundOrderRQ rq, PayOrderDto payOrder, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, IRefundService refundService)
