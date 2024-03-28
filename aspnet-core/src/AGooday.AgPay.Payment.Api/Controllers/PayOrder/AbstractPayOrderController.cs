@@ -143,14 +143,14 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     throw new BizException("获取商户应用信息失败");
                 }
 
-                MchInfoDto mchInfo = mchAppConfigContext.MchInfo;
-                MchAppDto mchApp = mchAppConfigContext.MchApp;
+                //MchInfoDto mchInfo = mchAppConfigContext.MchInfo;
+                //MchAppDto mchApp = mchAppConfigContext.MchApp;
 
                 //收银台支付并且只有新订单需要走这里，  收银台二次下单的wayCode应该为实际支付方式。
                 if (isNewOrder && CS.PAY_WAY_CODE.QR_CASHIER.Equals(wayCode))
                 {
                     //生成订单
-                    payOrder = GenPayOrder(bizRQ, mchInfo, mchApp, null, null, null);
+                    payOrder = GenPayOrder(bizRQ, mchAppConfigContext, null, null, null);
                     string payOrderId = payOrder.PayOrderId;
                     //订单入库 订单状态： 生成状态  此时没有和任何上游渠道产生交互。
                     _payOrderService.Add(payOrder);
@@ -189,7 +189,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 //生成订单
                 if (isNewOrder)
                 {
-                    payOrder = GenPayOrder(bizRQ, mchInfo, mchApp, ifCode, mchPayPassage, paymentService);
+                    payOrder = GenPayOrder(bizRQ, mchAppConfigContext, ifCode, mchPayPassage, paymentService);
                 }
                 else
                 {
@@ -250,7 +250,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
         }
 
-        private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
+        private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchAppConfigContext configContext, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
+        {
+            return GenPayOrder(rq, configContext.MchInfo, configContext.MchApp, configContext.AgentConfigContext?.AgentInfo, configContext.IsvConfigContext?.IsvInfo, ifCode, mchPayPassage, paymentService);
+        }
+
+        private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
         {
             var wayType = _payWayService.GetWayTypeByWayCode(rq.WayCode);
             PayOrderDto payOrder = new PayOrderDto();
@@ -259,7 +264,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrder.MchName = mchInfo.MchName; //商户名称
             payOrder.MchShortName = mchInfo.MchShortName; //商户简称
             payOrder.AgentNo = mchInfo.AgentNo; //代理商号
+            payOrder.AgentName = agentInfo?.AgentName; //代理商名称
+            payOrder.AgentShortName = agentInfo?.AgentShortName; //代理商简称
             payOrder.IsvNo = mchInfo.IsvNo; //服务商号
+            payOrder.IsvName = isvInfo?.IsvName; //服务商名称
+            payOrder.IsvShortName = isvInfo?.IsvShortName; //服务商简称
             payOrder.MchType = mchInfo.Type; //商户类型
             payOrder.MchOrderNo = rq.MchOrderNo; //商户订单号
             payOrder.AppId = mchApp.AppId; //商户应用appId

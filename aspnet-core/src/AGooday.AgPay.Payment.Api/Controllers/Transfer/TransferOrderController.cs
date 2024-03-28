@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                     throw new BizException("获取商户应用信息失败");
                 }
 
-                MchInfoDto mchInfo = mchAppConfigContext.MchInfo;
+                //MchInfoDto mchInfo = mchAppConfigContext.MchInfo;
                 MchAppDto mchApp = mchAppConfigContext.MchApp;
 
                 // 是否已正确配置
@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                     throw new BizException("该接口不支持该入账方式");
                 }
 
-                transferOrder = GenTransferOrder(bizRQ, mchInfo, mchApp, ifCode);
+                transferOrder = GenTransferOrder(bizRQ, mchAppConfigContext, ifCode);
 
                 //预先校验
                 string errMsg = transferService.PreCheck(bizRQ, transferOrder);
@@ -148,7 +148,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             }
         }
 
-        private TransferOrderDto GenTransferOrder(TransferOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, string ifCode)
+        private TransferOrderDto GenTransferOrder(TransferOrderRQ rq, MchAppConfigContext configContext, string ifCode)
+        {
+            return GenTransferOrder(rq, configContext.MchInfo, configContext.MchApp, configContext.AgentConfigContext?.AgentInfo, configContext.IsvConfigContext?.IsvInfo, ifCode);
+        }
+
+        private TransferOrderDto GenTransferOrder(TransferOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode)
         {
             TransferOrderDto transferOrder = new TransferOrderDto();
             transferOrder.TransferId = SeqUtil.GenTransferId(); //生成转账订单号
@@ -156,7 +161,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             transferOrder.MchName = mchInfo.MchName; //商户名称（简称）
             transferOrder.MchShortName = mchInfo.MchShortName; //商户简称
             transferOrder.AgentNo = mchInfo.AgentNo; //代理商号
+            transferOrder.AgentName = agentInfo?.AgentName; //代理商名称
+            transferOrder.AgentShortName = agentInfo?.AgentShortName; //代理商简称
             transferOrder.IsvNo = mchInfo.IsvNo; //服务商号
+            transferOrder.IsvName = isvInfo?.IsvName; //服务商名称
+            transferOrder.IsvShortName = isvInfo?.IsvShortName; //服务商简称
             transferOrder.AppId = mchApp.AppId; //商户应用appId
             transferOrder.MchType = mchInfo.Type; //商户类型
             transferOrder.MchOrderNo = rq.MchOrderNo; //商户订单号

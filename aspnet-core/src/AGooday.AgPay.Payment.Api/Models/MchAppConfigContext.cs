@@ -45,6 +45,11 @@ namespace AGooday.AgPay.Payment.Api.Models
         #endregion
 
         /// <summary>
+        /// 放置所属代理商的信息
+        /// </summary>
+        public AgentConfigContext AgentConfigContext { get; set; }
+
+        /// <summary>
         /// 放置所属服务商的信息
         /// </summary>
         public IsvConfigContext IsvConfigContext { get; set; }

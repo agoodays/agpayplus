@@ -127,8 +127,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                     throw new BizException("获取商户应用信息失败");
                 }
 
-                MchInfoDto mchInfo = mchAppConfigContext.MchInfo;
-                MchAppDto mchApp = mchAppConfigContext.MchApp;
+                //MchInfoDto mchInfo = mchAppConfigContext.MchInfo;
+                //MchAppDto mchApp = mchAppConfigContext.MchApp;
 
                 //获取退款接口
                 IRefundService refundService = _refundServiceFactory(payOrder.IfCode);
@@ -137,7 +137,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                     throw new BizException("当前通道不支持退款！");
                 }
 
-                refundOrder = GenRefundOrder(rq, payOrder, mchInfo, mchApp, refundService);
+                refundOrder = GenRefundOrder(rq, payOrder, mchAppConfigContext, refundService);
 
                 //退款单入库 退款单状态：生成状态  此时没有和任何上游渠道产生交互。
                 _refundOrderService.Add(refundOrder);
@@ -175,7 +175,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             }
         }
 
-        private RefundOrderDto GenRefundOrder(RefundOrderRQ rq, PayOrderDto payOrder, MchInfoDto mchInfo, MchAppDto mchApp, IRefundService refundService)
+        private RefundOrderDto GenRefundOrder(RefundOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext configContext, IRefundService refundService)
+        {
+            return GenRefundOrder(rq, payOrder, configContext.MchInfo, configContext.MchApp, configContext.AgentConfigContext?.AgentInfo, configContext.IsvConfigContext?.IsvInfo, refundService);
+        }
+
+        private RefundOrderDto GenRefundOrder(RefundOrderRQ rq, PayOrderDto payOrder, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, IRefundService refundService)
         {
             DateTime nowTime = DateTime.Now;
             RefundOrderDto refundOrder = new RefundOrderDto();
@@ -186,7 +191,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             refundOrder.MchName = mchInfo.MchName; //商户名称
             refundOrder.MchShortName = mchInfo.MchShortName; //商户简称
             refundOrder.AgentNo = mchInfo.AgentNo; //代理商号
+            refundOrder.AgentName = agentInfo?.AgentName; //代理商名称
+            refundOrder.AgentShortName = agentInfo?.AgentShortName; //代理商简称
             refundOrder.IsvNo = mchInfo.IsvNo; //服务商号
+            refundOrder.IsvName = isvInfo?.IsvName; //服务商名称
+            refundOrder.IsvShortName = isvInfo?.IsvShortName; //服务商简称
             refundOrder.AppId = mchApp.AppId; //商户应用ID
             refundOrder.AppName = mchApp.AppName; //商户应用名称
             refundOrder.StoreId = payOrder.StoreId; //商户门店ID

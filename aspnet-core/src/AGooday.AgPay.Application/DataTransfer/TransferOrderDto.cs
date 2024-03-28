@@ -31,9 +31,29 @@
         public string AgentNo { get; set; }
 
         /// <summary>
+        /// 代理商名称
+        /// </summary>
+        public string AgentName { get; set; }
+
+        /// <summary>
+        /// 代理商简称
+        /// </summary>
+        public string AgentShortName { get; set; }
+
+        /// <summary>
         /// 服务商号
         /// </summary>
         public string IsvNo { get; set; }
+
+        /// <summary>
+        /// 服务商名称
+        /// </summary>
+        public string IsvName { get; set; }
+
+        /// <summary>
+        /// 服务商简称
+        /// </summary>
+        public string IsvShortName { get; set; }
 
         /// <summary>
         /// 应用ID

@@ -190,7 +190,11 @@ ALTER TABLE `t_refund_order`
 ALTER TABLE `t_transfer_order`   
   CHANGE `mch_name` `mch_name` VARCHAR(64) NOT NULL COMMENT '商户名称'  AFTER `mch_no`,
   ADD COLUMN `mch_short_name` VARCHAR(32) NULL COMMENT '商户简称' AFTER `mch_name`,
-  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_short_name`;
+  ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_short_name`,
+  ADD COLUMN `agent_name` VARCHAR(64) DEFAULT NULL COMMENT '代理商名称' AFTER `agent_no`,
+  ADD COLUMN `agent_short_name` VARCHAR(32) DEFAULT NULL COMMENT '代理商简称' AFTER `agent_name`,
+  ADD COLUMN `isv_name` VARCHAR(64) DEFAULT NULL COMMENT '服务商名称' AFTER `isv_no`,
+  ADD COLUMN `isv_short_name` VARCHAR(32) DEFAULT NULL COMMENT '服务商简称' AFTER `isv_name`;
   
 ALTER TABLE `t_mch_notify_record`   
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `mch_no`,

@@ -47,11 +47,39 @@ namespace AGooday.AgPay.Domain.Models
         public string AgentNo { get; set; }
 
         /// <summary>
+        /// 代理商名称
+        /// </summary>
+        [Comment("代理商名称")]
+        [Column("agent_name", TypeName = "varchar(64)")]
+        public string AgentName { get; set; }
+
+        /// <summary>
+        /// 代理商简称
+        /// </summary>
+        [Comment("代理商简称")]
+        [Column("agent_short_name", TypeName = "varchar(32)")]
+        public string AgentShortName { get; set; }
+
+        /// <summary>
         /// 服务商号
         /// </summary>
         [Comment("服务商号")]
         [Column("isv_no", TypeName = "varchar(64)")]
         public string IsvNo { get; set; }
+
+        /// <summary>
+        /// 服务商名称
+        /// </summary>
+        [Comment("服务商名称")]
+        [Column("isv_name", TypeName = "varchar(64)")]
+        public string IsvName { get; set; }
+
+        /// <summary>
+        /// 服务商简称
+        /// </summary>
+        [Comment("服务商简称")]
+        [Column("isv_short_name", TypeName = "varchar(32)")]
+        public string IsvShortName { get; set; }
 
         /// <summary>
         /// 应用ID

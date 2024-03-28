@@ -22,21 +22,32 @@ namespace AGooday.AgPay.Payment.Api.Services
         private static readonly Dictionary<string, MchAppConfigContext> mchAppConfigContextMap = new Dictionary<string, MchAppConfigContext>();
 
         /// <summary>
+        /// <代理商号, 代理商配置上下文>
+        /// </summary>
+        private static readonly Dictionary<string, AgentConfigContext> agentConfigContextMap = new Dictionary<string, AgentConfigContext>();
+
+        /// <summary>
         /// <服务商号, 服务商配置上下文>
         /// </summary>
         private static readonly Dictionary<string, IsvConfigContext> isvConfigContextMap = new Dictionary<string, IsvConfigContext>();
 
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
+        private readonly IAgentInfoService _agentInfoService;
         private readonly IIsvInfoService _isvInfoService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
-        public ConfigContextService(IMchAppService mchAppService, IMchInfoService mchInfoService, IIsvInfoService isvInfoService, IPayInterfaceConfigService payInterfaceConfigService)
+        public ConfigContextService(IMchAppService mchAppService,
+            IMchInfoService mchInfoService,
+            IAgentInfoService agentInfoService,
+            IIsvInfoService isvInfoService,
+            IPayInterfaceConfigService payInterfaceConfigService)
         {
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
             _isvInfoService = isvInfoService;
             _payInterfaceConfigService = payInterfaceConfigService;
+            _agentInfoService = agentInfoService;
         }
 
         /// <summary>
@@ -76,6 +87,24 @@ namespace AGooday.AgPay.Payment.Api.Services
 
             mchAppConfigContextMap.TryGetValue(mchNo, out _mchAppConfigContext);
             return _mchAppConfigContext;
+        }
+
+        /// <summary>
+        /// 获取 [代理商配置信息]
+        /// </summary>
+        /// <param name="agentNo"></param>
+        /// <returns></returns>
+        public AgentConfigContext GetAgentConfigContext(string agentNo)
+        {
+            agentConfigContextMap.TryGetValue(agentNo, out AgentConfigContext _agentConfigContext);
+
+            //无此数据， 需要初始化
+            if (_agentConfigContext == null)
+            {
+                InitAgentConfigContext(agentNo);
+            }
+            agentConfigContextMap.TryGetValue(agentNo, out _agentConfigContext);
+            return _agentConfigContext;
         }
 
         /// <summary>
@@ -250,11 +279,49 @@ namespace AGooday.AgPay.Payment.Api.Services
                     );
                 }
 
+                if (!string.IsNullOrWhiteSpace(mchInfo.AgentNo))
+                {
+                    //放置 当前商户的 代理商信息
+                    mchAppConfigContext.AgentConfigContext = GetAgentConfigContext(mchInfo.AgentNo);
+                }
+
                 //放置 当前商户的 服务商信息
                 mchAppConfigContext.IsvConfigContext = GetIsvConfigContext(mchInfo.IsvNo);
             }
 
             mchAppConfigContextMap.Add(appId, mchAppConfigContext);
+        }
+
+        /// <summary>
+        /// 初始化 [代理商配置信息]
+        /// </summary>
+        /// <param name="agentNo"></param>
+        public void InitAgentConfigContext(string agentNo)
+        {
+            // 当前系统不进行缓存
+            if (!IsCache())
+            {
+                return;
+            }
+
+            //代理商主体信息
+            var agentInfo = _agentInfoService.GetById(agentNo);
+            // 查询不到代理商主体， 可能已经删除
+            if (agentInfo == null)
+            {
+                agentConfigContextMap.TryGetValue(agentNo, out AgentConfigContext _agentConfigContext);
+
+                agentConfigContextMap.Remove(agentNo);
+                return;
+            }
+
+            AgentConfigContext agentConfigContext = new AgentConfigContext();
+
+            // 设置代理商信息
+            agentConfigContext.AgentNo = agentInfo.AgentNo;
+            agentConfigContext.AgentInfo = agentInfo;
+
+            agentConfigContextMap.Add(agentNo, agentConfigContext);
         }
 
         /// <summary>
