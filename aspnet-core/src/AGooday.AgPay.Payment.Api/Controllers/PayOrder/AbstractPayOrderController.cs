@@ -262,7 +262,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
         {
             var wayType = _configContextQueryService.GetWayTypeByWayCode(rq.WayCode);
-            var mchStore = rq.StoreId.HasValue ? _configContextQueryService.QueryMchStore(rq.MchNo, rq.StoreId) : null;
+            var mchStore = _configContextQueryService.QueryMchStore(rq.MchNo, rq.StoreId);
             PayOrderDto payOrder = new PayOrderDto();
             payOrder.PayOrderId = SeqUtil.GenPayOrderId(); //生成订单ID
             payOrder.MchNo = mchInfo.MchNo; //商户号

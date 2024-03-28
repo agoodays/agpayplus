@@ -57,6 +57,11 @@ namespace AGooday.AgPay.Payment.Api.Services
 
         public MchStoreDto QueryMchStore(string mchNo, long? storeId)
         {
+            if (!storeId.HasValue)
+            {
+                return null;
+            }
+
             if (IsCache())
             {
                 return _configContextService.GetMchInfoConfigContext(mchNo).GetMchStore(storeId.Value);
