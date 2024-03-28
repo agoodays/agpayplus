@@ -19,12 +19,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
     /// </summary>
     public class AliPayDivisionService : IDivisionService
     {
-        private readonly ILogger<AliPayDivisionService> log;
+        private readonly ILogger<AliPayDivisionService> _logger;
         private readonly ConfigContextQueryService configContextQueryService;
 
-        public AliPayDivisionService(ILogger<AliPayDivisionService> logger, ConfigContextQueryService configContextQueryService)
+        public AliPayDivisionService(ILogger<AliPayDivisionService> logger,
+            ConfigContextQueryService configContextQueryService)
         {
-            this.log = logger;
+            _logger = logger;
             this.configContextQueryService = configContextQueryService;
         }
 
@@ -85,7 +86,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "绑定支付宝账号异常");
+                _logger.LogError(e, "绑定支付宝账号异常");
                 ChannelRetMsg channelRetMsg = ChannelRetMsg.ConfirmFail();
                 channelRetMsg.ChannelErrMsg = e.Message;
                 return channelRetMsg;
@@ -163,12 +164,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 model.ExtendParams = settleExtendParams;
 
                 // 调起支付宝分账接口
-                if (log.IsEnabled(LogLevel.Information))
+                if (_logger.IsEnabled(LogLevel.Information))
                 {
-                    log.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝分账请求：{JsonConvert.SerializeObject(model)}");
+                    _logger.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝分账请求：{JsonConvert.SerializeObject(model)}");
                 }
                 var alipayResp = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
-                log.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝分账响应：{alipayResp.Body}");
+                _logger.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝分账响应：{alipayResp.Body}");
                 if (!alipayResp.IsError)
                 {
                     return ChannelRetMsg.ConfirmSuccess(alipayResp.TradeNo);
@@ -189,7 +190,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "绑定支付宝账号异常");
+                _logger.LogError(e, "绑定支付宝账号异常");
                 var channelRetMsg = ChannelRetMsg.ConfirmFail();
                 channelRetMsg.ChannelErrMsg = e.Message;
                 return channelRetMsg;
@@ -222,9 +223,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 model.TradeNo = payOrder.ChannelOrderNo; //支付宝订单号
 
                 // 调起支付宝分账接口
-                log.LogInformation($"订单：[{recordList[0].BatchOrderId}], 支付宝查询分账请求：{JsonConvert.SerializeObject(model)}");
+                _logger.LogInformation($"订单：[{recordList[0].BatchOrderId}], 支付宝查询分账请求：{JsonConvert.SerializeObject(model)}");
                 var alipayResp = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
-                log.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝查询分账响应：{alipayResp.Body}");
+                _logger.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝查询分账响应：{alipayResp.Body}");
 
                 if (!alipayResp.IsError)
                 {
@@ -257,13 +258,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 }
                 else
                 {
-                    log.LogError($"支付宝分账查询响应异常, alipayResp:{JsonConvert.SerializeObject(alipayResp)}");
+                    _logger.LogError($"支付宝分账查询响应异常, alipayResp:{JsonConvert.SerializeObject(alipayResp)}");
                     throw new BizException($"支付宝分账查询响应异常：{alipayResp.SubMsg}");
                 }
             }
             catch (Exception e)
             {
-                log.LogError(e, "查询分账信息异常");
+                _logger.LogError(e, "查询分账信息异常");
                 throw new BizException(e.Message);
             }
 

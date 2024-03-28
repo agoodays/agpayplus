@@ -13,15 +13,15 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     {
         private static readonly int QUERY_PAGE_SIZE = 100; //每次查询数量
 
-        private readonly ILogger<TransferOrderReissueJob> logger;
+        private readonly ILogger<PayOrderDivisionRecordReissueJob> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly Func<string, IDivisionService> divisionServiceFactory;
 
-        public PayOrderDivisionRecordReissueJob(ILogger<TransferOrderReissueJob> logger,
+        public PayOrderDivisionRecordReissueJob(ILogger<PayOrderDivisionRecordReissueJob> logger,
             IServiceScopeFactory serviceScopeFactory,
             Func<string, IDivisionService> divisionServiceFactory)
         {
-            this.logger = logger;
+            _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
             this.divisionServiceFactory = divisionServiceFactory;
         }
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                             };
                             var pageRecordList = payOrderDivisionRecordService.DistinctBatchOrderIdList(dto);
 
-                            logger.LogInformation($"处理分账补单任务, 共计{pageRecordList.TotalCount}条");
+                            _logger.LogInformation($"处理分账补单任务, 共计{pageRecordList.TotalCount}条");
 
                             if (pageRecordList == null || pageRecordList.Count == 0)
                             {
@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                     PayOrderDto payOrder = payOrderService.GetById(batchRecord.PayOrderId);
                                     if (payOrder == null)
                                     {
-                                        logger.LogError($"支付订单记录不存在：{batchRecord.PayOrderId}");
+                                        _logger.LogError($"支付订单记录不存在：{batchRecord.PayOrderId}");
                                         continue;
                                     }
                                     // 查询分账接口是否存在
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
 
                                     if (divisionService == null)
                                     {
-                                        logger.LogError($"查询分账接口不存在：{payOrder.IfCode}");
+                                        _logger.LogError($"查询分账接口不存在：{payOrder.IfCode}");
                                         continue;
                                     }
                                     MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId);
@@ -115,7 +115,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                 }
                                 catch (Exception e)
                                 {
-                                    logger.LogError(e, $"处理补单任务单条[{batchRecord.BatchOrderId}]异常");
+                                    _logger.LogError(e, $"处理补单任务单条[{batchRecord.BatchOrderId}]异常");
                                 }
                             }
 
@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                         catch (Exception e)
                         {
                             //出现异常，直接退出，避免死循环。
-                            logger.LogError(e, "error");
+                            _logger.LogError(e, "error");
                             break;
                         }
                     }

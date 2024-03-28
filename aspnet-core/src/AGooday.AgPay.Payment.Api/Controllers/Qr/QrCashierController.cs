@@ -26,25 +26,24 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
     {
         private readonly Func<string, IChannelUserService> _channelUserServiceFactory;
         private readonly PayMchNotifyService _payMchNotifyService;
-
         private readonly IQrCodeService _qrCodeService;
 
-        public QrCashierController(IMQSender mqSender,
+        public QrCashierController(ILogger<QrCashierController> logger, 
             Func<string, IChannelUserService> channelUserServiceFactory,
-            Func<string, IPaymentService> paymentServiceFactory,
-            IQrCodeService qrCodeService,
-            ConfigContextQueryService configContextQueryService,
-            PayOrderProcessService payOrderProcessService,
             PayMchNotifyService payMchNotifyService,
-            RequestKit requestKit,
-            ILogger<AbstractPayOrderController> logger,
+            IQrCodeService qrCodeService,
+            Func<string, IPaymentService> paymentServiceFactory,
+            PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,
             IPayWayService payWayService,
             IPayOrderService payOrderService,
             IPayOrderProfitService payOrderProfitService,
-            ISysConfigService sysConfigService)
-            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService)
+            ISysConfigService sysConfigService,
+            IMQSender mqSender,
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
+            : base(logger, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
         {
             _channelUserServiceFactory = channelUserServiceFactory;
             _payMchNotifyService = payMchNotifyService;

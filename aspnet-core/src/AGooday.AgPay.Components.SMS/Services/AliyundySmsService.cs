@@ -12,13 +12,13 @@ namespace AGooday.AgPay.Components.SMS.Services
 {
     public class AliyundySmsService : ISmsService
     {
-        private readonly ILogger<AliyundySmsService> logger;
+        private readonly ILogger<AliyundySmsService> _logger;
         private readonly AliyundySmsConfig smsConfig;
         private readonly Client client;
 
         public AliyundySmsService(ILogger<AliyundySmsService> logger, ISysConfigService sysConfigService)
         {
-            this.logger = logger;
+            _logger = logger;
             var dbSmsConfig = sysConfigService.GetDBSmsConfig();
             smsConfig = (AliyundySmsConfig)AbstractSmsConfig.GetSmsConfig(dbSmsConfig.SmsProviderKey, dbSmsConfig.AliyundySmsConfig);
             Config config = new()
@@ -67,13 +67,13 @@ namespace AGooday.AgPay.Components.SMS.Services
                 else
                 {
                     // 短信发送失败
-                    logger.LogInformation($"短信发送失败，请求报文：{JsonConvert.SerializeObject(request)}，响应报文：{JsonConvert.SerializeObject(response)}");
+                    _logger.LogInformation($"短信发送失败，请求报文：{JsonConvert.SerializeObject(request)}，响应报文：{JsonConvert.SerializeObject(response)}");
                 }
             }
             catch (Exception ex)
             {
                 // 处理异常
-                logger.LogError(ex, $"短信发送异常，请求报文：{JsonConvert.SerializeObject(request)}");
+                _logger.LogError(ex, $"短信发送异常，请求报文：{JsonConvert.SerializeObject(request)}");
                 throw;
             }
         }
@@ -103,13 +103,13 @@ namespace AGooday.AgPay.Components.SMS.Services
                 else
                 {
                     // 短信发送失败
-                    logger.LogInformation($"短信发送失败，请求报文：{JsonConvert.SerializeObject(request)}，响应报文：{JsonConvert.SerializeObject(response)}");
+                    _logger.LogInformation($"短信发送失败，请求报文：{JsonConvert.SerializeObject(request)}，响应报文：{JsonConvert.SerializeObject(response)}");
                 }
             }
             catch (Exception ex)
             {
                 // 处理异常
-                logger.LogError(ex, $"短信发送异常，请求报文：{JsonConvert.SerializeObject(request)}");
+                _logger.LogError(ex, $"短信发送异常，请求报文：{JsonConvert.SerializeObject(request)}");
                 throw;
             }
         }

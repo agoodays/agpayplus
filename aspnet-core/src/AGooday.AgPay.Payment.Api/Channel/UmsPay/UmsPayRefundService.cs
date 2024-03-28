@@ -15,17 +15,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
     /// </summary>
     public class UmsPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<UmsPayRefundService> log;
+        private readonly ILogger<UmsPayRefundService> _logger;
         private readonly UmsPayPaymentService umsPayPaymentService;
 
-        public UmsPayRefundService(IServiceProvider serviceProvider,
+        public UmsPayRefundService(ILogger<UmsPayRefundService> logger,
+            UmsPayPaymentService umsPayPaymentService,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
-            ConfigContextQueryService configContextQueryService,
-            ILogger<UmsPayRefundService> log,
-            UmsPayPaymentService umsPayPaymentService)
+            ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
             this.umsPayPaymentService = umsPayPaymentService;
         }
 
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             }
             catch (Exception e)
             {
-                log.LogError(e, $"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 异常:{e.Message}");
+                _logger.LogError(e, $"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //退款中
             }
         }
@@ -260,7 +260,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             }
             catch (Exception e)
             {
-                log.LogError(e, $"{logPrefix}, 异常:{e.Message}");
+                _logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //支付中
             }
         }

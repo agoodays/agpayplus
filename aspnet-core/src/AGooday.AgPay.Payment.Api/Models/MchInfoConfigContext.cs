@@ -25,8 +25,13 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// 商户应用信息集
         /// </summary>
         public Dictionary<string, MchAppDto> AppMap { get; set; } = new Dictionary<string, MchAppDto>();
+        /// <summary>
+        /// 商户门店信息集
+        /// </summary>
+        public Dictionary<long, MchStoreDto> StoreMap { get; set; } = new Dictionary<long, MchStoreDto>();
         #endregion
 
+        #region App
         /// <summary>
         /// 重置商户APP
         /// </summary>
@@ -54,5 +59,36 @@ namespace AGooday.AgPay.Payment.Api.Models
 
             return mchApp;
         }
+        #endregion
+
+        #region Store
+        /// <summary>
+        /// 重置商户门店
+        /// </summary>
+        /// <param name="mchStore"></param>
+        public void PutMchStore(MchStoreDto mchStore)
+        {
+            if (StoreMap.TryGetValue(mchStore.StoreId.Value, out _))
+            {
+                StoreMap[mchStore.StoreId.Value] = mchStore;
+            }
+            else
+            {
+                StoreMap.Add(mchStore.StoreId.Value, mchStore);
+            }
+        }
+
+        /// <summary>
+        /// 获取商户APP
+        /// </summary>
+        /// <param name="storeId"></param>
+        /// <returns></returns>
+        public MchStoreDto GetMchStore(long storeId)
+        {
+            StoreMap.TryGetValue(storeId, out MchStoreDto mchStore);
+
+            return mchStore;
+        } 
+        #endregion
     }
 }

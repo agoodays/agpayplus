@@ -6,11 +6,11 @@ namespace AGooday.AgPay.Components.OCR.Services
 {
     public abstract class AbstractOcrService : IOcrService
     {
-        protected readonly ILogger<AbstractOcrService> logger;
+        protected readonly ILogger<AbstractOcrService> _logger;
 
         protected AbstractOcrService(ILogger<AbstractOcrService> logger)
         {
-            this.logger = logger;
+            _logger = logger;
         }
 
         public abstract Task<CardOCRResult> RecognizeCardTextAsync(string imageUrl, string type);

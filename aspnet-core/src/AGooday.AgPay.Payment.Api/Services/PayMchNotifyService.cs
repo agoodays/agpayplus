@@ -24,8 +24,8 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly IMchNotifyRecordService _mchNotifyRecordService;
         private readonly ConfigContextQueryService _configContextQueryService;
 
-        public PayMchNotifyService(IMQSender mqSender,
-            ILogger<PayMchNotifyService> logger,
+        public PayMchNotifyService(ILogger<PayMchNotifyService> logger,
+            IMQSender mqSender,
             ISysConfigService sysConfigService,
             IMchNotifyRecordService mchNotifyRecordService,
             ConfigContextQueryService configContextQueryService)

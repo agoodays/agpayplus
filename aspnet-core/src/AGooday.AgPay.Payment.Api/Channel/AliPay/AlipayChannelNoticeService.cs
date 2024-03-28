@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }

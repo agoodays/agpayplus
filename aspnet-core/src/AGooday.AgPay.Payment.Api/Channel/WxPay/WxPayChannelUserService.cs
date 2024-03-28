@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     /// </summary>
     public class WxPayChannelUserService : IChannelUserService
     {
-        private readonly ILogger<WxPayChannelUserService> log;
+        private readonly ILogger<WxPayChannelUserService> _logger;
         private readonly ConfigContextQueryService _configContextQueryService;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 
         public WxPayChannelUserService(ILogger<WxPayChannelUserService> logger, ConfigContextQueryService configContextQueryService)
         {
-            this.log = logger;
+            _logger = logger;
             _configContextQueryService = configContextQueryService;
         }
 
@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                 oauth2Url = DEFAULT_OAUTH_URL;
             }
             string wxUserRedirectUrl = $"{oauth2Url}?appid={appId}&scope=snsapi_base&state=&redirect_uri={callbackUrlEncode}&response_type=code#wechat_redirect";
-            log.LogInformation($"wxUserRedirectUrl={wxUserRedirectUrl}");
+            _logger.LogInformation($"wxUserRedirectUrl={wxUserRedirectUrl}");
             return wxUserRedirectUrl;
         }
 
@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                log.LogError(e, e.Message);
+                _logger.LogError(e, e.Message);
                 return null;
             }
         }

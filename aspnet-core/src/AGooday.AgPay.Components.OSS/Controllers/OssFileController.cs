@@ -15,12 +15,12 @@ namespace AGooday.AgPay.Components.OSS.Controllers
     [Route("api/ossFiles")]
     public class OssFileController : ControllerBase
     {
-        private readonly ILogger<OssFileController> logger;
+        private readonly ILogger<OssFileController> _logger;
         private readonly IOssService ossService;
 
         public OssFileController(ILogger<OssFileController> logger, IOssServiceFactory ossServiceFactory)
         {
-            this.logger = logger;
+            _logger = logger;
             this.ossService = ossServiceFactory.GetService();
         }
 
@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"upload error, fileName = {fileName}");
+                _logger.LogError(e, $"upload error, fileName = {fileName}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"upload error, fileName = {file.FileName}");
+                _logger.LogError(e, $"upload error, fileName = {file.FileName}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }

@@ -13,13 +13,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
     /// </summary>
     public class YsfPayPayOrderCloseService : IPayOrderCloseService
     {
-        private readonly ILogger<YsfPayPayOrderCloseService> log;
+        private readonly ILogger<YsfPayPayOrderCloseService> _logger;
         private readonly YsfPayPaymentService ysfpayPaymentService;
 
-        public YsfPayPayOrderCloseService(ILogger<YsfPayPayOrderCloseService> log,
+        public YsfPayPayOrderCloseService(ILogger<YsfPayPayOrderCloseService> logger,
             YsfPayPaymentService ysfpayPaymentService)
         {
-            this.log = log;
+            _logger = logger;
             this.ysfpayPaymentService = ysfpayPaymentService;
         }
 
@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = ysfpayPaymentService.PackageParamAndReq("/gateway/api/pay/closeOrder", reqParams, logPrefix, mchAppConfigContext);
-                log.LogInformation($"关闭订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation($"关闭订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.SysError("【云闪付】请求关闭订单异常");

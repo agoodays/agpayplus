@@ -14,12 +14,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
     /// </summary>
     public class AliPayChannelUserService : IChannelUserService
     {
-        private readonly ILogger<AliPayChannelUserService> log;
+        private readonly ILogger<AliPayChannelUserService> _logger;
         private readonly ConfigContextQueryService configContextQueryService;
 
-        public AliPayChannelUserService(ILogger<AliPayChannelUserService> logger, ConfigContextQueryService configContextQueryService)
+        public AliPayChannelUserService(ILogger<AliPayChannelUserService> logger, 
+            ConfigContextQueryService configContextQueryService)
         {
-            this.log = logger;
+            _logger = logger;
             this.configContextQueryService = configContextQueryService;
         }
 
@@ -52,7 +53,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 }
             }
             string alipayUserRedirectUrl = string.Format(oauthUrl, appId, callbackUrlEncode);
-            log.LogInformation($"alipayUserRedirectUrl={alipayUserRedirectUrl}");
+            _logger.LogInformation($"alipayUserRedirectUrl={alipayUserRedirectUrl}");
             return alipayUserRedirectUrl;
         }
 
@@ -69,7 +70,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (ChannelException e)
             {
-                log.LogError(e, e.Message);
+                _logger.LogError(e, e.Message);
                 return null;
             }
         }

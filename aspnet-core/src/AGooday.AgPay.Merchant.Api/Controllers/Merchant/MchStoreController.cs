@@ -25,10 +25,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         private readonly IMchInfoService _mchInfoService;
         private readonly ISysConfigService _sysConfigService;
 
-        public MchStoreController(IMQSender mqSender, ILogger<MchStoreController> logger,
+        public MchStoreController(ILogger<MchStoreController> logger, 
+            IMQSender mqSender,
             IMchStoreService mchStoreService,
             IMchInfoService mchInfoService,
-            ISysConfigService sysConfigService, 
+            ISysConfigService sysConfigService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)
@@ -49,7 +50,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         public ApiPageRes<MchStoreListDto> List([FromQuery] MchStoreQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
-            var data = _mchStoreService.GetPaginatedData(dto); 
+            var data = _mchStoreService.GetPaginatedData(dto);
             return ApiPageRes<MchStoreListDto>.Pages(data);
         }
 
@@ -110,7 +111,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         {
             if (!dto.StoreId.HasValue || dto.StoreId.Value <= 0) // 应用分配
             {
-                var sysUser = _mchStoreService.GetByKeyAsNoTracking(recordId);
+                var sysUser = _mchStoreService.GetByIdAsNoTracking(recordId);
                 sysUser.BindAppId = dto.BindAppId;
                 CopyUtil.CopyProperties(sysUser, dto);
             }

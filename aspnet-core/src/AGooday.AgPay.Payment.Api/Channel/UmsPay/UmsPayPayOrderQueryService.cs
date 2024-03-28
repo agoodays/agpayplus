@@ -12,13 +12,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
     /// </summary>
     public class UmsPayPayOrderQueryService : IPayOrderQueryService
     {
-        private readonly ILogger<UmsPayPayOrderQueryService> log;
+        private readonly ILogger<UmsPayPayOrderQueryService> _logger;
         private readonly UmsPayPaymentService umsPayPaymentService;
 
-        public UmsPayPayOrderQueryService(ILogger<UmsPayPayOrderQueryService> log,
+        public UmsPayPayOrderQueryService(ILogger<UmsPayPayOrderQueryService> logger,
             UmsPayPaymentService umsPayPaymentService)
         {
-            this.log = log;
+            _logger = logger;
             this.umsPayPaymentService = umsPayPaymentService;
         }
 
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
             }
             catch (Exception e)
             {
-                log.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
+                _logger.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //支付中
             }
         }

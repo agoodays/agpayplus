@@ -13,16 +13,26 @@ namespace AGooday.AgPay.Payment.Api.Services
     public class ConfigContextQueryService
     {
         private readonly ConfigContextService _configContextService;
+        private readonly IMchStoreService _mchStoreService;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly IIsvInfoService _isvInfoService;
+        private readonly IPayWayService _payWayService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
-        public ConfigContextQueryService(IMchAppService mchAppService, IMchInfoService mchInfoService, IIsvInfoService isvInfoService, IPayInterfaceConfigService payInterfaceConfigService, ConfigContextService configContextService)
+        public ConfigContextQueryService(IMchStoreService mchStoreService,
+            IMchAppService mchAppService,
+            IMchInfoService mchInfoService,
+            IIsvInfoService isvInfoService,
+            IPayWayService payWayService,
+            IPayInterfaceConfigService payInterfaceConfigService,
+            ConfigContextService configContextService)
         {
+            _mchStoreService = mchStoreService;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
             _isvInfoService = isvInfoService;
+            _payWayService = payWayService;
             _payInterfaceConfigService = payInterfaceConfigService;
             _configContextService = configContextService;
         }
@@ -40,6 +50,16 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
 
             return _mchAppService.GetById(mchAppId, mchNo);
+        }
+
+        public MchStoreDto QueryMchStore(string mchNo, long? storeId)
+        {
+            if (IsCache())
+            {
+                return _configContextService.GetMchInfoConfigContext(mchNo).GetMchStore(storeId.Value);
+            }
+
+            return _mchStoreService.GetById(storeId.Value, mchNo);
         }
 
         public MchAppConfigContext QueryMchInfoAndAppInfo(string mchNo, string mchAppId)
@@ -169,6 +189,12 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
             PpPayNormalMchParams ppPayNormalMchParams = (PpPayNormalMchParams)QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.PPPAY); ;
             return PayPalWrapper.BuildPaypalWrapper(ppPayNormalMchParams);
+        }
+
+        public string GetWayTypeByWayCode(string wayCode)
+        {
+            var wayType = _payWayService.GetWayTypeByWayCode(wayCode);
+            return wayType;
         }
     }
 }

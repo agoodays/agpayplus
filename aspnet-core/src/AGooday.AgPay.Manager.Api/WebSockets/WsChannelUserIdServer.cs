@@ -11,11 +11,11 @@ namespace AGooday.AgPay.Manager.Api.WebSockets
     /// </summary>
     public class WsChannelUserIdServer
     {
-        private readonly ILogger<WsChannelUserIdServer> logger;
+        private readonly ILogger<WsChannelUserIdServer> _logger;
 
         public WsChannelUserIdServer(ILogger<WsChannelUserIdServer> logger)
         {
-            this.logger = logger;
+            _logger = logger;
         }
 
         //当前在线客户端 数量
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Manager.Api.WebSockets
                     if (result.MessageType == WebSocketMessageType.Text && !result.CloseStatus.HasValue)
                     {
                         var msgString = Encoding.UTF8.GetString(buffer);
-                        logger.LogInformation($"Websocket客户端cid[{this.Cid}],appId[{this.AppId}]接收异步消息：{msgString}.");
+                        _logger.LogInformation($"Websocket客户端cid[{this.Cid}],appId[{this.AppId}]接收异步消息：{msgString}.");
                     }
                     else
                     {
@@ -71,16 +71,16 @@ namespace AGooday.AgPay.Manager.Api.WebSockets
                             wsAppIdMap.TryRemove(this.AppId, out ISet<WsChannelUserIdServer> wsSet);
                         }
                         this.SubOnlineCount();
-                        logger.LogInformation($"Websocket客户端cid[{this.Cid}],appId[{this.AppId}],{this.GetOnlineClientSize()}");
+                        _logger.LogInformation($"Websocket客户端cid[{this.Cid}],appId[{this.AppId}],{this.GetOnlineClientSize()}");
                     }
                 }
                 while (!result.CloseStatus.HasValue);
 
-                logger.LogInformation($"cid[{cid}],appId[{appId}]连接开启监听！当前在线人数为{OnlineClientSize}");
+                _logger.LogInformation($"cid[{cid}],appId[{appId}]连接开启监听！当前在线人数为{OnlineClientSize}");
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"ws监听异常cid[{cid}],appId[{appId}]");
+                _logger.LogError(e, $"ws监听异常cid[{cid}],appId[{appId}]");
             }
         }
 
@@ -107,12 +107,12 @@ namespace AGooday.AgPay.Manager.Api.WebSockets
         {
             try
             {
-                logger.LogInformation($"推送ws消息到浏览器, appId={cid}, appId={cid}，msg={msg}");
+                _logger.LogInformation($"推送ws消息到浏览器, appId={cid}, appId={cid}，msg={msg}");
 
                 var isExist = wsAppIdMap.TryGetValue(appId, out ISet<WsChannelUserIdServer> wsSet);
                 if (!isExist)
                 {
-                    logger.LogInformation($"appId[{appId}] 无ws监听客户端");
+                    _logger.LogInformation($"appId[{appId}] 无ws监听客户端");
                     return;
                 }
 
@@ -124,13 +124,13 @@ namespace AGooday.AgPay.Manager.Api.WebSockets
                     }
                     catch (Exception e)
                     {
-                        logger.LogInformation(e, $"推送设备消息时异常，appId={appId}, cid={item.Cid}");
+                        _logger.LogInformation(e, $"推送设备消息时异常，appId={appId}, cid={item.Cid}");
                     }
                 }
             }
             catch (Exception e)
             {
-                logger.LogInformation(e, $"推送消息时异常，appId={appId}");
+                _logger.LogInformation(e, $"推送消息时异常，appId={appId}");
             }
         }
 

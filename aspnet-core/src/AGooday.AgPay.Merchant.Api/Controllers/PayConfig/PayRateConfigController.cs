@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
     {
         private readonly IPayRateConfigService _payRateConfigService;
 
-        public PayRateConfigController(ILogger<PayInterfaceConfigController> logger,
+        public PayRateConfigController(ILogger<PayRateConfigController> logger,
             IPayRateConfigService payRateConfigService,
             RedisUtil client,
             IAuthService authService)

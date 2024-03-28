@@ -21,15 +21,15 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     /// </summary>
     public class WxPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<WxPayRefundService> log;
+        private readonly ILogger<WxPayRefundService> _logger;
 
-        public WxPayRefundService(ILogger<WxPayRefundService> log,
+        public WxPayRefundService(ILogger<WxPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
         }
 
         public override string GetIfCode()
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "微信退款查询Exception异常: ");
+                _logger.LogError(e, "微信退款查询Exception异常: ");
                 return ChannelRetMsg.SysError(e.Message);
             }
         }
@@ -211,7 +211,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "微信退款Exception异常: ");
+                _logger.LogError(e, "微信退款Exception异常: ");
                 return ChannelRetMsg.SysError(e.Message);
             }
         }

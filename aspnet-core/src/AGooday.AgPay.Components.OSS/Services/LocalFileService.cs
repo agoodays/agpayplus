@@ -9,12 +9,12 @@ namespace AGooday.AgPay.Components.OSS.Services
 {
     public class LocalFileService : IOssService
     {
+        private readonly ILogger<LocalFileService> _logger;
         private readonly ISysConfigService sysConfigService;
-        private readonly ILogger<LocalFileService> logger;
 
         public LocalFileService(ILogger<LocalFileService> logger, ISysConfigService sysConfigService)
         {
-            this.logger = logger;
+            _logger = logger;
             this.sysConfigService = sysConfigService;
         }
 
@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             }
             catch (Exception e)
             {
-                logger.LogError(e, e.Message);
+                _logger.LogError(e, e.Message);
             }
 
             saveDirAndFileName = saveDirAndFileName.Replace(@"\", "/");

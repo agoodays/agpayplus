@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public MchStore GetByKeyAsNoTracking(long recordId)
+        public MchStore GetByIdAsNoTracking(long recordId)
         {
             return DbSet.AsNoTracking().FirstOrDefault(w => w.StoreId.Equals(recordId));
         }

@@ -8,6 +8,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Payment.Api.Authorization;
 using AGooday.AgPay.Payment.Api.Channel;
+using AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
@@ -22,19 +23,19 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     [ApiController]
     public class UnifiedOrderController : AbstractPayOrderController
     {
-        public UnifiedOrderController(IMQSender mqSender,
+        public UnifiedOrderController(ILogger<UnifiedOrderController> logger,
             Func<string, IPaymentService> paymentServiceFactory,
-            ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
-            RequestKit requestKit,
-            ILogger<UnifiedOrderController> logger,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,
             IPayWayService payWayService,
             IPayOrderService payOrderService,
             IPayOrderProfitService payOrderProfitService,
-            ISysConfigService sysConfigService)
-            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService)
+            ISysConfigService sysConfigService,
+            IMQSender mqSender,
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
+            : base(logger, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
         {
         }
 

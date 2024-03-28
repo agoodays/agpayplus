@@ -18,8 +18,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
         private readonly ILogger<PayOrderMchNotifyMQReceiver> log;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public PayOrderMchNotifyMQReceiver(IMQSender mqSender,
-            ILogger<PayOrderMchNotifyMQReceiver> logger,
+        public PayOrderMchNotifyMQReceiver(ILogger<PayOrderMchNotifyMQReceiver> logger,
+            IMQSender mqSender,
             IServiceScopeFactory serviceScopeFactory)
         {
             this.mqSender = mqSender;

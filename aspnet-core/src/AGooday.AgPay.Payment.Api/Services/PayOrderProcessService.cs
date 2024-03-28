@@ -18,8 +18,8 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly PayMchNotifyService _payMchNotifyService;
         private readonly ILogger<PayOrderProcessService> _logger;
 
-        public PayOrderProcessService(IMQSender mqSender,
-            ILogger<PayOrderProcessService> logger,
+        public PayOrderProcessService(ILogger<PayOrderProcessService> logger,
+            IMQSender mqSender,
             IPayOrderService payOrderService,
             IAccountBillService accountBillService,
             PayMchNotifyService payMchNotifyService)

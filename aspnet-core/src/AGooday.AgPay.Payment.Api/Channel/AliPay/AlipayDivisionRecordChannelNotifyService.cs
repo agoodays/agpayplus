@@ -23,13 +23,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
     /// </summary>
     public class AliPayDivisionRecordChannelNotifyService : AbstractDivisionRecordChannelNotifyService
     {
-        private readonly ILogger<AliPayDivisionRecordChannelNotifyService> log;
+        private readonly ILogger<AliPayDivisionRecordChannelNotifyService> _logger;
 
-        public AliPayDivisionRecordChannelNotifyService(ILogger<AliPayDivisionRecordChannelNotifyService> log,
+        public AliPayDivisionRecordChannelNotifyService(ILogger<AliPayDivisionRecordChannelNotifyService> logger,
             RequestKit requestKit, ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
         }
 
         public override string GetIfCode()
@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }
@@ -145,7 +145,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }

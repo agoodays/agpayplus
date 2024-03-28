@@ -13,13 +13,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
     /// </summary>
     public class LesPayPayOrderQueryService : IPayOrderQueryService
     {
-        private readonly ILogger<LesPayPayOrderQueryService> log;
+        private readonly ILogger<LesPayPayOrderQueryService> _logger;
         private readonly LesPayPaymentService lesPayPaymentService;
 
-        public LesPayPayOrderQueryService(ILogger<LesPayPayOrderQueryService> log,
+        public LesPayPayOrderQueryService(ILogger<LesPayPayOrderQueryService> logger,
             LesPayPaymentService lesPayPaymentService)
         {
-            this.log = log;
+            _logger = logger;
             this.lesPayPaymentService = lesPayPaymentService;
         }
 
@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = lesPayPaymentService.PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
-                log.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.Waiting(); //支付中
@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             }
             catch (Exception e)
             {
-                log.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
+                _logger.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //支付中
             }
         }

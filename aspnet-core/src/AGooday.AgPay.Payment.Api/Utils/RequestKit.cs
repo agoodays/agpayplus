@@ -7,14 +7,14 @@ namespace AGooday.AgPay.Payment.Api.Utils
 {
     public class RequestKit
     {
-        private readonly ILogger<RequestKit> log;
+        private readonly ILogger<RequestKit> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         private const string REQ_CONTEXT_KEY_PARAMJSON = "REQ_CONTEXT_KEY_PARAMJSON";
 
-        public RequestKit(ILogger<RequestKit> log, IHttpContextAccessor httpContextAccessor)
+        public RequestKit(ILogger<RequestKit> logger, IHttpContextAccessor httpContextAccessor)
         {
-            this.log = log;
+            _logger = logger;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
                 }
                 catch (Exception e)
                 {
-                    log.LogError(e, $"请求参数转换异常！ params=[{body}]");
+                    _logger.LogError(e, $"请求参数转换异常！ params=[{body}]");
                     throw new BizException(ApiCode.PARAMS_ERROR, "转换异常");
                 }
             }
@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
                 }
                 catch (Exception e)
                 {
-                    log.LogError(e, $"请求参数转换异常！ params=[{body}]");
+                    _logger.LogError(e, $"请求参数转换异常！ params=[{body}]");
                     throw new BizException(ApiCode.PARAMS_ERROR, "转换异常");
                 }
             }

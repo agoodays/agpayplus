@@ -17,19 +17,19 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
     /// </summary>
     public class YsfBarOrderController : AbstractPayOrderController
     {
-        public YsfBarOrderController(IMQSender mqSender,
+        public YsfBarOrderController(ILogger<YsfBarOrderController> logger,
             Func<string, IPaymentService> paymentServiceFactory,
-            ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
-            RequestKit requestKit,
-            ILogger<AliBarOrderController> logger,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,
             IPayWayService payWayService,
             IPayOrderService payOrderService,
             IPayOrderProfitService payOrderProfitService,
-            ISysConfigService sysConfigService)
-            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService)
+            ISysConfigService sysConfigService,
+            IMQSender mqSender,
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
+            : base(logger, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
         {
         }
 

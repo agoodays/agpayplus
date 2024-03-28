@@ -15,14 +15,17 @@ namespace AGooday.AgPay.Payment.Api.Channel
     /// </summary>
     public abstract class AbstractTransferNoticeService : ITransferNoticeService
     {
-        protected readonly ILogger<AbstractChannelNoticeService> log;
+        protected readonly ILogger<AbstractTransferNoticeService> _logger;
         protected readonly RequestKit requestKit;
         protected readonly ChannelCertConfigKit channelCertConfigKit;
         protected readonly ConfigContextQueryService configContextQueryService;
 
-        protected AbstractTransferNoticeService(ILogger<AbstractChannelNoticeService> log, RequestKit requestKit, ChannelCertConfigKit channelCertConfigKit, ConfigContextQueryService configContextQueryService)
+        protected AbstractTransferNoticeService(ILogger<AbstractTransferNoticeService> logger, 
+            RequestKit requestKit, 
+            ChannelCertConfigKit channelCertConfigKit, 
+            ConfigContextQueryService configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
             this.requestKit = requestKit;
             this.channelCertConfigKit = channelCertConfigKit;
             this.configContextQueryService = configContextQueryService;

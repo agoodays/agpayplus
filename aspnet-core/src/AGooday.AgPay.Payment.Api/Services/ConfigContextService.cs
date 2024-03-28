@@ -31,13 +31,15 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// </summary>
         private static readonly Dictionary<string, IsvConfigContext> isvConfigContextMap = new Dictionary<string, IsvConfigContext>();
 
+        private readonly IMchStoreService _mchStoreService;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly IAgentInfoService _agentInfoService;
         private readonly IIsvInfoService _isvInfoService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
-        public ConfigContextService(IMchAppService mchAppService,
+        public ConfigContextService(IMchStoreService mchStoreService,
+            IMchAppService mchAppService,
             IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
             IIsvInfoService isvInfoService,
@@ -48,6 +50,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             _isvInfoService = isvInfoService;
             _payInterfaceConfigService = payInterfaceConfigService;
             _agentInfoService = agentInfoService;
+            _mchStoreService = mchStoreService;
         }
 
         /// <summary>
@@ -176,6 +179,11 @@ namespace AGooday.AgPay.Payment.Api.Services
                     mchAppConfigContext.MchType = mchInfo.Type;
                     mchAppConfigContext.MchInfo = mchInfo;
                 }
+            });
+            _mchStoreService.GetByMchNo(mchNo).ToList().ForEach(mchStore =>
+            {
+                //1. 更新商户内门店集合
+                mchInfoConfigContext.PutMchStore(mchStore);
             });
 
             mchInfoConfigContextMap.Add(mchNo, mchInfoConfigContext);

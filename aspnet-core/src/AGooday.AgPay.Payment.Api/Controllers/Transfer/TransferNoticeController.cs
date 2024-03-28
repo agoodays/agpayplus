@@ -18,8 +18,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         private readonly PayMchNotifyService _payMchNotifyService;
         private readonly ConfigContextQueryService _configContextQueryService;
 
-        public TransferNoticeController(
-            ILogger<TransferNoticeController> logger,
+        public TransferNoticeController(ILogger<TransferNoticeController> logger,
             Func<string, ITransferNoticeService> transferNoticeServiceFactory,
             ITransferOrderService transferOrderService,
             ConfigContextQueryService configContextQueryService,

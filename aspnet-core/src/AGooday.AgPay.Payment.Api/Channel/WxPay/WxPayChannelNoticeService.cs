@@ -26,15 +26,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     public class WxPayChannelNoticeService : AbstractChannelNoticeService
     {
         private readonly IPayOrderService payOrderService;
-        private readonly ILogger<WxPayChannelNoticeService> logger;
 
         public WxPayChannelNoticeService(ILogger<WxPayChannelNoticeService> logger,
+            IPayOrderService payOrderService,
             RequestKit requestKit,
-            ConfigContextQueryService configContextQueryService,
-            IPayOrderService payOrderService)
+            ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, configContextQueryService)
         {
-            this.logger = logger;
             this.payOrderService = payOrderService;
         }
 
@@ -79,7 +77,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     headerJSON.Add("Wechatpay-Nonce", nonce);
                     headerJSON.Add("Wechatpay-Signature", signature);
                     headerJSON.Add("Wechatpay-Serial", serialNumber);
-                    log.LogInformation($"\n【请求头信息】：{headerJSON}\n【加密数据】：{callbackJson}");
+                    _logger.LogInformation($"\n【请求头信息】：{headerJSON}\n【加密数据】：{callbackJson}");
 
                     bool valid = client.VerifyEventSignature(
                         callbackTimestamp: timestamp,
@@ -89,7 +87,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                         callbackSerialNumber: serialNumber, out Exception error);
                     if (!valid)
                     {
-                        log.LogError(error, "error");
+                        _logger.LogError(error, "error");
                         throw ResponseException.BuildText("ERROR");
                     }
                     /* 将 JSON 反序列化得到通知对象 */
@@ -128,7 +126,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                logger.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }
@@ -154,7 +152,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     bool valid = client.VerifyEventSignature(callbackXml, out Exception error);
                     if (!valid)
                     {
-                        log.LogError(error, "error");
+                        _logger.LogError(error, "error");
                         throw ResponseException.BuildText("ERROR");
                     }
                     // 核对金额
@@ -222,7 +220,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                logger.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }

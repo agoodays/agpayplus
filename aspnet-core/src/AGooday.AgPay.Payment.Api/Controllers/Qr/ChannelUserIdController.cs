@@ -25,20 +25,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
     {
         private readonly Func<string, IChannelUserService> _channelUserServiceFactory;
 
-        public ChannelUserIdController(IMQSender mqSender,
+        public ChannelUserIdController(ILogger<ChannelUserIdController> logger, 
             Func<string, IChannelUserService> channelUserServiceFactory,
             Func<string, IPaymentService> paymentServiceFactory,
-            ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
-            RequestKit requestKit,
-            ILogger<AbstractPayOrderController> logger,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,
             IPayWayService payWayService,
             IPayOrderService payOrderService,
             IPayOrderProfitService payOrderProfitService,
-            ISysConfigService sysConfigService)
-            : base(mqSender, paymentServiceFactory, configContextQueryService, payOrderProcessService, requestKit, logger, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService)
+            ISysConfigService sysConfigService,
+            IMQSender mqSender,
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
+            : base(logger, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
         {
             _channelUserServiceFactory = channelUserServiceFactory;
         }

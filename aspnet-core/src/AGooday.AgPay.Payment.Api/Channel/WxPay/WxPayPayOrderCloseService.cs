@@ -18,12 +18,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     /// </summary>
     public class WxPayPayOrderCloseService : IPayOrderCloseService
     {
-        private readonly ILogger<WxPayPayOrderCloseService> log;
+        private readonly ILogger<WxPayPayOrderCloseService> _logger;
         private readonly ConfigContextQueryService configContextQueryService;
 
-        public WxPayPayOrderCloseService(ILogger<WxPayPayOrderCloseService> log, ConfigContextQueryService configContextQueryService)
+        public WxPayPayOrderCloseService(ILogger<WxPayPayOrderCloseService> logger, ConfigContextQueryService configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
             this.configContextQueryService = configContextQueryService;
         }
 

@@ -14,14 +14,14 @@ namespace AGooday.AgPay.Components.OSS.Services
 {
     public class AliyunOssService : IOssService
     {
+        private readonly ILogger<AliyunOssService> _logger;
         private readonly ISysConfigService sysConfigService;
-        private readonly ILogger<AliyunOssService> logger;
         // ossClient 初始化
         private readonly OssClient ossClient = null;
 
         public AliyunOssService(ILogger<AliyunOssService> logger, ISysConfigService sysConfigService)
         {
-            this.logger = logger;
+            _logger = logger;
             this.sysConfigService = sysConfigService;
             AliyunOssConfig.Oss = JsonConvert.DeserializeObject<AliyunOssConfig.OssConfig>(sysConfigService.GetDBOssConfig().AliyunOssConfig);
             ossClient = new OssClient(AliyunOssConfig.Oss.Endpoint, AliyunOssConfig.Oss.AccessKeyId, AliyunOssConfig.Oss.AccessKeySecret);
@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             }
             catch (Exception e)
             {
-                logger.LogError(e, e.Message);
+                _logger.LogError(e, e.Message);
             }
             return Task.FromResult<string>(null);
         }
@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             }
             catch (Exception e)
             {
-                logger.LogError(e, e.Message);
+                _logger.LogError(e, e.Message);
                 return false;
             }
         }

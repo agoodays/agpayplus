@@ -31,12 +31,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         private readonly PayOrderDivisionProcessService _payOrderDivisionProcessService;
 
         public PayOrderDivisionExecController(ILogger<PayOrderDivisionExecController> logger,
-            RequestKit requestKit,
-            ConfigContextQueryService configContextQueryService,
             IPayOrderService payOrderService,
             IMchDivisionReceiverService mchDivisionReceiverService,
             IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
-            PayOrderDivisionProcessService payOrderDivisionProcessService)
+            PayOrderDivisionProcessService payOrderDivisionProcessService,
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
         {
             _logger = logger;

@@ -36,16 +36,16 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             Func<string, IRefundService> refundServiceFactory,
             PayMchNotifyService payMchNotifyService,
             RefundOrderProcessService refundOrderProcessService,
-            ConfigContextQueryService configContextQueryService,
-            RequestKit requestKit)
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
         {
             _logger = logger;
             _payOrderService = payOrderService;
             _refundOrderService = refundOrderService;
             _refundServiceFactory = refundServiceFactory;
-            _refundOrderProcessService = refundOrderProcessService;
             _payMchNotifyService = payMchNotifyService;
+            _refundOrderProcessService = refundOrderProcessService;
         }
 
         /// <summary>

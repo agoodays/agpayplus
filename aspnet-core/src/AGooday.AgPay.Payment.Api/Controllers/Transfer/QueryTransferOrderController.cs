@@ -19,13 +19,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
     [ApiController]
     public class QueryTransferOrderController : ApiControllerBase
     {
-        protected readonly ILogger<QueryRefundOrderController> _logger;
+        protected readonly ILogger<QueryTransferOrderController> _logger;
         private readonly ITransferOrderService _transferOrderService;
 
-        public QueryTransferOrderController(ILogger<QueryRefundOrderController> logger,
+        public QueryTransferOrderController(ILogger<QueryTransferOrderController> logger,
             ITransferOrderService transferOrderService,
-            ConfigContextQueryService configContextQueryService,
-            RequestKit requestKit)
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
         {
             _logger = logger;

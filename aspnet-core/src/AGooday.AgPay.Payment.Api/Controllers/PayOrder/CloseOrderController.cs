@@ -23,19 +23,19 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     [Route("api/pay")]
     public class CloseOrderController : ApiControllerBase
     {
-        private readonly ILogger<AbstractPayOrderController> log;
+        private readonly ILogger<CloseOrderController> _logger;
         private readonly PayOrderService payOrderService;
         private readonly ConfigContextQueryService configContextQueryService;
-        protected readonly Func<string, IPayOrderCloseService> _payOrderCloseServiceFactory;
+        private readonly Func<string, IPayOrderCloseService> _payOrderCloseServiceFactory;
 
-        public CloseOrderController(ILogger<AbstractPayOrderController> log,
+        public CloseOrderController(ILogger<CloseOrderController> logger,
             PayOrderService payOrderService,
             Func<string, IPayOrderCloseService> payOrderCloseServiceFactory,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
             this.payOrderService = payOrderService;
             this.configContextQueryService = configContextQueryService;
             _payOrderCloseServiceFactory = payOrderCloseServiceFactory;
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 支付通道接口实现不存在
                 if (closeService == null)
                 {
-                    log.LogError($"{payOrder.IfCode} interface not exists!");
+                    _logger.LogError($"{payOrder.IfCode} interface not exists!");
                     return null;
                 }
 
@@ -99,11 +99,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 ChannelRetMsg channelRetMsg = closeService.Close(payOrder, mchAppConfigContext);
                 if (channelRetMsg == null)
                 {
-                    log.LogError("channelRetMsg is null");
+                    _logger.LogError("channelRetMsg is null");
                     return null;
                 }
 
-                log.LogInformation($"关闭订单[{payOrderId}]结果为：{channelRetMsg}");
+                _logger.LogInformation($"关闭订单[{payOrderId}]结果为：{channelRetMsg}");
 
                 // 关闭订单 成功
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             catch (Exception e)
             {
                 // 关闭订单异常
-                log.LogError(e, $"error payOrderId = {payOrder.PayOrderId}");
+                _logger.LogError(e, $"error payOrderId = {payOrder.PayOrderId}");
                 return null;
             }
 

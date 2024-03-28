@@ -13,13 +13,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
     /// </summary>
     public class LcswPayPayOrderQueryService : IPayOrderQueryService
     {
-        private readonly ILogger<LcswPayPayOrderQueryService> log;
+        private readonly ILogger<LcswPayPayOrderQueryService> _logger;
         private readonly LcswPayPaymentService lcswpayPaymentService;
 
-        public LcswPayPayOrderQueryService(ILogger<LcswPayPayOrderQueryService> log,
+        public LcswPayPayOrderQueryService(ILogger<LcswPayPayOrderQueryService> logger,
             LcswPayPaymentService lcswpayPaymentService)
         {
-            this.log = log;
+            _logger = logger;
             this.lcswpayPaymentService = lcswpayPaymentService;
         }
 
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = lcswpayPaymentService.PackageParamAndReq("/pay/open/query", reqParams, logPrefix, mchAppConfigContext);
-                log.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.Waiting(); //支付中
@@ -125,7 +125,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
             }
             catch (Exception e)
             {
-                log.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
+                _logger.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //支付中
             }
         }

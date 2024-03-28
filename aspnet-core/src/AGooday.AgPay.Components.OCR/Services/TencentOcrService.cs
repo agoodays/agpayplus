@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             catch (Exception ex)
             {
                 // 处理异常
-                logger.LogError(ex, $"Ocr异常");
+                _logger.LogError(ex, $"Ocr异常");
                 throw;
             }
             finally
@@ -163,7 +163,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             catch (Exception ex)
             {
                 // 处理异常
-                logger.LogError(ex, $"OCR异常");
+                _logger.LogError(ex, $"OCR异常");
                 throw;
             }
             finally

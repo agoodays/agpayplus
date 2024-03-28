@@ -25,21 +25,21 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
     [ApiController]
     public class AliPayBizController : Controller
     {
-        private readonly ILogger<AliPayBizController> log;
+        private readonly ILogger<AliPayBizController> _logger;
         private readonly ConfigContextQueryService configContextQueryService;
         private readonly IPayInterfaceConfigService payInterfaceConfigService;
         private readonly ISysConfigService sysConfigService;
         private readonly IMchAppService mchAppService;
         private readonly IMQSender mqSender;
 
-        public AliPayBizController(ILogger<AliPayBizController> log,
+        public AliPayBizController(ILogger<AliPayBizController> logger,
             ConfigContextQueryService configContextQueryService,
             IPayInterfaceConfigService payInterfaceConfigService,
             ISysConfigService sysConfigService,
             IMchAppService mchAppService,
             IMQSender mqSender)
         {
-            this.log = log;
+            _logger = logger;
             this.configContextQueryService = configContextQueryService;
             this.payInterfaceConfigService = payInterfaceConfigService;
             this.sysConfigService = sysConfigService;
@@ -138,7 +138,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
             }
             catch (Exception e)
             {
-                log.LogError(e,"error");
+                _logger.LogError(e,"error");
                 errMsg = !string.IsNullOrWhiteSpace(e.Message) ? e.Message : "系统异常！";
             }
             ViewBag.ErrMsg = errMsg;
@@ -152,7 +152,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
             JObject reqJSON = GetReqParamJson();
 
             // 获取到报文信息，然后转发到对应的ctrl
-            log.LogInformation($"支付宝应用网关接收消息参数：{reqJSON}");
+            _logger.LogInformation($"支付宝应用网关接收消息参数：{reqJSON}");
 
             // 分账交易通知
             if ("alipay.trade.order.settle.notify".Equals(reqJSON.GetValue("msg_method").ToString()))

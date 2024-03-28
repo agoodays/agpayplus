@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MchPayPassageConfigController(ILogger<MchPayInterfaceConfigController> logger,
+        public MchPayPassageConfigController(ILogger<MchPayPassageConfigController> logger,
             IMchPayPassageService mchPayPassageServic,
             IPayWayService payWayService,
             IMchAppService mchAppService,

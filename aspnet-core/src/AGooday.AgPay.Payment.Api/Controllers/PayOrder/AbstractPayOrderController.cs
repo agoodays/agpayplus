@@ -25,9 +25,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     public abstract class AbstractPayOrderController : ApiControllerBase
     {
         protected readonly IMQSender mqSender;
+        protected readonly ILogger<AbstractPayOrderController> _logger;
         protected readonly Func<string, IPaymentService> _paymentServiceFactory;
         protected readonly PayOrderProcessService _payOrderProcessService;
-        protected readonly ILogger<AbstractPayOrderController> _logger;
         protected readonly IMchPayPassageService _mchPayPassageService;
         protected readonly IPayRateConfigService _payRateConfigService;
         protected readonly IPayWayService _payWayService;
@@ -35,30 +35,30 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         protected readonly IPayOrderProfitService _payOrderProfitService;
         protected readonly ISysConfigService _sysConfigService;
 
-        protected AbstractPayOrderController(IMQSender mqSender,
+        protected AbstractPayOrderController(ILogger<AbstractPayOrderController> logger,
             Func<string, IPaymentService> paymentServiceFactory,
-            ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
-            RequestKit requestKit,
-            ILogger<AbstractPayOrderController> logger,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,
             IPayWayService payWayService,
             IPayOrderService payOrderService,
             IPayOrderProfitService payOrderProfitService,
-            ISysConfigService sysConfigService)
+            ISysConfigService sysConfigService,
+            IMQSender mqSender,
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
         {
+            _logger = logger;
             _paymentServiceFactory = paymentServiceFactory;
             _payOrderProcessService = payOrderProcessService;
-            _logger = logger;
             _mchPayPassageService = mchPayPassageService;
             _payRateConfigService = payRateConfigService;
             _payWayService = payWayService;
             _payOrderService = payOrderService;
+            _payOrderProfitService = payOrderProfitService;
             _sysConfigService = sysConfigService;
             this.mqSender = mqSender;
-            _payOrderProfitService = payOrderProfitService;
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                         throw new BizException("订单状态异常");
                     }
 
-                    var wayType = _payWayService.GetWayTypeByWayCode(wayCode);
+                    var wayType = _configContextQueryService.GetWayTypeByWayCode(wayCode);
                     payOrder.WayCode = wayCode; // 需要将订单更新 支付方式
                     payOrder.WayType = wayType; // 需要将订单更新 支付类型
                     payOrder.ChannelUser = bizRQ.GetChannelUserId(); //更新渠道用户信息
@@ -257,7 +257,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
         private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
         {
-            var wayType = _payWayService.GetWayTypeByWayCode(rq.WayCode);
+            var wayType = _configContextQueryService.GetWayTypeByWayCode(rq.WayCode);
+            var mchStore = rq.StoreId.HasValue ? _configContextQueryService.QueryMchStore(rq.MchNo, rq.StoreId) : null;
             PayOrderDto payOrder = new PayOrderDto();
             payOrder.PayOrderId = SeqUtil.GenPayOrderId(); //生成订单ID
             payOrder.MchNo = mchInfo.MchNo; //商户号
@@ -273,7 +274,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrder.MchOrderNo = rq.MchOrderNo; //商户订单号
             payOrder.AppId = mchApp.AppId; //商户应用appId
             payOrder.AppName = mchApp.AppName; //商户应用名称
-            payOrder.StoreId = rq.StoreId; //商户门店ID
+            payOrder.StoreId = mchStore?.StoreId; //商户门店ID
+            payOrder.StoreName = mchStore?.StoreName; //商户门店ID
             payOrder.QrcId = rq.QrcId; //商户码牌ID
             payOrder.IfCode = ifCode; //接口代码
             payOrder.WayCode = rq.WayCode; //支付方式

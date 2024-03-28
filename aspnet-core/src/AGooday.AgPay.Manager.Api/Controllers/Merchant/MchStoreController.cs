@@ -135,7 +135,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         {
             if (!dto.StoreId.HasValue || dto.StoreId.Value <= 0) // 应用分配
             {
-                var sysUser = _mchStoreService.GetByKeyAsNoTracking(recordId);
+                var sysUser = _mchStoreService.GetByIdAsNoTracking(recordId);
                 sysUser.BindAppId = dto.BindAppId;
                 CopyUtil.CopyProperties(sysUser, dto);
             }

@@ -18,12 +18,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     /// </summary>
     public class WxPayDivisionService : IDivisionService
     {
-        private readonly ILogger<AliPayDivisionService> log;
+        private readonly ILogger<WxPayDivisionService> _logger;
         private readonly ConfigContextQueryService configContextQueryService;
 
-        public WxPayDivisionService(ILogger<AliPayDivisionService> log, ConfigContextQueryService configContextQueryService)
+        public WxPayDivisionService(ILogger<WxPayDivisionService> logger, ConfigContextQueryService configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
             this.configContextQueryService = configContextQueryService;
         }
 
@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "请求微信绑定分账接口异常");
+                _logger.LogError(e, "请求微信绑定分账接口异常");
                 ChannelRetMsg channelRetMsg = ChannelRetMsg.ConfirmFail();
                 channelRetMsg.ChannelErrMsg = e.Message;
                 return channelRetMsg;
@@ -181,7 +181,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "微信分账失败");
+                _logger.LogError(e, "微信分账失败");
                 ChannelRetMsg channelRetMsg = ChannelRetMsg.ConfirmFail();
                 channelRetMsg.ChannelErrMsg = e.Message;
                 return channelRetMsg;
@@ -282,7 +282,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "微信分账失败");
+                _logger.LogError(e, "微信分账失败");
                 throw new BizException(e.Message);
             }
 

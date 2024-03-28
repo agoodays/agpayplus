@@ -16,15 +16,15 @@ namespace AGooday.AgPay.Payment.Api.MQ
     public class PayOrderReissueMQReceiver : PayOrderReissueMQ.IMQReceiver
     {
         private readonly IMQSender mqSender;
-        private readonly ILogger<PayOrderReissueMQReceiver> log;
+        private readonly ILogger<PayOrderReissueMQReceiver> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public PayOrderReissueMQReceiver(IMQSender mqSender,
-            ILogger<PayOrderReissueMQReceiver> log,
+        public PayOrderReissueMQReceiver(ILogger<PayOrderReissueMQReceiver> logger,
+            IMQSender mqSender,
             IServiceScopeFactory serviceScopeFactory)
         {
+            _logger = logger;
             this.mqSender = mqSender;
-            this.log = log;
             _serviceScopeFactory = serviceScopeFactory;
         }
 
@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 var channelOrderReissueService = scope.ServiceProvider.GetService<ChannelOrderReissueService>();
                 try
                 {
-                    log.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                    _logger.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject(payload)}");
                     string payOrderId = payload.PayOrderId;
                     int currentCount = payload.Count;
                     currentCount++;
@@ -44,13 +44,13 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     PayOrderDto payOrder = payOrderService.GetById(payOrderId);
                     if (payOrder == null)
                     {
-                        log.LogWarning($"查询支付订单为空,payOrderId={payOrderId}");
+                        _logger.LogWarning($"查询支付订单为空,payOrderId={payOrderId}");
                         return;
                     }
 
                     if (payOrder.State != (byte)PayOrderState.STATE_ING)
                     {
-                        log.LogWarning($"订单状态不是支付中,不需查询渠道.payOrderId={payOrderId}");
+                        _logger.LogWarning($"订单状态不是支付中,不需查询渠道.payOrderId={payOrderId}");
                         return;
                     }
 
@@ -76,7 +76,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 }
                 catch (Exception e)
                 {
-                    log.LogError(e, e.Message);
+                    _logger.LogError(e, e.Message);
                     return;
                 }
             }

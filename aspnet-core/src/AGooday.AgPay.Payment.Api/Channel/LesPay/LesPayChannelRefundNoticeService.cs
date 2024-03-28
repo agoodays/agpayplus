@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
     /// </summary>
     public class LesPayChannelRefundNoticeService : AbstractChannelRefundNoticeService
     {
-        public LesPayChannelRefundNoticeService(ILogger<AbstractChannelRefundNoticeService> logger,
+        public LesPayChannelRefundNoticeService(ILogger<LesPayChannelRefundNoticeService> logger,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, configContextQueryService)
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }
@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                 string logPrefix = "【处理乐刷退款回调】";
                 // 获取请求参数
                 var resText = @params?.ToString();
-                log.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
+                _logger.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
                 var resJson = XmlUtil.ConvertToJson(resText);
                 var resParams = JObject.Parse(resJson);
 
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                log.LogInformation($"{logPrefix}验证退款通知数据及签名通过");
+                _logger.LogInformation($"{logPrefix}验证退款通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 var okResponse = TextResp("000000");
@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }
@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             //验签失败
             if (!LesSignUtil.Verify(jsonParams, noticeKey))
             {
-                log.LogInformation($"【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey}");
+                _logger.LogInformation($"【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey}");
                 return false;
             }
             return true;

@@ -2,7 +2,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Controllers.PayOrder;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.Services;
@@ -18,19 +17,19 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
     [ApiController]
     public class ChannelRefundNoticeController : ControllerBase
     {
-        private readonly ILogger<AbstractPayOrderController> log;
+        private readonly ILogger<ChannelRefundNoticeController> _logger;
         private readonly IRefundOrderService refundOrderService;
         private readonly ConfigContextQueryService configContextQueryService;
         private readonly RefundOrderProcessService refundOrderProcessService;
         protected readonly Func<string, IChannelRefundNoticeService> channelRefundNoticeServiceFactory;
 
-        public ChannelRefundNoticeController(ILogger<AbstractPayOrderController> log, 
+        public ChannelRefundNoticeController(ILogger<ChannelRefundNoticeController> logger, 
             IRefundOrderService refundOrderService, 
             ConfigContextQueryService configContextQueryService, 
             RefundOrderProcessService refundOrderProcessService, 
             Func<string, IChannelRefundNoticeService> channelRefundNoticeServiceFactory)
         {
-            this.log = log;
+            _logger = logger;
             this.refundOrderService = refundOrderService;
             this.configContextQueryService = configContextQueryService;
             this.refundOrderProcessService = refundOrderProcessService;
@@ -50,7 +49,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         public ActionResult DoNotify(string ifCode, string refundOrderId, string urlOrderId)
         {
             string logPrefix = $"进入[{ifCode}]退款回调：urlOrderId：[{urlOrderId}] ";
-            log.LogInformation($"===== {logPrefix} =====");
+            _logger.LogInformation($"===== {logPrefix} =====");
 
             try
             {
@@ -66,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 // 支付通道接口实现不存在
                 if (refundNotifyService == null)
                 {
-                    log.LogError($"{logPrefix}, interface not exists ");
+                    _logger.LogError($"{logPrefix}, interface not exists ");
                     return BadRequest($"[{ifCode}] interface not exists");
                 }
 
@@ -75,17 +74,17 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 if (mutablePair == null)
                 {
                     // 解析数据失败， 响应已处理
-                    log.LogError($"{logPrefix}, mutablePair is null ");
+                    _logger.LogError($"{logPrefix}, mutablePair is null ");
                     throw new BizException("解析数据异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 
                 // 解析到订单号
                 refundOrderId = mutablePair.First().Key;
-                log.LogInformation($"{logPrefix}, 解析数据为：refundOrderId:{refundOrderId}, params:{mutablePair.First().Value}");
+                _logger.LogInformation($"{logPrefix}, 解析数据为：refundOrderId:{refundOrderId}, params:{mutablePair.First().Value}");
 
                 if (!string.IsNullOrWhiteSpace(urlOrderId) && !urlOrderId.Equals(refundOrderId))
                 {
-                    log.LogError($"{logPrefix}, 订单号不匹配. urlOrderId={urlOrderId}, refundOrderId={refundOrderId} ");
+                    _logger.LogError($"{logPrefix}, 订单号不匹配. urlOrderId={urlOrderId}, refundOrderId={refundOrderId} ");
                     throw new BizException("退款单号不匹配！");
                 }
 
@@ -95,7 +94,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 // 订单不存在
                 if (refundOrder == null)
                 {
-                    log.LogError($"{logPrefix}, 退款订单不存在. payOrderId={refundOrder} ");
+                    _logger.LogError($"{logPrefix}, 退款订单不存在. payOrderId={refundOrder} ");
                     return refundNotifyService.DoNotifyOrderNotExists(Request);
                 }
 
@@ -108,7 +107,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)
                 {
-                    log.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ");
+                    _logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ");
                     throw new BizException("处理回调事件异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
                 // 处理退款订单
@@ -117,27 +116,27 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 // 更新退款订单 异常
                 if (!updateOrderSuccess)
                 {
-                    log.LogError($"{logPrefix}, updateOrderSuccess = {updateOrderSuccess} ");
+                    _logger.LogError($"{logPrefix}, updateOrderSuccess = {updateOrderSuccess} ");
                     return refundNotifyService.DoNotifyOrderStateUpdateFail(Request);
                 }
 
-                log.LogInformation($"===== {logPrefix}, 订单通知完成。 refundOrderId={refundOrderId}, parseState = {notifyResult.ChannelState} =====");
+                _logger.LogInformation($"===== {logPrefix}, 订单通知完成。 refundOrderId={refundOrderId}, parseState = {notifyResult.ChannelState} =====");
 
                 return notifyResult.ResponseEntity;
             }
             catch (BizException e)
             {
-                log.LogError(e, $"{logPrefix}, refundOrderId={refundOrderId}, BizException");
+                _logger.LogError(e, $"{logPrefix}, refundOrderId={refundOrderId}, BizException");
                 return BadRequest(e.Message);
             }
             catch (ResponseException e)
             {
-                log.LogError(e, $"{logPrefix}, refundOrderId={refundOrderId}, ResponseException");
+                _logger.LogError(e, $"{logPrefix}, refundOrderId={refundOrderId}, ResponseException");
                 return e.ResponseEntity;
             }
             catch (Exception e)
             {
-                log.LogError(e, $"{logPrefix}, refundOrderId={refundOrderId}, 系统异常");
+                _logger.LogError(e, $"{logPrefix}, refundOrderId={refundOrderId}, 系统异常");
                 return BadRequest(e.Message);
             }
         }

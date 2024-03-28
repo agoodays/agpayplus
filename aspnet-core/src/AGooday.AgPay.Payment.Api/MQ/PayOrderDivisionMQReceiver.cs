@@ -10,13 +10,13 @@ namespace AGooday.AgPay.Payment.Api.MQ
     /// </summary>
     public class PayOrderDivisionMQReceiver : PayOrderDivisionMQ.IMQReceiver
     {
-        private readonly ILogger<PayOrderDivisionMQReceiver> log;
+        private readonly ILogger<PayOrderDivisionMQReceiver> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public PayOrderDivisionMQReceiver(ILogger<PayOrderDivisionMQReceiver> log,
+        public PayOrderDivisionMQReceiver(ILogger<PayOrderDivisionMQReceiver> logger,
             IServiceScopeFactory serviceScopeFactory)
         {
-            this.log = log;
+            _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
         }
 
@@ -27,12 +27,12 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 var payOrderDivisionProcessService = scope.ServiceProvider.GetService<PayOrderDivisionProcessService>();
                 try
                 {
-                    log.LogInformation($"接收订单分账通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                    _logger.LogInformation($"接收订单分账通知MQ, msg={JsonConvert.SerializeObject(payload)}");
                     payOrderDivisionProcessService.ProcessPayOrderDivision(payload.PayOrderId, payload.UseSysAutoDivisionReceivers, payload.ReceiverList, payload.IsResend);
                 }
                 catch (Exception e)
                 {
-                    log.LogError(e, e.Message);
+                    _logger.LogError(e, e.Message);
                 }
             }
         }

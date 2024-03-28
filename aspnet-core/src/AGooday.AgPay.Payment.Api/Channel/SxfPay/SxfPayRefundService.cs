@@ -16,16 +16,16 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
     /// </summary>
     public class SxfPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<SxfPayRefundService> log;
+        private readonly ILogger<SxfPayRefundService> _logger;
         private readonly SxfPayPaymentService sxfpayPaymentService;
-        public SxfPayRefundService(IServiceProvider serviceProvider,
+        public SxfPayRefundService(ILogger<SxfPayRefundService> logger,
+            SxfPayPaymentService sxfpayPaymentService,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
-            ConfigContextQueryService configContextQueryService,
-            ILogger<SxfPayRefundService> log,
-            SxfPayPaymentService sxfpayPaymentService)
+            ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
             this.sxfpayPaymentService = sxfpayPaymentService;
         }
 
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = sxfpayPaymentService.PackageParamAndReq("/query/refundQuery", reqParams, logPrefix, mchAppConfigContext);
-                log.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -90,19 +90,19 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                             case SxfPayEnum.OrderStatus.REFUNDSUC:
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                log.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;
                             case SxfPayEnum.OrderStatus.REFUNDFAIL:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = bizCode;
                                 channelRetMsg.ChannelErrMsg = bizMsg;
-                                log.LogInformation($"{logPrefix} >>> 退款失败, {bizMsg}");
+                                _logger.LogInformation($"{logPrefix} >>> 退款失败, {bizMsg}");
                                 break;
                             case SxfPayEnum.OrderStatus.REFUNDING:
                                 //退款中
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
-                                log.LogInformation($"{logPrefix} >>> 退款中");
+                                _logger.LogInformation($"{logPrefix} >>> 退款中");
                                 break;
                         }
                     }
@@ -143,7 +143,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = sxfpayPaymentService.PackageParamAndReq("/order/refund", reqParams, logPrefix, mchAppConfigContext);
-                log.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -182,19 +182,19 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                             case SxfPayEnum.OrderStatus.REFUNDSUC:
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                log.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;
                             case SxfPayEnum.OrderStatus.REFUNDFAIL:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = bizCode;
                                 channelRetMsg.ChannelErrMsg = bizMsg;
-                                log.LogInformation($"{logPrefix} >>> 退款失败, {bizMsg}");
+                                _logger.LogInformation($"{logPrefix} >>> 退款失败, {bizMsg}");
                                 break;
                             case SxfPayEnum.OrderStatus.REFUNDING:
                                 //退款中
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
-                                log.LogInformation($"{logPrefix} >>> 退款中");
+                                _logger.LogInformation($"{logPrefix} >>> 退款中");
                                 break;
                         }
                     }
@@ -202,7 +202,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             }
             catch (Exception e)
             {
-                log.LogError(e, $"{logPrefix}, 异常:{e.Message}");
+                _logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }
             return channelRetMsg;

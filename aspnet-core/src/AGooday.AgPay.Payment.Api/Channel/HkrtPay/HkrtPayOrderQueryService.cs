@@ -13,13 +13,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
     /// </summary>
     public class HkrtPayPayOrderQueryService : IPayOrderQueryService
     {
-        private readonly ILogger<HkrtPayPayOrderQueryService> log;
+        private readonly ILogger<HkrtPayPayOrderQueryService> _logger;
         private readonly HkrtPayPaymentService hkrtPayPaymentService;
 
-        public HkrtPayPayOrderQueryService(ILogger<HkrtPayPayOrderQueryService> log,
+        public HkrtPayPayOrderQueryService(ILogger<HkrtPayPayOrderQueryService> logger,
             HkrtPayPaymentService hkrtPayPaymentService)
         {
-            this.log = log;
+            _logger = logger;
             this.hkrtPayPaymentService = hkrtPayPaymentService;
         }
 
@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = hkrtPayPaymentService.PackageParamAndReq("/api/v1/pay/polymeric/query", reqParams, logPrefix, mchAppConfigContext);
-                log.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.Waiting(); //支付中
@@ -114,7 +114,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
             }
             catch (Exception e)
             {
-                log.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
+                _logger.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //支付中
             }
         }

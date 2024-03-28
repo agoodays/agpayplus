@@ -18,12 +18,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     /// </summary>
     public class WxPayPayOrderQueryService : IPayOrderQueryService
     {
-        private readonly ILogger<WxPayPayOrderQueryService> log;
+        private readonly ILogger<WxPayPayOrderQueryService> _logger;
         private readonly ConfigContextQueryService configContextQueryService;
 
-        public WxPayPayOrderQueryService(ILogger<WxPayPayOrderQueryService> log, ConfigContextQueryService configContextQueryService)
+        public WxPayPayOrderQueryService(ILogger<WxPayPayOrderQueryService> logger, ConfigContextQueryService configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
             this.configContextQueryService = configContextQueryService;
         }
 

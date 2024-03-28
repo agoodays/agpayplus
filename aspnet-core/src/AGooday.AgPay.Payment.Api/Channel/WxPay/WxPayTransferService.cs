@@ -20,12 +20,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     /// </summary>
     public class WxPayTransferService : ITransferService
     {
-        private readonly ILogger<WxPayTransferService> log;
+        private readonly ILogger<WxPayTransferService> _logger;
         private readonly ConfigContextQueryService configContextQueryService;
 
-        public WxPayTransferService(ILogger<WxPayTransferService> log, ConfigContextQueryService configContextQueryService)
+        public WxPayTransferService(ILogger<WxPayTransferService> logger, ConfigContextQueryService configContextQueryService)
         {
-            this.log = log;
+            _logger = logger;
             this.configContextQueryService = configContextQueryService;
         }
 
@@ -145,7 +145,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "转账异常：");
+                _logger.LogError(e, "转账异常：");
                 return ChannelRetMsg.Waiting();
             }
         }
@@ -217,7 +217,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "转账状态查询异常：");
+                _logger.LogError(e, "转账状态查询异常：");
                 return ChannelRetMsg.Waiting();
             }
         }

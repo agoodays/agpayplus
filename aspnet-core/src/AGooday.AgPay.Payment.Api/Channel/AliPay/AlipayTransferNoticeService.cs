@@ -14,9 +14,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {
     public class AliPayTransferNoticeService : AbstractTransferNoticeService
     {
-        public AliPayTransferNoticeService(ILogger<AbstractChannelNoticeService> log,
-            RequestKit requestKit, ChannelCertConfigKit channelCertConfigKit, ConfigContextQueryService configContextQueryService)
-            : base(log, requestKit, channelCertConfigKit, configContextQueryService)
+        public AliPayTransferNoticeService(ILogger<AliPayTransferNoticeService> logger,
+            RequestKit requestKit, 
+            ChannelCertConfigKit channelCertConfigKit,
+            ConfigContextQueryService configContextQueryService)
+            : base(logger, requestKit, channelCertConfigKit, configContextQueryService)
         {
         }
 
@@ -30,7 +32,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             try
             {
                 var paramsJson = GetReqParamJSON();
-                log.LogInformation($"【支付宝转账】回调通知参数：{paramsJson}");
+                _logger.LogInformation($"【支付宝转账】回调通知参数：{paramsJson}");
 
                 var bizContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(paramsJson["biz_content"].ToString());
 
@@ -39,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }
@@ -89,7 +91,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 // 验签失败
                 if (!verifyResult)
                 {
-                    log.LogError($"{logPrefix}，验签失败");
+                    _logger.LogError($"{logPrefix}，验签失败");
                     throw ResponseException.BuildText("ERROR");
                 }
 
@@ -112,7 +114,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             }
             catch (Exception e)
             {
-                log.LogError(e, "error");
+                _logger.LogError(e, "error");
                 throw ResponseException.BuildText("ERROR");
             }
         }

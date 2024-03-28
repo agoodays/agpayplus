@@ -12,14 +12,14 @@ namespace AGooday.AgPay.Merchant.Api.MQ
     /// </summary>
     public class CleanAgentLoginAuthCacheMQReceiver : CleanAgentLoginAuthCacheMQ.IMQReceiver
     {
-        private readonly ILogger<CleanAgentLoginAuthCacheMQReceiver> log;
+        private readonly ILogger<CleanAgentLoginAuthCacheMQReceiver> _logger;
         private readonly int defaultDB;
         private readonly IDatabase redis;
         private readonly IServer redisServer;
 
-        public CleanAgentLoginAuthCacheMQReceiver(ILogger<CleanAgentLoginAuthCacheMQReceiver> log, RedisUtil client)
+        public CleanAgentLoginAuthCacheMQReceiver(ILogger<CleanAgentLoginAuthCacheMQReceiver> logger, RedisUtil client)
         {
-            this.log = log;
+            _logger = logger;
             defaultDB = client.GetDefaultDB();
             redis = client.GetDatabase();
             redisServer = client.GetServer();
@@ -27,13 +27,13 @@ namespace AGooday.AgPay.Merchant.Api.MQ
 
         public void Receive(CleanAgentLoginAuthCacheMQ.MsgPayload payload)
         {
-            log.LogInformation($"成功接收删除代理商用户登录的订阅通知, msg={JsonConvert.SerializeObject(payload)}");
+            _logger.LogInformation($"成功接收删除代理商用户登录的订阅通知, msg={JsonConvert.SerializeObject(payload)}");
             // 字符串转List<Long>
             List<long> userIdList = payload.UserIdList;
             // 删除redis用户缓存
             if (userIdList == null || userIdList.Count == 0)
             {
-                log.LogInformation("用户ID为空");
+                _logger.LogInformation("用户ID为空");
                 return;
             }
             foreach (long sysUserId in userIdList)
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Merchant.Api.MQ
                     continue;
                 }
             }
-            log.LogInformation("无权限登录用户信息已清除");
+            _logger.LogInformation("无权限登录用户信息已清除");
         }
     }
 }

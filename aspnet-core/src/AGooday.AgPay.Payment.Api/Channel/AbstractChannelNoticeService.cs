@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
 {
     public abstract class AbstractChannelNoticeService : IChannelNoticeService
     {
-        protected readonly ILogger<AbstractChannelNoticeService> log;
+        protected readonly ILogger<AbstractChannelNoticeService> _logger;
         protected readonly RequestKit _requestKit;
         protected ConfigContextQueryService configContextQueryService;
 
@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
         {
-            this.log = logger;
+            _logger = logger;
             _requestKit = requestKit;
             this.configContextQueryService = configContextQueryService;
         }

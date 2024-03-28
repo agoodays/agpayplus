@@ -13,13 +13,13 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     public class RefundOrderReissueJob : IJob
     {
         private static readonly int QUERY_PAGE_SIZE = 100; //每次查询数量
-        private readonly ILogger<RefundOrderReissueJob> logger;
+        private readonly ILogger<RefundOrderReissueJob> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public RefundOrderReissueJob(ILogger<RefundOrderReissueJob> logger,
             IServiceScopeFactory serviceScopeFactory)
         {
-            this.logger = logger;
+            _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
         }
 
@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                         catch (Exception e)
                         {
                             //出现异常，直接退出，避免死循环。
-                            logger.LogError(e, "error");
+                            _logger.LogError(e, "error");
                             break;
                         }
                     }

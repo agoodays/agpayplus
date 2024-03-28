@@ -13,13 +13,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
     /// </summary>
     public class LcswPayPayOrderCloseService : IPayOrderCloseService
     {
-        private readonly ILogger<LcswPayPayOrderCloseService> log;
+        private readonly ILogger<LcswPayPayOrderCloseService> _logger;
         private readonly LcswPayPaymentService lcswpayPaymentService;
 
-        public LcswPayPayOrderCloseService(ILogger<LcswPayPayOrderCloseService> log,
+        public LcswPayPayOrderCloseService(ILogger<LcswPayPayOrderCloseService> logger,
             LcswPayPaymentService lcswpayPaymentService)
         {
-            this.log = log;
+            _logger = logger;
             this.lcswpayPaymentService = lcswpayPaymentService;
         }
 
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = lcswpayPaymentService.PackageParamAndReq("/pay/open/close", reqParams, logPrefix, mchAppConfigContext);
-                log.LogInformation($"关闭订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation($"关闭订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.SysError("【利楚扫呗】请求关闭订单异常");

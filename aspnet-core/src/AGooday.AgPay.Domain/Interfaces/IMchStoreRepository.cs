@@ -4,6 +4,6 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IMchStoreRepository : IRepository<MchStore>
     {
-        MchStore GetByKeyAsNoTracking(long recordId);
+        MchStore GetByIdAsNoTracking(long recordId);
     }
 }

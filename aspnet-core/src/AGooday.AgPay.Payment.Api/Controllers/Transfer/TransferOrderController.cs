@@ -31,11 +31,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
 
         public TransferOrderController(ILogger<TransferOrderController> logger,
             Func<string, ITransferService> transferServiceFactory,
-            RequestKit requestKit,
-            ConfigContextQueryService configContextQueryService,
             ITransferOrderService transferOrderService,
             IPayInterfaceConfigService payInterfaceConfigService,
-            PayMchNotifyService payMchNotifyService)
+            PayMchNotifyService payMchNotifyService,
+            RequestKit requestKit,
+            ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
         {
             _logger = logger;

@@ -14,17 +14,17 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly Func<string, ITransferService> transferServiceFactory;
         private readonly ILogger<PayOrderProcessService> _logger;
 
-        public TransferOrderReissueService(ConfigContextQueryService configContextQueryService,
+        public TransferOrderReissueService(ILogger<PayOrderProcessService> logger,
+            ConfigContextQueryService configContextQueryService,
             ITransferOrderService transferOrderService,
             PayMchNotifyService payMchNotifyService,
-            Func<string, ITransferService> transferServiceFactory,
-            ILogger<PayOrderProcessService> logger)
+            Func<string, ITransferService> transferServiceFactory)
         {
+            _logger = logger;
             this.configContextQueryService = configContextQueryService;
             this.transferOrderService = transferOrderService;
             this.payMchNotifyService = payMchNotifyService;
             this.transferServiceFactory = transferServiceFactory;
-            _logger = logger;
         }
 
         /// <summary>

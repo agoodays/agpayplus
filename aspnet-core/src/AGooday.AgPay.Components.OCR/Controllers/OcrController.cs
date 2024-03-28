@@ -12,12 +12,12 @@ namespace AGooday.AgPay.Components.OCR.Controllers
     [Route("api/ocr")]
     public class OcrController : ControllerBase
     {
-        private readonly ILogger<OcrController> logger;
+        private readonly ILogger<OcrController> _logger;
         private readonly IOcrService ocrService;
 
         public OcrController(ILogger<OcrController> logger, IOcrServiceFactory ocrServiceFactory)
         {
-            this.logger = logger;
+            _logger = logger;
             this.ocrService = ocrServiceFactory.GetService();
         }
 
@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Components.OCR.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"通用文字识别异常, imageUrl = {imageUrl}");
+                _logger.LogError(e, $"通用文字识别异常, imageUrl = {imageUrl}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Components.OCR.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"卡证文字识别异常, imageUrl = {imageUrl}");
+                _logger.LogError(e, $"卡证文字识别异常, imageUrl = {imageUrl}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }

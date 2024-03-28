@@ -13,13 +13,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
     /// </summary>
     public class YsfPayPayOrderQueryService : IPayOrderQueryService
     {
-        private readonly ILogger<YsfPayPayOrderQueryService> log;
+        private readonly ILogger<YsfPayPayOrderQueryService> _logger;
         private readonly YsfPayPaymentService ysfpayPaymentService;
 
-        public YsfPayPayOrderQueryService(ILogger<YsfPayPayOrderQueryService> log,
+        public YsfPayPayOrderQueryService(ILogger<YsfPayPayOrderQueryService> logger,
             YsfPayPaymentService ysfpayPaymentService)
         {
-            this.log = log;
+            _logger = logger;
             this.ysfpayPaymentService = ysfpayPaymentService;
         }
 
@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = ysfpayPaymentService.PackageParamAndReq("/gateway/api/pay/queryOrder", reqParams, logPrefix, mchAppConfigContext);
-                log.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.Waiting(); //支付中

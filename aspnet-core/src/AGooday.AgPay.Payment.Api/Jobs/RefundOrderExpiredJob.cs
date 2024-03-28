@@ -9,13 +9,13 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     [DisallowConcurrentExecution]
     public class RefundOrderExpiredJob : IJob
     {
-        private readonly ILogger<RefundOrderExpiredJob> logger;
+        private readonly ILogger<RefundOrderExpiredJob> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public RefundOrderExpiredJob(ILogger<RefundOrderExpiredJob> logger,
             IServiceScopeFactory serviceScopeFactory)
         {
-            this.logger = logger;
+            _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
         }
 
@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                 {
                     var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
                     int updateCount = refundOrderService.UpdateOrderExpired();
-                    logger.LogInformation($"处理退款订单超时{updateCount}条.");
+                    _logger.LogInformation($"处理退款订单超时{updateCount}条.");
                 }
             });
         }

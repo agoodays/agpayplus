@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Payment.Api.Services
     /// </summary>
     public class ChannelOrderReissueService
     {
-        private readonly ILogger<PayOrderMchNotifyMQReceiver> log;
+        private readonly ILogger<ChannelOrderReissueService> _logger;
         protected readonly Func<string, IPayOrderQueryService> _payOrderQueryServiceFactory;
         protected readonly Func<string, IRefundService> _refundServiceFactory;
         private readonly ConfigContextQueryService configContextQueryService;
@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly RefundOrderProcessService refundOrderProcessService;
         private readonly IPayOrderService payOrderService;
 
-        public ChannelOrderReissueService(ILogger<PayOrderMchNotifyMQReceiver> log,
+        public ChannelOrderReissueService(ILogger<ChannelOrderReissueService> logger,
             Func<string, IPayOrderQueryService> payOrderQueryServiceFactory,
             Func<string, IRefundService> refundServiceFactory,
             ConfigContextQueryService configContextQueryService,
@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             this.payOrderProcessService = payOrderProcessService;
             this.refundOrderProcessService = refundOrderProcessService;
             this.payOrderService = payOrderService;
-            this.log = log;
+            _logger = logger;
             _payOrderQueryServiceFactory = payOrderQueryServiceFactory;
             _refundServiceFactory = refundServiceFactory;
         }
@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 // 支付通道接口实现不存在
                 if (queryService == null)
                 {
-                    log.LogError($"{payOrder.IfCode} interface not exists!");
+                    _logger.LogError($"{payOrder.IfCode} interface not exists!");
                     return null;
                 }
 
@@ -65,11 +65,11 @@ namespace AGooday.AgPay.Payment.Api.Services
                 ChannelRetMsg channelRetMsg = queryService.Query(payOrder, mchAppConfigContext);
                 if (channelRetMsg == null)
                 {
-                    log.LogError("channelRetMsg is null");
+                    _logger.LogError("channelRetMsg is null");
                     return null;
                 }
 
-                log.LogInformation($"补单[{payOrderId}]查询结果为：{JsonConvert.SerializeObject(channelRetMsg)}");
+                _logger.LogInformation($"补单[{payOrderId}]查询结果为：{JsonConvert.SerializeObject(channelRetMsg)}");
 
                 // 查询成功
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
@@ -91,7 +91,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             }
             catch (Exception e)
             {
-                log.LogError(e, $"error payOrderId = {payOrder.PayOrderId}");
+                _logger.LogError(e, $"error payOrderId = {payOrder.PayOrderId}");
                 return null;
             }
         }
@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 // 支付通道接口实现不存在
                 if (queryService == null)
                 {
-                    log.LogError($"退款补单：{refundOrder.IfCode} interface not exists!");
+                    _logger.LogError($"退款补单：{refundOrder.IfCode} interface not exists!");
                     return null;
                 }
 
@@ -122,11 +122,11 @@ namespace AGooday.AgPay.Payment.Api.Services
                 ChannelRetMsg channelRetMsg = queryService.Query(refundOrder, mchAppConfigContext);
                 if (channelRetMsg == null)
                 {
-                    log.LogError("退款补单：channelRetMsg is null");
+                    _logger.LogError("退款补单：channelRetMsg is null");
                     return null;
                 }
 
-                log.LogInformation($"退款补单：[{refundOrderId}]查询结果为：{channelRetMsg}");
+                _logger.LogInformation($"退款补单：[{refundOrderId}]查询结果为：{channelRetMsg}");
                 // 根据渠道返回结果，处理退款订单
                 refundOrderProcessService.HandleRefundOrder4Channel(channelRetMsg, refundOrder);
 
@@ -135,7 +135,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             catch (Exception e)
             {
                 //继续下一次迭代查询
-                log.LogError(e, $"退款补单：error refundOrderId = {refundOrder.RefundOrderId}");
+                _logger.LogError(e, $"退款补单：error refundOrderId = {refundOrder.RefundOrderId}");
                 return null;
             }
         }
