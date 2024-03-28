@@ -130,12 +130,12 @@ services.AddSingleton<IMQMsgReceiver, PayOrderDivisionRabbitMQReceiver>();
 services.AddSingleton<IMQMsgReceiver, PayOrderMchNotifyRabbitMQReceiver>();
 services.AddSingleton<IMQMsgReceiver, PayOrderReissueRabbitMQReceiver>();
 services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
-services.AddSingleton<IMQMsgReceiver, ResetIsvMchAppInfoRabbitMQReceiver>();
+services.AddSingleton<IMQMsgReceiver, ResetIsvAgentMchAppInfoRabbitMQReceiver>();
 services.AddSingleton<PayOrderDivisionMQ.IMQReceiver, PayOrderDivisionMQReceiver>();
 services.AddSingleton<PayOrderMchNotifyMQ.IMQReceiver, PayOrderMchNotifyMQReceiver>();
 services.AddSingleton<PayOrderReissueMQ.IMQReceiver, PayOrderReissueMQReceiver>();
 services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
-services.AddSingleton<ResetIsvMchAppInfoConfigMQ.IMQReceiver, ResetIsvMchAppInfoMQReceiver>();
+services.AddSingleton<ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver, ResetIsvAgentMchAppInfoMQReceiver>();
 services.AddHostedService<MQReceiverHostedService>();
 #endregion
 

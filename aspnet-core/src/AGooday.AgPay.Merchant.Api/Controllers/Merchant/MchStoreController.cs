@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
@@ -93,7 +94,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 
             //// 推送mq到目前节点进行更新数据
             //var mchStore = _mchStoreService.GetById(recordId);
-            //mqSender.Send(ResetIsvMchStoreInfoConfigMQ.Build(ResetIsvMchStoreInfoConfigMQ.RESET_TYPE_MCH_STORE, null, mchStore.MchNo, recordId));
+            //mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_STORE, null, null, mchStore.MchNo, recordId));
 
             return ApiRes.Ok();
         }
@@ -118,8 +119,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
             }
+
             //// 推送修改门店消息
-            //mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_STORE, null, dto.MchNo, dto.AppId));
+            //mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_STORE, null, null, dto.MchNo, recordId));
 
             return ApiRes.Ok();
         }

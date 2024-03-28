@@ -291,6 +291,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 }
 
                 CommitTransaction();
+
+                // 推送mq到目前节点进行更新数据
+                mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
             }
             catch (Exception e)
             {
@@ -359,6 +362,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 推送mq删除redis用户缓存
                 var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
                 mqSender.Send(CleanAgentLoginAuthCacheMQ.Build(userIdList));
+
+                // 推送mq到目前节点进行更新数据
+                mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
             }
             catch (Exception e)
             {

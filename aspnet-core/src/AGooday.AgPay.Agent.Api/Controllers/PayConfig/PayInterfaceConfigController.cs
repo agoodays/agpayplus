@@ -28,13 +28,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IPayInterfaceDefineService _payIfDefineService;
 
-        public PayInterfaceConfigController(ILogger<PayInterfaceConfigController> logger, 
+        public PayInterfaceConfigController(ILogger<PayInterfaceConfigController> logger,
             IMQSender mqSender,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
             IPayInterfaceDefineService payIfDefineService,
-            IPayInterfaceConfigService payIfConfigService,            
+            IPayInterfaceConfigService payIfConfigService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)
@@ -215,7 +215,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
             }
 
             // 推送mq到目前节点进行更新数据
-            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null));
+            mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null, null));
 
             return ApiRes.Ok();
         }

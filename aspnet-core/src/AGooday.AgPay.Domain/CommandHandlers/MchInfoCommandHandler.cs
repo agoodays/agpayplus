@@ -321,7 +321,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 CommitTransaction();
 
                 // 推送mq到目前节点进行更新数据
-                mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, mchInfo.MchNo, null));
+                mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, null, mchInfo.MchNo, null));
             }
             catch (Exception e)
             {
@@ -406,7 +406,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 mqSender.Send(CleanMchLoginAuthCacheMQ.Build(userIdList));
 
                 // 推送mq到目前节点进行更新数据
-                mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, request.MchNo, null));
+                mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, null, request.MchNo, null));
             }
             catch (Exception e)
             {

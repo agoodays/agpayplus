@@ -7,7 +7,7 @@ namespace AGooday.AgPay.Components.MQ.Models
     /// 定义MQ消息格式
     /// 业务场景： [ 支付订单补单（一般用于没有回调的接口，比如微信的条码支付） ]
     /// </summary>
-    public class ResetIsvMchAppInfoConfigMQ : AbstractMQ
+    public class ResetIsvAgentMchAppInfoConfigMQ : AbstractMQ
     {
         /// <summary>
         /// 【！重要配置项！】 定义MQ名称
@@ -17,15 +17,16 @@ namespace AGooday.AgPay.Components.MQ.Models
 
         // 重置类型 （枚举类型，无法json反序列化）
         public static readonly byte RESET_TYPE_ISV_INFO = 1;
-        public static readonly byte RESET_TYPE_MCH_INFO = 2;
-        public static readonly byte RESET_TYPE_MCH_APP = 3;
+        public static readonly byte RESET_TYPE_AGENT_INFO = 2;
+        public static readonly byte RESET_TYPE_MCH_INFO = 3;
+        public static readonly byte RESET_TYPE_MCH_APP = 4;
 
         /// <summary>
         /// 内置msg 消息体定义
         /// </summary>
         private MsgPayload Payload;
 
-        public ResetIsvMchAppInfoConfigMQ(MsgPayload payload) => Payload = payload;
+        public ResetIsvAgentMchAppInfoConfigMQ(MsgPayload payload) => Payload = payload;
 
         /// <summary>
         /// 【！重要配置项！】 定义Msg消息载体
@@ -37,13 +38,15 @@ namespace AGooday.AgPay.Components.MQ.Models
             /// </summary>
             public byte ResetType { get; private set; }
             public string IsvNo { get; private set; }
+            public string AgentNo { get; private set; }
             public string MchNo { get; private set; }
             public string AppId { get; private set; }
 
-            public MsgPayload(byte resetType, string isvNo, string mchNo, string appId)
+            public MsgPayload(byte resetType, string isvNo, string agentNo, string mchNo, string appId)
             {
                 ResetType = resetType;
                 IsvNo = isvNo;
+                AgentNo = agentNo;
                 MchNo = mchNo;
                 AppId = appId;
             }
@@ -63,8 +66,8 @@ namespace AGooday.AgPay.Components.MQ.Models
         /// 【！重要配置项！】 构造MQModel , 一般用于发送MQ时
         /// </summary>
         /// <returns></returns>
-        public static ResetIsvMchAppInfoConfigMQ Build(byte resetType, string isvNo, string mchNo, string appId)
-            => new ResetIsvMchAppInfoConfigMQ(new MsgPayload(resetType, isvNo, mchNo, appId));
+        public static ResetIsvAgentMchAppInfoConfigMQ Build(byte resetType, string isvNo, string agentNo, string mchNo, string appId)
+            => new ResetIsvAgentMchAppInfoConfigMQ(new MsgPayload(resetType, isvNo, agentNo, mchNo, appId));
 
         /// <summary>
         /// 解析MQ消息， 一般用于接收MQ消息时

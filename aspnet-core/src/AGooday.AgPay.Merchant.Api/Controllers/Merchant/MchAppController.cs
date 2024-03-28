@@ -107,7 +107,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 
             // 推送mq到目前节点进行更新数据
             var mchApp = _mchAppService.GetById(appId);
-            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, mchApp.MchNo, appId));
+            mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, appId));
 
             return ApiRes.Ok();
         }
@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
             }
             // 推送修改应用消息
-            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, dto.MchNo, dto.AppId));
+            mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, dto.MchNo, dto.AppId));
 
             return ApiRes.Ok();
         }

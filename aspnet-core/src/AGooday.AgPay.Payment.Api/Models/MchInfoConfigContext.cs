@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// <summary>
         /// 商户应用信息集
         /// </summary>
-        public Dictionary<string, MchAppDto> AppMap { get; set; } = new Dictionary<string, MchAppDto>(); 
+        public Dictionary<string, MchAppDto> AppMap { get; set; } = new Dictionary<string, MchAppDto>();
         #endregion
 
         /// <summary>
@@ -33,7 +33,14 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// <param name="mchApp"></param>
         public void PutMchApp(MchAppDto mchApp)
         {
-            AppMap.Add(mchApp.AppId, mchApp);
+            if (AppMap.TryGetValue(mchApp.AppId, out _))
+            {
+                AppMap[mchApp.AppId] = mchApp;
+            }
+            else
+            {
+                AppMap.Add(mchApp.AppId, mchApp);
+            }
         }
 
         /// <summary>

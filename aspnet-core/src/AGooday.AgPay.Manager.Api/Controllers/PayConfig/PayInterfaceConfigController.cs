@@ -215,7 +215,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             }
 
             // 推送mq到目前节点进行更新数据
-            mqSender.Send(ResetIsvMchAppInfoConfigMQ.Build(ResetIsvMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null));
+            mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null, null));
 
             return ApiRes.Ok();
         }

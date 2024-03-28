@@ -6,15 +6,15 @@ namespace AGooday.AgPay.Payment.Api.MQ
 {
     /// <summary>
     /// 接收MQ消息
-    /// 业务：更新服务商/商户/商户应用配置信息；
+    /// 业务：更新服务商/代理商/商户/商户应用配置信息；
     /// </summary>
-    public class ResetIsvMchAppInfoMQReceiver : ResetIsvMchAppInfoConfigMQ.IMQReceiver
+    public class ResetIsvAgentMchAppInfoMQReceiver : ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver
     {
-        private readonly ILogger<ResetIsvMchAppInfoMQReceiver> log;
+        private readonly ILogger<ResetIsvAgentMchAppInfoMQReceiver> log;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ConfigContextService configContextService;
 
-        public ResetIsvMchAppInfoMQReceiver(ILogger<ResetIsvMchAppInfoMQReceiver> log,
+        public ResetIsvAgentMchAppInfoMQReceiver(ILogger<ResetIsvAgentMchAppInfoMQReceiver> log,
             IServiceScopeFactory serviceScopeFactory)
         {
             this.log = log;
@@ -22,18 +22,22 @@ namespace AGooday.AgPay.Payment.Api.MQ
             this.configContextService = _serviceScopeFactory.CreateScope().ServiceProvider.GetService<ConfigContextService>();
         }
 
-        public void Receive(ResetIsvMchAppInfoConfigMQ.MsgPayload payload)
+        public void Receive(ResetIsvAgentMchAppInfoConfigMQ.MsgPayload payload)
         {
             log.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
-            if (payload.ResetType == ResetIsvMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO)
+            if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO)
             {
                 this.ModifyIsvInfo(payload.IsvNo);
             }
-            else if (payload.ResetType == ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO)
+            else if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO)
+            {
+                this.ModifyAgentInfo(payload.MchNo);
+            }
+            else if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO)
             {
                 this.ModifyMchInfo(payload.MchNo);
             }
-            else if (payload.ResetType == ResetIsvMchAppInfoConfigMQ.RESET_TYPE_MCH_APP)
+            else if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP)
             {
                 this.ModifyMchApp(payload.MchNo, payload.AppId);
             }
@@ -60,6 +64,17 @@ namespace AGooday.AgPay.Payment.Api.MQ
             log.LogInformation($"成功接收 [商户应用支付参数配置信息] 的消息, mchNo={mchNo}, appId={appId}");
             configContextService.InitMchAppConfigContext(mchNo, appId);
             log.LogInformation(" [商户应用支付参数配置信息] 已重置");
+        }
+
+        /// <summary>
+        /// 重置代理商信息
+        /// </summary>
+        /// <param name="agentNo"></param>
+        private void ModifyAgentInfo(string agentNo)
+        {
+            log.LogInformation($"成功接收 [代理商信息] 重置, msg={agentNo}");
+            configContextService.InitAgentConfigContext(agentNo);
+            log.LogInformation("[代理商信息] 已重置");
         }
 
         /// <summary>

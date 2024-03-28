@@ -5,20 +5,20 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
 {
     /// <summary>
     /// rabbitMQ消息接收器：仅在vender=rabbitMQ时 && 项目实现IMQReceiver接口时 进行实例化
-    /// 业务：更新服务商/商户/商户应用配置信息
+    /// 业务：更新服务商/代理商/商户/商户应用配置信息
     /// </summary>
-    public class ResetIsvMchAppInfoRabbitMQReceiver : IMQMsgReceiver
+    public class ResetIsvAgentMchAppInfoRabbitMQReceiver : IMQMsgReceiver
     {
-        private ResetIsvMchAppInfoConfigMQ.IMQReceiver mqReceiver;
+        private ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver mqReceiver;
 
-        public ResetIsvMchAppInfoRabbitMQReceiver(ResetIsvMchAppInfoConfigMQ.IMQReceiver mqReceiver)
+        public ResetIsvAgentMchAppInfoRabbitMQReceiver(ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver mqReceiver)
         {
             this.mqReceiver = mqReceiver;
         }
 
-        public MQSendTypeEnum GetMQType() => ResetIsvMchAppInfoConfigMQ.MQ_TYPE;
+        public MQSendTypeEnum GetMQType() => ResetIsvAgentMchAppInfoConfigMQ.MQ_TYPE;
 
-        public string GetMQName() => ResetIsvMchAppInfoConfigMQ.MQ_NAME;
+        public string GetMQName() => ResetIsvAgentMchAppInfoConfigMQ.MQ_NAME;
 
         /// <summary> 
         /// 接收 【 MQSendTypeEnum.BROADCAST  】 广播类型的消息
@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
         /// <param name="msg"></param>
         public void ReceiveMsg(string msg)
         {
-            mqReceiver.Receive(ResetIsvMchAppInfoConfigMQ.Parse(msg));
+            mqReceiver.Receive(ResetIsvAgentMchAppInfoConfigMQ.Parse(msg));
         }
     }
 }
