@@ -19,14 +19,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
         private readonly ILogger<HkrtPayRefundService> _logger;
         private readonly HkrtPayPaymentService hkrtPayPaymentService;
         public HkrtPayRefundService(ILogger<HkrtPayRefundService> logger,
-            HkrtPayPaymentService hkrtPayPaymentService,
             IServiceProvider serviceProvider,
             ConfigContextQueryService configContextQueryService,
             ISysConfigService sysConfigService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
             _logger = logger;
-            this.hkrtPayPaymentService = hkrtPayPaymentService;
+            this.hkrtPayPaymentService = _serviceProvider.GetRequiredService<HkrtPayPaymentService>();
         }
 
         public override string GetIfCode()

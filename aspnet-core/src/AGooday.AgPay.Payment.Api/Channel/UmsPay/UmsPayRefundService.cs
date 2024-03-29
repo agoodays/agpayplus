@@ -19,14 +19,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
         private readonly UmsPayPaymentService umsPayPaymentService;
 
         public UmsPayRefundService(ILogger<UmsPayRefundService> logger,
-            UmsPayPaymentService umsPayPaymentService,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
             _logger = logger;
-            this.umsPayPaymentService = umsPayPaymentService;
+            this.umsPayPaymentService = ActivatorUtilities.CreateInstance<UmsPayPaymentService>(serviceProvider);
         }
 
         public override string GetIfCode()

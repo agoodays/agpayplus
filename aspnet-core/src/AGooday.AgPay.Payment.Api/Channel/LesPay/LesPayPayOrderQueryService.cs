@@ -17,10 +17,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         private readonly LesPayPaymentService lesPayPaymentService;
 
         public LesPayPayOrderQueryService(ILogger<LesPayPayOrderQueryService> logger,
-            LesPayPaymentService lesPayPaymentService)
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.lesPayPaymentService = lesPayPaymentService;
+            this.lesPayPaymentService = ActivatorUtilities.CreateInstance<LesPayPaymentService>(serviceProvider);
         }
 
         public string GetIfCode()

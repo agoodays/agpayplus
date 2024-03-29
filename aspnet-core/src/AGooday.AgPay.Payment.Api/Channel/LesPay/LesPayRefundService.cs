@@ -19,14 +19,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         private readonly ILogger<LesPayRefundService> _logger;
         private readonly LesPayPaymentService lesPayPaymentService;
         public LesPayRefundService(ILogger<LesPayRefundService> logger,
-            LesPayPaymentService lesPayPaymentService,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
             _logger = logger;
-            this.lesPayPaymentService = lesPayPaymentService;
+            this.lesPayPaymentService = ActivatorUtilities.CreateInstance<LesPayPaymentService>(serviceProvider);
         }
 
         public override string GetIfCode()

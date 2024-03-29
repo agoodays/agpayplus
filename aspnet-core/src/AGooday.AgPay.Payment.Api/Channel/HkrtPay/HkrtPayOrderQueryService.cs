@@ -17,10 +17,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
         private readonly HkrtPayPaymentService hkrtPayPaymentService;
 
         public HkrtPayPayOrderQueryService(ILogger<HkrtPayPayOrderQueryService> logger,
-            HkrtPayPaymentService hkrtPayPaymentService)
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.hkrtPayPaymentService = hkrtPayPaymentService;
+            this.hkrtPayPaymentService = ActivatorUtilities.CreateInstance<HkrtPayPaymentService>(serviceProvider);
         }
 
         public string GetIfCode()

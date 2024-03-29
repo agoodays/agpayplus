@@ -19,14 +19,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         private readonly ILogger<YsfPayRefundService> _logger;
         private readonly YsfPayPaymentService ysfpayPaymentService;
         public YsfPayRefundService(ILogger<YsfPayRefundService> logger,
-            YsfPayPaymentService ysfpayPaymentService,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
             _logger = logger;
-            this.ysfpayPaymentService = ysfpayPaymentService;
+            this.ysfpayPaymentService = ActivatorUtilities.CreateInstance<YsfPayPaymentService>(serviceProvider);
         }
 
         public override string GetIfCode()
@@ -67,13 +66,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
                 {
                     // 请求成功
                     if ("00".Equals(origRespCode))
-                    { 
+                    {
                         //明确退款成功
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
                         _logger.LogInformation($"{logPrefix} >>> 退款成功");
                     }
                     else if ("01".Equals(origRespCode))
-                    { 
+                    {
                         //明确退款失败
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                         channelRetMsg.ChannelErrCode = respCode;
@@ -81,7 +80,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
                         _logger.LogInformation($"{logPrefix} >>> 退款失败, {origRespMsg}");
                     }
                     else if ("02".Equals(origRespCode))
-                    { 
+                    {
                         //退款中
                         channelRetMsg.ChannelState = ChannelState.WAITING;
                         _logger.LogInformation($"{logPrefix} >>> 退款中");

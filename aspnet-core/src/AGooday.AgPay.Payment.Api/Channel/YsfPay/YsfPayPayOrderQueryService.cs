@@ -17,10 +17,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
         private readonly YsfPayPaymentService ysfpayPaymentService;
 
         public YsfPayPayOrderQueryService(ILogger<YsfPayPayOrderQueryService> logger,
-            YsfPayPaymentService ysfpayPaymentService)
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.ysfpayPaymentService = ysfpayPaymentService;
+            this.ysfpayPaymentService = ActivatorUtilities.CreateInstance<YsfPayPaymentService>(serviceProvider);
         }
 
         public string GetIfCode()

@@ -17,10 +17,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         private readonly SxfPayPaymentService sxfpayPaymentService;
 
         public SxfPayPayOrderQueryService(ILogger<SxfPayPayOrderQueryService> logger,
-            SxfPayPaymentService sxfpayPaymentService)
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.sxfpayPaymentService = sxfpayPaymentService;
+            //this.sxfpayPaymentService = (SxfPayPaymentService)serviceProvider.GetRequiredKeyedService<IPaymentService>(GetIfCode());
+            this.sxfpayPaymentService = ActivatorUtilities.CreateInstance<SxfPayPaymentService>(serviceProvider);
         }
 
         public string GetIfCode()

@@ -62,17 +62,25 @@ namespace AGooday.AgPay.Payment.Api.Utils
             // 注册所有类
             foreach (Type type in targetTypes)
             {
-                services.AddScoped(typeof(IPaymentService), type);
+                services.AddKeyedScoped(typeof(IPaymentService), GetServiceKey(targetNamespace, type.Name), type);
             }
+        }
+
+        private static string GetServiceKey(string targetNamespace, string wayCode)
+        {
+            return $"{targetNamespace}.{wayCode}".ToLower();
         }
 
         private static IPaymentService GetRealPayWayService(IPaymentService service, string packageName, string wayCode)
         {
             try
             {
-                var serviceName = $"{service.GetType().Namespace}.{packageName}.{RenameUtil.SnakeCaseToUpperCamelCase(wayCode.ToLower())}";
-                IPaymentService paymentService = ServiceProvider.GetServices<IPaymentService>()
-                    .FirstOrDefault(f => $"{f.GetType().Namespace}.{f.GetType().Name}".Equals(serviceName, StringComparison.OrdinalIgnoreCase));
+                string targetNamespace = $"{service.GetType().Namespace}.{packageName}";
+                //var serviceName = $"{service.GetType().Namespace}.{packageName}.{RenameUtil.SnakeCaseToUpperCamelCase(wayCode.ToLower())}";
+                //IPaymentService paymentService = ServiceProvider.GetServices<IPaymentService>()
+                //    .FirstOrDefault(f => $"{f.GetType().Namespace}.{f.GetType().Name}".Equals(serviceName, StringComparison.OrdinalIgnoreCase));
+                var serviceKey = GetServiceKey(targetNamespace, RenameUtil.SnakeCaseToUpperCamelCase(wayCode));
+                var paymentService = ServiceProvider.GetRequiredKeyedService<IPaymentService>(serviceKey);
                 if (paymentService == null)
                 {
                     throw new BizException("支付接口不支持该支付方式");

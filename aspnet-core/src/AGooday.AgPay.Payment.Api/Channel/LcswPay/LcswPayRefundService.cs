@@ -19,14 +19,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
         private readonly ILogger<LcswPayRefundService> _logger;
         private readonly LcswPayPaymentService lcswpayPaymentService;
         public LcswPayRefundService(ILogger<LcswPayRefundService> logger,
-            LcswPayPaymentService lcswpayPaymentService,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
         {
             _logger = logger;
-            this.lcswpayPaymentService = lcswpayPaymentService;
+            this.lcswpayPaymentService = ActivatorUtilities.CreateInstance<LcswPayPaymentService>(serviceProvider);
         }
 
         public override string GetIfCode()

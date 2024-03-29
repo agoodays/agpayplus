@@ -16,10 +16,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
         private readonly UmsPayPaymentService umsPayPaymentService;
 
         public UmsPayPayOrderQueryService(ILogger<UmsPayPayOrderQueryService> logger,
-            UmsPayPaymentService umsPayPaymentService)
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.umsPayPaymentService = umsPayPaymentService;
+            this.umsPayPaymentService = ActivatorUtilities.CreateInstance<UmsPayPaymentService>(serviceProvider);
         }
 
         public string GetIfCode()

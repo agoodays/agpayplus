@@ -21,12 +21,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
     {
         private readonly HkrtPayPaymentService hkrtPayPaymentService;
         public HkrtPayChannelNoticeService(ILogger<HkrtPayChannelNoticeService> logger,
+            IServiceProvider serviceProvider,
             RequestKit requestKit,
-            ConfigContextQueryService configContextQueryService,
-            HkrtPayPaymentService hkrtPayPaymentService)
+            ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, configContextQueryService)
         {
-            this.hkrtPayPaymentService = hkrtPayPaymentService;
+            this.hkrtPayPaymentService = ActivatorUtilities.CreateInstance<HkrtPayPaymentService>(serviceProvider);
         }
 
         public override string GetIfCode()

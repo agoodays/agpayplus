@@ -17,10 +17,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
         private readonly LcswPayPaymentService lcswpayPaymentService;
 
         public LcswPayPayOrderCloseService(ILogger<LcswPayPayOrderCloseService> logger,
-            LcswPayPaymentService lcswpayPaymentService)
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.lcswpayPaymentService = lcswpayPaymentService;
+            this.lcswpayPaymentService = ActivatorUtilities.CreateInstance<LcswPayPaymentService>(serviceProvider);
         }
 
         public string GetIfCode()

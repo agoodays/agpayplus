@@ -2,7 +2,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.MQ;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using Newtonsoft.Json;
 
