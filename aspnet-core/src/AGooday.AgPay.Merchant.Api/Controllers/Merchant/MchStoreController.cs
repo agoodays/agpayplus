@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         private readonly IMchInfoService _mchInfoService;
         private readonly ISysConfigService _sysConfigService;
 
-        public MchStoreController(ILogger<MchStoreController> logger, 
+        public MchStoreController(ILogger<MchStoreController> logger,
             IMQSender mqSender,
             IMchStoreService mchStoreService,
             IMchInfoService mchInfoService,
@@ -50,7 +50,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         public ApiPageRes<MchStoreListDto> List([FromQuery] MchStoreQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
-            var data = _mchStoreService.GetPaginatedData(dto);
+            List<long> storeIds = null;
+            var sysUser = GetCurrentUser().SysUser;
+            if (sysUser.UserType.Equals(CS.USER_TYPE.DIRECTOR) || sysUser.UserType.Equals(CS.USER_TYPE.CLERK))
+            {
+                storeIds = sysUser.BindStoreIds;
+            }
+            var data = _mchStoreService.GetPaginatedData(dto, storeIds);
             return ApiPageRes<MchStoreListDto>.Pages(data);
         }
 

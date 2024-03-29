@@ -19,8 +19,8 @@ namespace AGooday.AgPay.Application.Services
         // 中介者 总线
         private readonly IMediatorHandler Bus;
 
-        public MchStoreService(IMapper mapper, IMediatorHandler bus, 
-            IMchStoreRepository mchStoreRepository, 
+        public MchStoreService(IMapper mapper, IMediatorHandler bus,
+            IMchStoreRepository mchStoreRepository,
             IMchInfoRepository mchInfoRepository)
         {
             _mapper = mapper;
@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
         }
 
-        public PaginatedList<MchStoreListDto> GetPaginatedData(MchStoreQueryDto dto, string agentNo = null)
+        public PaginatedList<MchStoreListDto> GetPaginatedData(MchStoreQueryDto dto, List<long> storeIds = null)
         {
             var mchStores = _mchStoreRepository.GetAllAsNoTracking()
                 .Join(_mchInfoRepository.GetAllAsNoTracking(),
@@ -98,8 +98,9 @@ namespace AGooday.AgPay.Application.Services
                 (ms, mi) => new { ms, mi })
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.ms.MchNo.Equals(dto.MchNo))
                 && (dto.StoreId.Equals(null) || w.ms.StoreId.Equals(dto.StoreId))
+                && (storeIds.Equals(null) || storeIds.Equals(w.ms.StoreId))
                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.ms.StoreName.Contains(dto.StoreName))
-                && (string.IsNullOrWhiteSpace(agentNo) || w.mi.AgentNo.Equals(agentNo))).ToList()
+                && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.mi.AgentNo.Equals(dto.AgentNo))).ToList()
                 .Select(s =>
                 {
                     var item = _mapper.Map<MchStoreListDto>(s.ms);
