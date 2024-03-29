@@ -20,14 +20,14 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     {
         private readonly ILogger<ChannelNoticeController> _logger;
         private readonly IPayOrderService payOrderService;
-        private readonly Func<string, IChannelNoticeService> channelNoticeServiceFactory;
+        private readonly IChannelServiceFactory<IChannelNoticeService> channelNoticeServiceFactory;
         private readonly ConfigContextQueryService configContextQueryService;
         private readonly PayMchNotifyService payMchNotifyService;
         private readonly PayOrderProcessService payOrderProcessService;
 
         public ChannelNoticeController(ILogger<ChannelNoticeController> logger,
             IPayOrderService payOrderService,
-            Func<string, IChannelNoticeService> channelNoticeServiceFactory,
+            IChannelServiceFactory<IChannelNoticeService> channelNoticeServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayMchNotifyService payMchNotifyService,
             PayOrderProcessService payOrderProcessService)
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     return this.ToReturnPage("ifCode is empty");
                 }
                 //查询支付接口是否存在
-                IChannelNoticeService payNotifyService = channelNoticeServiceFactory(ifCode);
+                IChannelNoticeService payNotifyService = channelNoticeServiceFactory.GetService(ifCode);
 
                 // 支付通道接口实现不存在
                 if (payNotifyService == null)
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 解析订单号 和 请求参数
                 Dictionary<string, object> mutablePair = payNotifyService.ParseParams(Request, urlOrderId, NoticeTypeEnum.DO_RETURN);
                 if (mutablePair == null)
-                { 
+                {
                     // 解析数据失败， 响应已处理
                     _logger.LogError($"{logPrefix}, mutablePair is null ");
                     throw new BizException("解析数据异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
@@ -174,7 +174,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     return StatusCode((int)HttpStatusCode.BadRequest, "ifCode is empty");
                 }
                 //查询支付接口是否存在
-                IChannelNoticeService payNotifyService = channelNoticeServiceFactory(ifCode);
+                IChannelNoticeService payNotifyService = channelNoticeServiceFactory.GetService(ifCode);
 
                 // 支付通道接口实现不存在
                 if (payNotifyService == null)

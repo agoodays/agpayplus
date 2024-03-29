@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
     public class YsfBarOrderController : AbstractPayOrderController
     {
         public YsfBarOrderController(ILogger<YsfBarOrderController> logger,
-            Func<string, IPaymentService> paymentServiceFactory,
+            IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,

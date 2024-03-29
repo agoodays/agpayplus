@@ -8,7 +8,6 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Payment.Api.Authorization;
 using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
@@ -24,7 +23,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     public class UnifiedOrderController : AbstractPayOrderController
     {
         public UnifiedOrderController(ILogger<UnifiedOrderController> logger,
-            Func<string, IPaymentService> paymentServiceFactory,
+            IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,

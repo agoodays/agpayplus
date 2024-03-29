@@ -15,11 +15,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
     {
         private readonly ILogger<DivisionRecordChannelNotifyController> _logger;
         private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
-        private readonly Func<string, AbstractDivisionRecordChannelNotifyService> _divisionRecordChannelNotifyServiceFactory;
+        private readonly IChannelServiceFactory<AbstractDivisionRecordChannelNotifyService> _divisionRecordChannelNotifyServiceFactory;
 
         public DivisionRecordChannelNotifyController(ILogger<DivisionRecordChannelNotifyController> logger,
             IPayOrderDivisionRecordService payOrderDivisionRecordService,
-            Func<string, AbstractDivisionRecordChannelNotifyService> divisionRecordChannelNotifyServiceFactory,
+            IChannelServiceFactory<AbstractDivisionRecordChannelNotifyService> divisionRecordChannelNotifyServiceFactory,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 }
 
                 //查询支付接口是否存在
-                AbstractDivisionRecordChannelNotifyService divisionNotifyService = _divisionRecordChannelNotifyServiceFactory(ifCode);
+                AbstractDivisionRecordChannelNotifyService divisionNotifyService = _divisionRecordChannelNotifyServiceFactory.GetService(ifCode);
 
                 // 支付通道接口实现不存在
                 if (divisionNotifyService == null)

@@ -21,37 +21,16 @@ namespace AGooday.AgPay.Payment.Api.Channel
             #region ChannelUserService
             services.AddKeyedScoped<IChannelUserService, AliPayChannelUserService>(CS.IF_CODE.ALIPAY);
             services.AddKeyedScoped<IChannelUserService, WxPayChannelUserService>(CS.IF_CODE.WXPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, IChannelUserService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<IChannelUserService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<IChannelUserService>, ChannelServiceFactory<IChannelUserService>>();
             #endregion
             #region DivisionService
             services.AddKeyedScoped<IDivisionService, AliPayDivisionService>(CS.IF_CODE.ALIPAY);
             services.AddKeyedScoped<IDivisionService, WxPayDivisionService>(CS.IF_CODE.WXPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, IDivisionService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<IDivisionService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<IDivisionService>, ChannelServiceFactory<IDivisionService>>();
             #endregion
             #region DivisionRecordChannelNotifyService
             services.AddKeyedScoped<AliPayDivisionRecordChannelNotifyService>(CS.IF_CODE.ALIPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, AbstractDivisionRecordChannelNotifyService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<AbstractDivisionRecordChannelNotifyService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<AliPayDivisionRecordChannelNotifyService>, ChannelServiceFactory<AliPayDivisionRecordChannelNotifyService>>();
             #endregion
             #region PaymentService
             services.AddKeyedScoped<IPaymentService, AliPayPaymentService>(CS.IF_CODE.ALIPAY);
@@ -63,14 +42,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IPaymentService, HkrtPayPaymentService>(CS.IF_CODE.HKRTPAY);
             services.AddKeyedScoped<IPaymentService, UmsPayPaymentService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IPaymentService, LcswPayPaymentService>(CS.IF_CODE.LCSWPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, IPaymentService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<IPaymentService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<IPaymentService>, ChannelServiceFactory<IPaymentService>>();
             PayWayUtil.PayWayServiceRegister<AliPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<WxPayPaymentService>(services);
             PayWayUtil.PayWayV3ServiceRegister<WxPayPaymentService>(services);
@@ -92,14 +64,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IRefundService, HkrtPayRefundService>(CS.IF_CODE.HKRTPAY);
             services.AddKeyedScoped<IRefundService, UmsPayRefundService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IRefundService, LcswPayRefundService>(CS.IF_CODE.LCSWPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, IRefundService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<IRefundService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<IRefundService>, ChannelServiceFactory<IRefundService>>();
             #endregion
             #region ChannelNoticeService
             services.AddKeyedScoped<IChannelNoticeService, AliPayChannelNoticeService>(CS.IF_CODE.ALIPAY);
@@ -111,14 +76,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IChannelNoticeService, HkrtPayChannelNoticeService>(CS.IF_CODE.HKRTPAY);
             services.AddKeyedScoped<IChannelNoticeService, UmsPayChannelNoticeService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IChannelNoticeService, LcswPayChannelNoticeService>(CS.IF_CODE.LCSWPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, IChannelNoticeService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<IChannelNoticeService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<IChannelNoticeService>, ChannelServiceFactory<IChannelNoticeService>>();
             #endregion
             #region ChannelRefundNoticeService
             //services.AddKeyedScoped<IChannelRefundNoticeService, AliPayChannelRefundNoticeService>(CS.IF_CODE.ALIPAY);
@@ -129,14 +87,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IChannelRefundNoticeService, LesPayChannelRefundNoticeService>(CS.IF_CODE.LESPAY);
             services.AddKeyedScoped<IChannelRefundNoticeService, HkrtPayChannelRefundNoticeService>(CS.IF_CODE.HKRTPAY);
             services.AddKeyedScoped<IChannelRefundNoticeService, UmsPayChannelRefundNoticeService>(CS.IF_CODE.UMSPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, IChannelRefundNoticeService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<IChannelRefundNoticeService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<IChannelRefundNoticeService>, ChannelServiceFactory<IChannelRefundNoticeService>>();
             #endregion
             #region CloseService
             services.AddKeyedScoped<IPayOrderCloseService, AliPayPayOrderCloseService>(CS.IF_CODE.ALIPAY);
@@ -144,14 +95,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IPayOrderCloseService, YsfPayPayOrderCloseService>(CS.IF_CODE.YSFPAY);
             services.AddKeyedScoped<IPayOrderCloseService, UmsPayPayOrderCloseService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IPayOrderCloseService, LcswPayPayOrderCloseService>(CS.IF_CODE.LCSWPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, IPayOrderCloseService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<IPayOrderCloseService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<IPayOrderCloseService>, ChannelServiceFactory<IPayOrderCloseService>>();
             #endregion
             #region QueryService
             services.AddKeyedScoped<IPayOrderQueryService, AliPayPayOrderQueryService>(CS.IF_CODE.ALIPAY);
@@ -163,43 +107,42 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IPayOrderQueryService, HkrtPayPayOrderQueryService>(CS.IF_CODE.HKRTPAY);
             services.AddKeyedScoped<IPayOrderQueryService, UmsPayPayOrderQueryService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IPayOrderQueryService, LcswPayPayOrderQueryService>(CS.IF_CODE.LCSWPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, IPayOrderQueryService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<IPayOrderQueryService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<IPayOrderQueryService>, ChannelServiceFactory<IPayOrderQueryService>>();
             #endregion
             #region TransferService
             services.AddKeyedScoped<ITransferService, AliPayTransferService>(CS.IF_CODE.ALIPAY);
             services.AddKeyedScoped<ITransferService, WxPayTransferService>(CS.IF_CODE.WXPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, ITransferService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<ITransferService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<ITransferService>, ChannelServiceFactory<ITransferService>>();
             #endregion
             #region TransferNoticeService
             services.AddKeyedScoped<ITransferNoticeService, AliPayTransferNoticeService>(CS.IF_CODE.ALIPAY);
-            services.AddScoped(provider =>
-            {
-                Func<string, ITransferNoticeService> funcFactory = ifCode =>
-                {
-                    return provider.GetRequiredKeyedService<ITransferNoticeService>(ifCode);
-                };
-                return funcFactory;
-            });
+            services.AddScoped<IChannelServiceFactory<ITransferNoticeService>, ChannelServiceFactory<ITransferNoticeService>>();
             #endregion
 
             var serviceProvider = services.BuildServiceProvider();
             PayWayUtil.ServiceProvider = serviceProvider;
             AliPayKit.ServiceProvider = serviceProvider;
             WxPayKit.ServiceProvider = serviceProvider;
+        }
+    }
+
+    public interface IChannelServiceFactory<T>
+    {
+        T GetService(object serviceKey);
+    }
+
+    public class ChannelServiceFactory<T> : IChannelServiceFactory<T>
+    {
+        private readonly IServiceProvider _serviceProvider;
+
+        public ChannelServiceFactory(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public T GetService(object serviceKey)
+        {
+            return _serviceProvider.GetRequiredKeyedService<T>(serviceKey);
         }
     }
 }

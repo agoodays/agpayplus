@@ -15,11 +15,11 @@ namespace AGooday.AgPay.Payment.Api.Jobs
 
         private readonly ILogger<PayOrderDivisionRecordReissueJob> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly Func<string, IDivisionService> divisionServiceFactory;
+        private readonly IChannelServiceFactory<IDivisionService> divisionServiceFactory;
 
         public PayOrderDivisionRecordReissueJob(ILogger<PayOrderDivisionRecordReissueJob> logger,
             IServiceScopeFactory serviceScopeFactory,
-            Func<string, IDivisionService> divisionServiceFactory)
+            IChannelServiceFactory<IDivisionService> divisionServiceFactory)
         {
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                         continue;
                                     }
                                     // 查询分账接口是否存在
-                                    IDivisionService divisionService = divisionServiceFactory(payOrder.IfCode);
+                                    IDivisionService divisionService = divisionServiceFactory.GetService(payOrder.IfCode);
 
                                     if (divisionService == null)
                                     {

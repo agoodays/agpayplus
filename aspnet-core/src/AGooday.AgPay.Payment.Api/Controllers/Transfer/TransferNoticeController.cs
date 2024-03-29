@@ -13,13 +13,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
     public class TransferNoticeController : Controller
     {
         private readonly ILogger<TransferNoticeController> _logger;
-        protected readonly Func<string, ITransferNoticeService> _transferNoticeServiceFactory;
+        private readonly IChannelServiceFactory<ITransferNoticeService> _transferNoticeServiceFactory;
         private readonly ITransferOrderService _transferOrderService;
         private readonly PayMchNotifyService _payMchNotifyService;
         private readonly ConfigContextQueryService _configContextQueryService;
 
         public TransferNoticeController(ILogger<TransferNoticeController> logger,
-            Func<string, ITransferNoticeService> transferNoticeServiceFactory,
+            IChannelServiceFactory<ITransferNoticeService> transferNoticeServiceFactory,
             ITransferOrderService transferOrderService,
             ConfigContextQueryService configContextQueryService,
             PayMchNotifyService payMchNotifyService)
@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 }
 
                 // 查询转账接口是否存在
-                ITransferNoticeService transferNotifyService = _transferNoticeServiceFactory(ifCode);
+                ITransferNoticeService transferNotifyService = _transferNoticeServiceFactory.GetService(ifCode);
 
                 // 支付通道转账接口实现不存在
                 if (transferNotifyService == null)

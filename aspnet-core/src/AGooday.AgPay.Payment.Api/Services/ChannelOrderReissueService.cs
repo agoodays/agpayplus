@@ -13,16 +13,16 @@ namespace AGooday.AgPay.Payment.Api.Services
     public class ChannelOrderReissueService
     {
         private readonly ILogger<ChannelOrderReissueService> _logger;
-        private readonly Func<string, IPayOrderQueryService> _payOrderQueryServiceFactory;
-        private readonly Func<string, IRefundService> _refundServiceFactory;
+        private readonly IChannelServiceFactory<IPayOrderQueryService> _payOrderQueryServiceFactory;
+        private readonly IChannelServiceFactory<IRefundService> _refundServiceFactory;
         private readonly ConfigContextQueryService configContextQueryService;
         private readonly PayOrderProcessService payOrderProcessService;
         private readonly RefundOrderProcessService refundOrderProcessService;
         private readonly IPayOrderService payOrderService;
 
         public ChannelOrderReissueService(ILogger<ChannelOrderReissueService> logger,
-            Func<string, IPayOrderQueryService> payOrderQueryServiceFactory,
-            Func<string, IRefundService> refundServiceFactory,
+            IChannelServiceFactory<IPayOrderQueryService> payOrderQueryServiceFactory,
+            IChannelServiceFactory<IRefundService> refundServiceFactory,
             ConfigContextQueryService configContextQueryService,
             PayOrderProcessService payOrderProcessService,
             RefundOrderProcessService refundOrderProcessService,
@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string payOrderId = payOrder.PayOrderId;
 
                 //查询支付接口是否存在
-                IPayOrderQueryService queryService = _payOrderQueryServiceFactory(payOrder.IfCode);
+                IPayOrderQueryService queryService = _payOrderQueryServiceFactory.GetService(payOrder.IfCode);
 
                 // 支付通道接口实现不存在
                 if (queryService == null)
@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string refundOrderId = refundOrder.RefundOrderId;
 
                 //查询支付接口是否存在
-                IRefundService queryService = _refundServiceFactory(refundOrder.IfCode);
+                IRefundService queryService = _refundServiceFactory.GetService(refundOrder.IfCode);
 
                 // 支付通道接口实现不存在
                 if (queryService == null)

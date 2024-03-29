@@ -11,14 +11,14 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly ConfigContextQueryService configContextQueryService;
         private readonly ITransferOrderService transferOrderService;
         private readonly PayMchNotifyService payMchNotifyService;
-        private readonly Func<string, ITransferService> transferServiceFactory;
+        private readonly IChannelServiceFactory<ITransferService> transferServiceFactory;
         private readonly ILogger<PayOrderProcessService> _logger;
 
         public TransferOrderReissueService(ILogger<PayOrderProcessService> logger,
             ConfigContextQueryService configContextQueryService,
             ITransferOrderService transferOrderService,
             PayMchNotifyService payMchNotifyService,
-            Func<string, ITransferService> transferServiceFactory)
+            IChannelServiceFactory<ITransferService> transferServiceFactory)
         {
             _logger = logger;
             this.configContextQueryService = configContextQueryService;
@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string transferId = transferOrder.TransferId;
 
                 // 查询转账接口是否存在
-                ITransferService transferService = transferServiceFactory(transferOrder.IfCode);
+                ITransferService transferService = transferServiceFactory.GetService(transferOrder.IfCode);
 
                 // 支付通道转账接口实现不存在
                 if (transferService == null)

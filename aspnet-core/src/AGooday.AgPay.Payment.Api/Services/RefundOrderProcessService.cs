@@ -18,13 +18,13 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly IRefundOrderService _refundOrderService;
         private readonly IPayOrderProfitService _payOrderProfitService;
         private readonly IAccountBillService _accountBillService;
-        private readonly Func<string, IPaymentService> _paymentServiceFactory;
+        private readonly IChannelServiceFactory<IPaymentService> _paymentServiceFactory;
 
         public RefundOrderProcessService(PayMchNotifyService payMchNotifyService,
             IPayOrderService payOrderService,
             IRefundOrderService refundOrderService,
             IPayOrderProfitService payOrderProfitService,
-            Func<string, IPaymentService> paymentServiceFactory,
+            IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             IAccountBillService accountBillService)
         {
             this.payMchNotifyService = payMchNotifyService;
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <param name="refundOrder"></param>
         public void UpdatePayOrderProfitAndGenAccountBill(RefundOrderDto refundOrder)
         {
-            IPaymentService paymentService = _paymentServiceFactory(refundOrder.IfCode);
+            IPaymentService paymentService = _paymentServiceFactory.GetService(refundOrder.IfCode);
             var payOrder = _payOrderService.GetById(refundOrder.PayOrderId);
             var payOrderProfits = _payOrderProfitService.GetByPayOrderIdAsNoTracking(refundOrder.PayOrderId);
             var amount = payOrder.Amount - payOrder.RefundAmount;

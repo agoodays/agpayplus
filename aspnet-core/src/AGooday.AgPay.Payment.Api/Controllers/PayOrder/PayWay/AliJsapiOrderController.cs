@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
     public class AliJsapiOrderController : AbstractPayOrderController
     {
         public AliJsapiOrderController(ILogger<AliJsapiOrderController> logger,
-            Func<string, IPaymentService> paymentServiceFactory,
+            IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,

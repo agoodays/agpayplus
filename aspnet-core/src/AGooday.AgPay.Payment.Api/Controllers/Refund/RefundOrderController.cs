@@ -26,14 +26,14 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         private readonly ILogger<RefundOrderController> _logger;
         private readonly IPayOrderService _payOrderService;
         private readonly IRefundOrderService _refundOrderService;
-        private readonly Func<string, IRefundService> _refundServiceFactory;
+        private readonly IChannelServiceFactory<IRefundService> _refundServiceFactory;
         private readonly RefundOrderProcessService _refundOrderProcessService;
         private readonly PayMchNotifyService _payMchNotifyService;
 
         public RefundOrderController(ILogger<RefundOrderController> logger,
             IPayOrderService payOrderService,
             IRefundOrderService refundOrderService,
-            Func<string, IRefundService> refundServiceFactory,
+            IChannelServiceFactory<IRefundService> refundServiceFactory,
             PayMchNotifyService payMchNotifyService,
             RefundOrderProcessService refundOrderProcessService,
             RequestKit requestKit,
@@ -131,7 +131,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 //MchAppDto mchApp = mchAppConfigContext.MchApp;
 
                 //获取退款接口
-                IRefundService refundService = _refundServiceFactory(payOrder.IfCode);
+                IRefundService refundService = _refundServiceFactory.GetService(payOrder.IfCode);
                 if (refundService == null)
                 {
                     throw new BizException("当前通道不支持退款！");

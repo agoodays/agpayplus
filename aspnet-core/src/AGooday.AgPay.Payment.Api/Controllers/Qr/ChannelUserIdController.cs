@@ -23,11 +23,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
     [ApiController]
     public class ChannelUserIdController : AbstractPayOrderController
     {
-        private readonly Func<string, IChannelUserService> _channelUserServiceFactory;
+        private readonly IChannelServiceFactory<IChannelUserService> _channelUserServiceFactory;
 
         public ChannelUserIdController(ILogger<ChannelUserIdController> logger, 
-            Func<string, IChannelUserService> channelUserServiceFactory,
-            Func<string, IPaymentService> paymentServiceFactory,
+            IChannelServiceFactory<IChannelUserService> channelUserServiceFactory,
+            IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,
@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             ChannelUserIdRQ rq = GetRQByWithMchSign<ChannelUserIdRQ>();
             string ifCode = "AUTO".Equals(rq.IfCode, StringComparison.OrdinalIgnoreCase) ? GetIfCodeByUA() : rq.IfCode;
 
-            IChannelUserService channelUserService = _channelUserServiceFactory(ifCode);
+            IChannelUserService channelUserService = _channelUserServiceFactory.GetService(ifCode);
 
             if (channelUserService == null)
             {
@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             string redirectUrl = callbackData.GetValue("redirectUrl").ToString();
 
             // 获取接口
-            IChannelUserService channelUserService = _channelUserServiceFactory(ifCode);
+            IChannelUserService channelUserService = _channelUserServiceFactory.GetService(ifCode);
 
             if (channelUserService == null)
             {

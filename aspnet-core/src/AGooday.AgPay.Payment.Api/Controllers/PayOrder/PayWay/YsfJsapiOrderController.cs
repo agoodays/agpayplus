@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
     public class YsfJsapiOrderController : AbstractPayOrderController
     {
         public YsfJsapiOrderController(ILogger<YsfJsapiOrderController> logger,
-            Func<string, IPaymentService> paymentServiceFactory,
+            IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,

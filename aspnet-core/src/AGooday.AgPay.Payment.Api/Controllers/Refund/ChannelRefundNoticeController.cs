@@ -21,13 +21,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         private readonly IRefundOrderService refundOrderService;
         private readonly ConfigContextQueryService configContextQueryService;
         private readonly RefundOrderProcessService refundOrderProcessService;
-        protected readonly Func<string, IChannelRefundNoticeService> channelRefundNoticeServiceFactory;
+        private readonly IChannelServiceFactory<IChannelRefundNoticeService> channelRefundNoticeServiceFactory;
 
         public ChannelRefundNoticeController(ILogger<ChannelRefundNoticeController> logger, 
             IRefundOrderService refundOrderService, 
             ConfigContextQueryService configContextQueryService, 
-            RefundOrderProcessService refundOrderProcessService, 
-            Func<string, IChannelRefundNoticeService> channelRefundNoticeServiceFactory)
+            RefundOrderProcessService refundOrderProcessService,
+            IChannelServiceFactory<IChannelRefundNoticeService> channelRefundNoticeServiceFactory)
         {
             _logger = logger;
             this.refundOrderService = refundOrderService;
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 //查询退款接口是否存在
-                IChannelRefundNoticeService refundNotifyService = channelRefundNoticeServiceFactory(ifCode);
+                IChannelRefundNoticeService refundNotifyService = channelRefundNoticeServiceFactory.GetService(ifCode);
 
                 // 支付通道接口实现不存在
                 if (refundNotifyService == null)

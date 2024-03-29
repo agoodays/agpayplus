@@ -23,14 +23,14 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
     [ApiController]
     public class TransferOrderController : ApiControllerBase
     {
-        protected readonly ILogger<TransferOrderController> _logger;
-        protected readonly Func<string, ITransferService> _transferServiceFactory;
+        private readonly ILogger<TransferOrderController> _logger;
+        private readonly IChannelServiceFactory<ITransferService> _transferServiceFactory;
         private readonly ITransferOrderService _transferOrderService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
         private readonly PayMchNotifyService _payMchNotifyService;
 
         public TransferOrderController(ILogger<TransferOrderController> logger,
-            Func<string, ITransferService> transferServiceFactory,
+            IChannelServiceFactory<ITransferService> transferServiceFactory,
             ITransferOrderService transferOrderService,
             IPayInterfaceConfigService payInterfaceConfigService,
             PayMchNotifyService payMchNotifyService,
@@ -91,7 +91,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                     throw new BizException("应用未开通此接口配置!");
                 }
 
-                ITransferService transferService = _transferServiceFactory(ifCode);
+                ITransferService transferService = _transferServiceFactory.GetService(ifCode);
                 if (transferService == null)
                 {
                     throw new BizException("无此转账通道接口");

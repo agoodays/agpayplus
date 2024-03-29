@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Payment.Api.Services
     {
         private readonly ILogger<PayOrderDivisionProcessService> log;
         private readonly IMQSender mqSender;
-        private readonly Func<string, IDivisionService> divisionServiceFactory;
+        private readonly IChannelServiceFactory<IDivisionService> divisionServiceFactory;
         private readonly IPayOrderService payOrderService;
         private readonly IMchDivisionReceiverService mchDivisionReceiverService;
         private readonly IMchDivisionReceiverGroupService mchDivisionReceiverGroupService;
@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
         public PayOrderDivisionProcessService(ILogger<PayOrderDivisionProcessService> logger,
             IMQSender mqSender,
-            Func<string, IDivisionService> divisionServiceFactory,
+            IChannelServiceFactory<IDivisionService> divisionServiceFactory,
             IPayOrderService payOrderService,
             IMchDivisionReceiverService mchDivisionReceiverService,
             IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
@@ -137,7 +137,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             try
             {
                 //调用渠道侧分账接口
-                IDivisionService divisionService = divisionServiceFactory(payOrder.IfCode);
+                IDivisionService divisionService = divisionServiceFactory.GetService(payOrder.IfCode);
                 if (divisionService == null)
                 {
                     throw new BizException("通道无此分账接口");

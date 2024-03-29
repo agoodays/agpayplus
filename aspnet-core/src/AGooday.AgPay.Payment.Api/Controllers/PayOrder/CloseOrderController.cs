@@ -26,11 +26,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         private readonly ILogger<CloseOrderController> _logger;
         private readonly PayOrderService payOrderService;
         private readonly ConfigContextQueryService configContextQueryService;
-        private readonly Func<string, IPayOrderCloseService> _payOrderCloseServiceFactory;
+        private readonly IChannelServiceFactory<IPayOrderCloseService> _payOrderCloseServiceFactory;
 
         public CloseOrderController(ILogger<CloseOrderController> logger,
             PayOrderService payOrderService,
-            Func<string, IPayOrderCloseService> payOrderCloseServiceFactory,
+            IChannelServiceFactory<IPayOrderCloseService> payOrderCloseServiceFactory,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 string payOrderId = payOrder.PayOrderId;
 
                 //查询支付接口是否存在
-                IPayOrderCloseService closeService = _payOrderCloseServiceFactory(payOrder.IfCode);
+                IPayOrderCloseService closeService = _payOrderCloseServiceFactory.GetService(payOrder.IfCode);
 
                 // 支付通道接口实现不存在
                 if (closeService == null)

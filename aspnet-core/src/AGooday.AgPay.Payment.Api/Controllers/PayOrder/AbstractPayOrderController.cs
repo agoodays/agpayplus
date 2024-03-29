@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     {
         protected readonly IMQSender mqSender;
         protected readonly ILogger<AbstractPayOrderController> _logger;
-        protected readonly Func<string, IPaymentService> _paymentServiceFactory;
+        protected readonly IChannelServiceFactory<IPaymentService> _paymentServiceFactory;
         protected readonly PayOrderProcessService _payOrderProcessService;
         protected readonly IMchPayPassageService _mchPayPassageService;
         protected readonly IPayRateConfigService _payRateConfigService;
@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         protected readonly ISysConfigService _sysConfigService;
 
         protected AbstractPayOrderController(ILogger<AbstractPayOrderController> logger,
-            Func<string, IPaymentService> paymentServiceFactory,
+            IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,
@@ -409,7 +409,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         {
             // 接口代码
             string ifCode = mchPayPassage.IfCode;
-            IPaymentService paymentService = _paymentServiceFactory(ifCode);
+            IPaymentService paymentService = _paymentServiceFactory.GetService(ifCode);
             if (paymentService == null)
             {
                 throw new BizException("无此支付通道接口");

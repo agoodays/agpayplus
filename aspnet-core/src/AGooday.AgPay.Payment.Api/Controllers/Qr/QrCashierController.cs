@@ -24,15 +24,15 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
     [ApiController]
     public class QrCashierController : AbstractPayOrderController
     {
-        private readonly Func<string, IChannelUserService> _channelUserServiceFactory;
+        private readonly IChannelServiceFactory<IChannelUserService> _channelUserServiceFactory;
         private readonly PayMchNotifyService _payMchNotifyService;
         private readonly IQrCodeService _qrCodeService;
 
-        public QrCashierController(ILogger<QrCashierController> logger, 
-            Func<string, IChannelUserService> channelUserServiceFactory,
+        public QrCashierController(ILogger<QrCashierController> logger,
+            IChannelServiceFactory<IChannelUserService> channelUserServiceFactory,
             PayMchNotifyService payMchNotifyService,
             IQrCodeService qrCodeService,
-            Func<string, IPaymentService> paymentServiceFactory,
+            IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,
@@ -238,11 +238,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         {
             if (CS.PAY_WAY_CODE.ALI_JSAPI.Equals(wayCode))
             {
-                return _channelUserServiceFactory(CS.IF_CODE.ALIPAY);
+                return _channelUserServiceFactory.GetService(CS.IF_CODE.ALIPAY);
             }
             else if (CS.PAY_WAY_CODE.WX_JSAPI.Equals(wayCode))
             {
-                return _channelUserServiceFactory(CS.IF_CODE.WXPAY);
+                return _channelUserServiceFactory.GetService(CS.IF_CODE.WXPAY);
             }
             return null;
         }

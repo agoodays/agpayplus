@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
     public class MchDivisionReceiverBindController : ApiControllerBase
     {
         private readonly ILogger<MchDivisionReceiverBindController> _logger;
-        private readonly Func<string, IDivisionService> _divisionServiceFactory;
+        private readonly IChannelServiceFactory<IDivisionService> _divisionServiceFactory;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
         private readonly IMchDivisionReceiverService _mchDivisionReceiverService;
         private readonly IMchDivisionReceiverGroupService _mchDivisionReceiverGroupService;
@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         public MchDivisionReceiverBindController(ILogger<MchDivisionReceiverBindController> logger,
             //IEnumerable<IDivisionService> divisionServices,
             //IServiceProvider serviceProvider,
-            Func<string, IDivisionService> divisionServiceFactory,
+            IChannelServiceFactory<IDivisionService> divisionServiceFactory,
             IPayInterfaceConfigService payInterfaceConfigService,
             IMchDivisionReceiverService mchDivisionReceiverService,
             IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
                 //生成数据库对象信息 （数据不完成， 暂时不可入库操作）
                 var receiver = GenRecord(bizRQ, group, mchInfo, divisionProfit);
-                IDivisionService divisionService = _divisionServiceFactory(ifCode);
+                IDivisionService divisionService = _divisionServiceFactory.GetService(ifCode);
                 if (divisionService == null)
                 {
                     throw new BizException("系统不支持该分账接口");

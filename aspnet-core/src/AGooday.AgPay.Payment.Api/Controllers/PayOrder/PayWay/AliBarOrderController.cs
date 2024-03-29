@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
     public class AliBarOrderController : AbstractPayOrderController
     {
         public AliBarOrderController(ILogger<AliBarOrderController> logger,
-            Func<string, IPaymentService> paymentServiceFactory,
+            IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
             IPayRateConfigService payRateConfigService,
