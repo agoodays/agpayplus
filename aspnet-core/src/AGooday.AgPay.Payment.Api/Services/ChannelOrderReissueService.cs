@@ -14,8 +14,8 @@ namespace AGooday.AgPay.Payment.Api.Services
     public class ChannelOrderReissueService
     {
         private readonly ILogger<ChannelOrderReissueService> _logger;
-        protected readonly Func<string, IPayOrderQueryService> _payOrderQueryServiceFactory;
-        protected readonly Func<string, IRefundService> _refundServiceFactory;
+        private readonly Func<string, IPayOrderQueryService> _payOrderQueryServiceFactory;
+        private readonly Func<string, IRefundService> _refundServiceFactory;
         private readonly ConfigContextQueryService configContextQueryService;
         private readonly PayOrderProcessService payOrderProcessService;
         private readonly RefundOrderProcessService refundOrderProcessService;
