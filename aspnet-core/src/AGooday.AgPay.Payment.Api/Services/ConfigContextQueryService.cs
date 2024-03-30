@@ -33,11 +33,11 @@ namespace AGooday.AgPay.Payment.Api.Services
             _mchStoreService = mchStoreService;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
+            _agentInfoService = agentInfoService;
             _isvInfoService = isvInfoService;
             _payWayService = payWayService;
             _payInterfaceConfigService = payInterfaceConfigService;
             _configContextService = configContextService;
-            _agentInfoService = agentInfoService;
         }
 
         private bool IsCache()

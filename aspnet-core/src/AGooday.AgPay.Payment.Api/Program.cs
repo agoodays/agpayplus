@@ -208,9 +208,19 @@ services.AddSingleton<ChannelCertConfigKit>(serviceProvider =>
 //var isvInfoService = (IIsvInfoService)provider.GetService(typeof(IIsvInfoService));
 //var payInterfaceConfigService = (IPayInterfaceConfigService)provider.GetService(typeof(IPayInterfaceConfigService));
 //services.AddSingleton(new ConfigContextService(mchAppService, mchInfoService, isvInfoService, payInterfaceConfigService));
-//services.AddSingleton(typeof(ConfigContextQueryService));
+//services.AddScoped<ConfigContextService>(provider =>
+//{
+//    var mchStoreService = (IMchStoreService)provider.GetService(typeof(IMchStoreService));
+//    var mchAppService = (IMchAppService)provider.GetService(typeof(IMchAppService));
+//    var mchInfoService = (IMchInfoService)provider.GetService(typeof(IMchInfoService));
+//    var agentInfoService = (IAgentInfoService)provider.GetService(typeof(IAgentInfoService));
+//    var isvInfoService = (IIsvInfoService)provider.GetService(typeof(IIsvInfoService));
+//    var payInterfaceConfigService = (IPayInterfaceConfigService)provider.GetService(typeof(IPayInterfaceConfigService));
+//    return new ConfigContextService(mchStoreService, mchAppService, mchInfoService, agentInfoService, isvInfoService, payInterfaceConfigService);
+//});
 //services.AddSingleton(typeof(ConfigContextService));
-services.AddScoped<ConfigContextService>();
+//services.AddSingleton(typeof(ConfigContextQueryService));
+services.AddSingleton<ConfigContextService>();
 services.AddScoped<ConfigContextQueryService>();
 services.AddScoped<ChannelOrderReissueService>();
 services.AddScoped<PayMchNotifyService>();

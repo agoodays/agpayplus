@@ -38,19 +38,31 @@ namespace AGooday.AgPay.Payment.Api.Services
         private readonly IIsvInfoService _isvInfoService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
-        public ConfigContextService(IMchStoreService mchStoreService,
-            IMchAppService mchAppService,
-            IMchInfoService mchInfoService,
-            IAgentInfoService agentInfoService,
-            IIsvInfoService isvInfoService,
-            IPayInterfaceConfigService payInterfaceConfigService)
+        //public ConfigContextService(IMchStoreService mchStoreService,
+        //    IMchAppService mchAppService,
+        //    IMchInfoService mchInfoService,
+        //    IAgentInfoService agentInfoService,
+        //    IIsvInfoService isvInfoService,
+        //    IPayInterfaceConfigService payInterfaceConfigService)
+        //{
+        //    _mchStoreService = mchStoreService;
+        //    _mchAppService = mchAppService;
+        //    _mchInfoService = mchInfoService;
+        //    _agentInfoService = agentInfoService;
+        //    _isvInfoService = isvInfoService;
+        //    _payInterfaceConfigService = payInterfaceConfigService;
+        //}
+        public ConfigContextService(IServiceProvider serviceProvider)
         {
-            _mchAppService = mchAppService;
-            _mchInfoService = mchInfoService;
-            _isvInfoService = isvInfoService;
-            _payInterfaceConfigService = payInterfaceConfigService;
-            _agentInfoService = agentInfoService;
-            _mchStoreService = mchStoreService;
+            using (var scope = serviceProvider.CreateScope())
+            {
+                _mchStoreService = scope.ServiceProvider.GetService<IMchStoreService>();
+                _mchAppService = scope.ServiceProvider.GetService<IMchAppService>();
+                _mchInfoService = scope.ServiceProvider.GetService<IMchInfoService>();
+                _agentInfoService = scope.ServiceProvider.GetService<IAgentInfoService>();
+                _isvInfoService = scope.ServiceProvider.GetService<IIsvInfoService>();
+                _payInterfaceConfigService = scope.ServiceProvider.GetService<IPayInterfaceConfigService>();
+            }
         }
 
         /// <summary>
