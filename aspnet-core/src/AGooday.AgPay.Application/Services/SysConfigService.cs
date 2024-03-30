@@ -5,7 +5,6 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Newtonsoft.Json;
 
@@ -41,7 +40,7 @@ namespace AGooday.AgPay.Application.Services
         /// true: 表示将使用内存缓存， 将部分系统配置项 或 商户应用/服务商信息进行缓存并读取
         /// false: 直接查询DB
         /// </summary>
-        public static bool IS_USE_CACHE = false;
+        public static bool IS_USE_CACHE = true;
 
         /// <summary>
         /// 数据库application配置参数
@@ -80,6 +79,18 @@ namespace AGooday.AgPay.Application.Services
             {
                 var dbConfig = JsonConvert.DeserializeObject<DBOssConfig>(SelectByGroupKey(groupKey));
                 OSS_CONFIG[OSS_CONFIG.First().Key] = dbConfig;
+            }
+
+            if (OCR_CONFIG.First().Key.Equals(groupKey))
+            {
+                var dbConfig = JsonConvert.DeserializeObject<DBOcrConfig>(SelectByGroupKey(groupKey));
+                OCR_CONFIG[OCR_CONFIG.First().Key] = dbConfig;
+            }
+
+            if (SMS_CONFIG.First().Key.Equals(groupKey))
+            {
+                var dbConfig = JsonConvert.DeserializeObject<DBSmsConfig>(SelectByGroupKey(groupKey));
+                SMS_CONFIG[SMS_CONFIG.First().Key] = dbConfig;
             }
         }
 

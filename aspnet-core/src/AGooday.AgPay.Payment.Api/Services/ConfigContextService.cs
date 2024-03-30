@@ -54,15 +54,13 @@ namespace AGooday.AgPay.Payment.Api.Services
         //}
         public ConfigContextService(IServiceProvider serviceProvider)
         {
-            using (var scope = serviceProvider.CreateScope())
-            {
-                _mchStoreService = scope.ServiceProvider.GetService<IMchStoreService>();
-                _mchAppService = scope.ServiceProvider.GetService<IMchAppService>();
-                _mchInfoService = scope.ServiceProvider.GetService<IMchInfoService>();
-                _agentInfoService = scope.ServiceProvider.GetService<IAgentInfoService>();
-                _isvInfoService = scope.ServiceProvider.GetService<IIsvInfoService>();
-                _payInterfaceConfigService = scope.ServiceProvider.GetService<IPayInterfaceConfigService>();
-            }
+            var scope = serviceProvider.CreateScope();
+            _mchStoreService = scope.ServiceProvider.GetService<IMchStoreService>();
+            _mchAppService = scope.ServiceProvider.GetService<IMchAppService>();
+            _mchInfoService = scope.ServiceProvider.GetService<IMchInfoService>();
+            _agentInfoService = scope.ServiceProvider.GetService<IAgentInfoService>();
+            _isvInfoService = scope.ServiceProvider.GetService<IIsvInfoService>();
+            _payInterfaceConfigService = scope.ServiceProvider.GetService<IPayInterfaceConfigService>();
         }
 
         /// <summary>
@@ -92,7 +90,7 @@ namespace AGooday.AgPay.Payment.Api.Services
         /// <returns></returns>
         public MchAppConfigContext GetMchAppConfigContext(string mchNo, string appId)
         {
-            mchAppConfigContextMap.TryGetValue(mchNo, out MchAppConfigContext _mchAppConfigContext);
+            mchAppConfigContextMap.TryGetValue(appId, out MchAppConfigContext _mchAppConfigContext);
 
             //无此数据， 需要初始化
             if (_mchAppConfigContext == null)
@@ -100,7 +98,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 InitMchAppConfigContext(mchNo, appId);
             }
 
-            mchAppConfigContextMap.TryGetValue(mchNo, out _mchAppConfigContext);
+            mchAppConfigContextMap.TryGetValue(appId, out _mchAppConfigContext);
             return _mchAppConfigContext;
         }
 
@@ -198,7 +196,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchInfoConfigContext.PutMchStore(mchStore);
             });
 
-            mchInfoConfigContextMap.Add(mchNo, mchInfoConfigContext);
+            mchInfoConfigContextMap.TryAdd(mchNo, mchInfoConfigContext);
         }
 
         /// <summary>
@@ -309,7 +307,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 mchAppConfigContext.IsvConfigContext = GetIsvConfigContext(mchInfo.IsvNo);
             }
 
-            mchAppConfigContextMap.Add(appId, mchAppConfigContext);
+            mchAppConfigContextMap.TryAdd(appId, mchAppConfigContext);
         }
 
         /// <summary>
@@ -341,7 +339,7 @@ namespace AGooday.AgPay.Payment.Api.Services
             agentConfigContext.AgentNo = agentInfo.AgentNo;
             agentConfigContext.AgentInfo = agentInfo;
 
-            agentConfigContextMap.Add(agentNo, agentConfigContext);
+            agentConfigContextMap.TryAdd(agentNo, agentConfigContext);
         }
 
         /// <summary>
@@ -393,7 +391,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
             foreach (var payInterfaceConfig in allConfigList)
             {
-                isvConfigContext.IsvParamsMap.Add(
+                isvConfigContext.IsvParamsMap.TryAdd(
                     payInterfaceConfig.IfCode,
                     IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams)
                 );
@@ -413,7 +411,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 isvConfigContext.WxServiceWrapper = WxServiceWrapper.BuildWxServiceWrapper(wxpayParams);
             }
 
-            isvConfigContextMap.Add(isvNo, isvConfigContext);
+            isvConfigContextMap.TryAdd(isvNo, isvConfigContext);
 
             //查询出所有商户的配置信息并更新
             foreach (string appId in mchAppIdList)
