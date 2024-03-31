@@ -142,7 +142,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
         /// 封装参数 & 统一请求
         /// </summary>
         /// <param name="apiUri"></param>
-        /// <param name="reqParams"></param>
+        /// <param name="reqData"></param>
         /// <param name="logPrefix"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>

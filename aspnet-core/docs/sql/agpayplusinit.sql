@@ -2013,6 +2013,14 @@ VALUES ('lcswpay', '利楚扫呗支付', 1, 0, 1,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
         'https://www.lcsw.cn/20170616033613576_easyicon_net_48.ico', '#00AFFE', 1, '利楚扫呗支付');
 
+INSERT INTO `t_pay_interface_define` (`if_code`, `if_name`, `is_mch_mode`, `is_isv_mode`, `config_page_type`, `isv_params`, `isvsub_mch_params`, `normal_mch_params`, `way_codes`, `icon`, `bg_color`, `state`, `remark`)
+VALUES ('dgpay', '斗拱支付', 1, 1, 1,
+        '[{"name":"settleCycle","desc":"商户结算周期","type":"radio","verify":"required","values":"T1,D1","titles":"T1,D1"},{"name":"settleFee","desc":"D1结算费率（填写值为 0.00-100.00 之间）","type":"text","verify":""},{"name":"mchSettManual","desc":"商户手动取现","type":"radio","verify":"required","values":"0,T1,D1,D0","titles":"关闭,T1,D1,D0"},{"name":"cashFee","desc":"取现费率（填写值为 0.00-100.00 之间）","type":"text","verify":""},{"name":"productId","desc":"产品ID","type":"radio","verify":"required","values":"PAYUN,EDUSTD,KAZX","titles":"PAYUN,EDUSTD,KAZX"},{"name":"sysId","desc":"服务商号","type":"text","verify":"required"},{"name":"wxOpenUrl","desc":"微信渠道拓展二维码URL","type":"text","verify":""},{"name":"aliChannelExtUrl","desc":"支付宝渠道拓展二维码URL","type":"text","verify":""},{"name":"agreementModel","desc":"【电子协议】协议模板号","type":"text","verify":""},{"name":"agreementName","desc":"【电子协议】协议模板名称","type":"text","verify":""},{"name":"rsaPrivateKey","desc":"商户私钥","type":"textarea","verify":"required","star":"1"},{"name":"rsaPublicKey","desc":"斗拱公钥","type":"textarea","verify":"required","star":"1"},{"name":"webhookPrivateKey","desc":"webhook终端秘钥（智能POS需配置此项）","type":"textarea","verify":"","star":"1"},{"name":"posPublicKey","desc":"智能POS公钥（智能POS需配置此项）","type":"textarea","verify":"","star":"1"}]',
+        '[{"name":"huifuId","desc":"商户号","type":"text","verify":"required"}]',
+        '[{"name":"huifuId","desc":"商户号","type":"text","verify":"required"},{"name":"productId","desc":"产品ID","type":"text","verify":"required"},{"name":"rsaPrivateKey","desc":"商户私钥","type":"textarea","verify":"required","star":"1"},{"name":"rsaPublicKey","desc":"斗拱公钥","type":"textarea","verify":"required","star":"1"}]',
+        '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
+        'https://cloudpnrcdn.oss-cn-shanghai.aliyuncs.com/dgwebsite/api-public/docs/images/favicon.ico', '#0f3e66', 1, '汇付天下聚合支付平台');
+
 -- 初始化设备供应商接口定义
 INSERT INTO `t_device_provider_define` (`provider_code`, `provider_name`, `config_page_type`, `provider_params`, `device_types`, `icon`, `bg_color`, `state`, `remark`)
 VALUES ('zgwl', '智谷联', 1,
