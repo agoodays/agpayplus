@@ -661,6 +661,15 @@
             public const string YSF_JSAPI = "YSF_JSAPI";    //云闪付服务窗支付
 
             /// <summary>
+            /// 数字人民币条码
+            /// </summary>
+            public const string DCEP_BAR = "DCEP_BAR";      // 数字人民币条码
+            /// <summary>
+            /// 数字人民币二维码
+            /// </summary>
+            public const string DCEP_QR = "DCEP_QR";        // 数字人民币二维码
+
+            /// <summary>
             /// 微信app支付
             /// </summary>
             public const string WX_APP = "WX_APP";          //微信app支付

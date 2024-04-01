@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Channel.AliPay.Kits;
+using AGooday.AgPay.Payment.Api.Channel.DgPay;
 using AGooday.AgPay.Payment.Api.Channel.HkrtPay;
 using AGooday.AgPay.Payment.Api.Channel.LcswPay;
 using AGooday.AgPay.Payment.Api.Channel.LesPay;
@@ -42,6 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IPaymentService, HkrtPayPaymentService>(CS.IF_CODE.HKRTPAY);
             services.AddKeyedScoped<IPaymentService, UmsPayPaymentService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IPaymentService, LcswPayPaymentService>(CS.IF_CODE.LCSWPAY);
+            services.AddKeyedScoped<IPaymentService, DgPayPaymentService>(CS.IF_CODE.DGPAY);
             services.AddScoped<IChannelServiceFactory<IPaymentService>, ChannelServiceFactory<IPaymentService>>();
             PayWayUtil.PayWayServiceRegister<AliPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<WxPayPaymentService>(services);
@@ -53,6 +55,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             PayWayUtil.PayWayServiceRegister<HkrtPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<UmsPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<LcswPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<DgPayPaymentService>(services);
             #endregion
             #region RefundService
             services.AddKeyedScoped<IRefundService, AliPayRefundService>(CS.IF_CODE.ALIPAY);
@@ -64,6 +67,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IRefundService, HkrtPayRefundService>(CS.IF_CODE.HKRTPAY);
             services.AddKeyedScoped<IRefundService, UmsPayRefundService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IRefundService, LcswPayRefundService>(CS.IF_CODE.LCSWPAY);
+            services.AddKeyedScoped<IRefundService, DgPayRefundService>(CS.IF_CODE.DGPAY);
             services.AddScoped<IChannelServiceFactory<IRefundService>, ChannelServiceFactory<IRefundService>>();
             #endregion
             #region ChannelNoticeService
@@ -76,6 +80,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IChannelNoticeService, HkrtPayChannelNoticeService>(CS.IF_CODE.HKRTPAY);
             services.AddKeyedScoped<IChannelNoticeService, UmsPayChannelNoticeService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IChannelNoticeService, LcswPayChannelNoticeService>(CS.IF_CODE.LCSWPAY);
+            services.AddKeyedScoped<IChannelNoticeService, DgPayChannelNoticeService>(CS.IF_CODE.DGPAY);
             services.AddScoped<IChannelServiceFactory<IChannelNoticeService>, ChannelServiceFactory<IChannelNoticeService>>();
             #endregion
             #region ChannelRefundNoticeService
@@ -107,6 +112,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IPayOrderQueryService, HkrtPayPayOrderQueryService>(CS.IF_CODE.HKRTPAY);
             services.AddKeyedScoped<IPayOrderQueryService, UmsPayPayOrderQueryService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IPayOrderQueryService, LcswPayPayOrderQueryService>(CS.IF_CODE.LCSWPAY);
+            services.AddKeyedScoped<IPayOrderQueryService, DgPayPayOrderQueryService>(CS.IF_CODE.DGPAY);
             services.AddScoped<IChannelServiceFactory<IPayOrderQueryService>, ChannelServiceFactory<IPayOrderQueryService>>();
             #endregion
             #region TransferService

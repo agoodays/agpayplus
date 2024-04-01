@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
             // 斗拱 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder, GetNotifyUrl());
 
-            var channelRetMsg = DgBar(reqParams, logPrefix, mchAppConfigContext);
+            var channelRetMsg = DgBar(reqParams, payOrder, logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }

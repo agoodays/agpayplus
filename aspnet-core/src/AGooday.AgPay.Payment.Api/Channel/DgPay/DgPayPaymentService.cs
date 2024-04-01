@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg DgBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public ChannelRetMsg DgBar(JObject reqParams, PayOrderDto payOrder, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
@@ -58,8 +58,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             var data = resJSON.GetValue("data")?.ToObject<JObject>();
             string respCode = data?.GetValue("resp_code").ToString(); //业务响应码
             string respDesc = data?.GetValue("resp_desc").ToString(); //业务响应信息	
-            string huifuId = string.Empty;
-            data?.TryGetString("huifu_id", out huifuId); // 商户号
+            string huifuId = data?.GetValue("huifu_id")?.ToString();
             channelRetMsg.ChannelMchNo = huifuId;
             try
             {
@@ -153,7 +152,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             }
 
             DgPayIsvSubMchParams isvsubMchParams = (DgPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-            reqData.Add("req_date", DateTime.Now.ToString("yyyyMMdd")); // 请求格式：yyyyMMdd；示例值：20220905
             //reqData.Add("req_seq_id", Guid.NewGuid().ToString("N")); //同一huifu_id下当天唯一，示例值：rQ20211213111739475651
             reqData.Add("huifu_id", isvsubMchParams.HuifuId); // 渠道与一级代理商的直属商户ID；示例值：6666000123123123
 
@@ -193,6 +191,21 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
         }
 
         /// <summary>
+        /// 随行付 jsapi下单请求统一发送参数
+        /// </summary>
+        /// <param name="reqParams"></param>
+        /// <param name="payOrder"></param>
+        /// <param name="notifyUrl"></param>
+        /// <param name="returnUrl"></param>
+        public static void UnifiedParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
+        {
+            DgPublicParams(reqParams, payOrder);
+            string tradeType = DgPayEnum.GetTransType(payOrder.WayCode);
+            reqParams.Add("trade_type", tradeType);
+            reqParams.Add("notify_url", notifyUrl); //交易异步通知地址，http或https开头。
+        }
+
+        /// <summary>
         /// 斗拱 bar下单请求统一发送参数
         /// </summary>
         /// <param name="reqParams"></param>
@@ -210,6 +223,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
         /// <param name="payOrder"></param>
         public static void DgPublicParams(JObject reqParams, PayOrderDto payOrder)
         {
+            reqParams.Add("req_date", payOrder.CreatedAt.Value.ToString("yyyyMMdd")); // 请求格式：yyyyMMdd；示例值：20220905
             reqParams.Add("req_seq_id", payOrder.PayOrderId); //商户订单号（字母、数字、下划线）需保证在合作方系统中不重复
             reqParams.Add("trans_amt", AmountUtil.ConvertCent2Dollar(payOrder.Amount)); //订单总金额(元)，格式：#########.##
             reqParams.Add("goods_desc", payOrder.Subject); //订单标题
