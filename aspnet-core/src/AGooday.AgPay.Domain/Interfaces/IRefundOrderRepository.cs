@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IRefundOrderRepository : IRepository<RefundOrder>
+    public interface IRefundOrderRepository : IAgPayRepository<RefundOrder>
     {
         bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo);
         bool IsExistRefundingOrder(string payOrderId);

@@ -4,7 +4,7 @@ using AGooday.AgPay.Infrastructure.Context;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class QrCodeShellRepository : Repository<QrCodeShell>, IQrCodeShellRepository
+    public class QrCodeShellRepository : AgPayRepository<QrCodeShell>, IQrCodeShellRepository
     {
         public QrCodeShellRepository(AgPayDbContext context)
             : base(context)

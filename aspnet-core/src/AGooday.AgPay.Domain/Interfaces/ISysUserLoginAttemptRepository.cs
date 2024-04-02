@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface ISysUserLoginAttemptRepository : IRepository<SysUserLoginAttempt, long>
+    public interface ISysUserLoginAttemptRepository : IAgPayRepository<SysUserLoginAttempt, long>
     {
         Task<(int failedAttempts, DateTime? lastLoginTime)> GetFailedLoginAttemptsAsync(long userId, TimeSpan timeWindow);
         Task<DateTime?> GetLastLoginTimeAsync(long userId);

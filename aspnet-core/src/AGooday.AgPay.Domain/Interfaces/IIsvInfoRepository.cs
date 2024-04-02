@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IIsvInfoRepository : IRepository<IsvInfo>
+    public interface IIsvInfoRepository : IAgPayRepository<IsvInfo>
     {
         bool IsExistIsvNo(string isvNo);
     }

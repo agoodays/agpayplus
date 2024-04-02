@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class TransferOrderRepository : Repository<TransferOrder>, ITransferOrderRepository
+    public class TransferOrderRepository : AgPayRepository<TransferOrder>, ITransferOrderRepository
     {
         public TransferOrderRepository(AgPayDbContext context)
             : base(context)

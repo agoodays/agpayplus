@@ -7,7 +7,7 @@ using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class SysUserAuthRepository : Repository<SysUserAuth, long>, ISysUserAuthRepository
+    public class SysUserAuthRepository : AgPayRepository<SysUserAuth, long>, ISysUserAuthRepository
     {
         public SysUserAuthRepository(AgPayDbContext context)
             : base(context)

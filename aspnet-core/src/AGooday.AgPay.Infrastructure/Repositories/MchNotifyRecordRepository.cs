@@ -4,7 +4,7 @@ using AGooday.AgPay.Infrastructure.Context;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class MchNotifyRecordRepository : Repository<MchNotifyRecord, long>, IMchNotifyRecordRepository
+    public class MchNotifyRecordRepository : AgPayRepository<MchNotifyRecord, long>, IMchNotifyRecordRepository
     {
         public MchNotifyRecordRepository(AgPayDbContext context)
             : base(context)

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class SysUserLoginAttemptRepository : Repository<SysUserLoginAttempt, long>, ISysUserLoginAttemptRepository
+    public class SysUserLoginAttemptRepository : AgPayRepository<SysUserLoginAttempt, long>, ISysUserLoginAttemptRepository
     {
         public SysUserLoginAttemptRepository(AgPayDbContext context)
             : base(context)

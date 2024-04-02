@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface ISysArticleRepository : IRepository<SysArticle, long>
+    public interface ISysArticleRepository : IAgPayRepository<SysArticle, long>
     {
     }
 }

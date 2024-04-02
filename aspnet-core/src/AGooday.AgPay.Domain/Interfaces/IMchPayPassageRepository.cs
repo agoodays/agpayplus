@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IMchPayPassageRepository : IRepository<MchPayPassage, long>
+    public interface IMchPayPassageRepository : IAgPayRepository<MchPayPassage, long>
     {
         bool IsExistMchPayPassageUseWayCode(string wayCode);
         void RemoveByMchNo(string mchNo);

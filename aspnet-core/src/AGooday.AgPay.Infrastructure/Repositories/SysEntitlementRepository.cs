@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class SysEntitlementRepository : Repository<SysEntitlement>, ISysEntitlementRepository
+    public class SysEntitlementRepository : AgPayRepository<SysEntitlement>, ISysEntitlementRepository
     {
         public SysEntitlementRepository(AgPayDbContext context)
             : base(context)

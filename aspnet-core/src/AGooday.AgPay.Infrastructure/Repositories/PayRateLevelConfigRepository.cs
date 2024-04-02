@@ -4,7 +4,7 @@ using AGooday.AgPay.Infrastructure.Context;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class PayRateLevelConfigRepository : Repository<PayRateLevelConfig, long>, IPayRateLevelConfigRepository
+    public class PayRateLevelConfigRepository : AgPayRepository<PayRateLevelConfig, long>, IPayRateLevelConfigRepository
     {
         public PayRateLevelConfigRepository(AgPayDbContext context)
             : base(context)

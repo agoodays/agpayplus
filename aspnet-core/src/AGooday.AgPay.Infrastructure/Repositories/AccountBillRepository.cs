@@ -4,7 +4,7 @@ using AGooday.AgPay.Infrastructure.Context;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class AccountBillRepository : Repository<AccountBill>, IAccountBillRepository
+    public class AccountBillRepository : AgPayRepository<AccountBill>, IAccountBillRepository
     {
         public AccountBillRepository(AgPayDbContext context)
             : base(context)

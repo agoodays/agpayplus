@@ -4,7 +4,7 @@ using AGooday.AgPay.Infrastructure.Context;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class PayOrderProfitRepository : Repository<PayOrderProfit>, IPayOrderProfitRepository
+    public class PayOrderProfitRepository : AgPayRepository<PayOrderProfit>, IPayOrderProfitRepository
     {
         public PayOrderProfitRepository(AgPayDbContext context)
             : base(context)

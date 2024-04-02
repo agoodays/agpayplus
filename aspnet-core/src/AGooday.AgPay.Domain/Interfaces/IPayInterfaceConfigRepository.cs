@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IPayInterfaceConfigRepository : IRepository<PayInterfaceConfig, long>
+    public interface IPayInterfaceConfigRepository : IAgPayRepository<PayInterfaceConfig, long>
     {
         bool IsExistUseIfCode(string ifCode);
         bool MchAppHasAvailableIfCode(string appId, string ifCode);

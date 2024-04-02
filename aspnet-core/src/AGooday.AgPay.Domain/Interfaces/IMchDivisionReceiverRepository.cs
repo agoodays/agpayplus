@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IMchDivisionReceiverRepository : IRepository<MchDivisionReceiver, long>
+    public interface IMchDivisionReceiverRepository : IAgPayRepository<MchDivisionReceiver, long>
     {
         bool IsExistUseReceiverGroup(long receiverGroupId);
     }

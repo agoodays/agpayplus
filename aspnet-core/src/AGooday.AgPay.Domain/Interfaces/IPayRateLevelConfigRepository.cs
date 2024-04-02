@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IPayRateLevelConfigRepository : IRepository<PayRateLevelConfig, long>
+    public interface IPayRateLevelConfigRepository : IAgPayRepository<PayRateLevelConfig, long>
     {
         IQueryable<PayRateLevelConfig> GetByRateConfigId(long id);
         IQueryable<PayRateLevelConfig> GetByRateConfigIds(List<long> ids);

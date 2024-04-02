@@ -4,7 +4,7 @@ using AGooday.AgPay.Infrastructure.Context;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class MchDivisionReceiverGroupRepository : Repository<MchDivisionReceiverGroup, long>, IMchDivisionReceiverGroupRepository
+    public class MchDivisionReceiverGroupRepository : AgPayRepository<MchDivisionReceiverGroup, long>, IMchDivisionReceiverGroupRepository
     {
         public MchDivisionReceiverGroupRepository(AgPayDbContext context)
             : base(context)

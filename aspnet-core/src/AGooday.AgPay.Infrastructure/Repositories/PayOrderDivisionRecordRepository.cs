@@ -5,7 +5,7 @@ using AGooday.AgPay.Infrastructure.Context;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class PayOrderDivisionRecordRepository : Repository<PayOrderDivisionRecord, long>, IPayOrderDivisionRecordRepository
+    public class PayOrderDivisionRecordRepository : AgPayRepository<PayOrderDivisionRecord, long>, IPayOrderDivisionRecordRepository
     {
         public PayOrderDivisionRecordRepository(AgPayDbContext context)
             : base(context)

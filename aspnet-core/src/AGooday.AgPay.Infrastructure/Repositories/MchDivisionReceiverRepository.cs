@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class MchDivisionReceiverRepository : Repository<MchDivisionReceiver, long>, IMchDivisionReceiverRepository
+    public class MchDivisionReceiverRepository : AgPayRepository<MchDivisionReceiver, long>, IMchDivisionReceiverRepository
     {
         public MchDivisionReceiverRepository(AgPayDbContext context)
             : base(context)

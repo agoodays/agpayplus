@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IMchNotifyRecordRepository : IRepository<MchNotifyRecord, long>
+    public interface IMchNotifyRecordRepository : IAgPayRepository<MchNotifyRecord, long>
     {
     }
 }

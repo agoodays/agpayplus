@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class PayInterfaceConfigRepository : Repository<PayInterfaceConfig, long>, IPayInterfaceConfigRepository
+    public class PayInterfaceConfigRepository : AgPayRepository<PayInterfaceConfig, long>, IPayInterfaceConfigRepository
     {
         public PayInterfaceConfigRepository(AgPayDbContext context)
             : base(context)

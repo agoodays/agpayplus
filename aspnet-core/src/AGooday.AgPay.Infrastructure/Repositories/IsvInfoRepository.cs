@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class IsvInfoRepository : Repository<IsvInfo>, IIsvInfoRepository
+    public class IsvInfoRepository : AgPayRepository<IsvInfo>, IIsvInfoRepository
     {
         public IsvInfoRepository(AgPayDbContext context)
             : base(context)

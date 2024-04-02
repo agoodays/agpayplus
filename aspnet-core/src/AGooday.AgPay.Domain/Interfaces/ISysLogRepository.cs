@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface ISysLogRepository : IRepository<SysLog, long>
+    public interface ISysLogRepository : IAgPayRepository<SysLog, long>
     {
     }
 }

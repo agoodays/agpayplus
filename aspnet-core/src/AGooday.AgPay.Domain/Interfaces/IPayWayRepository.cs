@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IPayWayRepository : IRepository<PayWay>
+    public interface IPayWayRepository : IAgPayRepository<PayWay>
     {
         bool IsExistPayWayCode(string wayCode);
     }

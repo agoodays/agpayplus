@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class SysConfigRepository : Repository<SysConfig>, ISysConfigRepository
+    public class SysConfigRepository : AgPayRepository<SysConfig>, ISysConfigRepository
     {
         public SysConfigRepository(AgPayDbContext context)
             : base(context)

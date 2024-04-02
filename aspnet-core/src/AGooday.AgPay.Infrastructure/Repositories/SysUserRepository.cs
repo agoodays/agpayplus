@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class SysUserRepository : Repository<SysUser, long>, ISysUserRepository
+    public class SysUserRepository : AgPayRepository<SysUser, long>, ISysUserRepository
     {
         public SysUserRepository(AgPayDbContext context)
             : base(context)

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class PayOrderRepository : Repository<PayOrder>, IPayOrderRepository
+    public class PayOrderRepository : AgPayRepository<PayOrder>, IPayOrderRepository
     {
         public PayOrderRepository(AgPayDbContext context)
             : base(context)

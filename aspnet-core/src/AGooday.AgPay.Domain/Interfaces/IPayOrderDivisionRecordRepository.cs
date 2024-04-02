@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IPayOrderDivisionRecordRepository : IRepository<PayOrderDivisionRecord, long>
+    public interface IPayOrderDivisionRecordRepository : IAgPayRepository<PayOrderDivisionRecord, long>
     {
         long SumSuccessDivisionAmount(string payOrderId);
     }

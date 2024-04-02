@@ -5,7 +5,7 @@ using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class PayInterfaceDefineRepository : Repository<PayInterfaceDefine>, IPayInterfaceDefineRepository
+    public class PayInterfaceDefineRepository : AgPayRepository<PayInterfaceDefine>, IPayInterfaceDefineRepository
     {
         public PayInterfaceDefineRepository(AgPayDbContext context)
             : base(context)

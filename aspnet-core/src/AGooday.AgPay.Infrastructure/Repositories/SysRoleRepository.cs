@@ -4,7 +4,7 @@ using AGooday.AgPay.Infrastructure.Context;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class SysRoleRepository : Repository<SysRole>, ISysRoleRepository
+    public class SysRoleRepository : AgPayRepository<SysRole>, ISysRoleRepository
     {
         public SysRoleRepository(AgPayDbContext context)
             : base(context)

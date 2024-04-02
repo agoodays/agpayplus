@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class SysUserRoleRelaRepository : Repository<SysUserRoleRela>, ISysUserRoleRelaRepository
+    public class SysUserRoleRelaRepository : AgPayRepository<SysUserRoleRela>, ISysUserRoleRelaRepository
     {
         public SysUserRoleRelaRepository(AgPayDbContext context)
             : base(context)

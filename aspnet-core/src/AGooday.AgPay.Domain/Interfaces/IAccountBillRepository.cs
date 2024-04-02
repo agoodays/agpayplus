@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IAccountBillRepository : IRepository<AccountBill>
+    public interface IAccountBillRepository : IAgPayRepository<AccountBill>
     {
     }
 }

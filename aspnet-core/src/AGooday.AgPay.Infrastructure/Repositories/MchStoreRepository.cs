@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class MchStoreRepository : Repository<MchStore>, IMchStoreRepository
+    public class MchStoreRepository : AgPayRepository<MchStore>, IMchStoreRepository
     {
         public MchStoreRepository(AgPayDbContext context)
             : base(context)

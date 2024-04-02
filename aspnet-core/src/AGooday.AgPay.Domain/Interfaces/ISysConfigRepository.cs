@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface ISysConfigRepository : IRepository<SysConfig>
+    public interface ISysConfigRepository : IAgPayRepository<SysConfig>
     {
         bool IsExistSysConfig(string configKey);
         SysConfig GetByKey(string configKey, string sysType, string belongInfoId);

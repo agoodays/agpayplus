@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IQrCodeRepository : IRepository<QrCode>
+    public interface IQrCodeRepository : IAgPayRepository<QrCode>
     {
     }
 }

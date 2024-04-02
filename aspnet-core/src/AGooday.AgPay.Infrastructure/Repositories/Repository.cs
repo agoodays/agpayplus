@@ -1,5 +1,4 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
-using AGooday.AgPay.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -13,10 +12,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         where TEntity : class
         where TPrimaryKey : struct
     {
-        protected readonly AgPayDbContext Db;
+        protected readonly DbContext Db;
         protected readonly DbSet<TEntity> DbSet;
 
-        public Repository(AgPayDbContext context)
+        public Repository(DbContext context)
         {
             Db = context;
             DbSet = Db.Set<TEntity>();
@@ -177,6 +176,35 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             else
                 Add(entity);
         }
+        public void SaveOrUpdate(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate)
+        {
+            var primaryKeyValue = RepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+            if (primaryKeyValue.Equals(default(TPrimaryKey)))
+            {
+                DbSet.Add(entity);
+            }
+            else
+            {
+                var existingEntity = DbSet.Find(primaryKeyValue);
+                if (existingEntity != null)
+                {
+                    if (propertiesToUpdate == null || propertiesToUpdate.Length == 0)
+                    {
+                        Db.Entry(existingEntity).State = EntityState.Modified;
+                        Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                    }
+                    else
+                    {
+                        foreach (var property in propertiesToUpdate)
+                        {
+                            var propertyName = RepositoryExtension<TEntity>.GetPropertyName(property);
+                            Db.Entry(existingEntity).Property(propertyName).IsModified = true;
+                        }
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// 保存
         /// </summary>
@@ -213,10 +241,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
     public class Repository<TEntity> : IRepository<TEntity>
         where TEntity : class
     {
-        protected readonly AgPayDbContext Db;
+        protected readonly DbContext Db;
         protected readonly DbSet<TEntity> DbSet;
 
-        public Repository(AgPayDbContext context)
+        public Repository(DbContext context)
         {
             Db = context;
             DbSet = Db.Set<TEntity>();
@@ -413,8 +441,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
     }
     public class Repository : IRepository
     {
-        protected readonly AgPayDbContext Db;
-        public Repository(AgPayDbContext context)
+        protected readonly DbContext Db;
+        public Repository(DbContext context)
         {
             Db = context;
         }
@@ -424,8 +452,31 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             GC.SuppressFinalize(this);
         }
     }
-    public static class RepositoryExtension<TEntity> where TEntity : class
+    public static class RepositoryExtension<TEntity>
+        where TEntity : class
     {
+        public static object[] GetPrimaryKeyValues(DbContext Db, TEntity entity)
+        {
+            var entityType = Db.Model.FindEntityType(typeof(TEntity));
+            var primaryKey = entityType.FindPrimaryKey();
+            if (primaryKey != null)
+            {
+                var primaryKeyProperties = primaryKey.Properties;
+                var primaryKeyValues = primaryKeyProperties.Select(p => p.GetGetter().GetClrValue(entity)).ToArray();
+                return primaryKeyValues;
+            }
+            throw new InvalidOperationException("Entity does not have a primary key defined.");
+        }
+
+        public static string GetPropertyName(Expression<Func<TEntity, object>> propertyExpression)
+        {
+            if (propertyExpression.Body is MemberExpression memberExpression)
+            {
+                return memberExpression.Member.Name;
+            }
+            throw new InvalidOperationException("Invalid property expression.");
+        }
+
         public static string[] GetPropertyNames(Expression<Func<TEntity, object>> expression)
         {
             if (expression.Body is not NewExpression newExpression)

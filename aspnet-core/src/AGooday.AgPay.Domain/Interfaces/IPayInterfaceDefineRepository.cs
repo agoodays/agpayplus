@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IPayInterfaceDefineRepository : IRepository<PayInterfaceDefine>
+    public interface IPayInterfaceDefineRepository : IAgPayRepository<PayInterfaceDefine>
     {
         IEnumerable<T> SelectAvailablePayInterfaceList<T>(string wayCode, string appId, string infoType, byte mchType);
     }

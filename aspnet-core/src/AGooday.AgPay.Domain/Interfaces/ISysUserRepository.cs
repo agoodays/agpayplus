@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface ISysUserRepository : IRepository<SysUser, long>
+    public interface ISysUserRepository : IAgPayRepository<SysUser, long>
     {
         bool IsExistLoginUsername(string loginUsername, string sysType);
         bool IsExistTelphone(string telphone, string sysType);

@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface ISysRoleRepository : IRepository<SysRole>
+    public interface ISysRoleRepository : IAgPayRepository<SysRole>
     {
     }
 }

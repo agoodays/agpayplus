@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IPayRateConfigRepository : IRepository<PayRateConfig, long>
+    public interface IPayRateConfigRepository : IAgPayRepository<PayRateConfig, long>
     {
         PayRateConfig GetByUniqueKey(string configType, string infoType, string infoId, string ifCode, string wayCode);
         IQueryable<PayRateConfig> GetByUniqueKeysAsNoTracking(string configType, string infoType, string ifCode, string wayCode, List<string> infoIds);

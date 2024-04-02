@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface ISysRoleEntRelaRepository : IRepository<SysRoleEntRela>
+    public interface ISysRoleEntRelaRepository : IAgPayRepository<SysRoleEntRela>
     {
         void RemoveByRoleId(string roleId);
     }

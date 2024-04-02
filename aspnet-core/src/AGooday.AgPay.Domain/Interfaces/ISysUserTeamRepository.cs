@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface ISysUserTeamRepository : IRepository<SysUserTeam>
+    public interface ISysUserTeamRepository : IAgPayRepository<SysUserTeam>
     {
     }
 }

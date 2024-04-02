@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface ISysUserRoleRelaRepository : IRepository<SysUserRoleRela>
+    public interface ISysUserRoleRelaRepository : IAgPayRepository<SysUserRoleRela>
     {
         bool IsAssignedToUser(string roleId);
         void RemoveByUserId(long userId);

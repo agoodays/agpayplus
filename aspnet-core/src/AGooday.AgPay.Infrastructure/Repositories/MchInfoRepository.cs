@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
-    public class MchInfoRepository : Repository<MchInfo>, IMchInfoRepository
+    public class MchInfoRepository : AgPayRepository<MchInfo>, IMchInfoRepository
     {
         public MchInfoRepository(AgPayDbContext context)
             : base(context)

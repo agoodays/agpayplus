@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
-    public interface IAgentInfoRepository : IRepository<AgentInfo>
+    public interface IAgentInfoRepository : IAgPayRepository<AgentInfo>
     {
         bool IsExistAgentNo(string agentNo);
         bool IsExistAgent(string isvNo);
