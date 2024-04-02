@@ -152,12 +152,12 @@ namespace AGooday.AgPay.Application.Services
                     {
                         Host = "smtp.qq.com",
                         Port = 465,
-                        FromName = "jones.xiang@foxmail.com",
-                        FromAddress = "jones.xiang@foxmail.com",
-                        Password = "ygslrbotmxsdecdh",
+                        FromName = "xxx@foxmail.com",
+                        FromAddress = "xxx@foxmail.com",
+                        Password = "******",
                         ToAddress = new List<string>()
                         {
-                            "1697504283@qq.com"
+                            "123@qq.com"
                         }
                     }
                 }

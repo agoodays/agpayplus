@@ -1835,21 +1835,21 @@ VALUES ('ossUseType', '文件上传服务类型', '文件上传服务类型', 'o
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('ossPublicSiteUrl', '公共oss访问地址(不包含结尾/)', '公共oss访问地址(不包含结尾/)', 'ossConfig', '系统应用配置', 'http://127.0.0.1:9217/api/anon/localOssFiles', 'text', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
-VALUES ('aliyunOssConfig', '阿里云oss配置', '阿里云oss配置', 'ossConfig', '阿里云oss配置', '{"accessKeyId":"LTAI4GEqjdMVqr6y7xTjsTo1","endpoint":"oss-cn-beijing.aliyuncs.com","expireTime":30000,"publicBucketName":"jeepaypublic","privateBucketName":"jeepayprivate","accessKeySecret":"lsMY95aWVv8Ghuoq91sDeNAU76xIYo"}', 'text', 'MGR', '0', 0, NOW());
+VALUES ('aliyunOssConfig', '阿里云oss配置', '阿里云oss配置', 'ossConfig', '阿里云oss配置', '{"accessKeyId":"MVqr64GEqjdI6y7xTMVqry7xLTAjsTo1","endpoint":"oss-cn-beijing.aliyuncs.com","expireTime":30000,"publicBucketName":"agpaypublic","privateBucketName":"agpayprivate","accessKeySecret":"q91sDeWVv8GhuoUY95a6x7NAlsMIYo"}', 'text', 'MGR', '0', 0, NOW());
 
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
-VALUES ('apiMapWebKey', '[高德地图商户端web配置]Key', '高德地图Key', 'apiMapConfig', '高德地图商户端web配置', '6cebea39ba50a4c9bc565baaf57d1c8b', 'text', 'MGR', '0', 0, NOW());
+VALUES ('apiMapWebKey', '[高德地图商户端web配置]Key', '高德地图Key', 'apiMapConfig', '高德地图商户端web配置', 'af5a39c9bc57d1ba6cebe65ba50a4c8b', 'text', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
-VALUES ('apiMapWebSecret', '[高德地图商户端web配置]秘钥', '高德地图Key', 'apiMapConfig', '高德地图商户端web配置', 'dccbb5a56d2a1850eda2b6e67f8f2f13', 'text', 'MGR', '0', 0, NOW());
+VALUES ('apiMapWebSecret', '[高德地图商户端web配置]秘钥', '高德地图Key', 'apiMapConfig', '高德地图商户端web配置', 'dccbb518e65a7f86d2af50eda2b62f13', 'text', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
-VALUES ('apiMapWebServiceKey', '[高德地图商户端web服务]Key', '商户端web服务key', 'apiMapConfig', '高德地图商户端web配置', '1e558c3dc1ce7ab2a0b332d78fcd4c16', 'text', 'MGR', '0', 0, NOW());
+VALUES ('apiMapWebServiceKey', '[高德地图商户端web服务]Key', '商户端web服务key', 'apiMapConfig', '高德地图商户端web配置', 'b2a0b3a8fcd2d73c1ce71e558c3d4c16', 'text', 'MGR', '0', 0, NOW());
 
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('smsProviderKey', '短信使用厂商', '短信使用厂商', 'smsConfig', '短信配置', 'agpaydx', 'radio', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('agpaydxSmsConfig', '[吉日短信]短信配置', '[吉日短信]短信配置', 'smsConfig', '短信配置', '{"signName":"吉日付","userName":"agooday","accountPwd":"agooday"}', 'text', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
-VALUES ('aliyundySmsConfig', '阿里云短信服务', '阿里云短信服务', 'smsConfig', '短信配置', '{"accessKeyId":"LTAI5tChn8DqogEzgm5FSyhZ","loginMchTemplateId":"SMS_178515044","registerMchTemplateId":"SMS_215795545","accessKeySecret":"u17oHlUkGe9l7q9aoApV7boNe3GlGe","signName":"吉日科技","mbrTelBindTemplateId":"SMS_215790589","forgetPwdTemplateId":"SMS_215795546","accountOpenTemplateId":"SMS_234420379"}', 'text', 'MGR', '0', 0, NOW());
+VALUES ('aliyundySmsConfig', '阿里云短信服务', '阿里云短信服务', 'smsConfig', '短信配置', '{"accessKeyId":"DqogEAI5tChnz8Syhgm5FLTZ","loginMchTemplateId":"SMS_178515044","registerMchTemplateId":"SMS_215795545","accessKeySecret":"boNe3GlkGe9l7q9aoApu17oHlUV7Ge","signName":"吉日科技","mbrTelBindTemplateId":"SMS_215790589","forgetPwdTemplateId":"SMS_215795546","accountOpenTemplateId":"SMS_234420379"}', 'text', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('mocktestSmsConfig', '[模拟测试]短信配置', '[模拟测试]短信配置', 'smsConfig', '短信配置', '{"mockCode": "888666"}', 'text', 'MGR', '0', 0, NOW());
 
@@ -1858,9 +1858,9 @@ VALUES ('ocrType', 'OCR识别使用类型', 'OCR识别使用类型 1-腾讯OCR 2
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('ocrState', 'OCR识别使用状态', 'OCR识别使用状态 0-关闭 1-开启', 'ocrConfig', 'OCR识别参数配置', '1', 'radio', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
-VALUES ('tencentOcrConfig', '腾讯OCR识别参数配置', '腾讯OCR识别参数配置', 'ocrConfig', 'OCR识别参数配置', '{"secretId":"AKIDHK7ewxhBOKzNTJr88svhCUVFiuqVsyoN","secretKey":"JL7cqnTs1tUord9QQ9blfIejY6NM5Xje"}', 'text', 'MGR', '0', 0, NOW());
+VALUES ('tencentOcrConfig', '腾讯OCR识别参数配置', '腾讯OCR识别参数配置', 'ocrConfig', 'OCR识别参数配置', '{"secretId":"HK7ewxhiuqVsCUVFAKBOKzNTJr88svhIDyoN","secretKey":"Q9blfIejY6qnTs1tNJL7cM5XUord9Qje"}', 'text', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
-VALUES ('aliOcrConfig', '阿里OCR识别参数配置', '阿里OCR识别参数配置', 'ocrConfig', 'OCR识别参数配置', '{"accessKeyId": "LTAI4GEqjdMVqr6y7xTjsTo1","accessKeySecret": "lsMY95aWVv8Ghuoq91sDeNAU76xIYo"}', 'text', 'MGR', '0', 0, NOW());
+VALUES ('aliOcrConfig', '阿里OCR识别参数配置', '阿里OCR识别参数配置', 'ocrConfig', 'OCR识别参数配置', '{"accessKeyId": "MVqr64GEqjdI6y7xTMVqry7xLTAjsTo1","accessKeySecret": "q91sDeWVv8GhuoUY95a6x7NAlsMIYo"}', 'text', 'MGR', '0', 0, NOW());
 
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('loginErrorMaxLimit', '限制登录次数(xx分钟最多尝试xx次)(0表示不限制)', '限制登录次数', 'securityConfig', '安全配置', '{"limitMinute":15,"maxLoginAttempts":3}', 'text', 'MGR', '0', 0, NOW());

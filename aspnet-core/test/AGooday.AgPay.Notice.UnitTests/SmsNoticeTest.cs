@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Notice.UnitTests
                             option.AliyunSms = new AliyunSmsOptions()
                             {
                                 Endpoint = "dysmsapi.aliyuncs.com",
-                                AccessKeyId = "R5w8rtFmI08Yijcn",
+                                AccessKeyId = "T5w****gI0****qch",
                                 AccessKeySecret = "u17oH**********aoApV**********",
                                 AccountOpenTemplateId = "SMS_135330112"
                             };

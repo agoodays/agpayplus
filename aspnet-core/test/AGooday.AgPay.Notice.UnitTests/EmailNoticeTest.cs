@@ -20,12 +20,12 @@ namespace AGooday.AgPay.Notice.UnitTests
                         {
                             option.Host = "smtp.qq.com";
                             option.Port = 465;
-                            option.FromName = "jones.xiang@foxmail.com";
-                            option.FromAddress = "jones.xiang@foxmail.com";
-                            option.Password = "ygslrbotmxsdecdh";
+                            option.FromName = "xxx@foxmail.com";
+                            option.FromAddress = "xxx@foxmail.com";
+                            option.Password = "******";
                             option.ToAddress = new List<string>()
                             {
-                                "1697504283@qq.com"
+                                "123@qq.com"
                             };
                         });
                     });
@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Notice.UnitTests
             var request = new EmailSendRequest()
             {
                 ToAddress = new List<string>() {
-                    "1697504283@qq.com"
+                    "123@qq.com"
                 },
                 Subject = subject,
                 Body = body,
@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Notice.UnitTests
             response = await _emailProvider.SendAsync(request);
             Assert.True(response.IsSuccess);
 
-            _emailProvider.SetToAddress(new List<string>() { "1697504283@qq.com" });
+            _emailProvider.SetToAddress(new List<string>() { "123@qq.com" });
             response = await _emailProvider.SendAsync(subject, body);
 
             Assert.True(response.IsSuccess);
