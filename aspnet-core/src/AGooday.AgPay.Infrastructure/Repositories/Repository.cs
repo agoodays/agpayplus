@@ -111,10 +111,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             var propertyNames = RepositoryExtension<TEntity>.GetPropertyNames(propertyExpression);
 
             // 根据主键查找实体
-            var entry = Db.Entry(entity);
-            var keyValues = Db.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties
-                .Select(x => entry.Property(x.Name).CurrentValue)
-                .ToArray();
+            //var entry = Db.Entry(entity);
+            //var keyValues = Db.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties
+            //    .Select(x => entry.Property(x.Name).CurrentValue)
+            //    .ToArray();
+            var keyValues = RepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
             var existingEntity = DbSet.Find(keyValues);
 
             // 更新实体的指定属性
@@ -176,6 +177,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             else
                 Add(entity);
         }
+        /// <summary>
+        /// 保存或更新
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="propertiesToUpdate"></param>
         public void SaveOrUpdate(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate)
         {
             var primaryKeyValue = RepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
@@ -188,10 +194,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                 var existingEntity = DbSet.Find(primaryKeyValue);
                 if (existingEntity != null)
                 {
+                    Db.Entry(existingEntity).CurrentValues.SetValues(entity);
                     if (propertiesToUpdate == null || propertiesToUpdate.Length == 0)
                     {
                         Db.Entry(existingEntity).State = EntityState.Modified;
-                        Db.Entry(existingEntity).CurrentValues.SetValues(entity);
                     }
                     else
                     {
@@ -204,7 +210,6 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                 }
             }
         }
-
         /// <summary>
         /// 保存
         /// </summary>
@@ -405,6 +410,39 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                 Update(obj);
             else
                 Add(obj);
+        }
+        /// <summary>
+        /// 保存或更新
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="propertiesToUpdate"></param>
+        public void SaveOrUpdate<TPrimaryKey>(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate)
+        {
+            var primaryKeyValue = RepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+            if (primaryKeyValue.Equals(default(TPrimaryKey)))
+            {
+                DbSet.Add(entity);
+            }
+            else
+            {
+                var existingEntity = DbSet.Find(primaryKeyValue);
+                if (existingEntity != null)
+                {
+                    Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                    if (propertiesToUpdate == null || propertiesToUpdate.Length == 0)
+                    {
+                        Db.Entry(existingEntity).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        foreach (var property in propertiesToUpdate)
+                        {
+                            var propertyName = RepositoryExtension<TEntity>.GetPropertyName(property);
+                            Db.Entry(existingEntity).Property(propertyName).IsModified = true;
+                        }
+                    }
+                }
+            }
         }
         /// <summary>
         /// 保存

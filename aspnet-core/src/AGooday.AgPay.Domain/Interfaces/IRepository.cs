@@ -86,6 +86,12 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="id"></param>
         void SaveOrUpdate(TEntity entity, TPrimaryKey? id);
         /// <summary>
+        /// 保存或更新
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="propertiesToUpdate"></param>
+        void SaveOrUpdate(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate);
+        /// <summary>
         /// 保存
         /// </summary>
         /// <returns></returns>
@@ -177,6 +183,13 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="entity"></param>
         /// <param name="id"></param>
         void SaveOrUpdate<TPrimaryKey>(TEntity entity, TPrimaryKey id);
+        /// <summary>
+        /// 保存或更新
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="propertiesToUpdate"></param>
+        void SaveOrUpdate<TPrimaryKey>(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate);
         /// <summary>
         /// 保存
         /// </summary>

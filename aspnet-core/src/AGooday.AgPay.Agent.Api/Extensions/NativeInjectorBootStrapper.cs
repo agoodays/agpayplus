@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             //services.AddDbContext<AgPayDbContext>(ServiceLifetime.Transient);
             services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IAgPayRepository, AgPayRepository>();
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();

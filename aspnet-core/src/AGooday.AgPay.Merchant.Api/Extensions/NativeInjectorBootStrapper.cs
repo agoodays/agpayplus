@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Merchant.Api.Extensions
             // 注入 基础设施层 - 数据层
             services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IAgPayRepository, AgPayRepository>();
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();

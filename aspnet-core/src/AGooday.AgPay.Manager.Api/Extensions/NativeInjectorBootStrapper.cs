@@ -113,7 +113,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             //services.AddDbContext<AgPayDbContext>(ServiceLifetime.Transient);
             services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IAgPayRepository, AgPayRepository>();
             services.AddScoped<IAccountBillRepository, AccountBillRepository>();
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
