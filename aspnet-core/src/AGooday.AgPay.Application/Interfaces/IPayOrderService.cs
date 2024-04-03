@@ -4,13 +4,8 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
-    public interface IPayOrderService : IDisposable
+    public interface IPayOrderService : IAgPayService<PayOrderDto>
     {
-        bool Add(PayOrderDto dto);
-        bool Remove(string recordId);
-        bool Update(PayOrderDto dto);
-        PayOrderDto GetById(string recordId);
-        IEnumerable<PayOrderDto> GetAll();
         PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo);
         PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto);
         JObject Statistics(PayOrderQueryDto dto);

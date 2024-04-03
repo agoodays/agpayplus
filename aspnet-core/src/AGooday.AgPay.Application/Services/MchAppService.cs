@@ -11,77 +11,35 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 商户应用表 服务实现类
     /// </summary>
-    public class MchAppService : IMchAppService
+    public class MchAppService : AgPayService<MchAppDto, MchApp>, IMchAppService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchAppRepository _mchAppRepository;
         private readonly IMchInfoRepository _mchInfoRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
-        public MchAppService(IMapper mapper, IMediatorHandler bus, 
+        public MchAppService(IMapper mapper, IMediatorHandler bus,
             IMchAppRepository mchAppRepository, IMchInfoRepository mchInfoRepository)
+            : base(mapper, bus, mchAppRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _mchAppRepository = mchAppRepository;
             _mchInfoRepository = mchInfoRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(MchAppDto dto)
-        {
-            var m = _mapper.Map<MchApp>(dto);
-            _mchAppRepository.Add(m);
-            return _mchAppRepository.SaveChanges(out int _);
-        }
-
-        public bool Remove(string recordId)
-        {
-            _mchAppRepository.Remove(recordId);
-            return _mchAppRepository.SaveChanges(out _);
-        }
-
-        public bool Update(MchAppDto dto)
-        {
-            var renew = _mapper.Map<MchApp>(dto);
-            var old = _mchAppRepository.GetAsNoTrackingById(dto.AppId);
-            renew.UpdatedAt = DateTime.Now;
-            renew.AppSecret = string.IsNullOrWhiteSpace(renew.AppSecret) ? old.AppSecret : renew.AppSecret;
-            _mchAppRepository.Update(renew);
-            return _mchAppRepository.SaveChanges(out int _);
-        }
-
-        public MchAppDto GetById(string recordId)
-        {
-            var entity = _mchAppRepository.GetById(recordId);
-            var dto = _mapper.Map<MchAppDto>(entity);
-            return dto;
-        }
         public MchAppDto GetById(string recordId, string mchNo)
         {
             var entity = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId)).FirstOrDefault();
             return _mapper.Map<MchAppDto>(entity);
         }
+
         public IEnumerable<MchAppDto> GetByMchNo(string mchNo)
         {
             var mchApps = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(mchNo));
             return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
         }
+
         public IEnumerable<MchAppDto> GetByMchNos(IEnumerable<string> mchNos)
         {
             var mchApps = _mchAppRepository.GetAll().Where(w => mchNos.Contains(w.MchNo));
-            return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
-        }
-        public IEnumerable<MchAppDto> GetAll()
-        {
-            var mchApps = _mchAppRepository.GetAll();
             return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
         }
 

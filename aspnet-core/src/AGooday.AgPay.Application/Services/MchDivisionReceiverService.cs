@@ -12,55 +12,25 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 商户分账接收者账号绑定关系表 服务实现类
     /// </summary>
-    public class MchDivisionReceiverService : IMchDivisionReceiverService
+    public class MchDivisionReceiverService : AgPayService<MchDivisionReceiverDto, MchDivisionReceiver, long>, IMchDivisionReceiverService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchDivisionReceiverRepository _mchDivisionReceiverRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
-        public MchDivisionReceiverService(IMapper mapper, IMediatorHandler bus, 
+        public MchDivisionReceiverService(IMapper mapper, IMediatorHandler bus,
             IMchDivisionReceiverRepository mchDivisionReceiverRepository)
+            : base(mapper, bus, mchDivisionReceiverRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _mchDivisionReceiverRepository = mchDivisionReceiverRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(MchDivisionReceiverDto dto)
+        public override bool Add(MchDivisionReceiverDto dto)
         {
             var m = _mapper.Map<MchDivisionReceiver>(dto);
             _mchDivisionReceiverRepository.Add(m);
             var result = _mchDivisionReceiverRepository.SaveChanges(out int _);
             dto.ReceiverId = m.ReceiverId;
             return result;
-        }
-
-        public bool Remove(long recordId)
-        {
-            _mchDivisionReceiverRepository.Remove(recordId);
-            return _mchDivisionReceiverRepository.SaveChanges(out int _);
-        }
-
-        public bool Update(MchDivisionReceiverDto dto)
-        {
-            var m = _mapper.Map<MchDivisionReceiver>(dto);
-            _mchDivisionReceiverRepository.Update(m);
-            return _mchDivisionReceiverRepository.SaveChanges(out int _);
-        }
-
-        public MchDivisionReceiverDto GetById(long recordId)
-        {
-            var entity = _mchDivisionReceiverRepository.GetById(recordId);
-            var dto = _mapper.Map<MchDivisionReceiverDto>(entity);
-            return dto;
         }
 
         public MchDivisionReceiverDto GetById(long recordId, string mchNo)
@@ -83,12 +53,6 @@ namespace AGooday.AgPay.Application.Services
             var count = _mchDivisionReceiverRepository.GetAll()
                     .Where(w => receiverGroupIds.Contains(w.ReceiverGroupId) && w.MchNo.Equals(mchNo)).Count();
             return count;
-        }
-
-        public IEnumerable<MchDivisionReceiverDto> GetAll()
-        {
-            var mchDivisionReceivers = _mchDivisionReceiverRepository.GetAll();
-            return _mapper.Map<IEnumerable<MchDivisionReceiverDto>>(mchDivisionReceivers);
         }
 
         public bool IsExistUseReceiverGroup(long receiverGroupId)

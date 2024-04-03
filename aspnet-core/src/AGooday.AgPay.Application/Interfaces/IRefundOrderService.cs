@@ -3,12 +3,8 @@ using AGooday.AgPay.Common.Models;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
-    public interface IRefundOrderService : IDisposable
+    public interface IRefundOrderService : IAgPayService<RefundOrderDto>
     {
-        void Add(RefundOrderDto dto);
-        void Remove(string recordId);
-        void Update(RefundOrderDto dto);
-        RefundOrderDto GetById(string recordId);
         /// <summary>
         /// 查询商户订单
         /// </summary>
@@ -17,7 +13,6 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="refundOrderId"></param>
         /// <returns></returns>
         RefundOrderDto QueryMchOrder(string mchNo, string mchRefundNo, string refundOrderId);
-        IEnumerable<RefundOrderDto> GetAll();
         PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto);
         bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo);
         bool IsExistRefundingOrder(string payOrderId);

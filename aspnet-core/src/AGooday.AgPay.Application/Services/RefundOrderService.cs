@@ -14,56 +14,20 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 退款订单表 服务实现类
     /// </summary>
-    public class RefundOrderService : IRefundOrderService
+    public class RefundOrderService : AgPayService<RefundOrderDto, RefundOrder>, IRefundOrderService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IRefundOrderRepository _refundOrderRepository;
-        private readonly IPayOrderRepository _payOrderRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
-        public RefundOrderService(IMapper mapper, IMediatorHandler bus, 
-            IRefundOrderRepository refundOrderRepository, 
+        private readonly IPayOrderRepository _payOrderRepository;
+
+        public RefundOrderService(IMapper mapper, IMediatorHandler bus,
+            IRefundOrderRepository refundOrderRepository,
             IPayOrderRepository payOrderRepository)
+            : base(mapper, bus, refundOrderRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _refundOrderRepository = refundOrderRepository;
             _payOrderRepository = payOrderRepository;
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public void Add(RefundOrderDto dto)
-        {
-            var m = _mapper.Map<RefundOrder>(dto);
-            _refundOrderRepository.Add(m);
-            _refundOrderRepository.SaveChanges();
-        }
-
-        public void Remove(string recordId)
-        {
-            _refundOrderRepository.Remove(recordId);
-            _refundOrderRepository.SaveChanges();
-        }
-
-        public void Update(RefundOrderDto dto)
-        {
-            var m = _mapper.Map<RefundOrder>(dto);
-            _refundOrderRepository.Update(m);
-            _refundOrderRepository.SaveChanges();
-        }
-
-        public RefundOrderDto GetById(string recordId)
-        {
-            var entity = _refundOrderRepository.GetById(recordId);
-            var dto = _mapper.Map<RefundOrderDto>(entity);
-            return dto;
         }
 
         /// <summary>
@@ -89,12 +53,6 @@ namespace AGooday.AgPay.Application.Services
             {
                 return null;
             }
-        }
-
-        public IEnumerable<RefundOrderDto> GetAll()
-        {
-            var refundOrders = _refundOrderRepository.GetAll();
-            return _mapper.Map<IEnumerable<RefundOrderDto>>(refundOrders);
         }
 
         public PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto)

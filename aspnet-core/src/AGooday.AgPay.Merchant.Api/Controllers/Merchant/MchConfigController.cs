@@ -74,9 +74,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_CONFIG_EDIT)]
         public ApiRes SetMchLevel(ModifyMchLevel model)
         {
-            MchInfoUpdateDto dto = new MchInfoUpdateDto();
+            MchInfoDto dto = new MchInfoDto();
             dto.MchNo = GetCurrentMchNo();
             dto.MchLevel = model.MchLevel;
+            dto.UpdatedAt = DateTime.Now;
             _mchInfoService.UpdateById(dto);
             return ApiRes.Ok();
         }
@@ -105,10 +106,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            MchInfoUpdateDto dto = new MchInfoUpdateDto();
-            dto.MchNo = mchinfo.MchNo;
-            dto.Sipw = opSipw;
-            _mchInfoService.UpdateById(dto);
+            mchinfo.Sipw = opSipw;
+            _mchInfoService.UpdateById(mchinfo);
             return ApiRes.Ok();
         }
     }

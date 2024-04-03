@@ -13,29 +13,19 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 公告信息表 服务实现类
     /// </summary>
-    public class SysArticleService : ISysArticleService
+    public class SysArticleService : AgPayService<SysArticleDto, SysArticle, long>, ISysArticleService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ISysArticleRepository _sysArticleRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public SysArticleService(IMapper mapper, IMediatorHandler bus,
             ISysArticleRepository sysArticleRepository)
+            : base(mapper, bus, sysArticleRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _sysArticleRepository = sysArticleRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(SysArticleDto dto)
+        public override bool Add(SysArticleDto dto)
         {
             var m = _mapper.Map<SysArticle>(dto);
             _sysArticleRepository.Add(m);
@@ -44,32 +34,12 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public bool Remove(long recordId)
+        public override bool Update(SysArticleDto dto)
         {
-            _sysArticleRepository.Remove(recordId);
-            return _sysArticleRepository.SaveChanges(out _);
-        }
-
-        public bool Update(SysArticleDto dto)
-        {
-            var renew = _mapper.Map<SysArticle>(dto);
-            //var old = _sysArticleRepository.GetById(dto.StoreId);
-            renew.UpdatedAt = DateTime.Now;
-            _sysArticleRepository.Update(renew);
+            var entity = _mapper.Map<SysArticle>(dto);
+            entity.UpdatedAt = DateTime.Now;
+            _sysArticleRepository.Update(entity);
             return _sysArticleRepository.SaveChanges(out int _);
-        }
-
-        public SysArticleDto GetById(long recordId)
-        {
-            var entity = _sysArticleRepository.GetById(recordId);
-            var dto = _mapper.Map<SysArticleDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<SysArticleDto> GetAll()
-        {
-            var sysArticles = _sysArticleRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysArticleDto>>(sysArticles);
         }
 
         public PaginatedList<SysArticleDto> GetPaginatedData(SysArticleQueryDto dto, string agentNo = null)

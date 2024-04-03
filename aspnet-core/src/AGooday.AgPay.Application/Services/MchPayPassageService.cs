@@ -12,82 +12,47 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 商户支付通道表 服务实现类
     /// </summary>
-    public class MchPayPassageService : IMchPayPassageService
+    public class MchPayPassageService : AgPayService<MchPayPassageDto, MchPayPassage, long>, IMchPayPassageService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
-        private readonly IPayRateConfigService _payRateConfigService;
-
         private readonly IMchPayPassageRepository _mchPayPassageRepository;
+
+        private readonly IPayRateConfigService _payRateConfigService;
         private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
         private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
         private readonly IPayRateConfigRepository _payRateConfigRepository;
         private readonly IPayRateLevelConfigRepository _payRateLevelConfigRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public MchPayPassageService(IMapper mapper, IMediatorHandler bus,
-            IPayRateConfigService payRateConfigService,
             IMchPayPassageRepository mchPayPassageRepository,
+            IPayRateConfigService payRateConfigService,
             IPayInterfaceDefineRepository payInterfaceDefineRepository,
             IPayInterfaceConfigRepository payInterfaceConfigRepository,
             IPayRateConfigRepository payRateConfigRepository,
             IPayRateLevelConfigRepository payRateLevelConfigRepository)
+            : base(mapper, bus, mchPayPassageRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
-            _payRateConfigService = payRateConfigService;
             _mchPayPassageRepository = mchPayPassageRepository;
+            _payRateConfigService = payRateConfigService;
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
             _payInterfaceConfigRepository = payInterfaceConfigRepository;
             _payRateConfigRepository = payRateConfigRepository;
             _payRateLevelConfigRepository = payRateLevelConfigRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public void Add(MchPayPassageDto dto)
+        public override bool Add(MchPayPassageDto dto)
         {
             var m = _mapper.Map<MchPayPassage>(dto);
             _mchPayPassageRepository.Add(m);
-            _mchPayPassageRepository.SaveChanges();
+            var result = _mchPayPassageRepository.SaveChanges(out int _);
             dto.Id = m.Id;
-        }
-
-        public void Remove(long recordId)
-        {
-            _mchPayPassageRepository.Remove(recordId);
-            _mchPayPassageRepository.SaveChanges();
-        }
-
-        public void Update(MchPayPassageDto dto)
-        {
-            var m = _mapper.Map<MchPayPassage>(dto);
-            _mchPayPassageRepository.Update(m);
-            _mchPayPassageRepository.SaveChanges();
-        }
-
-        public MchPayPassageDto GetById(long recordId)
-        {
-            var entity = _mchPayPassageRepository.GetById(recordId);
-            var dto = _mapper.Map<MchPayPassageDto>(entity);
-            return dto;
+            return result;
         }
 
         public IEnumerable<MchPayPassageDto> GetMchPayPassageByAppId(string mchNo, string appId)
         {
             var mchPayPassages = _mchPayPassageRepository.GetAll()
                 .Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.State.Equals(CS.PUB_USABLE));
-            return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
-        }
-
-        public IEnumerable<MchPayPassageDto> GetAll()
-        {
-            var mchPayPassages = _mchPayPassageRepository.GetAll();
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 

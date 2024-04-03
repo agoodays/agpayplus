@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Core.Bus;
+using AGooday.AgPay.Domain.Core.Models;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
@@ -13,29 +14,19 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 代理商信息表 服务实现类
     /// </summary>
-    public class AgentInfoService : IAgentInfoService
+    public class AgentInfoService : AgPayService<AgentInfoDto, AgentInfo>, IAgentInfoService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IAgentInfoRepository _agentInfoRepository;
         private readonly ISysUserRepository _sysUserRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public AgentInfoService(IMapper mapper, IMediatorHandler bus,
             IAgentInfoRepository agentInfoRepository,
             ISysUserRepository sysUserRepository)
+            : base(mapper, bus, agentInfoRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _agentInfoRepository = agentInfoRepository;
             _sysUserRepository = sysUserRepository;
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
         }
 
         public bool IsExistAgentNo(string mchNo)
@@ -46,13 +37,6 @@ namespace AGooday.AgPay.Application.Services
         public bool IsExistAgent(string isvNo)
         {
             return _agentInfoRepository.IsExistAgent(isvNo);
-        }
-
-        public bool Add(AgentInfoDto dto)
-        {
-            var m = _mapper.Map<AgentInfo>(dto);
-            _agentInfoRepository.Add(m);
-            return _agentInfoRepository.SaveChanges(out int _);
         }
 
         public async Task CreateAsync(AgentInfoCreateDto dto)
@@ -69,40 +53,20 @@ namespace AGooday.AgPay.Application.Services
             await Bus.SendCommand(command);
         }
 
-        public bool Update(AgentInfoDto dto)
-        {
-            var m = _mapper.Map<AgentInfo>(dto);
-            _agentInfoRepository.Update(m);
-            return _agentInfoRepository.SaveChanges(out int _);
-        }
-
-        public bool UpdateById(AgentInfoUpdateDto dto)
-        {
-            var entity = _agentInfoRepository.GetById(dto.AgentNo);
-            if (!string.IsNullOrWhiteSpace(dto.Sipw))
-                entity.Sipw = dto.Sipw;
-            entity.UpdatedAt = DateTime.Now;
-            _agentInfoRepository.Update(entity);
-            return _agentInfoRepository.SaveChanges(out int _);
-        }
-
         public async Task ModifyAsync(AgentInfoModifyDto dto)
         {
             var command = _mapper.Map<ModifyAgentInfoCommand>(dto);
             await Bus.SendCommand(command);
         }
 
-        public AgentInfoDto GetById(string recordId)
+        public bool UpdateById(AgentInfoDto dto)
         {
-            var entity = _agentInfoRepository.GetById(recordId);
-            var dto = _mapper.Map<AgentInfoDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<AgentInfoDto> GetAll()
-        {
-            var agentInfos = _agentInfoRepository.GetAll();
-            return _mapper.Map<IEnumerable<AgentInfoDto>>(agentInfos);
+            var entity = _mapper.Map<AgentInfo>(dto);
+            if (!string.IsNullOrWhiteSpace(dto.Sipw))
+                entity.Sipw = dto.Sipw;
+            entity.UpdatedAt = DateTime.Now;
+            _agentInfoRepository.Update(entity, e => new { e.Sipw, e.UpdatedAt });
+            return _agentInfoRepository.SaveChanges(out int _);
         }
 
         public IEnumerable<AgentInfoDto> GetParents(string agentNo)

@@ -5,7 +5,7 @@ using static AGooday.AgPay.Application.DataTransfer.PayRateConfigSaveDto;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
-    public interface IPayRateConfigService
+    public interface IPayRateConfigService : IAgPayService<PayRateConfigDto, long>
     {
         PaginatedList<PayWayDto> GetPayWaysByInfoId(PayWayUsableQueryDto dto);
         JObject GetByInfoIdAndIfCodeJson(string configMode, string infoId, string ifCode);

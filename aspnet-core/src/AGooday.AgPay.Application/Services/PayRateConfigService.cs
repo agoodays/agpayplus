@@ -6,6 +6,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -16,7 +17,7 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 支付费率配置记录表 服务实现类
     /// </summary>
-    public class PayRateConfigService : IPayRateConfigService
+    public class PayRateConfigService : AgPayService<PayRateConfigDto, PayRateConfig, long>, IPayRateConfigService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IIsvInfoRepository _isvInfoRepository;
@@ -29,10 +30,6 @@ namespace AGooday.AgPay.Application.Services
         private readonly IPayRateLevelConfigRepository _payRateLevelConfigRepository;
         // 注入工作单元
         private readonly IUnitOfWork _uow;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public PayRateConfigService(IUnitOfWork uow, IMapper mapper, IMediatorHandler bus,
             IPayRateConfigRepository payRateConfigRepository,
@@ -43,10 +40,9 @@ namespace AGooday.AgPay.Application.Services
             IMchAppRepository mchAppRepository,
             IPayWayRepository payWayRepository,
             IPayInterfaceDefineRepository payInterfaceDefineRepository)
+            : base(mapper, bus, payRateConfigRepository)
         {
             _uow = uow;
-            _mapper = mapper;
-            Bus = bus;
             _payRateConfigRepository = payRateConfigRepository;
             _payRateLevelConfigRepository = payRateLevelConfigRepository;
             _isvInfoRepository = isvInfoRepository;

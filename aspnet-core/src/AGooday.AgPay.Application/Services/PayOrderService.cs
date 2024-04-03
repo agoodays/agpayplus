@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 支付订单表 服务实现类
     /// </summary>
-    public class PayOrderService : IPayOrderService
+    public class PayOrderService : AgPayService<PayOrderDto, PayOrder>, IPayOrderService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IPayOrderRepository _payOrderRepository;
@@ -25,10 +25,6 @@ namespace AGooday.AgPay.Application.Services
         private readonly IIsvInfoRepository _isvInfoRepository;
         private readonly IPayWayRepository _payWayRepository;
         private readonly IPayOrderDivisionRecordRepository _payOrderDivisionRecordRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public PayOrderService(IMapper mapper, IMediatorHandler bus,
             IPayOrderRepository payOrderRepository,
@@ -38,9 +34,8 @@ namespace AGooday.AgPay.Application.Services
             IIsvInfoRepository isvInfoRepository,
             IPayWayRepository payWayRepository,
             IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository)
+            : base(mapper, bus, payOrderRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _payOrderRepository = payOrderRepository;
             _refundOrderRepository = refundOrderRepository;
             _mchInfoRepository = mchInfoRepository;
@@ -48,44 +43,6 @@ namespace AGooday.AgPay.Application.Services
             _isvInfoRepository = isvInfoRepository;
             _payWayRepository = payWayRepository;
             _payOrderDivisionRecordRepository = payOrderDivisionRecordRepository;
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(PayOrderDto dto)
-        {
-            var m = _mapper.Map<PayOrder>(dto);
-            _payOrderRepository.Add(m);
-            return _payOrderRepository.SaveChanges(out int _);
-        }
-
-        public bool Remove(string recordId)
-        {
-            _payOrderRepository.Remove(recordId);
-            return _payOrderRepository.SaveChanges(out int _);
-        }
-
-        public bool Update(PayOrderDto dto)
-        {
-            var m = _mapper.Map<PayOrder>(dto);
-            _payOrderRepository.Update(m);
-            return _payOrderRepository.SaveChanges(out int _);
-        }
-
-        public PayOrderDto GetById(string recordId)
-        {
-            var entity = _payOrderRepository.GetById(recordId);
-            var dto = _mapper.Map<PayOrderDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<PayOrderDto> GetAll()
-        {
-            var payOrders = _payOrderRepository.GetAll();
-            return _mapper.Map<IEnumerable<PayOrderDto>>(payOrders);
         }
 
         public PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo)

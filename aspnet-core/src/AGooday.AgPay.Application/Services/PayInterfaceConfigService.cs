@@ -12,18 +12,15 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 支付接口配置参数表 服务实现类
     /// </summary>
-    public class PayInterfaceConfigService : IPayInterfaceConfigService
+    public class PayInterfaceConfigService : AgPayService<PayInterfaceConfigDto, PayInterfaceConfig, long>, IPayInterfaceConfigService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
+
         private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
         private readonly IMchAppRepository _mchAppRepository;
         private readonly IMchInfoRepository _mchInfoRepository;
         private readonly IAgentInfoRepository _agentInfoRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public PayInterfaceConfigService(IMapper mapper, IMediatorHandler bus,
             IPayInterfaceConfigRepository payInterfaceConfigRepository,
@@ -31,40 +28,23 @@ namespace AGooday.AgPay.Application.Services
             IMchAppRepository mchAppRepository,
             IMchInfoRepository mchInfoRepository,
             IAgentInfoRepository agentInfoRepository)
+            : base(mapper, bus, payInterfaceConfigRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _payInterfaceConfigRepository = payInterfaceConfigRepository;
+
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
             _mchAppRepository = mchAppRepository;
             _mchInfoRepository = mchInfoRepository;
             _agentInfoRepository = agentInfoRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public void Add(PayInterfaceConfigDto dto)
+        public override bool Add(PayInterfaceConfigDto dto)
         {
             var m = _mapper.Map<PayInterfaceConfig>(dto);
             _payInterfaceConfigRepository.Add(m);
-            _payInterfaceConfigRepository.SaveChanges();
+            var result = _payInterfaceConfigRepository.SaveChanges(out int _);
             dto.Id = m.Id;
-        }
-
-        public void Remove(long recordId)
-        {
-            _payInterfaceConfigRepository.Remove(recordId);
-            _payInterfaceConfigRepository.SaveChanges();
-        }
-
-        public void Update(PayInterfaceConfigDto dto)
-        {
-            var m = _mapper.Map<PayInterfaceConfig>(dto);
-            _payInterfaceConfigRepository.Update(m);
-            _payInterfaceConfigRepository.SaveChanges();
+            return result;
         }
 
         public bool SaveOrUpdate(PayInterfaceConfigDto dto)
@@ -72,19 +52,6 @@ namespace AGooday.AgPay.Application.Services
             var m = _mapper.Map<PayInterfaceConfig>(dto);
             _payInterfaceConfigRepository.SaveOrUpdate(m, dto.Id);
             return _payInterfaceConfigRepository.SaveChanges() > 0;
-        }
-
-        public PayInterfaceConfigDto GetById(long recordId)
-        {
-            var entity = _payInterfaceConfigRepository.GetById(recordId);
-            var dto = _mapper.Map<PayInterfaceConfigDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<PayInterfaceConfigDto> GetAll()
-        {
-            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAll();
-            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfigs);
         }
 
         public bool IsExistUseIfCode(string ifCode)
@@ -293,7 +260,7 @@ namespace AGooday.AgPay.Application.Services
             var result = defineList.ToList().Select(define =>
             {
                 var entity = _mapper.Map<PayInterfaceDefineDto>(define);
-                entity.AddExt("mchType",  mchInfo.Type);// 所属商户类型
+                entity.AddExt("mchType", mchInfo.Type);// 所属商户类型
                 entity.AddExt("ifConfigState", configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null);
                 entity.AddExt("subMchIsvConfig", mchInfo.Type == CS.MCH_TYPE_ISVSUB && !isvPayConfigMap.TryGetValue(define.IfCode, out _) ? CS.NO : null);
                 return entity;

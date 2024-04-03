@@ -12,29 +12,19 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 服务商信息表 服务实现类
     /// </summary>
-    public class IsvInfoService : IIsvInfoService
+    public class IsvInfoService : AgPayService<IsvInfoDto, IsvInfo>, IIsvInfoService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IIsvInfoRepository _isvInfoRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
-        public IsvInfoService(IMapper mapper, IMediatorHandler bus, 
+        public IsvInfoService(IMapper mapper, IMediatorHandler bus,
             IIsvInfoRepository isvInfoRepository)
+            : base(mapper, bus, isvInfoRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _isvInfoRepository = isvInfoRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(IsvInfoDto dto)
+        public override bool Add(IsvInfoDto dto)
         {
             do
             {
@@ -45,32 +35,17 @@ namespace AGooday.AgPay.Application.Services
             return _isvInfoRepository.SaveChanges(out int _);
         }
 
-        public bool Remove(string recordId)
+        public override bool Update(IsvInfoDto dto)
         {
-            _isvInfoRepository.Remove(recordId);
+            var entity = _mapper.Map<IsvInfo>(dto);
+            entity.UpdatedAt = DateTime.Now;
+            _isvInfoRepository.Update(entity);
             return _isvInfoRepository.SaveChanges(out int _);
         }
 
-        public bool Update(IsvInfoDto dto)
+        public bool IsExistIsvNo(string isvNo)
         {
-            var renew = _mapper.Map<IsvInfo>(dto);
-            //var old = _isvInfoRepository.GetById(dto.IsvNo);
-            renew.UpdatedAt = DateTime.Now;
-            _isvInfoRepository.Update(renew);
-            return _isvInfoRepository.SaveChanges(out int _);
-        }
-
-        public IsvInfoDto GetById(string recordId)
-        {
-            var entity = _isvInfoRepository.GetById(recordId);
-            var dto = _mapper.Map<IsvInfoDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<IsvInfoDto> GetAll()
-        {
-            var isvInfos = _isvInfoRepository.GetAll();
-            return _mapper.Map<IEnumerable<IsvInfoDto>>(isvInfos);
+            return _isvInfoRepository.IsExistIsvNo(isvNo);
         }
 
         public PaginatedList<IsvInfoDto> GetPaginatedData(IsvInfoQueryDto dto)
@@ -82,10 +57,6 @@ namespace AGooday.AgPay.Application.Services
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
-        }
-        public bool IsExistIsvNo(string isvNo)
-        {
-            return _isvInfoRepository.IsExistIsvNo(isvNo);
         }
     }
 }

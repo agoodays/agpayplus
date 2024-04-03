@@ -10,55 +10,33 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 支付接口定义表 服务实现类
     /// </summary>
-    public class PayInterfaceDefineService : IPayInterfaceDefineService
+    public class PayInterfaceDefineService : AgPayService<PayInterfaceDefineDto, PayInterfaceDefine>, IPayInterfaceDefineService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IPayInterfaceDefineRepository _payInterfaceDefineRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
-        public PayInterfaceDefineService(IMapper mapper, IMediatorHandler bus, 
+        public PayInterfaceDefineService(IMapper mapper, IMediatorHandler bus,
             IPayInterfaceDefineRepository payInterfaceDefineRepository)
+            :base(mapper, bus, payInterfaceDefineRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
         }
 
-        public void Dispose()
+        public override bool Add(PayInterfaceDefineDto dto)
         {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(PayInterfaceDefineDto dto)
-        {
-            var m = _mapper.Map<PayInterfaceDefine>(dto);
-            _payInterfaceDefineRepository.Add(m);
+            var entity = _mapper.Map<PayInterfaceDefine>(dto);
+            dto.CreatedAt = DateTime.Now;
+            dto.UpdatedAt = DateTime.Now;
+            _payInterfaceDefineRepository.Add(entity);
             return _payInterfaceDefineRepository.SaveChanges(out int _);
         }
 
-        public bool Remove(string recordId)
+        public override bool Update(PayInterfaceDefineDto dto)
         {
-            _payInterfaceDefineRepository.Remove(recordId);
+            var entity = _mapper.Map<PayInterfaceDefine>(dto);
+            entity.UpdatedAt = DateTime.Now;
+            _payInterfaceDefineRepository.Update(entity);
             return _payInterfaceDefineRepository.SaveChanges(out int _);
-        }
-
-        public bool Update(PayInterfaceDefineDto dto)
-        {
-            var renew = _mapper.Map<PayInterfaceDefine>(dto);
-            //var old = _payInterfaceDefineRepository.GetById(dto.IfCode);
-            renew.UpdatedAt = DateTime.Now;
-            _payInterfaceDefineRepository.Update(renew);
-            return _payInterfaceDefineRepository.SaveChanges(out int _);
-        }
-
-        public PayInterfaceDefineDto GetById(string recordId)
-        {
-            var entity = _payInterfaceDefineRepository.GetById(recordId);
-            var dto = _mapper.Map<PayInterfaceDefineDto>(entity);
-            return dto;
         }
 
         public IEnumerable<PayInterfaceDefineDto> GetByIfCodes(IEnumerable<string> ifCodes)
@@ -67,12 +45,6 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => ifCodes.Contains(w.IfCode)); ;
             var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entitys);
             return result;
-        }
-
-        public IEnumerable<PayInterfaceDefineDto> GetAll()
-        {
-            var payInterfaceDefines = _payInterfaceDefineRepository.GetAll();
-            return _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(payInterfaceDefines);
         }
     }
 }

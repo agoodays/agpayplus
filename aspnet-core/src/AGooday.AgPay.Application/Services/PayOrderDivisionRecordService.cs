@@ -14,58 +14,29 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 分账记录表 服务实现类
     /// </summary>
-    public class PayOrderDivisionRecordService : IPayOrderDivisionRecordService
+    public class PayOrderDivisionRecordService : AgPayService<PayOrderDivisionRecordDto, PayOrderDivisionRecord, long>,IPayOrderDivisionRecordService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
-        private readonly IPayOrderRepository _payOrderRepository;
         private readonly IPayOrderDivisionRecordRepository _payOrderDivisionRecordRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
-        public PayOrderDivisionRecordService(IMapper mapper, IMediatorHandler bus, 
-            IPayOrderRepository payOrderRepository, 
-            IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository)
+        private readonly IPayOrderRepository _payOrderRepository;
+
+        public PayOrderDivisionRecordService(IMapper mapper, IMediatorHandler bus,
+            IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository, 
+            IPayOrderRepository payOrderRepository)
+            :base(mapper, bus, payOrderDivisionRecordRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
-            _payOrderRepository = payOrderRepository;
             _payOrderDivisionRecordRepository = payOrderDivisionRecordRepository;
+            _payOrderRepository = payOrderRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(PayOrderDivisionRecordDto dto)
+        public override bool Add(PayOrderDivisionRecordDto dto)
         {
             var m = _mapper.Map<PayOrderDivisionRecord>(dto);
             _payOrderDivisionRecordRepository.Add(m);
             var result = _payOrderDivisionRecordRepository.SaveChanges(out int _);
             dto.RecordId = m.RecordId;
             return result;
-        }
-
-        public bool Remove(long recordId)
-        {
-            _payOrderDivisionRecordRepository.Remove(recordId);
-            return _payOrderDivisionRecordRepository.SaveChanges(out int _);
-        }
-
-        public bool Update(PayOrderDivisionRecordDto dto)
-        {
-            var m = _mapper.Map<PayOrderDivisionRecord>(dto);
-            _payOrderDivisionRecordRepository.Update(m);
-            return _payOrderDivisionRecordRepository.SaveChanges(out int _);
-        }
-
-        public PayOrderDivisionRecordDto GetById(long recordId)
-        {
-            var entity = _payOrderDivisionRecordRepository.GetById(recordId);
-            var dto = _mapper.Map<PayOrderDivisionRecordDto>(entity);
-            return dto;
         }
 
         public PayOrderDivisionRecordDto GetById(long recordId, string mchNo)
@@ -88,12 +59,6 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderBy(o => o.RecordId);
             return _mapper.Map<List<PayOrderDivisionRecordDto>>(payOrderDivisionRecords);
-        }
-
-        public IEnumerable<PayOrderDivisionRecordDto> GetAll()
-        {
-            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAll();
-            return _mapper.Map<IEnumerable<PayOrderDivisionRecordDto>>(payOrderDivisionRecords);
         }
 
         public PaginatedList<PayOrderDivisionRecordDto> GetPaginatedData(PayOrderDivisionRecordQueryDto dto)

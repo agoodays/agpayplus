@@ -2,8 +2,10 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Bus;
+using AGooday.AgPay.Domain.Core.Models;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -11,53 +13,24 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 系统权限表 服务实现类
     /// </summary>
-    public class SysEntitlementService : ISysEntitlementService
+    public class SysEntitlementService : AgPayService<SysEntitlementDto, SysEntitlement>, ISysEntitlementService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ISysEntitlementRepository _sysEntitlementRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
-        public SysEntitlementService(ISysEntitlementRepository sysEntitlementRepository, IMapper mapper, IMediatorHandler bus)
+        public SysEntitlementService(IMapper mapper, IMediatorHandler bus,
+            ISysEntitlementRepository sysEntitlementRepository)
+            : base(mapper, bus, sysEntitlementRepository)
         {
             _sysEntitlementRepository = sysEntitlementRepository;
-            _mapper = mapper;
-            Bus = bus;
         }
 
-        public void Dispose()
+        public override bool Update(SysEntitlementDto dto)
         {
-            GC.SuppressFinalize(this);
-        }
-
-        public void Add(SysEntitlementDto dto)
-        {
-            var m = _mapper.Map<SysEntitlement>(dto);
-            _sysEntitlementRepository.Add(m);
-            _sysEntitlementRepository.SaveChanges();
-        }
-
-        public void Remove(string recordId)
-        {
-            _sysEntitlementRepository.Remove(recordId);
-            _sysEntitlementRepository.SaveChanges();
-        }
-
-        public void Update(SysEntitlementDto dto)
-        {
-            var renew = _mapper.Map<SysEntitlement>(dto);
-            renew.UpdatedAt = DateTime.Now;
-            _sysEntitlementRepository.Update(renew);
-            _sysEntitlementRepository.SaveChanges();
-        }
-
-        public SysEntitlementDto GetById(string recordId)
-        {
-            var entity = _sysEntitlementRepository.GetById(recordId);
-            var dto = _mapper.Map<SysEntitlementDto>(entity);
-            return dto;
+            var entity = _mapper.Map<SysEntitlement>(dto);
+            entity.UpdatedAt = DateTime.Now;
+            _sysEntitlementRepository.Update(entity);
+            return _sysEntitlementRepository.SaveChanges(out int _);
         }
 
         public SysEntitlementDto GetByKeyAsNoTracking(string entId, string sysType)
@@ -96,12 +69,6 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
                 && w.Pid.Equals(pId) && !w.EntId.Equals(entId));
             return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
-        }
-
-        public IEnumerable<SysEntitlementDto> GetAll()
-        {
-            var sysEntitlements = _sysEntitlementRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEntitlements);
         }
     }
 }

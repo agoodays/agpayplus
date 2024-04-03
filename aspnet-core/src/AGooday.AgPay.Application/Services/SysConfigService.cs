@@ -13,26 +13,16 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 系统配置表 服务实现类
     /// </summary>
-    public class SysConfigService : ISysConfigService
+    public class SysConfigService : AgPayService<SysConfigDto, SysConfig>, ISysConfigService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ISysConfigRepository _sysConfigRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public SysConfigService(IMapper mapper, IMediatorHandler bus,
             ISysConfigRepository sysConfigRepository)
+            : base(mapper, bus, sysConfigRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _sysConfigRepository = sysConfigRepository;
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -311,51 +301,11 @@ namespace AGooday.AgPay.Application.Services
             mergedList.AddRange(mergingList);
         }
 
-        public void Add(SysConfigDto dto)
-        {
-            var m = _mapper.Map<SysConfig>(dto);
-            _sysConfigRepository.Add(m);
-            _sysConfigRepository.SaveChanges();
-        }
-
-        public void Remove(string recordId)
-        {
-            _sysConfigRepository.Remove(recordId);
-            _sysConfigRepository.SaveChanges();
-        }
-
-        public void Update(SysConfigDto dto)
-        {
-            var m = _mapper.Map<SysConfig>(dto);
-            _sysConfigRepository.Update(m);
-            _sysConfigRepository.SaveChanges();
-        }
-
-        public bool SaveOrUpdate(SysConfigDto dto)
-        {
-            var config = _mapper.Map<SysConfig>(source: dto);
-            _sysConfigRepository.SaveOrUpdate(config, dto.ConfigKey);
-            return _sysConfigRepository.SaveChanges() > 0;
-        }
-
-        public SysConfigDto GetById(string recordId)
-        {
-            var entity = _sysConfigRepository.GetById(recordId);
-            var dto = _mapper.Map<SysConfigDto>(entity);
-            return dto;
-        }
-
         public SysConfigDto GetByKey(string configKey, string sysType, string belongInfoId)
         {
             var entity = _sysConfigRepository.GetByKey(configKey, sysType, belongInfoId);
             var dto = _mapper.Map<SysConfigDto>(entity);
             return dto;
-        }
-
-        public IEnumerable<SysConfigDto> GetAll()
-        {
-            var sysConfigs = _sysConfigRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysConfigDto>>(sysConfigs);
         }
     }
 }

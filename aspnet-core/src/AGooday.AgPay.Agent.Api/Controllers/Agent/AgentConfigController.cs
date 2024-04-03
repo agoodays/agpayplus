@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Agent.Api.Attributes;
 using AGooday.AgPay.Agent.Api.Authorization;
 using AGooday.AgPay.Agent.Api.Models;
-using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
@@ -35,7 +34,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         /// <returns></returns>
         [HttpPut, Route("agentSipw"), MethodLog("更改支付密码")]
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_CONFIG_EDIT)]
-        public ApiRes SetMchSipw(ModifyAgentSipw model)
+        public ApiRes SetAgentSipw(ModifyAgentSipw model)
         {
             var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);
@@ -51,10 +50,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            AgentInfoUpdateDto dto = new AgentInfoUpdateDto();
-            dto.AgentNo = agentInfo.AgentNo;
-            dto.Sipw = opSipw;
-            _agentInfoService.UpdateById(dto);
+            agentInfo.Sipw = opSipw;
+            _agentInfoService.UpdateById(agentInfo);
             return ApiRes.Ok();
         }
     }

@@ -11,29 +11,19 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 码牌模板信息表 服务实现类
     /// </summary>
-    public class QrCodeShellService : IQrCodeShellService
+    public class QrCodeShellService : AgPayService<QrCodeShellDto, QrCodeShell>, IQrCodeShellService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IQrCodeShellRepository _qrCodeShellRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public QrCodeShellService(IMapper mapper, IMediatorHandler bus,
             IQrCodeShellRepository qrCodeShellRepository)
+            : base(mapper, bus, qrCodeShellRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _qrCodeShellRepository = qrCodeShellRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(QrCodeShellDto dto)
+        public override bool Add(QrCodeShellDto dto)
         {
             var m = _mapper.Map<QrCodeShell>(dto);
             m.CreatedAt = DateTime.Now;
@@ -44,31 +34,12 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public bool Remove(long recordId)
-        {
-            _qrCodeShellRepository.Remove(recordId);
-            return _qrCodeShellRepository.SaveChanges(out int _);
-        }
-
-        public bool Update(QrCodeShellDto dto)
+        public override bool Update(QrCodeShellDto dto)
         {
             var m = _mapper.Map<QrCodeShell>(dto);
             m.UpdatedAt = DateTime.Now;
             _qrCodeShellRepository.Update(m);
             return _qrCodeShellRepository.SaveChanges(out int _);
-        }
-
-        public QrCodeShellDto GetById(long recordId)
-        {
-            var entity = _qrCodeShellRepository.GetById(recordId);
-            var dto = _mapper.Map<QrCodeShellDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<QrCodeShellDto> GetAll()
-        {
-            var QrCodeShells = _qrCodeShellRepository.GetAll();
-            return _mapper.Map<IEnumerable<QrCodeShellDto>>(QrCodeShells);
         }
 
         public PaginatedList<T> GetPaginatedData<T>(QrCodeShellQueryDto dto)

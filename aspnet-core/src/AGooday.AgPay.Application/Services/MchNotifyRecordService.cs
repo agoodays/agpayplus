@@ -12,60 +12,25 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 商户通知表 服务实现类
     /// </summary>
-    public class MchNotifyRecordService : IMchNotifyRecordService
+    public class MchNotifyRecordService : AgPayService<MchNotifyRecordDto, MchNotifyRecord, long>, IMchNotifyRecordService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchNotifyRecordRepository _mchNotifyRecordRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
-        public MchNotifyRecordService(IMapper mapper, IMediatorHandler bus, 
+        public MchNotifyRecordService(IMapper mapper, IMediatorHandler bus,
             IMchNotifyRecordRepository mchNotifyRecordRepository)
+            : base(mapper, bus, mchNotifyRecordRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _mchNotifyRecordRepository = mchNotifyRecordRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public void Add(MchNotifyRecordDto dto)
+        public override bool Add(MchNotifyRecordDto dto)
         {
             var m = _mapper.Map<MchNotifyRecord>(dto);
             _mchNotifyRecordRepository.Add(m);
-            _mchNotifyRecordRepository.SaveChanges();
+            var result = _mchNotifyRecordRepository.SaveChanges(out int _);
             dto.NotifyId = m.NotifyId;
-        }
-
-        public void Remove(long recordId)
-        {
-            _mchNotifyRecordRepository.Remove(recordId);
-            _mchNotifyRecordRepository.SaveChanges();
-        }
-
-        public void Update(MchNotifyRecordDto dto)
-        {
-            var m = _mapper.Map<MchNotifyRecord>(dto);
-            _mchNotifyRecordRepository.Update(m);
-            _mchNotifyRecordRepository.SaveChanges();
-        }
-
-        public MchNotifyRecordDto GetById(long recordId)
-        {
-            var entity = _mchNotifyRecordRepository.GetById(recordId);
-            var dto = _mapper.Map<MchNotifyRecordDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<MchNotifyRecordDto> GetAll()
-        {
-            var mchNotifyRecords = _mchNotifyRecordRepository.GetAll();
-            return _mapper.Map<IEnumerable<MchNotifyRecordDto>>(mchNotifyRecords);
+            return result;
         }
 
         public PaginatedList<MchNotifyRecordDto> GetPaginatedData(MchNotifyQueryDto dto)

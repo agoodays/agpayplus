@@ -13,32 +13,40 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 码牌信息表 服务实现类
     /// </summary>
-    public class QrCodeService : IQrCodeService
+    public class QrCodeService : AgPayService<QrCodeDto, QrCode>, IQrCodeService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
-        private readonly IQrCodeRepository _qrCodeShellRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
+        private readonly IQrCodeRepository _qrCodeRepository;
 
         public QrCodeService(IMapper mapper, IMediatorHandler bus,
-            IQrCodeRepository qrCodeShellRepository)
+            IQrCodeRepository qrCodeRepository)
+            : base(mapper, bus, qrCodeRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
-            _qrCodeShellRepository = qrCodeShellRepository;
+            _qrCodeRepository = qrCodeRepository;
         }
 
-        public void Dispose()
+        public override bool Add(QrCodeDto dto)
         {
-            GC.SuppressFinalize(this);
+            var m = _mapper.Map<QrCode>(dto);
+            m.State = CS.YES;
+            m.CreatedAt = DateTime.Now;
+            m.UpdatedAt = DateTime.Now;
+            _qrCodeRepository.Add(m);
+            return _qrCodeRepository.SaveChanges(out int _);
+        }
+
+        public override bool Update(QrCodeDto dto)
+        {
+            var m = _mapper.Map<QrCode>(dto);
+            m.UpdatedAt = DateTime.Now;
+            _qrCodeRepository.Update(m);
+            return _qrCodeRepository.SaveChanges(out int _);
         }
 
         public string BatchIdDistinctCount()
         {
             var BatchIdPrefix = DateTime.Now.ToString("yyyyMMdd");
-            var qrCodes = _qrCodeShellRepository.GetAll()
+            var qrCodes = _qrCodeRepository.GetAll()
                 .Where(w => (w.BatchId ?? "").StartsWith(BatchIdPrefix))
                 .OrderByDescending(o => o.BatchId).FirstOrDefault();
             return $"{Convert.ToInt64(qrCodes?.BatchId ?? $"{BatchIdPrefix}00") + 1}";
@@ -51,56 +59,14 @@ namespace AGooday.AgPay.Application.Services
                 var m = _mapper.Map<QrCode>(dto);
                 m.QrcId = $"{dto.BatchId}{i:D4}";
                 m.QrUrl = GenQrUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, m.QrcId));
-                _qrCodeShellRepository.Add(m);
+                _qrCodeRepository.Add(m);
             }
-            return _qrCodeShellRepository.SaveChanges(out int _);
-        }
-
-        public string GenQrUrl(string data)
-        {
-            return $"/hub/{AgPayUtil.AesEncode(data)}";
-        }
-
-        public bool Add(QrCodeDto dto)
-        {
-            var m = _mapper.Map<QrCode>(dto);
-            m.State = CS.YES;
-            m.CreatedAt = DateTime.Now;
-            m.UpdatedAt = DateTime.Now;
-            _qrCodeShellRepository.Add(m);
-            return _qrCodeShellRepository.SaveChanges(out int _);
-        }
-
-        public bool Remove(string recordId)
-        {
-            _qrCodeShellRepository.Remove(recordId);
-            return _qrCodeShellRepository.SaveChanges(out int _);
-        }
-
-        public bool Update(QrCodeDto dto)
-        {
-            var m = _mapper.Map<QrCode>(dto);
-            m.UpdatedAt = DateTime.Now;
-            _qrCodeShellRepository.Update(m);
-            return _qrCodeShellRepository.SaveChanges(out int _);
-        }
-
-        public QrCodeDto GetById(string recordId)
-        {
-            var entity = _qrCodeShellRepository.GetById(recordId);
-            var dto = _mapper.Map<QrCodeDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<QrCodeDto> GetAll()
-        {
-            var qrCodes = _qrCodeShellRepository.GetAll();
-            return _mapper.Map<IEnumerable<QrCodeDto>>(qrCodes);
+            return _qrCodeRepository.SaveChanges(out int _);
         }
 
         public PaginatedList<T> GetPaginatedData<T>(QrCodeQueryDto dto)
         {
-            var QrCodes = _qrCodeShellRepository.GetAllAsNoTracking()
+            var QrCodes = _qrCodeRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.QrcId) || w.QrcId.Equals(dto.QrcId))
                 && (string.IsNullOrWhiteSpace(dto.BatchId) || w.MchNo.Equals(dto.BatchId))
                 && (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
@@ -112,6 +78,11 @@ namespace AGooday.AgPay.Application.Services
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<QrCode>.Create<T>(QrCodes, _mapper, dto.PageNumber, dto.PageSize);
             return records;
+        }
+
+        private static string GenQrUrl(string data)
+        {
+            return $"/hub/{AgPayUtil.AesEncode(data)}";
         }
     }
 }

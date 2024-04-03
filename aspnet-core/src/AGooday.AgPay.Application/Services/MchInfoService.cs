@@ -12,26 +12,16 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 商户信息表 服务实现类
     /// </summary>
-    public class MchInfoService : IMchInfoService
+    public class MchInfoService : AgPayService<MchInfoDto, MchInfo>, IMchInfoService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchInfoRepository _mchInfoRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public MchInfoService(IMapper mapper, IMediatorHandler bus,
-            IMchInfoRepository mchInfoRepository)
+        IMchInfoRepository mchInfoRepository)
+            : base(mapper, bus, mchInfoRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _mchInfoRepository = mchInfoRepository;
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
         }
 
         public bool IsExistMchNo(string mchNo)
@@ -49,13 +39,6 @@ namespace AGooday.AgPay.Application.Services
             return _mchInfoRepository.IsExistMchByAgentNo(agentNo);
         }
 
-        public bool Add(MchInfoDto dto)
-        {
-            var m = _mapper.Map<MchInfo>(dto);
-            _mchInfoRepository.Add(m);
-            return _mchInfoRepository.SaveChanges(out int _);
-        }
-
         public async Task CreateAsync(MchInfoCreateDto dto)
         {
             var command = _mapper.Map<CreateMchInfoCommand>(dto);
@@ -70,22 +53,20 @@ namespace AGooday.AgPay.Application.Services
             await Bus.SendCommand(command);
         }
 
-        public bool Update(MchInfoDto dto)
-        {
-            var m = _mapper.Map<MchInfo>(dto);
-            _mchInfoRepository.Update(m);
-            return _mchInfoRepository.SaveChanges(out int _);
-        }
-
-        public bool UpdateById(MchInfoUpdateDto dto)
+        public bool UpdateById(MchInfoDto dto)
         {
             var entity = _mchInfoRepository.GetById(dto.MchNo);
-            if (!string.IsNullOrWhiteSpace(dto.MchLevel))
-                entity.MchLevel = dto.MchLevel;
-            if (!string.IsNullOrWhiteSpace(dto.Sipw))
-                entity.Sipw = dto.Sipw;
             entity.UpdatedAt = DateTime.Now;
-            _mchInfoRepository.Update(entity);
+            if (!string.IsNullOrWhiteSpace(dto.MchLevel))
+            {
+                entity.MchLevel = dto.MchLevel;
+                _mchInfoRepository.Update(entity, e => new { e.UpdatedAt });
+            }
+            if (!string.IsNullOrWhiteSpace(dto.Sipw))
+            {
+                entity.Sipw = dto.Sipw;
+                _mchInfoRepository.Update(entity, e => new { e.UpdatedAt });
+            }
             return _mchInfoRepository.SaveChanges(out int _);
         }
 
@@ -95,35 +76,15 @@ namespace AGooday.AgPay.Application.Services
             await Bus.SendCommand(command);
         }
 
-        public MchInfoDto GetById(string recordId)
-        {
-            var entity = _mchInfoRepository.GetById(recordId);
-            var dto = _mapper.Map<MchInfoDto>(entity);
-            return dto;
-        }
-
-        public async Task<MchInfoDto> GetByIdAsync(string recordId)
-        {
-            var entity = await _mchInfoRepository.GetByIdAsync(recordId);
-            var dto = _mapper.Map<MchInfoDto>(entity);
-            return dto;
-        }
-
         public IEnumerable<MchInfoDto> GetByMchNos(List<string> mchNos)
         {
-            var mchInfos = _mchInfoRepository.GetAll().Where(w => mchNos.Contains(w.MchNo));
+            var mchInfos = _mchInfoRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
             return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
         }
 
         public IEnumerable<MchInfoDto> GetByIsvNo(string isvNo)
         {
-            var mchInfos = _mchInfoRepository.GetAll().Where(w => w.IsvNo.Equals(isvNo));
-            return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
-        }
-
-        public IEnumerable<MchInfoDto> GetAll()
-        {
-            var mchInfos = _mchInfoRepository.GetAll();
+            var mchInfos = _mchInfoRepository.GetAllAsNoTracking().Where(w => w.IsvNo.Equals(isvNo));
             return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
         }
 

@@ -3,13 +3,8 @@ using AGooday.AgPay.Common.Models;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
-    public interface ISysArticleService : IDisposable
+    public interface ISysArticleService : IAgPayService<SysArticleDto, long>
     {
-        bool Add(SysArticleDto dto);
-        bool Remove(long recordId);
-        bool Update(SysArticleDto dto);
-        SysArticleDto GetById(long recordId);
-        IEnumerable<SysArticleDto> GetAll();
         PaginatedList<SysArticleDto> GetPaginatedData(SysArticleQueryDto dto, string agentNo = null);
     }
 }

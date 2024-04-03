@@ -2,14 +2,9 @@
 
 namespace AGooday.AgPay.Application.Interfaces
 {
-    public interface IPayInterfaceConfigService : IDisposable
+    public interface IPayInterfaceConfigService : IAgPayService<PayInterfaceConfigDto, long>
     {
-        void Add(PayInterfaceConfigDto dto);
-        void Remove(long recordId);
-        void Update(PayInterfaceConfigDto dto);
         bool SaveOrUpdate(PayInterfaceConfigDto dto);
-        PayInterfaceConfigDto GetById(long recordId);
-        IEnumerable<PayInterfaceConfigDto> GetAll();
         bool IsExistUseIfCode(string ifCode);
         bool Remove(string infoType, string infoId);
         /// <summary>

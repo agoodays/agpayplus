@@ -13,29 +13,17 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 账户帐单表 服务实现类
     /// </summary>
-    public class AccountBillService : IAccountBillService
+    public class AccountBillService : AgPayService<AccountBillDto, AccountBill>, IAccountBillService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
-        private readonly IAccountBillRepository _accountBillRepository;
         private readonly IPayOrderProfitRepository _payOrderProfitRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public AccountBillService(IMapper mapper, IMediatorHandler bus,
             IAccountBillRepository accountBillRepository,
             IPayOrderProfitRepository payOrderProfitRepository)
+            : base(mapper, bus, accountBillRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
-            _accountBillRepository = accountBillRepository;
             _payOrderProfitRepository = payOrderProfitRepository;
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
         }
 
         public void GenAccountBill(string payOrderId)
@@ -60,56 +48,37 @@ namespace AGooday.AgPay.Application.Services
                     accountBill.RelaBizOrderId = payOrderProfit.PayOrderId;
                     accountBill.CreatedAt = DateTime.Now;
                     accountBill.UpdatedAt = DateTime.Now;
-                    _accountBillRepository.Add(accountBill);
+                    _agPayRepository.Add(accountBill);
                     isSaveChanges = true;
                 }
             }
             if (isSaveChanges)
             {
-                _accountBillRepository.SaveChanges(out int _);
+                _agPayRepository.SaveChanges(out int _);
             }
         }
 
-        public bool Add(AccountBillDto dto)
+        public override bool Add(AccountBillDto dto)
         {
             var m = _mapper.Map<AccountBill>(dto);
             m.CreatedAt = DateTime.Now;
             m.UpdatedAt = DateTime.Now;
-            _accountBillRepository.Add(m);
-            var result = _accountBillRepository.SaveChanges(out int _);
+            _agPayRepository.Add(m);
+            var result = _agPayRepository.SaveChanges(out int _);
             return result;
         }
 
-        public bool Remove(long id)
-        {
-            _accountBillRepository.Remove(id);
-            return _accountBillRepository.SaveChanges(out int _);
-        }
-
-        public bool Update(AccountBillDto dto)
+        public override bool Update(AccountBillDto dto)
         {
             var m = _mapper.Map<AccountBill>(dto);
             m.UpdatedAt = DateTime.Now;
-            _accountBillRepository.Update(m);
-            return _accountBillRepository.SaveChanges(out int _);
-        }
-
-        public AccountBillDto GetById(long id)
-        {
-            var entity = _accountBillRepository.GetById(id);
-            var dto = _mapper.Map<AccountBillDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<AccountBillDto> GetAll()
-        {
-            var AccountBills = _accountBillRepository.GetAll();
-            return _mapper.Map<IEnumerable<AccountBillDto>>(AccountBills);
+            _agPayRepository.Update(m);
+            return _agPayRepository.SaveChanges(out int _);
         }
 
         public PaginatedList<T> GetPaginatedData<T>(AccountBillQueryDto dto)
         {
-            var AccountBills = _accountBillRepository.GetAllAsNoTracking()
+            var AccountBills = _agPayRepository.GetAllAsNoTracking()
                 .Where(w => (dto.Id.Equals(null) || w.Id.Equals(dto.Id))
                 && (string.IsNullOrWhiteSpace(dto.BillId) || w.BillId.Equals(dto.BillId))
                 && (string.IsNullOrWhiteSpace(dto.InfoId) || w.InfoId.Equals(dto.InfoId))

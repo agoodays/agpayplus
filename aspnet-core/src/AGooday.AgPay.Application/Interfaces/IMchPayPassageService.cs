@@ -3,14 +3,9 @@ using AGooday.AgPay.Common.Models;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
-    public interface IMchPayPassageService : IDisposable
+    public interface IMchPayPassageService : IAgPayService<MchPayPassageDto, long>
     {
-        void Add(MchPayPassageDto dto);
-        void Remove(long recordId);
-        void Update(MchPayPassageDto dto);
-        MchPayPassageDto GetById(long recordId);
         IEnumerable<MchPayPassageDto> GetMchPayPassageByAppId(string mchNo, string appId);
-        IEnumerable<MchPayPassageDto> GetAll();
         IEnumerable<MchPayPassageDto> GetByAppId(string appId, List<string> wayCodes);
         PaginatedList<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize);
         /// <summary>

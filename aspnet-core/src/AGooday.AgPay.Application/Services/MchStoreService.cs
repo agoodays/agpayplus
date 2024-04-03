@@ -9,60 +9,28 @@ using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
 {
-    public class MchStoreService : IMchStoreService
+    public class MchStoreService : AgPayService<MchStoreDto, MchStore>, IMchStoreService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchStoreRepository _mchStoreRepository;
         private readonly IMchInfoRepository _mchInfoRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public MchStoreService(IMapper mapper, IMediatorHandler bus,
             IMchStoreRepository mchStoreRepository,
             IMchInfoRepository mchInfoRepository)
+            : base(mapper, bus, mchStoreRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _mchStoreRepository = mchStoreRepository;
             _mchInfoRepository = mchInfoRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(MchStoreDto dto)
+        public override bool Add(MchStoreDto dto)
         {
             var m = _mapper.Map<MchStore>(dto);
             _mchStoreRepository.Add(m);
             var result = _mchStoreRepository.SaveChanges(out int _);
             dto.StoreId = m.StoreId;
             return result;
-        }
-
-        public bool Remove(long recordId)
-        {
-            _mchStoreRepository.Remove(recordId);
-            return _mchStoreRepository.SaveChanges(out _);
-        }
-
-        public bool Update(MchStoreDto dto)
-        {
-            var renew = _mapper.Map<MchStore>(dto);
-            //var old = _mchStoreRepository.GetById(dto.StoreId);
-            renew.UpdatedAt = DateTime.Now;
-            _mchStoreRepository.Update(renew);
-            return _mchStoreRepository.SaveChanges(out int _);
-        }
-
-        public MchStoreDto GetById(long recordId)
-        {
-            var entity = _mchStoreRepository.GetById(recordId);
-            var dto = _mapper.Map<MchStoreDto>(entity);
-            return dto;
         }
 
         public MchStoreDto GetById(long recordId, string mchNo)
@@ -81,12 +49,6 @@ namespace AGooday.AgPay.Application.Services
         public IEnumerable<MchStoreDto> GetByMchNo(string mchNo)
         {
             var mchStores = _mchStoreRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
-            return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
-        }
-
-        public IEnumerable<MchStoreDto> GetAll()
-        {
-            var mchStores = _mchStoreRepository.GetAll();
             return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
         }
 
