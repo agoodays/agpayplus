@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -14,7 +13,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public bool IsExistMchPayPassageUseWayCode(string wayCode)
         {
-            return DbSet.AsNoTracking().Any(c => c.WayCode.Equals(wayCode));
+            return GetAllAsNoTracking().Any(c => c.WayCode.Equals(wayCode));
         }
 
         public void RemoveByMchNo(string mchNo)

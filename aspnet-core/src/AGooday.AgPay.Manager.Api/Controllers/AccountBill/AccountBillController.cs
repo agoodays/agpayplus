@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.AccountBill
         [PermissionAuth(PermCode.MGR.ENT_ACCOUNT_BILL_LIST)]
         public ApiPageRes<AccountBillDto> List([FromQuery] AccountBillQueryDto dto)
         {
-            var data = _accountBillService.GetPaginatedData<AccountBillDto>(dto);
+            var data = _accountBillService.GetPaginatedData(dto);
             return ApiPageRes<AccountBillDto>.Pages(data);
         }
 

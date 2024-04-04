@@ -2,7 +2,7 @@
 
 namespace AGooday.AgPay.Application.Interfaces
 {
-    public interface ISysUserLoginAttemptService : IDisposable
+    public interface ISysUserLoginAttemptService : IAgPayService<SysUserLoginAttemptDto, long>
     {
         Task ClearFailedLoginAttemptsAsync(long userId);
         Task<(int failedAttempts, DateTime? lastLoginTime)> GetFailedLoginAttemptsAsync(long userId, TimeSpan timeWindow);

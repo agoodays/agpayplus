@@ -3,16 +3,11 @@ using AGooday.AgPay.Common.Models;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
-    public interface ISysUserRoleRelaService : IDisposable
+    public interface ISysUserRoleRelaService : IAgPayService<SysUserRoleRelaDto>
     {
-        void Add(SysUserRoleRelaDto dto);
-        void Remove(string recordId);
-        void Update(SysUserRoleRelaDto dto);
         void SaveUserRole(long userId, List<string> roleIds);
-        SysUserRoleRelaDto GetById(string recordId);
         IEnumerable<string> SelectRoleIdsByUserId(long userId);
         IEnumerable<long> SelectUserIdsByRoleId(string roleId);
-        IEnumerable<SysUserRoleRelaDto> GetAll();
         PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaQueryDto dto);
     }
 }

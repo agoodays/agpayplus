@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace AGooday.AgPay.Application.Interfaces
+﻿namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IAgPayService<TDto> : IDisposable
         where TDto : class

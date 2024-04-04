@@ -15,19 +15,19 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public bool IsExistAgentNo(string agentNo)
         {
-            return DbSet.AsNoTracking().Any(c => c.AgentNo.Equals(agentNo));
+            return GetAllAsNoTracking().Any(c => c.AgentNo.Equals(agentNo));
         }
 
         public bool IsExistAgent(string isvNo)
         {
-            return DbSet.AsNoTracking().Any(c => c.IsvNo.Equals(isvNo));
+            return GetAllAsNoTracking().Any(c => c.IsvNo.Equals(isvNo));
         }
 
         public IEnumerable<AgentInfo> GetAllOrSubAgents(string currentAgentNo)
         {
             if (string.IsNullOrEmpty(currentAgentNo))
             {
-                return DbSet.AsNoTracking();
+                return GetAllAsNoTracking();
             }
             // 获取当前代理商的所有下级代理商，不包括下级的下级代理商
             var subAgents = DbSet
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             if (string.IsNullOrEmpty(currentAgentNo))
             {
-                var query = DbSet.AsNoTracking();
+                var query = GetAllAsNoTracking();
 
                 if (filter != null)
                 {
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             if (string.IsNullOrEmpty(currentAgentNo))
             {
-                var query = DbSet.AsNoTracking();
+                var query = GetAllAsNoTracking();
 
                 if (filter != null)
                 {

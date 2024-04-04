@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Application.Services
             return _qrCodeRepository.SaveChanges(out int _);
         }
 
-        public PaginatedList<T> GetPaginatedData<T>(QrCodeQueryDto dto)
+        public PaginatedList<QrCodeDto> GetPaginatedData(QrCodeQueryDto dto)
         {
             var QrCodes = _qrCodeRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.QrcId) || w.QrcId.Equals(dto.QrcId))
@@ -76,7 +76,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<QrCode>.Create<T>(QrCodes, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<QrCode>.Create<QrCodeDto>(QrCodes, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

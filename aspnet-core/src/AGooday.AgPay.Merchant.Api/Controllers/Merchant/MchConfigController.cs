@@ -77,7 +77,6 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             MchInfoDto dto = new MchInfoDto();
             dto.MchNo = GetCurrentMchNo();
             dto.MchLevel = model.MchLevel;
-            dto.UpdatedAt = DateTime.Now;
             _mchInfoService.UpdateById(dto);
             return ApiRes.Ok();
         }

@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -12,53 +13,16 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 转账订单表 服务实现类
     /// </summary>
-    public class TransferOrderService : ITransferOrderService
+    public class TransferOrderService : AgPayService<TransferOrderDto, TransferOrder>, ITransferOrderService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ITransferOrderRepository _transferOrderRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public TransferOrderService(IMapper mapper, IMediatorHandler bus, 
             ITransferOrderRepository transferOrderRepository)
+            : base(mapper, bus, transferOrderRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _transferOrderRepository = transferOrderRepository;
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public void Add(TransferOrderDto dto)
-        {
-            var m = _mapper.Map<TransferOrder>(dto);
-            _transferOrderRepository.Add(m);
-            _transferOrderRepository.SaveChanges();
-        }
-
-        public void Remove(string recordId)
-        {
-            _transferOrderRepository.Remove(recordId);
-            _transferOrderRepository.SaveChanges();
-        }
-
-        public void Update(TransferOrderDto dto)
-        {
-            var m = _mapper.Map<TransferOrder>(dto);
-            _transferOrderRepository.Update(m);
-            _transferOrderRepository.SaveChanges();
-        }
-
-        public TransferOrderDto GetById(string recordId)
-        {
-            var entity = _transferOrderRepository.GetById(recordId);
-            var dto = _mapper.Map<TransferOrderDto>(entity);
-            return dto;
         }
 
         public TransferOrderDto QueryMchOrder(string mchNo, string mchOrderNo, string transferId)
@@ -77,12 +41,6 @@ namespace AGooday.AgPay.Application.Services
             {
                 return null;
             }
-        }
-
-        public IEnumerable<TransferOrderDto> GetAll()
-        {
-            var transferOrders = _transferOrderRepository.GetAll();
-            return _mapper.Map<IEnumerable<TransferOrderDto>>(transferOrders);
         }
 
         public PaginatedList<TransferOrderDto> GetPaginatedData(TransferOrderQueryDto dto)

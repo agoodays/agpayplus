@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
     [ApiController, Authorize]
     public class SysUserTeamController : CommonController
     {
-        private readonly ISysUserTeamService _mchStoreService;
+        private readonly ISysUserTeamService _sysUserTeamService;
 
         public SysUserTeamController(ILogger<SysUserTeamController> logger,
             ISysUserTeamService mchStoreService, 
@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
             IAuthService authService)
             : base(logger, client, authService)
         {
-            _mchStoreService = mchStoreService;
+            _sysUserTeamService = mchStoreService;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = GetCurrentAgentNo();
-            var data = _mchStoreService.GetPaginatedData(dto);
+            var data = _sysUserTeamService.GetPaginatedData(dto);
             return ApiPageRes<SysUserTeamDto>.Pages(data);
         }
 
@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
             dto.CreatedUid = sysUser.SysUserId;
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = sysUser.BelongInfoId;
-            var result = _mchStoreService.Add(dto);
+            var result = _sysUserTeamService.Add(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -75,12 +75,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_DEL)]
         public ApiRes Delete(long recordId)
         {
-            var mchStore = _mchStoreService.GetById(recordId);
+            var mchStore = _sysUserTeamService.GetById(recordId);
             if (mchStore == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            _mchStoreService.Remove(recordId);
+            _sysUserTeamService.Remove(recordId);
             return ApiRes.Ok();
         }
 
@@ -93,7 +93,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_EDIT)]
         public ApiRes Update(long recordId, SysUserTeamDto dto)
         {
-            var result = _mchStoreService.Update(dto);
+            var result = _sysUserTeamService.Update(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
@@ -110,7 +110,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_VIEW, PermCode.AGENT.ENT_UR_TEAM_EDIT)]
         public ApiRes Detail(long recordId)
         {
-            var mchStore = _mchStoreService.GetById(recordId);
+            var mchStore = _sysUserTeamService.GetById(recordId);
             if (mchStore == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

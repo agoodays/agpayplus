@@ -10,26 +10,16 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 系统操作员表 服务实现类
     /// </summary>
-    public class SysUserLoginAttemptService : ISysUserLoginAttemptService
+    public class SysUserLoginAttemptService : AgPayService<SysUserLoginAttemptDto, SysUserLoginAttempt, long>, ISysUserLoginAttemptService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ISysUserLoginAttemptRepository _sysUserLoginAttemptRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public SysUserLoginAttemptService(IMapper mapper, IMediatorHandler bus,
             ISysUserLoginAttemptRepository sysUserLoginAttemptRepository)
+            : base(mapper, bus, sysUserLoginAttemptRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _sysUserLoginAttemptRepository = sysUserLoginAttemptRepository;
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
         }
 
         public async Task RecordLoginAttemptAsync(SysUserLoginAttemptDto dto)

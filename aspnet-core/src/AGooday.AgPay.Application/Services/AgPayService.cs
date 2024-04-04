@@ -69,8 +69,12 @@ namespace AGooday.AgPay.Application.Services
 
         public virtual IEnumerable<TDto> GetAll()
         {
-            var entitys = _agPayRepository.GetAll();
-            return _mapper.Map<IEnumerable<TDto>>(entitys);
+            //第一种写法 Map
+            var sysUsers = _agPayRepository.GetAll();
+            return _mapper.Map<IEnumerable<TDto>>(sysUsers);
+
+            //第二种写法 ProjectTo
+            //return (_agPayRepository.GetAll()).ProjectTo<TDto>(_mapper.ConfigurationProvider);
         }
     }
     public abstract class AgPayService<TDto, TEntity, TPrimaryKey> : IAgPayService<TDto, TPrimaryKey>

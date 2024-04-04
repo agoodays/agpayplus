@@ -2,10 +2,8 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Bus;
-using AGooday.AgPay.Domain.Core.Models;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -50,8 +48,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var sysEnts = _sysEntitlementRepository.GetAllAsNoTracking()
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
-                && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId))
-                );
+                && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId)));
             return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
         }
 

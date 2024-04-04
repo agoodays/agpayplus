@@ -11,40 +11,25 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 系统操作日志表 服务实现类
     /// </summary>
-    public class SysLogService : ISysLogService
+    public class SysLogService : AgPayService<SysLogDto, SysLog, long>, ISysLogService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ISysLogRepository _sysLogRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
-        public SysLogService(IMapper mapper, IMediatorHandler bus, 
+        public SysLogService(IMapper mapper, IMediatorHandler bus,
             ISysLogRepository sysLogRepository)
+            : base(mapper, bus, sysLogRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _sysLogRepository = sysLogRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public void Add(SysLogDto dto)
+        public override bool Add(SysLogDto dto)
         {
             var m = _mapper.Map<SysLog>(dto);
             _sysLogRepository.Add(m);
-            _sysLogRepository.SaveChanges();
+            var result = _sysLogRepository.SaveChanges(out int _);
             dto.SysLogId = m.SysLogId;
-        }
-
-        public void Remove(long recordId)
-        {
-            _sysLogRepository.Remove(recordId);
-            _sysLogRepository.SaveChanges();
+            return result;
         }
 
         public bool RemoveByIds(List<long> recordIds)
@@ -54,26 +39,6 @@ namespace AGooday.AgPay.Application.Services
                 _sysLogRepository.Remove(recordId);
             }
             return _sysLogRepository.SaveChanges() > 0;
-        }
-
-        public void Update(SysLogDto dto)
-        {
-            var m = _mapper.Map<SysLog>(dto);
-            _sysLogRepository.Update(m);
-            _sysLogRepository.SaveChanges();
-        }
-
-        public SysLogDto GetById(long recordId)
-        {
-            var entity = _sysLogRepository.GetById(recordId);
-            var dto = _mapper.Map<SysLogDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<SysLogDto> GetAll()
-        {
-            var sysLogs = _sysLogRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysLogDto>>(sysLogs);
         }
 
         public PaginatedList<SysLogDto> GetPaginatedData(SysLogQueryDto dto)

@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -20,7 +19,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <returns></returns>
         public bool IsAssignedToUser(string roleId)
         {
-            return DbSet.AsNoTracking().Any(c => c.RoleId == roleId);
+            return GetAllAsNoTracking().Any(c => c.RoleId == roleId);
         }
 
         public void RemoveByUserId(long userId)

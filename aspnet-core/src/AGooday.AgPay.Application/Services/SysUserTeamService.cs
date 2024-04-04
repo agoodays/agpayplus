@@ -8,29 +8,19 @@ using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
 {
-    public class SysUserTeamService : ISysUserTeamService
+    public class SysUserTeamService : AgPayService<SysUserTeamDto, SysUserTeam>, ISysUserTeamService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ISysUserTeamRepository _sysUserTeamRepository;
-        // 用来进行DTO
-        private readonly IMapper _mapper;
-        // 中介者 总线
-        private readonly IMediatorHandler Bus;
 
         public SysUserTeamService(IMapper mapper, IMediatorHandler bus,
             ISysUserTeamRepository sysUserTeamRepository)
+            : base(mapper, bus, sysUserTeamRepository)
         {
-            _mapper = mapper;
-            Bus = bus;
             _sysUserTeamRepository = sysUserTeamRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Add(SysUserTeamDto dto)
+        public override bool Add(SysUserTeamDto dto)
         {
             var m = _mapper.Map<SysUserTeam>(dto);
             _sysUserTeamRepository.Add(m);
@@ -39,32 +29,12 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public bool Remove(long recordId)
-        {
-            _sysUserTeamRepository.Remove(recordId);
-            return _sysUserTeamRepository.SaveChanges(out _);
-        }
-
-        public bool Update(SysUserTeamDto dto)
+        public override bool Update(SysUserTeamDto dto)
         {
             var renew = _mapper.Map<SysUserTeam>(dto);
-            //var old = _sysUserTeamRepository.GetById(dto.StoreId);
             renew.UpdatedAt = DateTime.Now;
             _sysUserTeamRepository.Update(renew);
             return _sysUserTeamRepository.SaveChanges(out int _);
-        }
-
-        public SysUserTeamDto GetById(long recordId)
-        {
-            var entity = _sysUserTeamRepository.GetById(recordId);
-            var dto = _mapper.Map<SysUserTeamDto>(entity);
-            return dto;
-        }
-
-        public IEnumerable<SysUserTeamDto> GetAll()
-        {
-            var sysUserTeams = _sysUserTeamRepository.GetAll();
-            return _mapper.Map<IEnumerable<SysUserTeamDto>>(sysUserTeams);
         }
 
         public PaginatedList<SysUserTeamDto> GetPaginatedData(SysUserTeamQueryDto dto)

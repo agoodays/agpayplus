@@ -3,12 +3,8 @@ using AGooday.AgPay.Common.Models;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
-    public interface ITransferOrderService : IDisposable
+    public interface ITransferOrderService : IAgPayService<TransferOrderDto>
     {
-        void Add(TransferOrderDto dto);
-        void Remove(string recordId);
-        void Update(TransferOrderDto dto);
-        TransferOrderDto GetById(string recordId);
         /// <summary>
         /// 查询商户订单
         /// </summary>
@@ -17,7 +13,6 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="transferId"></param>
         /// <returns></returns>
         TransferOrderDto QueryMchOrder(string mchNo, string mchOrderNo, string transferId);
-        IEnumerable<TransferOrderDto> GetAll();
         PaginatedList<TransferOrderDto> GetPaginatedData(TransferOrderQueryDto dto);
         /// <summary>
         /// 更新转账订单状态 【转账订单生成】 --》 【转账中】

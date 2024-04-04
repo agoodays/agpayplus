@@ -76,7 +76,7 @@ namespace AGooday.AgPay.Application.Services
             return _agPayRepository.SaveChanges(out int _);
         }
 
-        public PaginatedList<T> GetPaginatedData<T>(AccountBillQueryDto dto)
+        public PaginatedList<AccountBillDto> GetPaginatedData(AccountBillQueryDto dto)
         {
             var AccountBills = _agPayRepository.GetAllAsNoTracking()
                 .Where(w => (dto.Id.Equals(null) || w.Id.Equals(dto.Id))
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<AccountBill>.Create<T>(AccountBills, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<AccountBill>.Create<AccountBillDto>(AccountBills, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

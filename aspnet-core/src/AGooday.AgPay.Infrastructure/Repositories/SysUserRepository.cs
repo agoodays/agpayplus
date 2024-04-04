@@ -2,7 +2,6 @@
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -15,32 +14,32 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public bool IsExistLoginUsername(string loginUsername, string sysType)
         {
-            return DbSet.AsNoTracking().Any(c => c.LoginUsername.Equals(loginUsername) && c.SysType.Equals(sysType));
+            return GetAllAsNoTracking().Any(c => c.LoginUsername.Equals(loginUsername) && c.SysType.Equals(sysType));
         }
 
         public bool IsExistTelphone(string telphone, string sysType)
         {
-            return DbSet.AsNoTracking().Any(c => c.Telphone.Equals(telphone) && c.SysType.Equals(sysType));
+            return GetAllAsNoTracking().Any(c => c.Telphone.Equals(telphone) && c.SysType.Equals(sysType));
         }
 
         public bool IsExistUserNo(string userNo, string sysType)
         {
-            return DbSet.AsNoTracking().Any(c => c.UserNo.Equals(userNo) && c.SysType.Equals(sysType));
+            return GetAllAsNoTracking().Any(c => c.UserNo.Equals(userNo) && c.SysType.Equals(sysType));
         }
 
         public bool IsExist(long sysUserId, string sysType)
         {
-            return DbSet.AsNoTracking().Any(c => c.SysUserId.Equals(sysUserId) && c.SysType.Equals(sysType));
+            return GetAllAsNoTracking().Any(c => c.SysUserId.Equals(sysUserId) && c.SysType.Equals(sysType));
         }
 
         public SysUser GetByKeyAsNoTracking(long recordId)
         {
-            return DbSet.AsNoTracking().FirstOrDefault(w => w.SysUserId.Equals(recordId));
+            return GetAllAsNoTracking().FirstOrDefault(w => w.SysUserId.Equals(recordId));
         }
 
         public IQueryable<SysUser> GetByBelongInfoIdAsNoTracking(string belongInfoId)
         {
-            return DbSet.AsNoTracking().Where(w => w.BelongInfoId.Equals(belongInfoId));
+            return GetAllAsNoTracking().Where(w => w.BelongInfoId.Equals(belongInfoId));
         }
 
         public SysUser GetByUserId(long sysUserId)

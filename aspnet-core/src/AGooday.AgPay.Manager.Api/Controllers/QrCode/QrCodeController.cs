@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_LIST)]
         public ApiPageRes<QrCodeDto> List([FromQuery] QrCodeQueryDto dto)
         {
-            var data = _qrCodeService.GetPaginatedData<QrCodeDto>(dto);
+            var data = _qrCodeService.GetPaginatedData(dto);
             return ApiPageRes<QrCodeDto>.Pages(data);
         }
 

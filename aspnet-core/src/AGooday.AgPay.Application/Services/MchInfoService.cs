@@ -60,12 +60,12 @@ namespace AGooday.AgPay.Application.Services
             if (!string.IsNullOrWhiteSpace(dto.MchLevel))
             {
                 entity.MchLevel = dto.MchLevel;
-                _mchInfoRepository.Update(entity, e => new { e.UpdatedAt });
+                _mchInfoRepository.Update(entity, e => new { e.MchLevel, e.UpdatedAt });
             }
             if (!string.IsNullOrWhiteSpace(dto.Sipw))
             {
                 entity.Sipw = dto.Sipw;
-                _mchInfoRepository.Update(entity, e => new { e.UpdatedAt });
+                _mchInfoRepository.Update(entity, e => new { e.Sipw, e.UpdatedAt });
             }
             return _mchInfoRepository.SaveChanges(out int _);
         }
