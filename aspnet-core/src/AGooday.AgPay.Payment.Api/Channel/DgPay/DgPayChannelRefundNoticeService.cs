@@ -11,16 +11,16 @@ using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using static AGooday.AgPay.Payment.Api.Channel.IChannelNoticeService;
+using static AGooday.AgPay.Payment.Api.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Channel.DgPay
 {
     /// <summary>
-    /// 斗拱回调
+    /// 斗拱支付 退款回调接口实现类
     /// </summary>
-    public class DgPayChannelNoticeService : AbstractChannelNoticeService
+    public class DgPayChannelRefundNoticeService : AbstractChannelRefundNoticeService
     {
-        public DgPayChannelNoticeService(ILogger<DgPayChannelNoticeService> logger,
+        public DgPayChannelRefundNoticeService(ILogger<DgPayChannelRefundNoticeService> logger,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, configContextQueryService)
@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
 
         public override string GetIfCode()
         {
-            return CS.IF_CODE.SXFPAY;
+            return CS.IF_CODE.DGPAY;
         }
 
         public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
@@ -38,8 +38,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             {
                 JObject @params = GetReqParamJSON();
                 var data = @params.GetValue("resp_data")?.ToObject<JObject>();
-                string payOrderId = data?.GetValue("req_seq_id")?.ToString();
-                return new Dictionary<string, object>() { { payOrderId, @params } };
+                string refundOrderId = data?.GetValue("req_seq_id")?.ToString();
+                return new Dictionary<string, object>() { { refundOrderId, @params } };
             }
             catch (Exception e)
             {
@@ -48,32 +48,33 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
+        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
                 ChannelRetMsg result = ChannelRetMsg.ConfirmSuccess(null);
 
-                string logPrefix = "【处理斗拱支付回调】";
+                string logPrefix = "【处理斗拱支付退款回调】";
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
                 _logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
 
-                // 校验支付回调
-                bool verifyResult = VerifyParams(jsonParams, payOrder, mchAppConfigContext);
+                // 校验退款回调
+                bool verifyResult = VerifyParams(jsonParams, mchAppConfigContext);
                 // 验证参数失败
                 if (!verifyResult)
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                _logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
+                _logger.LogInformation($"{logPrefix}验证退款通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 JObject resJSON = new JObject();
-                resJSON.Add("resp_code", "00000000");
-                resJSON.Add("resp_desc", "成功");
+                resJSON.Add("code", "success");
+                resJSON.Add("msg", "成功");
                 var okResponse = JsonResp(resJSON);
                 result.ResponseEntity = okResponse;
+
 
                 var data = jsonParams.GetValue("resp_data")?.ToObject<JObject>();
                 string respCode = data?.GetValue("resp_code").ToString(); //业务响应码
@@ -96,8 +97,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                     switch (transStat)
                     {
                         case DgPayEnum.TransStat.S:
-                            result.ChannelMchNo = huifuId;
-                            result.ChannelOrderId = hfSeqId;
+                            result.ChannelOrderId = reqSeqId;
                             result.ChannelUserId = subOpenid ?? buyerId;
                             result.PlatformOrderId = outTransId;
                             result.PlatformMchOrderId = partyOrderId;
@@ -125,21 +125,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             }
         }
 
-        public bool VerifyParams(JObject jsonParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public bool VerifyParams(JObject jsonParams, MchAppConfigContext mchAppConfigContext)
         {
-            string reqSeqId = jsonParams.GetValue("req_seq_id").ToString(); // 商户订单号
-            string transAmt = jsonParams.GetValue("trans_amt").ToString();  // 支付金额
-            if (string.IsNullOrWhiteSpace(reqSeqId))
-            {
-                _logger.LogInformation($"订单ID为空 [reqSeqId]={reqSeqId}");
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(transAmt))
-            {
-                _logger.LogInformation($"金额参数为空 [amt] :{transAmt}");
-                return false;
-            }
-
             //验签
             string publicKey;
             if (mchAppConfigContext.IsIsvSubMch())
@@ -169,15 +156,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             //验签失败
             if (!DgSignUtil.Verify(jsonParams, publicKey))
             {
-                _logger.LogInformation($"【斗拱回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
-                return false;
-            }
-
-            // 核对金额
-            long dbPayAmt = payOrder.Amount;
-            if (dbPayAmt != Convert.ToInt64(transAmt))
-            {
-                _logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={transAmt}, payOrderId={reqSeqId}");
+                _logger.LogInformation($"【斗拱支付回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
                 return false;
             }
             return true;
