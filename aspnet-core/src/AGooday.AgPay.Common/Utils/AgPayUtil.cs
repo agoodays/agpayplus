@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Common.Utils
             else if ("RSA2".Equals(signType))
             {
                 var signString = ConvertSignStringIncludeEmpty(param);
-                return RsaUtil.Sign(signString, RSA2_PRIVATE_KEY);
+                return RsaUtil.Sign(signString, RSA2_PRIVATE_KEY, signType: "RSA2");
             }
             else
             {
@@ -123,7 +123,7 @@ namespace AGooday.AgPay.Common.Utils
         private static bool VerifyRSA2(JObject param, string sign, string publicKey)
         {
             var signString = ConvertSignStringIncludeEmpty(param);
-            var flag = RsaUtil.Verify(signString, publicKey, sign);
+            var flag = RsaUtil.Verify(signString, publicKey, sign, signType: "RSA2");
             return flag;
         }
 

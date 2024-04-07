@@ -16,7 +16,7 @@ namespace AGooday.AgPay.AopSdk.Utils
             else if ("RSA2".Equals(signType))
             {
                 var signString = GetStrSort(map);
-                return RsaUtil.Sign(signString, key);
+                return RsaUtil.Sign(signString, key, signType: "RSA2");
             }
             else
             {
@@ -33,7 +33,7 @@ namespace AGooday.AgPay.AopSdk.Utils
             else if ("RSA2".Equals(signType))
             {
                 var signString = GetStrSort(map);
-                return RsaUtil.Verify(signString, key, sign);
+                return RsaUtil.Verify(signString, key, sign, signType: "RSA2");
             }
             else
             {

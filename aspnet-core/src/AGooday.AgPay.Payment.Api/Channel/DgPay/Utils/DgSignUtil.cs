@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.Utils
         public static string Sign(JObject reqParams, string privateKey)
         {
             var signString = ConvertSignStringIncludeEmpty(reqParams);
-            var sign = RsaUtil.Sign(signString, privateKey);
+            var sign = RsaUtil.Sign(signString, privateKey, signType: "RSA2");
             return sign;
         }
 
@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.Utils
             string sign = resParams.GetValue("sign").ToString();
             string data = resParams.GetValue("data").ToString();
             var signString = ConvertSignStringIncludeEmpty(JObject.Parse(data));
-            var flag = RsaUtil.Verify(signString, publicKey, sign);
+            var flag = RsaUtil.Verify(signString, publicKey, sign, signType: "RSA2");
             return flag;
         }
 
