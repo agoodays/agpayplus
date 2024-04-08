@@ -15,6 +15,12 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         public string Openid { get; set; }
 
         /// <summary>
+        /// 微信公众号或小程序AppId
+        /// </summary>
+        [Required(ErrorMessage = "subAppId不能为空")]
+        public string SubAppId { get; set; }
+
+        /// <summary>
         /// 标志是否为 subMchAppId的对应 openId， 0-否， 1-是， 默认否
         /// </summary>
         public byte IsSubOpenId { get; set; }

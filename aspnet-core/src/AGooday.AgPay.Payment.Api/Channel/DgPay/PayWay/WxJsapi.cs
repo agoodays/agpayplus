@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params.DgPay;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.DgPay.Enumerator;
@@ -40,13 +39,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
 
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
 
-            // 获取微信官方配置的 appId
-            DgPayIsvSubMchParams sxfpayIsvParams = (DgPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            //// 获取微信官方配置的 appId
+            //DgPayIsvSubMchParams dgpayIsvParams = (DgPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
             //斗拱扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
-            var wxData = JObject.FromObject(new { openid = bizRQ.Openid, sub_appid = sxfpayIsvParams.SubMchLiteAppId });
+            var wxData = JObject.FromObject(new { openid = bizRQ.Openid, sub_appid = bizRQ.SubAppId });
             reqParams.Add("wx_data", wxData.ToString());//支付宝扩展参数集合
 
             // 发送请求
