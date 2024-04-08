@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg DgBar(JObject reqParams, PayOrderDto payOrder, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public ChannelRetMsg DgBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                     支付宝渠道：买家支付宝用户号buyer_user_id
                     微信渠道：微信平台的sub_openid*/
                     data.TryGetString("wx_user_id", out string userId);
-                    var wxResponse = data.GetValue("wx_response")?.ToObject<JObject>(); ;
+                    var wxResponse = data.GetValue("wx_response")?.ToObject<JObject>();
                     var alipayResponse = data.GetValue("alipay_response")?.ToObject<JObject>();
                     var unionpayResponse = data.GetValue("unionpay_response")?.ToObject<JObject>();
                     var subOpenid = wxResponse?.GetValue("sub_openid").ToString();
