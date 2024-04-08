@@ -575,6 +575,10 @@
             /// 斗拱支付
             /// </summary>
             public const string DGPAY = "dgpay";     // 斗拱支付
+            /// <summary>
+            /// 拉卡拉支付
+            /// </summary>
+            public const string LKLPAY = "lklpay";   // 拉卡拉支付
         }
 
         /// <summary>

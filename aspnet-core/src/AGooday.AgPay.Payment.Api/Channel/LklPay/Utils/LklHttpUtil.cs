@@ -10,11 +10,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay.Utils
         private static readonly string DEFAULT_CHARSET = "UTF-8";
         private static readonly int DEFAULT_TIMEOUT = 60; // 60 秒超时
 
-        public static string DoPostJson(string url, string appId, string serialNo,string privateKey, JObject reqParams, out Dictionary<string, string> headers)
+        public static string DoPostJson(string url, string appId, string serialNo, string privateCert, JObject reqParams, out Dictionary<string, string> headers)
         {
             headers = null;
             var client = new AgHttpClient(DEFAULT_TIMEOUT, DEFAULT_CHARSET);
-            var authorization = LklSignUtil.GetAuthorizationHeader(appId, serialNo, reqParams.ToString(), privateKey);
+            var authorization = LklSignUtil.GetAuthorizationHeader(appId, serialNo, reqParams.ToString(), privateCert);
             var request = new AgHttpClient.Request()
             {
                 Url = url,

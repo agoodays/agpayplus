@@ -80,7 +80,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
             try
             {
-
                 string payOrderId = payOrder.PayOrderId;
 
                 //查询支付接口是否存在
