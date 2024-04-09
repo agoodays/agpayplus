@@ -61,13 +61,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay.PayWay
                     respData.TryGetString("merchant_no", out string merchantNo);//全局流水号
                     respData.TryGetString("trade_no", out string tradeNo);//全局流水号
                     var accRespFields = respData.GetValue("acc_resp_fields")?.ToObject<JObject>();
-                    string prepayId = respData.GetValue("prepay_id").ToString();//微信预下单id
-                    string payAppId = respData.GetValue("app_id").ToString();//微信 AppId
-                    string payTimeStamp = respData.GetValue("time_stamp").ToString();//微信 TimeStamp
-                    string paynonceStr = respData.GetValue("nonce_str").ToString();//微信 NonceStr
-                    string payPackage = respData.GetValue("package").ToString();//微信 Package
-                    string paySignType = respData.GetValue("sign_type").ToString();//微信 SignType
-                    string paySign = respData.GetValue("pay_sign").ToString();//微信 Sign
+                    string prepayId = accRespFields.GetValue("prepay_id").ToString();//微信预下单id
+                    string payAppId = accRespFields.GetValue("app_id").ToString();//微信 AppId
+                    string payTimeStamp = accRespFields.GetValue("time_stamp").ToString();//微信 TimeStamp
+                    string paynonceStr = accRespFields.GetValue("nonce_str").ToString();//微信 NonceStr
+                    string payPackage = accRespFields.GetValue("package").ToString();//微信 Package
+                    string paySignType = accRespFields.GetValue("sign_type").ToString();//微信 SignType
+                    string paySign = accRespFields.GetValue("pay_sign").ToString();//微信 Sign
                     JObject payInfo = new JObject
                     {
                         { "appId", payAppId },

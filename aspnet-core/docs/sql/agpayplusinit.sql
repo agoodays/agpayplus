@@ -2021,6 +2021,14 @@ VALUES ('dgpay', '斗拱支付', 1, 1, 1,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
         'https://cloudpnrcdn.oss-cn-shanghai.aliyuncs.com/dgwebsite/api-public/docs/images/favicon.ico', '#0f3e66', 1, '汇付天下聚合支付平台');
 
+INSERT INTO `t_pay_interface_define` (`if_code`, `if_name`, `is_mch_mode`, `is_isv_mode`, `config_page_type`, `isv_params`, `isvsub_mch_params`, `normal_mch_params`, `way_codes`, `icon`, `bg_color`, `state`, `remark`)
+VALUES ('lklpay', '拉卡拉支付', 0, 1, 1,
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"orgCode","desc":"机构号","type":"text","verify":"required"},{"name":"appId","desc":"appId","type":"text","verify":"required"},{"name":"channelNoWx","desc":"微信渠道号","type":"text","verify":""},{"name":"channelNoAli","desc":"支付宝渠道号","type":"text","verify":""},{"name":"wxOpenUrl","desc":"微信渠道拓展二维码URL","type":"text","verify":""},{"name":"aliChannelExtUrl","desc":"支付宝渠道拓展二维码URL","type":"text","verify":""},{"name":"serialNo","desc":"证书序列号","type":"text","verify":"required"},{"name":"privateCert","desc":"应用私钥证书（.pem格式）","type":"file","verify":"required"},{"name":"publicCert","desc":"拉卡拉公钥证书（.cer格式）","type":"file","verify":"required"}]',
+        '[{"name":"merchantNo","desc":"商户号","type":"text","verify":"required"},{"name":"termNo","desc":"终端号","type":"text","verify":"required"},{"name":"subMchId","desc":"微信子商户号","type":"text","verify":""}]',
+        NULL,
+        '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_LITE"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_LITE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
+        'http://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/lklpay.svg', '#00AFEC', 1, '拉卡拉开放平台');
+
 -- 初始化设备供应商接口定义
 INSERT INTO `t_device_provider_define` (`provider_code`, `provider_name`, `config_page_type`, `provider_params`, `device_types`, `icon`, `bg_color`, `state`, `remark`)
 VALUES ('zgwl', '智谷联', 1,

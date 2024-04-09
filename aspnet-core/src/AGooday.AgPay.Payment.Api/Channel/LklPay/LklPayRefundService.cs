@@ -60,9 +60,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
                 if ("BBS00000".Equals(code))
                 {
                     var respData = resJSON.GetValue("req_data").ToObject<JObject>();
-                    string tradeState = respData.GetValue("trade_state").ToString();
                     string tradeNo = respData.GetValue("trade_no").ToString();//拉卡拉商户订单号
                     string accTradeNo = respData.GetValue("acc_trade_no").ToString();//拉卡拉商户订单号
+                    string tradeState = respData.GetValue("trade_state").ToString();
                     var orderStatus = LklPayEnum.ConvertTradeState(tradeState);
                     switch (orderStatus)
                     {

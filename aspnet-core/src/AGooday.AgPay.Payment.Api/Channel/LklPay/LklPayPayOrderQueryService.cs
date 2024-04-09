@@ -53,11 +53,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
                 {
                     var respData = resJSON.GetValue("req_data").ToObject<JObject>();
                     respData.TryGetString("merchant_no", out string merchantNo);
-                    string tradeState = respData.GetValue("trade_state").ToString();
                     string tradeNo = respData.GetValue("trade_no").ToString();//拉卡拉商户订单号
                     string accTradeNo = respData.GetValue("acc_trade_no").ToString();//拉卡拉商户订单号
                     respData.TryGetString("user_id1", out string userId1);
                     respData.TryGetString("user_id2", out string userId2);
+                    string tradeState = respData.GetValue("trade_state").ToString();
                     var orderStatus = LklPayEnum.ConvertTradeState(tradeState);
                     switch (orderStatus)
                     {
