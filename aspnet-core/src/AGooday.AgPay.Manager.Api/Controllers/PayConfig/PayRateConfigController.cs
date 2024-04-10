@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("savedMapData"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_AGENT_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiRes List(string configMode, string infoId, string ifCode)
+        public ApiRes SavedMapData(string configMode, string infoId, string ifCode)
         {
             return ApiRes.Ok(_payRateConfigService.GetByInfoIdAndIfCodeJson(configMode, infoId, ifCode));
         }

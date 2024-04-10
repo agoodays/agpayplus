@@ -137,7 +137,9 @@ export default {
       ],
       sysRSA2PublicKey: '',
       rules: {
-        appName: [{ required: true, message: '请输入应用名称', trigger: 'blur' }]
+        appName: [{ required: true, message: '请输入应用名称', trigger: 'blur' }],
+        appSecret: [{ required: true, message: '请输入MD5秘钥', trigger: 'blur' }],
+        appRsa2PublicKey: [{ required: true, message: '请输入RSA2应用公钥', trigger: 'blur' }]
       }
     }
   },
@@ -147,16 +149,18 @@ export default {
       this.isAdd = !appId
       // 数据清空
       this.saveObject = {
-        'state': 1,
-        'defaultFlag': 0,
-        'appSignType': [],
-        'appSecret': '',
-        'appSecret_ph': '请输入'
+        state: 1,
+        defaultFlag: 0,
+        appSignType: ['MD5'],
+        appSecret: '',
+        appSecret_ph: '请输入'
       }
 
       if (this.$refs.infoFormModel !== undefined) {
         this.$refs.infoFormModel.resetFields()
       }
+
+      this.rules.appSecret = [{ required: true, message: '请输入MD5秘钥', trigger: 'blur' }]
 
       const that = this
       that.rules.appSecret = []
@@ -167,18 +171,14 @@ export default {
           that.saveObject = res
           that.saveObject.appSecret_ph = res.appSecret
           that.saveObject.appSecret = ''
+          const deleteAppSecretRules = !!that.saveObject.appSecret_ph
+          if (deleteAppSecretRules) {
+            delete that.rules.appSecret
+          }
         })
-        this.visible = true
-      } else {
-        // 新增时，appSecret必填
-        that.rules.appSecret.push({
-          required: true,
-          message: '请输入私钥或点击随机生成私钥',
-          trigger: 'blur'
-        })
-
-        that.visible = true // 展示弹层信息
       }
+
+      this.visible = true
 
       getSysRSA2PublicKey().then(res => {
         that.sysRSA2PublicKey = res

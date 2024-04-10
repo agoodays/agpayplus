@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.MchNo = sysUser.BelongInfoId;
-            dto.AppId = Guid.NewGuid().ToString("N").Substring(0, 24);
+            dto.AppId = SeqUtil.GenAppId();
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             if (!_mchInfoService.IsExistMchNo(dto.MchNo))

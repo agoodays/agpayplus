@@ -6,7 +6,6 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -125,6 +124,8 @@ namespace AGooday.AgPay.Application.Services
             }
         }
 
+        #region 丢弃
+        [Obsolete("请使用 GetByInfoIdAndIfCodeJson() 代替")]
         public Dictionary<string, Dictionary<string, PayRateConfigDto>> GetByInfoIdAndIfCode(string configMode, string infoId, string ifCode)
         {
             string isvNo;
@@ -171,6 +172,7 @@ namespace AGooday.AgPay.Application.Services
             return rateConfig;
         }
 
+        [Obsolete("请使用 GetReadOnlyRateJson() 代替")]
         private void GetReadOnlyRate(string ifCode, Dictionary<string, Dictionary<string, PayRateConfigDto>> rateConfig, string isvNo, string agentNo, string configType)
         {
             if (!string.IsNullOrWhiteSpace(isvNo))
@@ -192,6 +194,7 @@ namespace AGooday.AgPay.Application.Services
             }
         }
 
+        [Obsolete("请使用 GetPayRateConfigJson() 代替")]
         private Dictionary<string, PayRateConfigDto> GetPayRateConfig(string configType, string infoType, string infoId, string ifCode)
         {
             Dictionary<string, PayRateConfigDto> keyValues = new Dictionary<string, PayRateConfigDto>();
@@ -202,6 +205,7 @@ namespace AGooday.AgPay.Application.Services
             }
             return keyValues;
         }
+        #endregion
 
         public JObject GetByInfoIdAndIfCodeJson(string configMode, string infoId, string ifCode)
         {

@@ -25,6 +25,23 @@ namespace AGooday.AgPay.Application.Services
             _mchInfoRepository = mchInfoRepository;
         }
 
+        public override bool Update(MchAppDto dto)
+        {
+            var origin = _mchAppRepository.GetAsNoTrackingById(dto.AppId);
+            var entity = _mapper.Map<MchApp>(dto);
+            if (string.IsNullOrWhiteSpace(entity.AppSecret))
+            {
+                entity.AppSecret = origin.AppSecret;
+            }
+            if (string.IsNullOrWhiteSpace(entity.AppRsa2PublicKey))
+            {
+                entity.AppRsa2PublicKey = origin.AppRsa2PublicKey;
+            }
+            entity.UpdatedAt = DateTime.Now;
+            _mchAppRepository.Update(entity);
+            return _mchAppRepository.SaveChanges(out int _);
+        }
+
         public MchAppDto GetById(string recordId, string mchNo)
         {
             var entity = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId)).FirstOrDefault();
