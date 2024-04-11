@@ -45,10 +45,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
             string logPrefix = $"【拉卡拉({transType})退款查询】";
             try
             {
-                reqParams.Add("out_refund_order_no", refundOrder.RefundOrderId); // 退款订单号
+                reqParams.Add("out_trade_no", refundOrder.RefundOrderId); // 退款订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = lklpayPaymentService.PackageParamAndReq("/api/v3/labs/query/idmrefundquery", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = lklpayPaymentService.PackageParamAndReq("/api/v3/labs/query/tradequery", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -113,14 +113,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
             string logPrefix = $"【拉卡拉({transType})订单退款】";
             try
             {
-                reqParams.Add("out_refund_order_no", refundOrder.RefundOrderId); // 商户退款订单号
+                reqParams.Add("out_trade_no", refundOrder.RefundOrderId); // 商户退款订单号
                 reqParams.Add("origin_out_trade_no", payOrder.PayOrderId); // 原商户交易流水号
                 reqParams.Add("refund_amount", refundOrder.RefundAmount); // 退款金额
                 //reqParams.Add("notify_url", GetNotifyUrl());
                 reqParams.Add("refund_reason", refundOrder.RefundReason); // 退款原因
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = lklpayPaymentService.PackageParamAndReq("/api/v3/labs/relation/idmrefund", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = lklpayPaymentService.PackageParamAndReq("/api/v3/labs/relation/refund", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
