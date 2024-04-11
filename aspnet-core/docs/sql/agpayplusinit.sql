@@ -158,6 +158,29 @@ CREATE TABLE `t_sys_article`(
   PRIMARY KEY (`article_id`)
 ) ENGINE=INNODB AUTO_INCREMENT=1001 CHARSET=utf8mb4 COMMENT='文章信息表';
 
+-- 广告信息表
+DROP TABLE IF EXISTS `t_sys_advert`;
+CREATE TABLE `t_sys_advert`(
+  `advert_id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '广告ID',
+  `title` VARCHAR(64) NOT NULL COMMENT '广告标题',
+--   `subtitle` VARCHAR(64) NOT NULL COMMENT '广告副标题',
+  `advert_type` TINYINT(6) NOT NULL DEFAULT '1' COMMENT '广告类型: 1-刷脸设备 2-支付后 3-商户通APP 4-展业宝APP 5-商户系统登录页 6-代理商系统登录页',
+  `app_place` TINYINT(6) NULL COMMENT '广告位置: 1-首页 2-启动页 3-我的页 4-点金计划广告 5-小程序广告',
+  `app_place_type` TINYINT(6) NULL COMMENT '广告位置类型: 1-卡片广告 2-轮播广告',
+  `app_content` VARCHAR(4096) NULL COMMENT '接口配置参数,json字符串',
+  `img_url` VARCHAR(128) NOT NULL COMMENT '广告图片/预览图',
+  `link_url` VARCHAR(128) NOT NULL COMMENT '广告链接',
+  `advert_sort` INT NOT NULL DEFAULT '0' COMMENT '排序字段, 规则：正序',
+  `release_state` TINYINT NOT NULL DEFAULT '1' COMMENT '发布状态 0-待发布, 1-已发布',
+  `mch_no` VARCHAR(64) NULL COMMENT '商户号',
+  `agent_no` VARCHAR(64) NULL COMMENT '代理商号',
+  `created_uid` BIGINT(20) COMMENT '创建者用户ID',
+  `created_by` VARCHAR(64) COMMENT '创建者姓名',
+  `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
+  `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '更新时间',
+  PRIMARY KEY (`advert_id`)
+) ENGINE=INNODB AUTO_INCREMENT=100001 CHARSET=utf8mb4 COMMENT='广告信息表';
+
 -- 系统操作日志表
 DROP TABLE IF EXISTS `t_sys_log`;
 CREATE TABLE `t_sys_log` (
