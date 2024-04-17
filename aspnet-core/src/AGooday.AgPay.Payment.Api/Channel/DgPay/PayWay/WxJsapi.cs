@@ -47,6 +47,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
             payType == "WECHAT"或"ALIPAY"时必传*/
             var wxData = JObject.FromObject(new { openid = bizRQ.Openid, sub_appid = bizRQ.SubAppId });
             reqParams.Add("wx_data", wxData.ToString());//支付宝扩展参数集合
+            reqParams.Add("trade_type", DgPayEnum.TransType.T_JSAPI.ToString());//交易类型
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/trade/payment/jspay", reqParams, logPrefix, mchAppConfigContext);

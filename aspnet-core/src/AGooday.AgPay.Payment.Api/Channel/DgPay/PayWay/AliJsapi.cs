@@ -43,6 +43,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
             payType == "WECHAT"或"ALIPAY"时必传*/
             var alipayData = JObject.FromObject(new { buyer_id = bizRQ.BuyerUserId });
             reqParams.Add("alipay_data", alipayData.ToString());//支付宝扩展参数集合
+            reqParams.Add("trade_type", DgPayEnum.TransType.A_JSAPI.ToString());//交易类型
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/trade/payment/jspay", reqParams, logPrefix, mchAppConfigContext);
@@ -59,12 +60,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
                     data.TryGetString("hf_seq_id", out string hfSeqId);//全局流水号
                     data.TryGetString("req_seq_id", out string reqSeqId);//请求流水号
                     data.TryGetString("party_order_id", out string partyOrderId);//用户账单上的商户订单号	
+                    var payInfo = data.GetValue("pay_info").ToString();
+                    var tradeNo = JObject.Parse(payInfo).GetValue("tradeNO").ToString();
                     string _transStat = data.GetValue("trans_stat").ToString();
                     var transStat = DgPayEnum.ConvertTransStat(_transStat);
                     switch (transStat)
                     {
                         case DgPayEnum.TransStat.P:
-                            res.AlipayTradeNo = partyOrderId;
+                            res.AlipayTradeNo = tradeNo;
                             channelRetMsg.ChannelOrderId = hfSeqId;
                             channelRetMsg.ChannelState = ChannelState.WAITING;
                             break;

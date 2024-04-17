@@ -38,6 +38,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
             // 请求参数赋值
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
+            reqParams.Add("trade_type", DgPayEnum.TransType.A_NATIVE.ToString());//交易类型
+
             // 发送请求
             JObject resJSON = PackageParamAndReq("/trade/payment/jspay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑

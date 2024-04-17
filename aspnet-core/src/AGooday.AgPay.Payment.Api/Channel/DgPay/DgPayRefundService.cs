@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                 if ("00000000".Equals(respCode))
                 {
                     data.TryGetString("org_hf_seq_id", out string orgHfSeqId);//全局流水号
-                    data.TryGetString("req_seq_id", out string reqSeqId);//请求流水号
+                    data.TryGetString("org_req_seq_id", out string orgReqSeqId);//请求流水号
                     string _transStat = data.GetValue("trans_stat").ToString();
                     var transStat = DgPayEnum.ConvertTransStat(_transStat);
                     switch (transStat)
