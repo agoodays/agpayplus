@@ -89,7 +89,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                 }
                 else
                 {
-                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                     channelRetMsg.ChannelErrCode = respCode;
                     channelRetMsg.ChannelErrMsg = respDesc;
                 }
