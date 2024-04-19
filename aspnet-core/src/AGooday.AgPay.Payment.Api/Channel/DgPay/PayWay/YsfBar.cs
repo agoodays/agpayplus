@@ -32,7 +32,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
             YsfBarOrderRS res = ApiResBuilder.BuildSuccess<YsfBarOrderRS>();
 
             JObject reqParams = new JObject();
-            reqParams.Add("trade_type", DgPayEnum.TransType.U_MICROPAY.ToString());//交易类型
             reqParams.Add("auth_code", bizRQ.AuthCode.Trim()); //授权码 通过扫码枪/声波获取设备获取的支付宝/微信/银联付款码
             // 斗拱 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder, GetNotifyUrl());

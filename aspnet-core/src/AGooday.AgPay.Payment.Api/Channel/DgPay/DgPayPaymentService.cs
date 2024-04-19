@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             channelRetMsg.ChannelMchNo = huifuId;
             try
             {
-                if ("00000000".Equals(respCode))
+                if ("00000000".Equals(respCode) || "00000100".Equals(respCode))
                 {
                     data.TryGetString("hf_seq_id", out string hfSeqId);//全局流水号
                     data.TryGetString("req_seq_id", out string reqSeqId);//请求流水号
@@ -81,12 +81,21 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                     var transStat = DgPayEnum.ConvertTransStat(_transStat);
                     switch (transStat)
                     {
+                        case DgPayEnum.TransStat.P:
                         case DgPayEnum.TransStat.S:
                             channelRetMsg.ChannelOrderId = hfSeqId;
                             channelRetMsg.ChannelUserId = subOpenid ?? buyerId;
                             channelRetMsg.PlatformOrderId = outTransId;
                             channelRetMsg.PlatformMchOrderId = partyOrderId;
-                            channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                            if (transStat.Equals(DgPayEnum.TransStat.S))
+                            {
+                                channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                            }
+                            else
+                            {
+                                channelRetMsg.ChannelState = ChannelState.WAITING;
+                                channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                            }
                             break;
                         case DgPayEnum.TransStat.F:
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;

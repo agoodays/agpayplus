@@ -92,6 +92,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                 }
                 else
                 {
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                     channelRetMsg.ChannelErrCode = respCode;
                     channelRetMsg.ChannelErrMsg = respDesc;
                 }
@@ -133,7 +134,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                 string respDesc = data?.GetValue("resp_desc").ToString(); //业务响应信息	
                 string huifuId = data?.GetValue("huifu_id")?.ToString();
                 channelRetMsg.ChannelMchNo = huifuId;
-                if ("00000000".Equals(respCode))
+                if ("00000000".Equals(respCode) || "00000100".Equals(respCode))
                 {
                     data.TryGetString("hf_seq_id", out string hfSeqId);//全局流水号
                     data.TryGetString("req_seq_id", out string reqSeqId);//请求流水号
@@ -156,6 +157,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                             break;
                         case DgPayEnum.TransStat.P:
                             //退款中
+                            channelRetMsg.ChannelOrderId = hfSeqId;
                             channelRetMsg.ChannelState = ChannelState.WAITING;
                             _logger.LogInformation($"{logPrefix} >>> 退款中");
                             break;

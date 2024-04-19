@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
             channelRetMsg.ChannelMchNo = huifuId;
             try
             {
-                if ("00000000".Equals(respCode))
+                if ("00000000".Equals(respCode) || "00000100".Equals(respCode))
                 {
                     data.TryGetString("hf_seq_id", out string hfSeqId);//全局流水号
                     data.TryGetString("req_seq_id", out string reqSeqId);//请求流水号
