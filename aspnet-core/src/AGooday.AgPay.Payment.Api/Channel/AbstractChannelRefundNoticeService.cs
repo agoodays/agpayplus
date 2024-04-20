@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
+using System.Net;
+using System.Net.Mime;
 using static AGooday.AgPay.Payment.Api.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Channel
@@ -41,13 +43,13 @@ namespace AGooday.AgPay.Payment.Api.Channel
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected ContentResult TextResp(string text)
+        protected ContentResult TextResp(string text, int statusCode = (int)HttpStatusCode.OK)
         {
             return new ContentResult
             {
-                StatusCode = 200,
+                StatusCode = statusCode,
                 Content = text,
-                ContentType = "text/html"
+                ContentType = MediaTypeNames.Text.Html,
             };
         }
 
@@ -56,13 +58,13 @@ namespace AGooday.AgPay.Payment.Api.Channel
         /// </summary>
         /// <param name="body"></param>
         /// <returns></returns>
-        protected ObjectResult JsonResp(object body)
+        protected ObjectResult JsonResp(object body, int statusCode = (int)HttpStatusCode.OK)
         {
             var mediaType = new MediaTypeCollection();
-            mediaType.Add(MediaTypeHeaderValue.Parse("application/json"));
+            mediaType.Add(MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json));
             return new ObjectResult(body)
             {
-                StatusCode = 200,
+                StatusCode = statusCode,
                 ContentTypes = mediaType
             };
         }

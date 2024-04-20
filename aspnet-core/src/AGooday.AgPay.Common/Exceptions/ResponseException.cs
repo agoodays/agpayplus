@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Net.Mime;
 
 namespace AGooday.AgPay.Common.Exceptions
 {
@@ -19,13 +21,13 @@ namespace AGooday.AgPay.Common.Exceptions
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static ResponseException BuildText(string text)
+        public static ResponseException BuildText(string text, int statusCode = (int)HttpStatusCode.OK)
         {
             var entity = new ContentResult
             {
-                StatusCode = 200,
+                StatusCode = statusCode,
                 Content = text,
-                ContentType = "text/html"
+                ContentType = MediaTypeNames.Text.Html
             }; ;
             return new ResponseException(entity);
         }

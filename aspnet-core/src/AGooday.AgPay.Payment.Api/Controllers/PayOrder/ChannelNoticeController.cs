@@ -260,7 +260,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 //{
                 //    message = "id must larger than zero."
                 //});
-                //return Content("id must larger than zero.", "text/html");
+                //return Content("id must larger than zero.", MediaTypeNames.Text.Html);
                 return notifyResult.ResponseEntity;
             }
             catch (BizException e)

@@ -204,13 +204,13 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public ActionResult TextResp(string text)
+        public ActionResult TextResp(string text, int statusCode = (int)HttpStatusCode.OK)
         {
             var response = new ContentResult
             {
                 Content = text,
                 ContentType = MediaTypeNames.Text.Html,
-                StatusCode = (int)HttpStatusCode.OK
+                StatusCode = statusCode
             };
             return response;
         }

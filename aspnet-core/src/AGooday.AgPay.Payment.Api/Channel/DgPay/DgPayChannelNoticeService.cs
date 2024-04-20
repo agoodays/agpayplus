@@ -11,6 +11,7 @@ using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net;
 using static AGooday.AgPay.Payment.Api.Channel.IChannelNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Channel.DgPay
@@ -64,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                 // 验证参数失败
                 if (!verifyResult)
                 {
-                    throw ResponseException.BuildText("ERROR");
+                    throw ResponseException.BuildText("ERROR", (int)HttpStatusCode.BadRequest);
                 }
                 _logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
 
@@ -121,7 +122,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             catch (Exception e)
             {
                 _logger.LogError(e, "error");
-                throw ResponseException.BuildText("ERROR");
+                throw ResponseException.BuildText("ERROR", (int)HttpStatusCode.BadRequest);
             }
         }
 

@@ -11,6 +11,7 @@ using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net;
 using static AGooday.AgPay.Payment.Api.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Channel.DgPay
@@ -44,7 +45,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             catch (Exception e)
             {
                 _logger.LogError(e, "error");
-                throw ResponseException.BuildText("ERROR");
+                throw ResponseException.BuildText("ERROR", (int)HttpStatusCode.BadRequest);
             }
         }
 
@@ -121,7 +122,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             catch (Exception e)
             {
                 _logger.LogError(e, "error");
-                throw ResponseException.BuildText("ERROR");
+                throw ResponseException.BuildText("ERROR", (int)HttpStatusCode.BadRequest);
             }
         }
 

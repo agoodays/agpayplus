@@ -47,24 +47,24 @@ namespace AGooday.AgPay.Payment.Api.Channel
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        protected ActionResult TextResp(string text)
+        protected ActionResult TextResp(string text, int statusCode = (int)HttpStatusCode.OK)
         {
             var response = new ContentResult
             {
                 Content = text,
                 ContentType = MediaTypeNames.Text.Html,
-                StatusCode = (int)HttpStatusCode.OK
+                StatusCode = statusCode
             };
             return response;
         }
 
-        protected ActionResult JsonResp(object body)
+        protected ActionResult JsonResp(object body, int statusCode = (int)HttpStatusCode.OK)
         {
             var response = new ContentResult
             {
                 Content = JObject.FromObject(body).ToString(),
                 ContentType = MediaTypeNames.Application.Json,
-                StatusCode = (int)HttpStatusCode.OK
+                StatusCode = statusCode
             };
             return response;
         }
