@@ -2,6 +2,7 @@
 using AGooday.AgPay.Payment.Api.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net.Mime;
 
 namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.Utils
 {
@@ -23,9 +24,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.Utils
             var request = new AgHttpClient.Request()
             {
                 Url = url,
-                Method = "POST",
+                Method = HttpMethod.Post.Method,
                 Content = body,
-                ContentType = "application/json",
+                ContentType = MediaTypeNames.Application.Json,
                 Headers = new Dictionary<string, string> { { "Authorization", authorization } }
             };
             try

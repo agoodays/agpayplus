@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Net.Mime;
 
 namespace AGooday.AgPay.AopSdk.Nets
 {
@@ -20,7 +21,7 @@ namespace AGooday.AgPay.AopSdk.Nets
         public static APIHttpContent BuildJsonContent(Dictionary<string, object> @params)
         {
             ArgumentNullException.ThrowIfNull(@params);
-            return new APIHttpContent(CreateJsonString(@params), $"application/json");
+            return new APIHttpContent(CreateJsonString(@params), MediaTypeNames.Application.Json);
         }
 
         private static string CreateJsonString(Dictionary<string, object> @params)

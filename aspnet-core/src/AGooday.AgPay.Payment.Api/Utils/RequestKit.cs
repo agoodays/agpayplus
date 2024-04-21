@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using Newtonsoft.Json.Linq;
+using System.Net.Mime;
 using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Utils
@@ -129,7 +130,7 @@ namespace AGooday.AgPay.Payment.Api.Utils
 
             //有contentType  && json格式，  get请求不转换
             if (!string.IsNullOrEmpty(contentType) &&
-                contentType.Contains("application/json", StringComparison.CurrentCultureIgnoreCase) &&
+                contentType.Contains(MediaTypeNames.Application.Json, StringComparison.CurrentCultureIgnoreCase) &&
                 !_httpContextAccessor.HttpContext.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
             {
                 //application/json 需要转换为json格式；

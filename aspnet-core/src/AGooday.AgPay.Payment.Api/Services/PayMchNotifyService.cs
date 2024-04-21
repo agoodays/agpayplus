@@ -10,6 +10,7 @@ using AGooday.AgPay.Payment.Api.RQRS.Refund;
 using AGooday.AgPay.Payment.Api.RQRS.Transfer;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net.Mime;
 
 namespace AGooday.AgPay.Payment.Api.Services
 {
@@ -64,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string appSecret = _configContextQueryService.QueryMchApp(dbPayOrder.MchNo, dbPayOrder.AppId).AppSecret;
 
                 // 封装通知url
-                string reqMethod = "POST";
+                string reqMethod = HttpMethod.Post.Method;
                 string extParams = GetExtParams(dbPayOrder.MchNo, out string reqMediaType);
                 string notifyUrl = CreateNotifyUrl(dbPayOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
                 var nowDate = DateTime.Now;
@@ -134,7 +135,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string appSecret = _configContextQueryService.QueryMchApp(dbRefundOrder.MchNo, dbRefundOrder.AppId).AppSecret;
 
                 // 封装通知url
-                string reqMethod = "POST";
+                string reqMethod = HttpMethod.Post.Method;
                 string extParams = GetExtParams(dbRefundOrder.MchNo, out string reqMediaType);
                 string notifyUrl = CreateNotifyUrl(dbRefundOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
                 var nowDate = DateTime.Now;
@@ -203,7 +204,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 string appSecret = _configContextQueryService.QueryMchApp(dbTransferOrder.MchNo, dbTransferOrder.AppId).AppSecret;
 
                 // 封装通知url
-                string reqMethod = "POST";
+                string reqMethod = HttpMethod.Post.Method;
                 string extParams = GetExtParams(dbTransferOrder.MchNo, out string reqMediaType);
                 string notifyUrl = CreateNotifyUrl(dbTransferOrder, appSecret, reqMethod, reqMediaType, extParams, out string reqBody);
                 var nowDate = DateTime.Now;
@@ -325,11 +326,11 @@ namespace AGooday.AgPay.Payment.Api.Services
                 case "POST_QUERYSTRING":
                     break;
                 case "POST_BODY":
-                    reqMediaType = "application/x-www-form-urlencoded";
+                    reqMediaType = MediaTypeNames.Application.FormUrlEncoded;
                     break;
                 case "POST_JSON":
                 default:
-                    reqMediaType = "application/json";
+                    reqMediaType = MediaTypeNames.Application.Json;
                     break;
             }
 
@@ -364,10 +365,10 @@ namespace AGooday.AgPay.Payment.Api.Services
                         case "":
                             notifyUrl = URLUtil.AppendUrlQuery(notifyUrl, jsonObject);
                             break;
-                        case "application/x-www-form-urlencoded":
+                        case MediaTypeNames.Application.FormUrlEncoded:
                             body = BuildQueryString(jsonObject);
                             break;
-                        case "application/json":
+                        case MediaTypeNames.Application.Json:
                         default:
                             body = JsonConvert.SerializeObject(jsonObject);
                             break;

@@ -2,6 +2,7 @@
 using AGooday.AgPay.Common.Models;
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Mime;
 
 namespace AGooday.AgPay.Manager.Api.Middlewares
 {
@@ -29,7 +30,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            context.Response.ContentType = "application/json";// 返回json 类型
+            context.Response.ContentType = MediaTypeNames.Application.Json;// 返回json 类型
             var response = context.Response;
 
             ApiRes errorResponse = ApiRes.Fail(ApiCode.SYSTEM_ERROR, exception.Message);

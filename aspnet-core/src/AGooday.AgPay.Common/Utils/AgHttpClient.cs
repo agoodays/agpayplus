@@ -38,14 +38,14 @@ namespace AGooday.AgPay.Common.Utils
                 switch (request.Method)
                 {
                     case "POST":
-                        content = new StringContent(request.Content, Encoding.UTF8, request.ContentType);
+                        content = new StringContent(request.Content, encoding, request.ContentType);
                         httpResponse = client.PostAsync(request.Url, content).Result;
                         break;
                     case "GET":
                         httpResponse = client.GetAsync(request.Url).Result;
                         break;
                     case "PUT":
-                        content = new StringContent(request.Content, Encoding.UTF8, request.ContentType);
+                        content = new StringContent(request.Content, encoding, request.ContentType);
                         httpResponse = client.PutAsync(request.Url, content).Result;
                         break;
                     case "DELETE":
@@ -138,7 +138,7 @@ namespace AGooday.AgPay.Common.Utils
                 }
                 else if (httpResponse.StatusCode == HttpStatusCode.RequestTimeout)
                 {
-                    response.StatusCode = HttpStatusCode.GatewayTimeout;
+                    response.StatusCode = HttpStatusCode.RequestTimeout;
                     response.Content = "The request has timed out.";
                 }
                 else if (httpResponse.StatusCode == HttpStatusCode.GatewayTimeout)

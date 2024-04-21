@@ -146,7 +146,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             var jsonArray = JArray.FromObject(sysEnt);
             var leftMenuTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
             //var json = JsonConvert.SerializeObject(ApiRes.Ok(leftMenuTree));
-            //return Content(json, "application/json");
+            //return Content(json, MediaTypeNames.Application.Json);
             return ApiRes.Ok(leftMenuTree);
         }
     }

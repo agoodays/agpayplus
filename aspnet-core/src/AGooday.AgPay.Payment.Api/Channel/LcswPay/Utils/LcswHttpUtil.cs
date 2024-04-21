@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Exceptions;
+using System.Net.Mime;
 
 namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.Utils
 {
@@ -14,9 +15,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.Utils
             var request = new AgHttpClient.Request()
             {
                 Url = url,
-                Method = "POST",
+                Method = HttpMethod.Post.Method,
                 Content = reqParams,
-                ContentType = "application/json"
+                ContentType = MediaTypeNames.Application.Json
             };
             try
             {

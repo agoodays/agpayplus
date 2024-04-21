@@ -2,6 +2,7 @@
 using AGooday.AgPay.Payment.Api.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net.Mime;
 
 namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils
 {
@@ -16,9 +17,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.Utils
             var request = new AgHttpClient.Request()
             {
                 Url = url,
-                Method = "POST",
+                Method = HttpMethod.Post.Method,
                 Content = JsonConvert.SerializeObject(reqParams),
-                ContentType = "application/json"
+                ContentType = MediaTypeNames.Application.Json
             };
             try
             {
