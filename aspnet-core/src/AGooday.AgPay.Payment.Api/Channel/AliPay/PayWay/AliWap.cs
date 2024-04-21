@@ -62,13 +62,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
                 else if (CS.PAY_DATA_TYPE.CODE_IMG_URL.Equals(bizRQ.PayDataType))
                 {
 
-                    string payUrl = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req, null, "GET").Body;
+                    string payUrl = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req, null, HttpMethod.Get.Method).Body;
                     res.CodeImgUrl = _sysConfigService.GetDBApplicationConfig().GenScanImgUrl(payUrl);
                 }
                 else
                 { // 默认都为 payUrl方式
 
-                    res.PayUrl = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req, null, "GET").Body;
+                    res.PayUrl = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req, null, HttpMethod.Get.Method).Body;
                 }
             }
             catch (AopException e)
