@@ -135,6 +135,9 @@ namespace AGooday.AgPay.Payment.Api.Channel
             PayWayUtil.ServiceProvider = serviceProvider;
             AliPayKit.ServiceProvider = serviceProvider;
             WxPayKit.ServiceProvider = serviceProvider;
+
+            ChannelCertConfigKit.ServiceProvider = serviceProvider;
+            ChannelCertConfigKit.Initialize();
         }
     }
 

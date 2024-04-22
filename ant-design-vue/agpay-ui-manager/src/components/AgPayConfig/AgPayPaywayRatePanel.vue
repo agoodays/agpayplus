@@ -1891,6 +1891,10 @@ export default {
     width: 90%;
   }
 
+  .drawer-btn-center:first-child {
+    margin-right: 0px
+  }
+
   .drawer-btn-center-payfee {
     position: absolute;
     right: 0px;

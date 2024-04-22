@@ -198,8 +198,7 @@ SMSNativeInjectorBootStrapper.RegisterServices(services);
 
 services.AddSingleton<ChannelCertConfigKit>(serviceProvider =>
 {
-    var ossServiceFactory = serviceProvider.GetService<IOssServiceFactory>();
-    return new ChannelCertConfigKit(ossServiceFactory);
+    return new ChannelCertConfigKit(serviceProvider);
 });
 
 //var provider = services.BuildServiceProvider();

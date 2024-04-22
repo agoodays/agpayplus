@@ -10,11 +10,19 @@ namespace AGooday.AgPay.Payment.Api.Utils
     /// </summary>
     public class ChannelCertConfigKit
     {
-        public static string OssUseType { get; set; }
+        public static IServiceProvider ServiceProvider { get; set; }
+        private static string OssUseType { get; set; }
         private static IOssService OssService { get; set; }
 
-        public ChannelCertConfigKit(IOssServiceFactory ossServiceFactory)
+        public ChannelCertConfigKit(IServiceProvider serviceProvider)
         {
+            ServiceProvider = serviceProvider;
+            Initialize();
+        }
+
+        public static void Initialize()
+        {
+            var ossServiceFactory = ServiceProvider.GetService<IOssServiceFactory>();
             OssService = ossServiceFactory.GetService();
             OssUseType = ossServiceFactory.GetOssUseType();
         }

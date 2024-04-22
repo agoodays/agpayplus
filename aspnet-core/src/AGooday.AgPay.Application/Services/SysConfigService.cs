@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Application.Services
         /// true: 表示将使用内存缓存， 将部分系统配置项 或 商户应用/服务商信息进行缓存并读取
         /// false: 直接查询DB
         /// </summary>
-        public static bool IS_USE_CACHE = true;
+        public static bool IS_USE_CACHE = false;
 
         /// <summary>
         /// 数据库application配置参数

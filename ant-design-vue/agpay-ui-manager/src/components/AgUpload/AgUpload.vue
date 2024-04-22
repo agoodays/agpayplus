@@ -80,6 +80,9 @@ export default {
     const fileList = ref([])
     const loading = ref(false)
 
+    const fileItems = getDefaultFileList(props.urls)
+    fileList.value = [...fileItems]
+
     // 如果父组件传过来的数据是异步获取的，则需要进行监听
     watch(() => props.urls, () => {
       const fileItems = getDefaultFileList(props.urls)
