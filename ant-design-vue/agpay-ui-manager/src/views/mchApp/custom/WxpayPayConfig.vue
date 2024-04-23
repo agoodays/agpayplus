@@ -87,11 +87,11 @@
               accept=".p12"
               bind-name="cert"
               :urls="[ifParams.cert]"
-              listType="text"
+              listType="picture"
               @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
@@ -103,11 +103,11 @@
               accept=".pem"
               bind-name="apiClientCert"
               :urls="[ifParams.apiClientCert]"
-              listType="text"
+              listType="picture"
               @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
@@ -119,11 +119,11 @@
               accept=".pem"
               bind-name="apiClientKey"
               :urls="[ifParams.apiClientKey]"
-              listType="text"
+              listType="picture"
               @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>

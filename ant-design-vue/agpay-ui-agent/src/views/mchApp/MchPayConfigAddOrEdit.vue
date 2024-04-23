@@ -54,11 +54,11 @@
               :action="action"
               :bind-name="item.name"
               :urls="[ifParams[item.name]]"
-              listType="text"
+              listType="picture"
               @uploadSuccess="uploadSuccess"
             >
               <template slot="uploadSlot" slot-scope="{loading}">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> {{ loading ? '正在上传' : '点击上传' }} </a-button>
+                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
               </template>
             </AgUpload>
           </a-form-model-item>
