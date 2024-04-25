@@ -91,13 +91,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_CONFIG_EDIT)]
         public ApiRes SetMchSipw(ModifyMchSipw model)
         {
-            var mchinfo = _mchInfoService.GetById(GetCurrentMchNo());
+            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);
-            bool verified = BCryptUtil.VerifyHash(currentSipw, mchinfo.Sipw);
-            //验证当前密码是否正确
-            if (!verified)
+            if (!string.IsNullOrWhiteSpace(mchInfo.Sipw))
             {
-                throw new BizException("原支付密码验证失败！");
+                bool verified = BCryptUtil.VerifyHash(currentSipw, mchInfo.Sipw);
+                //验证当前密码是否正确
+                if (!verified)
+                {
+                    throw new BizException("原支付密码验证失败！");
+                }
             }
             string opSipw = Base64Util.DecodeBase64(model.ConfirmPwd);
             // 验证原密码与新密码是否相同
@@ -105,9 +108,20 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            mchinfo.Sipw = opSipw;
-            _mchInfoService.UpdateById(mchinfo);
+            mchInfo.Sipw = opSipw;
+            _mchInfoService.UpdateById(mchInfo);
             return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 获取是否设置支付密码
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("hasSipwValidate"), NoLog]
+        public ApiRes HasSipwValidate()
+        {
+            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
+            return ApiRes.Ok(!string.IsNullOrWhiteSpace(mchInfo.Sipw));
         }
     }
 }

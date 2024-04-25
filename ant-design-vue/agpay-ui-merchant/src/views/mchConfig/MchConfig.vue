@@ -194,12 +194,12 @@
           </a-form-model>
         </div>
       </a-tab-pane>
-      <a-tab-pane key="1" tab="安全管理">
+      <a-tab-pane key="setSipw" tab="安全管理">
         <div class="account-settings-info-view">
           <a-row :gutter="16">
             <a-col :md="16" :lg="16">
               <a-form-model ref="pwdFormModel" :model="updateObject" :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
-                <a-form-model-item label="原支付密码：" prop="originalPwd">
+                <a-form-model-item label="原支付密码：" prop="originalPwd" v-if="hasSipwValidate">
                   <a-input-password :maxlength="6" v-model="updateObject.originalPwd" placeholder="请输入原支付密码" />
                 </a-form-model-item>
                 <a-form-model-item label="新支付密码：" prop="newPwd">
@@ -285,6 +285,7 @@ export default {
         mchDivisionEntFlag: 1
       },
       mchLevel: 'M0',
+      hasSipwValidate: false,
       updateObject: {
         originalPwd: '', // 原密码
         newPwd: '', //  新密码
@@ -357,6 +358,10 @@ export default {
         })
         return
       }
+      if (key === 'setSipw') {
+        that.setHasSipwValidate()
+        return
+      }
       if (key) {
         this.groupKey = key
         this.detail()
@@ -398,6 +403,11 @@ export default {
         that.btnLoading = false
       })
     },
+    setHasSipwValidate () {
+      getMchConfigs('hasSipwValidate').then(res => {
+        this.hasSipwValidate = res
+      })
+    },
     setMchSipw (e, title, content) {
       const that = this
       this.$refs.pwdFormModel.validate(valid => {
@@ -410,6 +420,7 @@ export default {
             req.updateById(API_URL_MCH_CONFIG, 'mchSipw', { originalPwd, confirmPwd }).then(res => {
               that.$infoBox.modalWarning(title, content)
               that.btnLoading = false
+              that.setHasSipwValidate()
             }).catch(res => {
               that.btnLoading = false
             })

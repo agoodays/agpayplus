@@ -89,18 +89,18 @@ namespace AGooday.AgPay.Domain.Models
         public byte AddAgentFlag { get; set; }
 
         /// <summary>
-        /// 状态: 0-停用, 1-正常
-        /// </summary>
-        [Comment("状态: 0-停用, 1-正常")]
-        [Required, Column("state", TypeName = "tinyint(6)")]
-        public byte State { get; set; }
-
-        /// <summary>
         /// 支付密码
         /// </summary>
         [Comment("支付密码")]
         [Column("sipw", TypeName = "varchar(128)")]
         public string Sipw { get; set; }
+
+        /// <summary>
+        /// 状态: 0-停用, 1-正常
+        /// </summary>
+        [Comment("状态: 0-停用, 1-正常")]
+        [Required, Column("state", TypeName = "tinyint(6)")]
+        public byte State { get; set; }
 
         /// <summary>
         /// 备注

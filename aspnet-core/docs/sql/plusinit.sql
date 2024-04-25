@@ -100,7 +100,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_ORDER_STATISTIC', '数据统计', 'bar
 ALTER TABLE `t_mch_info`   
   ADD COLUMN `mch_level` VARCHAR(8) DEFAULT 'M0' NOT NULL COMMENT '商户级别: M0商户-简单模式（页面简洁，仅基础收款功能）, M1商户-高级模式（支持api调用，支持配置应用及分账、转账功能）' AFTER `type`,
   ADD COLUMN `refund_mode` JSON NULL COMMENT '退款方式[\"plat\", \"api\"],平台退款、接口退款，平台退款方式必须包含接口退款。' AFTER `mch_level`,
-  ADD COLUMN `sipw` VARCHAR(128) NOT NULL COMMENT '支付密码' AFTER `refund_mode`,
+  ADD COLUMN `sipw` VARCHAR(128) NULL COMMENT '支付密码' AFTER `refund_mode`,
   ADD COLUMN `top_agent_no` VARCHAR(64) NULL COMMENT '顶级代理商号' AFTER `sipw`;
   ADD COLUMN `agent_no` VARCHAR(64) NULL COMMENT '代理商号' AFTER `top_agent_no`;
 
@@ -280,8 +280,8 @@ CREATE TABLE `t_agent_info` (
   `contact_tel` VARCHAR(32) NOT NULL COMMENT '联系人手机号',
   `contact_email` VARCHAR(32) NULL COMMENT '联系人邮箱',
   `add_agent_flag` TINYINT NOT NULL DEFAULT '0' COMMENT '是否允许发展下级: 0-否, 1-是',
+  `sipw` VARCHAR(128) NULL COMMENT '支付密码',
   `state` TINYINT NOT NULL DEFAULT '1' COMMENT '状态: 0-停用, 1-正常',
-  `sipw` VARCHAR(128) NOT NULL COMMENT '支付密码',
   `remark` VARCHAR(128) DEFAULT NULL COMMENT '备注',
   `init_user_id` BIGINT DEFAULT NULL COMMENT '初始用户ID（创建商户时，允许商户登录的用户）',
 --   `login_user_name` VARCHAR(32) COMMENT '登录名', 

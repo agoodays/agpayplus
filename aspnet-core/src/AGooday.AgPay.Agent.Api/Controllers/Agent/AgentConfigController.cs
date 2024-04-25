@@ -38,11 +38,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         {
             var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);
-            bool verified = BCryptUtil.VerifyHash(currentSipw, agentInfo.Sipw);
-            //验证当前密码是否正确
-            if (!verified)
+            if (!string.IsNullOrWhiteSpace(agentInfo.Sipw))
             {
-                throw new BizException("原支付密码验证失败！");
+                bool verified = BCryptUtil.VerifyHash(currentSipw, agentInfo.Sipw);
+                //验证当前密码是否正确
+                if (!verified)
+                {
+                    throw new BizException("原支付密码验证失败！");
+                }
             }
             string opSipw = Base64Util.DecodeBase64(model.ConfirmPwd);
             // 验证原密码与新密码是否相同
@@ -53,6 +56,17 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
             agentInfo.Sipw = opSipw;
             _agentInfoService.UpdateById(agentInfo);
             return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 获取是否设置支付密码
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("hasSipwValidate"), NoLog]
+        public ApiRes HasSipwValidate()
+        {
+            var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
+            return ApiRes.Ok(!string.IsNullOrWhiteSpace(agentInfo.Sipw));
         }
     }
 }

@@ -182,7 +182,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
                 // 插入代理商基本信息
                 // 存入代理商默认用户ID
-                agentInfo.Sipw = BCryptUtil.Hash(CS.DEFAULT_SIPW, out salt);
+                // agentInfo.Sipw = BCryptUtil.Hash(CS.DEFAULT_SIPW, out salt);
                 agentInfo.InitUserId = sysUser.SysUserId;
                 _agentInfoRepository.Add(agentInfo);
 
@@ -244,7 +244,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 BeginTransaction();
                 //修改了手机号， 需要修改auth表信息
                 // 获取代理商超管
-                long agentAdminUserId = _sysUserRepository.FindMchAdminUserId(agentInfo.AgentNo);
+                long agentAdminUserId = _sysUserRepository.FindAgentAdminUserId(agentInfo.AgentNo);
                 var sysUserAuth = _sysUserAuthRepository.GetAll()
                      .Where(w => w.UserId.Equals(agentAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.AGENT)
                      && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE)).FirstOrDefault();

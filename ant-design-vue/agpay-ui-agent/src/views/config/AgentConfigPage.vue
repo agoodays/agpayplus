@@ -6,7 +6,7 @@
           <a-row :gutter="16">
             <a-col :md="16" :lg="16">
               <a-form-model ref="pwdFormModel" :model="updateObject" :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
-                <a-form-model-item label="原支付密码：" prop="originalPwd">
+                <a-form-model-item label="原支付密码：" prop="originalPwd" v-if="hasSipwValidate">
                   <a-input-password :maxlength="6" v-model="updateObject.originalPwd" placeholder="请输入原支付密码" />
                 </a-form-model-item>
                 <a-form-model-item label="新支付密码：" prop="newPwd">
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { API_URL_AGENT_CONFIG, req } from '@/api/manage'
+import { API_URL_AGENT_CONFIG, req, getAgentConfigs } from '@/api/manage'
 import { Base64 } from 'js-base64'
 export default {
   components: {},
@@ -36,6 +36,7 @@ export default {
     return {
       btnLoading: false,
       groupKey: '1',
+      hasSipwValidate: false,
       updateObject: {
         originalPwd: '', // 原密码
         newPwd: '', //  新密码
@@ -61,7 +62,15 @@ export default {
       }
     }
   },
+  created () {
+    this.setHasSipwValidate()
+  },
   methods: {
+    setHasSipwValidate () {
+      getAgentConfigs('hasSipwValidate').then(res => {
+        this.hasSipwValidate = res
+      })
+    },
     setSipw (e, title, content) {
       const that = this
       this.$refs.pwdFormModel.validate(valid => {
@@ -74,6 +83,7 @@ export default {
             req.updateById(API_URL_AGENT_CONFIG, 'agentSipw', { originalPwd, confirmPwd }).then(res => {
               that.$infoBox.modalWarning(title, content)
               that.btnLoading = false
+              that.setHasSipwValidate()
             }).catch(res => {
               that.btnLoading = false
             })

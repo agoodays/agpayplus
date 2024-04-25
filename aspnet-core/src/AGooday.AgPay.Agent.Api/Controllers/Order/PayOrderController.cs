@@ -31,12 +31,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         private readonly IPayWayService _payWayService;
         private readonly ISysConfigService _sysConfigService;
         private readonly IMchAppService _mchAppService;
+        private readonly IAgentInfoService _agentInfoService;
 
         public PayOrderController(ILogger<PayOrderController> logger,
             IPayOrderService payOrderService,
             IPayWayService payWayService,
             ISysConfigService sysConfigService,
-            IMchAppService mchAppService, 
+            IMchAppService mchAppService,
+            IAgentInfoService agentInfoService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)
@@ -45,6 +47,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
             _payWayService = payWayService;
             _sysConfigService = sysConfigService;
             _mchAppService = mchAppService;
+            _agentInfoService = agentInfoService;
         }
 
         /// <summary>
@@ -228,6 +231,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
             if (payOrder.RefundAmount + refundOrder.RefundAmount > payOrder.Amount)
             {
                 throw new BizException("退款金额超过订单可退款金额！");
+            }
+            string sipw = Base64Util.DecodeBase64(refundOrder.RefundPassword);
+            var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
+            bool verified = BCryptUtil.VerifyHash(sipw, agentInfo.Sipw);
+            if (verified)
+            {
+                throw new BizException("当前未设置支付密码，请进入[系统管理-系统配置-安全管理]设置支付密码！");
             }
 
             //发起退款

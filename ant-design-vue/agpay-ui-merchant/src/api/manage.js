@@ -342,11 +342,11 @@ export function getIfCodeByAppId (appId) {
 }
 
 /** 退款接口 */
-export function payOrderRefund (payOrderId, refundAmount, refundReason) {
+export function payOrderRefund (payOrderId, refundAmount, refundReason, refundPassword) {
   return request.request({
     url: '/api/payOrder/refunds/' + payOrderId,
     method: 'POST',
-    data: { refundAmount, refundReason }
+    data: { refundAmount, refundReason, refundPassword }
   })
 }
 

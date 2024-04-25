@@ -39,14 +39,14 @@
         </a-col>
       </a-row>
 
-      <a-form-model :rules="rules" :model="refund" ref="refundInfo" >
+      <a-form-model :rules="rules" :model="refund" ref="refundInfo" layout="inline">
 
         <a-form-model-item label="退款金额" prop="refundAmount">
-          <a-input-number v-model="refund.refundAmount" :precision="2" style="width:100%"/>
+          <a-input-number v-model="refund.refundAmount" :precision="2" style="width: 100%"/>
         </a-form-model-item>
 
         <a-form-model-item label="退款原因" prop="refundReason">
-          <a-input v-model="refund.refundReason" type="textarea" />
+          <a-input v-model="refund.refundReason" type="textarea"/>
         </a-form-model-item>
 
       </a-form-model>
@@ -78,9 +78,9 @@ export default {
         refundAmount: [{ required: true, message: '请输入金额', trigger: 'blur' },
          {
             validator: (rule, value, callBack) => {
-								if (value < 0.01 || value > this.nowRefundAmount) {
-									callBack('退款金额不能小于0.01，或者大于可退金额')
-								}
+              if (value < 0.01 || value > this.nowRefundAmount) {
+                callBack('退款金额不能小于0.01，或者大于可退金额')
+              }
 							callBack()
 						}
          }]

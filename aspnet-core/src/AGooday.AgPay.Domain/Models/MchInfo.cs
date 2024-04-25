@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 支付密码
         /// </summary>
         [Comment("支付密码")]
-        [Required, Column("sipw", TypeName = "varchar(128)")]
+        [Column("sipw", TypeName = "varchar(128)")]
         public string Sipw { get; set; }
 
         /// <summary>

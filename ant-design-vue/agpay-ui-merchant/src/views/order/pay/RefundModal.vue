@@ -39,16 +39,24 @@
         </a-col>
       </a-row>
 
-      <a-form-model :rules="rules" :model="refund" ref="refundInfo" >
-
-        <a-form-model-item label="退款金额" prop="refundAmount">
-          <a-input-number v-model="refund.refundAmount" :precision="2" style="width:100%"/>
-        </a-form-model-item>
-
-        <a-form-model-item label="退款原因" prop="refundReason">
-          <a-input v-model="refund.refundReason" type="textarea" />
-        </a-form-model-item>
-
+      <a-form-model :rules="rules" :model="refund" ref="refundInfo" layout="inline">
+        <a-row :gutter="24">
+          <a-col :span="24">
+            <a-form-model-item label="退款金额" prop="refundAmount">
+              <a-input-number v-model="refund.refundAmount" :precision="2" style="width: 100%"/>
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-model-item label="支付密码" prop="refundPassword">
+              <a-input-password :maxlength="6" v-model="refund.refundPassword"/>
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-model-item label="退款原因" prop="refundReason">
+              <a-input v-model="refund.refundReason" type="textarea"/>
+            </a-form-model-item>
+          </a-col>
+        </a-row>
       </a-form-model>
 
     </a-modal>
@@ -76,13 +84,17 @@ export default {
         // refundAmount: '' // 退款金额
       },
       rules: {
+        refundPassword: [
+          { min: 6, max: 6, required: true, message: '请输入支付密码(6位数字格式)', trigger: 'blur' },
+          { pattern: /^\d{6}$/, message: '请输入支付密码(6位数字格式)', trigger: 'blur' }
+        ],
         refundReason: [{ min: 0, max: 256, required: true, trigger: 'blur', message: '请输入退款原因，最长不超过256个字符' }],
         refundAmount: [{ required: true, message: '请输入金额', trigger: 'blur' },
          {
             validator: (rule, value, callBack) => {
-								if (value < 0.01 || value > this.nowRefundAmount) {
-									callBack('退款金额不能小于0.01，或者大于可退金额')
-								}
+              if (value < 0.01 || value > this.nowRefundAmount) {
+                callBack('退款金额不能小于0.01，或者大于可退金额')
+              }
 							callBack()
 						}
          }]
@@ -113,7 +125,7 @@ export default {
           this.confirmLoading = true
           const that = this
           // 退款接口
-          payOrderRefund(that.recordId, that.refund.refundAmount * 100, that.refund.refundReason).then(res => {
+          payOrderRefund(that.recordId, that.refund.refundAmount * 100, that.refund.refundReason, that.refund.refundPassword).then(res => {
               that.visible = false // 关闭弹窗
               that.confirmLoading = false // 取消按钮转圈
 

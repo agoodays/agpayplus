@@ -212,7 +212,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
                 // 插入商户基本信息
                 // 存入商户默认用户ID
-                mchInfo.Sipw = BCryptUtil.Hash(CS.DEFAULT_SIPW, out salt);
+                // mchInfo.Sipw = BCryptUtil.Hash(CS.DEFAULT_SIPW, out salt);
                 mchInfo.InitUserId = sysUser.SysUserId;
                 _mchInfoRepository.Add(mchInfo);
 

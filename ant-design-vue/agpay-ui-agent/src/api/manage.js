@@ -159,11 +159,11 @@ export function getEntTree () {
 }
 
 /** 退款接口 */
-export function payOrderRefund (payOrderId, refundAmount, refundReason) {
+export function payOrderRefund (payOrderId, refundAmount, refundReason, refundPassword) {
   return request.request({
     url: '/api/payOrder/refunds/' + payOrderId,
     method: 'POST',
-    data: { refundAmount, refundReason }
+    data: { refundAmount, refundReason, refundPassword }
   })
 }
 
@@ -181,6 +181,14 @@ export function getRoleList (parameter) {
     url: '/api/sysRoles',
     method: 'get',
     params: parameter
+  })
+}
+
+export function getAgentConfigs (parameter, data) {
+  return request.request({
+    url: API_URL_AGENT_CONFIG + '/' + parameter,
+    method: 'GET',
+    params: data
   })
 }
 

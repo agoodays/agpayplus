@@ -63,14 +63,14 @@ namespace AGooday.AgPay.Application.DataTransfer
         public byte AddAgentFlag { get; set; }
 
         /// <summary>
-        /// 状态: 0-停用, 1-正常
-        /// </summary>
-        public byte State { get; set; }
-
-        /// <summary>
         /// 支付密码
         /// </summary>
         public string Sipw { get; set; }
+
+        /// <summary>
+        /// 状态: 0-停用, 1-正常
+        /// </summary>
+        public byte State { get; set; }
 
         /// <summary>
         /// 备注
