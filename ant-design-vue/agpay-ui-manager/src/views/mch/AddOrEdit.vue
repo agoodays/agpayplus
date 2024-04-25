@@ -244,6 +244,14 @@
       <div>
         <a-row justify="space-between" type="flex">
           <a-col :span="10">
+            <a-form-model-item label="" v-if="resetIsShow">
+              重置支付密码：<a-checkbox v-model="sysPassword.resetPayPass"></a-checkbox>
+            </a-form-model-item>
+          </a-col>
+        </a-row>
+
+        <a-row justify="space-between" type="flex">
+          <a-col :span="10">
             <a-form-model-item label="" v-if="resetIsShow" >
               重置密码：<a-checkbox v-model="sysPassword.resetPass"></a-checkbox>
             </a-form-model-item>
@@ -284,7 +292,7 @@
 </template>
 
 <script>
-import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req } from '@/api/manage'
+import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req, getPwdRulesRegexp } from '@/api/manage'
 import { Base64 } from 'js-base64'
 export default {
 
@@ -299,6 +307,15 @@ export default {
       }
       callback()
     }
+    const passwordRules = {
+      regexpRules: '',
+      errTips: ''
+    }
+    getPwdRulesRegexp().then((res) => {
+      passwordRules.regexpRules = res.regexpRules
+      passwordRules.errTips = res.errTips
+    })
+
     return {
       passwordLength: 6, // 密码长度
       includeUpperCase: true, // 包含大写字母
@@ -307,6 +324,7 @@ export default {
       newPwd: '', //  新密码
       resetIsShow: false, // 重置密码是否展现
       sysPassword: {
+        resetPayPass: false, // 重置支付密码
         resetPass: false, // 重置密码
         defaultPass: true, // 使用默认密码
         confirmPwd: '' //  确认密码
@@ -325,11 +343,15 @@ export default {
       rules: {
         mchName: [{ required: true, message: '请输入商户名称', trigger: 'blur' }],
         loginUsername: [{ required: true, pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/, message: '请输入字母开头，长度为6-18位的登录名', trigger: 'blur' }],
-        loginPassword: [{ required: false, trigger: 'blur' }, {
+        loginPassword: [{ required: true, message: '请输入登录密码', trigger: 'blur' }, {
           validator: (rule, value, callBack) => {
             if (this.saveObject.passwordType === 'custom') {
-              if (this.saveObject.loginPassword.length < 6 || this.saveObject.loginPassword.length > 12) {
-                callBack('请输入6-12位密码')
+              if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+                const regex = new RegExp(passwordRules.regexpRules)
+                const isMatch = regex.test(this.saveObject.loginPassword)
+                if (!isMatch) {
+                  callBack(passwordRules.errTips)
+                }
               }
             }
             callBack()
@@ -337,22 +359,33 @@ export default {
         }], // 登录密码
         mchShortName: [{ required: true, message: '请输入商户简称', trigger: 'blur' }],
         contactName: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
-        isvNo: [{ validator: checkIsvNo, trigger: 'blur' }],
+        isvNo: [{ required: true, validator: checkIsvNo, trigger: 'blur' }],
         contactEmail: [{ required: false, pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/, message: '请输入正确的邮箱地址', trigger: 'blur' }],
         contactTel: [{ required: true, pattern: /^1\d{10}$/, message: '请输入正确的手机号', trigger: 'blur' }],
-        newPwd: [{ required: false, trigger: 'blur' }, {
+        newPwd: [{ required: true, message: '请输入新密码', trigger: 'blur' }, {
           validator: (rule, value, callBack) => {
             if (!this.sysPassword.defaultPass) {
-              if (this.newPwd.length < 6 || this.newPwd.length > 12) {
-                callBack('请输入6-12位新密码')
+              if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+                const regex = new RegExp(passwordRules.regexpRules)
+                const isMatch = regex.test(this.newPwd)
+                if (!isMatch) {
+                  callBack(passwordRules.errTips)
+                }
               }
             }
             callBack()
           }
         }], // 新密码
-        confirmPwd: [{ required: false, trigger: 'blur' }, {
+        confirmPwd: [{ required: true, message: '请输入确认新密码', trigger: 'blur' }, {
           validator: (rule, value, callBack) => {
             if (!this.sysPassword.defaultPass) {
+              if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+                const regex = new RegExp(passwordRules.regexpRules)
+                const isMatch = regex.test(this.sysPassword.confirmPwd)
+                if (!isMatch) {
+                  callBack(passwordRules.errTips)
+                }
+              }
               this.newPwd === this.sysPassword.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
             } else {
               callBack()
@@ -421,6 +454,9 @@ export default {
               that.btnLoading = false
             })
           } else {
+            if (that.sysPassword.resetPayPass) {
+              that.sysPassword.sipw = null
+            }
             that.sysPassword.confirmPwd = Base64.encode(that.sysPassword.confirmPwd)
             console.log(that.sysPassword.confirmPwd)
             Object.assign(that.saveObject, that.sysPassword) // 拼接对象
@@ -431,12 +467,14 @@ export default {
               that.callbackFunc() // 刷新列表
               that.btnLoading = false
               that.resetIsShow = true // 展示重置密码板块
+              that.sysPassword.resetPayPass = false
               that.sysPassword.resetPass = false
               that.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
               that.resetPassEmpty(that) // 清空密码
             }).catch(res => {
               that.btnLoading = false
               that.resetIsShow = true // 展示重置密码板块
+              that.sysPassword.resetPayPass = false
               that.sysPassword.resetPass = false
               that.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
               that.resetPassEmpty(that) // 清空密码
@@ -448,6 +486,7 @@ export default {
     onClose () {
       this.visible = false
       this.resetIsShow = false // 取消重置密码板块展示
+      this.sysPassword.resetPayPass = false
       this.sysPassword.resetPass = false
       this.resetPassEmpty(this)
       this.sysPassword.defaultPass = true	// 是否使用默认密码默认为true

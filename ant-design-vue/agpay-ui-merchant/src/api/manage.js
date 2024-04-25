@@ -367,3 +367,8 @@ export function getSysRSA2PublicKey () {
 export function getMapConfig () {
   return request.request({ url: '/api/mchStore/mapConfig', method: 'GET' })
 }
+
+/** 获取密码规则 **/
+export function getPwdRulesRegexp () {
+  return request.request({ url: '/api/anon/cipher/pwdRulesRegexp', method: 'GET' })
+}

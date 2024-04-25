@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             ISysUserAuthService sysUserAuthService,
             ISysUserLoginAttemptService sysUserLoginAttemptService,
             ISysConfigService sysConfigService,
-            ISmsServiceFactory smsServiceFactory, 
+            ISmsServiceFactory smsServiceFactory,
             IAuthService authService)
         {
             _logger = logger;
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 throw new BizException("用户名/密码错误！");
             }
             var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
-            var loginErrorMaxLimit = JsonConvert.DeserializeObject<Dictionary<string,int>>(sysConfig.ConfigVal);
+            var loginErrorMaxLimit = JsonConvert.DeserializeObject<Dictionary<string, int>>(sysConfig.ConfigVal);
             loginErrorMaxLimit.TryGetValue("limitMinute", out int limitMinute);
             loginErrorMaxLimit.TryGetValue("maxLoginAttempts", out int maxLoginAttempts);
             var loginErrorMessage = "密码输入错误次数超限，请稍后再试！";
@@ -319,6 +319,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             // 删除短信验证码缓存数据
             _redis.KeyDelete(codeCacheKey);
             return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 获取密码规则
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("cipher/pwdRulesRegexp"), NoLog]
+        public ApiRes PwdRulesRegexp()
+        {
+            var sysConfig = _sysConfigService.GetByKey("passwordRegexp", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
+            return ApiRes.Ok(JsonConvert.DeserializeObject<Dictionary<string, string>>(sysConfig.ConfigVal));
         }
     }
 }

@@ -75,12 +75,22 @@
 import { mapActions } from 'vuex'
 import { message } from 'ant-design-vue'
 import { timeFix } from '@/utils/util'
+import { getPwdRulesRegexp } from '@/api/manage'
 import { sendcode, treaty, register } from '@/api/login'
 
 export default {
   components: {
   },
   data () {
+    const passwordRules = {
+      regexpRules: '',
+      errTips: ''
+    }
+    getPwdRulesRegexp().then((res) => {
+      passwordRules.regexpRules = res.regexpRules
+      passwordRules.errTips = res.errTips
+    })
+
     return {
       isShowTreaty: false,
       treatyTitle: '',
@@ -95,14 +105,25 @@ export default {
         code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
         password: [{ required: true, message: '请输入登录密码', trigger: 'blur' }, {
           validator: (rule, value, callBack) => {
-            if (this.saveObject.password.length < 6 || this.saveObject.password.length > 12) {
-              callBack('密码不符合规则，请输入6-12位密码')
+            if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+              const regex = new RegExp(passwordRules.regexpRules)
+              const isMatch = regex.test(this.saveObject.password)
+              if (!isMatch) {
+                callBack(passwordRules.errTips)
+              }
             }
             callBack()
           }
         }], // 登录密码
         confirmPwd: [{ required: true, message: '请输入确认登录密码', trigger: 'blur' }, {
           validator: (rule, value, callBack) => {
+            if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+              const regex = new RegExp(passwordRules.regexpRules)
+              const isMatch = regex.test(this.saveObject.confirmPwd)
+              if (!isMatch) {
+                callBack(passwordRules.errTips)
+              }
+            }
             if (this.saveObject.password !== this.saveObject.confirmPwd) {
               callBack('两次输入密码不一致')
             }

@@ -428,5 +428,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             _redis.KeyDelete(codeCacheKey);
             return ApiRes.Ok();
         }
+
+        /// <summary>
+        /// 获取密码规则
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("cipher/pwdRulesRegexp"), NoLog]
+        public ApiRes PwdRulesRegexp()
+        {
+            var sysConfig = _sysConfigService.GetByKey("passwordRegexp", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
+            return ApiRes.Ok(JsonConvert.DeserializeObject<Dictionary<string, string>>(sysConfig.ConfigVal));
+        }
     }
 }
