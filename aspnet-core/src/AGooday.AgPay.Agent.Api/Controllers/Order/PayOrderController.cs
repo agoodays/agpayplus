@@ -212,8 +212,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         /// 发起订单退款
         /// </summary>
         /// <param name="payOrderId"></param>
-        /// <param name="refundAmount"></param>
-        /// <param name="refundReason"></param>
+        /// <param name="refundOrder"></param>
         /// <returns></returns>
         [HttpPost, Route("refunds/{payOrderId}"), MethodLog("发起订单退款")]
         [PermissionAuth(PermCode.AGENT.ENT_PAY_ORDER_REFUND)]
