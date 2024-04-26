@@ -130,7 +130,7 @@
     <a-row :gutter="24" v-if="formData.infoType==='AGENT'">
       <a-col :span="12">
         <a-form-model-item label="选择使用的oauth2条目" prop="oauth2InfoId">
-          <a-select v-model="formData.oauth2InfoId" placeholder="">
+          <a-select v-model="formData.oauth2InfoId" placeholder="" @change="updateFormData('oauth2InfoId', $event)">
             <a-select-option :value="''">继承服务商配置</a-select-option>
             <a-select-option v-for="(item, key) in diyList" :value="item.infoId" :key="key">
               {{ item.remark + " [ ID: " + item.infoId + " ]" }}

@@ -173,7 +173,9 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         }
     }
 
-    //渠道状态枚举值
+    /// <summary>
+    /// 渠道状态枚举值
+    /// </summary>
     public enum ChannelState
     {
         /// <summary>
