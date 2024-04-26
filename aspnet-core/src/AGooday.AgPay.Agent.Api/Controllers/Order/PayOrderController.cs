@@ -232,12 +232,16 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
             {
                 throw new BizException("退款金额超过订单可退款金额！");
             }
-            string sipw = Base64Util.DecodeBase64(refundOrder.RefundPassword);
             var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
-            bool verified = BCryptUtil.VerifyHash(sipw, agentInfo.Sipw);
-            if (verified)
+            if (string.IsNullOrWhiteSpace(agentInfo.Sipw))
             {
                 throw new BizException("当前未设置支付密码，请进入[系统管理-系统配置-安全管理]设置支付密码！");
+            }
+            string sipw = Base64Util.DecodeBase64(refundOrder.RefundPassword);
+            bool verified = BCryptUtil.VerifyHash(sipw, agentInfo.Sipw);
+            if (!verified)
+            {
+                throw new BizException("支付密码验证失败！");
             }
 
             //发起退款

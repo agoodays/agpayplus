@@ -236,12 +236,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             {
                 throw new BizException("退款金额超过订单可退款金额！");
             }
-            string sipw = Base64Util.DecodeBase64(refundOrder.RefundPassword);
             var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
-            bool verified = BCryptUtil.VerifyHash(sipw, mchInfo.Sipw);
-            if (verified)
+            if (string.IsNullOrWhiteSpace(mchInfo.Sipw))
             {
                 throw new BizException("当前未设置支付密码，请进入[系统管理-系统配置-安全管理]设置支付密码！");
+            }
+            string sipw = Base64Util.DecodeBase64(refundOrder.RefundPassword);
+            bool verified = BCryptUtil.VerifyHash(sipw, mchInfo.Sipw);
+            if (!verified)
+            {
+                throw new BizException("支付密码验证失败！");
             }
 
             //发起退款

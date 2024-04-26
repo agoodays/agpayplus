@@ -39,18 +39,18 @@
         </a-col>
       </a-row>
 
-      <a-form-model :rules="rules" :model="refund" ref="refundInfo" layout="inline">
+      <a-form-model :rules="rules" :model="refund" ref="refundInfo" :label-col="labelCol" :wrapper-col="wrapperCol">
 
         <a-form-model-item label="退款金额" prop="refundAmount">
           <a-input-number v-model="refund.refundAmount" :precision="2" style="width: 100%"/>
         </a-form-model-item>
 
-        <a-form-model-item label="支付密码" prop="refundPassword">
-          <a-input-password :maxlength="6" v-model="refund.refundPassword"/>
-        </a-form-model-item>
-
         <a-form-model-item label="退款原因" prop="refundReason">
           <a-input v-model="refund.refundReason" type="textarea"/>
+        </a-form-model-item>
+
+        <a-form-model-item label="支付密码" prop="refundPassword">
+          <a-input-password :maxlength="6" v-model="refund.refundPassword"/>
         </a-form-model-item>
 
       </a-form-model>
@@ -59,6 +59,7 @@
   </div>
 </template>
 <script>
+import { Base64 } from 'js-base64'
 import { API_URL_PAY_ORDER_LIST, req, payOrderRefund } from '@/api/manage'
 export default {
 
@@ -121,7 +122,8 @@ export default {
           this.confirmLoading = true
           const that = this
           // 退款接口
-          payOrderRefund(that.recordId, that.refund.refundAmount, that.refund.refundReason, that.refund.refundPassword).then(res => {
+          const refundPassword = Base64.encode(that.refund.refundPassword)
+          payOrderRefund(that.recordId, that.refund.refundAmount, that.refund.refundReason, refundPassword).then(res => {
               that.visible = false // 关闭弹窗
               that.confirmLoading = false // 取消按钮转圈
 

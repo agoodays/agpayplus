@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            mchInfo.Sipw = opSipw;
+            mchInfo.Sipw = BCryptUtil.Hash(opSipw, out _);
             _mchInfoService.UpdateById(mchInfo);
             return ApiRes.Ok();
         }

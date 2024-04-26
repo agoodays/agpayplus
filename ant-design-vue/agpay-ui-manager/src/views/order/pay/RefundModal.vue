@@ -39,7 +39,7 @@
         </a-col>
       </a-row>
 
-      <a-form-model :rules="rules" :model="refund" ref="refundInfo" layout="inline">
+      <a-form-model :rules="rules" :model="refund" ref="refundInfo" :label-col="labelCol" :wrapper-col="wrapperCol">
 
         <a-form-model-item label="退款金额" prop="refundAmount">
           <a-input-number v-model="refund.refundAmount" :precision="2" style="width: 100%"/>
