@@ -76,14 +76,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                             case LesPayEnum.OrderStatus.RefundSuccess:
                                 channelRetMsg.ChannelOrderId = leshua_refund_id;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                                 break;
                             case LesPayEnum.OrderStatus.RefundFail:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = error_code;
                                 channelRetMsg.ChannelErrMsg = error_msg;
-                                _logger.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
+                                _logger.LogInformation("{logPrefix} >>> 退款失败, {error_msg}", logPrefix,error_msg);
                                 break;
                             case LesPayEnum.OrderStatus.Refunding:
                                 //退款中
@@ -153,14 +153,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
                             case LesPayEnum.OrderStatus.RefundSuccess:
                                 channelRetMsg.ChannelOrderId = leshua_refund_id;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                                 break;
                             case LesPayEnum.OrderStatus.RefundFail:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = error_code;
                                 channelRetMsg.ChannelErrMsg = error_msg;
-                                _logger.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
+                                _logger.LogInformation("{logPrefix} >>> 退款失败, {error_msg}", logPrefix,error_msg);
                                 break;
                             case LesPayEnum.OrderStatus.Refunding:
                                 //退款中

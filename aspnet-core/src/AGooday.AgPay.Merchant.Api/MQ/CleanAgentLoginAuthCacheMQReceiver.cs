@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Merchant.Api.MQ
 
         public void Receive(CleanAgentLoginAuthCacheMQ.MsgPayload payload)
         {
-            _logger.LogInformation($"成功接收删除代理商用户登录的订阅通知, msg={JsonConvert.SerializeObject(payload)}");
+            _logger.LogInformation("成功接收删除代理商用户登录的订阅通知, Msg={Msg}", JsonConvert.SerializeObject(payload));
             // 字符串转List<Long>
             List<long> userIdList = payload.UserIdList;
             // 删除redis用户缓存

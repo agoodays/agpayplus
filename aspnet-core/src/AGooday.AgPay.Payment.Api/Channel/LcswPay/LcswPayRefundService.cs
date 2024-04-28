@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
                                 channelRetMsg.PlatformOrderId = channelTradeNo;
                                 channelRetMsg.PlatformMchOrderId = channelOrderNo;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                                 break;
                             case LcswPayEnum.TradeState.FAIL:
                             case LcswPayEnum.TradeState.NOREFUND:

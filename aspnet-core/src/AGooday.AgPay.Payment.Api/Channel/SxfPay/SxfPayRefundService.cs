@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                             case SxfPayEnum.OrderStatus.REFUNDSUC:
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                                 break;
                             case SxfPayEnum.OrderStatus.REFUNDFAIL:
                                 //明确退款失败
@@ -184,7 +184,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
                             case SxfPayEnum.OrderStatus.REFUNDSUC:
                                 channelRetMsg.ChannelOrderId = uuid;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                                 break;
                             case SxfPayEnum.OrderStatus.REFUNDFAIL:
                                 //明确退款失败

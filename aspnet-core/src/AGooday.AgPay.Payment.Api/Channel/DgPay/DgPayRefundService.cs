@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                             //退款成功
                             channelRetMsg.ChannelOrderId = orgHfSeqId;
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                            _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                            _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                             break;
                         case DgPayEnum.TransStat.F:
                             //明确退款失败
@@ -146,7 +146,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                             //退款成功
                             channelRetMsg.ChannelOrderId = hfSeqId;
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                            _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                            _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                             break;
                         case DgPayEnum.TransStat.F:
                             //明确退款失败

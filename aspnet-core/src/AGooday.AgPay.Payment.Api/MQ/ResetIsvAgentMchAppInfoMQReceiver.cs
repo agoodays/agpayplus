@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
 
         public void Receive(ResetIsvAgentMchAppInfoConfigMQ.MsgPayload payload)
         {
-            _logger.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+            _logger.LogInformation($"接收商户通知MQ, Msg={Msg}", JsonConvert.SerializeObject(payload));
             if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO)
             {
                 this.ModifyIsvInfo(payload.IsvNo);

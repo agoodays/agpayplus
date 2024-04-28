@@ -28,7 +28,6 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                 && !context.Request.Path.Value.Contains("/qrc/shell/styleb.png")
                 && !context.Request.Path.Value.Contains("/export/"))
             {
-                context.TraceIdentifier = Guid.NewGuid().ToString("N");
                 context.Request.EnableBuffering();
                 Stream originalBody = context.Response.Body;
 
@@ -51,7 +50,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                 catch (Exception ex)
                 {
                     // 记录异常                        
-                    _logger.LogError(ex, $"{ex.Message}{ex.InnerException}");
+                    _logger.LogError(ex, "[{TraceIdentifier}] {Message}{InnerException}", context.TraceIdentifier, ex.Message, ex.InnerException);
                 }
                 finally
                 {
@@ -76,8 +75,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                 query = request.QueryString,
                 body = await sr.ReadToEndAsync(),
             };
-
-            _logger.LogInformation($"[{context.TraceIdentifier}] RequestData:{JsonConvert.SerializeObject(content)}");
+            _logger.LogInformation("[{TraceIdentifier}] RequestData: {RequestData}", context.TraceIdentifier, JsonConvert.SerializeObject(value: content));
 
             request.Body.Position = 0;
         }
@@ -93,7 +91,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
 
             if (!string.IsNullOrEmpty(responseBody))
             {
-                _logger.LogInformation($"[{context.TraceIdentifier}] ResponseData:{responseBody}");
+                _logger.LogInformation("[{TraceIdentifier}] ResponseData: {ResponseBody}", context.TraceIdentifier, responseBody);
             }
         }
     }

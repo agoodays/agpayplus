@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
                     {
                         //明确退款成功
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                        _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                        _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                     }
                     else if ("01".Equals(origRespCode))
                     {
@@ -130,7 +130,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
                 {
                     // 交易成功
                     channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                    _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                    _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                 }
                 else
                 {

@@ -95,14 +95,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
                                         break;
                                 }
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                                 break;
                             case HkrtPayEnum.RefundStatus.Failed:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = error_code;
                                 channelRetMsg.ChannelErrMsg = error_msg;
-                                _logger.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
+                                _logger.LogInformation("{logPrefix} >>> 退款失败, {error_msg}", logPrefix,error_msg);
                                 break;
                             case HkrtPayEnum.RefundStatus.Refunding:
                                 //退款中
@@ -192,14 +192,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
                                         break;
                                 }
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                                 break;
                             case HkrtPayEnum.RefundStatus.Failed:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = error_code;
                                 channelRetMsg.ChannelErrMsg = error_msg;
-                                _logger.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
+                                _logger.LogInformation("{logPrefix} >>> 退款失败, {error_msg}", logPrefix,error_msg);
                                 break;
                             case HkrtPayEnum.RefundStatus.Refunding:
                                 //退款中

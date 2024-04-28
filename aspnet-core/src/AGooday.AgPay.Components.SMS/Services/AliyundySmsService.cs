@@ -67,13 +67,13 @@ namespace AGooday.AgPay.Components.SMS.Services
                 else
                 {
                     // 短信发送失败
-                    _logger.LogInformation($"短信发送失败，请求报文：{JsonConvert.SerializeObject(request)}，响应报文：{JsonConvert.SerializeObject(response)}");
+                    _logger.LogInformation("短信发送失败，请求报文：{Request}，响应报文：{Response}", JsonConvert.SerializeObject(request), JsonConvert.SerializeObject(response));
                 }
             }
             catch (Exception ex)
             {
                 // 处理异常
-                _logger.LogError(ex, $"短信发送异常，请求报文：{JsonConvert.SerializeObject(request)}");
+                _logger.LogError(ex, "短信发送异常，请求报文：{Request}", JsonConvert.SerializeObject(request));
                 throw;
             }
         }
@@ -103,13 +103,13 @@ namespace AGooday.AgPay.Components.SMS.Services
                 else
                 {
                     // 短信发送失败
-                    _logger.LogInformation($"短信发送失败，请求报文：{JsonConvert.SerializeObject(request)}，响应报文：{JsonConvert.SerializeObject(response)}");
+                    _logger.LogInformation("短信发送失败，请求报文：{Request}，响应报文：{Response}", JsonConvert.SerializeObject(request), JsonConvert.SerializeObject(response));
                 }
             }
             catch (Exception ex)
             {
                 // 处理异常
-                _logger.LogError(ex, $"短信发送异常，请求报文：{JsonConvert.SerializeObject(request)}");
+                _logger.LogError(ex, "短信发送异常，请求报文：{Request}", JsonConvert.SerializeObject(request));
                 throw;
             }
         }

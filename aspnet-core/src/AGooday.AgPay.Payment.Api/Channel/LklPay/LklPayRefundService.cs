@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
                             channelRetMsg.PlatformOrderId = accTradeNo;
                             channelRetMsg.PlatformMchOrderId = tradeNo;
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                            _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                            _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                             break;
                         case LklPayEnum.TradeState.FAIL:
                             //明确退款失败
@@ -138,7 +138,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
                     channelRetMsg.PlatformOrderId = accTradeNo;
                     channelRetMsg.PlatformMchOrderId = tradeNo;
                     channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                    _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                    _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
                 }
                 else if ("BBS11112".Equals(code) || "BBS11105".Equals(code) || "BBS10000".Equals(code))
                 {

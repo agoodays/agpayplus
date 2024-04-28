@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 var channelOrderReissueService = scope.ServiceProvider.GetService<ChannelOrderReissueService>();
                 try
                 {
-                    _logger.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                    _logger.LogInformation($"接收轮询查单通知MQ, Msg={Msg}", JsonConvert.SerializeObject(payload));
                     string payOrderId = payload.PayOrderId;
                     int currentCount = payload.Count;
                     currentCount++;
