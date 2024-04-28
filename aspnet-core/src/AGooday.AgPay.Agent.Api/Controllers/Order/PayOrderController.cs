@@ -97,12 +97,17 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         /// <summary>
         /// 订单信息导出
         /// </summary>
+        /// <param name="bizType"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("export/{bizType}"), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_ORDER_LIST)]
         public IActionResult Export(string bizType, [FromQuery] PayOrderQueryDto dto)
         {
+            if (!"excel".Equals(bizType))
+            {
+                throw new BizException($"暂不支持{bizType}导出");
+            }
             dto.BindDateRange();
             dto.AgentNo = GetCurrentAgentNo();
             // 从数据库中检索需要导出的数据

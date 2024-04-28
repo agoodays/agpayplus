@@ -65,12 +65,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         /// <summary>
         /// 导出
         /// </summary>
+        /// <param name="bizType"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("export/{bizType}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
         public IActionResult Export(string bizType, [FromQuery] StatisticQueryDto dto)
         {
+            if (!"excel".Equals(bizType))
+            {
+                throw new BizException($"暂不支持{bizType}导出");
+            }
             ChickAuth(dto.Method);
             dto.BindDateRange();
             // 从数据库中检索需要导出的数据

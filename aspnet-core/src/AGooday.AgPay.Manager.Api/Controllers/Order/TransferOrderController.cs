@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -49,12 +50,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <summary>
         /// 订单信息导出
         /// </summary>
+        /// <param name="bizType"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("export/{bizType}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_TRANSFER_ORDER_LIST)]
         public IActionResult Export(string bizType, [FromQuery] TransferOrderQueryDto dto)
         {
+            if (!"excel".Equals(bizType))
+            {
+                throw new BizException($"暂不支持{bizType}导出");
+            }
             dto.BindDateRange();
             var transferOrders = _transferOrderService.GetPaginatedData(dto);
             string fileName = $"转账订单.xlsx";

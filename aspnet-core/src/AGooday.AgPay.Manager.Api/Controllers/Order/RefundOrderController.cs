@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -71,6 +72,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         [PermissionAuth(PermCode.MGR.ENT_REFUND_LIST)]
         public IActionResult Export(string bizType, [FromQuery] RefundOrderQueryDto dto)
         {
+            if (!"excel".Equals(bizType))
+            {
+                throw new BizException($"暂不支持{bizType}导出");
+            }
             dto.BindDateRange();
             // 从数据库中检索需要导出的数据
             var refundOrders = _refundOrderService.GetPaginatedData(dto);

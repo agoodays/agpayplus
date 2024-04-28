@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -50,12 +51,17 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         /// <summary>
         /// 订单信息导出
         /// </summary>
+        /// <param name="bizType"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet, Route("export/{bizType}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_REFUND_LIST)]
         public IActionResult Export(string bizType, [FromQuery] RefundOrderQueryDto dto)
         {
+            if (!"excel".Equals(bizType))
+            {
+                throw new BizException($"暂不支持{bizType}导出");
+            }
             dto.BindDateRange();
             dto.AgentNo = GetCurrentAgentNo();
             // 从数据库中检索需要导出的数据
