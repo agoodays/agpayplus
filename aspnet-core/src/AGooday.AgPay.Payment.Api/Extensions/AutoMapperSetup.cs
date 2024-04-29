@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Payment.Api.Extensions
     {
         public static void AddAutoMapperSetup(this IServiceCollection services)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
+            ArgumentNullException.ThrowIfNull(services);
             //添加服务,如果Profile文件在 api 层，这里，可以直接用 typeof(Startup) 就行
             //但是如果写到了其他层，必须写 config,
             //AutoMapper会从程序集中搜索Profile的子类，然后把这些子类加入到配置中。

@@ -206,10 +206,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         }
 
         /// <summary>
-        /// µÇ³ö
+        /// ÍË³öµÇÂ¼
         /// </summary>
         /// <returns></returns>
-        [HttpPost, Route("logout"), MethodLog("ÍË³ö")]
+        [HttpPost, Route("logout"), MethodLog("ÍË³öµÇÂ¼")]
         public ApiRes Logout()
         {
             var currentUser = GetCurrentUser();

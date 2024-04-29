@@ -15,10 +15,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.WebSockets
         }
 
         /// <summary>
-        /// /ws/payOrder/{訂單ID}/{客戶端自定義ID}
+        /// /ws/payOrder/{订单ID}/{客户端自定义ID}
         /// </summary>
-        /// <param name="payOrderId">訂單ID</param>
-        /// <param name="cid">客戶端自定義ID</param>
+        /// <param name="payOrderId">订单ID</param>
+        /// <param name="cid">客户端自定义ID</param>
         /// <returns></returns>
         [HttpGet, Route("api/anon/ws/payOrder/{payOrderId}/{cid}")]
         public async Task Get(string payOrderId, string cid)

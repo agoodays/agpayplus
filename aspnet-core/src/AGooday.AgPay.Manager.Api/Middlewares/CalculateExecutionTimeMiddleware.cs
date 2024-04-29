@@ -13,15 +13,9 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
         Stopwatch stopwatch;
         public CalculateExecutionTimeMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
-            if (next == null)
-            {
-                throw new ArgumentNullException(nameof(next));
-            }
+            ArgumentNullException.ThrowIfNull(next);
 
-            if (loggerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(loggerFactory));
-            }
+            ArgumentNullException.ThrowIfNull(loggerFactory);
 
             this._next = next;
             _logger = loggerFactory.CreateLogger<CalculateExecutionTimeMiddleware>();
@@ -36,17 +30,14 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             await _next.Invoke(context);
 
             stopwatch.Stop();
-            _logger.LogInformation($"[{context.TraceIdentifier}], RequestMethod: {context.Request.Method}, RequestPath: {context.Request.Path}, ElapsedMilliseconds: {stopwatch.ElapsedMilliseconds}, Response StatusCode: {context.Response.StatusCode}");
+            _logger.LogInformation($"[{context.TraceIdentifier}], RequestMethod: {context.Request.Method}, RequestPath: {context.Request.Path}, ElapsedMilliseconds: {stopwatch.ElapsedMilliseconds} ms, Response StatusCode: {context.Response.StatusCode}");
         }
     }
     public static class CalculateExecutionTimeMiddlewareExtensions
     {
         public static IApplicationBuilder UseCalculateExecutionTime(this IApplicationBuilder app)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
+            ArgumentNullException.ThrowIfNull(app);
 
             return app.UseMiddleware<CalculateExecutionTimeMiddleware>();
         }
