@@ -104,7 +104,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                         request.SubAppId = isvsubMchParams.SubMchAppId;
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                         request.OutBatchNumber = transferOrder.TransferId;
-                        request.BatchName = transferOrder.AccountName;
+                        if (!string.IsNullOrWhiteSpace(transferOrder.AccountName))
+                        {
+                            request.BatchName = transferOrder.AccountName;
+                        }
+                        else
+                        {
+                            request.BatchName = transferOrder.TransferDesc;
+                        }
                         request.BatchRemark = transferOrder.TransferDesc;
                         request.TotalAmount = (int)transferOrder.Amount;
                         request.TotalNumber = 1;
