@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Text.RegularExpressions;
 
 namespace AGooday.AgPay.Agent.Api.Middlewares
 {
@@ -24,7 +23,6 @@ namespace AGooday.AgPay.Agent.Api.Middlewares
                 && !context.Request.Path.Value.Contains("/qrc/shell/view")
                 && !context.Request.Path.Value.Contains("/export/"))
             {
-                context.TraceIdentifier = Guid.NewGuid().ToString("N");
                 context.Request.EnableBuffering();
                 Stream originalBody = context.Response.Body;
 
@@ -46,8 +44,8 @@ namespace AGooday.AgPay.Agent.Api.Middlewares
                 }
                 catch (Exception ex)
                 {
-                    // 记录异常                        
-                    _logger.LogError(ex, $"{ex.Message}{ex.InnerException}");
+                    // 记录异常
+                    _logger.LogError(ex, $"[{context.TraceIdentifier}]");
                 }
                 finally
                 {

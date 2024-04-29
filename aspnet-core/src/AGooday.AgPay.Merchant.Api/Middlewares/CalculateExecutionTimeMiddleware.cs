@@ -29,13 +29,14 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+            //context.TraceIdentifier = Guid.NewGuid().ToString("N");
             stopwatch = new Stopwatch();
             stopwatch.Start();
 
             await _next.Invoke(context);
 
             stopwatch.Stop();
-            _logger.LogInformation($"TraceId:{context.TraceIdentifier}, RequestMethod:{context.Request.Method}, RequestPath:{context.Request.Path}, ElapsedMilliseconds:{stopwatch.ElapsedMilliseconds}, Response StatusCode: {context.Response.StatusCode}");
+            _logger.LogInformation($"[{context.TraceIdentifier}], RequestMethod: {context.Request.Method}, RequestPath: {context.Request.Path}, ElapsedMilliseconds: {stopwatch.ElapsedMilliseconds}, Response StatusCode: {context.Response.StatusCode}");
         }
     }
     public static class CalculateExecutionTimeMiddlewareExtensions

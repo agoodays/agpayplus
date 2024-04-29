@@ -28,7 +28,6 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                 && !context.Request.Path.Value.Contains("/qrc/shell/styleb.png")
                 && !context.Request.Path.Value.Contains("/export/"))
             {
-                context.TraceIdentifier = Guid.NewGuid().ToString("N");
                 context.Request.EnableBuffering();
                 Stream originalBody = context.Response.Body;
 
@@ -51,7 +50,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                 catch (Exception ex)
                 {
                     // 记录异常                        
-                    _logger.LogError(ex, $"{ex.Message}{ex.InnerException}");
+                    _logger.LogError(ex, $"[{context.TraceIdentifier}]");
                 }
                 finally
                 {
