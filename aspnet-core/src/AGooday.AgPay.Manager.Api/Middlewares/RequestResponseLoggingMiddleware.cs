@@ -49,8 +49,8 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                 }
                 catch (Exception ex)
                 {
-                    // 记录异常                        
-                    _logger.LogError(ex, $"[{context.TraceIdentifier}]");
+                    // 记录异常
+                    _logger.LogError(ex, $"[{context.TraceIdentifier}] {ex.Message}");
                 }
                 finally
                 {

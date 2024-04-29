@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             await _next.Invoke(context);
 
             stopwatch.Stop();
-            _logger.LogInformation($"[{context.TraceIdentifier}], RequestMethod: {context.Request.Method}, RequestPath: {context.Request.Path}, ElapsedMilliseconds: {stopwatch.ElapsedMilliseconds} ms, Response StatusCode: {context.Response.StatusCode}");
+            _logger.LogInformation($"[{context.TraceIdentifier}] RequestMethod: {context.Request.Method}, RequestPath: {context.Request.Path}, ElapsedMilliseconds: {stopwatch.ElapsedMilliseconds} ms, Response StatusCode: {context.Response.StatusCode}");
         }
     }
     public static class CalculateExecutionTimeMiddlewareExtensions
