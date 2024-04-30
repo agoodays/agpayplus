@@ -100,7 +100,12 @@
           <div class="data-statistics" style="background: rgb(250, 250, 250);">
             <div class="statistics-list">
               <div class="item">
-                <div class="title">实际收款金额</div>
+                <div class="title" style="display: flex;">
+                  实际收款金额
+                  <a-tooltip title="扣除手续费后的实际到账金额">
+                    <a-icon class="bi" type="info-circle" />
+                  </a-tooltip>
+                </div>
                 <div class="amount" style="color: rgb(26, 102, 255);">
                   <span class="amount-num">{{ (countData.payAmount-countData.mchFeeAmount).toFixed(2) }}</span>元
                 </div>
@@ -110,7 +115,12 @@
                 <div class="title"></div>
               </div>
               <div class="item">
-                <div class="title">成交订单</div>
+                <div class="title" style="display: flex;">
+                  成交订单
+                  <a-tooltip title="支付成功的订单金额，包含部分退款及全额退款的订单">
+                    <a-icon class="bi" type="info-circle" />
+                  </a-tooltip>
+                </div>
                 <div class="amount">
                   <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>元
                 </div>
