@@ -212,6 +212,8 @@ app.UseWebSockets(new WebSocketOptions
 });
 
 // Configure the HTTP request pipeline.
+app.UseNdc();
+
 app.UseCalculateExecutionTime();
 
 app.UseRequestResponseLogging();

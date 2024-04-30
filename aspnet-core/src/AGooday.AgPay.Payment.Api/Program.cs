@@ -237,6 +237,8 @@ AgPayUtil.RSA2_PRIVATE_KEY = builder.Configuration["SysRSA2:PrivateKey"];
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseNdc();
+
 app.UseCalculateExecutionTime();
 
 app.UseRequestResponseLogging();
