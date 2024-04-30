@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
                 var isExist = wsAppIdMap.TryGetValue(appId, out ISet<WsChannelUserIdServer> wsSet);
                 if (!isExist)
                 {
-                    _logger.LogInformation($"AppId={appId}, Cid={this.Cid} 无ws监听客户端");
+                    _logger.LogInformation($"AppId={appId}, Cid={cid} 无ws监听客户端");
                     return;
                 }
 
@@ -124,7 +124,7 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
                     }
                     catch (Exception e)
                     {
-                        _logger.LogInformation(e, $"推送设备消息时异常，AppId={appId}, Cid={cid}");
+                        _logger.LogInformation(e, $"推送设备消息时异常，AppId={appId}, Cid={item.Cid}");
                     }
                 }
             }
