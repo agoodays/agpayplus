@@ -85,6 +85,56 @@
             </div>
           </div>
         </template>
+
+        <template slot="payAmountTitle" slot-scope="{record}">
+          <div style="display: flex;">
+            <span>{{ record }}</span>
+            <a-tooltip title="支付成功的订单金额，包含部分退款及全额退款的订单">
+              <a-icon class="bi" type="info-circle" style="margin-left: 5px;" />
+            </a-tooltip>
+          </div>
+        </template>
+        <template slot="amountTitle" slot-scope="{record}">
+          <div style="display: flex;">
+            <span>{{ record }}</span>
+            <a-tooltip title="扣除手续费后的实际到账金额">
+              <a-icon class="bi" type="info-circle" style="margin-left: 5px;" />
+            </a-tooltip>
+          </div>
+        </template>
+        <template slot="feeTitle" slot-scope="{record}">
+          <div style="display: flex;">
+            <span>{{ record }}</span>
+            <a-tooltip title="成交订单产生的手续费金额">
+              <a-icon class="bi" type="info-circle" style="margin-left: 5px;" />
+            </a-tooltip>
+          </div>
+        </template>
+        <template slot="refundFeeTitle" slot-scope="{record}">
+          <div style="display: flex;">
+            <span>{{ record }}</span>
+            <a-tooltip title="退款订单产生的手续费退费金额">
+              <a-icon class="bi" type="info-circle" style="margin-left: 5px;" />
+            </a-tooltip>
+          </div>
+        </template>
+        <template slot="refundCountTitle" slot-scope="{record}">
+          <div style="display: flex;">
+            <span>{{ record }}</span>
+            <a-tooltip title="实际退款订单笔数，若一笔已成交订单退款多次，则计多次">
+              <a-icon class="bi" type="info-circle" style="margin-left: 5px;" />
+            </a-tooltip>
+          </div>
+        </template>
+        <template slot="roundTitle" slot-scope="{record}">
+          <div style="display: flex;">
+            <span>{{ record }}</span>
+            <a-tooltip title="成交笔数与总订单笔数除得的百分比">
+              <a-icon class="bi" type="info-circle" style="margin-left: 5px;"/>
+            </a-tooltip>
+          </div>
+        </template>
+
         <template slot="payAmountSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">￥{{ (record.payAmount/100).toFixed(2) }}</b></template> <!-- 自定义插槽 -->
         <template slot="amountSlot" slot-scope="{record}"><b style="color: rgb(21, 184, 108)">￥{{ ((record.payAmount-record.fee)/100).toFixed(2) }}</b></template> <!-- 自定义插槽 -->
         <template slot="feeSlot" slot-scope="{record}"><b style="color: rgb(255, 104, 72)">￥{{ (record.fee/100).toFixed(2) }}</b></template> <!-- 自定义插槽 -->
@@ -109,14 +159,14 @@ import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
 const tableColumns = [
   { key: 'ifName', dataIndex: 'ifName', title: '通道名称', width: 140, ellipsis: true },
   { key: 'ifCode', dataIndex: 'ifCode', title: '通道代码', width: 100 },
-  { key: 'payAmount', title: '成交金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
-  { key: 'amount', title: '实收金额', width: 110, scopedSlots: { customRender: 'amountSlot' } },
-  { key: 'fee', title: '手续费', width: 110, scopedSlots: { customRender: 'feeSlot' } },
+  { key: 'payAmount', width: 110, ellipsis: true, scopedSlots: { title: 'payAmountTitle', titleValue: '成交金额', customRender: 'payAmountSlot' } },
+  { key: 'amount', width: 110, scopedSlots: { title: 'amountTitle', titleValue: '实收金额', customRender: 'amountSlot' } },
+  { key: 'fee', width: 110, scopedSlots: { title: 'feeTitle', titleValue: '手续费', customRender: 'feeSlot' } },
   { key: 'refundAmount', title: '退款金额', width: 110, scopedSlots: { customRender: 'refundAmountSlot' } },
-  { key: 'refundFee', title: '手续费回退', width: 110, scopedSlots: { customRender: 'refundFeeSlot' } },
-  { key: 'refundCount', title: '退款笔数', width: 110, scopedSlots: { customRender: 'refundCountSlot' } },
+  { key: 'refundFee', width: 125, scopedSlots: { title: 'refundFeeTitle', titleValue: '手续费回退', customRender: 'refundFeeSlot' } },
+  { key: 'refundCount', width: 110, scopedSlots: { title: 'refundCountTitle', titleValue: '退款笔数', customRender: 'refundCountSlot' } },
   { key: 'count', title: '成交/总笔数', width: 120, scopedSlots: { customRender: 'countSlot' } },
-  { key: 'round', title: '成功率', width: 110, scopedSlots: { customRender: 'roundSlot' } }
+  { key: 'round', width: 110, scopedSlots: { title: 'roundTitle', titleValue: '成功率', customRender: 'roundSlot' } }
 ]
 
 export default {

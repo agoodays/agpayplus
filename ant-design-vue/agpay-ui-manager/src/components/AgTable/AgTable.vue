@@ -148,12 +148,12 @@ export default {
   },
   // 计算属性
   computed: {
-    columnsCustomSlots () { // 自定义列插槽  1. 过滤器仅获取到包含slot属性的元素， 2. 返回slot数组
-      return this.tableColumns.filter(item => item.scopedSlots).map(item => item.scopedSlots)
-    },
     columnsCustomTitleSlots () { // 自定义列Title插槽  1. 过滤器仅获取到包含slot属性的元素， 2. 返回slot数组
       // 获取具有 scopedSlots 中包含 title 属性的数据
       return this.tableColumns.filter(column => column.scopedSlots && column.scopedSlots.title).map(item => item.scopedSlots)
+    },
+    columnsCustomSlots () { // 自定义列插槽  1. 过滤器仅获取到包含slot属性的元素， 2. 返回slot数组
+      return this.tableColumns.filter(item => item.scopedSlots).map(item => item.scopedSlots)
     },
     displayedColumns () {
       return this.allColumns.filter(column => this.visibleColumns.includes(column.key))

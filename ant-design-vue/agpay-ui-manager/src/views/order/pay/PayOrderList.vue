@@ -103,7 +103,7 @@
                 <div class="title" style="display: flex;">
                   实际收款金额
                   <a-tooltip title="扣除手续费后的实际到账金额">
-                    <a-icon class="bi" type="info-circle" />
+                    <a-icon class="bi" type="info-circle" style="margin-left: 5px;" />
                   </a-tooltip>
                 </div>
                 <div class="amount" style="color: rgb(26, 102, 255);">
@@ -115,12 +115,7 @@
                 <div class="title"></div>
               </div>
               <div class="item">
-                <div class="title" style="display: flex;">
-                  成交订单
-                  <a-tooltip title="支付成功的订单金额，包含部分退款及全额退款的订单">
-                    <a-icon class="bi" type="info-circle" />
-                  </a-tooltip>
-                </div>
+                <div class="title">成交订单</div>
                 <div class="amount">
                   <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>元
                 </div>
@@ -155,6 +150,7 @@
             </div>
           </div>
         </template>
+
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.amount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundAmountSlot" slot-scope="{record}">￥{{ record.refundAmount/100 }}</template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
