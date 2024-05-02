@@ -1,42 +1,35 @@
 <template>
   <div>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <a-form-item label="" class="table-head-layout">
-              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
-            </a-form-item>
-            <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-<!--            <ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
-<!--            <ag-text-up :placeholder="'商户退款单号'" :msg="searchData.mchRefundNo" v-model="searchData.mchRefundNo" />-->
-<!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
-<!--            <ag-text-up :placeholder="'渠道订单号'" :msg="searchData.channelPayOrderNo" v-model="searchData.channelPayOrderNo" />-->
-            <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="退款状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">订单生成</a-select-option>
-                <a-select-option value="1">退款中</a-select-option>
-                <a-select-option value="2">退款成功</a-select-option>
-                <a-select-option value="3">退款失败</a-select-option>
-              </a-select>
-            </a-form-item>
-
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">搜索</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line">
-<!--        <div class="btns" @click="isShowMore = !isShowMore">
-          <div>
-            {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
-          </div>
-        </div>-->
-      </div>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <a-form-item label="" class="table-head-layout">
+            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+          </a-form-item>
+          <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
+          <!--            <ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
+          <!--            <ag-text-up :placeholder="'商户退款单号'" :msg="searchData.mchRefundNo" v-model="searchData.mchRefundNo" />-->
+          <!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
+          <!--            <ag-text-up :placeholder="'渠道订单号'" :msg="searchData.channelPayOrderNo" v-model="searchData.channelPayOrderNo" />-->
+          <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.state" placeholder="退款状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">订单生成</a-select-option>
+              <a-select-option value="1">退款中</a-select-option>
+              <a-select-option value="2">退款成功</a-select-option>
+              <a-select-option value="3">退款失败</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -378,6 +371,16 @@
     mounted () {
     },
     methods: {
+      handleSearchFormData (searchData) {
+        this.searchData = searchData
+        // if (!Object.keys(searchData).length) {
+        //   this.searchData.queryDateRange = 'today'
+        // }
+        // this.$forceUpdate()
+      },
+      setIsShowMore (isShowMore) {
+        this.isShowMore = isShowMore
+      },
       queryFunc () {
         this.btnLoading = true
         this.$refs.infoTable.refTable(true)

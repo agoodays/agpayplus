@@ -1,68 +1,62 @@
 <template>
   <div>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <a-form-item label="" class="table-head-layout">
-              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
-            </a-form-item>
-            <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-<!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
-<!--            <ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
-            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
-            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
-            <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
-            <a-form-item v-if="isShowMore && $access('ENT_PAY_ORDER_SEARCH_PAY_WAY')" label="" class="table-head-layout">
-              <a-select v-model="searchData.wayCode" placeholder="支付方式" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option :key="item.wayCode" v-for="item in payWayList" :value="item.wayCode">
-                  {{ item.wayName }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="支付状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">订单生成</a-select-option>
-                <a-select-option value="1">支付中</a-select-option>
-                <a-select-option value="2">支付成功</a-select-option>
-                <a-select-option value="3">支付失败</a-select-option>
-                <a-select-option value="4">已撤销</a-select-option>
-                <a-select-option value="5">已退款</a-select-option>
-                <a-select-option value="6">订单关闭</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
-              <a-select v-model="searchData.notifyState" placeholder="回调状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">未发送</a-select-option>
-                <a-select-option value="1">已发送</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item v-if="isShowMore" label="" class="table-head-layout">
-              <a-select v-model="searchData.divisionState" placeholder="分账状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">未发生分账</a-select-option>
-                <a-select-option value="1">等待分账任务处理</a-select-option>
-                <a-select-option value="2">分账处理中</a-select-option>
-                <a-select-option value="3">分账任务已结束（状态请看分账记录）</a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">搜索</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line">
-        <div class="btns" @click="isShowMore = !isShowMore">
-          <div>
-            {{ isShowMore ? '收起' : '更多' }}筛选 <a-icon :type="isShowMore ? 'up' : 'down'" />
-          </div>
-        </div>
-      </div>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="true"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <a-form-item label="" class="table-head-layout">
+            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+          </a-form-item>
+          <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
+          <!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
+          <!--            <ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
+          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
+          <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
+          <a-form-item v-if="isShowMore && $access('ENT_PAY_ORDER_SEARCH_PAY_WAY')" label="" class="table-head-layout">
+            <a-select v-model="searchData.wayCode" placeholder="支付方式" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option :key="item.wayCode" v-for="item in payWayList" :value="item.wayCode">
+                {{ item.wayName }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item v-if="isShowMore" label="" class="table-head-layout">
+            <a-select v-model="searchData.state" placeholder="支付状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">订单生成</a-select-option>
+              <a-select-option value="1">支付中</a-select-option>
+              <a-select-option value="2">支付成功</a-select-option>
+              <a-select-option value="3">支付失败</a-select-option>
+              <a-select-option value="4">已撤销</a-select-option>
+              <a-select-option value="5">已退款</a-select-option>
+              <a-select-option value="6">订单关闭</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item v-if="isShowMore" label="" class="table-head-layout">
+            <a-select v-model="searchData.notifyState" placeholder="回调状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">未发送</a-select-option>
+              <a-select-option value="1">已发送</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item v-if="isShowMore" label="" class="table-head-layout">
+            <a-select v-model="searchData.divisionState" placeholder="分账状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">未发生分账</a-select-option>
+              <a-select-option value="1">等待分账任务处理</a-select-option>
+              <a-select-option value="2">分账处理中</a-select-option>
+              <a-select-option value="3">分账任务已结束（状态请看分账记录）</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -626,6 +620,16 @@ export default {
     this.countFunc()
   },
   methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+      // if (!Object.keys(searchData).length) {
+      //   this.searchData.queryDateRange = 'today'
+      // }
+      // this.$forceUpdate()
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     queryFunc () {
       this.btnLoading = true
       this.countFunc()
