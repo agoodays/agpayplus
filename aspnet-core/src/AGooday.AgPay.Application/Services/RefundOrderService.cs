@@ -7,6 +7,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Newtonsoft.Json.Linq;
 using System.Data;
 
 namespace AGooday.AgPay.Application.Services
@@ -57,7 +58,14 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto)
         {
-            var refundOrders = _refundOrderRepository.GetAllAsNoTracking()
+            var refundOrders = GetRefundOrders(dto).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<RefundOrder>.Create<RefundOrderDto>(refundOrders, _mapper, dto.PageNumber, dto.PageSize);
+            return records;
+        }
+
+        private IQueryable<RefundOrder> GetRefundOrders(RefundOrderQueryDto dto)
+        {
+            var result = _refundOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
@@ -71,10 +79,33 @@ namespace AGooday.AgPay.Application.Services
                 || w.RefundOrderId.Equals(dto.UnionOrderId) || w.MchRefundNo.Equals(dto.UnionOrderId)
                 || w.ChannelPayOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))// 三合一订单
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<RefundOrder>.Create<RefundOrderDto>(refundOrders, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
+            return result;
+        }
+
+        public JObject Statistics(RefundOrderQueryDto dto)
+        {
+            var refundOrders = GetRefundOrders(dto);
+            var allAmount = refundOrders.Sum(s => s.RefundAmount);
+            var allCount = refundOrders.Count();
+            var refund = refundOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS));
+            var fee = refund.Sum(s => s.RefundFeeAmount);
+            var refundAmount = refund.Sum(s => s.RefundAmount);
+            var refundCount = refund.Count();
+            var payAmount = refund.Sum(s => s.PayAmount);
+            var payCount = refund.Count();
+            JObject result = new JObject();
+            result.Add("allAmount", Decimal.Round(allAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("allCount", allCount);
+            result.Add("allPayAmount", 0);
+            result.Add("fee", Decimal.Round(fee / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("payAmount", Decimal.Round(payAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("payCount", payCount);
+            result.Add("refundAmount", Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("refundCount", refundCount);
+            result.Add("refundFeeAmount", 0);
+            result.Add("round", 0);
+            return result;
         }
 
         public bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo)

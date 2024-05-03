@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Models;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
@@ -14,6 +15,7 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <returns></returns>
         RefundOrderDto QueryMchOrder(string mchNo, string mchRefundNo, string refundOrderId);
         PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto);
+        JObject Statistics(RefundOrderQueryDto dto);
         bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo);
         bool IsExistRefundingOrder(string payOrderId);
         long SumSuccessRefundAmount(string payOrderId);

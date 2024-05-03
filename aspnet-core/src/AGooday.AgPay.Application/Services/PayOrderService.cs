@@ -59,49 +59,41 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto)
         {
-            var payOrders = _payOrderRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
-                && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
-                && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
-                && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))
-                && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Equals(dto.StoreName))
-                && (dto.DivisionState.Equals(null) || w.DivisionState.Equals(dto.DivisionState))
-                && (string.IsNullOrWhiteSpace(dto.PayOrderId) || w.PayOrderId.Equals(dto.PayOrderId))
-                && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
-                && (string.IsNullOrWhiteSpace(dto.ChannelOrderNo) || w.ChannelOrderNo.Equals(dto.ChannelOrderNo))
-                && (string.IsNullOrWhiteSpace(dto.PlatformOrderNo) || w.PlatformOrderNo.Equals(dto.PlatformOrderNo))
-                && (string.IsNullOrWhiteSpace(dto.PlatformMchOrderNo) || w.PlatformMchOrderNo.Equals(dto.PlatformMchOrderNo))
-                && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
-                ).OrderByDescending(o => o.CreatedAt);
+            var payOrders = GetPayOrders(dto).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayOrder>.Create<PayOrderDto>(payOrders, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
+        private IQueryable<PayOrder> GetPayOrders(PayOrderQueryDto dto)
+        {
+            var result = _payOrderRepository.GetAllAsNoTracking()
+                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
+                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                 && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
+                 && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
+                 && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
+                 && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
+                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
+                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+                 && (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))
+                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Equals(dto.StoreName))
+                 && (dto.DivisionState.Equals(null) || w.DivisionState.Equals(dto.DivisionState))
+                 && (string.IsNullOrWhiteSpace(dto.PayOrderId) || w.PayOrderId.Equals(dto.PayOrderId))
+                 && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
+                 && (string.IsNullOrWhiteSpace(dto.ChannelOrderNo) || w.ChannelOrderNo.Equals(dto.ChannelOrderNo))
+                 && (string.IsNullOrWhiteSpace(dto.PlatformOrderNo) || w.PlatformOrderNo.Equals(dto.PlatformOrderNo))
+                 && (string.IsNullOrWhiteSpace(dto.PlatformMchOrderNo) || w.PlatformMchOrderNo.Equals(dto.PlatformMchOrderNo))
+                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
+                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
+                 );
+            return result;
+        }
+
         public JObject Statistics(PayOrderQueryDto dto)
         {
-            var payOrders = _payOrderRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
-                && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
-                && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))
-                && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Equals(dto.StoreName))
-                && (dto.DivisionState.Equals(null) || w.DivisionState.Equals(dto.DivisionState))
-                && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
+            var payOrders = GetPayOrders(dto);
             var allPayAmount = payOrders.Sum(s => s.Amount);
             var allPayCount = payOrders.Count();
             var failPay = payOrders.Where(w => !(w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)));
@@ -115,17 +107,17 @@ namespace AGooday.AgPay.Application.Services
             var refund = payOrders.Where(w => w.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_SUB) || w.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_ALL));
             var refundAmount = refund.Sum(s => s.Amount);
             var refundCount = refund.Count();
-            JObject json = new JObject();
-            json.Add("allPayAmount", Decimal.Round(allPayAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("allPayCount", allPayCount);
-            json.Add("failPayAmount", Decimal.Round(failPayAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("failPayCount", failPayCount);
-            json.Add("mchFeeAmount", Decimal.Round(mchFeeAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("payAmount", Decimal.Round(payAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("payCount", payCount);
-            json.Add("refundAmount", Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("refundCount", refundCount);
-            return json;
+            JObject result = new JObject();
+            result.Add("allPayAmount", Decimal.Round(allPayAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("allPayCount", allPayCount);
+            result.Add("failPayAmount", Decimal.Round(failPayAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("failPayCount", failPayCount);
+            result.Add("mchFeeAmount", Decimal.Round(mchFeeAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("payAmount", Decimal.Round(payAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("payCount", payCount);
+            result.Add("refundAmount", Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("refundCount", refundCount);
+            return result;
         }
 
         public bool IsExistOrderUseIfCode(string ifCode)
