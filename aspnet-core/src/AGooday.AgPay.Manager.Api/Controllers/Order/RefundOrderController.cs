@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         }
 
         /// <summary>
-        /// 订单信息统计
+        /// 退款订单信息统计
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>

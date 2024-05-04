@@ -86,25 +86,19 @@ namespace AGooday.AgPay.Application.Services
         public JObject Statistics(RefundOrderQueryDto dto)
         {
             var refundOrders = GetRefundOrders(dto);
-            var allAmount = refundOrders.Sum(s => s.RefundAmount);
-            var allCount = refundOrders.Count();
+            var allRefundAmount = refundOrders.Sum(s => s.RefundAmount);
+            var allRefundCount = refundOrders.Count();
             var refund = refundOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS));
-            var fee = refund.Sum(s => s.RefundFeeAmount);
+            var refundFeeAmount = refund.Sum(s => s.RefundFeeAmount);
             var refundAmount = refund.Sum(s => s.RefundAmount);
             var refundCount = refund.Count();
-            var payAmount = refund.Sum(s => s.PayAmount);
-            var payCount = refund.Count();
             JObject result = new JObject();
-            result.Add("allAmount", Decimal.Round(allAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            result.Add("allCount", allCount);
-            result.Add("allPayAmount", 0);
-            result.Add("fee", Decimal.Round(fee / 100M, 2, MidpointRounding.AwayFromZero));
-            result.Add("payAmount", Decimal.Round(payAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            result.Add("payCount", payCount);
+            result.Add("allRefundAmount", Decimal.Round(allRefundAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("allRefundCount", allRefundCount);
             result.Add("refundAmount", Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero));
             result.Add("refundCount", refundCount);
-            result.Add("refundFeeAmount", 0);
-            result.Add("round", 0);
+            result.Add("refundFeeAmount", refundFeeAmount);
+            result.Add("round", Math.Round(allRefundCount > 0 ? refundCount / Convert.ToDecimal(allRefundCount) : 0M, 2, MidpointRounding.AwayFromZero));
             return result;
         }
 

@@ -453,7 +453,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public JObject MainPageIsvAndMchCount(string mchNo, string agentNo)
         {
-            JObject json = new JObject();
+            JObject result = new JObject();
             // 商户总数
             var mchInfos = _mchInfoRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
@@ -490,16 +490,16 @@ namespace AGooday.AgPay.Application.Services
                 agentCount = isvCount < 10 ? Random.Shared.Next(0, 500) : isvCount;
 #endif
                 mchCount = isvSubMchCount + normalMchCount;
-                json.Add("isvSubMchCount", isvSubMchCount);
-                json.Add("normalMchCount", normalMchCount);
-                json.Add("totalMch", mchCount);
-                json.Add("totalAgent", agentCount);
+                result.Add("isvSubMchCount", isvSubMchCount);
+                result.Add("normalMchCount", normalMchCount);
+                result.Add("totalMch", mchCount);
+                result.Add("totalAgent", agentCount);
                 if (string.IsNullOrWhiteSpace(agentNo))
                 {
-                    json.Add("totalIsv", isvCount);
+                    result.Add("totalIsv", isvCount);
                 }
             }
-            return json;
+            return result;
         }
 
         /// <summary>

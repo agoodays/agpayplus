@@ -46,6 +46,7 @@
         :autoRefresh="true"
         :isShowAutoRefresh="true"
         :isShowDownload="true"
+        :isEnableDataStatistics="true"
         :reqTableDataFunc="reqTableDataFunc"
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
@@ -53,6 +54,39 @@
         rowKey="refundOrderId"
         :tableRowCrossColor="true"
       >
+        <template slot="dataStatisticsSlot">
+          <div class="data-statistics" style="background: rgb(250, 250, 250);">
+            <div class="statistics-list">
+              <div class="item">
+                <div class="title">退款金额</div>
+                <div class="amount" style="color: rgb(26, 102, 255);">
+                  <span class="amount-num">{{ countData.refundAmount.toFixed(2) }}</span>元
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">退款笔数</div>
+                <div class="amount">
+                  <span class="amount-num">{{ countData.refundCount }}</span>笔
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">手续费金额</div>
+                <div class="amount">
+                  <span class="amount-num">{{ countData.refundFeeAmount.toFixed(2) }}</span>元
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
         <template slot="payAmountSlot" slot-scope="{record}"><b>￥{{ record.payAmount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundAmountSlot" slot-scope="{record}"><b>￥{{ record.refundAmount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundFeeAmountSlot" slot-scope="{record}"><b>￥{{ record.refundFeeAmount/100 }}</b></template> <!-- 自定义插槽 -->
@@ -365,6 +399,14 @@
         searchData: {
           queryDateRange: 'today'
         },
+        countData: {
+          allRefundAmount: 0.00,
+          allRefundCount: 0,
+          refundAmount: 0.00,
+          refundCount: 0,
+          refundFeeAmount: 0.00,
+          round: 0.00
+        },
         selectedIds: [], // 选中的数据
         createdStart: '', // 选择开始时间
         createdEnd: '', // 选择结束时间
@@ -375,6 +417,7 @@
     computed: {
     },
     mounted () {
+      this.countFunc()
     },
     methods: {
       handleSearchFormData (searchData) {
@@ -385,6 +428,7 @@
       },
       queryFunc () {
         this.btnLoading = true
+        this.countFunc()
         this.$refs.infoTable.refTable(true)
       },
       // 请求table接口数据
@@ -416,7 +460,14 @@
         })
       },
       searchFunc: function () { // 点击【查询】按钮点击事件
+        this.countFunc()
         this.$refs.infoTable.refTable(true)
+      },
+      countFunc: function () {
+        const that = this
+        req.count(API_URL_REFUND_ORDER_LIST, this.searchData).then(res => {
+          that.countData = res
+        })
       },
       detailFunc: function (recordId) {
         const that = this

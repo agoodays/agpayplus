@@ -85,17 +85,17 @@ namespace AGooday.AgPay.Application.Services
             var refundAmount = refund.Sum(s => s.RefundAmount);
             var refundCount = refund.Count();
             var refundFeeAmount = refund.Sum(s => s.RefundFeeAmount);
-            JObject json = new JObject();
-            json.Add("allAmount", Decimal.Round(allAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("allCount", allCount);
-            json.Add("payAmount", Decimal.Round(payAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("payCount", payCount);
-            json.Add("fee", Decimal.Round(fee / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("refundAmount", Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("refundCount", refundCount);
-            json.Add("refundFeeAmount", Decimal.Round(refundFeeAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            json.Add("round", Math.Round(allCount > 0 ? payCount / Convert.ToDecimal(allCount) : 0M, 2, MidpointRounding.AwayFromZero));
-            return json;
+            JObject result = new JObject();
+            result.Add("allAmount", Decimal.Round(allAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("allCount", allCount);
+            result.Add("payAmount", Decimal.Round(payAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("payCount", payCount);
+            result.Add("fee", Decimal.Round(fee / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("refundAmount", Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("refundCount", refundCount);
+            result.Add("refundFeeAmount", Decimal.Round(refundFeeAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("round", Math.Round(allCount > 0 ? payCount / Convert.ToDecimal(allCount) : 0M, 2, MidpointRounding.AwayFromZero));
+            return result;
         }
 
         public PaginatedList<StatisticResultDto> Statistics(string agentNo, StatisticQueryDto dto)

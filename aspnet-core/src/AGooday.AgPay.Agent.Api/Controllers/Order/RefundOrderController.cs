@@ -49,6 +49,20 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         }
 
         /// <summary>
+        /// 退款订单信息统计
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet, Route("count"), NoLog]
+        [PermissionAuth(PermCode.AGENT.ENT_REFUND_LIST)]
+        public ApiRes Count([FromQuery] RefundOrderQueryDto dto)
+        {
+            dto.BindDateRange();
+            var statistics = _refundOrderService.Statistics(dto);
+            return ApiRes.Ok(statistics);
+        }
+
+        /// <summary>
         /// 订单信息导出
         /// </summary>
         /// <param name="bizType"></param>
