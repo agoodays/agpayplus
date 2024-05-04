@@ -77,7 +77,7 @@
         </a-dropdown>
       </div>
     </div>
-    <slot name="dataStatisticsSlot" v-if="isShowDataStatistics"></slot>
+    <slot name="dataStatisticsSlot" v-if="isShowDataStatistics" :countData="countData"></slot>
     <a-table
       :columns="displayedColumns"
       :size="size"
@@ -122,7 +122,8 @@ export default {
     initData: { type: Boolean, default: true }, // 初始化列表数据， 默认true
     tableColumns: { type: Array, default: null }, // 表格数组列
     reqTableDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
-    reqDownloadDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
+    reqTableCountFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据统计
+    reqDownloadDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据下载
     currentChange: { type: Function, default: (v1, v2) => {} }, // 更新当前选择行事件， 默认空函数
     searchData: { type: Object, default: null }, // 搜索条件参数
     pageSize: { type: Number, default: 10 }, // 默认每页条数
@@ -136,6 +137,7 @@ export default {
     return {
       allColumns: this.tableColumns,
       visibleColumns: this.tableColumns.map(column => column.key),
+      countData: {},
       apiResData: { total: 0, records: [] }, // 接口返回数据
       iPage: { pageNumber: 1, pageSize: this.pageSize }, // 默认table 分页/排序请求后端格式
       pagination: { total: 0, current: 1, pageSize: this.pageSize, showSizeChanger: true, showTotal: total => `共${total}条` }, // ATable 分页配置项
@@ -162,6 +164,7 @@ export default {
   mounted () {
     if (this.initData) { // 是否自动加载数据
       this.refTable(true)
+      this.refCountData()
     }
     if (this.isShowAutoRefresh) { // 是否自动刷新数据
       this.startCountdown()
@@ -178,6 +181,7 @@ export default {
             that.countdown = that.defaultCountdown
             // clearInterval(timer)
             that.refTable(false)
+            this.refCountData()
           }
         }
       }, 1000)
@@ -232,6 +236,15 @@ export default {
         this.showLoading = false
         that.$emit('btnLoadClose')
       }) // 关闭loading
+    },
+    // 数据统计
+    refCountData: function () {
+      if (this.isEnableDataStatistics) {
+        const that = this
+        this.reqTableCountFunc(this.searchData).then(res => {
+          that.countData = res
+        })
+      }
     },
 
     // 下载数据

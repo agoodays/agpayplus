@@ -90,13 +90,14 @@
         :isShowDownload="true"
         :isEnableDataStatistics="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqTableCountFunc="reqTableCountFunc"
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
         rowKey="payOrderId"
         :tableRowCrossColor="true"
       >
-        <template slot="dataStatisticsSlot">
+        <template slot="dataStatisticsSlot" slot-scope="{countData}">
           <div class="data-statistics" style="background: rgb(250, 250, 250);">
             <div class="statistics-list">
               <div class="item">
@@ -149,6 +150,84 @@
               </div>
             </div>
           </div>
+          <!-- 成交订单详细 -->
+          <a-modal :visible="detailVisible" footer="" @cancel="detailVisible = false">
+            <div class="modal-title">成交订单详细</div>
+            <div class="modal-describe">创建订单金额/笔数 = 成交订单金额/笔数 + 未付款订单金额/笔数</div>
+            <div class="statistics-list" style="padding-bottom: 55px;">
+              <div class="item">
+                <div class="title">创建订单</div>
+                <a-tooltip placement="top">
+                  <template #title>
+                    <span>
+                      <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </template>
+                  <div class="amount">
+                    <span>
+                      <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </div>
+                </a-tooltip>
+                <div class="detail">
+                  <span>{{ countData.allPayCount }}笔</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">成交订单</div>
+                <a-tooltip placement="top">
+                  <template #title>
+                    <span>
+                      <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </template>
+                  <div class="amount">
+                    <span>
+                      <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </div>
+                </a-tooltip>
+                <div class="detail">
+                  <span>{{ countData.payCount }}笔</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">未付款订单</div>
+                <a-tooltip placement="top">
+                  <template #title>
+                    <span>
+                      <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </template>
+                  <div class="amount">
+                    <span>
+                      <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </div>
+                </a-tooltip>
+                <div class="detail">
+                  <span>{{ countData.failPayCount }}笔</span>
+                </div>
+              </div>
+            </div>
+            <div class="close">
+              <a-button type="primary" @click="detailVisible = false">知道了</a-button>
+            </div>
+          </a-modal>
         </template>
 
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.amount/100 }}</b></template> <!-- 自定义插槽 -->
@@ -216,84 +295,6 @@
     </a-card>
     <!-- 退款弹出框 -->
     <refund-modal ref="refundModalInfo" :callbackFunc="searchFunc"></refund-modal>
-    <!-- 成交订单详细 -->
-    <a-modal :visible="detailVisible" footer="" @cancel="detailVisible = false">
-      <div class="modal-title">成交订单详细</div>
-      <div class="modal-describe">创建订单金额/笔数 = 成交订单金额/笔数 + 未付款订单金额/笔数</div>
-      <div class="statistics-list" style="padding-bottom: 55px;">
-        <div class="item">
-          <div class="title">创建订单</div>
-          <a-tooltip placement="top">
-            <template #title>
-              <span>
-                <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </template>
-            <div class="amount">
-              <span>
-                <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </div>
-          </a-tooltip>
-          <div class="detail">
-            <span>{{ countData.allPayCount }}笔</span>
-          </div>
-        </div>
-        <div class="item">
-          <div class="line"></div>
-          <div class="title"></div>
-        </div>
-        <div class="item">
-          <div class="title">成交订单</div>
-          <a-tooltip placement="top">
-            <template #title>
-              <span>
-                <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </template>
-            <div class="amount">
-              <span>
-                <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </div>
-          </a-tooltip>
-          <div class="detail">
-            <span>{{ countData.payCount }}笔</span>
-          </div>
-        </div>
-        <div class="item">
-          <div class="line"></div>
-          <div class="title"></div>
-        </div>
-        <div class="item">
-          <div class="title">未付款订单</div>
-          <a-tooltip placement="top">
-            <template #title>
-              <span>
-                <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </template>
-            <div class="amount">
-              <span>
-                <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </div>
-          </a-tooltip>
-          <div class="detail">
-            <span>{{ countData.failPayCount }}笔</span>
-          </div>
-        </div>
-      </div>
-      <div class="close">
-        <a-button type="primary" @click="detailVisible = false">知道了</a-button>
-      </div>
-    </a-modal>
     <!-- 订单详情抽屉 -->
     <template>
       <a-drawer
@@ -675,17 +676,6 @@ export default {
       searchData: {
         queryDateRange: 'today'
       },
-      countData: {
-        mchFeeAmount: 0.00,
-        failPayAmount: 0.00,
-        failPayCount: 0,
-        refundCount: 0,
-        allPayAmount: 0.00,
-        allPayCount: 0,
-        payAmount: 0.00,
-        payCount: 0,
-        refundAmount: 0.00
-      },
       createdStart: '', // 选择开始时间
       createdEnd: '', // 选择结束时间
       visible: false,
@@ -701,7 +691,6 @@ export default {
       this.initPayWay()
     }
     this.initIfDefineList()
-    this.countFunc()
   },
   methods: {
     handleSearchFormData (searchData) {
@@ -716,12 +705,15 @@ export default {
     },
     queryFunc () {
       this.btnLoading = true
-      this.countFunc()
       this.$refs.infoTable.refTable(true)
+      this.$refs.infoTable.refCountData()
     },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_PAY_ORDER_LIST, params)
+    },
+    reqTableCountFunc: (params) => {
+      return req.count(API_URL_PAY_ORDER_LIST, params)
     },
     reqDownloadDataFunc: (params) => {
       req.export(API_URL_PAY_ORDER_LIST, 'excel', params).then(res => {
@@ -748,14 +740,8 @@ export default {
       })
     },
     searchFunc: function () { // 点击【查询】按钮点击事件
-      this.countFunc()
       this.$refs.infoTable.refTable(true)
-    },
-    countFunc: function () {
-      const that = this
-      req.count(API_URL_PAY_ORDER_LIST, this.searchData).then(res => {
-        that.countData = res
-      })
+      this.$refs.infoTable.refCountData()
     },
     // 打开退款弹出框
     openFunc (record, recordId) {
