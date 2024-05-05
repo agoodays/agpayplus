@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Common.Models;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Interfaces
 {
@@ -14,6 +15,7 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <returns></returns>
         TransferOrderDto QueryMchOrder(string mchNo, string mchOrderNo, string transferId);
         PaginatedList<TransferOrderDto> GetPaginatedData(TransferOrderQueryDto dto);
+        JObject Statistics(TransferOrderQueryDto dto);
         /// <summary>
         /// 更新转账订单状态 【转账订单生成】 --》 【转账中】
         /// </summary>

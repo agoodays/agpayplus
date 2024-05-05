@@ -38,13 +38,48 @@
         :autoRefresh="true"
         :isShowAutoRefresh="true"
         :isShowDownload="true"
+        :isEnableDataStatistics="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqTableCountFunc="reqTableCountFunc"
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
         rowKey="transferId"
         :tableRowCrossColor="true"
       >
+        <template slot="dataStatisticsSlot" slot-scope="{countData}">
+          <div class="data-statistics" style="background: rgb(250, 250, 250);">
+            <div class="statistics-list">
+              <div class="item">
+                <div class="title">转账金额</div>
+                <div class="amount" style="color: rgb(26, 102, 255);">
+                  <span class="amount-num">{{ countData.transferAmount.toFixed(2) }}</span>元
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">转账笔数</div>
+                <div class="amount">
+                  <span class="amount-num">{{ countData.transferCount }}</span>笔
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">手续费金额</div>
+                <div class="amount">
+                  <span class="amount-num">{{ countData.transferFeeAmount.toFixed(2) }}</span>元
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
         <template slot="transferAmountSlot" slot-scope="{record}"><b>￥{{ record.amount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
           <a-tag
@@ -137,10 +172,14 @@
       queryFunc () {
         this.btnLoading = true
         this.$refs.infoTable.refTable(true)
+        this.$refs.infoTable.refCountData()
       },
       // 请求table接口数据
       reqTableDataFunc: (params) => {
         return req.list(API_URL_TRANSFER_ORDER_LIST, params)
+      },
+      reqTableCountFunc: (params) => {
+        return req.count(API_URL_TRANSFER_ORDER_LIST, params)
       },
       reqDownloadDataFunc: (params) => {
         req.export(API_URL_TRANSFER_ORDER_LIST, 'excel', params).then(res => {
@@ -168,6 +207,7 @@
       },
       searchFunc: function () { // 点击【查询】按钮点击事件
         this.$refs.infoTable.refTable(true)
+        this.$refs.infoTable.refCountData()
       },
       detailFunc: function (recordId) {
         this.$refs.transferOrderDetail.show(recordId)
@@ -207,5 +247,54 @@
       margin-right: 2px;
     }
   }
+}
+
+.data-statistics {
+  margin: 0 30px 10px;
+  padding: 28px 0 32px;
+  border-radius: 3px;
+  border: 1px solid #ebebeb;
+  transform: translateY(-10px)
+}
+
+.statistics-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around
+}
+
+.statistics-list .item .title {
+  color: gray;
+  margin-bottom: 10px
+}
+
+.statistics-list .item .amount {
+  margin-bottom: 10px;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statistics-list .item .amount .amount-num {
+  padding-right: 3px;
+  font-weight: 600;
+  font-size: 20px
+}
+
+.statistics-list .item .symbol {
+  padding-right: 3px
+}
+
+.statistics-list .item .detail-text {
+  color: rgb(26, 102, 255);
+  padding-left: 5px;
+  cursor: pointer
+}
+
+.statistics-list .line {
+  width: 1px;
+  height: 100%;
+  border-right: 1px solid #efefef
 }
 </style>

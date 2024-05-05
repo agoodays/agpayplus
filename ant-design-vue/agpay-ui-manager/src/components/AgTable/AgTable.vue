@@ -122,7 +122,7 @@ export default {
     initData: { type: Boolean, default: true }, // 初始化列表数据， 默认true
     tableColumns: { type: Array, default: null }, // 表格数组列
     reqTableDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
-    reqTableCountFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据统计
+    reqTableCountFunc: { type: Function, default: () => new Promise(resolve => resolve()) }, // 请求列表数据统计
     reqDownloadDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据下载
     currentChange: { type: Function, default: (v1, v2) => {} }, // 更新当前选择行事件， 默认空函数
     searchData: { type: Object, default: null }, // 搜索条件参数

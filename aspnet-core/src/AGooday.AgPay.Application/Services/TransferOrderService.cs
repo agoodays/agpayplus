@@ -5,8 +5,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
+using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -45,7 +45,14 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<TransferOrderDto> GetPaginatedData(TransferOrderQueryDto dto)
         {
-            var transferOrders = _transferOrderRepository.GetAllAsNoTracking()
+            var transferOrders = GetTransferOrders(dto).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<TransferOrder>.Create<TransferOrderDto>(transferOrders, _mapper, dto.PageNumber, dto.PageSize);
+            return records;
+        }
+
+        private IQueryable<TransferOrder> GetTransferOrders(TransferOrderQueryDto dto)
+        {
+            var result = _transferOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
@@ -57,11 +64,29 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.TransferId.Equals(dto.UnionOrderId)
                 || w.MchOrderNo.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<TransferOrder>.Create<TransferOrderDto>(transferOrders, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
+            return result;
         }
+
+        public JObject Statistics(TransferOrderQueryDto dto)
+        {
+            var transferOrders = GetTransferOrders(dto);
+            var allTransferAmount = transferOrders.Sum(s => s.Amount);
+            var allTransferCount = transferOrders.Count();
+            var refund = transferOrders.Where(w => w.State.Equals((byte)TransferOrderState.STATE_SUCCESS));
+            //var transferFeeAmount = refund.Sum(s => s.FeeAmount);
+            var transferAmount = refund.Sum(s => s.Amount);
+            var transferCount = refund.Count();
+            JObject result = new JObject();
+            result.Add("allTransferAmount", Decimal.Round(allTransferAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("allTransferCount", allTransferCount);
+            result.Add("transferAmount", Decimal.Round(transferAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("transferCount", transferCount);
+            result.Add("transferFeeAmount", 0);
+            result.Add("round", Math.Round(allTransferAmount > 0 ? transferCount / Convert.ToDecimal(allTransferAmount) : 0M, 2, MidpointRounding.AwayFromZero));
+            return result;
+        }
+
         /// <summary>
         /// 更新转账订单状态 【转账订单生成】 --》 【转账中】
         /// </summary>

@@ -48,6 +48,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         }
 
         /// <summary>
+        /// 转账订单信息统计
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet, Route("count"), NoLog]
+        [PermissionAuth(PermCode.MGR.ENT_TRANSFER_ORDER_LIST)]
+        public ApiRes Count([FromQuery] TransferOrderQueryDto dto)
+        {
+            dto.BindDateRange();
+            var statistics = _transferOrderService.Statistics(dto);
+            return ApiRes.Ok(statistics);
+        }
+
+        /// <summary>
         /// 订单信息导出
         /// </summary>
         /// <param name="bizType"></param>

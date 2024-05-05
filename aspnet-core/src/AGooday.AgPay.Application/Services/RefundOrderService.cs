@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Application.Services
             var refundOrders = GetRefundOrders(dto);
             var allRefundAmount = refundOrders.Sum(s => s.RefundAmount);
             var allRefundCount = refundOrders.Count();
-            var refund = refundOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS));
+            var refund = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
             var refundFeeAmount = refund.Sum(s => s.RefundFeeAmount);
             var refundAmount = refund.Sum(s => s.RefundAmount);
             var refundCount = refund.Count();
