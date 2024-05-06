@@ -7,7 +7,9 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
     /// </summary>
     public class WxNativeOrderRQ : CommonPayDataRQ
     {
-        /** 构造函数 **/
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public WxNativeOrderRQ()
         {
             this.WayCode = CS.PAY_WAY_CODE.WX_NATIVE;

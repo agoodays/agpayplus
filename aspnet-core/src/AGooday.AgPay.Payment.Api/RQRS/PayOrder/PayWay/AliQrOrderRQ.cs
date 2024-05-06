@@ -7,7 +7,9 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
     /// </summary>
     public class AliQrOrderRQ : CommonPayDataRQ
     {
-        /** 构造函数 **/
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public AliQrOrderRQ()
         {
             this.WayCode = CS.PAY_WAY_CODE.ALI_QR;

@@ -13,7 +13,9 @@ namespace AGooday.AgPay.Payment.Api.RQRS.Msg
         /// </summary>
         public ActionResult ApiRes { get; set; }
 
-        /** 每一条记录的更新状态 <ID, 结果> **/
+        /// <summary>
+        /// 每一条记录的更新状态 <ID, 结果>
+        /// </summary>
         public Dictionary<long, ChannelRetMsg> RecordResultMap { get; set; }
     }
 }

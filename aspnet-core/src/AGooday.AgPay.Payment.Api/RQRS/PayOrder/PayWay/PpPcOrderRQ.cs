@@ -11,7 +11,9 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         [Required(ErrorMessage = "取消支付返回站点")]
         public string CancelUrl { get; set; }
 
-        /** 构造函数 **/
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public PpPcOrderRQ()
         {
             this.WayCode = CS.PAY_WAY_CODE.PP_PC;

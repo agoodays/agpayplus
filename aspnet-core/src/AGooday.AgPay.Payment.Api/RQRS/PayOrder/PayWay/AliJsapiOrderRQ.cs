@@ -15,7 +15,9 @@ namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
         [Required(ErrorMessage = "用户ID不能为空")]
         public string BuyerUserId { get; set; }
 
-        /** 构造函数 **/
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public AliJsapiOrderRQ()
         {
             this.WayCode = CS.PAY_WAY_CODE.ALI_JSAPI;
