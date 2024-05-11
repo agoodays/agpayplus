@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// <summary>
     /// 转账订单
     /// </summary>
-    [Route("/api/transferOrders")]
+    [Route("api/transferOrders")]
     [ApiController, Authorize, NoLog]
     public class TransferOrderController : CommonController
     {

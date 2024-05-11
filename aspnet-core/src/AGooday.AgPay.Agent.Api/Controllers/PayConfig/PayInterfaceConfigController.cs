@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
     /// <summary>
     /// 支付接口管理类
     /// </summary>
-    [Route("/api/payConfig")]
+    [Route("api/payConfig")]
     [ApiController, Authorize]
     public class PayInterfaceConfigController : CommonController
     {

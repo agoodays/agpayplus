@@ -24,8 +24,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
     /// <summary>
     /// 认证接口
     /// </summary>
-    [ApiController, AllowAnonymous]
     [Route("api/anon")]
+    [ApiController, AllowAnonymous]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;

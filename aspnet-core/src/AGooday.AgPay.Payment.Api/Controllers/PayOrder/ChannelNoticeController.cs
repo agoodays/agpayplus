@@ -45,8 +45,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("/api/pay/return/{ifCode}")]
-        [Route("/api/pay/return/{ifCode}/{payOrderId}")]
+        [Route("api/pay/return/{ifCode}")]
+        [Route("api/pay/return/{ifCode}/{payOrderId}")]
         public ActionResult DoReturn(string ifCode, string payOrderId)
         {
             string urlOrderId = payOrderId;
@@ -159,8 +159,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("/api/pay/notify/{ifCode}")]
-        [Route("/api/pay/notify/{ifCode}/{payOrderId}")]
+        [Route("api/pay/notify/{ifCode}")]
+        [Route("api/pay/notify/{ifCode}/{payOrderId}")]
         public ActionResult DoNotify(string ifCode, string payOrderId)
         {
             string urlOrderId = payOrderId;

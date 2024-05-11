@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
     /// <summary>
     /// 商户支付通道管理类
     /// </summary>
-    [Route("/api/mch/payPassages")]
+    [Route("api/mch/payPassages")]
     [ApiController, Authorize]
     public class MchPayPassageConfigController : CommonController
     {

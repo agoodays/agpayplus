@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         /// 转账
         /// </summary>
         /// <returns></returns>
-        [HttpPost, Route("/api/transferOrder")]
+        [HttpPost, Route("api/transferOrder")]
         [PermissionAuth(PermCode.PAY.API_TRANS_ORDER)]
         public ApiRes TransferOrder()
         {

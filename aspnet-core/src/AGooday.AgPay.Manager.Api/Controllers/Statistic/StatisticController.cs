@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
     /// <summary>
     /// 数据统计
     /// </summary>
-    [Route("/api/statistic")]
+    [Route("api/statistic")]
     [ApiController, Authorize]
     public class StatisticController : CommonController
     {

@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
     /// <summary>
     /// 代理商管理类
     /// </summary>
-    [Route("/api/agentInfo")]
+    [Route("api/agentInfo")]
     [ApiController, Authorize]
     public class AgentInfoController : CommonController
     {

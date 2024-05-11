@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// <summary>
     /// 商户通知类
     /// </summary>
-    [Route("/api/mchNotify")]
+    [Route("api/mchNotify")]
     [ApiController, Authorize, NoLog]
     public class MchNotifyController : CommonController
     {

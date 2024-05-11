@@ -146,7 +146,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
             return View("~/Views/Channel/Alipay/IsvSubMchAuth.cshtml");
         }
 
-        [HttpGet, Route("/appGatewayMsgReceive")]
+        [HttpGet, Route("appGatewayMsgReceive")]
         public ActionResult AlipayAppGatewayMsgReceive()
         {
             JObject reqJSON = GetReqParamJson();

@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             _transferOrderService = transferOrderService;
         }
 
-        [HttpPost, Route("/api/transfer/query")]
+        [HttpPost, Route("api/transfer/query")]
         [PermissionAuth(PermCode.PAY.API_TRANS_ORDER_QUERY)]
         public ApiRes QueryTransferOrder()
         {

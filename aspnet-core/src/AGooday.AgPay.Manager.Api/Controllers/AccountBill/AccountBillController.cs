@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.AccountBill
     /// <summary>
     /// 账户账单
     /// </summary>
-    [Route("/api/accountBill")]
+    [Route("api/accountBill")]
     [ApiController, Authorize]
     public class AccountBillController : CommonController
     {

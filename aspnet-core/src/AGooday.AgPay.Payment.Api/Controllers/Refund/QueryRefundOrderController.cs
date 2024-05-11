@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             _refundOrderService = refundOrderService;
         }
 
-        [HttpPost, Route("/api/refund/query")]
+        [HttpPost, Route("api/refund/query")]
         [PermissionAuth(PermCode.PAY.API_REFUND_ORDER_QUERY)]
         public ApiRes QueryRefundOrder()
         {

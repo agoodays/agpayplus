@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
     /// <summary>
     /// 服务商支付接口管理类
     /// </summary>
-    [Route("/api/isv/payConfigs")]
+    [Route("api/isv/payConfigs")]
     [ApiController, Authorize]
     public class IsvPayInterfaceConfigController : CommonController
     {

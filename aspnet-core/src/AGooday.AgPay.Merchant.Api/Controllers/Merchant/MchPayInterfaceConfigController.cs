@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
     /// <summary>
     /// 服务商支付接口管理类
     /// </summary>
-    [Route("/api/mch/payConfigs")]
+    [Route("api/mch/payConfigs")]
     [ApiController, Authorize]
     public class MchPayInterfaceConfigController : CommonController
     {

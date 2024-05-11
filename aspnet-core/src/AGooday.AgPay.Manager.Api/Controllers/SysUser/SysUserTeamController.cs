@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     /// <summary>
     /// 用户团队管理类
     /// </summary>
-    [Route("/api/userTeams")]
+    [Route("api/userTeams")]
     [ApiController, Authorize]
     public class SysUserTeamController : CommonController
     {

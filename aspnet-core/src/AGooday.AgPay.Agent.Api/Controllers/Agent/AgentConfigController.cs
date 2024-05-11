@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Agent.Api.Controllers.Agent
 {
-    [Route("/api/agentConfig")]
+    [Route("api/agentConfig")]
     [ApiController, Authorize]
     public class AgentConfigController : CommonController
     {
