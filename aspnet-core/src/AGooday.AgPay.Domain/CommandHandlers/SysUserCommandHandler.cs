@@ -95,7 +95,13 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     break;
             }
 
-            sysUser.InviteCode = StringUtil.GetUUID(6); //6位随机数
+            if (sysUser.UserType.Equals(CS.USER_TYPE.Expand) && string.IsNullOrWhiteSpace(sysUser.InviteCode))
+            {
+                do
+                {
+                    sysUser.InviteCode = StringUtil.GetUUID(6); //6位随机数
+                } while (_sysUserRepository.IsExistInviteCode(sysUser.InviteCode));
+            }
 
             try
             {
@@ -105,7 +111,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 #region 添加默认用户认证表
                 //string salt = StringUtil.GetUUID(6); //6位随机数
                 string authPwd = request.PasswordType.Equals(CS.PASSWORD_TYPE.CUSTOM) ? request.LoginPassword : CS.DEFAULT_PWD;
-                string userPwd = BCryptUtil.Hash(authPwd,out string salt);
+                string userPwd = BCryptUtil.Hash(authPwd, out string salt);
                 //用户名登录方式
                 var sysUserAuthByLoginUsername = new SysUserAuth()
                 {
@@ -290,6 +296,15 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
                 _mapper.Map(request, sysUser);
                 sysUser.UpdatedAt = DateTime.Now;
+
+                if (sysUser.UserType.Equals(CS.USER_TYPE.Expand) && string.IsNullOrWhiteSpace(sysUser.InviteCode))
+                {
+                    do
+                    {
+                        sysUser.InviteCode = StringUtil.GetUUID(6); //6位随机数
+                    } while (_sysUserRepository.IsExistInviteCode(sysUser.InviteCode));
+                }
+
                 _sysUserRepository.Update(sysUser);
 
                 if (!Commit())

@@ -27,6 +27,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return GetAllAsNoTracking().Any(c => c.UserNo.Equals(userNo) && c.SysType.Equals(sysType));
         }
 
+        public bool IsExistInviteCode(string inviteCode)
+        {
+            return GetAllAsNoTracking().Any(c => c.InviteCode.Equals(inviteCode));
+        }
+
         public bool IsExist(long sysUserId, string sysType)
         {
             return GetAllAsNoTracking().Any(c => c.SysUserId.Equals(sysUserId) && c.SysType.Equals(sysType));

@@ -7,6 +7,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         bool IsExistLoginUsername(string loginUsername, string sysType);
         bool IsExistTelphone(string telphone, string sysType);
         bool IsExistUserNo(string userNo, string sysType);
+        bool IsExistInviteCode(string inviteCode);
         bool IsExist(long sysUserId, string sysType);
         SysUser GetByKeyAsNoTracking(long recordId);
         IQueryable<SysUser> GetByBelongInfoIdAsNoTracking(string belongInfoId);

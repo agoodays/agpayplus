@@ -113,7 +113,6 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 sysUser.InitUser = true;
                 sysUser.UserType = CS.USER_TYPE.ADMIN;
                 sysUser.State = mchInfo.State;
-                sysUser.InviteCode = StringUtil.GetUUID(6); //6位随机数
 
                 #region 检查
                 // 登录用户名不可重复
