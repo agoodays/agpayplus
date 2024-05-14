@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Agent.Api.Controllers.Config
 {
-    [Route("/api/sysConfigs")]
+    [Route("api/sysConfigs")]
     [ApiController, Authorize]
     public class SysConfigController : CommonController
     {

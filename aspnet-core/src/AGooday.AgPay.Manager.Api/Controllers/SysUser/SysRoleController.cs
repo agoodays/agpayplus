@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     /// <summary>
     /// 角色管理
     /// </summary>
-    [Route("/api/sysRoles")]
+    [Route("api/sysRoles")]
     [ApiController, Authorize]
     public class SysRoleController : CommonController
     {

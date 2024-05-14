@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
 {
-    [Route("/api/payIfDefines")]
+    [Route("api/payIfDefines")]
     [ApiController, Authorize]
     public class PayInterfaceDefineController : CommonController
     {

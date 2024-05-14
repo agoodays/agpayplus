@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     /// <summary>
     /// 系统日志记录类
     /// </summary>
-    [Route("/api/sysLog")]
+    [Route("api/sysLog")]
     [ApiController, Authorize]
     public class SysLogController : CommonController
     {

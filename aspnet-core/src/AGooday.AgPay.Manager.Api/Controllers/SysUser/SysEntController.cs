@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     /// <summary>
     /// 权限 菜单 管理
     /// </summary>
-    [Route("/api/sysEnts")]
+    [Route("api/sysEnts")]
     [ApiController, Authorize]
     public class SysEntController : CommonController
     {

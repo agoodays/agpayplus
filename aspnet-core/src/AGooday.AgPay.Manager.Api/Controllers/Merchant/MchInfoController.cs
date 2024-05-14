@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     /// <summary>
     /// 商户管理类
     /// </summary>
-    [Route("/api/mchInfo")]
+    [Route("api/mchInfo")]
     [ApiController, Authorize]
     public class MchInfoController : CommonController
     {

@@ -44,8 +44,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         /// <param name="urlOrderId"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("/api/refund/notify/{ifCode}")]
-        [Route("/api/refund/notify/{ifCode}/{refundOrderId}")]
+        [Route("api/refund/notify/{ifCode}")]
+        [Route("api/refund/notify/{ifCode}/{refundOrderId}")]
         public ActionResult DoNotify(string ifCode, string refundOrderId, string urlOrderId)
         {
             string logPrefix = $"进入[{ifCode}]退款回调：urlOrderId：[{urlOrderId}] ";

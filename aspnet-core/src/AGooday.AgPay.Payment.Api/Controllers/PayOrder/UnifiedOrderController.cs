@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// 统一下单接口
         /// </summary>
         /// <returns></returns>
-        [HttpPost, Route("/api/pay/unifiedOrder")]
+        [HttpPost, Route("api/pay/unifiedOrder")]
         [PermissionAuth(PermCode.PAY.API_PAY_ORDER)]
         public ActionResult<ApiRes> UnifiedOrder()
         {

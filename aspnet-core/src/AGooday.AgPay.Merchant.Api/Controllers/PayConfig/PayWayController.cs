@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
     /// <summary>
     /// 支付方式管理类
     /// </summary>
-    [Route("/api/payWays")]
+    [Route("api/payWays")]
     [ApiController, Authorize, NoLog]
     public class PayWayController : CommonController
     {

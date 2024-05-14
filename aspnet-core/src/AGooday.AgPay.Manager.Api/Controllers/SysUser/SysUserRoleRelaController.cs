@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     /// <summary>
     /// 用户角色关联关系
     /// </summary>
-    [Route("/api/sysUserRoleRelas")]
+    [Route("api/sysUserRoleRelas")]
     [ApiController, Authorize]
     public class SysUserRoleRelaController : CommonController
     {

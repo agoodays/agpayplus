@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     /// <summary>
     /// 退款订单类
     /// </summary>
-    [Route("/api/refundOrder")]
+    [Route("api/refundOrder")]
     [ApiController, Authorize, NoLog]
     public class RefundOrderController : CommonController
     {

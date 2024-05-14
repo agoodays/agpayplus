@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Config
 {
-    [Route("/api/sysConfigs")]
+    [Route("api/sysConfigs")]
     [ApiController, Authorize]
     public class SysConfigController : CommonController
     {

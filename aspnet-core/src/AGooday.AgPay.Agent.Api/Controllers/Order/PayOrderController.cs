@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
     /// <summary>
     /// 支付订单类
     /// </summary>
-    [Route("/api/payOrder")]
+    [Route("api/payOrder")]
     [ApiController, Authorize]
     public class PayOrderController : CommonController
     {

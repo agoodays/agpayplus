@@ -32,8 +32,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         }
 
         [HttpPost]
-        [Route("/api/transfer/notify/{ifCode}")]
-        [Route("/api/transfer/notify/{ifCode}/{transferId}")]
+        [Route("api/transfer/notify/{ifCode}")]
+        [Route("api/transfer/notify/{ifCode}/{transferId}")]
         public ActionResult DoNotify(string ifCode, string transferId)
         {
             string urlOrderId = transferId;

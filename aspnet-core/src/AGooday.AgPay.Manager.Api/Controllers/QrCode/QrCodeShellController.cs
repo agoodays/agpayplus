@@ -167,7 +167,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             return View(qrCodeShell);
         }
 
-        [HttpGet, AllowAnonymous, Route("imgview/{key}.png")]
+        [HttpGet, Route("imgview/{key}.png"), AllowAnonymous]
         public ActionResult ImgView(string key)
         {
             var qrCodeShell = _qrCodeShellService.GetById(Convert.ToInt64(AgPayUtil.AesDecode(key)));
@@ -183,7 +183,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             return null;
         }
 
-        [HttpGet, AllowAnonymous, Route("nostyle.png")]
+        [HttpGet, Route("nostyle.png"), AllowAnonymous]
         public IActionResult NoStyle()
         {
             // 创建二维码对象
@@ -197,7 +197,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             }
         }
 
-        [HttpGet, AllowAnonymous, Route("stylea.png")]
+        [HttpGet, Route("stylea.png"), AllowAnonymous]
         public IActionResult StyleA()
         {
             var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay.png");
@@ -217,7 +217,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             }
         }
 
-        [HttpGet, AllowAnonymous, Route("styleb.png")]
+        [HttpGet, Route("styleb.png"), AllowAnonymous]
         public IActionResult StyleB()
         {
             var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay_blue.png");

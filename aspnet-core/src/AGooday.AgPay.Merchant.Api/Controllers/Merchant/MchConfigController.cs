@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
 {
-    [Route("/api/mchConfig")]
+    [Route("api/mchConfig")]
     [ApiController, Authorize]
     public class MchConfigController : CommonController
     {
