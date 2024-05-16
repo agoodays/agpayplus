@@ -1,12 +1,14 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 
+const loginForm = ref();
 const loading = ref(false);
 const isOverdue = ref(false);
 const vercodeImgSrc = ref('');
 const isAutoLogin = ref(false);
+const loginErrorInfo = ref('');
 
-const loginForm = reactive({
+const loginObject = reactive({
   loginMethod: 'password',
   username: '',
   password: '',
@@ -19,28 +21,43 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
 };
+
+async function refVercode() {
+  console.log('Vercode');
+}
+
+async function handleSubmit() {
+  loginForm.value.validate().then(async () => {
+    console.log(loginObject);
+  });
+}
+
+// 生命周期钩子
+onMounted(() => {
+  refVercode()
+})
 </script>
 
 <template>
-  <a-alert class="login-error-message" message="错误提示信息" type="error" show-icon />
+  <a-alert class="login-error-message" v-if="loginErrorInfo" :message="loginErrorInfo" type="error" show-icon />
   <div class="main">
     <div class="desc">运营平台登录</div>
-    <a-form class="user-layout-login" ref="loginForm" :model="loginForm" :rules="rules">
+    <a-form class="user-layout-login" ref="loginForm" :model="loginObject" :rules="rules" @submit="handleSubmit">
       <a-form-item name="username">
-        <a-input size="large" type="text" placeholder="登录名/手机" v-model:value="loginForm.username"/>
+        <a-input size="large" type="text" placeholder="登录名/手机" v-model:value="loginObject.username"/>
       </a-form-item>
       <a-form-item name="password">
-        <a-input-password size="large" placeholder="密码" v-model:value="loginForm.password"/>
+        <a-input-password size="large" placeholder="密码" v-model:value="loginObject.password"/>
       </a-form-item>
       <div class="code-body">
         <div class="code-layout">
           <div class="code code-layout-item">
             <a-form-item name="vercode">
-              <a-input v-model:value="loginForm.vercode" class="code-input" size="large" type="text" placeholder="图形验证码"/>
+              <a-input v-model:value="loginObject.vercode" class="code-input" size="large" type="text" placeholder="图形验证码"/>
             </a-form-item>
             <div class="code-img" style="position: relative;background:#ddd">
-              <img v-show="vercodeImgSrc" :src="vercodeImgSrc"/>
-              <div class="vercode-mask" v-show="isOverdue">已过期 请刷新</div>
+              <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()"/>
+              <div class="vercode-mask" v-show="isOverdue" @click="refVercode()">已过期 请刷新</div>
             </div>
           </div>
         </div>
