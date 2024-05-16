@@ -1,5 +1,13 @@
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import { resolve } from 'path';
+import vue from '@vitejs/plugin-vue';
+import customVariables from '/@/theme/custom-variables';
+
+const pathResolve = (dir) => {
+  return resolve(__dirname, '.', dir);
+};
+
+console.log(customVariables)
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,4 +21,16 @@ export default defineConfig({
     ]
   },
   plugins: [vue()],
+  css: {
+    preprocessorOptions: {
+      less: {
+        modifyVars: customVariables,
+        javascriptEnabled: true,
+      },
+    },
+  },
+  define: {
+    __INTLIFY_PROD_DEVTOOLS__: false,
+    'process.env': process.env,
+  },
 })

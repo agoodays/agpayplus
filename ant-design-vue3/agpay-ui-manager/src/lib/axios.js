@@ -2,123 +2,127 @@
  *  ajax请求
  *
  */
-import { message, Modal } from 'ant-design-vue';
 import axios from 'axios';
+import { message, Modal } from 'ant-design-vue';
+import { AgLoading } from '/@/components/framework/ag-loading';
 import { localClear, localRead } from '/@/utils/local-util';
 // import { decryptData, encryptData } from './encrypt';
 // import { DATA_TYPE_ENUM } from '../constants/common-const';
 import _ from 'lodash';
-import LocalStorageKeyConst from '/@/constants/local-storage-key-const.js';
+import LocalStorageKeyConst from '/@/constants/local-storage-key-const';
 
 // token的消息头
-const TOKEN_HEADER = 'authorization';
-
-// 创建axios对象
-const smartAxios = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_URL,
-});
+const TOKEN_HEADER = 'Authorization';
 
 // 退出系统
 function logout() {
   localClear();
-  location.href = '/';
+  location.reload() // 退出时 重置缓存
 }
 
-// ================================= 请求拦截器 =================================
-
-smartAxios.interceptors.request.use(
-  (config) => {
-    // 在发送请求之前消息头加入token token
+class AgAxios {
+  constructor (baseUrl = process.env.VUE_APP_API_BASE_URL) {
+    this.baseUrl = baseUrl
+    this.queue = {} // 发送队列, 格式为: {请求url: true}, 可以做一些验证之类
+  }
+  // 基础配置信息
+  baseConfig () {
+    const headers = {}
     const token = localRead(LocalStorageKeyConst.USER_TOKEN);
-    if (token) {
-      config.headers[TOKEN_HEADER] = token;
-    } else {
-      delete config.headers[TOKEN_HEADER];
+    headers[TOKEN_HEADER] = `Bearer ${token}`
+    return {
+      baseURL: this.baseUrl,
+      headers: headers
     }
-    return config;
-  },
-  (error) => {
-    // 对请求错误做些什么
-    return Promise.reject(error);
   }
-);
-
-// ================================= 响应拦截器 =================================
-
-// 添加响应拦截器
-smartAxios.interceptors.response.use(
-  (response) => {
-    // 根据content-type ，判断是否为 json 数据
-    let contentType = response.headers['content-type'] ? response.headers['content-type'] : response.headers['Content-Type'];
-    if (contentType.indexOf('application/json') === -1) {
-      return Promise.resolve(response);
-    }
-
-    // 如果是json数据
-    if (response.data && response.data instanceof Blob) {
-      return Promise.reject(response.data);
-    }
-
-    // 如果是加密数据
-    // if (response.data.dataType === DATA_TYPE_ENUM.ENCRYPT.value) {
-    //   response.data.encryptData = response.data.data;
-    //   let decryptStr = decryptData(response.data.data);
-    //   if (decryptStr) {
-    //     response.data.data = JSON.parse(decryptStr);
-    //   }
-    // }
-
-    const res = response.data;
-    if (res.code && res.code !== 1) {
-      // `token` 过期或者账号已在别处登录
-      if (res.code === 30007 || res.code === 30008) {
-        message.destroy();
-        message.error('您没有登录，请重新登录');
-        setTimeout(logout, 300);
-        return Promise.reject(response);
+  destroy (url) {
+    delete this.queue[url]
+  }
+  useInterceptors (instance, url, showErrorMsg, showLoading) {
+    // 请求拦截
+    instance.interceptors.request.use(config => {
+      // 添加全局的loading...
+      if (!Object.keys(this.queue).length && showLoading) {
+        AgLoading.Show() // 加载中显示loading组件
       }
-
-      // 等保安全的登录提醒
-      if (res.code === 30010 || res.code === 30011) {
-        Modal.error({
-          title: '重要提醒',
-          content: res.msg,
-        });
-        return Promise.reject(response);
+      this.queue[url] = true
+      return config
+    }, error => {
+      AgLoading.hide()  // 报错关闭loading组件
+      return Promise.reject(error)
+    })
+    // 响应拦截
+    instance.interceptors.response.use(response => {
+      this.destroy(url)
+      if (showLoading) {
+        AgLoading.hide() // 报错关闭loading组件
       }
-
-      // 长时间未操作系统，需要重新登录
-      if (res.code === 30012) {
-        Modal.error({
-          title: '重要提醒',
-          content: res.msg,
+      // 根据content-type ，判断是否为 json 数据
+      const contentType = response.headers['content-type'] ? response.headers['content-type'] : response.headers['Content-Type'];
+      if (contentType.indexOf('application/json') === -1) {
+        return Promise.resolve(response);
+      }
+      // 如果是json数据
+      if (response.data && response.data instanceof Blob) {
+        return Promise.reject(response.data);
+      }
+      const resData = response.data // 接口实际返回数据 格式为：{code: '', msg: '', data: ''}， res.data 是axios封装对象的返回数据；
+      if (resData.code && resData.code !== 0) { // 相应结果不为0， 说明异常
+        if (showErrorMsg) {
+          message.error(resData.msg) // 显示异常信息
+        }
+        return Promise.reject(resData)
+      } else {
+        return Promise.reject(resData.data)
+      }
+    }, error => {
+      this.destroy(url)
+      if (showLoading) {
+        AgLoading.hide() // 报错关闭loading组件
+      }
+      let errorInfo = error.response && error.response.data && error.response.data.data
+      if (!errorInfo) {
+        errorInfo = error.response.data
+      }
+      if (error.response.status === 401) { // 无访问权限，会话超时， 提示用户信息 & 退出系统
+        const toLoginTimeout = setTimeout(logout, 3000)
+        Modal.warning({
+          title: '会话超时，请重新登录',
+          content: '3s后将自动退出...',
+          okText: '重新登录',
+          cancelText: '关闭对话',
           onOk: logout,
-        });
-        setTimeout(logout, 3000);
-        return Promise.reject(response);
+          onCancel() {
+            clearTimeout(toLoginTimeout)
+          }})
+      } else {
+        if (showErrorMsg) {
+          message.error(JSON.stringify(errorInfo)) // 显示异常信息
+        }
       }
-      message.destroy();
-      message.error(res.msg);
-      return Promise.reject(response);
-    } else {
-      return Promise.resolve(res);
-    }
-  },
-  (error) => {
-    // 对响应错误做点什么
-    if (error.message.indexOf('timeout') !== -1) {
-      message.destroy();
-      message.error('网络超时');
-    } else if (error.message === 'Network Error') {
-      message.destroy();
-      message.error('网络连接错误');
-    } else if (error.message.indexOf('Request') !== -1) {
-      message.destroy();
-      message.error('网络发生错误');
-    }
-    return Promise.reject(error);
+
+      return Promise.reject(errorInfo)
+    })
   }
-);
+  /**
+   * ajax请求
+   * @options options 参数
+   * @interceptorsFlag 是否进行自定义拦截器处理，默认为： true
+   * @showErrorMsg 发送请求出现异常是否全局提示错误信息，默认为： true
+   * @showLoading 发送请求前后显示全局loading，默认为： false
+   */
+  request (options, interceptorsFlag = true, showErrorMsg = true, showLoading = false) {
+    const instance = axios.create()
+    options = Object.assign(this.baseConfig(), options)
+    if (interceptorsFlag) { // 注入 req, respo 拦截器
+      this.useInterceptors(instance, options.url, showErrorMsg, showLoading)
+    }
+
+    return instance(options)
+  }
+}
+
+const agAxios = new AgAxios()
 
 // ================================= 对外提供请求方法：通用请求，get， post, 下载download等 =================================
 
@@ -131,22 +135,137 @@ export const getRequest = (url, params) => {
 
 /**
  * 通用请求封装
- * @param config
+ *
  */
-export const request = (config) => {
-  return smartAxios.request(config);
+export const request = (config, interceptorsFlag = true, showErrorMsg = true, showLoading = false) => {
+  return agAxios.request(config, interceptorsFlag, showErrorMsg, showLoading);
 };
 
 /**
  * post请求
  */
 export const postRequest = (url, data) => {
-  return request({
-    data,
-    url,
-    method: 'post',
-  });
+  return request({ data, url, method: 'post' });
 };
+
+/**
+ *  全系列 restful api格式, 定义通用req对象
+ *
+ */
+export const req = {
+  // 通用列表查询接口
+  list: (url, params) => {
+    return request({ url: url, method: 'GET', params: params }, true, true, false)
+  },
+
+  // 通用获取数据接口
+  get: (url, params) => {
+    return request({ url: url, method: 'GET', params: params }, true, true, false)
+  },
+
+  // 通用列表查询统计接口
+  total: (url, params) => {
+    return request({ url: url + '/total', method: 'GET', params: params }, true, true, false)
+  },
+
+  // 通用列表查询统计接口
+  count: (url, params) => {
+    return request({ url: url + '/count', method: 'GET', params: params }, true, true, false)
+  },
+
+  // 通用列表数据导出接口
+  export: (url, bizType, params) => {
+    return request({ url: url + '/export/' + bizType, method: 'GET', params: params, responseType: 'blob' }, true, true, false)
+  },
+
+  // 通用Post接口
+  post: (url, data) => {
+    return request({ url: url, method: 'POST', data: data }, true, true, false)
+  },
+
+  // 通用新增接口
+  add: (url, data) => {
+    return request({ url: url, method: 'POST', data: data }, true, true, false)
+  },
+
+  // 通用查询单条数据接口
+  getById: (url, bizId) => {
+    return request({ url: url + '/' + bizId, method: 'GET' }, true, true, false)
+  },
+
+  // 通用修改接口
+  updateById: (url, bizId, data) => {
+    return request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, false)
+  },
+
+  // 通用删除接口
+  delById: (url, bizId) => {
+    return request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, false)
+  }
+}
+
+/**
+ *  全系列 restful api格式 (全局loading方式)
+ *
+ */
+export const reqLoad = {
+
+  // 通用列表查询接口
+  list: (url, params) => {
+    return request({ url: url, method: 'GET', params: params }, true, true, true)
+  },
+
+  // 通用新增接口
+  add: (url, data) => {
+    return request({ url: url, method: 'POST', data: data }, true, true, true)
+  },
+
+  // 通用查询单条数据接口
+  getById: (url, bizId) => {
+    return request({ url: url + '/' + bizId, method: 'GET' }, true, true, true)
+  },
+
+  // 通用修改接口
+  updateById: (url, bizId, data) => {
+    return request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, true)
+  },
+
+  // 通用删除接口
+  delById: (url, bizId) => {
+    return request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, true)
+  }
+}
+
+/**
+ * 上传图片/文件地址
+ *
+ */
+export const upload = {
+  avatar: agAxios.baseUrl + '/api/ossFiles/avatar',
+  ifBG: agAxios.baseUrl + '/api/ossFiles/ifBG',
+  cert: agAxios.baseUrl + '/api/ossFiles/cert',
+  form: agAxios.baseUrl + '/api/ossFiles/form',
+  /**
+   * 获取上传表单参数
+   *
+   */
+  getFormParams: (url, fileName, fileSize) => {
+    return request({ baseURL: url, method: 'GET', params: { fileName, fileSize } })
+  },
+  /**
+   * 上传单个文件
+   *
+   */
+  singleFile: (url, data) => {
+    const formData = new FormData()
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        formData.append(key, data[key])
+      }
+    }
+    return request({ baseURL: url, method: 'POST', data: formData })
+  }
+}
 
 // ================================= 加密 =================================
 
@@ -164,12 +283,7 @@ export const postRequest = (url, data) => {
 // ================================= 下载 =================================
 
 export const postDownload = function (url, data) {
-  request({
-    method: 'post',
-    url,
-    data,
-    responseType: 'blob',
-  })
+  request({ method: 'post', url, data, responseType: 'blob' })
     .then((data) => {
       handleDownloadData(data);
     })
@@ -182,12 +296,7 @@ export const postDownload = function (url, data) {
  * 文件下载
  */
 export const getDownload = function (url, params) {
-  request({
-    method: 'get',
-    url,
-    params,
-    responseType: 'blob',
-  })
+  request({ method: 'get', url, params, responseType: 'blob' })
     .then((data) => {
       handleDownloadData(data);
     })
