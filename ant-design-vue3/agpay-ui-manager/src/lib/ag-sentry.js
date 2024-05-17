@@ -3,7 +3,7 @@
  *
  */
 
-export const smartSentry = {
+export const agSentry = {
     /**
      * sentry 主动上报
      */

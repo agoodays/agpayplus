@@ -1,48 +1,8 @@
-<script setup>
-import { reactive, ref, onMounted } from 'vue';
-
-const loginForm = ref();
-const loading = ref(false);
-const isOverdue = ref(false);
-const vercodeImgSrc = ref('');
-const isAutoLogin = ref(false);
-const loginErrorInfo = ref('');
-
-const loginObject = reactive({
-  loginMethod: 'password',
-  username: '',
-  password: '',
-  vercode: '',
-  vercodeToken: ''
-});
-
-const rules = {
-  username: [{ required: true, message: '请输入登录名/手机号', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-};
-
-async function refVercode() {
-  console.log('Vercode');
-}
-
-async function handleSubmit() {
-  loginForm.value.validate().then(async () => {
-    console.log(loginObject);
-  });
-}
-
-// 生命周期钩子
-onMounted(() => {
-  refVercode()
-})
-</script>
-
 <template>
   <a-alert class="login-error-message" v-if="loginErrorInfo" :message="loginErrorInfo" type="error" show-icon />
   <div class="main">
     <div class="desc">运营平台登录</div>
-    <a-form class="user-layout-login" ref="loginForm" :model="loginObject" :rules="rules" @submit="handleSubmit">
+    <a-form class="user-layout-login" ref="loginForm" :model="loginObject" :rules="rules" @finish="handleSubmit" @finishFailed="onFinishFailed">
       <a-form-item name="username">
         <a-input size="large" type="text" placeholder="登录名/手机" v-model:value="loginObject.username"/>
       </a-form-item>
@@ -62,20 +22,62 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <a-form-item>
+      <a-form-item name="isAutoLogin">
         <!-- 自动登录 -->
         <!-- <a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">自动登录</a-checkbox> -->
-        <a-checkbox v-model:value="isAutoLogin">自动登录</a-checkbox>
+        <a-checkbox v-model:checked="loginObject.isAutoLogin">自动登录</a-checkbox>
         <!-- 忘记密码 -->
         <a class="forget-password" style="float: right;" href="/forget">忘记密码?</a>
       </a-form-item>
       <a-form-item class="submit">
-        <a-button size="large" type="primary" htmlType="submit" class="login-button" :loading="loading" >登录</a-button>
+        <a-button size="large" type="primary" html-type="submit" class="login-button" :loading="loading" >登录</a-button>
       </a-form-item>
     </a-form>
   </div>
   <div class="footer"></div>
 </template>
+
+<script setup>
+import { reactive, ref, onMounted } from 'vue';
+
+const loginForm = ref();
+const loading = ref(false);
+const isOverdue = ref(false);
+const vercodeImgSrc = ref('');
+const loginErrorInfo = ref('');
+
+const loginObject = reactive({
+  loginMethod: 'password',
+  username: '',
+  password: '',
+  vercode: '',
+  vercodeToken: '',
+  isAutoLogin: false
+});
+
+const rules = {
+  username: [{ required: true, message: '请输入登录名/手机号', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+};
+
+async function refVercode() {
+  console.log('Vercode');
+}
+
+const onFinish = values => {
+  console.log('Success:', values);
+};
+
+const onFinishFailed = errorInfo => {
+  console.log('Failed:', errorInfo);
+};
+
+// 生命周期钩子
+onMounted(() => {
+  refVercode()
+})
+</script>
 
 <style lang="less" scoped>
 .user-layout-login {

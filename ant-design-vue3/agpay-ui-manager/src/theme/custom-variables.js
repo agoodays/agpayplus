@@ -10,7 +10,7 @@ const token = convertLegacyToken.default(mapToken);
 //
 // const { useToken } = theme;
 // const { token } = useToken();
-console.log(token)
+// console.log(token)
 
 export default {
   '@primary-color': token['primary-color'], // 全局主色

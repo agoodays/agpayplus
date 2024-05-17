@@ -1,81 +1,8 @@
-<script setup>
-import { reactive, ref } from 'vue';
-
-const forgetForm = ref();
-const loading = ref(false);
-const codeExpireTime = ref(0);
-const forgetErrorInfo = ref('');
-
-const forgetObject = reactive({
-  phone: '',
-  code: '',
-  password: '',
-  confirmPwd: ''
-});
-
-const passwordRules = {
-  regexpRules: '',
-  errTips: ''
-};
-
-const rules = {
-  phone: [{ required: true, pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
-  code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-  password: [{ required: false, trigger: 'blur' }, {
-    validator: (rule, value, callBack) => {
-      if (!forgetObject.password.length) {
-        callBack('请输入新密码');
-      }
-      if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
-        const regex = new RegExp(passwordRules.regexpRules);
-        const isMatch = regex.test(forgetObject.password);
-        if (!isMatch) {
-          callBack(passwordRules.errTips);
-        }
-      }
-      // if (forgetObject.password !== forgetObject.confirmPwd) {
-      //   callBack('两次输入密码不一致');
-      // }
-      callBack();
-    }
-  }], // 新密码
-  confirmPwd: [{ required: false, trigger: 'blur' }, {
-    validator: (rule, value, callBack) => {
-      if (!forgetObject.confirmPwd.length) {
-        callBack('请输入确认新密码');
-      }
-      if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
-        const regex = new RegExp(passwordRules.regexpRules);
-        const isMatch = regex.test(forgetObject.confirmPwd);
-        if (!isMatch) {
-          callBack(passwordRules.errTips);
-        }
-      }
-      if (forgetObject.password !== forgetObject.confirmPwd) {
-        callBack('两次输入密码不一致');
-      }
-      callBack();
-    }
-  }] // 确认新密码
-};
-
-async function sendCode() {
-
-}
-
-async function handleSubmit() {
-  forgetForm.value.validate().then(async () => {
-    console.log(forgetObject);
-  });
-}
-
-</script>
-
 <template>
   <a-alert class="forget-error-message" v-if="forgetErrorInfo" :message="forgetErrorInfo" type="error" show-icon />
   <div class="main">
     <div class="desc">找回密码</div>
-    <a-form class="user-layout-forget" ref="forgetForm" :model="forgetObject" :rules="rules" @submit="handleSubmit">
+    <a-form class="user-layout-forget" ref="forgetForm" :model="forgetObject" :rules="rules">
       <a-form-item name="phone">
         <a-input size="large" type="text" placeholder="请输入手机号" v-model:value="forgetObject.phone"/>
       </a-form-item>
@@ -108,11 +35,87 @@ async function handleSubmit() {
         <a class="forge-password" style="float: right;" href="/login" >去登录 >></a>
       </a-form-item>
       <a-form-item class="submit">
-        <a-button size="large" type="primary" htmlType="submit" class="forget-button" :loading="loading">找回密码</a-button>
+        <a-button size="large" type="primary" class="forget-button" :loading="loading" @click="onSubmit">找回密码</a-button>
       </a-form-item>
     </a-form>
   </div>
 </template>
+
+<script setup>
+import { reactive, ref } from 'vue';
+
+const forgetForm = ref();
+const loading = ref(false);
+const codeExpireTime = ref(0);
+const forgetErrorInfo = ref('');
+
+const forgetObject = reactive({
+  phone: '',
+  code: '',
+  password: '',
+  confirmPwd: ''
+});
+
+const passwordRules = {
+  regexpRules: '',
+  errTips: ''
+};
+
+const validatePassword = async (rule, value) => {
+  if (!value) {
+    return Promise.reject('请输入新密码');
+  }
+  if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+    const regex = new RegExp(passwordRules.regexpRules);
+    const isMatch = regex.test(value);
+    if (!isMatch) {
+      return Promise.reject(passwordRules.errTips);
+    }
+  }
+  return Promise.resolve();
+};
+
+const validateConfirmPwd = async (rule, value) => {
+  if (!value) {
+    return Promise.reject('请输入确认新密码');
+  }
+  if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+    const regex = new RegExp(passwordRules.regexpRules);
+    const isMatch = regex.test(value);
+    if (!isMatch) {
+      return Promise.reject(passwordRules.errTips);
+    }
+  }
+  if (forgetObject.password !== value) {
+    return Promise.reject('两次输入密码不一致');
+  }
+  return Promise.resolve();
+};
+
+const rules = {
+  phone: [{ required: true, pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+  password: [{ required: false, trigger: 'blur', validator:validatePassword }], // 新密码
+  confirmPwd: [{ required: false, trigger: 'blur', validator: validateConfirmPwd}] // 确认新密码
+};
+
+const sendCode = () => {
+  forgetForm.value.validateFields('phone').then(() => {
+    console.log('code');
+  }).catch(error => {
+    console.log('error', error);
+  });
+}
+
+const onSubmit = () => {
+  forgetForm.value.validate().then(() => {
+    console.log(forgetObject);
+  }).catch(error => {
+    console.log('error', error);
+  });
+}
+
+</script>
 
 <style lang="less" scoped>
 .user-layout-forget {
@@ -172,21 +175,6 @@ async function handleSubmit() {
   }
   .submit {
     margin-bottom: 0;
-  }
-}
-.vercode-mask {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  opacity: 0.8;
-  text-align:center;
-  line-height: 40px;
-  color:#fff;
-  &:hover {
-    cursor: pointer;
   }
 }
 </style>

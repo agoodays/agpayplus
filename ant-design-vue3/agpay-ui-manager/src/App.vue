@@ -1,12 +1,3 @@
-<script setup>
-import { computed } from 'vue';
-import { useSpinStore } from '/@/store/modules/system/spin';
-
-// 全局loading
-let spinStore = useSpinStore();
-const spinning = computed(() => spinStore.loading);
-</script>
-
 <template>
   <a-config-provider
       :theme="{
@@ -22,6 +13,15 @@ const spinning = computed(() => spinStore.loading);
     </a-spin>
   </a-config-provider>
 </template>
+
+<script setup>
+import { computed } from 'vue';
+import { useSpinStore } from '/@/store/modules/system/spin';
+
+// 全局loading
+let spinStore = useSpinStore();
+const spinning = computed(() => spinStore.loading);
+</script>
 
 <style scoped>
 

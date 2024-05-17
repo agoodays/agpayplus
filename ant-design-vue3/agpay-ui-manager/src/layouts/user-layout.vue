@@ -1,18 +1,10 @@
-<script setup>
-import { theme } from 'ant-design-vue';
-
-const { useToken } = theme;
-const { token } = useToken();
-console.log(token)
-</script>
-
 <template>
   <div class="content-header">
     <img src="../assets/vue.svg" class="header-logo">
   </div>
   <div class="content-body">
     <div class="content-main" style="justify-content: flex-end;">
-      <div class="user-layout-lang"></div>
+      <div class="banner-content"></div>
       <div class="user-layout-content">
         <router-view />
       </div>
@@ -37,6 +29,14 @@ console.log(token)
     </div>
   </div>
 </template>
+
+<script setup>
+import { theme } from 'ant-design-vue';
+
+const { useToken } = theme;
+const { token } = useToken();
+// console.log(token)
+</script>
 
 <style lang="less">
 .content-header {
