@@ -105,7 +105,7 @@ const { token } = useToken();
   font-weight: 700;
   font-size: 20px;
   letter-spacing: .04em;
-  color: v-bind('token.colorPrimary');
+  color: var(--ant-primary-color);
   margin-bottom: 50px;
   text-align: center;
 }

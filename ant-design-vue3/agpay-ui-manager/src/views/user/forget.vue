@@ -125,7 +125,7 @@ const onSubmit = () => {
 
   .forge-password {
     //font-size: 14px;
-    color: @primary-color;
+    color: var(--ant-primary-color);
   }
 
   button.forget-button {

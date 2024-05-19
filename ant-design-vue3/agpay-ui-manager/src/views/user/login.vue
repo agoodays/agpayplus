@@ -2,7 +2,7 @@
   <a-alert class="login-error-message" v-if="loginErrorInfo" :message="loginErrorInfo" type="error" show-icon />
   <div class="main">
     <div class="desc">运营平台登录</div>
-    <a-form class="user-layout-login" ref="loginForm" :model="loginObject" :rules="rules" @finish="handleSubmit" @finishFailed="onFinishFailed">
+    <a-form class="user-layout-login" ref="loginForm" :model="loginObject" :rules="rules" @finish="onFinish" @finishFailed="onFinishFailed">
       <a-form-item name="username">
         <a-input size="large" type="text" placeholder="登录名/手机" v-model:value="loginObject.username"/>
       </a-form-item>
@@ -86,7 +86,7 @@ onMounted(() => {
   }
   .forget-password {
     //font-size: 14px;
-    color: @primary-color;
+    color: var(--ant-primary-color);
   }
   button.login-button {
     padding: 0 15px;
