@@ -54,4 +54,36 @@ export const loginApi = {
     getCurrentInfo: () => {
         return getRequest('/api/current/user');
     },
+
+    /**
+     * 找回密码
+     * @param phone
+     * @param code
+     * @param confirmPwd
+     * @returns {*}
+     */
+    forget:({ phone, code, confirmPwd })=>{
+        const data = {
+            phone: Base64.encode(phone), // 手机号
+            code: Base64.encode(code), // 验证码
+            newPwd: Base64.encode(confirmPwd) // 密码
+        }
+        return request.request({
+            url: '/api/anon/cipher/retrieve',
+            method: 'post',
+            data: data
+        }, true, true, true)
+    },
+    /**
+     * 发送短信验证码
+     * @param data
+     * @returns {*}
+     */
+     sendcode: (data) => {
+        return request.request({
+            url: '/api/anon/sms/code',
+            method: 'post',
+            data: data
+        }, true, true, true)
+    },
 };

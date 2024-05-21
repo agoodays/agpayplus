@@ -2,7 +2,7 @@
   <a-config-provider
       :theme="{
         token: {
-          colorPrimary: colorPrimary,
+          colorPrimary: appConfigStore.primaryColor,
         },
       }"
   >
@@ -15,22 +15,17 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, watchEffect } from 'vue';
+import { computed } from 'vue';
 import { useSpinStore } from '/@/store/modules/system/spin';
+import { useAppConfigStore } from '/@/store/modules/system/app-config';
 
 // 全局loading
 let spinStore = useSpinStore();
 const spinning = computed(() => spinStore.loading);
 
-const colorPrimary = ref('');
-onMounted(() => {
-  watchEffect(() => {
-    const rootStyles = getComputedStyle(document.documentElement);
-    console.log(rootStyles)
-    colorPrimary.value = rootStyles.getPropertyValue('--ant-primary-color');
-    console.log(colorPrimary.value)
-  });
-});
+let appConfigStore = useAppConfigStore();
+const colorPrimary = computed(() => appConfigStore.primaryColor);
+console.log(appConfigStore.primaryColor)
 
 </script>
 

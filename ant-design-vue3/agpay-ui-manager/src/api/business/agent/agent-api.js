@@ -2,7 +2,7 @@
  * 系统更新日志 api 封装
  *
  */
-import { req } from '/@/lib/axios';
+import { req } from '@/lib/axios';
 
 export const API_URL_AGENT = '/api/agentInfo'
 

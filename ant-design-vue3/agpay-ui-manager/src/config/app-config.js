@@ -30,7 +30,7 @@ export const appDefaultConfig = {
   // 网站名称
   websiteName: 'AgPay运营平台',
   // 主题颜色
-  primaryColor: '#ffd',
+  primaryColor: '#1677ff',
   // 紧凑
   compactFlag: false,
 };
