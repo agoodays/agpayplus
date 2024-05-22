@@ -79,7 +79,7 @@ export const loginApi = {
      * @param data
      * @returns {*}
      */
-     sendcode: (data) => {
+    sendcode: (data) => {
         return request.request({
             url: '/api/anon/sms/code',
             method: 'post',

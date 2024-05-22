@@ -20,6 +20,9 @@ export default defineConfig({
       },
     ]
   },
+  server: {
+    port: 8817
+  },
   plugins: [vue()],
   css: {
     preprocessorOptions: {
@@ -28,9 +31,5 @@ export default defineConfig({
         javascriptEnabled: true,
       },
     },
-  },
-  define: {
-    __INTLIFY_PROD_DEVTOOLS__: false,
-    'process.env': process.env,
   },
 })

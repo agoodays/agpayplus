@@ -5,57 +5,56 @@
 import axios from 'axios';
 import { message, Modal } from 'ant-design-vue';
 import { AgLoading } from '/@/components/framework/ag-loading';
-import { localClear, localRead } from '/@/utils/local-util';
+import { useUserStore } from '/@/store/modules/system/user';
 // import { decryptData, encryptData } from './encrypt';
 // import { DATA_TYPE_ENUM } from '../constants/common-const';
+import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const';
 import _ from 'lodash';
-import LocalStorageKeyConst from '/@/constants/local-storage-key-const';
 
-// token的消息头
-const TOKEN_HEADER = 'Authorization';
+const userStore = useUserStore();
 
 // 退出系统
 function logout() {
-  localClear();
-  location.reload() // 退出时 重置缓存
+  userStore.logout();
+  location.reload(); // 退出时 重置缓存
 }
 
 class AgAxios {
-  constructor (baseUrl = process.env.VUE_APP_API_BASE_URL) {
-    this.baseUrl = baseUrl
-    this.queue = {} // 发送队列, 格式为: {请求url: true}, 可以做一些验证之类
+  constructor (baseUrl = import.meta.env.VITE_APP_API_BASE_URL) {
+    this.baseUrl = baseUrl;
+    this.queue = {};// 发送队列, 格式为: {请求url: true}, 可以做一些验证之类
   }
   // 基础配置信息
   baseConfig () {
-    const headers = {}
-    const token = localRead(LocalStorageKeyConst.USER_TOKEN);
-    headers[TOKEN_HEADER] = `Bearer ${token}`
+    const headers = {};
+    const token = userStore.getToke;
+    headers[ACCESS_TOKEN_NAME] = `Bearer ${token}`;
     return {
       baseURL: this.baseUrl,
       headers: headers
-    }
+    };
   }
   destroy (url) {
-    delete this.queue[url]
+    delete this.queue[url];
   }
   useInterceptors (instance, url, showErrorMsg, showLoading) {
     // 请求拦截
     instance.interceptors.request.use(config => {
       // 添加全局的loading...
       if (!Object.keys(this.queue).length && showLoading) {
-        AgLoading.Show() // 加载中显示loading组件
+        AgLoading.show(); // 加载中显示loading组件
       }
-      this.queue[url] = true
-      return config
+      this.queue[url] = true;
+      return config;
     }, error => {
       AgLoading.hide()  // 报错关闭loading组件
       return Promise.reject(error)
     })
     // 响应拦截
     instance.interceptors.response.use(response => {
-      this.destroy(url)
+      this.destroy(url);
       if (showLoading) {
-        AgLoading.hide() // 报错关闭loading组件
+        AgLoading.hide(); // 报错关闭loading组件
       }
       // 根据content-type ，判断是否为 json 数据
       const contentType = response.headers['content-type'] ? response.headers['content-type'] : response.headers['Content-Type'];
@@ -64,28 +63,28 @@ class AgAxios {
       }
       // 如果是json数据
       if (response.data && response.data instanceof Blob) {
-        return Promise.reject(response.data);
+        return Promise.resolve(response.data);
       }
       const resData = response.data // 接口实际返回数据 格式为：{code: '', msg: '', data: ''}， res.data 是axios封装对象的返回数据；
       if (resData.code && resData.code !== 0) { // 相应结果不为0， 说明异常
         if (showErrorMsg) {
-          message.error(resData.msg) // 显示异常信息
+          message.error(resData.msg); // 显示异常信息
         }
-        return Promise.reject(resData)
+        return Promise.reject(resData);
       } else {
-        return Promise.reject(resData.data)
+        return Promise.resolve(resData.data);
       }
     }, error => {
-      this.destroy(url)
+      this.destroy(url);
       if (showLoading) {
-        AgLoading.hide() // 报错关闭loading组件
+        AgLoading.hide(); // 报错关闭loading组件
       }
-      let errorInfo = error.response && error.response.data && error.response.data.data
+      let errorInfo = error.response && error.response.data && error.response.data.data;
       if (!errorInfo) {
-        errorInfo = error.response.data
+        errorInfo = error.response.data;
       }
       if (error.response.status === 401) { // 无访问权限，会话超时， 提示用户信息 & 退出系统
-        const toLoginTimeout = setTimeout(logout, 3000)
+        const toLoginTimeout = setTimeout(logout, 3000);
         Modal.warning({
           title: '会话超时，请重新登录',
           content: '3s后将自动退出...',
@@ -94,14 +93,14 @@ class AgAxios {
           onOk: logout,
           onCancel() {
             clearTimeout(toLoginTimeout)
-          }})
+          }});
       } else {
         if (showErrorMsg) {
-          message.error(JSON.stringify(errorInfo)) // 显示异常信息
+          message.error(JSON.stringify(errorInfo)); // 显示异常信息
         }
       }
 
-      return Promise.reject(errorInfo)
+      return Promise.reject(errorInfo);
     })
   }
   /**
@@ -112,17 +111,17 @@ class AgAxios {
    * @showLoading 发送请求前后显示全局loading，默认为： false
    */
   request (options, interceptorsFlag = true, showErrorMsg = true, showLoading = false) {
-    const instance = axios.create()
-    options = Object.assign(this.baseConfig(), options)
+    const instance = axios.create();
+    options = Object.assign(this.baseConfig(), options);
     if (interceptorsFlag) { // 注入 req, respo 拦截器
-      this.useInterceptors(instance, options.url, showErrorMsg, showLoading)
+      this.useInterceptors(instance, options.url, showErrorMsg, showLoading);
     }
 
-    return instance(options)
+    return instance(options);
   }
 }
 
-const agAxios = new AgAxios()
+const agAxios = new AgAxios();
 
 // ================================= 对外提供请求方法：通用请求，get， post, 下载download等 =================================
 
@@ -155,52 +154,52 @@ export const postRequest = (url, data) => {
 export const req = {
   // 通用列表查询接口
   list: (url, params) => {
-    return request({ url: url, method: 'GET', params: params }, true, true, false)
+    return request({ url: url, method: 'GET', params: params }, true, true, false);
   },
 
   // 通用获取数据接口
   get: (url, params) => {
-    return request({ url: url, method: 'GET', params: params }, true, true, false)
+    return request({ url: url, method: 'GET', params: params }, true, true, false);
   },
 
   // 通用列表查询统计接口
   total: (url, params) => {
-    return request({ url: url + '/total', method: 'GET', params: params }, true, true, false)
+    return request({ url: url + '/total', method: 'GET', params: params }, true, true, false);
   },
 
   // 通用列表查询统计接口
   count: (url, params) => {
-    return request({ url: url + '/count', method: 'GET', params: params }, true, true, false)
+    return request({ url: url + '/count', method: 'GET', params: params }, true, true, false);
   },
 
   // 通用列表数据导出接口
   export: (url, bizType, params) => {
-    return request({ url: url + '/export/' + bizType, method: 'GET', params: params, responseType: 'blob' }, true, true, false)
+    return request({ url: url + '/export/' + bizType, method: 'GET', params: params, responseType: 'blob' }, true, true, false);
   },
 
   // 通用Post接口
   post: (url, data) => {
-    return request({ url: url, method: 'POST', data: data }, true, true, false)
+    return request({ url: url, method: 'POST', data: data }, true, true, false);
   },
 
   // 通用新增接口
   add: (url, data) => {
-    return request({ url: url, method: 'POST', data: data }, true, true, false)
+    return request({ url: url, method: 'POST', data: data }, true, true, false);
   },
 
   // 通用查询单条数据接口
   getById: (url, bizId) => {
-    return request({ url: url + '/' + bizId, method: 'GET' }, true, true, false)
+    return request({ url: url + '/' + bizId, method: 'GET' }, true, true, false);
   },
 
   // 通用修改接口
   updateById: (url, bizId, data) => {
-    return request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, false)
+    return request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, false);
   },
 
   // 通用删除接口
   delById: (url, bizId) => {
-    return request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, false)
+    return request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, false);
   }
 }
 
@@ -212,27 +211,27 @@ export const reqLoad = {
 
   // 通用列表查询接口
   list: (url, params) => {
-    return request({ url: url, method: 'GET', params: params }, true, true, true)
+    return request({ url: url, method: 'GET', params: params }, true, true, true);
   },
 
   // 通用新增接口
   add: (url, data) => {
-    return request({ url: url, method: 'POST', data: data }, true, true, true)
+    return request({ url: url, method: 'POST', data: data }, true, true, true);
   },
 
   // 通用查询单条数据接口
   getById: (url, bizId) => {
-    return request({ url: url + '/' + bizId, method: 'GET' }, true, true, true)
+    return request({ url: url + '/' + bizId, method: 'GET' }, true, true, true);
   },
 
   // 通用修改接口
   updateById: (url, bizId, data) => {
-    return request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, true)
+    return request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, true);
   },
 
   // 通用删除接口
   delById: (url, bizId) => {
-    return request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, true)
+    return request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, true);
   }
 }
 
@@ -250,20 +249,20 @@ export const upload = {
    *
    */
   getFormParams: (url, fileName, fileSize) => {
-    return request({ baseURL: url, method: 'GET', params: { fileName, fileSize } })
+    return request({ baseURL: url, method: 'GET', params: { fileName, fileSize } });
   },
   /**
    * 上传单个文件
    *
    */
   singleFile: (url, data) => {
-    const formData = new FormData()
+    const formData = new FormData();
     for (const key in data) {
       if (data.hasOwnProperty(key)) {
-        formData.append(key, data[key])
+        formData.append(key, data[key]);
       }
     }
-    return request({ baseURL: url, method: 'POST', data: formData })
+    return request({ baseURL: url, method: 'POST', data: formData });
   }
 }
 

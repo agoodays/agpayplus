@@ -13,8 +13,8 @@ export const basicApi = {
         let domain = document.location.protocol + '//' + document.location.host
 
         // 判断api_base_url 是否设置
-        if (process.env.VUE_APP_API_BASE_URL && process.env.VUE_APP_API_BASE_URL !== '/') {
-            domain = process.env.VUE_APP_API_BASE_URL
+        if (import.meta.env.VITE_APP_API_BASE_URL && import.meta.env.VITE_APP_API_BASE_URL !== '/') {
+            domain = import.meta.env.VITE_APP_API_BASE_URL
         }
 
         if (domain.startsWith('https:')) {

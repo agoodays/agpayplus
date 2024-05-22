@@ -20,11 +20,10 @@ import { useSpinStore } from '/@/store/modules/system/spin';
 import { useAppConfigStore } from '/@/store/modules/system/app-config';
 
 // 全局loading
-let spinStore = useSpinStore();
+const spinStore = useSpinStore();
 const spinning = computed(() => spinStore.loading);
 
-let appConfigStore = useAppConfigStore();
-const colorPrimary = computed(() => appConfigStore.primaryColor);
+const appConfigStore = useAppConfigStore();
 console.log(appConfigStore.primaryColor)
 
 </script>

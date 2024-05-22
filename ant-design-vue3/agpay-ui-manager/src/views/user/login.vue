@@ -39,6 +39,16 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { notification } from "ant-design-vue";
+import { timeFix } from '/@/utils/time-util'
+import { loginApi } from '/@/api/system/login-api';
+import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const';
+import { useUserStore } from '/@/store/modules/system/user';
+
+const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
 
 const loginForm = ref();
 const loading = ref(false);
@@ -61,12 +71,76 @@ const rules = {
   vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
 };
 
-async function refVercode() {
-  console.log('Vercode');
+let timer = null;
+
+// const refVercode = async () => {
+//   let res = await loginApi.getVercode();
+//   vercodeImgSrc.value = res.imageBase64Data;
+//   loginObject.vercodeToken = res.vercodeToken;
+//
+//   isOverdue.value = false;
+//   if (timer.value) clearInterval(timer.value); // 如果多次点击则清除已有的定时器
+//   // 默认超过60秒提示过期刷新
+//   timer.value = setInterval(() => {
+//     res.expireTime--;
+//     if (res.expireTime <= 0) {
+//       isOverdue.value = true;
+//       clearInterval(timer.value);
+//     }
+//   }, 1000);
+// }
+
+const refVercode = () => {
+  loginApi.getVercode().then(res => {
+    vercodeImgSrc.value = res.imageBase64Data;
+    loginObject.vercodeToken = res.vercodeToken;
+
+    isOverdue.value = false;
+    if (timer) clearInterval(timer); // 如果多次点击则清除已有的定时器
+    // 默认超过60秒提示过期刷新
+    timer = setInterval(() => {
+      res.expireTime--;
+      if (res.expireTime <= 0) {
+        isOverdue.value = true;
+        clearInterval(timer);
+      }
+    }, 1000);
+  }).catch(error => {
+    // 处理 Promise 的错误情况
+    console.error(error);
+    // 可以在这里进行错误处理，例如显示错误信息给用户
+  });
 }
 
 const onFinish = values => {
-  console.log('Success:', values);
+  loading.value = true // 登录按钮显示加载loading
+  loginApi.login(values).then(res => {
+    userStore.setToken(res[ACCESS_TOKEN_NAME], loginObject.isAutoLogin);
+    loginSuccess(res);
+  }).catch(error => {
+    console.error(error);
+    // 处理 Promise 的错误情况
+    // 可以在这里进行错误处理，例如显示错误信息给用户
+    loading.value = false;
+    loginErrorInfo.value = (error.msg || JSON.stringify(error));
+  });
+};
+
+const loginSuccess = res => {
+  const redirect = route.query.redirect;
+  router.push({ path: '/', query: { redirect: redirect } });
+  // 延迟 1 秒显示欢迎信息
+  setTimeout(() => {
+    notification.success({
+      message: '欢迎',
+      // description: `<p>${timeFix()}，欢迎回来</p>${(res.lastLoginTime ? `<p>上次登录时间：${res.lastLoginTime}</p>` : '')}`,
+      description: `${timeFix()}，欢迎回来${(res.lastLoginTime ? `\n上次登录时间：${res.lastLoginTime}` : '')}`,
+      style: {
+        whiteSpace: 'pre-wrap'
+      }
+    });
+  }, 1000);
+  loginErrorInfo.value = '';
 };
 
 const onFinishFailed = errorInfo => {
