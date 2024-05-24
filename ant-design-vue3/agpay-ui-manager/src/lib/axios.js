@@ -27,7 +27,7 @@ class AgAxios {
   // 基础配置信息
   baseConfig () {
     const headers = {};
-    const token = userStore.getToke;
+    const token = userStore.getToken;
     headers[ACCESS_TOKEN_NAME] = `Bearer ${token}`;
     return {
       baseURL: this.baseUrl,

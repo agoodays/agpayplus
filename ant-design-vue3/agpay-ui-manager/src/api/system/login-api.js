@@ -3,6 +3,7 @@
  *
  */
 import { request, getRequest } from '/@/lib/axios';
+import { LOGIN_METHOD_ENUM } from '/@/constants/system/login-const';
 import { Base64 } from '/@/lib/encrypt';
 
 export const loginApi = {
@@ -11,7 +12,7 @@ export const loginApi = {
      */
     login: ({ loginMethod, username, password, mobile, vercode, vercodeToken }) => {
         let data, url
-        if (loginMethod === 'message') {
+        if (loginMethod === LOGIN_METHOD_ENUM.MESSAGE) {
             data = {
                 phone: Base64.encode(mobile), // 手机号
                 code: Base64.encode(vercode) // 验证码值

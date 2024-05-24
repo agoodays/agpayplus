@@ -45,7 +45,7 @@
 import { reactive, ref } from 'vue';
 import { useRoute, useRouter } from "vue-router";
 import { loginApi } from '/@/api/system/login-api';
-import {notification} from "ant-design-vue";
+import { notification } from "ant-design-vue";
 import { timeFix } from "/@/utils/time-util.js";
 
 const route = useRoute();

@@ -44,6 +44,7 @@ import { notification } from "ant-design-vue";
 import { timeFix } from '/@/utils/time-util'
 import { loginApi } from '/@/api/system/login-api';
 import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const';
+import { LOGIN_METHOD_ENUM } from '/@/constants/system/login-const.js';
 import { useUserStore } from '/@/store/modules/system/user';
 
 const route = useRoute();
@@ -57,7 +58,7 @@ const vercodeImgSrc = ref('');
 const loginErrorInfo = ref('');
 
 const loginObject = reactive({
-  loginMethod: 'password',
+  loginMethod: LOGIN_METHOD_ENUM.PASSWORD,
   username: '',
   password: '',
   vercode: '',
