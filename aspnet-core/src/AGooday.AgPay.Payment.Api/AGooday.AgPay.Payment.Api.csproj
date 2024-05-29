@@ -26,15 +26,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AlipaySDKNet.Standard" Version="4.9.20" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
+    <PackageReference Include="AlipaySDKNet.Standard" Version="4.9.131" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
     <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
-    <PackageReference Include="Quartz" Version="3.8.0" />
-    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.Api" Version="2.37.0" />
-    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV2" Version="2.3.1" />
-    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="2.21.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Quartz" Version="3.9.0" />
+    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.Api" Version="3.2.0" />
+    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV2" Version="3.0.0" />
+    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="3.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>

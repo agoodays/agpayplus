@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.Kits
     {
         public static string RSASign(string plainText, string privateKey)
         {
-            return RSAUtility.SignWithSHA256(privateKey, plainText);
+            return RSAUtility.Sign(privateKey, plainText);
         }
     }
 }

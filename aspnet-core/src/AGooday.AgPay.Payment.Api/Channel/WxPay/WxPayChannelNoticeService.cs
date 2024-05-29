@@ -70,57 +70,52 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     var nonce = request.Headers["Wechatpay-Nonce"].FirstOrDefault();
                     var signature = request.Headers["Wechatpay-Signature"].FirstOrDefault();
                     var serialNumber = request.Headers["Wechatpay-Serial"].FirstOrDefault();
-                    string callbackJson = GetReqParamFromBody();
+                    string webhookJson = GetReqParamFromBody();
 
                     JObject headerJSON = new JObject();
                     headerJSON.Add("Wechatpay-Timestamp", timestamp);
                     headerJSON.Add("Wechatpay-Nonce", nonce);
                     headerJSON.Add("Wechatpay-Signature", signature);
                     headerJSON.Add("Wechatpay-Serial", serialNumber);
-                    _logger.LogInformation($"\n【请求头信息】：{headerJSON}\n【加密数据】：{callbackJson}");
+                    _logger.LogInformation($"\n【请求头信息】：{headerJSON}\n【加密数据】：{webhookJson}");
 
-                    bool valid = client.VerifyEventSignature(
-                        callbackTimestamp: timestamp,
-                        callbackNonce: nonce,
-                        callbackBody: callbackJson,
-                        callbackSignature: signature,
-                        callbackSerialNumber: serialNumber, out Exception error);
-                    if (!valid)
+                    var valid = client.VerifyEventSignature(timestamp,nonce,webhookJson,signature,serialNumber);
+                    if (!valid.Result)
                     {
-                        _logger.LogError(error, "error");
+                        _logger.LogError(valid.Error, "error");
                         throw ResponseException.BuildText("ERROR");
                     }
                     /* 将 JSON 反序列化得到通知对象 */
-                    var callbackModel = client.DeserializeEvent(callbackJson);
-                    if ("TRANSACTION.SUCCESS".Equals(callbackModel.EventType))
+                    var webhookModel = client.DeserializeEvent(webhookJson);
+                    if ("TRANSACTION.SUCCESS".Equals(webhookModel.EventType))
                     {
                         /* 根据事件类型，解密得到支付通知敏感数据 */
                         if (mchAppConfigContext.IsIsvSubMch())
                         {
-                            var callbackResource = client.DecryptEventResource<PartnerTransactionResource>(callbackModel);
-                            var payOrderId = callbackResource.OutTradeNumber;
-                            return new Dictionary<string, object>() { { payOrderId, callbackResource } };
+                            var webhookResource = client.DecryptEventResource<PartnerTransactionResource>(webhookModel);
+                            var payOrderId = webhookResource.OutTradeNumber;
+                            return new Dictionary<string, object>() { { payOrderId, webhookResource } };
                         }
                         else
                         {
-                            var callbackResource = client.DecryptEventResource<TransactionResource>(callbackModel);
-                            var payOrderId = callbackResource.OutTradeNumber;
-                            return new Dictionary<string, object>() { { payOrderId, callbackResource } };
+                            var webhookResource = client.DecryptEventResource<TransactionResource>(webhookModel);
+                            var payOrderId = webhookResource.OutTradeNumber;
+                            return new Dictionary<string, object>() { { payOrderId, webhookResource } };
                         }
                     }
                 }
                 // V2接口回调
                 else
                 {
-                    string callbackXml = GetReqParamFromBody();
-                    if (string.IsNullOrWhiteSpace(callbackXml))
+                    string webhookXml = GetReqParamFromBody();
+                    if (string.IsNullOrWhiteSpace(webhookXml))
                     {
                         return null;
                     }
-                    string callbackJson = XmlUtil.ConvertToJson(callbackXml);
-                    var callbackResource = JsonConvert.DeserializeObject<OrderEvent>(callbackJson);
-                    var payOrderId = callbackResource.OutTradeNumber;
-                    return new Dictionary<string, object>() { { payOrderId, callbackResource } };
+                    string webhookJson = XmlUtil.ConvertToJson(webhookXml);
+                    var webhookResource = JsonConvert.DeserializeObject<OrderEvent>(webhookJson);
+                    var payOrderId = webhookResource.OutTradeNumber;
+                    return new Dictionary<string, object>() { { payOrderId, webhookResource } };
                 }
                 return null;
             }
@@ -146,13 +141,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                     // 获取回调参数
                     //var result = (OrderEvent)@params;
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
-                    string callbackXml = GetReqParamFromBody();
-                    var result = client.JsonSerializer.Deserialize<OrderEvent>(callbackXml);
+                    string webhookXml = GetReqParamFromBody();
+                    var result = client.DeserializeEvent<OrderEvent>(webhookXml);
                     // 验证参数
-                    bool valid = client.VerifyEventSignature(callbackXml, out Exception error);
-                    if (!valid)
+                    var valid = client.VerifyEventSignature(webhookXml);
+                    if (!valid.Result)
                     {
-                        _logger.LogError(error, "error");
+                        _logger.LogError(valid.Error, "error");
                         throw ResponseException.BuildText("ERROR");
                     }
                     // 核对金额

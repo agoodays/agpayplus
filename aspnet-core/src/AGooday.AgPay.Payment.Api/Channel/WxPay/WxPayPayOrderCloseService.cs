@@ -10,6 +10,7 @@ using SKIT.FlurlHttpClient.Wechat.TenpayV3;
 using SKIT.FlurlHttpClient.Wechat.TenpayV3.Models;
 using WechatTenpayClientV2 = SKIT.FlurlHttpClient.Wechat.TenpayV2.WechatTenpayClient;
 using WechatTenpayClientV3 = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayClient;
+using WechatTenpayResponse = SKIT.FlurlHttpClient.Wechat.TenpayV3.WechatTenpayResponse;
 
 namespace AGooday.AgPay.Payment.Api.Channel.WxPay
 {
@@ -72,7 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
                 }
                 else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion)) // V3
                 {
-                    ClosePayTransactionResponse result;
+                    WechatTenpayResponse result;
                     var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
                     if (mchAppConfigContext.IsIsvSubMch()) // Sub-merchant
                     {
