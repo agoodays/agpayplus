@@ -11,6 +11,7 @@ using AGooday.AgPay.Payment.Api.Channel.SxfPay;
 using AGooday.AgPay.Payment.Api.Channel.UmsPay;
 using AGooday.AgPay.Payment.Api.Channel.WxPay;
 using AGooday.AgPay.Payment.Api.Channel.WxPay.Kits;
+using AGooday.AgPay.Payment.Api.Channel.YsePay;
 using AGooday.AgPay.Payment.Api.Channel.YsfPay;
 using AGooday.AgPay.Payment.Api.Utils;
 
@@ -46,6 +47,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IPaymentService, LcswPayPaymentService>(CS.IF_CODE.LCSWPAY);
             services.AddKeyedScoped<IPaymentService, DgPayPaymentService>(CS.IF_CODE.DGPAY);
             services.AddKeyedScoped<IPaymentService, LklPayPaymentService>(CS.IF_CODE.LKLPAY);
+            services.AddKeyedScoped<IPaymentService, YsePayPaymentService>(CS.IF_CODE.YSEPAY);
             services.AddScoped<IChannelServiceFactory<IPaymentService>, ChannelServiceFactory<IPaymentService>>();
             PayWayUtil.PayWayServiceRegister<AliPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<WxPayPaymentService>(services);
@@ -59,6 +61,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             PayWayUtil.PayWayServiceRegister<LcswPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<DgPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<LklPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<YsePayPaymentService>(services);
             #endregion
             #region RefundService
             services.AddKeyedScoped<IRefundService, AliPayRefundService>(CS.IF_CODE.ALIPAY);

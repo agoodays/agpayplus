@@ -579,6 +579,10 @@
             /// 拉卡拉支付
             /// </summary>
             public const string LKLPAY = "lklpay";   // 拉卡拉支付
+            /// <summary>
+            /// 银盛支付
+            /// </summary>
+            public const string YSEPAY = "ysepay";   // 银盛支付
         }
 
         /// <summary>

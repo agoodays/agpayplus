@@ -7,16 +7,15 @@ using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using Newtonsoft.Json.Linq;
 
-namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
+namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
 {
     /// <summary>
-    /// 斗拱 云闪付 条码支付
+    /// 银盛 微信 条码支付
     /// </summary>
-    public class YsfBar : DgPayPaymentService
+    public class WxBar : YsePayPaymentService
     {
-        public YsfBar(IServiceProvider serviceProvider,
+        public WxBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(serviceProvider, sysConfigService, configContextQueryService)
@@ -25,24 +24,24 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【斗拱条码(unionpay)支付】";
-            YsfBarOrderRQ bizRQ = (YsfBarOrderRQ)rq;
+            string logPrefix = "【银盛条码(wechat)支付】";
+            WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
             // 构造函数响应数据
-            YsfBarOrderRS res = ApiResBuilder.BuildSuccess<YsfBarOrderRS>();
+            WxBarOrderRS res = ApiResBuilder.BuildSuccess<WxBarOrderRS>();
 
-            JObject reqParams = new JObject();
+            SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
             reqParams.Add("auth_code", bizRQ.AuthCode.Trim()); //授权码 通过扫码枪/声波获取设备获取的支付宝/微信/银联付款码
-            // 斗拱 bar 统一参数赋值
+            // 银盛 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder, GetNotifyUrl());
 
-            var channelRetMsg = DgBar(reqParams, logPrefix, mchAppConfigContext);
+            var channelRetMsg = YseBar(reqParams, GetNotifyUrl(), logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            YsfBarOrderRQ bizRQ = (YsfBarOrderRQ)rq;
+            WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
             if (string.IsNullOrWhiteSpace(bizRQ.AuthCode))
             {
                 throw new BizException("用户支付条码[authCode]不可为空");

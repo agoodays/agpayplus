@@ -7,14 +7,13 @@ using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using Newtonsoft.Json.Linq;
 
-namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
+namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
 {
     /// <summary>
-    /// 斗拱 云闪付 条码支付
+    /// 银盛 云闪付 条码支付
     /// </summary>
-    public class YsfBar : DgPayPaymentService
+    public class YsfBar : YsePayPaymentService
     {
         public YsfBar(IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
@@ -25,17 +24,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【斗拱条码(unionpay)支付】";
+            string logPrefix = "【银盛条码(unionpay)支付】";
             YsfBarOrderRQ bizRQ = (YsfBarOrderRQ)rq;
             // 构造函数响应数据
             YsfBarOrderRS res = ApiResBuilder.BuildSuccess<YsfBarOrderRS>();
 
-            JObject reqParams = new JObject();
+            SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
             reqParams.Add("auth_code", bizRQ.AuthCode.Trim()); //授权码 通过扫码枪/声波获取设备获取的支付宝/微信/银联付款码
-            // 斗拱 bar 统一参数赋值
+            // 银盛 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder, GetNotifyUrl());
 
-            var channelRetMsg = DgBar(reqParams, logPrefix, mchAppConfigContext);
+            var channelRetMsg = YseBar(reqParams, GetNotifyUrl(), logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }
