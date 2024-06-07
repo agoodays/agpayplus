@@ -1,9 +1,7 @@
 ﻿using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.GM;
-using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
@@ -18,7 +16,7 @@ using System.Text.RegularExpressions;
 
 namespace AGooday.AgPay.Common.Utils
 {
-    public class Sm2Util
+    public class SM2Util
     {
         private static readonly X9ECParameters SM2_ECX9_PARAMS = GMNamedCurves.GetByName("SM2P256v1");
         private static readonly ECDomainParameters SM2_DOMAIN_PARAMS = new ECDomainParameters(SM2_ECX9_PARAMS.Curve, SM2_ECX9_PARAMS.G, SM2_ECX9_PARAMS.N);
@@ -92,154 +90,6 @@ namespace AGooday.AgPay.Common.Utils
             return new ECPublicKeyParameters(SM2_ECX9_PARAMS.Curve.CreatePoint(ecPublicKeyParamsX, ecPublicKeyParamsY), SM2_DOMAIN_PARAMS);
         }
 
-        #region https://www.cnblogs.com/runliuv/p/17610966.html
-        private const string SM4_ECB_NOPADDING = "SM4/ECB/NoPadding";
-        private const string SM4_CBC_NOPADDING = "SM4/CBC/NoPadding";
-        private const string SM4_CBC_PKCS7PADDING = "SM4/CBC/PKCS7Padding";
-
-        public class Sm2Cert
-        {
-            public AsymmetricKeyParameter PrivateKey;
-            public AsymmetricKeyParameter PublicKey;
-            public string CertId;
-        }
-
-        public static ECPrivateKeyParameters GetPrivatekeyFromD(BigInteger d)
-        {
-            return new ECPrivateKeyParameters(d, SM2_DOMAIN_PARAMS);
-        }
-
-        public static Sm2Cert ReadSm2File(byte[] pem, string pwd)
-        {
-            Sm2Cert sm2Cert = new Sm2Cert();
-            try
-            {
-                Asn1Sequence asn1Sequence = (Asn1Sequence)Asn1Object.FromByteArray(pem);
-                // ASN1Integer asn1Integer = (ASN1Integer) asn1Sequence.getObjectAt(0); //version=1
-                Asn1Sequence priSeq = (Asn1Sequence)asn1Sequence[1];//private key
-                Asn1Sequence pubSeq = (Asn1Sequence)asn1Sequence[2];//public key and x509 cert
-
-                // ASN1ObjectIdentifier sm2DataOid = (ASN1ObjectIdentifier) priSeq.getObjectAt(0);
-                // ASN1ObjectIdentifier sm4AlgOid = (ASN1ObjectIdentifier) priSeq.getObjectAt(1);
-                Asn1OctetString priKeyAsn1 = (Asn1OctetString)priSeq[2];
-                byte[] key = KDF(Encoding.UTF8.GetBytes(pwd), 32);
-                byte[] priKeyD = Sm4DecryptCBC(Arrays.CopyOfRange(key, 16, 32),
-                        priKeyAsn1.GetOctets(),
-                        Arrays.CopyOfRange(key, 0, 16), SM4_CBC_PKCS7PADDING);
-                sm2Cert.PrivateKey = GetPrivatekeyFromD(new BigInteger(1, priKeyD));
-
-                // ASN1ObjectIdentifier sm2DataOidPub = (ASN1ObjectIdentifier) pubSeq.getObjectAt(0);
-                Asn1OctetString pubKeyX509 = (Asn1OctetString)pubSeq[1];
-                X509Certificate x509 = (X509Certificate)new X509CertificateParser().ReadCertificate(pubKeyX509.GetOctets());
-                sm2Cert.PublicKey = x509.GetPublicKey();
-                sm2Cert.CertId = x509.SerialNumber.ToString(10); //这里转10进账，有啥其他进制要求的自己改改
-                return sm2Cert;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private static byte[] KDF(byte[] Z, int klen)
-        {
-            int ct = 1;
-            int end = (int)Math.Ceiling(klen * 1.0 / 32);
-            List<byte> byteSource = new List<byte>();
-            try
-            {
-                for (int i = 1; i < end; i++)
-                {
-                    byteSource.AddRange(Sm3(Join(Z, ToByteArray(ct))));
-                    ct++;
-                }
-                byte[] last = Sm3(Join(Z, ToByteArray(ct)));
-                if (klen % 32 == 0)
-                {
-                    byteSource.AddRange(last);
-                }
-                else
-                    byteSource.AddRange(Arrays.CopyOfRange(last, 0, klen % 32));
-                return byteSource.ToArray();
-            }
-            catch
-            {
-            }
-            return null;
-        }
-
-        private static byte[] ToByteArray(int i)
-        {
-            byte[] byteArray = new byte[4];
-            byteArray[0] = (byte)(i >> 24);
-            byteArray[1] = (byte)((i & 0xFFFFFF) >> 16);
-            byteArray[2] = (byte)((i & 0xFFFF) >> 8);
-            byteArray[3] = (byte)(i & 0xFF);
-            return byteArray;
-        }
-
-        private static byte[] Join(params byte[][] byteArrays)
-        {
-            List<byte> byteSource = new List<byte>();
-            for (int i = 0; i < byteArrays.Length; i++)
-            {
-                byteSource.AddRange(byteArrays[i]);
-            }
-            byte[] data = byteSource.ToArray();
-            return data;
-        }
-
-        public static byte[] Sm4DecryptCBC(byte[] keyBytes, byte[] cipher, byte[] iv, string algo)
-        {
-            if (keyBytes.Length != 16) throw new ArgumentException("err key length");
-            if (cipher.Length % 16 != 0) throw new ArgumentException("err data length");
-
-            try
-            {
-                KeyParameter key = ParameterUtilities.CreateKeyParameter("SM4", keyBytes);
-                IBufferedCipher c = CipherUtilities.GetCipher(algo);
-                if (iv == null) iv = ZeroIv(algo);
-                c.Init(false, new ParametersWithIV(key, iv));
-                return c.DoFinal(cipher);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public static byte[] ZeroIv(string algo)
-        {
-            try
-            {
-                IBufferedCipher cipher = CipherUtilities.GetCipher(algo);
-                int blockSize = cipher.GetBlockSize();
-                byte[] iv = new byte[blockSize];
-                Arrays.Fill(iv, (byte)0);
-                return iv;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public static byte[] Sm3(byte[] bytes)
-        {
-            try
-            {
-                SM3Digest digest = new SM3Digest();
-                digest.BlockUpdate(bytes, 0, bytes.Length);
-                byte[] result = DigestUtilities.DoFinal(digest);
-                return result;
-            }
-            catch
-            {
-                return null;
-            }
-        } 
-        #endregion
-
         private static byte[] ConvertC1C3C2ToAsn1(byte[] c1c3c2)
         {
             byte[] c1 = Arrays.CopyOfRange(c1c3c2, 0, SM2_C1_LENGTH);
@@ -279,28 +129,6 @@ namespace AGooday.AgPay.Common.Utils
             byte[] c1 = c1Point.GetEncoded(false);
 
             return Arrays.ConcatenateAll(c1, c3, c2);
-        }
-
-        private static byte[] ChangeC1C2C3ToC1C3C2(byte[] c1c2c3)
-        {
-            int c1Len = (SM2_ECX9_PARAMS.Curve.FieldSize + 7) / 8 * 2 + 1; //sm2p256v1的这个固定65。可看GMNamedCurves、ECCurve代码。
-            const int c3Len = 32; //new SM3Digest().getDigestSize();
-            byte[] result = new byte[c1c2c3.Length];
-            Buffer.BlockCopy(c1c2c3, 0, result, 0, c1Len); //c1
-            Buffer.BlockCopy(c1c2c3, c1c2c3.Length - c3Len, result, c1Len, c3Len); //c3
-            Buffer.BlockCopy(c1c2c3, c1Len, result, c1Len + c3Len, c1c2c3.Length - c1Len - c3Len); //c2
-            return result;
-        }
-
-        private static byte[] ChangeC1C3C2ToC1C2C3(byte[] c1c3c2)
-        {
-            int c1Len = (SM2_ECX9_PARAMS.Curve.FieldSize + 7) / 8 * 2 + 1; //sm2p256v1的这个固定65。可看GMNamedCurves、ECCurve代码。
-            const int c3Len = 32; //new SM3Digest().GetDigestSize();
-            byte[] result = new byte[c1c3c2.Length];
-            Buffer.BlockCopy(c1c3c2, 0, result, 0, c1Len); //c1: 0->65
-            Buffer.BlockCopy(c1c3c2, c1Len + c3Len, result, c1Len, c1c3c2.Length - c1Len - c3Len); //c2
-            Buffer.BlockCopy(c1c3c2, c1Len, result, c1c3c2.Length - c3Len, c3Len); //c3
-            return result;
         }
 
         private static byte[] ConvertRsToAsn1(byte[] rs)
@@ -386,12 +214,7 @@ namespace AGooday.AgPay.Common.Utils
             return signer.VerifySignature(signBytes);
         }
 
-        public static byte[] Decrypt(ECPrivateKeyParameters sm2PrivateKeyParams, byte[] cipherBytes, bool asn1Encoding)
-        {
-            return DecryptOld(sm2PrivateKeyParams, ChangeC1C3C2ToC1C2C3(cipherBytes), asn1Encoding);
-        }
-
-        private static byte[] DecryptOld(ECPrivateKeyParameters sm2PrivateKeyParams, byte[] cipherBytes, bool asn1Encoding)
+        private static byte[] Decrypt(ECPrivateKeyParameters sm2PrivateKeyParams, byte[] cipherBytes, bool asn1Encoding)
         {
             //// BouncyCastle 库的加密结果默认非 ASN.1 编码，如有需要需要手动转换
             //if (asn1Encoding)
@@ -408,21 +231,14 @@ namespace AGooday.AgPay.Common.Utils
             //    cipherBytes = tmp;
             //}
 
-            //SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
-            SM2Engine sm2Engine = new SM2Engine();
+            SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
             sm2Engine.Init(false, sm2PrivateKeyParams);
             return sm2Engine.ProcessBlock(cipherBytes, 0, cipherBytes.Length);
         }
 
-        public static byte[] Encrypt(ECPublicKeyParameters sm2PublicKeyParams, byte[] plainBytes, bool asn1Encoding)
+        private static byte[] Encrypt(ECPublicKeyParameters sm2PublicKeyParams, byte[] plainBytes, bool asn1Encoding)
         {
-            return ChangeC1C2C3ToC1C3C2(EncryptOld(sm2PublicKeyParams, plainBytes, asn1Encoding));
-        }
-
-        private static byte[] EncryptOld(ECPublicKeyParameters sm2PublicKeyParams, byte[] plainBytes, bool asn1Encoding)
-        {
-            //SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
-            SM2Engine sm2Engine = new SM2Engine();
+            SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
             sm2Engine.Init(true, new ParametersWithRandom(sm2PublicKeyParams, new SecureRandom()));
             byte[] cipherBytes = sm2Engine.ProcessBlock(plainBytes, 0, plainBytes.Length);
 
