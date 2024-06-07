@@ -55,5 +55,29 @@
             Enum.TryParse(tradeStatus, out TradeStatus _tradeStatus);
             return _tradeStatus;
         }
+
+        /// <summary>
+        /// 退款交易状态
+        /// </summary>
+        public enum RefundState {
+            /// <summary>
+            /// 成功
+            /// </summary>
+            success,
+            /// <summary>
+            /// 处理中
+            /// </summary>
+            in_process,
+            /// <summary>
+            /// 失败
+            /// </summary>
+            fail,
+        }
+
+        public static RefundState ConvertRefundState(string refundState)
+        {
+            Enum.TryParse(refundState, out RefundState _refundState);
+            return _refundState;
+        }
     }
 }

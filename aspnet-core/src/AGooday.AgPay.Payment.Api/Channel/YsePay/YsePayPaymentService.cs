@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
 
         public override string GetIfCode()
         {
-            return CS.IF_CODE.DGPAY;
+            return CS.IF_CODE.YSEPAY;
         }
 
         public override bool IsSupport(string wayCode)
@@ -55,9 +55,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("https://qrcode.ysepay.com/gateway.do", "ysepay.online.barcodepay", reqParams, notifyUrl, logPrefix, mchAppConfigContext);
+            string method = "ysepay.online.barcodepay", repMethod = "ysepay_online_barcodepay_response";
+            JObject resJSON = PackageParamAndReq(YsePayConfig.QRCODE_GATEWAY, method, repMethod, reqParams, notifyUrl, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
-            var data = resJSON.GetValue("ysepay_online_barcodepay_response")?.ToObject<JObject>();
+            var data = resJSON.GetValue(repMethod)?.ToObject<JObject>();
             string code = data?.GetValue("code").ToString();
             string msg = data?.GetValue("msg").ToString();
             string subCode = data?.GetValue("sub_code").ToString();
@@ -67,9 +68,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
             {
                 if ("10000".Equals(code))
                 {
-                    data.TryGetString("trade_no", out string tradeNo);//全局流水号
-                    data.TryGetString("channel_recv_sn", out string channelRecvSn);//用户账单上的交易订单号	
-                    data.TryGetString("channel_send_sn", out string channelSendSn);//用户账单上的商户订单号	
+                    data.TryGetString("trade_no", out string tradeNo);//银盛支付交易流水号
+                    data.TryGetString("channel_recv_sn", out string channelRecvSn);//渠道返回流水号	
+                    data.TryGetString("channel_send_sn", out string channelSendSn);//发往渠道流水号
                     /*买家用户号
                     支付宝渠道：买家支付宝用户号buyer_user_id
                     微信渠道：微信平台的sub_openid*/
@@ -103,10 +104,16 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
                             break;
                     }
                 }
-                else
+                else if ("50000".Equals(code) || "3501".Equals(code))
                 {
                     channelRetMsg.ChannelState = ChannelState.WAITING;
                     channelRetMsg.IsNeedQuery = true; // 开启轮询查单
+                }
+                else
+                {
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    channelRetMsg.ChannelErrCode = subCode ?? code;
+                    channelRetMsg.ChannelErrMsg = subMsg ?? msg;
                 }
             }
             catch (Exception)
@@ -127,10 +134,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, string method, SortedDictionary<string, string> reqData, string notifyUrl, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public JObject PackageParamAndReq(string apiUri, string method, string repMethod, SortedDictionary<string, string> reqData, string notifyUrl, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             // 签名
-            string partnerId, businessCode, sm2FilePath, sm2PassWord, certFilePath;
+            string partnerId, businessCode, privateKeyFilePath, privateKeyPassword, publicKeyFilePath;
             if (mchAppConfigContext.IsIsvSubMch())
             {
                 YsePayIsvParams isvParams = (YsePayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
@@ -142,9 +149,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
                 }
                 partnerId = isvParams.PartnerId;
                 businessCode = isvParams.BusinessCode;
-                sm2FilePath = ChannelCertConfigKit.GetCertFilePath(isvParams.SM2Private);
-                sm2PassWord = isvParams.SM2PrivatePassWord;
-                certFilePath = ChannelCertConfigKit.GetCertFilePath(isvParams.YsePayPublicCert);
+                privateKeyFilePath = ChannelCertConfigKit.GetCertFilePath(isvParams.PrivateKeyFile);
+                privateKeyPassword = isvParams.PrivateKeyPassword;
+                publicKeyFilePath = ChannelCertConfigKit.GetCertFilePath(isvParams.PublicKeyFile);
             }
             else
             {
@@ -168,8 +175,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
             }
             reqParams.Add("biz_content", JsonConvert.SerializeObject(reqData, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.None })); //业务请求参数，具体值参考API文档
 
-            var sign = YseSignUtil.Sign(reqParams, sm2FilePath, sm2PassWord, certFilePath); //SM 签名字符串
-            reqParams.Add("sign", sign); //加签结果
+            var sign = YseSignUtil.Sign(reqParams, privateKeyFilePath, privateKeyPassword); //SM 签名字符串
+            reqParams.Add("sign", HttpUtility.UrlEncode(sign)); //加签结果
             reqData.TryGetValue("biz_content", out string bizContent);
             reqData["biz_content"] = HttpUtility.UrlEncode(bizContent);
 
@@ -190,7 +197,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
 
             // 验签
             var resParams = JObject.Parse(resText);
-            if (!YseSignUtil.Verify(resParams, certFilePath))
+            if (!YseSignUtil.Verify(resParams, publicKeyFilePath, repMethod))
             {
                 log.Warn($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }

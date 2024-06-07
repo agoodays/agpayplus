@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
 
         public override string GetIfCode()
         {
-            return CS.IF_CODE.SXFPAY;
+            return CS.IF_CODE.DGPAY;
         }
 
         public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)

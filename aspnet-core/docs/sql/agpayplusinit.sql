@@ -2054,6 +2054,14 @@ VALUES ('lklpay', '拉卡拉支付', 0, 1, 1,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_LITE"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_LITE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
         'http://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/lklpay.svg', '#00AFEC', 1, '拉卡拉开放平台');
 
+INSERT INTO `t_pay_interface_define` (`if_code`, `if_name`, `is_mch_mode`, `is_isv_mode`, `config_page_type`, `isv_params`, `isvsub_mch_params`, `normal_mch_params`, `way_codes`, `icon`, `bg_color`, `state`, `remark`)
+VALUES ('ysepay', '银盛支付', 0, 1, 1,
+        '[{"name":"partnerId","desc":"服务商号","type":"text","verify":"required"},{"name":"businessCode","desc":"业务代码","type":"text","verify":"required"},{"name":"privateKeyPassword","desc":"私钥证书密码","type":"text","verify":"required"},{"name":"privateKeyFile","desc":"私钥证书（.pfx/.sm2）","type":"file","verify":"required"},{"name":"publicKeyFile","desc":"银盛公钥证书（.cer）","type":"file","verify":"required"},{"name":"channelNoWx","desc":"微信渠道号","type":"text","verify":""},{"name":"channelNoAli","desc":"支付宝渠道号","type":"text","verify":""}]',
+        '[{"name":"sellerId","desc":"收款商户号","type":"text","verify":"required"},{"name":"sellerName","desc":"收款商户名称","type":"text","verify":""}]',
+        NULL,
+        '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
+        'http://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/yspay.svg', '#004DA0', 1, '银盛支付');
+
 -- 初始化设备供应商接口定义
 INSERT INTO `t_device_provider_define` (`provider_code`, `provider_name`, `config_page_type`, `provider_params`, `device_types`, `icon`, `bg_color`, `state`, `remark`)
 VALUES ('zgwl', '智谷联', 1,

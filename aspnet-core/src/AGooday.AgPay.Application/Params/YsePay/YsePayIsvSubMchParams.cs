@@ -14,5 +14,9 @@
         /// 收款商户号对应商户名称
         /// </summary>
         public string SellerName { get; set; }
+
+        public string SubMchAppId { get; set; }
+
+        public string SubMchLiteAppId { get; set; }
     }
 }

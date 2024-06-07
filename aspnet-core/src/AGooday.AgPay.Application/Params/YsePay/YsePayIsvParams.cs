@@ -19,24 +19,19 @@ namespace AGooday.AgPay.Application.Params.YsePay
         public string BusinessCode { get; set; }
 
         /// <summary>
-        /// SM2算法（国密）私钥（.sm2格式）
+        /// 私钥密码
         /// </summary>
-        public string SM2Private { get; set; }
+        public string PrivateKeyPassword { get; set; }
 
         /// <summary>
-        /// SM2算法（国密）私钥密码
+        /// 私钥证书（.pfx/.sm2）
         /// </summary>
-        public string SM2PrivatePassWord { get; set; }
-
-        /// <summary>
-        /// SM2算法（国密）公钥证书（.cer格式）
-        /// </summary>
-        public string SM2PublicCert { get; set; }
+        public string PrivateKeyFile { get; set; }
 
         /// <summary>
         /// 银盛公钥证书（.cer格式）
         /// </summary>
-        public string YsePayPublicCert { get; set; }
+        public string PublicKeyFile { get; set; }
 
         /// <summary>
         /// 微信渠道号[服务商通过海科在(微信)申请的渠道编号]
@@ -50,9 +45,9 @@ namespace AGooday.AgPay.Application.Params.YsePay
 
         public override string DeSenData()
         {
-            if (!string.IsNullOrWhiteSpace(SM2PrivatePassWord))
+            if (!string.IsNullOrWhiteSpace(PrivateKeyPassword))
             {
-                SM2PrivatePassWord = SM2PrivatePassWord.Mask();
+                PrivateKeyPassword = PrivateKeyPassword.Mask();
             }
             return JsonConvert.SerializeObject(this);
         }
