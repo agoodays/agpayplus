@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Params.YsePay;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using Newtonsoft.Json.Linq;
@@ -56,8 +57,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
                 var data = resJSON.GetValue(repMethod)?.ToObject<JObject>();
                 string code = data?.GetValue("code").ToString();
                 string msg = data?.GetValue("msg").ToString();
-                string subCode = data?.GetValue("sub_code").ToString();
-                string subMsg = data?.GetValue("sub_msg").ToString();
+                data.TryGetString("sub_code", out string subCode);
+                data.TryGetString("sub_msg", out string subMsg);
                 if (!"10000".Equals(code))
                 {
                     return ChannelRetMsg.ConfirmSuccess(null);  //关单成功

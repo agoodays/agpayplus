@@ -42,7 +42,21 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
             //银盛扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
-            reqParams.Add("buyer_id", bizRQ.BuyerUserId);//支付宝扩展参数集合
+            reqParams.Add("buyer_id", bizRQ.BuyerUserId);//支付宝扩展参数集合if (mchAppConfigContext.IsIsvSubMch())
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                YsePayIsvParams isvParams = (YsePayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+
+                if (isvParams.PartnerId == null)
+                {
+                    throw new BizException("服务商配置为空。");
+                }
+                reqParams.Add("business_code", isvParams.BusinessCode);
+            }
+            else
+            {
+                throw new BizException("不支持普通商户配置");
+            }
 
             // 发送请求
             string method = "ysepay.online.alijsapi.pay", repMethod = "ysepay_online_alijsapi_pay_response";
@@ -51,8 +65,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
             var data = resJSON.GetValue(repMethod)?.ToObject<JObject>();
             string code = data?.GetValue("code").ToString();
             string msg = data?.GetValue("msg").ToString();
-            string subCode = data?.GetValue("sub_code").ToString();
-            string subMsg = data?.GetValue("sub_msg").ToString();
+            data.TryGetString("sub_code", out string subCode);
+            data.TryGetString("sub_msg", out string subMsg);
             channelRetMsg.ChannelMchNo = string.Empty;
             try
             {

@@ -36,11 +36,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
 
             try
             {
-                reqParams.Add("org_req_date", payOrder.CreatedAt.Value.ToString("yyyyMMdd")); //订单号
-                reqParams.Add("org_req_seq_id", payOrder.PayOrderId); //订单号
+                reqParams.Add("shopdate", payOrder.CreatedAt.Value.ToString("yyyyMMdd")); //订单号
+                reqParams.Add("out_trade_no", payOrder.PayOrderId); //订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                string method = "ysepay.online.barcodepay", repMethod = "ysepay_online_barcodepay_response";
+                string method = "ysepay.online.trade.order.query", repMethod = "ysepay_online_trade_order_query_response";
                 JObject resJSON = ysePayPaymentService.PackageParamAndReq(YsePayConfig.SEARCH_GATEWAY, method, repMethod, reqParams, string.Empty, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
@@ -52,14 +52,16 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
                 var data = resJSON.GetValue(repMethod)?.ToObject<JObject>();
                 string code = data?.GetValue("code").ToString();
                 string msg = data?.GetValue("msg").ToString();
-                string subCode = data?.GetValue("sub_code").ToString();
-                string subMsg = data?.GetValue("sub_msg").ToString();
+                data.TryGetString("sub_code", out string subCode);
+                data.TryGetString("sub_msg", out string subMsg);
                 channelRetMsg.ChannelMchNo = string.Empty;
                 if ("10000".Equals(code))
                 {
                     data.TryGetString("trade_no", out string tradeNo);//银盛支付交易流水号
-                    data.TryGetString("channel_recv_sn", out string channelRecvSn);//渠道返回流水号	
-                    data.TryGetString("channel_send_sn", out string channelSendSn);//发往渠道流水号
+                    data.TryGetValue("pay_detail_list", out JToken payDetailList);
+                    var payDetail = payDetailList?.ToArray()?.FirstOrDefault()?.ToObject<JObject>();
+                    payDetail.TryGetString("channel_recv_sn", out string channelRecvSn);//渠道返回流水号	
+                    payDetail.TryGetString("channel_send_sn", out string channelSendSn);//发往渠道流水号
                     /*买家用户号
                     支付宝渠道：买家支付宝用户号buyer_user_id
                     微信渠道：微信平台的sub_openid*/

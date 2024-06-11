@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("{bizType}")]
-        public async Task<ApiRes> SingleFileUploadAsync([FromForm] IFormFile file, string bizType)
+        public async Task<ApiRes> SingleFileUploadAsync(IFormFile file, string bizType)
         {
             if (file == null)
             {

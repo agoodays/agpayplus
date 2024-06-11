@@ -171,7 +171,7 @@ namespace AGooday.AgPay.Common.Utils
                 return null;
             }
 
-            originJSON.Merge(mergeJSON);
+            originJSON.Merge(mergeJSON, new JsonMergeSettings() { MergeArrayHandling = MergeArrayHandling.Replace });
             //return originJSON.ToString();
             return JsonConvert.SerializeObject(originJSON, Formatting.None);//压缩Json
         }

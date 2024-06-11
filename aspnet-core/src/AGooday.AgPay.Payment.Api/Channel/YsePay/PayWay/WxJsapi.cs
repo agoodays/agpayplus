@@ -48,6 +48,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
             payType == "WECHAT"或"ALIPAY"时必传*/
             reqParams.Add("appid", ysePayIsvParams.SubMchAppId);
             reqParams.Add("sub_openid", bizRQ.SubAppId);
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                YsePayIsvParams isvParams = (YsePayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+
+                if (isvParams.PartnerId == null)
+                {
+                    throw new BizException("服务商配置为空。");
+                }
+                reqParams.Add("business_code", isvParams.BusinessCode);
+            }
+            else
+            {
+                throw new BizException("不支持普通商户配置");
+            }
 
             // 发送请求
             string method = "ysepay.online.weixin.pay", repMethod = "ysepay_online_weixin_pay_response";
@@ -56,8 +70,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
             var data = resJSON.GetValue(repMethod)?.ToObject<JObject>();
             string code = data?.GetValue("code").ToString();
             string msg = data?.GetValue("msg").ToString();
-            string subCode = data?.GetValue("sub_code").ToString();
-            string subMsg = data?.GetValue("sub_msg").ToString();
+            data.TryGetString("sub_code", out string subCode);
+            data.TryGetString("sub_msg", out string subMsg);
             channelRetMsg.ChannelMchNo = string.Empty;
             try
             {

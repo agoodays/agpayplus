@@ -54,6 +54,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
         public ChannelRetMsg YseBar(SortedDictionary<string, string> reqParams, string notifyUrl, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                YsePayIsvParams isvParams = (YsePayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+
+                if (isvParams.PartnerId == null)
+                {
+                    throw new BizException("服务商配置为空。");
+                }
+                reqParams.Add("business_code", isvParams.BusinessCode);
+            }
+            else
+            {
+                throw new BizException("不支持普通商户配置");
+            }
             // 发送请求
             string method = "ysepay.online.barcodepay", repMethod = "ysepay_online_barcodepay_response";
             JObject resJSON = PackageParamAndReq(YsePayConfig.QRCODE_GATEWAY, method, repMethod, reqParams, notifyUrl, logPrefix, mchAppConfigContext);
@@ -61,8 +75,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
             var data = resJSON.GetValue(repMethod)?.ToObject<JObject>();
             string code = data?.GetValue("code").ToString();
             string msg = data?.GetValue("msg").ToString();
-            string subCode = data?.GetValue("sub_code").ToString();
-            string subMsg = data?.GetValue("sub_msg").ToString();
+            data.TryGetString("sub_code", out string subCode);
+            data.TryGetString("sub_msg", out string subMsg);
             channelRetMsg.ChannelMchNo = string.Empty;
             try
             {
@@ -161,6 +175,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
             YsePayIsvSubMchParams isvsubMchParams = (YsePayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             reqData.Add("seller_id", isvsubMchParams.SellerId);
             reqData.Add("seller_name", isvsubMchParams.SellerName);
+            //reqData.Add("business_code", businessCode);
 
             var reqParams = new SortedDictionary<string, string>();
             reqParams.Add("partner_id", partnerId);
@@ -238,9 +253,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
         {
             reqParams.Add("shopdate", payOrder.CreatedAt.Value.ToString("yyyyMMdd")); // 请求格式：yyyyMMdd；示例值：20220905
             reqParams.Add("out_trade_no", payOrder.PayOrderId); //商户订单号（字母、数字、下划线）需保证在合作方系统中不重复
-            reqParams.Add("amount", AmountUtil.ConvertCent2Dollar(payOrder.Amount)); //订单总金额(元)，格式：#########.##
+            reqParams.Add("total_amount", AmountUtil.ConvertCent2Dollar(payOrder.Amount)); //订单总金额(元)，格式：#########.##
             reqParams.Add("subject", payOrder.Subject); //订单标题
-            reqParams.Add("time_expire", $"{(payOrder.ExpiredTime.Value - payOrder.CreatedAt.Value).TotalMinutes}m"); //订单标题
+            reqParams.Add("timeout_express", $"{(payOrder.ExpiredTime.Value - payOrder.CreatedAt.Value).TotalMinutes}m"); //订单标题
         }
     }
 }

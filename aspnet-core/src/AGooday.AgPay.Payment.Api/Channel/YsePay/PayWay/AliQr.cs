@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.YsePay;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.YsePay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
@@ -38,6 +39,20 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
 
             // 请求参数赋值
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                YsePayIsvParams isvParams = (YsePayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+
+                if (isvParams.PartnerId == null)
+                {
+                    throw new BizException("服务商配置为空。");
+                }
+                reqParams.Add("business_code", isvParams.BusinessCode);
+            }
+            else
+            {
+                throw new BizException("不支持普通商户配置");
+            }
 
             // 发送请求
             string method = "ysepay.online.qrcodepay", repMethod = "ysepay_online_qrcodepay_response";
@@ -46,8 +61,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
             var data = resJSON.GetValue(repMethod)?.ToObject<JObject>();
             string code = data?.GetValue("code").ToString();
             string msg = data?.GetValue("msg").ToString();
-            string subCode = data?.GetValue("sub_code").ToString();
-            string subMsg = data?.GetValue("sub_msg").ToString();
+            data.TryGetString("sub_code", out string subCode);
+            data.TryGetString("sub_msg", out string subMsg);
             channelRetMsg.ChannelMchNo = string.Empty;
             try
             {
