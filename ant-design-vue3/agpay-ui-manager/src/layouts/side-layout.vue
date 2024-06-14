@@ -63,11 +63,13 @@
     </a-layout>
   </a-layout>
 </template>
+
 <script setup>
 import { ref } from 'vue';
 const selectedKeys = ref(['1']);
 const collapsed = ref(false);
 </script>
+
 <style lang="less" scoped>
 .ag-layout{
   .ag-layout-side{

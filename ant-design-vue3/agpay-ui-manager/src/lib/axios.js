@@ -11,11 +11,9 @@ import { useUserStore } from '/@/store/modules/system/user';
 import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const';
 import _ from 'lodash';
 
-const userStore = useUserStore();
-
 // 退出系统
 function logout() {
-  userStore.logout();
+  useUserStore().logout();
   location.reload(); // 退出时 重置缓存
 }
 
@@ -27,7 +25,7 @@ class AgAxios {
   // 基础配置信息
   baseConfig () {
     const headers = {};
-    const token = userStore.getToken;
+    const token = useUserStore().getToken;
     headers[ACCESS_TOKEN_NAME] = `Bearer ${token}`;
     return {
       baseURL: this.baseUrl,

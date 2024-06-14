@@ -4,7 +4,7 @@ import * as antIcons from '@ant-design/icons-vue';
 import './theme/index.less'
 import App from './App.vue'
 import { router } from '/@/router';
-import { store } from '/@/store'
+import { store } from '/@/store';
 import('./theme/style-blue.less');
 // import { basicApi } from '/@/api/system/basic-api';
 // import { localSave } from '/@/utils/local-util';
