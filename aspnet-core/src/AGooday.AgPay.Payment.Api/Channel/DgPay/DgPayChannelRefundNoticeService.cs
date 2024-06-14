@@ -111,6 +111,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                             break;
                     }
                 }
+                else if ("90000000".Equals(respCode))
+                {
+                    string bankCode = data?.GetValue("bank_code").ToString(); //外部通道返回码
+                    string bankMessage = data?.GetValue("bank_message").ToString(); //外部通道返回描述
+                    result.ChannelState = ChannelState.CONFIRM_FAIL;
+                    result.ChannelErrCode = bankCode ?? respCode;
+                    result.ChannelErrMsg = bankMessage ?? respDesc;
+                }
                 else
                 {
                     result.ChannelState = ChannelState.CONFIRM_FAIL;
