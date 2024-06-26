@@ -2061,6 +2061,15 @@ VALUES ('ysepay', '银盛支付', 0, 1, 1,
         NULL,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
         'http://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/yspay.svg', '#004DA0', 1, '银盛支付');
+        
+
+INSERT INTO `t_pay_interface_define` (`if_code`, `if_name`, `is_mch_mode`, `is_isv_mode`, `config_page_type`, `isv_params`, `isvsub_mch_params`, `normal_mch_params`, `way_codes`, `icon`, `bg_color`, `state`, `remark`)
+VALUES ('allinpay', '通联支付', 1, 1, 1,
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"signType","desc":"签名类型","type":"radio","verify":"required","values":"RSA,SM2","titles":"RSA,SM2"},{"name":"orgid","desc":"代理商ID","type":"text","verify":"required"},{"name":"appId","desc":"appId","type":"text","verify":"required"},{"name":"expandUser","desc":"拓展人（商户进件）","type":"text","verify":""},{"name":"privateKey","desc":"应用私钥","type":"textarea","verify":"required","star":"1"},{"name":"publicKey","desc":"通联公钥","type":"textarea","verify":"required","star":"1"}]',
+        '[{"name":"cusid","desc":"商户号","type":"text","verify":"required"}]',
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"signType","desc":"签名类型","type":"radio","verify":"required","values":"RSA,SM2","titles":"RSA,SM2"},{"name":"cusid","desc":"商户ID","type":"text","verify":"required"},{"name":"appId","desc":"appId","type":"text","verify":"required"},{"name":"privateKey","desc":"应用私钥","type":"textarea","verify":"required","star":"1"},{"name":"publicKey","desc":"通联公钥","type":"textarea","verify":"required","star":"1"}]',
+        '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
+        'http://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/allinpay.svg', '#1A1C33', 1, '通联支付');
 
 -- 初始化设备供应商接口定义
 INSERT INTO `t_device_provider_define` (`provider_code`, `provider_name`, `config_page_type`, `provider_params`, `device_types`, `icon`, `bg_color`, `state`, `remark`)

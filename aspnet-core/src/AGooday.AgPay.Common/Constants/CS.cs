@@ -583,6 +583,10 @@
             /// 银盛支付
             /// </summary>
             public const string YSEPAY = "ysepay";   // 银盛支付
+            /// <summary>
+            /// 通联支付
+            /// </summary>
+            public const string ALLINPAY = "allinpay";   // 通联支付
         }
 
         /// <summary>
