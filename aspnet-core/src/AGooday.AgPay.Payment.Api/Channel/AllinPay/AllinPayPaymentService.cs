@@ -1,9 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params;
 using AGooday.AgPay.Application.Params.AllinPay;
 using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.AllinPay.Enumerator;
@@ -14,7 +12,6 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using Aop.Api.Domain;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -75,7 +72,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay
                     支付宝渠道：买家支付宝用户号buyer_user_id
                     微信渠道：微信平台的sub_openid*/
                     resJSON.TryGetString("acct", out string acct);
-                    var orderStatus = AllinPayEnum.ConvertOrderStatus(trxstatus);
                     switch (trxstatus)
                     {
                         case "0000":
@@ -87,7 +83,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay
                             break;
                         case "2008":
                         case "2000":
-                            //case "3088":
+                        //case "3088":
                             channelRetMsg.ChannelState = ChannelState.WAITING;
                             channelRetMsg.IsNeedQuery = true; // 开启轮询查单;
                             break;
