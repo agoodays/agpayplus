@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl(), mchAppConfigContext);
 
             //微信JSAPI、微信小程序、支付宝JSAPI、支付宝小程序、银联JSAPI支付必填
-            reqParams.Add("sub_openid", bizRQ.BuyerUserId);
+            reqParams.Add("sub_openid", bizRQ.GetChannelUserId());
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[buyerUserId]不可为空");
             }

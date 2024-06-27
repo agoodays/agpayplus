@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
             // 业务处理
             JObject reqParams = new JObject();
             // 支付宝用户标识或者云闪付用户标识 支付宝必传，云闪付userId和code必传其一
-            reqParams.Add("userId", bizRQ.BuyerUserId);
+            reqParams.Add("userId", bizRQ.GetChannelUserId());
             // 请求参数赋值
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 

@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
             //银盛扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
-            reqParams.Add("buyer_id", bizRQ.BuyerUserId);//支付宝扩展参数集合if (mchAppConfigContext.IsIsvSubMch())
+            reqParams.Add("buyer_id", bizRQ.GetChannelUserId());//支付宝扩展参数集合if (mchAppConfigContext.IsIsvSubMch())
             if (mchAppConfigContext.IsIsvSubMch())
             {
                 YsePayIsvParams isvParams = (YsePayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[buyerUserId]不可为空");
             }

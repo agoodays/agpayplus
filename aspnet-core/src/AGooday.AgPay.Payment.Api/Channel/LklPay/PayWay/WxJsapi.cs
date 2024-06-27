@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay.PayWay
             //拉卡拉扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
-            accBusiFields.Add("user_id", bizRQ.Openid);
+            accBusiFields.Add("user_id", bizRQ.GetChannelUserId());
 
             //// 获取微信官方配置的 appId
             //LklPayIsvSubMchParams lklpayIsvParams = (LklPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
@@ -105,7 +105,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.Openid))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[openId]不可为空");
             }

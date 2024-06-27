@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay.PayWay
             //通联扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
-            reqParams.Add("acct", bizRQ.BuyerUserId);
+            reqParams.Add("acct", bizRQ.GetChannelUserId());
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/apiweb/unitorder/pay", reqParams, logPrefix, mchAppConfigContext);
@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[buyerUserId]不可为空");
             }

@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
             //用户子标识 微信必传，需要商户自行调用微信平台接口获取，具体获取方式 请根据微信接口文档
-            reqParams.Add("subOpenId", bizRQ.Openid);//用户ID
+            reqParams.Add("subOpenId", bizRQ.GetChannelUserId());//用户ID
 
             // 获取微信官方配置的 appId
             UmsPayIsvSubMchParams umspayIsvParams = (UmsPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());

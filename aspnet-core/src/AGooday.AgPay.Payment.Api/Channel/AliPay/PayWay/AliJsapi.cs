@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
             model.Body = payOrder.Body; //订单描述信息
             model.TotalAmount = AmountUtil.ConvertCent2Dollar(payOrder.Amount);  //支付金额
             model.TimeExpire = payOrder.ExpiredTime?.ToString("yyyy-MM-dd HH:mm:ss");
-            model.BuyerId = bizRQ.BuyerUserId;
+            model.BuyerId = bizRQ.GetChannelUserId();
             model.ProductCode = "JSAPI_PAY";
             req.SetNotifyUrl(GetNotifyUrl()); // 设置异步通知地址
             req.SetBizModel(model);
@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[buyerUserId]不可为空");
             }

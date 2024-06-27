@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay.PayWay
             //通联扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
-            reqParams.Add("acct", bizRQ.Openid);
+            reqParams.Add("acct", bizRQ.GetChannelUserId());
 
             // 获取微信官方配置的 appId
             //AllinPayIsvSubMchParams allinpayIsvParams = (AllinPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.Openid))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[openId]不可为空");
             }

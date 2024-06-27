@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl(), mchAppConfigContext);
 
             //微信JSAPI、微信小程序、支付宝JSAPI、支付宝小程序、银联JSAPI支付必填
-            reqParams.Add("sub_openid", bizRQ.Openid);
+            reqParams.Add("sub_openid", bizRQ.GetChannelUserId());
 
             // 获取微信官方配置的 appId
             LesPayIsvSubMchParams lespayIsvParams = (LesPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
@@ -93,7 +93,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.Openid))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[openId]不可为空");
             }

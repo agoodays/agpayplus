@@ -76,18 +76,18 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
 
                 var payer = new CreatePayPartnerTransactionJsapiRequest.Types.Payer()
                 {
-                    SubOpenId = bizRQ.Openid,
-                    OpenId = bizRQ.Openid,
+                    SubOpenId = bizRQ.GetChannelUserId(),
+                    OpenId = bizRQ.GetChannelUserId(),
                 };
                 // 子商户subAppId不为空
                 if (!string.IsNullOrEmpty(isvSubMchParams.SubMchAppId))
                 {
                     request.SubAppId = isvSubMchParams.SubMchAppId;
-                    payer.SubOpenId = bizRQ.Openid;// 用户在子商户appid下的唯一标识
+                    payer.SubOpenId = bizRQ.GetChannelUserId();// 用户在子商户appid下的唯一标识
                 }
                 else
                 {
-                    payer.OpenId = bizRQ.Openid;// 用户在服务商appid下的唯一标识
+                    payer.OpenId = bizRQ.GetChannelUserId();// 用户在服务商appid下的唯一标识
                 }
                 request.Payer = payer;
 
@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                     },
                     Payer = new CreatePayTransactionJsapiRequest.Types.Payer()
                     {
-                        OpenId = bizRQ.Openid
+                        OpenId = bizRQ.GetChannelUserId()
                     }
                 };
 
@@ -150,7 +150,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.Openid))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[openid]不可为空");
             }

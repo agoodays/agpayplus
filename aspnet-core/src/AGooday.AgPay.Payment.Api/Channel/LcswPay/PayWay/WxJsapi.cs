@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl());
 
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
-            reqParams.Add("open_id", bizRQ.Openid);// 用户标识（微信openid，支付宝userid），pay_type为010及020时必填
+            reqParams.Add("open_id", bizRQ.GetChannelUserId());// 用户标识（微信openid，支付宝userid），pay_type为010及020时必填
 
             // 获取微信官方配置的 appId
             LcswPayNormalMchParams lcswParams = (LcswPayNormalMchParams)_configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.Openid))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[openId]不可为空");
             }

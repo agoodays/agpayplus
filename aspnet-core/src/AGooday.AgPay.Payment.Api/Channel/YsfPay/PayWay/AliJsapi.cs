@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 
             AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
             //云闪付扫一扫支付， 需要传入buyerUserId参数
-            reqParams.Add("userId", bizRQ.BuyerUserId);// buyerUserId
+            reqParams.Add("userId", bizRQ.GetChannelUserId());// buyerUserId
 
             //客户端IP
             reqParams.Add("customerIp", !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1");
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[buyerUserId]不可为空");
             }

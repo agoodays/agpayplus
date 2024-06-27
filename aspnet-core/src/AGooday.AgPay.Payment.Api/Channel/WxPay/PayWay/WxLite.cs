@@ -34,11 +34,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
             request.TradeType = "JSAPI";
             if (mchAppConfigContext.IsIsvSubMch() && !String.IsNullOrWhiteSpace(request.SubAppId))// 特约商户 && 传了子商户appId
             {
-                request.SubOpenId = bizRQ.Openid;// 用户在子商户appid下的唯一标识
+                request.SubOpenId = bizRQ.GetChannelUserId();// 用户在子商户appid下的唯一标识
             }
             else
             {
-                request.OpenId = bizRQ.Openid;
+                request.OpenId = bizRQ.GetChannelUserId();
             }
 
             // 构造函数响应数据
@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.Openid))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[openid]不可为空");
             }

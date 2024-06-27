@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
             //斗拱扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
-            var alipayData = JObject.FromObject(new { buyer_id = bizRQ.BuyerUserId });
+            var alipayData = JObject.FromObject(new { buyer_id = bizRQ.GetChannelUserId() });
             reqParams.Add("alipay_data", alipayData.ToString());//支付宝扩展参数集合
             reqParams.Add("trade_type", DgPayEnum.TransType.A_JSAPI.ToString());//交易类型
 
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[buyerUserId]不可为空");
             }

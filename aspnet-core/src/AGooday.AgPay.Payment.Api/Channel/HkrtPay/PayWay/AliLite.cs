@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
             //微信JSAPI、微信小程序、支付宝JSAPI、支付宝小程序、银联JSAPI支付必填
-            reqParams.Add("userid", bizRQ.BuyerUserId);
+            reqParams.Add("userid", bizRQ.GetChannelUserId());
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/api/v1/pay/polymeric/jsapipay", reqParams, logPrefix, mchAppConfigContext);
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[buyerUserId]不可为空");
             }

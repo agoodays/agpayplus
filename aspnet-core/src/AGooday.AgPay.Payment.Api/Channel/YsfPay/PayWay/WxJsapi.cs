@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
 
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
             //云闪付扫一扫支付， 需要传入buyerUserId参数
-            reqParams.Add("userId", bizRQ.Openid);// openId
+            reqParams.Add("userId", bizRQ.GetChannelUserId());// openId
 
             //客户端IP
             reqParams.Add("customerIp", !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1");
@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.Openid))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[openId]不可为空");
             }

@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
             //随行付扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
-            reqParams.Add("userId", bizRQ.BuyerUserId);
+            reqParams.Add("userId", bizRQ.GetChannelUserId());
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/order/jsapiScan", reqParams, logPrefix, mchAppConfigContext);
@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.BuyerUserId))
+            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
                 throw new BizException("[buyerUserId]不可为空");
             }
