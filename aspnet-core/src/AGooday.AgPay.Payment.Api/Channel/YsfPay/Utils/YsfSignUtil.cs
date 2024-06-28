@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Utils;
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
