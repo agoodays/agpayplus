@@ -23,10 +23,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
         /// 支付宝 二维码支付
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public AliQr(IServiceProvider serviceProvider,
+        public AliQr(ILogger<AliQr> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

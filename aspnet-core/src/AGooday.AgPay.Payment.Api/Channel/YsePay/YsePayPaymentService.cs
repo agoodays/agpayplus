@@ -22,12 +22,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
 {
     public class YsePayPaymentService : AbstractPaymentService
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(YsePayPaymentService));
-
-        public YsePayPaymentService(IServiceProvider serviceProvider,
+        public YsePayPaymentService(ILogger<YsePayPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -158,7 +157,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
 
                 if (isvParams.PartnerId == null)
                 {
-                    log.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
                 partnerId = isvParams.PartnerId;
@@ -200,10 +199,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
             string unionId = Guid.NewGuid().ToString("N");
             string reqText = string.Join("&", reqParams.Select(s => $"{s.Key}={s.Value}"));
             var stopwatch = new Stopwatch();
-            log.Info($"{logPrefix} unionId={unionId} url={url} method={method} reqText={JsonConvert.SerializeObject(reqParams)} ");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} reqText={JsonConvert.SerializeObject(reqParams)} ");
             stopwatch.Restart();
             string resText = YseHttpUtil.DoPostFrom(url, reqText);
-            log.Info($"{logPrefix} unionId={unionId} url={url} method={method} resJSON={resText} time={stopwatch.ElapsedMilliseconds}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} resJSON={resText} time={stopwatch.ElapsedMilliseconds}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -214,7 +213,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
             var resParams = JObject.Parse(resText);
             if (!YseSignUtil.Verify(resParams, publicKeyFilePath, repMethod))
             {
-                log.Warn($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
+                _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }
 
             return resParams;

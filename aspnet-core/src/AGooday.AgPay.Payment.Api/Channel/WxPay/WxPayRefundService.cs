@@ -21,15 +21,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     /// </summary>
     public class WxPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<WxPayRefundService> _logger;
-
         public WxPayRefundService(ILogger<WxPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _logger = logger;
         }
 
         public override string GetIfCode()

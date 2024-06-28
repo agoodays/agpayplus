@@ -21,12 +21,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
     /// </summary>
     public class YsfPayPaymentService : AbstractPaymentService
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(YsfPayPaymentService));
-
-        public YsfPayPaymentService(IServiceProvider serviceProvider,
+        public YsfPayPaymentService(ILogger<YsfPayPaymentService> logger,IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -65,7 +63,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 
             if (isvParams.SerProvId == null)
             {
-                log.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -79,9 +77,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
             reqParams.Add("signature", YsfSignUtil.SignBy256(reqParams, isvPrivateCertFile, isvPrivateCertPwd)); //RSA 签名串
 
             // 调起上游接口
-            log.Info($"{logPrefix} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation($"{logPrefix} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = YsfHttpUtil.DoPostJson(GetYsfpayHost4env(isvParams) + apiUri, reqParams);
-            log.Info($"{logPrefix} resJSON={resText}");
+            _logger.LogInformation($"{logPrefix} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

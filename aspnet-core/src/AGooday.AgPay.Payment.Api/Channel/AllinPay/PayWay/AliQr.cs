@@ -20,10 +20,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay.PayWay
     /// </summary>
     public class AliQr : AllinPayPaymentService
     {
-        public AliQr(IServiceProvider serviceProvider,
+        public AliQr(ILogger<AliQr> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

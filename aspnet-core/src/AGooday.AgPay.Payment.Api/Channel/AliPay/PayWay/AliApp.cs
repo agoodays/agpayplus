@@ -21,10 +21,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
     /// </summary>
     public class AliApp : AliPayPaymentService
     {
-        public AliApp(IServiceProvider serviceProvider,
+        public AliApp(ILogger<AliApp> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

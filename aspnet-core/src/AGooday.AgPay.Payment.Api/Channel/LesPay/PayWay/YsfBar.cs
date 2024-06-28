@@ -15,10 +15,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
     /// </summary>
     public class YsfBar : LesPayPaymentService
     {
-        public YsfBar(IServiceProvider serviceProvider,
+        public YsfBar(ILogger<YsfBar> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

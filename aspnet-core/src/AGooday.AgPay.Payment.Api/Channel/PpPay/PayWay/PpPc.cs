@@ -17,10 +17,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.PpPay.PayWay
 {
     public class PpPc : PpPayPaymentService
     {
-        public PpPc(IServiceProvider serviceProvider,
+        public PpPc(ILogger<PpPc> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

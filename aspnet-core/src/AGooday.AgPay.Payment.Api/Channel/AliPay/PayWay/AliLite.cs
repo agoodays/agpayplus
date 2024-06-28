@@ -21,10 +21,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay.PayWay
     /// </summary>
     public class AliLite : AliPayPaymentService
     {
-        public AliLite(IServiceProvider serviceProvider,
+        public AliLite(ILogger<AliLite> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

@@ -15,15 +15,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
     /// </summary>
     public class LklPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<LklPayRefundService> _logger;
         private readonly LklPayPaymentService lklpayPaymentService;
         public LklPayRefundService(ILogger<LklPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _logger = logger;
             this.lklpayPaymentService = ActivatorUtilities.CreateInstance<LklPayPaymentService>(serviceProvider);
         }
 

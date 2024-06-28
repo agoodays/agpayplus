@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
     /// </summary>
     public class YsfJsapi : UmsPayPaymentService
     {
-        public YsfJsapi(IServiceProvider serviceProvider,
+        public YsfJsapi(ILogger<YsfJsapi> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

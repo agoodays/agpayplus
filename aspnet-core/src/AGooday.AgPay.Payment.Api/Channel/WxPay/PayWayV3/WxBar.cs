@@ -14,10 +14,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
     {
         private readonly IPaymentService wxBar;
 
-        public WxBar(IServiceProvider serviceProvider,
+        public WxBar(ILogger<WxBar> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
             this.wxBar = serviceProvider.GetService<PayWay.WxBar>(); //serviceProvider.GetServices<IPaymentService>().FirstOrDefault(f => f.GetType().Equals(typeof(PayWay.WxBar)));
         }

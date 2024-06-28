@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
     /// </summary>
     public class AliQr : HkrtPayPaymentService
     {
-        public AliQr(IServiceProvider serviceProvider,
+        public AliQr(ILogger<AliQr> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

@@ -12,7 +12,6 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -20,12 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay
 {
     public class AllinPayPaymentService : AbstractPaymentService
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(AllinPayPaymentService));
-
-        public AllinPayPaymentService(IServiceProvider serviceProvider,
+        public AllinPayPaymentService(ILogger<AllinPayPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -83,7 +81,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay
                             break;
                         case "2008":
                         case "2000":
-                        //case "3088":
+                            //case "3088":
                             channelRetMsg.ChannelState = ChannelState.WAITING;
                             channelRetMsg.IsNeedQuery = true; // 开启轮询查单;
                             break;
@@ -137,7 +135,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay
 
                 if (isvParams.Orgid == null)
                 {
-                    log.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
 
@@ -176,9 +174,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay
             // 调起上游接口
             string url = GetAllinPayHost4env(sandbox) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            log.Info($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = AllinHttpUtil.DoPostJson(url, reqParams);
-            log.Info($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -189,7 +187,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay
             var resParams = JObject.Parse(resText);
             if (!AllinSignUtil.Verify(resParams, publicKey))
             {
-                log.Warn($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
+                _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }
 
             return resParams;

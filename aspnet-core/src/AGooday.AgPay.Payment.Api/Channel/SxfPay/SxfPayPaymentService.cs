@@ -20,12 +20,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 {
     public class SxfPayPaymentService : AbstractPaymentService
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(SxfPayPaymentService));
-
-        public SxfPayPaymentService(IServiceProvider serviceProvider,
+        public SxfPayPaymentService(ILogger<SxfPayPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -153,7 +152,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
 
             if (isvParams.OrgId == null)
             {
-                log.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -175,9 +174,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             // 调起上游接口
             string url = GetSxfPayHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            log.Info($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = SxfHttpUtil.DoPostJson(url, reqParams);
-            log.Info($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -189,7 +188,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
             string publicKey = isvParams.PublicKey;
             if (!SxfSignUtil.Verify(resParams, publicKey))
             {
-                log.Warn($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
+                _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }
 
             return resParams;

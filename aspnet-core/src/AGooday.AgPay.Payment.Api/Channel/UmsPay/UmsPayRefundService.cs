@@ -15,16 +15,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay
     /// </summary>
     public class UmsPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<UmsPayRefundService> _logger;
         private readonly UmsPayPaymentService umsPayPaymentService;
 
         public UmsPayRefundService(ILogger<UmsPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _logger = logger;
             this.umsPayPaymentService = ActivatorUtilities.CreateInstance<UmsPayPaymentService>(serviceProvider);
         }
 

@@ -16,15 +16,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
     /// </summary>
     public class HkrtPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<HkrtPayRefundService> _logger;
         private readonly HkrtPayPaymentService hkrtPayPaymentService;
         public HkrtPayRefundService(ILogger<HkrtPayRefundService> logger,
             IServiceProvider serviceProvider,
             ConfigContextQueryService configContextQueryService,
             ISysConfigService sysConfigService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _logger = logger;
             this.hkrtPayPaymentService = _serviceProvider.GetRequiredService<HkrtPayPaymentService>();
         }
 

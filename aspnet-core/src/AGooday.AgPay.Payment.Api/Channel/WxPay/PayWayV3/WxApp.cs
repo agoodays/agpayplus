@@ -19,10 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
     /// </summary>
     public class WxApp : WxPayPaymentService
     {
-        public WxApp(IServiceProvider serviceProvider,
+        public WxApp(ILogger<WxApp> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

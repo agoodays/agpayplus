@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay.PayWay
     /// </summary>
     public class AliJsapi : LklPayPaymentService
     {
-        public AliJsapi(IServiceProvider serviceProvider,
+        public AliJsapi(ILogger<AliJsapi> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

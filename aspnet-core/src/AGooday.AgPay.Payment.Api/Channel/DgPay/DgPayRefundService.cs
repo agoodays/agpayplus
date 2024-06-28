@@ -16,15 +16,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
     /// </summary>
     public class DgPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<DgPayRefundService> _logger;
         private readonly DgPayPaymentService dgpayPaymentService;
         public DgPayRefundService(ILogger<DgPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _logger = logger;
             this.dgpayPaymentService = ActivatorUtilities.CreateInstance<DgPayPaymentService>(serviceProvider);
         }
 

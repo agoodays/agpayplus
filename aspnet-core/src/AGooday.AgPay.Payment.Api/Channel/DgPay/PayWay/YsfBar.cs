@@ -16,10 +16,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
     /// </summary>
     public class YsfBar : DgPayPaymentService
     {
-        public YsfBar(IServiceProvider serviceProvider,
+        public YsfBar(ILogger<YsfBar> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

@@ -15,13 +15,15 @@ namespace AGooday.AgPay.Payment.Api.Channel
     /// </summary>
     public abstract class AbstractDivisionRecordChannelNotifyService
     {
+        protected readonly ILogger<AbstractDivisionRecordChannelNotifyService> _logger;
         protected readonly RequestKit _requestKit;
         protected readonly ConfigContextQueryService _configContextQueryService;
 
-        public AbstractDivisionRecordChannelNotifyService(
+        public AbstractDivisionRecordChannelNotifyService(ILogger<AbstractDivisionRecordChannelNotifyService> logger,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
         {
+            _logger = logger;
             _requestKit = requestKit;
             _configContextQueryService = configContextQueryService;
         }

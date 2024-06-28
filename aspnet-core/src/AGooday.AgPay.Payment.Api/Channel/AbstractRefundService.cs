@@ -11,13 +11,16 @@ namespace AGooday.AgPay.Payment.Api.Channel
 {
     public abstract class AbstractRefundService : IRefundService
     {
+        protected readonly ILogger<AbstractRefundService> _logger;
         protected readonly ISysConfigService _sysConfigService;
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ConfigContextQueryService _configContextQueryService;
-        protected AbstractRefundService(IServiceProvider serviceProvider,
+        protected AbstractRefundService(ILogger<AbstractRefundService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
         {
+            _logger = logger;
             _serviceProvider = serviceProvider;
             _configContextQueryService = configContextQueryService;
             _sysConfigService = sysConfigService;

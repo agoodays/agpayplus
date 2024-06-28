@@ -14,16 +14,19 @@ namespace AGooday.AgPay.Payment.Api.Channel
     /// </summary>
     public abstract class AbstractPaymentService : IPaymentService
     {
-        protected readonly ISysConfigService _sysConfigService;
+        protected readonly ILogger<AbstractPaymentService> _logger;
         protected readonly IServiceProvider _serviceProvider;
+        protected readonly ISysConfigService _sysConfigService;
         protected readonly ConfigContextQueryService _configContextQueryService;
-        protected AbstractPaymentService(IServiceProvider serviceProvider,
+        protected AbstractPaymentService(ILogger<AbstractPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
         {
+            _logger = logger;
             _serviceProvider = serviceProvider;
-            _configContextQueryService = configContextQueryService;
             _sysConfigService = sysConfigService;
+            _configContextQueryService = configContextQueryService;
         }
 
         public abstract string GetIfCode();

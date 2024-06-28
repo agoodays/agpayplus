@@ -19,10 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
     /// </summary>
     public class WxPayPaymentService : AbstractPaymentService
     {
-        public WxPayPaymentService(IServiceProvider serviceProvider,
+        public WxPayPaymentService(ILogger<WxPayPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

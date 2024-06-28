@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
     /// </summary>
     public class WxNative : LcswPayPaymentService
     {
-        public WxNative(IServiceProvider serviceProvider,
+        public WxNative(ILogger<WxNative> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

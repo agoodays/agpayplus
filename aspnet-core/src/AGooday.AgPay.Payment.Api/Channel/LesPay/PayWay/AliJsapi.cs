@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
     /// </summary>
     public class AliJsapi : LesPayPaymentService
     {
-        public AliJsapi(IServiceProvider serviceProvider,
+        public AliJsapi(ILogger<AliJsapi> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

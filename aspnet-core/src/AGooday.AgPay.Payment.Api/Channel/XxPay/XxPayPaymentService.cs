@@ -11,10 +11,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.XxPay
 {
     public class XxPayPaymentService : AbstractPaymentService
     {
-        public XxPayPaymentService(IServiceProvider serviceProvider,
+        public XxPayPaymentService(ILogger<XxPayPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

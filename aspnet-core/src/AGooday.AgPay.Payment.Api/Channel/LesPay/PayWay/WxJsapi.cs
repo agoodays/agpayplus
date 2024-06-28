@@ -19,10 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
     /// </summary>
     public class WxJsapi : LesPayPaymentService
     {
-        public WxJsapi(IServiceProvider serviceProvider,
+        public WxJsapi(ILogger<WxJsapi> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

@@ -18,9 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
     /// </summary>
     public class AliQr : UmsPayPaymentService
     {
-        public AliQr(IServiceProvider serviceProvider, ISysConfigService sysConfigService,
+        public AliQr(ILogger<AliQr> logger, 
+            IServiceProvider serviceProvider, 
+            ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

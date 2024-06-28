@@ -16,10 +16,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
     /// </summary>
     public class WxBar : DgPayPaymentService
     {
-        public WxBar(IServiceProvider serviceProvider,
+        public WxBar(ILogger<WxBar> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

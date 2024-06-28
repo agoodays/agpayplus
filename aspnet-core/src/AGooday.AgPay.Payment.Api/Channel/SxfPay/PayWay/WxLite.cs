@@ -19,10 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
     /// </summary>
     public class WxLite : SxfPayPaymentService
     {
-        public WxLite(IServiceProvider serviceProvider,
+        public WxLite(ILogger<WxLite> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

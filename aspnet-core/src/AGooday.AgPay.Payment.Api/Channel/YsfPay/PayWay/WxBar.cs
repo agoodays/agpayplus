@@ -19,10 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
         /// 云闪付 微信 条码支付
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public WxBar(IServiceProvider serviceProvider,
+        public WxBar(ILogger<WxBar> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
         /// 云闪付 支付宝 jsapi
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public AliJsapi(IServiceProvider serviceProvider,
+        public AliJsapi(ILogger<AliJsapi> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

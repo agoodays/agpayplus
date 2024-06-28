@@ -12,7 +12,6 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -20,12 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
 {
     public class LcswPayPaymentService : AbstractPaymentService
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(LcswPayPaymentService));
-
-        public LcswPayPaymentService(IServiceProvider serviceProvider,
+        public LcswPayPaymentService(ILogger<LcswPayPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -146,9 +144,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
             string url = GetLcswPayHost4env(lcswParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             var reqJSON = JsonConvert.SerializeObject(reqParams);
-            log.Info($"{logPrefix} unionId={unionId} url={url} reqJSON={reqJSON}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={reqJSON}");
             string resText = LcswHttpUtil.DoPost(url, reqJSON);
-            log.Info($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -159,7 +157,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
             var resParams = JObject.Parse(resText);
             if (!LcswSignUtil.Verify(resParams, key))
             {
-                log.Warn($"{logPrefix} 验签失败！ reqJSON={reqJSON} resJSON={resText}");
+                _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={reqJSON} resJSON={resText}");
             }
 
             return resParams;

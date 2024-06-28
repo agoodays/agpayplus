@@ -19,10 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
         /// 云闪付 条码支付
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public YsfBar(IServiceProvider serviceProvider,
+        public YsfBar(ILogger<YsfBar> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

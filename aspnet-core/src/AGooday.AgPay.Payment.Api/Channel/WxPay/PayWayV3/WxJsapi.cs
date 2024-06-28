@@ -20,10 +20,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
     /// </summary>
     public class WxJsapi : WxPayPaymentService
     {
-        public WxJsapi(IServiceProvider serviceProvider,
+        public WxJsapi(ILogger<WxJsapi> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -145,7 +146,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
                 //var paySign = WxPayV3Util.RSASign(beforeSign, wxServiceWrapper.Config.MchPrivateKey);
                 //payInfo.Add("paySign", paySign);// 签名以后在增加prepayId参数
                 //payInfo.Add("prepayId", response.PrepayId);
-                var payInfo = client.GenerateParametersForJsapiPayRequest( appid, response.PrepayId);
+                var payInfo = client.GenerateParametersForJsapiPayRequest(appid, response.PrepayId);
                 res.PayInfo = JsonConvert.SerializeObject(payInfo);
                 channelRetMsg.ChannelState = ChannelState.WAITING;
             }

@@ -10,27 +10,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils
 {
     public class YsfSignUtil
     {
-        private static readonly ILog logger = LogManager.GetLogger(typeof(YsfSignUtil));
-
         public static string SignBy256(JObject jobjParams, string isvPrivateCertFile, string isvPrivateCertPwd)
         {
-            try
-            {
-                var certFilePath = ChannelCertConfigKit.GetCertFilePath(isvPrivateCertFile);
-                string privateKey = File.ReadAllText(certFilePath, Encoding.UTF8);
+            var certFilePath = ChannelCertConfigKit.GetCertFilePath(isvPrivateCertFile);
+            string privateKey = File.ReadAllText(certFilePath, Encoding.UTF8);
 
-                //0. 将请求参数 转换成key1=value1&key2=value2的形式
-                string stringSign = ConvertSignStringIncludeEmpty(jobjParams);
+            //0. 将请求参数 转换成key1=value1&key2=value2的形式
+            string stringSign = ConvertSignStringIncludeEmpty(jobjParams);
 
-                //1. 通过SHA256进行摘要并转16进制
-                //byte[] signDigest = Sha256X16(stringSign, "UTF-8");
-                return SHA256WithRSAUtil.CertSign(stringSign, certFilePath, isvPrivateCertPwd);
-            }
-            catch (Exception e)
-            {
-                logger.Error("银联签名失败", e);
-                return null;
-            }
+            //1. 通过SHA256进行摘要并转16进制
+            //byte[] signDigest = Sha256X16(stringSign, "UTF-8");
+            return SHA256WithRSAUtil.CertSign(stringSign, certFilePath, isvPrivateCertPwd);
         }
 
         public static bool Validate(JObject jsonParams, string ysfPayPublicKey)
@@ -40,17 +30,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.Utils
 
             // 将请求参数信息转换成key1=value1&key2=value2的形式
             string stringData = ConvertSignStringIncludeEmpty(jsonParams);
-            try
-            {
-                //1. 通过SHA256进行摘要并转16进制
-                //byte[] signDigest = Sha256X16(stringData, "UTF-8");
-                return SHA256WithRSAUtil.VerifySign(signature, stringData, ysfPayPublicKey);
-            }
-            catch (Exception e)
-            {
-                logger.Error("验签失败！", e);
-            }
-            return false;
+
+            //1. 通过SHA256进行摘要并转16进制
+            //byte[] signDigest = Sha256X16(stringData, "UTF-8");
+            return SHA256WithRSAUtil.VerifySign(signature, stringData, ysfPayPublicKey);
         }
 
         /// <summary>

@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
     /// </summary>
     public class AliLite : SxfPayPaymentService
     {
-        public AliLite(IServiceProvider serviceProvider,
+        public AliLite(ILogger<AliLite> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

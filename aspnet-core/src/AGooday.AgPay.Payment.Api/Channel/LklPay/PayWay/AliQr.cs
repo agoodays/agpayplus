@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay.PayWay
     /// </summary>
     public class AliQr : LklPayPaymentService
     {
-        public AliQr(IServiceProvider serviceProvider,
+        public AliQr(ILogger<AliQr> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

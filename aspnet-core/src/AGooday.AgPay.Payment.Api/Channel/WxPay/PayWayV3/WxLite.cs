@@ -20,10 +20,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWayV3
     /// </summary>
     public class WxLite : WxPayPaymentService
     {
-        public WxLite(IServiceProvider serviceProvider,
+        public WxLite(ILogger<WxLite> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

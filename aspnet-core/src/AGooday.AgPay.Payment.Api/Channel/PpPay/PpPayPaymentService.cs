@@ -11,16 +11,17 @@ namespace AGooday.AgPay.Payment.Api.Channel.PpPay
 {
     public class PpPayPaymentService : AbstractPaymentService
     {
-        public PpPayPaymentService(IServiceProvider serviceProvider,
+        public PpPayPaymentService(ILogger<PpPayPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
         public override string GetIfCode()
         {
-            return CS.IF_CODE.XXPAY;
+            return CS.IF_CODE.PPPAY;
         }
 
         public override bool IsSupport(string wayCode)

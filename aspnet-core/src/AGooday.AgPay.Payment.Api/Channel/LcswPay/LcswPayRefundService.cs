@@ -16,15 +16,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay
     /// </summary>
     public class LcswPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<LcswPayRefundService> _logger;
         private readonly LcswPayPaymentService lcswpayPaymentService;
         public LcswPayRefundService(ILogger<LcswPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _logger = logger;
             this.lcswpayPaymentService = ActivatorUtilities.CreateInstance<LcswPayPaymentService>(serviceProvider);
         }
 

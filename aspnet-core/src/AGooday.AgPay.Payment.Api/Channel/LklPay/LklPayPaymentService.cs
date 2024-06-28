@@ -20,12 +20,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
 {
     public class LklPayPaymentService : AbstractPaymentService
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(LklPayPaymentService));
-
-        public LklPayPaymentService(IServiceProvider serviceProvider,
+        public LklPayPaymentService(ILogger<LklPayPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -121,7 +120,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
 
             //if (isvParams.OrgCode == null)
             //{
-            //    log.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+            //    _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
             //    throw new BizException("服务商配置为空。");
             //}
 
@@ -143,9 +142,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
             // 调起上游接口
             string url = GetLklPayHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            log.Info($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = LklHttpUtil.DoPostJson(url, isvParams.AppId, isvParams.SerialNo, isvParams.PrivateCert, reqParams, out Dictionary<string, string> headers);
-            log.Info($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -156,7 +155,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay
             var resParams = JObject.Parse(resText);
             if (!LklSignUtil.Verify(headers, isvParams.AppId, resText, isvParams.PublicCert))
             {
-                log.Warn($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
+                _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }
 
             return resParams;

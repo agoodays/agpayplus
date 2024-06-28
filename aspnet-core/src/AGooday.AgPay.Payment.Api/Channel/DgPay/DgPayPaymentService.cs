@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Params.DgPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Payment.Api.Channel.AliPay;
 using AGooday.AgPay.Payment.Api.Channel.DgPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Channel.DgPay.Utils;
 using AGooday.AgPay.Payment.Api.Models;
@@ -20,12 +21,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
 {
     public class DgPayPaymentService : AbstractPaymentService
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(DgPayPaymentService));
-
-        public DgPayPaymentService(IServiceProvider serviceProvider,
+        public DgPayPaymentService(ILogger<DgPayPaymentService> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -144,7 +144,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
 
                 if (isvParams.SysId == null)
                 {
-                    log.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
                 sysId = isvParams.SysId;
@@ -158,7 +158,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
 
                 if (normalMchParams.HuifuId == null)
                 {
-                    log.Error($"商户配置为空：normalMchParams：{JsonConvert.SerializeObject(normalMchParams)}");
+                    _logger.LogError($"商户配置为空：normalMchParams：{JsonConvert.SerializeObject(normalMchParams)}");
                     throw new BizException("商户配置为空。");
                 }
 
@@ -188,9 +188,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             // 调起上游接口
             string url = "https://api.huifu.com/v2" + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            log.Info($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = DgHttpUtil.DoPostJson(url, reqParams);
-            log.Info($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -201,7 +201,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
             var resParams = JObject.Parse(resText);
             if (!DgSignUtil.Verify(resParams, publicKey))
             {
-                log.Warn($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
+                _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }
 
             return resParams;

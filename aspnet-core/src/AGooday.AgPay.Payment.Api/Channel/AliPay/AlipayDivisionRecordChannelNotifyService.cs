@@ -23,13 +23,10 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
     /// </summary>
     public class AliPayDivisionRecordChannelNotifyService : AbstractDivisionRecordChannelNotifyService
     {
-        private readonly ILogger<AliPayDivisionRecordChannelNotifyService> _logger;
-
         public AliPayDivisionRecordChannelNotifyService(ILogger<AliPayDivisionRecordChannelNotifyService> logger,
             RequestKit requestKit, ConfigContextQueryService configContextQueryService)
-            : base(requestKit, configContextQueryService)
+            : base(logger, requestKit, configContextQueryService)
         {
-            _logger = logger;
         }
 
         public override string GetIfCode()

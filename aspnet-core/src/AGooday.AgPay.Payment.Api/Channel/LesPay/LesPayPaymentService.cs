@@ -12,7 +12,6 @@ using AGooday.AgPay.Payment.Api.RQRS.Msg;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -20,12 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
 {
     public class LesPayPaymentService : AbstractPaymentService
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(LesPayPaymentService));
-
-        public LesPayPaymentService(IServiceProvider serviceProvider,
+        public LesPayPaymentService(ILogger<LesPayPaymentService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -138,7 +136,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
 
             if (isvParams.AgentId == null)
             {
-                log.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -154,9 +152,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
             string url = GetLesPayHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             var reqText = string.Join("&", reqParams.Select(s => $"{s.Key}={s.Value}"));
-            log.Info($"{logPrefix} unionId={unionId} url={url} reqText={reqText}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqText={reqText}");
             string resText = LesHttpUtil.DoPost(url, reqText);
-            log.Info($"{logPrefix} unionId={unionId} url={url} resText={resText}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resText={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

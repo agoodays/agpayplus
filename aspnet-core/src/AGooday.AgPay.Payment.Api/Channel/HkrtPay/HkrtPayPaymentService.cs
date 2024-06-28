@@ -20,12 +20,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
 {
     public class HkrtPayPaymentService : AbstractPaymentService
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(HkrtPayPaymentService));
-
-        public HkrtPayPaymentService(IServiceProvider serviceProvider,
+        public HkrtPayPaymentService(ILogger<HkrtPayPaymentService> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 
@@ -153,7 +152,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
 
             if (isvParams.AgentNo == null)
             {
-                log.Error($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -168,9 +167,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
             // 调起上游接口
             string url = GetHkrtPayHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            log.Info($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = HkrtHttpUtil.DoPost(url, reqParams);
-            log.Info($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -203,7 +202,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay
             }
             catch (Exception)
             {
-                log.Info($"海科融通解析支付宝/微信原生参数异常 resParams={resParams}");
+                _logger.LogInformation($"海科融通解析支付宝/微信原生参数异常 resParams={resParams}");
                 return null;
             }
         }

@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
     /// </summary>
     public class AliPayRefundService : AbstractRefundService
     {
-        public AliPayRefundService(IServiceProvider serviceProvider,
+        public AliPayRefundService(ILogger<AliPayRefundService> logger,
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

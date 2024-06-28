@@ -16,15 +16,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
     /// </summary>
     public class LesPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<LesPayRefundService> _logger;
         private readonly LesPayPaymentService lesPayPaymentService;
         public LesPayRefundService(ILogger<LesPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _logger = logger;
             this.lesPayPaymentService = ActivatorUtilities.CreateInstance<LesPayPaymentService>(serviceProvider);
         }
 

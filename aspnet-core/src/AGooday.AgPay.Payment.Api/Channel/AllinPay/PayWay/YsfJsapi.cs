@@ -17,10 +17,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay.PayWay
     /// </summary>
     public class YsfJsapi : AllinPayPaymentService
     {
-        public YsfJsapi(IServiceProvider serviceProvider,
+        public YsfJsapi(ILogger<YsfJsapi> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

@@ -18,10 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay.PayWay
     /// </summary>
     public class WxH5 : WxPayPaymentService
     {
-        public WxH5(IServiceProvider serviceProvider,
+        public WxH5(ILogger<WxH5> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

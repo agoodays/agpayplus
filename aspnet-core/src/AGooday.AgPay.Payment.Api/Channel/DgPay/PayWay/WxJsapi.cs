@@ -19,10 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
     /// </summary>
     public class WxJsapi : DgPayPaymentService
     {
-        public WxJsapi(IServiceProvider serviceProvider,
+        public WxJsapi(ILogger<WxJsapi> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

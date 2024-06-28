@@ -15,10 +15,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay.PayWay
     /// </summary>
     public class AliBar : LesPayPaymentService
     {
-        public AliBar(IServiceProvider serviceProvider,
+        public AliBar(ILogger<AliBar> logger, 
+            IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
         }
 

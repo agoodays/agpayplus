@@ -16,15 +16,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
     /// </summary>
     public class YsfPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<YsfPayRefundService> _logger;
         private readonly YsfPayPaymentService ysfpayPaymentService;
         public YsfPayRefundService(ILogger<YsfPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _logger = logger;
             this.ysfpayPaymentService = ActivatorUtilities.CreateInstance<YsfPayPaymentService>(serviceProvider);
         }
 

@@ -16,16 +16,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay
     /// </summary>
     public class SxfPayRefundService : AbstractRefundService
     {
-        private readonly ILogger<SxfPayRefundService> _logger;
         private readonly SxfPayPaymentService sxfpayPaymentService;
         public SxfPayRefundService(ILogger<SxfPayRefundService> logger,
             //[FromKeyedServices(CS.IF_CODE.SXFPAY)] IPaymentService sxfpayPaymentService,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
-            : base(serviceProvider, sysConfigService, configContextQueryService)
+            : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _logger = logger;
             //this.sxfpayPaymentService = (SxfPayPaymentService)sxfpayPaymentService;
             //this.sxfpayPaymentService = (SxfPayPaymentService)serviceProvider.GetRequiredKeyedService<IPaymentService>(CS.IF_CODE.SXFPAY);
             this.sxfpayPaymentService = ActivatorUtilities.CreateInstance<SxfPayPaymentService>(serviceProvider);
