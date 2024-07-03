@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Payment.Api.Services
                 else if (channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
                 {
                     // 转账失败
-                    transferOrderService.UpdateIng2Fail(transferId, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.ChannelErrCode);
+                    transferOrderService.UpdateIng2Fail(transferId, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
                     payMchNotifyService.TransferOrderNotify(transferOrderService.GetById(transferId));
                 }
 
