@@ -633,6 +633,10 @@
             /// 支付宝 小程序
             /// </summary>
             public const string ALI_LITE = "ALI_LITE";      //支付宝 小程序
+            /// <summary>
+            /// 支付宝 订单码支付
+            /// </summary>
+            public const string ALI_OC = "ALI_OC";          //支付宝 订单码支付
 
             /// <summary>
             /// 银联App支付

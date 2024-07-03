@@ -3,16 +3,16 @@
 namespace AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay
 {
     /// <summary>
-    /// 支付方式： ALI_QR
+    /// 支付方式： ALI_OC
     /// </summary>
-    public class AliQrOrderRQ : CommonPayDataRQ
+    public class AliOcOrderRQ : CommonPayDataRQ
     {
         /// <summary>
         /// 构造函数
         /// </summary>
-        public AliQrOrderRQ()
+        public AliOcOrderRQ()
         {
-            this.WayCode = CS.PAY_WAY_CODE.ALI_QR;
+            this.WayCode = CS.PAY_WAY_CODE.ALI_OC;
         }
     }
 }
