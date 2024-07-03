@@ -249,13 +249,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             {
                 this.UpdateInitOrderStateThrowException((byte)RefundOrderState.STATE_SUCCESS, refundOrder, channelRetMsg);
                 _refundOrderProcessService.UpdatePayOrderProfitAndGenAccountBill(refundOrder);
-                _payMchNotifyService.RefundOrderNotify(refundOrder);
+                _payMchNotifyService.RefundOrderNotify(_refundOrderService.GetById(refundOrder.RefundOrderId));
             }
             //明确失败
             else if (ChannelState.CONFIRM_FAIL == channelRetMsg.ChannelState)
             {
                 this.UpdateInitOrderStateThrowException((byte)RefundOrderState.STATE_FAIL, refundOrder, channelRetMsg);
-                _payMchNotifyService.RefundOrderNotify(refundOrder);
+                _payMchNotifyService.RefundOrderNotify(_refundOrderService.GetById(refundOrder.RefundOrderId));
             }
             // 上游处理中 || 未知 || 上游接口返回异常  退款单为退款中状态
             else if (ChannelState.WAITING == channelRetMsg.ChannelState ||

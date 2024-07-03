@@ -6,7 +6,6 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using log4net;
 
 namespace AGooday.AgPay.Payment.Api.Services
 {
