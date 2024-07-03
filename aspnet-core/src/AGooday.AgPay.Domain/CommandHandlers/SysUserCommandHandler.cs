@@ -294,6 +294,16 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, request.LoginUsername, null, null);
                 }
 
+                //修改了编号
+                if (!sysUser.LoginUsername.Equals(request.UserNo))
+                {
+                    if (_sysUserRepository.IsExistUserNo(request.UserNo, request.SysType))
+                    {
+                        Bus.RaiseEvent(new DomainNotification("", "该员工编号已关联其他用户！"));
+                        return Task.CompletedTask;
+                    }
+                }
+
                 _mapper.Map(request, sysUser);
                 sysUser.UpdatedAt = DateTime.Now;
 
