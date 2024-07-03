@@ -519,19 +519,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 payOrder.ChannelUser = channelRetMsg.ChannelUserId;
             }
 
-            bool isSuccess = _payOrderService.UpdateInit2Ing(payOrder.PayOrderId, payOrder);
-            if (!isSuccess)
-            {
-                throw new BizException("更新订单异常!");
-            }
-
-            isSuccess = _payOrderService.UpdateIng2SuccessOrFail(payOrder.PayOrderId, payOrder.State,
-                    channelRetMsg.ChannelMchNo, channelRetMsg.ChannelIsvNo, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.PlatformOrderId, channelRetMsg.PlatformMchOrderId, 
-                    channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
-            if (!isSuccess)
-            {
-                throw new BizException("更新订单异常!");
-            }
+            _payOrderProcessService.UpdateIngAndSuccessOrFailByCreatebyOrder(payOrder, channelRetMsg);
         }
 
         /// <summary>
