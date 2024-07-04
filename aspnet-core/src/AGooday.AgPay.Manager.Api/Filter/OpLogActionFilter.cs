@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Manager.Api.Attributes;
-using AGooday.AgPay.Manager.Api.Logs;
+using AGooday.AgPay.Manager.Api.OpLog;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace AGooday.AgPay.Manager.Api.Filter
@@ -7,11 +7,11 @@ namespace AGooday.AgPay.Manager.Api.Filter
     /// <summary>
     /// 操作日志过滤器
     /// </summary>
-    public class LogActionFilter : IAsyncActionFilter
+    public class OpLogActionFilter : IAsyncActionFilter
     {
-        private readonly ILogHandler _logHandler;
+        private readonly IOpLogHandler _logHandler;
 
-        public LogActionFilter(ILogHandler logHandler)
+        public OpLogActionFilter(IOpLogHandler logHandler)
         {
             _logHandler = logHandler;
         }

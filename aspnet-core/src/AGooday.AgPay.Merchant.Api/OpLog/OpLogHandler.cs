@@ -3,8 +3,8 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Manager.Api.Attributes;
-using AGooday.AgPay.Manager.Api.Extensions;
+using AGooday.AgPay.Merchant.Api.Attributes;
+using AGooday.AgPay.Merchant.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -13,18 +13,18 @@ using System.Diagnostics;
 using System.Security.Claims;
 using System.Text;
 
-namespace AGooday.AgPay.Manager.Api.Logs
+namespace AGooday.AgPay.Merchant.Api.OpLog
 {
     /// <summary>
     /// 操作日志处理
     /// </summary>
-    public class LogHandler : ILogHandler
+    public class OpLogHandler : IOpLogHandler
     {
         private readonly ILogger _logger;
         private readonly ISysLogService _sysLogService;
         private static IHttpContextAccessor _context;
 
-        public LogHandler(ILogger<LogHandler> logger, IHttpContextAccessor httpContextAccessor, ISysLogService sysLogService)
+        public OpLogHandler(ILogger<OpLogHandler> logger, IHttpContextAccessor httpContextAccessor, ISysLogService sysLogService)
         {
             _logger = logger;
             _context = httpContextAccessor;
@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Manager.Api.Logs
                 model.Device = device;
                 model.BrowserInfo = ua;
                 model.UserIp = IpUtil.GetIP(context?.HttpContext?.Request);
-                model.SysType = CS.SYS_TYPE.MGR;
+                model.SysType = CS.SYS_TYPE.MCH;
                 model.MethodName = context.ActionDescriptor.DisplayName.Split(" (").First();
                 model.ReqUrl = GetAbsoluteUri(context?.HttpContext?.Request).ToLower();//context.ActionDescriptor.AttributeRouteInfo.Template.ToLower();
                 model.ReqMethod = context.HttpContext.Request.Method.ToLower();
@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Manager.Api.Logs
         }
 
         /// <summary>
-        /// 获取绝对路径 https://localhost:9417/api/anon/auth/validate
+        /// 获取绝对路径 https://localhost:9418/api/anon/auth/validate
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>

@@ -12,7 +12,7 @@ using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Extensions;
 using AGooday.AgPay.Merchant.Api.Extensions.AuthContext;
 using AGooday.AgPay.Merchant.Api.Filter;
-using AGooday.AgPay.Merchant.Api.Logs;
+using AGooday.AgPay.Merchant.Api.OpLog;
 using AGooday.AgPay.Merchant.Api.Middlewares;
 using AGooday.AgPay.Merchant.Api.Models;
 using AGooday.AgPay.Merchant.Api.MQ;
@@ -51,7 +51,7 @@ services.AddSingleton(new Appsettings(Env.ContentRootPath));
 //});
 services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
 
-services.AddScoped<ILogHandler, LogHandler>();
+services.AddScoped<IOpLogHandler, OpLogHandler>();
 
 #region Redis
 //redis»º´æ
@@ -113,7 +113,7 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 services.AddControllersWithViews(options =>
 {
     //ÈÕÖ¾¹ýÂËÆ÷
-    options.Filters.Add<LogActionFilter>();
+    options.Filters.Add<OpLogActionFilter>();
 })
     .AddApplicationPart(typeof(OssFileController).Assembly)
     //.AddNewtonsoftJson();

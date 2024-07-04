@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace AGooday.AgPay.Agent.Api.Logs
+namespace AGooday.AgPay.Manager.Api.OpLog
 {
     /// <summary>
     /// 操作日志处理接口
     /// </summary>
-    public interface ILogHandler
+    public interface IOpLogHandler
     {
         /// <summary>
         /// 写操作日志

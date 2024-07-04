@@ -1,17 +1,17 @@
-﻿using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Logs;
+﻿using AGooday.AgPay.Merchant.Api.Attributes;
+using AGooday.AgPay.Merchant.Api.OpLog;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace AGooday.AgPay.Agent.Api.Filter
+namespace AGooday.AgPay.Merchant.Api.Filter
 {
     /// <summary>
     /// 操作日志过滤器
     /// </summary>
-    public class LogActionFilter : IAsyncActionFilter
+    public class OpLogActionFilter : IAsyncActionFilter
     {
-        private readonly ILogHandler _logHandler;
+        private readonly IOpLogHandler _logHandler;
 
-        public LogActionFilter(ILogHandler logHandler)
+        public OpLogActionFilter(IOpLogHandler logHandler)
         {
             _logHandler = logHandler;
         }

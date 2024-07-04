@@ -1,10 +1,10 @@
-﻿using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Extensions;
-using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Manager.Api.Attributes;
+using AGooday.AgPay.Manager.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -13,18 +13,18 @@ using System.Diagnostics;
 using System.Security.Claims;
 using System.Text;
 
-namespace AGooday.AgPay.Agent.Api.Logs
+namespace AGooday.AgPay.Manager.Api.OpLog
 {
     /// <summary>
     /// 操作日志处理
     /// </summary>
-    public class LogHandler : ILogHandler
+    public class OpLogHandler : IOpLogHandler
     {
         private readonly ILogger _logger;
         private readonly ISysLogService _sysLogService;
         private static IHttpContextAccessor _context;
 
-        public LogHandler(ILogger<LogHandler> logger, IHttpContextAccessor httpContextAccessor, ISysLogService sysLogService)
+        public OpLogHandler(ILogger<OpLogHandler> logger, IHttpContextAccessor httpContextAccessor, ISysLogService sysLogService)
         {
             _logger = logger;
             _context = httpContextAccessor;
@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Agent.Api.Logs
                 model.Device = device;
                 model.BrowserInfo = ua;
                 model.UserIp = IpUtil.GetIP(context?.HttpContext?.Request);
-                model.SysType = CS.SYS_TYPE.AGENT;
+                model.SysType = CS.SYS_TYPE.MGR;
                 model.MethodName = context.ActionDescriptor.DisplayName.Split(" (").First();
                 model.ReqUrl = GetAbsoluteUri(context?.HttpContext?.Request).ToLower();//context.ActionDescriptor.AttributeRouteInfo.Template.ToLower();
                 model.ReqMethod = context.HttpContext.Request.Method.ToLower();

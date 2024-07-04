@@ -14,7 +14,7 @@ using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.Extensions.AuthContext;
 using AGooday.AgPay.Manager.Api.Filter;
-using AGooday.AgPay.Manager.Api.Logs;
+using AGooday.AgPay.Manager.Api.OpLog;
 using AGooday.AgPay.Manager.Api.Middlewares;
 using AGooday.AgPay.Manager.Api.Models;
 using AGooday.AgPay.Manager.Api.MQ;
@@ -53,7 +53,7 @@ services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 //});
 services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
 
-services.AddScoped<ILogHandler, LogHandler>();
+services.AddScoped<IOpLogHandler, OpLogHandler>();
 
 #region Redis
 //redis缓存
@@ -118,7 +118,7 @@ services.AddControllers(options =>
         ////添加全局异常过滤器
         //options.Filters.Add<GlobalExceptionsFilter>();
         //日志过滤器
-        options.Filters.Add<LogActionFilter>();
+        options.Filters.Add<OpLogActionFilter>();
     })
     .AddApplicationPart(typeof(OssFileController).Assembly)
     .AddApplicationPart(typeof(OcrController).Assembly)
