@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AlibabaCloud.SDK.Ocr-api20210707" Version="3.0.0" />
-    <PackageReference Include="TencentCloudSDK.Ocr" Version="3.0.1033" />
+    <PackageReference Include="TencentCloudSDK.Ocr" Version="3.0.1041" />
   </ItemGroup>
 
   <ItemGroup>
