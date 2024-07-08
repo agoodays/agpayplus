@@ -135,7 +135,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
         public JObject PackageParamAndReq(string apiUri, JObject reqData, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             // 签名
-            string sysId, productId, privateKey, publicKey;
+            string sysId, productId, huifuId, privateKey, publicKey;
             if (mchAppConfigContext.IsIsvSubMch())
             {
                 DgPayIsvParams isvParams = (DgPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
@@ -145,8 +145,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                     _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
+
+                DgPayIsvSubMchParams isvsubMchParams = (DgPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+
                 sysId = isvParams.SysId;
                 productId = isvParams.ProductId;
+                huifuId = isvsubMchParams.HuifuId;
                 privateKey = isvParams.RsaPrivateKey;
                 publicKey = isvParams.RsaPublicKey;
             }
@@ -161,14 +165,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                 }
 
                 sysId = normalMchParams.HuifuId;
+                huifuId = normalMchParams.HuifuId;
                 productId = normalMchParams.ProductId;
                 privateKey = normalMchParams.RsaPrivateKey;
                 publicKey = normalMchParams.RsaPublicKey;
             }
 
-            DgPayIsvSubMchParams isvsubMchParams = (DgPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             //reqData.Add("req_seq_id", Guid.NewGuid().ToString("N")); //同一huifu_id下当天唯一，示例值：rQ20211213111739475651
-            reqData.Add("huifu_id", isvsubMchParams.HuifuId); // 渠道与一级代理商的直属商户ID；示例值：6666000123123123
+            reqData.Add("huifu_id", huifuId); // 渠道与一级代理商的直属商户ID；示例值：6666000123123123
 
             var sign = DgSignUtil.Sign(reqData, privateKey); //RSA 签名字符串
             var reqParams = new JObject();
