@@ -4,6 +4,7 @@ using AGooday.AgPay.Payment.Api.Channel.AliPay.Kits;
 using AGooday.AgPay.Payment.Api.Channel.AllinPay;
 using AGooday.AgPay.Payment.Api.Channel.DgPay;
 using AGooday.AgPay.Payment.Api.Channel.HkrtPay;
+using AGooday.AgPay.Payment.Api.Channel.JlPay;
 using AGooday.AgPay.Payment.Api.Channel.LcswPay;
 using AGooday.AgPay.Payment.Api.Channel.LesPay;
 using AGooday.AgPay.Payment.Api.Channel.LklPay;
@@ -50,6 +51,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IPaymentService, LklPayPaymentService>(CS.IF_CODE.LKLPAY);
             services.AddKeyedScoped<IPaymentService, YsePayPaymentService>(CS.IF_CODE.YSEPAY);
             services.AddKeyedScoped<IPaymentService, AllinPayPaymentService>(CS.IF_CODE.ALLINPAY);
+            services.AddKeyedScoped<IPaymentService, JlPayPaymentService>(CS.IF_CODE.JLPAY);
             services.AddScoped<IChannelServiceFactory<IPaymentService>, ChannelServiceFactory<IPaymentService>>();
             PayWayUtil.PayWayServiceRegister<AliPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<WxPayPaymentService>(services);
@@ -65,6 +67,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             PayWayUtil.PayWayServiceRegister<LklPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<YsePayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<AllinPayPaymentService>(services);
+            PayWayUtil.PayWayServiceRegister<JlPayPaymentService>(services);
             #endregion
             #region RefundService
             services.AddKeyedScoped<IRefundService, AliPayRefundService>(CS.IF_CODE.ALIPAY);
@@ -80,6 +83,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IRefundService, LklPayRefundService>(CS.IF_CODE.LKLPAY);
             services.AddKeyedScoped<IRefundService, YsePayRefundService>(CS.IF_CODE.YSEPAY);
             services.AddKeyedScoped<IRefundService, AllinPayRefundService>(CS.IF_CODE.ALLINPAY);
+            services.AddKeyedScoped<IRefundService, JlPayRefundService>(CS.IF_CODE.JLPAY);
             services.AddScoped<IChannelServiceFactory<IRefundService>, ChannelServiceFactory<IRefundService>>();
             #endregion
             #region ChannelNoticeService
@@ -96,6 +100,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IChannelNoticeService, LklPayChannelNoticeService>(CS.IF_CODE.LKLPAY);
             services.AddKeyedScoped<IChannelNoticeService, YsePayChannelNoticeService>(CS.IF_CODE.YSEPAY);
             services.AddKeyedScoped<IChannelNoticeService, AllinPayChannelNoticeService>(CS.IF_CODE.ALLINPAY);
+            services.AddKeyedScoped<IChannelNoticeService, JlPayChannelNoticeService>(CS.IF_CODE.JLPAY);
             services.AddScoped<IChannelServiceFactory<IChannelNoticeService>, ChannelServiceFactory<IChannelNoticeService>>();
             #endregion
             #region ChannelRefundNoticeService
@@ -118,6 +123,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IPayOrderCloseService, UmsPayPayOrderCloseService>(CS.IF_CODE.UMSPAY);
             services.AddKeyedScoped<IPayOrderCloseService, LcswPayPayOrderCloseService>(CS.IF_CODE.LCSWPAY);
             services.AddKeyedScoped<IPayOrderCloseService, YsePayPayOrderCloseService>(CS.IF_CODE.YSEPAY);
+            services.AddKeyedScoped<IPayOrderCloseService, JlPayPayOrderCloseService>(CS.IF_CODE.JLPAY);
             services.AddScoped<IChannelServiceFactory<IPayOrderCloseService>, ChannelServiceFactory<IPayOrderCloseService>>();
             #endregion
             #region QueryService
@@ -134,6 +140,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
             services.AddKeyedScoped<IPayOrderQueryService, LklPayPayOrderQueryService>(CS.IF_CODE.LKLPAY);
             services.AddKeyedScoped<IPayOrderQueryService, YsePayPayOrderQueryService>(CS.IF_CODE.YSEPAY);
             services.AddKeyedScoped<IPayOrderQueryService, AllinPayPayOrderQueryService>(CS.IF_CODE.ALLINPAY);
+            services.AddKeyedScoped<IPayOrderQueryService, JlPayPayOrderQueryService>(CS.IF_CODE.JLPAY);
             services.AddScoped<IChannelServiceFactory<IPayOrderQueryService>, ChannelServiceFactory<IPayOrderQueryService>>();
             #endregion
             #region TransferService

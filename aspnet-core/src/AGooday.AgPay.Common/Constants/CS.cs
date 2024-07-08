@@ -587,6 +587,10 @@
             /// 通联支付
             /// </summary>
             public const string ALLINPAY = "allinpay";   // 通联支付
+            /// <summary>
+            /// 嘉联支付
+            /// </summary>
+            public const string JLPAY = "jlpay";   // 嘉联支付
         }
 
         /// <summary>
