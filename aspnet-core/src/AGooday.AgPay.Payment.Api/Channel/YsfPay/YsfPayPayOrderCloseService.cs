@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Payment.Api.Channel.YsfPay
 {
     /// <summary>
-    /// 云闪付查单
+    /// 云闪付关单
     /// </summary>
     public class YsfPayPayOrderCloseService : IPayOrderCloseService
     {
