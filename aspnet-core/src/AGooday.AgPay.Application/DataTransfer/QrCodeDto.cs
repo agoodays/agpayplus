@@ -23,12 +23,12 @@
         /// <summary>
         /// 是否固定金额: 0-任意金额, 1-固定金额
         /// </summary>
-        public byte FixedFlag { get; set; }
+        public byte? FixedFlag { get; set; }
 
         /// <summary>
         /// 固定金额
         /// </summary>
-        public int FixedPayAmount { get; set; }
+        public int? FixedPayAmount { get; set; }
 
         /// <summary>
         /// 选择页面类型: default-默认(未指定，取决于二维码是否绑定到微信侧), h5-固定H5页面, lite-固定小程序页面
@@ -48,7 +48,7 @@
         /// <summary>
         /// 码牌绑定状态: 0-未绑定, 1-已绑定
         /// </summary>
-        public byte BindState { get; set; }
+        public byte? BindState { get; set; }
 
         /// <summary>
         /// 代理商号
@@ -78,7 +78,7 @@
         /// <summary>
         /// 状态: 0-停用, 1-启用
         /// </summary>
-        public byte State { get; set; }
+        public byte? State { get; set; }
 
         /// <summary>
         /// 所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心
@@ -93,11 +93,11 @@
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

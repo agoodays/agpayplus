@@ -10,5 +10,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
+
+        public QrCode GetByIdAsNoTracking(string recordId)
+        {
+            return GetAllAsNoTracking().FirstOrDefault(w => w.QrcId.Equals(recordId));
+        }
     }
 }

@@ -295,7 +295,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 }
 
                 //修改了编号
-                if (!sysUser.LoginUsername.Equals(request.UserNo))
+                if (!sysUser.UserNo.Equals(request.UserNo))
                 {
                     if (_sysUserRepository.IsExistUserNo(request.UserNo, request.SysType))
                     {

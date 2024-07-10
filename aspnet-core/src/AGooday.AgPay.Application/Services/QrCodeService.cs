@@ -43,6 +43,13 @@ namespace AGooday.AgPay.Application.Services
             return _qrCodeRepository.SaveChanges(out int _);
         }
 
+        public QrCodeDto GetByIdAsNoTracking(string recordId)
+        {
+            var entity = _qrCodeRepository.GetByIdAsNoTracking(recordId);
+            var dto = _mapper.Map<QrCodeDto>(entity);
+            return dto;
+        }
+
         public string BatchIdDistinctCount()
         {
             var BatchIdPrefix = DateTime.Now.ToString("yyyyMMdd");

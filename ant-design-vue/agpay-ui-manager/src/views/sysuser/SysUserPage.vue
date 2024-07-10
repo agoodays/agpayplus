@@ -191,7 +191,10 @@ export default {
     },
     queryFunc: function () { // 点击【查询】按钮点击事件
       this.btnLoading = true // 打开查询按钮的loading
-      this.$refs.infoTable.refTable(true)
+      this.searchFunc(true)
+    },
+    searchFunc (isToFirst = false) { // 点击【查询】按钮点击事件
+      this.$refs.infoTable.refTable(isToFirst)
     },
     addFunc: function () { // 业务通用【新增】 函数
       this.$refs.infoAddOrEdit.show()

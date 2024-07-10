@@ -85,15 +85,11 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysUserCreateDto, CreateSysUserCommand>()
                 .ForMember(d => d.EntRules, o => o.MapFrom(s => s.EntRules == null ? null : JsonConvert.SerializeObject(s.EntRules)))
                 .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => s.BindStoreIds == null ? null : JsonConvert.SerializeObject(s.BindStoreIds)));
-            CreateMap<CreateSysUserCommand, SysUser>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => s.EntRules == null ? null : JsonConvert.SerializeObject(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => s.BindStoreIds == null ? null : JsonConvert.SerializeObject(s.BindStoreIds)));
             CreateMap<SysUserModifyDto, ModifySysUserCommand>()
                 .ForMember(d => d.EntRules, o => o.MapFrom(s => s.EntRules == null ? null : JsonConvert.SerializeObject(s.EntRules)))
                 .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => s.BindStoreIds == null ? null : JsonConvert.SerializeObject(s.BindStoreIds)));
-            CreateMap<ModifySysUserCommand, SysUser>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => s.EntRules == null ? null : JsonConvert.SerializeObject(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => s.BindStoreIds == null ? null : JsonConvert.SerializeObject(s.BindStoreIds)));
+            CreateMap<CreateSysUserCommand, SysUser>();
+            CreateMap<ModifySysUserCommand, SysUser>();
             CreateMap<SysUserQueryDto, SysUserQuery>();
 
             CreateMap<SysUserTeamDto, SysUserTeam>();

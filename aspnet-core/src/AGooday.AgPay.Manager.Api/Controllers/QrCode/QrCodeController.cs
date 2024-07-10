@@ -109,6 +109,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
         public ApiRes Update(string recordId, QrCodeDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.QrcId)) // 状态变更
+            {
+                var sysUser = _qrCodeService.GetByIdAsNoTracking(recordId);
+                sysUser.State = dto.State.Value;
+                CopyUtil.CopyProperties(sysUser, dto);
+            }
             bool result = _qrCodeService.Update(dto);
             if (!result)
             {

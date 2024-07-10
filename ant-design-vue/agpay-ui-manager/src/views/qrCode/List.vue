@@ -52,7 +52,7 @@
           <span>{{ record.entryPage === 'default' ? '默认':(record.entryPage === 'h5' ? 'H5':(record.entryPage === 'lite' ? '小程序':'')) }}</span>
         </template>
         <template slot="stateSlot" slot-scope="{record}">
-          <a-badge :status="record.state === 0?'error':'processing'" :text="record.state === 0?'禁用':'启用'" />
+          <AgTableColState :state="record.state" :showSwitchType="$access('ENT_DEVICE_QRC_EDIT')" :onChange="(state) => { return updateState(record.qrcId, state)}"/>
         </template>
         <template slot="fixedPayAmountSlot" slot-scope="{record}">
           <span>{{ record.fixedFlag === 0 ? '任意金额': record.fixedPayAmount }}</span>
@@ -74,7 +74,8 @@
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_QRC_LIST, req } from '@/api/manage'
+import AgTableColState from '@/components/AgTable/AgTableColState'
+import { API_URL_QRC_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
@@ -93,7 +94,7 @@ const tableColumns = [
 
 export default {
   name: 'PayWayPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, InfoAddOrEdit, AgTextUp, AgDateRangePicker },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgTableColState, InfoAddOrEdit, AgTextUp, AgDateRangePicker },
   data () {
     return {
       isShowMore: false,
@@ -119,7 +120,10 @@ export default {
     },
     queryFunc () { // 点击【查询】按钮点击事件
       this.btnLoading = true
-      this.$refs.infoTable.refTable(true)
+      this.searchFunc(true)
+    },
+    searchFunc (isToFirst = false) { // 点击【查询】按钮点击事件
+      this.$refs.infoTable.refTable(isToFirst)
     },
     onPreview (recordId) {
       const that = this
@@ -145,6 +149,22 @@ export default {
           that.$message.success('删除成功！')
           that.$refs.infoTable.refTable(false)
         })
+      })
+    },
+    updateState: function (recordId, state) { // 【更新状态】
+      const that = this
+      const title = state === 1 ? '确认[启用]？' : '确认[停用]？'
+
+      return new Promise((resolve, reject) => {
+        that.$infoBox.confirmDanger(title, '', () => {
+              return reqLoad.updateById(API_URL_QRC_LIST, recordId, { state: state }).then(res => {
+                that.searchFunc()
+                resolve()
+              }).catch(err => reject(err))
+            },
+            () => {
+              reject(new Error())
+            })
       })
     }
   }
