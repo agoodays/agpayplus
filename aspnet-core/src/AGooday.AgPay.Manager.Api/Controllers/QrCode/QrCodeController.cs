@@ -155,7 +155,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             }
             else
             {
-                inArray = QrCodeBuilder.Generate(content);
+                //inArray = QrCodeBuilder.Generate(content);
+                inArray = DrawQrCode.GenerateNoStyleImage(content: content, text: $"No.{qrCode.QrcId}");
             }
             var imageBase64Data = inArray == null ? "" : DrawQrCode.BitmapToImageBase64String(inArray);
             return ApiRes.Ok(imageBase64Data);

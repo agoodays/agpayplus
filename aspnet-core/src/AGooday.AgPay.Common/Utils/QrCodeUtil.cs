@@ -334,6 +334,72 @@ namespace AGooday.AgPay.Common.Utils
 
     public static class DrawQrCode
     {
+        public static byte[] GenerateNoStyleImage(int width = 595, int cornerRadius = 50, string content = "https://www.example.com", string text = "No.220101000001")
+        {
+            using (var bitmap = new SKBitmap(width, width))
+            {
+                using (var canvas = new SKCanvas(bitmap))
+                {
+                    // 清空画布绘制背景色
+                    canvas.Clear(SKColors.White);
+
+                    int leftMargin = (int)(width * 0.05);
+                    int topMargin = (int)(width * 0.05);
+                    int middleWidth = width - (leftMargin * 2);
+                    int middleLeft = leftMargin;
+                    int middleTop = topMargin;
+                    int middleRight = middleLeft + middleWidth;
+
+                    // 绘制二维码
+                    var qrCodeByte = QrCodeBuilder.Generate(content);
+                    using (var stream = new MemoryStream(qrCodeByte))
+                    using (var qrCodeImage = SKBitmap.Decode(stream))
+                    {
+                        using (var qrCodeSkBitmap = new SKBitmap(middleWidth, middleWidth))
+                        {
+                            using (var qrCodeCanvas = new SKCanvas(qrCodeSkBitmap))
+                            {
+                                qrCodeCanvas.Clear(SKColors.Transparent);
+
+                                // 创建圆角路径
+                                var path = new SKPath();
+                                var qrCodeRect = new SKRect(0, 0, middleWidth, middleWidth);
+                                path.AddRoundRect(qrCodeRect, cornerRadius, cornerRadius);
+
+                                // 在剪切区域内绘制图像
+                                qrCodeCanvas.ClipPath(path);
+                                qrCodeCanvas.DrawBitmap(qrCodeImage, qrCodeRect);
+                            }
+
+                            var qrCodeSkImage = SKImage.FromBitmap(qrCodeSkBitmap);
+                            var rect = new SKRect(middleLeft, middleTop, middleRight, middleTop + middleWidth);
+                            canvas.DrawImage(qrCodeSkImage, rect);
+                        }
+                    }
+
+                    // 创建画笔对象
+                    using (var paint = new SKPaint
+                    {
+                        TextSize = 24,
+                        IsAntialias = true,
+                        Color = SKColors.Black,
+                        TextAlign = SKTextAlign.Center,
+                        Typeface = SKTypeface.FromFamilyName("Arial")
+                    })
+                    {
+                        // 在画布上绘制文本
+                        canvas.DrawText(text, width / 2, topMargin + middleWidth, paint);
+                    }
+                }
+                // 将绘制的图像保存到内存流中
+                using (var image = SKImage.FromBitmap(bitmap))
+                using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 100))
+                {
+                    return data.ToArray();
+                }
+            }
+        }
+
         public static byte[] GenerateStyleAImage(int width = 1190, int height = 1684, string backgroundColor = "#ff0000", int cornerRadius = 50, string logoPath = null, string title = null, string content = "https://www.example.com", string iconPath = null, string text = "No.220101000001", List<QrCodePayType> payTypes = null)
         {
             using (var bitmap = new SKBitmap(width, height))
@@ -410,7 +476,12 @@ namespace AGooday.AgPay.Common.Utils
                     using (var stream = new MemoryStream(qrCodeByte))
                     using (var qrCodeImage = SKBitmap.Decode(stream))
                     {
-                        using (var qrCodeSkBitmap = new SKBitmap(middleWidth, middleWidth))
+                        var qrCodeWidth = middleWidth - cornerRadius / 2;
+                        var qrCodeLeft = middleLeft + cornerRadius / 2;
+                        var qrCodeRight = middleRight - cornerRadius / 2;
+                        var qrCodeTop = middleTop + cornerRadius / 2;
+                        var qrCodeBottom = middleTop + qrCodeWidth;
+                        using (var qrCodeSkBitmap = new SKBitmap(qrCodeWidth, qrCodeWidth))
                         {
                             using (var qrCodeCanvas = new SKCanvas(qrCodeSkBitmap))
                             {
@@ -418,7 +489,7 @@ namespace AGooday.AgPay.Common.Utils
 
                                 // 创建圆角路径
                                 var path = new SKPath();
-                                var qrCodeRect = new SKRect(0, 0, middleWidth, middleWidth);
+                                var qrCodeRect = new SKRect(0, 0, qrCodeWidth, qrCodeWidth);
                                 path.AddRoundRect(qrCodeRect, cornerRadius, cornerRadius);
 
                                 // 在剪切区域内绘制图像
@@ -427,7 +498,7 @@ namespace AGooday.AgPay.Common.Utils
                             }
 
                             var qrCodeSkImage = SKImage.FromBitmap(qrCodeSkBitmap);
-                            var rect = new SKRect(middleLeft, middleTop, middleRight, middleTop + middleWidth);
+                            var rect = new SKRect(qrCodeLeft, qrCodeTop, qrCodeRight, qrCodeBottom);
                             canvas.DrawImage(qrCodeSkImage, rect);
                         }
                     }
@@ -593,7 +664,12 @@ namespace AGooday.AgPay.Common.Utils
                     using (var stream = new MemoryStream(qrCodeByte))
                     using (var qrCodeImage = SKBitmap.Decode(stream))
                     {
-                        using (var qrCodeSkBitmap = new SKBitmap(middleWidth, middleWidth))
+                        var qrCodeWidth = middleWidth - cornerRadius / 2;
+                        var qrCodeLeft = middleLeft + cornerRadius / 2;
+                        var qrCodeRight = middleRight - cornerRadius / 2;
+                        var qrCodeTop = middleBottom - middleWidth + cornerRadius / 2;
+                        var qrCodeBottom = middleBottom - cornerRadius / 2;
+                        using (var qrCodeSkBitmap = new SKBitmap(qrCodeWidth, qrCodeWidth))
                         {
                             using (var qrCodeCanvas = new SKCanvas(qrCodeSkBitmap))
                             {
@@ -601,7 +677,7 @@ namespace AGooday.AgPay.Common.Utils
 
                                 // 创建圆角路径
                                 var path = new SKPath();
-                                var qrCodeRect = new SKRect(0, 0, middleWidth, middleWidth);
+                                var qrCodeRect = new SKRect(0, 0, qrCodeWidth, qrCodeWidth);
                                 path.AddRoundRect(qrCodeRect, cornerRadius, cornerRadius);
 
                                 // 在剪切区域内绘制图像
@@ -610,7 +686,7 @@ namespace AGooday.AgPay.Common.Utils
                             }
 
                             var qrCodeSkImage = SKImage.FromBitmap(qrCodeSkBitmap);
-                            var rect = new SKRect(middleLeft, middleBottom - middleWidth, middleRight, middleBottom);
+                            var rect = new SKRect(qrCodeLeft, qrCodeTop, qrCodeRight, qrCodeBottom);
                             canvas.DrawImage(qrCodeSkImage, rect);
                         }
                     }
