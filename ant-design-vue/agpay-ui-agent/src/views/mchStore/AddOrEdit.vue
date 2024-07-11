@@ -198,7 +198,6 @@ export default {
         that.mchList = res.records
       })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
-        console.log(555)
         that.recordId = recordId
         req.getById(API_URL_MCH_STORE, recordId).then(res => {
           that.saveObject = res

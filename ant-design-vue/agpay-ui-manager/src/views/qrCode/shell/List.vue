@@ -30,12 +30,12 @@
         </template>
 
         <template slot="shellImgViewUrlSlot" slot-scope="{record}">
-          <img width="119" :src="record.shellImgViewUrl" v-if="$access('ENT_DEVICE_QRC_SHELL_VIEW')" @click="onPreview(record.id)" />
+          <img width="119" :src="record.shellImgViewUrl" v-if="$access('ENT_DEVICE_QRC_SHELL_VIEW')" @click="onPreview(record.shellImgViewUrl)" />
           <img width="119" :src="record.shellImgViewUrl" v-else>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
-            <a-button type="link" v-if="$access('ENT_DEVICE_QRC_SHELL_VIEW')" @click="onPreview(record.id)">详情</a-button>
+            <a-button type="link" v-if="$access('ENT_DEVICE_QRC_SHELL_VIEW')" @click="onPreview(record.shellImgViewUrl)">详情</a-button>
             <a-button type="link" v-if="$access('ENT_DEVICE_QRC_SHELL_EDIT')" @click="editFunc(record.id)">修改</a-button>
             <a-button type="link" style="color: red" v-if="$access('ENT_DEVICE_QRC_SHELL_DEL')" @click="delFunc(record.id)">删除</a-button>
           </AgTableColumns>
@@ -80,15 +80,12 @@ export default {
       this.$refs.infoTable.refTable(isToFirst)
     },
 
-    onPreview (recordId) {
-      const that = this
-      req.get(API_URL_QRC_SHELL_LIST + '/view/' + recordId).then(res => {
-        that.$viewerApi({
-          images: [res],
-          options: {
-            initialViewIndex: 0
-          }
-        })
+    onPreview (url) {
+      this.$viewerApi({
+        images: [url],
+        options: {
+          initialViewIndex: 0
+        }
       })
     },
 

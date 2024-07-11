@@ -25,7 +25,13 @@
         <a-select v-model="saveObject.qrcShellId" placeholder="请选择模板">
           <a-select-option value="" key="">无</a-select-option>
           <a-select-option v-for="d in shellList" :value="d.id" :key="d.id">
-            <span class="icon-style"><img class="icon" :src="d.shellImgViewUrl" alt=""></span> {{ d.shellAlias }}
+            <a-tooltip placement="left">
+              <template #title>
+                <span><img :style="{width: '100%', height: '100%', cursor: 'pointer'}" :src="d.shellImgViewUrl" alt="" @click="onPreview(d.shellImgViewUrl)"></span>
+              </template>
+              <span class="icon-style"><img class="icon" :src="d.shellImgViewUrl" alt=""></span>
+            </a-tooltip>
+            {{ d.shellAlias }}
           </a-select-option>
         </a-select>
       </a-form-model-item>
@@ -214,6 +220,14 @@ export default {
             }
           }
         })
+    },
+    onPreview (url) {
+      this.$viewerApi({
+        images: [url],
+        options: {
+          initialViewIndex: 0
+        }
+      })
     }
   }
 }

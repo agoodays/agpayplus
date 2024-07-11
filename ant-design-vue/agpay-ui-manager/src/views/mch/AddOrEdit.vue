@@ -412,7 +412,6 @@ export default {
         that.isvList = res.records
       })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
-        console.log(555)
         that.resetIsShow = true // 展示重置密码板块
         that.recordId = recordId
         req.getById(API_URL_MCH_LIST, recordId).then(res => {
