@@ -35,7 +35,7 @@
             <a-row v-for="(item, index) in saveObject.configInfo.payTypeList" :key="index" >
               <a-col>
                 <a-radio-group :options="payTypeOptions" v-model="item.name" @change="onPayTypeChange($event, index)"/>
-                <span><lable>名称：</lable><a-input size="small" v-model="item.alias" style="width: 60px" @change="onChange"/></span>
+                <span><span>名称：</span><a-input size="small" v-model="item.alias" style="width: 60px" @change="onChange"/></span>
                 <a-button size="small" @click="removePayTypeItem(index)">删除</a-button>
                 <a-button size="small" @click="addPayTypeItem" v-if="saveObject.configInfo.payTypeList.length<=4 && index === saveObject.configInfo.payTypeList.length-1">新增</a-button>
                 <div v-if="item.name==='custom'">
