@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-
-namespace AGooday.AgPay.Application.DataTransfer
+﻿namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 系统用户表

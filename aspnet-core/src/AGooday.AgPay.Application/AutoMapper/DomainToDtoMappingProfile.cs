@@ -26,22 +26,38 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<IsvInfo, IsvInfoDto>();
             CreateMap<PayRateLevelConfig, PayRateLevelConfigDto>();
             CreateMap<MchApp, MchAppDto>()
-                .ForMember(d => d.AppSignType, o => o.MapFrom(s => JArray.Parse(s.AppSignType)));
+                .ForMember(d => d.AppSignType, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.AppSignType));
+                    o.MapFrom(s => JArray.Parse(s.AppSignType));
+                });
             CreateMap<MchStore, MchStoreDto>();
             CreateMap<MchStore, MchStoreListDto>();
             CreateMap<MchDivisionReceiverGroup, MchDivisionReceiverGroupDto>();
             CreateMap<MchDivisionReceiver, MchDivisionReceiverDto>();
 
             CreateMap<MchInfo, MchInfoDto>()
-                .ForMember(d => d.RefundMode, o => o.MapFrom(s => JArray.Parse(s.RefundMode)));
+                .ForMember(d => d.RefundMode, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.RefundMode));
+                    o.MapFrom(s => JArray.Parse(s.RefundMode));
+                });
             CreateMap<MchInfo, MchInfoCreatedEvent>()
-                .ForMember(d => d.RefundMode, o => o.MapFrom(s => JArray.Parse(s.RefundMode)));
+                .ForMember(d => d.RefundMode, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.RefundMode));
+                    o.MapFrom(s => JArray.Parse(s.RefundMode));
+                });
 
             CreateMap<MchNotifyRecord, MchNotifyRecordDto>();
             CreateMap<MchPayPassage, MchPayPassageDto>();
             CreateMap<PayInterfaceConfig, PayInterfaceConfigDto>();
             CreateMap<PayInterfaceDefine, PayInterfaceDefineDto>()
-                .ForMember(d => d.WayCodes, o => o.MapFrom(s => JArray.Parse(s.WayCodes)));
+                .ForMember(d => d.WayCodes, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.WayCodes));
+                    o.MapFrom(s => JArray.Parse(s.WayCodes));
+                });
             CreateMap<PayOrderDivisionRecord, PayOrderDivisionRecordDto>();
             CreateMap<PayOrder, PayOrderDto>();
             CreateMap<PayOrderProfit, PayOrderProfitDto>();
@@ -53,16 +69,28 @@ namespace AGooday.AgPay.Application.AutoMapper
 
             CreateMap<QrCode, QrCodeDto>();
             CreateMap<QrCodeShell, QrCodeShellDto>()
-                .ForMember(d => d.ConfigInfo, o => o.MapFrom(s => JObject.Parse(s.ConfigInfo)));
+                .ForMember(d => d.ConfigInfo, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.ConfigInfo));
+                    o.MapFrom(s => JObject.Parse(s.ConfigInfo));
+                });
 
             CreateMap<RefundOrder, RefundOrderDto>();
             CreateMap<SysArticle, SysArticleDto>()
-                .ForMember(d => d.ArticleRange, o => o.MapFrom(s => JArray.Parse(s.ArticleRange)));
+                .ForMember(d => d.ArticleRange, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.ArticleRange));
+                    o.MapFrom(s => JArray.Parse(s.ArticleRange));
+                });
             CreateMap<SysConfig, SysConfigDto>()
                 .ForMember(dest => dest.SysType, opt => opt.Ignore())
                 .ForMember(dest => dest.BelongInfoId, opt => opt.Ignore());
             CreateMap<SysEntitlement, SysEntitlementDto>()
-                .ForMember(d => d.MatchRule, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.MatchRule) ? null : JsonConvert.DeserializeObject<SysEntitlementDto.EntMatchRule>(s.MatchRule)));
+                .ForMember(d => d.MatchRule, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.MatchRule));
+                    o.MapFrom(s => JsonConvert.DeserializeObject<SysEntitlementDto.EntMatchRule>(s.MatchRule));
+                });
             CreateMap<SysLog, SysLogDto>();
             CreateMap<SysRole, SysRoleDto>();
             CreateMap<SysRoleEntRela, SysRoleEntRelaDto>();
@@ -71,14 +99,38 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<SysUserRoleRela, SysUserRoleRelaDto>();
 
             CreateMap<SysUser, SysUserDto>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.EntRules) ? null : JsonConvert.DeserializeObject<List<string>>(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.BindStoreIds) ? null : JsonConvert.DeserializeObject<List<long>>(s.BindStoreIds)));
+                .ForMember(d => d.EntRules, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.EntRules));
+                    o.MapFrom(s => JsonConvert.DeserializeObject<List<string>>(s.EntRules));
+                })
+                .ForMember(d => d.BindStoreIds, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.BindStoreIds));
+                    o.MapFrom(s => JsonConvert.DeserializeObject<List<string>>(s.BindStoreIds));
+                });
             CreateMap<SysUser, SysUserListDto>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.EntRules) ? null : JsonConvert.DeserializeObject<List<string>>(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.BindStoreIds) ? null : JsonConvert.DeserializeObject<List<long>>(s.BindStoreIds)));
+                .ForMember(d => d.EntRules, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.EntRules));
+                    o.MapFrom(s => JsonConvert.DeserializeObject<List<string>>(s.EntRules));
+                })
+                .ForMember(d => d.BindStoreIds, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.BindStoreIds));
+                    o.MapFrom(s => JsonConvert.DeserializeObject<List<string>>(s.BindStoreIds));
+                });
             CreateMap<SysUser, SysUserCreatedEvent>()
-                .ForMember(d => d.EntRules, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.EntRules) ? null : JsonConvert.DeserializeObject<List<string>>(s.EntRules)))
-                .ForMember(d => d.BindStoreIds, o => o.MapFrom(s => string.IsNullOrWhiteSpace(s.BindStoreIds) ? null : JsonConvert.DeserializeObject<List<long>>(s.BelongInfoId)));
+                .ForMember(d => d.EntRules, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.EntRules));
+                    o.MapFrom(s => JsonConvert.DeserializeObject<List<string>>(s.EntRules));
+                })
+                .ForMember(d => d.BindStoreIds, o =>
+                {
+                    o.PreCondition(s => !string.IsNullOrWhiteSpace(s.BindStoreIds));
+                    o.MapFrom(s => JsonConvert.DeserializeObject<List<string>>(s.BindStoreIds));
+                });
 
             CreateMap<SysUserTeam, SysUserTeamDto>();
 
