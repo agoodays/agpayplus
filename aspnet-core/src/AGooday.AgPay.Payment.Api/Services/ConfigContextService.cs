@@ -253,6 +253,7 @@ namespace AGooday.AgPay.Payment.Api.Services
 
             // 查询商户的所有支持的参数配置
             var allConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP, appId);
+            var allOauth2ConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP_OAUTH2, appId);
 
             // 普通商户
             if (mchInfo.Type == CS.MCH_TYPE_NORMAL)
@@ -265,8 +266,21 @@ namespace AGooday.AgPay.Payment.Api.Services
                     );
                 }
 
+                foreach (var payInterfaceConfig in allOauth2ConfigList)
+                {
+                    mchAppConfigContext.NormalMchOauth2ParamsMap.Add(
+                        payInterfaceConfig.IfCode,
+                        NormalMchOauth2Params.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams)
+                    );
+                }
+
                 //放置alipay client
                 AliPayNormalMchParams alipayParams = mchAppConfigContext.GetNormalMchParamsByIfCode<AliPayNormalMchParams>(CS.IF_CODE.ALIPAY);
+                if (alipayParams != null)
+                {
+                    mchAppConfigContext.AlipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(alipayParams);
+                }
+                AliPayNormalMchOauth2Params alipayOauth2Params = mchAppConfigContext.GetNormalMchOauth2ParamsByInfoId<AliPayNormalMchOauth2Params>(CS.IF_CODE.ALIPAY);
                 if (alipayParams != null)
                 {
                     mchAppConfigContext.AlipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(alipayParams);
@@ -294,6 +308,14 @@ namespace AGooday.AgPay.Payment.Api.Services
                     mchAppConfigContext.IsvSubMchParamsMap.Add(
                             payInterfaceConfig.IfCode,
                             IsvSubMchParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams)
+                    );
+                }
+
+                foreach (var payInterfaceConfig in allOauth2ConfigList)
+                {
+                    mchAppConfigContext.IsvSubMchOauth2ParamsMap.Add(
+                            payInterfaceConfig.IfCode,
+                            IsvSubMchOauth2Params.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams)
                     );
                 }
 
@@ -388,12 +410,26 @@ namespace AGooday.AgPay.Payment.Api.Services
 
             // 查询商户的所有支持的参数配置
             var allConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE.ISV, isvNo);
+            var allOauth2ConfigList = _payInterfaceConfigService.GetPayOauth2ConfigByStartsWithInfoId(CS.INFO_TYPE.ISV_OAUTH2, isvNo);
 
             foreach (var payInterfaceConfig in allConfigList)
             {
                 isvConfigContext.IsvParamsMap.TryAdd(
                     payInterfaceConfig.IfCode,
                     IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams)
+                );
+
+                isvConfigContext.IsvPayIfConfigMap.TryAdd(
+                    payInterfaceConfig.IfCode,
+                    payInterfaceConfig
+                );
+            }
+
+            foreach (var payInterfaceConfig in allOauth2ConfigList)
+            {
+                isvConfigContext.IsvOauth2ParamsMap.TryAdd(
+                    payInterfaceConfig.IfCode + payInterfaceConfig.InfoId,
+                    IsvOauth2Params.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams)
                 );
             }
 

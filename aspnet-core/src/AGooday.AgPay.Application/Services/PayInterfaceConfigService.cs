@@ -103,9 +103,9 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfigs);
         }
 
-        public IEnumerable<PayInterfaceConfigDto> GetPayOauth2ConfigByInfoId(string infoType, string infoId)
+        public IEnumerable<PayInterfaceConfigDto> GetPayOauth2ConfigByStartsWithInfoId(string infoType, string infoId)
         {
-            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.StartsWith($"{infoId}_LIST_")
+            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.StartsWith(infoId)
             && w.InfoType.Equals(infoType) && w.State.Equals(CS.PUB_USABLE));
             return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfigs);
         }

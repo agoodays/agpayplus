@@ -44,6 +44,17 @@ namespace AGooday.AgPay.Payment.Api.Models
         public Dictionary<string, IsvSubMchParams> IsvSubMchParamsMap { get; set; } = new Dictionary<string, IsvSubMchParams>();
         #endregion
 
+        #region 商户Oauth2配置信息缓存,  <接口代码, 支付参数>
+        /// <summary>
+        /// 普通商户Oauth2配置信息缓存
+        /// </summary>
+        public Dictionary<string, NormalMchOauth2Params> NormalMchOauth2ParamsMap { get; set; } = new Dictionary<string, NormalMchOauth2Params>();
+        /// <summary>
+        /// 特约商户Oauth2配置信息缓存
+        /// </summary>
+        public Dictionary<string, IsvSubMchOauth2Params> IsvSubMchOauth2ParamsMap { get; set; } = new Dictionary<string, IsvSubMchOauth2Params>();
+        #endregion
+
         /// <summary>
         /// 放置所属代理商的信息
         /// </summary>
@@ -81,7 +92,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         }
 
         /// <summary>
-        /// 获取isv配置信息
+        /// 获取普通商户配置信息
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="ifCode"></param>
@@ -104,7 +115,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         }
 
         /// <summary>
-        /// 获取isv配置信息
+        /// 获取特约商户配置信息
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="ifCode"></param>
@@ -116,7 +127,53 @@ namespace AGooday.AgPay.Payment.Api.Models
         }
 
         /// <summary>
-        ///  是否为 服务商特约商户
+        /// 获取普通商户Oauth2配置信息
+        /// </summary>
+        /// <param name="infoId"></param>
+        /// <returns></returns>
+        public NormalMchOauth2Params GetNormalMchOauth2ParamsByInfoId(string infoId)
+        {
+            NormalMchOauth2ParamsMap.TryGetValue(infoId, out NormalMchOauth2Params normalMchOauth2Params);
+            return normalMchOauth2Params;
+        }
+
+        /// <summary>
+        /// 获取普通商户Oauth2配置信息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="infoId"></param>
+        /// <returns></returns>
+        public T GetNormalMchOauth2ParamsByInfoId<T>(string infoId) where T : NormalMchOauth2Params
+        {
+            NormalMchOauth2ParamsMap.TryGetValue(infoId, out NormalMchOauth2Params normalMchOauth2Params);
+            return (T)normalMchOauth2Params;
+        }
+
+        /// <summary>
+        /// 获取特约商户Oauth2配置信息
+        /// </summary>
+        /// <param name="infoId"></param>
+        /// <returns></returns>
+        public IsvSubMchOauth2Params GetIsvSubMchOauth2ParamsByInfoId(string infoId)
+        {
+            IsvSubMchOauth2ParamsMap.TryGetValue(infoId, out IsvSubMchOauth2Params isvSubMchOauth2Params);
+            return isvSubMchOauth2Params;
+        }
+
+        /// <summary>
+        /// 获取特约商户Oauth2配置信息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="infoId"></param>
+        /// <returns></returns>
+        public T GetIsvsubMchOauth2ParamsByInfoId<T>(string infoId) where T : IsvSubMchOauth2Params
+        {
+            IsvSubMchOauth2ParamsMap.TryGetValue(infoId, out IsvSubMchOauth2Params isvSubMchOauth2Params);
+            return (T)isvSubMchOauth2Params;
+        }
+
+        /// <summary>
+        ///  是否为服务商特约商户
         /// </summary>
         /// <returns></returns>
         public bool IsIsvSubMch()

@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
-            IPayInterfaceConfigService payIfConfigService, 
+            IPayInterfaceConfigService payIfConfigService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)
@@ -55,7 +55,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 result.Add(new { InfoId = infoId, Remark = "服务商默认" });
             }
             string infoType = GetInfoType(configMode);
-            var data = _payIfConfigService.GetPayOauth2ConfigByInfoId(infoType, infoId)
+            var data = _payIfConfigService.GetPayOauth2ConfigByStartsWithInfoId(infoType, infoId)
+                .Where(w => !w.InfoId.Equals(infoId))
                 .GroupBy(g => new { g.InfoId, g.Remark })
                 .Select(s => new { s.Key.InfoId, s.Key.Remark });
             result.AddRange(data);

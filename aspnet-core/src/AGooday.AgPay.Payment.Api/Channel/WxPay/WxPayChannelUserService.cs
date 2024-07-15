@@ -34,24 +34,25 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             string oauth2Url = "";
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                WxPayIsvParams wxpayIsvParams = (WxPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.WXPAY);
-                if (wxpayIsvParams == null)
+                var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                var isvOauth2Params = (WxPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, payInterfaceConfig?.Oauth2InfoId, CS.IF_CODE.WXPAY);
+                if (isvOauth2Params == null)
                 {
-                    throw new BizException("服务商微信支付接口没有配置！");
+                    throw new BizException("服务商微信Oauth2配置没有配置！");
                 }
-                appId = wxpayIsvParams.AppId;
-                oauth2Url = wxpayIsvParams.Oauth2Url;
+                appId = isvOauth2Params.AppId;
+                oauth2Url = isvOauth2Params.Oauth2Url;
             }
             else
             {
                 //获取商户配置信息
-                WxPayNormalMchParams normalMchParams = (WxPayNormalMchParams)_configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
-                if (normalMchParams == null)
+                var normalMchOauth2Params = (WxPayNormalMchOauth2Params)_configContextQueryService.QueryNormalMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                if (normalMchOauth2Params == null)
                 {
-                    throw new BizException("商户微信支付接口没有配置！");
+                    throw new BizException("商户微信Oauth2配置没有配置！");
                 }
-                appId = normalMchParams.AppId;
-                oauth2Url = normalMchParams.Oauth2Url;
+                appId = normalMchOauth2Params.AppId;
+                oauth2Url = normalMchOauth2Params.Oauth2Url;
             }
 
             if (string.IsNullOrEmpty(oauth2Url))
@@ -68,11 +69,33 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             try
             {
                 string code = reqParams.GetValue("code").ToString();
-                WxServiceWrapper wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+                string appId, appSecret;
+                if (mchAppConfigContext.IsIsvSubMch())
+                {
+                    var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                    var isvOauth2Params = (WxPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, payInterfaceConfig?.Oauth2InfoId, CS.IF_CODE.WXPAY);
+                    if (isvOauth2Params == null)
+                    {
+                        throw new BizException("服务商微信Oauth2配置没有配置！");
+                    }
+                    appId = isvOauth2Params.AppId;
+                    appSecret = isvOauth2Params.AppSecret;
+                }
+                else
+                {
+                    //获取商户配置信息
+                    var normalMchOauth2Params = (WxPayNormalMchOauth2Params)_configContextQueryService.QueryNormalMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                    if (normalMchOauth2Params == null)
+                    {
+                        throw new BizException("商户微信Oauth2配置没有配置！");
+                    }
+                    appId = normalMchOauth2Params.AppId;
+                    appSecret = normalMchOauth2Params.AppSecret;
+                }
                 var options = new WechatApiClientOptions()
                 {
-                    AppId = wxServiceWrapper.Config.AppId,
-                    AppSecret = wxServiceWrapper.Config.AppSecret,
+                    AppId = appId,
+                    AppSecret = appSecret,
                 };
                 var client = new WechatApiClient(options);
                 var request = new SnsOAuth2AccessTokenRequest();

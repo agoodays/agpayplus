@@ -15,42 +15,46 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
     public class AliPayChannelUserService : IChannelUserService
     {
         private readonly ILogger<AliPayChannelUserService> _logger;
-        private readonly ConfigContextQueryService configContextQueryService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
-        public AliPayChannelUserService(ILogger<AliPayChannelUserService> logger, 
+        public AliPayChannelUserService(ILogger<AliPayChannelUserService> logger,
             ConfigContextQueryService configContextQueryService)
         {
             _logger = logger;
-            this.configContextQueryService = configContextQueryService;
+            _configContextQueryService = configContextQueryService;
         }
 
         public string BuildUserRedirectUrl(string callbackUrlEncode, MchAppConfigContext mchAppConfigContext)
         {
-            string oauthUrl = AliPayConfig.PROD_OAUTH_URL;
             string appId = null;
+            byte? sandbox;
 
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                AliPayIsvParams isvParams = (AliPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
-                if (isvParams == null)
+                var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                var isvOauth2Params = (AliPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, payInterfaceConfig?.Oauth2InfoId, GetIfCode());
+                if (isvOauth2Params == null)
                 {
-                    throw new BizException("服务商支付宝接口没有配置！");
+                    throw new BizException("服务商支付宝Oauth2配置没有配置！");
                 }
-                appId = isvParams.AppId;
+                appId = isvOauth2Params.AppId;
+                sandbox = isvOauth2Params.Sandbox;
             }
             else
             {
                 //获取商户配置信息
-                AliPayNormalMchParams normalMchParams = (AliPayNormalMchParams)configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-                if (normalMchParams == null)
+                var normalMchOauth2Params = (AliPayNormalMchOauth2Params)_configContextQueryService.QueryNormalMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                if (normalMchOauth2Params == null)
                 {
-                    throw new BizException("商户支付宝接口没有配置！");
+                    throw new BizException("商户支付宝Oauth2配置没有配置！");
                 }
-                appId = normalMchParams.AppId;
-                if (normalMchParams.Sandbox != null && normalMchParams.Sandbox == CS.YES)
-                {
-                    oauthUrl = AliPayConfig.SANDBOX_OAUTH_URL;
-                }
+                appId = normalMchOauth2Params.AppId;
+                sandbox = normalMchOauth2Params.Sandbox;
+            }
+            string oauthUrl = AliPayConfig.PROD_OAUTH_URL;
+            if (sandbox == CS.YES)
+            {
+                oauthUrl = AliPayConfig.SANDBOX_OAUTH_URL;
             }
             string alipayUserRedirectUrl = string.Format(oauthUrl, appId, callbackUrlEncode);
             _logger.LogInformation($"alipayUserRedirectUrl={alipayUserRedirectUrl}");
@@ -61,12 +65,25 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
         {
             try
             {
+                AliPayClientWrapper alipayClientWrapper;
+
+                if (mchAppConfigContext.IsIsvSubMch())
+                {
+                    var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                    var isvOauth2Params = (AliPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, payInterfaceConfig?.Oauth2InfoId, GetIfCode());
+                    alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(isvOauth2Params);
+                }
+                else
+                {
+                    var normalMchOauth2Params = (AliPayNormalMchOauth2Params)_configContextQueryService.QueryNormalMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.ALIPAY);
+                    alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(normalMchOauth2Params);
+                }
                 string authCode = reqParams.GetValue("auth_code").ToString();
                 //通过code 换取openId
                 AlipaySystemOauthTokenRequest request = new AlipaySystemOauthTokenRequest();
                 request.Code = authCode;
                 request.GrantType = "authorization_code";
-                return configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request).UserId;
+                return alipayClientWrapper.Execute(request).UserId;
             }
             catch (ChannelException e)
             {

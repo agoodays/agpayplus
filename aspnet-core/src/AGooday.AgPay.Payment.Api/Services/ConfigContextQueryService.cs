@@ -171,6 +171,80 @@ namespace AGooday.AgPay.Payment.Api.Services
             return IsvParams.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
         }
 
+        public NormalMchOauth2Params QueryNormalMchOauth2Params(string mchNo, string mchAppId, string ifCode)
+        {
+            if (IsCache())
+            {
+                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetNormalMchOauth2ParamsByInfoId(mchAppId);
+            }
+
+            // 查询商户的所有支持的参数配置
+            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP_OAUTH2, mchAppId, ifCode);
+
+            if (payInterfaceConfig == null || payInterfaceConfig.State != CS.YES)
+            {
+                return null;
+            }
+
+            return NormalMchOauth2Params.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
+        }
+
+        public IsvSubMchOauth2Params QueryIsvSubMchOauth2Params(string mchNo, string mchAppId, string ifCode)
+        {
+            if (IsCache())
+            {
+                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetIsvsubMchOauth2ParamsByInfoId<IsvSubMchOauth2Params>(mchAppId);
+            }
+
+            // 查询商户的所有支持的参数配置
+            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP_OAUTH2, mchAppId, ifCode);
+
+            if (payInterfaceConfig == null || payInterfaceConfig.State != CS.YES)
+            {
+                return null;
+            }
+
+            return IsvSubMchOauth2Params.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
+        }
+
+        public PayInterfaceConfigDto QueryIsvPayIfConfig(string isvNo, string ifCode)
+        {
+            if (IsCache())
+            {
+                IsvConfigContext isvConfigContext = _configContextService.GetIsvConfigContext(isvNo);
+                return isvConfigContext == null ? null : isvConfigContext.GetIsvPayIfConfigByIfCode(ifCode);
+            }
+
+            // 查询商户的所有支持的参数配置
+            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, isvNo, ifCode);
+
+            if (payInterfaceConfig == null || payInterfaceConfig.State != CS.YES)
+            {
+                return null;
+            }
+
+            return payInterfaceConfig;
+        }
+
+        public IsvOauth2Params QueryIsvOauth2Params(string isvNo, string infoId, string ifCode)
+        {
+            if (IsCache())
+            {
+                IsvConfigContext isvConfigContext = _configContextService.GetIsvConfigContext(isvNo);
+                return isvConfigContext == null ? null : isvConfigContext.GetIsvOauth2ParamsByIfCodeAndInfoId(ifCode + (infoId ?? isvNo));
+            }
+
+            // 查询商户的所有支持的参数配置
+            var payInterfaceConfig = _payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV_OAUTH2, (infoId ?? isvNo), ifCode);
+
+            if (payInterfaceConfig == null || payInterfaceConfig.State != CS.YES)
+            {
+                return null;
+            }
+
+            return IsvOauth2Params.Factory(payInterfaceConfig.IfCode, payInterfaceConfig.IfParams);
+        }
+
         public AliPayClientWrapper GetAlipayClientWrapper(MchAppConfigContext mchAppConfigContext)
         {
             if (IsCache())
