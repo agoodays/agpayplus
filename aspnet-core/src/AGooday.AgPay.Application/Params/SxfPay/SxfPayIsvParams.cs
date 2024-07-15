@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Params.SxfPay
         /// <summary>
         /// 是否沙箱环境
         /// </summary>
-        public byte Sandbox { get; set; }
+        public byte? Sandbox { get; set; }
 
         /// <summary>
         /// 机构编号

@@ -8,7 +8,7 @@ namespace AGooday.AgPay.Application.Params.PpPay
         /**
          * 是否沙箱环境
          */
-        public byte Sandbox { get; set; }
+        public byte? Sandbox { get; set; }
 
         /**
          * clientId

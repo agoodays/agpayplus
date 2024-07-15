@@ -11,7 +11,8 @@ namespace AGooday.AgPay.Application.Params.AliPay
         /// <summary>
         /// 特约商户小程序支付跳转的选择
         /// </summary>
-        public int IsUseSubmchAccount { get; set; }
+        public byte? IsUseSubmchAccount { get; set; }
+
         /// <summary>
         /// 小程序参数配置
         /// </summary>

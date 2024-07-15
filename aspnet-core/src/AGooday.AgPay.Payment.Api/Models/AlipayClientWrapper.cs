@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// <summary>
         /// 默认为 不使用证书方式
         /// </summary>
-        public byte UseCert { get; private set; } = CS.NO;
+        public byte? UseCert { get; private set; } = CS.NO;
 
         /// <summary>
         /// 缓存支付宝client 对象
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Payment.Api.Models
                 throw ChannelException.SysError($"调用支付宝client服务异常：{e.Message}");
             }
         }
-        public AliPayClientWrapper(byte useCert, IAopClient alipayClient)
+        public AliPayClientWrapper(byte? useCert, IAopClient alipayClient)
         {
             this.UseCert = useCert;
             this.AlipayClient = alipayClient;
@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Payment.Api.Models
         /// <param name="alipayPublicCert">支付宝公钥证书路径（.crt格式）</param>
         /// <param name="alipayRootCert">支付宝根证书路径</param>
         /// <returns></returns>
-        public static AliPayClientWrapper BuildAlipayClientWrapper(byte useCert, byte? sandbox, string appId, string privateKey,
+        public static AliPayClientWrapper BuildAlipayClientWrapper(byte? useCert, byte? sandbox, string appId, string privateKey,
             string alipayPublicKey, string signType, string appCert,
             string alipayPublicCert, string alipayRootCert)
         {

@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 {
     /// <summary>
-    /// 支付宝： 获取用户ID实现类
+    /// 支付宝 获取用户ID实现类
     /// </summary>
     public class AliPayChannelUserService : IChannelUserService
     {

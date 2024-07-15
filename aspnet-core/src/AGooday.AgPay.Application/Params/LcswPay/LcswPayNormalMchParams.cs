@@ -8,7 +8,7 @@ namespace AGooday.AgPay.Application.Params.LcswPay
         /// <summary>
         /// 是否沙箱环境
         /// </summary>
-        public byte Sandbox { get; set; }
+        public byte? Sandbox { get; set; }
 
         /// <summary>
         /// 商户号

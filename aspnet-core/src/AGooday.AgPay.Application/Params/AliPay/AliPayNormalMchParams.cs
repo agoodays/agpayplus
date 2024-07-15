@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Application.Params.AliPay
         /// <summary>
         /// 是否使用证书方式
         /// </summary>
-        public byte UseCert { get; set; }
+        public byte? UseCert { get; set; }
 
         /// <summary>
         /// app 证书

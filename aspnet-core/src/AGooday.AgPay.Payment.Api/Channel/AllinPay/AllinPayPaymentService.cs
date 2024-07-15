@@ -110,7 +110,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetAllinPayHost4env(byte sandbox)
+        public static string GetAllinPayHost4env(byte? sandbox)
         {
             return CS.YES == sandbox ? AllinPayConfig.SANDBOX_SERVER_URL : AllinPayConfig.PROD_SERVER_URL;
         }
@@ -126,7 +126,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AllinPay
         /// <exception cref="BizException"></exception>
         public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
-            byte sandbox;
+            byte? sandbox;
             string signType, orgid = null, cusid, appid, privateKey, publicKey;
             if (mchAppConfigContext.IsIsvSubMch())
             {

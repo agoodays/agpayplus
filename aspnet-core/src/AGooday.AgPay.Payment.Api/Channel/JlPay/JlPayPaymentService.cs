@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.JlPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetJlPayHost4env(byte sandbox)
+        public static string GetJlPayHost4env(byte? sandbox)
         {
             return CS.YES == sandbox ? JlPayConfig.SANDBOX_SERVER_URL : JlPayConfig.PROD_SERVER_URL;
         }
@@ -123,7 +123,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.JlPay
         public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext, bool isPay = true)
         {
             // 签名
-            byte sandbox;
+            byte? sandbox;
             string orgCode, mchId, termNo, privateKey, publicKey;
             if (mchAppConfigContext.IsIsvSubMch())
             {
