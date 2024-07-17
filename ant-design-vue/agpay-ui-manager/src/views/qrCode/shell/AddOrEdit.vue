@@ -205,7 +205,7 @@ export default {
         that.recordId = recordId
         req.getById(API_URL_QRC_SHELL_LIST, recordId).then(res => {
           that.saveObject = res
-          that.onChange()
+          // that.onChange()
         })
         this.visible = true
       } else {

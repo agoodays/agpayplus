@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Application.DataTransfer
     /// <summary>
     /// 码牌模板信息表
     /// </summary>
-    public class QrCodeShellDto
+    public class QrCodeShellDto : BaseModel
     {
         /// <summary>
         /// 码牌模板ID
@@ -42,11 +42,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 所属商户ID / 代理商ID / 0(平台)
         /// </summary>
         public string BelongInfoId { get; set; }
-
-        /// <summary>
-        /// 模板预览图Url
-        /// </summary>
-        public string ShellImgViewUrl { get; set; }
 
         /// <summary>
         /// 创建时间

@@ -41,13 +41,6 @@ namespace AGooday.AgPay.Domain.Models
         public string ConfigInfo { get; set; }
 
         /// <summary>
-        /// 模板预览图Url
-        /// </summary>
-        [Comment("模板预览图Url")]
-        [Column("shell_img_view_url", TypeName = "varchar(255)")]
-        public string ShellImgViewUrl { get; set; }
-
-        /// <summary>
         /// 所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心
         /// </summary>
         [Comment("所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心")]

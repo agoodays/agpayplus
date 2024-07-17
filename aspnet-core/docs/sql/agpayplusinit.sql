@@ -900,7 +900,6 @@ CREATE TABLE `t_qr_code_shell` (
   `style_code` VARCHAR(20) NOT NULL COMMENT '样式代码: shellA, shellB', 
   `shell_alias` VARCHAR(20) NOT NULL COMMENT '模板别名',
   `config_info` VARCHAR(4096) NOT NULL COMMENT '模板配置信息,json字符串',
-  `shell_img_view_url` VARCHAR(255) COMMENT '模板预览图Url',
 --   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
   `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心', 
   `belong_info_id` VARCHAR(64) NOT NULL COMMENT '所属商户ID / 代理商ID / 0(平台)', 

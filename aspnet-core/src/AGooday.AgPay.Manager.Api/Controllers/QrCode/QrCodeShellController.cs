@@ -44,6 +44,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         public ApiPageRes<QrCodeShellDto> List([FromQuery] QrCodeShellQueryDto dto)
         {
             var data = _qrCodeShellService.GetPaginatedData(dto);
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+            foreach (var item in data)
+            {
+                item.AddExt("shellImgViewUrl", dbApplicationConfig.GenShellImgViewUrl(item.Id.ToString()));
+            }
             return ApiPageRes<QrCodeShellDto>.Pages(data);
         }
 
@@ -60,8 +65,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             bool result = _qrCodeShellService.Add(dto);
-            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
-            dto.ShellImgViewUrl = dbApplicationConfig.GenShellImgViewUrl(dto.Id.ToString());
             _qrCodeShellService.Update(dto);
             if (!result)
             {
@@ -96,8 +99,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
         public ApiRes Update(long recordId, QrCodeShellDto dto)
         {
-            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
-            dto.ShellImgViewUrl = dbApplicationConfig.GenShellImgViewUrl(recordId.ToString());
             bool result = _qrCodeShellService.Update(dto);
             if (!result)
             {
@@ -120,6 +121,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+            qrCodeShell.AddExt("shellImgViewUrl", dbApplicationConfig.GenShellImgViewUrl(qrCodeShell.Id.ToString()));
             return ApiRes.Ok(qrCodeShell);
         }
 
