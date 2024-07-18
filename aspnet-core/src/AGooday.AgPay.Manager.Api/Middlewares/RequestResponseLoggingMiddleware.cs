@@ -16,17 +16,23 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
         public async Task InvokeAsync(HttpContext context)
         {
             // 过滤，只有接口
-            if (context.Request.Path.Value.StartsWith("/api")
-                && !context.Request.Path.Value.Contains("/ossFiles")
-                && !context.Request.Path.Value.Contains("/localOssFiles")
-                && !context.Request.Path.Value.Contains("/auth/vercode")
-                && !context.Request.Path.Value.Contains("/qrc/view")
-                && !context.Request.Path.Value.Contains("/qrc/shell/view")
-                && !context.Request.Path.Value.Contains("/qrc/shell/imgview")
-                && !context.Request.Path.Value.Contains("/qrc/shell/nostyle.png")
-                && !context.Request.Path.Value.Contains("/qrc/shell/stylea.png")
-                && !context.Request.Path.Value.Contains("/qrc/shell/styleb.png")
-                && !context.Request.Path.Value.Contains("/export/"))
+            var excludedPaths = new string[]
+            {
+                "/ossFiles",
+                "/localOssFiles",
+                "/auth/vercode",
+                "/qrc/view",
+                "/qrc/shell/view",
+                "/qrc/shell/imgview",
+                "/qrc/shell/nostyle.png",
+                "/qrc/shell/stylea.png",
+                "/qrc/shell/styleb.png",
+                "/export/"
+            };
+            var requestPath = context.Request.Path.Value;
+            var isApiPath = requestPath.StartsWith("/api");
+            var isExcludedPath = excludedPaths.Any(path => requestPath.Contains(path));
+            if (isApiPath && !isExcludedPath)
             {
                 context.Request.EnableBuffering();
                 Stream originalBody = context.Response.Body;
