@@ -71,9 +71,9 @@
         public long? StoreId { get; set; }
 
         /// <summary>
-        /// 二维码Url
+        /// Url占位符
         /// </summary>
-        public string QrUrl { get; set; }
+        public string UrlPlaceholder { get; set; }
 
         /// <summary>
         /// 状态: 0-停用, 1-启用

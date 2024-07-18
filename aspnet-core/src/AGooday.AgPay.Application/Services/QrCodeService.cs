@@ -2,7 +2,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
@@ -65,7 +64,6 @@ namespace AGooday.AgPay.Application.Services
             {
                 var m = _mapper.Map<QrCode>(dto);
                 m.QrcId = $"{dto.BatchId}{i:D4}";
-                m.QrUrl = GenQrUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, m.QrcId));
                 _qrCodeRepository.Add(m);
             }
             return _qrCodeRepository.SaveChanges(out int _);
@@ -85,11 +83,6 @@ namespace AGooday.AgPay.Application.Services
                 ).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<QrCode>.Create<QrCodeDto>(QrCodes, _mapper, dto.PageNumber, dto.PageSize);
             return records;
-        }
-
-        private static string GenQrUrl(string data)
-        {
-            return $"/hub/{AgPayUtil.AesEncode(data)}";
         }
     }
 }

@@ -926,7 +926,7 @@ CREATE TABLE `t_qr_code` (
   -- `mch_name` VARCHAR(30) NOT NULL COMMENT '商户名称',
   `app_id` VARCHAR(64) NULL COMMENT '应用ID',
   `store_id` BIGINT NULL COMMENT '门店ID',
-  `qr_url` VARCHAR(255) NOT NULL COMMENT '二维码Url', 
+  `url_placeholder` VARCHAR(20) NULL COMMENT 'Url占位符', 
   -- `qrc_state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用', 
   `state` TINYINT NOT NULL COMMENT '状态: 0-停用, 1-启用',
   -- `qrc_belong_type` INT NOT NULL DEFAULT '1' COMMENT '获取方式: 1-自制, 2-下发',

@@ -147,16 +147,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             var qrCode = _qrCodeService.GetById(recordId);
             byte[] inArray;
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
-            var content = $"{dbApplicationConfig.PaySiteUrl}{qrCode.QrUrl}";
+            string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, qrCode.QrcId));
             if (qrCode.QrcShellId.HasValue)
             {
                 var qrCodeShell = _qrCodeShellService.GetById(qrCode.QrcShellId.Value);
-                inArray = GetBitmap(qrCodeShell, content, $"No.{qrCode.QrcId}");
+                inArray = GetBitmap(qrCodeShell, payUrl, $"No.{qrCode.QrcId}");
             }
             else
             {
-                //inArray = QrCodeBuilder.Generate(content);
-                inArray = DrawQrCode.GenerateNoStyleImage(content: content, text: $"No.{qrCode.QrcId}");
+                //inArray = QrCodeBuilder.Generate(payUrl);
+                inArray = DrawQrCode.GenerateNoStyleImage(content: payUrl, text: $"No.{qrCode.QrcId}");
             }
             var imageBase64Data = inArray == null ? "" : DrawQrCode.BitmapToImageBase64String(inArray);
             return ApiRes.Ok(imageBase64Data);

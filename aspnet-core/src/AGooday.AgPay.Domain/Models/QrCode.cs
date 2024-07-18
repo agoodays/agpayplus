@@ -103,11 +103,11 @@ namespace AGooday.AgPay.Domain.Models
         public long? StoreId { get; set; }
 
         /// <summary>
-        /// 二维码Url
+        /// Url占位符
         /// </summary>
-        [Comment("二维码Url")]
-        [Required, Column("qr_url", TypeName = "varchar(255)")]
-        public string QrUrl { get; set; }
+        [Comment("Url占位符")]
+        [Column("url_placeholder", TypeName = "varchar(20)")]
+        public string UrlPlaceholder { get; set; }
 
         /// <summary>
         /// 状态: 0-停用, 1-启用
