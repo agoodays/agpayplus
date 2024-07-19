@@ -78,7 +78,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
 
                 var data = jsonParams.GetValue("resp_data")?.ToObject<JObject>();
                 string respCode = data?.GetValue("resp_code").ToString(); //业务响应码
-                string respDesc = data?.GetValue("resp_desc").ToString(); //业务响应信息	
+                string respDesc = data?.GetValue("resp_desc").ToString(); //业务响应信息
+                string bankCode = null, bankDesc = null, bankMessage = null;
+                data?.TryGetString("bank_code", out bankCode); //外部通道返回码
+                data?.TryGetString("bank_desc", out bankDesc); //外部通道返回描述
+                data?.TryGetString("bank_message", out bankMessage); //外部通道返回描述
+                string code = bankCode ?? respCode;
+                string msg = (bankMessage ?? bankDesc) ?? respDesc;
                 if ("00000000".Equals(respCode))
                 {
                     data.TryGetString("huifu_id", out string huifuId);//商户编号
@@ -106,24 +112,22 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                             break;
                         case DgPayEnum.TransStat.F:
                             result.ChannelState = ChannelState.CONFIRM_FAIL;
-                            result.ChannelErrCode = respCode;
-                            result.ChannelErrMsg = respDesc;
+                            result.ChannelErrCode = code;
+                            result.ChannelErrMsg = msg;
                             break;
                     }
                 }
                 else if ("90000000".Equals(respCode))
                 {
-                    string bankCode = data?.GetValue("bank_code").ToString(); //外部通道返回码
-                    string bankMessage = data?.GetValue("bank_message").ToString(); //外部通道返回描述
                     result.ChannelState = ChannelState.CONFIRM_FAIL;
-                    result.ChannelErrCode = bankCode ?? respCode;
-                    result.ChannelErrMsg = bankMessage ?? respDesc;
+                    result.ChannelErrCode = code;
+                    result.ChannelErrMsg = msg;
                 }
                 else
                 {
                     result.ChannelState = ChannelState.CONFIRM_FAIL;
-                    result.ChannelErrCode = respCode;
-                    result.ChannelErrMsg = respDesc;
+                    result.ChannelErrCode = code;
+                    result.ChannelErrMsg = msg;
                 }
                 return result;
             }

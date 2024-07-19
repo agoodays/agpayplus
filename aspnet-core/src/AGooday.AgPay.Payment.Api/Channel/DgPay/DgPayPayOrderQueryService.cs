@@ -50,7 +50,13 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                 //请求 & 响应成功， 判断业务逻辑
                 var data = resJSON.GetValue("data")?.ToObject<JObject>();
                 string respCode = data?.GetValue("resp_code").ToString(); //业务响应码
-                string respDesc = data?.GetValue("resp_desc").ToString(); //业务响应信息	
+                string respDesc = data?.GetValue("resp_desc").ToString(); //业务响应信息
+                string bankCode = null, bankDesc = null, bankMessage = null;
+                data?.TryGetString("bank_code", out bankCode); //外部通道返回码
+                data?.TryGetString("bank_desc", out bankDesc); //外部通道返回描述
+                data?.TryGetString("bank_message", out bankMessage); //外部通道返回描述
+                string code = bankCode ?? respCode;
+                string msg = (bankMessage ?? bankDesc) ?? respDesc;
                 string huifuId = data?.GetValue("huifu_id")?.ToString();
                 channelRetMsg.ChannelMchNo = huifuId;
                 if ("00000000".Equals(respCode))
@@ -82,24 +88,22 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay
                             break;
                         case DgPayEnum.TransStat.F:
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
-                            channelRetMsg.ChannelErrCode = respCode;
-                            channelRetMsg.ChannelErrMsg = respDesc;
+                            channelRetMsg.ChannelErrCode = code;
+                            channelRetMsg.ChannelErrMsg = msg;
                             break;
                     }
                 }
                 else if ("90000000".Equals(respCode))
                 {
-                    string bankCode = data?.GetValue("bank_code").ToString(); //外部通道返回码
-                    string bankMessage = data?.GetValue("bank_message").ToString(); //外部通道返回描述
                     channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
-                    channelRetMsg.ChannelErrCode = bankCode ?? respCode;
-                    channelRetMsg.ChannelErrMsg = bankMessage ?? respDesc;
+                    channelRetMsg.ChannelErrCode = code;
+                    channelRetMsg.ChannelErrMsg = msg;
                 }
                 else
                 {
                     channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
-                    channelRetMsg.ChannelErrCode = respCode;
-                    channelRetMsg.ChannelErrMsg = respDesc;
+                    channelRetMsg.ChannelErrCode = code;
+                    channelRetMsg.ChannelErrMsg = msg;
                 }
                 return channelRetMsg; //支付中
             }
