@@ -9,6 +9,7 @@ using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Controllers.PayOrder;
 using AGooday.AgPay.Payment.Api.Models;
+using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Payment.Api.Services;
 using AGooday.AgPay.Payment.Api.Utils;
@@ -101,21 +102,29 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         public ApiRes PayOrderInfo()
         {
             (byte type, string id) = GetTokenData();
-            if (!type.Equals(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID))
+            if (type.Equals(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID))
+            {
+                //查询订单
+                PayOrderDto payOrder = GetPayOrder(id);
+
+                PayOrderDto resOrder = new PayOrderDto();
+                resOrder.PayOrderId = payOrder.PayOrderId;
+                resOrder.MchOrderNo = payOrder.MchOrderNo;
+                resOrder.MchName = payOrder.MchName;
+                resOrder.Amount = payOrder.Amount;
+                resOrder.ReturnUrl = _payMchNotifyService.CreateReturnUrl(payOrder, _configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId).MchApp.AppSecret);
+                return ApiRes.Ok(resOrder);
+            }
+            else if (type.Equals(CS.TOKEN_DATA_TYPE.QRC_ID))
+            {
+                var qrCode = GetQrCode(id);
+                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(qrCode.MchNo, qrCode.AppId);
+                return ApiRes.Ok(new { qrCode.FixedFlag, Amount = qrCode.FixedPayAmount, mchAppConfigContext.MchInfo.MchName });
+            }
+            else
             {
                 return ApiRes.CustomFail("参数错误");
             }
-
-            //查询订单
-            PayOrderDto payOrder = GetPayOrder(id);
-
-            PayOrderDto resOrder = new PayOrderDto();
-            resOrder.PayOrderId = payOrder.PayOrderId;
-            resOrder.MchOrderNo = payOrder.MchOrderNo;
-            resOrder.MchName = payOrder.MchName;
-            resOrder.Amount = payOrder.Amount;
-            resOrder.ReturnUrl = _payMchNotifyService.CreateReturnUrl(payOrder, _configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId).MchApp.AppSecret);
-            return ApiRes.Ok(resOrder);
         }
 
         /// <summary>
@@ -126,27 +135,72 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         public ApiRes Pay()
         {
             (byte type, string id) = GetTokenData();
-            if (!type.Equals(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID))
+            if (type.Equals(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID))
+            {
+                //查询订单
+                PayOrderDto payOrder = GetPayOrder(id);
+
+                string wayCode = GetWayCode();
+
+                ApiRes apiRes = null;
+
+                if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
+                {
+                    apiRes = PackageAlipayPayPackage(payOrder);
+                }
+                else if (wayCode.Equals(CS.PAY_WAY_CODE.WX_JSAPI))
+                {
+                    apiRes = PackageWxpayPayPackage(payOrder);
+                }
+
+                return ApiRes.Ok(apiRes);
+            }
+            else if (type.Equals(CS.TOKEN_DATA_TYPE.QRC_ID))
+            {
+                var qrCode = GetQrCode(id);
+
+                string wayCode = GetWayCode();
+
+                ApiRes apiRes = null;
+                string channelUserId = GetReqParamJson().GetValue("channelUserId").ToString();
+                string amount = GetReqParamJson().GetValue("amount").ToString();
+                UnifiedOrderRQ rq = new UnifiedOrderRQ();
+                rq.MchNo = qrCode.MchNo; // 商户号
+                rq.AppId = qrCode.AppId;
+                rq.StoreId = qrCode.StoreId;
+                rq.MchOrderNo = SeqUtil.GenMhoOrderId();
+                rq.WayCode = wayCode;
+                rq.Amount = Convert.ToInt64(amount);
+                rq.Currency = "CNY";
+                rq.ClientIp = IpUtil.GetIP(Request);
+                rq.Subject = $"静态码支付";
+                rq.Body = $"静态码支付";
+                if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
+                {
+                    JObject resJSON = new JObject();
+                    resJSON.Add("buyerUserId", channelUserId);
+                    rq.ChannelExtra = resJSON.ToString();
+                }
+                else if (wayCode.Equals(CS.PAY_WAY_CODE.WX_JSAPI))
+                {
+                    JObject resJSON = new JObject();
+                    resJSON.Add("openid", channelUserId);
+                    rq.ChannelExtra = resJSON.ToString();
+                }
+                else
+                {
+                    throw new BizException("不支持的支付方式");
+                }
+                UnifiedOrderRQ bizRQ = rq.BuildBizRQ();
+
+                apiRes = this.UnifiedOrder(GetWayCode(), bizRQ);
+
+                return ApiRes.Ok(apiRes);
+            }
+            else
             {
                 return ApiRes.CustomFail("参数错误");
             }
-            //查询订单
-            PayOrderDto payOrder = GetPayOrder(id);
-
-            string wayCode = GetWayCode();
-
-            ApiRes apiRes = null;
-
-            if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
-            {
-                apiRes = PackageAlipayPayPackage(payOrder);
-            }
-            else if (wayCode.Equals(CS.PAY_WAY_CODE.WX_JSAPI))
-            {
-                apiRes = PackageWxpayPayPackage(payOrder);
-            }
-
-            return ApiRes.Ok(apiRes);
         }
 
         /// <summary>
