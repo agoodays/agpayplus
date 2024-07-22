@@ -72,6 +72,9 @@
 | ![输入图片说明](docs/images/mch-login-page.png) | ![输入图片说明](docs/images/quick-cashier-page.png)  |
 |-----------------------------------|---|
 
+| ![输入图片说明](docs/images/wxpay-page-view.png) | ![输入图片说明](docs/images/wxpay-page-view-remark.png) | ![输入图片说明](docs/images/alipay-page-view.png) | ![输入图片说明](docs/images/ysfpay-page-view.png) |
+| ------------ | ------------ | ------------ | ------------ |
+
 ### Docker安装Redis和RabbitMQ
 ```
 # Docker中安装Redis
