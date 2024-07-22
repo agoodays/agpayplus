@@ -9,6 +9,7 @@
         public string WayCode { get; set; }
         public byte DivisionMode { get; set; }
         public string OrderTitle { get; set; }
+        public string SellerRemark { get; set; }
         public string PayDataType { get; set; }
         public string AuthCode { get; set; }
     }

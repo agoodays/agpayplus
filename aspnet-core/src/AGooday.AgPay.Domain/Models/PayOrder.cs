@@ -229,16 +229,16 @@ namespace AGooday.AgPay.Domain.Models
         public string Body { get; set; }
 
         /// <summary>
-        /// 买家备注
+        /// 卖家备注
         /// </summary>
-        [Comment("买家备注")]
+        [Comment("卖家备注")]
         [Column("seller_remark", TypeName = "varchar(256)")]
         public string SellerRemark { get; set; }
 
         /// <summary>
-        /// 卖家备注
+        /// 买家备注
         /// </summary>
-        [Comment("卖家备注")]
+        [Comment("买家备注")]
         [Column("buyer_remark", TypeName = "varchar(256)")]
         public string BuyerRemark { get; set; }
 

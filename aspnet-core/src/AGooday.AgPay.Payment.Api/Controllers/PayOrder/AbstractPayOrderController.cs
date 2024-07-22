@@ -111,6 +111,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     bizRQ.Currency = payOrder.Currency;
                     bizRQ.ClientIp = payOrder.ClientIp;
                     bizRQ.Subject = payOrder.Subject;
+                    bizRQ.Body = payOrder.Body;
+                    bizRQ.SellerRemark = payOrder.SellerRemark;
+                    bizRQ.BuyerRemark = payOrder.BuyerRemark;
                     bizRQ.NotifyUrl = payOrder.NotifyUrl;
                     bizRQ.ReturnUrl = payOrder.ReturnUrl;
                     bizRQ.ChannelExtra = payOrder.ChannelExtra;
@@ -305,6 +308,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrder.ClientIp = string.IsNullOrWhiteSpace(rq.ClientIp) ? GetClientIp() : rq.ClientIp; //客户端IP
             payOrder.Subject = rq.Subject; //商品标题
             payOrder.Body = rq.Body; //商品描述信息
+            payOrder.SellerRemark = rq.SellerRemark; //卖家备注
+            payOrder.BuyerRemark = rq.BuyerRemark; //买家备注
             //payOrder.ChannelExtra = rq.ChannelExtra; //特殊渠道发起的附件额外参数,  是否应该删除该字段了？？ 比如authCode不应该记录， 只是在传输阶段存在的吧？  之前的为了在payOrder对象需要传参。
             payOrder.ChannelUser = rq.GetChannelUserId(); //渠道用户标志
             payOrder.ExtParam = rq.ExtParam; //商户扩展参数

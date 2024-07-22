@@ -194,7 +194,7 @@ export default {
 
     pay: function () {
       let that = this;
-      getPayPackage(this.amount).then(res => {
+      getPayPackage(this.amount, this.remark).then(res => {
 
         //订单创建异常
         if (res.code != '0') {

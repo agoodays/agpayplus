@@ -62,6 +62,18 @@ namespace AGooday.AgPay.AopSdk.Models
         public string Body { get; set; }
 
         /// <summary>
+        /// 卖家备注
+        /// </summary>
+        [JsonProperty("sellerRemark")]
+        public string SellerRemark { get; set; }
+
+        /// <summary>
+        /// 买家备注
+        /// </summary>
+        [JsonProperty("buyerRemark")]
+        public string BuyerRemark { get; set; }
+
+        /// <summary>
         /// 门店ID
         /// </summary>
         [JsonProperty("storeId")]

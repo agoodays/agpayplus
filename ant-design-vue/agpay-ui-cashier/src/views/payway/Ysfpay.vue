@@ -179,7 +179,7 @@ export default {
 
     pay: function () {
       let that = this;
-      getPayPackage(this.amount).then(res => {
+      getPayPackage(this.amount, this.remark).then(res => {
 
         console.log(res)
 

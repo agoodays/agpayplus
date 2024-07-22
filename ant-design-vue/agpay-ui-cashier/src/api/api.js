@@ -22,7 +22,7 @@ export function getChannelUserId (redirectData) {
 }
 
 /** 调起支付接口, 获取支付数据包 **/
-export function getPayPackage (amount) {
+export function getPayPackage (amount, remark) {
   return request.request({
     url: '/api/cashier/pay',
     method: 'POST',
@@ -30,6 +30,7 @@ export function getPayPackage (amount) {
       wayCode: wayCode.getPayWay().wayCode,
       token: config.cacheToken,
       amount: amount,
+      buyerRemark: remark,
       channelUserId: channelUserIdUtil.getChannelUserId()
     }
   })

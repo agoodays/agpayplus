@@ -97,6 +97,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             model.ClientIp = IpUtil.GetIP(Request);
             model.Subject = $"{payOrder.OrderTitle}[{model.MchNo}商户联调]";
             model.Body = $"{payOrder.OrderTitle}[{model.MchNo}商户联调]";
+            model.SellerRemark = payOrder.SellerRemark;
 
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
 

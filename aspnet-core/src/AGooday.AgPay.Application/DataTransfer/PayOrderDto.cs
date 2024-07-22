@@ -163,12 +163,12 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string Body { get; set; }
 
         /// <summary>
-        /// 买家备注
+        /// 卖家备注
         /// </summary>
         public string SellerRemark { get; set; }
 
         /// <summary>
-        /// 卖家备注
+        /// 买家备注
         /// </summary>
         public string BuyerRemark { get; set; }
 

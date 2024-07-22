@@ -208,7 +208,7 @@ export default {
     pay: function () {
       // 该函数执行效果慢
       let that = this;
-      getPayPackage(this.amount).then(res => {
+      getPayPackage(this.amount, this.remark).then(res => {
         if (res.code != '0') {
           return alert(res.msg);
         }

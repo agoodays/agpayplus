@@ -77,8 +77,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// <summary>
         /// 获取userId
         /// </summary>
-        /// <param name="token"></param>
-        /// <param name="wayCode"></param>
         /// <returns></returns>
         [HttpPost, Route("channelUserId")]
         public ApiRes ChannelUserId()
@@ -164,6 +162,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 ApiRes apiRes = null;
                 string channelUserId = GetReqParamJson().GetValue("channelUserId").ToString();
                 string amount = GetReqParamJson().GetValue("amount").ToString();
+                GetReqParamJson().TryGetString("buyerRemark", out string buyerRemark);
                 UnifiedOrderRQ rq = new UnifiedOrderRQ();
                 rq.MchNo = qrCode.MchNo; // 商户号
                 rq.AppId = qrCode.AppId;
@@ -175,6 +174,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 rq.ClientIp = IpUtil.GetIP(Request);
                 rq.Subject = $"静态码支付";
                 rq.Body = $"静态码支付";
+                rq.BuyerRemark = buyerRemark;
                 if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
                 {
                     JObject resJSON = new JObject();

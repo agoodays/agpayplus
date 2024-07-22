@@ -36,7 +36,7 @@
         <span>订单金额：</span>
         <a-input v-model="amount" ref="amountInput" @change="onAmountChange"/>
         <span>备注：</span>
-        <a-input v-model="saveObject.remark"/>
+        <a-input v-model="saveObject.sellerRemark"/>
       </div>
       <div class="keyboard display" style="margin-top: 40px;">
         <div class="keyboard-num noSelect">
@@ -81,7 +81,7 @@ export default {
         storeId: null,
         authCode: null,
         amount: 0,
-        remark: null,
+        sellerRemark: null,
         divisionMode: 0,
         mchOrderNo: null,
         orderTitle: '快捷收款',
@@ -125,7 +125,7 @@ export default {
       }
       that.saveObject.amount = 0
       that.saveObject.authCode = null
-      that.saveObject.remark = null
+      that.saveObject.sellerRemark = null
       that.saveObject.wayCode = 'QR_CASHIER'
       this.isOpen = true
       // 在进入页面时刷新订单号
