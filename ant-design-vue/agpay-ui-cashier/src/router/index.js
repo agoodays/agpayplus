@@ -26,6 +26,7 @@ const routes = [
   {path: '/oauth2Callback/:agpayToken', name: 'Oauth2Callback', component: () => import('../views/Oauth2Callback.vue')}, //oauth回调地址
   {path: '/cashier', name: 'Cashier', component: () => import('../views/Cashier.vue'), //收银台（该地址无意义）
     children: [
+        { path: '/cashier/index', name: 'CashierIndex', component: () => import('../views/payway/Index') },
         { path: '/cashier/wxpay', name: 'CashierWxpay', component: () => import('../views/payway/Wxpay.vue') },
         { path: '/cashier/alipay', name: 'CashierAlipay', component: () => import('../views/payway/Alipay.vue') },
         { path: '/cashier/ysfpay', name: 'CashierYsfpay', component: () => import('../views/payway/Ysfpay.vue') }
