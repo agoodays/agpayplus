@@ -11,6 +11,11 @@ namespace AGooday.AgPay.Common.Utils
             return HttpUtility.UrlEncode(url, Encoding.UTF8);
         }
 
+        public static string DecodeAll(string url)
+        {
+            return HttpUtility.UrlDecode(url, Encoding.UTF8);
+        }
+
         public static string AppendUrlQuery(string url, JObject param)
         {
             if (string.IsNullOrWhiteSpace(url) || param == null)

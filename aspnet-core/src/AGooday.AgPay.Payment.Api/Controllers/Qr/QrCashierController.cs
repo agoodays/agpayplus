@@ -56,13 +56,16 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// </summary>
         /// <returns></returns>
         [HttpPost, Route("redirectUrl")]
-        public ApiRes RedirectUrl()
+        public IActionResult RedirectUrl()
         {
             (byte type, string id) = GetTokenData();
             (string mchNo, string appId) = GetMchNoAndAppId(type, id);
 
             //回调地址
             string redirectUrlEncode = _sysConfigService.GetDBApplicationConfig().GenOauth2RedirectUrlEncode(CS.GetTokenData(type, id));
+#if DEBUG
+            return Redirect(URLUtil.DecodeAll(redirectUrlEncode));
+#endif
 
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
@@ -71,7 +74,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 
             //获取接口并返回数据
             IChannelUserService channelUserService = GetServiceByWayCode(wayCode);
-            return ApiRes.Ok(channelUserService.BuildUserRedirectUrl(redirectUrlEncode, mchAppConfigContext));
+            return Ok(ApiRes.Ok(channelUserService.BuildUserRedirectUrl(redirectUrlEncode, mchAppConfigContext)));
         }
 
         /// <summary>
@@ -89,6 +92,22 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
             IChannelUserService channelUserService = GetServiceByWayCode(wayCode);
+#if DEBUG
+            string channelUserId;
+            switch (wayCode)
+            {
+                case CS.PAY_WAY_CODE.ALI_JSAPI:
+                    channelUserId = "2088612672407456";
+                    break;
+                case CS.PAY_WAY_CODE.WX_JSAPI:
+                    channelUserId = "oo_BZ0p305z0ZmW-eBvuuRbHrumw";
+                    break;
+                default:
+                    channelUserId = string.Empty;
+                    break;
+            }
+            return ApiRes.Ok(channelUserId);
+#endif
             return ApiRes.Ok(channelUserService.GetChannelUserId(GetReqParamJson(), mchAppConfigContext));
         }
 
