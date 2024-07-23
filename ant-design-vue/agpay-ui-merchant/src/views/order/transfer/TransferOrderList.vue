@@ -86,103 +86,104 @@
   </div>
 </template>
 <script>
-  import AgTable from '@/components/AgTable/AgTable'
-  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
-  import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
-  import AgTableColumns from '@/components/AgTable/AgTableColumns'
-  import TransferOrderDetail from './TransferOrderDetail'
-  import { API_URL_TRANSFER_ORDER_LIST, req } from '@/api/manage'
-  import moment from 'moment'
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
+import AgTable from '@/components/AgTable/AgTable'
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import TransferOrderDetail from './TransferOrderDetail'
+import { API_URL_TRANSFER_ORDER_LIST, req } from '@/api/manage'
+import moment from 'moment'
 
-  // eslint-disable-next-line no-unused-vars
-  const tableColumns = [
-    { key: 'amount', title: '转账金额', width: 100, scopedSlots: { customRender: 'transferAmountSlot' } },
-    { key: 'orderNo', title: '订单号', width: 260, scopedSlots: { customRender: 'orderSlot' } },
-    // { key: 'transferId', dataIndex: 'transferId', title: '转账订单号' },
-    // { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户转账单号' },
-    // { key: 'channelOrderNo', dataIndex: 'channelOrderNo', title: '渠道订单号' },
-    { key: 'accountNo', dataIndex: 'accountNo', title: '收款账号', width: 200 },
-    { key: 'accountName', dataIndex: 'accountName', title: '收款人姓名', width: 120 },
-    { key: 'transferDesc', dataIndex: 'transferDesc', title: '转账备注', width: 200 },
-    { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
-    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
-    { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
-  ]
+// eslint-disable-next-line no-unused-vars
+const tableColumns = [
+  { key: 'amount', title: '转账金额', width: 100, scopedSlots: { customRender: 'transferAmountSlot' } },
+  { key: 'orderNo', title: '订单号', width: 260, scopedSlots: { customRender: 'orderSlot' } },
+  // { key: 'transferId', dataIndex: 'transferId', title: '转账订单号' },
+  // { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户转账单号' },
+  // { key: 'channelOrderNo', dataIndex: 'channelOrderNo', title: '渠道订单号' },
+  { key: 'accountNo', dataIndex: 'accountNo', title: '收款账号', width: 200 },
+  { key: 'accountName', dataIndex: 'accountName', title: '收款人姓名', width: 120 },
+  { key: 'transferDesc', dataIndex: 'transferDesc', title: '转账备注', width: 200 },
+  { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+]
 
-  export default {
-    name: 'TransferOrderList',
-    components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, TransferOrderDetail },
-    data () {
-      return {
-        isShowMore: false,
-        btnLoading: false,
-        tableColumns: tableColumns,
-        searchData: {
-          queryDateRange: 'today'
-        },
-        createdStart: '', // 选择开始时间
-        createdEnd: '' // 选择结束时间
-      }
+export default {
+  name: 'TransferOrderList',
+  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, TransferOrderDetail },
+  data () {
+    return {
+      isShowMore: false,
+      btnLoading: false,
+      tableColumns: tableColumns,
+      searchData: {
+        queryDateRange: 'today'
+      },
+      createdStart: '', // 选择开始时间
+      createdEnd: '' // 选择结束时间
+    }
+  },
+  methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
     },
-    methods: {
-      handleSearchFormData (searchData) {
-        this.searchData = searchData
-      },
-      setIsShowMore (isShowMore) {
-        this.isShowMore = isShowMore
-      },
-      queryFunc () {
-        this.btnLoading = true
-        this.$refs.infoTable.refTable(true)
-      },
-      // 请求table接口数据
-      reqTableDataFunc: (params) => {
-        return req.list(API_URL_TRANSFER_ORDER_LIST, params)
-      },
-      reqDownloadDataFunc: (params) => {
-        req.export(API_URL_TRANSFER_ORDER_LIST, 'excel', params).then(res => {
-          // 将响应体中的二进制数据转换为Blob对象
-          const blob = new Blob([res])
-          const fileName = '转账订单.xlsx' // 要保存的文件名称
-          if ('download' in document.createElement('a')) {
-            // 非IE下载
-            // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
-            const elink = document.createElement('a')
-            elink.download = fileName
-            elink.style.display = 'none'
-            elink.href = URL.createObjectURL(blob) // 创建URL.createObjectURL(blob) URL，并将其赋值给a标签的href属性
-            document.body.appendChild(elink)
-            elink.click()
-            URL.revokeObjectURL(elink.href) // 释放URL 对象
-            document.body.removeChild(elink)
-          } else {
-            // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
-          }
-        }).catch((error) => {
-          console.error(error)
-        })
-      },
-      searchFunc: function () { // 点击【查询】按钮点击事件
-        this.$refs.infoTable.refTable(true)
-      },
-      detailFunc: function (recordId) {
-        this.$refs.transferOrderDetail.show(recordId)
-      },
-      moment,
-      onChange (date, dateString) {
-        this.searchData.createdStart = dateString[0] // 开始时间
-        this.searchData.createdEnd = dateString[1] // 结束时间
-      },
-      disabledDate (current) { // 今日之后日期不可选
-        return current && current > moment().endOf('day')
-      },
-      changeStr2ellipsis (orderNo, baseLength) {
-        const halfLengh = parseInt(baseLength / 2)
-        return orderNo.substring(0, halfLengh - 1) + '...' + orderNo.substring(orderNo.length - halfLengh, orderNo.length)
-      }
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
+    queryFunc () {
+      this.btnLoading = true
+      this.$refs.infoTable.refTable(true)
+    },
+    // 请求table接口数据
+    reqTableDataFunc: (params) => {
+      return req.list(API_URL_TRANSFER_ORDER_LIST, params)
+    },
+    reqDownloadDataFunc: (params) => {
+      req.export(API_URL_TRANSFER_ORDER_LIST, 'excel', params).then(res => {
+        // 将响应体中的二进制数据转换为Blob对象
+        const blob = new Blob([res])
+        const fileName = '转账订单.xlsx' // 要保存的文件名称
+        if ('download' in document.createElement('a')) {
+          // 非IE下载
+          // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
+          const elink = document.createElement('a')
+          elink.download = fileName
+          elink.style.display = 'none'
+          elink.href = URL.createObjectURL(blob) // 创建URL.createObjectURL(blob) URL，并将其赋值给a标签的href属性
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href) // 释放URL 对象
+          document.body.removeChild(elink)
+        } else {
+          // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
+      }).catch((error) => {
+        console.error(error)
+      })
+    },
+    searchFunc: function () { // 点击【查询】按钮点击事件
+      this.$refs.infoTable.refTable(true)
+    },
+    detailFunc: function (recordId) {
+      this.$refs.transferOrderDetail.show(recordId)
+    },
+    moment,
+    onChange (date, dateString) {
+      this.searchData.createdStart = dateString[0] // 开始时间
+      this.searchData.createdEnd = dateString[1] // 结束时间
+    },
+    disabledDate (current) { // 今日之后日期不可选
+      return current && current > moment().endOf('day')
+    },
+    changeStr2ellipsis (orderNo, baseLength) {
+      const halfLengh = parseInt(baseLength / 2)
+      return orderNo.substring(0, halfLengh - 1) + '...' + orderNo.substring(orderNo.length - halfLengh, orderNo.length)
     }
   }
+}
 </script>
 <style lang="less" scoped>
 .order-list {

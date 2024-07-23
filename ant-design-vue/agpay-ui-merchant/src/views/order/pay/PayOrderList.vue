@@ -536,11 +536,12 @@
   </div>
 </template>
 <script>
-import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import RefundModal from './RefundModal' // 退款弹出框
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import RefundModal from './RefundModal' // 退款弹出框
 import { API_URL_PAY_ORDER_LIST, API_URL_PAYWAYS_LIST, req } from '@/api/manage'
 import moment from 'moment'
 
@@ -562,7 +563,7 @@ const tableColumns = [
 
 export default {
   name: 'PayOrderList',
-  components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, RefundModal },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, RefundModal },
   data () {
     return {
       isShowMore: false,

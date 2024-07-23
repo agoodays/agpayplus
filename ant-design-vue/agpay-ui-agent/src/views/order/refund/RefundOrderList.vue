@@ -367,132 +367,133 @@
   </div>
 </template>
 <script>
-  import AgTable from '@/components/AgTable/AgTable'
-  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
-  import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
-  import AgTableColumns from '@/components/AgTable/AgTableColumns'
-  import { API_URL_REFUND_ORDER_LIST, req } from '@/api/manage'
-  import moment from 'moment'
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
+import AgTable from '@/components/AgTable/AgTable'
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import { API_URL_REFUND_ORDER_LIST, req } from '@/api/manage'
+import moment from 'moment'
 
-  // eslint-disable-next-line no-unused-vars
-  const tableColumns = [
-    { key: 'refund', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
-    { key: 'pay', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
-    { key: 'payAmount', title: '支付金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
-    { key: 'refundAmount', title: '退款金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'refundAmountSlot' } },
-    { key: 'refundFeeAmount', title: '手续费退还金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'refundFeeAmountSlot' } },
-    // { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
-    // { key: 'mchRefundNo', dataIndex: 'mchRefundNo', title: '商户退款单号' },
-    { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
-    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
-    { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
-  ]
+// eslint-disable-next-line no-unused-vars
+const tableColumns = [
+  { key: 'refund', title: '退款订单号', width: 200, fixed: 'left', scopedSlots: { customRender: 'refundOrderSlot' } },
+  { key: 'pay', title: '支付订单号', width: 200, scopedSlots: { customRender: 'payOrderSlot' } },
+  { key: 'payAmount', title: '支付金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'payAmountSlot' } },
+  { key: 'refundAmount', title: '退款金额', width: 100, ellipsis: true, scopedSlots: { customRender: 'refundAmountSlot' } },
+  { key: 'refundFeeAmount', title: '手续费退还金额', width: 110, ellipsis: true, scopedSlots: { customRender: 'refundFeeAmountSlot' } },
+  // { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号' },
+  // { key: 'mchRefundNo', dataIndex: 'mchRefundNo', title: '商户退款单号' },
+  { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+]
 
-  export default {
-    name: 'RefundOrderList',
-    components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
-    data () {
-      return {
-        isShowMore: false,
-        btnLoading: false,
-        tableColumns: tableColumns,
-        searchData: {
-          queryDateRange: 'today'
-        },
-        countData: {
-          allRefundAmount: 0.00,
-          allRefundCount: 0,
-          refundAmount: 0.00,
-          refundCount: 0,
-          refundFeeAmount: 0.00,
-          round: 0.00
-        },
-        selectedIds: [], // 选中的数据
-        createdStart: '', // 选择开始时间
-        createdEnd: '', // 选择结束时间
-        visible: false,
-        detailData: {}
-      }
+export default {
+  name: 'RefundOrderList',
+  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
+  data () {
+    return {
+      isShowMore: false,
+      btnLoading: false,
+      tableColumns: tableColumns,
+      searchData: {
+        queryDateRange: 'today'
+      },
+      countData: {
+        allRefundAmount: 0.00,
+        allRefundCount: 0,
+        refundAmount: 0.00,
+        refundCount: 0,
+        refundFeeAmount: 0.00,
+        round: 0.00
+      },
+      selectedIds: [], // 选中的数据
+      createdStart: '', // 选择开始时间
+      createdEnd: '', // 选择结束时间
+      visible: false,
+      detailData: {}
+    }
+  },
+  computed: {
+  },
+  mounted () {
+    this.countFunc()
+  },
+  methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
     },
-    computed: {
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
     },
-    mounted () {
+    queryFunc () {
+      this.btnLoading = true
       this.countFunc()
+      this.$refs.infoTable.refTable(true)
     },
-    methods: {
-      handleSearchFormData (searchData) {
-        this.searchData = searchData
-      },
-      setIsShowMore (isShowMore) {
-        this.isShowMore = isShowMore
-      },
-      queryFunc () {
-        this.btnLoading = true
-        this.countFunc()
-        this.$refs.infoTable.refTable(true)
-      },
-      // 请求table接口数据
-      reqTableDataFunc: (params) => {
-        return req.list(API_URL_REFUND_ORDER_LIST, params)
-      },
-      reqDownloadDataFunc: (params) => {
-        req.export(API_URL_REFUND_ORDER_LIST, 'excel', params).then(res => {
-          // 将响应体中的二进制数据转换为Blob对象
-          const blob = new Blob([res])
-          const fileName = '退款订单.xlsx' // 要保存的文件名称
-          if ('download' in document.createElement('a')) {
-            // 非IE下载
-            // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
-            const elink = document.createElement('a')
-            elink.download = fileName
-            elink.style.display = 'none'
-            elink.href = URL.createObjectURL(blob) // 创建URL.createObjectURL(blob) URL，并将其赋值给a标签的href属性
-            document.body.appendChild(elink)
-            elink.click()
-            URL.revokeObjectURL(elink.href) // 释放URL 对象
-            document.body.removeChild(elink)
-          } else {
-            // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
-          }
-        }).catch((error) => {
-          console.error(error)
-        })
-      },
-      searchFunc: function () { // 点击【查询】按钮点击事件
-        this.countFunc()
-        this.$refs.infoTable.refTable(true)
-      },
-      countFunc: function () {
-        const that = this
-        req.count(API_URL_REFUND_ORDER_LIST, this.searchData).then(res => {
-          that.countData = res
-        })
-      },
-      detailFunc: function (recordId) {
-        const that = this
-        req.getById(API_URL_REFUND_ORDER_LIST, recordId).then(res => {
-          that.detailData = res
-        })
-        this.visible = true
-      },
-      moment,
-      onChange (date, dateString) {
-        this.searchData.createdStart = dateString[0] // 开始时间
-        this.searchData.createdEnd = dateString[1] // 结束时间
-      },
-      disabledDate (current) { // 今日之后日期不可选
-        return current && current > moment().endOf('day')
-      },
-      onClose () {
-        this.visible = false
-      },
-      changeStr2ellipsis (orderNo, baseLength) {
-        const halfLengh = parseInt(baseLength / 2)
-        return orderNo.substring(0, halfLengh - 1) + '...' + orderNo.substring(orderNo.length - halfLengh, orderNo.length)
-      }
+    // 请求table接口数据
+    reqTableDataFunc: (params) => {
+      return req.list(API_URL_REFUND_ORDER_LIST, params)
+    },
+    reqDownloadDataFunc: (params) => {
+      req.export(API_URL_REFUND_ORDER_LIST, 'excel', params).then(res => {
+        // 将响应体中的二进制数据转换为Blob对象
+        const blob = new Blob([res])
+        const fileName = '退款订单.xlsx' // 要保存的文件名称
+        if ('download' in document.createElement('a')) {
+          // 非IE下载
+          // 创建一个a标签，设置download属性和href属性，并触发click事件下载文件
+          const elink = document.createElement('a')
+          elink.download = fileName
+          elink.style.display = 'none'
+          elink.href = URL.createObjectURL(blob) // 创建URL.createObjectURL(blob) URL，并将其赋值给a标签的href属性
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href) // 释放URL 对象
+          document.body.removeChild(elink)
+        } else {
+          // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
+      }).catch((error) => {
+        console.error(error)
+      })
+    },
+    searchFunc: function () { // 点击【查询】按钮点击事件
+      this.countFunc()
+      this.$refs.infoTable.refTable(true)
+    },
+    countFunc: function () {
+      const that = this
+      req.count(API_URL_REFUND_ORDER_LIST, this.searchData).then(res => {
+        that.countData = res
+      })
+    },
+    detailFunc: function (recordId) {
+      const that = this
+      req.getById(API_URL_REFUND_ORDER_LIST, recordId).then(res => {
+        that.detailData = res
+      })
+      this.visible = true
+    },
+    moment,
+    onChange (date, dateString) {
+      this.searchData.createdStart = dateString[0] // 开始时间
+      this.searchData.createdEnd = dateString[1] // 结束时间
+    },
+    disabledDate (current) { // 今日之后日期不可选
+      return current && current > moment().endOf('day')
+    },
+    onClose () {
+      this.visible = false
+    },
+    changeStr2ellipsis (orderNo, baseLength) {
+      const halfLengh = parseInt(baseLength / 2)
+      return orderNo.substring(0, halfLengh - 1) + '...' + orderNo.substring(orderNo.length - halfLengh, orderNo.length)
     }
   }
+}
 </script>
 <style lang="less" scoped>
 .order-list {
