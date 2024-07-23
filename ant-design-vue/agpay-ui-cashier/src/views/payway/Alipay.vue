@@ -117,16 +117,14 @@ export default {
       },
     }
   },
-
   mounted() {
-     //this.setPayOrderInfo(true); //获取订单信息 & 调起支付插件
+     this.setPayOrderInfo(); //获取订单信息 & 调起支付插件
   },
-
   methods: {
     payment() {
       if (this.money == -1)
         return;
-      console.log('payment');
+      this.pay();
     },
     conceal() {
       this.concealSate = !this.concealSate
@@ -177,21 +175,20 @@ export default {
       this.remark = remark;
       this.myDialogState = !this.myDialogState;
     },
-
-    setPayOrderInfo(isAutoPay){
+    setPayOrderInfo(){
       const that = this
       getPayOrderInfo().then(res => {
         that.payOrderInfo = res
         that.merchantName = res.mchName
         that.amount = res.amount
-        if(isAutoPay){
+        that.isAllowModifyAmount = res.fixedFlag !== 1
+        if(res.payOrderId){
           that.pay()
         }
       }).catch(res => {
         that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})
       });
     },
-
     pay: function () {
       let that = this;
       getPayPackage(this.amount, this.remark).then(res => {

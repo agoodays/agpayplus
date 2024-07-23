@@ -85,7 +85,7 @@
 <script>
 import MyDialog from "@/views/dialog/dialog";// 添加备注弹出的对话框
 import Keyboard from "@/views/keyboard/keyboard";// 手写键盘
-import { getPayPackage }from '@/api/api'
+import { getPayPackage, getPayOrderInfo }from '@/api/api'
 import config from "@/config";
 export default {
   // 注册备注对话框，和 手写键盘组件，由于这里是直接掉起支付事件，所以目前不应用
@@ -118,14 +118,14 @@ export default {
   },
 
   mounted() {
-    // this.pay(); //自动调起
+    this.setPayOrderInfo(); //获取订单信息 & 调起支付插件
   },
 
   methods: {
     payment() {
       if (this.money == -1)
         return;
-      console.log('payment');
+      this.pay();
     },
     conceal() {
       this.concealSate = !this.concealSate
@@ -176,11 +176,23 @@ export default {
       this.remark = remark;
       this.myDialogState = !this.myDialogState;
     },
-
+    setPayOrderInfo(){
+      const that = this
+      getPayOrderInfo().then(res => {
+        that.payOrderInfo = res
+        that.merchantName = res.mchName
+        that.amount = res.amount
+        that.isAllowModifyAmount = res.fixedFlag !== 1
+        if(res.payOrderId){
+          that.pay()
+        }
+      }).catch(res => {
+        that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})
+      });
+    },
     pay: function () {
       let that = this;
       getPayPackage(this.amount, this.remark).then(res => {
-
         console.log(res)
 
         if (!window.AlipayJSBridge) {
@@ -195,7 +207,6 @@ export default {
         that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})
       });
     },
-
     doAlipay(alipayTradeNo) {
       // eslint-disable-next-line no-undef
       AlipayJSBridge.call("tradePay", {

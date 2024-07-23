@@ -35,6 +35,7 @@ export default {
     const that = this;
     //以下为不存在
     getRedirectUrl().then(res => {
+      console.log(res);
       location.href = res;
     }).catch(res => {
       that.$router.push({ name: config.errorPageRouteName, params: { errInfo: res.msg } })

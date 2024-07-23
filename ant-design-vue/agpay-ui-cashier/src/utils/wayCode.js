@@ -14,7 +14,7 @@ const getToPageRouteName = function () {
 }
 
 const getPayWay = function () {
-
+    console.log(navigator.userAgent);
     const userAgent = navigator.userAgent;
 
     if(userAgent.indexOf("MicroMessenger") >= 0){

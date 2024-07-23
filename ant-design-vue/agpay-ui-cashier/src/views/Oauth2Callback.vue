@@ -22,6 +22,7 @@ export default {
 
     const that = this;
     getChannelUserId(allQuery).then(res => {
+      console.log(res)
       //设置channelUserId
       channelUserIdUtil.setChannelUserId(res);
 
