@@ -188,7 +188,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 rq.StoreId = qrCode.StoreId;
                 rq.MchOrderNo = SeqUtil.GenMhoOrderId();
                 rq.WayCode = wayCode;
-                rq.Amount = Convert.ToInt64(amount);
+                rq.Amount = AmountUtil.ConvertDollar2Cent(amount);
                 rq.Currency = "CNY";
                 rq.ClientIp = IpUtil.GetIP(Request);
                 rq.Subject = $"静态码支付";

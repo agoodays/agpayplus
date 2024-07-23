@@ -192,7 +192,8 @@ export default {
       getPayOrderInfo().then(res => {
         that.payOrderInfo = res
         that.merchantName = res.mchName
-        that.amount = res.amount
+        that.amount = (res.amount / 100) + ""
+        that.money = this.payOrderInfo.amount > 0 ? this.payOrderInfo.amount : -1
         that.isAllowModifyAmount = res.fixedFlag !== 1
         if(res.payOrderId){
           that.pay()
