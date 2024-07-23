@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// </summary>
         /// <returns></returns>
         [HttpPost, Route("redirectUrl")]
-        public IActionResult RedirectUrl()
+        public ApiRes RedirectUrl()
         {
             (byte type, string id) = GetTokenData();
             (string mchNo, string appId) = GetMchNoAndAppId(type, id);
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             //回调地址
             string redirectUrlEncode = _sysConfigService.GetDBApplicationConfig().GenOauth2RedirectUrlEncode(CS.GetTokenData(type, id));
 #if DEBUG
-            return Redirect(URLUtil.DecodeAll(redirectUrlEncode));
+            return ApiRes.Ok(URLUtil.DecodeAll(redirectUrlEncode));
 #endif
 
             //获取商户配置信息
@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 
             //获取接口并返回数据
             IChannelUserService channelUserService = GetServiceByWayCode(wayCode);
-            return Ok(ApiRes.Ok(channelUserService.BuildUserRedirectUrl(redirectUrlEncode, mchAppConfigContext)));
+            return ApiRes.Ok(channelUserService.BuildUserRedirectUrl(redirectUrlEncode, mchAppConfigContext));
         }
 
         /// <summary>
