@@ -25,8 +25,7 @@ namespace AGooday.AgPay.AopSdk.Nets
 
         public T Execute<T>(IAgPayRequest<T> request, RequestMethod method, string url) where T : AgPayResponse
         {
-            var jsonParam = JsonConvert.SerializeObject(request.GetBizModel());
-            var @params = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonParam);
+            Dictionary<string, object> @params = GetParams(request);
             var apiAgPayRequest = new APIAgPayRequest(method, url, @params, request.GetRequestOptions());
             var response = httpClient.Request(apiAgPayRequest);
             int responseCode = response.ResponseCode;
@@ -40,8 +39,7 @@ namespace AGooday.AgPay.AopSdk.Nets
 
         public async Task<T> ExecuteAsync<T>(IAgPayRequest<T> request, RequestMethod method, string url) where T : AgPayResponse
         {
-            var jsonParam = JsonConvert.SerializeObject(request.GetBizModel());
-            var @params = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonParam);
+            Dictionary<string, object> @params = GetParams(request);
             var apiAgPayRequest = new APIAgPayRequest(method, url, @params, request.GetRequestOptions());
             var response = await httpClient.RequestAsync(apiAgPayRequest);
             int responseCode = response.ResponseCode;
@@ -51,6 +49,29 @@ namespace AGooday.AgPay.AopSdk.Nets
                 HandleAPIError(response);
             }
             return JsonConvert.DeserializeObject<T>(responseBody);
+        }
+
+        private static Dictionary<string, object> GetParams<T>(IAgPayRequest<T> request) where T : AgPayResponse
+        {
+            //1.把requset转为map
+            var bizModel = request.GetBizModel();
+            var jsonParam = JsonConvert.SerializeObject(bizModel);
+            var @params = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonParam);
+            //2.把bizModel.extendInfos 里的键值，覆盖已有的
+            var extendInfos = bizModel.GetExtendInfos();
+            if (extendInfos != null && extendInfos.Count > 0)
+            {
+                foreach (var item in extendInfos)
+                {
+                    if (@params.ContainsKey(item.Key))
+                    {
+                        @params.Remove(item.Key);
+                    }
+                    @params.Add(item.Key, item.Value);
+                }
+            }
+
+            return @params;
         }
 
         private static void HandleAPIError(APIAgPayResponse response)
