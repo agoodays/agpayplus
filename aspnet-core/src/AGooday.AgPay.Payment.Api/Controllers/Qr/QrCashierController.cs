@@ -124,7 +124,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 //查询订单
                 PayOrderDto payOrder = GetPayOrder(id);
 
-                PayOrderDto resOrder = new PayOrderDto();
+                PayOrderInfo resOrder = new PayOrderInfo();
                 resOrder.PayOrderId = payOrder.PayOrderId;
                 resOrder.MchOrderNo = payOrder.MchOrderNo;
                 resOrder.MchName = payOrder.MchName;
@@ -136,7 +136,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             {
                 var qrCode = GetQrCode(id);
                 MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(qrCode.MchNo, qrCode.AppId);
-                return ApiRes.Ok(new { qrCode.FixedFlag, Amount = qrCode.FixedPayAmount, mchAppConfigContext.MchInfo.MchName });
+                PayOrderInfo resOrder = new PayOrderInfo();
+                resOrder.MchName = mchAppConfigContext.MchInfo.MchName;
+                resOrder.FixedFlag = qrCode.FixedFlag;
+                resOrder.Amount = qrCode.FixedPayAmount;
+                return ApiRes.Ok(resOrder);
             }
             else
             {
