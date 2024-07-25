@@ -450,7 +450,7 @@ export default {
     left: 30px;
   }
   .agpay-tip-text {
-    font-size: 10px !important;
+    font-size: 12px !important;
     border-radius: 5px;
     background: #ffeed8;
     color: #c57000 !important;
@@ -459,5 +459,6 @@ export default {
     max-width: 100%;
     position: relative;
     margin-top: 15px;
+    line-height: 1.5715;
   }
 </style>

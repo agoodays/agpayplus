@@ -60,7 +60,7 @@
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_DEVICE_QRC_VIEW')" @click="onPreview(record.qrcId)">详情</a-button>
-<!--            <a-button type="link" v-if="$access('ENT_DEVICE_QRC_EDIT')" @click="editFunc(record.qrcId)">修改</a-button>-->
+            <a-button type="link" v-if="$access('ENT_DEVICE_QRC_EDIT')" @click="editFunc(record.qrcId)">修改</a-button>
             <a-button type="link" style="color: red" v-if="$access('ENT_DEVICE_QRC_DEL')" @click="delFunc(record.qrcId)">删除</a-button>
           </AgTableColumns>
         </template>

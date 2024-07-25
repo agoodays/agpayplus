@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
@@ -60,6 +61,10 @@ namespace AGooday.AgPay.Application.Services
 
         public bool BatchAdd(QrCodeAddDto dto)
         {
+            if (_qrCodeRepository.IsExistBatchId(dto.BatchId))
+            {
+                throw new BizException("批次号已存在，请重新填写");
+            }
             for (int i = 1; i <= dto.AddNum; i++)
             {
                 var entity = _mapper.Map<QrCode>(dto);

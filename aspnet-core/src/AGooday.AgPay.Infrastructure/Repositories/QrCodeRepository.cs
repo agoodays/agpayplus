@@ -15,5 +15,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return GetAllAsNoTracking().FirstOrDefault(w => w.QrcId.Equals(recordId));
         }
+
+        public bool IsExistBatchId(string batchId)
+        {
+            return GetAllAsNoTracking().Any(c => c.BatchId.Equals(batchId));
+        }
     }
 }

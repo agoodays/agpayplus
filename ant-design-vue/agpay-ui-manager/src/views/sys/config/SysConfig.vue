@@ -405,8 +405,8 @@
               </a-col>
               <a-col :span="8" :offset="1">
                 <a-form-model-item label="密码规则">
-                  <a-checkbox v-model="requireUppercaseLowercaseDigits" @change="passwordRegexpChange">是否要求大小写和数字</a-checkbox>
-                  <a-checkbox v-model="requireMinimumLength" @change="passwordRegexpChange">密码最少<a-input-number v-model="minimumLength" @change="passwordMinimumLengthChange"/>位</a-checkbox>
+                  <a-checkbox style="margin-left: auto;" v-model="requireUppercaseLowercaseDigits" @change="passwordRegexpChange">是否要求大小写和数字</a-checkbox>
+                  <a-checkbox style="margin-left: auto;" v-model="requireMinimumLength" @change="passwordRegexpChange">密码最少<a-input-number v-model="minimumLength" @change="passwordMinimumLengthChange"/>位</a-checkbox>
                 </a-form-model-item>
               </a-col>
             </a-row>
@@ -637,7 +637,7 @@ export default {
     left: 30px;
   }
   .agpay-tip-text {
-    font-size: 10px !important;
+    font-size: 12px !important;
     border-radius: 5px;
     background: #ffeed8;
     color: #c57000 !important;
@@ -646,5 +646,6 @@ export default {
     max-width: 100%;
     position: relative;
     margin-top: 15px;
+    line-height: 1.5715;
   }
 </style>

@@ -9,19 +9,15 @@
     width="40%"
     class="drawer-width">
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 6}" :wrapper-col="{span: 18}" :rules="rules">
-      <a-form-model-item label="批次号：" prop="batchId">
-        <a-row>
-          <a-col span="14"><a-input-number v-model="saveObject.batchId" :disabled="!isAdd" style="width: 100%" /></a-col>
-          <a-col span="6"><a-button type="primary" @click="onToday" size="small" style="margin-left: 20px">今天</a-button></a-col>
-        </a-row>
-        <div class="agpay-tip-text">
-          <span>( 数字格式， 二维码编号的前缀， 建议采用： YYYYMMDD+次数表示 )</span>
-        </div>
+      <a-form-model-item label="批次号：" prop="batchId" v-if="isAdd">
+        <a-input-number v-model="saveObject.batchId" style="width: 70%;margin-right: 20px;" />
+        <a-button type="primary" @click="onToday" size="small">今天</a-button>
+        <p class="agpay-tip-text">( 数字格式， 二维码编号的前缀， 建议采用： YYYYMMDD+次数表示 )</p>
       </a-form-model-item>
-      <a-form-model-item label="创建数量：" prop="addNum">
+      <a-form-model-item label="创建数量：" prop="addNum" v-if="isAdd">
         <a-input-number v-model="saveObject.addNum" :min="1" :max="500" />
       </a-form-model-item>
-      <a-form-model-item label="选择模板" prop="qrcShellId">
+      <a-form-model-item label="选择模板" prop="qrcShellId" v-if="isAdd">
         <a-select v-model="saveObject.qrcShellId" placeholder="请选择模板">
           <a-select-option value="" key="">无</a-select-option>
           <a-select-option v-for="d in shellList" :value="d.id" :key="d.id">
@@ -57,10 +53,10 @@
 <!--        <a-input v-if="saveObject.fixedFlag===1" v-model="saveObject.fixedPayAmount" type="number" addon-after="元" style="width: 150px"/>-->
         <span v-if="saveObject.fixedFlag===1"><a-input-number v-model="saveObject.fixedPayAmount" addon-after="元"/>元</span>
       </a-form-model-item>
-      <a-form-model-item prop="entryPage">
+      <a-form-model-item prop="entryPage" v-if="isAdd">
         <template slot="label">
           <span>
-            <label title="选择页面类型" style="margin-right: 4px">选择页面类型</label>
+            <label title="选择页面类型" style="margin-right: 4px">扫码后页面类型</label>
             <!-- 选择页面类型 气泡弹窗 -->
             <!-- title可省略，就不显示 -->
             <a-popover placement="top">
@@ -88,6 +84,7 @@
             固定小程序页面
           </a-radio>
         </a-radio-group>
+        <p class="agpay-tip-text">选择[默认/H5/小程序]任意一种后不可修改，请谨慎选择。</p>
       </a-form-model-item>
       <a-form-model-item prop="alipayWayCode">
         <template slot="label">
@@ -111,6 +108,8 @@
             ALI_WAP
           </a-radio>
         </a-radio-group>
+        <br>
+        <p class="agpay-tip-text">仅H5呈现时生效</p>
       </a-form-model-item>
     </a-form-model>
     <div class="drawer-btn-center" >
@@ -161,6 +160,7 @@ export default {
     show: function (recordId) { // 弹层打开事件
       this.isAdd = !recordId
       this.saveObject = {
+        batchId: null,
         addNum: 1,
         state: 1,
         fixedFlag: 0,
@@ -173,12 +173,15 @@ export default {
       }
 
       const that = this
-      req.list(API_URL_QRC_SHELL_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 模板下拉选择列表
-        that.shellList = res.records
-      })
-      req.get(API_URL_QRC_LIST + '/batchIdDistinctCount').then(res => { // 模板下拉选择列表
-        that.saveObject.batchId = res
-      })
+      if (this.isAdd) {
+        req.list(API_URL_QRC_SHELL_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 模板下拉选择列表
+          that.shellList = res.records
+        })
+        req.get(API_URL_QRC_LIST + '/batchIdDistinctCount').then(res => { // 模板下拉选择列表
+          that.saveObject.batchId = +res
+          console.log(this.saveObject.batchId)
+        })
+      }
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.recordId = recordId
         req.getById(API_URL_QRC_LIST, recordId).then(res => { that.saveObject = res })
@@ -196,7 +199,6 @@ export default {
       const month = (today.getMonth() + 1).toString().padStart(2, '0')
       const day = today.getDate().toString().padStart(2, '0')
       this.saveObject.batchId = +`${year}${month}${day}00`
-      console.log(this.saveObject.batchId)
       this.$forceUpdate()
     },
     handleOkFunc: function () { // 点击【确认】按钮事件
@@ -257,7 +259,7 @@ export default {
     left: 30px;
   }
   .agpay-tip-text {
-    font-size: 10px !important;
+    font-size: 12px !important;
     border-radius: 5px;
     background: #ffeed8;
     color: #c57000 !important;
@@ -266,5 +268,6 @@ export default {
     max-width: 100%;
     position: relative;
     margin-top: 15px;
+    line-height: 1.5715;
   }
 </style>
