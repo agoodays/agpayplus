@@ -10,6 +10,7 @@
         TDto GetById(TPrimaryKey id);
         Task<TDto> GetByIdAsync(TPrimaryKey recordId);
         IEnumerable<TDto> GetAll();
+        IEnumerable<TDto> GetAllAsNoTracking();
     }
     public interface IAgPayService<TDto> : IDisposable
         where TDto : class
@@ -20,5 +21,6 @@
         TDto GetById<TPrimaryKey>(TPrimaryKey id);
         Task<TDto> GetByIdAsync<TPrimaryKey>(TPrimaryKey recordId);
         IEnumerable<TDto> GetAll();
+        IEnumerable<TDto> GetAllAsNoTracking();
     }
 }

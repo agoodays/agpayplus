@@ -25,10 +25,10 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(SysLogDto dto)
         {
-            var m = _mapper.Map<SysLog>(dto);
-            _sysLogRepository.Add(m);
+            var entity = _mapper.Map<SysLog>(dto);
+            _sysLogRepository.Add(entity);
             var result = _sysLogRepository.SaveChanges(out int _);
-            dto.SysLogId = m.SysLogId;
+            dto.SysLogId = entity.SysLogId;
             return result;
         }
 

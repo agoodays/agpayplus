@@ -26,10 +26,10 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(MchNotifyRecordDto dto)
         {
-            var m = _mapper.Map<MchNotifyRecord>(dto);
-            _mchNotifyRecordRepository.Add(m);
+            var entity = _mapper.Map<MchNotifyRecord>(dto);
+            _mchNotifyRecordRepository.Add(entity);
             var result = _mchNotifyRecordRepository.SaveChanges(out int _);
-            dto.NotifyId = m.NotifyId;
+            dto.NotifyId = entity.NotifyId;
             return result;
         }
 
@@ -71,7 +71,9 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public MchNotifyRecordDto FindByOrderAndType(string orderId, byte orderType)
         {
-            var entity = _mchNotifyRecordRepository.GetAll().Where(w => w.OrderId.Equals(orderId) && w.OrderType.Equals(orderType)).FirstOrDefault();
+            var entity = _mchNotifyRecordRepository.GetAllAsNoTracking()
+                .Where(w => w.OrderId.Equals(orderId) && w.OrderType.Equals(orderType))
+                .FirstOrDefault();
             return _mapper.Map<MchNotifyRecordDto>(entity);
         }
 

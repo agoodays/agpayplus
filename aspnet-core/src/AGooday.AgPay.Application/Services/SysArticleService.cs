@@ -27,10 +27,10 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(SysArticleDto dto)
         {
-            var m = _mapper.Map<SysArticle>(dto);
-            _sysArticleRepository.Add(m);
+            var entity = _mapper.Map<SysArticle>(dto);
+            _sysArticleRepository.Add(entity);
             var result = _sysArticleRepository.SaveChanges(out int _);
-            dto.ArticleId = m.ArticleId;
+            dto.ArticleId = entity.ArticleId;
             return result;
         }
 

@@ -25,20 +25,20 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(QrCodeShellDto dto)
         {
-            var m = _mapper.Map<QrCodeShell>(dto);
-            m.CreatedAt = DateTime.Now;
-            m.UpdatedAt = DateTime.Now;
-            _qrCodeShellRepository.Add(m);
+            var entity = _mapper.Map<QrCodeShell>(dto);
+            entity.CreatedAt = DateTime.Now;
+            entity.UpdatedAt = DateTime.Now;
+            _qrCodeShellRepository.Add(entity);
             var result = _qrCodeShellRepository.SaveChanges(out int _);
-            dto.Id = m.Id;
+            dto.Id = entity.Id;
             return result;
         }
 
         public override bool Update(QrCodeShellDto dto)
         {
-            var m = _mapper.Map<QrCodeShell>(dto);
-            m.UpdatedAt = DateTime.Now;
-            _qrCodeShellRepository.Update(m);
+            var entity = _mapper.Map<QrCodeShell>(dto);
+            entity.UpdatedAt = DateTime.Now;
+            _qrCodeShellRepository.Update(entity);
             return _qrCodeShellRepository.SaveChanges(out int _);
         }
 

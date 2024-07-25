@@ -66,13 +66,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             var payOrders = _payOrderService.GetPaginatedData(dto);
             // 得到所有支付方式
             Dictionary<string, string> payWayNameMap = new Dictionary<string, string>();
-            _payWayService.GetAll()
+            _payWayService.GetAllAsNoTracking()
                 .Select(s => new { s.WayCode, s.WayName }).ToList()
                 .ForEach((c) =>
                 {
                     payWayNameMap.Add(c.WayCode, c.WayName);
                 });
-            var ifDefines = _payIfDefineService.GetAll();
+            var ifDefines = _payIfDefineService.GetAllAsNoTracking();
 
             foreach (var payOrder in payOrders)
             {

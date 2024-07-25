@@ -31,11 +31,11 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(SysUserDto dto)
         {
-            var m = _mapper.Map<SysUser>(dto);
-            _sysUserRepository.Add(m);
+            var entity = _mapper.Map<SysUser>(dto);
+            _sysUserRepository.Add(entity);
             _sysUserRepository.SaveChanges();
             var result = _sysUserRepository.SaveChanges(out int _);
-            dto.SysUserId = m.SysUserId;
+            dto.SysUserId = entity.SysUserId;
             return result;
         }
 
@@ -101,14 +101,16 @@ namespace AGooday.AgPay.Application.Services
 
         public SysUserDto GetById(long recordId, string belongInfoId)
         {
-            var entity = _sysUserRepository.GetAll().Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefault();
+            var entity = _sysUserRepository.GetAllAsNoTracking()
+                .Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefault();
             var dto = _mapper.Map<SysUserDto>(entity);
             return dto;
         }
 
         public IEnumerable<SysUserDto> GetByIds(List<long> recordIds)
         {
-            var sysUsers = _sysUserRepository.GetAll().Where(w => recordIds.Contains(w.SysUserId));
+            var sysUsers = _sysUserRepository.GetAllAsNoTracking()
+                .Where(w => recordIds.Contains(w.SysUserId));
             return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
 

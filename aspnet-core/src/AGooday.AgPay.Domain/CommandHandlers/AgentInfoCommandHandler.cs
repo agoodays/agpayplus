@@ -234,7 +234,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             // 如果代理商状态为禁用状态，清除该代理商用户登录信息
             if (agentInfo.State == CS.NO)
             {
-                removeCacheUserIdList = _sysUserRepository.GetAll().Where(w => w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.BelongInfoId.Equals(agentInfo.AgentNo))
+                removeCacheUserIdList = _sysUserRepository.GetAllAsNoTracking()
+                    .Where(w => w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.BelongInfoId.Equals(agentInfo.AgentNo))
                     .Select(w => w.SysUserId).ToList();
             }
 
@@ -245,8 +246,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 获取代理商超管
                 long agentAdminUserId = _sysUserRepository.FindAgentAdminUserId(agentInfo.AgentNo);
                 var sysUserAuth = _sysUserAuthRepository.GetAll()
-                     .Where(w => w.UserId.Equals(agentAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.AGENT)
-                     && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE)).FirstOrDefault();
+                     .Where(w => w.UserId.Equals(agentAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE))
+                     .FirstOrDefault();
 
                 if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
                 {
@@ -334,10 +335,12 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             try
             {
                 BeginTransaction();
-                var sysUsers = _sysUserRepository.GetAll().Where(w => w.BelongInfoId.Equals(request.AgentNo) && w.SysType.Equals(CS.SYS_TYPE.AGENT));
+                var sysUsers = _sysUserRepository.GetAllAsNoTracking()
+                    .Where(w => w.BelongInfoId.Equals(request.AgentNo) && w.SysType.Equals(CS.SYS_TYPE.AGENT));
                 foreach (var sysUser in sysUsers)
                 {
-                    var sysUserAuths = _sysUserAuthRepository.GetAll().Where(w => w.UserId.Equals(sysUser.SysUserId));
+                    var sysUserAuths = _sysUserAuthRepository.GetAllAsNoTracking()
+                        .Where(w => w.UserId.Equals(sysUser.SysUserId));
                     // 删除当前代理商用户认证信息
                     foreach (var sysUserAuth in sysUserAuths)
                     {

@@ -26,19 +26,19 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(QrCodeDto dto)
         {
-            var m = _mapper.Map<QrCode>(dto);
-            m.State = CS.YES;
-            m.CreatedAt = DateTime.Now;
-            m.UpdatedAt = DateTime.Now;
-            _qrCodeRepository.Add(m);
+            var entity = _mapper.Map<QrCode>(dto);
+            entity.State = CS.YES;
+            entity.CreatedAt = DateTime.Now;
+            entity.UpdatedAt = DateTime.Now;
+            _qrCodeRepository.Add(entity);
             return _qrCodeRepository.SaveChanges(out int _);
         }
 
         public override bool Update(QrCodeDto dto)
         {
-            var m = _mapper.Map<QrCode>(dto);
-            m.UpdatedAt = DateTime.Now;
-            _qrCodeRepository.Update(m);
+            var entity = _mapper.Map<QrCode>(dto);
+            entity.UpdatedAt = DateTime.Now;
+            _qrCodeRepository.Update(entity);
             return _qrCodeRepository.SaveChanges(out int _);
         }
 
@@ -51,20 +51,20 @@ namespace AGooday.AgPay.Application.Services
 
         public string BatchIdDistinctCount()
         {
-            var BatchIdPrefix = DateTime.Now.ToString("yyyyMMdd");
-            var qrCodes = _qrCodeRepository.GetAll()
-                .Where(w => (w.BatchId ?? "").StartsWith(BatchIdPrefix))
+            var batchIdPrefix = DateTime.Now.ToString("yyyyMMdd");
+            var qrCodes = _qrCodeRepository.GetAllAsNoTracking()
+                .Where(w => (w.BatchId ?? string.Empty).StartsWith(batchIdPrefix))
                 .OrderByDescending(o => o.BatchId).FirstOrDefault();
-            return $"{Convert.ToInt64(qrCodes?.BatchId ?? $"{BatchIdPrefix}00") + 1}";
+            return $"{Convert.ToInt64(qrCodes?.BatchId ?? $"{batchIdPrefix}00") + 1}";
         }
 
         public bool BatchAdd(QrCodeAddDto dto)
         {
             for (int i = 1; i <= dto.AddNum; i++)
             {
-                var m = _mapper.Map<QrCode>(dto);
-                m.QrcId = $"{dto.BatchId}{i:D4}";
-                _qrCodeRepository.Add(m);
+                var entity = _mapper.Map<QrCode>(dto);
+                entity.QrcId = $"{dto.BatchId}{i:D4}";
+                _qrCodeRepository.Add(entity);
             }
             return _qrCodeRepository.SaveChanges(out int _);
         }

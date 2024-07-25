@@ -42,24 +42,25 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(MchPayPassageDto dto)
         {
-            var m = _mapper.Map<MchPayPassage>(dto);
-            _mchPayPassageRepository.Add(m);
+            var entity = _mapper.Map<MchPayPassage>(dto);
+            _mchPayPassageRepository.Add(entity);
             var result = _mchPayPassageRepository.SaveChanges(out int _);
-            dto.Id = m.Id;
+            dto.Id = entity.Id;
             return result;
         }
 
         public IEnumerable<MchPayPassageDto> GetMchPayPassageByAppId(string mchNo, string appId)
         {
-            var mchPayPassages = _mchPayPassageRepository.GetAll()
+            var mchPayPassages = _mchPayPassageRepository.GetAllAsNoTracking()
                 .Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.State.Equals(CS.PUB_USABLE));
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 
         public IEnumerable<MchPayPassageDto> GetByAppId(string appId, List<string> wayCodes)
         {
-            var mchPayPassages = _mchPayPassageRepository.GetAll().Where(w => w.AppId.Equals(appId)
-            && (wayCodes.Count == 0 || wayCodes.Contains(w.WayCode)));
+            var mchPayPassages = _mchPayPassageRepository.GetAllAsNoTracking()
+                .Where(w => w.AppId.Equals(appId)
+                && (wayCodes.Count == 0 || wayCodes.Contains(w.WayCode)));
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 

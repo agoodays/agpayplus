@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public IEnumerable<SysUserDto> GetUserByIds(List<long> userIds)
         {
-            var sysUsers = _sysUserRepository.GetAll().Where(w => userIds.Contains(w.SysUserId));
+            var sysUsers = _sysUserRepository.GetAllAsNoTracking().Where(w => userIds.Contains(w.SysUserId));
             return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
 
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<SysEntitlementDto> GetEntsBySysType(string sysType, string entId)
         {
-            var sysEnts = _sysEntitlementRepository.GetAll()
+            var sysEnts = _sysEntitlementRepository.GetAllAsNoTracking()
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
                 && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId))
                 );
@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<SysEntitlementDto> GetEntsBySysType(string sysType, List<string> entIds, List<string> entTypes)
         {
-            var sysEnts = _sysEntitlementRepository.GetAll()
+            var sysEnts = _sysEntitlementRepository.GetAllAsNoTracking()
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
                 && (!(entIds != null && entIds.Count > 0) || entIds.Contains(w.EntId))
                 && (!(entTypes != null && entTypes.Count > 0) || entTypes.Contains(w.EntType))
@@ -100,13 +100,13 @@ namespace AGooday.AgPay.Application.Services
         {
             if (userType == CS.USER_TYPE.ADMIN)
             {
-                var result = _sysEntitlementRepository.GetAll()
+                var result = _sysEntitlementRepository.GetAllAsNoTracking()
                     .Where(w => w.SysType.Equals(sysType) && w.State == CS.PUB_USABLE);
                 return _mapper.Map<IEnumerable<SysEntitlementDto>>(result);
             }
             else
             {
-                var result = _sysUserRoleRelaRepository.GetAll()
+                var result = _sysUserRoleRelaRepository.GetAllAsNoTracking()
                     .Join(_sysUserRoleRelaRepository.GetAll<SysRoleEntRela>(),
                     ur => ur.RoleId, re => re.RoleId,
                     (ur, re) => new { ur.UserId, re.EntId })
@@ -121,8 +121,8 @@ namespace AGooday.AgPay.Application.Services
 
         public SysUserAuthInfoDto GetUserAuthInfoById(long userId)
         {
-            var auth = _sysUserAuthRepository.GetAll()
-                .Join(_sysUserAuthRepository.GetAll<SysUser>(),
+            var auth = _sysUserAuthRepository.GetAllAsNoTracking()
+                .Join(_sysUserAuthRepository.GetAllAsNoTracking<SysUser>(),
                 ua => ua.UserId, ur => ur.SysUserId,
                 (ua, ur) => new { ua, ur })
                 .Where(w => w.ua.UserId == userId)
@@ -207,8 +207,8 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public SysUserAuthInfoDto LoginAuth(string identifier, byte identityType, string sysType)
         {
-            var auth = _sysUserAuthRepository.GetAll()
-                .Join(_sysUserRepository.GetAll(),
+            var auth = _sysUserAuthRepository.GetAllAsNoTracking()
+                .Join(_sysUserRepository.GetAllAsNoTracking(),
                 ua => ua.UserId, ur => ur.SysUserId,
                 (ua, ur) => new { ua, ur })
                 .Where(w => w.ua.IdentityType == identityType && w.ua.Identifier.Equals(identifier) && w.ua.SysType.Equals(sysType) && w.ur.State == CS.PUB_USABLE)

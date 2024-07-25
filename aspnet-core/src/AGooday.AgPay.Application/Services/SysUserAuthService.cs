@@ -24,10 +24,10 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(SysUserAuthDto dto)
         {
-            var m = _mapper.Map<SysUserAuth>(dto);
-            _sysUserAuthRepository.Add(m);
+            var entity = _mapper.Map<SysUserAuth>(dto);
+            _sysUserAuthRepository.Add(entity);
             var result = _sysUserAuthRepository.SaveChanges(out int _);
-            dto.AuthId = m.AuthId;
+            dto.AuthId = entity.AuthId;
             return result;
         }
 

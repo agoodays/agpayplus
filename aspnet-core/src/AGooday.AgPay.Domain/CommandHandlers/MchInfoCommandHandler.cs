@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             IIsvInfoRepository isvInfoRepository,
             ISysUserRepository sysUserRepository,
             ISysUserAuthRepository sysUserAuthRepository,
-            IMchAppRepository mchAppRepository, 
+            IMchAppRepository mchAppRepository,
             IMchStoreRepository mchStoreRepository,
             IPayOrderRepository payOrderRepository,
             IMchPayPassageRepository mchPayPassageRepository,
@@ -143,7 +143,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 #region 添加默认用户认证表
                 //string salt = StringUtil.GetUUID(6); //6位随机数
                 string authPwd = request.PasswordType.Equals(CS.PASSWORD_TYPE.CUSTOM) ? request.LoginPassword : CS.DEFAULT_PWD;
-                string userPwd = BCryptUtil.Hash(authPwd,out string salt);
+                string userPwd = BCryptUtil.Hash(authPwd, out string salt);
                 //用户名登录方式
                 var sysUserAuthByLoginUsername = new SysUserAuth()
                 {
@@ -264,7 +264,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             // 如果商户状态为禁用状态，清除该商户用户登录信息
             if (mchInfo.State == CS.NO)
             {
-                removeCacheUserIdList = _sysUserRepository.GetAll().Where(w => w.SysType.Equals(CS.SYS_TYPE.MCH) && w.BelongInfoId.Equals(mchInfo.MchNo))
+                removeCacheUserIdList = _sysUserRepository.GetAllAsNoTracking()
+                    .Where(w => w.SysType.Equals(CS.SYS_TYPE.MCH) && w.BelongInfoId.Equals(mchInfo.MchNo))
                     .Select(w => w.SysUserId).ToList();
             }
 
@@ -275,8 +276,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 获取商户超管
                 long mchAdminUserId = _sysUserRepository.FindMchAdminUserId(mchInfo.MchNo);
                 var sysUserAuth = _sysUserAuthRepository.GetAll()
-                     .Where(w => w.UserId.Equals(mchAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.MCH)
-                     && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE)).FirstOrDefault();
+                     .Where(w => w.UserId.Equals(mchAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.MCH) && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE))
+                     .FirstOrDefault();
 
                 if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
                 {
@@ -376,10 +377,12 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     _mchAppRepository.Remove(appId);
                 }
 
-                var sysUsers = _sysUserRepository.GetAll().Where(w => w.BelongInfoId.Equals(request.MchNo) && w.SysType.Equals(CS.SYS_TYPE.MCH));
+                var sysUsers = _sysUserRepository.GetAllAsNoTracking()
+                    .Where(w => w.BelongInfoId.Equals(request.MchNo) && w.SysType.Equals(CS.SYS_TYPE.MCH));
                 foreach (var sysUser in sysUsers)
                 {
-                    var sysUserAuths = _sysUserAuthRepository.GetAll().Where(w => w.UserId.Equals(sysUser.SysUserId));
+                    var sysUserAuths = _sysUserAuthRepository.GetAllAsNoTracking()
+                        .Where(w => w.UserId.Equals(sysUser.SysUserId));
                     // 5.删除当前商户用户认证信息
                     foreach (var sysUserAuth in sysUserAuths)
                     {

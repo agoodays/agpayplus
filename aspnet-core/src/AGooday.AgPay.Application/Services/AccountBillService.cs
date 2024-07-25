@@ -60,19 +60,19 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(AccountBillDto dto)
         {
-            var m = _mapper.Map<AccountBill>(dto);
-            m.CreatedAt = DateTime.Now;
-            m.UpdatedAt = DateTime.Now;
-            _agPayRepository.Add(m);
+            var entity = _mapper.Map<AccountBill>(dto);
+            entity.CreatedAt = DateTime.Now;
+            entity.UpdatedAt = DateTime.Now;
+            _agPayRepository.Add(entity);
             var result = _agPayRepository.SaveChanges(out int _);
             return result;
         }
 
         public override bool Update(AccountBillDto dto)
         {
-            var m = _mapper.Map<AccountBill>(dto);
-            m.UpdatedAt = DateTime.Now;
-            _agPayRepository.Update(m);
+            var entity = _mapper.Map<AccountBill>(dto);
+            entity.UpdatedAt = DateTime.Now;
+            _agPayRepository.Update(entity);
             return _agPayRepository.SaveChanges(out int _);
         }
 

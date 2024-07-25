@@ -251,8 +251,8 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public int UpdateOrderExpired()
         {
-            var updateRecords = _refundOrderRepository.GetAll().Where(
-                w => (new List<byte>() { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
+            var updateRecords = _refundOrderRepository.GetAll()
+                .Where(w => (new List<byte>() { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
                 && w.ExpiredTime < DateTime.Now);
             foreach (var refundOrder in updateRecords)
             {

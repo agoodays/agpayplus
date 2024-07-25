@@ -26,32 +26,37 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(MchDivisionReceiverDto dto)
         {
-            var m = _mapper.Map<MchDivisionReceiver>(dto);
-            _mchDivisionReceiverRepository.Add(m);
+            var entity = _mapper.Map<MchDivisionReceiver>(dto);
+            _mchDivisionReceiverRepository.Add(entity);
             var result = _mchDivisionReceiverRepository.SaveChanges(out int _);
-            dto.ReceiverId = m.ReceiverId;
+            dto.ReceiverId = entity.ReceiverId;
             return result;
         }
 
         public MchDivisionReceiverDto GetById(long recordId, string mchNo)
         {
-            var entity = _mchDivisionReceiverRepository.GetAll().Where(w => w.ReceiverId.Equals(recordId) && w.MchNo.Equals(mchNo)).FirstOrDefault();
+            var entity = _mchDivisionReceiverRepository.GetAllAsNoTracking()
+                .Where(w => w.ReceiverId.Equals(recordId) && w.MchNo.Equals(mchNo))
+                .FirstOrDefault();
             var dto = _mapper.Map<MchDivisionReceiverDto>(entity);
             return dto;
         }
 
         public int GetCount(HashSet<long> receiverIds, string mchNo, string appId, string ifCode, byte state = CS.YES)
         {
-            var count = _mchDivisionReceiverRepository.GetAll()
+            var count = _mchDivisionReceiverRepository.GetAllAsNoTracking()
                     .Where(w => receiverIds.Contains(w.ReceiverId)
-                    && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.IfCode.Equals(ifCode) && w.State.Equals(state)).Count();
+                    && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) 
+                    && w.IfCode.Equals(ifCode) && w.State.Equals(state))
+                    .Count();
             return count;
         }
 
         public int GetCount(HashSet<long> receiverGroupIds, string mchNo)
         {
-            var count = _mchDivisionReceiverRepository.GetAll()
-                    .Where(w => receiverGroupIds.Contains(w.ReceiverGroupId) && w.MchNo.Equals(mchNo)).Count();
+            var count = _mchDivisionReceiverRepository.GetAllAsNoTracking()
+                    .Where(w => receiverGroupIds.Contains(w.ReceiverGroupId) && w.MchNo.Equals(mchNo))
+                    .Count();
             return count;
         }
 

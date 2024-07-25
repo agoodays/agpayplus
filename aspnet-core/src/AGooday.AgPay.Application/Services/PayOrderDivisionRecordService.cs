@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Application.Services
     /// <summary>
     /// 分账记录表 服务实现类
     /// </summary>
-    public class PayOrderDivisionRecordService : AgPayService<PayOrderDivisionRecordDto, PayOrderDivisionRecord, long>,IPayOrderDivisionRecordService
+    public class PayOrderDivisionRecordService : AgPayService<PayOrderDivisionRecordDto, PayOrderDivisionRecord, long>, IPayOrderDivisionRecordService
     {
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IPayOrderDivisionRecordRepository _payOrderDivisionRecordRepository;
@@ -22,9 +22,9 @@ namespace AGooday.AgPay.Application.Services
         private readonly IPayOrderRepository _payOrderRepository;
 
         public PayOrderDivisionRecordService(IMapper mapper, IMediatorHandler bus,
-            IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository, 
+            IPayOrderDivisionRecordRepository payOrderDivisionRecordRepository,
             IPayOrderRepository payOrderRepository)
-            :base(mapper, bus, payOrderDivisionRecordRepository)
+            : base(mapper, bus, payOrderDivisionRecordRepository)
         {
             _payOrderDivisionRecordRepository = payOrderDivisionRecordRepository;
             _payOrderRepository = payOrderRepository;
@@ -32,32 +32,32 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(PayOrderDivisionRecordDto dto)
         {
-            var m = _mapper.Map<PayOrderDivisionRecord>(dto);
-            _payOrderDivisionRecordRepository.Add(m);
+            var entity = _mapper.Map<PayOrderDivisionRecord>(dto);
+            _payOrderDivisionRecordRepository.Add(entity);
             var result = _payOrderDivisionRecordRepository.SaveChanges(out int _);
-            dto.RecordId = m.RecordId;
+            dto.RecordId = entity.RecordId;
             return result;
         }
 
         public PayOrderDivisionRecordDto GetById(long recordId, string mchNo)
         {
-            var entity = _payOrderDivisionRecordRepository.GetAll().Where(w => w.RecordId.Equals(recordId) && w.MchNo.Equals(mchNo)).FirstOrDefault();
+            var entity = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
+                .Where(w => w.RecordId.Equals(recordId) && w.MchNo.Equals(mchNo)).FirstOrDefault();
             return _mapper.Map<PayOrderDivisionRecordDto>(entity);
         }
 
         public IEnumerable<PayOrderDivisionRecordDto> GetByPayOrderId(string payOrderId)
         {
-            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAll()
-                    .Where(w => w.PayOrderId.Equals(payOrderId));
+            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
+                .Where(w => w.PayOrderId.Equals(payOrderId));
             return _mapper.Map<IEnumerable<PayOrderDivisionRecordDto>>(payOrderDivisionRecords);
         }
 
         public List<PayOrderDivisionRecordDto> GetByBatchOrderId(PayOrderDivisionRecordQueryDto dto)
         {
-            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAll()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                ).OrderBy(o => o.RecordId);
+            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
+                .Where(w => (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId)) && (dto.State.Equals(null) || w.State.Equals(dto.State)))
+                .OrderBy(o => o.RecordId);
             return _mapper.Map<List<PayOrderDivisionRecordDto>>(payOrderDivisionRecords);
         }
 

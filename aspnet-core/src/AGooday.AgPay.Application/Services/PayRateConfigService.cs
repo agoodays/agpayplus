@@ -859,18 +859,20 @@ namespace AGooday.AgPay.Application.Services
 
         private IQueryable<PayRateConfig> GetAgentRateConfigByIsvNo(string isvNo, string ifCode, string wayCode)
         {
-            var agentInfos = _agentInfoRepository.GetAll().Where(w => w.IsvNo.Equals(isvNo));
-            var payRateConfigs = _payRateConfigRepository.GetAll().Where(w => w.ConfigType.Equals(CS.CONFIG_TYPE.AGENTRATE)
-            && w.InfoType.Equals(CS.INFO_TYPE.AGENT) && w.IfCode.Equals(ifCode) && w.WayCode.Equals(wayCode));
+            var agentInfos = _agentInfoRepository.GetAllAsNoTracking()
+                .Where(w => w.IsvNo.Equals(isvNo));
+            var payRateConfigs = _payRateConfigRepository.GetAllAsNoTracking()
+                .Where(w => w.ConfigType.Equals(CS.CONFIG_TYPE.AGENTRATE) && w.InfoType.Equals(CS.INFO_TYPE.AGENT) && w.IfCode.Equals(ifCode) && w.WayCode.Equals(wayCode));
 
             return payRateConfigs.Join(agentInfos, r => r.InfoId, a => a.AgentNo, (r, a) => r);
         }
 
         private IQueryable<PayRateConfig> GetMchRateConfigByIsvNo(string isvNo, string ifCode, string wayCode)
         {
-            var mchInfos = _mchInfoRepository.GetAll().Where(w => w.IsvNo.Equals(isvNo));
-            var payRateConfigs = _payRateConfigRepository.GetAll().Where(w => w.ConfigType.Equals(CS.CONFIG_TYPE.AGENTRATE)
-            && w.InfoType.Equals(CS.INFO_TYPE.AGENT) && w.IfCode.Equals(ifCode) && w.WayCode.Equals(wayCode));
+            var mchInfos = _mchInfoRepository.GetAllAsNoTracking()
+                .Where(w => w.IsvNo.Equals(isvNo));
+            var payRateConfigs = _payRateConfigRepository.GetAllAsNoTracking()
+                .Where(w => w.ConfigType.Equals(CS.CONFIG_TYPE.AGENTRATE) && w.InfoType.Equals(CS.INFO_TYPE.AGENT) && w.IfCode.Equals(ifCode) && w.WayCode.Equals(wayCode));
 
             return payRateConfigs.Join(mchInfos, r => r.InfoId, a => a.MchNo, (r, a) => r);
         }

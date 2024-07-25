@@ -32,8 +32,8 @@ namespace AGooday.AgPay.Domain.QueryHandlers
 
         public Task<IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>> Handle(SysUserQuery request, CancellationToken cancellationToken)
         {
-            var sysUsers = (from u in _sysUserRepository.GetAll()
-                            join ut in _sysUserTeamRepository.GetAll() on u.TeamId equals ut.TeamId into temp
+            var sysUsers = (from u in _sysUserRepository.GetAllAsNoTracking()
+                            join ut in _sysUserTeamRepository.GetAllAsNoTracking() on u.TeamId equals ut.TeamId into temp
                             from team in temp.DefaultIfEmpty()
                             where (string.IsNullOrWhiteSpace(request.SysType) || u.SysType.Equals(request.SysType))
                             && (string.IsNullOrWhiteSpace(request.BelongInfoId) || u.BelongInfoId.Contains(request.BelongInfoId))

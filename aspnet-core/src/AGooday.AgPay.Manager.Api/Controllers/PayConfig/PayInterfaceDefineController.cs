@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_LIST)]
         public ApiRes List(byte? state)
         {
-            var data = _payIfDefineService.GetAll()
+            var data = _payIfDefineService.GetAllAsNoTracking()
                 .Where(w => !state.HasValue || w.State.Equals(state))
                 .OrderByDescending(o => o.CreatedAt);
             return ApiRes.Ok(data);

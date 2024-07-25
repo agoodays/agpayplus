@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         {
             dto.BindDateRange();
             var refundOrders = _refundOrderService.GetPaginatedData(dto);
-            var ifDefines = _payIfDefineService.GetAll();
+            var ifDefines = _payIfDefineService.GetAllAsNoTracking();
 
             foreach (var refundOrder in refundOrders)
             {

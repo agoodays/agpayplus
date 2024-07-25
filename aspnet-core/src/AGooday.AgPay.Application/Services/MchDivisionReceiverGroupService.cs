@@ -4,7 +4,6 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
-using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -26,29 +25,31 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(MchDivisionReceiverGroupDto dto)
         {
-            var m = _mapper.Map<MchDivisionReceiverGroup>(dto);
-            _mchDivisionReceiverGroupRepository.Add(m);
+            var entity = _mapper.Map<MchDivisionReceiverGroup>(dto);
+            _mchDivisionReceiverGroupRepository.Add(entity);
             var result = _mchDivisionReceiverGroupRepository.SaveChanges(out int _);
-            dto.ReceiverGroupId = m.ReceiverGroupId;
+            dto.ReceiverGroupId = entity.ReceiverGroupId;
             return result;
         }
 
         public MchDivisionReceiverGroupDto GetById(long recordId, string mchNo)
         {
-            var entity = _mchDivisionReceiverGroupRepository.GetAll().Where(w => w.ReceiverGroupId.Equals(recordId) && w.MchNo.Equals(mchNo)).FirstOrDefault();
+            var entity = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
+                .Where(w => w.ReceiverGroupId.Equals(recordId) && w.MchNo.Equals(mchNo))
+                .FirstOrDefault();
             return _mapper.Map<MchDivisionReceiverGroupDto>(entity);
         }
 
         public IEnumerable<MchDivisionReceiverGroupDto> GetByMchNo(string mchNo)
         {
-            var mchDivisionReceiverGroups = _mchDivisionReceiverGroupRepository.GetAll()
+            var mchDivisionReceiverGroups = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
                 .Where(w => w.MchNo.Equals(mchNo));
             return _mapper.Map<IEnumerable<MchDivisionReceiverGroupDto>>(mchDivisionReceiverGroups);
         }
 
         public MchDivisionReceiverGroupDto FindByIdAndMchNo(long receiverGroupId, string mchNo)
         {
-            var entity = _mchDivisionReceiverGroupRepository.GetAll()
+            var entity = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
                 .Where(w => w.ReceiverGroupId.Equals(receiverGroupId) && w.MchNo.Equals(mchNo));
             return _mapper.Map<MchDivisionReceiverGroupDto>(entity);
         }

@@ -40,10 +40,10 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(PayInterfaceConfigDto dto)
         {
-            var m = _mapper.Map<PayInterfaceConfig>(dto);
-            _payInterfaceConfigRepository.Add(m);
+            var entity = _mapper.Map<PayInterfaceConfig>(dto);
+            _payInterfaceConfigRepository.Add(entity);
             var result = _payInterfaceConfigRepository.SaveChanges(out int _);
-            dto.Id = m.Id;
+            dto.Id = entity.Id;
             return result;
         }
 
@@ -98,15 +98,17 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public IEnumerable<PayInterfaceConfigDto> GetByInfoId(string infoType, string infoId)
         {
-            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.Equals(infoId)
-            && w.InfoType.Equals(infoType) && w.State.Equals(CS.PUB_USABLE));
+            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                .Where(w => w.InfoId.Equals(infoId)
+                && w.InfoType.Equals(infoType) && w.State.Equals(CS.PUB_USABLE));
             return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfigs);
         }
 
         public IEnumerable<PayInterfaceConfigDto> GetPayOauth2ConfigByStartsWithInfoId(string infoType, string infoId)
         {
-            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.StartsWith(infoId)
-            && w.InfoType.Equals(infoType) && w.State.Equals(CS.PUB_USABLE));
+            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                .Where(w => w.InfoId.StartsWith(infoId)
+                && w.InfoType.Equals(infoType) && w.State.Equals(CS.PUB_USABLE));
             return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfigs);
         }
 
@@ -119,9 +121,11 @@ namespace AGooday.AgPay.Application.Services
         public List<PayInterfaceDefineDto> SelectAllPayIfConfigListByIsvNo(string infoType, string infoId)
         {
             // 支付定义列表
-            var defineList = _payInterfaceDefineRepository.GetAll().Where(w => w.IsIsvMode.Equals(CS.YES) && w.State.Equals(CS.YES));
+            var defineList = _payInterfaceDefineRepository.GetAllAsNoTracking()
+                .Where(w => w.IsIsvMode.Equals(CS.YES) && w.State.Equals(CS.YES));
             // 支付参数列表
-            var configList = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoType.Equals(infoType) && w.InfoId.Equals(infoId));
+            var configList = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                .Where(w => w.InfoType.Equals(infoType) && w.InfoId.Equals(infoId));
 
             var result = defineList.ToList().Select(s =>
             {
@@ -136,14 +140,14 @@ namespace AGooday.AgPay.Application.Services
         public List<PayInterfaceDefineDto> PayIfConfigList(string infoType, string configMode, string infoId, string ifName, string ifCode)
         {
             // 支付定义列表
-            var defineList = _payInterfaceDefineRepository.GetAll()
+            var defineList = _payInterfaceDefineRepository.GetAllAsNoTracking()
                 .Where(w => w.State.Equals(CS.YES)
                 && (string.IsNullOrWhiteSpace(ifName) || w.IfName.Contains(ifName))
-                && (string.IsNullOrWhiteSpace(ifCode) || w.IfCode.Equals(ifCode))
-                );
+                && (string.IsNullOrWhiteSpace(ifCode) || w.IfCode.Equals(ifCode)));
 
             // 支付参数列表
-            var configList = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoType.Equals(infoType) && w.InfoId.Equals(infoId));
+            var configList = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                .Where(w => w.InfoType.Equals(infoType) && w.InfoId.Equals(infoId));
 
             switch (infoType)
             {
@@ -175,9 +179,8 @@ namespace AGooday.AgPay.Application.Services
                     if (mchInfo.Type == CS.MCH_TYPE_ISVSUB)
                     {
                         // 商户类型为特约商户，服务商应已经配置支付参数
-                        var isvConfigList = _payInterfaceConfigRepository.GetAll().Where(w => w.State.Equals(CS.YES)
-                        && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
-                        );
+                        var isvConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                            .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
 
                         foreach (var isvConfig in isvConfigList)
                         {
@@ -203,7 +206,7 @@ namespace AGooday.AgPay.Application.Services
                         throw new BizException("代理商不存在");
                     }
                     // 商户类型为特约商户，服务商应已经配置支付参数
-                    var isvConfigs = _payInterfaceConfigRepository.GetAll()
+                    var isvConfigs = _payInterfaceConfigRepository.GetAllAsNoTracking()
                         .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(agentInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
                     defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES) && isvConfigs.Select(s => s.IfCode).Contains(w.IfCode));
                     break;
@@ -241,9 +244,8 @@ namespace AGooday.AgPay.Application.Services
             if (mchInfo.Type == CS.MCH_TYPE_ISVSUB)
             {
                 // 商户类型为特约商户，服务商应已经配置支付参数
-                var isvConfigList = _payInterfaceConfigRepository.GetAll().Where(w => w.State.Equals(CS.YES)
-                && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
-                );
+                var isvConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                    .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
 
                 foreach (var isvConfig in isvConfigList)
                 {
@@ -254,8 +256,8 @@ namespace AGooday.AgPay.Application.Services
             }
 
             // 支付参数列表
-            var configList = _payInterfaceConfigRepository.GetAll().Where(w => w.InfoId.Equals(appId)
-            && w.InfoType.Equals(CS.INFO_TYPE.MCH_APP));
+            var configList = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                .Where(w => w.InfoId.Equals(appId) && w.InfoType.Equals(CS.INFO_TYPE.MCH_APP));
 
             var result = defineList.ToList().Select(define =>
             {
@@ -272,8 +274,8 @@ namespace AGooday.AgPay.Application.Services
         public List<PayInterfaceDefineDto> GetPayIfConfigsByMchNo(string mchNo)
         {
             // 支付定义列表
-            var defineList = _payInterfaceDefineRepository.GetAll()
-            .Where(w => w.State.Equals(CS.YES));
+            var defineList = _payInterfaceDefineRepository.GetAllAsNoTracking()
+                .Where(w => w.State.Equals(CS.YES));
             MchInfo mchInfo = _mchInfoRepository.GetById(mchNo);
             if (mchInfo == null || mchInfo.State != CS.YES)
             {
@@ -288,9 +290,8 @@ namespace AGooday.AgPay.Application.Services
             if (mchInfo.Type == CS.MCH_TYPE_ISVSUB)
             {
                 // 商户类型为特约商户，服务商应已经配置支付参数
-                var isvConfigList = _payInterfaceConfigRepository.GetAll().Where(w => w.State.Equals(CS.YES)
-                && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
-                );
+                var isvConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking().Where(w => w.State.Equals(CS.YES)
+                && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
 
                 foreach (var isvConfig in isvConfigList)
                 {

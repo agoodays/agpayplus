@@ -22,10 +22,10 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(SysUserTeamDto dto)
         {
-            var m = _mapper.Map<SysUserTeam>(dto);
-            _sysUserTeamRepository.Add(m);
+            var entity = _mapper.Map<SysUserTeam>(dto);
+            _sysUserTeamRepository.Add(entity);
             var result = _sysUserTeamRepository.SaveChanges(out int _);
-            dto.TeamId = m.TeamId;
+            dto.TeamId = entity.TeamId;
             return result;
         }
 

@@ -26,10 +26,10 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Add(MchStoreDto dto)
         {
-            var m = _mapper.Map<MchStore>(dto);
-            _mchStoreRepository.Add(m);
+            var entity = _mapper.Map<MchStore>(dto);
+            _mchStoreRepository.Add(entity);
             var result = _mchStoreRepository.SaveChanges(out int _);
-            dto.StoreId = m.StoreId;
+            dto.StoreId = entity.StoreId;
             return result;
         }
 

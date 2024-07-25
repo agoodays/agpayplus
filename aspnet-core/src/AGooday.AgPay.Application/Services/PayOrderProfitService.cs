@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Update(PayOrderProfitDto dto)
         {
-            var m = _mapper.Map<PayOrderProfit>(dto);
-            m.UpdatedAt = DateTime.Now;
-            _payOrderProfitRepository.Update(m);
+            var entity = _mapper.Map<PayOrderProfit>(dto);
+            entity.UpdatedAt = DateTime.Now;
+            _payOrderProfitRepository.Update(entity);
             return _payOrderProfitRepository.SaveChanges(out int _);
         }
 

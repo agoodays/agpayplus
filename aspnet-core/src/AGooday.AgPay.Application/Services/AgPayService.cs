@@ -73,6 +73,12 @@ namespace AGooday.AgPay.Application.Services
             var entitys = _agPayRepository.GetAll();
             return _mapper.Map<IEnumerable<TDto>>(entitys);
         }
+
+        public virtual IEnumerable<TDto> GetAllAsNoTracking()
+        {
+            var entitys = _agPayRepository.GetAllAsNoTracking();
+            return _mapper.Map<IEnumerable<TDto>>(entitys);
+        }
     }
     public abstract class AgPayService<TDto, TEntity> : IAgPayService<TDto>
         where TDto : class
@@ -141,6 +147,16 @@ namespace AGooday.AgPay.Application.Services
 
             //第二种写法 ProjectTo
             //return (_agPayRepository.GetAll()).ProjectTo<TDto>(_mapper.ConfigurationProvider);
+        }
+
+        public virtual IEnumerable<TDto> GetAllAsNoTracking()
+        {
+            //第一种写法 Map
+            var sysUsers = _agPayRepository.GetAllAsNoTracking();
+            return _mapper.Map<IEnumerable<TDto>>(sysUsers);
+
+            //第二种写法 ProjectTo
+            //return (_agPayRepository.GetAllAsNoTracking()).ProjectTo<TDto>(_mapper.ConfigurationProvider);
         }
     }
 }
