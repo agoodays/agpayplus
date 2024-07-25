@@ -214,6 +214,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 {
                     throw new BizException("不支持的支付方式");
                 }
+                rq.Version = "1.0";
+                rq.SignType = "MD5";
+                rq.ReqTime = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(qrCode.MchNo, qrCode.AppId);
+                var jsonObject = JObject.FromObject(rq);
+                string sign = AgPayUtil.Sign(jsonObject, rq.SignType, mchAppConfigContext.MchApp.AppSecret);
+                rq.Sign = sign;
                 UnifiedOrderRQ bizRQ = rq.BuildBizRQ();
 
                 apiRes = this.UnifiedOrder(GetWayCode(), bizRQ);

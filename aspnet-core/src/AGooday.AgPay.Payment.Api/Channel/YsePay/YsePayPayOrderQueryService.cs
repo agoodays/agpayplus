@@ -65,8 +65,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
                     /*买家用户号
                     支付宝渠道：买家支付宝用户号buyer_user_id
                     微信渠道：微信平台的sub_openid*/
-                    data.TryGetString("buyer_user_id", out string buyerUserId);
-                    data.TryGetString("openid", out string openid);
+                    payDetail.TryGetString("buyer_user_id", out string buyerUserId);
+                    payDetail.TryGetString("openid", out string openid);
                     string tradeStatus = data.GetValue("trade_status").ToString();
                     var transStat = YsePayEnum.ConvertTradeStatus(tradeStatus);
                     switch (transStat)
@@ -74,6 +74,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsePay
                         case YsePayEnum.TradeStatus.WAIT_BUYER_PAY:
                         case YsePayEnum.TradeStatus.TRADE_PROCESS:
                         case YsePayEnum.TradeStatus.TRADE_ABNORMALITY:
+                            break;
                         case YsePayEnum.TradeStatus.TRADE_SUCCESS:
                             channelRetMsg = ChannelRetMsg.ConfirmSuccess(tradeNo);  //支付成功
                             channelRetMsg.ChannelMchNo = string.Empty;

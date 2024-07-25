@@ -42,9 +42,9 @@
         </template> <!-- 自定义插槽 -->
         <template slot="bindInfoSlot" slot-scope="{record}">
           <span v-if="record.mchNo">
-            <p>{{ record.mchNo }}</p>
-            <p>{{ record.appId }}</p>
-            <p>{{ record.storeId }}</p>
+            <p>已绑定商户：{{ record.mchNo }}</p>
+            <p>应用：{{ record.appId }}</p>
+            <p>门店：{{ record.storeId }}</p>
           </span>
           <span v-else><a-icon type="exclamation-circle"/>未绑定</span>
         </template>
