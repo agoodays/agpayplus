@@ -8,6 +8,7 @@ namespace AGooday.AgPay.Application.Interfaces
         QrCodeDto GetByIdAsNoTracking(string recordId);
         string BatchIdDistinctCount();
         bool BatchAdd(QrCodeAddDto dto);
+        bool UnBind(string recordId);
         PaginatedList<QrCodeDto> GetPaginatedData(QrCodeQueryDto dto);
     }
 }

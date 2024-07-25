@@ -111,11 +111,46 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         {
             if (string.IsNullOrWhiteSpace(dto.QrcId)) // 状态变更
             {
-                var sysUser = _qrCodeService.GetByIdAsNoTracking(recordId);
-                sysUser.State = dto.State.Value;
-                CopyUtil.CopyProperties(sysUser, dto);
+                var entity = _qrCodeService.GetByIdAsNoTracking(recordId);
+                entity.State = dto.State.Value;
+                CopyUtil.CopyProperties(entity, dto);
             }
             bool result = _qrCodeService.Update(dto);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
+            }
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 绑定码牌
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut, Route("/bind/{recordId}"), MethodLog("绑定码牌")]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
+        public ApiRes Bind(string recordId, QrCodeDto dto)
+        {
+            dto.BindState = CS.YES;
+            bool result = _qrCodeService.Update(dto);
+            if (!result)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
+            }
+            return ApiRes.Ok();
+        }
+
+        /// <summary>
+        /// 解绑码牌
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut, Route("/unbind/{recordId}"), MethodLog("解绑码牌")]
+        [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
+        public ApiRes UnBind(string recordId)
+        {
+            bool result = _qrCodeService.UnBind(recordId);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);

@@ -74,6 +74,17 @@ namespace AGooday.AgPay.Application.Services
             return _qrCodeRepository.SaveChanges(out int _);
         }
 
+        public bool UnBind(string recordId)
+        {
+            var entity = _qrCodeRepository.GetById(recordId);
+            entity.BindState = CS.NO;
+            entity.MchNo = null;
+            entity.AppId = null;
+            entity.StoreId = null;
+            _qrCodeRepository.Update(entity);
+            return _qrCodeRepository.SaveChanges(out int _);
+        }
+
         public PaginatedList<QrCodeDto> GetPaginatedData(QrCodeQueryDto dto)
         {
             var QrCodes = _qrCodeRepository.GetAllAsNoTracking()
