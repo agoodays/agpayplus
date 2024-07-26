@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params.HkrtPay;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
@@ -41,10 +40,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.HkrtPay.PayWay
 
             //微信JSAPI、微信小程序、支付宝JSAPI、支付宝小程序、银联JSAPI支付必填
             reqParams.Add("userid", bizRQ.GetChannelUserId());
-
             // 获取微信官方配置的 appId
-            HkrtPayIsvSubMchParams hkrtpayIsvParams = (HkrtPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-            reqParams.Add("appid", hkrtpayIsvParams.SubMchLiteAppId);
+            reqParams.Add("appid", bizRQ.SubAppId);
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/api/v1/pay/polymeric/jsapipay", reqParams, logPrefix, mchAppConfigContext);

@@ -2001,7 +2001,7 @@ VALUES ('pppay', 'PayPal支付', 1, 0, 1,
 INSERT INTO `t_pay_interface_define` (`if_code`, `if_name`, `is_mch_mode`, `is_isv_mode`, `config_page_type`, `isv_params`, `isvsub_mch_params`, `normal_mch_params`, `way_codes`, `icon`, `bg_color`, `state`, `remark`)
 VALUES ('sxfpay', '随行付支付', 0, 1, 1,
         '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"orgId","desc":"机构编号","type":"text","verify":"required"},{"name":"publicKey","desc":"天阙平台公钥","type":"textarea","verify":"required","star":"1"},{"name":"privateKey","desc":"天阙平台私钥","type":"textarea","verify":"required","star":"1"},{"name":"channelNoWx","desc":"微信渠道号[服务商通过海科在(微信)申请的渠道编号]","type":"text","verify":"required"},{"name":"channelNoAli","desc":"支付宝渠道号[服务商自行申请的支付宝渠道号(PID)]","type":"text","verify":"required"}]',
-        '[{"name":"mno","desc":"商户编号","type":"text","verify":"required"},{"name":"subMchLiteAppId","desc":"子商户小程序AppId(置空表示使用服务商)","type":"text"}]',
+        '[{"name":"mno","desc":"商户编号","type":"text","verify":"required"}]',
         NULL,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
         'https://paas.tianquetech.com/favicon.png', '#0084c0', 1, '天阙开放平台');
@@ -2034,7 +2034,7 @@ INSERT INTO `t_pay_interface_define` (`if_code`, `if_name`, `is_mch_mode`, `is_i
 VALUES ('lcswpay', '利楚扫呗支付', 1, 0, 1,
         NULL,
         NULL,
-        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境, 生产环境"},{"name":"merchantNo","desc":"商户号","type":"text","verify":"required"},{"name":"terminalId","desc":"终端号","type":"text","verify":"required"},{"name":"accessToken","desc":"令牌标识","type":"text","verify":"required","star":"1"},{"name":"subMchAppId","desc":"子商户公众号AppId","type":"text"},{"name":"subMchLiteAppId","desc":"子商户小程序AppId","type":"text"}]',
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境, 生产环境"},{"name":"merchantNo","desc":"商户号","type":"text","verify":"required"},{"name":"terminalId","desc":"终端号","type":"text","verify":"required"},{"name":"accessToken","desc":"令牌标识","type":"text","verify":"required","star":"1"}]',
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
         'https://www.lcsw.cn/20170616033613576_easyicon_net_48.ico', '#00AFFE', 1, '利楚扫呗支付');
 

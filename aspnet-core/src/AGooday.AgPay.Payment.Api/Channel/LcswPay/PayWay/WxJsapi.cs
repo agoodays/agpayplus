@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params.LcswPay;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
@@ -40,10 +39,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.LcswPay.PayWay
 
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
             reqParams.Add("open_id", bizRQ.GetChannelUserId());// 用户标识（微信openid，支付宝userid），pay_type为010及020时必填
-
             // 获取微信官方配置的 appId
-            LcswPayNormalMchParams lcswParams = (LcswPayNormalMchParams)_configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-            reqParams.Add("sub_appid", lcswParams.SubMchAppId); // 传商户自己的公众号appid，微信支付时此参数必传。（即获取open_id所使用的appid）。
+            reqParams.Add("sub_appid", bizRQ.SubAppId); // 传商户自己的公众号appid，微信支付时此参数必传。（即获取open_id所使用的appid）。
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/pay/open/jspay", reqParams, logPrefix, mchAppConfigContext);

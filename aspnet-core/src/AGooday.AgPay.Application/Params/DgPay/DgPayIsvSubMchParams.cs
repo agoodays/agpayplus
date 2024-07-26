@@ -9,7 +9,5 @@
         /// 汇付客户Id
         /// </summary>
         public string HuifuId { get; set; }
-
-        public string SubMchLiteAppId { get; set; }
     }
 }

@@ -40,9 +40,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.JlPay.PayWay
 
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
 
-            //// 获取微信官方配置的 appId
-            //JlPayIsvSubMchParams jlpayIsvParams = (JlPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-
             //嘉联扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）*/
             reqParams.Add("open_id", bizRQ.GetChannelUserId());

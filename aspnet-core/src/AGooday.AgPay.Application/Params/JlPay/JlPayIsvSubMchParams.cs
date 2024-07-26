@@ -14,7 +14,5 @@
         /// 终端号
         /// </summary>
         public string TermNo { get; set; }
-
-        public string SubMchLiteAppId { get; set; }
     }
 }

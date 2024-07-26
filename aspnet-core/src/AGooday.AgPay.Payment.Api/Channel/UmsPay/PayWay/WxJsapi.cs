@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params.UmsPay;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
@@ -40,11 +39,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.UmsPay.PayWay
 
             //用户子标识 微信必传，需要商户自行调用微信平台接口获取，具体获取方式 请根据微信接口文档
             reqParams.Add("subOpenId", bizRQ.GetChannelUserId());//用户ID
-
             // 获取微信官方配置的 appId
-            UmsPayIsvSubMchParams umspayIsvParams = (UmsPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-            // 微信子商户appId
-            reqParams.Add("subAppId", umspayIsvParams.SubMchAppId);
+            reqParams.Add("subAppId", bizRQ.SubAppId);
 
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求

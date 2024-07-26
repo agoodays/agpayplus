@@ -25,10 +25,6 @@ namespace AGooday.AgPay.Application.Params.LcswPay
         /// </summary>
         public string AccessToken { get; set; }
 
-        public string SubMchAppId { get; set; }
-
-        public string SubMchLiteAppId { get; set; }
-
         public override string DeSenData()
         {
             if (!string.IsNullOrWhiteSpace(AccessToken))

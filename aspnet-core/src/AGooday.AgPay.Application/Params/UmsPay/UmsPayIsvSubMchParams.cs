@@ -7,8 +7,6 @@
         /// </summary>
         public string Mid { get; set; }
 
-        public string SubMchAppId { get; set; }
-
         /// <summary>
         /// 终端号
         /// </summary>

@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params.YsfPay;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS;
@@ -46,8 +45,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.YsfPay.PayWay
             reqParams.Add("customerIp", !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1");
 
             // 获取微信官方配置 的appId
-            YsfPayIsvSubMchParams ysfpayIsvParams = (YsfPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-            reqParams.Add("subAppId", ysfpayIsvParams.SubMchAppId); //用户ID
+            reqParams.Add("subAppId", bizRQ.SubAppId); //用户ID
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/gateway/api/pay/unifiedorder", reqParams, logPrefix, mchAppConfigContext);

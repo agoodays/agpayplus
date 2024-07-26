@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Application.Params.SxfPay;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Models;
@@ -43,10 +42,8 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
             reqParams.Add("userId", bizRQ.GetChannelUserId());
-
             // 获取微信官方配置的 appId
-            SxfPayIsvSubMchParams sxfpayIsvParams = (SxfPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-            reqParams.Add("subAppId", sxfpayIsvParams.SubMchLiteAppId);
+            reqParams.Add("subAppId", bizRQ.SubAppId);
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/order/jsapiScan", reqParams, logPrefix, mchAppConfigContext);

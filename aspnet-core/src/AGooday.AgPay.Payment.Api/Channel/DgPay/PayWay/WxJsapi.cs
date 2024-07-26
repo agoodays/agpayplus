@@ -40,9 +40,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.DgPay.PayWay
 
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
 
-            //// 获取微信官方配置的 appId
-            //DgPayIsvSubMchParams dgpayIsvParams = (DgPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
-
             //斗拱扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/

@@ -11,7 +11,7 @@
         public string SubMchId { get; set; }
 
         /// <summary>
-        /// 子账户appID
+        /// 子账户AppId
         /// </summary>
         public string SubMchAppId { get; set; }
     }

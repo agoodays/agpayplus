@@ -45,7 +45,6 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay.PayWay
             accBusiFields.Add("user_id", bizRQ.GetChannelUserId());
 
             //// 获取微信官方配置的 appId
-            //LklPayIsvSubMchParams lklpayIsvParams = (LklPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             accBusiFields.Add("sub_appid", bizRQ.SubAppId);
             reqParams.Add("acc_busi_fields", accBusiFields);
 
