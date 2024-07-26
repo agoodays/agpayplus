@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Params.WxPay
         /// <summary>
         /// 特约商户小程序支付跳转的选择
         /// </summary>
-        public int IsUseSubmchAccount { get; set; }
+        public byte? IsUseSubmchAccount { get; set; }
         /// <summary>
         /// 特约商户的小程序AppID
         /// </summary>

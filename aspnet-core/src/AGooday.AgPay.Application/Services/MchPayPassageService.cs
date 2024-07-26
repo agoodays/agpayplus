@@ -187,6 +187,22 @@ namespace AGooday.AgPay.Application.Services
             _mchPayPassageRepository.SaveChanges();
         }
 
+
+        /// <summary>
+        /// 根据应用ID 和 支付方式， 查询出商户可用的支付接口
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <param name="appId"></param>
+        /// <param name="wayCode"></param>
+        /// <returns></returns>
+        public MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode)
+        {
+            var entity = _mchPayPassageRepository.GetAll().Where(w => w.State.Equals(CS.YES)
+            && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.WayCode.Equals(wayCode)).FirstOrDefault();
+            var dto = _mapper.Map<MchPayPassageDto>(entity);
+            return dto;
+        }
+
         /// <summary>
         /// 根据应用ID 和 支付方式， 查询出商户可用的支付接口
         /// </summary>

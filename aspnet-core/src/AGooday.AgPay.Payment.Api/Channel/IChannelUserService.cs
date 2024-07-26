@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Payment.Api.Channel
         /// <param name="callbackUrlEncode"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        string BuildUserRedirectUrl(string callbackUrlEncode, MchAppConfigContext mchAppConfigContext);
+        string BuildUserRedirectUrl(string callbackUrlEncode, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext);
 
         /// <summary>
         /// 获取渠道用户ID
@@ -28,6 +28,6 @@ namespace AGooday.AgPay.Payment.Api.Channel
         /// <param name="reqParams"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        string GetChannelUserId(JObject reqParams, MchAppConfigContext mchAppConfigContext);
+        string GetChannelUserId(JObject reqParams, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext);
     }
 }

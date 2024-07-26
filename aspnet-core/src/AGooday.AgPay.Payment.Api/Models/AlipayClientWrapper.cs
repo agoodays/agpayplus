@@ -149,5 +149,12 @@ namespace AGooday.AgPay.Payment.Api.Models
                 alipayOauth2Params.AlipayPublicKey, alipayOauth2Params.SignType, alipayOauth2Params.AppPublicCert,
                 alipayOauth2Params.AlipayPublicCert, alipayOauth2Params.AlipayRootCert);
         }
+
+        public static AliPayClientWrapper BuildAlipayClientWrapper(AliLiteParams alipayOauth2Params)
+        {
+            return BuildAlipayClientWrapper(alipayOauth2Params.UseCert, alipayOauth2Params.Sandbox, alipayOauth2Params.AppId, alipayOauth2Params.PrivateKey,
+                alipayOauth2Params.AlipayPublicKey, alipayOauth2Params.SignType, alipayOauth2Params.AppPublicCert,
+                alipayOauth2Params.AlipayPublicCert, alipayOauth2Params.AlipayRootCert);
+        }
     }
 }

@@ -24,21 +24,31 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             _configContextQueryService = configContextQueryService;
         }
 
-        public string BuildUserRedirectUrl(string callbackUrlEncode, MchAppConfigContext mchAppConfigContext)
+        public string BuildUserRedirectUrl(string callbackUrlEncode, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
             string appId = null;
             byte? sandbox;
 
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
-                var isvOauth2Params = (AliPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, payInterfaceConfig?.Oauth2InfoId, GetIfCode());
+                var isvOauth2Params = (AliPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, oauth2InfoId, GetIfCode());
                 if (isvOauth2Params == null)
                 {
                     throw new BizException("服务商支付宝Oauth2配置没有配置！");
                 }
                 appId = isvOauth2Params.AppId;
                 sandbox = isvOauth2Params.Sandbox;
+                if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_LITE))
+                {
+                    appId = isvOauth2Params.LiteParams.AppId;
+                    sandbox = isvOauth2Params.LiteParams.Sandbox;
+                    var isvSubMchOauth2Params = (AliPayIsvSubMchOauth2Params)_configContextQueryService.QueryIsvSubMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                    if (isvSubMchOauth2Params.IsUseSubmchAccount.Equals(CS.YES))
+                    {
+                        appId = isvSubMchOauth2Params.LiteParams.AppId;
+                        sandbox = isvSubMchOauth2Params.LiteParams.Sandbox;
+                    }
+                }
             }
             else
             {
@@ -50,6 +60,11 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
                 }
                 appId = normalMchOauth2Params.AppId;
                 sandbox = normalMchOauth2Params.Sandbox;
+                if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_LITE))
+                {
+                    appId = normalMchOauth2Params.LiteParams.AppId;
+                    sandbox = normalMchOauth2Params.LiteParams.Sandbox;
+                }
             }
             string oauthUrl = AliPayConfig.PROD_OAUTH_URL;
             if (sandbox == CS.YES)
@@ -61,7 +76,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
             return alipayUserRedirectUrl;
         }
 
-        public string GetChannelUserId(JObject reqParams, MchAppConfigContext mchAppConfigContext)
+        public string GetChannelUserId(JObject reqParams, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
@@ -69,14 +84,38 @@ namespace AGooday.AgPay.Payment.Api.Channel.AliPay
 
                 if (mchAppConfigContext.IsIsvSubMch())
                 {
-                    var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
-                    var isvOauth2Params = (AliPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, payInterfaceConfig?.Oauth2InfoId, GetIfCode());
-                    alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(isvOauth2Params);
+                    var isvOauth2Params = (AliPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, oauth2InfoId, GetIfCode());
+
+                    if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_LITE))
+                    {
+                        var isvSubMchOauth2Params = (AliPayIsvSubMchOauth2Params)_configContextQueryService.QueryIsvSubMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                        if (isvSubMchOauth2Params.IsUseSubmchAccount.Equals(CS.YES))
+                        {
+                            alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(isvSubMchOauth2Params.LiteParams);
+                        }
+                        else
+                        {
+                            alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(isvOauth2Params.LiteParams);
+                        }
+                    }
+                    else
+                    {
+                        alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(isvOauth2Params);
+                    }
+
                 }
                 else
                 {
-                    var normalMchOauth2Params = (AliPayNormalMchOauth2Params)_configContextQueryService.QueryNormalMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.ALIPAY);
-                    alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(normalMchOauth2Params);
+                    var normalMchOauth2Params = (AliPayNormalMchOauth2Params)_configContextQueryService.QueryNormalMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+
+                    if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_LITE))
+                    {
+                        alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(normalMchOauth2Params.LiteParams);
+                    }
+                    else
+                    {
+                        alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(normalMchOauth2Params);
+                    }
                 }
                 string authCode = reqParams.GetValue("auth_code").ToString();
                 //通过code 换取openId

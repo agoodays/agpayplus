@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
     {
         private readonly IChannelServiceFactory<IChannelUserService> _channelUserServiceFactory;
 
-        public ChannelUserIdController(ILogger<ChannelUserIdController> logger, 
+        public ChannelUserIdController(ILogger<ChannelUserIdController> logger,
             IChannelServiceFactory<IChannelUserService> channelUserServiceFactory,
             IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         }
 
         /// <summary>
-        /// 重定向到微信地址
+        /// 重定向到微信/支付宝地址
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("jump")]
@@ -54,6 +54,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             //获取请求数据
             ChannelUserIdRQ rq = GetRQByWithMchSign<ChannelUserIdRQ>();
             string ifCode = "AUTO".Equals(rq.IfCode, StringComparison.OrdinalIgnoreCase) ? GetIfCodeByUA() : rq.IfCode;
+            string wayCode = GetWayCodeByIfCode(ifCode);
 
             IChannelUserService channelUserService = _channelUserServiceFactory.GetService(ifCode);
 
@@ -72,6 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             jsonObject.Add("appId", rq.AppId);
             jsonObject.Add("extParam", rq.ExtParam);
             jsonObject.Add("ifCode", ifCode);
+            jsonObject.Add("wayCode", wayCode);
             jsonObject.Add("redirectUrl", rq.RedirectUrl);
 
             //回调地址
@@ -79,7 +81,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(rq.MchNo, rq.AppId);
-            string redirectUrl = channelUserService.BuildUserRedirectUrl(callbackUrl, mchAppConfigContext);
+            string oauth2InfoId = GetOauth2InfoId(ifCode, mchAppConfigContext);
+
+            string redirectUrl = channelUserService.BuildUserRedirectUrl(callbackUrl, oauth2InfoId, wayCode, mchAppConfigContext);
 
             return Redirect(redirectUrl);
         }
@@ -96,6 +100,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             string mchNo = callbackData.GetValue("mchNo").ToString();
             string appId = callbackData.GetValue("appId").ToString();
             string ifCode = callbackData.GetValue("ifCode").ToString();
+            string wayCode = callbackData.GetValue("wayCode").ToString();
             string extParam = callbackData.GetValue("extParam").ToString();
             string redirectUrl = callbackData.GetValue("redirectUrl").ToString();
 
@@ -109,9 +114,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
+            string oauth2InfoId = GetOauth2InfoId(ifCode, mchAppConfigContext);
 
             //获取渠道用户ID
-            string channelUserId = channelUserService.GetChannelUserId(GetReqParamJson(), mchAppConfigContext);
+            string channelUserId = channelUserService.GetChannelUserId(GetReqParamJson(), oauth2InfoId, wayCode, mchAppConfigContext);
 
             //同步跳转
             JObject appendParams = new JObject();
@@ -155,6 +161,35 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 return CS.IF_CODE.WXPAY;
             }
             return null;
+        }
+
+        /// <summary>
+        /// 根据支付接口获取支付方式
+        /// </summary>
+        /// <returns></returns>
+        private string GetWayCodeByIfCode(string ifCode)
+        {
+            if (ifCode.Equals(CS.IF_CODE.ALIPAY))
+            {
+                return CS.PAY_WAY_CODE.ALI_JSAPI;  //支付宝服务窗支付
+            }
+            if (ifCode.Equals(CS.IF_CODE.WXPAY))
+            {
+                return CS.PAY_WAY_CODE.WX_JSAPI;
+            }
+            return null;
+        }
+
+        private string GetOauth2InfoId(string ifCode, MchAppConfigContext mchAppConfigContext)
+        {
+            string oauth2InfoId = null;
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, ifCode);
+                oauth2InfoId = payInterfaceConfig?.Oauth2InfoId;
+            }
+
+            return oauth2InfoId;
         }
     }
 }

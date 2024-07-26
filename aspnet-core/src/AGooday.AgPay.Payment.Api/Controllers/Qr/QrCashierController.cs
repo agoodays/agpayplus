@@ -7,6 +7,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Payment.Api.Channel;
+using AGooday.AgPay.Payment.Api.Channel.WxPay;
 using AGooday.AgPay.Payment.Api.Controllers.PayOrder;
 using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
@@ -71,10 +72,14 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
 
             string wayCode = GetWayCode();
-
+            string oauth2InfoId = GetOauth2InfoId(mchAppConfigContext, wayCode);
             //获取接口并返回数据
             IChannelUserService channelUserService = GetServiceByWayCode(wayCode);
-            return ApiRes.Ok(channelUserService.BuildUserRedirectUrl(redirectUrlEncode, mchAppConfigContext));
+            if (channelUserService == null)
+            {
+                throw new BizException("无此支付通道接口");
+            }
+            return ApiRes.Ok(channelUserService.BuildUserRedirectUrl(redirectUrlEncode, oauth2InfoId, wayCode, mchAppConfigContext));
         }
 
         /// <summary>
@@ -91,6 +96,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
+            string oauth2InfoId = GetOauth2InfoId(mchAppConfigContext, wayCode);
             IChannelUserService channelUserService = GetServiceByWayCode(wayCode);
 #if DEBUG
             string channelUserId;
@@ -108,7 +114,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             }
             return ApiRes.Ok(channelUserId);
 #endif
-            return ApiRes.Ok(channelUserService.GetChannelUserId(GetReqParamJson(), mchAppConfigContext));
+            return ApiRes.Ok(channelUserService.GetChannelUserId(GetReqParamJson(), oauth2InfoId, wayCode, mchAppConfigContext));
         }
 
         /// <summary>
@@ -198,6 +204,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 rq.Subject = $"静态码支付";
                 rq.Body = $"静态码支付";
                 rq.BuyerRemark = buyerRemark;
+                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(qrCode.MchNo, qrCode.AppId);
                 if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
                 {
                     JObject resJSON = new JObject();
@@ -206,8 +213,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 }
                 else if (wayCode.Equals(CS.PAY_WAY_CODE.WX_JSAPI))
                 {
+                    string oauth2InfoId = GetOauth2InfoId(mchAppConfigContext, wayCode);
+                    WxPayChannelUserService channelUserService = (WxPayChannelUserService)GetServiceByWayCode(wayCode);
+                    channelUserService.GetOauth2Params(oauth2InfoId, wayCode, mchAppConfigContext, out string appId, out string _, out string _);
                     JObject resJSON = new JObject();
                     resJSON.Add("openid", channelUserId);
+                    resJSON.Add("subAppId", appId);
                     rq.ChannelExtra = resJSON.ToString();
                 }
                 else
@@ -217,7 +228,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 rq.Version = "1.0";
                 rq.SignType = "MD5";
                 rq.ReqTime = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
-                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(qrCode.MchNo, qrCode.AppId);
                 var jsonObject = JObject.FromObject(rq);
                 string sign = AgPayUtil.Sign(jsonObject, rq.SignType, mchAppConfigContext.MchApp.AppSecret);
                 rq.Sign = sign;
@@ -329,6 +339,24 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 return _channelUserServiceFactory.GetService(CS.IF_CODE.WXPAY);
             }
             return null;
+        }
+
+        private string GetOauth2InfoId(MchAppConfigContext mchAppConfigContext, string wayCode)
+        {
+            // 根据支付方式， 查询出 该商户 可用的支付接口
+            var mchPayPassage = _mchPayPassageService.FindMchPayPassage(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, wayCode);
+            if (mchPayPassage == null)
+            {
+                throw new BizException("商户应用不支持该支付方式");
+            }
+            string oauth2InfoId = null;
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, mchPayPassage.IfCode);
+                oauth2InfoId = payInterfaceConfig?.Oauth2InfoId;
+            }
+
+            return oauth2InfoId;
         }
     }
 }

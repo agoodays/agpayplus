@@ -28,32 +28,9 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             _configContextQueryService = configContextQueryService;
         }
 
-        public string BuildUserRedirectUrl(string callbackUrlEncode, MchAppConfigContext mchAppConfigContext)
+        public string BuildUserRedirectUrl(string callbackUrlEncode, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
-            string appId = null;
-            string oauth2Url = "";
-            if (mchAppConfigContext.IsIsvSubMch())
-            {
-                var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
-                var isvOauth2Params = (WxPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, payInterfaceConfig?.Oauth2InfoId, CS.IF_CODE.WXPAY);
-                if (isvOauth2Params == null)
-                {
-                    throw new BizException("服务商微信Oauth2配置没有配置！");
-                }
-                appId = isvOauth2Params.AppId;
-                oauth2Url = isvOauth2Params.Oauth2Url;
-            }
-            else
-            {
-                //获取商户配置信息
-                var normalMchOauth2Params = (WxPayNormalMchOauth2Params)_configContextQueryService.QueryNormalMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
-                if (normalMchOauth2Params == null)
-                {
-                    throw new BizException("商户微信Oauth2配置没有配置！");
-                }
-                appId = normalMchOauth2Params.AppId;
-                oauth2Url = normalMchOauth2Params.Oauth2Url;
-            }
+            GetOauth2Params(oauth2InfoId, wayCode, mchAppConfigContext, out string appId, out string _, out string oauth2Url);
 
             if (string.IsNullOrEmpty(oauth2Url))
             {
@@ -64,34 +41,12 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             return wxUserRedirectUrl;
         }
 
-        public string GetChannelUserId(JObject reqParams, MchAppConfigContext mchAppConfigContext)
+        public string GetChannelUserId(JObject reqParams, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
                 string code = reqParams.GetValue("code").ToString();
-                string appId, appSecret;
-                if (mchAppConfigContext.IsIsvSubMch())
-                {
-                    var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
-                    var isvOauth2Params = (WxPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, payInterfaceConfig?.Oauth2InfoId, CS.IF_CODE.WXPAY);
-                    if (isvOauth2Params == null)
-                    {
-                        throw new BizException("服务商微信Oauth2配置没有配置！");
-                    }
-                    appId = isvOauth2Params.AppId;
-                    appSecret = isvOauth2Params.AppSecret;
-                }
-                else
-                {
-                    //获取商户配置信息
-                    var normalMchOauth2Params = (WxPayNormalMchOauth2Params)_configContextQueryService.QueryNormalMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
-                    if (normalMchOauth2Params == null)
-                    {
-                        throw new BizException("商户微信Oauth2配置没有配置！");
-                    }
-                    appId = normalMchOauth2Params.AppId;
-                    appSecret = normalMchOauth2Params.AppSecret;
-                }
+                GetOauth2Params(oauth2InfoId, wayCode, mchAppConfigContext, out string appId, out string appSecret, out string _);
                 var options = new WechatApiClientOptions()
                 {
                     AppId = appId,
@@ -106,6 +61,49 @@ namespace AGooday.AgPay.Payment.Api.Channel.WxPay
             {
                 _logger.LogError(e, e.Message);
                 return null;
+            }
+        }
+
+        public void GetOauth2Params(string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext, out string appId, out string appSecret, out string oauth2Url)
+        {
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                var isvOauth2Params = (WxPayIsvOauth2Params)_configContextQueryService.QueryIsvOauth2Params(mchAppConfigContext.MchInfo.IsvNo, oauth2InfoId, GetIfCode());
+                if (isvOauth2Params == null)
+                {
+                    throw new BizException("服务商微信Oauth2配置没有配置！");
+                }
+                appId = isvOauth2Params.AppId;
+                appSecret = isvOauth2Params.AppSecret;
+                oauth2Url = isvOauth2Params.Oauth2Url;
+                if (wayCode.Equals(CS.PAY_WAY_CODE.WX_LITE))
+                {
+                    appId = isvOauth2Params.LiteAppId;
+                    appSecret = isvOauth2Params.LiteAppSecret;
+                    var isvSubMchOauth2Params = (WxPayIsvSubMchOauth2Params)_configContextQueryService.QueryIsvSubMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                    if (isvSubMchOauth2Params.IsUseSubmchAccount.Equals(CS.YES))
+                    {
+                        appId = isvSubMchOauth2Params.LiteAppId;
+                        appSecret = isvSubMchOauth2Params.LiteAppSecret;
+                    }
+                }
+            }
+            else
+            {
+                //获取商户配置信息
+                var normalMchOauth2Params = (WxPayNormalMchOauth2Params)_configContextQueryService.QueryNormalMchOauth2Params(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                if (normalMchOauth2Params == null)
+                {
+                    throw new BizException("商户微信Oauth2配置没有配置！");
+                }
+                appId = normalMchOauth2Params.AppId;
+                appSecret = normalMchOauth2Params.AppSecret;
+                oauth2Url = normalMchOauth2Params.Oauth2Url;
+                if (wayCode.Equals(CS.PAY_WAY_CODE.WX_LITE))
+                {
+                    appId = normalMchOauth2Params.LiteAppId;
+                    appSecret = normalMchOauth2Params.LiteAppSecret;
+                }
             }
         }
 
