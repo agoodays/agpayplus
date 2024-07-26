@@ -41,10 +41,10 @@
           </span>
         </template> <!-- 自定义插槽 -->
         <template slot="bindInfoSlot" slot-scope="{record}">
-          <span v-if="record.mchNo">
-            <p>已绑定商户：{{ record.mchNo }}</p>
-            <p>应用：{{ record.appId }}</p>
-            <p>门店：{{ record.storeId }}</p>
+          <span v-if="record.bindState === 1 && record.mchNo">
+            <p>已绑定商户：{{ record.mchName }}[{{ record.mchNo }}]</p>
+            <p>应用：{{ record.appName }}[{{ record.appId }}]</p>
+            <p>门店：{{ record.storeName }}[{{ record.storeId }}]</p>
           </span>
           <span v-else><a-icon type="exclamation-circle"/>未绑定</span>
         </template>
@@ -61,6 +61,8 @@
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_DEVICE_QRC_VIEW')" @click="onPreview(record.qrcId)">详情</a-button>
             <a-button type="link" v-if="$access('ENT_DEVICE_QRC_EDIT')" @click="editFunc(record.qrcId)">修改</a-button>
+            <a-button type="link" v-if="$access('ENT_DEVICE_QRC_EDIT')" @click="bindFunc(record.qrcId)">绑定</a-button>
+            <a-button type="link" v-if="$access('ENT_DEVICE_QRC_EDIT') && record.bindState === 1" @click="unbindFunc(record.qrcId)">解绑</a-button>
             <a-button type="link" style="color: red" v-if="$access('ENT_DEVICE_QRC_DEL')" @click="delFunc(record.qrcId)">删除</a-button>
           </AgTableColumns>
         </template>
@@ -68,6 +70,7 @@
     </a-card>
     <!-- 新增页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="queryFunc"/>
+    <Bind  ref="bind" :callbackFunc="queryFunc"/>
   </div>
 </template>
 <script>
@@ -77,13 +80,14 @@ import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgTableColState from '@/components/AgTable/AgTableColState'
 import { API_URL_QRC_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
+import Bind from './Bind'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 
 const tableColumns = [
   { key: 'qrcId', fixed: 'left', title: '码牌ID', width: 180, scopedSlots: { customRender: 'qrcIdSlot' } },
   { key: 'batchId', dataIndex: 'batchId', title: '批次号', width: 135 },
-  { key: 'bindInfo', title: '绑定商户信息', width: 280, scopedSlots: { customRender: 'bindInfoSlot' } },
+  { key: 'bindInfo', title: '绑定商户信息', width: 360, scopedSlots: { customRender: 'bindInfoSlot' } },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
   { key: 'entryPage', title: '扫码页面', width: 140, scopedSlots: { customRender: 'entryPageSlot' } },
   { key: 'state', title: '状态', width: 80, scopedSlots: { customRender: 'stateSlot' } },
@@ -94,7 +98,7 @@ const tableColumns = [
 
 export default {
   name: 'PayWayPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgTableColState, InfoAddOrEdit, AgTextUp, AgDateRangePicker },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgTableColState, InfoAddOrEdit, Bind, AgTextUp, AgDateRangePicker },
   data () {
     return {
       isShowMore: false,
@@ -142,6 +146,9 @@ export default {
     editFunc: function (qrcId) { // 业务通用【修改】 函数
       this.$refs.infoAddOrEdit.show(qrcId)
     },
+    bindFunc: function (qrcId) {
+      this.$refs.bind.show(qrcId)
+    },
     delFunc: function (qrcId) {
       const that = this
       this.$infoBox.confirmDanger('确认删除？', '', () => {
@@ -149,6 +156,20 @@ export default {
           that.$message.success('删除成功！')
           that.$refs.infoTable.refTable(false)
         })
+      })
+    },
+    unbindFunc: function (recordId) { // 【解绑码牌】
+      const that = this
+      return new Promise((resolve, reject) => {
+        that.$infoBox.confirmDanger('确认解绑？', '解绑后商户将无法使用该码牌！', () => {
+              return reqLoad.updateById(API_URL_QRC_LIST + '/unbind', recordId, {}).then(res => {
+                that.searchFunc()
+                resolve()
+              }).catch(err => reject(err))
+            },
+            () => {
+              reject(new Error())
+            })
       })
     },
     updateState: function (recordId, state) { // 【更新状态】

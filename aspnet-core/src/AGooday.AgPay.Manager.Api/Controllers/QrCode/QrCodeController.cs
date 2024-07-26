@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
@@ -21,6 +22,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         private readonly IQrCodeService _qrCodeService;
         private readonly IQrCodeShellService _qrCodeShellService;
         private readonly ISysConfigService _sysConfigService;
+        private readonly IMchInfoService _mchInfoService;
+        private readonly IMchAppService _mchAppService;
+        private readonly IMchStoreService _mchStoreService;
 
         public QrCodeController(ILogger<QrCodeController> logger,
             IWebHostEnvironment env,
@@ -28,13 +32,19 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             IQrCodeShellService qrCodeShellService,
             RedisUtil client,
             IAuthService authService,
-            ISysConfigService sysConfigService)
+            ISysConfigService sysConfigService,
+            IMchInfoService mchInfoService,
+            IMchAppService mchAppService,
+            IMchStoreService mchStoreService)
             : base(logger, client, authService)
         {
             _env = env;
             _qrCodeService = qrCodeService;
             _qrCodeShellService = qrCodeShellService;
             _sysConfigService = sysConfigService;
+            _mchInfoService = mchInfoService;
+            _mchAppService = mchAppService;
+            _mchStoreService = mchStoreService;
         }
 
         /// <summary>
@@ -47,6 +57,18 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         public ApiPageRes<QrCodeDto> List([FromQuery] QrCodeQueryDto dto)
         {
             var data = _qrCodeService.GetPaginatedData(dto);
+            var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
+            var appIds = data.Select(s => s.AppId).Distinct().ToList();
+            var storeIds = data.Select(s => s.StoreId).Distinct().ToList();
+            var mchInfos = _mchInfoService.GetByMchNos(mchNos);
+            var mchApps = _mchAppService.GetByAppIds(appIds);
+            var mchStores = _mchStoreService.GetByStoreIds(storeIds);
+            foreach (var item in data)
+            {
+                item.AddExt("mchName", mchInfos?.FirstOrDefault(s => s.MchNo == item.MchNo)?.MchName);
+                item.AddExt("appName", mchApps?.FirstOrDefault(s => s.AppId == item.AppId)?.AppName);
+                item.AddExt("storeName", mchStores?.FirstOrDefault(s => s.StoreId == item.StoreId)?.StoreName);
+            }
             return ApiPageRes<QrCodeDto>.Pages(data);
         }
 
@@ -128,7 +150,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("/bind/{recordId}"), MethodLog("绑定码牌")]
+        [HttpPut, Route("bind/{recordId}"), MethodLog("绑定码牌")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
         public ApiRes Bind(string recordId, QrCodeDto dto)
         {
@@ -146,7 +168,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("/unbind/{recordId}"), MethodLog("解绑码牌")]
+        [HttpPut, Route("unbind/{recordId}"), MethodLog("解绑码牌")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
         public ApiRes UnBind(string recordId)
         {

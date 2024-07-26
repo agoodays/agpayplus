@@ -52,6 +52,12 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
         }
 
+        public IEnumerable<MchStoreDto> GetByStoreIds(IEnumerable<long?> storeIds)
+        {
+            var mchStores = _mchStoreRepository.GetAllAsNoTracking().Where(w => storeIds.Contains(w.StoreId));
+            return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
+        }
+
         public PaginatedList<MchStoreListDto> GetPaginatedData(MchStoreQueryDto dto, List<long> storeIds = null)
         {
             var mchStores = _mchStoreRepository.GetAllAsNoTracking()

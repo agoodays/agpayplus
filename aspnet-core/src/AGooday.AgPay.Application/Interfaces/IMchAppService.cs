@@ -8,6 +8,7 @@ namespace AGooday.AgPay.Application.Interfaces
         MchAppDto GetById(string recordId, string mchNo);
         IEnumerable<MchAppDto> GetByMchNo(string mchNo);
         IEnumerable<MchAppDto> GetByMchNos(IEnumerable<string> mchNos);
+        IEnumerable<MchAppDto> GetByAppIds(IEnumerable<string> appIds);
         PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto, string agentNo = null);
     }
 }

@@ -60,6 +60,12 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
         }
 
+        public IEnumerable<MchAppDto> GetByAppIds(IEnumerable<string> appIds)
+        {
+            var mchApps = _mchAppRepository.GetAll().Where(w => appIds.Contains(w.AppId));
+            return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
+        }
+
         public PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto, string agentNo = null)
         {
             var mchApps = _mchAppRepository.GetAllAsNoTracking()
