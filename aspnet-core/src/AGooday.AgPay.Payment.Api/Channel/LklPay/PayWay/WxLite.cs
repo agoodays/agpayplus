@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.LklPay.PayWay
                     respData.TryGetString("merchant_no", out string merchantNo);//全局流水号
                     respData.TryGetString("trade_no", out string tradeNo);//全局流水号
                     var accRespFields = respData.GetValue("acc_resp_fields")?.ToObject<JObject>();
-                    string prepayId = accRespFields.GetValue("prepay_id").ToString();//微信预下单id
+                    accRespFields.TryGetString("prepay_id", out string prepayId);//微信预下单id
                     string payAppId = accRespFields.GetValue("app_id").ToString();//微信 AppId
                     string payTimeStamp = accRespFields.GetValue("time_stamp").ToString();//微信 TimeStamp
                     string paynonceStr = accRespFields.GetValue("nonce_str").ToString();//微信 NonceStr

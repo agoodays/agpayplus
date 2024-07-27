@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
     /// </summary>
     public class WxJsapi : SxfPayPaymentService
     {
-        public WxJsapi(ILogger<WxJsapi> logger, 
+        public WxJsapi(ILogger<WxJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -68,14 +68,14 @@ namespace AGooday.AgPay.Payment.Api.Channel.SxfPay.PayWay
                         仅供退款使用
                         消费者账单中的条形码订单号*/
                         string sxfUuid = respData.GetValue("sxfUuid").ToString();
-                        string prepayId = respData.GetValue("prepayId").ToString();//微信预下单id
+                        respData.TryGetString("prepayId", out string prepayId);//微信预下单id
                         string payAppId = respData.GetValue("payAppId").ToString();//微信 AppId
                         string payTimeStamp = respData.GetValue("payTimeStamp").ToString();//微信 TimeStamp
                         string paynonceStr = respData.GetValue("paynonceStr").ToString();//微信 NonceStr
                         string payPackage = respData.GetValue("payPackage").ToString();//微信 Package
                         string paySignType = respData.GetValue("paySignType").ToString();//微信 SignType
                         string paySign = respData.GetValue("paySign").ToString();//微信 Sign
-                        string partnerId = respData.GetValue("partnerId").ToString();//微信 PartnerId
+                        respData.TryGetString("partnerId", out string partnerId);//微信 PartnerId
                         JObject payInfo = new JObject
                         {
                             { "appId", payAppId },

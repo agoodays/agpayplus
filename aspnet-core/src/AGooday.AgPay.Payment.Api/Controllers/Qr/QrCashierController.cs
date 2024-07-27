@@ -167,6 +167,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             {
                 //查询订单
                 payOrder = GetPayOrder(id);
+                payOrder.WayCode = wayCode;
             }
             else if (type.Equals(CS.TOKEN_DATA_TYPE.QRC_ID))
             {
@@ -191,14 +192,23 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             {
                 return ApiRes.CustomFail("参数错误");
             }
+            var mchNo = rq?.MchNo ?? payOrder?.MchNo;
+            var appId = rq?.AppId ?? payOrder?.AppId;
+            MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
+            rq.Version = "1.0";
+            rq.SignType = "MD5";
+            rq.ReqTime = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+            var jsonObject = JObject.FromObject(rq);
+            string sign = AgPayUtil.Sign(jsonObject, rq.SignType, mchAppConfigContext.MchApp.AppSecret);
+            rq.Sign = sign;
 
             if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
             {
-                apiRes = PackageAlipayPayPackage(rq, payOrder);
+                apiRes = PackageAlipayPayPackage(rq, payOrder, mchAppConfigContext);
             }
             else if (wayCode.Equals(CS.PAY_WAY_CODE.WX_JSAPI))
             {
-                apiRes = PackageWxpayPayPackage(rq, payOrder);
+                apiRes = PackageWxpayPayPackage(rq, payOrder, mchAppConfigContext);
             }
             else
             {
@@ -213,12 +223,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// </summary>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        private ApiRes PackageAlipayPayPackage(UnifiedOrderRQ rq, PayOrderDto payOrder)
+        private ApiRes PackageAlipayPayPackage(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
+            var wayCode = (rq.WayCode ?? payOrder?.WayCode) ?? GetWayCode();
             string channelUserId = GetReqParamJson().GetValue("channelUserId").ToString();
-            AliJsapiOrderRQ bizRQ = rq == null ? new AliJsapiOrderRQ() : (AliJsapiOrderRQ)rq;
+            AliJsapiOrderRQ bizRQ = new AliJsapiOrderRQ();
+            if (rq != null)
+            {
+                JObject resJSON = new JObject();
+                resJSON.Add("buyerUserId", channelUserId);
+                rq.ChannelExtra = resJSON.ToString();
+                bizRQ = (AliJsapiOrderRQ)rq.BuildBizRQ();
+            }
             bizRQ.BuyerUserId = channelUserId;
-            return this.UnifiedOrder(GetWayCode(), bizRQ, payOrder);
+            return this.UnifiedOrder(wayCode, bizRQ, payOrder);
         }
 
         /// <summary>
@@ -226,17 +244,25 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// </summary>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        private ApiRes PackageWxpayPayPackage(UnifiedOrderRQ rq, PayOrderDto payOrder)
+        private ApiRes PackageWxpayPayPackage(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
+            var wayCode = (rq.WayCode ?? payOrder?.WayCode) ?? GetWayCode();
             string openId = GetReqParamJson().GetValue("channelUserId").ToString();
-            MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId);
-            string oauth2InfoId = GetOauth2InfoId(mchAppConfigContext, payOrder.WayCode);
-            WxPayChannelUserService channelUserService = (WxPayChannelUserService)GetServiceByWayCode(payOrder.WayCode);
-            channelUserService.GetOauth2Params(oauth2InfoId, payOrder.WayCode, mchAppConfigContext, out string appId, out string _, out string _);
-            WxJsapiOrderRQ bizRQ = rq == null ? new WxJsapiOrderRQ() : (WxJsapiOrderRQ)rq;
+            string oauth2InfoId = GetOauth2InfoId(mchAppConfigContext, wayCode);
+            WxPayChannelUserService channelUserService = (WxPayChannelUserService)GetServiceByWayCode(wayCode);
+            channelUserService.GetOauth2Params(oauth2InfoId, wayCode, mchAppConfigContext, out string appId, out string _, out string _);
+            WxJsapiOrderRQ bizRQ = new WxJsapiOrderRQ();
             bizRQ.Openid = openId;
             bizRQ.SubAppId = appId;
-            return this.UnifiedOrder(GetWayCode(), bizRQ, payOrder);
+            if (rq != null)
+            {
+                JObject resJSON = new JObject();
+                resJSON.Add("openid", openId);
+                resJSON.Add("subAppId", appId);
+                rq.ChannelExtra = resJSON.ToString();
+                bizRQ = (WxJsapiOrderRQ)rq.BuildBizRQ();
+            }
+            return this.UnifiedOrder(wayCode, bizRQ, payOrder);
         }
 
         private (string mchNo, string appId) GetMchNoAndAppId(byte type, string id)
