@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Agent.Api.Middlewares
             };
             var requestPath = context.Request.Path.Value;
             var isApiPath = requestPath.StartsWith("/api");
-            var isExcludedPath = excludedPaths.Any(path => requestPath.Contains(path));
+            var isExcludedPath = excludedPaths.Any(path => requestPath.Contains(path, StringComparison.OrdinalIgnoreCase));
             if (isApiPath && !isExcludedPath)
             {
                 context.Request.EnableBuffering();
