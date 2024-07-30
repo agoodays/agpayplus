@@ -2,6 +2,7 @@
 using SkiaSharp;
 using SkiaSharp.QrCode;
 using SkiaSharp.QrCode.Models;
+using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Common.Utils
 {
@@ -343,6 +344,15 @@ namespace AGooday.AgPay.Common.Utils
                     // 清空画布绘制背景色
                     canvas.Clear(SKColors.White);
 
+                    // 获取字体文件的完整路径
+                    string fontFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fonts", "arial.ttf");
+                    // 加载字体文件
+                    SKTypeface typeface = SKTypeface.FromFile(fontFilePath);
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        typeface = SKTypeface.FromFamilyName("Arial");
+                    }
+
                     int leftMargin = (int)(width * 0.05);
                     int topMargin = (int)(width * 0.05);
                     int middleWidth = width - (leftMargin * 2);
@@ -384,7 +394,7 @@ namespace AGooday.AgPay.Common.Utils
                         IsAntialias = true,
                         Color = SKColors.Black,
                         TextAlign = SKTextAlign.Center,
-                        Typeface = SKTypeface.FromFamilyName("Arial")
+                        Typeface = typeface
                     })
                     {
                         // 在画布上绘制文本
@@ -409,6 +419,20 @@ namespace AGooday.AgPay.Common.Utils
                     var bgColor = SKColor.Parse(backgroundColor);
                     // 清空画布绘制背景色
                     canvas.Clear(bgColor);
+
+                    // 获取字体文件的完整路径
+                    string fontFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fonts", "arial.ttf");
+                    string simsunfontFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fonts", "simsun.ttc");
+                    // 加载字体文件
+                    SKTypeface typeface = SKTypeface.FromFile(fontFilePath);
+                    SKTypeface simsunTypeface = SKTypeface.FromFile(simsunfontFilePath);
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        typeface = SKTypeface.FromFamilyName("Arial");
+                        var fontManager = SKFontManager.Default;
+                        //simsunTypeface = fontManager.MatchCharacter(null, SKFontStyle.Bold, null, '汉');
+                        simsunTypeface = fontManager.MatchCharacter('汉');
+                    }
 
                     int leftMargin = (int)(width * 0.1);
                     int topMargin = (int)(width * 0.3);
@@ -443,8 +467,6 @@ namespace AGooday.AgPay.Common.Utils
 
                     if (string.IsNullOrWhiteSpace(logoPath) && !string.IsNullOrWhiteSpace(title))
                     {
-                        var fontManager = SKFontManager.Default;
-                        var typeface = fontManager.MatchCharacter(null, SKFontStyle.Bold, null, '汉');
                         // 创建画笔对象
                         using (var paint = new SKPaint
                         {
@@ -452,7 +474,7 @@ namespace AGooday.AgPay.Common.Utils
                             IsAntialias = true,
                             Color = SKColors.White,
                             TextAlign = SKTextAlign.Center,
-                            Typeface = typeface
+                            Typeface = simsunTypeface
                         })
                         {
                             // 在画布上绘制文本
@@ -510,7 +532,7 @@ namespace AGooday.AgPay.Common.Utils
                         IsAntialias = true,
                         Color = SKColors.Black,
                         TextAlign = SKTextAlign.Center,
-                        Typeface = SKTypeface.FromFamilyName("Arial")
+                        Typeface = typeface
                     })
                     {
                         // 在画布上绘制文本
@@ -549,8 +571,6 @@ namespace AGooday.AgPay.Common.Utils
 
                                     if (!string.IsNullOrWhiteSpace(item.Alias))
                                     {
-                                        var fontManager = SKFontManager.Default;
-                                        var typeface = fontManager.MatchCharacter('汉');
                                         // 创建画笔对象
                                         using (var paint = new SKPaint
                                         {
@@ -558,7 +578,7 @@ namespace AGooday.AgPay.Common.Utils
                                             IsAntialias = true,
                                             Color = SKColors.White,
                                             TextAlign = SKTextAlign.Center,
-                                            Typeface = typeface,
+                                            Typeface = simsunTypeface,
                                         })
                                         {
                                             // 在画布上绘制文本
@@ -602,6 +622,20 @@ namespace AGooday.AgPay.Common.Utils
                     // 清空画布绘制背景色
                     canvas.Clear(bgColor);
 
+                    // 获取字体文件的完整路径
+                    string fontFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fonts", "arial.ttf");
+                    string simsunFontFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fonts", "simsun.ttc");
+                    // 加载字体文件
+                    SKTypeface typeface = SKTypeface.FromFile(fontFilePath);
+                    SKTypeface simsunTypeface = SKTypeface.FromFile(simsunFontFilePath);
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        typeface = SKTypeface.FromFamilyName("Arial");
+                        var fontManager = SKFontManager.Default;
+                        //simsunTypeface = fontManager.MatchCharacter(null, SKFontStyle.Bold, null, '汉');
+                        simsunTypeface = fontManager.MatchCharacter('汉');
+                    }
+
                     int leftMargin = (int)(width * 0.1);
                     int topMargin = (int)(width * 0.1);
                     int bottomMargin = (int)(width * 0.1);
@@ -631,8 +665,6 @@ namespace AGooday.AgPay.Common.Utils
 
                     if (string.IsNullOrWhiteSpace(logoPath) && !string.IsNullOrWhiteSpace(title))
                     {
-                        var fontManager = SKFontManager.Default;
-                        var typeface = fontManager.MatchCharacter(null, SKFontStyle.Bold, null, '汉');
                         // 创建画笔对象
                         using (var paint = new SKPaint
                         {
@@ -640,7 +672,7 @@ namespace AGooday.AgPay.Common.Utils
                             IsAntialias = true,
                             Color = bgColor,
                             TextAlign = SKTextAlign.Center,
-                            Typeface = typeface
+                            Typeface = simsunTypeface
                         })
                         {
                             // 在画布上绘制文本
@@ -698,7 +730,7 @@ namespace AGooday.AgPay.Common.Utils
                         IsAntialias = true,
                         Color = SKColors.Black,
                         TextAlign = SKTextAlign.Center,
-                        Typeface = SKTypeface.FromFamilyName("Arial")
+                        Typeface = typeface
                     })
                     {
                         // 在画布上绘制文本
@@ -737,8 +769,6 @@ namespace AGooday.AgPay.Common.Utils
 
                                     if (!string.IsNullOrWhiteSpace(item.Alias))
                                     {
-                                        var fontManager = SKFontManager.Default;
-                                        var typeface = fontManager.MatchCharacter('汉');
                                         // 创建画笔对象
                                         using (var paint = new SKPaint
                                         {
@@ -746,7 +776,7 @@ namespace AGooday.AgPay.Common.Utils
                                             IsAntialias = true,
                                             Color = SKColors.White,
                                             TextAlign = SKTextAlign.Center,
-                                            Typeface = typeface,
+                                            Typeface = simsunTypeface,
                                         })
                                         {
                                             // 在画布上绘制文本

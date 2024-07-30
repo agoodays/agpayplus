@@ -1,4 +1,5 @@
 ﻿using SkiaSharp;
+using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Common.Utils
 {
@@ -48,8 +49,19 @@ namespace AGooday.AgPay.Common.Utils
                 SKColors.GreenYellow, SKColors.HotPink, SKColors.SpringGreen, SKColors.LawnGreen,
                 SKColors.Tomato, SKColors.Yellow, SKColors.YellowGreen, SKColors.Gold
             };
-            string[] fonts = { "Verdana", "Microsoft Sans Serif", "Comic Sans MS", "Arial", "宋体" };
+
             var random = new Random();
+            var fonts = new[] { "verdana.ttf", "micross.ttf", "comic.ttf", "arial.ttf", "simsun.ttc" };
+            // 获取字体文件的完整路径
+            string fontFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fonts", fonts[random.Next(fonts.Length)]);
+
+            // 加载字体文件
+            SKTypeface typeface = SKTypeface.FromFile(fontFilePath);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                fonts = new[] { "Verdana", "Microsoft Sans Serif", "Comic Sans MS", "Arial", "宋体" };
+                typeface = SKTypeface.FromFamilyName(fonts[random.Next(fonts.Length)], SKFontStyle.Bold);
+            }
 
             // 创建一个 SKBitmap 对象
             var bitmap = new SKBitmap(width, imageHeight);
@@ -80,7 +92,7 @@ namespace AGooday.AgPay.Common.Utils
                     canvas.DrawText(code.Substring(i, 1),
                         x,
                         y,
-                        new SKPaint() { Color = colors[random.Next(colors.Length)], TextSize = fontSize, Typeface = SKTypeface.FromFamilyName(fonts[random.Next(fonts.Length)], SKFontStyle.Bold) });
+                        new SKPaint() { Color = colors[random.Next(colors.Length)], TextSize = fontSize, Typeface = typeface });
                 }
 
                 // 绘制验证码噪点
