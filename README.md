@@ -142,9 +142,9 @@ docker rm agpay-plus-manager-api
 # 生成证书并配置本地计算机
 # https://learn.microsoft.com/zh-cn/aspnet/core/security/docker-https?view=aspnetcore-8.0
 # https://www.linkedin.com/pulse/run-aspnet-core-api-docker-https-senthil-kumaran
-dotnet dev-certs https -ep $env:USERPROFILE\.aspnet\https\MyLearn.APIApp.pfx -p 123456
+dotnet dev-certs https -ep $env:USERPROFILE\.aspnet\https\agpayplusapi.pfx -p 123456
 dotnet dev-certs https --trust
 
 # 使用为 HTTPS 配置的 ASP.NET Core 运行容器镜像
-docker run --rm -it -d --name agpay-plus-manager-api --network agpay-plus-network -p 5817:5017 -p 9817:9017 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9817 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-manager-api
+docker run --rm -it -d --name agpay-plus-manager-api --network agpay-plus-network -p 5817:5017 -p 9817:9017 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9817 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-manager-api
 ```
