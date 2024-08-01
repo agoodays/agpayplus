@@ -75,13 +75,12 @@
 | ![输入图片说明](docs/images/wxpay-page-view.png) | ![输入图片说明](docs/images/wxpay-page-view-remark.png) | ![输入图片说明](docs/images/alipay-page-view.png) | ![输入图片说明](docs/images/ysfpay-page-view.png) |
 | ------------ | ------------ | ------------ | ------------ |
 
-### Docker安装Redis和RabbitMQ
+### Docker
 ```
-# Docker中安装Redis
-
 # 创建网络
 docker network create agpay-plus-network
 
+# Docker安装Redis
 # Docker搜索redis镜像 命令：docker search <镜像名称>
 docker search redis
 
@@ -91,6 +90,7 @@ docker pull redis
 # 运行 redis 容器
 docker run -d --name agpay-plus-redis -p 6389:6379 --network agpay-plus-network redis
 
+# Docker安装RabbitMQ
 # 拉去镜像
 docker pull rabbitmq:management
 
@@ -126,18 +126,8 @@ agpayplus\aspnet-core> docker build -t agpay-plus-agent-api -f ./src/AGooday.AgP
 agpayplus\aspnet-core> docker build -t agpay-plus-merchant-api -f ./src/AGooday.AgPay.Merchant.Api/Dockerfile .
 agpayplus\aspnet-core> docker build -t agpay-plus-payment-api -f ./src/AGooday.AgPay.Payment.Api/Dockerfile .
 
-# 运行容器镜像
-docker run -d --name agpay-plus-manager-api --network agpay-plus-network -p 9817:80 agpay-plus-manager-api
-docker run -d --name agpay-plus-agent-api --network agpay-plus-network -p 9816:80 agpay-plus-agent-api
-docker run -d --name agpay-plus-merchant-api --network agpay-plus-network -p 9818:80 agpay-plus-merchant-api
-docker run -d --name agpay-plus-payment-api --network agpay-plus-network -p 9819:80 agpay-plus-payment-api
-
 # 将运行的容器连接到指定的网络，运行 docker network inspect agpay-plus-network 命令查看容器是否连接到了该网络
 docker network connect agpay-plus-network agpay-plus-manager-api
-
-# 停止并删除当前正在运行的 agpay-plus-manager-api 容器：
-docker stop agpay-plus-manager-api
-docker rm agpay-plus-manager-api
 
 # 生成证书并配置本地计算机
 # https://learn.microsoft.com/zh-cn/aspnet/core/security/docker-https?view=aspnetcore-8.0
@@ -147,4 +137,11 @@ dotnet dev-certs https --trust
 
 # 使用为 HTTPS 配置的 ASP.NET Core 运行容器镜像
 docker run --rm -it -d --name agpay-plus-manager-api --network agpay-plus-network -p 5817:5017 -p 9817:9017 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9817 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-manager-api
+docker run --rm -it -d --name agpay-plus-agent-api --network agpay-plus-network -p 5816:5016 -p 9816:9016 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9816 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-agent-api
+docker run --rm -it -d --name agpay-plus-merchant-api --network agpay-plus-network -p 5818:5018 -p 9818:9018 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9818 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-merchant-api
+docker run --rm -it -d --name agpay-plus-payment-api --network agpay-plus-network -p 5819:5019 -p 9819:9019 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9819 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-payment-api
+
+# 停止并删除当前正在运行的 agpay-plus-manager-api 容器：
+docker stop agpay-plus-manager-api
+docker rm agpay-plus-manager-api
 ```
