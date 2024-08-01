@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AlibabaCloud.SDK.Ocr-api20210707" Version="3.1.0" />
+    <PackageReference Include="Baidu.AI" Version="4.15.15" />
     <PackageReference Include="TencentCloudSDK.Ocr" Version="3.0.1054" />
   </ItemGroup>
 

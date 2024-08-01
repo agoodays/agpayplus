@@ -25,6 +25,11 @@ namespace AGooday.AgPay.Application
         public string AliOcrConfig { get; set; }
 
         /// <summary>
+        /// 百度OCR识别参数配置
+        /// </summary>
+        public string BaiduOcrConfig { get; set; }
+
+        /// <summary>
         /// 获取腾讯云OCR配置
         /// </summary>
         /// <returns></returns>
@@ -40,6 +45,15 @@ namespace AGooday.AgPay.Application
         public Dictionary<string,string> GenAliOcrConfig()
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(AliOcrConfig);
+        }
+
+        /// <summary>
+        /// 获取百度智能云OCR配置
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, string> GenBaiduOcrConfig()
+        {
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(BaiduOcrConfig);
         }
     }
 }

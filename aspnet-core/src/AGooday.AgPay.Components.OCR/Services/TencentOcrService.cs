@@ -22,10 +22,10 @@ namespace AGooday.AgPay.Components.OCR.Services
         public TencentOcrService(ILogger<TencentOcrService> logger, ISysConfigService sysConfigService)
             : base(logger)
         {
-            var dbSmsConfig = sysConfigService.GetDBOcrConfig();
+            var dbOcrConfig = sysConfigService.GetDBOcrConfig();
             // 获取全局默认配置
             globalSettings = JsonConvert.DefaultSettings?.Invoke() ?? new JsonSerializerSettings();
-            ocrConfig = (TencentOcrConfig)AbstractOcrConfig.GetOcrConfig(dbSmsConfig.OcrType, dbSmsConfig.TencentOcrConfig);
+            ocrConfig = (TencentOcrConfig)AbstractOcrConfig.GetOcrConfig(dbOcrConfig.OcrType, dbOcrConfig.TencentOcrConfig);
             // 设置腾讯云API访问密钥
             Credential cred = new Credential()
             {
