@@ -3,13 +3,13 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 5018
-EXPOSE 9018
+EXPOSE 5016
+EXPOSE 9016
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/AGooday.AgPay.Merchant.Api/AGooday.AgPay.Merchant.Api.csproj", "src/AGooday.AgPay.Merchant.Api/"]
+COPY ["src/AGooday.AgPay.Agent.Api/AGooday.AgPay.Agent.Api.csproj", "src/AGooday.AgPay.Agent.Api/"]
 COPY ["src/AGooday.AgPay.AopSdk/AGooday.AgPay.AopSdk.csproj", "src/AGooday.AgPay.AopSdk/"]
 COPY ["src/AGooday.AgPay.Application/AGooday.AgPay.Application.csproj", "src/AGooday.AgPay.Application/"]
 COPY ["src/AGooday.AgPay.Infrastructure/AGooday.AgPay.Infrastructure.csproj", "src/AGooday.AgPay.Infrastructure/"]
@@ -21,16 +21,16 @@ COPY ["src/AGooday.AgPay.Notice.Email/AGooday.AgPay.Notice.Email.csproj", "src/A
 COPY ["src/AGooday.AgPay.Notice.Core/AGooday.AgPay.Notice.Core.csproj", "src/AGooday.AgPay.Notice.Core/"]
 COPY ["src/AGooday.AgPay.Components.OSS/AGooday.AgPay.Components.OSS.csproj", "src/AGooday.AgPay.Components.OSS/"]
 COPY ["src/AGooday.AgPay.Components.SMS/AGooday.AgPay.Components.SMS.csproj", "src/AGooday.AgPay.Components.SMS/"]
-RUN dotnet restore "./src/AGooday.AgPay.Merchant.Api/AGooday.AgPay.Merchant.Api.csproj"
+RUN dotnet restore "./src/AGooday.AgPay.Agent.Api/AGooday.AgPay.Agent.Api.csproj"
 COPY . .
-WORKDIR "/src/src/AGooday.AgPay.Merchant.Api"
-RUN dotnet build "./AGooday.AgPay.Merchant.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/AGooday.AgPay.Agent.Api"
+RUN dotnet build "./AGooday.AgPay.Agent.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./AGooday.AgPay.Merchant.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./AGooday.AgPay.Agent.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "AGooday.AgPay.Merchant.Api.dll"]
+ENTRYPOINT ["dotnet", "AGooday.AgPay.Agent.Api.dll"]
