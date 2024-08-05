@@ -40,22 +40,31 @@ namespace AGooday.AgPay.Components.OCR.Services
                 if (type.Equals(OcrTypeCS.GENERAL_BASIC, StringComparison.OrdinalIgnoreCase))
                 {
                     var resp = client.GeneralBasicUrl(imageUrl);
-                    resp.TryGetValue("words_result", out JToken wordsResult);
-                    detectedTexts = ((JArray)wordsResult).Select(item => item["words"]?.ToString()).ToList();
+                    var isHaveResult = resp.TryGetValue("words_result", out JToken wordsResult);
+                    if (isHaveResult)
+                    {
+                        detectedTexts = ((JArray)wordsResult).Select(item => item["words"]?.ToString()).ToList();
+                    }
                 }
 
                 if (type.Equals(OcrTypeCS.GENERAL_ACCURATE, StringComparison.OrdinalIgnoreCase))
                 {
                     var resp = client.AccurateBasicUrl(imageUrl);
-                    resp.TryGetValue("words_result", out JToken wordsResult);
-                    detectedTexts = ((JArray)wordsResult).Select(item => item["words"]?.ToString()).ToList();
+                    var isHaveResult = resp.TryGetValue("words_result", out JToken wordsResult);
+                    if (isHaveResult)
+                    {
+                        detectedTexts = ((JArray)wordsResult).Select(item => item["words"]?.ToString()).ToList();
+                    }
                 }
 
                 if (type.Equals(OcrTypeCS.GENERAL_HANDWRITING, StringComparison.OrdinalIgnoreCase))
                 {
                     var resp = client.HandwritingUrl(imageUrl);
-                    resp.TryGetValue("words_result", out JToken wordsResult);
-                    detectedTexts = ((JArray)wordsResult).Select(item => item["words"]?.ToString()).ToList();
+                    var isHaveResult = resp.TryGetValue("words_result", out JToken wordsResult);
+                    if (isHaveResult)
+                    {
+                        detectedTexts = ((JArray)wordsResult).Select(item => item["words"]?.ToString()).ToList();
+                    }
                 }
 
                 return Task.FromResult(string.Join("\n", detectedTexts));
@@ -86,60 +95,57 @@ namespace AGooday.AgPay.Components.OCR.Services
                     string idCardSide = "front";
                     // 发送请求并获取识别结果
                     var resp = client.IdcardUrl(imageUrl, idCardSide);
-                    resp.TryGetValue("words_result", out JToken wordsResult);
-                    static string GetWords(JToken wordsResult, string propertyName)
+                    var isHaveResult = resp.TryGetValue("words_result", out JToken wordsResult);
+                    if (isHaveResult)
                     {
-                        ((JObject)wordsResult).TryGetValue(propertyName, out JToken jToken);
-                        ((JObject)jToken).TryGetString("words", out string words);
-                        return words;
+                        result.IdCardName = ConvertEmptyStringToNull(GetWords(wordsResult, "姓名"));
+                        result.IdCardSex = ConvertEmptyStringToNull(GetWords(wordsResult, "性别"));
+                        result.IdCardNation = ConvertEmptyStringToNull(GetWords(wordsResult, "民族"));
+                        result.IdCardBirth = ConvertEmptyStringToNull(ConvertDateToFormat(GetWords(wordsResult, "出生"), "yyyyMMdd"));
+                        result.IdCardAddress = ConvertEmptyStringToNull(GetWords(wordsResult, "住址"));
+                        result.IdCardIdNum = ConvertEmptyStringToNull(GetWords(wordsResult, "公民身份号码"));
+                        result.IdCardAuthority = ConvertEmptyStringToNull(GetWords(wordsResult, "签发机关"));
+                        var issueDate = ConvertDateToFormat(GetWords(wordsResult, "签发日期"), "yyyyMMdd", "yyyy.MM.dd");
+                        var expiringDate = ConvertDateToFormat(GetWords(wordsResult, "失效日期"), "yyyyMMdd", "yyyy.MM.dd");
+                        result.IdCardValidDate = issueDate != null && expiringDate != null ? $"{issueDate}-{expiringDate}" : issueDate ?? expiringDate;
                     }
-                    result.IdCardName = ConvertEmptyStringToNull(GetWords(wordsResult, "姓名"));
-                    result.IdCardSex = ConvertEmptyStringToNull(GetWords(wordsResult, "性别"));
-                    result.IdCardNation = ConvertEmptyStringToNull(GetWords(wordsResult, "民族"));
-                    result.IdCardBirth = ConvertEmptyStringToNull(ConvertDateToFormat(GetWords(wordsResult, "出生"), "yyyyMMdd"));
-                    result.IdCardAddress = ConvertEmptyStringToNull(GetWords(wordsResult, "住址"));
-                    result.IdCardIdNum = ConvertEmptyStringToNull(GetWords(wordsResult, "公民身份号码"));
-                    result.IdCardAuthority = ConvertEmptyStringToNull(GetWords(wordsResult, "签发机关"));
-                    var issueDate = ConvertDateToFormat(GetWords(wordsResult, "签发日期"), "yyyyMMdd", "yyyy.MM.dd");
-                    var expiringDate = ConvertDateToFormat(GetWords(wordsResult, "失效日期"), "yyyyMMdd", "yyyy.MM.dd");
-                    result.IdCardValidDate = $"{issueDate}-{expiringDate}";
                 }
 
                 if (type.Equals(OcrTypeCS.BANK_CARD, StringComparison.OrdinalIgnoreCase))
                 {
                     var image = await GetImageBytesAsync(imageUrl);
                     var resp = client.Bankcard(image);
-                    resp.TryGetValue("result", out JToken _result);
-                    ((JObject)_result).TryGetString("bank_card_number", out string bankCardNumber);
-                    ((JObject)_result).TryGetString("bank_name", out string bankName);
-                    ((JObject)_result).TryGetString("bank_card_type", out string bankCardType);
-                    result.BankCardCardNo = bankCardNumber;
-                    result.BankCardBankInfo = bankName;
-                    result.BankCardValidDate = null;
-                    result.BankCardCardType = bankCardType;
+                    var isHaveResult = resp.TryGetValue("result", out JToken _result);
+                    if (isHaveResult)
+                    {
+                        ((JObject)_result).TryGetString("bank_card_number", out string bankCardNumber);
+                        ((JObject)_result).TryGetString("bank_name", out string bankName);
+                        ((JObject)_result).TryGetString("bank_card_type", out string bankCardType);
+                        result.BankCardCardNo = bankCardNumber;
+                        result.BankCardBankInfo = bankName;
+                        result.BankCardValidDate = null;
+                        result.BankCardCardType = bankCardType;
+                    }
                 }
 
                 if (type.Equals(OcrTypeCS.BIZ_LICENSE, StringComparison.OrdinalIgnoreCase))
                 {
                     var image = await GetImageBytesAsync(imageUrl);
                     var resp = client.BusinessLicense(image);
-                    resp.TryGetValue("words_result", out JToken wordsResult);
-                    static string GetWords(JToken wordsResult, string propertyName)
+                    var isHaveResult = resp.TryGetValue("words_result", out JToken wordsResult);
+                    if (isHaveResult)
                     {
-                        ((JObject)wordsResult).TryGetValue(propertyName, out JToken jToken);
-                        ((JObject)jToken).TryGetString("words", out string words);
-                        return words;
+                        result.BizLicenseRegNum = GetWords(wordsResult, "社会信用代码");
+                        result.BizLicenseName = GetWords(wordsResult, "单位名称");
+                        result.BizLicenseCapital = GetWords(wordsResult, "注册资本");
+                        result.BizLicensePerson = GetWords(wordsResult, "法人");
+                        result.BizLicenseAddress = GetWords(wordsResult, "地址");
+                        result.BizLicenseBusiness = GetWords(wordsResult, "经营范围");
+                        result.BizLicenseType = GetWords(wordsResult, "类型");
+                        result.BizLicensePeriod = GetWords(wordsResult, "有效期");
+                        result.BizLicenseComposingForm = GetWords(wordsResult, "组成形式");
+                        result.BizLicenseRegistrationDate = GetWords(wordsResult, "成立日期");
                     }
-                    result.BizLicenseRegNum = GetWords(wordsResult, "社会信用代码");
-                    result.BizLicenseName = GetWords(wordsResult, "单位名称");
-                    result.BizLicenseCapital = GetWords(wordsResult, "注册资本");
-                    result.BizLicensePerson = GetWords(wordsResult, "法人");
-                    result.BizLicenseAddress = GetWords(wordsResult, "地址");
-                    result.BizLicenseBusiness = GetWords(wordsResult, "经营范围");
-                    result.BizLicenseType = GetWords(wordsResult, "类型");
-                    result.BizLicensePeriod = GetWords(wordsResult, "有效期");
-                    result.BizLicenseComposingForm = GetWords(wordsResult, "组成形式");
-                    result.BizLicenseRegistrationDate = GetWords(wordsResult, "成立日期");
                 }
 
                 return result;
@@ -154,6 +160,17 @@ namespace AGooday.AgPay.Components.OCR.Services
             {
                 JsonConvert.DefaultSettings = () => globalSettings;
             }
+        }
+
+        public static string GetWords(JToken wordsResult, string propertyName)
+        {
+            var isHaveResult = ((JObject)wordsResult).TryGetValue(propertyName, out JToken jToken);
+            if (isHaveResult)
+            {
+                ((JObject)jToken).TryGetString("words", out string words);
+                return words;
+            }
+            return null;
         }
     }
 }
