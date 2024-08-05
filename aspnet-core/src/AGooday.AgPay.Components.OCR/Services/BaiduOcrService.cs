@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             var dbOcrConfig = sysConfigService.GetDBOcrConfig();
             // 获取全局默认配置
             globalSettings = JsonConvert.DefaultSettings?.Invoke() ?? new JsonSerializerSettings();
-            ocrConfig = (BaiduOcrConfig)AbstractOcrConfig.GetOcrConfig(dbOcrConfig.OcrType, dbOcrConfig.TencentOcrConfig);
+            ocrConfig = (BaiduOcrConfig)AbstractOcrConfig.GetOcrConfig(dbOcrConfig.OcrType, dbOcrConfig.BaiduOcrConfig);
             client = new Ocr(ocrConfig.ApiKey, ocrConfig.SecretKey);
         }
 
