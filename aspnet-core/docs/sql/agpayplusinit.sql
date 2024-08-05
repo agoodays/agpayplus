@@ -1958,13 +1958,15 @@ INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_k
 VALUES ('mocktestSmsConfig', '[模拟测试]短信配置', '[模拟测试]短信配置', 'smsConfig', '短信配置', '{"mockCode": "888666"}', 'text', 'MGR', '0', 0, NOW());
 
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
-VALUES ('ocrType', 'OCR识别使用类型', 'OCR识别使用类型 1-腾讯OCR 2-阿里OCR', 'ocrConfig', 'OCR识别参数配置', '1', 'radio', 'MGR', '0', 0, NOW());
+VALUES ('ocrType', 'OCR识别使用类型', 'OCR识别使用类型 1-腾讯OCR 2-阿里OCR 3-百度OCR', 'ocrConfig', 'OCR识别参数配置', '1', 'radio', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('ocrState', 'OCR识别使用状态', 'OCR识别使用状态 0-关闭 1-开启', 'ocrConfig', 'OCR识别参数配置', '1', 'radio', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('tencentOcrConfig', '腾讯OCR识别参数配置', '腾讯OCR识别参数配置', 'ocrConfig', 'OCR识别参数配置', '{"secretId":"HK7ewxhiuqVsCUVFAKBOKzNTJr88svhIDyoN","secretKey":"Q9blfIejY6qnTs1tNJL7cM5XUord9Qje"}', 'text', 'MGR', '0', 0, NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('aliOcrConfig', '阿里OCR识别参数配置', '阿里OCR识别参数配置', 'ocrConfig', 'OCR识别参数配置', '{"accessKeyId": "MVqr64GEqjdI6y7xTMVqry7xLTAjsTo1","accessKeySecret": "q91sDeWVv8GhuoUY95a6x7NAlsMIYo"}', 'text', 'MGR', '0', 0, NOW());
+INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
+VALUES ('baiduOcrConfig', '百度OCR识别参数配置', '百度OCR识别参数配置', 'ocrConfig', 'OCR识别参数配置', '{"apiKey": "25aJ1TXkWcQOGwz2j2t0DJVF","aecretKey": "68O7EbRUikddg8FqpGEpwQco1L5dQKMP"}', 'text', 'MGR', '0', 0, NOW());
 
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `updated_at`) 
 VALUES ('loginErrorMaxLimit', '限制登录次数(xx分钟最多尝试xx次)(0表示不限制)', '限制登录次数', 'securityConfig', '安全配置', '{"limitMinute":15,"maxLoginAttempts":3}', 'text', 'MGR', '0', 0, NOW());

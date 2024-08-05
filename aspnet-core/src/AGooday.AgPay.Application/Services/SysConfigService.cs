@@ -252,7 +252,7 @@ namespace AGooday.AgPay.Application.Services
                 {
                     "aliyunOssConfig" or
                     "agpaydxSmsConfig" or "aliyundySmsConfig" or
-                    "tencentOcrConfig" or "aliOcrConfig" => StringUtil.Merge(sysConfig.ConfigVal, config.Value),
+                    "tencentOcrConfig" or "aliOcrConfig" or "baiduOcrConfig" => StringUtil.Merge(sysConfig.ConfigVal, config.Value),
                     _ => config.Value,
                 };
                 sysConfig.UpdatedAt = DateTime.Now;

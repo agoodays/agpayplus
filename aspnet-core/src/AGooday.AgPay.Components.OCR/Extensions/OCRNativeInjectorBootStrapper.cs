@@ -9,6 +9,7 @@ namespace AGooday.AgPay.Components.OCR.Extensions
     {
         public static void RegisterServices(IServiceCollection services)
         {
+            services.AddKeyedScoped<IOcrService, BaiduOcrService>(OcrTypeEnum.Baidu);
             services.AddKeyedScoped<IOcrService, AliyunOcrService>(OcrTypeEnum.Aliyun);
             services.AddKeyedScoped<IOcrService, TencentOcrService>(OcrTypeEnum.Tencent);
             services.AddScoped<IOcrServiceFactory, OcrServiceFactory>();

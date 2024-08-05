@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Components.OCR.Services
             // 获取全局默认配置
             globalSettings = JsonConvert.DefaultSettings?.Invoke() ?? new JsonSerializerSettings();
             ocrConfig = (BaiduOcrConfig)AbstractOcrConfig.GetOcrConfig(dbOcrConfig.OcrType, dbOcrConfig.TencentOcrConfig);
-            client = new Ocr(ocrConfig.APIKey, ocrConfig.SecretKey);
+            client = new Ocr(ocrConfig.ApiKey, ocrConfig.SecretKey);
         }
 
         public override Task<string> RecognizeTextAsync(string imageUrl, string type)

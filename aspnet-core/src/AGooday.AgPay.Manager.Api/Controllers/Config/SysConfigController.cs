@@ -83,6 +83,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
                 {
                     JsonConfigValDesen(sysConfig, "accessKeySecret");
                 }
+                sysConfig = configList.FirstOrDefault(w => w.ConfigKey.Equals("baiduOcrConfig"));
+                if (sysConfig != null)
+                {
+                    JsonConfigValDesen(sysConfig, "aecretKey");
+                }
             }
 
             return ApiRes.Ok(configList);

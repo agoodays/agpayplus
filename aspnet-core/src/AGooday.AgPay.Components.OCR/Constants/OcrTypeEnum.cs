@@ -11,5 +11,10 @@
         /// 阿里OCR
         /// </summary>
         Aliyun = 2,
+
+        /// <summary>
+        /// 百度OCR
+        /// </summary>
+        Baidu = 3,
     }
 }

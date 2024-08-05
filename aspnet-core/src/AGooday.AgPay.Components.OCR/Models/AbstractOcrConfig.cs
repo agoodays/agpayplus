@@ -11,6 +11,7 @@ namespace AGooday.AgPay.Components.OCR.Models
             {
                 OcrTypeEnum.Tencent => JsonConvert.DeserializeObject<TencentOcrConfig>(configVal),
                 OcrTypeEnum.Aliyun => JsonConvert.DeserializeObject<AliyunOcrConfig>(configVal),
+                OcrTypeEnum.Baidu => JsonConvert.DeserializeObject<BaiduOcrConfig>(configVal),
                 _ => throw new NotImplementedException()
             };
         }

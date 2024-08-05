@@ -222,6 +222,7 @@
                         <a-radio-group v-model="ocrConfig.ocrType">
                           <a-radio :value="1">腾讯OCR</a-radio>
                           <a-radio :value="2">阿里OCR</a-radio>
+                          <a-radio :value="3">百度OCR</a-radio>
                         </a-radio-group>
                       </a-form-model-item>
                     </a-col>
@@ -259,8 +260,22 @@
                               </a-form-model-item>
                             </a-col>
                             <a-col :span="22" :offset="1">
-                              <a-form-model-item label="AccessKey Secret" prop="secretKey">
+                              <a-form-model-item label="AccessKey Secret" prop="accessKeySecret">
                                 <a-input :placeholder="ocrConfig.aliOcrConfigDesen.accessKeySecret?ocrConfig.aliOcrConfigDesen.accessKeySecret:'请填写'" v-model="ocrConfig.aliOcrConfig.accessKeySecret" />
+                              </a-form-model-item>
+                            </a-col>
+                          </a-row>
+                        </a-collapse-panel>
+                        <a-collapse-panel key="3" header="[ 百度OCR识别配置 ]">
+                          <a-row>
+                            <a-col :span="22" :offset="1">
+                              <a-form-model-item label="ApiKey" prop="apiKey">
+                                <a-input placeholder="请填写" v-model="ocrConfig.baiduOcrConfig.apiKey" />
+                              </a-form-model-item>
+                            </a-col>
+                            <a-col :span="22" :offset="1">
+                              <a-form-model-item label="SecretKey" prop="aecretKey">
+                                <a-input :placeholder="ocrConfig.baiduOcrConfigDesen.aecretKey?ocrConfig.baiduOcrConfigDesen.aecretKey:'请填写'" v-model="ocrConfig.baiduOcrConfig.aecretKey" />
                               </a-form-model-item>
                             </a-col>
                           </a-row>
@@ -454,7 +469,9 @@ export default {
         tencentOcrConfig: {},
         tencentOcrConfigDesen: {},
         aliOcrConfig: {},
-        aliOcrConfigDesen: {}
+        aliOcrConfigDesen: {},
+        baiduOcrConfig: {},
+        baiduOcrConfigDesen: {}
       },
       ossConfig: {
         ossUseType: 'localFile',
@@ -505,6 +522,7 @@ export default {
           that.setConfigVal(that, 'ocrConfig', 'ocrState', 1)
           that.setJSONConfigDesen(that, 'ocrConfig', 'tencentOcrConfig', true)
           that.setJSONConfigDesen(that, 'ocrConfig', 'aliOcrConfig', true)
+          that.setJSONConfigDesen(that, 'ocrConfig', 'baiduOcrConfig', true)
         }
 
         if (that.groupKey === 'securityConfig') {
@@ -604,6 +622,9 @@ export default {
               break
             case 'aliOcrConfig':
               configVal = JSON.stringify(that.ocrConfig.aliOcrConfig)
+              break
+            case 'baiduOcrConfig':
+              configVal = JSON.stringify(that.ocrConfig.baiduOcrConfig)
               break
             case 'loginErrorMaxLimit':
               configVal = JSON.stringify(that.securityConfig.loginErrorMaxLimit)
