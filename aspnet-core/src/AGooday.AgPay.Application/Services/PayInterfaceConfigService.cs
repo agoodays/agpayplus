@@ -139,16 +139,19 @@ namespace AGooday.AgPay.Application.Services
 
         public List<PayInterfaceDefineDto> PayIfConfigList(string infoType, string configMode, string infoId, string ifName, string ifCode)
         {
+            bool isApplyment = configMode.EndsWith("Applyment", StringComparison.OrdinalIgnoreCase);
             // 支付定义列表
             var defineList = _payInterfaceDefineRepository.GetAllAsNoTracking()
                 .Where(w => w.State.Equals(CS.YES)
                 && (string.IsNullOrWhiteSpace(ifName) || w.IfName.Contains(ifName))
-                && (string.IsNullOrWhiteSpace(ifCode) || w.IfCode.Equals(ifCode)));
+                && (string.IsNullOrWhiteSpace(ifCode) || w.IfCode.Equals(ifCode))
+                && (!isApplyment || (isApplyment && w.IsSupportApplyment.Equals(CS.YES) && w.IsOpenApplyment.Equals(CS.YES))));
 
             // 支付参数列表
             var configList = _payInterfaceConfigRepository.GetAllAsNoTracking()
                 .Where(w => w.InfoType.Equals(infoType) && w.InfoId.Equals(infoId));
 
+            AgentInfo agentInfo; IQueryable<string> ifCodes; IQueryable<PayInterfaceConfig> isvConfigList;
             switch (infoType)
             {
                 case CS.INFO_TYPE.ISV:
@@ -179,8 +182,16 @@ namespace AGooday.AgPay.Application.Services
                     if (mchInfo.Type == CS.MCH_TYPE_ISVSUB)
                     {
                         // 商户类型为特约商户，服务商应已经配置支付参数
-                        var isvConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking()
-                            .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
+                        isvConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                            .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(mchInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams)
+                            && (!isApplyment || (isApplyment && w.IsOpenApplyment.Equals(CS.YES))));
+
+                        if (!string.IsNullOrEmpty(mchInfo.AgentNo))
+                        {
+                            agentInfo = _agentInfoRepository.GetById(mchInfo.AgentNo);
+                            ifCodes = GetAgentIfCodes(agentInfo, isApplyment);
+                            isvConfigList = isvConfigList.Where(s => ifCodes.Contains(s.IfCode));
+                        }
 
                         foreach (var isvConfig in isvConfigList)
                         {
@@ -200,15 +211,17 @@ namespace AGooday.AgPay.Application.Services
                         }).ToList();
                     return results;
                 case CS.INFO_TYPE.AGENT:
-                    AgentInfo agentInfo = _agentInfoRepository.GetById(infoId);
+                    agentInfo = _agentInfoRepository.GetById(infoId);
                     if (agentInfo == null || agentInfo.State != CS.YES)
                     {
                         throw new BizException("代理商不存在");
                     }
                     // 商户类型为特约商户，服务商应已经配置支付参数
-                    var isvConfigs = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                    isvConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking()
                         .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(agentInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
-                    defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES) && isvConfigs.Select(s => s.IfCode).Contains(w.IfCode));
+                    ifCodes = GetAgentIfCodes(agentInfo, isApplyment);
+                    isvConfigList = isvConfigList.Where(s => ifCodes.Contains(s.IfCode));
+                    defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES) && isvConfigList.Select(s => s.IfCode).Contains(w.IfCode));
                     break;
                 default:
                     break;
@@ -221,6 +234,39 @@ namespace AGooday.AgPay.Application.Services
             }).ToList();
 
             return result;
+        }
+
+        /// <summary>
+        /// 查询代理商正常可用通道代码
+        /// </summary>
+        /// <param name="agentInfo"></param>
+        /// <param name="isApplyment"></param>
+        /// <returns></returns>
+        private IQueryable<string> GetAgentIfCodes(AgentInfo agentInfo, bool isApplyment)
+        {
+            IQueryable<string> ifCodes;
+            if (!string.IsNullOrEmpty(agentInfo.Pid))
+            {
+                var agentInfos = _agentInfoRepository.GetParentAgentsFromSql(agentInfo.AgentNo);
+                var infoIds = agentInfos.Select(s => s.AgentNo).ToList();
+
+                var agentConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                    .Where(w => infoIds.Contains(w.InfoId) && w.InfoType.Equals(CS.INFO_TYPE.AGENT));
+
+                ifCodes = agentConfigList.GroupBy(g => g.IfCode)
+                    .Where(w => w.All(m => m.State.Equals(CS.YES) && (!isApplyment || (isApplyment && m.IsOpenApplyment.Equals(CS.YES)))))
+                    .Select(s => s.Key);
+            }
+            else
+            {
+                var agentConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking()
+                    .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(agentInfo.AgentNo) && w.InfoType.Equals(CS.INFO_TYPE.AGENT)
+                    && (!isApplyment || (isApplyment && w.IsOpenApplyment.Equals(CS.YES))));
+
+                ifCodes = agentConfigList.Select(s => s.IfCode);
+            }
+
+            return ifCodes;
         }
 
         public List<PayInterfaceDefineDto> SelectAllPayIfConfigListByAppId(string appId)
