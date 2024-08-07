@@ -116,6 +116,8 @@ namespace AGooday.AgPay.Components.OCR.Services
                             var issueDate = ConvertDateToFormat(GetWords(idcardBackResult, "签发日期"), "yyyyMMdd", "yyyy.MM.dd");
                             var expiringDate = ConvertDateToFormat(GetWords(idcardBackResult, "失效日期"), "yyyyMMdd", "yyyy.MM.dd");
                             result.IdCardValidDate = issueDate != null && expiringDate != null ? $"{issueDate}-{expiringDate}" : issueDate ?? expiringDate;
+                            result.IdCardIssueDate = ConvertDateToFormat(issueDate, "yyyy.MM.dd");
+                            result.IdCardExpiringDate = ConvertDateToFormat(expiringDate, "yyyy.MM.dd");
                         }
                     }
                 }
@@ -151,9 +153,12 @@ namespace AGooday.AgPay.Components.OCR.Services
                         result.BizLicenseAddress = GetWords(wordsResult, "地址");
                         result.BizLicenseBusiness = GetWords(wordsResult, "经营范围");
                         result.BizLicenseType = GetWords(wordsResult, "类型");
-                        result.BizLicensePeriod = GetWords(wordsResult, "有效期");
+                        string period = GetWords(wordsResult, "有效期");
+                        result.BizLicensePeriod = (period?.EndsWith("长期") ?? true) ? "长期" : ConvertDateToFormat(period, "yyyy年MM月dd日");
                         result.BizLicenseComposingForm = GetWords(wordsResult, "组成形式");
-                        result.BizLicenseRegistrationDate = GetWords(wordsResult, "成立日期");
+                        result.BizLicenseRegistrationDate = ConvertDateToFormat(GetWords(wordsResult, "成立日期"), "yyyy年MM月dd日");
+                        result.BizLicenseValidFromDate = result.BizLicenseRegistrationDate;
+                        result.BizLicenseValidToDate = result.BizLicensePeriod;
                     }
                 }
 
@@ -179,7 +184,7 @@ namespace AGooday.AgPay.Components.OCR.Services
                 if (isHaveResult)
                 {
                     ((JObject)jToken).TryGetString("words", out string words);
-                    return words;
+                    return words == "无" ? null : words;
                 }
             }
             return null;

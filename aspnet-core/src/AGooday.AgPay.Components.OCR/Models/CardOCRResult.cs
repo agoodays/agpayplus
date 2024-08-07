@@ -16,6 +16,7 @@
         public string IdCardNation { get; set; }
         /// <summary>
         /// 出生日期（人像面）
+        /// 格式：yyyy-MM-dd
         /// </summary>
         public string IdCardBirth { get; set; }
         /// <summary>
@@ -32,8 +33,19 @@
         public string IdCardAuthority { get; set; }
         /// <summary>
         /// 证件有效期（国徽面）
+        /// 格式：yyyy.MM.dd-yyyy.MM.dd 或 yyyy.MM.dd-长期
         /// </summary>
         public string IdCardValidDate { get; set; }
+        /// <summary>
+        /// 签发日期
+        /// 格式：yyyy-MM-dd
+        /// </summary>
+        public string IdCardIssueDate { get; set; }
+        /// <summary>
+        /// 失效日期
+        /// 格式：yyyy-MM-dd 或 长期
+        /// </summary>
+        public string IdCardExpiringDate { get; set; }
 
         /// <summary>
         /// 卡号
@@ -90,14 +102,17 @@
         public string BizLicenseComposingForm { get; set; }
         /// <summary>
         /// 注册日期
+        /// 格式：yyyy-MM-dd
         /// </summary>
         public string BizLicenseRegistrationDate { get; set; }
         /// <summary>
         /// 格式化营业期限起始日期
+        /// 格式：yyyy-MM-dd
         /// </summary>
         public string BizLicenseValidFromDate { get; set; }
         /// <summary>
         /// 格式化营业期限终止日期
+        /// 格式：yyyy-MM-dd
         /// </summary>
         public string BizLicenseValidToDate { get; set; }
     }

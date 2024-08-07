@@ -116,6 +116,11 @@ namespace AGooday.AgPay.Components.OCR.Services
 
                     result.IdCardAuthority = resp.Data.Back?.Data.IssueAuthority;
                     result.IdCardValidDate = resp.Data.Back?.Data.ValidPeriod;
+                    var validDates = result.IdCardValidDate.Split('-');
+                    var issueDate = validDates.First();
+                    var expiringDate = validDates.Last();
+                    result.IdCardIssueDate = ConvertDateToFormat(issueDate, "yyyy.MM.dd");
+                    result.IdCardExpiringDate = ConvertDateToFormat(expiringDate, "yyyy.MM.dd");
                 }
 
                 if (type.Equals(OcrTypeCS.BANK_CARD, StringComparison.OrdinalIgnoreCase))
@@ -149,11 +154,11 @@ namespace AGooday.AgPay.Components.OCR.Services
                     result.BizLicenseAddress = resp.Data.BusinessAddress;
                     result.BizLicenseBusiness = resp.Data.BusinessScope;
                     result.BizLicenseType = resp.Data.CompanyType;
-                    result.BizLicensePeriod = resp.Data.ValidPeriod;
+                    result.BizLicensePeriod = (resp.Data.ValidPeriod?.EndsWith("长期") ?? true) ? "长期" : ConvertDateToFormat(resp.Data.ValidPeriod, "yyyy年MM月dd日");
                     result.BizLicenseComposingForm = resp.Data.CompanyForm;
-                    result.BizLicenseRegistrationDate = resp.Data.RegistrationDate;
-                    result.BizLicenseValidFromDate = resp.Data.ValidFromDate;
-                    result.BizLicenseValidToDate = resp.Data.ValidToDate;
+                    result.BizLicenseRegistrationDate = ConvertDateToFormat(resp.Data.RegistrationDate, "yyyyMMdd");
+                    result.BizLicenseValidFromDate = ConvertDateToFormat(resp.Data.ValidFromDate, "yyyyMMdd");
+                    result.BizLicenseValidToDate = ConvertDateToFormat(resp.Data.ValidToDate.Equals("29991231") ? "长期" : resp.Data.ValidToDate, "yyyyMMdd");
                 }
 
                 return Task.FromResult(result);
