@@ -1,5 +1,5 @@
 # AgPay UI
-为AgPay对应的前端项目，包括运营平台、代理商系统、商户系统、聚合码收银台。前端技术以vue为主，框架使用Ant Design Vue开发。
+AgPay对应的前端项目，包括运营平台、代理商系统、商户系统、聚合码收银台。前端技术以Vue为主，框架使用Ant Design Vue开发。
 
 服务端项目：https://github.com/agoodays/agpayplus/tree/main/aspnet-core
 
