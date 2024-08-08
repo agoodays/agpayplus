@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Payment.Api.Channel.LesPay.Enumerator;
 using AGooday.AgPay.Payment.Api.Models;
@@ -34,6 +35,22 @@ namespace AGooday.AgPay.Payment.Api.Channel.LesPay
         public override string PreCheck(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder)
         {
             return null;
+        }
+
+        public override long CalculateFeeAmount(long amount, PayOrderDto payOrder)
+        {
+            var refundState = payOrder.RefundAmount + amount >= payOrder.Amount ? PayOrderRefund.REFUND_STATE_ALL : PayOrderRefund.REFUND_STATE_SUB;
+            if (refundState.Equals(PayOrderRefund.REFUND_STATE_ALL))
+            {
+                return payOrder.MchFeeAmount;
+            }
+            /**
+             * 退款手续费规则说明：https://www.yuque.com/leshuazf/doc/iuuz6n#73bDC
+             * 退款手续费计算公式如下：
+             * 全额退款的手续费返还：退款手续费=原交易手续费
+             * 部分退款的手续费返还：部分退款金额/原交易金额*原交易手续费 【手续费逐笔计算，向下取整保留两位小数】。
+             **/
+            return AmountUtil.CalPercentageFee(amount, payOrder.MchOrderFeeAmount, payOrder.Amount, MidpointRounding.ToNegativeInfinity);
         }
 
         public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
