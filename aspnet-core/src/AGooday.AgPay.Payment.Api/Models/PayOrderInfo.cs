@@ -1,4 +1,4 @@
-﻿namespace AGooday.AgPay.Components.Third.Models
+﻿namespace AGooday.AgPay.Payment.Api.Models
 {
     public class PayOrderInfo
     {

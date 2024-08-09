@@ -14,6 +14,7 @@ using AGooday.AgPay.Components.Third.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using AGooday.AgPay.Payment.Api.Controllers.PayOrder;
+using AGooday.AgPay.Payment.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 

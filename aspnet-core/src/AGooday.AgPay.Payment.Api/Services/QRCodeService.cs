@@ -1,6 +1,6 @@
 ﻿using AGooday.AgPay.Common.Utils;
 
-namespace AGooday.AgPay.Components.Third.Services
+namespace AGooday.AgPay.Payment.Api.Services
 {
     public class QRCodeService : IQRCodeService
     {
