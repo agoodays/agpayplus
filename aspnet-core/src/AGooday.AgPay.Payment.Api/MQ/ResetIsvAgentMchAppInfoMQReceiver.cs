@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Components.MQ.Models;
-using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Components.Third.Services;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Payment.Api.MQ

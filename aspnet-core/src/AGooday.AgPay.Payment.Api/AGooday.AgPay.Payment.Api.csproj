@@ -26,14 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AlipaySDKNet.Standard" Version="4.9.198" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
     <PackageReference Include="Quartz" Version="3.11.0" />
-    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.Api" Version="3.4.0" />
-    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV2" Version="3.1.0" />
-    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="3.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
@@ -43,6 +38,7 @@
     <ProjectReference Include="..\AGooday.AgPay.Components.MQ\AGooday.AgPay.Components.MQ.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Components.OSS\AGooday.AgPay.Components.OSS.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Components.SMS\AGooday.AgPay.Components.SMS.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Components.Third\AGooday.AgPay.Components.Third.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -57,7 +57,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.AopSdk.UnitTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Components.OCR", "src\AGooday.AgPay.Components.OCR\AGooday.AgPay.Components.OCR.csproj", "{1F22FF7E-AF32-4752-8B6F-D4D6E63D5138}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Common.UnitTests", "test\AGooday.AgPay.Common.UnitTests\AGooday.AgPay.Common.UnitTests.csproj", "{B33DBCF8-17BE-4E7A-A041-7F7D4047A6AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Common.UnitTests", "test\AGooday.AgPay.Common.UnitTests\AGooday.AgPay.Common.UnitTests.csproj", "{B33DBCF8-17BE-4E7A-A041-7F7D4047A6AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Components.Third", "src\AGooday.AgPay.Components.Third\AGooday.AgPay.Components.Third.csproj", "{F170C1B9-E170-48D0-BD63-96F8923127F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -149,6 +151,10 @@ Global
 		{B33DBCF8-17BE-4E7A-A041-7F7D4047A6AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B33DBCF8-17BE-4E7A-A041-7F7D4047A6AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B33DBCF8-17BE-4E7A-A041-7F7D4047A6AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F170C1B9-E170-48D0-BD63-96F8923127F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F170C1B9-E170-48D0-BD63-96F8923127F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F170C1B9-E170-48D0-BD63-96F8923127F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F170C1B9-E170-48D0-BD63-96F8923127F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -180,6 +186,7 @@ Global
 		{6B1029C0-0070-4BDC-9443-43DC564B1AEE} = {FDF5C7A4-32BC-40E7-82AE-C9B862014B86}
 		{1F22FF7E-AF32-4752-8B6F-D4D6E63D5138} = {9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}
 		{B33DBCF8-17BE-4E7A-A041-7F7D4047A6AB} = {FDF5C7A4-32BC-40E7-82AE-C9B862014B86}
+		{F170C1B9-E170-48D0-BD63-96F8923127F2} = {9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACDADF0F-3F17-4DE0-A322-714493E80E85}

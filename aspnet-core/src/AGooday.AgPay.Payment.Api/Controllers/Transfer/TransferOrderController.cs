@@ -5,14 +5,14 @@ using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Third.Channel;
+using AGooday.AgPay.Components.Third.Exceptions;
+using AGooday.AgPay.Components.Third.Models;
+using AGooday.AgPay.Components.Third.RQRS.Msg;
+using AGooday.AgPay.Components.Third.RQRS.Transfer;
+using AGooday.AgPay.Components.Third.Services;
+using AGooday.AgPay.Components.Third.Utils;
 using AGooday.AgPay.Payment.Api.Authorization;
-using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Exceptions;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.RQRS.Transfer;
-using AGooday.AgPay.Payment.Api.Services;
-using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
@@ -204,7 +204,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 return;
             }
 
-            string transferId = transferOrder.TransferId;
+            // string transferId = transferOrder.TransferId;
 
             // 明确成功
             if (ChannelState.CONFIRM_SUCCESS == channelRetMsg.ChannelState)

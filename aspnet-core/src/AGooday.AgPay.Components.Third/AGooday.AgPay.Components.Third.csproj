@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--<Nullable>enable</Nullable>-->
+  </PropertyGroup>
+	
+  <!-- 全局 using 声明 -->
+  <ItemGroup>
+	<Using Include="Microsoft.AspNetCore.Http" />
+	<Using Include="Microsoft.Extensions.Logging" />
+	<Using Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AlipaySDKNet.Standard" Version="4.9.231" />
+    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
+    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.Api" Version="3.4.0" />
+    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV2" Version="3.1.1" />
+    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AGooday.AgPay.Application\AGooday.AgPay.Application.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Common\AGooday.AgPay.Common.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Components.OSS\AGooday.AgPay.Components.OSS.csproj" />
+  </ItemGroup>
+
+</Project>

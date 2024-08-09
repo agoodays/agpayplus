@@ -1,5 +1,5 @@
 ﻿using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Components.Third.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.ScanImg

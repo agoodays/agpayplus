@@ -3,8 +3,8 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Components.Third.RQRS.Msg;
+using AGooday.AgPay.Components.Third.Services;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Payment.Api.MQ

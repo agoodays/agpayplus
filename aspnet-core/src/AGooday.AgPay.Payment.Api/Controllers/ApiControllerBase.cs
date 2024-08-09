@@ -1,10 +1,10 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS;
-using AGooday.AgPay.Payment.Api.Services;
-using AGooday.AgPay.Payment.Api.Utils;
+using AGooday.AgPay.Components.Third.Models;
+using AGooday.AgPay.Components.Third.RQRS;
+using AGooday.AgPay.Components.Third.Services;
+using AGooday.AgPay.Components.Third.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;

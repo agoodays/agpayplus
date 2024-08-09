@@ -4,13 +4,13 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
+using AGooday.AgPay.Components.Third.Channel;
+using AGooday.AgPay.Components.Third.Models;
+using AGooday.AgPay.Components.Third.RQRS;
+using AGooday.AgPay.Components.Third.Services;
+using AGooday.AgPay.Components.Third.Utils;
 using AGooday.AgPay.Payment.Api.Authorization;
-using AGooday.AgPay.Payment.Api.Channel;
 using AGooday.AgPay.Payment.Api.Controllers.PayOrder;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS;
-using AGooday.AgPay.Payment.Api.Services;
-using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -167,7 +167,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// 根据支付接口获取支付方式
         /// </summary>
         /// <returns></returns>
-        private string GetWayCodeByIfCode(string ifCode)
+        private static string GetWayCodeByIfCode(string ifCode)
         {
             if (ifCode.Equals(CS.IF_CODE.ALIPAY))
             {

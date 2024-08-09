@@ -1,10 +1,10 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
-using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Components.Third.Channel;
+using AGooday.AgPay.Components.Third.Models;
+using AGooday.AgPay.Components.Third.RQRS.Msg;
+using AGooday.AgPay.Components.Third.Services;
 using Quartz;
 
 namespace AGooday.AgPay.Payment.Api.Jobs

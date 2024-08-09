@@ -7,12 +7,12 @@ using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.Third.Models;
+using AGooday.AgPay.Components.Third.RQRS.Division;
+using AGooday.AgPay.Components.Third.RQRS.Msg;
+using AGooday.AgPay.Components.Third.Services;
+using AGooday.AgPay.Components.Third.Utils;
 using AGooday.AgPay.Payment.Api.Authorization;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS.Division;
-using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.Services;
-using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 

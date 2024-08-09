@@ -1,13 +1,13 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Components.Third.Channel;
+using AGooday.AgPay.Components.Third.Models;
+using AGooday.AgPay.Components.Third.RQRS.Msg;
+using AGooday.AgPay.Components.Third.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using static AGooday.AgPay.Payment.Api.Channel.IChannelRefundNoticeService;
+using static AGooday.AgPay.Components.Third.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 {

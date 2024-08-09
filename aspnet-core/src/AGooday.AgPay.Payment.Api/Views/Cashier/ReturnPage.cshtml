@@ -3,6 +3,7 @@
 *@
 @{
     Layout = null;
+    var message = ViewData["ErrInfo"] ?? "支付成功";
 }
 <!DOCTYPE html>
 <html>
@@ -41,7 +42,7 @@
         <i class="layui-icon" style="font-size:100px;">&#x1005;</i>
     </div>
     <div class="mainDiv2 layui-fluid">
-        <span style="font-size:16px">支付成功</span>
+        <span style="font-size:16px">@message</span>
     </div>
 
     <div class="mainDiv3 layui-fluid">

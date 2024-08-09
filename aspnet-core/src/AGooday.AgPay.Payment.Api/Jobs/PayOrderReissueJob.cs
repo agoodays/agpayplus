@@ -1,7 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
-using AGooday.AgPay.Payment.Api.Services;
+using AGooday.AgPay.Components.Third.Services;
 using Quartz;
 
 namespace AGooday.AgPay.Payment.Api.Jobs

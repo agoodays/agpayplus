@@ -1,4 +1,4 @@
-﻿namespace AGooday.AgPay.Payment.Api.Services
+﻿namespace AGooday.AgPay.Components.Third.Services
 {
     public interface IQRCodeService
     {

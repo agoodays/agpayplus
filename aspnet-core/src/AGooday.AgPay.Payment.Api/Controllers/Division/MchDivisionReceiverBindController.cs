@@ -4,13 +4,13 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Components.Third.Channel;
+using AGooday.AgPay.Components.Third.Models;
+using AGooday.AgPay.Components.Third.RQRS.Division;
+using AGooday.AgPay.Components.Third.RQRS.Msg;
+using AGooday.AgPay.Components.Third.Services;
+using AGooday.AgPay.Components.Third.Utils;
 using AGooday.AgPay.Payment.Api.Authorization;
-using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS.Division;
-using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.Services;
-using AGooday.AgPay.Payment.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Division
@@ -137,7 +137,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             }
         }
 
-        private MchDivisionReceiverDto GenRecord(DivisionReceiverBindRQ bizRQ, MchDivisionReceiverGroupDto group, MchInfoDto mchInfo, decimal divisionProfit)
+        private static MchDivisionReceiverDto GenRecord(DivisionReceiverBindRQ bizRQ, MchDivisionReceiverGroupDto group, MchInfoDto mchInfo, decimal divisionProfit)
         {
             MchDivisionReceiverDto receiver = new MchDivisionReceiverDto();
             receiver.ReceiverAlias = string.IsNullOrWhiteSpace(bizRQ.ReceiverAlias) ? bizRQ.AccNo : bizRQ.ReceiverAlias; //别名

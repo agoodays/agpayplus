@@ -8,14 +8,14 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Payment.Api.Channel;
-using AGooday.AgPay.Payment.Api.Exceptions;
-using AGooday.AgPay.Payment.Api.Models;
-using AGooday.AgPay.Payment.Api.RQRS.Msg;
-using AGooday.AgPay.Payment.Api.RQRS.PayOrder;
-using AGooday.AgPay.Payment.Api.RQRS.PayOrder.PayWay;
-using AGooday.AgPay.Payment.Api.Services;
-using AGooday.AgPay.Payment.Api.Utils;
+using AGooday.AgPay.Components.Third.Channel;
+using AGooday.AgPay.Components.Third.Exceptions;
+using AGooday.AgPay.Components.Third.Models;
+using AGooday.AgPay.Components.Third.RQRS.Msg;
+using AGooday.AgPay.Components.Third.RQRS.PayOrder;
+using AGooday.AgPay.Components.Third.RQRS.PayOrder.PayWay;
+using AGooday.AgPay.Components.Third.Services;
+using AGooday.AgPay.Components.Third.Utils;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 {
