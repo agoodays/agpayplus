@@ -24,7 +24,7 @@
         }
 
         /// <summary>
-        /// 计算百分比类型的各种费用值  （订单金额 * 真实费率  结果四舍五入并保留0位小数 ）
+        /// 计算百分比类型的各种费用值  （退款金额 / 支付金额 * 收单手续费  结果四舍五入并保留0位小数 ）
         /// </summary>
         /// <param name="refundAmount">退款金额  （保持与数据库的格式一致 ，单位：分）</param>
         /// <param name="payAmount">支付金额  （保持与数据库的格式一致 ，单位：分）</param>
@@ -33,7 +33,7 @@
         public static long CalPercentageFee(long refundAmount, long payAmount, long mchOrderFeeAmount) => CalPercentageFee(refundAmount, payAmount, mchOrderFeeAmount, MidpointRounding.AwayFromZero);
 
         /// <summary>
-        /// 计算百分比类型的各种费用值  （订单金额 * 真实费率  结果四舍五入/向下取整/向上取整并保留0位小数 ）
+        /// 计算百分比类型的各种费用值  （退款金额 / 支付金额 * 收单手续费  结果四舍五入/向下取整/向上取整并保留0位小数 ）
         /// </summary>
         /// <param name="refundAmount">退款金额  （保持与数据库的格式一致 ，单位：分）</param>
         /// <param name="payAmount">支付金额  （保持与数据库的格式一致 ，单位：分）</param>

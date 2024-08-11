@@ -2,11 +2,29 @@
 {
     public static class DateUtil
     {
+        /// <summary>
+        /// 今天
+        /// </summary>
         public const string TODAY = "today";
+        /// <summary>
+        /// 昨天
+        /// </summary>
         public const string YESTERDAY = "yesterday";
+        /// <summary>
+        /// 当月
+        /// </summary>
         public const string CURR_MONTH = "currMonth";
+        /// <summary>
+        /// 上月
+        /// </summary>
         public const string PREV_MONTH = "prevMonth";
+        /// <summary>
+        /// 近xx天，到今天
+        /// </summary>
         public const string NEAR2NOW = "near2now";
+        /// <summary>
+        /// 自定义日期时间格式
+        /// </summary>
         public const string CUSTOM_DATE_TIME = "customDateTime";
 
         public static void GetQueryDateRange(string queryDateRange, out string createdStart, out string createdEnd)
