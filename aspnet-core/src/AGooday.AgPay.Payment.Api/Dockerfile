@@ -20,6 +20,7 @@ COPY ["src/AGooday.AgPay.Notice.Email/AGooday.AgPay.Notice.Email.csproj", "src/A
 COPY ["src/AGooday.AgPay.Notice.Core/AGooday.AgPay.Notice.Core.csproj", "src/AGooday.AgPay.Notice.Core/"]
 COPY ["src/AGooday.AgPay.Components.OSS/AGooday.AgPay.Components.OSS.csproj", "src/AGooday.AgPay.Components.OSS/"]
 COPY ["src/AGooday.AgPay.Components.SMS/AGooday.AgPay.Components.SMS.csproj", "src/AGooday.AgPay.Components.SMS/"]
+COPY ["src/AGooday.AgPay.Components.Third/AGooday.AgPay.Components.Third.csproj", "src/AGooday.AgPay.Components.Third/"]
 RUN dotnet restore "./src/AGooday.AgPay.Payment.Api/AGooday.AgPay.Payment.Api.csproj"
 COPY . .
 WORKDIR "/src/src/AGooday.AgPay.Payment.Api"

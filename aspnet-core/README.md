@@ -1,37 +1,39 @@
 # AgPay
-AgPayÊÇÒ»Ì×ÊÊºÏ»¥ÁªÍøÆóÒµÊ¹ÓÃµÄÖ§¸¶ÏµÍ³£¬Ö§³Ö¶àÇþµÀ·þÎñÉÌºÍÆÕÍ¨ÉÌ»§Ä£Ê½¡£ÒÑ¶Ô½ÓÎ¢ÐÅÖ§¸¶£¬Ö§¸¶±¦£¬ÔÆÉÁ¸¶¹Ù·½½Ó¿Ú£¬Ö§³Ö¾ÛºÏÂëÖ§¸¶¡£
-AgPay»ùÓÚ.Net 8£¬Ê¹ÓÃ Web API¿ª·¢£¬ÊµÏÖÈ¨ÏÞ¹ÜÀí¹¦ÄÜ£¬ÊÇÒ»Ì×·Ç³£ÊµÓÃµÄWeb¿ª·¢¿ò¼Ü¡£
+AgPayæ˜¯ä¸€å¥—é€‚åˆäº’è”ç½‘ä¼ä¸šä½¿ç”¨çš„æ”¯ä»˜ç³»ç»Ÿï¼Œæ”¯æŒå¤šæ¸ é“æœåŠ¡å•†å’Œæ™®é€šå•†æˆ·æ¨¡å¼ã€‚å·²å¯¹æŽ¥å¾®ä¿¡æ”¯ä»˜ï¼Œæ”¯ä»˜å®ï¼Œäº‘é—ªä»˜å®˜æ–¹æŽ¥å£ï¼Œæ”¯æŒèšåˆç æ”¯ä»˜ã€‚
+AgPayåŸºäºŽ.Net 8ï¼Œä½¿ç”¨ Web APIå¼€å‘ï¼Œå®žçŽ°æƒé™ç®¡ç†åŠŸèƒ½ï¼Œæ˜¯ä¸€å¥—éžå¸¸å®žç”¨çš„Webå¼€å‘æ¡†æž¶ã€‚
 
-Ç°¶ËÏîÄ¿£ºhttps://github.com/agoodays/agpayplus/tree/main/ant-design-vue
+å‰ç«¯é¡¹ç›®ï¼šhttps://github.com/agoodays/agpayplus/tree/main/ant-design-vue
 
-> ½â¾ö·½°¸Ä¿Â¼½á¹¹
+> è§£å†³æ–¹æ¡ˆç›®å½•ç»“æž„
 
 ```lua
 AGooday.AgPay
-©À©¤©¤ src
-    ©À©¤©¤ 1.Presentation Layer
-        ©À©¤©¤ AGooday.AgPay.Agent.Api
-        ©À©¤©¤ AGooday.AgPay.Manager.Api
-        ©À©¤©¤ AGooday.AgPay.Merchant.Api
-        ©¸©¤©¤ AGooday.AgPay.Payment.Api
-    ©À©¤©¤ 2.Application Layer(Service)
-        ©¸©¤©¤ AGooday.AgPay.Application
-    ©À©¤©¤ 3.Domain Layer(Domain)
-        ©¸©¤©¤ AGooday.AgPay.Domain
-    ©À©¤©¤ 4.Infrastructure Layer
-        ©¸©¤©¤ AGooday.AgPay.Domain.Core
-    ©¸©¤©¤ 5.Project.Common Layer
-        ©À©¤©¤ AGooday.AgPay.AopSdk
-        ©À©¤©¤ AGooday.AgPay.Common
-        ©À©¤©¤ AGooday.AgPay.Components.MQ
-        ©À©¤©¤ AGooday.AgPay.Components.OCR
-        ©À©¤©¤ AGooday.AgPay.Components.OSS
-        ©À©¤©¤ AGooday.AgPay.Components.SMS
-        ©À©¤©¤ AGooday.AgPay.Notice.Email
-        ©¸©¤©¤ AGooday.AgPay.Notice.Sms
-©¸©¤©¤ test
-    ©À©¤©¤ AGooday.AgPay.AopSdk.UnitTests
-    ©À©¤©¤ AGooday.AgPay.Common.UnitTests
-    ©À©¤©¤ AGooday.AgPay.Infrastructure.UnitTests
-    ©¸©¤©¤ AGooday.AgPay.Notice.UnitTests
+â”œâ”€â”€ src
+    â”œâ”€â”€ 1.Presentation Layer
+        â”œâ”€â”€ AGooday.AgPay.Agent.Api
+        â”œâ”€â”€ AGooday.AgPay.Manager.Api
+        â”œâ”€â”€ AGooday.AgPay.Merchant.Api
+        â””â”€â”€ AGooday.AgPay.Payment.Api
+    â”œâ”€â”€ 2.Application Layer(Service)
+        â””â”€â”€ AGooday.AgPay.Application
+    â”œâ”€â”€ 3.Domain Layer(Domain)
+        â””â”€â”€ AGooday.AgPay.Domain
+    â”œâ”€â”€ 4.Infrastructure Layer
+        â””â”€â”€ AGooday.AgPay.Domain.Core
+    â””â”€â”€ 5.Project.Common Layer
+        â”œâ”€â”€ AGooday.AgPay.AopSdk
+        â”œâ”€â”€ AGooday.AgPay.Common
+        â”œâ”€â”€ AGooday.AgPay.Components.MQ
+        â”œâ”€â”€ AGooday.AgPay.Components.OCR
+        â”œâ”€â”€ AGooday.AgPay.Components.OSS
+        â”œâ”€â”€ AGooday.AgPay.Components.SMS
+        â”œâ”€â”€ AGooday.AgPay.Components.Third
+        â”œâ”€â”€ AGooday.AgPay.Notice.Core
+        â”œâ”€â”€ AGooday.AgPay.Notice.Email
+        â””â”€â”€ AGooday.AgPay.Notice.Sms
+â””â”€â”€ test
+    â”œâ”€â”€ AGooday.AgPay.AopSdk.UnitTests
+    â”œâ”€â”€ AGooday.AgPay.Common.UnitTests
+    â”œâ”€â”€ AGooday.AgPay.Infrastructure.UnitTests
+    â””â”€â”€ AGooday.AgPay.Notice.UnitTests
 ```
