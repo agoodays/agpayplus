@@ -55,9 +55,9 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWay
                 //payInfo.Add("partnerid", partnerId);
                 //string packageValue = "Sign=WXPay";
                 //payInfo.Add("package", packageValue);
-                //payInfo.Add("timeStamp", DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
-                //payInfo.Add("nonceStr", Guid.NewGuid().ToString("N"));
-                //payInfo.Add("appId", response.AppId);
+                //payInfo.Add("timestamp", DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
+                //payInfo.Add("noncestr", Guid.NewGuid().ToString("N"));
+                //payInfo.Add("appid", response.AppId);
                 //var paySign = WxPayKit.Sign(payInfo, wxServiceWrapper.Config.MchKey);
                 //payInfo.Add("sign", paySign);
                 var payInfo = client.GenerateParametersForAppGetBrandPayRequest(partnerId,request.AppId, response.PrepayId, request.SignType);

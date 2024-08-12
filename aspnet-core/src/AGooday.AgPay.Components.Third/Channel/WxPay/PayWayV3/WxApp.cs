@@ -133,9 +133,9 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
                 //payInfo.Add("partnerid", partnerId);
                 //string packageValue = "Sign=WXPay";
                 //payInfo.Add("package", packageValue);
-                //payInfo.Add("timeStamp", DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
-                //payInfo.Add("nonceStr", Guid.NewGuid().ToString("N"));
-                //payInfo.Add("appId", wxAppId);
+                //payInfo.Add("timestamp", DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
+                //payInfo.Add("noncestr", Guid.NewGuid().ToString("N"));
+                //payInfo.Add("appid", wxAppId);
                 //string beforeSign = $"{wxAppId}\n{timestamp}\n{nonceStr}\nprepay_id={response.PrepayId}\n";
                 //var paySign = WxPayV3Util.RSASign(beforeSign, wxServiceWrapper.Config.MchPrivateKey);
                 //payInfo.Add("sign", paySign);// 签名以后在增加prepayId参数

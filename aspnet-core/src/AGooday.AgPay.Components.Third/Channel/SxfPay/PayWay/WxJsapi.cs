@@ -69,23 +69,14 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
                         消费者账单中的条形码订单号*/
                         string sxfUuid = respData.GetValue("sxfUuid").ToString();
                         respData.TryGetString("prepayId", out string prepayId);//微信预下单id
-                        string payAppId = respData.GetValue("payAppId").ToString();//微信 AppId
-                        string payTimeStamp = respData.GetValue("payTimeStamp").ToString();//微信 TimeStamp
-                        string paynonceStr = respData.GetValue("paynonceStr").ToString();//微信 NonceStr
-                        string payPackage = respData.GetValue("payPackage").ToString();//微信 Package
-                        string paySignType = respData.GetValue("paySignType").ToString();//微信 SignType
+                        string appId = respData.GetValue("payAppId").ToString();//微信 AppId
+                        string timeStamp = respData.GetValue("payTimeStamp").ToString();//微信 TimeStamp
+                        string nonceStr = respData.GetValue("paynonceStr").ToString();//微信 NonceStr
+                        string package = respData.GetValue("payPackage").ToString();//微信 Package
+                        string signType = respData.GetValue("paySignType").ToString();//微信 SignType
                         string paySign = respData.GetValue("paySign").ToString();//微信 Sign
                         respData.TryGetString("partnerId", out string partnerId);//微信 PartnerId
-                        JObject payInfo = new JObject
-                        {
-                            { "appId", payAppId },
-                            { "timeStamp", payTimeStamp },
-                            { "nonceStr", paynonceStr },
-                            { "package", payPackage },
-                            { "signType", paySignType },
-                            { "paySign", paySign }
-                        };
-                        res.PayInfo = payInfo.ToString();
+                        res.PayInfo = PayInfoBuilder.BuildPayInfoForJsapi(appId, timeStamp, nonceStr, package, signType, paySign);
                         channelRetMsg.ChannelOrderId = uuid;
                         channelRetMsg.ChannelState = ChannelState.WAITING;
                     }

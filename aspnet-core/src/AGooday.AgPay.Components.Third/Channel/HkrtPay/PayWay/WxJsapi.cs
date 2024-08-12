@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.PayWay
     /// </summary>
     public class WxJsapi : HkrtPayPaymentService
     {
-        public WxJsapi(ILogger<WxJsapi> logger, 
+        public WxJsapi(ILogger<WxJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -64,16 +64,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.PayWay
                         string package = resJSON.GetValue("package").ToString();//微信 package
                         string signType = resJSON.GetValue("signtype").ToString();//微信 signType
                         string paySign = resJSON.GetValue("paysign").ToString();//微信 paySign
-                        JObject payInfo = new JObject
-                        {
-                            { "appId", appId },
-                            { "timeStamp", timeStamp },
-                            { "nonceStr", nonceStr },
-                            { "package", package },
-                            { "signType", signType },
-                            { "paySign", paySign }
-                        };
-                        res.PayInfo = payInfo.ToString();
+                        res.PayInfo = PayInfoBuilder.BuildPayInfoForJsapi(appId, timeStamp, nonceStr, package, signType, paySign);
                         channelRetMsg.ChannelOrderId = trade_no;
                         channelRetMsg.ChannelState = ChannelState.WAITING;
                     }

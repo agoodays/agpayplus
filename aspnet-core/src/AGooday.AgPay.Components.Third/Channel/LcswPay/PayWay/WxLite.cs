@@ -63,16 +63,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay.PayWay
                         string package = resJSON.GetValue("package_str").ToString();//微信 Package
                         string signType = resJSON.GetValue("signType").ToString();//微信 SignType
                         string paySign = resJSON.GetValue("paySign").ToString();//微信 Sign
-                        JObject payInfo = new JObject
-                        {
-                            { "appId", appId },
-                            { "timeStamp", timeStamp },
-                            { "nonceStr", nonceStr },
-                            { "package", package },
-                            { "signType", signType },
-                            { "paySign", paySign }
-                        };
-                        res.PayInfo = payInfo.ToString();
+                        res.PayInfo = PayInfoBuilder.BuildPayInfoForLite(timeStamp, nonceStr, package, signType, paySign);
                         channelRetMsg.ChannelOrderId = outTradeNo;
                         channelRetMsg.ChannelState = ChannelState.WAITING;
                     }
