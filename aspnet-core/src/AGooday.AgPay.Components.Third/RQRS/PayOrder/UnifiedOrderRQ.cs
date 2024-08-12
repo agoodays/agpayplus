@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Components.Third.RQRS.PayOrder
         /// 支付金额， 单位：分
         /// </summary>
         [Required(ErrorMessage = "支付金额不能为空")]
-        [Range(minimum: 1, long.MaxValue, ErrorMessage = "支付金额不能为空")]
+        [Range(1, long.MaxValue, ErrorMessage = "支付金额不能为空")]
         public long Amount { get; set; }
 
         /// <summary>
