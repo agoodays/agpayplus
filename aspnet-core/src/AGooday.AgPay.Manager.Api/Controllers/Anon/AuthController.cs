@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 
 #if !DEBUG
             string cacheCode = _redis.StringGet(codeCacheKey);
-            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode))
+            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode,StringComparison.OrdinalIgnoreCase))
             {
                 throw new BizException("—È÷§¬Î”–ŒÛ£°");
             } 
@@ -212,7 +212,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             //    var imageBytes = picStream.ToArray();
             //    imageBase64Data = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
             //}
-            var code = VerificationCodeUtil.RandomVerificationCode(6);
+            var code = VerificationCodeUtil.RandomVerificationCode(4);
             var bitmap = VerificationCodeUtil.DrawImage(code, 137, 40, 20);
             //var imageBase64Data = $"data:image/jpg;base64,{VerificationCodeUtil.BitmapToBase64String(bitmap)}";
             var imageBase64Data = VerificationCodeUtil.BitmapToImageBase64String(bitmap);
