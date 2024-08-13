@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace AGooday.AgPay.Application
+namespace AGooday.AgPay.Application.Config
 {
     public class DBOssConfig
     {
@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Application
         /// 获取阿里云oss配置
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string,string> GenAliyunOssConfig()
+        public Dictionary<string, string> GenAliyunOssConfig()
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(AliyunOssConfig);
         }

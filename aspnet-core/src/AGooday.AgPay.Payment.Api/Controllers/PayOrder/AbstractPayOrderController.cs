@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application;
+﻿using AGooday.AgPay.Application.Config;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;

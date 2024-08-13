@@ -1,4 +1,4 @@
-﻿namespace AGooday.AgPay.Application
+﻿namespace AGooday.AgPay.Application.Config
 {
     public class DBSmsConfig
     {

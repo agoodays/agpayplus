@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace AGooday.AgPay.Application
+namespace AGooday.AgPay.Application.Config
 {
     public class DBOcrConfig
     {
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Application
         /// 获取阿里云OCR配置
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string,string> GenAliOcrConfig()
+        public Dictionary<string, string> GenAliOcrConfig()
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(AliOcrConfig);
         }

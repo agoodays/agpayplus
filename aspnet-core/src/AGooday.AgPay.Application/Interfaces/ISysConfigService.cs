@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Application.Config;
+using AGooday.AgPay.Application.DataTransfer;
 
 namespace AGooday.AgPay.Application.Interfaces
 {

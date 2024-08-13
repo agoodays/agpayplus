@@ -3,7 +3,7 @@ using AGooday.AgPay.AopSdk.Exceptions;
 using AGooday.AgPay.AopSdk.Models;
 using AGooday.AgPay.AopSdk.Request;
 using AGooday.AgPay.AopSdk.Response;
-using AGooday.AgPay.Application;
+using AGooday.AgPay.Application.Config;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;

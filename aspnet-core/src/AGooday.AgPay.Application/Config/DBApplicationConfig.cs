@@ -1,7 +1,7 @@
 ﻿using AGooday.AgPay.Common.Utils;
 using Newtonsoft.Json.Linq;
 
-namespace AGooday.AgPay.Application
+namespace AGooday.AgPay.Application.Config
 {
     public class DBApplicationConfig
     {
