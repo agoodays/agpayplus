@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
 #if !DEBUG
             string cacheCode = _redis.StringGet(codeCacheKey);
-            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode,StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode, StringComparison.OrdinalIgnoreCase))
             {
                 throw new BizException("—È÷§¬Î”–ŒÛ£°");
             } 

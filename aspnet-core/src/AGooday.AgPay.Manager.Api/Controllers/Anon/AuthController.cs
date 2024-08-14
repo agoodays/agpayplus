@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 
 #if !DEBUG
             string cacheCode = _redis.StringGet(codeCacheKey);
-            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode,StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode, StringComparison.OrdinalIgnoreCase))
             {
                 throw new BizException("—È÷§¬Î”–ŒÛ£°");
             } 

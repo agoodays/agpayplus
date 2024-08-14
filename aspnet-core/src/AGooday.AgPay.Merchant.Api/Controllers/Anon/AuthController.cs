@@ -81,10 +81,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
 #if !DEBUG
             string cacheCode = _redis.StringGet(codeCacheKey);
-            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode,StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode, StringComparison.OrdinalIgnoreCase))
             {
                 throw new BizException("验证码有误！");
-            } 
+            }
 #endif
 
             //登录方式， 默认为账号密码登录

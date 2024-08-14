@@ -18,7 +18,7 @@
     <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
     <PackageReference Include="SKIT.FlurlHttpClient.Wechat.Api" Version="3.4.0" />
     <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV2" Version="3.1.1" />
-    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="3.6.0" />
+    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="3.7.0" />
   </ItemGroup>
 
   <ItemGroup>
