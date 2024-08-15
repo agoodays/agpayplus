@@ -7,25 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\PayOrder\**" />
-    <Content Remove="Controllers\PayOrder\**" />
-    <EmbeddedResource Remove="Controllers\PayOrder\**" />
-    <None Remove="Controllers\PayOrder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="Controllers\PayOrder\AbstractPayOrderController.cs" />
-    <Compile Include="Controllers\PayOrder\CloseOrderController.cs" />
-    <Compile Include="Controllers\PayOrder\PayWay\AliBarOrderController.cs" />
-    <Compile Include="Controllers\PayOrder\PayWay\YsfJsapiOrderController.cs" />
-    <Compile Include="Controllers\PayOrder\PayWay\AliJsapiOrderController.cs" />
-    <Compile Include="Controllers\PayOrder\ChannelNoticeController.cs" />
-    <Compile Include="Controllers\PayOrder\PayWay\YsfBarOrderController.cs" />
-    <Compile Include="Controllers\PayOrder\QueryOrderController.cs" />
-    <Compile Include="Controllers\PayOrder\UnifiedOrderController.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.8" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Quartz" Version="3.13.0" />
