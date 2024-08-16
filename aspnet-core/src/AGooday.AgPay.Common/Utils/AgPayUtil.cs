@@ -15,15 +15,9 @@ namespace AGooday.AgPay.Common.Utils
 
         private static readonly string encodingCharset = "utf-8";
 
-        public static string AesEncode(string data)
-        {
-            return EnDecryptUtil.AESEncryptToHex(data, AES_KEY);
-        }
+        public static string AesEncode(string data) => EnDecryptUtil.AESEncryptToHex(data, AES_KEY);
 
-        public static string AesDecode(string data)
-        {
-            return EnDecryptUtil.AESDecryptFromHex(data, AES_KEY);
-        }
+        public static string AesDecode(string data) => EnDecryptUtil.AESDecryptFromHex(data, AES_KEY);
 
         /// <summary>
         /// 校验微信/支付宝二维码是否符合规范， 并根据支付类型返回对应的支付方式
