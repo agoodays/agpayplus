@@ -27,12 +27,13 @@ namespace AGooday.AgPay.Components.Third.Channel
             #region ChannelUserService
             //services.AddKeyedScoped<IChannelUserService, AliPayChannelUserService>(CS.IF_CODE.ALIPAY);
             //services.AddKeyedScoped<IChannelUserService, WxPayChannelUserService>(CS.IF_CODE.WXPAY);
-            ChannelUserServiceRegister(services);
+            ServiceRegister<IChannelUserService>(services);
             services.AddScoped<IChannelServiceFactory<IChannelUserService>, ChannelServiceFactory<IChannelUserService>>();
             #endregion
             #region DivisionService
-            services.AddKeyedScoped<IDivisionService, AliPayDivisionService>(CS.IF_CODE.ALIPAY);
-            services.AddKeyedScoped<IDivisionService, WxPayDivisionService>(CS.IF_CODE.WXPAY);
+            //services.AddKeyedScoped<IDivisionService, AliPayDivisionService>(CS.IF_CODE.ALIPAY);
+            //services.AddKeyedScoped<IDivisionService, WxPayDivisionService>(CS.IF_CODE.WXPAY);
+            ServiceRegister<IDivisionService>(services);
             services.AddScoped<IChannelServiceFactory<IDivisionService>, ChannelServiceFactory<IDivisionService>>();
             #endregion
             #region DivisionRecordChannelNotifyService
@@ -56,37 +57,38 @@ namespace AGooday.AgPay.Components.Third.Channel
             //services.AddKeyedScoped<IPaymentService, JlPayPaymentService>(CS.IF_CODE.JLPAY);
             PaymentServiceRegister(services);
             services.AddScoped<IChannelServiceFactory<IPaymentService>, ChannelServiceFactory<IPaymentService>>();
-            PayWayUtil.PayWayServiceRegister<AliPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<WxPayPaymentService>(services);
-            PayWayUtil.PayWayV3ServiceRegister<WxPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<YsfPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<PpPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<SxfPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<LesPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<HkrtPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<UmsPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<LcswPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<DgPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<LklPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<YsePayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<AllinPayPaymentService>(services);
-            PayWayUtil.PayWayServiceRegister<JlPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<AliPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<WxPayPaymentService>(services);
+            //PayWayUtil.PayWayV3ServiceRegister<WxPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<YsfPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<PpPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<SxfPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<LesPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<HkrtPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<UmsPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<LcswPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<DgPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<LklPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<YsePayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<AllinPayPaymentService>(services);
+            //PayWayUtil.PayWayServiceRegister<JlPayPaymentService>(services);
             #endregion
             #region RefundService
-            services.AddKeyedScoped<IRefundService, AliPayRefundService>(CS.IF_CODE.ALIPAY);
-            services.AddKeyedScoped<IRefundService, WxPayRefundService>(CS.IF_CODE.WXPAY);
-            services.AddKeyedScoped<IRefundService, YsfPayRefundService>(CS.IF_CODE.YSFPAY);
-            services.AddKeyedScoped<IRefundService, PpPayRefundService>(CS.IF_CODE.PPPAY);
-            services.AddKeyedScoped<IRefundService, SxfPayRefundService>(CS.IF_CODE.SXFPAY);
-            services.AddKeyedScoped<IRefundService, LesPayRefundService>(CS.IF_CODE.LESPAY);
-            services.AddKeyedScoped<IRefundService, HkrtPayRefundService>(CS.IF_CODE.HKRTPAY);
-            services.AddKeyedScoped<IRefundService, UmsPayRefundService>(CS.IF_CODE.UMSPAY);
-            services.AddKeyedScoped<IRefundService, LcswPayRefundService>(CS.IF_CODE.LCSWPAY);
-            services.AddKeyedScoped<IRefundService, DgPayRefundService>(CS.IF_CODE.DGPAY);
-            services.AddKeyedScoped<IRefundService, LklPayRefundService>(CS.IF_CODE.LKLPAY);
-            services.AddKeyedScoped<IRefundService, YsePayRefundService>(CS.IF_CODE.YSEPAY);
-            services.AddKeyedScoped<IRefundService, AllinPayRefundService>(CS.IF_CODE.ALLINPAY);
-            services.AddKeyedScoped<IRefundService, JlPayRefundService>(CS.IF_CODE.JLPAY);
+            //services.AddKeyedScoped<IRefundService, AliPayRefundService>(CS.IF_CODE.ALIPAY);
+            //services.AddKeyedScoped<IRefundService, WxPayRefundService>(CS.IF_CODE.WXPAY);
+            //services.AddKeyedScoped<IRefundService, YsfPayRefundService>(CS.IF_CODE.YSFPAY);
+            //services.AddKeyedScoped<IRefundService, PpPayRefundService>(CS.IF_CODE.PPPAY);
+            //services.AddKeyedScoped<IRefundService, SxfPayRefundService>(CS.IF_CODE.SXFPAY);
+            //services.AddKeyedScoped<IRefundService, LesPayRefundService>(CS.IF_CODE.LESPAY);
+            //services.AddKeyedScoped<IRefundService, HkrtPayRefundService>(CS.IF_CODE.HKRTPAY);
+            //services.AddKeyedScoped<IRefundService, UmsPayRefundService>(CS.IF_CODE.UMSPAY);
+            //services.AddKeyedScoped<IRefundService, LcswPayRefundService>(CS.IF_CODE.LCSWPAY);
+            //services.AddKeyedScoped<IRefundService, DgPayRefundService>(CS.IF_CODE.DGPAY);
+            //services.AddKeyedScoped<IRefundService, LklPayRefundService>(CS.IF_CODE.LKLPAY);
+            //services.AddKeyedScoped<IRefundService, YsePayRefundService>(CS.IF_CODE.YSEPAY);
+            //services.AddKeyedScoped<IRefundService, AllinPayRefundService>(CS.IF_CODE.ALLINPAY);
+            //services.AddKeyedScoped<IRefundService, JlPayRefundService>(CS.IF_CODE.JLPAY);
+            RefundServiceRegister(services);
             services.AddScoped<IChannelServiceFactory<IRefundService>, ChannelServiceFactory<IRefundService>>();
             #endregion
             #region ChannelNoticeService
@@ -165,13 +167,13 @@ namespace AGooday.AgPay.Components.Third.Channel
             ChannelCertConfigKit.Initialize();
         }
 
-        private static void ChannelUserServiceRegister(IServiceCollection services)
+        private static void ServiceRegister<T>(IServiceCollection services)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
 
             // 获取指定命名空间下的所有类
             Type[] targetTypes = assembly.GetTypes()
-                .Where(type => typeof(IChannelUserService).IsAssignableFrom(type))
+                .Where(type => typeof(T).IsAssignableFrom(type))
                 .ToArray();
 
             // 注册所有类
@@ -184,7 +186,7 @@ namespace AGooday.AgPay.Components.Third.Channel
                     var code = getIfCodeMethod.Invoke(instance, null) as string;
                     if (!string.IsNullOrEmpty(code))
                     {
-                        services.AddKeyedScoped(typeof(IPaymentService), code, type);
+                        services.AddKeyedScoped(typeof(T), code, type);
                     }
                 }
             }
@@ -203,6 +205,25 @@ namespace AGooday.AgPay.Components.Third.Channel
             foreach (Type type in targetTypes)
             {
                 AbstractPaymentService instance = (AbstractPaymentService)Activator.CreateInstance(type);
+                services.AddKeyedScoped(typeof(IPaymentService), instance.GetIfCode(), type);
+                PayWayUtil.PayWayServiceRegister(services, type);
+                PayWayUtil.PayWayV3ServiceRegister(services, type);
+            }
+        }
+
+        private static void RefundServiceRegister(IServiceCollection services)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            // 获取指定命名空间下的所有类
+            Type[] targetTypes = assembly.GetTypes()
+                .Where(type => type.BaseType == typeof(AbstractRefundService) && typeof(IPaymentService).IsAssignableFrom(type))
+                .ToArray();
+
+            // 注册所有类
+            foreach (Type type in targetTypes)
+            {
+                AbstractRefundService instance = (AbstractRefundService)Activator.CreateInstance(type);
                 services.AddKeyedScoped(typeof(IPaymentService), instance.GetIfCode(), type);
             }
         }

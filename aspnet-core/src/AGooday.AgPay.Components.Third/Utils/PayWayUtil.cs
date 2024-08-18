@@ -49,7 +49,22 @@ namespace AGooday.AgPay.Components.Third.Utils
 
         private static void PayWayServiceRegister<T>(IServiceCollection services, string packageName) where T : AbstractPaymentService
         {
-            string targetNamespace = $"{typeof(T).Namespace}.{packageName}";
+            PayWayServiceRegister(services, typeof(T), packageName);
+        }
+
+        public static void PayWayServiceRegister(IServiceCollection services, Type targetType)
+        {
+            PayWayServiceRegister(services, targetType, PAYWAY_PACKAGE_NAME);
+        }
+
+        public static void PayWayV3ServiceRegister(IServiceCollection services, Type targetType)
+        {
+            PayWayServiceRegister(services, targetType, PAYWAYV3_PACKAGE_NAME);
+        }
+
+        private static void PayWayServiceRegister(IServiceCollection services, Type targetType, string packageName)
+        {
+            string targetNamespace = $"{targetType.Namespace}.{packageName}";
 
             Assembly assembly = Assembly.GetExecutingAssembly();
 
