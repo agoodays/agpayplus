@@ -16,6 +16,7 @@ using AGooday.AgPay.Components.Third.Channel.WxPay.Kits;
 using AGooday.AgPay.Components.Third.Channel.YsePay;
 using AGooday.AgPay.Components.Third.Channel.YsfPay;
 using AGooday.AgPay.Components.Third.Utils;
+using System.Reflection;
 
 namespace AGooday.AgPay.Components.Third.Channel
 {
@@ -24,8 +25,9 @@ namespace AGooday.AgPay.Components.Third.Channel
         public static void RegisterServices(IServiceCollection services)
         {
             #region ChannelUserService
-            services.AddKeyedScoped<IChannelUserService, AliPayChannelUserService>(CS.IF_CODE.ALIPAY);
-            services.AddKeyedScoped<IChannelUserService, WxPayChannelUserService>(CS.IF_CODE.WXPAY);
+            //services.AddKeyedScoped<IChannelUserService, AliPayChannelUserService>(CS.IF_CODE.ALIPAY);
+            //services.AddKeyedScoped<IChannelUserService, WxPayChannelUserService>(CS.IF_CODE.WXPAY);
+            ChannelUserServiceRegister(services);
             services.AddScoped<IChannelServiceFactory<IChannelUserService>, ChannelServiceFactory<IChannelUserService>>();
             #endregion
             #region DivisionService
@@ -38,20 +40,21 @@ namespace AGooday.AgPay.Components.Third.Channel
             services.AddScoped<IChannelServiceFactory<AliPayDivisionRecordChannelNotifyService>, ChannelServiceFactory<AliPayDivisionRecordChannelNotifyService>>();
             #endregion
             #region PaymentService
-            services.AddKeyedScoped<IPaymentService, AliPayPaymentService>(CS.IF_CODE.ALIPAY);
-            services.AddKeyedScoped<IPaymentService, WxPayPaymentService>(CS.IF_CODE.WXPAY);
-            services.AddKeyedScoped<IPaymentService, YsfPayPaymentService>(CS.IF_CODE.YSFPAY);
-            services.AddKeyedScoped<IPaymentService, PpPayPaymentService>(CS.IF_CODE.PPPAY);
-            services.AddKeyedScoped<IPaymentService, SxfPayPaymentService>(CS.IF_CODE.SXFPAY);
-            services.AddKeyedScoped<IPaymentService, LesPayPaymentService>(CS.IF_CODE.LESPAY);
-            services.AddKeyedScoped<IPaymentService, HkrtPayPaymentService>(CS.IF_CODE.HKRTPAY);
-            services.AddKeyedScoped<IPaymentService, UmsPayPaymentService>(CS.IF_CODE.UMSPAY);
-            services.AddKeyedScoped<IPaymentService, LcswPayPaymentService>(CS.IF_CODE.LCSWPAY);
-            services.AddKeyedScoped<IPaymentService, DgPayPaymentService>(CS.IF_CODE.DGPAY);
-            services.AddKeyedScoped<IPaymentService, LklPayPaymentService>(CS.IF_CODE.LKLPAY);
-            services.AddKeyedScoped<IPaymentService, YsePayPaymentService>(CS.IF_CODE.YSEPAY);
-            services.AddKeyedScoped<IPaymentService, AllinPayPaymentService>(CS.IF_CODE.ALLINPAY);
-            services.AddKeyedScoped<IPaymentService, JlPayPaymentService>(CS.IF_CODE.JLPAY);
+            //services.AddKeyedScoped<IPaymentService, AliPayPaymentService>(CS.IF_CODE.ALIPAY);
+            //services.AddKeyedScoped<IPaymentService, WxPayPaymentService>(CS.IF_CODE.WXPAY);
+            //services.AddKeyedScoped<IPaymentService, YsfPayPaymentService>(CS.IF_CODE.YSFPAY);
+            //services.AddKeyedScoped<IPaymentService, PpPayPaymentService>(CS.IF_CODE.PPPAY);
+            //services.AddKeyedScoped<IPaymentService, SxfPayPaymentService>(CS.IF_CODE.SXFPAY);
+            //services.AddKeyedScoped<IPaymentService, LesPayPaymentService>(CS.IF_CODE.LESPAY);
+            //services.AddKeyedScoped<IPaymentService, HkrtPayPaymentService>(CS.IF_CODE.HKRTPAY);
+            //services.AddKeyedScoped<IPaymentService, UmsPayPaymentService>(CS.IF_CODE.UMSPAY);
+            //services.AddKeyedScoped<IPaymentService, LcswPayPaymentService>(CS.IF_CODE.LCSWPAY);
+            //services.AddKeyedScoped<IPaymentService, DgPayPaymentService>(CS.IF_CODE.DGPAY);
+            //services.AddKeyedScoped<IPaymentService, LklPayPaymentService>(CS.IF_CODE.LKLPAY);
+            //services.AddKeyedScoped<IPaymentService, YsePayPaymentService>(CS.IF_CODE.YSEPAY);
+            //services.AddKeyedScoped<IPaymentService, AllinPayPaymentService>(CS.IF_CODE.ALLINPAY);
+            //services.AddKeyedScoped<IPaymentService, JlPayPaymentService>(CS.IF_CODE.JLPAY);
+            PaymentServiceRegister(services);
             services.AddScoped<IChannelServiceFactory<IPaymentService>, ChannelServiceFactory<IPaymentService>>();
             PayWayUtil.PayWayServiceRegister<AliPayPaymentService>(services);
             PayWayUtil.PayWayServiceRegister<WxPayPaymentService>(services);
@@ -160,6 +163,48 @@ namespace AGooday.AgPay.Components.Third.Channel
 
             ChannelCertConfigKit.ServiceProvider = serviceProvider;
             ChannelCertConfigKit.Initialize();
+        }
+
+        private static void ChannelUserServiceRegister(IServiceCollection services)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            // 获取指定命名空间下的所有类
+            Type[] targetTypes = assembly.GetTypes()
+                .Where(type => typeof(IChannelUserService).IsAssignableFrom(type))
+                .ToArray();
+
+            // 注册所有类
+            foreach (Type type in targetTypes)
+            {
+                var instance = Activator.CreateInstance(type);
+                var getIfCodeMethod = type.GetMethod("GetIfCode");
+                if (getIfCodeMethod != null)
+                {
+                    var code = getIfCodeMethod.Invoke(instance, null) as string;
+                    if (!string.IsNullOrEmpty(code))
+                    {
+                        services.AddKeyedScoped(typeof(IPaymentService), code, type);
+                    }
+                }
+            }
+        }
+
+        private static void PaymentServiceRegister(IServiceCollection services)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            // 获取指定命名空间下的所有类
+            Type[] targetTypes = assembly.GetTypes()
+                .Where(type => type.BaseType == typeof(AbstractPaymentService) && typeof(IPaymentService).IsAssignableFrom(type))
+                .ToArray();
+
+            // 注册所有类
+            foreach (Type type in targetTypes)
+            {
+                AbstractPaymentService instance = (AbstractPaymentService)Activator.CreateInstance(type);
+                services.AddKeyedScoped(typeof(IPaymentService), instance.GetIfCode(), type);
+            }
         }
     }
 
