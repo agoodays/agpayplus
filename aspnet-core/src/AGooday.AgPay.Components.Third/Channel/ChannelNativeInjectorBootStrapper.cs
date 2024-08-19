@@ -37,8 +37,8 @@ namespace AGooday.AgPay.Components.Third.Channel
             services.AddScoped<IChannelServiceFactory<IDivisionService>, ChannelServiceFactory<IDivisionService>>();
             #endregion
             #region DivisionRecordChannelNotifyService
-            services.AddKeyedScoped<AliPayDivisionRecordChannelNotifyService>(CS.IF_CODE.ALIPAY);
-            services.AddScoped<IChannelServiceFactory<AliPayDivisionRecordChannelNotifyService>, ChannelServiceFactory<AliPayDivisionRecordChannelNotifyService>>();
+            services.AddKeyedScoped<IDivisionRecordChannelNotifyService, AliPayDivisionRecordChannelNotifyService>(CS.IF_CODE.ALIPAY);
+            services.AddScoped<IChannelServiceFactory<IDivisionRecordChannelNotifyService>, ChannelServiceFactory<IDivisionRecordChannelNotifyService>>();
             #endregion
             #region PaymentService
             //services.AddKeyedScoped<IPaymentService, AliPayPaymentService>(CS.IF_CODE.ALIPAY);

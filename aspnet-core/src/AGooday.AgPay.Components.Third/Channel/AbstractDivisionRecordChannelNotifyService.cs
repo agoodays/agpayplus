@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Components.Third.Channel
     /// <summary>
     /// 分账结果回调接口抽象类
     /// </summary>
-    public abstract class AbstractDivisionRecordChannelNotifyService
+    public abstract class AbstractDivisionRecordChannelNotifyService : IDivisionRecordChannelNotifyService
     {
         protected readonly ILogger<AbstractDivisionRecordChannelNotifyService> _logger;
         protected readonly RequestKit _requestKit;
@@ -52,12 +52,12 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <returns></returns>
         public abstract DivisionChannelNotifyModel DoNotify(HttpRequest request, object parameters, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
 
-        public ActionResult DoNotifyOrderNotExists(HttpRequest request)
+        public virtual ActionResult DoNotifyOrderNotExists(HttpRequest request)
         {
             return TextResp("order not exists");
         }
 
-        public ActionResult DoNotifyOrderStateUpdateFail(HttpRequest request)
+        public virtual ActionResult DoNotifyOrderStateUpdateFail(HttpRequest request)
         {
             return TextResp("update status error");
         }
