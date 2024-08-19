@@ -28,6 +28,10 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             this.configContextQueryService = configContextQueryService;
         }
 
+        public WxPayPayOrderCloseService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.WXPAY;

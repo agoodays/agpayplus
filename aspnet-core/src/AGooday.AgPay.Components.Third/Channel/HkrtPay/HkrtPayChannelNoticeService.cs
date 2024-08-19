@@ -29,6 +29,11 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             this.hkrtPayPaymentService = ActivatorUtilities.CreateInstance<HkrtPayPaymentService>(serviceProvider);
         }
 
+        public HkrtPayChannelNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.HKRTPAY;

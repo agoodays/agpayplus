@@ -17,6 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
     public class JlPayRefundService : AbstractRefundService
     {
         private readonly JlPayPaymentService jlpayPaymentService;
+
         public JlPayRefundService(ILogger<JlPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
@@ -24,6 +25,11 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
             this.jlpayPaymentService = ActivatorUtilities.CreateInstance<JlPayPaymentService>(serviceProvider);
+        }
+
+        public JlPayRefundService()
+            : base()
+        {
         }
 
         public override string GetIfCode()

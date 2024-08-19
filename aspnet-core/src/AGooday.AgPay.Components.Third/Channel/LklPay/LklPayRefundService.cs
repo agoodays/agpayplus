@@ -16,6 +16,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
     public class LklPayRefundService : AbstractRefundService
     {
         private readonly LklPayPaymentService lklpayPaymentService;
+
         public LklPayRefundService(ILogger<LklPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
@@ -23,6 +24,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
             this.lklpayPaymentService = ActivatorUtilities.CreateInstance<LklPayPaymentService>(serviceProvider);
+        }
+
+        public LklPayRefundService()
+            : base()
+        {
         }
 
         public override string GetIfCode()

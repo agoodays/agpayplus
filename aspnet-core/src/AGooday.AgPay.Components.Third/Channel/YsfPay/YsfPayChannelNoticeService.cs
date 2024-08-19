@@ -25,6 +25,11 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
         {
         }
 
+        public YsfPayChannelNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.YSFPAY;

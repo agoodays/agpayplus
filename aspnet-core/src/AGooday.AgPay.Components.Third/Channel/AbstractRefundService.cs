@@ -26,6 +26,10 @@ namespace AGooday.AgPay.Components.Third.Channel
             _sysConfigService = sysConfigService;
         }
 
+        protected AbstractRefundService()
+        {
+        }
+
         public abstract string GetIfCode();
         public abstract string PreCheck(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder);
 

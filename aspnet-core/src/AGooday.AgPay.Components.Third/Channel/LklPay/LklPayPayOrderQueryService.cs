@@ -23,6 +23,10 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             this.lklpayPaymentService = ActivatorUtilities.CreateInstance<LklPayPaymentService>(serviceProvider);
         }
 
+        public LklPayPayOrderQueryService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.LKLPAY;

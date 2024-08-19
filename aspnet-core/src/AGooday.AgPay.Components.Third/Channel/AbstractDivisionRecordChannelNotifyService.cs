@@ -19,13 +19,17 @@ namespace AGooday.AgPay.Components.Third.Channel
         protected readonly RequestKit _requestKit;
         protected readonly ConfigContextQueryService _configContextQueryService;
 
-        public AbstractDivisionRecordChannelNotifyService(ILogger<AbstractDivisionRecordChannelNotifyService> logger,
+        protected AbstractDivisionRecordChannelNotifyService(ILogger<AbstractDivisionRecordChannelNotifyService> logger,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
         {
             _logger = logger;
             _requestKit = requestKit;
             _configContextQueryService = configContextQueryService;
+        }
+
+        protected AbstractDivisionRecordChannelNotifyService()
+        {
         }
 
         /// <summary>

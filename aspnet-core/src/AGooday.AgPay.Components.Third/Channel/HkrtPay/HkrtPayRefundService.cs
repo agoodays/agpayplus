@@ -17,6 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
     public class HkrtPayRefundService : AbstractRefundService
     {
         private readonly HkrtPayPaymentService hkrtPayPaymentService;
+
         public HkrtPayRefundService(ILogger<HkrtPayRefundService> logger,
             IServiceProvider serviceProvider,
             ConfigContextQueryService configContextQueryService,
@@ -24,6 +25,11 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
             this.hkrtPayPaymentService = _serviceProvider.GetRequiredService<HkrtPayPaymentService>();
+        }
+
+        public HkrtPayRefundService()
+            : base()
+        {
         }
 
         public override string GetIfCode()

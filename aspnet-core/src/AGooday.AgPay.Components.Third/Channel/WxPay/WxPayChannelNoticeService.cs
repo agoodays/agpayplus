@@ -36,6 +36,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             this.payOrderService = payOrderService;
         }
 
+        public WxPayChannelNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.WXPAY;
@@ -79,7 +84,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     headerJSON.Add("Wechatpay-Serial", serialNumber);
                     _logger.LogInformation($"\n【请求头信息】：{headerJSON}\n【加密数据】：{webhookJson}");
 
-                    var valid = client.VerifyEventSignature(timestamp,nonce,webhookJson,signature,serialNumber);
+                    var valid = client.VerifyEventSignature(timestamp, nonce, webhookJson, signature, serialNumber);
                     if (!valid.Result)
                     {
                         _logger.LogError(valid.Error, "error");

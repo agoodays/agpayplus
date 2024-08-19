@@ -15,10 +15,15 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
     public class AliPayTransferNoticeService : AbstractTransferNoticeService
     {
         public AliPayTransferNoticeService(ILogger<AliPayTransferNoticeService> logger,
-            RequestKit requestKit, 
+            RequestKit requestKit,
             ChannelCertConfigKit channelCertConfigKit,
             ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, channelCertConfigKit, configContextQueryService)
+        {
+        }
+
+        public AliPayTransferNoticeService()
+            : base()
         {
         }
 

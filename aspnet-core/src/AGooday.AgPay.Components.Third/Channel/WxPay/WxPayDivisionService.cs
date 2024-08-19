@@ -3,7 +3,6 @@ using AGooday.AgPay.Application.Params.WxPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.Third.Channel.AliPay;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
 using AGooday.AgPay.Components.Third.Services;
@@ -25,6 +24,10 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
         {
             _logger = logger;
             this.configContextQueryService = configContextQueryService;
+        }
+
+        public WxPayDivisionService()
+        {
         }
 
         public string GetIfCode()

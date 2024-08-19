@@ -8,11 +8,15 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
 {
     public class PpPayPayOrderQueryService : IPayOrderQueryService
     {
-        protected readonly ConfigContextQueryService _configContextQueryService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public PpPayPayOrderQueryService(ConfigContextQueryService configContextQueryService)
         {
             _configContextQueryService = configContextQueryService;
+        }
+
+        public PpPayPayOrderQueryService()
+        {
         }
 
         public string GetIfCode()

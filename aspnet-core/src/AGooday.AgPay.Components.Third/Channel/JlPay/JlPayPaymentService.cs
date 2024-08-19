@@ -27,6 +27,11 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
         {
         }
 
+        public JlPayPaymentService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.JLPAY;

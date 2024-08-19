@@ -26,6 +26,11 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             this.umsPayPaymentService = ActivatorUtilities.CreateInstance<UmsPayPaymentService>(serviceProvider);
         }
 
+        public UmsPayRefundService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.UMSPAY;

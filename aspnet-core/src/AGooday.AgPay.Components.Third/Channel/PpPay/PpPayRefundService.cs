@@ -16,11 +16,16 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
 {
     public class PpPayRefundService : AbstractRefundService
     {
-        public PpPayRefundService(ILogger<PpPayRefundService> logger, 
+        public PpPayRefundService(ILogger<PpPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
+        {
+        }
+
+        public PpPayRefundService()
+            : base()
         {
         }
 

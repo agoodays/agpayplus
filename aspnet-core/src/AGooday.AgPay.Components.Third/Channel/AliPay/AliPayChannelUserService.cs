@@ -24,6 +24,10 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             _configContextQueryService = configContextQueryService;
         }
 
+        public AliPayChannelUserService()
+        {
+        }
+
         public string BuildUserRedirectUrl(string callbackUrlEncode, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
             string appId;

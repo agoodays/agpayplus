@@ -19,6 +19,11 @@ namespace AGooday.AgPay.Components.Third.Channel.XxPay
         {
         }
 
+        public XxPayPaymentService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.XXPAY;

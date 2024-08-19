@@ -19,11 +19,16 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
 {
     public class HkrtPayPaymentService : AbstractPaymentService
     {
-        public HkrtPayPaymentService(ILogger<HkrtPayPaymentService> logger, 
+        public HkrtPayPaymentService(ILogger<HkrtPayPaymentService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
+        {
+        }
+
+        public HkrtPayPaymentService()
+            : base()
         {
         }
 

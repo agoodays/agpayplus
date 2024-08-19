@@ -15,11 +15,15 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
     /// </summary>
     public class AliPayPayOrderQueryService : IPayOrderQueryService
     {
-        protected readonly ConfigContextQueryService _configContextQueryService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public AliPayPayOrderQueryService(ConfigContextQueryService configContextQueryService)
         {
             _configContextQueryService = configContextQueryService;
+        }
+
+        public AliPayPayOrderQueryService()
+        {
         }
 
         public string GetIfCode()

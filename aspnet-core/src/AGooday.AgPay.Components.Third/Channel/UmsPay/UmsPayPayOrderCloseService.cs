@@ -10,6 +10,10 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
     /// </summary>
     public class UmsPayPayOrderCloseService : IPayOrderCloseService
     {
+        public UmsPayPayOrderCloseService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.UMSPAY;

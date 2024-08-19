@@ -28,6 +28,11 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
         {
         }
 
+        public DgPayChannelNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.DGPAY;

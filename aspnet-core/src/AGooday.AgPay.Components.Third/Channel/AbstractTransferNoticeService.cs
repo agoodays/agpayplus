@@ -31,6 +31,10 @@ namespace AGooday.AgPay.Components.Third.Channel
             this.configContextQueryService = configContextQueryService;
         }
 
+        protected AbstractTransferNoticeService()
+        {
+        }
+
         public abstract string GetIfCode();
 
         public abstract Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId);

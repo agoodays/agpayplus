@@ -17,6 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
     public class YsfPayRefundService : AbstractRefundService
     {
         private readonly YsfPayPaymentService ysfpayPaymentService;
+
         public YsfPayRefundService(ILogger<YsfPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
@@ -24,6 +25,11 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
             this.ysfpayPaymentService = ActivatorUtilities.CreateInstance<YsfPayPaymentService>(serviceProvider);
+        }
+
+        public YsfPayRefundService()
+            : base()
+        {
         }
 
         public override string GetIfCode()

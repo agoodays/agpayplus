@@ -27,6 +27,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
         {
         }
 
+        public WxPayPaymentService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.WXPAY;
@@ -41,7 +46,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
         {
             // 微信API版本
             WxServiceWrapper wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
-            string apiVersion = wxServiceWrapper.Config.ApiVersion; 
+            string apiVersion = wxServiceWrapper.Config.ApiVersion;
             if (CS.PAY_IF_VERSION.WX_V2.Equals(apiVersion))
             {
                 return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);

@@ -27,6 +27,11 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
         {
         }
 
+        public SxfPayPaymentService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.SXFPAY;

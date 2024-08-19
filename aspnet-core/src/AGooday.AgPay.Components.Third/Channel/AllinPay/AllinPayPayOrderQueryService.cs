@@ -24,6 +24,10 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             this.allinpayPaymentService = ActivatorUtilities.CreateInstance<AllinPayPaymentService>(serviceProvider);
         }
 
+        public AllinPayPayOrderQueryService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.ALLINPAY;

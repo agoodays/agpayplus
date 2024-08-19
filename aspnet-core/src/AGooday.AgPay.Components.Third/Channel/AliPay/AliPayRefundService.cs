@@ -26,6 +26,11 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
         {
         }
 
+        public AliPayRefundService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.ALIPAY;
