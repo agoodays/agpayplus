@@ -23,6 +23,10 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             this.jlpayPaymentService = ActivatorUtilities.CreateInstance<JlPayPaymentService>(serviceProvider);
         }
 
+        public JlPayPayOrderQueryService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.JLPAY;

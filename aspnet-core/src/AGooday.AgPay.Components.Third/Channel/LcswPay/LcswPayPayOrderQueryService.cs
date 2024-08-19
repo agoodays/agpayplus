@@ -23,6 +23,10 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             this.lcswpayPaymentService = ActivatorUtilities.CreateInstance<LcswPayPaymentService>(serviceProvider);
         }
 
+        public LcswPayPayOrderQueryService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.LCSWPAY;

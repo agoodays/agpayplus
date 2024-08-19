@@ -28,6 +28,11 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
         {
         }
 
+        public YsePayChannelRefundNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.YSEPAY;

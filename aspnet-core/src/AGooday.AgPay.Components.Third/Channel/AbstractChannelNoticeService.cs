@@ -28,6 +28,10 @@ namespace AGooday.AgPay.Components.Third.Channel
             this.configContextQueryService = configContextQueryService;
         }
 
+        protected AbstractChannelNoticeService()
+        {
+        }
+
         public ActionResult DoNotifyOrderNotExists(HttpRequest request)
         {
             return TextResp("order not exists");

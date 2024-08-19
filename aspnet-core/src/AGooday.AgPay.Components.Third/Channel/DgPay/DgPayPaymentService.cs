@@ -19,11 +19,16 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
 {
     public class DgPayPaymentService : AbstractPaymentService
     {
-        public DgPayPaymentService(ILogger<DgPayPaymentService> logger, 
+        public DgPayPaymentService(ILogger<DgPayPaymentService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
+        {
+        }
+
+        public DgPayPaymentService()
+            : base()
         {
         }
 

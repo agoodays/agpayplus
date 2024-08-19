@@ -29,6 +29,10 @@ namespace AGooday.AgPay.Components.Third.Channel
             _configContextQueryService = configContextQueryService;
         }
 
+        protected AbstractPaymentService()
+        {
+        }
+
         public abstract string GetIfCode();
         public abstract bool IsSupport(string wayCode);
         public abstract AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);

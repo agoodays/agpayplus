@@ -20,10 +20,15 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
     /// </summary>
     public class YsfPayPaymentService : AbstractPaymentService
     {
-        public YsfPayPaymentService(ILogger<YsfPayPaymentService> logger,IServiceProvider serviceProvider,
+        public YsfPayPaymentService(ILogger<YsfPayPaymentService> logger, IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
+        {
+        }
+
+        public YsfPayPaymentService()
+            : base()
         {
         }
 

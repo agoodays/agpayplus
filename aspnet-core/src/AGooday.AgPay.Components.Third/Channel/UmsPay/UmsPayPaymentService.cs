@@ -29,6 +29,11 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
         {
         }
 
+        public UmsPayPaymentService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.UMSPAY;

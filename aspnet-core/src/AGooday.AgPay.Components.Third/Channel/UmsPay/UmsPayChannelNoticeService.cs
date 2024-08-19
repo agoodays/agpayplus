@@ -20,6 +20,11 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
         {
         }
 
+        public UmsPayChannelNoticeService()
+            :base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.UMSPAY;

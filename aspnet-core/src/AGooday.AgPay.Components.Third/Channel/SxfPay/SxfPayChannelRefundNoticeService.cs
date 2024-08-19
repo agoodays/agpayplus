@@ -25,6 +25,11 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
         {
         }
 
+        public SxfPayChannelRefundNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.SXFPAY;

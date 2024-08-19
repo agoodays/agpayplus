@@ -28,6 +28,10 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             _configContextQueryService = configContextQueryService;
         }
 
+        public WxPayChannelUserService()
+        {
+        }
+
         public string BuildUserRedirectUrl(string callbackUrlEncode, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
             GetOauth2Params(oauth2InfoId, wayCode, mchAppConfigContext, out string appId, out string _, out string oauth2Url);

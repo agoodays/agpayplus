@@ -37,6 +37,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             this.refundOrderService = refundOrderService;
         }
 
+        public WxPayChannelRefundNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.WXPAY;

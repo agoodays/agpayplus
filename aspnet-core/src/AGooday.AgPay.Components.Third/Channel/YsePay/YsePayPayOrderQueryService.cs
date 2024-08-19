@@ -24,6 +24,10 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             this.ysePayPaymentService = ActivatorUtilities.CreateInstance<YsePayPaymentService>(serviceProvider);
         }
 
+        public YsePayPayOrderQueryService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.YSEPAY;

@@ -27,6 +27,11 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             this.dgpayPaymentService = ActivatorUtilities.CreateInstance<DgPayPaymentService>(serviceProvider);
         }
 
+        public DgPayRefundService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.DGPAY;

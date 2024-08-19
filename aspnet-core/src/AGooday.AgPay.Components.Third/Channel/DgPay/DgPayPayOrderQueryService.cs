@@ -23,6 +23,10 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             this.dgpayPaymentService = ActivatorUtilities.CreateInstance<DgPayPaymentService>(serviceProvider);
         }
 
+        public DgPayPayOrderQueryService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.DGPAY;

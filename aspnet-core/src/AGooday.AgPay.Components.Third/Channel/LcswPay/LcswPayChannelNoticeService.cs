@@ -25,6 +25,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
         {
         }
 
+        public LcswPayChannelNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.LCSWPAY;

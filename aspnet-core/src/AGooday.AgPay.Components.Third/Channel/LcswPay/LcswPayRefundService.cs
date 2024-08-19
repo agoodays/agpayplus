@@ -17,6 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
     public class LcswPayRefundService : AbstractRefundService
     {
         private readonly LcswPayPaymentService lcswpayPaymentService;
+
         public LcswPayRefundService(ILogger<LcswPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
@@ -24,6 +25,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
             this.lcswpayPaymentService = ActivatorUtilities.CreateInstance<LcswPayPaymentService>(serviceProvider);
+        }
+
+        public LcswPayRefundService()
+            : base()
+        {
         }
 
         public override string GetIfCode()

@@ -26,6 +26,11 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
         {
         }
 
+        public HkrtPayChannelRefundNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.HKRTPAY;

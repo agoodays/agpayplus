@@ -24,6 +24,10 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             this.sxfpayPaymentService = ActivatorUtilities.CreateInstance<SxfPayPaymentService>(serviceProvider);
         }
 
+        public SxfPayPayOrderQueryService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.SXFPAY;

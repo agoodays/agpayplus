@@ -17,6 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
     public class AllinPayRefundService : AbstractRefundService
     {
         private readonly AllinPayPaymentService allinpayPaymentService;
+
         public AllinPayRefundService(ILogger<AllinPayRefundService> logger,
             //[FromKeyedServices(CS.IF_CODE.ALLINPAY)] IPaymentService allinpayPaymentService,
             IServiceProvider serviceProvider,
@@ -27,6 +28,11 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             //this.allinpayPaymentService = (AllinPayPaymentService)allinpayPaymentService;
             //this.allinpayPaymentService = (AllinPayPaymentService)serviceProvider.GetRequiredKeyedService<IPaymentService>(CS.IF_CODE.ALLINPAY);
             this.allinpayPaymentService = ActivatorUtilities.CreateInstance<AllinPayPaymentService>(serviceProvider);
+        }
+
+        public AllinPayRefundService()
+            : base()
+        {
         }
 
         public override string GetIfCode()
@@ -76,7 +82,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
                             break;
                         case "2008":
                         case "2000":
-                        //case "3088":
+                            //case "3088":
                             //退款中
                             channelRetMsg.ChannelState = ChannelState.WAITING;
                             _logger.LogInformation($"{logPrefix} >>> 退款中");
@@ -144,7 +150,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
                             break;
                         case "2008":
                         case "2000":
-                        //case "3088":
+                            //case "3088":
                             //退款中
                             channelRetMsg.ChannelState = ChannelState.WAITING;
                             _logger.LogInformation($"{logPrefix} >>> 退款中");

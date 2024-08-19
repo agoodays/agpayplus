@@ -29,6 +29,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
         {
         }
 
+        public WxPayRefundService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.WXPAY;

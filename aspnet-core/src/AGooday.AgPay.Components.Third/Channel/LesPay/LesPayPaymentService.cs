@@ -27,6 +27,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
         {
         }
 
+        public LesPayPaymentService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.LESPAY;

@@ -26,6 +26,11 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
         {
         }
 
+        public AllinPayChannelRefundNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.ALLINPAY;

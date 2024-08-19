@@ -29,6 +29,11 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
         {
         }
 
+        public AliPayDivisionRecordChannelNotifyService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.ALIPAY;

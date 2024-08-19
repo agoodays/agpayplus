@@ -25,6 +25,10 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             this.configContextQueryService = configContextQueryService;
         }
 
+        public AliPayTransferService()
+        {
+        }
+
         public string GetIfCode()
         {
             return CS.IF_CODE.ALIPAY;

@@ -27,6 +27,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             this.lesPayPaymentService = ActivatorUtilities.CreateInstance<LesPayPaymentService>(serviceProvider);
         }
 
+        public LesPayRefundService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.LESPAY;

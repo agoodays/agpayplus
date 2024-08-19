@@ -19,6 +19,11 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
         {
         }
 
+        public PpPayChannelNoticeService()
+            : base()
+        {
+        }
+
         public override string GetIfCode()
         {
             return CS.IF_CODE.PPPAY;
