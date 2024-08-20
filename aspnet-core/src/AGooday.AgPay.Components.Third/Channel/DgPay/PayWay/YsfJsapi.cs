@@ -1,6 +1,5 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Channel.DgPay.Enumerator;
 using AGooday.AgPay.Components.Third.Models;
@@ -15,11 +14,11 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
 {
     /// <summary>
-    /// 斗拱 微信 小程序支付
+    /// 斗拱 云闪付 jsapi
     /// </summary>
-    public class WxLite : DgPayPaymentService
+    public class YsfJsapi : DgPayPaymentService
     {
-        public WxLite(ILogger<WxLite> logger, 
+        public YsfJsapi(ILogger<YsfJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -29,25 +28,21 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【斗拱(wechat)小程序支付】";
+            string logPrefix = "【斗拱(unionpay)jsapi支付】";
+            YsfJsapiOrderRQ bizRQ = (YsfJsapiOrderRQ)rq;
             JObject reqParams = new JObject();
-            WxLiteOrderRS res = ApiResBuilder.BuildSuccess<WxLiteOrderRS>();
+            YsfJsapiOrderRS res = ApiResBuilder.BuildSuccess<YsfJsapiOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
             // 请求参数赋值
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
-
-            WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
-
-            //斗拱扫一扫支付， 需要传入buyerUserId参数
-            /*用户号（微信openid / 支付宝userid / 银联userid）
-            payType == "WECHAT"或"ALIPAY"时必传*/
-            var wxData = JObject.FromObject(new { openid = bizRQ.GetChannelUserId(), sub_appid = bizRQ.SubAppId });
-            reqParams.Add("wx_data", wxData.ToString());//支付宝扩展参数集合
+            reqParams.Add("order_desc", string.IsNullOrWhiteSpace(payOrder.Body) ? $"{payOrder.MchName}商品" : payOrder.Body);
+            var riskCheckData = JObject.FromObject(new { ip_addr = payOrder.ClientIp });
+            reqParams.Add("risk_check_data", riskCheckData);
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/trade/payment/jspay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = PackageParamAndReq("/trade/onlinepayment/unionpay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             var data = resJSON.GetValue("data")?.ToObject<JObject>();
             string respCode = data?.GetValue("resp_code").ToString(); //业务响应码
@@ -72,7 +67,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
                     switch (transStat)
                     {
                         case DgPayEnum.TransStat.P:
-                            res.PayInfo = data.GetValue("pay_info").ToString();
+                            res.RedirectUrl = data.GetValue("notify_sync_url").ToString();
                             channelRetMsg.ChannelOrderId = hfSeqId;
                             channelRetMsg.ChannelState = ChannelState.WAITING;
                             break;
@@ -105,12 +100,6 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
-            if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
-            {
-                throw new BizException("[openId]不可为空");
-            }
-
             return null;
         }
     }

@@ -15,7 +15,7 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
 {
     /// <summary>
-    /// 通联 支付宝 小程序支付
+    /// 嘉联 支付宝 小程序支付
     /// </summary>
     public class AliLite : JlPayPaymentService
     {
@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【通联(alipay)小程序支付】";
+            string logPrefix = "【嘉联(alipay)小程序支付】";
             AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
             JObject reqParams = new JObject();
             AliLiteOrderRS res = ApiResBuilder.BuildSuccess<AliLiteOrderRS>();
@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
             // 请求参数赋值
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
-            //通联扫一扫支付， 需要传入buyerUserId参数
+            //嘉联扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）*/
             reqParams.Add("buyer_id", bizRQ.GetChannelUserId());
 

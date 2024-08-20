@@ -85,13 +85,13 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.Enumerator
                     payType = TransType.A_MICROPAY.ToString();
                     break;
                 case CS.PAY_WAY_CODE.ALI_JSAPI:
+                case CS.PAY_WAY_CODE.ALI_LITE:
                     payType = TransType.A_JSAPI.ToString();
                     break;
                 case CS.PAY_WAY_CODE.ALI_APP:
                 case CS.PAY_WAY_CODE.ALI_PC:
                 case CS.PAY_WAY_CODE.ALI_WAP:
                 case CS.PAY_WAY_CODE.ALI_QR:
-                case CS.PAY_WAY_CODE.ALI_LITE:
                     payType = TransType.A_NATIVE.ToString();
                     break;
                 case CS.PAY_WAY_CODE.WX_BAR:

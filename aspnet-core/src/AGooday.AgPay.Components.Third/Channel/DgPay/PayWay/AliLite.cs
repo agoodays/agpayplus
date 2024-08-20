@@ -15,11 +15,11 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
 {
     /// <summary>
-    /// 斗拱 微信 小程序支付
+    /// 斗拱 支付宝 小程序支付
     /// </summary>
-    public class WxLite : DgPayPaymentService
+    public class AliLite : DgPayPaymentService
     {
-        public WxLite(ILogger<WxLite> logger, 
+        public AliLite(ILogger<AliLite> logger, 
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -29,22 +29,21 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【斗拱(wechat)小程序支付】";
+            string logPrefix = "【斗拱(alipayJs)小程序支付】";
+            AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
             JObject reqParams = new JObject();
-            WxLiteOrderRS res = ApiResBuilder.BuildSuccess<WxLiteOrderRS>();
+            AliLiteOrderRS res = ApiResBuilder.BuildSuccess<AliLiteOrderRS>();
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             res.ChannelRetMsg = channelRetMsg;
 
             // 请求参数赋值
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
-            WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
-
             //斗拱扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）
             payType == "WECHAT"或"ALIPAY"时必传*/
-            var wxData = JObject.FromObject(new { openid = bizRQ.GetChannelUserId(), sub_appid = bizRQ.SubAppId });
-            reqParams.Add("wx_data", wxData.ToString());//支付宝扩展参数集合
+            var alipayData = JObject.FromObject(new { buyer_id = bizRQ.GetChannelUserId() });
+            reqParams.Add("alipay_data", alipayData.ToString());//支付宝扩展参数集合
 
             // 发送请求
             JObject resJSON = PackageParamAndReq("/trade/payment/jspay", reqParams, logPrefix, mchAppConfigContext);
@@ -67,12 +66,14 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
                     data.TryGetString("hf_seq_id", out string hfSeqId);//全局流水号
                     data.TryGetString("req_seq_id", out string reqSeqId);//请求流水号
                     data.TryGetString("party_order_id", out string partyOrderId);//用户账单上的商户订单号	
+                    var payInfo = data.GetValue("pay_info").ToString();
+                    var tradeNo = JObject.Parse(payInfo).GetValue("tradeNO").ToString();
                     string _transStat = data.GetValue("trans_stat").ToString();
                     var transStat = DgPayEnum.ConvertTransStat(_transStat);
                     switch (transStat)
                     {
                         case DgPayEnum.TransStat.P:
-                            res.PayInfo = data.GetValue("pay_info").ToString();
+                            res.AlipayTradeNo = tradeNo;
                             channelRetMsg.ChannelOrderId = hfSeqId;
                             channelRetMsg.ChannelState = ChannelState.WAITING;
                             break;
@@ -105,10 +106,10 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
+            AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
             if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
             {
-                throw new BizException("[openId]不可为空");
+                throw new BizException("[buyerUserId]不可为空");
             }
 
             return null;

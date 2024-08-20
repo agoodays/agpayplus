@@ -15,7 +15,7 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
 {
     /// <summary>
-    /// 通联 微信 Native
+    /// 嘉联 微信 Native
     /// </summary>
     public class WxNative : JlPayPaymentService
     {
@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【通联(wechat)二维码支付】";
+            string logPrefix = "【嘉联(wechat)二维码支付】";
             WxNativeOrderRQ bizRQ = (WxNativeOrderRQ)rq;
             JObject reqParams = new JObject();
             WxNativeOrderRS res = ApiResBuilder.BuildSuccess<WxNativeOrderRS>();

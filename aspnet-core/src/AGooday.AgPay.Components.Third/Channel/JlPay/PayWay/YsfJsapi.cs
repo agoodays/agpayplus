@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
 {
     /// <summary>
-    /// 通联 嘉联 jsapi
+    /// 嘉联 云闪付 jsapi
     /// </summary>
     public class YsfJsapi : JlPayPaymentService
     {
@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
 
         public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            string logPrefix = "【通联(unionpay)jsapi支付】";
+            string logPrefix = "【嘉联(unionpay)jsapi支付】";
             YsfJsapiOrderRQ bizRQ = (YsfJsapiOrderRQ)rq;
             JObject reqParams = new JObject();
             YsfJsapiOrderRS res = ApiResBuilder.BuildSuccess<YsfJsapiOrderRS>();
@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
 
             // 请求参数赋值
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
-            //通联扫一扫支付， 需要传入buyerUserId参数
+            //嘉联扫一扫支付， 需要传入buyerUserId参数
             /*用户号（微信openid / 支付宝userid / 银联userid）*/
             reqParams.Add("app_up_identifier", "UnionPay/1.0");
             reqParams.Add("user_auth_code", bizRQ.GetChannelUserId());

@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
 {
     /// <summary>
-    /// 嘉联 嘉联 条码支付
+    /// 嘉联 云闪付 条码支付
     /// </summary>
     public class YsfBar : JlPayPaymentService
     {

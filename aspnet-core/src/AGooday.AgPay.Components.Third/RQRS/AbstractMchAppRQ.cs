@@ -5,7 +5,7 @@ namespace AGooday.AgPay.Components.Third.RQRS
     /// <summary>
     /// 通用RQ, 包含mchNo和appId 必填项
     /// </summary>
-    public class AbstractMchAppRQ : AbstractRQ
+    public abstract class AbstractMchAppRQ : AbstractRQ
     {
         /// <summary>
         /// 商户号
