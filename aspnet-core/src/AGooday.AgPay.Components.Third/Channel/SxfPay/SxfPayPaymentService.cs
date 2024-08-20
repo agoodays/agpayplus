@@ -32,9 +32,11 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
         {
         }
 
+        public static string IfCode { get; private set; } = CS.IF_CODE.SXFPAY;
+
         public override string GetIfCode()
         {
-            return CS.IF_CODE.SXFPAY;
+            return IfCode;
         }
 
         public override bool IsSupport(string wayCode)

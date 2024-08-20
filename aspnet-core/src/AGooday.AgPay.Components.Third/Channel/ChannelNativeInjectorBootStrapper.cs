@@ -75,15 +75,25 @@ namespace AGooday.AgPay.Components.Third.Channel
             // 注册所有类
             foreach (Type implementationType in targetTypes)
             {
-                var instance = Activator.CreateInstance(implementationType);
-                var getIfCodeMethod = implementationType.GetMethod("GetIfCode");
-                if (getIfCodeMethod != null)
+                string serviceKey;
+                // 查找无参构造函数
+                // ConstructorInfo constructorInfo = implementationType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
+                ConstructorInfo constructor = implementationType.GetConstructor(Type.EmptyTypes);
+                if (constructor == null)
                 {
-                    var serviceKey = getIfCodeMethod.Invoke(instance, null) as string;
-                    if (!string.IsNullOrEmpty(serviceKey))
-                    {
-                        services.AddKeyedScoped(serviceType, serviceKey, implementationType);
-                    }
+                    var instance = Activator.CreateInstance(implementationType);
+                    var getIfCodeMethod = implementationType.GetMethod("GetIfCode");
+                    serviceKey = getIfCodeMethod?.Invoke(instance, null)?.ToString();
+                }
+                else
+                {
+                    // 获取静态属性
+                    PropertyInfo ifCodePropertyInfo = implementationType.GetProperty("IfCode", BindingFlags.Public | BindingFlags.Static);
+                    serviceKey = ifCodePropertyInfo?.GetValue(null)?.ToString();
+                }
+                if (!string.IsNullOrEmpty(serviceKey))
+                {
+                    services.AddKeyedScoped(serviceType, serviceKey, implementationType);
                 }
             }
         }
@@ -108,16 +118,26 @@ namespace AGooday.AgPay.Components.Third.Channel
             // 注册所有类
             foreach (Type implementationType in targetTypes)
             {
-                var instance = Activator.CreateInstance(implementationType);
-                var getIfCodeMethod = implementationType.GetMethod("GetIfCode");
-                if (getIfCodeMethod != null)
+                string serviceKey;
+                // 查找无参构造函数
+                // ConstructorInfo constructorInfo = implementationType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
+                ConstructorInfo constructor = implementationType.GetConstructor(Type.EmptyTypes);
+                if (constructor == null)
                 {
-                    var serviceKey = getIfCodeMethod.Invoke(instance, null) as string;
-                    if (!string.IsNullOrEmpty(serviceKey))
-                    {
-                        services.AddKeyedScoped(serviceType, serviceKey, implementationType);
-                        action?.Invoke(implementationType);
-                    }
+                    var instance = Activator.CreateInstance(implementationType);
+                    var getIfCodeMethod = implementationType.GetMethod("GetIfCode");
+                    serviceKey = getIfCodeMethod?.Invoke(instance, null)?.ToString();
+                }
+                else
+                {
+                    // 获取静态属性
+                    PropertyInfo ifCodePropertyInfo = implementationType.GetProperty("IfCode", BindingFlags.Public | BindingFlags.Static);
+                    serviceKey = ifCodePropertyInfo?.GetValue(null)?.ToString();
+                }
+                if (!string.IsNullOrEmpty(serviceKey))
+                {
+                    services.AddKeyedScoped(serviceType, serviceKey, implementationType);
+                    action?.Invoke(implementationType);
                 }
             }
         }
