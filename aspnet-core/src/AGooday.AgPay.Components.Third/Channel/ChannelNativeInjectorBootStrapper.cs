@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Components.Third.Channel
                 // 查找无参构造函数
                 // ConstructorInfo constructorInfo = implementationType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
                 ConstructorInfo constructor = implementationType.GetConstructor(Type.EmptyTypes);
-                if (constructor == null)
+                if (constructor != null)
                 {
                     var instance = Activator.CreateInstance(implementationType);
                     var getIfCodeMethod = implementationType.GetMethod("GetIfCode");
@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Components.Third.Channel
                 // 查找无参构造函数
                 // ConstructorInfo constructorInfo = implementationType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
                 ConstructorInfo constructor = implementationType.GetConstructor(Type.EmptyTypes);
-                if (constructor == null)
+                if (constructor != null)
                 {
                     var instance = Activator.CreateInstance(implementationType);
                     var getIfCodeMethod = implementationType.GetMethod("GetIfCode");
@@ -159,7 +159,14 @@ namespace AGooday.AgPay.Components.Third.Channel
 
         public T GetService(object serviceKey)
         {
-            return _serviceProvider.GetRequiredKeyedService<T>(serviceKey);
+            try
+            {
+                return _serviceProvider.GetRequiredKeyedService<T>(serviceKey);
+            }
+            catch (InvalidOperationException)
+            {
+                return default;
+            }
         }
     }
 }

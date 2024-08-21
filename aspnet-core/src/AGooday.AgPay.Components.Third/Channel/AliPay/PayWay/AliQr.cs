@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Channel.AliPay.Kits;
 using AGooday.AgPay.Components.Third.Models;

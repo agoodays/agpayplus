@@ -32,12 +32,18 @@ namespace AGooday.AgPay.Components.Third.Channel
         {
         }
 
-        public ActionResult DoNotifyOrderNotExists(HttpRequest request)
+        public abstract string GetIfCode();
+
+        public abstract Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum);
+
+        public abstract ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum);
+
+        public virtual ActionResult DoNotifyOrderNotExists(HttpRequest request)
         {
             return TextResp("order not exists");
         }
 
-        public ActionResult DoNotifyOrderStateUpdateFail(HttpRequest request)
+        public virtual ActionResult DoNotifyOrderStateUpdateFail(HttpRequest request)
         {
             return TextResp("update status error");
         }
@@ -102,9 +108,5 @@ namespace AGooday.AgPay.Components.Third.Channel
         {
             return ChannelCertConfigKit.GetCertFile(certFilePath);
         }
-
-        public abstract string GetIfCode();
-        public abstract Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum);
-        public abstract ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum);
     }
 }
