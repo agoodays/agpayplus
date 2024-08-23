@@ -4,13 +4,26 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <!--<Nullable>enable</Nullable>-->
-	  
-	<!--以下是我们自己添加的-->
-	<!--版本号，重要性不必多说-->
-	<Version>1.0.0.1</Version>
-	<!--添加该配置，在编译时进行打包-->
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <PropertyGroup>
+  	<PackageId>AGooday.AgPay.AopSdk</PackageId>
+  	<PackageIcon>LOGO.png</PackageIcon>
+  	<PackageReadmeFile>README.md</PackageReadmeFile>
+  	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+  	<PackageProjectUrl>https://github.com/agoodays/agpayplus</PackageProjectUrl>
+  	<PackageTags>支付;聚合支付</PackageTags>
+  	<Version>1.0.0.2</Version>
+  	<Description>AgPay客户端实现，支持：支付、退款、转账、分账等接口。</Description>
+  	<Authors>Xiang YiSheng</Authors>
+  	<RepositoryType>git</RepositoryType>
+  	<RepositoryUrl>https://github.com/agoodays/agpayplus.git</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<None Include="LOGO.png" Pack="true" PackagePath="/" />
+	<None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0" />
