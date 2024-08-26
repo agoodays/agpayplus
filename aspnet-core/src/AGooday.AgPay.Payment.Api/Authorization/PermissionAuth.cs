@@ -22,6 +22,10 @@ namespace AGooday.AgPay.Payment.Api.Authorization
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             string mchNo = GetMchNoFromRequest(context.HttpContext.Request);
+            if (string.IsNullOrWhiteSpace(mchNo))
+            {
+                throw new BizException($"商户号不能为空");
+            }
             var sysConfigService = context.HttpContext.RequestServices.GetRequiredService<ISysConfigService>();
             var configVal = sysConfigService.GetByGroupKey("mchApiEnt", CS.SYS_TYPE.MCH, mchNo)
                 .Where(w => w.ConfigKey.Equals("mchApiEntList")).FirstOrDefault().ConfigVal;
