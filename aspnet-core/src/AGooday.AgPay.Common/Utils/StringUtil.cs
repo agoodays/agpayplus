@@ -55,10 +55,7 @@ namespace AGooday.AgPay.Common.Utils
         //    return inputByteArray;
         //}
 
-        public static string ToHex(string s)
-        {
-            return ToHex(s, Encoding.UTF8.ToString(), false);
-        }
+        public static string ToHex(string s) => ToHex(s, Encoding.UTF8.ToString(), false);
 
         /// 从字符串转换到16进制表示的字符串
         /// 编码,如"utf-8","gb2312"
@@ -196,30 +193,17 @@ namespace AGooday.AgPay.Common.Utils
             }
         }
 
-        public static string GetUUID()
-        {
-            return Guid.NewGuid().ToString("N") + Environment.CurrentManagedThreadId;
-        }
+        public static string GetUUID() => Guid.NewGuid().ToString("N") + Environment.CurrentManagedThreadId;
 
-        public static string GetUUID(int endAt)
-        {
-            return GetUUID().Substring(0, endAt);
-        }
+        public static string GetUUID(int endAt) => GetUUID().Substring(0, endAt);
 
         /// <summary>
         /// 是否 http 或 https连接
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static bool IsAvailableUrl(string url)
-        {
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                return false;
-            }
+        public static bool IsAvailableUrl(string url) => !string.IsNullOrWhiteSpace(url) && (url.StartsWith("http://") || url.StartsWith("https://"));
 
-            return url.StartsWith("http://") || url.StartsWith("https://");
-        }
         /// <summary>
         /// 值为Null使用默认值
         /// </summary>
@@ -241,6 +225,32 @@ namespace AGooday.AgPay.Common.Utils
         /// <param name="defaultStr"></param>
         /// <returns></returns>
         public static string DefaultString(string str, string defaultStr) => string.IsNullOrWhiteSpace(str) ? defaultStr : str;
+        /// <summary>
+        /// 第一个非Null和非空字符串
+        /// </summary>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static string FirstNonNullAndNonEmptyString(params string[] strs) => strs.FirstOrDefault(s => !string.IsNullOrEmpty(s));
+        /// <summary>
+        /// 第一个非Null和非空白字符串
+        /// </summary>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static string FirstNonNullAndNonWhiteSpaceString(params string[] strs) => strs.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s));
+        /// <summary>
+        /// 连接非Null和非空字符串
+        /// </summary>
+        /// <param name="separator"></param>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static string JoinNonNullAndNonEmptyString(string separator, params string[] strs) => string.Join(separator, strs.Where(s => !string.IsNullOrEmpty(s)));
+        /// <summary>
+        /// 连接非Null和非空白字符串
+        /// </summary>
+        /// <param name="separator"></param>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static string JoinNonNullAndNonWhiteSpaceString(string separator, params string[] strs) => string.Join(separator, strs.Where(s => !string.IsNullOrWhiteSpace(s)));
         /// <summary>
         /// 任意为Null或空
         /// </summary>

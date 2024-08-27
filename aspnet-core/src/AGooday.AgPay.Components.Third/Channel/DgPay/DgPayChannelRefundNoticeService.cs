@@ -89,8 +89,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                 data?.TryGetString("bank_code", out bankCode); //外部通道返回码
                 data?.TryGetString("bank_desc", out bankDesc); //外部通道返回描述
                 data?.TryGetString("bank_message", out bankMessage); //外部通道返回描述
-                string code = bankCode ?? respCode;
-                string msg = (bankMessage ?? bankDesc) ?? respDesc;
+                string code = StringUtil.FirstNonNullAndNonWhiteSpaceString(bankCode, respCode);
+                string msg = StringUtil.FirstNonNullAndNonWhiteSpaceString(bankMessage, bankDesc, respDesc);
                 if ("00000000".Equals(respCode))
                 {
                     data.TryGetString("huifu_id", out string huifuId);//商户编号

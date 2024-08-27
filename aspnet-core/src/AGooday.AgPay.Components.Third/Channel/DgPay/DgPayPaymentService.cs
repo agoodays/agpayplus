@@ -65,8 +65,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             data?.TryGetString("bank_code", out bankCode); //外部通道返回码
             data?.TryGetString("bank_desc", out bankDesc); //外部通道返回描述
             data?.TryGetString("bank_message", out bankMessage); //外部通道返回描述
-            string code = bankCode ?? respCode;
-            string msg = (bankMessage ?? bankDesc) ?? respDesc;
+            string code = StringUtil.FirstNonNullAndNonWhiteSpaceString(bankCode, respCode);
+            string msg = StringUtil.FirstNonNullAndNonWhiteSpaceString(bankMessage, bankDesc, respDesc);
             string huifuId = data?.GetValue("huifu_id")?.ToString();
             channelRetMsg.ChannelMchNo = huifuId;
             try
