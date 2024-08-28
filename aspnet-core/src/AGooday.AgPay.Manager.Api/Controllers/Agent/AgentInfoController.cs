@@ -59,12 +59,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新增代理商信息")]
         [PermissionAuth(PermCode.MGR.ENT_AGENT_INFO_ADD)]
-        public ApiRes Add(AgentInfoCreateDto dto)
+        public async Task<ApiRes> AddAsync(AgentInfoCreateDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
-            _agentInfoService.CreateAsync(dto);
+            await _agentInfoService.CreateAsync(dto);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();
@@ -79,9 +79,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         /// <returns></returns>
         [HttpDelete, Route("{agentNo}"), MethodLog("删除代理商信息")]
         [PermissionAuth(PermCode.MGR.ENT_AGENT_INFO_DEL)]
-        public ApiRes Delete(string agentNo)
+        public async Task<ApiRes> DeleteAsync(string agentNo)
         {
-            _agentInfoService.RemoveAsync(agentNo);
+            await _agentInfoService.RemoveAsync(agentNo);
             return ApiRes.Ok();
         }
 
@@ -109,14 +109,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         /// <returns></returns>
         [HttpGet, Route("{agentNo}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_AGENT_INFO_VIEW, PermCode.MGR.ENT_AGENT_INFO_EDIT)]
-        public ApiRes Detail(string agentNo)
+        public async Task<ApiRes> DetailAsync(string agentNo)
         {
-            var agentInfo = _agentInfoService.GetById(agentNo);
+            var agentInfo = await _agentInfoService.GetByIdAsync(agentNo);
             if (agentInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var sysUser = _sysUserService.GetById(agentInfo.InitUserId.Value);
+            var sysUser = await _sysUserService.GetByIdAsync(agentInfo.InitUserId.Value);
             if (sysUser != null)
             {
                 agentInfo.AddExt("loginUsername", sysUser.LoginUsername);

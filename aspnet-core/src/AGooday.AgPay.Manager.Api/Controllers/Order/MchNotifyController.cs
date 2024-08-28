@@ -56,9 +56,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("{notifyId}")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_NOTIFY_VIEW)]
-        public ApiRes Detail(long notifyId)
+        public async Task<ApiRes> DetailAsync(long notifyId)
         {
-            var mchNotify = _mchNotifyService.GetById(notifyId);
+            var mchNotify = await _mchNotifyService.GetByIdAsync(notifyId);
             if (mchNotify == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -74,9 +74,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("resend/{notifyId}")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_NOTIFY_RESEND)]
-        public ApiRes Resend(long notifyId)
+        public async Task<ApiRes> ResendAsync(long notifyId)
         {
-            var mchNotify = _mchNotifyService.GetById(notifyId);
+            var mchNotify = await _mchNotifyService.GetByIdAsync(notifyId);
             if (mchNotify == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

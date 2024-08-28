@@ -60,11 +60,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <exception cref="BizException"></exception>
         [HttpPost, Route(""), MethodLog("新增码牌模板")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_ADD)]
-        public ApiRes Add(QrCodeShellDto dto)
+        public async Task<ApiRes> AddAsync(QrCodeShellDto dto)
         {
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
-            bool result = _qrCodeShellService.Add(dto);
+            bool result = await _qrCodeShellService.AddAsync(dto);
             _qrCodeShellService.Update(dto);
             if (!result)
             {
@@ -114,9 +114,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_VIEW, PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var qrCodeShell = _qrCodeShellService.GetById(recordId);
+            var qrCodeShell = await _qrCodeShellService.GetByIdAsync(recordId);
             if (qrCodeShell == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -164,16 +164,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 
         [HttpGet, Route("view/{recordId}")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_VIEW, PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
-        public ApiRes View(long recordId)
+        public async Task<ApiRes> ViewAsync(long recordId)
         {
-            var qrCodeShell = _qrCodeShellService.GetById(recordId);
+            var qrCodeShell = await _qrCodeShellService.GetByIdAsync(recordId);
             return View(qrCodeShell);
         }
 
         [HttpGet, Route("imgview/{key}.png"), AllowAnonymous]
-        public ActionResult ImgView(string key)
+        public async Task<ActionResult> ImgViewAsync(string key)
         {
-            var qrCodeShell = _qrCodeShellService.GetById(Convert.ToInt64(AgPayUtil.AesDecode(key)));
+            var qrCodeShell = await _qrCodeShellService.GetByIdAsync(Convert.ToInt64(AgPayUtil.AesDecode(key)));
             if (qrCodeShell != null)
             {
                 var buffer = GetQrCodeShellImage(qrCodeShell);

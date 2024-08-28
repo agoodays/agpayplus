@@ -41,6 +41,14 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
+        public virtual async Task<bool> AddAsync(TDto dto)
+        {
+            var entity = _mapper.Map<TEntity>(dto);
+            await _agPayRepository.AddAsync(entity);
+            var result = _agPayRepository.SaveChanges(out int _);
+            return result;
+        }
+
         public virtual bool Remove(TPrimaryKey id)
         {
             _agPayRepository.Remove(id);
@@ -108,6 +116,14 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<TEntity>(dto);
             _agPayRepository.Add(entity);
+            var result = _agPayRepository.SaveChanges(out int _);
+            return result;
+        }
+
+        public virtual async Task<bool> AddAsync(TDto dto)
+        {
+            var entity = _mapper.Map<TEntity>(dto);
+            await _agPayRepository.AddAsync(entity);
             var result = _agPayRepository.SaveChanges(out int _);
             return result;
         }

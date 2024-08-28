@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
         }
 
         [HttpGet, Route("appToAppAuthCallback")]
-        public IActionResult AppToAppAuthCallback(string state, string app_auth_code)
+        public async Task<IActionResult> AppToAppAuthCallbackAsync(string state, string app_auth_code)
         {
             string errMsg = null;
             bool isAlipaySysAuth = true; //是否 服务商登录支付宝后台系统发起的商户授权， 此时无法获取authCode和商户的信息。
@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
                     string isvNo = isvAndMchAppId.Split("_")[0];
                     string mchAppId = isvAndMchAppId.Split("_")[1];
 
-                    MchAppDto mchApp = mchAppService.GetById(mchAppId);
+                    MchAppDto mchApp = await mchAppService.GetByIdAsync(mchAppId);
 
                     MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(mchApp.MchNo, mchAppId);
                     AliPayClientWrapper alipayClientWrapper = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext);

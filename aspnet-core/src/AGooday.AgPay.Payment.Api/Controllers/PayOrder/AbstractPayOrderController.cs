@@ -67,9 +67,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="wayCode"></param>
         /// <param name="bizRQ">业务请求报文</param>
         /// <returns></returns>
-        protected ApiRes UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ)
+        protected async Task<ApiRes> UnifiedOrderAsync(string wayCode, UnifiedOrderRQ bizRQ)
         {
-            return UnifiedOrder(wayCode, bizRQ, null);
+            return await UnifiedOrderAsync(wayCode, bizRQ, null);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="bizRQ"></param>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        protected ApiRes UnifiedOrder(string wayCode, UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
+        protected async Task<ApiRes> UnifiedOrderAsync(string wayCode, UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
         {
             // 响应数据
             UnifiedOrderRS bizRS = null;
@@ -156,7 +156,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     payOrder = GenPayOrder(bizRQ, mchAppConfigContext, null, null, null);
                     string payOrderId = payOrder.PayOrderId;
                     //订单入库 订单状态： 生成状态  此时没有和任何上游渠道产生交互。
-                    _payOrderService.Add(payOrder);
+                    await _payOrderService.AddAsync(payOrder);
 
                     QrCashierOrderRS qrCashierOrderRS = new QrCashierOrderRS();
                     QrCashierOrderRQ qrCashierOrderRQ = (QrCashierOrderRQ)bizRQ;
@@ -216,7 +216,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 if (isNewOrder)
                 {
                     //订单入库 订单状态： 生成状态  此时没有和任何上游渠道产生交互。
-                    _payOrderService.Add(payOrder);
+                    await _payOrderService.AddAsync(payOrder);
                 }
 
                 // 生成订单分润
@@ -257,15 +257,15 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         {
             MchInfoDto mchInfo = configContext.MchInfo;
             MchAppDto mchApp = configContext.MchApp;
+            MchStoreDto mchStore = _configContextQueryService.QueryMchStore(rq.MchNo, rq.StoreId);
             AgentInfoDto agentInfo = _configContextQueryService.QueryAgentInfo(configContext);
             IsvInfoDto isvInfo = _configContextQueryService.QueryIsvInfo(configContext);
-            return GenPayOrder(rq, mchInfo, mchApp, agentInfo, isvInfo, ifCode, mchPayPassage, paymentService);
+            var wayType = _configContextQueryService.GetWayTypeByWayCode(rq.WayCode);
+            return GenPayOrder(rq, mchInfo, mchApp, mchStore, agentInfo, isvInfo, ifCode, wayType, mchPayPassage, paymentService);
         }
 
-        private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
+        private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, MchStoreDto mchStore, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode, string wayType, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
         {
-            var wayType = _configContextQueryService.GetWayTypeByWayCode(rq.WayCode);
-            var mchStore = _configContextQueryService.QueryMchStore(rq.MchNo, rq.StoreId);
             PayOrderDto payOrder = new PayOrderDto();
             payOrder.PayOrderId = SeqUtil.GenPayOrderId(); //生成订单ID
             payOrder.MchNo = mchInfo.MchNo; //商户号

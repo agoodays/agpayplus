@@ -73,9 +73,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         [HttpPost, Route(""), MethodLog("新增分账接收账号")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_ADD)]
-        public ApiRes Add(DivisionReceiverBindReqModel model)
+        public async Task<ApiRes> AddAsync(DivisionReceiverBindReqModel model)
         {
-            var mchApp = _mchAppService.GetById(model.AppId);
+            var mchApp = await _mchAppService.GetByIdAsync(model.AppId);
             if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentMchNo()))
             {
                 throw new BizException("商户应用不存在或不可用");
@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 
             try
             {
-                DivisionReceiverBindResponse response = agPayClient.Execute(request);
+                DivisionReceiverBindResponse response = await agPayClient.ExecuteAsync(request);
                 if (response.Code != 0)
                 {
                     throw new BizException(response.Msg);
@@ -140,9 +140,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除分账接收账号")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_DELETE)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var record = _mchDivisionReceiverService.GetById(recordId);
+            var record = await _mchDivisionReceiverService.GetByIdAsync(recordId);
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

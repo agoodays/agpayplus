@@ -113,9 +113,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_EDIT)]
-        public ApiRes Detail(string recordId)
+        public async Task<ApiRes> DetailAsync(string recordId)
         {
-            var sysRole = _sysRoleService.GetById(recordId);
+            var sysRole = await _sysRoleService.GetByIdAsync(recordId);
             if (sysRole is null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

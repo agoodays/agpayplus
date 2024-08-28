@@ -89,9 +89,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("mchSipw"), MethodLog("更改支付密码")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_CONFIG_EDIT)]
-        public ApiRes SetMchSipw(ModifyMchSipw model)
+        public async Task<ApiRes> SetMchSipwAsync(ModifyMchSipw model)
         {
-            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
+            var mchInfo = await _mchInfoService.GetByIdAsync(GetCurrentMchNo());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);
             if (!string.IsNullOrWhiteSpace(mchInfo.Sipw))
             {
@@ -118,9 +118,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("hasSipwValidate"), NoLog]
-        public ApiRes HasSipwValidate()
+        public async Task<ApiRes> HasSipwValidateAsync()
         {
-            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
+            var mchInfo = await _mchInfoService.GetByIdAsync(GetCurrentMchNo());
             return ApiRes.Ok(!string.IsNullOrWhiteSpace(mchInfo.Sipw));
         }
     }

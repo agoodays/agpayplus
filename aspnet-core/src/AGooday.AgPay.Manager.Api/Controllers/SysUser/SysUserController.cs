@@ -150,15 +150,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
-        //public ApiRes Detail(long recordId)
-        //{
-        //    var sysUser = _sysUserService.GetById(recordId);
-        //    if (sysUser == null)
-        //    {
-        //        return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
-        //    }
-        //    return ApiRes.Ok(sysUser);
-        //}
         public async Task<ApiRes> DetailAsync(long recordId)
         {
             var sysUser = await _sysUserService.GetByIdAsync(recordId);

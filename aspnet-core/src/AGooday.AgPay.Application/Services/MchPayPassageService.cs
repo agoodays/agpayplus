@@ -49,18 +49,15 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public IEnumerable<MchPayPassageDto> GetMchPayPassageByAppId(string mchNo, string appId)
+        public IEnumerable<MchPayPassageDto> GetMchPayPassageByMchNoAndAppId(string mchNo, string appId)
         {
-            var mchPayPassages = _mchPayPassageRepository.GetAllAsNoTracking()
-                .Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.State.Equals(CS.PUB_USABLE));
+            var mchPayPassages = _mchPayPassageRepository.GetMchPayPassageByMchNoAndAppId(mchNo, appId);
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 
-        public IEnumerable<MchPayPassageDto> GetByAppId(string appId, List<string> wayCodes)
+        public IEnumerable<MchPayPassageDto> GetByAppIdAndWayCodesAsNoTracking(string appId, List<string> wayCodes)
         {
-            var mchPayPassages = _mchPayPassageRepository.GetAllAsNoTracking()
-                .Where(w => w.AppId.Equals(appId)
-                && (wayCodes.Count == 0 || wayCodes.Contains(w.WayCode)));
+            var mchPayPassages = _mchPayPassageRepository.GetByAppIdAndWayCodesAsNoTracking(appId, wayCodes);
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 

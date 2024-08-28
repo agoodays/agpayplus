@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <returns></returns>
         [HttpPost, Route("api/pay/unifiedOrder")]
         [PermissionAuth(PermCode.PAY.API_PAY_ORDER)]
-        public ActionResult<ApiRes> UnifiedOrder()
+        public async Task<ActionResult<ApiRes>> UnifiedOrderAsync()
         {
             //获取参数 & 验签
             UnifiedOrderRQ rq = GetRQByWithMchSign<UnifiedOrderRQ>();
@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             UnifiedOrderRQ bizRQ = BuildBizRQ(rq);
 
             //实现子类的res
-            ApiRes apiRes = UnifiedOrder(bizRQ.WayCode, bizRQ);
+            ApiRes apiRes = await UnifiedOrderAsync(bizRQ.WayCode, bizRQ);
             if (apiRes.Data == null)
             {
                 return apiRes;

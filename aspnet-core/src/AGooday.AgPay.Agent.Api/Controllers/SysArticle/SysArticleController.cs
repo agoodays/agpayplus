@@ -50,9 +50,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysArticle
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_ARTICLE_NOTICEINFO)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var sysArticle = _sysArticleService.GetById(recordId);
+            var sysArticle = await _sysArticleService.GetByIdAsync(recordId);
             if (sysArticle == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

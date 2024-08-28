@@ -56,13 +56,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <exception cref="BizException"></exception>
         [HttpPost, Route(""), MethodLog("新增支付方式")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_ADD)]
-        public ApiRes Add(PayWayDto dto)
+        public async Task<ApiRes> AddAsync(PayWayDto dto)
         {
             if (_payWayService.IsExistPayWayCode(dto.WayCode))
             {
                 throw new BizException("支付方式代码已存在");
             }
-            bool result = _payWayService.Add(dto);
+            bool result = await _payWayService.AddAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -118,9 +118,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("{wayCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_VIEW, PermCode.MGR.ENT_PC_WAY_EDIT)]
-        public ApiRes Detail(string wayCode)
+        public async Task<ApiRes> DetailAsync(string wayCode)
         {
-            var payWay = _payWayService.GetById(wayCode);
+            var payWay = await _payWayService.GetByIdAsync(wayCode);
             if (payWay == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

@@ -72,11 +72,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("interfaceSavedConfigs"), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_PAY_CONFIG_VIEW, PermCode.AGENT.ENT_MCH_PAY_CONFIG_VIEW)]
-        public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
+        public async Task<ApiRes> GetByInfoIdAsync(string configMode, string infoId, string ifCode)
         {
             string infoType = GetInfoType(configMode);
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
-            var payIfDefine = _payIfDefineService.GetById(ifCode);
+            var payIfDefine = await _payIfDefineService.GetByIdAsync(ifCode);
             payInterfaceConfig ??= new PayInterfaceConfigDto()
             {
                 InfoType = infoType,
@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
                     }
                     break;
                 case CS.INFO_TYPE.AGENT:
-                    var agentInfo = _agentInfoService.GetById(infoId);
+                    var agentInfo = await _agentInfoService.GetByIdAsync(infoId);
                     var isvPayInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, agentInfo.IsvNo, ifCode);
                     isSupportApplyments.Add(isvPayInterfaceConfig.IsOpenApplyment);
                     isSupportCheckBills.Add(isvPayInterfaceConfig.IsOpenCheckBill);
@@ -121,8 +121,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
                     }
                     break;
                 case CS.INFO_TYPE.MCH_APP:
-                    var mchApp = _mchAppService.GetById(infoId);
-                    var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+                    var mchApp = await _mchAppService.GetByIdAsync(infoId);
+                    var mchInfo = await _mchInfoService.GetByIdAsync(mchApp.MchNo);
                     if (!string.IsNullOrEmpty(mchInfo.IsvNo))
                     {
                         var mchIsvPayInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, mchInfo.IsvNo, ifCode);

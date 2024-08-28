@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
                 var wayCodes = payWays.Select(s => s.WayCode).ToList();
 
                 // 应用支付通道集合
-                var mchPayPassages = _mchPayPassageService.GetByAppId(appId, wayCodes);
+                var mchPayPassages = _mchPayPassageService.GetByAppIdAndWayCodesAsNoTracking(appId, wayCodes);
 
                 foreach (var payWay in payWays)
                 {
@@ -84,14 +84,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("availablePayInterface/{appId}/{wayCode}"), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_PAY_PASSAGE_CONFIG)]
-        public ApiRes AvailablePayInterface(string appId, string wayCode, int pageNumber, int pageSize)
+        public async Task<ApiRes> AvailablePayInterfaceAsync(string appId, string wayCode, int pageNumber, int pageSize)
         {
-            var mchApp = _mchAppService.GetById(appId);
+            var mchApp = await _mchAppService.GetByIdAsync(appId);
             if (mchApp == null || mchApp.State != CS.YES)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+            var mchInfo = await _mchInfoService.GetByIdAsync(mchApp.MchNo);
             if (mchInfo == null || mchInfo.State != CS.YES)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("更新商户支付通道")]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_PAY_PASSAGE_ADD)]
-        public ApiRes SaveOrUpdate(ReqParams model)
+        public async Task<ApiRes> SaveOrUpdateAsync(ReqParams model)
         {
             try
             {
@@ -118,7 +118,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
                 {
                     throw new BizException("操作失败");
                 }
-                var mchApp = _mchAppService.GetById(mchPayPassages.First().AppId);
+                var mchApp = await _mchAppService.GetByIdAsync(mchPayPassages.First().AppId);
                 if (mchApp == null || mchApp.State != CS.YES)
                 {
                     return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

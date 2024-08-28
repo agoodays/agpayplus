@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("{appId}/{ifCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
-        public ApiRes GetByAppId(string appId, string ifCode)
+        public async Task<ApiRes> GetByAppIdAsync(string appId, string ifCode)
         {
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP, appId, ifCode);
             if (payInterfaceConfig != null)
@@ -79,8 +79,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 // 敏感数据脱敏
                 if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
                 {
-                    var mchApp = _mchAppService.GetById(appId);
-                    var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+                    var mchApp = await _mchAppService.GetByIdAsync(appId);
+                    var mchInfo = await _mchInfoService.GetByIdAsync(mchApp.MchNo);
 
                     // 普通商户的支付参数执行数据脱敏
                     if (mchInfo.Type == CS.MCH_TYPE_NORMAL)
@@ -103,9 +103,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("更新应用支付参数")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_ADD)]
-        public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
+        public async Task<ApiRes> SaveOrUpdateAsync(PayInterfaceConfigDto dto)
         {
-            var mchApp = _mchAppService.GetById(dto.InfoId);
+            var mchApp = await _mchAppService.GetByIdAsync(dto.InfoId);
             if (mchApp == null || mchApp.State != CS.YES)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -157,9 +157,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("ifCodes/{appId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_ADD)]
-        public ApiRes GetIfCodeByAppId(string appId)
+        public async Task<ApiRes> GetIfCodeByAppIdAsync(string appId)
         {
-            var mchApp = _mchAppService.GetById(appId);
+            var mchApp = await _mchAppService.GetByIdAsync(appId);
             if (mchApp == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -174,10 +174,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         }
 
         [HttpGet, Route("alipayIsvsubMchAuthUrls/{mchAppId}"), AllowAnonymous, NoLog]
-        public ApiRes QueryAlipayIsvsubMchAuthUrl(string mchAppId)
+        public async Task<ApiRes> QueryAlipayIsvsubMchAuthUrl(string mchAppId)
         {
-            var mchApp = _mchAppService.GetById(mchAppId);
-            var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+            var mchApp = await _mchAppService.GetByIdAsync(mchAppId);
+            var mchInfo = await _mchInfoService.GetByIdAsync(mchApp.MchNo);
             var dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
             string authUrl = dbApplicationConfig.GenAlipayIsvsubMchAuthUrl(mchInfo.IsvNo, mchAppId);
             string authQrImgUrl = dbApplicationConfig.GenScanImgUrl(authUrl);

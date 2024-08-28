@@ -46,6 +46,12 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<PayOrderDivisionRecordDto>(entity);
         }
 
+        public async Task<PayOrderDivisionRecordDto> GetByIdAsNoTrackingAsync(long recordId, string mchNo)
+        {
+            var entity = await _payOrderDivisionRecordRepository.GetByIdAsNoTrackingAsync(recordId, mchNo);
+            return _mapper.Map<PayOrderDivisionRecordDto>(entity);
+        }
+
         public IEnumerable<PayOrderDivisionRecordDto> GetByPayOrderId(string payOrderId)
         {
             var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAllAsNoTracking()

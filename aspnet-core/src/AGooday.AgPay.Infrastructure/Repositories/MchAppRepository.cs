@@ -11,9 +11,19 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public MchApp GetAsNoTrackingById(string id)
+        public MchApp GetByIdAsNoTracking(string recordId)
         {
-            return GetAllAsNoTracking().FirstOrDefault(w => w.AppId.Equals(id));
+            return GetAllAsNoTracking().FirstOrDefault(w => w.AppId.Equals(recordId));
+        }
+
+        public MchApp GetById(string recordId, string mchNo)
+        {
+            return GetAll().FirstOrDefault(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId));
+        }
+
+        public MchApp GetByIdAsNoTracking(string recordId, string mchNo)
+        {
+            return GetAllAsNoTracking().FirstOrDefault(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId));
         }
     }
 }

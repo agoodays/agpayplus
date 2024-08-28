@@ -5,8 +5,8 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchPayPassageService : IAgPayService<MchPayPassageDto, long>
     {
-        IEnumerable<MchPayPassageDto> GetMchPayPassageByAppId(string mchNo, string appId);
-        IEnumerable<MchPayPassageDto> GetByAppId(string appId, List<string> wayCodes);
+        IEnumerable<MchPayPassageDto> GetMchPayPassageByMchNoAndAppId(string mchNo, string appId);
+        IEnumerable<MchPayPassageDto> GetByAppIdAndWayCodesAsNoTracking(string appId, List<string> wayCodes);
         PaginatedList<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize);
         /// <summary>
         /// 根据支付方式查询可用的支付接口列表

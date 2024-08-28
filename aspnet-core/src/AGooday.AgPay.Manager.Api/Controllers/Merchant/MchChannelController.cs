@@ -33,9 +33,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 
         [HttpGet, Route("channelUserId")]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_ADD)]
-        public ApiRes ChannelUserId(string appId, string ifCode, string extParam)
+        public async Task<ApiRes> ChannelUserIdAsync(string appId, string ifCode, string extParam)
         {
-            var mchApp = _mchAppService.GetById(appId);
+            var mchApp = await _mchAppService.GetByIdAsync(appId);
             if (mchApp == null || mchApp.State != CS.PUB_USABLE)
             {
                 throw new BizException("商户应用不存在或不可用");

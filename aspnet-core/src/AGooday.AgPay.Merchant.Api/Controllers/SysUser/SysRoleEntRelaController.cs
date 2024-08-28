@@ -57,9 +57,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route("relas/{roleId}"), MethodLog("重置角色权限关联信息")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST)]
-        public ApiRes Relas(string roleId, List<string> entIds)
+        public async Task<ApiRes> RelasAsync(string roleId, List<string> entIds)
         {
-            var role = _sysRoleService.GetById(roleId);
+            var role = await _sysRoleService.GetByIdAsync(roleId);
             if (role == null || !role.SysType.Equals(CS.SYS_TYPE.MCH) || !role.BelongInfoId.Equals(GetCurrentMchNo()))
             {
                 ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

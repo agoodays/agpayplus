@@ -172,9 +172,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("{refundOrderId}")]
         [PermissionAuth(PermCode.MCH.ENT_REFUND_ORDER_VIEW)]
-        public ApiRes Detail(string refundOrderId)
+        public async Task<ApiRes> DetailAsync(string refundOrderId)
         {
-            var refundOrder = _refundOrderService.GetById(refundOrderId);
+            var refundOrder = await _refundOrderService.GetByIdAsync(refundOrderId);
             if (refundOrder == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

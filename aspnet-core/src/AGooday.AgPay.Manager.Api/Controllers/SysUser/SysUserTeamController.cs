@@ -50,14 +50,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新建团队")]
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_ADD)]
-        public ApiRes Add(SysUserTeamDto dto)
+        public async Task<ApiRes> AddAsync(SysUserTeamDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             dto.SysType = CS.SYS_TYPE.MGR;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
-            var result = _mchStoreService.Add(dto);
+            var result = await _mchStoreService.AddAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -72,9 +72,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除团队")]
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_DEL)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var mchStore = _mchStoreService.GetById(recordId);
+            var mchStore = await _mchStoreService.GetByIdAsync(recordId);
             if (mchStore == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -107,9 +107,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_VIEW, PermCode.MGR.ENT_UR_TEAM_EDIT)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var mchStore = _mchStoreService.GetById(recordId);
+            var mchStore = await _mchStoreService.GetByIdAsync(recordId);
             if (mchStore == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

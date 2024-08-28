@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新建门店")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_ADD)]
-        public ApiRes Add(MchStoreDto dto)
+        public async Task<ApiRes> AddAsync(MchStoreDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.MchNo = sysUser.BelongInfoId;
@@ -75,12 +75,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var mchInfo = _mchInfoService.GetById(dto.MchNo);
+            var mchInfo = await _mchInfoService.GetByIdAsync(dto.MchNo);
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             dto.AgentNo = mchInfo.AgentNo;
             dto.IsvNo = mchInfo.IsvNo;
-            var result = _mchStoreService.Add(dto);
+            var result = await _mchStoreService.AddAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -113,11 +113,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新门店信息")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_EDIT)]
-        public ApiRes Update(long recordId, MchStoreDto dto)
+        public async Task<ApiRes> UpdateAsync(long recordId, MchStoreDto dto)
         {
             if (!dto.StoreId.HasValue || dto.StoreId.Value <= 0) // 应用分配
             {
-                var sysUser = _mchStoreService.GetByIdAsNoTracking(recordId);
+                var sysUser = await _mchStoreService.GetByIdAsNoTrackingAsync(recordId);
                 sysUser.BindAppId = dto.BindAppId;
                 CopyUtil.CopyProperties(sysUser, dto);
             }
@@ -140,9 +140,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_VIEW, PermCode.MCH.ENT_MCH_STORE_EDIT)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var mchStore = _mchStoreService.GetById(recordId);
+            var mchStore = await _mchStoreService.GetByIdAsync(recordId);
             if (mchStore == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

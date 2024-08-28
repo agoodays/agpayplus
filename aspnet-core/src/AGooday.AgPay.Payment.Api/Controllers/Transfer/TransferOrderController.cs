@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         /// <returns></returns>
         [HttpPost, Route("api/transferOrder")]
         [PermissionAuth(PermCode.PAY.API_TRANS_ORDER)]
-        public ApiRes TransferOrder()
+        public async Task<ApiRes> TransferOrderAsync()
         {
             TransferOrderDto transferOrder = null;
 
@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 }
 
                 // 入库
-                _transferOrderService.Add(transferOrder);
+                await _transferOrderService.AddAsync(transferOrder);
 
                 // 调起上游接口
                 ChannelRetMsg channelRetMsg = transferService.Transfer(bizRQ, transferOrder, mchAppConfigContext);

@@ -5,6 +5,7 @@
         where TPrimaryKey : struct
     {
         bool Add(TDto dto);
+        Task<bool> AddAsync(TDto dto);
         bool Remove(TPrimaryKey id);
         bool Update(TDto dto);
         TDto GetById(TPrimaryKey id);
@@ -16,6 +17,7 @@
         where TDto : class
     {
         bool Add(TDto dto);
+        Task<bool> AddAsync(TDto dto);
         bool Remove<TPrimaryKey>(TPrimaryKey id);
         bool Update(TDto dto);
         TDto GetById<TPrimaryKey>(TPrimaryKey id);

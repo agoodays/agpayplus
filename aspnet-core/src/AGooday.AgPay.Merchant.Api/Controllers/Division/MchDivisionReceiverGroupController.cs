@@ -122,9 +122,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         [HttpDelete, Route("{recordId}"), MethodLog("删除分账账号组")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_DELETE)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var record = _mchDivisionReceiverGroupService.GetById(recordId);
+            var record = await _mchDivisionReceiverGroupService.GetByIdAsync(recordId);
             if (record == null || !record.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

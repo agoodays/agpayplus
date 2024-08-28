@@ -39,13 +39,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
         /// </summary>
         [HttpPost, Route("api/pay/ysfJsapiOrder")]
         [PermissionAuth(PermCode.PAY.API_PAY_ORDER)]
-        public ActionResult<ApiRes> YsfJsapiOrder()
+        public async Task<ActionResult<ApiRes>> YsfJsapiOrderAsync()
         {
             //获取参数 & 验证
             YsfJsapiOrderRQ bizRQ = GetRQByWithMchSign<YsfJsapiOrderRQ>();
 
             // 统一下单接口
-            return UnifiedOrder(CS.PAY_WAY_CODE.YSF_JSAPI, bizRQ);
+            return await UnifiedOrderAsync(CS.PAY_WAY_CODE.YSF_JSAPI, bizRQ);
         }
     }
 }

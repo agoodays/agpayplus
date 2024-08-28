@@ -176,7 +176,7 @@ namespace AGooday.AgPay.Components.Third.Services
             mchInfoConfigContext.MchNo = mchInfo.MchNo;
             mchInfoConfigContext.MchType = mchInfo.Type;
             mchInfoConfigContext.MchInfo = mchInfo;
-            _mchAppService.GetByMchNo(mchNo).ToList().ForEach(mchApp =>
+            _mchAppService.GetByMchNoAsNoTracking(mchNo).ToList().ForEach(mchApp =>
             {
                 //1. 更新商户内appId集合
                 mchInfoConfigContext.PutMchApp(mchApp);
@@ -190,7 +190,7 @@ namespace AGooday.AgPay.Components.Third.Services
                     mchAppConfigContext.MchInfo = mchInfo;
                 }
             });
-            _mchStoreService.GetByMchNo(mchNo).ToList().ForEach(mchStore =>
+            _mchStoreService.GetByMchNoAsNoTracking(mchNo).ToList().ForEach(mchStore =>
             {
                 //1. 更新商户内门店集合
                 mchInfoConfigContext.PutMchStore(mchStore);

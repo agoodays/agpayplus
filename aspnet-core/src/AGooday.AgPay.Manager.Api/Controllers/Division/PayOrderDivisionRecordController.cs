@@ -64,9 +64,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECORD_VIEW)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var record = _payOrderDivisionRecordService.GetById(recordId);
+            var record = await _payOrderDivisionRecordService.GetByIdAsync(recordId);
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -82,9 +82,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECORD_RESEND)]
-        public ApiRes Resend(long recordId)
+        public async Task<ApiRes> ResendAsync(long recordId)
         {
-            var record = _payOrderDivisionRecordService.GetById(recordId);
+            var record = await _payOrderDivisionRecordService.GetByIdAsync(recordId);
             if (record == null)
             {
                 throw new BizException(ApiCode.SYS_OPERATION_FAIL_SELETE);

@@ -6,6 +6,7 @@ namespace AGooday.AgPay.Application.Interfaces
     public interface IPayOrderDivisionRecordService : IAgPayService<PayOrderDivisionRecordDto, long>
     {
         PayOrderDivisionRecordDto GetById(long recordId, string mchNo);
+        Task<PayOrderDivisionRecordDto> GetByIdAsNoTrackingAsync(long recordId, string mchNo);
         IEnumerable<PayOrderDivisionRecordDto> GetByPayOrderId(string payOrderId);
         List<PayOrderDivisionRecordDto> GetByBatchOrderId(PayOrderDivisionRecordQueryDto dto);
         PaginatedList<PayOrderDivisionRecordDto> GetPaginatedData(PayOrderDivisionRecordQueryDto dto);

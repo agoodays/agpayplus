@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新增支付接口")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_ADD)]
-        public ApiRes Add(PayInterfaceDefineAddOrEditDto dto)
+        public async Task<ApiRes> AddAsync(PayInterfaceDefineAddOrEditDto dto)
         {
             JArray jsonArray = new JArray();
             var wayCodes = dto.WayCodeStrs.Split(",");
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 jsonArray.Add(value);
             }
             dto.WayCodes = jsonArray;
-            var result = _payIfDefineService.Add(dto);
+            var result = await _payIfDefineService.AddAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -132,9 +132,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("{ifCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_VIEW, PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
-        public ApiRes Detail(string ifCode)
+        public async Task<ApiRes> DetailAsync(string ifCode)
         {
-            var payIfDefine = _payIfDefineService.GetById(ifCode);
+            var payIfDefine = await _payIfDefineService.GetByIdAsync(ifCode);
             if (payIfDefine == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

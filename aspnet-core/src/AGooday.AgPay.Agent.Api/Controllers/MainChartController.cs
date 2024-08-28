@@ -38,10 +38,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_CURRENT_INFO)]
-        public ApiRes AgentInfo()
+        public async Task<ApiRes> AgentInfoAsync()
         {
             var sysUser = _authService.GetUserById(GetCurrentUser().SysUser.SysUserId);
-            var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
+            var agentInfo = await _agentInfoService.GetByIdAsync(GetCurrentAgentNo());
             //var jobj = JObject.FromObject(agentInfo);
             //jobj.Add("loginUsername", sysUser.LoginUsername);
             //jobj.Add("realname", sysUser.Realname);

@@ -34,9 +34,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         /// <returns></returns>
         [HttpPut, Route("agentSipw"), MethodLog("更改支付密码")]
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_CONFIG_EDIT)]
-        public ApiRes SetAgentSipw(ModifyAgentSipw model)
+        public async Task<ApiRes> SetAgentSipwAsync(ModifyAgentSipw model)
         {
-            var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
+            var agentInfo = await _agentInfoService.GetByIdAsync(GetCurrentAgentNo());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);
             if (!string.IsNullOrWhiteSpace(agentInfo.Sipw))
             {
@@ -64,9 +64,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("hasSipwValidate"), NoLog]
-        public ApiRes HasSipwValidate()
+        public async Task<ApiRes> HasSipwValidateAsync()
         {
-            var agentInfo = _agentInfoService.GetById(GetCurrentAgentNo());
+            var agentInfo = await _agentInfoService.GetByIdAsync(GetCurrentAgentNo());
             return ApiRes.Ok(!string.IsNullOrWhiteSpace(agentInfo.Sipw));
         }
     }

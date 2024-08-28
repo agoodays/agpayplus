@@ -1,17 +1,14 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Division
 {
@@ -26,10 +23,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         private readonly IMchDivisionReceiverService _mchDivisionReceiverService;
         private readonly IMchDivisionReceiverGroupService _mchDivisionReceiverGroupService;
 
-        public MchDivisionReceiverGroupController(ILogger<MchDivisionReceiverGroupController> logger, 
+        public MchDivisionReceiverGroupController(ILogger<MchDivisionReceiverGroupController> logger,
             IMchInfoService mchInfoService,
             IMchDivisionReceiverService mchDivisionReceiverService,
-            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService, 
+            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)
@@ -65,9 +62,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_GROUP_VIEW)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var record = _mchDivisionReceiverGroupService.GetById(recordId);
+            var record = await _mchDivisionReceiverGroupService.GetByIdAsync(recordId);
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -82,7 +79,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新增分账账号组")]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_GROUP_ADD)]
-        public ApiRes Add(MchDivisionReceiverGroupDto dto)
+        public async Task<ApiRes> AddAsync(MchDivisionReceiverGroupDto dto)
         {
             if (!_mchInfoService.IsExistMchNo(dto.MchNo))
             {
@@ -92,7 +89,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
 
-            var result = _mchDivisionReceiverGroupService.Add(dto);
+            var result = await _mchDivisionReceiverGroupService.AddAsync(dto);
             if (result)
             {
                 // 更新其他组为非默认分账组
@@ -145,9 +142,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         [HttpDelete, Route("{recordId}"), MethodLog("删除分账账号组")]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_GROUP_DELETE)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var record = _mchDivisionReceiverGroupService.GetById(recordId);
+            var record = await _mchDivisionReceiverGroupService.GetByIdAsync(recordId);
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

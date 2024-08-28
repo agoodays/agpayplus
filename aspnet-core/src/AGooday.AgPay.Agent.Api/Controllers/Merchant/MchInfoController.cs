@@ -126,14 +126,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("{mchNo}"), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_INFO_VIEW, PermCode.AGENT.ENT_MCH_INFO_EDIT)]
-        public ApiRes Detail(string mchNo)
+        public async Task<ApiRes> DetailAsync(string mchNo)
         {
-            var mchInfo = _mchInfoService.GetById(mchNo);
+            var mchInfo = await _mchInfoService.GetByIdAsync(mchNo);
             if (mchInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var sysUser = _sysUserService.GetById(mchInfo.InitUserId.Value);
+            var sysUser = await _sysUserService.GetByIdAsync(mchInfo.InitUserId.Value);
             if (sysUser != null)
             {
                 mchInfo.AddExt("loginUsername", sysUser.LoginUsername);

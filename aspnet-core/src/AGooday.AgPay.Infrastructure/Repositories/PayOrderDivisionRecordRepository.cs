@@ -2,6 +2,7 @@
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -10,6 +11,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public PayOrderDivisionRecordRepository(AgPayDbContext context)
             : base(context)
         {
+        }
+
+        public async Task<PayOrderDivisionRecord> GetByIdAsNoTrackingAsync(long recordId, string mchNo)
+        {
+            return await GetAllAsNoTracking().FirstOrDefaultAsync(w => w.RecordId.Equals(recordId) && w.MchNo.Equals(mchNo));
         }
 
         public long SumSuccessDivisionAmount(string payOrderId)

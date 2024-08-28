@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         [HttpPost]
         [Route("api/transfer/notify/{ifCode}")]
         [Route("api/transfer/notify/{ifCode}/{transferId}")]
-        public ActionResult DoNotify(string ifCode, string transferId)
+        public async Task<ActionResult> DoNotifyAsync(string ifCode, string transferId)
         {
             string urlOrderId = transferId;
             string logPrefix = $"进入[{ifCode}]转账回调：urlOrderId：[{urlOrderId}]";
@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 _logger.LogInformation($"{logPrefix}, 解析数据为：transferId:{transferId}, params:{mutablePair.First().Key}");
 
                 // 获取转账单号和转账单数据
-                TransferOrderDto transferOrder = _transferOrderService.GetById(transferId);
+                TransferOrderDto transferOrder = await _transferOrderService.GetByIdAsync(transferId);
 
                 // 转账单不存在
                 if (transferOrder == null)
@@ -100,13 +100,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                     {
                         // 转账成功
                         _transferOrderService.UpdateIng2Success(transferId, notifyResult.ChannelOrderId);
-                        _payMchNotifyService.TransferOrderNotify(_transferOrderService.GetById(transferId));
+                        _payMchNotifyService.TransferOrderNotify(await _transferOrderService.GetByIdAsync(transferId));
                     }
                     else if (notifyResult.ChannelState == ChannelState.CONFIRM_FAIL)
                     {
                         // 转账失败
                         _transferOrderService.UpdateIng2Fail(transferId, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.ChannelErrCode);
-                        _payMchNotifyService.TransferOrderNotify(_transferOrderService.GetById(transferId));
+                        _payMchNotifyService.TransferOrderNotify(await _transferOrderService.GetByIdAsync(transferId));
                     }
                 }
 

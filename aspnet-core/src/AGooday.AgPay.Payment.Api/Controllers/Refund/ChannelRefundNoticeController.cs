@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         [HttpPost]
         [Route("api/refund/notify/{ifCode}")]
         [Route("api/refund/notify/{ifCode}/{refundOrderId}")]
-        public ActionResult DoNotify(string ifCode, string refundOrderId, string urlOrderId)
+        public async Task<ActionResult> DoNotifyAsync(string ifCode, string refundOrderId, string urlOrderId)
         {
             string logPrefix = $"进入[{ifCode}]退款回调：urlOrderId：[{urlOrderId}] ";
             _logger.LogInformation($"===== {logPrefix} =====");
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 //获取订单号 和 订单数据
-                RefundOrderDto refundOrder = refundOrderService.GetById(refundOrderId);
+                RefundOrderDto refundOrder = await refundOrderService.GetByIdAsync(refundOrderId);
 
                 // 订单不存在
                 if (refundOrder == null)

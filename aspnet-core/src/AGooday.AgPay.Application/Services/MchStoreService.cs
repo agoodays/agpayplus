@@ -35,24 +35,36 @@ namespace AGooday.AgPay.Application.Services
 
         public MchStoreDto GetById(long recordId, string mchNo)
         {
-            var entity = _mchStoreRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.StoreId.Equals(recordId)).FirstOrDefault();
+            var entity = _mchStoreRepository.GetById(recordId, mchNo);
             return _mapper.Map<MchStoreDto>(entity);
         }
 
-        public MchStoreDto GetByIdAsNoTracking(long recordId)
+        public async Task<MchStoreDto> GetByIdAsync(long recordId, string mchNo)
         {
-            var entity = _mchStoreRepository.GetByIdAsNoTracking(recordId);
+            var entity = await _mchStoreRepository.GetByIdAsync(recordId, mchNo);
+            return _mapper.Map<MchStoreDto>(entity);
+        }
+
+        public async Task<MchStoreDto> GetByIdAsNoTrackingAsync(long recordId, string mchNo)
+        {
+            var entity = await _mchStoreRepository.GetByIdAsNoTrackingAsync(recordId, mchNo);
+            return _mapper.Map<MchStoreDto>(entity);
+        }
+
+        public async Task<MchStoreDto> GetByIdAsNoTrackingAsync(long recordId)
+        {
+            var entity = await _mchStoreRepository.GetByIdAsNoTrackingAsync(recordId);
             var dto = _mapper.Map<MchStoreDto>(entity);
             return dto;
         }
 
-        public IEnumerable<MchStoreDto> GetByMchNo(string mchNo)
+        public IEnumerable<MchStoreDto> GetByMchNoAsNoTracking(string mchNo)
         {
             var mchStores = _mchStoreRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
             return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
         }
 
-        public IEnumerable<MchStoreDto> GetByStoreIds(IEnumerable<long?> storeIds)
+        public IEnumerable<MchStoreDto> GetByStoreIdsAsNoTracking(IEnumerable<long?> storeIds)
         {
             var mchStores = _mchStoreRepository.GetAllAsNoTracking().Where(w => storeIds.Contains(w.StoreId));
             return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);

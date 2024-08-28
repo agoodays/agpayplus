@@ -38,10 +38,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_INFO)]
-        public ApiRes MchInfo()
+        public async Task<ApiRes> MchInfoAsync()
         {
-            var sysUser = _sysUserService.GetById(GetCurrentUser().SysUser.SysUserId);
-            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
+            var sysUser = await _sysUserService.GetByIdAsync(GetCurrentUser().SysUser.SysUserId);
+            var mchInfo = await _mchInfoService.GetByIdAsync(GetCurrentMchNo());
             //var jobj = JObject.FromObject(mchInfo);
             //jobj.Add("loginUsername", sysUser.LoginUsername);
             //jobj.Add("realname", sysUser.Realname);

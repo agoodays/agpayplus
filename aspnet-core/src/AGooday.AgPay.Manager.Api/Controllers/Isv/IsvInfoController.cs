@@ -64,12 +64,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新增服务商")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_ADD)]
-        public ApiRes Add(IsvInfoDto dto)
+        public async Task<ApiRes> AddAsync(IsvInfoDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
-            var result = _isvInfoService.Add(dto);
+            var result = await _isvInfoService.AddAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -84,10 +84,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <returns></returns>
         [HttpDelete, Route("{isvNo}"), MethodLog("删除服务商")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_DEL)]
-        public ApiRes Delete(string isvNo)
+        public async Task<ApiRes> DeleteAsync(string isvNo)
         {
             // 0.当前服务商是否存在
-            var isvInfo = _isvInfoService.GetById(isvNo);
+            var isvInfo = await _isvInfoService.GetByIdAsync(isvNo);
             if (isvInfo == null)
             {
                 throw new BizException("该服务商不存在");
@@ -145,9 +145,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <returns></returns>
         [HttpGet, Route("{isvNo}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_VIEW, PermCode.MGR.ENT_ISV_INFO_EDIT)]
-        public ApiRes Detail(string isvNo)
+        public async Task<ApiRes> DetailAsync(string isvNo)
         {
-            var isvInfo = _isvInfoService.GetById(isvNo);
+            var isvInfo = await _isvInfoService.GetByIdAsync(isvNo);
             if (isvInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

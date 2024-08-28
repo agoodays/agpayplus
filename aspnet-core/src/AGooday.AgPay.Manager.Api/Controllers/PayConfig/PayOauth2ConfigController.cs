@@ -45,12 +45,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("diyList"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_OAUTH2_CONFIG_VIEW, PermCode.MGR.ENT_AGENT_PAY_CONFIG_VIEW)]
-        public ApiRes List(string configMode, string infoId)
+        public async Task<ApiRes> ListAsync(string configMode, string infoId)
         {
             List<object> result = new List<object>();
             if (configMode.Equals(CS.CONFIG_MODE.MGR_AGENT) || configMode.Equals(CS.CONFIG_MODE.AGENT_SUBAGENT))
             {
-                var agentInfo = _agentInfoService.GetById(infoId);
+                var agentInfo = await _agentInfoService.GetByIdAsync(infoId);
                 infoId = agentInfo.IsvNo;
                 result.Add(new { InfoId = infoId, Remark = "服务商默认" });
             }
@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("savedConfigs"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_OAUTH2_CONFIG_VIEW, PermCode.MGR.ENT_MCH_OAUTH2_CONFIG_VIEW)]
-        public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
+        public async Task<ApiRes> GetByInfoIdAsync(string configMode, string infoId, string ifCode)
         {
             string infoType = GetInfoType(configMode);
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
@@ -126,8 +126,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                     }
                     break;
                 case CS.INFO_TYPE.MCH_APP_OAUTH2:
-                    var mchApp = _mchAppService.GetById(infoId);
-                    var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+                    var mchApp = await _mchAppService.GetByIdAsync(infoId);
+                    var mchInfo = await _mchInfoService.GetByIdAsync(mchApp.MchNo);
                     // 敏感数据脱敏
                     if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
                     {

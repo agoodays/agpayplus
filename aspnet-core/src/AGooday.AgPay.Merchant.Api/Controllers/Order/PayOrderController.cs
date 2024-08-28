@@ -203,9 +203,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("{payOrderId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_PAY_ORDER_VIEW)]
-        public ApiRes Detail(string payOrderId)
+        public async Task<ApiRes> DetailAsync(string payOrderId)
         {
-            var payOrder = _payOrderService.GetById(payOrderId);
+            var payOrder = await _payOrderService.GetByIdAsync(payOrderId);
             if (payOrder == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -225,9 +225,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// <returns></returns>
         [HttpPost, Route("refunds/{payOrderId}"), MethodLog("发起订单退款")]
         [PermissionAuth(PermCode.MCH.ENT_PAY_ORDER_REFUND)]
-        public ApiRes Refund(string payOrderId, RefundOrderModel refundOrder)
+        public async Task<ApiRes> RefundAsync(string payOrderId, RefundOrderModel refundOrder)
         {
-            var payOrder = _payOrderService.GetById(payOrderId);
+            var payOrder = await _payOrderService.GetByIdAsync(payOrderId);
             if (payOrder == null || !payOrder.MchNo.Equals(GetCurrentMchNo()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -240,7 +240,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             {
                 throw new BizException("退款金额超过订单可退款金额！");
             }
-            var mchInfo = _mchInfoService.GetById(GetCurrentMchNo());
+            var mchInfo = await _mchInfoService.GetByIdAsync(GetCurrentMchNo());
             if (string.IsNullOrWhiteSpace(mchInfo.Sipw))
             {
                 throw new BizException("当前未设置支付密码，请进入[系统管理-系统配置-安全管理]设置支付密码！");
@@ -265,12 +265,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             model.ClientIp = IpUtil.GetIP(Request);
             request.SetBizModel(model);
 
-            var mchApp = _mchAppService.GetById(payOrder.AppId);
+            var mchApp = await _mchAppService.GetByIdAsync(payOrder.AppId);
 
             var agpayClient = new AgPayClient(_sysConfigService.GetDBApplicationConfig().PaySiteUrl, mchApp.AppSecret);
             try
             {
-                var response = agpayClient.Execute(request);
+                var response = await agpayClient.ExecuteAsync(request);
                 if (response.Code != 0)
                 {
                     throw new BizException(response.Msg);

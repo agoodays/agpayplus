@@ -211,9 +211,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("{payOrderId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PAY_ORDER_VIEW)]
-        public ApiRes Detail(string payOrderId)
+        public async Task<ApiRes> DetailAsync(string payOrderId)
         {
-            var payOrder = _payOrderService.GetById(payOrderId);
+            var payOrder = await _payOrderService.GetByIdAsync(payOrderId);
             if (payOrder == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -235,9 +235,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpPost, Route("refunds/{payOrderId}"), MethodLog("发起订单退款")]
         [PermissionAuth(PermCode.MGR.ENT_PAY_ORDER_REFUND)]
-        public ApiRes Refund(string payOrderId, RefundOrderModel refundOrder)
+        public async Task<ApiRes> RefundAsync(string payOrderId, RefundOrderModel refundOrder)
         {
-            var payOrder = _payOrderService.GetById(payOrderId);
+            var payOrder = await _payOrderService.GetByIdAsync(payOrderId);
             if (payOrder == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -263,12 +263,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             model.Currency = "CNY";
             request.SetBizModel(model);
 
-            var mchApp = _mchAppService.GetById(payOrder.AppId);
+            var mchApp = await _mchAppService.GetByIdAsync(payOrder.AppId);
 
             var agpayClient = new AgPayClient(_sysConfigService.GetDBApplicationConfig().PaySiteUrl, mchApp.AppSecret);
             try
             {
-                var response = agpayClient.Execute(request);
+                var response = await agpayClient.ExecuteAsync(request);
                 if (response.Code != 0)
                 {
                     throw new BizException(response.Msg);

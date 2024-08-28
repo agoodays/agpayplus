@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         /// <returns></returns>
         [HttpPost, Route("api/refund/refundOrder")]
         [PermissionAuth(PermCode.PAY.API_REFUND_ORDER)]
-        public ApiRes RefundOrder()
+        public async Task<ApiRes> RefundOrderAsync()
         {
             RefundOrderDto refundOrder = null;
 
@@ -140,13 +140,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 refundOrder = GenRefundOrder(rq, payOrder, mchAppConfigContext, refundService);
 
                 //退款单入库 退款单状态：生成状态  此时没有和任何上游渠道产生交互。
-                _refundOrderService.Add(refundOrder);
+                await _refundOrderService.AddAsync(refundOrder);
 
                 // 调起退款接口
                 ChannelRetMsg channelRetMsg = refundService.Refund(rq, refundOrder, payOrder, mchAppConfigContext);
 
                 //处理退款单状态
-                this.ProcessChannelMsg(channelRetMsg, refundOrder);
+                await ProcessChannelMsg(channelRetMsg, refundOrder);
 
                 RefundOrderRS bizRes = RefundOrderRS.BuildByRefundOrder(refundOrder);
                 return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
@@ -158,7 +158,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             catch (ChannelException e)
             {
                 //处理上游返回数据
-                this.ProcessChannelMsg(e.ChannelRetMsg, refundOrder);
+                await ProcessChannelMsg(e.ChannelRetMsg, refundOrder);
 
                 if (e.ChannelRetMsg.ChannelState == ChannelState.SYS_ERROR)
                 {
@@ -236,7 +236,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         /// <param name="channelRetMsg"></param>
         /// <param name="refundOrder"></param>
         /// <exception cref="BizException"></exception>
-        private void ProcessChannelMsg(ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder)
+        private async Task ProcessChannelMsg(ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder)
         {
             //对象为空 || 上游返回状态为空， 则无需操作
             if (channelRetMsg == null || channelRetMsg.ChannelState == null)
@@ -249,13 +249,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             {
                 this.UpdateInitOrderStateThrowException((byte)RefundOrderState.STATE_SUCCESS, refundOrder, channelRetMsg);
                 _refundOrderProcessService.UpdatePayOrderProfitAndGenAccountBill(refundOrder);
-                _payMchNotifyService.RefundOrderNotify(_refundOrderService.GetById(refundOrder.RefundOrderId));
+                _payMchNotifyService.RefundOrderNotify(await _refundOrderService.GetByIdAsync(refundOrder.RefundOrderId));
             }
             //明确失败
             else if (ChannelState.CONFIRM_FAIL == channelRetMsg.ChannelState)
             {
                 this.UpdateInitOrderStateThrowException((byte)RefundOrderState.STATE_FAIL, refundOrder, channelRetMsg);
-                _payMchNotifyService.RefundOrderNotify(_refundOrderService.GetById(refundOrder.RefundOrderId));
+                _payMchNotifyService.RefundOrderNotify(await _refundOrderService.GetByIdAsync(refundOrder.RefundOrderId));
             }
             // 上游处理中 || 未知 || 上游接口返回异常  退款单为退款中状态
             else if (ChannelState.WAITING == channelRetMsg.ChannelState ||

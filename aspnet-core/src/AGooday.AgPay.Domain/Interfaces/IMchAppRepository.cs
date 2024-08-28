@@ -4,6 +4,8 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IMchAppRepository : IAgPayRepository<MchApp>
     {
-        MchApp GetAsNoTrackingById(string id);
+        MchApp GetByIdAsNoTracking(string recordId);
+        MchApp GetById(string recordId, string mchNo);
+        MchApp GetByIdAsNoTracking(string recordId, string mchNo);
     }
 }

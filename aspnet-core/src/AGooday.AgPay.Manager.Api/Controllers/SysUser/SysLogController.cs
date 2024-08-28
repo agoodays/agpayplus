@@ -67,9 +67,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route("{sysLogId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_SYS_LOG_VIEW)]
-        public ApiRes Detail(long sysLogId)
+        public async Task<ApiRes> DetailAsync(long sysLogId)
         {
-            var sysLog = _sysLogService.GetById(sysLogId);
+            var sysLog = await _sysLogService.GetByIdAsync(sysLogId);
             if (sysLog == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

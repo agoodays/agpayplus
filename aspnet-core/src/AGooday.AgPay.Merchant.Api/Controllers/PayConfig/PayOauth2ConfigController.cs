@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("savedConfigs"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_OAUTH2_CONFIG_VIEW)]
-        public ApiRes GetByInfoId(string configMode, string infoId, string ifCode)
+        public async Task<ApiRes> GetByInfoIdAsync(string configMode, string infoId, string ifCode)
         {
             string infoType = GetInfoType(configMode);
             var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
@@ -66,8 +66,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                     }
                     break;
                 case CS.INFO_TYPE.MCH_APP_OAUTH2:
-                    var mchApp = _mchAppService.GetById(infoId);
-                    var mchInfo = _mchInfoService.GetById(mchApp.MchNo);
+                    var mchApp = await _mchAppService.GetByIdAsync(infoId);
+                    var mchInfo = await _mchInfoService.GetByIdAsync(mchApp.MchNo);
                     // 敏感数据脱敏
                     if (!string.IsNullOrWhiteSpace(payInterfaceConfig.IfParams))
                     {

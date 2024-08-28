@@ -51,13 +51,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新建文章")]
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_ADD)]
-        public ApiRes Add(SysArticleDto dto)
+        public async Task<ApiRes> AddAsync(SysArticleDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.ArticleType = (byte)ArticleType.NOTICE;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
-            var result = _sysArticleService.Add(dto);
+            var result = await _sysArticleService.AddAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -72,9 +72,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除文章")]
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_DEL)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var sysArticle = _sysArticleService.GetById(recordId);
+            var sysArticle = await _sysArticleService.GetByIdAsync(recordId);
             if (sysArticle == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -109,9 +109,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_VIEW, PermCode.MGR.ENT_NOTICE_EDIT)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var sysArticle = _sysArticleService.GetById(recordId);
+            var sysArticle = await _sysArticleService.GetByIdAsync(recordId);
             if (sysArticle == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             var storeIds = data.Select(s => s.StoreId).Distinct().ToList();
             var mchInfos = _mchInfoService.GetByMchNos(mchNos);
             var mchApps = _mchAppService.GetByAppIds(appIds);
-            var mchStores = _mchStoreService.GetByStoreIds(storeIds);
+            var mchStores = _mchStoreService.GetByStoreIdsAsNoTracking(storeIds);
             foreach (var item in data)
             {
                 item.AddExt("mchName", mchInfos?.FirstOrDefault(s => s.MchNo == item.MchNo)?.MchName);
@@ -187,9 +187,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_VIEW, PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
-        public ApiRes Detail(string recordId)
+        public async Task<ApiRes> DetailAsync(string recordId)
         {
-            var qrCode = _qrCodeService.GetById(recordId);
+            var qrCode = await _qrCodeService.GetByIdAsync(recordId);
             if (qrCode == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -199,15 +199,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
 
         [HttpGet, Route("view/{recordId}")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_VIEW, PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
-        public ApiRes View(string recordId)
+        public async Task<ApiRes> ViewAsync(string recordId)
         {
-            var qrCode = _qrCodeService.GetById(recordId);
+            var qrCode = await _qrCodeService.GetByIdAsync(recordId);
             byte[] inArray;
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
             string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, qrCode.QrcId));
             if (qrCode.QrcShellId.HasValue)
             {
-                var qrCodeShell = _qrCodeShellService.GetById(qrCode.QrcShellId.Value);
+                var qrCodeShell = await _qrCodeShellService.GetByIdAsync(qrCode.QrcShellId.Value);
                 inArray = GetBitmap(qrCodeShell, payUrl, $"No.{qrCode.QrcId}");
             }
             else

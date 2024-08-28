@@ -30,9 +30,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         }
 
         [HttpPost, Route("payOrder")]
-        public async Task<ActionResult> PayOrderNotify(PayOrderNotifyModel payOrderNotify)
+        public async Task<ActionResult> PayOrderNotifyAsync(PayOrderNotifyModel payOrderNotify)
         {
-            var mchApp = _mchAppService.GetById(payOrderNotify.AppId);
+            var mchApp = await _mchAppService.GetByIdAsync(payOrderNotify.AppId);
             if (mchApp == null || !mchApp.MchNo.Equals(payOrderNotify.MchNo))
             {
                 return Content("app is not exists");
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             msg.Add("errMsg", payOrderNotify.ErrMsg);
 
             //推送到前端
-            await _wsPayOrderServer.SendMsgByOrderId(payOrderNotify.PayOrderId, msg.ToString(Formatting.None));
+            await _wsPayOrderServer.SendMsgByOrderIdAsync(payOrderNotify.PayOrderId, msg.ToString(Formatting.None));
 
             return Content("SUCCESS");
         }

@@ -26,9 +26,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
 
         private readonly DomainNotificationHandler _notifications;
 
-        public AgentInfoController(IMQSender mqSender, ILogger<AgentInfoController> logger, 
+        public AgentInfoController(IMQSender mqSender, ILogger<AgentInfoController> logger,
             INotificationHandler<DomainNotification> notifications,
-            IAgentInfoService agentInfoService, 
+            IAgentInfoService agentInfoService,
             RedisUtil client,
             ISysUserService sysUserService,
             IAuthService authService)
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         public async Task<ApiRes> AddAsync(AgentInfoCreateDto dto)
         {
             var agentNo = GetCurrentAgentNo();
-            var agentInfo = _agentInfoService.GetById(agentNo);
+            var agentInfo = await _agentInfoService.GetByIdAsync(agentNo);
             dto.Pid = agentInfo.AgentNo;
             dto.IsvNo = agentInfo.IsvNo;
             await _agentInfoService.CreateAsync(dto);
@@ -112,14 +112,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         /// <returns></returns>
         [HttpGet, Route("{agentNo}"), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_INFO_VIEW, PermCode.AGENT.ENT_AGENT_INFO_EDIT)]
-        public ApiRes Detail(string agentNo)
+        public async Task<ApiRes> DetailAsync(string agentNo)
         {
-            var agentInfo = _agentInfoService.GetById(agentNo);
+            var agentInfo = await _agentInfoService.GetByIdAsync(agentNo);
             if (agentInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var sysUser = _sysUserService.GetById(agentInfo.InitUserId.Value);
+            var sysUser = await _sysUserService.GetByIdAsync(agentInfo.InitUserId.Value);
             if (sysUser != null)
             {
                 agentInfo.AddExt("loginUsername", sysUser.LoginUsername);

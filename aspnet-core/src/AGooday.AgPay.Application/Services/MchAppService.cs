@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Application.Services
 
         public override bool Update(MchAppDto dto)
         {
-            var origin = _mchAppRepository.GetAsNoTrackingById(dto.AppId);
+            var origin = _mchAppRepository.GetByIdAsNoTracking(dto.AppId);
             var entity = _mapper.Map<MchApp>(dto);
             if (string.IsNullOrWhiteSpace(entity.AppSecret))
             {
@@ -44,13 +44,19 @@ namespace AGooday.AgPay.Application.Services
 
         public MchAppDto GetById(string recordId, string mchNo)
         {
-            var entity = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId)).FirstOrDefault();
+            var entity = _mchAppRepository.GetById(recordId, mchNo);
             return _mapper.Map<MchAppDto>(entity);
         }
 
-        public IEnumerable<MchAppDto> GetByMchNo(string mchNo)
+        public MchAppDto GetByIdAsNoTracking(string recordId, string mchNo)
         {
-            var mchApps = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(mchNo));
+            var entity = _mchAppRepository.GetByIdAsNoTracking(recordId, mchNo);
+            return _mapper.Map<MchAppDto>(entity);
+        }
+
+        public IEnumerable<MchAppDto> GetByMchNoAsNoTracking(string mchNo)
+        {
+            var mchApps = _mchAppRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
             return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
         }
 

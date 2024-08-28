@@ -101,12 +101,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpDelete, Route("{appId}"), MethodLog("删除应用")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_DEL)]
-        public ApiRes Delete(string appId)
+        public async Task<ApiRes> DeleteAsync(string appId)
         {
             _mchAppService.Remove(appId);
 
             // 推送mq到目前节点进行更新数据
-            var mchApp = _mchAppService.GetById(appId);
+            var mchApp = await _mchAppService.GetByIdAsync(appId);
             mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, appId));
 
             return ApiRes.Ok();
@@ -139,9 +139,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("{appId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_VIEW, PermCode.MCH.ENT_MCH_APP_EDIT)]
-        public ApiRes Detail(string appId)
+        public async Task<ApiRes> DetailAsync(string appId)
         {
-            var mchApp = _mchAppService.GetById(appId);
+            var mchApp = await _mchAppService.GetByIdAsync(appId);
             if (mchApp == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

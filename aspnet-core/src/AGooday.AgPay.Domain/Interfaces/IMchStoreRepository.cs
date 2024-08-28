@@ -4,6 +4,10 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IMchStoreRepository : IAgPayRepository<MchStore>
     {
-        MchStore GetByIdAsNoTracking(long recordId);
+        Task<MchStore> GetByIdAsync(long recordId);
+        Task<MchStore> GetByIdAsNoTrackingAsync(long recordId);
+        MchStore GetById(long recordId, string mchNo);
+        Task<MchStore> GetByIdAsync(long recordId, string mchNo);
+        Task<MchStore> GetByIdAsNoTrackingAsync(long recordId, string mchNo);
     }
 }

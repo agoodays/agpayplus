@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         [HttpPost]
         [Route("api/pay/return/{ifCode}")]
         [Route("api/pay/return/{ifCode}/{payOrderId}")]
-        public ActionResult DoReturn(string ifCode, string payOrderId)
+        public async Task<ActionResult> DoReturnAsync(string ifCode, string payOrderId)
         {
             string urlOrderId = payOrderId;
             string logPrefix = $"进入[{ifCode}]支付同步跳转：urlOrderId：[{payOrderId}] ";
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 //获取订单号 和 订单数据
-                PayOrderDto payOrder = payOrderService.GetById(payOrderId);
+                PayOrderDto payOrder = await payOrderService.GetByIdAsync(payOrderId);
 
                 // 订单不存在
                 if (payOrder == null)
@@ -161,7 +161,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         [HttpPost]
         [Route("api/pay/notify/{ifCode}")]
         [Route("api/pay/notify/{ifCode}/{payOrderId}")]
-        public ActionResult DoNotify(string ifCode, string payOrderId)
+        public async Task<ActionResult> DoNotifyAsync(string ifCode, string payOrderId)
         {
             string urlOrderId = payOrderId;
             string logPrefix = $"进入[{ifCode}]支付回调：urlOrderId：[{payOrderId}] ";
@@ -203,7 +203,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 //获取订单号 和 订单数据
-                PayOrderDto payOrder = payOrderService.GetById(payOrderId);
+                PayOrderDto payOrder = await payOrderService.GetByIdAsync(payOrderId);
 
                 // 订单不存在
                 if (payOrder == null)

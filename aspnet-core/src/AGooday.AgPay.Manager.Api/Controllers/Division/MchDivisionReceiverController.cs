@@ -63,9 +63,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
 
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_VIEW)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var record = _mchDivisionReceiverService.GetById(recordId);
+            var record = await _mchDivisionReceiverService.GetByIdAsync(recordId);
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -81,13 +81,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         [HttpPost, Route(""), MethodLog("新增分账接收账号")]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_ADD)]
-        public ApiRes Add(DivisionReceiverBindReqModel dto)
+        public async Task<ApiRes> AddAsync(DivisionReceiverBindReqModel dto)
         {
             if (!_mchInfoService.IsExistMchNo(dto.MchNo))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var mchApp = _mchAppService.GetById(dto.AppId);
+            var mchApp = await _mchAppService.GetByIdAsync(dto.AppId);
             if (mchApp == null || mchApp.State != CS.PUB_USABLE)
             {
                 throw new BizException("商户应用不存在或不可用");
@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
 
             try
             {
-                DivisionReceiverBindResponse response = agPayClient.Execute(request);
+                DivisionReceiverBindResponse response = await agPayClient.ExecuteAsync(request);
                 if (response.Code != 0)
                 {
                     throw new BizException(response.Msg);
@@ -151,9 +151,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除分账接收账号")]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_DELETE)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var record = _mchDivisionReceiverService.GetById(recordId);
+            var record = await _mchDivisionReceiverService.GetByIdAsync(recordId);
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

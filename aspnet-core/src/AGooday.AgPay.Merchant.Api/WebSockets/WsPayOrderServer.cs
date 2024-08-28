@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
         /// 实现服务器主动推送
         /// </summary>
         /// <param name="message"></param>
-        public async Task SendMessage(string message)
+        public async Task SendMessageAsync(string message)
         {
             var buff = Encoding.UTF8.GetBytes(message);
             var data = new ArraySegment<byte>(buff, 0, buff.Length);
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
         /// </summary>
         /// <param name="payOrderId"></param>
         /// <param name="msg"></param>
-        public async Task SendMsgByOrderId(string payOrderId, string msg)
+        public async Task SendMsgByOrderIdAsync(string payOrderId, string msg)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
                 {
                     try
                     {
-                        await item.SendMessage(msg);
+                        await item.SendMessageAsync(msg);
                     }
                     catch (Exception e)
                     {

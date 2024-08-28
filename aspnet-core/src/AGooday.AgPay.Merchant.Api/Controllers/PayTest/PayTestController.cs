@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_TEST_PAYWAY_LIST)]
         public ApiRes PayWayList(string appId)
         {
-            var payWays = _mchPayPassageService.GetMchPayPassageByAppId(GetCurrentMchNo(), appId)
+            var payWays = _mchPayPassageService.GetMchPayPassageByMchNoAndAppId(GetCurrentMchNo(), appId)
                 .Select(s => s.WayCode);
             return ApiRes.Ok(payWays);
         }
@@ -65,13 +65,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("payOrders")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_TEST_DO)]
-        public ApiRes DoPay(PayOrderModel payOrder)
+        public async Task<ApiRes> DoPayAsync(PayOrderModel payOrder)
         {
             if (string.IsNullOrWhiteSpace(payOrder.OrderTitle))
             {
                 throw new BizException("订单标题不能为空");
             }
-            var mchApp = _mchAppService.GetById(payOrder.AppId);
+            var mchApp = await _mchAppService.GetByIdAsync(payOrder.AppId);
             if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.AppId.Equals(payOrder.AppId))
             {
                 throw new BizException("商户应用不存在或不可用");
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
 
             try
             {
-                PayOrderCreateResponse response = agPayClient.Execute(request);
+                PayOrderCreateResponse response = await agPayClient.ExecuteAsync(request);
                 if (response.Code != 0)
                 {
                     throw new BizException(response.Msg);

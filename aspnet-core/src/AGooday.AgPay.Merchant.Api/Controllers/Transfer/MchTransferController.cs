@@ -63,9 +63,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
 
         [HttpGet, Route("channelUserId")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_TRANSFER_CHANNEL_USER, PermCode.MCH.ENT_DIVISION_RECEIVER_ADD)]
-        public ApiRes ChannelUserId(string appId, string ifCode, string extParam)
+        public async Task<ApiRes> ChannelUserIdAsync(string appId, string ifCode, string extParam)
         {
-            var mchApp = _mchAppService.GetById(appId);
+            var mchApp = await _mchAppService.GetByIdAsync(appId);
             if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentMchNo()))
             {
                 throw new BizException("商户应用不存在或不可用");
@@ -91,12 +91,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
 
         [HttpPost, Route("doTransfer")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_TEST_DO)]
-        public ApiRes DoTransfer(TransferOrderModel transferOrder)
+        public async Task<ApiRes> DoTransferAsync(TransferOrderModel transferOrder)
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<TransferOrderModel, TransferOrderCreateReqModel>());
             var mapper = config.CreateMapper();
             var model = mapper.Map<TransferOrderModel, TransferOrderCreateReqModel>(transferOrder);
-            var mchApp = _mchAppService.GetById(model.AppId);
+            var mchApp = await _mchAppService.GetByIdAsync(model.AppId);
             if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentMchNo()))
             {
                 throw new BizException("商户应用不存在或不可用");
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
 
             try
             {
-                TransferOrderCreateResponse response = agPayClient.Execute(request);
+                TransferOrderCreateResponse response = await agPayClient.ExecuteAsync(request);
                 if (response.Code != 0)
                 {
                     throw new BizException(response.Msg);
