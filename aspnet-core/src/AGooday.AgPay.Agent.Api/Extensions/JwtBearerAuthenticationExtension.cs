@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             });
         }
 
-        public static string IssueJwt(JwtSettings jwtSettings, TokenModelJwt tokenModel)
+        public static string IssueJwt(JwtSettings jwtSettings, JwtTokenModel tokenModel)
         {
             // 返回前端 accessToken
             var claimsIdentity = new ClaimsIdentity(new Claim[]
@@ -96,10 +96,10 @@ namespace AGooday.AgPay.Agent.Api.Extensions
         /// </summary>
         /// <param name="jwtStr"></param>
         /// <returns></returns>
-        public static TokenModelJwt SerializeJwt(string jwtStr)
+        public static JwtTokenModel SerializeJwt(string jwtStr)
         {
             var jwtHandler = new JwtSecurityTokenHandler();
-            TokenModelJwt tokenModelJwt = new TokenModelJwt();
+            JwtTokenModel tokenModelJwt = new JwtTokenModel();
 
             // token校验
             if (jwtStr.IsNotEmptyOrNull() && jwtHandler.CanReadToken(jwtStr))
@@ -145,7 +145,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
     /// <summary>
     /// 令牌
     /// </summary>
-    public class TokenModelJwt
+    public class JwtTokenModel
     {
         /// <summary>
         /// 系统用户ID

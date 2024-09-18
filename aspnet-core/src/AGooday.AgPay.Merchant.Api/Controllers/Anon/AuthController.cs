@@ -165,7 +165,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());
 
             // ·µ»ØÇ°¶Ë accessToken
-            TokenModelJwt tokenModel = new TokenModelJwt();
+            JwtTokenModel tokenModel = new JwtTokenModel();
             tokenModel.SysUserId = auth.SysUserId.ToString();
             tokenModel.AvatarUrl = auth.AvatarUrl;
             tokenModel.Realname = auth.Realname;
