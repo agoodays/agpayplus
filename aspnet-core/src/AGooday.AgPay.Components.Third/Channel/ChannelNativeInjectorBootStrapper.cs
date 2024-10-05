@@ -59,43 +59,8 @@ namespace AGooday.AgPay.Components.Third.Channel
         private static void ServiceRegister<TService>(IServiceCollection services)
             where TService : class
         {
-            ServiceRegister(services, typeof(TService));
+            ServiceRegister(services, typeof(TService), null, null);
             services.AddScoped<IChannelServiceFactory<TService>, ChannelServiceFactory<TService>>();
-        }
-
-        private static void ServiceRegister(IServiceCollection services, Type serviceType)
-        {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-
-            // 获取指定命名空间下的所有类
-            Type[] targetTypes = assembly.GetTypes()
-                .Where(type => type.BaseType != null && serviceType.IsAssignableFrom(type))
-                .ToArray();
-
-            // 注册所有类
-            foreach (Type implementationType in targetTypes)
-            {
-                string serviceKey;
-                // 查找无参构造函数
-                // ConstructorInfo constructorInfo = implementationType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
-                ConstructorInfo constructor = implementationType.GetConstructor(Type.EmptyTypes);
-                if (constructor != null)
-                {
-                    var instance = Activator.CreateInstance(implementationType);
-                    var getIfCodeMethod = implementationType.GetMethod("GetIfCode");
-                    serviceKey = getIfCodeMethod?.Invoke(instance, null)?.ToString();
-                }
-                else
-                {
-                    // 获取静态属性
-                    PropertyInfo ifCodePropertyInfo = implementationType.GetProperty("IfCode", BindingFlags.Public | BindingFlags.Static);
-                    serviceKey = ifCodePropertyInfo?.GetValue(null)?.ToString();
-                }
-                if (!string.IsNullOrEmpty(serviceKey))
-                {
-                    services.AddKeyedScoped(serviceType, serviceKey, implementationType);
-                }
-            }
         }
 
         private static void ServiceRegister<TService, TAbstractService>(IServiceCollection services, Action<Type> action = null)
@@ -112,7 +77,7 @@ namespace AGooday.AgPay.Components.Third.Channel
 
             // 获取指定命名空间下的所有类
             Type[] targetTypes = assembly.GetTypes()
-                .Where(type => type.BaseType == baseType && serviceType.IsAssignableFrom(type))
+                .Where(type => ((baseType == null && type.BaseType != null) || (baseType != null && type.BaseType == baseType)) && serviceType.IsAssignableFrom(type))
                 .ToArray();
 
             // 注册所有类
