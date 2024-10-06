@@ -4,7 +4,6 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Core.Bus;
-using AGooday.AgPay.Domain.Core.Models;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;

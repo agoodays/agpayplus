@@ -6,7 +6,7 @@ using AutoMapper;
 namespace AGooday.AgPay.Application.Services
 {
     /// <summary>
-    /// 账户帐单表 服务实现类
+    /// 泛型服务实现类
     /// </summary>
     public abstract class AgPayService<TDto, TEntity, TPrimaryKey> : IAgPayService<TDto, TPrimaryKey>
         where TDto : class

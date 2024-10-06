@@ -3,7 +3,6 @@
     /// <summary>
     /// 定义泛型仓储接口，并继承IDisposable，显式释放资源
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
     public interface IAgPayRepository<TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
         where TEntity : class
         where TPrimaryKey : struct

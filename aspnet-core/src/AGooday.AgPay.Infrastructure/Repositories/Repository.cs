@@ -71,6 +71,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <returns></returns>
         public virtual IQueryable<TEntity> GetAllAsNoTracking()
         {
+            // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
             return DbSet.AsNoTracking();
         }
         /// <summary>
@@ -90,7 +91,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <returns></returns>
         public virtual IQueryable<T> GetAllAsNoTracking<T>() where T : class
         {
-            return Db.Set<T>();
+            // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
+            return Db.Set<T>().AsNoTracking();
         }
         /// <summary>
         /// 根据对象进行更新
@@ -307,6 +309,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <returns></returns>
         public virtual IQueryable<TEntity> GetAllAsNoTracking()
         {
+            // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
             return DbSet.AsNoTracking();
         }
         /// <summary>
@@ -326,6 +329,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <returns></returns>
         public virtual IQueryable<T> GetAllAsNoTracking<T>() where T : class
         {
+            // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
             return Db.Set<T>().AsNoTracking();
         }
         /// <summary>
