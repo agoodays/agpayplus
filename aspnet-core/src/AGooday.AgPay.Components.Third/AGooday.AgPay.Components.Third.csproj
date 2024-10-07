@@ -13,11 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AlipaySDKNet.Standard" Version="4.9.249" />
+    <PackageReference Include="AlipaySDKNet.Standard" Version="4.9.280" />
     <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
     <PackageReference Include="SKIT.FlurlHttpClient.Wechat.Api" Version="3.5.0" />
     <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV2" Version="3.1.1" />
-    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="3.7.0" />
+    <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="3.8.0" />
   </ItemGroup>
 
   <ItemGroup>
