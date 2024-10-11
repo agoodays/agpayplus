@@ -53,24 +53,6 @@ namespace AGooday.AgPay.Application.Services
 
         public JObject Total(string agentNo, StatisticQueryDto dto)
         {
-            switch (dto.QueryDateType)
-            {
-                case "day":
-                    dto.CreatedStart ??= DateTime.Today.AddMonths(-1);
-                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
-                    break;
-                case "month":
-                    dto.CreatedStart ??= DateTime.Today.AddYears(-1);
-                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
-                    break;
-                case "year":
-                    dto.CreatedStart ??= DateTime.Today.AddYears(-1);
-                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
-                    break;
-                default:
-                    break;
-            }
-
             IEnumerable<AgentInfo> agents = _agentInfoRepository.GetAllOrSubAgents(agentNo);
             var agentNos = agentNo == null ? null : agents.Select(s => s.AgentNo);
             SelectOrderCount(dto, agentNos, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
@@ -102,47 +84,25 @@ namespace AGooday.AgPay.Application.Services
         {
             return dto.Method switch
             {
-                "transaction" => TransactionStatistics(agentNo, dto),
-                "mch" => MchStatistics(agentNo, dto),
-                "store" => StoreStatistics(dto),
-                "wayCode" => WayCodeStatistics(dto),
-                "wayType" => WayTypeStatistics(dto),
-                "agent" => AgentStatistics(agentNo, dto),
-                "isv" => IsvStatistics(dto),
-                "channel" => ChannelStatistics(dto),
+                StatisticCS.Method.TRANSACTION => TransactionStatistics(agentNo, dto),
+                StatisticCS.Method.MCH => MchStatistics(agentNo, dto),
+                StatisticCS.Method.STORE => StoreStatistics(dto),
+                StatisticCS.Method.WAY_CODE => WayCodeStatistics(dto),
+                StatisticCS.Method.WAY_TYPE => WayTypeStatistics(dto),
+                StatisticCS.Method.AGENT => AgentStatistics(agentNo, dto),
+                StatisticCS.Method.ISV => IsvStatistics(dto),
+                StatisticCS.Method.CHANNEL => ChannelStatistics(dto),
                 _ => throw new NotImplementedException()
             };
         }
 
         private PaginatedList<StatisticResultDto> TransactionStatistics(string agentNo, StatisticQueryDto dto)
         {
-            var format = "yyyy-MM-dd";
-            switch (dto.QueryDateType)
-            {
-                case "day":
-                    format = "yyyy-MM-dd";
-                    dto.CreatedStart ??= DateTime.Today.AddMonths(-1);
-                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
-                    break;
-                case "month":
-                    format = "yyyy-MM";
-                    dto.CreatedStart ??= DateTime.Today.AddYears(-1);
-                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
-                    break;
-                case "year":
-                    format = "yyyy";
-                    dto.CreatedStart ??= DateTime.Today.AddYears(-1);
-                    dto.CreatedEnd ??= DateTime.Today.AddSeconds(-1);
-                    break;
-                default:
-                    break;
-            }
-
             IEnumerable<AgentInfo> agents = _agentInfoRepository.GetSubAgents(agentNo);
             var agentNos = agents?.Select(s => s.AgentNo);
             SelectOrderCount(dto, agentNos, null, out IQueryable<PayOrder> payOrders, out IQueryable<RefundOrder> refundOrders);
 
-            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.CreatedAt.ToString(format))
+            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.CreatedAt.ToString(dto.Format))
                 .Select(s =>
                 {
                     var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
@@ -158,7 +118,7 @@ namespace AGooday.AgPay.Application.Services
                     };
                 });
 
-            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.CreatedAt.ToString(format))
+            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.CreatedAt.ToString(dto.Format))
                 .Select(s =>
                 {
                     IEnumerable<RefundOrder> refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));

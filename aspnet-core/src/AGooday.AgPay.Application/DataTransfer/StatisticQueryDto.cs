@@ -70,5 +70,55 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string QueryDateType { get; set; }
 
         public string Method { get; set; }
+
+        public string Format { get; set; } = "yyyy-MM-dd";
+
+        public override void BindDateRange()
+        {
+            base.BindDateRange();
+
+            switch (QueryDateType)
+            {
+                case StatisticCS.QueryDateType.DAY:
+                    Format = "yyyy-MM-dd";
+                    CreatedStart ??= DateTime.Today.AddMonths(-1);
+                    CreatedEnd ??= DateTime.Today.AddSeconds(-1);
+                    break;
+                case StatisticCS.QueryDateType.MONTH:
+                    Format = "yyyy-MM";
+                    CreatedStart ??= DateTime.Today.AddYears(-1);
+                    CreatedEnd ??= DateTime.Today.AddSeconds(-1);
+                    break;
+                case StatisticCS.QueryDateType.YEAR:
+                    Format = "yyyy";
+                    CreatedStart ??= DateTime.Today.AddYears(-1);
+                    CreatedEnd ??= DateTime.Today.AddSeconds(-1);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public class StatisticCS
+    {
+        public interface Method
+        {
+            public const string TRANSACTION = "transaction";
+            public const string MCH = "mch";
+            public const string STORE = "store";
+            public const string WAY_CODE = "wayCode";
+            public const string WAY_TYPE = "wayType";
+            public const string AGENT = "agent";
+            public const string ISV = "isv";
+            public const string CHANNEL = "channel";
+        }
+
+        public interface QueryDateType
+        {
+            public const string DAY = "day";
+            public const string MONTH = "month";
+            public const string YEAR = "year";
+        }
     }
 }

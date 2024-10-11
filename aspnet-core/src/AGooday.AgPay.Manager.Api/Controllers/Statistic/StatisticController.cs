@@ -83,14 +83,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
 
             string title = dto.Method switch
             {
-                "transaction" => "交易报表",
-                "mch" => "商户统计",
-                "store" => "门店统计",
-                "wayCode" => "支付方式统计",
-                "wayType" => "支付类型统计",
-                "agent" => "代理商统计",
-                "isv" => "服务商统计",
-                "channel" => "通道统计",
+                StatisticCS.Method.TRANSACTION => "交易报表",
+                StatisticCS.Method.MCH => "商户统计",
+                StatisticCS.Method.STORE => "门店统计",
+                StatisticCS.Method.WAY_CODE => "支付方式统计",
+                StatisticCS.Method.WAY_TYPE => "支付类型统计",
+                StatisticCS.Method.AGENT => "代理商统计",
+                StatisticCS.Method.ISV => "服务商统计",
+                StatisticCS.Method.CHANNEL => "通道统计",
                 _ => throw new NotImplementedException()
             };
             string fileName = $"{title}.xlsx";
@@ -98,32 +98,32 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             List<dynamic> excelHeaders = dto.Method switch
             {
-                "transaction" => new List<dynamic>() { new { Key = "groupDate", Width = 20d, Value = $"日期" } },
-                "mch" => new List<dynamic>() {
+                StatisticCS.Method.TRANSACTION => new List<dynamic>() { new { Key = "groupDate", Width = 20d, Value = $"日期" } },
+                StatisticCS.Method.MCH => new List<dynamic>() {
                     new { Key = "mchName", Width = 20d, Value = $"商户名称" },
                     new { Key = "mchNo", Width = 20d, Value = $"商户号" }
                 },
-                "store" => new List<dynamic>() {
+                StatisticCS.Method.STORE => new List<dynamic>() {
                     new { Key = "storeName", Width = 20d, Value = $"门店名称" },
                     new { Key = "storeId", Width = 20d, Value = $"门店ID" }
                 },
-                "wayCode" => new List<dynamic>() {
+                StatisticCS.Method.WAY_CODE => new List<dynamic>() {
                     new { Key = "wayName", Width = 20d, Value = $"支付方式名称" },
                     new { Key = "wayCode", Width = 20d, Value = $"支付方式代码" }
                 },
-                "wayType" => new List<dynamic>() {
+                StatisticCS.Method.WAY_TYPE => new List<dynamic>() {
                     new { Key = "wayTypeName", Width = 20d, Value = $"支付类型名称" },
                     new { Key = "wayType", Width = 20d, Value = $"支付类型代码" }
                 },
-                "agent" => new List<dynamic>() {
+                StatisticCS.Method.AGENT => new List<dynamic>() {
                     new { Key = "agentName", Width = 20d, Value = $"代理商名称" },
                     new { Key = "agentNo", Width = 20d, Value = $"代理商号" }
                 },
-                "isv" => new List<dynamic>() {
+                StatisticCS.Method.ISV => new List<dynamic>() {
                     new { Key = "isvName", Width = 20d, Value = $"服务商名称" },
                     new { Key = "isvNo", Width = 20d, Value = $"服务商号" }
                 },
-                "channel" => new List<dynamic>() {
+                StatisticCS.Method.CHANNEL => new List<dynamic>() {
                     new { Key = "ifName", Width = 20d, Value = $"通道名称" },
                     new { Key = "ifCode", Width = 20d, Value = $"通道代码" }
                 },
@@ -205,35 +205,35 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
 
         private void ChickAuth(string method)
         {
-            if (method.Equals("transaction", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_TRANSACTION))
+            if (method.Equals(StatisticCS.Method.TRANSACTION, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_TRANSACTION))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals("mch", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH))
+            if (method.Equals(StatisticCS.Method.MCH, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals("store", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_STORE))
+            if (method.Equals(StatisticCS.Method.STORE, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_STORE))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals("wayCode", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_CODE))
+            if (method.Equals(StatisticCS.Method.WAY_CODE, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_CODE))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals("wayType", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_TYPE))
+            if (method.Equals(StatisticCS.Method.WAY_TYPE, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_TYPE))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals("agent", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_AGENT))
+            if (method.Equals(StatisticCS.Method.AGENT, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_AGENT))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals("isv", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_ISV))
+            if (method.Equals(StatisticCS.Method.ISV, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_ISV))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals("channel", StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_CHANNEL))
+            if (method.Equals(StatisticCS.Method.CHANNEL, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_CHANNEL))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }

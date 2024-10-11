@@ -4,7 +4,7 @@ namespace AGooday.AgPay.Common.Models
 {
     public class DatePageQuery : PageQuery
     {
-        public void BindDateRange()
+        public virtual void BindDateRange()
         {
             QueryDateRange ??= string.Empty;
             DateUtil.GetQueryDateRange(QueryDateRange, out string createdStart, out string createdEnd);
