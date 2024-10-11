@@ -24,14 +24,14 @@ namespace AGooday.AgPay.Application.Services
             _isvInfoRepository = isvInfoRepository;
         }
 
-        public override bool Add(IsvInfoDto dto)
+        public override async Task<bool> AddAsync(IsvInfoDto dto)
         {
             do
             {
                 dto.IsvNo = SeqUtil.GenIsvNo();
             } while (IsExistIsvNo(dto.IsvNo));
             var m = _mapper.Map<IsvInfo>(dto);
-            _isvInfoRepository.Add(m);
+            await _isvInfoRepository.AddAsync(m);
             return _isvInfoRepository.SaveChanges(out int _);
         }
 
