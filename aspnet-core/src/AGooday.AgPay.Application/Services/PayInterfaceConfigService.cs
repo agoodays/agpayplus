@@ -217,8 +217,11 @@ namespace AGooday.AgPay.Application.Services
                     // 商户类型为特约商户，服务商应已经配置支付参数
                     isvConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking()
                         .Where(w => w.State.Equals(CS.YES) && w.InfoId.Equals(agentInfo.IsvNo) && w.InfoType.Equals(CS.INFO_TYPE.ISV) && !string.IsNullOrWhiteSpace(w.IfParams));
-                    ifCodes = GetAgentIfCodes(agentInfo, isApplyment);
-                    isvConfigList = isvConfigList.Where(s => ifCodes.Contains(s.IfCode));
+                    if (!string.IsNullOrEmpty(agentInfo.Pid))
+                    {
+                        ifCodes = GetAgentIfCodes(agentInfo, isApplyment);
+                        isvConfigList = isvConfigList.Where(s => ifCodes.Contains(s.IfCode));
+                    }
                     defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES) && isvConfigList.Select(s => s.IfCode).Contains(w.IfCode));
                     break;
                 default:
