@@ -14,8 +14,6 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.Kits
     /// </summary>
     public class AliPayKit
     {
-        public static IServiceProvider ServiceProvider { get; set; }
-
         /// <summary>
         /// 放置 isv特殊信息
         /// </summary>
@@ -30,7 +28,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.Kits
                 return;
             }
 
-            ConfigContextQueryService configContextQueryService = ServiceProvider.GetService<ConfigContextQueryService>();
+            ConfigContextQueryService configContextQueryService = ServiceResolver.GetService<ConfigContextQueryService>();
 
             // 获取支付参数
             AliPayIsvParams isvParams = (AliPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.ALIPAY);

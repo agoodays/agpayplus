@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Channel;
+using AGooday.AgPay.Components.Third.Models;
 using System.Reflection;
 
 namespace AGooday.AgPay.Components.Third.Utils
@@ -12,8 +13,6 @@ namespace AGooday.AgPay.Components.Third.Utils
     {
         private static readonly string PAYWAY_PACKAGE_NAME = "PayWay";
         private static readonly string PAYWAYV3_PACKAGE_NAME = "PayWayV3";
-
-        public static IServiceProvider ServiceProvider { get; set; }
 
         /// <summary>
         /// 获取真实的支付方式Service
@@ -95,7 +94,7 @@ namespace AGooday.AgPay.Components.Third.Utils
                 //IPaymentService paymentService = ServiceProvider.GetServices<IPaymentService>()
                 //    .FirstOrDefault(f => $"{f.GetType().Namespace}.{f.GetType().Name}".Equals(serviceName, StringComparison.OrdinalIgnoreCase));
                 var serviceKey = GetServiceKey(targetNamespace, RenameUtil.SnakeCaseToUpperCamelCase(wayCode));
-                var paymentService = ServiceProvider.GetRequiredKeyedService<IPaymentService>(serviceKey);
+                var paymentService = ServiceResolver.GetRequiredKeyedService<IPaymentService>(serviceKey);
                 if (paymentService == null)
                 {
                     throw new BizException("支付接口不支持该支付方式");

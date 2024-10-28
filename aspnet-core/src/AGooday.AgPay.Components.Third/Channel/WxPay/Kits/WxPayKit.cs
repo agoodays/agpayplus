@@ -15,8 +15,6 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.Kits
     /// </summary>
     public class WxPayKit
     {
-        public static IServiceProvider ServiceProvider { get; set; }
-
         /// <summary>
         /// 放置 isv特殊信息
         /// </summary>
@@ -30,7 +28,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.Kits
                 return;
             }
 
-            ConfigContextQueryService configContextQueryService = ServiceProvider.GetService<ConfigContextQueryService>();
+            ConfigContextQueryService configContextQueryService = ServiceResolver.GetService<ConfigContextQueryService>();
 
             WxPayIsvSubMchParams isvsubMchParams =
                 (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);

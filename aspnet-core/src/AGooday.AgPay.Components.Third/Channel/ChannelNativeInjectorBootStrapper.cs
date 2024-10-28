@@ -1,5 +1,4 @@
-﻿using AGooday.AgPay.Components.Third.Channel.AliPay.Kits;
-using AGooday.AgPay.Components.Third.Channel.WxPay.Kits;
+﻿using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.Utils;
 using System.Reflection;
 
@@ -47,13 +46,9 @@ namespace AGooday.AgPay.Components.Third.Channel
             ServiceRegister<ITransferNoticeService, AbstractTransferNoticeService>(services);
             #endregion
 
+            // 初始化静态 ServiceResolver
             var serviceProvider = services.BuildServiceProvider();
-            PayWayUtil.ServiceProvider = serviceProvider;
-            AliPayKit.ServiceProvider = serviceProvider;
-            WxPayKit.ServiceProvider = serviceProvider;
-
-            ChannelCertConfigKit.ServiceProvider = serviceProvider;
-            ChannelCertConfigKit.Initialize();
+            ServiceResolver.Initialize(serviceProvider);
         }
 
         private static void ServiceRegister<TService>(IServiceCollection services)
