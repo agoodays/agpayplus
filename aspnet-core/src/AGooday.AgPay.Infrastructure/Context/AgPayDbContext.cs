@@ -140,8 +140,11 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<AgentInfo>().Property(c => c.FreezeAmount).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<AgentInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)"); 
-            modelBuilder.Entity<AgentInfo>().HasMany(a => a.SubAgents)
-                .WithOne(a => a.ParentAgent).HasForeignKey(a => a.Pid);
+            modelBuilder.Entity<AgentInfo>()
+                .HasOne(a => a.ParentAgent)// 指定一个代理商可以有一个上级代理商
+                .WithMany(a => a.SubAgents)// 指定一个代理商可以有多个子代理商
+                .HasForeignKey(a => a.Pid)// 指定外键属性
+                .OnDelete(DeleteBehavior.Restrict); // 防止级联删除导致数据丢失;
             modelBuilder.Entity<IsvInfo>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<IsvInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<IsvInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");

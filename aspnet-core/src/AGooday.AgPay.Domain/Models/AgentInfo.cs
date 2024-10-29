@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Domain.Models
         public byte Level { get; set; }
 
         /// <summary>
-        /// 上级代理商号
+        /// 上级代理商号（外键属性）
         /// </summary>
         [Comment("上级代理商号")]
         [Column("pid", TypeName = "varchar(64)")]
@@ -263,7 +263,14 @@ namespace AGooday.AgPay.Domain.Models
         [Required, Column("updated_at", TypeName = "timestamp(6)")]
         public DateTime UpdatedAt { get; set; }
 
+        /// <summary>
+        /// 导航属性（上级代理商）
+        /// </summary>
         public virtual AgentInfo ParentAgent { get; set; }
+
+        /// <summary>
+        /// 子代理商集合
+        /// </summary>
         public virtual ICollection<AgentInfo> SubAgents { get; set; }
     }
 }
