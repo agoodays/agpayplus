@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
-using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -40,7 +39,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                     sql += "\nand pid.is_isv_mode = 1";
                     break;
             }
-            return Db.Database.FromSql<T>(sql, new
+            return FromSql<T>(sql, new
             {
                 WayCode = wayCode,
                 InfoType = infoType,

@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
+using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -239,6 +240,25 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return count > 0;
         }
 
+        #region FromSql
+        public virtual List<T> FromSql<T>(string sql, object parameters = null)
+        {
+            return Db.Database.FromSql<T>(sql, parameters);
+        }
+        public virtual IQueryable<TEntity> FromSql(FormattableString sql)
+        {
+            return DbSet.FromSql(sql);
+        }
+        public virtual IQueryable<TEntity> FromSqlRaw(string sql, object parameters = null)
+        {
+            return DbSet.FromSqlRaw(sql, parameters);
+        }
+        public virtual IQueryable<TEntity> FromSqlInterpolated(FormattableString sql)
+        {
+            return DbSet.FromSqlInterpolated(sql);
+        } 
+        #endregion
+
         public void Dispose()
         {
             Db.Dispose();
@@ -474,6 +494,25 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             count = Db.SaveChanges();
             return count > 0;
         }
+
+        #region FromSql
+        public virtual List<T> FromSql<T>(string sql, object parameters = null)
+        {
+            return Db.Database.FromSql<T>(sql, parameters);
+        }
+        public virtual IQueryable<TEntity> FromSql(FormattableString sql)
+        {
+            return DbSet.FromSql(sql);
+        }
+        public virtual IQueryable<TEntity> FromSqlRaw(string sql, object parameters = null)
+        {
+            return DbSet.FromSqlRaw(sql, parameters);
+        }
+        public virtual IQueryable<TEntity> FromSqlInterpolated(FormattableString sql)
+        {
+            return DbSet.FromSqlInterpolated(sql);
+        }
+        #endregion
 
         public void Dispose()
         {

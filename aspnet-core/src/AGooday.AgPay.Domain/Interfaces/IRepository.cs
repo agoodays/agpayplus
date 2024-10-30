@@ -106,6 +106,13 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="count"></param>
         /// <returns></returns>
         bool SaveChanges(out int count);
+
+        #region FromSql
+        List<T> FromSql<T>(string sql, object parameters = null);
+        IQueryable<TEntity> FromSql(FormattableString sql);
+        IQueryable<TEntity> FromSqlRaw(string sql, object parameters = null);
+        IQueryable<TEntity> FromSqlInterpolated(FormattableString sql);
+        #endregion
     }
     public interface IRepository<TEntity> : IDisposable
         where TEntity : class
@@ -205,6 +212,13 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="count"></param>
         /// <returns></returns>
         bool SaveChanges(out int count);
+
+        #region FromSql
+        List<T> FromSql<T>(string sql, object parameters = null);
+        IQueryable<TEntity> FromSql(FormattableString sql);
+        IQueryable<TEntity> FromSqlRaw(string sql, object parameters = null);
+        IQueryable<TEntity> FromSqlInterpolated(FormattableString sql);
+        #endregion
     }
     public interface IRepository : IDisposable
     {

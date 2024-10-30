@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         }
 
         /// <summary>
-        /// 重写自定义Map配置
+        /// 重写自定义Map配置（配置 Fluent API）
         /// </summary>
         /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)

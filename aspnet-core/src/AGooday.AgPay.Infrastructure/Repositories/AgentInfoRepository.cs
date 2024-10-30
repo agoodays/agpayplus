@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
-using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
@@ -170,7 +169,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
               SELECT t.* FROM t_agent_info t INNER JOIN sub_agents sa ON t.pid = sa.agent_no
             )
             SELECT * FROM sub_agents;";
-            return Db.Database.FromSql<AgentInfo>(sql, new
+            return FromSql<AgentInfo>(sql, new
             {
                 AgentNo = agentNo
             });
@@ -184,7 +183,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
               SELECT t.* FROM t_agent_info t INNER JOIN parent_agents pa ON t.agent_no = pa.pid
             )
             SELECT * FROM parent_agents;";
-            return Db.Database.FromSql<AgentInfo>(sql, new
+            return FromSql<AgentInfo>(sql, new
             {
                 AgentNo = agentNo
             });
