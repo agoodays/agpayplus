@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Linq.Expressions;
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
@@ -9,6 +10,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         where TEntity : class
         where TPrimaryKey : struct
     {
+        EntityEntry<TEntity> DbEntry(TEntity entity);
         /// <summary>
         /// 添加
         /// </summary>
@@ -117,6 +119,7 @@ namespace AGooday.AgPay.Domain.Interfaces
     public interface IRepository<TEntity> : IDisposable
         where TEntity : class
     {
+        EntityEntry<TEntity> DbEntry(TEntity entity);
         /// <summary>
         /// 添加
         /// </summary>

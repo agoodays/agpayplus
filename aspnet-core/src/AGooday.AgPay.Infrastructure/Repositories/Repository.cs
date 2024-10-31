@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
@@ -20,6 +21,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             Db = context;
             DbSet = Db.Set<TEntity>();
+        }
+
+        public virtual EntityEntry<TEntity> DbEntry(TEntity entity)
+        {
+            return Db.Entry(entity);
         }
 
         /// <summary>
@@ -256,7 +262,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public virtual IQueryable<TEntity> FromSqlInterpolated(FormattableString sql)
         {
             return DbSet.FromSqlInterpolated(sql);
-        } 
+        }
         #endregion
 
         public void Dispose()
@@ -275,6 +281,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             Db = context;
             DbSet = Db.Set<TEntity>();
+        }
+
+        public virtual EntityEntry<TEntity> DbEntry(TEntity entity)
+        {
+            return Db.Entry(entity);
         }
 
         /// <summary>

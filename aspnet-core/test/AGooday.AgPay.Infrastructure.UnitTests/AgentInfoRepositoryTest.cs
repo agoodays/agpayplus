@@ -76,6 +76,124 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         }
 
         [TestMethod]
+        public void GetAllParentAgentsTest(string agentNo = "A1702728742")
+        {
+            var agent = LoadAgentWithParents(agentNo);
+            if (agent == null)
+            {
+                throw new ArgumentException("代理商号不存在");
+            }
+
+            var parentAgents = new List<AgentInfo>();
+            while (agent.ParentAgent != null)
+            {
+                parentAgents.Add(agent.ParentAgent);
+                agent = agent.ParentAgent;
+            }
+            Assert.IsNotNull(parentAgents);
+        }
+
+        /// <summary>
+        /// 递归加载所有上级代理商
+        /// </summary>
+        /// <param name="agentNo">代理商号</param>
+        /// <returns>加载了所有上级代理商的 AgentInfo 对象</returns>
+        private AgentInfo LoadAgentWithParents(string agentNo)
+        {
+            var agent = _repository.GetAll()
+                .Include(a => a.ParentAgent)
+                .FirstOrDefault(a => a.AgentNo == agentNo);
+
+            if (agent?.ParentAgent != null)
+            {
+                LoadAgentWithParentsRecursive(agent.ParentAgent);
+            }
+
+            return agent;
+        }
+
+        /// <summary>
+        /// 递归加载所有上级代理商
+        /// </summary>
+        /// <param name="agent">当前代理商</param>
+        private void LoadAgentWithParentsRecursive(AgentInfo agent)
+        {
+            if (agent.ParentAgent != null)
+            {
+                _repository.DbEntry(agent).Reference(a => a.ParentAgent).Load();
+                LoadAgentWithParentsRecursive(agent.ParentAgent);
+            }
+        }
+
+        /// <summary>
+        /// 获取所有下级代理商
+        /// </summary>
+        /// <param name="agentNo">代理商号</param>
+        /// <returns>下级代理商列表</returns>
+        [TestMethod]
+        public void GetAllSubAgentsTest(string agentNo = "A1702728742")
+        {
+            var agent = LoadAgentWithSubAgents(agentNo);
+            if (agent == null)
+            {
+                throw new ArgumentException("代理商号不存在");
+            }
+
+            var subAgents = new List<AgentInfo>();
+            GetAllSubAgentsRecursive(agent, subAgents);
+
+            Assert.IsNotNull(subAgents);
+        }
+
+        /// <summary>
+        /// 递归加载所有下级代理商
+        /// </summary>
+        /// <param name="agentNo">代理商号</param>
+        /// <returns>加载了所有下级代理商的 AgentInfo 对象</returns>
+        private AgentInfo LoadAgentWithSubAgents(string agentNo)
+        {
+            var agent = _repository.GetAll()
+                .Include(a => a.SubAgents)
+                .FirstOrDefault(a => a.AgentNo == agentNo);
+
+            if (agent?.SubAgents != null && agent.SubAgents.Any())
+            {
+                LoadAgentWithSubAgentsRecursive(agent);
+            }
+
+            return agent;
+        }
+
+        /// <summary>
+        /// 递归加载所有下级代理商
+        /// </summary>
+        /// <param name="agent">当前代理商</param>
+        private void LoadAgentWithSubAgentsRecursive(AgentInfo agent)
+        {
+            if (agent.SubAgents != null && agent.SubAgents.Any())
+            {
+                foreach (var subAgent in agent.SubAgents)
+                {
+                    _repository.DbEntry(agent).Collection(a => a.SubAgents).Load();
+                    LoadAgentWithSubAgentsRecursive(subAgent);
+                }
+            }
+        }
+
+        private void GetAllSubAgentsRecursive(AgentInfo agent, List<AgentInfo> subAgents)
+        {
+            if (agent.SubAgents != null && agent.SubAgents.Any())
+            {
+                foreach (var subAgent in agent.SubAgents)
+                {
+                    subAgents.Add(subAgent);
+                    GetAllSubAgentsRecursive(subAgent, subAgents);
+                }
+            }
+        }
+
+
+        [TestMethod]
         public void GetAgentTest()
         {
             var agentInfo = _repository.GetAll()
