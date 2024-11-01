@@ -38,29 +38,9 @@ namespace AGooday.AgPay.Components.OSS.Controllers
             try
             {
                 OssFileConfig ossFileConfig = OssFileConfig.GetOssFileConfigByBizType(bizType);
+                ValidateFile(fileName, fileSize, ossFileConfig);
 
-                //1. 判断bizType 是否可用
-                if (ossFileConfig == null)
-                {
-                    throw new BizException("类型有误");
-                }
-
-                // 2. 判断文件是否支持
-                string suffix = Path.GetExtension(fileName);
-                string fileSuffix = FileUtil.GetFileSuffix(fileName, false);
-                if (!ossFileConfig.IsAllowFileSuffix(fileSuffix))
-                {
-                    throw new BizException("上传文件格式不支持！");
-                }
-
-                // 3. 判断文件大小是否超限
-                if (!ossFileConfig.IsMaxSizeLimit(fileSize))
-                {
-                    throw new BizException($"上传大小请限制在[{ossFileConfig.MaxSize / 1024 / 1024}M]以内！");
-                }
-
-                // 新文件地址 (xxx/xxx.jpg 格式)
-                string saveDirAndFileName = Path.Combine(bizType, $"{Guid.NewGuid():N}{Path.GetExtension(fileName)}");
+                string saveDirAndFileName = GetSaveDirAndFileName(bizType, fileName);
                 var formParams = await ossService.GetUploadFormParamsAsync(ossFileConfig.OssSavePlaceEnum, bizType, saveDirAndFileName);
                 return ApiRes.Ok(formParams);
             }
@@ -88,29 +68,11 @@ namespace AGooday.AgPay.Components.OSS.Controllers
             try
             {
                 OssFileConfig ossFileConfig = OssFileConfig.GetOssFileConfigByBizType(bizType);
+                string fileName = file.FileName;
+                long fileSize = file.Length;
+                ValidateFile(fileName, fileSize, ossFileConfig);
 
-                //1. 判断bizType 是否可用
-                if (ossFileConfig == null)
-                {
-                    throw new BizException("类型有误");
-                }
-
-                // 2. 判断文件是否支持
-                string suffix = Path.GetExtension(file.FileName);
-                string fileSuffix = FileUtil.GetFileSuffix(file.FileName, false);
-                if (!ossFileConfig.IsAllowFileSuffix(fileSuffix))
-                {
-                    throw new BizException("上传文件格式不支持！");
-                }
-
-                // 3. 判断文件大小是否超限
-                if (!ossFileConfig.IsMaxSizeLimit(file.Length))
-                {
-                    throw new BizException($"上传大小请限制在[{ossFileConfig.MaxSize / 1024 / 1024}M]以内！");
-                }
-
-                // 新文件地址 (xxx/xxx.jpg 格式)
-                string saveDirAndFileName = Path.Combine(bizType, $"{Guid.NewGuid():N}{Path.GetExtension(file.FileName)}");
+                string saveDirAndFileName = GetSaveDirAndFileName(bizType, fileName);
                 string url = await ossService.Upload2PreviewUrlAsync(ossFileConfig.OssSavePlaceEnum, file, saveDirAndFileName);
                 return ApiRes.Ok(url);
             }
@@ -126,5 +88,36 @@ namespace AGooday.AgPay.Components.OSS.Controllers
         {
             return Enumerable.Range(1, 5).Select(index => Random.Shared.Next(index, 55)).ToArray();
         }
+
+        private static void ValidateFile(string fileName, long fileSize, OssFileConfig ossFileConfig)
+        {
+            //1. 判断bizType 是否可用
+            if (ossFileConfig == null)
+            {
+                throw new BizException("类型有误");
+            }
+
+            // 2. 判断文件是否支持
+            string suffix = Path.GetExtension(fileName);
+            string fileSuffix = FileUtil.GetFileSuffix(fileName, false);
+            if (!ossFileConfig.IsAllowFileSuffix(fileSuffix))
+            {
+                throw new BizException("上传文件格式不支持！");
+            }
+
+            // 3. 判断文件大小是否超限
+            if (!ossFileConfig.IsMaxSizeLimit(fileSize))
+            {
+                throw new BizException($"上传大小请限制在[{ossFileConfig.MaxSize / 1024 / 1024}M]以内！");
+            }
+        }
+
+        /// <summary>
+        /// 新文件地址 (xxx/xxx.jpg 格式)
+        /// </summary>
+        /// <param name="bizType"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static string GetSaveDirAndFileName(string bizType, string fileName) => Path.Combine(bizType, $"{Guid.NewGuid():N}{Path.GetExtension(fileName)}");
     }
 }
