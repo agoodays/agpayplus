@@ -394,7 +394,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="dayStart"></param>
         /// <param name="dayEnd"></param>
         /// <returns></returns>
-        private List<(string GroupDate, decimal PayAmount, int PayCount)> SelectPayOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
+        private List<(string GroupDate, long PayAmount, int PayCount)> SelectPayOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
         {
             var payOrders = _payOrderRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
@@ -411,7 +411,7 @@ namespace AGooday.AgPay.Application.Services
                 }).ToList();
 
             var result = payOrders.Select(s =>
-                (s.GroupDate, Decimal.Round(s.PayAmount / 100M, 2, MidpointRounding.AwayFromZero), s.PayCount)
+                (s.GroupDate, s.PayAmount, s.PayCount)
             ).ToList();
             return result;
         }
@@ -423,7 +423,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="dayStart"></param>
         /// <param name="dayEnd"></param>
         /// <returns></returns>
-        private List<(string GroupDate, decimal RefundAmount, int RefundCount)> SelectRefundOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
+        private List<(string GroupDate, long RefundAmount, int RefundCount)> SelectRefundOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
         {
             var refundOrders = _refundOrderRepository.GetAll()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
@@ -440,7 +440,7 @@ namespace AGooday.AgPay.Application.Services
                 }).ToList();
 
             var result = refundOrders.Select(s =>
-                (s.GroupDate, Decimal.Round(s.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero), s.RefundCount)
+                (s.GroupDate, s.RefundAmount, s.RefundCount)
             ).ToList();
             return result;
         }
@@ -592,9 +592,9 @@ namespace AGooday.AgPay.Application.Services
                 dateList.Add(dt.ToString("MM-dd"));
 #if DEBUG
                 // 生成虚拟数据
-                item.PayAmount = item.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) / 100M : item.PayAmount;
+                item.PayAmount = item.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) : item.PayAmount;
 #endif
-                payAmountList.Add(item.PayAmount.ToString("0.00"));
+                payAmountList.Add(AmountUtil.ConvertCent2Dollar(item.PayAmount, 2, MidpointRounding.AwayFromZero));
             }
             JObject result = new JObject();
             result.Add("dateList", JToken.FromObject(dateList));
@@ -638,14 +638,14 @@ namespace AGooday.AgPay.Application.Services
                 var refund = refundOrderList.FirstOrDefault(x => x.GroupDate.Equals(dt.ToString("yyyy-MM-dd")));
 #if DEBUG
                 // 生成虚拟数据
-                pay.PayAmount = pay.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) / 100M : pay.PayAmount;
+                pay.PayAmount = pay.PayAmount <= 0 ? Random.Shared.Next(0, 1000000) : pay.PayAmount;
                 pay.PayCount = pay.PayCount <= 0 ? Random.Shared.Next(0, 1000) : pay.PayCount;
-                refund.RefundAmount = refund.RefundAmount <= 0 ? Random.Shared.Next(0, 500000) / 100M : refund.RefundAmount;
+                refund.RefundAmount = refund.RefundAmount <= 0 ? Random.Shared.Next(0, 500000) : refund.RefundAmount;
 #endif
                 resDateArr.Add(dt.ToString("yyyy-MM-dd"));
-                resPayAmountArr.Add(pay.PayAmount.ToString("0.00"));
+                resPayAmountArr.Add(AmountUtil.ConvertCent2Dollar(pay.PayAmount, 2, MidpointRounding.AwayFromZero));
                 resPayCountArr.Add(pay.PayCount.ToString());
-                resRefAmountArr.Add(refund.RefundAmount.ToString("0.00"));
+                resRefAmountArr.Add(AmountUtil.ConvertCent2Dollar(refund.RefundAmount, 2, MidpointRounding.AwayFromZero));
             }
 
             JObject result = new JObject();

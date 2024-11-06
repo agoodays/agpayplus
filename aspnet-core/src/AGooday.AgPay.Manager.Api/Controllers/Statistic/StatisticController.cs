@@ -164,8 +164,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                         var value = orderJO[excelHeader.Key];
                         value = excelHeader.Key switch
                         {
-                            "payAmount" or "refundAmount" => (Convert.ToDecimal(value) / 100).ToString("0.00"),
-                            "amount" => (Convert.ToDecimal(item.PayAmount - item.Fee) / 100).ToString("0.00"),
+                            "payAmount" or "refundAmount" => AmountUtil.ConvertCent2Dollar(value),
+                            "amount" => AmountUtil.ConvertCent2Dollar(item.PayAmount - item.Fee),
                             "round" => $"{value:0.00}%",
                             _ => Convert.ToString(value),
                         };
