@@ -281,6 +281,42 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         }
 
         /// <summary>
+        /// 异步POS回调入口
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/pay/posnotify/{ifCode}")]
+        public async Task<ActionResult> DoPosNotifyAsync(string ifCode)
+        {
+            string logPrefix = $"进入[{ifCode}]POS支付回调：";
+            _logger.LogInformation($"===== {logPrefix} =====", logPrefix);
+            try
+            {
+                if (string.IsNullOrWhiteSpace(ifCode))
+                {
+                    return StatusCode((int)HttpStatusCode.BadRequest, "ifCode is empty");
+                }
+
+                return null;
+            }
+            catch (BizException e)
+            {
+                _logger.LogError(e, $"{logPrefix}, BizException");
+                return BadRequest(e.Message);
+            }
+            catch (ResponseException e)
+            {
+                _logger.LogError(e, $"{logPrefix}, ResponseException");
+                return e.ResponseEntity;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{logPrefix}, 系统异常");
+                return BadRequest(e.Message);
+            }
+        }
+
+        /// <summary>
         /// 跳转到支付成功页面
         /// </summary>
         /// <param name="errInfo"></param>
