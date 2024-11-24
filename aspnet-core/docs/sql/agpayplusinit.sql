@@ -938,11 +938,11 @@ CREATE TABLE `t_qr_code` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='码牌信息表';
 
 -- 对账批次信息表
-DROP TABLE IF EXISTS `check_bill_batch`;
-CREATE TABLE `channel_bill` (
-  `batch_no` VARCHAR(64) DEFAULT NOT NULL COMMENT '批次号',
-  `if_code` VARCHAR(20) DEFAULT NOT NULL COMMENT '支付接口代码',
-  `bill_date` DATETIME DEFAULT NOT NULL COMMENT '账单日期',
+DROP TABLE IF EXISTS `t_check_bill_batch`;
+CREATE TABLE `t_check_bill_batch` (
+  `batch_no` VARCHAR(64) NOT NULL COMMENT '批次号',
+  `if_code` VARCHAR(20) NOT NULL COMMENT '支付接口代码',
+  `bill_date` DATETIME NOT NULL COMMENT '账单日期',
   `org_bill_file_path` VARCHAR(128) DEFAULT NULL COMMENT '渠道对账文件存放地址',
   `parse_status` TINYINT(6) NOT NULL DEFAULT '0' COMMENT '解析状态: 0-解析失败, 1-解析成功',
   `parse_err_msg` VARCHAR(256) DEFAULT NULL COMMENT '解析错误描述',
@@ -966,13 +966,13 @@ CREATE TABLE `channel_bill` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='对账批次信息表';
 
 -- 渠道账单信息表
-DROP TABLE IF EXISTS `channel_bill`;
-CREATE TABLE `channel_bill` (
+DROP TABLE IF EXISTS `t_channel_bill`;
+CREATE TABLE `t_channel_bill` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `if_code` VARCHAR(20) DEFAULT NOT NULL COMMENT '支付接口代码',
-  `batch_no` VARCHAR(64) DEFAULT NOT NULL COMMENT '批次号',
+  `if_code` VARCHAR(20) NOT NULL COMMENT '支付接口代码',
+  `batch_no` VARCHAR(64) NOT NULL COMMENT '批次号',
   `bill_type` VARCHAR(8) NOT NULL COMMENT '账单类型: pay-支付, refund-退款', 
-  `bill_date` DATETIME DEFAULT NOT NULL COMMENT '账单日期',
+  `bill_date` DATETIME NOT NULL COMMENT '账单日期',
   `order_id` VARCHAR(30) NOT NULL COMMENT '平台订单号',
   `channel_mch_no` VARCHAR(64) DEFAULT NULL COMMENT '渠道商户号',
   `channel_order_no` VARCHAR(64) DEFAULT NULL COMMENT '渠道订单号',
@@ -988,18 +988,18 @@ CREATE TABLE `channel_bill` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='渠道账单信息表';
 
 -- 差异账单信息表
-DROP TABLE IF EXISTS `diff_bill`;
-CREATE TABLE `diff_bill` (
+DROP TABLE IF EXISTS `t_diff_bill`;
+CREATE TABLE `t_diff_bill` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `diff_type` VARCHAR(8) NOT NULL COMMENT '账单类型: local-本地多账, channel-渠道多账, order-订单差异', 
-  `if_code` VARCHAR(20) DEFAULT NOT NULL COMMENT '支付接口代码',
-  `batch_no` VARCHAR(64) DEFAULT NOT NULL COMMENT '批次号',
+  `if_code` VARCHAR(20) NOT NULL COMMENT '支付接口代码',
+  `batch_no` VARCHAR(64) NOT NULL COMMENT '批次号',
   `bill_type` VARCHAR(8) NOT NULL COMMENT '账单类型: pay-支付, refund-退款', 
-  `bill_date` DATETIME DEFAULT NOT NULL COMMENT '账单日期',
+  `bill_date` DATETIME NOT NULL COMMENT '账单日期',
   `order_id` VARCHAR(30) NOT NULL COMMENT '平台订单号',
   `order_state` TINYINT(6) NOT NULL DEFAULT '0' COMMENT '订单状态: 0-订单生成, 1-支付中, 2-支付成功, 3-支付失败, 4-已撤销, 5-退款成功',
   `order_success_time` DATETIME DEFAULT NULL COMMENT '交易成功时间',
-  `order_created_at` TIMESTAMP(6) NOT NULL DEFAULT NULL COMMENT '创建时间',
+  `order_created_at` TIMESTAMP(6) NOT NULL COMMENT '创建时间',
   `amount` BIGINT(20) NOT NULL COMMENT '交易金额,单位分',
   `fee_amount` BIGINT NOT NULL COMMENT '渠道手续费,单位分',
   `refund_amount` BIGINT(20) NOT NULL COMMENT '交易金额,单位分',
