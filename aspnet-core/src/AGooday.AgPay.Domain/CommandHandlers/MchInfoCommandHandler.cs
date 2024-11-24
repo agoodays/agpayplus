@@ -218,6 +218,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!Commit())
                 {
                     Bus.RaiseEvent(new DomainNotification("", "添加商户失败"));
+                    RollbackTransaction();
                     return Task.CompletedTask;
                 }
 
@@ -315,6 +316,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!Commit())
                 {
                     Bus.RaiseEvent(new DomainNotification("", "修改当前商户失败"));
+                    RollbackTransaction();
                     return Task.CompletedTask;
                 }
 
@@ -398,6 +400,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!Commit())
                 {
                     Bus.RaiseEvent(new DomainNotification("", "删除当前商户失败"));
+                    RollbackTransaction();
                     return Task.CompletedTask;
                 }
 
