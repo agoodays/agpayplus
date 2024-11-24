@@ -2,6 +2,7 @@
 using AGooday.AgPay.Infrastructure.Mappings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace AGooday.AgPay.Infrastructure.Context
 {
@@ -9,9 +10,15 @@ namespace AGooday.AgPay.Infrastructure.Context
     {
         protected readonly IConfiguration Configuration;
 
-        public AgPayDbContext(IConfiguration configuration)
+        private readonly ILoggerFactory _loggerFactory;
+
+        //输出sql
+        //private readonly ILoggerFactory _loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+
+        public AgPayDbContext(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
+            _loggerFactory = loggerFactory;
         }
 
         #region DbSets
@@ -111,6 +118,8 @@ namespace AGooday.AgPay.Infrastructure.Context
             //        //break;
             //}
             #endregion
+
+            optionsBuilder.UseLoggerFactory(_loggerFactory); // 设置自定义日志工厂
 
             base.OnConfiguring(optionsBuilder);
         }
