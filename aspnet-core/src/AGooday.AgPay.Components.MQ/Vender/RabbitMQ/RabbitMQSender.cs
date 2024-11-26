@@ -10,11 +10,12 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 {
     /// <summary>
     /// https://github.com/whuanle/learnrabbitmq
+    /// https://www.rabbitmq.com/client-libraries/dotnet-api-guide
     /// </summary>
     public class RabbitMQSender : IMQSender
     {
         private IConnection connection;
-        private IModel channel;
+        private IChannel channel;
 
         private readonly ILogger<RabbitMQSender> _logger;
         private readonly IServiceProvider _serviceProvider;
@@ -52,7 +53,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
             }
         }
 
-        public void Receive()
+        public async void Receive()
         {
             try
             {
@@ -63,37 +64,38 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                     Password = RabbitMQConfig.MQ.Password,
                     Port = RabbitMQConfig.MQ.Port
                 };
-                connection = factory.CreateConnection();
-                channel = connection.CreateModel();
+                connection = await factory.CreateConnectionAsync();
+                channel = await connection.CreateChannelAsync();
                 var msgReceivers = _serviceProvider.GetServices<IMQMsgReceiver>()
                     .Where(w => $"{w.GetType().Name}".EndsWith("RabbitMQReceiver", StringComparison.OrdinalIgnoreCase));
                 foreach (var msgReceiver in msgReceivers)
                 {
-                    string queue = string.Empty;
+                    string queueName = string.Empty;
                     if (msgReceiver.GetMQType() == MQSendTypeEnum.QUEUE)
                     {
-                        queue = msgReceiver.GetMQName();
-                        channel.QueueDeclare(queue, true, false, false, null);
+                        queueName = msgReceiver.GetMQName();
+                        await channel.QueueDeclareAsync(queueName, true, false, false, null);
                     }
                     else
                     {
                         var exchange = RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + msgReceiver.GetMQName();
-                        channel.ExchangeDeclare(exchange, "fanout");
-                        queue = channel.QueueDeclare().QueueName;
-                        channel.QueueBind(queue, exchange, "");
+                        await channel.ExchangeDeclareAsync(exchange, "fanout");
+                        var queue = await channel.QueueDeclareAsync();
+                        queueName = queue.QueueName;
+                        await channel.QueueBindAsync(queueName, exchange, "");
                     }
-                    channel.BasicQos(0, 1, false);
+                    await channel.BasicQosAsync(0, 1, false);
 
-                    var consumer = new EventingBasicConsumer(channel);
-                    consumer.Received += (model, ea) =>
+                    var consumer = new AsyncEventingBasicConsumer(channel);
+                    consumer.ReceivedAsync += async (model, ea) =>
                     {
                         var body = ea.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
                         msgReceiver.ReceiveMsg(message);
 
-                        channel.BasicAck(ea.DeliveryTag, false);
+                        await channel.BasicAckAsync(ea.DeliveryTag, false);
                     };
-                    channel.BasicConsume(queue, false, consumer);
+                    await channel.BasicConsumeAsync(queueName, false, consumer);
                 }
             }
             catch (Exception ex)
@@ -107,12 +109,12 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
         public void Close()
         {
             if (channel != null)
-                this.channel.Close();
+                this.channel.CloseAsync();
             if (connection != null)
-                this.connection.Close();
+                this.connection.CloseAsync();
         }
 
-        private void ConvertAndSend(MQSendTypeEnum mqtype, string exchange, string queue, string routingKey, string message)
+        private async void ConvertAndSend(MQSendTypeEnum mqtype, string exchange, string queue, string routingKey, string message)
         {
             try
             {
@@ -123,25 +125,25 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                     Password = RabbitMQConfig.MQ.Password,
                     Port = RabbitMQConfig.MQ.Port
                 };
-                using (var connection = factory.CreateConnection())
-                using (var channel = connection.CreateModel())
+                using (var connection = await factory.CreateConnectionAsync())
+                using (var channel = await connection.CreateChannelAsync())
                 {
                     if (mqtype == MQSendTypeEnum.QUEUE && !string.IsNullOrWhiteSpace(queue))
                     {
-                        channel.QueueDeclare(queue, true, false, false, null);
+                        await channel.QueueDeclareAsync(queue, true, false, false, null);
                     }
 
                     if (mqtype == MQSendTypeEnum.BROADCAST && !string.IsNullOrWhiteSpace(exchange))
                     {
-                        channel.ExchangeDeclare(exchange, type: "fanout");
+                        await channel.ExchangeDeclareAsync(exchange, "fanout");
                     }
 
                     var body = Encoding.UTF8.GetBytes(message);
 
-                    var properties = channel.CreateBasicProperties();
+                    var properties = new BasicProperties();
                     properties.Persistent = true;
 
-                    channel.BasicPublish(exchange, routingKey, properties, body);
+                    await channel.BasicPublishAsync(exchange, routingKey, true, properties, body);
                 }
             }
             catch (Exception e)
@@ -152,7 +154,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
             }
         }
 
-        private void ConvertAndDelaySend(string exchange, string queue, string routingKey, string message, int delay)
+        private async void ConvertAndDelaySend(string exchange, string queue, string routingKey, string message, int delay)
         {
             try
             {
@@ -163,8 +165,8 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                     Password = RabbitMQConfig.MQ.Password,
                     Port = RabbitMQConfig.MQ.Port
                 };
-                using (var connection = factory.CreateConnection())
-                using (var channel = connection.CreateModel())
+                using (var connection = await factory.CreateConnectionAsync())
+                using (var channel = await connection.CreateChannelAsync())
                 {
                     //设置Exchange队列类型
                     var arguments = new Dictionary<string, object>()
@@ -172,20 +174,20 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                         {"x-delayed-type", "topic"}
                     };
                     //设置当前消息为延时队列, 需要安装延时插件: https://www.yuque.com/xiangyisheng/kgcg9t/vmhkyo
-                    channel.ExchangeDeclare(exchange, "x-delayed-message", true, false, arguments);
-                    channel.QueueDeclare(queue, true, false, false, arguments);
-                    channel.QueueBind(queue, exchange, routingKey);
+                    await channel.ExchangeDeclareAsync(exchange, "x-delayed-message", true, false, arguments);
+                    await channel.QueueDeclareAsync(queue, true, false, false, arguments);
+                    await channel.QueueBindAsync(queue, exchange, routingKey);
 
                     var body = Encoding.UTF8.GetBytes(message);
 
-                    var properties = channel.CreateBasicProperties();
+                    var properties = new BasicProperties();
                     //设置消息的过期时间
                     properties.Headers = new Dictionary<string, object>()
                     {
                         {  "x-delay", delay * 1000 }
                     };
 
-                    channel.BasicPublish(exchange, routingKey, properties, body);
+                    await channel.BasicPublishAsync(exchange, routingKey, true, properties, body);
                 }
             }
             catch (Exception e)
