@@ -7,8 +7,7 @@ using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PayPalCheckoutSdk.Core;
-using PayPalCheckoutSdk.Payments;
+using PaypalServerSdk.Standard.Models;
 using static AGooday.AgPay.Components.Third.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Components.Third.Channel.PpPay
@@ -48,21 +47,20 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
                 string orderId = obj.SelectToken("resource.id")?.ToString();
 
                 PayPalWrapper wrapper = mchAppConfigContext.GetPaypalWrapper();
-                PayPalHttpClient client = wrapper.Client;
 
                 // 查询退款详情以及状态
-                RefundsGetRequest refundRequest = new RefundsGetRequest(orderId);
-                var response = client.Execute(refundRequest).Result;
+                RefundsGetInput refundRequest = new RefundsGetInput(orderId);
+                var response = wrapper.Client.PaymentsController.RefundsGet(refundRequest);
 
                 ChannelRetMsg channelRetMsg = ChannelRetMsg.Waiting();
                 channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("ERROR");
 
                 if ((int)response.StatusCode == 200)
                 {
-                    string responseJson = JsonConvert.SerializeObject(response.Result<Refund>());
-                    channelRetMsg = PayPalWrapper.DispatchCode(response.Result<Refund>().Status, channelRetMsg);
+                    string responseJson = JsonConvert.SerializeObject(response.Data);
+                    channelRetMsg = PayPalWrapper.DispatchCode(response.Data.Status.Value, channelRetMsg);
                     channelRetMsg.ChannelAttach = responseJson;
-                    channelRetMsg.ChannelOrderId = response.Result<Refund>().Id;
+                    channelRetMsg.ChannelOrderId = response.Data.Id;
                     channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("SUCCESS");
                 }
                 else

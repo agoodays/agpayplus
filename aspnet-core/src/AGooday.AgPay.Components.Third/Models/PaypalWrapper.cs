@@ -1,20 +1,24 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Net;
+using System.Net.Mime;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Params.PpPay;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PayPalCheckoutSdk.Core;
-using PayPalCheckoutSdk.Orders;
-using System.Net;
-using System.Net.Mime;
+using PaypalServerSdk.Standard;
+using PaypalServerSdk.Standard.Authentication;
+using PaypalServerSdk.Standard.Controllers;
+using PaypalServerSdk.Standard.Models;
 
 namespace AGooday.AgPay.Components.Third.Models
 {
+    /// <summary>
+    /// https://github.com/paypal/PayPal-Dotnet-Server-SDK
+    /// </summary>
     public class PayPalWrapper
     {
-        public PayPalEnvironment Environment { get; private set; }
-        public PayPalHttpClient Client { get; private set; }
+        public PaypalServerSdkClient Client { get; private set; }
 
         public string NotifyWebhook { get; private set; }
         public string RefundWebhook { get; private set; }
@@ -93,17 +97,21 @@ namespace AGooday.AgPay.Components.Third.Models
             }
             else
             {
+                OrdersController ordersController = Client.OrdersController;
+
                 Order order;
 
                 channelRetMsg.ChannelOrderId = $"{ppOrderId},null";
 
                 if (ppCatptId == null && isCapture)
                 {
-                    OrderActionRequest orderRequest = new OrderActionRequest();
-                    OrdersCaptureRequest ordersCaptureRequest = new OrdersCaptureRequest(ppOrderId);
-                    ordersCaptureRequest.RequestBody(orderRequest);
+                    OrdersCaptureInput ordersCaptureInput = new OrdersCaptureInput
+                    {
+                        Id = ppOrderId,
+                        Prefer = "return=representation",
+                    };
 
-                    var response = Client.Execute(ordersCaptureRequest).Result;
+                    var response = ordersController.OrdersCapture(ordersCaptureInput);
 
                     if ((int)response.StatusCode != 201)
                     {
@@ -111,12 +119,12 @@ namespace AGooday.AgPay.Components.Third.Models
                         channelRetMsg.ChannelErrMsg = "捕获订单请求失败";
                         return channelRetMsg;
                     }
-                    order = response.Result<Order>();
+                    order = response.Data;
                 }
                 else
                 {
-                    OrdersGetRequest request = new OrdersGetRequest(ppOrderId);
-                    var response = Client.Execute(request).Result;
+                    OrdersGetInput request = new OrdersGetInput(ppOrderId);
+                    var response = ordersController.OrdersGet(request);
 
                     if ((int)response.StatusCode != 200)
                     {
@@ -126,10 +134,9 @@ namespace AGooday.AgPay.Components.Third.Models
                         return channelRetMsg;
                     }
 
-                    order = response.Result<Order>();
+                    order = response.Data;
                 }
 
-                string status = order.Status;
                 string orderJsonStr = JsonConvert.SerializeObject(order);
                 var orderJson = JObject.Parse(orderJsonStr);
 
@@ -155,7 +162,7 @@ namespace AGooday.AgPay.Components.Third.Models
                 result.ChannelAttach = orderJsonStr;
                 result.ResponseEntity = TextResp("SUCCESS");
                 result.ChannelState = ChannelState.WAITING; // 默认支付中
-                result = DispatchCode(status, result); // 处理状态码
+                result = DispatchCode(order.Status.Value, result); // 处理状态码
                 return result;
             }
         }
@@ -166,35 +173,45 @@ namespace AGooday.AgPay.Components.Third.Models
         /// <param name="status"></param>
         /// <param name="channelRetMsg"></param>
         /// <returns></returns>
-        public static ChannelRetMsg DispatchCode(string status, ChannelRetMsg channelRetMsg)
+        public static ChannelRetMsg DispatchCode(OrderStatus status, ChannelRetMsg channelRetMsg)
         {
-            if ("SAVED".Equals(status, StringComparison.OrdinalIgnoreCase))
+            switch (status)
             {
-                channelRetMsg.ChannelState = ChannelState.WAITING;
+                case OrderStatus.Saved:
+                case OrderStatus.Approved:
+                case OrderStatus.PayerActionRequired:
+                case OrderStatus.Created:
+                    channelRetMsg.ChannelState = ChannelState.WAITING;
+                    break;
+                case OrderStatus.Voided:
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    break;
+                case OrderStatus.Completed:
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                    break;
+                default:
+                    channelRetMsg.ChannelState = ChannelState.WAITING;
+                    break;
             }
-            else if ("APPROVED".Equals(status, StringComparison.OrdinalIgnoreCase))
+            return channelRetMsg;
+        }
+
+        public static ChannelRetMsg DispatchCode(RefundStatus status, ChannelRetMsg channelRetMsg)
+        {
+            switch (status)
             {
-                channelRetMsg.ChannelState = ChannelState.WAITING;
-            }
-            else if ("VOIDED".Equals(status, StringComparison.OrdinalIgnoreCase))
-            {
-                channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
-            }
-            else if ("COMPLETED".Equals(status, StringComparison.OrdinalIgnoreCase))
-            {
-                channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-            }
-            else if ("PAYER_ACTION_REQUIRED".Equals(status, StringComparison.OrdinalIgnoreCase))
-            {
-                channelRetMsg.ChannelState = ChannelState.WAITING;
-            }
-            else if ("CREATED".Equals(status, StringComparison.OrdinalIgnoreCase))
-            {
-                channelRetMsg.ChannelState = ChannelState.WAITING;
-            }
-            else
-            {
-                channelRetMsg.ChannelState = ChannelState.UNKNOWN;
+                case RefundStatus.Pending:
+                    channelRetMsg.ChannelState = ChannelState.WAITING;
+                    break;
+                case RefundStatus.Failed:
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                    break;
+                case RefundStatus.Completed:
+                    channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                    break;
+                default:
+                    channelRetMsg.ChannelState = ChannelState.WAITING;
+                    break;
             }
             return channelRetMsg;
         }
@@ -218,15 +235,20 @@ namespace AGooday.AgPay.Components.Third.Models
         public static PayPalWrapper BuildPaypalWrapper(PpPayNormalMchParams ppPayNormalMchParams)
         {
             PayPalWrapper paypalWrapper = new PayPalWrapper();
-            PayPalEnvironment environment = new LiveEnvironment(ppPayNormalMchParams.ClientId, ppPayNormalMchParams.Secret);
-
-            if (ppPayNormalMchParams.Sandbox == 1)
-            {
-                environment = new SandboxEnvironment(ppPayNormalMchParams.ClientId, ppPayNormalMchParams.Secret);
-            }
-
-            paypalWrapper.Environment = environment;
-            paypalWrapper.Client = new PayPalHttpClient(environment);
+            paypalWrapper.Client = new PaypalServerSdkClient.Builder()
+                .ClientCredentialsAuth(
+                    new ClientCredentialsAuthModel.Builder(
+                        ppPayNormalMchParams.ClientId,
+                        ppPayNormalMchParams.Secret
+                    )
+                    .Build())
+                .Environment(ppPayNormalMchParams.Sandbox == 1 ? PaypalServerSdk.Standard.Environment.Sandbox : PaypalServerSdk.Standard.Environment.Production)
+                .LoggingConfig(config => config
+                    .LogLevel(LogLevel.Information)
+                    .RequestConfig(reqConfig => reqConfig.Body(true))
+                    .ResponseConfig(respConfig => respConfig.Headers(true))
+                )
+                .Build();
             paypalWrapper.NotifyWebhook = ppPayNormalMchParams.NotifyWebhook;
             paypalWrapper.RefundWebhook = ppPayNormalMchParams.RefundWebhook;
 
