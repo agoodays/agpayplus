@@ -8,9 +8,7 @@ using AGooday.AgPay.Components.Third.RQRS.Refund;
 using AGooday.AgPay.Components.Third.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PayPalCheckoutSdk.Core;
-using PayPalCheckoutSdk.Payments;
-using PayPalHttp;
+using PaypalServerSdk.Standard.Models;
 
 namespace AGooday.AgPay.Components.Third.Channel.PpPay
 {
@@ -47,20 +45,19 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             }
 
             PayPalWrapper wrapper = mchAppConfigContext.GetPaypalWrapper();
-            PayPalHttpClient client = wrapper.Client;
 
-            RefundsGetRequest refundRequest = new RefundsGetRequest(refundOrder.PayOrderId);
-            var response = client.Execute(refundRequest).Result;
+            RefundsGetInput refundRequest = new RefundsGetInput(refundOrder.PayOrderId);
+            var response = wrapper.Client.PaymentsController.RefundsGet(refundRequest);
 
             ChannelRetMsg channelRetMsg = ChannelRetMsg.Waiting();
             channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("ERROR");
 
             if ((int)response.StatusCode == 201)
             {
-                string responseJson = JsonConvert.SerializeObject(response.Result<Refund>());
-                channelRetMsg = PayPalWrapper.DispatchCode(response.Result<Refund>().Status, channelRetMsg);
+                string responseJson = JsonConvert.SerializeObject(response.Data);
+                channelRetMsg = PayPalWrapper.DispatchCode(response.Data.Status.Value, channelRetMsg);
                 channelRetMsg.ChannelAttach = responseJson;
-                channelRetMsg.ChannelOrderId = response.Result<Refund>().Id;
+                channelRetMsg.ChannelOrderId = response.Data.Id;
                 channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("SUCCESS");
             }
             else
@@ -91,8 +88,6 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
                 return ChannelRetMsg.ConfirmFail();
             }
 
-            PayPalHttpClient client = paypalWrapper.Client;
-
             // 处理金额
             string amountStr = AmountUtil.ConvertCent2Dollar(refundOrder.RefundAmount.ToString());
             string currency = payOrder.Currency.ToUpper();
@@ -100,28 +95,27 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             RefundRequest refundRequest = new RefundRequest();
             Money money = new Money();
             money.CurrencyCode = currency;
-            money.Value = amountStr;
+            money.MValue = amountStr;
 
             refundRequest.InvoiceId = refundOrder.RefundOrderId;
             refundRequest.Amount = money;
             refundRequest.NoteToPayer = bizRQ.RefundReason;
 
-            CapturesRefundRequest request = new CapturesRefundRequest(ppCatptId);
-            request.Prefer("return=representation");
-            request.RequestBody(refundRequest);
+            CapturesRefundInput request = new CapturesRefundInput(ppCatptId, "return=representation");
+            request.Body=refundRequest;
 
             ChannelRetMsg channelRetMsg = ChannelRetMsg.Waiting();
             channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("ERROR");
             try
             {
-                var response = client.Execute(request).Result;
+                var response = paypalWrapper.Client.PaymentsController.CapturesRefund(request);
 
                 if ((int)response.StatusCode == 201)
                 {
-                    string responseJson = JsonConvert.SerializeObject(response.Result<Refund>());
-                    channelRetMsg = PayPalWrapper.DispatchCode(response.Result<Refund>().Status, channelRetMsg);
+                    string responseJson = JsonConvert.SerializeObject(response.Data);
+                    channelRetMsg = PayPalWrapper.DispatchCode(response.Data.Status.Value, channelRetMsg);
                     channelRetMsg.ChannelAttach = responseJson;
-                    channelRetMsg.ChannelOrderId = response.Result<Refund>().Id;
+                    channelRetMsg.ChannelOrderId = response.Data.Id;
                     channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("SUCCESS");
                 }
                 else
@@ -129,7 +123,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
                     return ChannelRetMsg.ConfirmFail("201", "请求退款失败，Paypal 响应非 201");
                 }
             }
-            catch (HttpException e)
+            catch (HttpProtocolException e)
             {
                 string message = e.Message;
                 var messageObj = JObject.Parse(message);

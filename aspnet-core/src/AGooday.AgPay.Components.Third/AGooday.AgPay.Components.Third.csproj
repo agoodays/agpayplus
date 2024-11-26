@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="AlipaySDKNet.Standard" Version="4.9.320" />
-    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
+    <PackageReference Include="PayPalServerSDK" Version="0.6.1" />
     <PackageReference Include="SKIT.FlurlHttpClient.Wechat.Api" Version="3.6.0" />
     <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV2" Version="3.2.0" />
     <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="3.9.0" />
