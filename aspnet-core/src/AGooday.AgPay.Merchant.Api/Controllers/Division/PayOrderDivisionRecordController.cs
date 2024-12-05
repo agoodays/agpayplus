@@ -24,9 +24,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         private readonly IMQSender mqSender;
         private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
 
-        public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger, 
+        public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger,
             IMQSender mqSender,
-            IPayOrderDivisionRecordService payOrderDivisionRecordService, 
+            IPayOrderDivisionRecordService payOrderDivisionRecordService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

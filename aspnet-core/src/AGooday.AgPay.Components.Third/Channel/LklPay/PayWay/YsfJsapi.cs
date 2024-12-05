@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
     /// </summary>
     public class YsfJsapi : LklPayPaymentService
     {
-        public YsfJsapi(ILogger<YsfJsapi> logger, 
+        public YsfJsapi(ILogger<YsfJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

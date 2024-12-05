@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
 
         public SysRoleEntRelaController(ILogger<SysRoleEntRelaController> logger,
-            ISysRoleEntRelaService sysRoleEntRelaService, 
+            ISysRoleEntRelaService sysRoleEntRelaService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

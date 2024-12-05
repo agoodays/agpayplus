@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
     /// </summary>
     public class AliJsapi : SxfPayPaymentService
     {
-        public AliJsapi(ILogger<AliJsapi> logger, 
+        public AliJsapi(ILogger<AliJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

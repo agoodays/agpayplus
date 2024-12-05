@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var count = _mchDivisionReceiverRepository.GetAllAsNoTracking()
                     .Where(w => receiverIds.Contains(w.ReceiverId)
-                    && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) 
+                    && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId)
                     && w.IfCode.Equals(ifCode) && w.State.Equals(state))
                     .Count();
             return count;

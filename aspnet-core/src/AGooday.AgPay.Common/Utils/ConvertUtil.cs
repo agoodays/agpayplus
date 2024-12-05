@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using System.Data;
+using System.Globalization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using System.Data;
-using System.Globalization;
 
 namespace AGooday.AgPay.Common.Utils
 {

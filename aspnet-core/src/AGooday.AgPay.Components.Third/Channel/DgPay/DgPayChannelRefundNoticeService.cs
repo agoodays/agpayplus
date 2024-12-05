@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Net;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Params.DgPay;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
@@ -11,7 +12,6 @@ using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Net;
 using static AGooday.AgPay.Components.Third.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Components.Third.Channel.DgPay

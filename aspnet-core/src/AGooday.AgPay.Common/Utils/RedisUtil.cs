@@ -1,5 +1,5 @@
-﻿using StackExchange.Redis;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+using StackExchange.Redis;
 
 namespace AGooday.AgPay.Common.Utils
 {

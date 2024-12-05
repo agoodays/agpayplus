@@ -1,7 +1,7 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using System.Text;
+using AGooday.AgPay.Common.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text;
 
 namespace AGooday.AgPay.Components.Third.Channel.YsePay.Utils
 {

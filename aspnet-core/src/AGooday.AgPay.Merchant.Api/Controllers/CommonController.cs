@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         private readonly IServer redisServer;
         private readonly IAuthService _authService;
 
-        public CommonController(ILogger<CommonController> logger, 
+        public CommonController(ILogger<CommonController> logger,
             RedisUtil client,
             IAuthService authService)
         {
@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         /// <param name="sysUserIdList"></param>
         protected void DelAuthentication(List<long> sysUserIdList)
         {
-            if (sysUserIdList == null || sysUserIdList.Count<=0)
+            if (sysUserIdList == null || sysUserIdList.Count <= 0)
             {
                 return;
             }

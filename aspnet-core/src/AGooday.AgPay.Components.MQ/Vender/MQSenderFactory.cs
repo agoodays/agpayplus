@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Components.MQ.Vender
             switch (mqVender)
             {
                 case MQVenderCS.RABBIT_MQ:
-                    _configuration.GetSection("MQ:RabbitMQ").Bind(RabbitMQConfig.MQ); 
+                    _configuration.GetSection("MQ:RabbitMQ").Bind(RabbitMQConfig.MQ);
                     return _serviceProvider.GetRequiredService<RabbitMQSender>();
                 default:
                     throw new NotSupportedException("Invalid MQ vender configuration.");

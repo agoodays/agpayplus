@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Application.Services
             IMchStoreRepository mchStoreRepository,
             IAgentInfoRepository agentInfoRepository,
             IIsvInfoRepository isvInfoRepository,
-            IPayWayRepository payWayRepository, 
+            IPayWayRepository payWayRepository,
             IPayInterfaceDefineRepository payInterfaceDefineRepository)
         {
             _mapper = mapper;

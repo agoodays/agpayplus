@@ -1,9 +1,9 @@
-﻿using AGooday.AgPay.Components.OSS.Config;
+﻿using System.Text;
+using System.Web;
+using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Manager.Api.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
-using System.Web;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Common
 {

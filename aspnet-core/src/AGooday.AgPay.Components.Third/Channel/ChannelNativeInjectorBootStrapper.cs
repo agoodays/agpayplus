@@ -1,6 +1,6 @@
-﻿using AGooday.AgPay.Components.Third.Models;
+﻿using System.Reflection;
+using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.Utils;
-using System.Reflection;
 
 namespace AGooday.AgPay.Components.Third.Channel
 {

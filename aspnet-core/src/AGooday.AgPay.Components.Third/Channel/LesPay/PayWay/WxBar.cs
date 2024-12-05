@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay.PayWay
     /// </summary>
     public class WxBar : LesPayPaymentService
     {
-        public WxBar(ILogger<WxBar> logger, 
+        public WxBar(ILogger<WxBar> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

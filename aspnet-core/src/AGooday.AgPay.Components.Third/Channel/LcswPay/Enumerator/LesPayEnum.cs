@@ -1,5 +1,4 @@
 ﻿using AGooday.AgPay.Common.Constants;
-using static AGooday.AgPay.Components.Third.Channel.SxfPay.Enumerator.SxfPayEnum;
 
 namespace AGooday.AgPay.Components.Third.Channel.LcswPay.Enumerator
 {

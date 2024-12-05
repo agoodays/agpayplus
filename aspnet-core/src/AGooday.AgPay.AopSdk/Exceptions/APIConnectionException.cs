@@ -5,7 +5,7 @@
     /// </summary>
     public class APIConnectionException : AgPayException
     {
-        public APIConnectionException(string errorMessage) 
+        public APIConnectionException(string errorMessage)
             : base(errorMessage)
         {
         }

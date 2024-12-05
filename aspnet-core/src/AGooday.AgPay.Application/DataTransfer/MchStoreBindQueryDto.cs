@@ -1,6 +1,4 @@
-﻿using AGooday.AgPay.Common.Models;
-
-namespace AGooday.AgPay.Application.DataTransfer
+﻿namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 用户绑定商户门店查询

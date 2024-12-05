@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
     /// </summary>
     public class WxJsapi : AllinPayPaymentService
     {
-        public WxJsapi(ILogger<WxJsapi> logger, 
+        public WxJsapi(ILogger<WxJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

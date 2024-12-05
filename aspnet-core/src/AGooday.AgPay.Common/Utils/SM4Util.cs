@@ -1,5 +1,5 @@
-﻿using Org.BouncyCastle.Utilities.Encoders;
-using System.Text;
+﻿using System.Text;
+using Org.BouncyCastle.Utilities.Encoders;
 
 namespace AGooday.AgPay.Common.Utils
 {

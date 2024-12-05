@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
     /// </summary>
     public class WxJsapi : LklPayPaymentService
     {
-        public WxJsapi(ILogger<WxJsapi> logger, 
+        public WxJsapi(ILogger<WxJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
                     respData.TryGetString("merchant_no", out string merchantNo);//全局流水号
                     respData.TryGetString("trade_no", out string tradeNo);//全局流水号
                     var accRespFields = respData.GetValue("acc_resp_fields")?.ToObject<JObject>();
-                    accRespFields.TryGetString("prepay_id",out string prepayId);//微信预下单id
+                    accRespFields.TryGetString("prepay_id", out string prepayId);//微信预下单id
                     string appId = accRespFields.GetValue("app_id").ToString();//微信 AppId
                     string timeStamp = accRespFields.GetValue("time_stamp").ToString();//微信 TimeStamp
                     string nonceStr = accRespFields.GetValue("nonce_str").ToString();//微信 NonceStr

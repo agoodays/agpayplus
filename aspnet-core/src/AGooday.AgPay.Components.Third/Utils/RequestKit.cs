@@ -1,8 +1,8 @@
-﻿using AGooday.AgPay.Common.Exceptions;
+﻿using System.Net.Mime;
+using System.Text;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using Newtonsoft.Json.Linq;
-using System.Net.Mime;
-using System.Text;
 
 namespace AGooday.AgPay.Components.Third.Utils
 {

@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
-            ISysConfigService sysConfigService, 
+            ISysConfigService sysConfigService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

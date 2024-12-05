@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.PayWay
     /// </summary>
     public class WxLite : HkrtPayPaymentService
     {
-        public WxLite(ILogger<WxLite> logger, 
+        public WxLite(ILogger<WxLite> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

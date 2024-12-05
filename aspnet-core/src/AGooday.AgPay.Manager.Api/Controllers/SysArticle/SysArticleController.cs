@@ -4,7 +4,6 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;

@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.Interfaces;
+﻿using System.Text;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Models;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text;
 
 namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
 {
@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         private readonly IMchAppService _mchAppService;
         private readonly WsPayOrderServer _wsPayOrderServer;
 
-        public PayTestNotifyController(ILogger<PayTestNotifyController> logger, 
+        public PayTestNotifyController(ILogger<PayTestNotifyController> logger,
             IMchAppService mchAppService,
             WsPayOrderServer wsPayOrderServer,
             RedisUtil client,

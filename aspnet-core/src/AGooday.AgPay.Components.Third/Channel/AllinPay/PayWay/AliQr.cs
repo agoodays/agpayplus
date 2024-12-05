@@ -2,7 +2,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.Third.Channel.AllinPay.Enumerator;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
@@ -11,7 +10,6 @@ using AGooday.AgPay.Components.Third.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Ocsp;
 
 namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
 {
@@ -20,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
     /// </summary>
     public class AliQr : AllinPayPaymentService
     {
-        public AliQr(ILogger<AliQr> logger, 
+        public AliQr(ILogger<AliQr> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

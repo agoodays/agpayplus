@@ -1,4 +1,5 @@
-﻿using Org.BouncyCastle.Asn1;
+﻿using System.Text;
+using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.GM;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
@@ -11,7 +12,6 @@ using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.Utilities.Encoders;
 using Org.BouncyCastle.X509;
-using System.Text;
 
 namespace AGooday.AgPay.Common.Utils
 {

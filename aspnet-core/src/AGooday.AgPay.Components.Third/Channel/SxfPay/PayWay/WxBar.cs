@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
     /// </summary>
     public class WxBar : SxfPayPaymentService
     {
-        public WxBar(ILogger<WxBar> logger, 
+        public WxBar(ILogger<WxBar> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

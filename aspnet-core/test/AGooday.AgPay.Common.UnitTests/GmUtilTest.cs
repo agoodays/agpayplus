@@ -1,7 +1,7 @@
+using System.Text;
 using AGooday.AgPay.Common.Utils;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Math;
-using System.Text;
 
 namespace AGooday.AgPay.Common.UnitTests
 {

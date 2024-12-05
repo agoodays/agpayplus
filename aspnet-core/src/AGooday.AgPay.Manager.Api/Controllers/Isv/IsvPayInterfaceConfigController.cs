@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         private readonly IMQSender mqSender;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
-        public IsvPayInterfaceConfigController(ILogger<IsvPayInterfaceConfigController> logger, 
+        public IsvPayInterfaceConfigController(ILogger<IsvPayInterfaceConfigController> logger,
             IMQSender mqSender,
             IPayInterfaceConfigService payIfConfigService,
             RedisUtil client,

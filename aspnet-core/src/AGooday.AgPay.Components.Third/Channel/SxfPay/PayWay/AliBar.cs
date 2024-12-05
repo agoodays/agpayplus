@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
     /// </summary>
     public class AliBar : SxfPayPaymentService
     {
-        public AliBar(ILogger<AliBar> logger, 
+        public AliBar(ILogger<AliBar> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

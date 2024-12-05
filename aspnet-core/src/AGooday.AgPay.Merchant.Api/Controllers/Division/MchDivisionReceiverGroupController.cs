@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 
         public MchDivisionReceiverGroupController(ILogger<MchDivisionReceiverGroupController> logger,
             IMchDivisionReceiverService mchDivisionReceiverService,
-            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService, 
+            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

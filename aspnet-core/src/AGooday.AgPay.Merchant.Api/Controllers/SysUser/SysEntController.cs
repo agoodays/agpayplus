@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         private readonly ISysEntitlementService _sysEntService;
 
         public SysEntController(ILogger<SysEntController> logger,
-            ISysEntitlementService sysEntService, 
+            ISysEntitlementService sysEntService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

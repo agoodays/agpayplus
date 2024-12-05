@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Text;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.AliPay;
 using AGooday.AgPay.Common.Constants;
@@ -14,7 +15,6 @@ using Aop.Api.Request;
 using Aop.Api.Response;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
 {
@@ -138,7 +138,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
             }
             catch (Exception e)
             {
-                _logger.LogError(e,"error");
+                _logger.LogError(e, "error");
                 errMsg = !string.IsNullOrWhiteSpace(e.Message) ? e.Message : "系统异常！";
             }
             ViewBag.ErrMsg = errMsg;

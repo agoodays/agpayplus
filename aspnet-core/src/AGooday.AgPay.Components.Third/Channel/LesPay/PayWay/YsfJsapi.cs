@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay.PayWay
     /// </summary>
     public class YsfJsapi : LesPayPaymentService
     {
-        public YsfJsapi(ILogger<YsfJsapi> logger, 
+        public YsfJsapi(ILogger<YsfJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

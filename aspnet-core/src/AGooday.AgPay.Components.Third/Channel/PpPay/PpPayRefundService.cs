@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             refundRequest.NoteToPayer = bizRQ.RefundReason;
 
             CapturesRefundInput request = new CapturesRefundInput(ppCatptId, "return=representation");
-            request.Body=refundRequest;
+            request.Body = refundRequest;
 
             ChannelRetMsg channelRetMsg = ChannelRetMsg.Waiting();
             channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("ERROR");

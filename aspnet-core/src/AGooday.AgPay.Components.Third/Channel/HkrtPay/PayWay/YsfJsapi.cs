@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.PayWay
     /// </summary>
     public class YsfJsapi : HkrtPayPaymentService
     {
-        public YsfJsapi(ILogger<YsfJsapi> logger, 
+        public YsfJsapi(ILogger<YsfJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

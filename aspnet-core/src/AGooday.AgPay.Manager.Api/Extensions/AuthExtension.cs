@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             ents = new List<SysEntitlementDto>();
             if (auth.UserType.Equals(CS.USER_TYPE.ADMIN) || auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
             {
-                authorities = authService.GetUserRolesByUserId(auth.SysUserId).Select(s=>s.RoleId).ToList();
+                authorities = authService.GetUserRolesByUserId(auth.SysUserId).Select(s => s.RoleId).ToList();
                 ents = authService.GetEntsByUserId(auth.SysUserId, auth.UserType, auth.SysType)
                     .ToList();
             }

@@ -1,8 +1,8 @@
-﻿using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Security;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
 
 namespace AGooday.AgPay.Common.Utils
 {

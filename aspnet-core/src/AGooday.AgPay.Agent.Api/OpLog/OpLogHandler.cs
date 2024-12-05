@@ -1,4 +1,7 @@
-﻿using AGooday.AgPay.Agent.Api.Attributes;
+﻿using System.Diagnostics;
+using System.Security.Claims;
+using System.Text;
+using AGooday.AgPay.Agent.Api.Attributes;
 using AGooday.AgPay.Agent.Api.Extensions;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
@@ -9,9 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
-using System.Diagnostics;
-using System.Security.Claims;
-using System.Text;
 
 namespace AGooday.AgPay.Agent.Api.OpLog
 {

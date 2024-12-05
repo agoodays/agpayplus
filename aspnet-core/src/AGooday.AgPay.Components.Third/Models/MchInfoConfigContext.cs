@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Components.Third.Models
             StoreMap.TryGetValue(storeId, out MchStoreDto mchStore);
 
             return mchStore;
-        } 
+        }
         #endregion
     }
 }

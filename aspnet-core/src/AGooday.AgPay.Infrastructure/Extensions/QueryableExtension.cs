@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Query.Internal;
-using System.Reflection;
-
-namespace AGooday.AgPay.Infrastructure.Extensions
+﻿namespace AGooday.AgPay.Infrastructure.Extensions
 {
     /// <summary>
     /// 

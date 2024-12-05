@@ -1,10 +1,10 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Text;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using Newtonsoft.Json;
-using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.MQ
 {

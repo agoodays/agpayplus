@@ -133,7 +133,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.Kits
             string result = null;
             if (StringUtil.IsAllNotNullOrWhiteSpace(msg, subMsg))
             {
-                result =  $"msg【{subMsg}】";
+                result = $"msg【{subMsg}】";
             }
             else
             {

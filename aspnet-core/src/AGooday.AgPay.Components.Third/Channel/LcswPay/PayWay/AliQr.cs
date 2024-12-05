@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay.PayWay
     /// </summary>
     public class AliQr : LcswPayPaymentService
     {
-        public AliQr(ILogger<AliQr> logger, 
+        public AliQr(ILogger<AliQr> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

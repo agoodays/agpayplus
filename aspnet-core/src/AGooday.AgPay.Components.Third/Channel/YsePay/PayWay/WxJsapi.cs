@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
     /// </summary>
     public class WxJsapi : YsePayPaymentService
     {
-        public WxJsapi(ILogger<WxJsapi> logger, 
+        public WxJsapi(ILogger<WxJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

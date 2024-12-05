@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
                 throw new BizException("新密码与原密码不能相同！");
             }
 
-            agentInfo.Sipw = BCryptUtil.Hash( opSipw, out _);
+            agentInfo.Sipw = BCryptUtil.Hash(opSipw, out _);
             _agentInfoService.UpdateById(agentInfo);
             return ApiRes.Ok();
         }

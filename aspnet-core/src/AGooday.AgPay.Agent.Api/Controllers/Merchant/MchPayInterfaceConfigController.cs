@@ -1,4 +1,6 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Agent.Api.Authorization;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params;
 using AGooday.AgPay.Application.Permissions;
@@ -7,8 +9,6 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

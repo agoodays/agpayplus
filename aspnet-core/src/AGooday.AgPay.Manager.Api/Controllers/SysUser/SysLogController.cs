@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     {
         private readonly ISysLogService _sysLogService;
 
-        public SysLogController(ILogger<SysLogController> logger, 
+        public SysLogController(ILogger<SysLogController> logger,
             ISysLogService sysLogService,
             RedisUtil client,
             IAuthService authService)

@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay.PayWay
     /// </summary>
     public class AliQr : LesPayPaymentService
     {
-        public AliQr(ILogger<AliQr> logger, 
+        public AliQr(ILogger<AliQr> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

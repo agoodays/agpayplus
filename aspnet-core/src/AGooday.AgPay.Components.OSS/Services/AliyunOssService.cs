@@ -1,4 +1,6 @@
-﻿using AGooday.AgPay.Application.Interfaces;
+﻿using System.Security.Cryptography;
+using System.Text;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Constants;
 using AGooday.AgPay.Components.OSS.Models;
@@ -7,8 +9,6 @@ using Aliyun.OSS.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace AGooday.AgPay.Components.OSS.Services
 {

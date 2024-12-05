@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PayInterfaceDefineService(IMapper mapper, IMediatorHandler bus,
             IPayInterfaceDefineRepository payInterfaceDefineRepository)
-            :base(mapper, bus, payInterfaceDefineRepository)
+            : base(mapper, bus, payInterfaceDefineRepository)
         {
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
         }

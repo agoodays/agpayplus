@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
     /// </summary>
     public class AliWap : AliPayPaymentService
     {
-        public AliWap(ILogger<AliWap> logger, 
+        public AliWap(ILogger<AliWap> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

@@ -1,11 +1,11 @@
-﻿using AGooday.AgPay.Common.Constants;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Merchant.Api.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace AGooday.AgPay.Merchant.Api.Extensions
 {

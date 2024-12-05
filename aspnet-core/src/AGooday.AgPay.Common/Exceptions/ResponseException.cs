@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mime;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AGooday.AgPay.Common.Exceptions
 {

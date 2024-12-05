@@ -30,12 +30,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
-        public CurrentUserController(ILogger<CurrentUserController> logger, 
+        public CurrentUserController(ILogger<CurrentUserController> logger,
             IMemoryCache cache,
             ISysUserService sysUserService,
             ISysUserAuthService sysUserAuthService,
-            ISysUserLoginAttemptService sysUserLoginAttemptService, 
-            INotificationHandler<DomainNotification> notifications, 
+            ISysUserLoginAttemptService sysUserLoginAttemptService,
+            INotificationHandler<DomainNotification> notifications,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

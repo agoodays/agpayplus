@@ -27,11 +27,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
-        public SysUserController(ILogger<SysUserController> logger, 
-            IMemoryCache cache, 
+        public SysUserController(ILogger<SysUserController> logger,
+            IMemoryCache cache,
             INotificationHandler<DomainNotification> notifications,
             ISysUserService sysUserService,
-            ISysUserLoginAttemptService sysUserLoginAttemptService, 
+            ISysUserLoginAttemptService sysUserLoginAttemptService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

@@ -10,8 +10,6 @@ using AGooday.AgPay.Components.Third.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Asn1.Ocsp;
-using Org.BouncyCastle.Ocsp;
 
 namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
 {
@@ -20,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
     /// </summary>
     public class AliJsapi : AllinPayPaymentService
     {
-        public AliJsapi(ILogger<AliJsapi> logger, 
+        public AliJsapi(ILogger<AliJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

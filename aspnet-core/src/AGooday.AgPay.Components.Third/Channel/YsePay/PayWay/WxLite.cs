@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
     /// </summary>
     public class WxLite : YsePayPaymentService
     {
-        public WxLite(ILogger<WxLite> logger, 
+        public WxLite(ILogger<WxLite> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

@@ -182,7 +182,7 @@ namespace AGooday.AgPay.Common.Utils
                 mD5 = EnDecryptUtil.GetMD5("utf-8", Encoding.GetEncoding(charset));
             }
             return mD5;
-        } 
+        }
         #endregion
     }
 }

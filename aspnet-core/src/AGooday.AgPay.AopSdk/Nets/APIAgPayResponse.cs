@@ -14,5 +14,5 @@
             this.ResponseBody = responseBody;
             this.ResponseHeaders = responseHeaders;
         }
-}
+    }
 }

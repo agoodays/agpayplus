@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
     /// </summary>
     public class AliQr : YsePayPaymentService
     {
-        public AliQr(ILogger<AliQr> logger, 
+        public AliQr(ILogger<AliQr> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

@@ -1,6 +1,6 @@
-﻿using MySqlConnector;
-using System.Collections;
+﻿using System.Collections;
 using System.Data;
+using MySqlConnector;
 
 namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
 {

@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         public MchInfoController(ILogger<MchInfoController> logger,
             IMQSender mqSender,
             INotificationHandler<DomainNotification> notifications,
-            IMchInfoService mchInfoService, 
+            IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
             ISysUserService sysUserService,
             RedisUtil client,
@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             var agentNo = sysUser.BelongInfoId;
             var agentInfos = _agentInfoService.GetParents(agentNo);
             var topAgentInfo = agentInfos.OrderBy(x => x.Level).FirstOrDefault();
-            var agentInfo = agentInfos.FirstOrDefault(f=>f.AgentNo.Equals(agentNo));
+            var agentInfo = agentInfos.FirstOrDefault(f => f.AgentNo.Equals(agentNo));
             dto.RefundMode = JArray.Parse("[\"plat\", \"api\"]");
             dto.Type = CS.MCH_TYPE_ISVSUB;
             dto.TopAgentNo = topAgentInfo.AgentNo;

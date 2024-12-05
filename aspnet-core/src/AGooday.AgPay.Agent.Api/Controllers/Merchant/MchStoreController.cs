@@ -6,7 +6,6 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +27,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         public MchStoreController(IMQSender mqSender, ILogger<MchStoreController> logger,
             IMchStoreService mchStoreService,
             IMchInfoService mchInfoService,
-            ISysConfigService sysConfigService, 
+            ISysConfigService sysConfigService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

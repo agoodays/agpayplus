@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         private readonly ITransferOrderService _transferOrderService;
 
         public TransferOrderController(ILogger<TransferOrderController> logger,
-            ITransferOrderService transferOrderService, 
+            ITransferOrderService transferOrderService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

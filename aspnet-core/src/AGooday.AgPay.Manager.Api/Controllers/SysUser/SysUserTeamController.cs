@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         private readonly ISysUserTeamService _mchStoreService;
 
         public SysUserTeamController(ILogger<SysUserTeamController> logger,
-            ISysUserTeamService mchStoreService, 
+            ISysUserTeamService mchStoreService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

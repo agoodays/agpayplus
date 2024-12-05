@@ -1,8 +1,8 @@
-﻿using AGooday.AgPay.Common.Exceptions;
+﻿using System.Reflection;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Channel;
 using AGooday.AgPay.Components.Third.Models;
-using System.Reflection;
 
 namespace AGooday.AgPay.Components.Third.Utils
 {

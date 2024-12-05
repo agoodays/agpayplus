@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             IMQSender mqSender,
             IOptions<SysRSA2Config> sysRSA2Config,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService, 
+            IMchInfoService mchInfoService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

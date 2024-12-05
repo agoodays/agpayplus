@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay.PayWay
         /// 云闪付 微信jsapi
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public WxJsapi(ILogger<WxJsapi> logger, 
+        public WxJsapi(ILogger<WxJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

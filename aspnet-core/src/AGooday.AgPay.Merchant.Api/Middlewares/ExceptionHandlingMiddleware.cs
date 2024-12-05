@@ -1,8 +1,8 @@
-﻿using AGooday.AgPay.Common.Exceptions;
+﻿using System.Net;
+using System.Net.Mime;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using Newtonsoft.Json;
-using System.Net;
-using System.Net.Mime;
 
 namespace AGooday.AgPay.Merchant.Api.Middlewares
 {

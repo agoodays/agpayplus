@@ -1,5 +1,5 @@
-﻿using AGooday.AgPay.Common.Constants;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using AGooday.AgPay.Common.Constants;
 
 namespace AGooday.AgPay.Agent.Api.Extensions.AuthContext
 {

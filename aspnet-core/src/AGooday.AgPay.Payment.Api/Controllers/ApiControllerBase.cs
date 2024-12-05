@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Common.Constants;
+﻿using System.Text;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Models;
@@ -9,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Controllers
 {

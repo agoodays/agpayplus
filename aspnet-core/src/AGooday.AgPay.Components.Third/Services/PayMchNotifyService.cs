@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Net.Mime;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Enumerator;
@@ -10,7 +11,6 @@ using AGooday.AgPay.Components.Third.RQRS.Refund;
 using AGooday.AgPay.Components.Third.RQRS.Transfer;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Net.Mime;
 
 namespace AGooday.AgPay.Components.Third.Services
 {

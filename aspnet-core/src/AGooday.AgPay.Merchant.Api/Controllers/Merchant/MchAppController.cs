@@ -27,11 +27,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MchAppController(ILogger<MchAppController> logger, 
-            IOptions<SysRSA2Config> sysRSA2Config, 
+        public MchAppController(ILogger<MchAppController> logger,
+            IOptions<SysRSA2Config> sysRSA2Config,
             IMQSender mqSender,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService, 
+            IMchInfoService mchInfoService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

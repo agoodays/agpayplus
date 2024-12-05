@@ -1,8 +1,8 @@
-﻿using AGooday.AgPay.Common.Models;
+﻿using System.Runtime.InteropServices;
+using AGooday.AgPay.Common.Models;
 using SkiaSharp;
 using SkiaSharp.QrCode;
 using SkiaSharp.QrCode.Models;
-using System.Runtime.InteropServices;
 
 namespace AGooday.AgPay.Common.Utils
 {

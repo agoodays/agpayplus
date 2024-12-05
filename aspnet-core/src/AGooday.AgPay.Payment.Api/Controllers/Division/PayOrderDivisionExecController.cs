@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 }
 
                 //处理分账请求
-                ChannelRetMsg channelRetMsg = _payOrderDivisionProcessService.ProcessPayOrderDivision(bizRQ.PayOrderId, bizRQ.UseSysAutoDivisionReceivers, receiverList,false);
+                ChannelRetMsg channelRetMsg = _payOrderDivisionProcessService.ProcessPayOrderDivision(bizRQ.PayOrderId, bizRQ.UseSysAutoDivisionReceivers, receiverList, false);
 
                 PayOrderDivisionExecRS bizRS = new PayOrderDivisionExecRS();
                 //bizRS.State = (byte)(channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS ? PayOrderDivisionRecordState.STATE_SUCCESS : PayOrderDivisionRecordState.STATE_FAIL);
@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             }
             catch (Exception e)
             {
-                _logger.LogError(e,$"系统异常：payOrderId={bizRQ.PayOrderId}");
+                _logger.LogError(e, $"系统异常：payOrderId={bizRQ.PayOrderId}");
                 return ApiRes.CustomFail("系统异常");
             }
         }

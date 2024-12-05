@@ -1,11 +1,11 @@
-﻿using AGooday.AgPay.Application.Interfaces;
+﻿using System.Text;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text;
 
 namespace AGooday.AgPay.Payment.Api.Authorization
 {

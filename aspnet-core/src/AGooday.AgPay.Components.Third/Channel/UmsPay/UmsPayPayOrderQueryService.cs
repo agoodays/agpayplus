@@ -145,7 +145,8 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
                 {
                     case "SUCCESS":
                         resJSON.TryGetString("billStatus", out string billStatus);// 账单状态
-                        switch (billStatus) {
+                        switch (billStatus)
+                        {
                             case "PAID":
                             case "REFUND":
                                 resJSON.TryGetValue("billPayment", out JToken billPayment); // 账单支付信息
@@ -175,7 +176,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
                                         break;
                                 }
                                 break;
-                            case "UNPAID": 
+                            case "UNPAID":
                                 break;
                             case "CLOSED":
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;

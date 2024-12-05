@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
 
-        public MchAppController(ILogger<MchAppController> logger, 
+        public MchAppController(ILogger<MchAppController> logger,
             IMQSender mqSender,
             IOptions<SysRSA2Config> sysRSA2Config,
             IMchAppService mchAppService,

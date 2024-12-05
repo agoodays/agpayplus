@@ -10,9 +10,9 @@ namespace AGooday.AgPay.AopSdk.Request
     public class PayOrderCreateRequest : IAgPayRequest<PayOrderCreateResponse>
     {
         private string ApiVersion = AgPay.VERSION;
-        private string ApiUri  = "api/pay/unifiedOrder";
+        private string ApiUri = "api/pay/unifiedOrder";
         private RequestOptions Options;
-        private AgPayObject BizModel  = null;
+        private AgPayObject BizModel = null;
 
         public string GetApiUri()
         {

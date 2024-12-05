@@ -25,10 +25,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         private readonly IMchInfoService _mchInfoService;
         private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
 
-        public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger, 
-            IMQSender mqSender, 
+        public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger,
+            IMQSender mqSender,
             IMchInfoService mchInfoService,
-            IPayOrderDivisionRecordService payOrderDivisionRecordService, 
+            IPayOrderDivisionRecordService payOrderDivisionRecordService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

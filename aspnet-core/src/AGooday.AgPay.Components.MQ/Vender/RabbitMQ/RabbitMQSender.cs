@@ -1,10 +1,10 @@
-﻿using AGooday.AgPay.Components.MQ.Constants;
+﻿using System.Text;
+using AGooday.AgPay.Components.MQ.Constants;
 using AGooday.AgPay.Components.MQ.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Text;
 
 namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 {

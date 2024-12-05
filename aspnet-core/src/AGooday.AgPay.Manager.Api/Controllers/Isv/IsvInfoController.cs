@@ -27,12 +27,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         private readonly IMchInfoService _mchInfoService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
-        public IsvInfoController(ILogger<IsvInfoController> logger, 
+        public IsvInfoController(ILogger<IsvInfoController> logger,
             IMQSender mqSender,
             IIsvInfoService isvInfoService,
             IAgentInfoService agentInfoService,
             IMchInfoService mchInfoService,
-            IPayInterfaceConfigService payInterfaceConfigService, 
+            IPayInterfaceConfigService payInterfaceConfigService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

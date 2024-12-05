@@ -4,7 +4,6 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
@@ -26,7 +25,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly ISysUserService _sysUserService;
         private readonly ISysConfigService _sysConfigService;
 
-        public MchStoreController(ILogger<MchStoreController> logger, 
+        public MchStoreController(ILogger<MchStoreController> logger,
             IMQSender mqSender,
             IMchStoreService mchStoreService,
             IMchInfoService mchInfoService,

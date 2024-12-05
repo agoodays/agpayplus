@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
     /// </summary>
     public class WxJsapi : JlPayPaymentService
     {
-        public WxJsapi(ILogger<WxJsapi> logger, 
+        public WxJsapi(ILogger<WxJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

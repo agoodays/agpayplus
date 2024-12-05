@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
                             break;
                         case "2008":
                         case "2000":
-                        //case "3088":
+                            //case "3088":
                             break;
                         default:
                             channelRetMsg = ChannelRetMsg.ConfirmFail(code, msg);

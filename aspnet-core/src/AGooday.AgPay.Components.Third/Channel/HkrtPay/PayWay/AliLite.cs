@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.PayWay
     /// </summary>
     public class AliLite : HkrtPayPaymentService
     {
-        public AliLite(ILogger<AliLite> logger, 
+        public AliLite(ILogger<AliLite> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

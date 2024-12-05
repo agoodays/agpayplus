@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Net.Mime;
+﻿using System.Net.Mime;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.AopSdk.Nets
 {

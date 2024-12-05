@@ -1,6 +1,6 @@
-﻿using AGooday.AgPay.Common.Utils;
+﻿using System.Net.Mime;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Exceptions;
-using System.Net.Mime;
 
 namespace AGooday.AgPay.Components.Third.Channel.LcswPay.Utils
 {

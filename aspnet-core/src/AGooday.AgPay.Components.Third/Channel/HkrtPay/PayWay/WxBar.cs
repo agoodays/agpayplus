@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.PayWay
     /// </summary>
     public class WxBar : HkrtPayPaymentService
     {
-        public WxBar(ILogger<WxBar> logger, 
+        public WxBar(ILogger<WxBar> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

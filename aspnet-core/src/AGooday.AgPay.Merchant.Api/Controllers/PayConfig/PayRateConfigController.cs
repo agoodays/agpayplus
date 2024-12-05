@@ -3,7 +3,6 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;

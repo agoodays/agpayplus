@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
 
         public SysUserRoleRelaController(ILogger<SysUserRoleRelaController> logger,
             ISysUserService sysUserService,
-            ISysUserRoleRelaService sysUserRoleRelaService, 
+            ISysUserRoleRelaService sysUserRoleRelaService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

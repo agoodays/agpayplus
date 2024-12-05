@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using System.Data;
 
 namespace AGooday.AgPay.Infrastructure.Extensions.DataAccess
 {

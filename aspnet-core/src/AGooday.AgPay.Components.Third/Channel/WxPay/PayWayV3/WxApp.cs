@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
     /// </summary>
     public class WxApp : WxPayPaymentService
     {
-        public WxApp(ILogger<WxApp> logger, 
+        public WxApp(ILogger<WxApp> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -140,7 +140,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
                 //var paySign = WxPayV3Util.RSASign(beforeSign, wxServiceWrapper.Config.MchPrivateKey);
                 //payInfo.Add("sign", paySign);// 签名以后在增加prepayId参数
                 //payInfo.Add("prepayId", response.PrepayId);
-                var payInfo = client.GenerateParametersForAppPayRequest(partnerId,wxAppId, response.PrepayId);
+                var payInfo = client.GenerateParametersForAppPayRequest(partnerId, wxAppId, response.PrepayId);
                 res.PayInfo = JsonConvert.SerializeObject(payInfo);
                 channelRetMsg.ChannelState = ChannelState.WAITING;
             }

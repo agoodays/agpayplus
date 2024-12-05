@@ -1,8 +1,8 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel;
+using System.Text.Json;
+using AutoMapper;
 using EmitMapper.MappingConfiguration;
 using log4net;
-using System.ComponentModel;
-using System.Text.Json;
 
 namespace AGooday.AgPay.Common.Utils
 {

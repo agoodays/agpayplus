@@ -1,7 +1,7 @@
-﻿using AGooday.AgPay.Components.Third.Models;
-using AGooday.AgPay.Components.Third.RQRS.PayOrder;
+﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS;
-using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Components.Third.RQRS.PayOrder;
 
 namespace AGooday.AgPay.Components.Third.Channel
 {

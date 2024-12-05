@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
         /// 支付宝 二维码支付
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public AliQr(ILogger<AliQr> logger, 
+        public AliQr(ILogger<AliQr> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
                     res.CodeImgUrl = _sysConfigService.GetDBApplicationConfig().GenScanImgUrl(alipayResp.QrCode);
                 }
                 else
-                { 
+                {
                     //默认都为跳转地址方式
                     res.CodeUrl = alipayResp.QrCode;
                 }

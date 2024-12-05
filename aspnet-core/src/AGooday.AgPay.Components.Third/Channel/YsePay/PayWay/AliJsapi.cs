@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
     /// </summary>
     public class AliJsapi : YsePayPaymentService
     {
-        public AliJsapi(ILogger<AliJsapi> logger, 
+        public AliJsapi(ILogger<AliJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

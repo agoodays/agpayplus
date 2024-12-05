@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
     /// </summary>
     public class WxH5 : WxPayPaymentService
     {
-        public WxH5(ILogger<WxH5> logger, 
+        public WxH5(ILogger<WxH5> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

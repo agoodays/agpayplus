@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay.PayWay
     /// </summary>
     public class WxNative : LcswPayPaymentService
     {
-        public WxNative(ILogger<WxNative> logger, 
+        public WxNative(ILogger<WxNative> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

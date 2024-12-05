@@ -1,4 +1,6 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Diagnostics;
+using System.Web;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.YsePay;
 using AGooday.AgPay.Common.Constants;
@@ -14,8 +16,6 @@ using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Diagnostics;
-using System.Web;
 
 namespace AGooday.AgPay.Components.Third.Channel.YsePay
 {

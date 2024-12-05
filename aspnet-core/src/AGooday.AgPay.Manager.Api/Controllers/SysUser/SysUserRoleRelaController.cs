@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
 
         public SysUserRoleRelaController(ILogger<SysUserRoleRelaController> logger,
-            ISysUserRoleRelaService sysUserRoleRelaService, 
+            ISysUserRoleRelaService sysUserRoleRelaService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

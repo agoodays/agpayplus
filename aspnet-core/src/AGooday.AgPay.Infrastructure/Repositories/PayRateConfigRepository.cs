@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public IQueryable<PayRateConfig> GetByInfoIdAndIfCode(string configType, string infoType, string infoId, string ifCode)
         {
-            return DbSet.Where(w => w.State.Equals(CS.YES) 
+            return DbSet.Where(w => w.State.Equals(CS.YES)
             && w.ConfigType.Equals(configType)
             && w.InfoType.Equals(infoType)
             && w.InfoId.Equals(infoId)

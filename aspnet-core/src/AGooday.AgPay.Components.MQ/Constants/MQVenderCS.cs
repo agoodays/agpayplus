@@ -6,7 +6,7 @@
     public class MQVenderCS
     {
         public const string MQ_VENDER_KEY = "MQ:Vender";
-               
+
         public const string ACTIVE_MQ = "ActiveMQ";
         public const string RABBIT_MQ = "RabbitMQ";
         public const string ROCKET_MQ = "RocketMQ";

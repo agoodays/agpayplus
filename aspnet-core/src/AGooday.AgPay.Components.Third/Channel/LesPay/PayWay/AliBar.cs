@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay.PayWay
     /// </summary>
     public class AliBar : LesPayPaymentService
     {
-        public AliBar(ILogger<AliBar> logger, 
+        public AliBar(ILogger<AliBar> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay.PayWay
             SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
             reqParams.Add("auth_code", bizRQ.AuthCode.Trim()); //授权码 通过扫码枪/声波获取设备获取的支付宝/微信/银联付款码
             // 云闪付 bar 统一参数赋值
-            BarParamsSet(reqParams, payOrder,GetNotifyUrl(), mchAppConfigContext);
+            BarParamsSet(reqParams, payOrder, GetNotifyUrl(), mchAppConfigContext);
 
             var channelRetMsg = LesBar(reqParams, logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;

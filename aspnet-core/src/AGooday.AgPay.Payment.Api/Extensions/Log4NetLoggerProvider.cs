@@ -1,13 +1,13 @@
-﻿using log4net.Appender;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
+using log4net;
+using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
 using log4net.Filter;
 using log4net.Layout;
-using log4net.Repository.Hierarchy;
 using log4net.Repository;
-using log4net;
-using System.Collections.Concurrent;
-using System.Reflection;
+using log4net.Repository.Hierarchy;
 
 namespace AGooday.AgPay.Payment.Api.Extensions
 {

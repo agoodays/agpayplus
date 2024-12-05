@@ -148,7 +148,7 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<AgentInfo>().Property(c => c.AuditProfitAmount).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.FreezeAmount).HasDefaultValue(0);
             modelBuilder.Entity<AgentInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-            modelBuilder.Entity<AgentInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)"); 
+            modelBuilder.Entity<AgentInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<AgentInfo>()
                 .HasOne(a => a.ParentAgent)// 指定一个代理商可以有一个上级代理商
                 .WithMany(a => a.SubAgents)// 指定一个代理商可以有多个子代理商

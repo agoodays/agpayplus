@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
     /// </summary>
     public class YsfBar : YsePayPaymentService
     {
-        public YsfBar(ILogger<YsfBar> logger, 
+        public YsfBar(ILogger<YsfBar> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

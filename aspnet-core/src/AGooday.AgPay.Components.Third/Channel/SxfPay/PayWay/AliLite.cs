@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
     /// </summary>
     public class AliLite : SxfPayPaymentService
     {
-        public AliLite(ILogger<AliLite> logger, 
+        public AliLite(ILogger<AliLite> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

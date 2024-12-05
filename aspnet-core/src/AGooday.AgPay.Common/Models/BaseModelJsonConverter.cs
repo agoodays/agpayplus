@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Reflection;
 
 namespace AGooday.AgPay.Common.Models
 {

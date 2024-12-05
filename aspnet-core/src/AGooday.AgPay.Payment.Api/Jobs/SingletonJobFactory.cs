@@ -1,5 +1,5 @@
-﻿using Quartz.Spi;
-using Quartz;
+﻿using Quartz;
+using Quartz.Spi;
 
 namespace AGooday.AgPay.Payment.Api.Jobs
 {

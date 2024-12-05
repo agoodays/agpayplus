@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
     /// </summary>
     public class AliBar : AliPayPaymentService
     {
-        public AliBar(ILogger<AliBar> logger, 
+        public AliBar(ILogger<AliBar> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

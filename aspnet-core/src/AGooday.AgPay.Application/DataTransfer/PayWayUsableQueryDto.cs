@@ -1,6 +1,4 @@
-﻿using AGooday.AgPay.Common.Models;
-
-namespace AGooday.AgPay.Application.DataTransfer
+﻿namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 支付方式表

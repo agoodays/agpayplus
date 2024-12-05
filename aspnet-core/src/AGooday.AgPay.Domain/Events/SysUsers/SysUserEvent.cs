@@ -1,5 +1,4 @@
 ﻿using AGooday.AgPay.Domain.Core.Events;
-using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Domain.Events.SysUsers
 {

@@ -1,6 +1,6 @@
-﻿using AGooday.AgPay.Components.OCR.Models;
+﻿using System.Globalization;
+using AGooday.AgPay.Components.OCR.Models;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
 
 namespace AGooday.AgPay.Components.OCR.Services
 {

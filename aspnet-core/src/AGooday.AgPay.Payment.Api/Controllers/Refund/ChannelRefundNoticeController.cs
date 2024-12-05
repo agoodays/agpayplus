@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Net;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Components.Third.Channel;
@@ -6,7 +7,6 @@ using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
 using AGooday.AgPay.Components.Third.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using static AGooday.AgPay.Components.Third.Channel.IChannelRefundNoticeService;
 
 namespace AGooday.AgPay.Payment.Api.Controllers.Refund
@@ -23,9 +23,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         private readonly RefundOrderProcessService refundOrderProcessService;
         private readonly IChannelServiceFactory<IChannelRefundNoticeService> channelRefundNoticeServiceFactory;
 
-        public ChannelRefundNoticeController(ILogger<ChannelRefundNoticeController> logger, 
-            IRefundOrderService refundOrderService, 
-            ConfigContextQueryService configContextQueryService, 
+        public ChannelRefundNoticeController(ILogger<ChannelRefundNoticeController> logger,
+            IRefundOrderService refundOrderService,
+            ConfigContextQueryService configContextQueryService,
             RefundOrderProcessService refundOrderProcessService,
             IChannelServiceFactory<IChannelRefundNoticeService> channelRefundNoticeServiceFactory)
         {

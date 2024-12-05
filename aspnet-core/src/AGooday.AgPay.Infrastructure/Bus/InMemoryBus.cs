@@ -1,8 +1,8 @@
-﻿using AGooday.AgPay.Domain.Core.Bus;
+﻿using System.Collections.Concurrent;
+using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Core.Commands;
 using AGooday.AgPay.Domain.Core.Events;
 using MediatR;
-using System.Collections.Concurrent;
 
 namespace AGooday.AgPay.Infrastructure.Bus
 {

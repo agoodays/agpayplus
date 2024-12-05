@@ -5,7 +5,6 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Models;

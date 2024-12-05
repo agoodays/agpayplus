@@ -128,7 +128,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             }
             catch (Exception e)
             {
-                return ApiRes.Fail(ApiCode.SYSTEM_ERROR,e.Message);
+                return ApiRes.Fail(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }
     }

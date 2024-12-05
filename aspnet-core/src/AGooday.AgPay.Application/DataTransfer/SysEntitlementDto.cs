@@ -75,8 +75,9 @@
         /// <summary>
         /// 匹配规则
         /// </summary>
-        public class EntMatchRule { 
-        
+        public class EntMatchRule
+        {
+
             /// <summary>
             /// 拓展员
             /// </summary>

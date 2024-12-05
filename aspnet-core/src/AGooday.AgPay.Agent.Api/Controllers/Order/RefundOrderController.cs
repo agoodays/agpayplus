@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         private readonly IRefundOrderService _refundOrderService;
 
         public RefundOrderController(ILogger<RefundOrderController> logger,
-            IRefundOrderService refundOrderService, 
+            IRefundOrderService refundOrderService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

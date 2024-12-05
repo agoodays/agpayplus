@@ -2,7 +2,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
-using AGooday.AgPay.Components.Third.Channel.AllinPay.Enumerator;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
@@ -19,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
     /// </summary>
     public class WxNative : AllinPayPaymentService
     {
-        public WxNative(ILogger<WxNative> logger, 
+        public WxNative(ILogger<WxNative> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

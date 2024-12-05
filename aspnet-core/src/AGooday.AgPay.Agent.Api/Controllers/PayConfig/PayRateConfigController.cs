@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
         private readonly IMQSender mqSender;
         private readonly IPayRateConfigService _payRateConfigService;
 
-        public PayRateConfigController(ILogger<PayRateConfigController> logger, 
+        public PayRateConfigController(ILogger<PayRateConfigController> logger,
             IMQSender mqSender,
             IPayRateConfigService payRateConfigService,
             RedisUtil client,

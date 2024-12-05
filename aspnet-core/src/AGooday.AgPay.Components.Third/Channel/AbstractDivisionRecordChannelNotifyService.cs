@@ -1,12 +1,12 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Net;
+using System.Net.Mime;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
 using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Net.Mime;
 
 namespace AGooday.AgPay.Components.Third.Channel
 {

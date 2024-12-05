@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
 
         public MainChartController(ILogger<MainChartController> logger,
             IAgentInfoService agentInfoService,
-            IPayOrderService payOrderService, 
+            IPayOrderService payOrderService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

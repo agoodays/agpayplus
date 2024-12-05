@@ -1,9 +1,9 @@
-﻿using AGooday.AgPay.Common.Constants;
+﻿using System.ComponentModel.DataAnnotations;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.RQRS.PayOrder.PayWay;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 
 namespace AGooday.AgPay.Components.Third.RQRS.PayOrder
 {

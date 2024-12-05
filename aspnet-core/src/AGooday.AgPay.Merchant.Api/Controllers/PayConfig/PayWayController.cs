@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet,Route("")]
+        [HttpGet, Route("")]
         [PermissionAuth(PermCode.MCH.ENT_PAY_ORDER_SEARCH_PAY_WAY)]
         public ApiPageRes<PayWayDto> List([FromQuery] PayWayQueryDto dto)
         {

@@ -1,4 +1,6 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Net;
+using System.Net.Mime;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
 using AGooday.AgPay.Components.Third.Services;
@@ -7,8 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Net.Mime;
 using static AGooday.AgPay.Components.Third.Channel.IChannelNoticeService;
 
 namespace AGooday.AgPay.Components.Third.Channel

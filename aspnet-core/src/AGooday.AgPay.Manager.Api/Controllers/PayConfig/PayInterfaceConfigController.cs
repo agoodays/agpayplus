@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IPayInterfaceDefineService _payIfDefineService;
 
-        public PayInterfaceConfigController(ILogger<PayInterfaceConfigController> logger, 
+        public PayInterfaceConfigController(ILogger<PayInterfaceConfigController> logger,
             IMQSender mqSender,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,

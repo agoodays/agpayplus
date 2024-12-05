@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
     /// </summary>
     public class AliPc : AliPayPaymentService
     {
-        public AliPc(ILogger<AliPc> logger, 
+        public AliPc(ILogger<AliPc> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

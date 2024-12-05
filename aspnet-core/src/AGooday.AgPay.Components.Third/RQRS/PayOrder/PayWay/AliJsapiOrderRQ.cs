@@ -1,5 +1,5 @@
-﻿using AGooday.AgPay.Common.Constants;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using AGooday.AgPay.Common.Constants;
 
 namespace AGooday.AgPay.Components.Third.RQRS.PayOrder.PayWay
 {

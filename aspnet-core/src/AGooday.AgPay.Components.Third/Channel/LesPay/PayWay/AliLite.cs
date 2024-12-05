@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay.PayWay
     /// </summary>
     public class AliLite : LesPayPaymentService
     {
-        public AliLite(ILogger<AliLite> logger, 
+        public AliLite(ILogger<AliLite> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay.PayWay
                 if ("0".Equals(resp_code))
                 {
                     string result_code = resJSON.GetValue("result_code").ToString(); //业务结果
-                    resJSON.TryGetString("error_code" ,out string error_code); //错误码
+                    resJSON.TryGetString("error_code", out string error_code); //错误码
                     resJSON.TryGetString("error_msg", out string error_msg); //错误码描述
                     if ("0".Equals(result_code))
                     {

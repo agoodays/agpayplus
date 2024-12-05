@@ -1,5 +1,5 @@
-﻿using SkiaSharp;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using SkiaSharp;
 
 namespace AGooday.AgPay.Common.Utils
 {

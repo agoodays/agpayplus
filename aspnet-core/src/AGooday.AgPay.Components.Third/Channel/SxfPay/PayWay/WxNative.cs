@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
     /// </summary>
     public class WxNative : SxfPayPaymentService
     {
-        public WxNative(ILogger<WxNative> logger, 
+        public WxNative(ILogger<WxNative> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

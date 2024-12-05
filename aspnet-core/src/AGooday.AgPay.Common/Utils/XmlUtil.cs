@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Xml.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Xml.Linq;
 
 namespace AGooday.AgPay.Common.Utils
 {

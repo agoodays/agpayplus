@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay.PayWay
     /// </summary>
     public class YsfJsapi : UmsPayPaymentService
     {
-        public YsfJsapi(ILogger<YsfJsapi> logger, 
+        public YsfJsapi(ILogger<YsfJsapi> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

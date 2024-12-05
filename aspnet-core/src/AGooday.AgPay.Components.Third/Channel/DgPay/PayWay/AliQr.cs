@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
     /// </summary>
     public class AliQr : DgPayPaymentService
     {
-        public AliQr(ILogger<AliQr> logger, 
+        public AliQr(ILogger<AliQr> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         public PayOauth2ConfigController(ILogger<PayOauth2ConfigController> logger,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
-            IPayInterfaceConfigService payIfConfigService, 
+            IPayInterfaceConfigService payIfConfigService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

@@ -27,7 +27,7 @@
             /// <summary>
             /// 交易正在处理中，可对该交易做查询，避免重复支付。
             /// </summary>
-            TRADE_PROCESS,  
+            TRADE_PROCESS,
             /// <summary>
             /// 交易失败
             /// </summary>
@@ -59,7 +59,8 @@
         /// <summary>
         /// 退款交易状态
         /// </summary>
-        public enum RefundState {
+        public enum RefundState
+        {
             /// <summary>
             /// 成功
             /// </summary>

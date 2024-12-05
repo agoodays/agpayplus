@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             IPayInterfaceConfigService payIfConfigService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
-            ISysConfigService sysConfigService, 
+            ISysConfigService sysConfigService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)

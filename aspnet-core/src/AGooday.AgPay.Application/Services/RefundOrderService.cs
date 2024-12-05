@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Data;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
@@ -8,7 +9,6 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
 using Newtonsoft.Json.Linq;
-using System.Data;
 
 namespace AGooday.AgPay.Application.Services
 {

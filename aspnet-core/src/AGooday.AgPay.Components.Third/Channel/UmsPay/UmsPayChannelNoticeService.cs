@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
         }
 
         public UmsPayChannelNoticeService()
-            :base()
+            : base()
         {
         }
 

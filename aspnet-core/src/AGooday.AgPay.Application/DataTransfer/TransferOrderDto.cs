@@ -93,42 +93,42 @@
         /// <summary>
         /// 收款账号
         /// </summary>
-        public string AccountNo{ get; set; }
+        public string AccountNo { get; set; }
 
         /// <summary>
         /// 收款人姓名
         /// </summary>
-        public string AccountName{ get; set; }
+        public string AccountName { get; set; }
 
         /// <summary>
         /// 收款人开户行名称
         /// </summary>
-        public string BankName{ get; set; }
+        public string BankName { get; set; }
 
         /// <summary>
         /// 转账备注信息
         /// </summary>
-        public string TransferDesc{ get; set; }
+        public string TransferDesc { get; set; }
 
         /// <summary>
         /// 客户端IP
         /// </summary>
-        public string ClientIp{ get; set; }
+        public string ClientIp { get; set; }
 
         /// <summary>
         /// 支付状态: 0-订单生成, 1-转账中, 2-转账成功, 3-转账失败, 4-订单关闭
         /// </summary>
-        public byte State{ get; set; }
+        public byte State { get; set; }
 
         /// <summary>
         /// 特定渠道发起额外参数
         /// </summary>
-        public string ChannelExtra{ get; set; }
+        public string ChannelExtra { get; set; }
 
         /// <summary>
         /// 渠道订单号
         /// </summary>
-        public string ChannelOrderNo{ get; set; }
+        public string ChannelOrderNo { get; set; }
 
         /// <summary>
         /// 渠道支付错误码

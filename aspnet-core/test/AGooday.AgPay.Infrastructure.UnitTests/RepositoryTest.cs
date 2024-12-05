@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
             //});
 
             var loggerFactory = LoggerFactory.Create(builder => builder.AddProvider(_loggerProvider)
-                //.SetMinimumLevel(LogLevel.Trace)
+            //.SetMinimumLevel(LogLevel.Trace)
             );
 
             _logger = loggerFactory.CreateLogger<RepositoryTest>();

@@ -1,11 +1,11 @@
-﻿using AGooday.AgPay.Common.Exceptions;
+﻿using System.Security.Claims;
+using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Merchant.Api.Extensions;
 using AGooday.AgPay.Merchant.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using StackExchange.Redis;
-using System.Security.Claims;
 
 namespace AGooday.AgPay.Merchant.Api.Authorization
 {

@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public void RemoveByRoleId(string roleId)
         {
-            var entitys = DbSet.Where(w=>w.RoleId.Equals(roleId));
+            var entitys = DbSet.Where(w => w.RoleId.Equals(roleId));
             foreach (var entity in entitys)
             {
                 DbSet.Remove(entity);

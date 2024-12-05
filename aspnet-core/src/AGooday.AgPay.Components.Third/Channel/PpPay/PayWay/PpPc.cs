@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay.PayWay
 {
     public class PpPc : PpPayPaymentService
     {
-        public PpPc(ILogger<PpPc> logger, 
+        public PpPc(ILogger<PpPc> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

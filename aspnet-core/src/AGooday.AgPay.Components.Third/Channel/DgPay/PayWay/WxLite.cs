@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
     /// </summary>
     public class WxLite : DgPayPaymentService
     {
-        public WxLite(ILogger<WxLite> logger, 
+        public WxLite(ILogger<WxLite> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)

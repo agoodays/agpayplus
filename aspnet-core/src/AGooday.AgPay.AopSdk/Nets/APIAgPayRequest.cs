@@ -1,9 +1,9 @@
-﻿using AGooday.AgPay.AopSdk.Exceptions;
+﻿using System.Text;
+using System.Web;
+using AGooday.AgPay.AopSdk.Exceptions;
 using AGooday.AgPay.AopSdk.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text;
-using System.Web;
 
 namespace AGooday.AgPay.AopSdk.Nets
 {

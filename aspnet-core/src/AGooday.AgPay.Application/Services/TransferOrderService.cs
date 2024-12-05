@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Application.Services
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly ITransferOrderRepository _transferOrderRepository;
 
-        public TransferOrderService(IMapper mapper, IMediatorHandler bus, 
+        public TransferOrderService(IMapper mapper, IMediatorHandler bus,
             ITransferOrderRepository transferOrderRepository)
             : base(mapper, bus, transferOrderRepository)
         {
