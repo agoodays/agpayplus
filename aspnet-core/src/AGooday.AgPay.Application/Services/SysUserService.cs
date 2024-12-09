@@ -137,14 +137,14 @@ namespace AGooday.AgPay.Application.Services
                             && (dto.UserType.Equals(null) || u.UserType.Equals(dto.UserType))
                             && (dto.SysUserId.Equals(null) || u.SysUserId.Equals(dto.SysUserId))
                             && (currentUserId.Equals(null) || !u.SysUserId.Equals(currentUserId))
-                            select new { u, team }).ToList().Select(s =>
-                            {
-                                var item = _mapper.Map<SysUserListDto>(s.u);
-                                item.TeamName = s.team?.TeamName;
-                                return item;
-                            }).OrderByDescending(o => o.CreatedAt);
+                            select new { u, team }).OrderByDescending(o => o.u.CreatedAt);
 
-            var records = PaginatedList<SysUserListDto>.Create(sysUsers, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysUserListDto>.Create(sysUsers, s =>
+            {
+                var item = _mapper.Map<SysUserListDto>(s.u);
+                item.TeamName = s.team?.TeamName;
+                return item;
+            }, dto.PageNumber, dto.PageSize);
             return records;
         }
 

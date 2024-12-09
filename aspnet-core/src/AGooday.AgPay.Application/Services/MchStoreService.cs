@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<MchStoreListDto> GetPaginatedData(MchStoreQueryDto dto, List<long> storeIds = null)
         {
-            var mchStores = _mchStoreRepository.GetAllAsNoTracking()
+            var query = _mchStoreRepository.GetAllAsNoTracking()
                 .Join(_mchInfoRepository.GetAllAsNoTracking(),
                 ms => ms.MchNo, mi => mi.MchNo,
                 (ms, mi) => new { ms, mi })
@@ -80,15 +80,15 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.StoreId.Equals(null) || w.ms.StoreId.Equals(dto.StoreId))
                 && (storeIds == null || storeIds.Equals(w.ms.StoreId))
                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.ms.StoreName.Contains(dto.StoreName))
-                && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.mi.AgentNo.Equals(dto.AgentNo))).ToList()
-                .Select(s =>
-                {
-                    var item = _mapper.Map<MchStoreListDto>(s.ms);
-                    item.MchName = s.mi.MchName;
-                    return item;
-                }).OrderByDescending(o => o.CreatedAt);
+                && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.mi.AgentNo.Equals(dto.AgentNo)))
+                .OrderByDescending(o => o.ms.CreatedAt);
 
-            var records = PaginatedList<MchStoreListDto>.Create(mchStores, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<MchStoreListDto>.Create(query, s =>
+            {
+                var item = _mapper.Map<MchStoreListDto>(s.ms);
+                item.MchName = s.mi.MchName;
+                return item;
+            }, dto.PageNumber, dto.PageSize);
             return records;
         }
     }
