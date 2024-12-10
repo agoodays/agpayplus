@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Application.Services
             return _sysUserTeamRepository.SaveChanges(out int _);
         }
 
-        public PaginatedList<SysUserTeamDto> GetPaginatedData(SysUserTeamQueryDto dto)
+        public async Task<PaginatedList<SysUserTeamDto>> GetPaginatedDataAsync(SysUserTeamQueryDto dto)
         {
             var sysUsers = _sysUserTeamRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.TeamNo) || w.TeamNo.Equals(dto.TeamNo))
                 && (dto.TeamId.Equals(null) || w.TeamId.Equals(dto.TeamId))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysUserTeam>.Create<SysUserTeamDto>(sysUsers, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<SysUserTeam>.CreateAsync<SysUserTeamDto>(sysUsers, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

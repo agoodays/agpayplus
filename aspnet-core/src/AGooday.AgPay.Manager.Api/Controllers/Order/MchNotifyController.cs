@@ -42,10 +42,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.MGR.ENT_NOTIFY_LIST)]
-        public ApiPageRes<MchNotifyRecordDto> List([FromQuery] MchNotifyQueryDto dto)
+        public async Task<ApiPageRes<MchNotifyRecordDto>> ListAsync([FromQuery] MchNotifyQueryDto dto)
         {
             dto.BindDateRange();
-            var data = _mchNotifyService.GetPaginatedData(dto);
+            var data = await _mchNotifyService.GetPaginatedDataAsync(dto);
             return ApiPageRes<MchNotifyRecordDto>.Pages(data);
         }
 

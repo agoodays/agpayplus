@@ -49,9 +49,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_LIST)]
-        public ApiPageRes<MchAppDto> List([FromQuery] MchAppQueryDto dto)
+        public async Task<ApiPageRes<MchAppDto>> ListAsync([FromQuery] MchAppQueryDto dto)
         {
-            var data = _mchAppService.GetPaginatedData(dto);
+            var data = await _mchAppService.GetPaginatedDataAsync(dto);
             var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
             var mchInfos = _mchInfoService.GetByMchNos(mchNos);
             //JArray records = new JArray();

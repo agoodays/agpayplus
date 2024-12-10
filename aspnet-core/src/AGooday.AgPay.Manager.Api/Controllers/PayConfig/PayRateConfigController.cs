@@ -55,9 +55,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("payways"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST, PermCode.MGR.ENT_AGENT_PAY_CONFIG_LIST, PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiPageRes<PayWayDto> GetPayWaysByInfoId([FromQuery] PayWayUsableQueryDto dto)
+        public async Task<ApiPageRes<PayWayDto>> GetPayWaysByInfoIdAsync([FromQuery] PayWayUsableQueryDto dto)
         {
-            var data = _payRateConfigService.GetPayWaysByInfoId(dto);
+            var data = await _payRateConfigService.GetPayWaysByInfoIdAsync(dto);
             return ApiPageRes<PayWayDto>.Pages(data);
         }
 

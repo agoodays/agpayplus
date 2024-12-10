@@ -52,14 +52,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_LIST)]
-        public ApiPageRes<MchInfoDto> List([FromQuery] MchInfoQueryDto dto)
+        public async Task<ApiPageRes<MchInfoDto>> ListAsync([FromQuery] MchInfoQueryDto dto)
         {
             var currentUser = GetCurrentUser().SysUser;
             if (currentUser.UserType.Equals(CS.USER_TYPE.Expand))
             {
                 dto.CreatedUid = currentUser.SysUserId;
             }
-            var data = _mchInfoService.GetPaginatedData(dto);
+            var data = await _mchInfoService.GetPaginatedDataAsync(dto);
             return ApiPageRes<MchInfoDto>.Pages(data);
         }
 

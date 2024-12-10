@@ -33,11 +33,11 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRoleRelaRepository.SaveChanges();
         }
 
-        public PaginatedList<SysUserRoleRelaDto> GetPaginatedData(SysUserRoleRelaQueryDto dto)
+        public async Task<PaginatedList<SysUserRoleRelaDto>> GetPaginatedDataAsync(SysUserRoleRelaQueryDto dto)
         {
             var sysUserRoleRelas = _sysUserRoleRelaRepository.GetAllAsNoTracking()
                 .Where(w => dto.UserId.Equals(null) || w.UserId.Equals(dto.UserId));
-            var records = PaginatedList<SysUserRoleRela>.Create<SysUserRoleRelaDto>(sysUserRoleRelas, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<SysUserRoleRela>.CreateAsync<SysUserRoleRelaDto>(sysUserRoleRelas, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

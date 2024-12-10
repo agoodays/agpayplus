@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
@@ -70,7 +69,7 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
         }
 
-        public PaginatedList<MchStoreListDto> GetPaginatedData(MchStoreQueryDto dto, List<long> storeIds = null)
+        public async Task<PaginatedList<MchStoreListDto>> GetPaginatedDataAsync(MchStoreQueryDto dto, List<long> storeIds = null)
         {
             var query = _mchStoreRepository.GetAllAsNoTracking()
                 .Join(_mchInfoRepository.GetAllAsNoTracking(),
@@ -83,7 +82,7 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.mi.AgentNo.Equals(dto.AgentNo)))
                 .OrderByDescending(o => o.ms.CreatedAt);
 
-            var records = PaginatedList<MchStoreListDto>.Create(query, s =>
+            var records = await PaginatedList<MchStoreListDto>.CreateAsync(query, s =>
             {
                 var item = _mapper.Map<MchStoreListDto>(s.ms);
                 item.MchName = s.mi.MchName;

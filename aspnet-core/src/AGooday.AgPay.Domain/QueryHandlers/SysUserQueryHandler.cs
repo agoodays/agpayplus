@@ -8,7 +8,7 @@ namespace AGooday.AgPay.Domain.QueryHandlers
 {
     public class SysUserQueryHandler :
         IRequestHandler<GetByIdQuery<SysUser, long>, SysUser>,
-        IRequestHandler<SysUserQuery, IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>>
+        IRequestHandler<SysUserQuery, IQueryable<SysUserQueryResult>>
     {
         private readonly ISysUserRepository _sysUserRepository;
         private readonly ISysUserTeamRepository _sysUserTeamRepository;
@@ -30,22 +30,24 @@ namespace AGooday.AgPay.Domain.QueryHandlers
             return _sysUserRepository.GetByIdAsync(request.Id);
         }
 
-        public Task<IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>> Handle(SysUserQuery request, CancellationToken cancellationToken)
+        public Task<IQueryable<SysUserQueryResult>> Handle(SysUserQuery request, CancellationToken cancellationToken)
         {
-            var sysUsers = (from u in _sysUserRepository.GetAllAsNoTracking()
-                            join ut in _sysUserTeamRepository.GetAllAsNoTracking() on u.TeamId equals ut.TeamId into temp
-                            from team in temp.DefaultIfEmpty()
-                            where (string.IsNullOrWhiteSpace(request.SysType) || u.SysType.Equals(request.SysType))
-                            && (string.IsNullOrWhiteSpace(request.BelongInfoId) || u.BelongInfoId.Contains(request.BelongInfoId))
-                            && (string.IsNullOrWhiteSpace(request.Realname) || u.Realname.Contains(request.Realname))
-                            && (request.UserType.Equals(null) || u.UserType.Equals(request.UserType))
-                            && (request.SysUserId.Equals(null) || u.SysUserId.Equals(request.SysUserId))
-                            && (request.CurrentUserId.Equals(null) || !u.SysUserId.Equals(request.CurrentUserId))
-                            select new { u, team }).OrderByDescending(o => o.u.CreatedAt).ToList()
-                            .Select(s =>
-                            {
-                                return (s.u, s.team);
-                            });
+            // 构建 IQueryable 查询，但不立即执行
+            var sysUsers = from u in _sysUserRepository.GetAllAsNoTracking()
+                           join ut in _sysUserTeamRepository.GetAllAsNoTracking() on u.TeamId equals ut.TeamId into temp
+                           from team in temp.DefaultIfEmpty()
+                           where (string.IsNullOrWhiteSpace(request.SysType) || u.SysType.Equals(request.SysType))
+                           && (string.IsNullOrWhiteSpace(request.BelongInfoId) || u.BelongInfoId.Contains(request.BelongInfoId))
+                           && (string.IsNullOrWhiteSpace(request.Realname) || u.Realname.Contains(request.Realname))
+                           && (request.UserType == null || u.UserType.Equals(request.UserType))
+                           && (request.SysUserId == null || u.SysUserId.Equals(request.SysUserId))
+                           && (request.CurrentUserId == null || !u.SysUserId.Equals(request.CurrentUserId))
+                           orderby u.CreatedAt descending
+                           select new SysUserQueryResult
+                           {
+                               SysUser = u,
+                               SysUserTeam = team
+                           };
 
             return Task.FromResult(sysUsers);
         }

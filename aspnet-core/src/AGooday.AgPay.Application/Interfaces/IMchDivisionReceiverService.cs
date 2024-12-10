@@ -10,6 +10,7 @@ namespace AGooday.AgPay.Application.Interfaces
         int GetCount(HashSet<long> receiverIds, string mchNo, string appId, string ifCode, byte state = CS.YES);
         int GetCount(HashSet<long> receiverGroupIds, string mchNo);
         bool IsExistUseReceiverGroup(long receiverGroupId);
-        PaginatedList<MchDivisionReceiverDto> GetPaginatedData(MchDivisionReceiverQueryDto dto);
+        List<MchDivisionReceiverDto> GetAllMchReceiver(MchDivisionReceiverQueryDto dto);
+        Task<PaginatedList<MchDivisionReceiverDto>> GetPaginatedDataAsync(MchDivisionReceiverQueryDto dto);
     }
 }

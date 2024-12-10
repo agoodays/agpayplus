@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_LIST)]
-        public ApiPageRes<MchStoreListDto> List([FromQuery] MchStoreQueryDto dto)
+        public async Task<ApiPageRes<MchStoreListDto>> ListAsync([FromQuery] MchStoreQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
             List<long> storeIds = null;
@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 storeIds = sysUser.BindStoreIds;
             }
-            var data = _mchStoreService.GetPaginatedData(dto, storeIds);
+            var data = await _mchStoreService.GetPaginatedDataAsync(dto, storeIds);
             return ApiPageRes<MchStoreListDto>.Pages(data);
         }
 

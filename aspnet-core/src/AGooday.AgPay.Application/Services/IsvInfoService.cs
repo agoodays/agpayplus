@@ -48,14 +48,14 @@ namespace AGooday.AgPay.Application.Services
             return _isvInfoRepository.IsExistIsvNo(isvNo);
         }
 
-        public PaginatedList<IsvInfoDto> GetPaginatedData(IsvInfoQueryDto dto)
+        public async Task<PaginatedList<IsvInfoDto>> GetPaginatedDataAsync(IsvInfoQueryDto dto)
         {
             var isvInfos = _isvInfoRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<IsvInfo>.Create<IsvInfoDto>(isvInfos, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<IsvInfo>.CreateAsync<IsvInfoDto>(isvInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

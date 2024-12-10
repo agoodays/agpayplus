@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
         }
 
-        public PaginatedList<MchInfoDto> GetPaginatedData(MchInfoQueryDto dto)
+        public async Task<PaginatedList<MchInfoDto>> GetPaginatedDataAsync(MchInfoQueryDto dto)
         {
             var mchInfos = _mchInfoRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 && (dto.CreatedUid.Equals(null) || w.CreatedUid.Equals(dto.CreatedUid))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchInfo>.Create<MchInfoDto>(mchInfos, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<MchInfo>.CreateAsync<MchInfoDto>(mchInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

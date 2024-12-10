@@ -49,9 +49,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
 
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_LIST)]
-        public ApiPageRes<MchDivisionReceiverDto> List([FromQuery] MchDivisionReceiverQueryDto dto)
+        public async Task<ApiPageRes<MchDivisionReceiverDto>> ListAsync([FromQuery] MchDivisionReceiverQueryDto dto)
         {
-            var data = _mchDivisionReceiverService.GetPaginatedData(dto);
+            var data = await _mchDivisionReceiverService.GetPaginatedDataAsync(dto);
             var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
             var mchInfos = _mchInfoService.GetByMchNos(mchNos);
             foreach (var item in data)

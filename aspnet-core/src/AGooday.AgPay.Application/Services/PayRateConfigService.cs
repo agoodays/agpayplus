@@ -52,13 +52,13 @@ namespace AGooday.AgPay.Application.Services
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
         }
 
-        public PaginatedList<PayWayDto> GetPayWaysByInfoId(PayWayUsableQueryDto dto)
+        public async Task<PaginatedList<PayWayDto>> GetPayWaysByInfoIdAsync(PayWayUsableQueryDto dto)
         {
             var infoType = string.Empty;
             var configMode = dto.ConfigMode;
             var wayCodes = new List<string>();
 
-            var payIfDefine = _payInterfaceDefineRepository.GetById(dto.IfCode);
+            var payIfDefine = await _payInterfaceDefineRepository.GetByIdAsync(dto.IfCode);
             var payIfWayCodes = JsonConvert.DeserializeObject<object[]>(payIfDefine.WayCodes).Select(obj => (string)((dynamic)obj).wayCode).ToList();
 
             switch (configMode)
@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Application.Services
                 case CS.CONFIG_MODE.AGENT_SELF:
                 case CS.CONFIG_MODE.AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE.AGENT;
-                    var agent = _agentInfoRepository.GetById(dto.InfoId);
+                    var agent = await _agentInfoRepository.GetByIdAsync(dto.InfoId);
                     wayCodes = GetPayWayCodes(dto.IfCode, agent.IsvNo, agent.Pid, payIfWayCodes);
                     break;
                 case CS.CONFIG_MODE.MGR_MCH:
@@ -79,8 +79,8 @@ namespace AGooday.AgPay.Application.Services
                 case CS.CONFIG_MODE.MCH_SELF_APP1:
                 case CS.CONFIG_MODE.MCH_SELF_APP2:
                     infoType = CS.INFO_TYPE.MCH_APP;
-                    var mchApp = _mchAppRepository.GetById(dto.InfoId);
-                    var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
+                    var mchApp = await _mchAppRepository.GetByIdAsync(dto.InfoId);
+                    var mchInfo = await _mchInfoRepository.GetByIdAsync(mchApp.MchNo);
                     wayCodes = payIfWayCodes;
                     if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
                     {
@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Application.Services
             }
             var payWays = _payWayRepository.GetAllAsNoTracking().Where(w => wayCodes.Contains(w.WayCode))
                 .OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayWay>.Create<PayWayDto>(payWays, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<PayWay>.CreateAsync<PayWayDto>(payWays, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

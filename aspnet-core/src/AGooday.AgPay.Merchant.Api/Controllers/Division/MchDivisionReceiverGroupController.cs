@@ -35,10 +35,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_LIST)]
-        public ApiPageRes<MchDivisionReceiverGroupDto> List([FromQuery] MchDivisionReceiverGroupQueryDto dto)
+        public async Task<ApiPageRes<MchDivisionReceiverGroupDto>> ListAsync([FromQuery] MchDivisionReceiverGroupQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
-            var data = _mchDivisionReceiverGroupService.GetPaginatedData(dto);
+            var data = await _mchDivisionReceiverGroupService.GetPaginatedDataAsync(dto);
             return ApiPageRes<MchDivisionReceiverGroupDto>.Pages(data);
         }
 

@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public PaginatedList<MchNotifyRecordDto> GetPaginatedData(MchNotifyQueryDto dto)
+        public async Task<PaginatedList<MchNotifyRecordDto>> GetPaginatedDataAsync(MchNotifyQueryDto dto)
         {
             var mchNotifyRecords = _mchNotifyRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchNotifyRecord>.Create<MchNotifyRecordDto>(mchNotifyRecords, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<MchNotifyRecord>.CreateAsync<MchNotifyRecordDto>(mchNotifyRecords, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public PaginatedList<SysRoleDto> GetPaginatedData(SysRoleQueryDto dto)
+        public async Task<PaginatedList<SysRoleDto>> GetPaginatedDataAsync(SysRoleQueryDto dto)
         {
             var sysRoles = _sysRoleRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.RoleName) || w.RoleName.Contains(dto.RoleName))
@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Application.Services
             {
                 sysRoles = sysRoles.OrderBy(dto.SortField, dto.SortOrder.Equals(PageQuery.DESCEND, StringComparison.OrdinalIgnoreCase));
             }
-            var records = PaginatedList<SysRole>.Create<SysRoleDto>(sysRoles, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<SysRole>.CreateAsync<SysRoleDto>(sysRoles, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

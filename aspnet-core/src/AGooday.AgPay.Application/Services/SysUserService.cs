@@ -128,7 +128,7 @@ namespace AGooday.AgPay.Application.Services
 
         public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long? currentUserId)
         {
-            var sysUsers = (from u in _sysUserRepository.GetAllAsNoTracking()
+            var query = (from u in _sysUserRepository.GetAllAsNoTracking()
                             join ut in _sysUserTeamRepository.GetAllAsNoTracking() on u.TeamId equals ut.TeamId into temp
                             from team in temp.DefaultIfEmpty()
                             where (string.IsNullOrWhiteSpace(dto.SysType) || u.SysType.Equals(dto.SysType))
@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Application.Services
                             && (currentUserId.Equals(null) || !u.SysUserId.Equals(currentUserId))
                             select new { u, team }).OrderByDescending(o => o.u.CreatedAt);
 
-            var records = PaginatedList<SysUserListDto>.Create(sysUsers, s =>
+            var records = PaginatedList<SysUserListDto>.Create(query, s =>
             {
                 var item = _mapper.Map<SysUserListDto>(s.u);
                 item.TeamName = s.team?.TeamName;
@@ -152,14 +152,13 @@ namespace AGooday.AgPay.Application.Services
         {
             var query = _mapper.Map<SysUserQuery>(dto);
             query.CurrentUserId = currentUserId;
-            var sysUsers = (IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>)await Bus.SendQuery(query);
-            var result = sysUsers.Select(s =>
+            var result = (IQueryable<SysUserQueryResult>)await Bus.SendQuery(query);
+            var records = PaginatedList<SysUserListDto>.Create(result, s =>
             {
                 var item = _mapper.Map<SysUserListDto>(s.SysUser);
                 item.TeamName = s.SysUserTeam?.TeamName;
                 return item;
-            });
-            var records = PaginatedList<SysUserListDto>.Create(result, dto.PageNumber, dto.PageSize);
+            }, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

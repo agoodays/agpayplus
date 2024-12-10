@@ -41,9 +41,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_LIST)]
-        public ApiPageRes<QrCodeShellDto> List([FromQuery] QrCodeShellQueryDto dto)
+        public async Task<ApiPageRes<QrCodeShellDto>> ListAsync([FromQuery] QrCodeShellQueryDto dto)
         {
-            var data = _qrCodeShellService.GetPaginatedData(dto);
+            var data = await _qrCodeShellService.GetPaginatedDataAsync(dto);
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
             foreach (var item in data)
             {

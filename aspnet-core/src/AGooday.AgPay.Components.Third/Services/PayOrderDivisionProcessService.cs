@@ -256,7 +256,7 @@ namespace AGooday.AgPay.Components.Third.Services
             }
 
             //全部分账账号
-            List<MchDivisionReceiverDto> allMchReceiver = mchDivisionReceiverService.GetPaginatedData(queryWrapper);
+            List<MchDivisionReceiverDto> allMchReceiver = mchDivisionReceiverService.GetAllMchReceiver(queryWrapper);
             if (allMchReceiver.Count == 0)
             {
                 return allMchReceiver;

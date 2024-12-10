@@ -51,9 +51,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_LIST, PermCode.MGR.ENT_MCH_INFO_ADD, PermCode.MGR.ENT_MCH_INFO_EDIT, PermCode.MGR.ENT_MCH_INFO_VIEW)]
-        public ApiPageRes<IsvInfoDto> List([FromQuery] IsvInfoQueryDto dto)
+        public async Task<ApiPageRes<IsvInfoDto>> ListAsync([FromQuery] IsvInfoQueryDto dto)
         {
-            var data = _isvInfoService.GetPaginatedData(dto);
+            var data = await _isvInfoService.GetPaginatedDataAsync(dto);
             return ApiPageRes<IsvInfoDto>.Pages(data);
         }
 

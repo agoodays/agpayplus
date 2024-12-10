@@ -31,11 +31,11 @@ namespace AGooday.AgPay.Application.Services
         }
 
 
-        public PaginatedList<SysRoleEntRelaDto> GetPaginatedData(SysRoleEntRelaQueryDto dto)
+        public async Task<PaginatedList<SysRoleEntRelaDto>> GetPaginatedDataAsync(SysRoleEntRelaQueryDto dto)
         {
             var sysRoleEntRelas = _sysRoleEntRelaRepository.GetAllAsNoTracking()
                 .Where(w => string.IsNullOrWhiteSpace(dto.RoleId) || w.RoleId.Equals(dto.RoleId));
-            var records = PaginatedList<SysRoleEntRela>.Create<SysRoleEntRelaDto>(sysRoleEntRelas, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<SysRoleEntRela>.CreateAsync<SysRoleEntRelaDto>(sysRoleEntRelas, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

@@ -7,7 +7,7 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IPayRateConfigService : IAgPayService<PayRateConfigDto, long>
     {
-        PaginatedList<PayWayDto> GetPayWaysByInfoId(PayWayUsableQueryDto dto);
+        Task<PaginatedList<PayWayDto>> GetPayWaysByInfoIdAsync(PayWayUsableQueryDto dto);
         JObject GetByInfoIdAndIfCodeJson(string configMode, string infoId, string ifCode);
         PayRateConfigItem GetPayRateConfigItem(string configType, string infoType, string infoId, string ifCode, string wayCode);
         bool SaveOrUpdate(PayRateConfigSaveDto dto);

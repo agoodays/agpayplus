@@ -8,6 +8,6 @@ namespace AGooday.AgPay.Application.Interfaces
         MchDivisionReceiverGroupDto GetById(long recordId, string mchNo);
         IEnumerable<MchDivisionReceiverGroupDto> GetByMchNo(string mchNo);
         MchDivisionReceiverGroupDto FindByIdAndMchNo(long receiverGroupId, string mchNo);
-        PaginatedList<MchDivisionReceiverGroupDto> GetPaginatedData(MchDivisionReceiverGroupQueryDto dto);
+        Task<PaginatedList<MchDivisionReceiverGroupDto>> GetPaginatedDataAsync(MchDivisionReceiverGroupQueryDto dto);
     }
 }

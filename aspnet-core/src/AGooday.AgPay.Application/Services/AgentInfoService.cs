@@ -75,18 +75,18 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<AgentInfoDto>>(source);
         }
 
-        public PaginatedList<AgentInfoDto> GetPaginatedData(AgentInfoQueryDto dto)
+        public async Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(AgentInfoQueryDto dto)
         {
             var agentInfos = GetAgentInfos(dto);
-            var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(agentInfos, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<AgentInfo>.CreateAsync<AgentInfoDto>(agentInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
-        public PaginatedList<AgentInfoDto> GetPaginatedData(string agentNo, AgentInfoQueryDto dto)
+        public async Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(string agentNo, AgentInfoQueryDto dto)
         {
             var agentInfos = GetAgentInfos(dto);
             var subAgentInfos = GetSons(agentInfos, agentNo).Where(w => w.AgentNo != agentNo);
-            var records = PaginatedList<AgentInfo>.Create<AgentInfoDto>(subAgentInfos, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<AgentInfo>.CreateAsync<AgentInfoDto>(subAgentInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

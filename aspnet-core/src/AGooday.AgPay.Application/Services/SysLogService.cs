@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Application.Services
             return _sysLogRepository.SaveChanges() > 0;
         }
 
-        public PaginatedList<SysLogDto> GetPaginatedData(SysLogQueryDto dto)
+        public async Task<PaginatedList<SysLogDto>> GetPaginatedDataAsync(SysLogQueryDto dto)
         {
             var sysLogs = _sysLogRepository.GetAllAsNoTracking()
                 .Where(w => (dto.UserId.Equals(null) || w.UserId.Equals(dto.UserId))
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysLog>.Create<SysLogDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<SysLog>.CreateAsync<SysLogDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

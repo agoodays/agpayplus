@@ -10,6 +10,6 @@ namespace AGooday.AgPay.Application.Interfaces
         IEnumerable<MchAppDto> GetByMchNoAsNoTracking(string mchNo);
         IEnumerable<MchAppDto> GetByMchNos(IEnumerable<string> mchNos);
         IEnumerable<MchAppDto> GetByAppIds(IEnumerable<string> appIds);
-        PaginatedList<MchAppDto> GetPaginatedData(MchAppQueryDto dto, string agentNo = null);
+        Task<PaginatedList<MchAppDto>> GetPaginatedDataAsync(MchAppQueryDto dto, string agentNo = null);
     }
 }

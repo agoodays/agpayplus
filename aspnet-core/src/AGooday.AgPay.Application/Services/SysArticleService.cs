@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Application.Services
             return _sysArticleRepository.SaveChanges(out int _);
         }
 
-        public PaginatedList<SysArticleDto> GetPaginatedData(SysArticleQueryDto dto, string agentNo = null)
+        public async Task<PaginatedList<SysArticleDto>> GetPaginatedDataAsync(SysArticleQueryDto dto, string agentNo = null)
         {
             var sysLogs = _sysArticleRepository.GetAllAsNoTracking()
                 .Where(w => (dto.ArticleId.Equals(null) || w.ArticleId.Equals(dto.ArticleId))
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysArticle>.Create<SysArticleDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<SysArticle>.CreateAsync<SysArticleDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

@@ -5,6 +5,6 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IQrCodeShellService : IAgPayService<QrCodeShellDto>
     {
-        PaginatedList<QrCodeShellDto> GetPaginatedData(QrCodeShellQueryDto dto);
+        Task<PaginatedList<QrCodeShellDto>> GetPaginatedDataAsync(QrCodeShellQueryDto dto);
     }
 }

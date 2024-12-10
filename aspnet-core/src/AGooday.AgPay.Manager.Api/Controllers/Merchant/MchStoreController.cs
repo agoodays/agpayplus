@@ -49,9 +49,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_LIST)]
-        public ApiPageRes<MchStoreListDto> List([FromQuery] MchStoreQueryDto dto)
+        public async Task<ApiPageRes<MchStoreListDto>> ListAsync([FromQuery] MchStoreQueryDto dto)
         {
-            var data = _mchStoreService.GetPaginatedData(dto);
+            var data = await _mchStoreService.GetPaginatedDataAsync(dto);
             return ApiPageRes<MchStoreListDto>.Pages(data);
         }
 
@@ -62,9 +62,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("bindStoreList"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_ADD, PermCode.MGR.ENT_UR_USER_EDIT)]
-        public ApiPageRes<MchStoreListDto> BindStoreList([FromQuery] MchStoreBindQueryDto dto)
+        public async Task<ApiPageRes<MchStoreListDto>> BindStoreListAsync([FromQuery] MchStoreBindQueryDto dto)
         {
-            var data = _mchStoreService.GetPaginatedData(dto);
+            var data = await _mchStoreService.GetPaginatedDataAsync(dto);
             if (dto.UserType.Equals(CS.USER_TYPE.DIRECTOR))
             {
                 var bindStoreIds = _sysUserService.GetByBelongInfoIdAsNoTracking(dto.MchNo)

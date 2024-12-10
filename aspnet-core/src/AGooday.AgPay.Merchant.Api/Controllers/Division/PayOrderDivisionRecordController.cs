@@ -42,10 +42,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_LIST)]
-        public ApiPageRes<PayOrderDivisionRecordDto> List([FromQuery] PayOrderDivisionRecordQueryDto dto)
+        public async Task<ApiPageRes<PayOrderDivisionRecordDto>> ListAsync([FromQuery] PayOrderDivisionRecordQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
-            var data = _payOrderDivisionRecordService.GetPaginatedData(dto);
+            var data = await _payOrderDivisionRecordService.GetPaginatedDataAsync(dto);
             return ApiPageRes<PayOrderDivisionRecordDto>.Pages(data);
         }
 

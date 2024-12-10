@@ -36,11 +36,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_LIST)]
-        public ApiPageRes<SysUserTeamDto> List([FromQuery] SysUserTeamQueryDto dto)
+        public async Task<ApiPageRes<SysUserTeamDto>> ListAsync([FromQuery] SysUserTeamQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = GetCurrentAgentNo();
-            var data = _sysUserTeamService.GetPaginatedData(dto);
+            var data = await _sysUserTeamService.GetPaginatedDataAsync(dto);
             return ApiPageRes<SysUserTeamDto>.Pages(data);
         }
 

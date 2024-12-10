@@ -45,9 +45,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECORD_LIST)]
-        public ApiPageRes<PayOrderDivisionRecordDto> List([FromQuery] PayOrderDivisionRecordQueryDto dto)
+        public async Task<ApiPageRes<PayOrderDivisionRecordDto>> ListAsync([FromQuery] PayOrderDivisionRecordQueryDto dto)
         {
-            var data = _payOrderDivisionRecordService.GetPaginatedData(dto);
+            var data = await _payOrderDivisionRecordService.GetPaginatedDataAsync(dto);
             var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
             var mchInfos = _mchInfoService.GetByMchNos(mchNos);
             foreach (var item in data)

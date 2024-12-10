@@ -4,7 +4,7 @@ using MediatR;
 
 namespace AGooday.AgPay.Domain.Queries.SysUsers
 {
-    public class SysUserQuery : PageQuery, IRequest<IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>>
+    public class SysUserQuery : PageQuery, IRequest<IQueryable<SysUserQueryResult>>
     {
         /// <summary>
         /// 当前用户ID
@@ -35,5 +35,11 @@ namespace AGooday.AgPay.Domain.Queries.SysUsers
         /// 所属商户ID / 代理商ID / 0(平台)
         /// </summary>
         public string BelongInfoId { get; set; }
+    }
+
+    public class SysUserQueryResult
+    {
+        public SysUser SysUser { get; set; }
+        public SysUserTeam SysUserTeam { get; set; }
     }
 }

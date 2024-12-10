@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Application.Interfaces
         Task ModifyAsync(MchInfoModifyDto dto);
         bool UpdateById(MchInfoDto dto);
         IEnumerable<MchInfoDto> GetByMchNos(List<string> mchNos);
-        PaginatedList<MchInfoDto> GetPaginatedData(MchInfoQueryDto dto);
         IEnumerable<MchInfoDto> GetByIsvNo(string isvNo);
+        Task<PaginatedList<MchInfoDto>> GetPaginatedDataAsync(MchInfoQueryDto dto);
     }
 }

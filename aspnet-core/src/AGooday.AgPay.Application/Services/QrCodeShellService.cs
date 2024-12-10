@@ -42,12 +42,12 @@ namespace AGooday.AgPay.Application.Services
             return _qrCodeShellRepository.SaveChanges(out int _);
         }
 
-        public PaginatedList<QrCodeShellDto> GetPaginatedData(QrCodeShellQueryDto dto)
+        public async Task<PaginatedList<QrCodeShellDto>> GetPaginatedDataAsync(QrCodeShellQueryDto dto)
         {
             var QrCodeShells = _qrCodeShellRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.ShellAlias) || w.ShellAlias.Contains(dto.ShellAlias))
                 ).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<QrCodeShell>.Create<QrCodeShellDto>(QrCodeShells, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<QrCodeShell>.CreateAsync<QrCodeShellDto>(QrCodeShells, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

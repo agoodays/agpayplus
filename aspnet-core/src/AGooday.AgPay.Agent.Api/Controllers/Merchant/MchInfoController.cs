@@ -53,10 +53,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_LIST)]
-        public ApiPageRes<MchInfoDto> List([FromQuery] MchInfoQueryDto dto)
+        public async Task<ApiPageRes<MchInfoDto>> ListAsync([FromQuery] MchInfoQueryDto dto)
         {
             dto.AgentNo = GetCurrentAgentNo();
-            var data = _mchInfoService.GetPaginatedData(dto);
+            var data = await _mchInfoService.GetPaginatedDataAsync(dto);
             return ApiPageRes<MchInfoDto>.Pages(data);
         }
 

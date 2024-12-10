@@ -35,10 +35,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_LOG_LIST)]
-        public ApiPageRes<SysLogDto> List([FromQuery] SysLogQueryDto dto)
+        public async Task<ApiPageRes<SysLogDto>> ListAsync([FromQuery] SysLogQueryDto dto)
         {
             dto.BindDateRange();
-            var data = _sysLogService.GetPaginatedData(dto);
+            var data = await _sysLogService.GetPaginatedDataAsync(dto);
             return ApiPageRes<SysLogDto>.Pages(data);
         }
 

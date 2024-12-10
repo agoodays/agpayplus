@@ -36,10 +36,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_LIST)]
-        public ApiPageRes<SysUserTeamDto> List([FromQuery] SysUserTeamQueryDto dto)
+        public async Task<ApiPageRes<SysUserTeamDto>> ListAsync([FromQuery] SysUserTeamQueryDto dto)
         {
             dto.BelongInfoId = string.IsNullOrWhiteSpace(dto.BelongInfoId) ? (dto.SysType ?? string.Empty).Equals(CS.SYS_TYPE.MGR) ? CS.BASE_BELONG_INFO_ID.MGR : dto.BelongInfoId : dto.BelongInfoId;
-            var data = _mchStoreService.GetPaginatedData(dto);
+            var data = await _mchStoreService.GetPaginatedDataAsync(dto);
             return ApiPageRes<SysUserTeamDto>.Pages(data);
         }
 

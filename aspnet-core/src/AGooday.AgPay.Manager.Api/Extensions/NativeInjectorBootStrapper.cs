@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             services.AddScoped<IRequestHandler<ModifySysUserCommand>, SysUserCommandHandler>();
 
             services.AddScoped<IRequestHandler<GetByIdQuery<SysUser, long>, SysUser>, SysUserQueryHandler>();
-            services.AddScoped<IRequestHandler<SysUserQuery, IEnumerable<(SysUser SysUser, SysUserTeam SysUserTeam)>>, SysUserQueryHandler>();
+            services.AddScoped<IRequestHandler<SysUserQuery, IQueryable<SysUserQueryResult>>, SysUserQueryHandler>();
 
             services.AddScoped<IRequestHandler<CreateAgentInfoCommand>, AgentInfoCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveAgentInfoCommand>, AgentInfoCommandHandler>();

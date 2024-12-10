@@ -43,9 +43,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST), NoLog]
-        public ApiPageRes<SysRoleEntRelaDto> List([FromQuery] SysRoleEntRelaQueryDto dto)
+        public async Task<ApiPageRes<SysRoleEntRelaDto>> ListAsync([FromQuery] SysRoleEntRelaQueryDto dto)
         {
-            var data = _sysRoleEntRelaService.GetPaginatedData(dto);
+            var data = await _sysRoleEntRelaService.GetPaginatedDataAsync(dto);
             return ApiPageRes<SysRoleEntRelaDto>.Pages(data);
         }
 

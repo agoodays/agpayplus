@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.AccountBill
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ACCOUNT_BILL_LIST)]
-        public ApiPageRes<AccountBillDto> List([FromQuery] AccountBillQueryDto dto)
+        public async Task<ApiPageRes<AccountBillDto>> ListAsync([FromQuery] AccountBillQueryDto dto)
         {
-            var data = _accountBillService.GetPaginatedData(dto);
+            var data = await _accountBillService.GetPaginatedDataAsync(dto);
             return ApiPageRes<AccountBillDto>.Pages(data);
         }
 

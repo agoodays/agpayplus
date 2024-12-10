@@ -42,11 +42,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_UR_ROLE_LIST, PermCode.AGENT.ENT_UR_USER_UPD_ROLE)]
-        public ApiPageRes<SysRoleDto> List([FromQuery] SysRoleQueryDto dto)
+        public async Task<ApiPageRes<SysRoleDto>> ListAsync([FromQuery] SysRoleQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = GetCurrentAgentNo();
-            var data = _sysRoleService.GetPaginatedData(dto);
+            var data = await _sysRoleService.GetPaginatedDataAsync(dto);
             return ApiPageRes<SysRoleDto>.Pages(data);
         }
 
