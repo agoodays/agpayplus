@@ -130,6 +130,10 @@ namespace AGooday.AgPay.Infrastructure.Context
         /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // 先调用基类的方法以应用默认配置
+            base.OnModelCreating(modelBuilder);
+
+            #region 自定义配置
             modelBuilder.Entity<AccountBill>().Property(c => c.BeforeBalance).HasDefaultValue(0);
             modelBuilder.Entity<AccountBill>().Property(c => c.ChangeAmount).HasDefaultValue(0);
             modelBuilder.Entity<AccountBill>().Property(c => c.AfterBalance).HasDefaultValue(0);
@@ -298,10 +302,15 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<SysRoleEntRela>().HasKey(c => new { c.RoleId, c.EntId });
             modelBuilder.Entity<SysUserRoleRela>().HasKey(c => new { c.UserId, c.RoleId });
 
-            //对 PayOrderMap 进行配置
+            //对 PayOrder 进行配置
             modelBuilder.ApplyConfiguration(new PayOrderMap());
 
-            base.OnModelCreating(modelBuilder);
+            //// 然后应用当前程序集中的所有 IEntityTypeConfiguration 实现
+            //modelBuilder.ApplyConfigurationsFromAssembly(typeof(AgPayDbContext).Assembly);
+
+            // 或者应用特定程序集中的配置
+            // modelBuilder.ApplyConfigurationsFromAssembly(typeof(PayOrderMap).Assembly);
+            #endregion
         }
     }
 }
