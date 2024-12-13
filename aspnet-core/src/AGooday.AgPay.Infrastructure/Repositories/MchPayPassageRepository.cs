@@ -2,6 +2,7 @@
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -22,18 +23,15 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return GetAllAsNoTracking().Where(w => w.AppId.Equals(appId) && (wayCodes.Count == 0 || wayCodes.Contains(w.WayCode)));
         }
 
-        public bool IsExistMchPayPassageUseWayCode(string wayCode)
+        public Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode)
         {
-            return GetAllAsNoTracking().Any(c => c.WayCode.Equals(wayCode));
+            return GetAllAsNoTracking().AnyAsync(c => c.WayCode.Equals(wayCode));
         }
 
         public void RemoveByMchNo(string mchNo)
         {
-            var mchPayPassages = DbSet.Where(w => w.MchNo.Equals(mchNo));
-            foreach (var mchPayPassage in mchPayPassages)
-            {
-                Remove(mchPayPassage.Id);
-            }
+            var entitys = DbSet.Where(w => w.MchNo.Equals(mchNo));
+            RemoveRange(entitys);
         }
     }
 }

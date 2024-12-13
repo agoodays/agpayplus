@@ -54,9 +54,9 @@ namespace AGooday.AgPay.Application.Services
             return _payInterfaceConfigRepository.SaveChanges() > 0;
         }
 
-        public bool IsExistUseIfCode(string ifCode)
+        public Task<bool> IsExistUseIfCodeAsync(string ifCode)
         {
-            return _payInterfaceConfigRepository.IsExistUseIfCode(ifCode);
+            return _payInterfaceConfigRepository.IsExistUseIfCodeAsync(ifCode);
         }
 
         public bool Remove(string infoType, string infoId)
@@ -363,9 +363,9 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="appId"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        public bool MchAppHasAvailableIfCode(string appId, string ifCode)
+        public Task<bool> MchAppHasAvailableIfCodeAsync(string appId, string ifCode)
         {
-            return _payInterfaceConfigRepository.MchAppHasAvailableIfCode(appId, ifCode);
+            return _payInterfaceConfigRepository.MchAppHasAvailableIfCodeAsync(appId, ifCode);
         }
     }
 }

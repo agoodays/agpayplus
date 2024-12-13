@@ -57,12 +57,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("添加角色信息")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_ADD)]
-        public ApiRes Add(SysRoleCreateDto dto)
+        public async Task<ApiRes> AddAsync(SysRoleCreateDto dto)
         {
             dto.RoleId = $"ROLE_{StringUtil.GetUUID(6)}";
             dto.SysType = CS.SYS_TYPE.MCH;
             dto.BelongInfoId = GetCurrentMchNo();
-            _sysRoleService.Add(dto);
+            await _sysRoleService.AddAsync(dto);
 
             //如果包含： 可分配权限的权限 && EntIds 不为空
             if (GetCurrentUser().Authorities.Contains(PermCode.MCH.ENT_UR_ROLE_DIST))
@@ -80,14 +80,14 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除角色")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DEL)]
-        public ApiRes Delete(string recordId)
+        public async Task<ApiRes> DeleteAsync(string recordId)
         {
-            var sysRole = _sysRoleService.GetById(recordId, GetCurrentMchNo());
+            var sysRole = await _sysRoleService.GetByIdAsync(recordId, GetCurrentMchNo());
             if (sysRole is null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            _sysRoleService.RemoveRole(recordId);
+            await _sysRoleService.RemoveRoleAsync(recordId);
             return ApiRes.Ok();
         }
 
@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_EDIT)]
         public ApiRes Update(string recordId, SysRoleModifyDto dto)
         {
-            _sysRoleService.Update(dto);
+            _sysRoleService.UpdateAsync(dto);
             //如果包含： 可分配权限的权限 && EntIds 不为空
             if (GetCurrentUser().Authorities.Contains(PermCode.MCH.ENT_UR_ROLE_DIST))
             {
@@ -120,9 +120,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_EDIT)]
-        public ApiRes Detail(string recordId)
+        public async Task<ApiRes> DetailAsync(string recordId)
         {
-            var sysRole = _sysRoleService.GetById(recordId, GetCurrentMchNo());
+            var sysRole = await _sysRoleService.GetByIdAsync(recordId, GetCurrentMchNo());
             if (sysRole is null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

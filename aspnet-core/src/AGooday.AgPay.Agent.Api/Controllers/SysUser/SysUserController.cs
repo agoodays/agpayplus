@@ -49,12 +49,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_UR_USER_LIST)]
-        public ApiPageRes<SysUserListDto> List([FromQuery] SysUserQueryDto dto)
+        public async Task<ApiPageRes<SysUserListDto>> ListAsync([FromQuery] SysUserQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = GetCurrentAgentNo();
             long? currentUserId = null;//GetCurrentUserId();
-            var data = _sysUserService.GetPaginatedData(dto, currentUserId);
+            var data = await _sysUserService.GetPaginatedDataAsync(dto, currentUserId);
             return ApiPageRes<SysUserListDto>.Pages(data);
         }
 
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
             dto.SysType = CS.SYS_TYPE.AGENT;
             if (!dto.SysUserId.HasValue || dto.SysUserId.Value <= 0)
             {
-                var sysUser = _sysUserService.GetByKeyAsNoTracking(recordId);
+                var sysUser = await _sysUserService.GetByKeyAsNoTrackingAsync(recordId);
                 sysUser.State = dto.State.Value;
                 CopyUtil.CopyProperties(sysUser, dto);
             }

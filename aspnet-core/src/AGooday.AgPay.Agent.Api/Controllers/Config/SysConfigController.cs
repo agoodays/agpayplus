@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Config
         /// <returns></returns>
         [HttpPut, Route("{groupKey}"), MethodLog("系统配置修改")]
         [PermissionAuth(PermCode.AGENT.ENT_SYS_CONFIG_EDIT)]
-        public ApiRes Update(string groupKey, Dictionary<string, string> configs)
+        public async Task<ApiRes> Update(string groupKey, Dictionary<string, string> configs)
         {
             //foreach (var config in configs)
             //{
@@ -63,17 +63,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Config
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");
             }
             // 异步更新到MQ
-            UpdateSysConfigMQ(groupKey);
+            await UpdateSysConfigMQAsync(groupKey);
 
             return ApiRes.Ok();
         }
 
-        private async void UpdateSysConfigMQ(string groupKey)
+        private Task UpdateSysConfigMQAsync(string groupKey)
         {
-            await Task.Run(() =>
-            {
-                mqSender.Send(ResetAppConfigMQ.Build(groupKey));
-            });
+            return mqSender.SendAsync(ResetAppConfigMQ.Build(groupKey));
         }
     }
 }

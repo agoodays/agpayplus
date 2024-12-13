@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 MchAppDto mchApp = mchAppConfigContext.MchApp;
 
                 // 是否已正确配置
-                if (!_payInterfaceConfigService.MchAppHasAvailableIfCode(appId, ifCode))
+                if (!await _payInterfaceConfigService.MchAppHasAvailableIfCodeAsync(appId, ifCode))
                 {
                     throw new BizException("应用未开通此接口配置!");
                 }

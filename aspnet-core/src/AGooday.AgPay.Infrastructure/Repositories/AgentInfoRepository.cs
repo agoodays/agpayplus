@@ -12,14 +12,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public bool IsExistAgentNo(string agentNo)
+        public Task<bool> IsExistAgentNoAsync(string agentNo)
         {
-            return GetAllAsNoTracking().Any(c => c.AgentNo.Equals(agentNo));
+            return GetAllAsNoTracking().AnyAsync(c => c.AgentNo.Equals(agentNo));
         }
 
-        public bool IsExistAgent(string isvNo)
+        public Task<bool> IsExistAgentAsync(string isvNo)
         {
-            return GetAllAsNoTracking().Any(c => c.IsvNo.Equals(isvNo));
+            return GetAllAsNoTracking().AnyAsync(c => c.IsvNo.Equals(isvNo));
         }
 
         public IEnumerable<AgentInfo> GetAllOrSubAgents(string currentAgentNo)

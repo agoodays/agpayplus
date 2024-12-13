@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public void Receive(PayOrderReissueMQ.MsgPayload payload)
+        public async Task ReceiveAsync(PayOrderReissueMQ.MsgPayload payload)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                         //最多查询6次
                         if (currentCount <= 6)
                         {
-                            mqSender.Send(PayOrderReissueMQ.Build(payOrderId, currentCount), 5); //延迟5s再次查询
+                            await mqSender.SendAsync(PayOrderReissueMQ.Build(payOrderId, currentCount), 5); //延迟5s再次查询
                         }
                         else
                         {

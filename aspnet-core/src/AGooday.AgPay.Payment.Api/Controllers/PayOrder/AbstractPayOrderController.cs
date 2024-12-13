@@ -125,7 +125,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 string appId = bizRQ.AppId;
 
                 // 只有新订单模式，进行校验
-                if (isNewOrder && _payOrderService.IsExistOrderByMchOrderNo(mchNo, bizRQ.MchOrderNo))
+                if (isNewOrder && await _payOrderService.IsExistOrderByMchOrderNoAsync(mchNo, bizRQ.MchOrderNo))
                 {
                     throw new BizException($"商户订单[{bizRQ.MchOrderNo}]已存在");
                 }
@@ -457,7 +457,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="channelRetMsg"></param>
         /// <param name="payOrder"></param>
         /// <exception cref="BizException"></exception>
-        private void ProcessChannelMsg(ChannelRetMsg channelRetMsg, PayOrderDto payOrder)
+        private async void ProcessChannelMsg(ChannelRetMsg channelRetMsg, PayOrderDto payOrder)
         {
             //对象为空 || 上游返回状态为空， 则无需操作
             if (channelRetMsg == null || channelRetMsg.ChannelState == null)
@@ -500,7 +500,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             if (channelRetMsg.IsNeedQuery)
             {
                 //推送到MQ
-                mqSender.Send(PayOrderReissueMQ.Build(payOrderId, 1), 5);
+                await mqSender.SendAsync(PayOrderReissueMQ.Build(payOrderId, 1), 5);
             }
         }
 

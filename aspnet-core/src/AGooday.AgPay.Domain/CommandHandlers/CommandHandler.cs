@@ -86,9 +86,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
             return false;
         }
-        public async Task<bool> CommitAsync()
+        public Task<bool> CommitAsync()
         {
-            return await _uow.CommitAsync();
+            return _uow.CommitAsync();
         }
     }
 }

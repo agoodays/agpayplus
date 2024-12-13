@@ -7,6 +7,7 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -31,23 +32,23 @@ namespace AGooday.AgPay.Application.Services
             _sysRoleEntRelaRepository = sysRoleEntRelaRepository;
         }
 
-        public void Add(SysRoleCreateDto dto)
+        public async Task AddAsync(SysRoleCreateDto dto)
         {
             var entity = _mapper.Map<SysRole>(dto);
-            _sysRoleRepository.Add(entity);
-            _sysRoleRepository.SaveChanges();
+            await _sysRoleRepository.AddAsync(entity);
+            await _sysRoleRepository.SaveChangesAsync();
         }
 
-        public void Update(SysRoleModifyDto dto)
+        public async Task UpdateAsync(SysRoleModifyDto dto)
         {
             var entity = _mapper.Map<SysRole>(dto);
             _sysRoleRepository.Update(entity);
-            _sysRoleRepository.SaveChanges();
+            await _sysRoleRepository.SaveChangesAsync();
         }
 
-        public void RemoveRole(string roleId)
+        public async Task RemoveRoleAsync(string roleId)
         {
-            if (_sysUserRoleRelaRepository.IsAssignedToUser(roleId))
+            if (await _sysUserRoleRelaRepository.IsAssignedToUserAsync(roleId))
             {
                 throw new BizException("当前角色已分配到用户，不可删除！");
             }
@@ -58,12 +59,12 @@ namespace AGooday.AgPay.Application.Services
             //删除关联表
             _sysRoleEntRelaRepository.RemoveByRoleId(roleId);
 
-            _sysRoleEntRelaRepository.SaveChanges();
+            await _sysRoleEntRelaRepository.SaveChangesAsync();
         }
 
-        public SysRoleDto GetById(string recordId, string belongInfoId)
+        public async Task<SysRoleDto> GetByIdAsync(string recordId, string belongInfoId)
         {
-            var entity = _sysRoleRepository.GetAll().Where(w => w.RoleId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefault();
+            var entity = await _sysRoleRepository.GetAllAsNoTracking().Where(w => w.RoleId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefaultAsync();
             var dto = _mapper.Map<SysRoleDto>(entity);
             return dto;
         }

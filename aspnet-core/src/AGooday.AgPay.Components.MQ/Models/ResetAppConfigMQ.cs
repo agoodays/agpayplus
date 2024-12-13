@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Components.MQ.Models
         /// </summary>
         public interface IMQReceiver
         {
-            void Receive(MsgPayload payload);
+            Task ReceiveAsync(MsgPayload payload);
         }
     }
 }

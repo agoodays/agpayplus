@@ -24,33 +24,33 @@ namespace AGooday.AgPay.Application.Services
             _mchInfoRepository = mchInfoRepository;
         }
 
-        public bool IsExistMchNo(string mchNo)
+        public Task<bool> IsExistMchNoAsync(string mchNo)
         {
-            return _mchInfoRepository.IsExistMchNo(mchNo);
+            return _mchInfoRepository.IsExistMchNoAsync(mchNo);
         }
 
-        public bool IsExistMchByIsvNo(string isvNo)
+        public Task<bool> IsExistMchByIsvNoAsync(string isvNo)
         {
-            return _mchInfoRepository.IsExistMchByIsvNo(isvNo);
+            return _mchInfoRepository.IsExistMchByIsvNoAsync(isvNo);
         }
 
-        public bool IsExistMchByAgentNo(string agentNo)
+        public Task<bool> IsExistMchByAgentNoAsync(string agentNo)
         {
-            return _mchInfoRepository.IsExistMchByAgentNo(agentNo);
+            return _mchInfoRepository.IsExistMchByAgentNoAsync(agentNo);
         }
 
-        public async Task CreateAsync(MchInfoCreateDto dto)
+        public Task CreateAsync(MchInfoCreateDto dto)
         {
             var command = _mapper.Map<CreateMchInfoCommand>(dto);
-            await Bus.SendCommand(command);
+            return Bus.SendCommand(command);
         }
 
-        public async Task RemoveAsync(string recordId)
+        public Task RemoveAsync(string recordId)
         {
             //_mchInfoRepository.Remove(recordId);
             //_mchInfoRepository.SaveChanges();
             var command = new RemoveMchInfoCommand() { MchNo = recordId };
-            await Bus.SendCommand(command);
+            return Bus.SendCommand(command);
         }
 
         public bool UpdateById(MchInfoDto dto)

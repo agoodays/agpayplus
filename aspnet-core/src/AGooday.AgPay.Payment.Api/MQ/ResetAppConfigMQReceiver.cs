@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public void Receive(ResetAppConfigMQ.MsgPayload payload)
+        public Task ReceiveAsync(ResetAppConfigMQ.MsgPayload payload)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
@@ -30,6 +30,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 sysConfigService.InitDBConfig(payload.GroupKey);
                 _logger.LogInformation("系统配置静态属性已重置");
             }
+            return Task.CompletedTask;
         }
     }
 }

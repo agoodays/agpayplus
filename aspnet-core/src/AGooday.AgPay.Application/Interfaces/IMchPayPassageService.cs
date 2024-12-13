@@ -21,6 +21,6 @@ namespace AGooday.AgPay.Application.Interfaces
         void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo);
         MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode);
         MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode, long amount, string bankCardType = null);
-        bool IsExistMchPayPassageUseWayCode(string wayCode);
+        Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode);
     }
 }

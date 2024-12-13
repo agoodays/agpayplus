@@ -31,9 +31,9 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public SysUserAuthDto GetByIdentifier(byte identityType, string identifier, string sysType)
+        public async Task<SysUserAuthDto> GetByIdentifierAsync(byte identityType, string identifier, string sysType)
         {
-            var entity = _sysUserAuthRepository.GetByIdentifier(identityType, identifier, sysType);
+            var entity = await _sysUserAuthRepository.GetByIdentifierAsync(identityType, identifier, sysType);
             var dto = _mapper.Map<SysUserAuthDto>(entity);
             return dto;
         }

@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public void Receive(PayOrderMchNotifyMQ.MsgPayload payload)
+        public async Task ReceiveAsync(PayOrderMchNotifyMQ.MsgPayload payload)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     log.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
 
                     long notifyId = payload.NotifyId;
-                    MchNotifyRecordDto record = mchNotifyRecordService.GetById(notifyId);
+                    MchNotifyRecordDto record = await mchNotifyRecordService.GetByIdAsync(notifyId);
                     if (record == null || record.State != (byte)MchNotifyRecordState.STATE_ING)
                     {
                         log.LogInformation("查询通知记录不存在或状态不是通知中");
@@ -69,14 +69,14 @@ namespace AGooday.AgPay.Payment.Api.MQ
                         {
                             case "POST":
                                 content = new StringContent(body, Encoding.UTF8, mediaType);
-                                response = client.PostAsync(notifyUrl, content).Result;
-                                res = response.Content.ReadAsStringAsync().Result;
+                                response = await client.PostAsync(notifyUrl, content);
+                                res = await response.Content.ReadAsStringAsync();
                                 break;
                             case "PUT":
                                 break;
                             case "GET":
-                                response = client.GetAsync(notifyUrl).Result;
-                                res = response.Content.ReadAsStringAsync().Result;
+                                response = await client.GetAsync(notifyUrl);
+                                res = await response.Content.ReadAsStringAsync();
                                 break;
                             case "DELETE":
                                 break;
@@ -115,7 +115,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     // 通知延时次数
                     //        1   2   3   4   5   6
                     //        0   30  60  90  120 150
-                    mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId), currentCount * 30);
+                    await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId), currentCount * 30);
 
                     return;
                 }

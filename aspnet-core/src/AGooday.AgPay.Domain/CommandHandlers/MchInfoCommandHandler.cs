@@ -10,6 +10,7 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AGooday.AgPay.Domain.CommandHandlers
@@ -65,7 +66,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _payInterfaceConfigRepository = payInterfaceConfigRepository;
         }
 
-        public Task Handle(CreateMchInfoCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateMchInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -73,25 +74,25 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.CompletedTask;
+                return;
             }
 
             var mchInfo = _mapper.Map<MchInfo>(request);
             do
             {
                 mchInfo.MchNo = SeqUtil.GenMchNo();
-            } while (_mchInfoRepository.IsExistMchNo(mchInfo.MchNo));
+            } while (await _mchInfoRepository.IsExistMchNoAsync(mchInfo.MchNo));
 
             #region 检查
             // 校验特邀商户信息
             if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB) && !string.IsNullOrWhiteSpace(mchInfo.IsvNo))
             {
                 // 当前服务商状态是否正确
-                var isvInfo = _isvInfoRepository.GetById(mchInfo.IsvNo);
+                var isvInfo = await _isvInfoRepository.GetByIdAsync(mchInfo.IsvNo);
                 if (isvInfo == null || isvInfo.State == CS.NO)
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "当前服务商不可用！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "当前服务商不可用！"));
+                    return;
                 }
             }
             #endregion
@@ -117,28 +118,28 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 #region 检查
                 // 登录用户名不可重复
                 // 这些业务逻辑，当然要在领域层中（领域命令处理程序中）进行处理
-                if (_sysUserRepository.IsExistLoginUsername(sysUser.LoginUsername, sysUser.SysType))
+                if (await _sysUserRepository.IsExistLoginUsernameAsync(sysUser.LoginUsername, sysUser.SysType))
                 {
                     // 引发错误事件
-                    Bus.RaiseEvent(new DomainNotification("", "登录名已经被使用！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "登录名已经被使用！"));
+                    return;
                 }
                 // 手机号不可重复
-                if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
+                if (await _sysUserRepository.IsExistTelphoneAsync(sysUser.Telphone, sysUser.SysType))
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "联系人手机号已存在！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "联系人手机号已存在！"));
+                    return;
                 }
                 // 员工号不可重复
-                if (_sysUserRepository.IsExistUserNo(sysUser.UserNo, sysUser.SysType))
+                if (await _sysUserRepository.IsExistUserNoAsync(sysUser.UserNo, sysUser.SysType))
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
+                    return;
                 }
                 #endregion
 
-                _sysUserRepository.Add(sysUser);
-                _sysUserRepository.SaveChanges();
+                await _sysUserRepository.AddAsync(sysUser);
+                await _sysUserRepository.SaveChangesAsync();
 
                 #region 添加默认用户认证表
                 //string salt = StringUtil.GetUUID(6); //6位随机数
@@ -154,7 +155,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     Salt = salt,
                     SysType = sysUser.SysType
                 };
-                _sysUserAuthRepository.Add(sysUserAuthByLoginUsername);
+                await _sysUserAuthRepository.AddAsync(sysUserAuthByLoginUsername);
 
                 //手机号登录方式
                 var sysUserAuthByTelphone = new SysUserAuth()
@@ -166,7 +167,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     Salt = salt,
                     SysType = sysUser.SysType
                 };
-                _sysUserAuthRepository.Add(sysUserAuthByTelphone);
+                await _sysUserAuthRepository.AddAsync(sysUserAuthByTelphone);
                 #endregion
                 #endregion
 
@@ -182,7 +183,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 mchApp.CreatedBy = sysUser.Realname;
                 mchApp.CreatedUid = sysUser.SysUserId;
 
-                _mchAppRepository.Add(mchApp);
+                await _mchAppRepository.AddAsync(mchApp);
                 #endregion
 
                 #region 插入商户默认店铺
@@ -206,20 +207,20 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 mchStore.CreatedBy = sysUser.Realname;
                 mchStore.CreatedUid = sysUser.SysUserId;
 
-                _mchStoreRepository.Add(mchStore);
+                await _mchStoreRepository.AddAsync(mchStore);
                 #endregion
 
                 // 插入商户基本信息
                 // 存入商户默认用户ID
                 // mchInfo.Sipw = BCryptUtil.Hash(CS.DEFAULT_SIPW, out salt);
                 mchInfo.InitUserId = sysUser.SysUserId;
-                _mchInfoRepository.Add(mchInfo);
+                await _mchInfoRepository.AddAsync(mchInfo);
 
-                if (!Commit())
+                if (!await CommitAsync())
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "添加商户失败"));
+                    await Bus.RaiseEvent(new DomainNotification("", "添加商户失败"));
                     RollbackTransaction();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 CommitTransaction();
@@ -232,20 +233,18 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     createdEvent.LoginUsername = request.LoginUsername;
                     createdEvent.LoginPassword = authPwd;
                     createdEvent.IsNotify = request.IsNotify;
-                    Bus.RaiseEvent(createdEvent);
+                    await Bus.RaiseEvent(createdEvent);
                 }
             }
             catch (Exception e)
             {
                 RollbackTransaction();
-                Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return;
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task Handle(ModifyMchInfoCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ModifyMchInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -253,7 +252,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.CompletedTask;
+                return;
             }
 
             request.UpdatedAt = DateTime.Now;
@@ -275,17 +274,17 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 BeginTransaction();
                 //修改了手机号， 需要修改auth表信息
                 // 获取商户超管
-                long mchAdminUserId = _sysUserRepository.FindMchAdminUserId(mchInfo.MchNo);
-                var sysUserAuth = _sysUserAuthRepository.GetAll()
+                long mchAdminUserId = await _sysUserRepository.FindMchAdminUserIdAsync(mchInfo.MchNo);
+                var sysUserAuth = await _sysUserAuthRepository.GetAllAsNoTracking()
                      .Where(w => w.UserId.Equals(mchAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.MCH) && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE))
-                     .FirstOrDefault();
+                     .FirstOrDefaultAsync();
 
                 if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
                 {
-                    if (_sysUserRepository.IsExistTelphone(request.ContactTel, request.ContactTel))
+                    if (await _sysUserRepository.IsExistTelphoneAsync(request.ContactTel, request.ContactTel))
                     {
-                        Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
-                        return Task.CompletedTask;
+                        await Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                        return;
                     }
                     sysUserAuth.Identifier = request.ContactTel;
                     _sysUserAuthRepository.Update(sysUserAuth);
@@ -307,35 +306,33 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 推送mq删除redis用户认证信息
                 if (removeCacheUserIdList.Count != 0)
                 {
-                    mqSender.Send(CleanMchLoginAuthCacheMQ.Build(removeCacheUserIdList));
+                    await mqSender.SendAsync(CleanMchLoginAuthCacheMQ.Build(removeCacheUserIdList));
                 }
 
                 // 更新商户信息
                 _mchInfoRepository.Update(mchInfo);
 
-                if (!Commit())
+                if (!await CommitAsync())
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "修改当前商户失败"));
+                    await Bus.RaiseEvent(new DomainNotification("", "修改当前商户失败"));
                     RollbackTransaction();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 CommitTransaction();
 
                 // 推送mq到目前节点进行更新数据
-                mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, null, mchInfo.MchNo, null));
+                await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, null, mchInfo.MchNo, null));
             }
             catch (Exception e)
             {
                 RollbackTransaction();
-                Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return;
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task Handle(RemoveMchInfoCommand request, CancellationToken cancellationToken)
+        public async Task Handle(RemoveMchInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -343,23 +340,23 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.CompletedTask;
+                return;
             }
 
             // 0.当前商户是否存在
-            var mchInfo = _mchInfoRepository.GetById(request.MchNo);
+            var mchInfo = await _mchInfoRepository.GetByIdAsync(request.MchNo);
             if (mchInfo is null)
             {
                 // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "该商户不存在！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "该商户不存在！"));
+                return;
             }
             // 1.查看当前商户是否存在交易数据
-            if (_payOrderRepository.IsExistOrderUseMchNo(request.MchNo))
+            if (await _payOrderRepository.IsExistOrderUseMchNoAsync(request.MchNo))
             {
                 // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "该商户已存在交易数据，不可删除！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "该商户已存在交易数据，不可删除！"));
+                return;
             }
 
             try
@@ -370,57 +367,48 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 _mchPayPassageRepository.RemoveByMchNo(request.MchNo);
 
                 // 3.删除当前商户支付接口配置参数
-                var appIds = _mchAppRepository.GetAll().Where(w => w.MchNo.Equals(request.MchNo)).Select(s => s.AppId).ToList();
+                var apps = _mchAppRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(request.MchNo));
+                var appIds = apps.Select(s => s.AppId);
                 _payInterfaceConfigRepository.RemoveByInfoIds(appIds, CS.INFO_TYPE.MCH_APP);
 
                 // 4.删除当前商户应用信息
-                foreach (var appId in appIds)
-                {
-                    _mchAppRepository.Remove(appId);
-                }
+                _mchAppRepository.RemoveRange(apps);
 
                 var sysUsers = _sysUserRepository.GetAllAsNoTracking()
                     .Where(w => w.BelongInfoId.Equals(request.MchNo) && w.SysType.Equals(CS.SYS_TYPE.MCH));
-                foreach (var sysUser in sysUsers)
-                {
-                    var sysUserAuths = _sysUserAuthRepository.GetAllAsNoTracking()
-                        .Where(w => w.UserId.Equals(sysUser.SysUserId));
-                    // 5.删除当前商户用户认证信息
-                    foreach (var sysUserAuth in sysUserAuths)
-                    {
-                        _sysUserAuthRepository.Remove(sysUserAuth.AuthId);
-                    }
-                    // 6.删除当前商户的登录用户
-                    _sysUserRepository.Remove(sysUser.SysUserId);
-                }
+                var sysUserIds = sysUsers.Select(s => s.SysUserId);
+                var sysUserAuths = _sysUserAuthRepository.GetAllAsNoTracking()
+                    .Where(w => sysUserIds.Contains(w.UserId));
+                // 5.删除当前商户用户认证信息
+                _sysUserAuthRepository.RemoveRange(sysUserAuths);
+                // 6.删除当前商户的登录用户
+                _sysUserRepository.RemoveRange(sysUsers);
 
                 // 7.删除当前商户
                 _mchInfoRepository.Remove(mchInfo.MchNo);
 
-                if (!Commit())
+                if (!await CommitAsync())
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "删除当前商户失败"));
+                    await Bus.RaiseEvent(new DomainNotification("", "删除当前商户失败"));
                     RollbackTransaction();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 CommitTransaction();
 
                 // 推送mq删除redis用户缓存
                 var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
-                mqSender.Send(CleanMchLoginAuthCacheMQ.Build(userIdList));
+                await mqSender.SendAsync(CleanMchLoginAuthCacheMQ.Build(userIdList));
 
                 // 推送mq到目前节点进行更新数据
-                mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, null, request.MchNo, null));
+                await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO, null, null, request.MchNo, null));
             }
             catch (Exception e)
             {
                 RollbackTransaction();
-                Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return;
             }
-
-            return Task.CompletedTask;
         }
     }
 }

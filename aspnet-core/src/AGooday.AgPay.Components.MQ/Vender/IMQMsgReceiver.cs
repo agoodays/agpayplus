@@ -23,6 +23,6 @@ namespace AGooday.AgPay.Components.MQ.Vender
         /// 接收消息
         /// </summary>
         /// <param name="msg"></param>
-        void ReceiveMsg(string msg);
+        Task ReceiveMsgAsync(string msg);
     }
 }

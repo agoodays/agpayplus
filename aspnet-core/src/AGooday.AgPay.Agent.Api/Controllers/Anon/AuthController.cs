@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             string vercodeToken = Base64Util.DecodeBase64(model.vt); //验证码token, vercode token , 已做base64处理
             string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
 #if !DEBUG
-            string cacheCode = _redis.StringGet(codeCacheKey);
+            string cacheCode = await _redis.StringGetAsync(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode, StringComparison.OrdinalIgnoreCase))
             {
                 throw new BizException("验证码有误！");
@@ -137,10 +137,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             await _sysUserLoginAttemptService.RecordLoginAttemptAsync(loginAttempt);
             // 登录成功，清除登录尝试记录
             await _sysUserLoginAttemptService.ClearFailedLoginAttemptsAsync(auth.SysUserId);
-            return Auth(auth, codeCacheKey, lastLoginTime);
+            return await AuthAsync(auth, codeCacheKey, lastLoginTime);
         }
 
-        private ApiRes Auth(SysUserAuthInfoDto auth, string codeCacheKey, DateTime? lastLoginTime = null)
+        private async Task<ApiRes> AuthAsync(SysUserAuthInfoDto auth, string codeCacheKey, DateTime? lastLoginTime = null)
         {
             //非超级管理员 && 不包含左侧菜单 进行错误提示
             if (auth.IsAdmin != CS.YES && !_authService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
@@ -185,10 +185,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
                 SysUser = auth,
                 Authorities = authorities
             });
-            _redis.StringSet(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
+            await _redis.StringSetAsync(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
 
             // 删除验证码缓存数据
-            _redis.KeyDelete(codeCacheKey);
+            await _redis.KeyDeleteAsync(codeCacheKey);
 
             if (lastLoginTime != null)
             {
@@ -214,7 +214,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             string smsCodeToken = $"{CS.SYS_TYPE.AGENT.ToLower()}_{CS.SMS_TYPE.AUTH}_{phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 #if !DEBUG
-            string cacheCode = _redis.StringGet(codeCacheKey);
+            string cacheCode = await _redis.StringGetAsync(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
@@ -233,7 +233,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
                 throw new BizException("未绑定手机号！");
             }
             (int failedAttempts, DateTime? lastLoginTime) = await _sysUserLoginAttemptService.GetFailedLoginAttemptsAsync(auth.SysUserId, TimeSpan.FromMinutes(15));
-            return Auth(auth, codeCacheKey, lastLoginTime);
+            return await AuthAsync(auth, codeCacheKey, lastLoginTime);
         }
 
         /// <summary>
@@ -242,19 +242,19 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("auth/qrcodeStatus"), NoLog]
-        public ApiRes QrCodeStatus(string qrcodeNo)
+        public async Task<ApiRes> QrCodeStatusAsync(string qrcodeNo)
         {
             if (string.IsNullOrWhiteSpace(qrcodeNo))
             {
                 qrcodeNo = CS.LOGIN_QR_CODE_NO;
                 string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
-                _redis.StringSet(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.WAITING }), new TimeSpan(0, 0, CS.LOGIN_QR_CACHE_TIME)); //登录二维码缓存时间: 1分钟
+                await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.WAITING }), new TimeSpan(0, 0, CS.LOGIN_QR_CACHE_TIME)); //登录二维码缓存时间: 1分钟
                 return ApiRes.Ok(new { qrcodeNo });
             }
             else
             {
                 string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
-                string qrcodeStatus = _redis.StringGet(loginQRCacheKey);
+                string qrcodeStatus = await _redis.StringGetAsync(loginQRCacheKey);
                 return ApiRes.Ok(string.IsNullOrWhiteSpace(qrcodeStatus) ? new { qrcodeStatus = CS.QR_CODE_STATUS.EXPIRED } : JsonConvert.DeserializeObject(qrcodeStatus));
             }
         }
@@ -264,7 +264,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("auth/vercode"), NoLog]
-        public ApiRes Vercode()
+        public async Task<ApiRes> VercodeAsync()
         {
             //定义图形验证码的长和宽 // 6位验证码
             //string code = ImageFactory.CreateCode(6);
@@ -282,7 +282,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             //redis
             string vercodeToken = Guid.NewGuid().ToString("N");
             string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
-            _redis.StringSet(codeCacheKey, code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
+            await _redis.StringSetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
 
             return ApiRes.Ok(new { imageBase64Data, vercodeToken, expireTime = CS.VERCODE_CACHE_TIME });
         }
@@ -293,7 +293,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost, Route("register/agentRegister"), MethodLog("代理商注册")]
-        public ApiRes Register(Register model)
+        public async Task<ApiRes> RegisterAsync(Register model)
         {
             string phone = Base64Util.DecodeBase64(model.phone);
             string code = Base64Util.DecodeBase64(model.code);
@@ -302,7 +302,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 
 #if !DEBUG
-            string cacheCode = _redis.StringGet(codeCacheKey);
+            string cacheCode = await _redis.StringGetAsync(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
@@ -314,7 +314,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
 #endif
 
             // 删除短信验证码缓存数据
-            _redis.KeyDelete(codeCacheKey);
+            await _redis.KeyDeleteAsync(codeCacheKey);
             return ApiRes.Ok();
         }
 
@@ -346,15 +346,15 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost, Route("sms/code"), NoLog]
-        public ApiRes SendCode(SmsCode model)
+        public async Task<ApiRes> SendCodeAsync(SmsCode model)
         {
-            if (model.smsType.Equals(CS.SMS_TYPE.REGISTER) && _sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.AGENT))
+            if (model.smsType.Equals(CS.SMS_TYPE.REGISTER) && await _sysUserService.IsExistTelphoneAsync(model.phone, CS.SYS_TYPE.AGENT))
             {
                 throw new BizException("当前用户已存在！");
             }
 
             if ((model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) || model.smsType.Equals(CS.SMS_TYPE.AUTH))
-                && !_sysUserService.IsExistTelphone(model.phone, CS.SYS_TYPE.AGENT))
+                && !await _sysUserService.IsExistTelphoneAsync(model.phone, CS.SYS_TYPE.AGENT))
             {
                 throw new BizException("用户不存在！");
             }
@@ -364,7 +364,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             //redis
             string smsCodeToken = $"{CS.SYS_TYPE.AGENT.ToLower()}_{model.smsType}_{model.phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
-            _redis.StringSet(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
+            await _redis.StringSetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
 #if !DEBUG
             smsService.SendVercode(new SmsBizVercodeModel()
             {
@@ -382,7 +382,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost, Route("cipher/retrieve"), MethodLog("密码找回")]
-        public ApiRes Retrieve(Retrieve model)
+        public async Task<ApiRes> RetrieveAsync(Retrieve model)
         {
             string phone = Base64Util.DecodeBase64(model.phone);
             string code = Base64Util.DecodeBase64(model.code);
@@ -391,7 +391,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 
 #if !DEBUG
-            string cacheCode = _redis.StringGet(codeCacheKey);
+            string cacheCode = await _redis.StringGetAsync(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
@@ -401,7 +401,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
                 throw new BizException("验证码有误！");
             }
 #endif
-            var sysUser = _sysUserService.GetByTelphone(model.phone, CS.SYS_TYPE.AGENT);
+            var sysUser = await _sysUserService.GetByTelphoneAsync(model.phone, CS.SYS_TYPE.AGENT);
             if (sysUser == null)
             {
                 throw new BizException("用户不存在！");
@@ -410,7 +410,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             {
                 throw new BizException("用户已停用！");
             }
-            var sysUserAuth = _sysUserAuthService.GetByIdentifier(CS.AUTH_TYPE.TELPHONE, model.phone, CS.SYS_TYPE.AGENT);
+            var sysUserAuth = await _sysUserAuthService.GetByIdentifierAsync(CS.AUTH_TYPE.TELPHONE, model.phone, CS.SYS_TYPE.AGENT);
             if (sysUserAuth == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -422,7 +422,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             }
             _sysUserAuthService.ResetAuthInfo(sysUser.SysUserId.Value, null, null, newPwd, CS.SYS_TYPE.AGENT);
             // 删除短信验证码缓存数据
-            _redis.KeyDelete(codeCacheKey);
+            await _redis.KeyDeleteAsync(codeCacheKey);
             return ApiRes.Ok();
         }
 

@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Merchant.Api.Authorization
             _redis = client.GetDatabase();
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionAuthorizationRequirement requirement)
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionAuthorizationRequirement requirement)
         {
             if (context.User != null)
             {
@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Merchant.Api.Authorization
                 else
                 {
                     var cacheKey = context.User.FindFirstValue(ClaimAttributes.CacheKey);
-                    string currentUserJson = _redis.StringGet(cacheKey);
+                    string currentUserJson = await _redis.StringGetAsync(cacheKey);
                     if (string.IsNullOrWhiteSpace(currentUserJson))
                     {
                         throw new UnauthorizeException();
@@ -48,7 +48,6 @@ namespace AGooday.AgPay.Merchant.Api.Authorization
                     }
                 }
             }
-            return Task.CompletedTask;
         }
     }
 }

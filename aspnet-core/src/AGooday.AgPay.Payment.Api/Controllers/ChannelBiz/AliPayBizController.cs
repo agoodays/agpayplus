@@ -133,7 +133,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
                     }
 
                     // 更新应用配置信息
-                    mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, mchApp.AppId));
+                    await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, mchApp.AppId));
                 }
             }
             catch (Exception e)

@@ -175,6 +175,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             DbSet.Remove(DbSet.Find(id));
         }
         /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="entitys"></param>
+        public virtual void RemoveRange(IQueryable<TEntity> entitys)
+        {
+            DbSet.RemoveRange(entitys);
+        }
+        /// <summary>
         /// 保存或更新
         /// </summary>
         /// <param name="entity"></param>
@@ -231,9 +239,9 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 保存
         /// </summary>
         /// <returns></returns>
-        public async Task<int> SaveChangesAsync()
+        public Task<int> SaveChangesAsync()
         {
-            return await Db.SaveChangesAsync();
+            return Db.SaveChangesAsync();
         }
         /// <summary>
         /// 保存
@@ -435,6 +443,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             DbSet.Remove(DbSet.Find(id));
         }
         /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="entitys"></param>
+        public virtual void RemoveRange(IQueryable<TEntity> entitys)
+        {
+            DbSet.RemoveRange(entitys);
+        }
+        /// <summary>
         /// 保存或更新
         /// </summary>
         /// <returns></returns>
@@ -491,9 +507,9 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 保存
         /// </summary>
         /// <returns></returns>
-        public async Task<int> SaveChangesAsync()
+        public Task<int> SaveChangesAsync()
         {
-            return await Db.SaveChangesAsync();
+            return Db.SaveChangesAsync();
         }
         /// <summary>
         /// 保存

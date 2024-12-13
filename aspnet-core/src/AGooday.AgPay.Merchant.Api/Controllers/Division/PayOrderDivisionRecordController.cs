@@ -91,7 +91,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             _payOrderDivisionRecordService.UpdateResendState(record.PayOrderId);
 
             // 重发到MQ
-            mqSender.Send(PayOrderDivisionMQ.Build(record.PayOrderId, null, null, true));
+            await mqSender.SendAsync(PayOrderDivisionMQ.Build(record.PayOrderId, null, null, true));
 
             return ApiRes.Ok(record);
         }

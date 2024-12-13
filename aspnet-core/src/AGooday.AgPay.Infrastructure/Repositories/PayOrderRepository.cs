@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -11,24 +12,24 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public bool IsExistOrderUseIfCode(string ifCode)
+        public Task<bool> IsExistOrderUseIfCodeAsync(string ifCode)
         {
-            return GetAllAsNoTracking().Any(c => c.IfCode.Equals(ifCode));
+            return GetAllAsNoTracking().AnyAsync(c => c.IfCode.Equals(ifCode));
         }
 
-        public bool IsExistOrderUseMchNo(string mchNo)
+        public Task<bool> IsExistOrderUseMchNoAsync(string mchNo)
         {
-            return GetAllAsNoTracking().Any(c => c.MchNo.Equals(mchNo));
+            return GetAllAsNoTracking().AnyAsync(c => c.MchNo.Equals(mchNo));
         }
 
-        public bool IsExistOrderUseWayCode(string wayCode)
+        public Task<bool> IsExistOrderUseWayCodeAsync(string wayCode)
         {
-            return GetAllAsNoTracking().Any(c => c.WayCode.Equals(wayCode));
+            return GetAllAsNoTracking().AnyAsync(c => c.WayCode.Equals(wayCode));
         }
 
-        public bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo)
+        public Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchOrderNo)
         {
-            return GetAllAsNoTracking().Any(c => c.MchNo.Equals(mchNo) && c.MchOrderNo.Equals(mchOrderNo));
+            return GetAllAsNoTracking().AnyAsync(c => c.MchNo.Equals(mchNo) && c.MchOrderNo.Equals(mchOrderNo));
         }
     }
 }

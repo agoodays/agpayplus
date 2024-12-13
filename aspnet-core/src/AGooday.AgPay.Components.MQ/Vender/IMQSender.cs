@@ -11,20 +11,20 @@ namespace AGooday.AgPay.Components.MQ.Vender
         /// 推送MQ消息， 实时
         /// </summary>
         /// <param name="mqModel"></param>
-        void Send(AbstractMQ mqModel);
+        Task SendAsync(AbstractMQ mqModel);
 
         /// <summary>
         /// 推送MQ消息， 延迟接收，单位：s
         /// </summary>
         /// <param name="mqModel"></param>
         /// <param name="delay"></param>
-        void Send(AbstractMQ mqModel, int delay);
+        Task SendAsync(AbstractMQ mqModel, int delay);
 
         /// <summary>
         /// MQ消息接收
         /// </summary>
-        void Receive();
+        Task ReceiveAsync();
 
-        void Close();
+        Task CloseAsync();
     }
 }

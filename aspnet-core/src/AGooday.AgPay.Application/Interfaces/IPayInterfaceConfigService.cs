@@ -5,7 +5,7 @@ namespace AGooday.AgPay.Application.Interfaces
     public interface IPayInterfaceConfigService : IAgPayService<PayInterfaceConfigDto, long>
     {
         bool SaveOrUpdate(PayInterfaceConfigDto dto);
-        bool IsExistUseIfCode(string ifCode);
+        Task<bool> IsExistUseIfCodeAsync(string ifCode);
         bool Remove(string infoType, string infoId);
         /// <summary>
         /// 根据 账户类型、账户号 获取支付参数配置列表
@@ -34,6 +34,6 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="appId"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
-        bool MchAppHasAvailableIfCode(string appId, string ifCode);
+        Task<bool> MchAppHasAvailableIfCodeAsync(string appId, string ifCode);
     }
 }

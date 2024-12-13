@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Merchant.Api.MQ
             redisServer = client.GetServer();
         }
 
-        public void Receive(CleanMchLoginAuthCacheMQ.MsgPayload payload)
+        public async Task ReceiveAsync(CleanMchLoginAuthCacheMQ.MsgPayload payload)
         {
             _logger.LogInformation($"成功接收删除商户用户登录的订阅通知, msg={JsonConvert.SerializeObject(payload)}");
             // 字符串转List<Long>
@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Merchant.Api.MQ
                 foreach (string cacheKey in cacheKeyList)
                 {
                     // 删除用户Redis信息
-                    redis.KeyDelete(cacheKey);
+                    await redis.KeyDeleteAsync(cacheKey);
                     continue;
                 }
             }

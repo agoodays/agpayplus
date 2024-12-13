@@ -28,14 +28,14 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRepository = sysUserRepository;
         }
 
-        public bool IsExistAgentNo(string mchNo)
+        public Task<bool> IsExistAgentNoAsync(string mchNo)
         {
-            return _agentInfoRepository.IsExistAgentNo(mchNo);
+            return _agentInfoRepository.IsExistAgentNoAsync(mchNo);
         }
 
-        public bool IsExistAgent(string isvNo)
+        public Task<bool> IsExistAgentAsync(string isvNo)
         {
-            return _agentInfoRepository.IsExistAgent(isvNo);
+            return _agentInfoRepository.IsExistAgentAsync(isvNo);
         }
 
         public async Task CreateAsync(AgentInfoCreateDto dto)

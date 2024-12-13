@@ -31,9 +31,9 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
         /// 参考： https://bbs.csdn.net/topics/392509262?list=70088931
         /// </summary>
         /// <param name="msg"></param>
-        public void ReceiveMsg(string msg)
+        public Task ReceiveMsgAsync(string msg)
         {
-            mqReceiver.Receive(ResetIsvAgentMchAppInfoConfigMQ.Parse(msg));
+            return mqReceiver.ReceiveAsync(ResetIsvAgentMchAppInfoConfigMQ.Parse(msg));
         }
     }
 }

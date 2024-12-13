@@ -4,8 +4,8 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IAgentInfoRepository : IAgPayRepository<AgentInfo>
     {
-        bool IsExistAgentNo(string agentNo);
-        bool IsExistAgent(string isvNo);
+        Task<bool> IsExistAgentNoAsync(string agentNo);
+        Task<bool> IsExistAgentAsync(string isvNo);
         IEnumerable<AgentInfo> GetAllOrSubAgents(string agentNo);
         IEnumerable<AgentInfo> GetAllOrSubAgents(string currentAgentNo, Func<AgentInfo, bool> filter = null);
         ICollection<AgentInfo> GetSubAgents(string agentNo);

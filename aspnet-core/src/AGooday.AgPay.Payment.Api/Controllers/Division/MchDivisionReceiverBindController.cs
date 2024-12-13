@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         /// <returns></returns>
         [HttpPost, Route("api/division/receiver/bind")]
         [PermissionAuth(PermCode.PAY.API_DIVISION_BIND)]
-        public ApiRes Bind()
+        public async Task<ApiRes> BindAsync()
         {
             //获取参数 & 验签
             DivisionReceiverBindRQ bizRQ = GetRQByWithMchSign<DivisionReceiverBindRQ>();
@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 }
                 var mchInfo = mchAppConfigContext.MchInfo;
 
-                if (!_payInterfaceConfigService.MchAppHasAvailableIfCode(bizRQ.AppId, ifCode))
+                if (!await _payInterfaceConfigService.MchAppHasAvailableIfCodeAsync(bizRQ.AppId, ifCode))
                 {
                     throw new BizException("商户应用的支付配置不存在或已关闭");
                 }

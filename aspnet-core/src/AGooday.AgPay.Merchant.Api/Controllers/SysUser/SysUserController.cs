@@ -49,12 +49,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_UR_USER_LIST)]
-        public ApiPageRes<SysUserListDto> List([FromQuery] SysUserQueryDto dto)
+        public async Task<ApiPageRes<SysUserListDto>> ListAsync([FromQuery] SysUserQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
             dto.BelongInfoId = GetCurrentMchNo();
             long? currentUserId = null;//GetCurrentUserId();
-            var data = _sysUserService.GetPaginatedData(dto, currentUserId);
+            var data = await _sysUserService.GetPaginatedDataAsync(dto, currentUserId);
             return ApiPageRes<SysUserListDto>.Pages(data);
         }
 
@@ -114,7 +114,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         public async Task<ApiRes> UpdateAsync(long recordId, SysUserModifyDto dto)
         {
             dto.SysType = CS.SYS_TYPE.MCH;
-            var sysUser = _sysUserService.GetByKeyAsNoTracking(recordId);
+            var sysUser = await _sysUserService.GetByKeyAsNoTrackingAsync(recordId);
             if (sysUser == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

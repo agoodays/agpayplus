@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
             _configContextService = configContextService;
         }
 
-        public void Receive(ResetIsvAgentMchAppInfoConfigMQ.MsgPayload payload)
+        public Task ReceiveAsync(ResetIsvAgentMchAppInfoConfigMQ.MsgPayload payload)
         {
             _logger.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
             if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO)
@@ -39,6 +39,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
             {
                 this.ModifyMchApp(payload.MchNo, payload.AppId);
             }
+            return Task.CompletedTask;
         }
 
         /// <summary>

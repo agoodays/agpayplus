@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         public async Task<ApiRes> AddAsync(MchAppDto dto)
         {
             dto.AppId = SeqUtil.GenAppId();
-            if (!_mchInfoService.IsExistMchNo(dto.MchNo))
+            if (!await _mchInfoService.IsExistMchNoAsync(dto.MchNo))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
@@ -104,7 +104,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
 
             // 推送mq到目前节点进行更新数据
             var mchApp = await _mchAppService.GetByIdAsync(appId);
-            mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, appId));
+            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, appId));
 
             return ApiRes.Ok();
         }
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{appId}"), MethodLog("更新应用信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_EDIT)]
-        public ApiRes Update(string appId, MchAppDto dto)
+        public async Task<ApiRes> UpdateAsync(string appId, MchAppDto dto)
         {
             var result = _mchAppService.Update(dto);
             if (!result)
@@ -124,7 +124,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
             }
             // 推送修改应用消息
-            mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, dto.MchNo, dto.AppId));
+            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, dto.MchNo, dto.AppId));
 
             return ApiRes.Ok();
         }

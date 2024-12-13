@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -17,18 +18,15 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <param name="telphone"></param>
         /// <param name="sysType"></param>
         /// <returns></returns>
-        public bool IsAssignedToUser(string roleId)
+        public Task<bool> IsAssignedToUserAsync(string roleId)
         {
-            return GetAllAsNoTracking().Any(c => c.RoleId == roleId);
+            return GetAllAsNoTracking().AnyAsync(c => c.RoleId == roleId);
         }
 
         public void RemoveByUserId(long userId)
         {
             var entitys = DbSet.Where(w => w.UserId == userId);
-            foreach (var entity in entitys)
-            {
-                DbSet.Remove(entity);
-            }
+            DbSet.RemoveRange(entitys);
         }
     }
 }

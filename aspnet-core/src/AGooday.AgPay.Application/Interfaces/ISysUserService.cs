@@ -7,13 +7,13 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         Task CreateAsync(SysUserCreateDto dto);
         Task RemoveAsync(long sysUserId, long currentUserId, string sysType);
-        void ModifyCurrentUserInfo(ModifyCurrentUserInfoDto user);
+        Task ModifyCurrentUserInfoAsync(ModifyCurrentUserInfoDto user);
         Task ModifyAsync(SysUserModifyDto dto);
-        SysUserDto GetByKeyAsNoTracking(long recordId);
+        Task<SysUserDto> GetByKeyAsNoTrackingAsync(long recordId);
         IEnumerable<SysUserDto> GetByBelongInfoIdAsNoTracking(string belongInfoId);
-        SysUserDto GetById(long recordId, string belongInfoId);
-        bool IsExistTelphone(string telphone, string sysType);
-        SysUserDto GetByTelphone(string telphone, string sysType);
+        Task<SysUserDto> GetByIdAsync(long recordId, string belongInfoId);
+        Task<bool> IsExistTelphoneAsync(string telphone, string sysType);
+        Task<SysUserDto> GetByTelphoneAsync(string telphone, string sysType);
         IEnumerable<SysUserDto> GetByIds(List<long> recordIds);
         PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long? currentUserId);
         Task<PaginatedList<SysUserListDto>> GetPaginatedDataAsync(SysUserQueryDto dto, long? currentUserId);

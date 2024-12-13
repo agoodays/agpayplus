@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_GROUP_ADD)]
         public async Task<ApiRes> AddAsync(MchDivisionReceiverGroupDto dto)
         {
-            if (!_mchInfoService.IsExistMchNo(dto.MchNo))
+            if (!await _mchInfoService.IsExistMchNoAsync(dto.MchNo))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

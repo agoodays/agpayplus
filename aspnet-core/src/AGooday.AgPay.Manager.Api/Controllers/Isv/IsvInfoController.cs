@@ -94,13 +94,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             }
 
             // 1.查询当前服务商下是否存在商户
-            if (_mchInfoService.IsExistMchByIsvNo(isvInfo.IsvNo))
+            if (await _mchInfoService.IsExistMchByIsvNoAsync(isvInfo.IsvNo))
             {
                 throw new BizException("该服务商下存在商户，不可删除");
             }
 
             // 2.查询当前服务商下是否存在代理商
-            if (_agentInfoService.IsExistAgent(isvInfo.IsvNo))
+            if (await _agentInfoService.IsExistAgentAsync(isvInfo.IsvNo))
             {
                 throw new BizException("该服务商下存在代理商，不可删除");
             }
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             }
 
             // 推送mq到目前节点进行更新数据
-            mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, isvNo, null, null, null));
+            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, isvNo, null, null, null));
 
             return ApiRes.Ok();
         }
@@ -128,12 +128,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <returns></returns>
         [HttpPut, Route("{isvNo}"), MethodLog("更新服务商信息")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_EDIT)]
-        public ApiRes Update(string isvNo, IsvInfoDto dto)
+        public async Task<ApiRes> UpdateAsync(string isvNo, IsvInfoDto dto)
         {
             _isvInfoService.Update(dto);
 
             // 推送mq到目前节点进行更新数据
-            mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.IsvNo, null, null, null));
+            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.IsvNo, null, null, null));
 
             return ApiRes.Ok();
         }

@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 更新订单自动分账业务
         /// </summary>
         /// <param name="payOrder"></param>
-        private void UpdatePayOrderAutoDivision(PayOrderDto payOrder)
+        private async void UpdatePayOrderAutoDivision(PayOrderDto payOrder)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 if (updDivisionState)
                 {
                     //推送到分账MQ
-                    mqSender.Send(PayOrderDivisionMQ.Build(payOrder.PayOrderId, CS.YES, null), 60); //1分钟后执行
+                    await mqSender.SendAsync(PayOrderDivisionMQ.Build(payOrder.PayOrderId, CS.YES, null), 60); //1分钟后执行
                 }
             }
             catch (Exception e)

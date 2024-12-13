@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Components.OCR.Controllers
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("recognizeText/{type}")]
-        public async Task<ApiRes> RecognizeText(string imageUrl, string type)
+        public async Task<ApiRes> RecognizeTextAsync(string imageUrl, string type)
         {
             try
             {
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Components.OCR.Controllers
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPost, Route("{type}")]
-        public async Task<ApiRes> RecognizeCardText(string imageUrl, string type)
+        public async Task<ApiRes> RecognizeCardTextAsync(string imageUrl, string type)
         {
             try
             {

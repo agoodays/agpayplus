@@ -87,7 +87,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_STORE_ADD)]
         public async Task<ApiRes> AddAsync(MchStoreDto dto)
         {
-            if (!_mchInfoService.IsExistMchNo(dto.MchNo))
+            if (!await _mchInfoService.IsExistMchNoAsync(dto.MchNo))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

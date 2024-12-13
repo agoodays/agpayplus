@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             _mchNotifyService.UpdateIngAndAddNotifyCountLimit(notifyId);
 
             //调起MQ重发
-            mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId));
+            await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
 
             return ApiRes.Ok(mchNotify);
         }

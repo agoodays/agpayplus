@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 商户通知信息， 只有订单是终态，才会发送通知， 如明确成功和明确失败
         /// </summary>
         /// <param name="dbPayOrder"></param>
-        public void PayOrderNotify(PayOrderDto dbPayOrder)
+        public async void PayOrderNotify(PayOrderDto dbPayOrder)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 //推送到MQ
                 long notifyId = mchNotifyRecord.NotifyId;
-                mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId));
+                await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
             }
             catch (Exception e)
             {
@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 商户通知信息，退款成功的发送通知
         /// </summary>
         /// <param name="dbRefundOrder"></param>
-        public void RefundOrderNotify(RefundOrderDto dbRefundOrder)
+        public async void RefundOrderNotify(RefundOrderDto dbRefundOrder)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 //推送到MQ
                 long notifyId = mchNotifyRecord.NotifyId;
-                mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId));
+                await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
             }
             catch (Exception e)
             {
@@ -181,7 +181,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 商户通知信息，转账订单的通知接口
         /// </summary>
         /// <param name="dbTransferOrder"></param>
-        public void TransferOrderNotify(TransferOrderDto dbTransferOrder)
+        public async void TransferOrderNotify(TransferOrderDto dbTransferOrder)
         {
             try
             {
@@ -238,7 +238,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 //推送到MQ
                 long notifyId = mchNotifyRecord.NotifyId;
-                mqSender.Send(PayOrderMchNotifyMQ.Build(notifyId));
+                await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
             }
             catch (Exception e)
             {

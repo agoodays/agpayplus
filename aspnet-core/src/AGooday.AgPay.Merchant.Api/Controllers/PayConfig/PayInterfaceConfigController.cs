@@ -180,7 +180,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPost, Route("interfaceParams"), MethodLog("更新支付参数")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_ADD)]
-        public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
+        public async Task<ApiRes> SaveOrUpdateAsync(PayInterfaceConfigDto dto)
         {
             dto.IfRate = dto.IfRate / 100;// 存入真实费率
             //添加更新者信息
@@ -215,7 +215,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
             }
 
             // 推送mq到目前节点进行更新数据
-            mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null, null));
+            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null, null));
 
             return ApiRes.Ok();
         }

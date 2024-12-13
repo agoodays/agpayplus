@@ -57,12 +57,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("添加角色信息")]
         [PermissionAuth(PermCode.AGENT.ENT_UR_ROLE_ADD)]
-        public ApiRes Add(SysRoleCreateDto dto)
+        public async Task<ApiRes> AddAsync(SysRoleCreateDto dto)
         {
             dto.RoleId = $"ROLE_{StringUtil.GetUUID(6)}";
             dto.SysType = CS.SYS_TYPE.AGENT;
             dto.BelongInfoId = GetCurrentAgentNo();
-            _sysRoleService.Add(dto);
+            await _sysRoleService.AddAsync(dto);
 
             //如果包含： 可分配权限的权限 && EntIds 不为空
             if (GetCurrentUser().Authorities.Contains(PermCode.AGENT.ENT_UR_ROLE_DIST))
@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         [PermissionAuth(PermCode.AGENT.ENT_UR_ROLE_DEL)]
         public ApiRes Delete(string recordId)
         {
-            _sysRoleService.RemoveRole(recordId);
+            _sysRoleService.RemoveRoleAsync(recordId);
             return ApiRes.Ok();
         }
 
@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         [PermissionAuth(PermCode.AGENT.ENT_UR_ROLE_EDIT)]
         public ApiRes Update(string recordId, SysRoleModifyDto dto)
         {
-            _sysRoleService.Update(dto);
+            _sysRoleService.UpdateAsync(dto);
             //如果包含：可分配权限的权限 && EntIds 不为空
             if (GetCurrentUser().Authorities.Contains(PermCode.AGENT.ENT_UR_ROLE_DIST))
             {

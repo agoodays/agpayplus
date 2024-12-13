@@ -255,9 +255,9 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public bool IsExistMchPayPassageUseWayCode(string wayCode)
+        public Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode)
         {
-            return _mchPayPassageRepository.IsExistMchPayPassageUseWayCode(wayCode);
+            return _mchPayPassageRepository.IsExistMchPayPassageUseWayCodeAsync(wayCode);
         }
     }
 }

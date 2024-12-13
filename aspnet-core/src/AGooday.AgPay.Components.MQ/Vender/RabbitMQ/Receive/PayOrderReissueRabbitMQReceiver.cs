@@ -24,9 +24,9 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
         /// 接收 【 queue 】 类型的消息
         /// </summary>
         /// <param name="msg"></param>
-        public void ReceiveMsg(string msg)
+        public Task ReceiveMsgAsync(string msg)
         {
-            mqReceiver.Receive(PayOrderReissueMQ.Parse(msg));
+            return mqReceiver.ReceiveAsync(PayOrderReissueMQ.Parse(msg));
         }
     }
 }

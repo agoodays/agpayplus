@@ -4,8 +4,8 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IPayInterfaceConfigRepository : IAgPayRepository<PayInterfaceConfig, long>
     {
-        bool IsExistUseIfCode(string ifCode);
-        bool MchAppHasAvailableIfCode(string appId, string ifCode);
-        void RemoveByInfoIds(List<string> infoIds, string infoType);
+        Task<bool> IsExistUseIfCodeAsync(string ifCode);
+        Task<bool> MchAppHasAvailableIfCodeAsync(string appId, string ifCode);
+        void RemoveByInfoIds(IQueryable<string> infoIds, string infoType);
     }
 }

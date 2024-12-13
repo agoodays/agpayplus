@@ -84,10 +84,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <exception cref="BizException"></exception>
         [HttpDelete, Route("{ifCode}"), MethodLog("删除支付接口")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_DEL)]
-        public ApiRes Delete(string ifCode)
+        public async Task<ApiRes> DeleteAsync(string ifCode)
         {
             // 校验该支付方式是否有服务商或商户配置参数或者已有订单
-            if (_payIfConfigService.IsExistUseIfCode(ifCode) || _payOrderService.IsExistOrderUseIfCode(ifCode))
+            if (await _payIfConfigService.IsExistUseIfCodeAsync(ifCode) || await _payOrderService.IsExistOrderUseIfCodeAsync(ifCode))
             {
                 throw new BizException("该支付接口已有服务商或商户配置参数或已发生交易，无法删除！");
             }

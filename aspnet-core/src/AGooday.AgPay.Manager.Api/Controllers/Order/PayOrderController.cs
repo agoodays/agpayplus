@@ -60,10 +60,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
-        public ApiPageRes<PayOrderDto> List([FromQuery] PayOrderQueryDto dto)
+        public async Task<ApiPageRes<PayOrderDto>> ListAsync([FromQuery] PayOrderQueryDto dto)
         {
             dto.BindDateRange();
-            var payOrders = _payOrderService.GetPaginatedData(dto);
+            var payOrders = await _payOrderService.GetPaginatedDataAsync(dto);
             // 得到所有支付方式
             Dictionary<string, string> payWayNameMap = new Dictionary<string, string>();
             _payWayService.GetAllAsNoTracking()
@@ -97,10 +97,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("count"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
-        public ApiRes Count([FromQuery] PayOrderQueryDto dto)
+        public async Task<ApiRes> CountAsync([FromQuery] PayOrderQueryDto dto)
         {
             dto.BindDateRange();
-            var statistics = _payOrderService.Statistics(dto);
+            var statistics = await _payOrderService.StatisticsAsync(dto);
             return ApiRes.Ok(statistics);
         }
 
@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("export/{bizType}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
-        public IActionResult Export(string bizType, [FromQuery] PayOrderQueryDto dto)
+        public async Task<IActionResult> ExportAsync(string bizType, [FromQuery] PayOrderQueryDto dto)
         {
             if (!"excel".Equals(bizType))
             {
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             }
             dto.BindDateRange();
             // 从数据库中检索需要导出的数据
-            var payOrders = _payOrderService.GetPaginatedData(dto);
+            var payOrders = await _payOrderService.GetPaginatedDataAsync(dto);
             string fileName = $"订单列表.xlsx";
             // 5.0之后的epplus需要指定 商业证书 或者非商业证书。低版本不需要此行代码
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;

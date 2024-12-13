@@ -5,9 +5,9 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchInfoService : IAgPayService<MchInfoDto>
     {
-        bool IsExistMchNo(string mchNo);
-        bool IsExistMchByIsvNo(string isvNo);
-        bool IsExistMchByAgentNo(string agentNo);
+        Task<bool> IsExistMchNoAsync(string mchNo);
+        Task<bool> IsExistMchByIsvNoAsync(string isvNo);
+        Task<bool> IsExistMchByAgentNoAsync(string agentNo);
         Task CreateAsync(MchInfoCreateDto dto);
         Task RemoveAsync(string recordId);
         Task ModifyAsync(MchInfoModifyDto dto);

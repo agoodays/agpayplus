@@ -7,6 +7,7 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Domain.Queries.SysUsers;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -64,9 +65,9 @@ namespace AGooday.AgPay.Application.Services
             return _sysUserRepository.SaveChanges(out int _);
         }
 
-        public void ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
+        public async Task ModifyCurrentUserInfoAsync(ModifyCurrentUserInfoDto dto)
         {
-            var user = _sysUserRepository.GetByUserId(dto.SysUserId);
+            var user = await _sysUserRepository.GetByUserIdAsync(dto.SysUserId);
             if (!string.IsNullOrWhiteSpace(dto.AvatarUrl))
                 user.AvatarUrl = dto.AvatarUrl;
             if (!string.IsNullOrWhiteSpace(dto.Realname))
@@ -86,9 +87,9 @@ namespace AGooday.AgPay.Application.Services
             await Bus.SendCommand(command);
         }
 
-        public SysUserDto GetByKeyAsNoTracking(long recordId)
+        public async Task<SysUserDto> GetByKeyAsNoTrackingAsync(long recordId)
         {
-            var entity = _sysUserRepository.GetByKeyAsNoTracking(recordId);
+            var entity = await _sysUserRepository.GetByKeyAsNoTrackingAsync(recordId);
             var dto = _mapper.Map<SysUserDto>(entity);
             return dto;
         }
@@ -99,10 +100,10 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysUserDto>>(entitys);
         }
 
-        public SysUserDto GetById(long recordId, string belongInfoId)
+        public async Task<SysUserDto> GetByIdAsync(long recordId, string belongInfoId)
         {
-            var entity = _sysUserRepository.GetAllAsNoTracking()
-                .Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefault();
+            var entity = await _sysUserRepository.GetAllAsNoTracking()
+                .Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefaultAsync();
             var dto = _mapper.Map<SysUserDto>(entity);
             return dto;
         }
@@ -114,14 +115,14 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<SysUserDto>>(sysUsers);
         }
 
-        public bool IsExistTelphone(string telphone, string sysType)
+        public Task<bool> IsExistTelphoneAsync(string telphone, string sysType)
         {
-            return _sysUserRepository.IsExistTelphone(telphone, sysType);
+            return _sysUserRepository.IsExistTelphoneAsync(telphone, sysType);
         }
 
-        public SysUserDto GetByTelphone(string telphone, string sysType)
+        public async Task<SysUserDto> GetByTelphoneAsync(string telphone, string sysType)
         {
-            var entity = _sysUserRepository.GetByTelphone(telphone, sysType);
+            var entity = await _sysUserRepository.GetByTelphoneAsync(telphone, sysType);
             var dto = _mapper.Map<SysUserDto>(entity);
             return dto;
         }
@@ -129,15 +130,15 @@ namespace AGooday.AgPay.Application.Services
         public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long? currentUserId)
         {
             var query = (from u in _sysUserRepository.GetAllAsNoTracking()
-                            join ut in _sysUserTeamRepository.GetAllAsNoTracking() on u.TeamId equals ut.TeamId into temp
-                            from team in temp.DefaultIfEmpty()
-                            where (string.IsNullOrWhiteSpace(dto.SysType) || u.SysType.Equals(dto.SysType))
-                            && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || u.BelongInfoId.Equals(dto.BelongInfoId))
-                            && (string.IsNullOrWhiteSpace(dto.Realname) || u.Realname.Contains(dto.Realname))
-                            && (dto.UserType.Equals(null) || u.UserType.Equals(dto.UserType))
-                            && (dto.SysUserId.Equals(null) || u.SysUserId.Equals(dto.SysUserId))
-                            && (currentUserId.Equals(null) || !u.SysUserId.Equals(currentUserId))
-                            select new { u, team }).OrderByDescending(o => o.u.CreatedAt);
+                         join ut in _sysUserTeamRepository.GetAllAsNoTracking() on u.TeamId equals ut.TeamId into temp
+                         from team in temp.DefaultIfEmpty()
+                         where (string.IsNullOrWhiteSpace(dto.SysType) || u.SysType.Equals(dto.SysType))
+                         && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || u.BelongInfoId.Equals(dto.BelongInfoId))
+                         && (string.IsNullOrWhiteSpace(dto.Realname) || u.Realname.Contains(dto.Realname))
+                         && (dto.UserType.Equals(null) || u.UserType.Equals(dto.UserType))
+                         && (dto.SysUserId.Equals(null) || u.SysUserId.Equals(dto.SysUserId))
+                         && (currentUserId.Equals(null) || !u.SysUserId.Equals(currentUserId))
+                         select new { u, team }).OrderByDescending(o => o.u.CreatedAt);
 
             var records = PaginatedList<SysUserListDto>.Create(query, s =>
             {

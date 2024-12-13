@@ -10,6 +10,7 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AGooday.AgPay.Domain.CommandHandlers
@@ -53,7 +54,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _mchInfoRepository = mchInfoRepository;
         }
 
-        public Task Handle(CreateAgentInfoCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateAgentInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -61,14 +62,14 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.CompletedTask;
+                return;
             }
 
             var agentInfo = _mapper.Map<AgentInfo>(request);
             do
             {
                 agentInfo.AgentNo = SeqUtil.GenAgentNo();
-            } while (_agentInfoRepository.IsExistAgentNo(agentInfo.AgentNo));
+            } while (await _agentInfoRepository.IsExistAgentNoAsync(agentInfo.AgentNo));
 
             #region 检查
             // 校验上级代理商信息
@@ -78,13 +79,13 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 var pagentInfo = _agentInfoRepository.GetById(agentInfo.Pid);
                 if (pagentInfo == null || pagentInfo.State == CS.NO)
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "上级代理商不可用！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "上级代理商不可用！"));
+                    return;
                 }
                 if (!agentInfo.IsvNo.Equals(pagentInfo.IsvNo))
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "上级代理商/服务商信息有误！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "上级代理商/服务商信息有误！"));
+                    return;
                 }
                 agentInfo.Level = (byte)(pagentInfo.Level + 1);
             }
@@ -96,11 +97,11 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             if (!string.IsNullOrWhiteSpace(agentInfo.IsvNo))
             {
                 // 当前服务商状态是否正确
-                var isvInfo = _isvInfoRepository.GetById(agentInfo.IsvNo);
+                var isvInfo = await _isvInfoRepository.GetByIdAsync(agentInfo.IsvNo);
                 if (isvInfo == null || isvInfo.State == CS.NO)
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "服务商号不可用！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "服务商号不可用！"));
+                    return;
                 }
             }
             #endregion
@@ -126,28 +127,28 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 #region 检查
                 // 登录用户名不可重复
                 // 这些业务逻辑，当然要在领域层中（领域命令处理程序中）进行处理
-                if (_sysUserRepository.IsExistLoginUsername(sysUser.LoginUsername, sysUser.SysType))
+                if (await _sysUserRepository.IsExistLoginUsernameAsync(sysUser.LoginUsername, sysUser.SysType))
                 {
                     // 引发错误事件
-                    Bus.RaiseEvent(new DomainNotification("", "登录名已经被使用！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "登录名已经被使用！"));
+                    return;
                 }
                 // 手机号不可重复
-                if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
+                if (await _sysUserRepository.IsExistTelphoneAsync(sysUser.Telphone, sysUser.SysType))
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "联系人手机号已存在！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "联系人手机号已存在！"));
+                    return;
                 }
                 // 员工号不可重复
-                if (_sysUserRepository.IsExistUserNo(sysUser.UserNo, sysUser.SysType))
+                if (await _sysUserRepository.IsExistUserNoAsync(sysUser.UserNo, sysUser.SysType))
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
-                    return Task.CompletedTask;
+                    await Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
+                    return;
                 }
                 #endregion
 
-                _sysUserRepository.Add(sysUser);
-                _sysUserRepository.SaveChanges();
+                await _sysUserRepository.AddAsync(sysUser);
+                await _sysUserRepository.SaveChangesAsync();
 
                 #region 添加默认用户认证表
                 //string salt = StringUtil.GetUUID(6); //6位随机数
@@ -163,7 +164,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     Salt = salt,
                     SysType = sysUser.SysType
                 };
-                _sysUserAuthRepository.Add(sysUserAuthByLoginUsername);
+                await _sysUserAuthRepository.AddAsync(sysUserAuthByLoginUsername);
 
                 //手机号登录方式
                 var sysUserAuthByTelphone = new SysUserAuth()
@@ -175,7 +176,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     Salt = salt,
                     SysType = sysUser.SysType
                 };
-                _sysUserAuthRepository.Add(sysUserAuthByTelphone);
+                await _sysUserAuthRepository.AddAsync(sysUserAuthByTelphone);
                 #endregion
                 #endregion
 
@@ -183,13 +184,13 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 存入代理商默认用户ID
                 // agentInfo.Sipw = BCryptUtil.Hash(CS.DEFAULT_SIPW, out salt);
                 agentInfo.InitUserId = sysUser.SysUserId;
-                _agentInfoRepository.Add(agentInfo);
+                await _agentInfoRepository.AddAsync(agentInfo);
 
-                if (!Commit())
+                if (!await CommitAsync())
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "添加代理商失败"));
+                    await Bus.RaiseEvent(new DomainNotification("", "添加代理商失败"));
                     RollbackTransaction();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 CommitTransaction();
@@ -202,20 +203,18 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     createdEvent.LoginUsername = request.LoginUsername;
                     createdEvent.LoginPassword = authPwd;
                     createdEvent.IsNotify = request.IsNotify;
-                    Bus.RaiseEvent(createdEvent);
+                    await Bus.RaiseEvent(createdEvent);
                 }
             }
             catch (Exception e)
             {
                 RollbackTransaction();
-                Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return;
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task Handle(ModifyAgentInfoCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ModifyAgentInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -223,7 +222,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.CompletedTask;
+                return;
             }
 
             request.UpdatedAt = DateTime.Now;
@@ -245,17 +244,17 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 BeginTransaction();
                 //修改了手机号， 需要修改auth表信息
                 // 获取代理商超管
-                long agentAdminUserId = _sysUserRepository.FindAgentAdminUserId(agentInfo.AgentNo);
-                var sysUserAuth = _sysUserAuthRepository.GetAll()
+                long agentAdminUserId = await _sysUserRepository.FindAgentAdminUserIdAsync(agentInfo.AgentNo);
+                var sysUserAuth = await _sysUserAuthRepository.GetAllAsNoTracking()
                      .Where(w => w.UserId.Equals(agentAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE))
-                     .FirstOrDefault();
+                     .FirstOrDefaultAsync();
 
                 if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
                 {
-                    if (_sysUserRepository.IsExistTelphone(request.ContactTel, request.ContactTel))
+                    if (await _sysUserRepository.IsExistTelphoneAsync(request.ContactTel, request.ContactTel))
                     {
-                        Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
-                        return Task.CompletedTask;
+                        await Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                        return;
                     }
                     sysUserAuth.Identifier = request.ContactTel;
                     _sysUserAuthRepository.Update(sysUserAuth);
@@ -269,7 +268,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
                     // 重置超管密码
                     _sysUserAuthRepository.ResetAuthInfo(agentAdminUserId, CS.SYS_TYPE.AGENT, null, null, updatePwd);
-                    _sysUserAuthRepository.SaveChanges();
+                    await _sysUserAuthRepository.SaveChangesAsync();
 
                     // 删除超管登录信息
                     removeCacheUserIdList.Add(agentAdminUserId);
@@ -278,7 +277,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 推送mq删除redis用户认证信息
                 if (removeCacheUserIdList.Count != 0)
                 {
-                    mqSender.Send(CleanAgentLoginAuthCacheMQ.Build(removeCacheUserIdList));
+                    await mqSender.SendAsync(CleanAgentLoginAuthCacheMQ.Build(removeCacheUserIdList));
                 }
 
                 // 更新代理商信息
@@ -287,27 +286,25 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
                 if (!Commit())
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "修改当前代理商失败"));
+                    await Bus.RaiseEvent(new DomainNotification("", "修改当前代理商失败"));
                     RollbackTransaction();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 CommitTransaction();
 
                 // 推送mq到目前节点进行更新数据
-                mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
+                await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
             }
             catch (Exception e)
             {
                 RollbackTransaction();
-                Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return;
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task Handle(RemoveAgentInfoCommand request, CancellationToken cancellationToken)
+        public async Task Handle(RemoveAgentInfoCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -315,23 +312,23 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.CompletedTask;
+                return;
             }
 
             // 0.当前代理商是否存在
-            var agentInfo = _agentInfoRepository.GetById(request.AgentNo);
+            var agentInfo = await _agentInfoRepository.GetByIdAsync(request.AgentNo);
             if (agentInfo is null)
             {
                 // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "该代理商不存在！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "该代理商不存在！"));
+                return;
             }
 
             // 1.查询当前服务商下是否存在商户
-            if (_mchInfoRepository.IsExistMchByAgentNo(request.AgentNo))
+            if (await _mchInfoRepository.IsExistMchByAgentNoAsync(request.AgentNo))
             {
-                Bus.RaiseEvent(new DomainNotification("", "该代理商下存在商户，不可删除"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "该代理商下存在商户，不可删除"));
+                return;
             }
 
             try
@@ -339,46 +336,39 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 BeginTransaction();
                 var sysUsers = _sysUserRepository.GetAllAsNoTracking()
                     .Where(w => w.BelongInfoId.Equals(request.AgentNo) && w.SysType.Equals(CS.SYS_TYPE.AGENT));
-                foreach (var sysUser in sysUsers)
-                {
-                    var sysUserAuths = _sysUserAuthRepository.GetAllAsNoTracking()
-                        .Where(w => w.UserId.Equals(sysUser.SysUserId));
-                    // 删除当前代理商用户认证信息
-                    foreach (var sysUserAuth in sysUserAuths)
-                    {
-                        _sysUserAuthRepository.Remove(sysUserAuth.AuthId);
-                    }
-                    // 删除当前代理商的登录用户
-                    _sysUserRepository.Remove(sysUser.SysUserId);
-                }
+                var sysUserIds = sysUsers.Select(s => s.SysUserId);
+                var sysUserAuths = _sysUserAuthRepository.GetAllAsNoTracking()
+                    .Where(w => sysUserIds.Contains(w.UserId));
+                // 删除当前代理商用户认证信息
+                _sysUserAuthRepository.RemoveRange(sysUserAuths);
+                // 删除当前代理商的登录用户
+                _sysUserRepository.RemoveRange(sysUsers);
 
                 // 2.删除当前代理商信息
                 _agentInfoRepository.Remove(agentInfo.AgentNo);
 
                 if (!Commit())
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "删除当前代理商失败"));
+                    await Bus.RaiseEvent(new DomainNotification("", "删除当前代理商失败"));
                     RollbackTransaction();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 CommitTransaction();
 
                 // 推送mq删除redis用户缓存
                 var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
-                mqSender.Send(CleanAgentLoginAuthCacheMQ.Build(userIdList));
+                await mqSender.SendAsync(CleanAgentLoginAuthCacheMQ.Build(userIdList));
 
                 // 推送mq到目前节点进行更新数据
-                mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
+                await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
             }
             catch (Exception e)
             {
                 RollbackTransaction();
-                Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return;
             }
-
-            return Task.CompletedTask;
         }
     }
 }

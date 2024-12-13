@@ -15,15 +15,13 @@ namespace AGooday.AgPay.Merchant.Api.MQ
         public Task StartAsync(CancellationToken cancellationToken)
         {
             // 启动后台任务，在后台接收消息
-            _mqSender.Receive();
-            return Task.CompletedTask;
+            return _mqSender.ReceiveAsync();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
             // 在停止时执行必要的清理操作
-            _mqSender.Close();
-            return Task.CompletedTask;
+            return _mqSender.CloseAsync();
         }
     }
 }

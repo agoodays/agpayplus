@@ -26,34 +26,34 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
             _serviceProvider = serviceProvider;
         }
 
-        public void Send(AbstractMQ mqModel)
+        public async Task SendAsync(AbstractMQ mqModel)
         {
             if (mqModel.GetMQType() == MQSendTypeEnum.QUEUE)
             {
-                ConvertAndSend(mqModel.GetMQType(), "", mqModel.GetMQName(), mqModel.GetMQName(), mqModel.ToMessage());
+                await ConvertAndSend(mqModel.GetMQType(), "", mqModel.GetMQName(), mqModel.GetMQName(), mqModel.ToMessage());
             }
             else
             {
                 // fanout模式 的 routeKEY 没意义。
-                ConvertAndSend(mqModel.GetMQType(), RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + mqModel.GetMQName(), "", "", mqModel.ToMessage());
+                await ConvertAndSend(mqModel.GetMQType(), RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + mqModel.GetMQName(), "", "", mqModel.ToMessage());
             }
         }
 
-        public void Send(AbstractMQ mqModel, int delay)
+        public async Task SendAsync(AbstractMQ mqModel, int delay)
         {
             if (mqModel.GetMQType() == MQSendTypeEnum.QUEUE)
             {
                 var queue = mqModel.GetMQName();
-                ConvertAndDelaySend(RabbitMQConfig.DELAYED_EXCHANGE_NAME, queue, "delay.delay", mqModel.ToMessage(), delay);
+                await ConvertAndDelaySend(RabbitMQConfig.DELAYED_EXCHANGE_NAME, queue, "delay.delay", mqModel.ToMessage(), delay);
             }
             else
             {
                 // fanout模式 的 routeKEY 没意义。  没有延迟属性
-                ConvertAndSend(mqModel.GetMQType(), RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + mqModel.GetMQName(), "", "", mqModel.ToMessage());
+                await ConvertAndSend(mqModel.GetMQType(), RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + mqModel.GetMQName(), "", "", mqModel.ToMessage());
             }
         }
 
-        public async void Receive()
+        public async Task ReceiveAsync()
         {
             try
             {
@@ -91,7 +91,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                     {
                         var body = ea.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
-                        msgReceiver.ReceiveMsg(message);
+                        await msgReceiver.ReceiveMsgAsync(message);
 
                         await channel.BasicAckAsync(ea.DeliveryTag, false);
                     };
@@ -106,15 +106,16 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
             }
         }
 
-        public void Close()
+        public Task CloseAsync()
         {
             if (channel != null)
-                this.channel.CloseAsync();
+                return this.channel.CloseAsync();
             if (connection != null)
-                this.connection.CloseAsync();
+                return this.connection.CloseAsync();
+            return Task.CompletedTask;
         }
 
-        private async void ConvertAndSend(MQSendTypeEnum mqtype, string exchange, string queue, string routingKey, string message)
+        private async Task ConvertAndSend(MQSendTypeEnum mqtype, string exchange, string queue, string routingKey, string message)
         {
             try
             {
@@ -154,7 +155,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
             }
         }
 
-        private async void ConvertAndDelaySend(string exchange, string queue, string routingKey, string message, int delay)
+        private async Task ConvertAndDelaySend(string exchange, string queue, string routingKey, string message, int delay)
         {
             try
             {

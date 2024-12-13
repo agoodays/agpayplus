@@ -8,6 +8,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Services
@@ -64,6 +65,13 @@ namespace AGooday.AgPay.Application.Services
             return records;
         }
 
+        public async Task<PaginatedList<PayOrderDto>> GetPaginatedDataAsync(PayOrderQueryDto dto)
+        {
+            var payOrders = GetPayOrders(dto).OrderByDescending(o => o.CreatedAt);
+            var records = await PaginatedList<PayOrder>.CreateAsync<PayOrderDto>(payOrders, _mapper, dto.PageNumber, dto.PageSize);
+            return records;
+        }
+
         private IQueryable<PayOrder> GetPayOrders(PayOrderQueryDto dto)
         {
             var result = _payOrderRepository.GetAllAsNoTracking()
@@ -91,22 +99,22 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public JObject Statistics(PayOrderQueryDto dto)
+        public async Task<JObject> StatisticsAsync(PayOrderQueryDto dto)
         {
             var payOrders = GetPayOrders(dto);
-            var allPayAmount = payOrders.Sum(s => s.Amount);
-            var allPayCount = payOrders.Count();
+            var allPayAmount = await payOrders.SumAsync(s => s.Amount);
+            var allPayCount = await payOrders.CountAsync();
             var failPay = payOrders.Where(w => !(w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)));
-            var failPayAmount = failPay.Sum(s => s.Amount);
-            var failPayCount = failPay.Count();
+            var failPayAmount = await failPay.SumAsync(s => s.Amount);
+            var failPayCount = await failPay.CountAsync();
             // 成交金额: 支付成功的订单金额，包含部分退款及全额退款的订单
             var pay = payOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
-            var mchFeeAmount = pay.Sum(s => s.MchFeeAmount);
-            var payAmount = pay.Sum(s => s.Amount);
-            var payCount = pay.Count();
+            var mchFeeAmount = await pay.SumAsync(s => s.MchFeeAmount);
+            var payAmount = await pay.SumAsync(s => s.Amount);
+            var payCount = await pay.CountAsync();
             var refund = payOrders.Where(w => w.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_SUB) || w.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_ALL));
-            var refundAmount = refund.Sum(s => s.Amount);
-            var refundCount = refund.Count();
+            var refundAmount = await refund.SumAsync(s => s.Amount);
+            var refundCount = await refund.CountAsync();
             JObject result = new JObject();
             result.Add("allPayAmount", Decimal.Round(allPayAmount / 100M, 2, MidpointRounding.AwayFromZero));
             result.Add("allPayCount", allPayCount);
@@ -120,17 +128,17 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public bool IsExistOrderUseIfCode(string ifCode)
+        public Task<bool> IsExistOrderUseIfCodeAsync(string ifCode)
         {
-            return _payOrderRepository.IsExistOrderUseIfCode(ifCode);
+            return _payOrderRepository.IsExistOrderUseIfCodeAsync(ifCode);
         }
-        public bool IsExistOrderUseWayCode(string wayCode)
+        public Task<bool> IsExistOrderUseWayCodeAsync(string wayCode)
         {
-            return _payOrderRepository.IsExistOrderUseWayCode(wayCode);
+            return _payOrderRepository.IsExistOrderUseWayCodeAsync(wayCode);
         }
-        public bool IsExistOrderByMchOrderNo(string mchNo, string mchOrderNo)
+        public Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchOrderNo)
         {
-            return _payOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchOrderNo);
+            return _payOrderRepository.IsExistOrderByMchOrderNoAsync(mchNo, mchOrderNo);
         }
         /// <summary>
         /// 更新订单状态 【订单生成】 --》 【支付中】

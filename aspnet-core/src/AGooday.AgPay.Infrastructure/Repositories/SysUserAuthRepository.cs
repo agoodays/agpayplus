@@ -3,6 +3,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -16,10 +17,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public void RemoveByUserId(long userId, string sysType)
         {
             var entitys = DbSet.Where(w => w.UserId.Equals(userId) && w.SysType.Equals(sysType));
-            foreach (var entity in entitys)
-            {
-                DbSet.Remove(entity);
-            }
+            DbSet.RemoveRange(entitys);
         }
 
         public void ResetAuthInfo(long userId, string sysType, string loginUserName, string telphone, string newPwd)
@@ -61,9 +59,9 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             }
         }
 
-        public SysUserAuth GetByIdentifier(byte identityType, string identifier, string sysType)
+        public Task<SysUserAuth> GetByIdentifierAsync(byte identityType, string identifier, string sysType)
         {
-            return DbSet.FirstOrDefault(w => w.IdentityType.Equals(identityType) && w.Identifier.Equals(identifier) && w.SysType.Equals(sysType));
+            return DbSet.FirstOrDefaultAsync(w => w.IdentityType.Equals(identityType) && w.Identifier.Equals(identifier) && w.SysType.Equals(sysType));
         }
 
         public List<SysUserAuth> GetUserAuths(string identifier, string sysType)

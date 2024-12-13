@@ -77,11 +77,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpDelete, Route("{wayCode}"), MethodLog("删除支付方式")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_DEL)]
-        public ApiRes Delete(string wayCode)
+        public async Task<ApiRes> DeleteAsync(string wayCode)
         {
             // 校验该支付方式是否有商户已配置通道或者已有订单
-            if (_mchPayPassageService.IsExistMchPayPassageUseWayCode(wayCode)
-                || _payOrderService.IsExistOrderUseWayCode(wayCode))
+            if (await _mchPayPassageService.IsExistMchPayPassageUseWayCodeAsync(wayCode)
+                || await _payOrderService.IsExistOrderUseWayCodeAsync(wayCode))
             {
                 throw new BizException("该支付方式已有商户配置通道或已发生交易，无法删除！");
             }

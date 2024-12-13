@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _sysUserRoleRelaRepository = sysUserRoleRelaRepository;
         }
 
-        public Task Handle(CreateSysUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateSysUserCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.CompletedTask;
+                return;
             }
 
             var sysUser = _mapper.Map<SysUser>(request);
@@ -64,23 +64,23 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             #region 检查
             // 登录用户名不可重复
             // 这些业务逻辑，当然要在领域层中（领域命令处理程序中）进行处理
-            if (_sysUserRepository.IsExistLoginUsername(sysUser.LoginUsername, sysUser.SysType))
+            if (await _sysUserRepository.IsExistLoginUsernameAsync(sysUser.LoginUsername, sysUser.SysType))
             {
                 // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "该用户名已经被使用！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "该用户名已经被使用！"));
+                return;
             }
             // 手机号不可重复
-            if (_sysUserRepository.IsExistTelphone(sysUser.Telphone, sysUser.SysType))
+            if (await _sysUserRepository.IsExistTelphoneAsync(sysUser.Telphone, sysUser.SysType))
             {
-                Bus.RaiseEvent(new DomainNotification("", "手机号已存在！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "手机号已存在！"));
+                return;
             }
             // 员工号不可重复
-            if (_sysUserRepository.IsExistUserNo(sysUser.UserNo, sysUser.SysType))
+            if (await _sysUserRepository.IsExistUserNoAsync(sysUser.UserNo, sysUser.SysType))
             {
-                Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "员工号已存在！"));
+                return;
             }
             #endregion
 
@@ -100,13 +100,13 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 do
                 {
                     sysUser.InviteCode = StringUtil.GetUUID(6); //6位随机数
-                } while (_sysUserRepository.IsExistInviteCode(sysUser.InviteCode));
+                } while (await _sysUserRepository.IsExistInviteCodeAsync(sysUser.InviteCode));
             }
 
             try
             {
                 BeginTransaction();
-                _sysUserRepository.Add(sysUser);
+                await _sysUserRepository.AddAsync(sysUser);
 
                 #region 添加默认用户认证表
                 //string salt = StringUtil.GetUUID(6); //6位随机数
@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     Salt = salt,
                     SysType = sysUser.SysType
                 };
-                _sysUserAuthRepository.Add(sysUserAuthByLoginUsername);
+                await _sysUserAuthRepository.AddAsync(sysUserAuthByLoginUsername);
 
                 //手机号登录方式
                 var sysUserAuthByTelphone = new SysUserAuth()
@@ -134,14 +134,14 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     Salt = salt,
                     SysType = sysUser.SysType
                 };
-                _sysUserAuthRepository.Add(sysUserAuthByTelphone);
+                await _sysUserAuthRepository.AddAsync(sysUserAuthByTelphone);
                 #endregion
 
                 if (!Commit())
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "添加用户失败"));
+                    await Bus.RaiseEvent(new DomainNotification("", "添加用户失败"));
                     RollbackTransaction();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 CommitTransaction();
@@ -153,20 +153,18 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     var createdEvent = _mapper.Map<SysUserCreatedEvent>(sysUser);
                     createdEvent.LoginPassword = authPwd;
                     createdEvent.IsNotify = request.IsNotify;
-                    Bus.RaiseEvent(createdEvent);
+                    await Bus.RaiseEvent(createdEvent);
                 }
             }
             catch (Exception e)
             {
                 RollbackTransaction();
-                Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return;
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task Handle(RemoveSysUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(RemoveSysUserCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -174,36 +172,36 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.CompletedTask;
+                return;
             }
             //查询该操作员信息
             SysUser sysUser;
             if (string.IsNullOrWhiteSpace(request.SysType))
             {
-                sysUser = _sysUserRepository.GetByUserId(request.SysUserId);
+                sysUser = await _sysUserRepository.GetByUserIdAsync(request.SysUserId);
             }
             else
             {
-                sysUser = _sysUserRepository.GetByUserId(request.SysUserId, request.SysType);
+                sysUser = await _sysUserRepository.GetByUserIdAsync(request.SysUserId, request.SysType);
             }
             if (sysUser is null)
             {
                 // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "该操作员不存在！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "该操作员不存在！"));
+                return;
             }
             //判断是否自己删除自己
             if (sysUser.SysUserId.Equals(request.CurrentSysUserId))
             {
                 // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "系统不允许删除当前登陆用户！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "系统不允许删除当前登陆用户！"));
+                return;
             }
             //判断是否删除商户默认超管（初始用户）
             if (sysUser != null && sysUser.SysType == CS.SYS_TYPE.MCH && sysUser.InitUser)
             {
-                Bus.RaiseEvent(new DomainNotification("", "系统不允许删除商户默认用户！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "系统不允许删除商户默认用户！"));
+                return;
             }
 
             try
@@ -218,25 +216,23 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 删除用户
                 _sysUserRepository.Remove(sysUser);
 
-                if (!Commit())
+                if (!await CommitAsync())
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "删除用户失败"));
+                    await Bus.RaiseEvent(new DomainNotification("", "删除用户失败"));
                     RollbackTransaction();
-                    return Task.CompletedTask;
+                    return;
                 }
                 CommitTransaction();
             }
             catch (Exception e)
             {
                 RollbackTransaction();
-                Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return;
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task Handle(ModifySysUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ModifySysUserCommand request, CancellationToken cancellationToken)
         {
             // 命令验证
             if (!request.IsValid())
@@ -244,24 +240,24 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 错误信息收集
                 NotifyValidationErrors(request);
                 // 返回，结束当前线程
-                return Task.CompletedTask;
+                return;
             }
 
             //查询该操作员信息
-            var sysUser = _sysUserRepository.GetByUserId(request.SysUserId, request.SysType);
+            var sysUser = await _sysUserRepository.GetByUserIdAsync(request.SysUserId, request.SysType);
             if (sysUser is null)
             {
                 // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "该用户不存在！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "该用户不存在！"));
+                return;
             }
 
             //判断是否自己禁用自己
             if (request.SysUserId.Equals(request.CurrentSysUserId) && request.State == CS.PUB_DISABLE)
             {
                 // 引发错误事件
-                Bus.RaiseEvent(new DomainNotification("", "系统不允许禁用当前登陆用户！"));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", "系统不允许禁用当前登陆用户！"));
+                return;
             }
 
             try
@@ -277,10 +273,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 //修改了手机号， 需要修改auth表信息
                 if (!sysUser.Telphone.Equals(request.Telphone))
                 {
-                    if (_sysUserRepository.IsExistTelphone(request.Telphone, request.SysType))
+                    if (await _sysUserRepository.IsExistTelphoneAsync(request.Telphone, request.SysType))
                     {
-                        Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
-                        return Task.CompletedTask;
+                        await Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                        return;
                     }
                     _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, request.Telphone, null);
                 }
@@ -288,10 +284,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 //修改了用户名， 需要修改auth表信息
                 if (!sysUser.LoginUsername.Equals(request.LoginUsername))
                 {
-                    if (_sysUserRepository.IsExistLoginUsername(request.LoginUsername, request.SysType))
+                    if (await _sysUserRepository.IsExistLoginUsernameAsync(request.LoginUsername, request.SysType))
                     {
-                        Bus.RaiseEvent(new DomainNotification("", "该登录用户名已关联其他用户！"));
-                        return Task.CompletedTask;
+                        await Bus.RaiseEvent(new DomainNotification("", "该登录用户名已关联其他用户！"));
+                        return;
                     }
                     _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, request.LoginUsername, null, null);
                 }
@@ -299,10 +295,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 //修改了编号
                 if (!sysUser.UserNo.Equals(request.UserNo))
                 {
-                    if (_sysUserRepository.IsExistUserNo(request.UserNo, request.SysType))
+                    if (await _sysUserRepository.IsExistUserNoAsync(request.UserNo, request.SysType))
                     {
-                        Bus.RaiseEvent(new DomainNotification("", "该员工编号已关联其他用户！"));
-                        return Task.CompletedTask;
+                        await Bus.RaiseEvent(new DomainNotification("", "该员工编号已关联其他用户！"));
+                        return;
                     }
                 }
 
@@ -314,16 +310,16 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     do
                     {
                         sysUser.InviteCode = StringUtil.GetUUID(6); //6位随机数
-                    } while (_sysUserRepository.IsExistInviteCode(sysUser.InviteCode));
+                    } while (await _sysUserRepository.IsExistInviteCodeAsync(sysUser.InviteCode));
                 }
 
                 _sysUserRepository.Update(sysUser);
 
                 if (!Commit())
                 {
-                    Bus.RaiseEvent(new DomainNotification("", "修改当前用户失败"));
+                    await Bus.RaiseEvent(new DomainNotification("", "修改当前用户失败"));
                     RollbackTransaction();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 CommitTransaction();
@@ -331,11 +327,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             catch (Exception e)
             {
                 RollbackTransaction();
-                Bus.RaiseEvent(new DomainNotification("", e.Message));
-                return Task.CompletedTask;
+                await Bus.RaiseEvent(new DomainNotification("", e.Message));
+                return;
             }
-
-            return Task.CompletedTask;
         }
     }
 }

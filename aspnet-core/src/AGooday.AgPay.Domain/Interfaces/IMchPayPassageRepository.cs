@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Domain.Interfaces
     {
         IQueryable<MchPayPassage> GetMchPayPassageByMchNoAndAppId(string mchNo, string appId);
         IQueryable<MchPayPassage> GetByAppIdAndWayCodesAsNoTracking(string appId, List<string> wayCodes);
-        bool IsExistMchPayPassageUseWayCode(string wayCode);
+        Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode);
         void RemoveByMchNo(string mchNo);
     }
 }

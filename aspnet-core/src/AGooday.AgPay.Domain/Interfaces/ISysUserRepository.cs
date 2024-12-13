@@ -4,18 +4,18 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface ISysUserRepository : IAgPayRepository<SysUser, long>
     {
-        bool IsExistLoginUsername(string loginUsername, string sysType);
-        bool IsExistTelphone(string telphone, string sysType);
-        bool IsExistUserNo(string userNo, string sysType);
-        bool IsExistInviteCode(string inviteCode);
-        bool IsExist(long sysUserId, string sysType);
-        SysUser GetByKeyAsNoTracking(long recordId);
+        Task<bool> IsExistLoginUsernameAsync(string loginUsername, string sysType);
+        Task<bool> IsExistTelphoneAsync(string telphone, string sysType);
+        Task<bool> IsExistUserNoAsync(string userNo, string sysType);
+        Task<bool> IsExistInviteCodeAsync(string inviteCode);
+        Task<bool> IsExistAsync(long sysUserId, string sysType);
+        Task<SysUser> GetByKeyAsNoTrackingAsync(long recordId);
         IQueryable<SysUser> GetByBelongInfoIdAsNoTracking(string belongInfoId);
-        SysUser GetByUserId(long sysUserId);
-        SysUser GetByUserId(long sysUserId, string sysType);
-        SysUser GetByTelphone(string telphone, string sysType);
+        Task<SysUser> GetByUserIdAsync(long sysUserId);
+        Task<SysUser> GetByUserIdAsync(long sysUserId, string sysType);
+        Task<SysUser> GetByTelphoneAsync(string telphone, string sysType);
+        Task<long> FindMchAdminUserIdAsync(string mchNo);
+        Task<long> FindAgentAdminUserIdAsync(string agentNo);
         void Remove(SysUser sysUser);
-        long FindMchAdminUserId(string mchNo);
-        long FindAgentAdminUserId(string agentNo);
     }
 }

@@ -4,8 +4,8 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IMchInfoRepository : IAgPayRepository<MchInfo>
     {
-        bool IsExistMchNo(string mchNo);
-        bool IsExistMchByIsvNo(string isvNo);
-        bool IsExistMchByAgentNo(string agentNo);
+        Task<bool> IsExistMchNoAsync(string mchNo);
+        Task<bool> IsExistMchByIsvNoAsync(string isvNo);
+        Task<bool> IsExistMchByAgentNoAsync(string agentNo);
     }
 }

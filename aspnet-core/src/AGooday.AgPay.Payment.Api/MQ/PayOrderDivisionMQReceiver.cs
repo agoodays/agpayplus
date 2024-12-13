@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public void Receive(PayOrderDivisionMQ.MsgPayload payload)
+        public Task ReceiveAsync(PayOrderDivisionMQ.MsgPayload payload)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
@@ -35,6 +35,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     _logger.LogError(e, e.Message);
                 }
             }
+
+            return Task.CompletedTask;
         }
     }
 }

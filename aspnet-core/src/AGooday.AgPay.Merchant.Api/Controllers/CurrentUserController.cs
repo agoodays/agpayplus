@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         public async Task<ApiRes> ScanAsync(string qrcodeNo)
         {
             string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
-            if (!_redis.KeyExists(loginQRCacheKey))
+            if (!await _redis.KeyExistsAsync(loginQRCacheKey))
             {
                 throw new BizException("二维码无效，请刷新二维码后重新扫描");
             }
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             {
                 throw new BizException("二维码状态无效，请刷新二维码后重新扫描");
             }
-            var cacheExpiry = _redis.KeyTimeToLive(loginQRCacheKey);
+            var cacheExpiry = await _redis.KeyTimeToLiveAsync(loginQRCacheKey);
             await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.SCANNED }), cacheExpiry, When.Exists);
             return ApiRes.Ok();
         }
@@ -126,7 +126,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         public async Task<ApiRes> ConfirmLoginAsync(string qrcodeNo, bool isConfirm = true)
         {
             string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
-            if (!_redis.KeyExists(loginQRCacheKey))
+            if (!await _redis.KeyExistsAsync(loginQRCacheKey))
             {
                 throw new BizException("二维码无效，请刷新二维码后重新扫描");
             }
@@ -164,16 +164,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut, Route("user"), MethodLog("修改个人信息")]
-        public ApiRes ModifyCurrentUserInfo(ModifyCurrentUserInfoDto dto)
+        public async Task<ApiRes> ModifyCurrentUserInfoAsync(ModifyCurrentUserInfoDto dto)
         {
             var currentUser = GetCurrentUser();
             dto.SysUserId = currentUser.SysUser.SysUserId;
-            _sysUserService.ModifyCurrentUserInfo(dto);
+            await _sysUserService.ModifyCurrentUserInfoAsync(dto);
             var userinfo = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             currentUser.SysUser = userinfo;
             //保存redis最新数据
             var currentUserJson = JsonConvert.SerializeObject(currentUser);
-            _redis.StringSet(currentUser.CacheKey, currentUserJson, new TimeSpan(0, 0, CS.TOKEN_TIME));
+            await _redis.StringSetAsync(currentUser.CacheKey, currentUserJson, new TimeSpan(0, 0, CS.TOKEN_TIME));
             return ApiRes.Ok();
         }
 
@@ -184,7 +184,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
         [HttpPut, Route("modifyPwd"), MethodLog("修改密码")]
-        public ApiRes ModifyPwd(ModifyPwd model)
+        public async Task<ApiRes> ModifyPwdAsync(ModifyPwd model)
         {
             var currentUser = GetCurrentUser();
             string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码
@@ -202,7 +202,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 throw new BizException("新密码与原密码不能相同！");
             }
             _sysUserAuthService.ResetAuthInfo(user.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MCH);
-            return Logout();
+            return await LogoutAsync();
         }
 
         /// <summary>
@@ -210,10 +210,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost, Route("logout"), MethodLog("退出登录")]
-        public ApiRes Logout()
+        public async Task<ApiRes> LogoutAsync()
         {
             var currentUser = GetCurrentUser();
-            _redis.KeyDelete(currentUser.CacheKey);
+            await _redis.KeyDeleteAsync(currentUser.CacheKey);
             return ApiRes.Ok();
         }
     }
