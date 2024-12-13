@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AGooday.AgPay.Application\AGooday.AgPay.Application.csproj" />
-    <ProjectReference Include="..\AGooday.AgPay.Common\AGooday.AgPay.Common.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Components.MQ\AGooday.AgPay.Components.MQ.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Components.OSS\AGooday.AgPay.Components.OSS.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Components.SMS\AGooday.AgPay.Components.SMS.csproj" />

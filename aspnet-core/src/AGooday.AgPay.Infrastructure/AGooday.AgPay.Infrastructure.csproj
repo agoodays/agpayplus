@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AGooday.AgPay.Common\AGooday.AgPay.Common.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Domain\AGooday.AgPay.Domain.csproj" />
   </ItemGroup>
 
