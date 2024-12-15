@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
     /// </summary>
     public class PayOrderMchNotifyMQReceiver : PayOrderMchNotifyMQ.IMQReceiver
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly ILogger<PayOrderMchNotifyMQReceiver> log;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
             IMQSender mqSender,
             IServiceScopeFactory serviceScopeFactory)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             log = logger;
             _serviceScopeFactory = serviceScopeFactory;
         }
@@ -93,29 +93,29 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     //支付订单 & 第一次通知: 更新为已通知
                     if (currentCount == 1 && (byte)MchNotifyRecordType.TYPE_PAY_ORDER == record.OrderType)
                     {
-                        payOrderService.UpdateNotifySent(record.OrderId);
+                        await payOrderService.UpdateNotifySentAsync(record.OrderId);
                     }
 
                     //通知成功
                     if ("SUCCESS".Equals(res, StringComparison.OrdinalIgnoreCase))
                     {
-                        mchNotifyRecordService.UpdateNotifyResult(notifyId, (byte)MchNotifyRecordState.STATE_SUCCESS, res);
+                        await mchNotifyRecordService.UpdateNotifyResultAsync(notifyId, (byte)MchNotifyRecordState.STATE_SUCCESS, res);
                         return;
                     }
 
                     //通知次数 >= 最大通知次数时， 更新响应结果为异常， 不在继续延迟发送消息
                     if (currentCount >= record.NotifyCountLimit)
                     {
-                        mchNotifyRecordService.UpdateNotifyResult(notifyId, (byte)MchNotifyRecordState.STATE_FAIL, res);
+                        await mchNotifyRecordService.UpdateNotifyResultAsync(notifyId, (byte)MchNotifyRecordState.STATE_FAIL, res);
                         return;
                     }
 
                     // 继续发送MQ 延迟发送
-                    mchNotifyRecordService.UpdateNotifyResult(notifyId, (byte)MchNotifyRecordState.STATE_ING, res);
+                    await mchNotifyRecordService.UpdateNotifyResultAsync(notifyId, (byte)MchNotifyRecordState.STATE_ING, res);
                     // 通知延时次数
                     //        1   2   3   4   5   6
                     //        0   30  60  90  120 150
-                    await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId), currentCount * 30);
+                    await _mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId), currentCount * 30);
 
                     return;
                 }

@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             AliPcOrderRQ bizRQ = (AliPcOrderRQ)rq;
 
@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
             req.SetBizModel(model);
 
             //统一放置 isv接口必传信息
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, req, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, req, model);
 
             // 构造函数响应数据
             AliPcOrderRS res = ApiResBuilder.BuildSuccess<AliPcOrderRS>();
@@ -55,13 +55,14 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
             // sdk方式需自行拦截接口异常信息
             try
             {
+                var alipayClientWrapper = await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext);
                 if (CS.PAY_DATA_TYPE.FORM.Equals(bizRQ.PayDataType))
                 {
-                    res.FormContent = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req).Body;
+                    res.FormContent = alipayClientWrapper.AlipayClient.pageExecute(req).Body;
                 }
                 else
                 {
-                    res.PayUrl = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req, null, "GET").Body;
+                    res.PayUrl = alipayClientWrapper.AlipayClient.pageExecute(req, null, "GET").Body;
                 }
             }
             catch (AopException e)

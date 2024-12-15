@@ -6,6 +6,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -38,20 +39,13 @@ namespace AGooday.AgPay.Application.Services
             _agentInfoRepository = agentInfoRepository;
         }
 
-        public override bool Add(PayInterfaceConfigDto dto)
+        public override async Task<bool> AddAsync(PayInterfaceConfigDto dto)
         {
             var entity = _mapper.Map<PayInterfaceConfig>(dto);
-            _payInterfaceConfigRepository.Add(entity);
-            var result = _payInterfaceConfigRepository.SaveChanges(out int _);
+            await _payInterfaceConfigRepository.AddAsync(entity);
+            var result = await _payInterfaceConfigRepository.SaveChangesAsync() > 0;
             dto.Id = entity.Id;
             return result;
-        }
-
-        public bool SaveOrUpdate(PayInterfaceConfigDto dto)
-        {
-            var m = _mapper.Map<PayInterfaceConfig>(dto);
-            _payInterfaceConfigRepository.SaveOrUpdate(m, dto.Id);
-            return _payInterfaceConfigRepository.SaveChanges() > 0;
         }
 
         public Task<bool> IsExistUseIfCodeAsync(string ifCode)
@@ -59,12 +53,19 @@ namespace AGooday.AgPay.Application.Services
             return _payInterfaceConfigRepository.IsExistUseIfCodeAsync(ifCode);
         }
 
-        public bool Remove(string infoType, string infoId)
+        public async Task<bool> SaveOrUpdateAsync(PayInterfaceConfigDto dto)
         {
-            var payInterfaceConfig = _payInterfaceConfigRepository.GetAllAsNoTracking()
-                .Where(w => w.InfoId.Equals(infoId) && w.InfoType.Equals(infoType)).FirstOrDefault();
+            var m = _mapper.Map<PayInterfaceConfig>(dto);
+            _payInterfaceConfigRepository.SaveOrUpdate(m, dto.Id);
+            return await _payInterfaceConfigRepository.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> RemoveAsync(string infoType, string infoId)
+        {
+            var payInterfaceConfig = await _payInterfaceConfigRepository.GetAllAsNoTracking()
+                .Where(w => w.InfoId.Equals(infoId) && w.InfoType.Equals(infoType)).FirstOrDefaultAsync();
             _payInterfaceConfigRepository.Remove(payInterfaceConfig.Id);
-            return _payInterfaceConfigRepository.SaveChanges(out int _);
+            return await _payInterfaceConfigRepository.SaveChangesAsync() > 0;
         }
 
         /// <summary>
@@ -74,10 +75,10 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoId">账户号</param>
         /// <param name="ifCode">接口类型</param>
         /// <returns></returns>
-        public PayInterfaceConfigDto GetByInfoIdAndIfCode(string infoType, string infoId, string ifCode)
+        public async Task<PayInterfaceConfigDto> GetByInfoIdAndIfCodeAsync(string infoType, string infoId, string ifCode)
         {
-            var payInterfaceConfig = _payInterfaceConfigRepository.GetAllAsNoTracking().Where(w => w.InfoId.Equals(infoId)
-            && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode)).FirstOrDefault();
+            var payInterfaceConfig = await _payInterfaceConfigRepository.GetAllAsNoTracking().Where(w => w.InfoId.Equals(infoId)
+            && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode)).FirstOrDefaultAsync();
             return _mapper.Map<PayInterfaceConfigDto>(payInterfaceConfig);
         }
 
@@ -116,7 +117,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoType"></param>
         /// <param name="infoId"></param>
         /// <returns></returns>
-        public List<PayInterfaceDefineDto> SelectAllPayIfConfigListByIsvNo(string infoType, string infoId)
+        public async Task<IEnumerable<PayInterfaceDefineDto>> SelectAllPayIfConfigListByIsvNoAsync(string infoType, string infoId)
         {
             // 支付定义列表
             var defineList = _payInterfaceDefineRepository.GetAllAsNoTracking()
@@ -125,17 +126,17 @@ namespace AGooday.AgPay.Application.Services
             var configList = _payInterfaceConfigRepository.GetAllAsNoTracking()
                 .Where(w => w.InfoType.Equals(infoType) && w.InfoId.Equals(infoId));
 
-            var result = defineList.ToList().Select(s =>
+            var result = (await defineList.ToListAsync()).Select(s =>
             {
                 var entity = _mapper.Map<PayInterfaceDefineDto>(s);
                 entity.AddExt("ifConfigState", configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null);
                 return entity;
-            }).ToList();
+            });
 
             return result;
         }
 
-        public List<PayInterfaceDefineDto> PayIfConfigList(string infoType, string configMode, string infoId, string ifName, string ifCode)
+        public async Task<List<PayInterfaceDefineDto>> PayIfConfigListAsync(string infoType, string configMode, string infoId, string ifName, string ifCode)
         {
             bool isApplyment = configMode.EndsWith("Applyment", StringComparison.OrdinalIgnoreCase);
             // 支付定义列表
@@ -227,7 +228,7 @@ namespace AGooday.AgPay.Application.Services
                 default:
                     break;
             }
-            var result = defineList.ToList().Select(s =>
+            var result = (await defineList.ToListAsync()).Select(s =>
             {
                 var entity = _mapper.Map<PayInterfaceDefineDto>(s);
                 entity.AddExt("ifConfigState", configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null);
@@ -270,20 +271,20 @@ namespace AGooday.AgPay.Application.Services
             return ifCodes;
         }
 
-        public List<PayInterfaceDefineDto> SelectAllPayIfConfigListByAppId(string appId)
+        public async Task<IEnumerable<PayInterfaceDefineDto>> SelectAllPayIfConfigListByAppIdAsync(string appId)
         {
-            MchApp mchApp = _mchAppRepository.GetById(appId);
+            MchApp mchApp = await _mchAppRepository.GetByIdAsync(appId);
             if (mchApp == null || mchApp.State != CS.YES)
             {
                 throw new BizException("商户应用不存在");
             }
-            MchInfo mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
+            MchInfo mchInfo = await _mchInfoRepository.GetByIdAsync(mchApp.MchNo);
             if (mchInfo == null || mchInfo.State != CS.YES)
             {
                 throw new BizException("商户不存在");
             }
             // 支付定义列表
-            var defineList = _payInterfaceDefineRepository.GetAll().Where(w => w.State.Equals(CS.YES)
+            var defineList = _payInterfaceDefineRepository.GetAllAsNoTracking().Where(w => w.State.Equals(CS.YES)
             && ((mchInfo.Type.Equals(CS.MCH_TYPE_NORMAL) && w.IsMchMode.Equals(CS.YES))// 支持普通商户模式
             || (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB) && w.IsIsvMode.Equals(CS.YES)))// 支持服务商模式
             );
@@ -306,24 +307,24 @@ namespace AGooday.AgPay.Application.Services
             var configList = _payInterfaceConfigRepository.GetAllAsNoTracking()
                 .Where(w => w.InfoId.Equals(appId) && w.InfoType.Equals(CS.INFO_TYPE.MCH_APP));
 
-            var result = defineList.ToList().Select(define =>
+            var result = defineList.AsEnumerable().Select(define =>
             {
                 var entity = _mapper.Map<PayInterfaceDefineDto>(define);
                 entity.AddExt("mchType", mchInfo.Type);// 所属商户类型
                 entity.AddExt("ifConfigState", configList.Any(a => a.IfCode.Equals(define.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null);
                 entity.AddExt("subMchIsvConfig", mchInfo.Type == CS.MCH_TYPE_ISVSUB && !isvPayConfigMap.TryGetValue(define.IfCode, out _) ? CS.NO : null);
                 return entity;
-            }).ToList();
+            });
 
             return result;
         }
 
-        public List<PayInterfaceDefineDto> GetPayIfConfigsByMchNo(string mchNo)
+        public async Task<IEnumerable<PayInterfaceDefineDto>> GetPayIfConfigsByMchNoAsync(string mchNo)
         {
             // 支付定义列表
             var defineList = _payInterfaceDefineRepository.GetAllAsNoTracking()
                 .Where(w => w.State.Equals(CS.YES));
-            MchInfo mchInfo = _mchInfoRepository.GetById(mchNo);
+            MchInfo mchInfo = await _mchInfoRepository.GetByIdAsync(mchNo);
             if (mchInfo == null || mchInfo.State != CS.YES)
             {
                 throw new BizException("商户不存在");
@@ -347,13 +348,13 @@ namespace AGooday.AgPay.Application.Services
                     isvPayConfigMap.Add(config.IfCode, config);
                 }
             }
-            var results = defineList.ToList()
+            var results = defineList.AsEnumerable()
                 .Where(w => mchInfo.Type != CS.MCH_TYPE_ISVSUB || (mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.TryGetValue(w.IfCode, out _)))
                 .Select(define =>
                 {
                     var entity = _mapper.Map<PayInterfaceDefineDto>(define);
                     return entity;
-                }).ToList();
+                }).OrderByDescending(o => o.CreatedAt);
             return results;
         }
 

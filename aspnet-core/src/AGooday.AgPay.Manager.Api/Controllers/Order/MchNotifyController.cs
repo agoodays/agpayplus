@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
     [ApiController, Authorize, NoLog]
     public class MchNotifyController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IMchNotifyRecordService _mchNotifyService;
 
         public MchNotifyController(ILogger<MchNotifyController> logger,
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _mchNotifyService = mchNotifyService;
         }
 
@@ -87,10 +87,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             }
 
             //更新通知中
-            _mchNotifyService.UpdateIngAndAddNotifyCountLimit(notifyId);
+            await _mchNotifyService.UpdateIngAndAddNotifyCountLimitAsync(notifyId);
 
             //调起MQ重发
-            await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
+            await _mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
 
             return ApiRes.Ok(mchNotify);
         }

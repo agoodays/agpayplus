@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             RefundOrderDto refundOrder = null;
 
             //获取参数 & 验签
-            RefundOrderRQ rq = GetRQByWithMchSign<RefundOrderRQ>();
+            RefundOrderRQ rq = await this.GetRQByWithMchSignAsync<RefundOrderRQ>();
 
             try
             {
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                     throw new BizException("mchOrderNo 和 payOrderId不能同时为空");
                 }
 
-                PayOrderDto payOrder = _payOrderService.QueryMchOrder(rq.MchNo, rq.PayOrderId, rq.MchOrderNo);
+                PayOrderDto payOrder = await _payOrderService.QueryMchOrderAsync(rq.MchNo, rq.PayOrderId, rq.MchOrderNo);
                 if (payOrder == null)
                 {
                     throw new BizException("退款订单不存在");
@@ -89,13 +89,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                     throw new BizException("申请金额超出订单可退款余额，请检查退款金额");
                 }
 
-                if (_refundOrderService.IsExistRefundingOrder(payOrder.PayOrderId))
+                if (await _refundOrderService.IsExistRefundingOrderAsync(payOrder.PayOrderId))
                 {
                     throw new BizException("支付订单具有在途退款申请，请稍后再试");
                 }
 
                 //全部退款金额 （退款订单表）
-                long sumSuccessRefundAmount = _refundOrderService.SumSuccessRefundAmount(payOrder.PayOrderId);
+                long sumSuccessRefundAmount = await _refundOrderService.SumSuccessRefundAmountAsync(payOrder.PayOrderId);
                 if (sumSuccessRefundAmount >= payOrder.Amount)
                 {
                     throw new BizException("退款单已完成全部订单退款，本次申请失败");
@@ -110,7 +110,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 string appId = rq.AppId;
 
                 // 校验退款单号是否重复
-                if (_refundOrderService.IsExistOrderByMchOrderNo(mchNo, rq.MchRefundNo))
+                if (await _refundOrderService.IsExistOrderByMchOrderNoAsync(mchNo, rq.MchRefundNo))
                 {
                     throw new BizException($"商户退款订单号[{rq.MchRefundNo}]已存在");
                 }
@@ -121,7 +121,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 //获取支付参数 (缓存数据) 和 商户信息
-                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
                 if (mchAppConfigContext == null)
                 {
                     throw new BizException("获取商户应用信息失败");
@@ -137,19 +137,19 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                     throw new BizException("当前通道不支持退款！");
                 }
 
-                refundOrder = GenRefundOrder(rq, payOrder, mchAppConfigContext, refundService);
+                refundOrder = await this.GenRefundOrderAsync(rq, payOrder, mchAppConfigContext, refundService);
 
                 //退款单入库 退款单状态：生成状态  此时没有和任何上游渠道产生交互。
                 await _refundOrderService.AddAsync(refundOrder);
 
                 // 调起退款接口
-                ChannelRetMsg channelRetMsg = refundService.Refund(rq, refundOrder, payOrder, mchAppConfigContext);
+                ChannelRetMsg channelRetMsg = await refundService.RefundAsync(rq, refundOrder, payOrder, mchAppConfigContext);
 
                 //处理退款单状态
-                await ProcessChannelMsg(channelRetMsg, refundOrder);
+                await this.ProcessChannelMsgAsync(channelRetMsg, refundOrder);
 
                 RefundOrderRS bizRes = RefundOrderRS.BuildByRefundOrder(refundOrder);
-                return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+                return ApiRes.OkWithSign(bizRes, rq.SignType, (await _configContextQueryService.QueryMchAppAsync(rq.MchNo, rq.AppId)).AppSecret);
             }
             catch (BizException e)
             {
@@ -158,7 +158,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             catch (ChannelException e)
             {
                 //处理上游返回数据
-                await ProcessChannelMsg(e.ChannelRetMsg, refundOrder);
+                await this.ProcessChannelMsgAsync(e.ChannelRetMsg, refundOrder);
 
                 if (e.ChannelRetMsg.ChannelState == ChannelState.SYS_ERROR)
                 {
@@ -166,7 +166,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 RefundOrderRS bizRes = RefundOrderRS.BuildByRefundOrder(refundOrder);
-                return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+                return ApiRes.OkWithSign(bizRes, rq.SignType, (await _configContextQueryService.QueryMchAppAsync(rq.MchNo, rq.AppId)).AppSecret);
             }
             catch (Exception e)
             {
@@ -175,13 +175,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             }
         }
 
-        private RefundOrderDto GenRefundOrder(RefundOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext configContext, IRefundService refundService)
+        private async Task<RefundOrderDto> GenRefundOrderAsync(RefundOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext configContext, IRefundService refundService)
         {
             MchInfoDto mchInfo = configContext.MchInfo;
             MchAppDto mchApp = configContext.MchApp;
-            AgentInfoDto agentInfo = _configContextQueryService.QueryAgentInfo(configContext);
-            IsvInfoDto isvInfo = _configContextQueryService.QueryIsvInfo(configContext);
-            return GenRefundOrder(rq, payOrder, mchInfo, mchApp, agentInfo, isvInfo, refundService);
+            AgentInfoDto agentInfo = await _configContextQueryService.QueryAgentInfoAsync(configContext);
+            IsvInfoDto isvInfo = await _configContextQueryService.QueryIsvInfoAsync(configContext);
+            return this.GenRefundOrder(rq, payOrder, mchInfo, mchApp, agentInfo, isvInfo, refundService);
         }
 
         private RefundOrderDto GenRefundOrder(RefundOrderRQ rq, PayOrderDto payOrder, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, IRefundService refundService)
@@ -236,7 +236,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         /// <param name="channelRetMsg"></param>
         /// <param name="refundOrder"></param>
         /// <exception cref="BizException"></exception>
-        private async Task ProcessChannelMsg(ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder)
+        private async Task ProcessChannelMsgAsync(ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder)
         {
             //对象为空 || 上游返回状态为空， 则无需操作
             if (channelRetMsg == null || channelRetMsg.ChannelState == null)
@@ -247,22 +247,22 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             //明确成功
             if (ChannelState.CONFIRM_SUCCESS == channelRetMsg.ChannelState)
             {
-                this.UpdateInitOrderStateThrowException((byte)RefundOrderState.STATE_SUCCESS, refundOrder, channelRetMsg);
-                _refundOrderProcessService.UpdatePayOrderProfitAndGenAccountBill(refundOrder);
-                _payMchNotifyService.RefundOrderNotify(await _refundOrderService.GetByIdAsync(refundOrder.RefundOrderId));
+                await this.UpdateInitOrderStateThrowExceptionAsync((byte)RefundOrderState.STATE_SUCCESS, refundOrder, channelRetMsg);
+                await _refundOrderProcessService.UpdatePayOrderProfitAndGenAccountBillAsync(refundOrder);
+                await _payMchNotifyService.RefundOrderNotifyAsync(await _refundOrderService.GetByIdAsync(refundOrder.RefundOrderId));
             }
             //明确失败
             else if (ChannelState.CONFIRM_FAIL == channelRetMsg.ChannelState)
             {
-                this.UpdateInitOrderStateThrowException((byte)RefundOrderState.STATE_FAIL, refundOrder, channelRetMsg);
-                _payMchNotifyService.RefundOrderNotify(await _refundOrderService.GetByIdAsync(refundOrder.RefundOrderId));
+                await this.UpdateInitOrderStateThrowExceptionAsync((byte)RefundOrderState.STATE_FAIL, refundOrder, channelRetMsg);
+                await _payMchNotifyService.RefundOrderNotifyAsync(await _refundOrderService.GetByIdAsync(refundOrder.RefundOrderId));
             }
             // 上游处理中 || 未知 || 上游接口返回异常  退款单为退款中状态
             else if (ChannelState.WAITING == channelRetMsg.ChannelState ||
                 ChannelState.UNKNOWN == channelRetMsg.ChannelState ||
                 ChannelState.API_RET_ERROR == channelRetMsg.ChannelState)
             {
-                this.UpdateInitOrderStateThrowException((byte)RefundOrderState.STATE_ING, refundOrder, channelRetMsg);
+                await this.UpdateInitOrderStateThrowExceptionAsync((byte)RefundOrderState.STATE_ING, refundOrder, channelRetMsg);
             }
             // 系统异常：  退款单不再处理。  为： 生成状态
             else if (ChannelState.SYS_ERROR == channelRetMsg.ChannelState)
@@ -281,20 +281,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
         /// <param name="refundOrder"></param>
         /// <param name="channelRetMsg"></param>
         /// <exception cref="BizException"></exception>
-        private void UpdateInitOrderStateThrowException(byte orderState, RefundOrderDto refundOrder, ChannelRetMsg channelRetMsg)
+        private async Task UpdateInitOrderStateThrowExceptionAsync(byte orderState, RefundOrderDto refundOrder, ChannelRetMsg channelRetMsg)
         {
             refundOrder.State = orderState;
             refundOrder.ChannelOrderNo = channelRetMsg.ChannelOrderId;
             refundOrder.ErrCode = channelRetMsg.ChannelErrCode;
             refundOrder.ErrMsg = channelRetMsg.ChannelErrMsg;
 
-            bool isSuccess = _refundOrderService.UpdateInit2Ing(refundOrder.RefundOrderId, channelRetMsg.ChannelOrderId);
+            bool isSuccess = await _refundOrderService.UpdateInit2IngAsync(refundOrder.RefundOrderId, channelRetMsg.ChannelOrderId);
             if (!isSuccess)
             {
                 throw new BizException("更新退款单异常!");
             }
 
-            isSuccess = _refundOrderService.UpdateIng2SuccessOrFail(refundOrder.RefundOrderId, refundOrder.State,
+            isSuccess = await _refundOrderService.UpdateIng2SuccessOrFailAsync(refundOrder.RefundOrderId, refundOrder.State,
                 channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
             if (!isSuccess)
             {

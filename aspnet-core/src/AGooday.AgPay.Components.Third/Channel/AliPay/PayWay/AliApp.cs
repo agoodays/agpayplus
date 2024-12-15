@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             AlipayTradeAppPayRequest req = new AlipayTradeAppPayRequest();
             AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
             req.SetBizModel(model);
 
             //统一放置 isv接口必传信息
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, req, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, req, model);
 
 
             string payData;
@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
             // sdk方式需自行拦截接口异常信息
             try
             {
-                payData = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.SdkExecute(req).Body;
+                payData = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).AlipayClient.SdkExecute(req).Body;
             }
             catch (AopException e)
             {

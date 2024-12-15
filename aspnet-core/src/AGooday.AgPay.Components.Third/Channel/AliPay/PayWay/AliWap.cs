@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             AliWapOrderRQ bizRQ = (AliWapOrderRQ)rq;
 
@@ -46,30 +46,30 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
             req.SetBizModel(model);
 
             //统一放置 isv接口必传信息
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, req, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, req, model);
 
             // 构造函数响应数据
             AliWapOrderRS res = ApiResBuilder.BuildSuccess<AliWapOrderRS>();
 
             try
             {
+                var alipayClientWrapper = await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext);
                 //表单方式
                 if (CS.PAY_DATA_TYPE.FORM.Equals(bizRQ.PayDataType))
                 {
-                    res.FormContent = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req).Body;
+                    res.FormContent = alipayClientWrapper.AlipayClient.pageExecute(req).Body;
 
                 }
                 //二维码图片地址
                 else if (CS.PAY_DATA_TYPE.CODE_IMG_URL.Equals(bizRQ.PayDataType))
                 {
 
-                    string payUrl = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req, null, HttpMethod.Get.Method).Body;
+                    string payUrl = alipayClientWrapper.AlipayClient.pageExecute(req, null, HttpMethod.Get.Method).Body;
                     res.CodeImgUrl = _sysConfigService.GetDBApplicationConfig().GenScanImgUrl(payUrl);
                 }
                 else
                 { // 默认都为 payUrl方式
-
-                    res.PayUrl = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).AlipayClient.pageExecute(req, null, HttpMethod.Get.Method).Body;
+                    res.PayUrl = alipayClientWrapper.AlipayClient.pageExecute(req, null, HttpMethod.Get.Method).Body;
                 }
             }
             catch (AopException e)

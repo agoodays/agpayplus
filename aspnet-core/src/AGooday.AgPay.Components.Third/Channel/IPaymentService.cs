@@ -54,6 +54,6 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="payOrder"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
+        Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
     }
 }

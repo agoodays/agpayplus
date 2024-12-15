@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
 
         private readonly ILogger<PayOrderDivisionRecordReissueJob> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly IChannelServiceFactory<IDivisionService> divisionServiceFactory;
+        private readonly IChannelServiceFactory<IDivisionService> _divisionServiceFactory;
 
         public PayOrderDivisionRecordReissueJob(ILogger<PayOrderDivisionRecordReissueJob> logger,
             IServiceScopeFactory serviceScopeFactory,
@@ -23,12 +23,12 @@ namespace AGooday.AgPay.Payment.Api.Jobs
         {
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
-            this.divisionServiceFactory = divisionServiceFactory;
+            _divisionServiceFactory = divisionServiceFactory;
         }
 
         public Task Execute(IJobExecutionContext context)
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
@@ -77,27 +77,27 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                     }
 
                                     // 查询支付订单信息
-                                    PayOrderDto payOrder = payOrderService.GetById(batchRecord.PayOrderId);
+                                    PayOrderDto payOrder = await payOrderService.GetByIdAsync(batchRecord.PayOrderId);
                                     if (payOrder == null)
                                     {
                                         _logger.LogError($"支付订单记录不存在：{batchRecord.PayOrderId}");
                                         continue;
                                     }
                                     // 查询分账接口是否存在
-                                    IDivisionService divisionService = divisionServiceFactory.GetService(payOrder.IfCode);
+                                    IDivisionService divisionService = _divisionServiceFactory.GetService(payOrder.IfCode);
 
                                     if (divisionService == null)
                                     {
                                         _logger.LogError($"查询分账接口不存在：{payOrder.IfCode}");
                                         continue;
                                     }
-                                    MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId);
+                                    MchAppConfigContext mchAppConfigContext = await configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId);
                                     // 调用渠道侧的查单接口：   注意：  渠道内需保证：
                                     // 1. 返回的条目 必须全部来自recordList， 可以少于recordList但是不得高于 recordList 数量；
                                     // 2. recordList 的记录可能与接口返回的数量不一致，  接口实现不要求对条目数量做验证；
                                     // 3. 接口查询的记录若recordList 不存在， 忽略即可。  （  例如两条相同的accNo, 则可能仅匹配一条。 那么另外一条将在下一次循环中处理。  ）
                                     // 4. 仅明确状态的再返回，若不明确则不需返回；
-                                    Dictionary<long, ChannelRetMsg> queryDivision = divisionService.QueryDivision(payOrder, recordList, mchAppConfigContext);
+                                    Dictionary<long, ChannelRetMsg> queryDivision = await divisionService.QueryDivisionAsync(payOrder, recordList, mchAppConfigContext);
 
                                     //// 处理查询结果
                                     foreach (var record in recordList)

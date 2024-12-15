@@ -23,21 +23,21 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRoleRelaRepository = sysUserRoleRelaRepository;
         }
 
-        public void SaveUserRole(long userId, List<string> roleIds)
+        public async Task<int> SaveUserRoleAsync(long userId, List<string> roleIds)
         {
             foreach (var roleId in roleIds)
             {
                 var m = new SysUserRoleRela() { UserId = userId, RoleId = roleId };
-                _sysUserRoleRelaRepository.Add(m);
+                await _sysUserRoleRelaRepository.AddAsync(m);
             }
-            _sysUserRoleRelaRepository.SaveChanges();
+            return await _sysUserRoleRelaRepository.SaveChangesAsync();
         }
 
-        public async Task<PaginatedList<SysUserRoleRelaDto>> GetPaginatedDataAsync(SysUserRoleRelaQueryDto dto)
+        public Task<PaginatedList<SysUserRoleRelaDto>> GetPaginatedDataAsync(SysUserRoleRelaQueryDto dto)
         {
-            var sysUserRoleRelas = _sysUserRoleRelaRepository.GetAllAsNoTracking()
+            var query = _sysUserRoleRelaRepository.GetAllAsNoTracking()
                 .Where(w => dto.UserId.Equals(null) || w.UserId.Equals(dto.UserId));
-            var records = await PaginatedList<SysUserRoleRela>.CreateAsync<SysUserRoleRelaDto>(sysUserRoleRelas, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysUserRoleRela>.CreateAsync<SysUserRoleRelaDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public IEnumerable<string> SelectRoleIdsByUserId(long userId)
         {
-            return _sysUserRoleRelaRepository.GetAll()
+            return _sysUserRoleRelaRepository.GetAllAsNoTracking()
                 .Where(w => w.UserId == userId)
                 .Select(s => s.RoleId);
         }
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public IEnumerable<long> SelectUserIdsByRoleId(string roleId)
         {
-            return _sysUserRoleRelaRepository.GetAll()
+            return _sysUserRoleRelaRepository.GetAllAsNoTracking()
                 .Where(w => w.RoleId.Equals(roleId))
                 .Select(s => s.UserId);
         }

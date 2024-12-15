@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{entId}"), MethodLog("更新资源权限")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
-        public ApiRes Update(string entId, SysEntitlementDto dto)
+        public async Task<ApiRes> UpdateAsync(string entId, SysEntitlementDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.EntId))
             {
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
                 CopyUtil.CopyProperties(sysEnt, dto);
             }
             dto.UpdatedAt = DateTime.Now;
-            _sysEntService.Update(dto);
+            await _sysEntService.UpdateAsync(dto);
             return ApiRes.Ok();
         }
 
@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("setMatchRule"), MethodLog("设置权限匹配规则")]
         [PermissionAuth(PermCode.MGR.ENT_UR_ROLE_ENT_EDIT)]
-        public ApiRes SetMatchRule(SysEntMatchRuleSetDto dto)
+        public async Task<ApiRes> SetMatchRuleAsync(SysEntMatchRuleSetDto dto)
         {
             var sysEnts = _sysEntService.GetByIds(dto.SysType, dto.EntIds);
             foreach (var sysEnt in sysEnts)
@@ -119,7 +119,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
                     }
                 }
                 sysEnt.UpdatedAt = DateTime.Now;
-                _sysEntService.Update(sysEnt);
+                await _sysEntService.UpdateAsync(sysEnt);
             }
             return ApiRes.Ok();
         }

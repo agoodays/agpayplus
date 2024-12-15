@@ -21,6 +21,6 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="payOrder"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        ChannelRetMsg Close(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
+        Task<ChannelRetMsg> CloseAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
     }
 }

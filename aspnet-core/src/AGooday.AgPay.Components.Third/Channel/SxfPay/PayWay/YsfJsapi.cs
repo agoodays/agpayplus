@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【随行付(unionpay)jsapi支付】";
             JObject reqParams = new JObject();
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
             reqParams.Add("customerIp", !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1");
 
             // 发送请求并返回订单状态
-            JObject resJSON = PackageParamAndReq("/order/jsapiScan", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/order/jsapiScan", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("code").ToString(); //请求响应码
             string msg = resJSON.GetValue("msg").ToString(); //响应信息

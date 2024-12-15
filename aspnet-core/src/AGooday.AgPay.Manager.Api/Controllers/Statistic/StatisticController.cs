@@ -39,11 +39,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ORDER_STATISTIC)]
-        public ApiPageRes<StatisticResultDto> Statistics([FromQuery] StatisticQueryDto dto)
+        public async Task<ApiPageRes<StatisticResultDto>> StatisticsAsync([FromQuery] StatisticQueryDto dto)
         {
             ChickAuth(dto.Method);
             dto.BindDateRange();
-            var result = _statisticService.Statistics(null, dto);
+            var result = await _statisticService.StatisticsAsync(null, dto);
             return ApiPageRes<StatisticResultDto>.Pages(result);
         }
 
@@ -54,11 +54,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         /// <returns></returns>
         [HttpGet, Route("total"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ORDER_STATISTIC)]
-        public ApiRes Total([FromQuery] StatisticQueryDto dto)
+        public async Task<ApiRes> TotalAsync([FromQuery] StatisticQueryDto dto)
         {
             ChickAuth(dto.Method);
             dto.BindDateRange();
-            var statistics = _statisticService.Total(null, dto);
+            var statistics = await _statisticService.TotalAsync(null, dto);
             return ApiRes.Ok(statistics);
         }
 
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         /// <returns></returns>
         [HttpGet, Route("export/{bizType}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ORDER_LIST)]
-        public IActionResult Export(string bizType, [FromQuery] StatisticQueryDto dto)
+        public async Task<IActionResult> ExportAsync(string bizType, [FromQuery] StatisticQueryDto dto)
         {
             if (!"excel".Equals(bizType))
             {
@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
             ChickAuth(dto.Method);
             dto.BindDateRange();
             // 从数据库中检索需要导出的数据
-            var result = _statisticService.Statistics(null, dto);
+            var result = await _statisticService.StatisticsAsync(null, dto);
 
             string title = dto.Method switch
             {

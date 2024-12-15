@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="transferOrder"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        ChannelRetMsg Transfer(TransferOrderRQ bizRQ, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext);
+        Task<ChannelRetMsg> TransferAsync(TransferOrderRQ bizRQ, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext);
 
         /// <summary>
         /// 调起转账查询接口
@@ -46,6 +46,6 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="transferOrder"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        ChannelRetMsg Query(TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext);
+        Task<ChannelRetMsg> QueryAsync(TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext);
     }
 }

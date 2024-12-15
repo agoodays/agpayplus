@@ -13,13 +13,13 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
     public class UmsPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<UmsPayPayOrderQueryService> _logger;
-        private readonly UmsPayPaymentService umsPayPaymentService;
+        private readonly UmsPayPaymentService _paymentService;
 
         public UmsPayPayOrderQueryService(ILogger<UmsPayPayOrderQueryService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.umsPayPaymentService = ActivatorUtilities.CreateInstance<UmsPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<UmsPayPaymentService>(serviceProvider);
         }
 
         public UmsPayPayOrderQueryService()
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return CS.IF_CODE.UMSPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = $"【银联商务({payOrder.WayCode})查单】";
 
@@ -43,15 +43,15 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
                     case CS.PAY_WAY_CODE.ALI_BAR:
                     case CS.PAY_WAY_CODE.WX_BAR:
                     case CS.PAY_WAY_CODE.YSF_BAR:
-                        BarQuery(logPrefix, channelRetMsg, payOrder, mchAppConfigContext);
+                        await BarQueryAsync(logPrefix, channelRetMsg, payOrder, mchAppConfigContext);
                         break;
                     case CS.PAY_WAY_CODE.ALI_QR:
-                        QrQuery(logPrefix, channelRetMsg, payOrder, mchAppConfigContext);
+                        await QrQueryAsync(logPrefix, channelRetMsg, payOrder, mchAppConfigContext);
                         break;
                     case CS.PAY_WAY_CODE.ALI_JSAPI:
                     case CS.PAY_WAY_CODE.WX_JSAPI:
                     case CS.PAY_WAY_CODE.YSF_JSAPI:
-                        UnifiedQuery(logPrefix, channelRetMsg, payOrder, mchAppConfigContext);
+                        await UnifiedQueryAsync(logPrefix, channelRetMsg, payOrder, mchAppConfigContext);
                         break;
                     default:
                         break;
@@ -65,12 +65,12 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             }
         }
 
-        private ChannelRetMsg BarQuery(string logPrefix, ChannelRetMsg channelRetMsg, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ChannelRetMsg> BarQueryAsync(string logPrefix, ChannelRetMsg channelRetMsg, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             reqParams.Add("merchantOrderId", payOrder.PayOrderId); // 商户订单号
             //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v6/poslink/transaction/query", reqParams, logPrefix, mchAppConfigContext, true);
+            JObject resJSON = await _paymentService.PackageParamAndReqAsync("/v6/poslink/transaction/query", reqParams, logPrefix, mchAppConfigContext, true);
 
             //请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
@@ -126,7 +126,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return channelRetMsg;
         }
 
-        private ChannelRetMsg QrQuery(string logPrefix, ChannelRetMsg channelRetMsg, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ChannelRetMsg> QrQueryAsync(string logPrefix, ChannelRetMsg channelRetMsg, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             reqParams.Add("requestTimestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));// 报文请求时间 格式：yyyy-MM-dd HH:mm:ss
@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             reqParams.Add("billNo", payOrder.PayOrderId); // 账单号
             reqParams.Add("billDate", payOrder.CreatedAt?.ToString("yyyy-MM-dd")); // 订单时间 格式：yyyy-MM-dd
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/bills/query", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await _paymentService.PackageParamAndReqAsync("/v1/netpay/bills/query", reqParams, logPrefix, mchAppConfigContext);
 
             // 请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
@@ -206,7 +206,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return channelRetMsg;
         }
 
-        private ChannelRetMsg UnifiedQuery(string logPrefix, ChannelRetMsg channelRetMsg, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ChannelRetMsg> UnifiedQueryAsync(string logPrefix, ChannelRetMsg channelRetMsg, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             reqParams.Add("requestTimestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -214,7 +214,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             reqParams.Add("instMid", "YUEDANDEFAULT");
             reqParams.Add("merOrderId", payOrder.PayOrderId); // 商户订单号
             //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/query", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await _paymentService.PackageParamAndReqAsync("/v1/netpay/query", reqParams, logPrefix, mchAppConfigContext);
 
             //请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码

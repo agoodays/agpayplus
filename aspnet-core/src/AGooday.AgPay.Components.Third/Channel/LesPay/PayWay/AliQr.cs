@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【乐刷(alipay)二维码支付】";
             AliQrOrderRQ bizRQ = (AliQrOrderRQ)rq;
@@ -36,10 +36,10 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay.PayWay
             res.ChannelRetMsg = channelRetMsg;
 
             // 请求参数赋值
-            UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl(), mchAppConfigContext);
+            await UnifiedParamsSetAsync(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl(), mchAppConfigContext);
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string resp_code = resJSON.GetValue("resp_code").ToString(); //返回状态码
             resJSON.TryGetString("resp_msg", out string resp_msg); //返回错误信息

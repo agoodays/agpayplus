@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
             }
 
             agentInfo.Sipw = BCryptUtil.Hash(opSipw, out _);
-            _agentInfoService.UpdateById(agentInfo);
+            await _agentInfoService.UpdateByIdAsync(agentInfo);
             return ApiRes.Ok();
         }
 

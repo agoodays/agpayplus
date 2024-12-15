@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【通联条码(alipay)支付】";
             AliBarOrderRQ bizRQ = (AliBarOrderRQ)rq;
@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
             // 通联 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder, GetNotifyUrl());
 
-            var channelRetMsg = AllinBar(reqParams, logPrefix, mchAppConfigContext);
+            var channelRetMsg = await BarAsync(reqParams, logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }

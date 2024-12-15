@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -52,11 +52,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg LcswBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BarAsync(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/pay/open/barcodepay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/pay/open/barcodepay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string returnCode = resJSON.GetValue("return_code").ToString(); //请求响应码
             string returnMsg = resJSON.GetValue("return_msg").ToString(); //响应信息
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetLcswPayHost4env(LcswPayNormalMchParams isvParams)
+        public static string GetHost4env(LcswPayNormalMchParams isvParams)
         {
             return CS.YES == isvParams.Sandbox ? LcswPayConfig.SANDBOX_SERVER_URL : LcswPayConfig.PROD_SERVER_URL;
         }
@@ -134,9 +134,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
-            LcswPayNormalMchParams lcswParams = (LcswPayNormalMchParams)_configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            LcswPayNormalMchParams lcswParams = (LcswPayNormalMchParams)await _configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
             reqParams.Add("merchant_no", lcswParams.MerchantNo); // 商户号
             reqParams.Add("terminal_id", lcswParams.TerminalId); // 商户发起交易的IP地址
@@ -146,11 +146,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             reqParams.Add("key_sign", LcswSignUtil.Sign(reqParams, key)); // 签名字符串
 
             // 调起上游接口
-            string url = GetLcswPayHost4env(lcswParams) + apiUri;
+            string url = GetHost4env(lcswParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             var reqJSON = JsonConvert.SerializeObject(reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={reqJSON}");
-            string resText = LcswHttpUtil.DoPost(url, reqJSON);
+            string resText = await LcswHttpUtil.DoPostAsync(url, reqJSON);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -183,7 +183,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             reqParams.Add("payType", payType);
             reqParams.Add("notify_url", notifyUrl);
             reqParams.Add("terminal_ip", payOrder.ClientIp); //商户发起交易的IP地址
-            LcswPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             reqParams.Add("payType", payType);
             reqParams.Add("notify_url", notifyUrl);
             reqParams.Add("terminal_ip", payOrder.ClientIp); //商户发起交易的IP地址
-            LcswPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             reqParams.Add("pay_type", payType);
             reqParams.Add("service_id", "010");
             reqParams.Add("terminal_ip", payOrder.ClientIp); //商户发起交易的IP地址
-            LcswPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void LcswPublicParams(JObject reqParams, PayOrderDto payOrder)
+        public static void PublicParams(JObject reqParams, PayOrderDto payOrder)
         {
             reqParams.Add("terminal_trace", payOrder.PayOrderId); //终端流水号，填写商户系统的支付订单号，不可重复
             reqParams.Add("terminal_time", payOrder.CreatedAt.Value.ToString("yyyyMMddHHmmss"));

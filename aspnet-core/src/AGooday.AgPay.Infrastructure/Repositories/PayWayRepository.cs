@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -11,9 +12,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public bool IsExistPayWayCode(string wayCode)
+        public Task<bool> IsExistPayWayCodeAsync(string wayCode)
         {
-            return GetAllAsNoTracking().Any(c => c.WayCode == wayCode.ToUpper());
+            //return GetAllAsNoTracking().AnyAsync(c => c.WayCode == wayCode.ToUpper());
+            return GetAllAsNoTracking().AnyAsync(c => string.Equals(c.WayCode, wayCode, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

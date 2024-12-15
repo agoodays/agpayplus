@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -52,11 +52,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg LesBar(SortedDictionary<string, string> reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BarAsync(SortedDictionary<string, string> reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string resp_code = resJSON.GetValue("resp_code").ToString(); //返回状态码
             resJSON.TryGetString("resp_msg", out string resp_msg); //返回错误信息
@@ -121,7 +121,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetLesPayHost4env(LesPayIsvParams isvParams)
+        public static string GetHost4env(LesPayIsvParams isvParams)
         {
             return CS.YES == isvParams.Sandbox ? LesPayConfig.SANDBOX_SERVER_URL : LesPayConfig.PROD_SERVER_URL;
         }
@@ -135,9 +135,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, SortedDictionary<string, string> reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, SortedDictionary<string, string> reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
-            LesPayIsvParams isvParams = (LesPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+            LesPayIsvParams isvParams = (LesPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             if (isvParams.AgentId == null)
             {
@@ -145,7 +145,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
                 throw new BizException("服务商配置为空。");
             }
 
-            LesPayIsvSubMchParams isvsubMchParams = (LesPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            LesPayIsvSubMchParams isvsubMchParams = (LesPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             reqParams.Add("merchant_id", isvsubMchParams.MerchantId); // 商户号
             reqParams.Add("nonce_str", Guid.NewGuid().ToString("N"));//随机字符串
 
@@ -154,11 +154,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             reqParams.Add("sign", LesSignUtil.Sign(reqParams, tradeKey)); //RSA 签名字符串
 
             // 调起上游接口
-            string url = GetLesPayHost4env(isvParams) + apiUri;
+            string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             var reqText = string.Join("&", reqParams.Select(s => $"{s.Key}={s.Value}"));
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqText={reqText}");
-            string resText = LesHttpUtil.DoPost(url, reqText);
+            string resText = await LesHttpUtil.DoPostAsync(url, reqText);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resText={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -178,9 +178,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
         /// <param name="payOrder"></param>
         /// <param name="notifyUrl"></param>
         /// <param name="returnUrl"></param>
-        public void UnifiedParamsSet(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl, MchAppConfigContext mchAppConfigContext)
+        public async Task UnifiedParamsSetAsync(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl, MchAppConfigContext mchAppConfigContext)
         {
-            LesPublicParams(reqParams, payOrder, mchAppConfigContext);
+            await PublicParamsAsync(reqParams, payOrder, mchAppConfigContext);
             reqParams.Add("service", "get_tdcode");
             string payWay = LesPayEnum.GetPayWay(payOrder.WayCode);
             reqParams.Add("pay_way", payWay);
@@ -197,9 +197,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public void BarParamsSet(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, string notifyUrl, MchAppConfigContext mchAppConfigContext)
+        public async Task BarParamsSetAsync(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, string notifyUrl, MchAppConfigContext mchAppConfigContext)
         {
-            LesPublicParams(reqParams, payOrder, mchAppConfigContext);
+            await PublicParamsAsync(reqParams, payOrder, mchAppConfigContext);
             reqParams.Add("service", "upload_authcode");
             reqParams.Add("notify_url", notifyUrl); //通知地址 接收乐刷通知（支付结果通知）的URL，需做UrlEncode 处理，需要绝对路径，确保乐刷能正确访问，若不需要回调请忽略
         }
@@ -209,7 +209,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public void LesPublicParams(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task PublicParamsAsync(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             //获取订单类型
             reqParams.Add("third_order_id", payOrder.PayOrderId); //商户内部订单号 可以包含字母：确保同一个商户下唯一
@@ -217,7 +217,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             reqParams.Add("body", payOrder.Body); //商品描述,不能包含回车换行等特殊字符
             reqParams.Add("client_ip", payOrder.ClientIp); //商户发起交易的IP地址
 
-            LesPayIsvSubMchParams isvsubMchParams = (LesPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            LesPayIsvSubMchParams isvsubMchParams = (LesPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             if (isvsubMchParams.T0.HasValue)
             {
                 reqParams.Add("t0", isvsubMchParams.T0.Value.ToString()); // T0交易标志

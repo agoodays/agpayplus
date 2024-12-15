@@ -14,7 +14,7 @@ namespace AGooday.AgPay.Components.Third.Services
     /// </summary>
     public class PayOrderProcessService
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IPayOrderService _payOrderService;
         private readonly IAccountBillService _accountBillService;
         private readonly PayMchNotifyService _payMchNotifyService;
@@ -26,33 +26,33 @@ namespace AGooday.AgPay.Components.Third.Services
             IAccountBillService accountBillService,
             PayMchNotifyService payMchNotifyService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _logger = logger;
             _payOrderService = payOrderService;
             _payMchNotifyService = payMchNotifyService;
             _accountBillService = accountBillService;
         }
 
-        public void ConfirmSuccess(PayOrderDto payOrder)
+        public async Task ConfirmSuccessAsync(PayOrderDto payOrder)
         {
             //设置订单状态
             payOrder.State = (byte)PayOrderState.STATE_SUCCESS;
 
             //记账
-            _accountBillService.GenAccountBill(payOrder.PayOrderId);
+            await _accountBillService.GenAccountBillAsync(payOrder.PayOrderId);
 
             //自动分账 处理逻辑， 不影响主订单任务
-            this.UpdatePayOrderAutoDivision(payOrder);
+            await UpdatePayOrderAutoDivisionAsync(payOrder);
 
             //发送商户通知
-            _payMchNotifyService.PayOrderNotify(payOrder);
+            await _payMchNotifyService.PayOrderNotifyAsync(payOrder);
         }
 
         /// <summary>
         /// 更新订单自动分账业务
         /// </summary>
         /// <param name="payOrder"></param>
-        private async void UpdatePayOrderAutoDivision(PayOrderDto payOrder)
+        private async Task UpdatePayOrderAutoDivisionAsync(PayOrderDto payOrder)
         {
             try
             {
@@ -63,12 +63,12 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //更新订单表分账状态为： 等待分账任务处理
-                bool updDivisionState = _payOrderService.UpdateDivisionState(payOrder);
+                bool updDivisionState = await _payOrderService.UpdateDivisionStateAsync(payOrder);
 
                 if (updDivisionState)
                 {
                     //推送到分账MQ
-                    await mqSender.SendAsync(PayOrderDivisionMQ.Build(payOrder.PayOrderId, CS.YES, null), 60); //1分钟后执行
+                    await _mqSender.SendAsync(PayOrderDivisionMQ.Build(payOrder.PayOrderId, CS.YES, null), 60); //1分钟后执行
                 }
             }
             catch (Exception e)
@@ -77,16 +77,16 @@ namespace AGooday.AgPay.Components.Third.Services
             }
         }
 
-        public void UpdateIngAndSuccessOrFailByCreatebyOrder(PayOrderDto payOrder, ChannelRetMsg channelRetMsg)
+        public async Task UpdateIngAndSuccessOrFailByCreatebyOrderAsync(PayOrderDto payOrder, ChannelRetMsg channelRetMsg)
         {
-            bool isSuccess = _payOrderService.UpdateInit2Ing(payOrder.PayOrderId, payOrder);
+            bool isSuccess = await _payOrderService.UpdateInit2IngAsync(payOrder.PayOrderId, payOrder);
             if (!isSuccess)
             {
                 _logger.LogError($"updateInit2Ing更新异常 payOrderId={payOrder.PayOrderId}");
                 throw new BizException("更新订单异常!");
             }
 
-            isSuccess = _payOrderService.UpdateIng2SuccessOrFail(payOrder.PayOrderId, payOrder.State,
+            isSuccess = await _payOrderService.UpdateIng2SuccessOrFail(payOrder.PayOrderId, payOrder.State,
                     channelRetMsg.ChannelMchNo, channelRetMsg.ChannelIsvNo, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.PlatformOrderId, channelRetMsg.PlatformMchOrderId,
                     channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
             if (!isSuccess)

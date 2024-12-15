@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【海科融通(alipay)二维码支付】";
             AliQrOrderRQ bizRQ = (AliQrOrderRQ)rq;
@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.PayWay
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/api/v1/pay/ali/activepay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/api/v1/pay/ali/activepay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string return_code = resJSON.GetValue("return_code").ToString(); //返回状态码
             resJSON.TryGetString("return_msg", out string return_msg); //返回错误信息

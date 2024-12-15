@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -10,9 +11,9 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             : base(context)
         {
         }
-        public bool IsExistIsvNo(string isvNo)
+        public Task<bool> IsExistIsvNoAsync(string isvNo)
         {
-            return GetAllAsNoTracking().Any(c => c.IsvNo.Equals(isvNo));
+            return GetAllAsNoTracking().AnyAsync(c => c.IsvNo.Equals(isvNo));
         }
     }
 }

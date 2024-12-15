@@ -6,6 +6,6 @@ namespace AGooday.AgPay.Domain.Interfaces
     {
         Task<(int failedAttempts, DateTime? lastLoginTime)> GetFailedLoginAttemptsAsync(long userId, TimeSpan timeWindow);
         Task<DateTime?> GetLastLoginTimeAsync(long userId);
-        Task ClearFailedLoginAttemptsAsync(long userId);
+        void ClearFailedLoginAttempts(long userId);
     }
 }

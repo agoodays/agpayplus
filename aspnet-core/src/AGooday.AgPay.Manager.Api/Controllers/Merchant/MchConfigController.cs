@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     [ApiController, Authorize]
     public class MchConfigController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly ISysConfigService _sysConfigService;
 
         public MchConfigController(ILogger<MchConfigController> logger,
@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _sysConfigService = sysConfigService;
         }
 
@@ -51,9 +51,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{groupKey}"), MethodLog("更新商户配置信息")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_CONFIG_PAGE)]
-        public ApiRes Update(string groupKey, MchConfigRequest model)
+        public async Task<ApiRes> UpdateAsync(string groupKey, MchConfigRequest model)
         {
-            int update = _sysConfigService.UpdateByConfigKey(model.Configs, groupKey, CS.SYS_TYPE.MCH, model.MchNo);
+            int update = await _sysConfigService.UpdateByConfigKeyAsync(model.Configs, groupKey, CS.SYS_TYPE.MCH, model.MchNo);
             if (update <= 0)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");

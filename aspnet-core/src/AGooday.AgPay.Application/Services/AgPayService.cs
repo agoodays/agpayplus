@@ -45,8 +45,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<TEntity>(dto);
             await _agPayRepository.AddAsync(entity);
-            var result = _agPayRepository.SaveChanges(out int _);
-            return result;
+            return await _agPayRepository.SaveChangesAsync() > 0;
         }
 
         public virtual bool Remove(TPrimaryKey id)
@@ -55,11 +54,24 @@ namespace AGooday.AgPay.Application.Services
             return _agPayRepository.SaveChanges(out int _);
         }
 
+        public virtual async Task<bool> RemoveAsync(TPrimaryKey id)
+        {
+            _agPayRepository.Remove(id);
+            return await _agPayRepository.SaveChangesAsync() > 0;
+        }
+
         public virtual bool Update(TDto dto)
         {
             var entity = _mapper.Map<TEntity>(dto);
             _agPayRepository.Update(entity);
             return _agPayRepository.SaveChanges(out int _);
+        }
+
+        public virtual async Task<bool> UpdateAsync(TDto dto)
+        {
+            var entity = _mapper.Map<TEntity>(dto);
+            _agPayRepository.Update(entity);
+            return await _agPayRepository.SaveChangesAsync() > 0;
         }
 
         public virtual TDto GetById(TPrimaryKey id)
@@ -124,8 +136,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<TEntity>(dto);
             await _agPayRepository.AddAsync(entity);
-            var result = _agPayRepository.SaveChanges(out int _);
-            return result;
+            return await _agPayRepository.SaveChangesAsync() > 0;
         }
 
         public virtual bool Remove<TPrimaryKey>(TPrimaryKey id)
@@ -134,11 +145,24 @@ namespace AGooday.AgPay.Application.Services
             return _agPayRepository.SaveChanges(out int _);
         }
 
+        public virtual async Task<bool> RemoveAsync<TPrimaryKey>(TPrimaryKey id)
+        {
+            _agPayRepository.Remove(id);
+            return await _agPayRepository.SaveChangesAsync() > 0;
+        }
+
         public virtual bool Update(TDto dto)
         {
             var entity = _mapper.Map<TEntity>(dto);
             _agPayRepository.Update(entity);
             return _agPayRepository.SaveChanges(out int _);
+        }
+
+        public virtual async Task<bool> UpdateAsync(TDto dto)
+        {
+            var entity = _mapper.Map<TEntity>(dto);
+            _agPayRepository.Update(entity);
+            return await _agPayRepository.SaveChangesAsync() > 0;
         }
 
         public virtual TDto GetById<TPrimaryKey>(TPrimaryKey id)

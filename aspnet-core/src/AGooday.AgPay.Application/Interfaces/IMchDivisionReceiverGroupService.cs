@@ -5,9 +5,10 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchDivisionReceiverGroupService : IAgPayService<MchDivisionReceiverGroupDto, long>
     {
-        MchDivisionReceiverGroupDto GetById(long recordId, string mchNo);
+        Task UpdateAutoDivisionFlagAsync(MchDivisionReceiverGroupDto dto);
+        Task<MchDivisionReceiverGroupDto> GetByIdAsync(long recordId, string mchNo);
         IEnumerable<MchDivisionReceiverGroupDto> GetByMchNo(string mchNo);
-        MchDivisionReceiverGroupDto FindByIdAndMchNo(long receiverGroupId, string mchNo);
+        Task<MchDivisionReceiverGroupDto> FindByIdAndMchNoAsync(long receiverGroupId, string mchNo);
         Task<PaginatedList<MchDivisionReceiverGroupDto>> GetPaginatedDataAsync(MchDivisionReceiverGroupQueryDto dto);
     }
 }

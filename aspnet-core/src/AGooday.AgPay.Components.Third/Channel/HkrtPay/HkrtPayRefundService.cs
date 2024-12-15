@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
     /// </summary>
     public class HkrtPayRefundService : AbstractRefundService
     {
-        private readonly HkrtPayPaymentService hkrtPayPaymentService;
+        private readonly HkrtPayPaymentService _paymentService;
 
         public HkrtPayRefundService(ILogger<HkrtPayRefundService> logger,
             IServiceProvider serviceProvider,
@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             ISysConfigService sysConfigService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.hkrtPayPaymentService = _serviceProvider.GetRequiredService<HkrtPayPaymentService>();
+            _paymentService = _serviceProvider.GetRequiredService<HkrtPayPaymentService>();
         }
 
         public HkrtPayRefundService()
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             return null;
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 reqParams.Add("out_refund_no", refundOrder.RefundOrderId); // 退款订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = hkrtPayPaymentService.PackageParamAndReq("/api/v1/pay/polymeric/refundquery", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/v1/pay/polymeric/refundquery", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                             case HkrtPayEnum.RefundStatus.Success:
                                 channelRetMsg.ChannelOrderId = refund_no;
                                 var tradeType = HkrtPayEnum.ConvertTradeType(type);
-                                var attach = hkrtPayPaymentService.GetHkrtAttach(resJSON);
+                                var attach = _paymentService.GetAttach(resJSON);
                                 attach.TryGetString("out_refund_no", out string out_refund_no);
                                 channelRetMsg.PlatformMchOrderId = out_refund_no;
                                 switch (tradeType)
@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -150,7 +150,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 reqParams.Add("notify_url", GetNotifyUrl()); // 订单类型
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = hkrtPayPaymentService.PackageParamAndReq("/api/v1/pay/polymeric/refund", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/v1/pay/polymeric/refund", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -175,7 +175,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                             case HkrtPayEnum.RefundStatus.Success:
                                 channelRetMsg.ChannelOrderId = refund_no;
                                 var tradeType = HkrtPayEnum.ConvertTradeType(type);
-                                var attach = hkrtPayPaymentService.GetHkrtAttach(resJSON);
+                                var attach = _paymentService.GetAttach(resJSON);
                                 attach.TryGetString("out_refund_no", out string out_refund_no);
                                 channelRetMsg.PlatformMchOrderId = out_refund_no;
                                 switch (tradeType)

@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             return CS.IF_CODE.ALIPAY;
         }
 
-        public ChannelRetMsg Close(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> CloseAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             AlipayTradeCloseRequest req = new AlipayTradeCloseRequest();
 
@@ -41,9 +41,9 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             req.SetBizModel(model);
 
             //通用字段
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, req, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, req, model);
 
-            AlipayTradeCloseResponse resp = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(req);
+            AlipayTradeCloseResponse resp = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(req);
 
             // 返回状态成功
             if (!resp.IsError)

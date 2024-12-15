@@ -46,29 +46,30 @@ namespace AGooday.AgPay.Application.Services
             _payOrderDivisionRecordRepository = payOrderDivisionRecordRepository;
         }
 
-        public PayOrderDto QueryMchOrder(string mchNo, string payOrderId, string mchOrderNo)
+        public Task<bool> IsExistOrderUseIfCodeAsync(string ifCode)
         {
-            var entity = _payOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo)
-            && (w.PayOrderId.Equals(payOrderId) || w.MchOrderNo.Equals(mchOrderNo))).FirstOrDefault();
+            return _payOrderRepository.IsExistOrderUseIfCodeAsync(ifCode);
+        }
+        public Task<bool> IsExistOrderUseWayCodeAsync(string wayCode)
+        {
+            return _payOrderRepository.IsExistOrderUseWayCodeAsync(wayCode);
+        }
+        public Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchOrderNo)
+        {
+            return _payOrderRepository.IsExistOrderByMchOrderNoAsync(mchNo, mchOrderNo);
+        }
+
+        public async Task<PayOrderDto> QueryMchOrderAsync(string mchNo, string payOrderId, string mchOrderNo)
+        {
+            var entity = await _payOrderRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo)
+            && (w.PayOrderId.Equals(payOrderId) || w.MchOrderNo.Equals(mchOrderNo))).FirstOrDefaultAsync();
             return _mapper.Map<PayOrderDto>(entity);
         }
 
-        /// <summary>
-        /// 通用列表查询条件
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        public PaginatedList<PayOrderDto> GetPaginatedData(PayOrderQueryDto dto)
+        public Task<PaginatedList<PayOrderDto>> GetPaginatedDataAsync(PayOrderQueryDto dto)
         {
-            var payOrders = GetPayOrders(dto).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayOrder>.Create<PayOrderDto>(payOrders, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
-        }
-
-        public async Task<PaginatedList<PayOrderDto>> GetPaginatedDataAsync(PayOrderQueryDto dto)
-        {
-            var payOrders = GetPayOrders(dto).OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<PayOrder>.CreateAsync<PayOrderDto>(payOrders, _mapper, dto.PageNumber, dto.PageSize);
+            var query = GetPayOrders(dto).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<PayOrder>.CreateAsync<PayOrderDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
@@ -94,8 +95,7 @@ namespace AGooday.AgPay.Application.Services
                  && (string.IsNullOrWhiteSpace(dto.PlatformMchOrderNo) || w.PlatformMchOrderNo.Equals(dto.PlatformMchOrderNo))
                  && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
                  && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
-                 );
+                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
             return result;
         }
 
@@ -128,25 +128,13 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public Task<bool> IsExistOrderUseIfCodeAsync(string ifCode)
-        {
-            return _payOrderRepository.IsExistOrderUseIfCodeAsync(ifCode);
-        }
-        public Task<bool> IsExistOrderUseWayCodeAsync(string wayCode)
-        {
-            return _payOrderRepository.IsExistOrderUseWayCodeAsync(wayCode);
-        }
-        public Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchOrderNo)
-        {
-            return _payOrderRepository.IsExistOrderByMchOrderNoAsync(mchNo, mchOrderNo);
-        }
         /// <summary>
         /// 更新订单状态 【订单生成】 --》 【支付中】
         /// </summary>
         /// <param name="payOrderId"></param>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        public bool UpdateInit2Ing(string payOrderId, PayOrderDto payOrder)
+        public async Task<bool> UpdateInit2IngAsync(string payOrderId, PayOrderDto payOrder)
         {
             var updateRecord = _payOrderRepository.GetById(payOrderId);
             if (updateRecord.State != (byte)PayOrderState.STATE_INIT)
@@ -165,7 +153,7 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.MchOrderFeeAmount = payOrder.MchOrderFeeAmount;
             updateRecord.ChannelUser = payOrder.ChannelUser;
             _payOrderRepository.Update(updateRecord);
-            return _payOrderRepository.SaveChanges(out int _);
+            return await _payOrderRepository.SaveChangesAsync() > 0;
         }
         /// <summary>
         /// 更新订单状态 【支付中】 --》 【支付成功】
@@ -178,7 +166,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="platformOrderNo"></param>
         /// <param name="platformMchOrderNo"></param>
         /// <returns></returns>
-        public bool UpdateIng2Success(string payOrderId, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo)
+        public async Task<bool> UpdateIng2SuccessAsync(string payOrderId, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo)
         {
             var updateRecord = _payOrderRepository.GetById(payOrderId);
             if (updateRecord.State != (byte)PayOrderState.STATE_ING)
@@ -194,14 +182,14 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.PlatformMchOrderNo = platformMchOrderNo;
             updateRecord.SuccessTime = DateTime.Now;
             _payOrderRepository.Update(updateRecord);
-            return _payOrderRepository.SaveChanges(out int _);
+            return await _payOrderRepository.SaveChangesAsync() > 0;
         }
         /// <summary>
         /// 更新订单状态  【支付中】 --》 【订单关闭】
         /// </summary>
         /// <param name="payOrderId"></param>
         /// <returns></returns>
-        public bool UpdateIng2Close(string payOrderId)
+        public async Task<bool> UpdateIng2CloseAsync(string payOrderId)
         {
             var updateRecord = _payOrderRepository.GetById(payOrderId);
             if (updateRecord.State != (byte)PayOrderState.STATE_ING)
@@ -211,7 +199,7 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.State = (byte)PayOrderState.STATE_CLOSED;
             updateRecord.SuccessTime = DateTime.Now;
             _payOrderRepository.Update(updateRecord);
-            return _payOrderRepository.SaveChanges(out int _);
+            return await _payOrderRepository.SaveChangesAsync() > 0;
         }
         /// <summary>
         /// 更新订单状态 【支付中】 --》 【支付失败】
@@ -226,7 +214,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="channelErrCode"></param>
         /// <param name="channelErrMsg"></param>
         /// <returns></returns>
-        public bool UpdateIng2Fail(string payOrderId, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo, string channelErrCode, string channelErrMsg)
+        public async Task<bool> UpdateIng2FailAsync(string payOrderId, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo, string channelErrCode, string channelErrMsg)
         {
             var updateRecord = _payOrderRepository.GetById(payOrderId);
             if (updateRecord.State != (byte)PayOrderState.STATE_ING)
@@ -243,7 +231,7 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.PlatformOrderNo = platformOrderNo;
             updateRecord.PlatformMchOrderNo = platformMchOrderNo;
             _payOrderRepository.Update(updateRecord);
-            return _payOrderRepository.SaveChanges(out int _);
+            return await _payOrderRepository.SaveChangesAsync() > 0;
         }
         /// <summary>
         /// 更新订单状态 【支付中】 --》 【支付成功/支付失败】
@@ -259,27 +247,27 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="channelErrCode"></param>
         /// <param name="channelErrMsg"></param>
         /// <returns></returns>
-        public bool UpdateIng2SuccessOrFail(string payOrderId, byte updateState, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo, string channelErrCode, string channelErrMsg)
+        public Task<bool> UpdateIng2SuccessOrFail(string payOrderId, byte updateState, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo, string channelErrCode, string channelErrMsg)
         {
             if (updateState == (byte)PayOrderState.STATE_ING)
             {
-                return true;
+                return Task.FromResult(true);
             }
             else if (updateState == (byte)PayOrderState.STATE_SUCCESS)
             {
-                return UpdateIng2Success(payOrderId, channelMchNo, channelIsvNo, channelOrderNo, channelUserId, platformOrderNo, platformMchOrderNo);
+                return UpdateIng2SuccessAsync(payOrderId, channelMchNo, channelIsvNo, channelOrderNo, channelUserId, platformOrderNo, platformMchOrderNo);
             }
             else if (updateState == (byte)PayOrderState.STATE_FAIL)
             {
-                return UpdateIng2Fail(payOrderId, channelMchNo, channelIsvNo, channelOrderNo, channelUserId, platformOrderNo, platformMchOrderNo, channelErrCode, channelErrMsg);
+                return UpdateIng2FailAsync(payOrderId, channelMchNo, channelIsvNo, channelOrderNo, channelUserId, platformOrderNo, platformMchOrderNo, channelErrCode, channelErrMsg);
             }
-            return false;
+            return Task.FromResult(false);
         }
         /// <summary>
         /// 更新订单为 超时状态
         /// </summary>
         /// <returns></returns>
-        public int UpdateOrderExpired()
+        public Task<int> UpdateOrderExpiredAsync()
         {
             var updateRecords = _payOrderRepository.GetAll().Where(
                 w => (new List<byte>() { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }).Contains(w.State)
@@ -289,26 +277,26 @@ namespace AGooday.AgPay.Application.Services
                 payOrder.State = (byte)PayOrderState.STATE_CLOSED;
                 _payOrderRepository.Update(payOrder);
             }
-            return _payOrderRepository.SaveChanges();
+            return _payOrderRepository.SaveChangesAsync();
         }
         /// <summary>
         /// 更新订单 通知状态 --> 已发送
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        public bool UpdateNotifySent(string orderId)
+        public async Task<bool> UpdateNotifySentAsync(string orderId)
         {
             var updateRecord = _payOrderRepository.GetById(orderId);
             updateRecord.NotifyState = CS.YES;
             _payOrderRepository.Update(updateRecord);
-            return _payOrderRepository.SaveChanges(out int _);
+            return await _payOrderRepository.SaveChangesAsync() > 0;
         }
         /// <summary>
         /// 更新订单表分账状态为： 等待分账任务处理
         /// </summary>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        public bool UpdateDivisionState(PayOrderDto payOrder)
+        public async Task<bool> UpdateDivisionStateAsync(PayOrderDto payOrder)
         {
             var updateRecord = _payOrderRepository.GetById(payOrder.PayOrderId);
             if (updateRecord.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_UNHAPPEN)
@@ -317,7 +305,7 @@ namespace AGooday.AgPay.Application.Services
             }
             updateRecord.DivisionState = (byte)PayOrderDivisionState.DIVISION_STATE_WAIT_TASK;
             _payOrderRepository.Update(updateRecord);
-            return _payOrderRepository.SaveChanges(out int _);
+            return await _payOrderRepository.SaveChangesAsync() > 0;
         }
 
         /// <summary>
@@ -325,13 +313,13 @@ namespace AGooday.AgPay.Application.Services
         /// 商家订单入账金额 （支付金额 - 手续费 - 退款金额 - 总分账金额）</summary>
         /// <param name="dbPayOrder"></param>
         /// <returns></returns>
-        public long CalMchIncomeAmount(PayOrderDto dbPayOrder)
+        public async Task<long> CalMchIncomeAmountAsync(PayOrderDto dbPayOrder)
         {
             //商家订单入账金额 （支付金额 - 手续费 - 退款金额 - 总分账金额）
             long mchIncomeAmount = dbPayOrder.Amount - dbPayOrder.MchFeeAmount - dbPayOrder.RefundAmount;
 
             //减去已分账金额
-            mchIncomeAmount -= _payOrderDivisionRecordRepository.SumSuccessDivisionAmount(dbPayOrder.PayOrderId);
+            mchIncomeAmount -= await _payOrderDivisionRecordRepository.SumSuccessDivisionAmountAsync(dbPayOrder.PayOrderId);
 
             return mchIncomeAmount <= 0 ? 0 : mchIncomeAmount;
         }
@@ -346,21 +334,21 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="dayStart"></param>
         /// <param name="dayEnd"></param>
         /// <returns></returns>
-        private List<PayTypeCountDto> PayTypeCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
+        private async Task<List<PayTypeCountDto>> PayTypeCountAsync(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
         {
-            var result = _payOrderRepository.GetAll()
+            var payOrders = await _payOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 && (new List<byte> { (byte)PayOrderState.STATE_SUCCESS, (byte)PayOrderState.STATE_REFUND }).Contains(w.State)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
-                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
-                .GroupBy(g => g.WayType, (key, group) => new { WayType = key, Items = group.AsEnumerable() })
-                .Select(s => new PayTypeCountDto
-                {
-                    WayType = s.WayType,
-                    TypeCount = s.Items.Count(),
-                    TypeAmount = Decimal.Round(s.Items.Sum(s => s.Amount) / 100M, 2, MidpointRounding.AwayFromZero)
-                }).ToList();
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).ToListAsync();
+            var result = payOrders.GroupBy(g => g.WayType, (key, group) => new { WayType = key, Items = group.AsEnumerable() })
+               .Select(s => new PayTypeCountDto
+               {
+                   WayType = s.WayType,
+                   TypeCount = s.Items.Count(),
+                   TypeAmount = Decimal.Round(s.Items.Sum(s => s.Amount) / 100M, 2, MidpointRounding.AwayFromZero)
+               }).ToList();
             return result;
         }
 
@@ -372,14 +360,14 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="dayStart"></param>
         /// <param name="dayEnd"></param>
         /// <returns></returns>
-        private List<(string GroupDate, decimal PayAmount, int PayCount, decimal RefundAmount)> SelectOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
+        private IEnumerable<(string GroupDate, decimal PayAmount, int PayCount, decimal RefundAmount)> SelectOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
         {
-            var ordercounts = _payOrderRepository.GetAll()
+            var ordercounts = _payOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 && (new List<byte> { (byte)PayOrderState.STATE_SUCCESS, (byte)PayOrderState.STATE_REFUND }).Contains(w.State)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
-                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd))
                 .GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
                 .Select(s => new
                 {
@@ -387,10 +375,8 @@ namespace AGooday.AgPay.Application.Services
                     PayAmount = (s.Items.Sum(s => s.Amount) - s.Items.Sum(s => s.RefundAmount)),
                     PayCount = s.Items.Count(),
                     RefundAmount = s.Items.Sum(s => s.RefundAmount)
-                }).ToList();
-            var result = ordercounts.Select(s =>
-            (s.GroupDate, Decimal.Round(s.PayAmount / 100M, 2, MidpointRounding.AwayFromZero), s.PayCount, Decimal.Round(s.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero))
-            ).ToList();
+                });
+            var result = ordercounts.AsEnumerable().Select(s => (s.GroupDate, Decimal.Round(s.PayAmount / 100M, 2, MidpointRounding.AwayFromZero), s.PayCount, Decimal.Round(s.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero)));
             return result;
         }
 
@@ -402,25 +388,21 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="dayStart"></param>
         /// <param name="dayEnd"></param>
         /// <returns></returns>
-        private List<(string GroupDate, long PayAmount, int PayCount)> SelectPayOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
+        private async Task<List<(string GroupDate, long PayAmount, int PayCount)>> SelectPayOrderCountAsync(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
         {
-            var payOrders = _payOrderRepository.GetAll()
+            var payOrders = await _payOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 && (new List<byte> { (byte)PayOrderState.STATE_SUCCESS, (byte)PayOrderState.STATE_REFUND }).Contains(w.State)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
-                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
-                .GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).ToListAsync();
+            var result = payOrders.GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
                 .Select(s => new
                 {
                     GroupDate = s.GroupDate,
                     PayAmount = s.Items.Sum(s => s.Amount),
                     PayCount = s.Items.Count()
-                }).ToList();
-
-            var result = payOrders.Select(s =>
-                (s.GroupDate, s.PayAmount, s.PayCount)
-            ).ToList();
+                }).Select(s => (s.GroupDate, s.PayAmount, s.PayCount)).ToList();
             return result;
         }
         /// <summary>
@@ -431,25 +413,22 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="dayStart"></param>
         /// <param name="dayEnd"></param>
         /// <returns></returns>
-        private List<(string GroupDate, long RefundAmount, int RefundCount)> SelectRefundOrderCount(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
+        private async Task<List<(string GroupDate, long RefundAmount, int RefundCount)>> SelectRefundOrderCountAsync(string mchNo, string agentNo, DateTime? dayStart, DateTime? dayEnd)
         {
-            var refundOrders = _refundOrderRepository.GetAll()
+            var refundOrders = await _refundOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 && (new List<byte> { (byte)RefundOrderState.STATE_SUCCESS }).Contains(w.State)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
-                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable()
-                .GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).ToListAsync();
+            var result = refundOrders.GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
                 .Select(s => new
                 {
                     GroupDate = s.GroupDate,
                     RefundCount = s.Items.Count(),
                     RefundAmount = s.Items.Sum(s => s.RefundAmount)
-                }).ToList();
+                }).Select(s => (s.GroupDate, s.RefundAmount, s.RefundCount)).ToList();
 
-            var result = refundOrders.Select(s =>
-                (s.GroupDate, s.RefundAmount, s.RefundCount)
-            ).ToList();
             return result;
         }
 
@@ -459,35 +438,35 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="mchNo"></param>
         /// <param name="agentNo"></param>
         /// <returns></returns>
-        public JObject MainPageIsvAndMchCount(string mchNo, string agentNo)
+        public async Task<JObject> MainPageIsvAndMchCountAsync(string mchNo, string agentNo)
         {
             JObject result = new JObject();
             // 商户总数
-            var mchInfos = _mchInfoRepository.GetAll()
+            var mchInfos = _mchInfoRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo)));
-            int isvSubMchCount = mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_ISVSUB)).Count();
-            int normalMchCount = mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_NORMAL)).Count();
-            int mchCount = mchInfos.Count();
+            int isvSubMchCount = await mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_ISVSUB)).CountAsync();
+            int normalMchCount = await mchInfos.Where(w => w.Type.Equals(CS.MCH_TYPE_NORMAL)).CountAsync();
+            int mchCount = await mchInfos.CountAsync();
 
             int agentCount = 0;
 
             if (string.IsNullOrWhiteSpace(agentNo))
             {
                 // 代理商总数
-                var agentInfos = _agentInfoRepository.GetAll()
+                var agentInfos = _agentInfoRepository.GetAllAsNoTracking()
                     .Where(w => (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo)));
-                agentCount = agentInfos.Count();
+                agentCount = await agentInfos.CountAsync();
             }
             else
             {
-                var subAgentInfos = GetSons(_agentInfoRepository.GetAll(), agentNo);
+                var subAgentInfos = GetSons(_agentInfoRepository.GetAllAsNoTracking(), agentNo);
                 agentCount = subAgentInfos.Count();
             }
 
             // 服务商总数
-            var isvInfos = _isvInfoRepository.GetAll();
-            int isvCount = isvInfos.Count();
+            var isvInfos = _isvInfoRepository.GetAllAsNoTracking();
+            int isvCount = await isvInfos.CountAsync();
             if (string.IsNullOrWhiteSpace(mchNo))
             {
 #if DEBUG
@@ -516,33 +495,33 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="mchNo"></param>
         /// <param name="agentNo"></param>
         /// <returns></returns>
-        public JObject MainPagePayDayCount(string mchNo, string agentNo, DateTime? day)
+        public async Task<JObject> MainPagePayDayCountAsync(string mchNo, string agentNo, DateTime? day)
         {
             DateTime? dayStart = day;
             DateTime? dayEnd = day?.AddDays(1).AddSeconds(-1);
             JObject json = new JObject();
             int allCount = 0;
-            var payorders = _payOrderRepository.GetAll()
+            var payorders = _payOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 //&& w.State.Equals((byte)PayOrderState.STATE_SUCCESS)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
-                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable();
-            allCount += payorders.Count();
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd));
+            allCount += await payorders.CountAsync();
             var pay = payorders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
-            var payAmount = pay.Sum(s => s.Amount);
-            var payCount = pay.Count();
+            var payAmount = await pay.SumAsync(s => s.Amount);
+            var payCount = await pay.CountAsync();
 
-            var refundOrder = _refundOrderRepository.GetAll()
+            var refundOrder = _refundOrderRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(mchNo) || w.MchNo.Equals(mchNo))
                 && (string.IsNullOrWhiteSpace(agentNo) || w.AgentNo.Equals(agentNo))
                 //&& w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
-                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).AsEnumerable();
-            allCount += refundOrder.Count();
-            var refund = refundOrder.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable();
-            var refundAmount = refund.Sum(s => s.RefundAmount);
-            var refundCount = refund.Count();
+                && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd));
+            allCount += await refundOrder.CountAsync();
+            var refund = refundOrder.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
+            var refundAmount = await refund.SumAsync(s => s.RefundAmount);
+            var refundCount = await refund.CountAsync();
 
 #if DEBUG
             // 生成虚拟数据
@@ -585,12 +564,12 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="agentNo"></param>
         /// <param name="recentDay"></param>
         /// <returns></returns>
-        public JObject MainPagePayTrendCount(string mchNo, string agentNo, int recentDay)
+        public async Task<JObject> MainPagePayTrendCountAsync(string mchNo, string agentNo, int recentDay)
         {
             // 查询支付的记录
             var dayStart = DateTime.Today.AddDays(-(recentDay - 1));
             var dayEnd = DateTime.Today.AddDays(1).AddSeconds(-1);
-            var payOrderList = SelectPayOrderCount(mchNo, agentNo, dayStart, dayEnd);
+            var payOrderList = await SelectPayOrderCountAsync(mchNo, agentNo, dayStart, dayEnd);
             // 生成前端返回参数类型
             List<string> dateList = new List<string>();
             List<string> payAmountList = new List<string>();
@@ -617,7 +596,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="createdStart"></param>
         /// <param name="createdEnd"></param>
         /// <returns></returns>
-        public JObject MainPagePayCount(string mchNo, string agentNo, string createdStart, string createdEnd)
+        public async Task<JObject> MainPagePayCountAsync(string mchNo, string agentNo, string createdStart, string createdEnd)
         {
             int daySpace = 6; // 默认最近七天（含当天）
             if (!DateTime.TryParse(createdStart, out DateTime dayStart) || !DateTime.TryParse(createdEnd, out DateTime dayEnd))
@@ -633,8 +612,8 @@ namespace AGooday.AgPay.Application.Services
             }
 
             // 查询支付的记录
-            var payOrderList = SelectPayOrderCount(mchNo, agentNo, dayStart, dayEnd);
-            var refundOrderList = SelectRefundOrderCount(mchNo, agentNo, dayStart, dayEnd);
+            var payOrderList = await SelectPayOrderCountAsync(mchNo, agentNo, dayStart, dayEnd);
+            var refundOrderList = await SelectRefundOrderCountAsync(mchNo, agentNo, dayStart, dayEnd);
             // 生成前端返回参数类型
             List<string> resDateArr = new List<string>();
             List<string> resPayAmountArr = new List<string>();
@@ -672,7 +651,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="createdStart"></param>
         /// <param name="createdEnd"></param>
         /// <returns></returns>
-        public List<PayTypeCountDto> MainPagePayTypeCount(string mchNo, string agentNo, string createdStart, string createdEnd)
+        public async Task<IEnumerable<PayTypeCountDto>> MainPagePayTypeCountAsync(string mchNo, string agentNo, string createdStart, string createdEnd)
         {
             if (!DateTime.TryParse(createdStart, out DateTime dayStart) || !DateTime.TryParse(createdEnd, out DateTime dayEnd))
             {
@@ -681,7 +660,7 @@ namespace AGooday.AgPay.Application.Services
                 dayEnd = today.AddDays(1).AddSeconds(-1);
             }
             // 统计列表
-            var payCountMap = PayTypeCount(mchNo, agentNo, dayStart, dayEnd);
+            var payCountMap = await PayTypeCountAsync(mchNo, agentNo, dayStart, dayEnd);
 
             // 支付方式名称标注
             foreach (var payCount in payCountMap)
@@ -694,23 +673,18 @@ namespace AGooday.AgPay.Application.Services
             if (payCountMap?.Count <= 0)
             {
                 // 得到所有支付方式
-                var payWayList = _payWayRepository.GetAll();
-                payCountMap = new List<PayTypeCountDto>();
-                foreach (var wayType in payWayList.Select(s => s.WayType).Distinct())
+                payCountMap = await _payWayRepository.GetAllAsNoTracking().GroupBy(g => g.WayType).Select(s => new PayTypeCountDto()
                 {
-                    payCountMap.Add(new PayTypeCountDto()
-                    {
-                        WayType = wayType,
-                        TypeName = wayType.ToEnum<PayWayType>().GetDescriptionOrDefault("未知"),
-                        TypeCount = Random.Shared.Next(0, 100),
-                        TypeAmount = Decimal.Round(Random.Shared.Next(10000, 100000) / 100M, 2, MidpointRounding.AwayFromZero),
-                    });
-                }
+                    WayType = s.Key,
+                    TypeName = s.Key.ToEnum<PayWayType>().GetDescriptionOrDefault("未知"),
+                    TypeCount = Random.Shared.Next(0, 100),
+                    TypeAmount = Decimal.Round(Random.Shared.Next(10000, 100000) / 100M, 2, MidpointRounding.AwayFromZero),
+                }).ToListAsync();
             }
 #endif
 
             // 返回数据列
-            return payCountMap.OrderBy(o => (int)Enum.Parse(typeof(PayWayType), o.WayType)).ToList();
+            return payCountMap.OrderBy(o => (int)Enum.Parse(typeof(PayWayType), o.WayType));
         }
     }
 }

@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -52,11 +52,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg LklBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BarAsync(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/api/v3/labs/trans/micropay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/api/v3/labs/trans/micropay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON?.GetValue("code").ToString(); //业务响应码
             string msg = resJSON?.GetValue("msg").ToString(); //业务响应信息	
@@ -104,7 +104,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetLklPayHost4env(LklPayIsvParams isvParams)
+        public static string GetHost4env(LklPayIsvParams isvParams)
         {
             return CS.YES == isvParams.Sandbox ? LklPayConfig.SANDBOX_SERVER_URL : LklPayConfig.PROD_SERVER_URL;
         }
@@ -118,9 +118,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqData, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, JObject reqData, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
-            LklPayIsvParams isvParams = (LklPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+            LklPayIsvParams isvParams = (LklPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             //if (isvParams.OrgCode == null)
             //{
@@ -128,7 +128,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             //    throw new BizException("服务商配置为空。");
             //}
 
-            LklPayIsvSubMchParams isvsubMchParams = (LklPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            LklPayIsvSubMchParams isvsubMchParams = (LklPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             reqData.Add("merchant_no", isvsubMchParams.MerchantNo); // 拉卡拉分配的商户号
             reqData.Add("term_no", isvsubMchParams.TermNo); // 拉卡拉分配的业务终端号
 
@@ -144,10 +144,10 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             reqParams.Add("req_data", reqData); //业务请求参数，具体值参考API文档
 
             // 调起上游接口
-            string url = GetLklPayHost4env(isvParams) + apiUri;
+            string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = LklHttpUtil.DoPostJson(url, isvParams.AppId, isvParams.SerialNo, isvParams.PrivateCert, reqParams, out Dictionary<string, string> headers);
+            var (resText, headers) = await LklHttpUtil.DoPostJsonAsync(url, isvParams.AppId, isvParams.SerialNo, isvParams.PrivateCert, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -174,7 +174,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
         /// <param name="returnUrl"></param>
         public static void UnifiedParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
-            LklPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             string accountType = LklPayEnum.GetAccountType(payOrder.WayCode);
             string transType = LklPayEnum.GetTransType(payOrder.WayCode);
             reqParams.Add("account_type", accountType);
@@ -189,7 +189,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
         /// <param name="payOrder"></param>
         public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl)
         {
-            LklPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             reqParams.Add("notify_url", notifyUrl); //异步通知地址
         }
 
@@ -198,7 +198,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void LklPublicParams(JObject reqParams, PayOrderDto payOrder)
+        public static void PublicParams(JObject reqParams, PayOrderDto payOrder)
         {
             reqParams.Add("out_trade_no", payOrder.PayOrderId); //商户交易流水号	商户系统唯一，对应数据库表中外部请求流水号。
             reqParams.Add("total_amount", payOrder.Amount); //单位分，整数型字符

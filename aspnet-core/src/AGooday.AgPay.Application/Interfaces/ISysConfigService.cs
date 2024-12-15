@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
         DBOssConfig GetDBOssConfig();
         DBOcrConfig GetDBOcrConfig();
         DBSmsConfig GetDBSmsConfig();
-        int UpdateByConfigKey(Dictionary<string, string> configs, string groupKey, string sysType, string belongInfoId);
+        Task<int> UpdateByConfigKeyAsync(Dictionary<string, string> configs, string groupKey, string sysType, string belongInfoId);
         IEnumerable<SysConfigDto> GetByGroupKey(string groupKey, string sysType, string belongInfoId);
         Dictionary<string, string> GetKeyValueByGroupKey(string groupKey, string sysType, string belongInfoId);
         SysConfigDto GetByKey(string configKey, string sysType, string belongInfoId);

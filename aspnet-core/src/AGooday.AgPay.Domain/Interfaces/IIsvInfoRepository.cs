@@ -4,6 +4,6 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IIsvInfoRepository : IAgPayRepository<IsvInfo>
     {
-        bool IsExistIsvNo(string isvNo);
+        Task<bool> IsExistIsvNoAsync(string isvNo);
     }
 }

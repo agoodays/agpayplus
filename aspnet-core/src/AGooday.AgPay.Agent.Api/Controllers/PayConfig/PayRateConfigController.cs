@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
     [ApiController, Authorize]
     public class PayRateConfigController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IPayRateConfigService _payRateConfigService;
 
         public PayRateConfigController(ILogger<PayRateConfigController> logger,
@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _payRateConfigService = payRateConfigService;
         }
 

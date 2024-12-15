@@ -31,33 +31,12 @@ namespace AGooday.AgPay.Application.Services
         }
 
 
-        public async Task<PaginatedList<SysRoleEntRelaDto>> GetPaginatedDataAsync(SysRoleEntRelaQueryDto dto)
+        public Task<PaginatedList<SysRoleEntRelaDto>> GetPaginatedDataAsync(SysRoleEntRelaQueryDto dto)
         {
-            var sysRoleEntRelas = _sysRoleEntRelaRepository.GetAllAsNoTracking()
+            var query = _sysRoleEntRelaRepository.GetAllAsNoTracking()
                 .Where(w => string.IsNullOrWhiteSpace(dto.RoleId) || w.RoleId.Equals(dto.RoleId));
-            var records = await PaginatedList<SysRoleEntRela>.CreateAsync<SysRoleEntRelaDto>(sysRoleEntRelas, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysRoleEntRela>.CreateAsync<SysRoleEntRelaDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
-        }
-
-        /// <summary>
-        /// 查询当前用户是否存在左侧菜单 (仅普通操作员)
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="sysType"></param>
-        /// <returns></returns>
-        public bool UserHasLeftMenu(long userId, string sysType)
-        {
-            var result = _sysRoleEntRelaRepository.GetAllAsNoTracking<SysUserRoleRela>()
-                .Join(_sysRoleEntRelaRepository.GetAllAsNoTracking(),
-                ur => ur.RoleId, re => re.RoleId,
-                (ur, re) => new { ur.UserId, re.EntId })
-                .Join(_sysRoleEntRelaRepository.GetAll<SysEntitlement>(),
-                    ue => ue.EntId, ent => ent.EntId,
-                    (ue, ent) => new { ue.UserId, ent.EntId, ent.EntType, ent.SysType, ent.State })
-                .Any(w => w.UserId.Equals(userId)
-                && w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE) && w.EntType.Equals(CS.ENT_TYPE.MENU_LEFT));
-
-            return result;
         }
 
         /// <summary>
@@ -83,17 +62,17 @@ namespace AGooday.AgPay.Application.Services
         {
             if (userType == CS.USER_TYPE.ADMIN)
             {
-                var result = _sysEntitlementRepository.GetAll()
+                var result = _sysEntitlementRepository.GetAllAsNoTracking()
                     .Where(w => w.SysType.Equals(sysType) && w.State == CS.PUB_USABLE);
                 return _mapper.Map<IEnumerable<SysEntitlementDto>>(result);
             }
             else
             {
-                var result = _sysUserRoleRelaRepository.GetAll()
-                    .Join(_sysUserRoleRelaRepository.GetAll<SysRoleEntRela>(),
+                var result = _sysUserRoleRelaRepository.GetAllAsNoTracking()
+                    .Join(_sysUserRoleRelaRepository.GetAllAsNoTracking<SysRoleEntRela>(),
                     ur => ur.RoleId, re => re.RoleId,
                     (ur, re) => new { ur.UserId, re.EntId })
-                    .Join(_sysUserRoleRelaRepository.GetAll<SysEntitlement>(),
+                    .Join(_sysUserRoleRelaRepository.GetAllAsNoTracking<SysEntitlement>(),
                         ue => ue.EntId, ent => ent.EntId,
                         (ue, ent) => new { ue.UserId, ent })
                     .Where(w => w.UserId.Equals(userId) && w.ent.SysType.Equals(sysType) && w.ent.State.Equals(CS.PUB_USABLE))
@@ -107,23 +86,23 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="roleId"></param>
         /// <param name="entIdList"></param>
-        public void ResetRela(string roleId, List<string> entIdList)
+        public async Task<int> ResetRelaAsync(string roleId, List<string> entIdList)
         {
             //1. 删除
             _sysRoleEntRelaRepository.RemoveByRoleId(roleId);
 
             //2. 插入
-            entIdList.ForEach((entId) =>
+            foreach (var entId in entIdList)
             {
                 var m = new SysRoleEntRela()
                 {
                     RoleId = roleId,
                     EntId = entId,
                 };
-                _sysRoleEntRelaRepository.Add(m);
-            });
+                await _sysRoleEntRelaRepository.AddAsync(m);
+            }
 
-            _sysRoleEntRelaRepository.SaveChanges();
+            return await _sysRoleEntRelaRepository.SaveChangesAsync();
         }
     }
 }

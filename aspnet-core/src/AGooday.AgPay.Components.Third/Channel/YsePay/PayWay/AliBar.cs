@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【银盛条码(alipay)支付】";
             AliBarOrderRQ bizRQ = (AliBarOrderRQ)rq;
@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
             // 银盛 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder, GetNotifyUrl());
 
-            var channelRetMsg = YseBar(reqParams, GetNotifyUrl(), logPrefix, mchAppConfigContext);
+            var channelRetMsg = await BarAsync(reqParams, GetNotifyUrl(), logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }

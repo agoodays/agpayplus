@@ -17,14 +17,14 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
     /// </summary>
     public class DgPayRefundService : AbstractRefundService
     {
-        private readonly DgPayPaymentService dgpayPaymentService;
+        private readonly DgPayPaymentService _paymentService;
         public DgPayRefundService(ILogger<DgPayRefundService> logger,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.dgpayPaymentService = ActivatorUtilities.CreateInstance<DgPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<DgPayPaymentService>(serviceProvider);
         }
 
         public DgPayRefundService()
@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             return AmountUtil.CalPercentageFee(amount, payOrder.MchOrderFeeAmount, payOrder.Amount, MidpointRounding.ToNegativeInfinity);
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                 reqParams.Add("org_hf_seq_id", refundOrder.RefundOrderId); // 退款订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = dgpayPaymentService.PackageParamAndReq("trade/payment/scanpay/refundquery", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("trade/payment/scanpay/refundquery", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -153,7 +153,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                 reqParams.Add("remark", refundOrder.RefundReason); // 退货原因
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = dgpayPaymentService.PackageParamAndReq("/trade/payment/scanpay/refund", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/trade/payment/scanpay/refund", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

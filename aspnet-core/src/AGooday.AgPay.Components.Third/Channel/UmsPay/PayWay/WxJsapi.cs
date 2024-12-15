@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【银联商务(wechatJs)jsapi支付】";
             WxJsapiOrderRQ bizRQ = (WxJsapiOrderRQ)rq;
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay.PayWay
 
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/v1/netpay/wx/unified-order", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/v1/netpay/wx/unified-order", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
             resJSON.TryGetString("errInfo", out string errInfo); // 错误说明

@@ -43,10 +43,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.MGR.ENT_REFUND_LIST)]
-        public ApiPageRes<RefundOrderDto> List([FromQuery] RefundOrderQueryDto dto)
+        public async Task<ApiPageRes<RefundOrderDto>> ListAsync([FromQuery] RefundOrderQueryDto dto)
         {
             dto.BindDateRange();
-            var refundOrders = _refundOrderService.GetPaginatedData(dto);
+            var refundOrders = await _refundOrderService.GetPaginatedDataAsync(dto);
             var ifDefines = _payIfDefineService.GetAllAsNoTracking();
 
             foreach (var refundOrder in refundOrders)
@@ -70,10 +70,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("count"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_REFUND_LIST)]
-        public ApiRes Count([FromQuery] RefundOrderQueryDto dto)
+        public async Task<ApiRes> CountAsync([FromQuery] RefundOrderQueryDto dto)
         {
             dto.BindDateRange();
-            var statistics = _refundOrderService.Statistics(dto);
+            var statistics = await _refundOrderService.StatisticsAsync(dto);
             return ApiRes.Ok(statistics);
         }
 
@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("export/{bizType}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_REFUND_LIST)]
-        public IActionResult Export(string bizType, [FromQuery] RefundOrderQueryDto dto)
+        public async Task<IActionResult> ExportAsync(string bizType, [FromQuery] RefundOrderQueryDto dto)
         {
             if (!"excel".Equals(bizType))
             {
@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             }
             dto.BindDateRange();
             // 从数据库中检索需要导出的数据
-            var refundOrders = _refundOrderService.GetPaginatedData(dto);
+            var refundOrders = await _refundOrderService.GetPaginatedDataAsync(dto);
 
             string fileName = $"退款订单.xlsx";
             // 5.0之后的epplus需要指定 商业证书 或者非商业证书。低版本不需要此行代码

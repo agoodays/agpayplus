@@ -40,10 +40,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("")]
         [PermissionAuth(PermCode.MCH.ENT_TRANSFER_ORDER_LIST)]
-        public ApiPageRes<TransferOrderDto> List([FromQuery] TransferOrderQueryDto dto)
+        public async Task<ApiPageRes<TransferOrderDto>> ListAsync([FromQuery] TransferOrderQueryDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
-            var transferOrders = _transferOrderService.GetPaginatedData(dto);
+            var transferOrders = await _transferOrderService.GetPaginatedDataAsync(dto);
             return ApiPageRes<TransferOrderDto>.Pages(transferOrders);
         }
 
@@ -55,14 +55,14 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("export/{bizType}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_TRANSFER_ORDER_LIST)]
-        public IActionResult Export(string bizType, [FromQuery] TransferOrderQueryDto dto)
+        public async Task<IActionResult> ExportAsync(string bizType, [FromQuery] TransferOrderQueryDto dto)
         {
             if (!"excel".Equals(bizType))
             {
                 throw new BizException($"暂不支持{bizType}导出");
             }
             dto.BindDateRange();
-            var transferOrders = _transferOrderService.GetPaginatedData(dto);
+            var transferOrders = await _transferOrderService.GetPaginatedDataAsync(dto);
             string fileName = $"转账订单.xlsx";
             // 5.0之后的epplus需要指定 商业证书 或者非商业证书。低版本不需要此行代码
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;

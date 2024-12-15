@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【拉卡拉(wechat)小程序支付】";
             JObject reqParams = new JObject();
@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
             reqParams.Add("acc_busi_fields", accBusiFields);
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/api/v3/labs/trans/preorder", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/api/v3/labs/trans/preorder", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON?.GetValue("code").ToString(); //请求响应码
             string msg = resJSON?.GetValue("msg").ToString(); //响应信息

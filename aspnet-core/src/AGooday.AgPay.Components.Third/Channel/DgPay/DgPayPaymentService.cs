@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -52,11 +52,11 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg DgBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> DgBarAsync(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/trade/payment/micropay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/trade/payment/micropay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             var data = resJSON.GetValue("data")?.ToObject<JObject>();
             string respCode = data?.GetValue("resp_code").ToString(); //业务响应码
@@ -141,13 +141,13 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqData, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, JObject reqData, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             // 签名
             string sysId, productId, huifuId, privateKey, publicKey;
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                DgPayIsvParams isvParams = (DgPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                DgPayIsvParams isvParams = (DgPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
                 if (isvParams.SysId == null)
                 {
@@ -155,7 +155,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                     throw new BizException("服务商配置为空。");
                 }
 
-                DgPayIsvSubMchParams isvsubMchParams = (DgPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                DgPayIsvSubMchParams isvsubMchParams = (DgPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
                 sysId = isvParams.SysId;
                 productId = isvParams.ProductId;
@@ -165,7 +165,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             }
             else
             {
-                var normalMchParams = (DgPayNormalMchParams)_configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                var normalMchParams = (DgPayNormalMchParams)await _configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
                 if (normalMchParams.HuifuId == null)
                 {
@@ -200,7 +200,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             string url = "https://api.huifu.com/v2" + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = DgHttpUtil.DoPostJson(url, reqParams);
+            string resText = await DgHttpUtil.DoPostJsonAsync(url, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))

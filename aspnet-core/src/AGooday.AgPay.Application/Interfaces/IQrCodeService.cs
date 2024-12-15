@@ -5,10 +5,10 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IQrCodeService : IAgPayService<QrCodeDto>
     {
-        QrCodeDto GetByIdAsNoTracking(string recordId);
-        string BatchIdDistinctCount();
-        bool BatchAdd(QrCodeAddDto dto);
-        bool UnBind(string recordId);
+        Task<QrCodeDto> GetByIdAsNoTrackingAsync(string recordId);
+        Task<string> BatchIdDistinctCountAsync();
+        Task<bool> BatchAddAsync(QrCodeAddDto dto);
+        Task<bool> UnBindAsync(string recordId);
         Task<PaginatedList<QrCodeDto>> GetPaginatedDataAsync(QrCodeQueryDto dto);
     }
 }

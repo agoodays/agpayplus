@@ -27,11 +27,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             WxLiteOrderRQ bizRQ = (WxLiteOrderRQ)rq;
 
-            var request = BuildUnifiedOrderRequest(payOrder, mchAppConfigContext, out WxServiceWrapper wxServiceWrapper);
+            var (request, wxServiceWrapper) = await BuildUnifiedOrderRequestAsync(payOrder, mchAppConfigContext);
             request.TradeType = "JSAPI";
             if (mchAppConfigContext.IsIsvSubMch() && !String.IsNullOrWhiteSpace(request.SubAppId))// 特约商户 && 传了子商户appId
             {
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWay
             // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
             // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
             var client = (WechatTenpayClient)wxServiceWrapper.Client;
-            var response = client.ExecuteCreatePayUnifiedOrderAsync(request).Result;
+            var response = await client.ExecuteCreatePayUnifiedOrderAsync(request);
             if (response.IsSuccessful())
             {
                 // 下面的参数字典可直接以 JSON 格式返回给客户端，客户端反序列化后再原样传递给 wx.chooseWXPay() 方法即可

@@ -36,11 +36,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             return CS.IF_CODE.LESPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
-                string resText = GetReqParamFromBody();
+                string resText = await GetReqParamFromBodyAsync();
                 var resJson = XmlUtil.ConvertToJson(resText);
                 var resParams = JObject.Parse(resJson);
                 string refundOrderId = resParams.GetValue("third_order_id").ToString();
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
                 var resParams = JObject.Parse(resJson);
 
                 // 校验退款回调
-                bool verifyResult = VerifyParams(resText, resParams, mchAppConfigContext);
+                bool verifyResult = await VerifyParamsAsync(resText, resParams, mchAppConfigContext);
                 // 验证参数失败
                 if (!verifyResult)
                 {
@@ -122,9 +122,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             }
         }
 
-        public bool VerifyParams(string resText, JObject jsonParams, MchAppConfigContext mchAppConfigContext)
+        public async Task<bool> VerifyParamsAsync(string resText, JObject jsonParams, MchAppConfigContext mchAppConfigContext)
         {
-            LesPayIsvParams isvParams = (LesPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+            LesPayIsvParams isvParams = (LesPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             //验签
             string noticeKey = isvParams.NoticeKey;

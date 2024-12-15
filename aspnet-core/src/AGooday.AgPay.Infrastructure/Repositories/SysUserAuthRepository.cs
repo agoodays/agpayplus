@@ -20,14 +20,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             DbSet.RemoveRange(entitys);
         }
 
-        public void ResetAuthInfo(long userId, string sysType, string loginUserName, string telphone, string newPwd)
+        public async Task ResetAuthInfoAsync(long userId, string sysType, string loginUserName, string telphone, string newPwd)
         {
             var sysUserAuths = DbSet.Where(w => w.UserId.Equals(userId) && w.SysType.Equals(sysType));
 
             //更改登录用户名
             if (!string.IsNullOrWhiteSpace(loginUserName))
             {
-                var sysUserAuth = sysUserAuths.FirstOrDefault(w => w.IdentityType.Equals(CS.AUTH_TYPE.LOGIN_USER_NAME));
+                var sysUserAuth = await sysUserAuths.FirstOrDefaultAsync(w => w.IdentityType.Equals(CS.AUTH_TYPE.LOGIN_USER_NAME));
                 if (sysUserAuth != null)
                 {
                     sysUserAuth.Identifier = loginUserName;
@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             //更新手机号认证
             if (!string.IsNullOrWhiteSpace(telphone))
             {
-                var sysUserAuth = sysUserAuths.FirstOrDefault(w => w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE));
+                var sysUserAuth = await sysUserAuths.FirstOrDefaultAsync(w => w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE));
                 if (sysUserAuth != null)
                 {
                     sysUserAuth.Identifier = telphone;

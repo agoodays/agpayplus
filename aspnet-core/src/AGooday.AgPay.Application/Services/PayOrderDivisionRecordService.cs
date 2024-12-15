@@ -8,6 +8,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -30,19 +31,19 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository = payOrderRepository;
         }
 
-        public override bool Add(PayOrderDivisionRecordDto dto)
+        public override async Task<bool> AddAsync(PayOrderDivisionRecordDto dto)
         {
             var entity = _mapper.Map<PayOrderDivisionRecord>(dto);
-            _payOrderDivisionRecordRepository.Add(entity);
-            var result = _payOrderDivisionRecordRepository.SaveChanges(out int _);
+            await _payOrderDivisionRecordRepository.AddAsync(entity);
+            var result = await _payOrderDivisionRecordRepository.SaveChangesAsync() > 0;
             dto.RecordId = entity.RecordId;
             return result;
         }
 
-        public PayOrderDivisionRecordDto GetById(long recordId, string mchNo)
+        public async Task<PayOrderDivisionRecordDto> GetByIdAsync(long recordId, string mchNo)
         {
-            var entity = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
-                .Where(w => w.RecordId.Equals(recordId) && w.MchNo.Equals(mchNo)).FirstOrDefault();
+            var entity = await _payOrderDivisionRecordRepository.GetAllAsNoTracking()
+                .Where(w => w.RecordId.Equals(recordId) && w.MchNo.Equals(mchNo)).FirstOrDefaultAsync();
             return _mapper.Map<PayOrderDivisionRecordDto>(entity);
         }
 
@@ -69,7 +70,7 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task<PaginatedList<PayOrderDivisionRecordDto>> GetPaginatedDataAsync(PayOrderDivisionRecordQueryDto dto)
         {
-            var payOrderDivisionRecords = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
+            var query = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (dto.ReceiverId.Equals(null) || w.ReceiverId.Equals(dto.ReceiverId))
@@ -81,9 +82,9 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<PayOrderDivisionRecord>.CreateAsync<PayOrderDivisionRecordDto>(payOrderDivisionRecords, _mapper, dto.PageNumber, dto.PageSize);
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                .OrderByDescending(o => o.CreatedAt);
+            var records = await PaginatedList<PayOrderDivisionRecord>.CreateAsync<PayOrderDivisionRecordDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 

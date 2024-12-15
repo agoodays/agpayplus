@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
     /// </summary>
     public class YsePayRefundService : AbstractRefundService
     {
-        private readonly YsePayPaymentService ysePayPaymentService;
+        private readonly YsePayPaymentService _paymentService;
 
         public YsePayRefundService(ILogger<YsePayRefundService> logger,
             IServiceProvider serviceProvider,
@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.ysePayPaymentService = ActivatorUtilities.CreateInstance<YsePayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<YsePayPaymentService>(serviceProvider);
         }
 
         public YsePayRefundService()
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             return null;
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 string method = "ysepay.online.trade.refund.query", repMethod = "ysepay_online_trade_refund_query_response";
-                JObject resJSON = ysePayPaymentService.PackageParamAndReq(YsePayConfig.SEARCH_GATEWAY, method, repMethod, reqParams, string.Empty, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync(YsePayConfig.SEARCH_GATEWAY, method, repMethod, reqParams, string.Empty, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 string method = "ysepay.online.trade.refund", repMethod = "ysepay_online_trade_refund_response";
-                JObject resJSON = ysePayPaymentService.PackageParamAndReq(YsePayConfig.OPENAPI_GATEWAY, method, repMethod, reqParams, GetNotifyUrl(), logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync(YsePayConfig.OPENAPI_GATEWAY, method, repMethod, reqParams, GetNotifyUrl(), logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

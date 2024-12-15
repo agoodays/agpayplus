@@ -24,8 +24,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     public class CloseOrderController : ApiControllerBase
     {
         private readonly ILogger<CloseOrderController> _logger;
-        private readonly PayOrderService payOrderService;
-        private readonly ConfigContextQueryService configContextQueryService;
+        private readonly PayOrderService _payOrderService;
         private readonly IChannelServiceFactory<IPayOrderCloseService> _payOrderCloseServiceFactory;
 
         public CloseOrderController(ILogger<CloseOrderController> logger,
@@ -36,8 +35,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             : base(requestKit, configContextQueryService)
         {
             _logger = logger;
-            this.payOrderService = payOrderService;
-            this.configContextQueryService = configContextQueryService;
+            _payOrderService = payOrderService;
             _payOrderCloseServiceFactory = payOrderCloseServiceFactory;
         }
 
@@ -47,17 +45,17 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <returns></returns>
         [HttpPost, Route("close")]
         [PermissionAuth(PermCode.PAY.API_PAY_ORDER_CLOSE)]
-        public ApiRes CloseOrder()
+        public async Task<ApiRes> CloseOrderAsync()
         {
             //获取参数 & 验签
-            ClosePayOrderRQ rq = GetRQByWithMchSign<ClosePayOrderRQ>();
+            ClosePayOrderRQ rq = await this.GetRQByWithMchSignAsync<ClosePayOrderRQ>();
 
             if (StringUtil.IsAllNullOrEmpty(rq.MchOrderNo, rq.PayOrderId))
             {
                 throw new BizException("mchOrderNo 和 payOrderId 不能同时为空");
             }
 
-            PayOrderDto payOrder = payOrderService.QueryMchOrder(rq.MchNo, rq.PayOrderId, rq.MchOrderNo);
+            PayOrderDto payOrder = await _payOrderService.QueryMchOrderAsync(rq.MchNo, rq.PayOrderId, rq.MchOrderNo);
             if (payOrder == null)
             {
                 throw new BizException("订单不存在");
@@ -73,9 +71,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             // 订单生成状态  直接修改订单状态
             if (payOrder.State == (sbyte)PayOrderState.STATE_INIT)
             {
-                payOrderService.UpdateIng2Close(payOrder.PayOrderId);
+                await _payOrderService.UpdateIng2CloseAsync(payOrder.PayOrderId);
                 bizRes.ChannelRetMsg = ChannelRetMsg.ConfirmSuccess(null);
-                return ApiRes.OkWithSign(bizRes, rq.SignType, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+                return ApiRes.OkWithSign(bizRes, rq.SignType, (await _configContextQueryService.QueryMchAppAsync(rq.MchNo, rq.AppId)).AppSecret);
             }
 
             try
@@ -93,9 +91,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 //查询出商户应用的配置信息
-                MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId);
 
-                ChannelRetMsg channelRetMsg = closeService.Close(payOrder, mchAppConfigContext);
+                ChannelRetMsg channelRetMsg = await closeService.CloseAsync(payOrder, mchAppConfigContext);
                 if (channelRetMsg == null)
                 {
                     _logger.LogError("channelRetMsg is null");
@@ -107,7 +105,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 关闭订单 成功
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
-                    payOrderService.UpdateIng2Close(payOrderId);
+                    await _payOrderService.UpdateIng2CloseAsync(payOrderId);
                 }
                 else
                 {
@@ -123,7 +121,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 return null;
             }
 
-            return ApiRes.OkWithSign(bizRes, rq.SignType, configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRes, rq.SignType, (await _configContextQueryService.QueryMchAppAsync(rq.MchNo, rq.AppId)).AppSecret);
         }
     }
 }

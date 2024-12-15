@@ -6,6 +6,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -40,11 +41,16 @@ namespace AGooday.AgPay.Application.Services
             _payRateLevelConfigRepository = payRateLevelConfigRepository;
         }
 
-        public override bool Add(MchPayPassageDto dto)
+        public Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode)
+        {
+            return _mchPayPassageRepository.IsExistMchPayPassageUseWayCodeAsync(wayCode);
+        }
+
+        public override async Task<bool> AddAsync(MchPayPassageDto dto)
         {
             var entity = _mapper.Map<MchPayPassage>(dto);
-            _mchPayPassageRepository.Add(entity);
-            var result = _mchPayPassageRepository.SaveChanges(out int _);
+            await _mchPayPassageRepository.AddAsync(entity);
+            var result = await _mchPayPassageRepository.SaveChangesAsync() > 0;
             dto.Id = entity.Id;
             return result;
         }
@@ -61,13 +67,6 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
         }
 
-        public PaginatedList<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize)
-        {
-            var result = SelectAvailablePayInterfaceList(wayCode, appId, infoType, mchType);
-            var records = PaginatedList<AvailablePayInterfaceDto>.Create(result, pageNumber, pageSize);
-            return records;
-        }
-
         /// <summary>
         /// 根据支付方式查询可用的支付接口列表
         /// </summary>
@@ -76,7 +75,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoType"></param>
         /// <param name="mchType"></param>
         /// <returns></returns>
-        public IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType)
+        public async Task<PaginatedList<AvailablePayInterfaceDto>> SelectAvailablePayInterfaceListAsync(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize)
         {
             //var result = _payInterfaceDefineRepository.GetAll()
             //    .Join(_payInterfaceDefineRepository.GetAll<PayInterfaceConfig>(),
@@ -110,7 +109,7 @@ namespace AGooday.AgPay.Application.Services
                 {
                     item.IfRate = item.IfRate ?? item.IfRate * 100;
                     item.PayWayFee = _payRateConfigService.GetPayRateConfigItem(configType, infoType, appId, item.IfCode, wayCode);
-                    var payPassage = mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).FirstOrDefault();
+                    var payPassage = await mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).FirstOrDefaultAsync();
                     if (payPassage != null)
                     {
                         item.PassageId = payPassage.Id;
@@ -119,14 +118,15 @@ namespace AGooday.AgPay.Application.Services
                     }
                 }
             }
-            return result;
+            var records = PaginatedList<AvailablePayInterfaceDto>.Create(result, pageNumber, pageSize);
+            return records;
         }
 
-        public void SetMchPassage(string mchNo, string appId, string wayCode, string ifCode, byte state)
+        public async Task<bool> SetMchPassageAsync(string mchNo, string appId, string wayCode, string ifCode, byte state)
         {
             var mchPayPassages = _mchPayPassageRepository.GetAll()
                 .Where(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.WayCode.Equals(wayCode));
-            var mchPayPassage = mchPayPassages.FirstOrDefault(w => w.IfCode.Equals(ifCode));
+            var mchPayPassage = await mchPayPassages.FirstOrDefaultAsync(w => w.IfCode.Equals(ifCode));
             if (mchPayPassage == null)
             {
                 mchPayPassage = new MchPayPassage()
@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Application.Services
                     State = state,
                     CreatedAt = DateTime.Now,
                 };
-                _mchPayPassageRepository.Add(mchPayPassage);
+                await _mchPayPassageRepository.AddAsync(mchPayPassage);
             }
             else
             {
@@ -156,10 +156,10 @@ namespace AGooday.AgPay.Application.Services
                     _mchPayPassageRepository.Update(item);
                 }
             }
-            _mchPayPassageRepository.SaveChanges();
+            return await _mchPayPassageRepository.SaveChangesAsync() > 0;
         }
 
-        public void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo)
+        public async Task<bool> SaveOrUpdateBatchSelfAsync(List<MchPayPassageDto> mchPayPassages, string mchNo)
         {
             var _smchPayPassages = _mchPayPassageRepository.GetAllAsNoTracking()
                 .Where(w => w.MchNo.Equals(mchNo) && mchPayPassages.Select(s => s.Id).Contains(w.Id));
@@ -175,13 +175,13 @@ namespace AGooday.AgPay.Application.Services
                     payPassage.MchNo = mchNo;
                 }
                 payPassage.Rate = payPassage.Rate / 100;
-                var _payPassage = _smchPayPassages.Where(w => w.Id.Equals(payPassage.Id)).FirstOrDefault();
+                var _payPassage = await _smchPayPassages.Where(w => w.Id.Equals(payPassage.Id)).FirstOrDefaultAsync();
                 payPassage.CreatedAt = _payPassage?.CreatedAt ?? DateTime.Now;
                 payPassage.UpdatedAt = payPassage.UpdatedAt ?? DateTime.Now;
                 var m = _mapper.Map<MchPayPassage>(payPassage);
                 _mchPayPassageRepository.SaveOrUpdate(m, payPassage.Id);
             }
-            _mchPayPassageRepository.SaveChanges();
+            return await _mchPayPassageRepository.SaveChangesAsync() > 0;
         }
 
 
@@ -192,12 +192,11 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="appId"></param>
         /// <param name="wayCode"></param>
         /// <returns></returns>
-        public MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode)
+        public async Task<MchPayPassageDto> FindMchPayPassageAsync(string mchNo, string appId, string wayCode)
         {
-            var entity = _mchPayPassageRepository.GetAll().Where(w => w.State.Equals(CS.YES)
-            && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.WayCode.Equals(wayCode)).FirstOrDefault();
-            var dto = _mapper.Map<MchPayPassageDto>(entity);
-            return dto;
+            var entity = await _mchPayPassageRepository.GetAllAsNoTracking().Where(w => w.State.Equals(CS.YES)
+            && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && w.WayCode.Equals(wayCode)).FirstOrDefaultAsync();
+            return _mapper.Map<MchPayPassageDto>(entity);
         }
 
         /// <summary>
@@ -207,22 +206,24 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="appId"></param>
         /// <param name="wayCode"></param>
         /// <returns></returns>
-        public MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode, long amount, string bankCardType = null)
+        public async Task<MchPayPassageDto> FindMchPayPassageAsync(string mchNo, string appId, string wayCode, long amount, string bankCardType = null)
         {
             var configType = CS.CONFIG_TYPE.MCHRATE;
             var infoType = CS.INFO_TYPE.MCH_APP;
             var payRateConfigs = _payRateConfigRepository.GetByInfoIdAsNoTracking(configType, infoType, appId);
             var ifCodes = payRateConfigs.Where(w => w.WayCode.Equals(wayCode)).Select(s => s.IfCode).Distinct().ToList();
 
-            var entity = _mchPayPassageRepository.GetAllAsNoTracking().Where(w => w.State.Equals(CS.YES)
-            && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && ifCodes.Contains(w.IfCode) && w.WayCode.Equals(wayCode)).FirstOrDefault();
+            var entity = await _mchPayPassageRepository.GetAllAsNoTracking()
+                .Where(w => w.State.Equals(CS.YES)
+                && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId) && ifCodes.Contains(w.IfCode) && w.WayCode.Equals(wayCode))
+                .FirstOrDefaultAsync();
 
             if (entity == null)
             {
                 return null;
             }
             var dto = _mapper.Map<MchPayPassageDto>(entity);
-            var payRateConfig = payRateConfigs.FirstOrDefault(w => w.IfCode.Equals(dto.IfCode) && w.WayCode.Equals(wayCode));
+            var payRateConfig = await payRateConfigs.FirstOrDefaultAsync(w => w.IfCode.Equals(dto.IfCode) && w.WayCode.Equals(wayCode));
             if (payRateConfig.FeeType.Equals(CS.FEE_TYPE_SINGLE))
             {
                 dto.Rate = payRateConfig.FeeRate.Value;
@@ -234,12 +235,12 @@ namespace AGooday.AgPay.Application.Services
                 PayRateLevelConfig payRateLevelConfig = null;
                 if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_NORMAL))
                 {
-                    payRateLevelConfig = payRateLevelConfigs.FirstOrDefault(w => string.IsNullOrEmpty(w.BankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
+                    payRateLevelConfig = await payRateLevelConfigs.FirstOrDefaultAsync(w => string.IsNullOrEmpty(w.BankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
                 }
 
                 if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY))
                 {
-                    payRateLevelConfig = payRateLevelConfigs.FirstOrDefault(w => w.BankCardType.Equals(bankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
+                    payRateLevelConfig = await payRateLevelConfigs.FirstOrDefaultAsync(w => w.BankCardType.Equals(bankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
                 }
 
                 if (payRateLevelConfig == null)
@@ -253,11 +254,6 @@ namespace AGooday.AgPay.Application.Services
                 dto.RateDesc = $"({payRateLevelConfig.MinAmount / 100M:F2}元-{payRateLevelConfig.MaxAmount / 100M:F2}元]{modeName}费率: {dto.Rate * 100:F4}%, 保底{payRateLevelConfig.MinFee / 100M:F2}元, 封顶{payRateLevelConfig.MaxFee / 100M:F2}元";
             }
             return dto;
-        }
-
-        public Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode)
-        {
-            return _mchPayPassageRepository.IsExistMchPayPassageUseWayCodeAsync(wayCode);
         }
     }
 }

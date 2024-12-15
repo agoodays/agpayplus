@@ -13,12 +13,12 @@ namespace AGooday.AgPay.Components.Third.Services
     public class ChannelOrderReissueService
     {
         private readonly ILogger<ChannelOrderReissueService> _logger;
-        private readonly IChannelServiceFactory<IPayOrderQueryService> _payOrderQueryServiceFactory;
+        private readonly IPayOrderService _payOrderService;
         private readonly IChannelServiceFactory<IRefundService> _refundServiceFactory;
-        private readonly ConfigContextQueryService configContextQueryService;
-        private readonly PayOrderProcessService payOrderProcessService;
-        private readonly RefundOrderProcessService refundOrderProcessService;
-        private readonly IPayOrderService payOrderService;
+        private readonly IChannelServiceFactory<IPayOrderQueryService> _payOrderQueryServiceFactory;
+        private readonly ConfigContextQueryService _configContextQueryService;
+        private readonly PayOrderProcessService _payOrderProcessService;
+        private readonly RefundOrderProcessService _refundOrderProcessService;
 
         public ChannelOrderReissueService(ILogger<ChannelOrderReissueService> logger,
             IChannelServiceFactory<IPayOrderQueryService> payOrderQueryServiceFactory,
@@ -28,13 +28,13 @@ namespace AGooday.AgPay.Components.Third.Services
             RefundOrderProcessService refundOrderProcessService,
             IPayOrderService payOrderService)
         {
-            this.configContextQueryService = configContextQueryService;
-            this.payOrderProcessService = payOrderProcessService;
-            this.refundOrderProcessService = refundOrderProcessService;
-            this.payOrderService = payOrderService;
             _logger = logger;
-            _payOrderQueryServiceFactory = payOrderQueryServiceFactory;
+            _payOrderService = payOrderService;
             _refundServiceFactory = refundServiceFactory;
+            _payOrderQueryServiceFactory = payOrderQueryServiceFactory;
+            _configContextQueryService = configContextQueryService;
+            _payOrderProcessService = payOrderProcessService;
+            _refundOrderProcessService = refundOrderProcessService;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// </summary>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        public ChannelRetMsg ProcessPayOrder(PayOrderDto payOrder)
+        public async Task<ChannelRetMsg> ProcessPayOrderAsync(PayOrderDto payOrder)
         {
             try
             {
@@ -59,9 +59,9 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //查询出商户应用的配置信息
-                MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId);
 
-                ChannelRetMsg channelRetMsg = queryService.Query(payOrder, mchAppConfigContext);
+                ChannelRetMsg channelRetMsg = await queryService.QueryAsync(payOrder, mchAppConfigContext);
                 if (channelRetMsg == null)
                 {
                     _logger.LogError("channelRetMsg is null");
@@ -73,17 +73,17 @@ namespace AGooday.AgPay.Components.Third.Services
                 // 查询成功
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
-                    if (payOrderService.UpdateIng2Success(payOrderId, channelRetMsg.ChannelMchNo, channelRetMsg.ChannelIsvNo, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.PlatformOrderId, channelRetMsg.PlatformMchOrderId))
+                    if (await _payOrderService.UpdateIng2SuccessAsync(payOrderId, channelRetMsg.ChannelMchNo, channelRetMsg.ChannelIsvNo, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.PlatformOrderId, channelRetMsg.PlatformMchOrderId))
                     {
                         //订单支付成功，其他业务逻辑
-                        payOrderProcessService.ConfirmSuccess(payOrder);
+                        await _payOrderProcessService.ConfirmSuccessAsync(payOrder);
                     }
                 }
                 //确认失败
                 else if (channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
                 {
                     //1. 更新支付订单表为失败状态
-                    payOrderService.UpdateIng2Fail(payOrderId, channelRetMsg.ChannelMchNo, channelRetMsg.ChannelIsvNo, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.PlatformOrderId, channelRetMsg.PlatformMchOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
+                    await _payOrderService.UpdateIng2FailAsync(payOrderId, channelRetMsg.ChannelMchNo, channelRetMsg.ChannelIsvNo, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelUserId, channelRetMsg.PlatformOrderId, channelRetMsg.PlatformMchOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
                 }
 
                 return channelRetMsg;
@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// </summary>
         /// <param name="refundOrder"></param>
         /// <returns></returns>
-        public ChannelRetMsg ProcessRefundOrder(RefundOrderDto refundOrder)
+        public async Task<ChannelRetMsg> ProcessRefundOrderAsync(RefundOrderDto refundOrder)
         {
             try
             {
@@ -116,9 +116,9 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //查询出商户应用的配置信息
-                MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(refundOrder.MchNo, refundOrder.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(refundOrder.MchNo, refundOrder.AppId);
 
-                ChannelRetMsg channelRetMsg = queryService.Query(refundOrder, mchAppConfigContext);
+                ChannelRetMsg channelRetMsg = await queryService.QueryAsync(refundOrder, mchAppConfigContext);
                 if (channelRetMsg == null)
                 {
                     _logger.LogError("退款补单：channelRetMsg is null");
@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 _logger.LogInformation($"退款补单：[{refundOrderId}]查询结果为：{channelRetMsg}");
                 // 根据渠道返回结果，处理退款订单
-                refundOrderProcessService.HandleRefundOrder4Channel(channelRetMsg, refundOrder);
+                await _refundOrderProcessService.HandleRefundOrder4ChannelAsync(channelRetMsg, refundOrder);
 
                 return channelRetMsg;
             }

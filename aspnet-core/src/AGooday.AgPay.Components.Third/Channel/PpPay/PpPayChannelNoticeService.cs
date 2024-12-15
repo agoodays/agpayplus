@@ -29,13 +29,13 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             return CS.IF_CODE.PPPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             // 同步和异步需要不同的解析方案
             // 异步需要从 webhook 中读取，所以这里读取方式不太一样
             if (noticeTypeEnum == NoticeTypeEnum.DO_NOTIFY)
             {
-                JObject paramsObj = JObject.Parse(GetReqParamJSON().ToString());
+                JObject paramsObj = await GetReqParamJSONAsync();
                 string orderId = paramsObj.SelectToken("resource.purchase_units[0].invoice_id")?.ToString();
                 return new Dictionary<string, object>() { { orderId, paramsObj } };
             }
@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
                 }
                 try
                 {
-                    JObject paramsObj = JObject.Parse(GetReqParamJSON().ToString());
+                    JObject paramsObj = JObject.Parse(GetReqParamJSONAsync().ToString());
                     return new Dictionary<string, object>() { { urlOrderId, paramsObj } };
                 }
                 catch (Exception e)
@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object parameters, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
+        public override Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object parameters, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -75,22 +75,22 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             }
         }
 
-        public ChannelRetMsg DoReturn(HttpRequest request, object parameters, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public Task<ChannelRetMsg> DoReturn(HttpRequest request, object parameters, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject obj = JObject.FromObject(parameters); ;
             // 获取 Paypal 订单 ID
             string ppOrderId = obj.GetValue("token")?.ToString();
             // 统一处理订单
-            return mchAppConfigContext.GetPaypalWrapper().ProcessOrder(ppOrderId, payOrder);
+            return mchAppConfigContext.GetPaypalWrapper().ProcessOrderAsync(ppOrderId, payOrder);
         }
 
-        public ChannelRetMsg DoNotify(HttpRequest request, object parameters, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public Task<ChannelRetMsg> DoNotify(HttpRequest request, object parameters, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject obj = JObject.FromObject(parameters);
             // 获取 Paypal 订单 ID
             string ppOrderId = obj.SelectToken("resource.id")?.ToString();
             // 统一处理订单
-            return mchAppConfigContext.GetPaypalWrapper().ProcessOrder(ppOrderId, payOrder, true);
+            return mchAppConfigContext.GetPaypalWrapper().ProcessOrderAsync(ppOrderId, payOrder, true);
         }
     }
 }

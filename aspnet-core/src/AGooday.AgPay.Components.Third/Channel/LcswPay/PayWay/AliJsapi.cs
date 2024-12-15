@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【利楚扫呗(alipayJs)jsapi支付】";
             AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay.PayWay
             reqParams.Add("open_id", bizRQ.GetChannelUserId()); // 用户标识（微信openid，支付宝userid），pay_type为010及020时必填
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/pay/open/jspay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/pay/open/jspay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string returnCode = resJSON.GetValue("return_code").ToString(); //请求响应码
             string returnMsg = resJSON.GetValue("return_msg").ToString(); //响应信息

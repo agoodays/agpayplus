@@ -23,12 +23,12 @@ namespace AGooday.AgPay.Application.Services
             _sysEntitlementRepository = sysEntitlementRepository;
         }
 
-        public override bool Update(SysEntitlementDto dto)
+        public override async Task<bool> UpdateAsync(SysEntitlementDto dto)
         {
             var entity = _mapper.Map<SysEntitlement>(dto);
             entity.UpdatedAt = DateTime.Now;
             _sysEntitlementRepository.Update(entity);
-            return _sysEntitlementRepository.SaveChanges(out int _);
+            return await _sysEntitlementRepository.SaveChangesAsync() > 0;
         }
 
         public SysEntitlementDto GetByKeyAsNoTracking(string entId, string sysType)

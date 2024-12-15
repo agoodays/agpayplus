@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【随行付(wechat)二维码支付】";
             WxNativeOrderRQ bizRQ = (WxNativeOrderRQ)rq;
@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
             res.ChannelRetMsg = channelRetMsg;
 
             // 请求参数赋值
-            SxfPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
             /*支付渠道，枚举值
             取值范围：
@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay.PayWay
             reqParams.Add("notifyUrl", GetNotifyUrl()); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/order/activeScan", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/order/activeScan", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("code").ToString(); //请求响应码
             string msg = resJSON.GetValue("msg").ToString(); //响应信息

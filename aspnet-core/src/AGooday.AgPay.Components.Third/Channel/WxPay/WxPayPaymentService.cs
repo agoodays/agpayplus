@@ -42,18 +42,18 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             // 微信API版本
-            WxServiceWrapper wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+            WxServiceWrapper wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
             string apiVersion = wxServiceWrapper.Config.ApiVersion;
             if (CS.PAY_IF_VERSION.WX_V2.Equals(apiVersion))
             {
-                return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+                return await PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
             }
             else if (CS.PAY_IF_VERSION.WX_V3.Equals(apiVersion))
             {
-                return PayWayUtil.GetRealPayWayV3Service(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+                return await PayWayUtil.GetRealPayWayV3Service(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
             }
             else
             {
@@ -66,9 +66,9 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public CreatePayUnifiedOrderRequest BuildUnifiedOrderRequest(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, out WxServiceWrapper wxServiceWrapper)
+        public async Task<(CreatePayUnifiedOrderRequest request, WxServiceWrapper wxServiceWrapper)> BuildUnifiedOrderRequestAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+            var wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
 
             // 微信统一下单请求对象
             var request = new CreatePayUnifiedOrderRequest()
@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             //放置isv信息
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                var isvSubMchParams = (WxPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                var isvSubMchParams = (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
                 request.SubMerchantId = isvSubMchParams.SubMchId;
                 // 子商户subAppId不为空
                 if (!string.IsNullOrEmpty(isvSubMchParams.SubMchAppId))
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                 }
             }
 
-            return request;
+            return (request, wxServiceWrapper);
         }
     }
 }

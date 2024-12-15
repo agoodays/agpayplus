@@ -7,6 +7,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -25,43 +26,43 @@ namespace AGooday.AgPay.Application.Services
             _qrCodeRepository = qrCodeRepository;
         }
 
-        public override bool Add(QrCodeDto dto)
+        public override async Task<bool> AddAsync(QrCodeDto dto)
         {
             var entity = _mapper.Map<QrCode>(dto);
             entity.State = CS.YES;
             entity.CreatedAt = DateTime.Now;
             entity.UpdatedAt = DateTime.Now;
-            _qrCodeRepository.Add(entity);
-            return _qrCodeRepository.SaveChanges(out int _);
+            await _qrCodeRepository.AddAsync(entity);
+            return await _qrCodeRepository.SaveChangesAsync() > 0;
         }
 
-        public override bool Update(QrCodeDto dto)
+        public override async Task<bool> UpdateAsync(QrCodeDto dto)
         {
             var entity = _mapper.Map<QrCode>(dto);
             entity.UpdatedAt = DateTime.Now;
             _qrCodeRepository.Update(entity);
-            return _qrCodeRepository.SaveChanges(out int _);
+            return await _qrCodeRepository.SaveChangesAsync() > 0;
         }
 
-        public QrCodeDto GetByIdAsNoTracking(string recordId)
+        public async Task<QrCodeDto> GetByIdAsNoTrackingAsync(string recordId)
         {
-            var entity = _qrCodeRepository.GetByIdAsNoTracking(recordId);
+            var entity = await _qrCodeRepository.GetByIdAsNoTrackingAsync(recordId);
             var dto = _mapper.Map<QrCodeDto>(entity);
             return dto;
         }
 
-        public string BatchIdDistinctCount()
+        public async Task<string> BatchIdDistinctCountAsync()
         {
             var batchIdPrefix = DateTime.Now.ToString("yyyyMMdd");
-            var qrCodes = _qrCodeRepository.GetAllAsNoTracking()
+            var qrCodes = await _qrCodeRepository.GetAllAsNoTracking()
                 .Where(w => (w.BatchId ?? string.Empty).StartsWith(batchIdPrefix))
-                .OrderByDescending(o => o.BatchId).FirstOrDefault();
+                .OrderByDescending(o => o.BatchId).FirstOrDefaultAsync();
             return $"{Convert.ToInt64(qrCodes?.BatchId ?? $"{batchIdPrefix}00") + 1}";
         }
 
-        public bool BatchAdd(QrCodeAddDto dto)
+        public async Task<bool> BatchAddAsync(QrCodeAddDto dto)
         {
-            if (_qrCodeRepository.IsExistBatchId(dto.BatchId))
+            if (await _qrCodeRepository.IsExistBatchIdAsync(dto.BatchId))
             {
                 throw new BizException("批次号已存在，请重新填写");
             }
@@ -69,25 +70,25 @@ namespace AGooday.AgPay.Application.Services
             {
                 var entity = _mapper.Map<QrCode>(dto);
                 entity.QrcId = $"{dto.BatchId}{i:D4}";
-                _qrCodeRepository.Add(entity);
+                await _qrCodeRepository.AddAsync(entity);
             }
-            return _qrCodeRepository.SaveChanges(out int _);
+            return await _qrCodeRepository.SaveChangesAsync() > 0;
         }
 
-        public bool UnBind(string recordId)
+        public async Task<bool> UnBindAsync(string recordId)
         {
-            var entity = _qrCodeRepository.GetById(recordId);
+            var entity = await _qrCodeRepository.GetByIdAsync(recordId);
             entity.BindState = CS.NO;
             entity.MchNo = null;
             entity.AppId = null;
             entity.StoreId = null;
             _qrCodeRepository.Update(entity);
-            return _qrCodeRepository.SaveChanges(out int _);
+            return await _qrCodeRepository.SaveChangesAsync() > 0;
         }
 
-        public async Task<PaginatedList<QrCodeDto>> GetPaginatedDataAsync(QrCodeQueryDto dto)
+        public Task<PaginatedList<QrCodeDto>> GetPaginatedDataAsync(QrCodeQueryDto dto)
         {
-            var QrCodes = _qrCodeRepository.GetAllAsNoTracking()
+            var query = _qrCodeRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.QrcId) || w.QrcId.Equals(dto.QrcId))
                 && (string.IsNullOrWhiteSpace(dto.BatchId) || w.MchNo.Equals(dto.BatchId))
                 && (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
@@ -95,9 +96,9 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.State.Equals(null) || w.State.Equals(dto.State))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<QrCode>.CreateAsync<QrCodeDto>(QrCodes, _mapper, dto.PageNumber, dto.PageSize);
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                .OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<QrCode>.CreateAsync<QrCodeDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

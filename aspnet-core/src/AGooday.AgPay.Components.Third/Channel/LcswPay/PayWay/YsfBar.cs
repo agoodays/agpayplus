@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【利楚扫呗条码(unionpay)支付】";
             YsfBarOrderRQ bizRQ = (YsfBarOrderRQ)rq;
@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay.PayWay
             // 利楚扫呗 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder);
 
-            var channelRetMsg = LcswBar(reqParams, logPrefix, mchAppConfigContext);
+            var channelRetMsg = await BarAsync(reqParams, logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }

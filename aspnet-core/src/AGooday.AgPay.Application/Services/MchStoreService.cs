@@ -23,11 +23,11 @@ namespace AGooday.AgPay.Application.Services
             _mchInfoRepository = mchInfoRepository;
         }
 
-        public override bool Add(MchStoreDto dto)
+        public override async Task<bool> AddAsync(MchStoreDto dto)
         {
             var entity = _mapper.Map<MchStore>(dto);
-            _mchStoreRepository.Add(entity);
-            var result = _mchStoreRepository.SaveChanges(out int _);
+            await _mchStoreRepository.AddAsync(entity);
+            var result = await _mchStoreRepository.SaveChangesAsync() > 0;
             dto.StoreId = entity.StoreId;
             return result;
         }
@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
         }
 
-        public async Task<PaginatedList<MchStoreListDto>> GetPaginatedDataAsync(MchStoreQueryDto dto, List<long> storeIds = null)
+        public Task<PaginatedList<MchStoreListDto>> GetPaginatedDataAsync(MchStoreQueryDto dto, List<long> storeIds = null)
         {
             var query = _mchStoreRepository.GetAllAsNoTracking()
                 .Join(_mchInfoRepository.GetAllAsNoTracking(),
@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.mi.AgentNo.Equals(dto.AgentNo)))
                 .OrderByDescending(o => o.ms.CreatedAt);
 
-            var records = await PaginatedList<MchStoreListDto>.CreateAsync(query, s =>
+            var records = PaginatedList<MchStoreListDto>.CreateAsync(query, s =>
             {
                 var item = _mapper.Map<MchStoreListDto>(s.ms);
                 item.MchName = s.mi.MchName;

@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -52,11 +52,11 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg AllinBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BarAsync(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/apiweb/unitorder/scanqrpay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/apiweb/unitorder/scanqrpay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("retcode").ToString(); //请求响应码
             string msg = resJSON.GetValue("retmsg").ToString(); //响应信息
@@ -115,7 +115,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetAllinPayHost4env(byte? sandbox)
+        public static string GetHost4env(byte? sandbox)
         {
             return CS.YES == sandbox ? AllinPayConfig.SANDBOX_SERVER_URL : AllinPayConfig.PROD_SERVER_URL;
         }
@@ -129,14 +129,14 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             byte? sandbox;
             string signType, orgid = null, cusid, appid, privateKey, publicKey;
             if (mchAppConfigContext.IsIsvSubMch())
             {
                 // 获取支付参数
-                AllinPayIsvParams isvParams = (AllinPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                AllinPayIsvParams isvParams = (AllinPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
                 if (isvParams.Orgid == null)
                 {
@@ -144,7 +144,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
                     throw new BizException("服务商配置为空。");
                 }
 
-                AllinPayIsvSubMchParams isvsubMchParams = (AllinPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                AllinPayIsvSubMchParams isvsubMchParams = (AllinPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
                 sandbox = isvParams.Sandbox;
                 signType = isvParams.SignType;
                 orgid = isvParams.Orgid;
@@ -156,7 +156,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             else
             {
                 // 获取支付参数
-                AllinPayNormalMchParams normalMchParams = (AllinPayNormalMchParams)_configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                AllinPayNormalMchParams normalMchParams = (AllinPayNormalMchParams)await _configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
                 sandbox = normalMchParams.Sandbox;
                 signType = normalMchParams.SignType;
                 cusid = normalMchParams.Cusid;
@@ -177,10 +177,10 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             reqParams.Add("sign", AllinSignUtil.Sign(reqParams, privateKey));
 
             // 调起上游接口
-            string url = GetAllinPayHost4env(sandbox) + apiUri;
+            string url = GetHost4env(sandbox) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = AllinHttpUtil.DoPostJson(url, reqParams);
+            string resText = await AllinHttpUtil.DoPostJsonAsync(url, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -207,7 +207,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
         /// <param name="returnUrl"></param>
         public static void UnifiedParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
-            AllinPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             string payType = AllinPayEnum.GetPayType(payOrder.WayCode);
             reqParams.Add("paytype", payType);
             //var maxvalidtime = payOrder.WayType.Equals(PayWayType.WECHAT.ToString()) ? 120 : 1440;
@@ -224,7 +224,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
         /// <param name="payOrder"></param>
         public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl)
         {
-            AllinPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             reqParams.Add("notify_url", notifyUrl); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
         }
 
@@ -233,7 +233,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void AllinPublicParams(JObject reqParams, PayOrderDto payOrder)
+        public static void PublicParams(JObject reqParams, PayOrderDto payOrder)
         {
             reqParams.Add("reqsn", payOrder.PayOrderId);
             reqParams.Add("trxamt", payOrder.Amount);

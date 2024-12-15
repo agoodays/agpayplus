@@ -32,21 +32,21 @@ namespace AGooday.AgPay.Application.Services
             _sysRoleEntRelaRepository = sysRoleEntRelaRepository;
         }
 
-        public async Task AddAsync(SysRoleCreateDto dto)
+        public async Task<bool> AddAsync(SysRoleCreateDto dto)
         {
             var entity = _mapper.Map<SysRole>(dto);
             await _sysRoleRepository.AddAsync(entity);
-            await _sysRoleRepository.SaveChangesAsync();
+            return await _sysRoleRepository.SaveChangesAsync() > 0;
         }
 
-        public async Task UpdateAsync(SysRoleModifyDto dto)
+        public async Task<bool> UpdateAsync(SysRoleModifyDto dto)
         {
             var entity = _mapper.Map<SysRole>(dto);
             _sysRoleRepository.Update(entity);
-            await _sysRoleRepository.SaveChangesAsync();
+            return await _sysRoleRepository.SaveChangesAsync() > 0;
         }
 
-        public async Task RemoveRoleAsync(string roleId)
+        public async Task<bool> RemoveRoleAsync(string roleId)
         {
             if (await _sysUserRoleRelaRepository.IsAssignedToUserAsync(roleId))
             {
@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Application.Services
             //删除关联表
             _sysRoleEntRelaRepository.RemoveByRoleId(roleId);
 
-            await _sysRoleEntRelaRepository.SaveChangesAsync();
+            return await _sysRoleEntRelaRepository.SaveChangesAsync() > 0;
         }
 
         public async Task<SysRoleDto> GetByIdAsync(string recordId, string belongInfoId)
@@ -69,19 +69,19 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public async Task<PaginatedList<SysRoleDto>> GetPaginatedDataAsync(SysRoleQueryDto dto)
+        public Task<PaginatedList<SysRoleDto>> GetPaginatedDataAsync(SysRoleQueryDto dto)
         {
-            var sysRoles = _sysRoleRepository.GetAllAsNoTracking()
+            var query = _sysRoleRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.RoleName) || w.RoleName.Contains(dto.RoleName))
                 && (string.IsNullOrWhiteSpace(dto.RoleId) || w.RoleId.Equals(dto.RoleId))
                 && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
-                && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Equals(dto.BelongInfoId))
-                ).OrderByDescending(o => o.UpdatedAt);
+                && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Equals(dto.BelongInfoId)))
+                .OrderByDescending(o => o.UpdatedAt);
             if (!string.IsNullOrEmpty(dto.SortField) && !string.IsNullOrEmpty(dto.SortOrder))
             {
-                sysRoles = sysRoles.OrderBy(dto.SortField, dto.SortOrder.Equals(PageQuery.DESCEND, StringComparison.OrdinalIgnoreCase));
+                query = query.OrderBy(dto.SortField, dto.SortOrder.Equals(PageQuery.DESCEND, StringComparison.OrdinalIgnoreCase));
             }
-            var records = await PaginatedList<SysRole>.CreateAsync<SysRoleDto>(sysRoles, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysRole>.CreateAsync<SysRoleDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

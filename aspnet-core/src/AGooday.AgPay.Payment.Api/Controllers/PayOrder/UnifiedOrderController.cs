@@ -47,12 +47,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         public async Task<ActionResult<ApiRes>> UnifiedOrderAsync()
         {
             //获取参数 & 验签
-            UnifiedOrderRQ rq = GetRQByWithMchSign<UnifiedOrderRQ>();
+            UnifiedOrderRQ rq = await this.GetRQByWithMchSignAsync<UnifiedOrderRQ>();
 
-            UnifiedOrderRQ bizRQ = BuildBizRQ(rq);
+            UnifiedOrderRQ bizRQ = await this.BuildBizRQAsync(rq);
 
             //实现子类的res
-            ApiRes apiRes = await UnifiedOrderAsync(bizRQ.WayCode, bizRQ);
+            ApiRes apiRes = await this.UnifiedOrderAsync(bizRQ.WayCode, bizRQ);
             if (apiRes.Data == null)
             {
                 return apiRes;
@@ -71,9 +71,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 res.PayData = bizRes.BuildPayData();
             }
 
-            return ApiRes.OkWithSign(res, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(res, rq.SignType, (await _configContextQueryService.QueryMchAppAsync(rq.MchNo, rq.AppId)).AppSecret);
         }
-        private UnifiedOrderRQ BuildBizRQ(UnifiedOrderRQ rq)
+        private async Task<UnifiedOrderRQ> BuildBizRQAsync(UnifiedOrderRQ rq)
         {
             //支付方式  比如： ali_bar
             string wayCode = rq.WayCode;
@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 rq.WayCode = wayCode.Trim();
             }
 
-            if (!_payWayService.IsExistPayWayCode(wayCode))
+            if (!await _payWayService.IsExistPayWayCodeAsync(wayCode))
             {
                 throw new BizException("不支持的支付方式");
             }

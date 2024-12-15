@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="request">HTTP 请求</param>
         /// <param name="urlOrderId">转账单号</param>
         /// <returns>转账单号和请求参数的键值对</returns>
-        Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId);
+        Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId);
 
         /// <summary>
         /// 执行通知处理
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="transferOrder">转账订单</param>
         /// <param name="mchAppConfigContext">商户应用配置上下文</param>
         /// <returns>需要更新的订单状态和响应数据</returns>
-        ChannelRetMsg DoNotice(HttpRequest request, object parameters, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext);
+        Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object parameters, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext);
 
         /// <summary>
         /// 数据库订单数据不存在（仅用于异步通知）

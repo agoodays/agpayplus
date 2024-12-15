@@ -2,6 +2,7 @@
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -12,14 +13,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo)
+        public Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchRefundNo)
         {
-            return GetAllAsNoTracking().Any(c => c.MchNo.Equals(mchNo) && c.MchRefundNo.Equals(mchRefundNo));
+            return GetAllAsNoTracking().AnyAsync(c => c.MchNo.Equals(mchNo) && c.MchRefundNo.Equals(mchRefundNo));
         }
 
-        public bool IsExistRefundingOrder(string payOrderId)
+        public Task<bool> IsExistRefundingOrderAsync(string payOrderId)
         {
-            return GetAllAsNoTracking().Any(c => c.PayOrderId.Equals(payOrderId) && c.State.Equals((byte)RefundOrderState.STATE_ING));
+            return GetAllAsNoTracking().AnyAsync(c => c.PayOrderId.Equals(payOrderId) && c.State.Equals((byte)RefundOrderState.STATE_ING));
         }
     }
 }

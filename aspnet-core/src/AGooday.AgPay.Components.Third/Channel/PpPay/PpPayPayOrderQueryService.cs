@@ -24,9 +24,9 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             return CS.IF_CODE.PPPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return _configContextQueryService.GetPaypalWrapper(mchAppConfigContext).ProcessOrder(null, payOrder);
+            return await (await _configContextQueryService.GetPaypalWrapperAsync(mchAppConfigContext)).ProcessOrderAsync(null, payOrder);
         }
     }
 }

@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Application.Services
@@ -40,9 +41,9 @@ namespace AGooday.AgPay.Application.Services
             _mapper = mapper;
         }
 
-        public SysUserDto GetUserById(long userId)
+        public async Task<SysUserDto> GetUserByIdAsync(long userId)
         {
-            var entity = _sysUserRepository.GetById(userId);
+            var entity = await _sysUserRepository.GetByIdAsync(userId);
             var dto = _mapper.Map<SysUserDto>(entity);
             return dto;
         }
@@ -65,7 +66,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public IEnumerable<SysUserRoleRelaDto> GetUserRolesByUserId(long userId)
         {
-            var userRoles = _sysUserRoleRelaRepository.GetAll()
+            var userRoles = _sysUserRoleRelaRepository.GetAllAsNoTracking()
                 .Where(w => w.UserId == userId);
             return _mapper.Map<IEnumerable<SysUserRoleRelaDto>>(userRoles);
         }
@@ -183,16 +184,16 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="userId"></param>
         /// <param name="sysType"></param>
         /// <returns></returns>
-        public bool UserHasLeftMenu(long userId, string sysType)
+        public Task<bool> UserHasLeftMenuAsync(long userId, string sysType)
         {
             var result = _sysRoleEntRelaRepository.GetAllAsNoTracking<SysUserRoleRela>()
                 .Join(_sysRoleEntRelaRepository.GetAllAsNoTracking(),
                 ur => ur.RoleId, re => re.RoleId,
                 (ur, re) => new { ur.UserId, re.EntId })
-                .Join(_sysRoleEntRelaRepository.GetAll<SysEntitlement>(),
+                .Join(_sysRoleEntRelaRepository.GetAllAsNoTracking<SysEntitlement>(),
                     ue => ue.EntId, ent => ent.EntId,
                     (ue, ent) => new { ue.UserId, ent.EntId, ent.EntType, ent.SysType, ent.State })
-                .Any(w => w.UserId.Equals(userId)
+                .AnyAsync(w => w.UserId.Equals(userId)
                 && w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE) && w.EntType.Equals(CS.ENT_TYPE.MENU_LEFT));
 
             return result;

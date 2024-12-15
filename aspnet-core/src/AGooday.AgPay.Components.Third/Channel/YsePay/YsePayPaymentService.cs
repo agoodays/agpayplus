@@ -44,9 +44,9 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -54,12 +54,12 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg YseBar(SortedDictionary<string, string> reqParams, string notifyUrl, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BarAsync(SortedDictionary<string, string> reqParams, string notifyUrl, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                YsePayIsvParams isvParams = (YsePayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                YsePayIsvParams isvParams = (YsePayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
                 if (isvParams.PartnerId == null)
                 {
@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             }
             // 发送请求
             string method = "ysepay.online.barcodepay", repMethod = "ysepay_online_barcodepay_response";
-            JObject resJSON = PackageParamAndReq(YsePayConfig.QRCODE_GATEWAY, method, repMethod, reqParams, notifyUrl, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync(YsePayConfig.QRCODE_GATEWAY, method, repMethod, reqParams, notifyUrl, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             var data = resJSON.GetValue(repMethod)?.ToObject<JObject>();
             string code = data?.GetValue("code").ToString();
@@ -151,13 +151,13 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, string method, string repMethod, SortedDictionary<string, string> reqData, string notifyUrl, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, string method, string repMethod, SortedDictionary<string, string> reqData, string notifyUrl, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             // 签名
             string partnerId, businessCode, privateKeyFilePath, privateKeyPassword, publicKeyFilePath;
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                YsePayIsvParams isvParams = (YsePayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                YsePayIsvParams isvParams = (YsePayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
                 if (isvParams.PartnerId == null)
                 {
@@ -175,7 +175,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
                 throw new BizException("不支持普通商户配置");
             }
 
-            YsePayIsvSubMchParams isvsubMchParams = (YsePayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            YsePayIsvSubMchParams isvsubMchParams = (YsePayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             reqData.Add("seller_id", isvsubMchParams.SellerId);
             reqData.Add("seller_name", isvsubMchParams.SellerName);
             //reqData.Add("business_code", businessCode);
@@ -205,7 +205,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             var stopwatch = new Stopwatch();
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} reqText={JsonConvert.SerializeObject(reqParams)} ");
             stopwatch.Restart();
-            string resText = YseHttpUtil.DoPostFrom(url, reqText);
+            string resText = await YseHttpUtil.DoPostFromAsync(url, reqText);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} resJSON={resText} time={stopwatch.ElapsedMilliseconds}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -232,7 +232,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
         /// <param name="returnUrl"></param>
         public static void UnifiedParamsSet(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
-            YsePublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             //reqParams.Add("notify_url", notifyUrl); //交易异步通知地址，http或https开头。
         }
 
@@ -243,7 +243,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
         /// <param name="payOrder"></param>
         public static void BarParamsSet(SortedDictionary<string, string> reqParams, PayOrderDto payOrder, string notifyUrl)
         {
-            YsePublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             //reqParams.Add("notify_url", notifyUrl); //异步通知地址
         }
 
@@ -252,7 +252,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void YsePublicParams(SortedDictionary<string, string> reqParams, PayOrderDto payOrder)
+        public static void PublicParams(SortedDictionary<string, string> reqParams, PayOrderDto payOrder)
         {
             reqParams.Add("shopdate", payOrder.CreatedAt.Value.ToString("yyyyMMdd")); // 请求格式：yyyyMMdd；示例值：20220905
             reqParams.Add("out_trade_no", payOrder.PayOrderId); //商户订单号（字母、数字、下划线）需保证在合作方系统中不重复

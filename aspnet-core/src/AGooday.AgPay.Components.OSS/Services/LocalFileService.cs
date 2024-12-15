@@ -10,12 +10,12 @@ namespace AGooday.AgPay.Components.OSS.Services
     public class LocalFileService : IOssService
     {
         private readonly ILogger<LocalFileService> _logger;
-        private readonly ISysConfigService sysConfigService;
+        private readonly ISysConfigService _sysConfigService;
 
         public LocalFileService(ILogger<LocalFileService> logger, ISysConfigService sysConfigService)
         {
             _logger = logger;
-            this.sysConfigService = sysConfigService;
+            _sysConfigService = sysConfigService;
         }
 
         public Task<UploadFormParams> GetUploadFormParamsAsync(OssSavePlaceEnum ossSavePlaceEnum, string bizType, string saveDirAndFileName)
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Components.OSS.Services
                 return saveDirAndFileName;
             }
 
-            return $"{sysConfigService.GetDBOssConfig().OssPublicSiteUrl}/{saveDirAndFileName}";
+            return $"{_sysConfigService.GetDBOssConfig().OssPublicSiteUrl}/{saveDirAndFileName}";
         }
 
         public bool DownloadFile(OssSavePlaceEnum ossSavePlaceEnum, string source, string target)

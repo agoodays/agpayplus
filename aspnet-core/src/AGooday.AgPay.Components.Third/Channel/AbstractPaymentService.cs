@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Components.Third.Channel
 
         public abstract string GetIfCode();
         public abstract bool IsSupport(string wayCode);
-        public abstract AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
+        public abstract Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
         public abstract string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder);
 
         public virtual long CalculateFeeAmount(long amount, decimal rate)

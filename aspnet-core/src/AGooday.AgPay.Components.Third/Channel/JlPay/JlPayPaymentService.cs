@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -52,11 +52,11 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg JlBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BarAsync(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/api/pay/micropay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/api/pay/micropay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string retCode = resJSON?.GetValue("ret_code").ToString(); //业务响应码
             string retMsg = resJSON?.GetValue("ret_msg").ToString(); //业务响应信息	
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetJlPayHost4env(byte? sandbox)
+        public static string GetHost4env(byte? sandbox)
         {
             return CS.YES == sandbox ? JlPayConfig.SANDBOX_SERVER_URL : JlPayConfig.PROD_SERVER_URL;
         }
@@ -125,21 +125,21 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext, bool isPay = true)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext, bool isPay = true)
         {
             // 签名
             byte? sandbox;
             string orgCode, mchId, termNo, privateKey, publicKey;
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                JlPayIsvParams isvParams = (JlPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                JlPayIsvParams isvParams = (JlPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
                 if (isvParams.OrgCode == null)
                 {
                     _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
-                JlPayIsvSubMchParams isvsubMchParams = (JlPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                JlPayIsvSubMchParams isvsubMchParams = (JlPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
                 sandbox = isvParams.Sandbox;
                 orgCode = isvParams.OrgCode;
                 mchId = isvsubMchParams.MchId;
@@ -163,10 +163,10 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             reqParams.Add("sign", sign); //加签结果
 
             // 调起上游接口
-            string url = GetJlPayHost4env(sandbox) + apiUri;
+            string url = GetHost4env(sandbox) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = JlHttpUtil.DoPostJson(url, reqParams);
+            string resText = await JlHttpUtil.DoPostJsonAsync(url, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -193,7 +193,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
         /// <param name="returnUrl"></param>
         public static void UnifiedParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
-            JlPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             reqParams.Add("notify_url", notifyUrl); //交易异步通知地址，http或https开头。
         }
 
@@ -204,7 +204,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
         /// <param name="payOrder"></param>
         public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl)
         {
-            JlPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             //reqParams.Add("notify_url", notifyUrl); //异步通知地址
         }
 
@@ -213,7 +213,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void JlPublicParams(JObject reqParams, PayOrderDto payOrder)
+        public static void PublicParams(JObject reqParams, PayOrderDto payOrder)
         {
             string payType = JlPayEnum.GetPayType(payOrder.WayCode);
             reqParams.Add("pay_type", payType);

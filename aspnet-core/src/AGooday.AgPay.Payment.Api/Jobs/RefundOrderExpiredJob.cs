@@ -19,17 +19,14 @@ namespace AGooday.AgPay.Payment.Api.Jobs
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public Task Execute(IJobExecutionContext context)
+        public async Task Execute(IJobExecutionContext context)
         {
-            return Task.Run(() =>
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                using (var scope = _serviceScopeFactory.CreateScope())
-                {
-                    var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
-                    int updateCount = refundOrderService.UpdateOrderExpired();
-                    _logger.LogInformation($"处理退款订单超时{updateCount}条.");
-                }
-            });
+                var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
+                int updateCount = await refundOrderService.UpdateOrderExpiredAsync();
+                _logger.LogInformation($"处理退款订单超时{updateCount}条.");
+            }
         }
     }
 }

@@ -7,7 +7,9 @@
         bool Add(TDto dto);
         Task<bool> AddAsync(TDto dto);
         bool Remove(TPrimaryKey id);
+        Task<bool> RemoveAsync(TPrimaryKey id);
         bool Update(TDto dto);
+        Task<bool> UpdateAsync(TDto dto);
         TDto GetById(TPrimaryKey id);
         Task<TDto> GetByIdAsync(TPrimaryKey recordId);
         IEnumerable<TDto> GetAll();
@@ -19,7 +21,9 @@
         bool Add(TDto dto);
         Task<bool> AddAsync(TDto dto);
         bool Remove<TPrimaryKey>(TPrimaryKey id);
+        Task<bool> RemoveAsync<TPrimaryKey>(TPrimaryKey id);
         bool Update(TDto dto);
+        Task<bool> UpdateAsync(TDto dto);
         TDto GetById<TPrimaryKey>(TPrimaryKey id);
         Task<TDto> GetByIdAsync<TPrimaryKey>(TPrimaryKey recordId);
         IEnumerable<TDto> GetAll();

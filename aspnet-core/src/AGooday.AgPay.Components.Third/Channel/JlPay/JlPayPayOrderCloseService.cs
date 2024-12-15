@@ -14,13 +14,13 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
     public class JlPayPayOrderCloseService : IPayOrderCloseService
     {
         private readonly ILogger<JlPayPayOrderCloseService> _logger;
-        private readonly JlPayPaymentService jlpayPaymentService;
+        private readonly JlPayPaymentService _paymentService;
 
         public JlPayPayOrderCloseService(ILogger<JlPayPayOrderCloseService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.jlpayPaymentService = ActivatorUtilities.CreateInstance<JlPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<JlPayPaymentService>(serviceProvider);
         }
 
         public JlPayPayOrderCloseService()
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             return CS.IF_CODE.JLPAY;
         }
 
-        public ChannelRetMsg Close(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> CloseAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             string payType = JlPayEnum.GetPayType(payOrder.WayCode);
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
                 reqParams.Add("ori_out_trade_no", payOrder.PayOrderId); //订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = jlpayPaymentService.PackageParamAndReq("/api/pay/cancel", reqParams, logPrefix, mchAppConfigContext, false);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/pay/cancel", reqParams, logPrefix, mchAppConfigContext, false);
                 _logger.LogInformation($"关闭订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
 
             ArgumentNullException.ThrowIfNull(loggerFactory);
 
-            this._next = next;
+            _next = next;
             _logger = loggerFactory.CreateLogger<CalculateExecutionTimeMiddleware>();
         }
 

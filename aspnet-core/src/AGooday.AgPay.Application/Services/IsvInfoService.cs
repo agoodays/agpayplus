@@ -29,33 +29,33 @@ namespace AGooday.AgPay.Application.Services
             do
             {
                 dto.IsvNo = SeqUtil.GenIsvNo();
-            } while (IsExistIsvNo(dto.IsvNo));
+            } while (await IsExistIsvNoAsync(dto.IsvNo));
             var m = _mapper.Map<IsvInfo>(dto);
             await _isvInfoRepository.AddAsync(m);
-            return _isvInfoRepository.SaveChanges(out int _);
+            return await _isvInfoRepository.SaveChangesAsync() > 0;
         }
 
-        public override bool Update(IsvInfoDto dto)
+        public override async Task<bool> UpdateAsync(IsvInfoDto dto)
         {
             var entity = _mapper.Map<IsvInfo>(dto);
             entity.UpdatedAt = DateTime.Now;
             _isvInfoRepository.Update(entity);
-            return _isvInfoRepository.SaveChanges(out int _);
+            return await _isvInfoRepository.SaveChangesAsync() > 0;
         }
 
-        public bool IsExistIsvNo(string isvNo)
+        public Task<bool> IsExistIsvNoAsync(string isvNo)
         {
-            return _isvInfoRepository.IsExistIsvNo(isvNo);
+            return _isvInfoRepository.IsExistIsvNoAsync(isvNo);
         }
 
-        public async Task<PaginatedList<IsvInfoDto>> GetPaginatedDataAsync(IsvInfoQueryDto dto)
+        public Task<PaginatedList<IsvInfoDto>> GetPaginatedDataAsync(IsvInfoQueryDto dto)
         {
-            var isvInfos = _isvInfoRepository.GetAllAsNoTracking()
+            var query = _isvInfoRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<IsvInfo>.CreateAsync<IsvInfoDto>(isvInfos, _mapper, dto.PageNumber, dto.PageSize);
+                && (dto.State.Equals(null) || w.State.Equals(dto.State)))
+                .OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<IsvInfo>.CreateAsync<IsvInfoDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

@@ -18,7 +18,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
         {
             return CS.IF_CODE.UMSPAY;
         }
-        public ChannelRetMsg Close(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public Task<ChannelRetMsg> CloseAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             throw new NotImplementedException();
         }

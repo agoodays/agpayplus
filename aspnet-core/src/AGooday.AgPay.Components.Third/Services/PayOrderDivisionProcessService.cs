@@ -16,14 +16,14 @@ namespace AGooday.AgPay.Components.Third.Services
     /// </summary>
     public class PayOrderDivisionProcessService
     {
-        private readonly ILogger<PayOrderDivisionProcessService> log;
-        private readonly IMQSender mqSender;
-        private readonly IChannelServiceFactory<IDivisionService> divisionServiceFactory;
-        private readonly IPayOrderService payOrderService;
-        private readonly IMchDivisionReceiverService mchDivisionReceiverService;
-        private readonly IMchDivisionReceiverGroupService mchDivisionReceiverGroupService;
-        private readonly IPayOrderDivisionRecordService payOrderDivisionRecordService;
-        private readonly ConfigContextQueryService configContextQueryService;
+        private readonly ILogger<PayOrderDivisionProcessService> _logger;
+        private readonly IMQSender _mqSender;
+        private readonly IChannelServiceFactory<IDivisionService> _divisionServiceFactory;
+        private readonly IPayOrderService _payOrderService;
+        private readonly IMchDivisionReceiverService _mchDivisionReceiverService;
+        private readonly IMchDivisionReceiverGroupService _mchDivisionReceiverGroupService;
+        private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public PayOrderDivisionProcessService(ILogger<PayOrderDivisionProcessService> logger,
             IMQSender mqSender,
@@ -34,14 +34,14 @@ namespace AGooday.AgPay.Components.Third.Services
             IPayOrderDivisionRecordService payOrderDivisionRecordService,
             ConfigContextQueryService configContextQueryService)
         {
-            log = logger;
-            this.mqSender = mqSender;
-            this.divisionServiceFactory = divisionServiceFactory;
-            this.payOrderService = payOrderService;
-            this.mchDivisionReceiverService = mchDivisionReceiverService;
-            this.mchDivisionReceiverGroupService = mchDivisionReceiverGroupService;
-            this.payOrderDivisionRecordService = payOrderDivisionRecordService;
-            this.configContextQueryService = configContextQueryService;
+            _logger = logger;
+            _mqSender = mqSender;
+            _divisionServiceFactory = divisionServiceFactory;
+            _payOrderService = payOrderService;
+            _mchDivisionReceiverService = mchDivisionReceiverService;
+            _mchDivisionReceiverGroupService = mchDivisionReceiverGroupService;
+            _payOrderDivisionRecordService = payOrderDivisionRecordService;
+            _configContextQueryService = configContextQueryService;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// <param name="receiverList"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public ChannelRetMsg ProcessPayOrderDivision(string payOrderId, byte? useSysAutoDivisionReceivers, List<PayOrderDivisionMQ.CustomerDivisionReceiver> receiverList, bool? isResend)
+        public async Task<ChannelRetMsg> ProcessPayOrderDivisionAsync(string payOrderId, byte? useSysAutoDivisionReceivers, List<PayOrderDivisionMQ.CustomerDivisionReceiver> receiverList, bool? isResend)
         {
             // 是否重发分账接口（ 当分账失败， 列表允许再次发送请求 ）
             isResend ??= false;
@@ -62,27 +62,27 @@ namespace AGooday.AgPay.Components.Third.Services
             string logPrefix = $"订单[{payOrderId}]执行分账";
 
             //查询订单信息
-            PayOrderDto payOrder = payOrderService.GetById(payOrderId);
+            PayOrderDto payOrder = await _payOrderService.GetByIdAsync(payOrderId);
 
             if (payOrder == null)
             {
-                log.LogError($"{logPrefix}，订单不存在");
+                _logger.LogError($"{logPrefix}，订单不存在");
                 throw new BizException("订单不存在");
             }
 
             // 订单不是成功状态 || 分账状态不正确
             if (payOrder.State != (byte)PayOrderState.STATE_SUCCESS || (payOrder.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_WAIT_TASK && payOrder.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_UNHAPPEN))
             {
-                log.LogError($"{logPrefix}, 订单状态或分账状态不正确");
+                _logger.LogError($"{logPrefix}, 订单状态或分账状态不正确");
                 throw new BizException("订单状态或分账状态不正确");
             }
 
             //更新订单为： 分账任务处理中
             payOrder.DivisionState = (byte)PayOrderDivisionState.DIVISION_STATE_ING;
-            bool updPayOrder = payOrderService.Update(payOrder);
+            bool updPayOrder = await _payOrderService.UpdateAsync(payOrder);
             if (!updPayOrder)
             {
-                log.LogError($"{logPrefix}, 更新支付订单为分账处理中异常！");
+                _logger.LogError($"{logPrefix}, 更新支付订单为分账处理中异常！");
                 throw new BizException("更新支付订单为分账处理中异常");
             }
             // 所有的分账列表
@@ -92,13 +92,13 @@ namespace AGooday.AgPay.Components.Third.Services
             if (isResend.Value)
             {
                 // 根据payOrderId && 待分账（ 重试时将更新为待分账状态 ）  ， 此处不可查询出分账成功的订单。
-                recordList = payOrderDivisionRecordService.GetByPayOrderId(payOrderId)
+                recordList = _payOrderDivisionRecordService.GetByPayOrderId(payOrderId)
                     .Where(w => w.State == (byte)PayOrderDivisionRecordState.STATE_WAIT).ToList();
             }
             else
             {
                 // 查询&过滤 所有的分账接收对象
-                List<MchDivisionReceiverDto> allReceiver = this.QueryReceiver(useSysAutoDivisionReceivers, payOrder, receiverList);
+                var allReceiver = await QueryReceiverAsync(useSysAutoDivisionReceivers, payOrder, receiverList);
 
                 //得到全部分账比例 (所有待分账账号的分账比例总和)
                 var allDivisionProfit = Decimal.Zero;
@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //计算分账金额 = 商家实际入账金额
-                long payOrderDivisionAmount = payOrderService.CalMchIncomeAmount(payOrder);
+                long payOrderDivisionAmount = await _payOrderService.CalMchIncomeAmountAsync(payOrder);
 
                 //剩余待分账金额 (用作最后一个分账账号的 计算， 避免出现分账金额超出最大) [结果向下取整 ， 避免出现金额溢出的情况。 ]
                 long subDivisionAmount = AmountUtil.CalPercentageFee(payOrderDivisionAmount, allDivisionProfit, MidpointRounding.ToNegativeInfinity);
@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Components.Third.Services
                     subDivisionAmount -= record.CalDivisionAmount;
 
                     //入库保存
-                    payOrderDivisionRecordService.Add(record);
+                    await _payOrderDivisionRecordService.AddAsync(record);
                     recordList.Add(record);
                 }
             }
@@ -137,36 +137,36 @@ namespace AGooday.AgPay.Components.Third.Services
             try
             {
                 //调用渠道侧分账接口
-                IDivisionService divisionService = divisionServiceFactory.GetService(payOrder.IfCode);
+                IDivisionService divisionService = _divisionServiceFactory.GetService(payOrder.IfCode);
                 if (divisionService == null)
                 {
                     throw new BizException("通道无此分账接口");
                 }
 
-                channelRetMsg = divisionService.SingleDivision(payOrder, recordList, configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId));
+                channelRetMsg = await divisionService.SingleDivisionAsync(payOrder, recordList, await _configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId));
 
                 // 确认分账成功 ( 明确分账成功 )
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
                     //分账成功
-                    payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_SUCCESS, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelOriginResponse);
+                    _payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_SUCCESS, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelOriginResponse);
                 }
                 // 分账失败 ( 明确分账成功 )
                 else if (channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
                 {
                     //分账失败
-                    payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
+                    _payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
                 }
                 // 已受理
                 else if (channelRetMsg.ChannelState == ChannelState.WAITING)
                 {
-                    payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_ACCEPT, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
+                    _payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_ACCEPT, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
                 }
             }
             catch (Exception e)
             {
-                log.LogError(e, $"{logPrefix}, 调用分账接口异常");
-                payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, null, $"系统异常：{e.Message}");
+                _logger.LogError(e, $"{logPrefix}, 调用分账接口异常");
+                _payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, null, $"系统异常：{e.Message}");
 
                 channelRetMsg = ChannelRetMsg.ConfirmFail(null, null, e.Message);
             }
@@ -175,7 +175,7 @@ namespace AGooday.AgPay.Components.Third.Services
             payOrder.DivisionState = (byte)PayOrderDivisionState.DIVISION_STATE_FINISH;
             payOrder.DivisionLastTime = DateTime.Now;
             if (payOrder.DivisionState.Equals((byte)PayOrderDivisionState.DIVISION_STATE_ING))
-                payOrderService.Update(payOrder);
+                await _payOrderService.UpdateAsync(payOrder);
             return channelRetMsg;
         }
         /// <summary>
@@ -230,7 +230,7 @@ namespace AGooday.AgPay.Components.Third.Services
             return record;
         }
 
-        private List<MchDivisionReceiverDto> QueryReceiver(byte? useSysAutoDivisionReceivers, PayOrderDto payOrder, List<PayOrderDivisionMQ.CustomerDivisionReceiver> customerDivisionReceiverList)
+        private async Task<IEnumerable<MchDivisionReceiverDto>> QueryReceiverAsync(byte? useSysAutoDivisionReceivers, PayOrderDto payOrder, List<PayOrderDivisionMQ.CustomerDivisionReceiver> customerDivisionReceiverList)
         {
             // 查询全部分账列表
             MchDivisionReceiverQueryDto queryWrapper = new MchDivisionReceiverQueryDto();
@@ -244,7 +244,7 @@ namespace AGooday.AgPay.Components.Third.Services
             // 自动分账组的账号
             if (useSysAutoDivisionReceivers == CS.YES)
             {
-                var groups = mchDivisionReceiverGroupService.GetByMchNo(payOrder.MchNo)
+                var groups = _mchDivisionReceiverGroupService.GetByMchNo(payOrder.MchNo)
                     .Where(w => w.AutoDivisionFlag.Equals(CS.YES));
 
                 if (!groups.Any())
@@ -256,8 +256,8 @@ namespace AGooday.AgPay.Components.Third.Services
             }
 
             //全部分账账号
-            List<MchDivisionReceiverDto> allMchReceiver = mchDivisionReceiverService.GetAllMchReceiver(queryWrapper);
-            if (allMchReceiver.Count == 0)
+            var allMchReceiver = await _mchDivisionReceiverService.GetPaginatedDataAsync(queryWrapper);
+            if (!allMchReceiver.Any())
             {
                 return allMchReceiver;
             }

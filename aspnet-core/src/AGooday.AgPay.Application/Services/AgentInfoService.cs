@@ -38,34 +38,34 @@ namespace AGooday.AgPay.Application.Services
             return _agentInfoRepository.IsExistAgentAsync(isvNo);
         }
 
-        public async Task CreateAsync(AgentInfoCreateDto dto)
+        public Task CreateAsync(AgentInfoCreateDto dto)
         {
             var command = _mapper.Map<CreateAgentInfoCommand>(dto);
-            await Bus.SendCommand(command);
+            return Bus.SendCommand(command);
         }
 
-        public async Task RemoveAsync(string recordId)
+        public Task RemoveAsync(string recordId)
         {
             //_agentInfoRepository.Remove(recordId);
             //_agentInfoRepository.SaveChanges();
             var command = new RemoveAgentInfoCommand() { AgentNo = recordId };
-            await Bus.SendCommand(command);
+            return Bus.SendCommand(command);
         }
 
-        public async Task ModifyAsync(AgentInfoModifyDto dto)
+        public Task ModifyAsync(AgentInfoModifyDto dto)
         {
             var command = _mapper.Map<ModifyAgentInfoCommand>(dto);
-            await Bus.SendCommand(command);
+            return Bus.SendCommand(command);
         }
 
-        public bool UpdateById(AgentInfoDto dto)
+        public async Task<bool> UpdateByIdAsync(AgentInfoDto dto)
         {
             var entity = _mapper.Map<AgentInfo>(dto);
             if (!string.IsNullOrWhiteSpace(dto.Sipw))
                 entity.Sipw = dto.Sipw;
             entity.UpdatedAt = DateTime.Now;
             _agentInfoRepository.Update(entity, e => new { e.Sipw, e.UpdatedAt });
-            return _agentInfoRepository.SaveChanges(out int _);
+            return await _agentInfoRepository.SaveChangesAsync() > 0;
         }
 
         public IEnumerable<AgentInfoDto> GetParents(string agentNo)
@@ -75,18 +75,18 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<AgentInfoDto>>(source);
         }
 
-        public async Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(AgentInfoQueryDto dto)
+        public Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(AgentInfoQueryDto dto)
         {
             var agentInfos = GetAgentInfos(dto);
-            var records = await PaginatedList<AgentInfo>.CreateAsync<AgentInfoDto>(agentInfos, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<AgentInfo>.CreateAsync<AgentInfoDto>(agentInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
-        public async Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(string agentNo, AgentInfoQueryDto dto)
+        public Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(string agentNo, AgentInfoQueryDto dto)
         {
             var agentInfos = GetAgentInfos(dto);
             var subAgentInfos = GetSons(agentInfos, agentNo).Where(w => w.AgentNo != agentNo);
-            var records = await PaginatedList<AgentInfo>.CreateAsync<AgentInfoDto>(subAgentInfos, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<AgentInfo>.CreateAsync<AgentInfoDto>(subAgentInfos, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
@@ -106,8 +106,8 @@ namespace AGooday.AgPay.Application.Services
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.AgentName))
                 && (string.IsNullOrWhiteSpace(dto.ContactTel) || w.IsvNo.Equals(dto.ContactTel))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                ).OrderByDescending(o => o.CreatedAt);
+                && (dto.State.Equals(null) || w.State.Equals(dto.State)))
+                .OrderByDescending(o => o.CreatedAt);
             return agentInfos;
         }
 

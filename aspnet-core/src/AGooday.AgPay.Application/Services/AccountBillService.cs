@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Application.Services
             _payOrderProfitRepository = payOrderProfitRepository;
         }
 
-        public void GenAccountBill(string payOrderId)
+        public async Task GenAccountBillAsync(string payOrderId)
         {
             var payOrderProfits = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId).OrderBy(o => o.Id);
             var isSaveChanges = false;
@@ -48,37 +48,37 @@ namespace AGooday.AgPay.Application.Services
                     accountBill.RelaBizOrderId = payOrderProfit.PayOrderId;
                     accountBill.CreatedAt = DateTime.Now;
                     accountBill.UpdatedAt = DateTime.Now;
-                    _agPayRepository.Add(accountBill);
+                    await _agPayRepository.AddAsync(accountBill);
                     isSaveChanges = true;
                 }
             }
             if (isSaveChanges)
             {
-                _agPayRepository.SaveChanges(out int _);
+                await _agPayRepository.SaveChangesAsync();
             }
         }
 
-        public override bool Add(AccountBillDto dto)
+        public override async Task<bool> AddAsync(AccountBillDto dto)
         {
             var entity = _mapper.Map<AccountBill>(dto);
             entity.CreatedAt = DateTime.Now;
             entity.UpdatedAt = DateTime.Now;
-            _agPayRepository.Add(entity);
-            var result = _agPayRepository.SaveChanges(out int _);
+            await _agPayRepository.AddAsync(entity);
+            var result = await _agPayRepository.SaveChangesAsync() > 0;
             return result;
         }
 
-        public override bool Update(AccountBillDto dto)
+        public override async Task<bool> UpdateAsync(AccountBillDto dto)
         {
             var entity = _mapper.Map<AccountBill>(dto);
             entity.UpdatedAt = DateTime.Now;
             _agPayRepository.Update(entity);
-            return _agPayRepository.SaveChanges(out int _);
+            return await _agPayRepository.SaveChangesAsync() > 0;
         }
 
-        public async Task<PaginatedList<AccountBillDto>> GetPaginatedDataAsync(AccountBillQueryDto dto)
+        public Task<PaginatedList<AccountBillDto>> GetPaginatedDataAsync(AccountBillQueryDto dto)
         {
-            var AccountBills = _agPayRepository.GetAllAsNoTracking()
+            var query = _agPayRepository.GetAllAsNoTracking()
                 .Where(w => (dto.Id.Equals(null) || w.Id.Equals(dto.Id))
                 && (string.IsNullOrWhiteSpace(dto.BillId) || w.BillId.Equals(dto.BillId))
                 && (string.IsNullOrWhiteSpace(dto.InfoId) || w.InfoId.Equals(dto.InfoId))
@@ -87,9 +87,9 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.AccountType.Equals(null) || w.AccountType.Equals(dto.AccountType))
                 && (string.IsNullOrWhiteSpace(dto.RelaBizOrderId) || w.RelaBizOrderId.Equals(dto.RelaBizOrderId))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<AccountBill>.CreateAsync<AccountBillDto>(AccountBills, _mapper, dto.PageNumber, dto.PageSize);
+                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                .OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<AccountBill>.CreateAsync<AccountBillDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

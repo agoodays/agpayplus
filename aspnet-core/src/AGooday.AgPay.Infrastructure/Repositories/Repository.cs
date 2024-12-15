@@ -110,6 +110,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             DbSet.Update(entity);
         }
         /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="entitys"></param>
+        public virtual void UpdateRange(IQueryable<TEntity> entitys)
+        {
+            DbSet.UpdateRange(entitys);
+        }
+        /// <summary>
         /// 更新指定实体的指定列
         /// </summary>
         /// <param name="entity"></param>
@@ -375,9 +383,17 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 根据对象进行更新
         /// </summary>
         /// <param name="obj"></param>
-        public virtual void Update(TEntity obj)
+        public virtual void Update(TEntity entity)
         {
-            DbSet.Update(obj);
+            DbSet.Update(entity);
+        }
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="entitys"></param>
+        public virtual void UpdateRange(IQueryable<TEntity> entitys)
+        {
+            DbSet.UpdateRange(entitys);
         }
         /// <summary>
         /// 更新指定实体的指定列

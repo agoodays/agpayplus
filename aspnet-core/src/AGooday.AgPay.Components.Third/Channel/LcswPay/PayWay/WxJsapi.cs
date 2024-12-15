@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【利楚扫呗(wechatJs)jsapi支付】";
             JObject reqParams = new JObject();
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay.PayWay
             reqParams.Add("sub_appid", bizRQ.SubAppId); // 传商户自己的公众号appid，微信支付时此参数必传。（即获取open_id所使用的appid）。
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/pay/open/jspay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/pay/open/jspay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string returnCode = resJSON.GetValue("return_code").ToString(); //请求响应码
             string returnMsg = resJSON.GetValue("return_msg").ToString(); //响应信息

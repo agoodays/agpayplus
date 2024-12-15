@@ -13,12 +13,12 @@ namespace AGooday.AgPay.Components.OCR.Controllers
     public class OcrController : ControllerBase
     {
         private readonly ILogger<OcrController> _logger;
-        private readonly IOcrService ocrService;
+        private readonly IOcrService _ocrService;
 
         public OcrController(ILogger<OcrController> logger, IOcrServiceFactory ocrServiceFactory)
         {
             _logger = logger;
-            this.ocrService = ocrServiceFactory.GetService();
+            _ocrService = ocrServiceFactory.GetService();
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Components.OCR.Controllers
         {
             try
             {
-                var text = await ocrService.RecognizeTextAsync(imageUrl, type);
+                var text = await _ocrService.RecognizeTextAsync(imageUrl, type);
                 return ApiRes.Ok(text);
             }
             catch (Exception e)
@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Components.OCR.Controllers
         {
             try
             {
-                var text = await ocrService.RecognizeCardTextAsync(imageUrl, type);
+                var text = await _ocrService.RecognizeCardTextAsync(imageUrl, type);
                 return ApiRes.Ok(text);
             }
             catch (Exception e)

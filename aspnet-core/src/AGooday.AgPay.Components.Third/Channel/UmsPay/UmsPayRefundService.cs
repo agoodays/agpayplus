@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
     /// </summary>
     public class UmsPayRefundService : AbstractRefundService
     {
-        private readonly UmsPayPaymentService umsPayPaymentService;
+        private readonly UmsPayPaymentService _paymentService;
 
         public UmsPayRefundService(ILogger<UmsPayRefundService> logger,
             IServiceProvider serviceProvider,
@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.umsPayPaymentService = ActivatorUtilities.CreateInstance<UmsPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<UmsPayPaymentService>(serviceProvider);
         }
 
         public UmsPayRefundService()
@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return null;
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = $"【银联商务({refundOrder.WayCode})退款查询】";
 
@@ -53,15 +53,15 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
                     case CS.PAY_WAY_CODE.ALI_BAR:
                     case CS.PAY_WAY_CODE.WX_BAR:
                     case CS.PAY_WAY_CODE.YSF_BAR:
-                        BarQuery(logPrefix, channelRetMsg, refundOrder, mchAppConfigContext);
+                        await BarQueryAsync(logPrefix, channelRetMsg, refundOrder, mchAppConfigContext);
                         break;
                     case CS.PAY_WAY_CODE.ALI_QR:
-                        QrQuery(logPrefix, channelRetMsg, refundOrder, mchAppConfigContext);
+                        await QrQueryAsync(logPrefix, channelRetMsg, refundOrder, mchAppConfigContext);
                         break;
                     case CS.PAY_WAY_CODE.ALI_JSAPI:
                     case CS.PAY_WAY_CODE.WX_JSAPI:
                     case CS.PAY_WAY_CODE.YSF_JSAPI:
-                        UnifiedQuery(logPrefix, channelRetMsg, refundOrder, mchAppConfigContext);
+                        await UnifiedQueryAsync(logPrefix, channelRetMsg, refundOrder, mchAppConfigContext);
                         break;
                     default:
                         break;
@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             }
         }
 
-        private ChannelRetMsg BarQuery(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ChannelRetMsg> BarQueryAsync(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             reqParams.Add("merchantOrderId", refundOrder.PayOrderId); // 商户订单号 商户订单号与银商订单号至少存在一个，如均存在，以银商订单号为准，忽略商户订单号	
@@ -83,7 +83,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             reqParams.Add("refundRequestId", refundOrder.RefundOrderId); // 退款订单号 多次退款必传，每次退款上送的refundOrderId值需不同
 
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v6/poslink/transaction/query-refund", reqParams, logPrefix, mchAppConfigContext, true);
+            JObject resJSON = await _paymentService.PackageParamAndReqAsync("/v6/poslink/transaction/query-refund", reqParams, logPrefix, mchAppConfigContext, true);
 
             // 请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
@@ -124,14 +124,14 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return channelRetMsg;
         }
 
-        private ChannelRetMsg QrQuery(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ChannelRetMsg> QrQueryAsync(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             reqParams.Add("requestTimestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));// 报文请求时间 格式：yyyy-MM-dd HH:mm:ss
             reqParams.Add("instMid", "QRPAYDEFAULT");// 业务类型 QRPAYDEFAULT
             reqParams.Add("billNo", refundOrder.PayOrderId); // 账单号
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/bills/query", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await _paymentService.PackageParamAndReqAsync("/v1/netpay/bills/query", reqParams, logPrefix, mchAppConfigContext);
 
             // 请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
@@ -177,14 +177,14 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return channelRetMsg;
         }
 
-        private ChannelRetMsg UnifiedQuery(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ChannelRetMsg> UnifiedQueryAsync(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             reqParams.Add("requestTimestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));// 报文请求时间 格式：yyyy-MM-dd HH:mm:ss
             reqParams.Add("instMid", "YUEDANDEFAULT");// 业务类型 YUEDANDEFAULT
             reqParams.Add("merOrderId", refundOrder.RefundOrderId); // 商户订单号 原交易订单号
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/refund-query", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await _paymentService.PackageParamAndReqAsync("/v1/netpay/refund-query", reqParams, logPrefix, mchAppConfigContext);
 
             // 请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
@@ -233,7 +233,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = $"【银联商务({payOrder.WayCode})订单退款】";
 
@@ -245,15 +245,15 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
                     case CS.PAY_WAY_CODE.ALI_BAR:
                     case CS.PAY_WAY_CODE.WX_BAR:
                     case CS.PAY_WAY_CODE.YSF_BAR:
-                        BarRefund(logPrefix, channelRetMsg, bizRQ, refundOrder, payOrder, mchAppConfigContext);
+                        await BarRefundAsync(logPrefix, channelRetMsg, bizRQ, refundOrder, payOrder, mchAppConfigContext);
                         break;
                     case CS.PAY_WAY_CODE.ALI_QR:
-                        QrRefund(logPrefix, channelRetMsg, bizRQ, refundOrder, payOrder, mchAppConfigContext);
+                        await QrRefundAsync(logPrefix, channelRetMsg, bizRQ, refundOrder, payOrder, mchAppConfigContext);
                         break;
                     case CS.PAY_WAY_CODE.ALI_JSAPI:
                     case CS.PAY_WAY_CODE.WX_JSAPI:
                     case CS.PAY_WAY_CODE.YSF_JSAPI:
-                        UnifiedRefund(logPrefix, channelRetMsg, bizRQ, refundOrder, payOrder, mchAppConfigContext);
+                        await UnifiedRefundAsync(logPrefix, channelRetMsg, bizRQ, refundOrder, payOrder, mchAppConfigContext);
                         break;
                     default:
                         break;
@@ -267,7 +267,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             }
         }
 
-        private ChannelRetMsg BarRefund(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ChannelRetMsg> BarRefundAsync(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             reqParams.Add("merchantOrderId", payOrder.PayOrderId); // 商户订单号 商户订单号与银商订单号至少存在一个，如均存在，以银商订单号为准，忽略商户订单号	
@@ -277,7 +277,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             reqParams.Add("refundDesc", refundOrder.RefundReason); // 退货说明
             reqParams.Add("transactionCurrencyCode", "156"); // 交易币种 必须与原支付交易一致
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v6/poslink/transaction/refund", reqParams, logPrefix, mchAppConfigContext, true);
+            JObject resJSON = await _paymentService.PackageParamAndReqAsync("/v6/poslink/transaction/refund", reqParams, logPrefix, mchAppConfigContext, true);
 
             // 请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
@@ -310,7 +310,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return channelRetMsg;
         }
 
-        private ChannelRetMsg QrRefund(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ChannelRetMsg> QrRefundAsync(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             reqParams.Add("requestTimestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));// 报文请求时间 格式：yyyy-MM-dd HH:mm:ss
@@ -320,7 +320,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             reqParams.Add("refundOrderId", refundOrder.RefundOrderId); // 退款订单号 多次退款必传，每次退款上送的refundOrderId值需不同
             reqParams.Add("refundAmount", refundOrder.RefundAmount); // 要退货的金额，单位：分
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/bills/refund", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await _paymentService.PackageParamAndReqAsync("/v1/netpay/bills/refund", reqParams, logPrefix, mchAppConfigContext);
 
             // 请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
@@ -374,7 +374,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return channelRetMsg;
         }
 
-        private ChannelRetMsg UnifiedRefund(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ChannelRetMsg> UnifiedRefundAsync(string logPrefix, ChannelRetMsg channelRetMsg, RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             reqParams.Add("requestTimestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));// 报文请求时间 格式：yyyy-MM-dd HH:mm:ss
@@ -384,7 +384,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             reqParams.Add("refundOrderId", refundOrder.RefundOrderId); // 退款订单号 多次退款必传，每次退款上送的refundOrderId值需不同，若多次退货，且后续退货上送的merOrderId和refundOrderId字段与之前退货上送的值一致，将不会走退货逻辑，而是返回已有退货订单的退货信息，遵循商户订单号生成规范
             reqParams.Add("refundDesc", refundOrder.RefundReason); // 退货说明
             // 封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-            JObject resJSON = umsPayPaymentService.PackageParamAndReq("/v1/netpay/refund", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await _paymentService.PackageParamAndReqAsync("/v1/netpay/refund", reqParams, logPrefix, mchAppConfigContext);
 
             // 请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码

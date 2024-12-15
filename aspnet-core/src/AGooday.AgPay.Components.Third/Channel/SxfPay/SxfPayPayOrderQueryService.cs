@@ -14,14 +14,14 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
     public class SxfPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<SxfPayPayOrderQueryService> _logger;
-        private readonly SxfPayPaymentService sxfpayPaymentService;
+        private readonly SxfPayPaymentService _paymentService;
 
         public SxfPayPayOrderQueryService(ILogger<SxfPayPayOrderQueryService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            //this.sxfpayPaymentService = (SxfPayPaymentService)serviceProvider.GetRequiredKeyedService<IPaymentService>(GetIfCode());
-            this.sxfpayPaymentService = ActivatorUtilities.CreateInstance<SxfPayPaymentService>(serviceProvider);
+            //_sxfpayPaymentService = (SxfPayPaymentService)serviceProvider.GetRequiredKeyedService<IPaymentService>(GetIfCode());
+            _paymentService = ActivatorUtilities.CreateInstance<SxfPayPaymentService>(serviceProvider);
         }
 
         public SxfPayPayOrderQueryService()
@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             return CS.IF_CODE.SXFPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
                 reqParams.Add("ordNo", payOrder.PayOrderId); //订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = sxfpayPaymentService.PackageParamAndReq("/query/tradeQuery", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/query/tradeQuery", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

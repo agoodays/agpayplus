@@ -26,11 +26,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
     public class AliPayBizController : Controller
     {
         private readonly ILogger<AliPayBizController> _logger;
-        private readonly ConfigContextQueryService configContextQueryService;
-        private readonly IPayInterfaceConfigService payInterfaceConfigService;
-        private readonly ISysConfigService sysConfigService;
-        private readonly IMchAppService mchAppService;
-        private readonly IMQSender mqSender;
+        private readonly ConfigContextQueryService _configContextQueryService;
+        private readonly IPayInterfaceConfigService _payInterfaceConfigService;
+        private readonly ISysConfigService _sysConfigService;
+        private readonly IMchAppService _mchAppService;
+        private readonly IMQSender _mqSender;
 
         public AliPayBizController(ILogger<AliPayBizController> logger,
             ConfigContextQueryService configContextQueryService,
@@ -40,11 +40,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
             IMQSender mqSender)
         {
             _logger = logger;
-            this.configContextQueryService = configContextQueryService;
-            this.payInterfaceConfigService = payInterfaceConfigService;
-            this.sysConfigService = sysConfigService;
-            this.mchAppService = mchAppService;
-            this.mqSender = mqSender;
+            _configContextQueryService = configContextQueryService;
+            _payInterfaceConfigService = payInterfaceConfigService;
+            _sysConfigService = sysConfigService;
+            _mchAppService = mchAppService;
+            _mqSender = mqSender;
         }
 
         /// <summary>
@@ -54,16 +54,16 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
         /// </summary>
         /// <param name="isvAndMchAppId"></param>
         [HttpGet, Route("redirectAppToAppAuth/{isvAndMchAppId}")]
-        public IActionResult RedirectAppToAppAuth(string isvAndMchAppId)
+        public async Task<IActionResult> RedirectAppToAppAuthAsync(string isvAndMchAppId)
         {
             string isvNo = isvAndMchAppId.Split("_")[0];
 
-            AliPayIsvParams alipayIsvParams = (AliPayIsvParams)configContextQueryService.QueryIsvParams(isvNo, CS.IF_CODE.ALIPAY);
+            AliPayIsvParams alipayIsvParams = (AliPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(isvNo, CS.IF_CODE.ALIPAY);
             var isSandbox = alipayIsvParams.Sandbox != null && alipayIsvParams.Sandbox == CS.YES;
 
             string oauthUrl = isSandbox ? AliPayConfig.SANDBOX_APP_TO_APP_AUTH_URL : AliPayConfig.PROD_APP_TO_APP_AUTH_URL;
 
-            string redirectUrl = sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/channelbiz/alipay/appToAppAuthCallback";
+            string redirectUrl = _sysConfigService.GetDBApplicationConfig().PaySiteUrl + "/api/channelbiz/alipay/appToAppAuthCallback";
 
             return Redirect(string.Format(oauthUrl, alipayIsvParams.AppId, URLUtil.EncodeAll(redirectUrl), isvAndMchAppId));
         }
@@ -86,10 +86,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
                     string isvNo = isvAndMchAppId.Split("_")[0];
                     string mchAppId = isvAndMchAppId.Split("_")[1];
 
-                    MchAppDto mchApp = await mchAppService.GetByIdAsync(mchAppId);
+                    MchAppDto mchApp = await _mchAppService.GetByIdAsync(mchAppId);
 
-                    MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(mchApp.MchNo, mchAppId);
-                    AliPayClientWrapper alipayClientWrapper = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext);
+                    MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchApp.MchNo, mchAppId);
+                    AliPayClientWrapper alipayClientWrapper = await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext);
 
                     AlipayOpenAuthTokenAppRequest request = new AlipayOpenAuthTokenAppRequest();
                     AlipayOpenAuthTokenAppModel model = new AlipayOpenAuthTokenAppModel();
@@ -110,13 +110,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
                     ifParams.Add("refreshToken", resp.AppRefreshToken);
                     ifParams.Add("expireTimestamp", resp.ExpiresIn);
 
-                    PayInterfaceConfigDto dbRecord = payInterfaceConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP, mchAppId, CS.IF_CODE.ALIPAY);
+                    PayInterfaceConfigDto dbRecord = await _payInterfaceConfigService.GetByInfoIdAndIfCodeAsync(CS.INFO_TYPE.MCH_APP, mchAppId, CS.IF_CODE.ALIPAY);
 
                     if (dbRecord != null)
                     {
                         dbRecord.Id = dbRecord.Id;
                         dbRecord.IfParams = ifParams.ToString();
-                        payInterfaceConfigService.Update(dbRecord);
+                        await _payInterfaceConfigService.UpdateAsync(dbRecord);
                     }
                     else
                     {
@@ -129,11 +129,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
                         dbRecord.State = CS.YES;
                         dbRecord.CreatedBy = "SYS";
                         dbRecord.CreatedUid = 0L;
-                        payInterfaceConfigService.Add(dbRecord);
+                        await _payInterfaceConfigService.AddAsync(dbRecord);
                     }
 
                     // 更新应用配置信息
-                    await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, mchApp.AppId));
+                    await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, mchApp.AppId));
                 }
             }
             catch (Exception e)

@@ -122,13 +122,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         [HttpPut, Route("{recordId}"), MethodLog("更新分账接收账号")]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_EDIT)]
-        public ApiRes Update(long recordId, MchDivisionReceiverDto dto)
+        public async Task<ApiRes> UpdateAsync(long recordId, MchDivisionReceiverDto dto)
         {
             // 改为真实比例
             dto.DivisionProfit = dto.DivisionProfit / 100;
             if (dto.ReceiverGroupId != null)
             {
-                var groupRecord = _mchDivisionReceiverGroupService.FindByIdAndMchNo(dto.ReceiverGroupId.Value, dto.MchNo);
+                var groupRecord = await _mchDivisionReceiverGroupService.FindByIdAndMchNoAsync(dto.ReceiverGroupId.Value, dto.MchNo);
                 if (dto == null)
                 {
                     throw new BizException("账号组不存在");
@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
                 dto.ReceiverGroupId = groupRecord.ReceiverGroupId;
                 dto.ReceiverGroupName = groupRecord.ReceiverGroupName;
             }
-            var result = _mchDivisionReceiverService.Update(dto);
+            var result = await _mchDivisionReceiverService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
@@ -158,7 +158,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            _mchDivisionReceiverService.Remove(recordId);
+            await _mchDivisionReceiverService.RemoveAsync(recordId);
             return ApiRes.Ok();
         }
     }

@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             return null;
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             AlipayTradeFastpayRefundQueryRequest request = new AlipayTradeFastpayRefundQueryRequest();
             AlipayTradeFastpayRefundQueryModel model = new AlipayTradeFastpayRefundQueryModel();
@@ -51,9 +51,9 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             request.SetBizModel(model);
 
             //统一放置 isv接口必传信息
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, request, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, request, model);
 
-            AlipayTradeFastpayRefundQueryResponse response = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
+            AlipayTradeFastpayRefundQueryResponse response = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(request);
 
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             channelRetMsg.ChannelAttach = response.Body;
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
             AlipayTradeRefundModel model = new AlipayTradeRefundModel();
@@ -84,9 +84,9 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             request.SetBizModel(model);
 
             //统一放置 isv接口必传信息
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, request, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, request, model);
 
-            AlipayTradeRefundResponse response = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
+            AlipayTradeRefundResponse response = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(request);
 
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             channelRetMsg.ChannelAttach = response.Body;

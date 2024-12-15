@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly ISysConfigService _sysConfigService;
-        private readonly ISmsService smsService;
+        private readonly ISmsService _smsService;
         private readonly IMemoryCache _cache;
         private readonly IDatabase _redis;
         private readonly IAuthService _authService;
@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             _sysUserAuthService = sysUserAuthService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _sysConfigService = sysConfigService;
-            this.smsService = smsServiceFactory.GetService();
+            _smsService = smsServiceFactory.GetService();
             _cache = cache;
             _redis = client.GetDatabase();
             _authService = authService;
@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             await _sysUserLoginAttemptService.ClearFailedLoginAttemptsAsync(auth.SysUserId);
 
             //非超级管理员 && 不包含左侧菜单 进行错误提示
-            if (auth.IsAdmin != CS.YES && !_authService.UserHasLeftMenu(auth.SysUserId, auth.SysType))
+            if (auth.IsAdmin != CS.YES && !await _authService.UserHasLeftMenuAsync(auth.SysUserId, auth.SysType))
             {
                 if (auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
                 {
@@ -260,7 +260,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
             await _redis.StringSetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
 #if !DEBUG
-            smsService.SendVercode(new SmsBizVercodeModel()
+            _smsService.SendVercode(new SmsBizVercodeModel()
             {
                 Mobile = model.phone,
                 Vercode = code,
@@ -314,7 +314,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             {
                 throw new BizException("新密码与原密码相同！");
             }
-            _sysUserAuthService.ResetAuthInfo(sysUser.SysUserId.Value, null, null, newPwd, CS.SYS_TYPE.MGR);
+            await _sysUserAuthService.ResetAuthInfoAsync(sysUser.SysUserId.Value, null, null, newPwd, CS.SYS_TYPE.MGR);
             // 删除短信验证码缓存数据
             await _redis.KeyDeleteAsync(codeCacheKey);
             return ApiRes.Ok();

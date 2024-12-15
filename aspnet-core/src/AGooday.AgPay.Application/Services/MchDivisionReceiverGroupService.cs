@@ -1,10 +1,12 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -23,20 +25,35 @@ namespace AGooday.AgPay.Application.Services
             _mchDivisionReceiverGroupRepository = mchDivisionReceiverGroupRepository;
         }
 
-        public override bool Add(MchDivisionReceiverGroupDto dto)
+        public override async Task<bool> AddAsync(MchDivisionReceiverGroupDto dto)
         {
             var entity = _mapper.Map<MchDivisionReceiverGroup>(dto);
-            _mchDivisionReceiverGroupRepository.Add(entity);
-            var result = _mchDivisionReceiverGroupRepository.SaveChanges(out int _);
+            await _mchDivisionReceiverGroupRepository.AddAsync(entity);
+            var result = await _mchDivisionReceiverGroupRepository.SaveChangesAsync() > 0;
             dto.ReceiverGroupId = entity.ReceiverGroupId;
             return result;
         }
 
-        public MchDivisionReceiverGroupDto GetById(long recordId, string mchNo)
+        public async Task UpdateAutoDivisionFlagAsync(MchDivisionReceiverGroupDto dto)
         {
-            var entity = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
+            if (dto.AutoDivisionFlag == CS.YES)
+            {
+                var mchDivisionReceiverGroups = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
+                .Where(w => w.MchNo.Equals(dto.MchNo) && !w.ReceiverGroupId.Equals(dto.ReceiverGroupId));
+                await mchDivisionReceiverGroups.ForEachAsync(a =>
+                {
+                    a.AutoDivisionFlag = CS.NO;
+                });
+                _mchDivisionReceiverGroupRepository.UpdateRange(mchDivisionReceiverGroups);
+                await _mchDivisionReceiverGroupRepository.SaveChangesAsync();
+            }
+        }
+
+        public async Task<MchDivisionReceiverGroupDto> GetByIdAsync(long recordId, string mchNo)
+        {
+            var entity = await _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
                 .Where(w => w.ReceiverGroupId.Equals(recordId) && w.MchNo.Equals(mchNo))
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
             return _mapper.Map<MchDivisionReceiverGroupDto>(entity);
         }
 
@@ -47,22 +64,23 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<MchDivisionReceiverGroupDto>>(mchDivisionReceiverGroups);
         }
 
-        public MchDivisionReceiverGroupDto FindByIdAndMchNo(long receiverGroupId, string mchNo)
+        public async Task<MchDivisionReceiverGroupDto> FindByIdAndMchNoAsync(long receiverGroupId, string mchNo)
         {
-            var entity = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
-                .Where(w => w.ReceiverGroupId.Equals(receiverGroupId) && w.MchNo.Equals(mchNo));
+            var entity = await _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
+                .Where(w => w.ReceiverGroupId.Equals(receiverGroupId) && w.MchNo.Equals(mchNo))
+                .FirstOrDefaultAsync();
             return _mapper.Map<MchDivisionReceiverGroupDto>(entity);
         }
 
-        public async Task<PaginatedList<MchDivisionReceiverGroupDto>> GetPaginatedDataAsync(MchDivisionReceiverGroupQueryDto dto)
+        public Task<PaginatedList<MchDivisionReceiverGroupDto>> GetPaginatedDataAsync(MchDivisionReceiverGroupQueryDto dto)
         {
-            var mchDivisionReceiverGroups = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
+            var query = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.ReceiverGroupName) || w.ReceiverGroupName.Equals(dto.ReceiverGroupName))
                 && (dto.ReceiverGroupId.Equals(null) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
-                && (!dto.AutoDivisionFlag.HasValue || w.AutoDivisionFlag.Equals(dto.AutoDivisionFlag))
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<MchDivisionReceiverGroup>.CreateAsync<MchDivisionReceiverGroupDto>(mchDivisionReceiverGroups, _mapper, dto.PageNumber, dto.PageSize);
+                && (!dto.AutoDivisionFlag.HasValue || w.AutoDivisionFlag.Equals(dto.AutoDivisionFlag)))
+                .OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<MchDivisionReceiverGroup>.CreateAsync<MchDivisionReceiverGroupDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

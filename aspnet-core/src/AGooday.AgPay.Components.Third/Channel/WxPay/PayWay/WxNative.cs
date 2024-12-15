@@ -26,11 +26,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             WxNativeOrderRQ bizRQ = (WxNativeOrderRQ)rq;
 
-            var request = BuildUnifiedOrderRequest(payOrder, mchAppConfigContext, out WxServiceWrapper wxServiceWrapper);
+            var (request, wxServiceWrapper) = await BuildUnifiedOrderRequestAsync(payOrder, mchAppConfigContext);
             request.TradeType = "NATIVE";
 
             // 构造函数响应数据
@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWay
             // 调起上游接口：
             // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
             // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
-            var response = ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayUnifiedOrderAsync(request).Result;
+            var response = await ((WechatTenpayClient)wxServiceWrapper.Client).ExecuteCreatePayUnifiedOrderAsync(request);
             if (response.IsSuccessful())
             {
                 string payUrl = response.MobileWebUrl;

@@ -38,11 +38,11 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             return CS.IF_CODE.DGPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
-                JObject @params = GetReqParamJSON();
+                JObject @params = await GetReqParamJSONAsync();
                 var data = @params.GetValue("resp_data")?.ToObject<JObject>();
                 string refundOrderId = data?.GetValue("req_seq_id")?.ToString();
                 return new Dictionary<string, object>() { { refundOrderId, @params } };
@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                 _logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
 
                 // 校验退款回调
-                bool verifyResult = VerifyParams(jsonParams, mchAppConfigContext);
+                bool verifyResult = await VerifyParamsAsync(jsonParams, mchAppConfigContext);
                 // 验证参数失败
                 if (!verifyResult)
                 {
@@ -143,13 +143,13 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             }
         }
 
-        public bool VerifyParams(JObject jsonParams, MchAppConfigContext mchAppConfigContext)
+        public async Task<bool> VerifyParamsAsync(JObject jsonParams, MchAppConfigContext mchAppConfigContext)
         {
             //验签
             string publicKey;
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                DgPayIsvParams isvParams = (DgPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                DgPayIsvParams isvParams = (DgPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
                 if (isvParams.SysId == null)
                 {
@@ -160,7 +160,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             }
             else
             {
-                var normalMchParams = (DgPayNormalMchParams)configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                var normalMchParams = (DgPayNormalMchParams)await _configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
                 if (normalMchParams.HuifuId == null)
                 {

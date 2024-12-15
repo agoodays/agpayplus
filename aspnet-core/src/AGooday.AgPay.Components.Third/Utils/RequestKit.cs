@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Components.Third.Utils
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string GetReqParamFromBody()
+        public async Task<string> GetReqParamFromBodyAsync()
         {
             string body = "";
 
@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Components.Third.Utils
                 {
                     using (StreamReader reader = new StreamReader(_httpContextAccessor.HttpContext.Request.Body, Encoding.UTF8, true, 1024, true))
                     {
-                        body = reader.ReadToEnd();
+                        body = await reader.ReadToEndAsync();
                     }
 
                     return body;
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Components.Third.Utils
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public JObject ReqParam2JSON()
+        public async Task<JObject> ReqParam2JSONAsync()
         {
             JObject returnObject = new JObject();
 
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Components.Third.Utils
                 {
                     using (StreamReader reader = new StreamReader(_httpContextAccessor.HttpContext.Request.Body, Encoding.UTF8, true, 1024, true))
                     {
-                        body = reader.ReadToEnd();
+                        body = await reader.ReadToEndAsync();
                     }
 
                     if (string.IsNullOrEmpty(body))
@@ -110,14 +110,14 @@ namespace AGooday.AgPay.Components.Third.Utils
         /// 获取json格式的请求参数
         /// </summary>
         /// <returns></returns>
-        public JObject GetReqParamJSON()
+        public async Task<JObject> GetReqParamJSONAsync()
         {
             // 将转换好的 reqParam JSON 格式的对象保存在当前请求上下文对象中进行保存
             // 注意：ASP.NET Core 的请求模式为线程池，不会出现不清空或被覆盖的问题
             var reqParamObject = _httpContextAccessor.HttpContext.Items[REQ_CONTEXT_KEY_PARAMJSON];
             if (reqParamObject == null)
             {
-                var reqParam = ReqParam2JSON();
+                var reqParam = await ReqParam2JSONAsync();
                 _httpContextAccessor.HttpContext.Items[REQ_CONTEXT_KEY_PARAMJSON] = reqParam;
                 return reqParam;
             }

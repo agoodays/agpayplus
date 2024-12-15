@@ -267,7 +267,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (request.ResetPass)
                 {
                     string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
-                    _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, null, updatePwd);
+                    await _sysUserAuthRepository.ResetAuthInfoAsync(request.SysUserId, request.SysType, null, null, updatePwd);
                 }
 
                 //修改了手机号， 需要修改auth表信息
@@ -278,7 +278,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                         await Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
                         return;
                     }
-                    _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, null, request.Telphone, null);
+                    await _sysUserAuthRepository.ResetAuthInfoAsync(request.SysUserId, request.SysType, null, request.Telphone, null);
                 }
 
                 //修改了用户名， 需要修改auth表信息
@@ -289,7 +289,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                         await Bus.RaiseEvent(new DomainNotification("", "该登录用户名已关联其他用户！"));
                         return;
                     }
-                    _sysUserAuthRepository.ResetAuthInfo(request.SysUserId, request.SysType, request.LoginUsername, null, null);
+                    await _sysUserAuthRepository.ResetAuthInfoAsync(request.SysUserId, request.SysType, request.LoginUsername, null, null);
                 }
 
                 //修改了编号

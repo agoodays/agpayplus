@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             return CS.IF_CODE.ALIPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             AlipayTradeQueryRequest req = new AlipayTradeQueryRequest();
 
@@ -41,9 +41,9 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             req.SetBizModel(model);
 
             //通用字段
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, req, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, req, model);
 
-            AlipayTradeQueryResponse resp = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(req);
+            AlipayTradeQueryResponse resp = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(req);
             string result = resp.TradeStatus;
 
             if ("TRADE_SUCCESS".Equals(result))

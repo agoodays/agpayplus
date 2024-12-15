@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
     /// </summary>
     public class LcswPayRefundService : AbstractRefundService
     {
-        private readonly LcswPayPaymentService lcswpayPaymentService;
+        private readonly LcswPayPaymentService _paymentService;
 
         public LcswPayRefundService(ILogger<LcswPayRefundService> logger,
             IServiceProvider serviceProvider,
@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.lcswpayPaymentService = ActivatorUtilities.CreateInstance<LcswPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<LcswPayPaymentService>(serviceProvider);
         }
 
         public LcswPayRefundService()
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             return null;
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
                 }
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = lcswpayPaymentService.PackageParamAndReq("/pay/open/queryrefund", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/pay/open/queryrefund", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -167,7 +167,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
                 }
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = lcswpayPaymentService.PackageParamAndReq("/pay/open/refund", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/pay/open/refund", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Components.Third.Services
     /// </summary>
     public class PayMchNotifyService
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly ILogger<PayMchNotifyService> _logger;
         private readonly ISysConfigService _sysConfigService;
         private readonly IMchNotifyRecordService _mchNotifyRecordService;
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Components.Third.Services
             IMchNotifyRecordService mchNotifyRecordService,
             ConfigContextQueryService configContextQueryService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _logger = logger;
             _sysConfigService = sysConfigService;
             _mchNotifyRecordService = mchNotifyRecordService;
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 商户通知信息， 只有订单是终态，才会发送通知， 如明确成功和明确失败
         /// </summary>
         /// <param name="dbPayOrder"></param>
-        public async void PayOrderNotify(PayOrderDto dbPayOrder)
+        public async Task PayOrderNotifyAsync(PayOrderDto dbPayOrder)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //获取到通知对象
-                MchNotifyRecordDto mchNotifyRecord = _mchNotifyRecordService.FindByPayOrder(dbPayOrder.PayOrderId);
+                MchNotifyRecordDto mchNotifyRecord = await _mchNotifyRecordService.FindByPayOrderAsync(dbPayOrder.PayOrderId);
 
                 if (mchNotifyRecord != null)
                 {
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //商户app私钥
-                string appSecret = _configContextQueryService.QueryMchApp(dbPayOrder.MchNo, dbPayOrder.AppId).AppSecret;
+                string appSecret = (await _configContextQueryService.QueryMchAppAsync(dbPayOrder.MchNo, dbPayOrder.AppId)).AppSecret;
 
                 // 封装通知url
                 string reqMethod = HttpMethod.Post.Method;
@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 try
                 {
-                    _mchNotifyRecordService.Add(mchNotifyRecord);
+                    await _mchNotifyRecordService.AddAsync(mchNotifyRecord);
                 }
                 catch (Exception e)
                 {
@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 //推送到MQ
                 long notifyId = mchNotifyRecord.NotifyId;
-                await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
+                await _mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
             }
             catch (Exception e)
             {
@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 商户通知信息，退款成功的发送通知
         /// </summary>
         /// <param name="dbRefundOrder"></param>
-        public async void RefundOrderNotify(RefundOrderDto dbRefundOrder)
+        public async Task RefundOrderNotifyAsync(RefundOrderDto dbRefundOrder)
         {
             try
             {
@@ -123,7 +123,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //获取到通知对象
-                MchNotifyRecordDto mchNotifyRecord = _mchNotifyRecordService.FindByRefundOrder(dbRefundOrder.RefundOrderId);
+                MchNotifyRecordDto mchNotifyRecord = await _mchNotifyRecordService.FindByRefundOrderAsync(dbRefundOrder.RefundOrderId);
 
                 if (mchNotifyRecord != null)
                 {
@@ -132,7 +132,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //商户app私钥
-                string appSecret = _configContextQueryService.QueryMchApp(dbRefundOrder.MchNo, dbRefundOrder.AppId).AppSecret;
+                string appSecret = (await _configContextQueryService.QueryMchAppAsync(dbRefundOrder.MchNo, dbRefundOrder.AppId)).AppSecret;
 
                 // 封装通知url
                 string reqMethod = HttpMethod.Post.Method;
@@ -159,7 +159,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 try
                 {
-                    _mchNotifyRecordService.Add(mchNotifyRecord);
+                    await _mchNotifyRecordService.AddAsync(mchNotifyRecord);
                 }
                 catch (Exception e)
                 {
@@ -169,7 +169,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 //推送到MQ
                 long notifyId = mchNotifyRecord.NotifyId;
-                await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
+                await _mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
             }
             catch (Exception e)
             {
@@ -181,7 +181,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 商户通知信息，转账订单的通知接口
         /// </summary>
         /// <param name="dbTransferOrder"></param>
-        public async void TransferOrderNotify(TransferOrderDto dbTransferOrder)
+        public async Task TransferOrderNotifyAsync(TransferOrderDto dbTransferOrder)
         {
             try
             {
@@ -192,7 +192,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //获取到通知对象
-                MchNotifyRecordDto mchNotifyRecord = _mchNotifyRecordService.FindByRefundOrder(dbTransferOrder.TransferId);
+                MchNotifyRecordDto mchNotifyRecord = await _mchNotifyRecordService.FindByRefundOrderAsync(dbTransferOrder.TransferId);
 
                 if (mchNotifyRecord != null)
                 {
@@ -201,7 +201,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 //商户app私钥
-                string appSecret = _configContextQueryService.QueryMchApp(dbTransferOrder.MchNo, dbTransferOrder.AppId).AppSecret;
+                string appSecret = (await _configContextQueryService.QueryMchAppAsync(dbTransferOrder.MchNo, dbTransferOrder.AppId)).AppSecret;
 
                 // 封装通知url
                 string reqMethod = HttpMethod.Post.Method;
@@ -228,7 +228,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 try
                 {
-                    _mchNotifyRecordService.Add(mchNotifyRecord);
+                    await _mchNotifyRecordService.AddAsync(mchNotifyRecord);
                 }
                 catch (Exception e)
                 {
@@ -238,7 +238,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 //推送到MQ
                 long notifyId = mchNotifyRecord.NotifyId;
-                await mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
+                await _mqSender.SendAsync(PayOrderMchNotifyMQ.Build(notifyId));
             }
             catch (Exception e)
             {

@@ -14,13 +14,13 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
     public class LcswPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<LcswPayPayOrderQueryService> _logger;
-        private readonly LcswPayPaymentService lcswpayPaymentService;
+        private readonly LcswPayPaymentService _paymentService;
 
         public LcswPayPayOrderQueryService(ILogger<LcswPayPayOrderQueryService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.lcswpayPaymentService = ActivatorUtilities.CreateInstance<LcswPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<LcswPayPaymentService>(serviceProvider);
         }
 
         public LcswPayPayOrderQueryService()
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             return CS.IF_CODE.LCSWPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             string payType = LcswPayEnum.GetPayType(payOrder.WayCode);
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
                 }
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = lcswpayPaymentService.PackageParamAndReq("/pay/open/query", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/pay/open/query", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

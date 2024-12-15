@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【嘉联(unionpay)jsapi支付】";
             YsfJsapiOrderRQ bizRQ = (YsfJsapiOrderRQ)rq;
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay.PayWay
             reqParams.Add("user_auth_code", bizRQ.GetChannelUserId());
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/api/pay/unionjspay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/api/pay/unionjspay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string retCode = resJSON?.GetValue("ret_code").ToString(); //业务响应码
             string retMsg = resJSON?.GetValue("ret_msg").ToString(); //业务响应信息	

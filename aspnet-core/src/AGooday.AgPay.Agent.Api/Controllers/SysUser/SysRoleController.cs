@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
             //如果包含： 可分配权限的权限 && EntIds 不为空
             if (GetCurrentUser().Authorities.Contains(PermCode.AGENT.ENT_UR_ROLE_DIST))
             {
-                _sysRoleEntRelaService.ResetRela(dto.RoleId, dto.EntIds);
+                await _sysRoleEntRelaService.ResetRelaAsync(dto.RoleId, dto.EntIds);
             }
 
             return ApiRes.Ok();
@@ -80,9 +80,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除角色")]
         [PermissionAuth(PermCode.AGENT.ENT_UR_ROLE_DEL)]
-        public ApiRes Delete(string recordId)
+        public async Task<ApiRes> DeleteAsync(string recordId)
         {
-            _sysRoleService.RemoveRoleAsync(recordId);
+            await _sysRoleService.RemoveRoleAsync(recordId);
             return ApiRes.Ok();
         }
 
@@ -93,13 +93,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新角色信息")]
         [PermissionAuth(PermCode.AGENT.ENT_UR_ROLE_EDIT)]
-        public ApiRes Update(string recordId, SysRoleModifyDto dto)
+        public async Task<ApiRes> UpdateAsync(string recordId, SysRoleModifyDto dto)
         {
-            _sysRoleService.UpdateAsync(dto);
+            await _sysRoleService.UpdateAsync(dto);
             //如果包含：可分配权限的权限 && EntIds 不为空
             if (GetCurrentUser().Authorities.Contains(PermCode.AGENT.ENT_UR_ROLE_DIST))
             {
-                _sysRoleEntRelaService.ResetRela(dto.RoleId, dto.EntIds);
+                await _sysRoleEntRelaService.ResetRelaAsync(dto.RoleId, dto.EntIds);
 
                 //查询到该角色的人员， 将redis更新
                 var sysUserIdList = _sysUserRoleRelaService.SelectUserIdsByRoleId(dto.RoleId).ToList();

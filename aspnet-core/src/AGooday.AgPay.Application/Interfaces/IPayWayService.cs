@@ -5,8 +5,8 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IPayWayService : IAgPayService<PayWayDto>
     {
-        string GetWayTypeByWayCode(string wayCode);
-        bool IsExistPayWayCode(string wayCode);
-        PaginatedList<T> GetPaginatedData<T>(PayWayQueryDto dto);
+        Task<bool> IsExistPayWayCodeAsync(string wayCode);
+        Task<string> GetWayTypeByWayCodeAsync(string wayCode);
+        Task<PaginatedList<T>> GetPaginatedDataAsync<T>(PayWayQueryDto dto);
     }
 }

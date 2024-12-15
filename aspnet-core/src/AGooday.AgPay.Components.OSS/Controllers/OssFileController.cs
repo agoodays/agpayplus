@@ -16,12 +16,12 @@ namespace AGooday.AgPay.Components.OSS.Controllers
     public class OssFileController : ControllerBase
     {
         private readonly ILogger<OssFileController> _logger;
-        private readonly IOssService ossService;
+        private readonly IOssService _ossService;
 
         public OssFileController(ILogger<OssFileController> logger, IOssServiceFactory ossServiceFactory)
         {
             _logger = logger;
-            this.ossService = ossServiceFactory.GetService();
+            _ossService = ossServiceFactory.GetService();
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
                 ValidateFile(fileName, fileSize, ossFileConfig);
 
                 string saveDirAndFileName = GetSaveDirAndFileName(bizType, fileName);
-                var formParams = await ossService.GetUploadFormParamsAsync(ossFileConfig.OssSavePlaceEnum, bizType, saveDirAndFileName);
+                var formParams = await _ossService.GetUploadFormParamsAsync(ossFileConfig.OssSavePlaceEnum, bizType, saveDirAndFileName);
                 return ApiRes.Ok(formParams);
             }
             catch (Exception e)
@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
                 ValidateFile(fileName, fileSize, ossFileConfig);
 
                 string saveDirAndFileName = GetSaveDirAndFileName(bizType, fileName);
-                string url = await ossService.Upload2PreviewUrlAsync(ossFileConfig.OssSavePlaceEnum, file, saveDirAndFileName);
+                string url = await _ossService.Upload2PreviewUrlAsync(ossFileConfig.OssSavePlaceEnum, file, saveDirAndFileName);
                 return ApiRes.Ok(url);
             }
             catch (Exception e)

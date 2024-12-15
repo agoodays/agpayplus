@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -11,9 +12,9 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public bool IsExistUseReceiverGroup(long receiverGroupId)
+        public Task<bool> IsExistUseReceiverGroupAsync(long receiverGroupId)
         {
-            return GetAllAsNoTracking().Any(c => c.ReceiverGroupId.Equals(receiverGroupId));
+            return GetAllAsNoTracking().AnyAsync(c => c.ReceiverGroupId.Equals(receiverGroupId));
         }
     }
 }

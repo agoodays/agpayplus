@@ -41,17 +41,13 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public async Task<DateTime?> GetLastLoginTimeAsync(long userId)
         {
-            return (await DbSet
-                            .Where(w => w.UserId.Equals(userId) && w.Success)
-                            .OrderByDescending(l => l.AttemptTime)
-                            .FirstOrDefaultAsync())?.AttemptTime;
+            return (await DbSet.Where(w => w.UserId.Equals(userId) && w.Success).OrderByDescending(l => l.AttemptTime).FirstOrDefaultAsync())?.AttemptTime;
         }
 
-        public async Task ClearFailedLoginAttemptsAsync(long userId)
+        public void ClearFailedLoginAttempts(long userId)
         {
-            var loginAttempts = await DbSet
-                .Where(w => w.UserId == userId && !w.Success)
-                .ToListAsync();
+            var loginAttempts = DbSet
+                .Where(w => w.UserId == userId && !w.Success);
 
             DbSet.RemoveRange(loginAttempts);
         }

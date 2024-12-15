@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
     /// </summary>
     public class JlPayRefundService : AbstractRefundService
     {
-        private readonly JlPayPaymentService jlpayPaymentService;
+        private readonly JlPayPaymentService _paymentService;
 
         public JlPayRefundService(ILogger<JlPayRefundService> logger,
             IServiceProvider serviceProvider,
@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.jlpayPaymentService = ActivatorUtilities.CreateInstance<JlPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<JlPayPaymentService>(serviceProvider);
         }
 
         public JlPayRefundService()
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             return null;
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
                 reqParams.Add("out_trade_no", refundOrder.PayOrderId); //退款订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = jlpayPaymentService.PackageParamAndReq("/api/pay/chnquery", reqParams, logPrefix, mchAppConfigContext, false);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/pay/chnquery", reqParams, logPrefix, mchAppConfigContext, false);
                 _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
                 reqParams.Add("remark", refundOrder.RefundReason); // 退货原因
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = jlpayPaymentService.PackageParamAndReq("/api/pay/refund", reqParams, logPrefix, mchAppConfigContext, false);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/pay/refund", reqParams, logPrefix, mchAppConfigContext, false);
                 _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

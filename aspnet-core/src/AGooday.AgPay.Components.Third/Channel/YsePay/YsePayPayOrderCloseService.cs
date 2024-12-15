@@ -14,13 +14,13 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
     public class YsePayPayOrderCloseService : IPayOrderCloseService
     {
         private readonly ILogger<YsePayPayOrderCloseService> _logger;
-        private readonly YsePayPaymentService ysePayPaymentService;
+        private readonly YsePayPaymentService _paymentService;
 
         public YsePayPayOrderCloseService(ILogger<YsePayPayOrderCloseService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.ysePayPaymentService = ActivatorUtilities.CreateInstance<YsePayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<YsePayPaymentService>(serviceProvider);
         }
 
         public YsePayPayOrderCloseService()
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
         {
             return CS.IF_CODE.YSEPAY;
         }
-        public ChannelRetMsg Close(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> CloseAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
             string logPrefix = $"【银盛({payOrder.WayCode})关闭订单】";
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 string method = "ysepay.online.trade.close", repMethod = "ysepay_online_trade_close_response";
-                JObject resJSON = ysePayPaymentService.PackageParamAndReq(YsePayConfig.SEARCH_GATEWAY, method, repMethod, reqParams, string.Empty, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync(YsePayConfig.SEARCH_GATEWAY, method, repMethod, reqParams, string.Empty, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"关闭订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

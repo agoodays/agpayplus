@@ -18,15 +18,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
     [ApiController, Authorize]
     public class SysUserTeamController : CommonController
     {
-        private readonly ISysUserTeamService _mchStoreService;
+        private readonly ISysUserTeamService _sysUserTeamService;
 
         public SysUserTeamController(ILogger<SysUserTeamController> logger,
-            ISysUserTeamService mchStoreService,
+            ISysUserTeamService sysUserTeamService,
             RedisUtil client,
             IAuthService authService)
             : base(logger, client, authService)
         {
-            _mchStoreService = mchStoreService;
+            _sysUserTeamService = sysUserTeamService;
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         public async Task<ApiPageRes<SysUserTeamDto>> ListAsync([FromQuery] SysUserTeamQueryDto dto)
         {
             dto.BelongInfoId = string.IsNullOrWhiteSpace(dto.BelongInfoId) ? (dto.SysType ?? string.Empty).Equals(CS.SYS_TYPE.MGR) ? CS.BASE_BELONG_INFO_ID.MGR : dto.BelongInfoId : dto.BelongInfoId;
-            var data = await _mchStoreService.GetPaginatedDataAsync(dto);
+            var data = await _sysUserTeamService.GetPaginatedDataAsync(dto);
             return ApiPageRes<SysUserTeamDto>.Pages(data);
         }
 
@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             dto.CreatedUid = sysUser.SysUserId;
             dto.SysType = CS.SYS_TYPE.MGR;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
-            var result = await _mchStoreService.AddAsync(dto);
+            var result = await _sysUserTeamService.AddAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -74,12 +74,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_DEL)]
         public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var mchStore = await _mchStoreService.GetByIdAsync(recordId);
+            var mchStore = await _sysUserTeamService.GetByIdAsync(recordId);
             if (mchStore == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            _mchStoreService.Remove(recordId);
+            await _sysUserTeamService.RemoveAsync(recordId);
             return ApiRes.Ok();
         }
 
@@ -90,9 +90,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新团队信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_EDIT)]
-        public ApiRes Update(long recordId, SysUserTeamDto dto)
+        public async Task<ApiRes> UpdateAsync(long recordId, SysUserTeamDto dto)
         {
-            var result = _mchStoreService.Update(dto);
+            var result = await _sysUserTeamService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
@@ -109,7 +109,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_VIEW, PermCode.MGR.ENT_UR_TEAM_EDIT)]
         public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var mchStore = await _mchStoreService.GetByIdAsync(recordId);
+            var mchStore = await _sysUserTeamService.GetByIdAsync(recordId);
             if (mchStore == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

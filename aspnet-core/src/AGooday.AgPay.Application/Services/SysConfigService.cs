@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Application.Services
         {
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
 
-            var sysConfigs = _sysConfigRepository.GetAll()
+            var sysConfigs = _sysConfigRepository.GetAllAsNoTracking()
                 .Where(w => w.GroupKey.Equals(groupKey) && w.SysType.Equals(sysType) && w.BelongInfoId.Equals(belongInfoId));
             sysConfigs.Select(s => new { s.ConfigKey, s.ConfigVal }).ToList().ForEach((c) =>
             {
@@ -215,7 +215,7 @@ namespace AGooday.AgPay.Application.Services
             return SMS_CONFIG.First().Value;
         }
 
-        public int UpdateByConfigKey(Dictionary<string, string> configs, string groupKey, string sysType, string belongInfoId)
+        public async Task<int> UpdateByConfigKeyAsync(Dictionary<string, string> configs, string groupKey, string sysType, string belongInfoId)
         {
             foreach (KeyValuePair<string, string> config in configs)
             {
@@ -246,7 +246,7 @@ namespace AGooday.AgPay.Application.Services
                     };
                     sysConfig.BelongInfoId = belongInfoId;
                     isAdd = true;
-                    _sysConfigRepository.Add(sysConfig);
+                    await _sysConfigRepository.AddAsync(sysConfig);
                 }
                 sysConfig.ConfigKey = config.Key;
                 sysConfig.ConfigVal = config.Key switch
@@ -259,19 +259,19 @@ namespace AGooday.AgPay.Application.Services
                 sysConfig.UpdatedAt = DateTime.Now;
                 if (isAdd)
                 {
-                    _sysConfigRepository.Add(sysConfig);
+                    await _sysConfigRepository.AddAsync(sysConfig);
                 }
                 else
                 {
                     _sysConfigRepository.Update(sysConfig);
                 }
             }
-            return _sysConfigRepository.SaveChanges();
+            return await _sysConfigRepository.SaveChangesAsync();
         }
 
         public IEnumerable<SysConfigDto> GetByGroupKey(string groupKey, string sysType, string belongInfoId)
         {
-            var sysConfigs = _sysConfigRepository.GetAll()
+            var sysConfigs = _sysConfigRepository.GetAllAsNoTracking()
                 .Where(w => w.GroupKey.Equals(groupKey) && w.SysType.Equals(sysType) && w.BelongInfoId.Equals(belongInfoId))
                 .OrderBy(o => o.SortNum);
             List<SysConfig> mergedList = new List<SysConfig>(sysConfigs);
@@ -292,7 +292,7 @@ namespace AGooday.AgPay.Application.Services
 
         private void MergedSysConfig(string groupKey, string sysType, IOrderedQueryable<SysConfig> sysConfigs, List<SysConfig> mergedList, string belongInfoId)
         {
-            var sysConfigsTemp = _sysConfigRepository.GetAll()
+            var sysConfigsTemp = _sysConfigRepository.GetAllAsNoTracking()
                 .Where(w => w.GroupKey.Equals(groupKey) && w.SysType.Equals(sysType) && w.BelongInfoId.Equals(belongInfoId))
                 .OrderBy(o => o.SortNum);
             var mergingList = sysConfigsTemp

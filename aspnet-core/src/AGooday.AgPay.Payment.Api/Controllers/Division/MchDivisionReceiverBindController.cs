@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         public async Task<ApiRes> BindAsync()
         {
             //获取参数 & 验签
-            DivisionReceiverBindRQ bizRQ = GetRQByWithMchSign<DivisionReceiverBindRQ>();
+            DivisionReceiverBindRQ bizRQ = await this.GetRQByWithMchSignAsync<DivisionReceiverBindRQ>();
 
             try
             {
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 string ifCode = bizRQ.IfCode;
 
                 // 商户配置信息
-                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(bizRQ.MchNo, bizRQ.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(bizRQ.MchNo, bizRQ.AppId);
                 if (mchAppConfigContext == null)
                 {
                     throw new BizException("获取商户应用信息失败");
@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 {
                     throw new BizException("商户应用的支付配置不存在或已关闭");
                 }
-                var group = _mchDivisionReceiverGroupService.FindByIdAndMchNo(bizRQ.ReceiverGroupId, bizRQ.MchNo);
+                var group = await _mchDivisionReceiverGroupService.FindByIdAndMchNoAsync(bizRQ.ReceiverGroupId, bizRQ.MchNo);
                 if (group == null)
                 {
                     throw new BizException("商户分账账号组不存在，请检查或进入商户平台进行创建操作");
@@ -98,12 +98,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                     throw new BizException("系统不支持该分账接口");
                 }
 
-                ChannelRetMsg retMsg = divisionService.Bind(receiver, mchAppConfigContext);
+                ChannelRetMsg retMsg = await divisionService.BindAsync(receiver, mchAppConfigContext);
                 if (retMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
                     receiver.State = CS.YES;
                     receiver.BindSuccessTime = DateTime.Now;
-                    _mchDivisionReceiverService.Add(receiver);
+                    await _mchDivisionReceiverService.AddAsync(receiver);
                 }
                 else
                 {

@@ -19,14 +19,14 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
     /// </summary>
     public class HkrtPayChannelNoticeService : AbstractChannelNoticeService
     {
-        private readonly HkrtPayPaymentService hkrtPayPaymentService;
+        private readonly HkrtPayPaymentService _paymentService;
         public HkrtPayChannelNoticeService(ILogger<HkrtPayChannelNoticeService> logger,
             IServiceProvider serviceProvider,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, configContextQueryService)
         {
-            this.hkrtPayPaymentService = ActivatorUtilities.CreateInstance<HkrtPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<HkrtPayPaymentService>(serviceProvider);
         }
 
         public HkrtPayChannelNoticeService()
@@ -39,11 +39,11 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             return CS.IF_CODE.HKRTPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
-                string resText = GetReqParamFromBody();
+                string resText = await GetReqParamFromBodyAsync();
                 var resJson = XmlUtil.ConvertToJson(resText);
                 var resParams = JObject.Parse(resJson);
                 string payOrderId = resParams.GetValue("third_order_id").ToString();
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 var resParams = JObject.Parse(resJson);
 
                 // 校验支付回调
-                bool verifyResult = VerifyParams(resText, resParams, payOrder, mchAppConfigContext);
+                bool verifyResult = await VerifyParamsAsync(resText, resParams, payOrder, mchAppConfigContext);
                 // 验证参数失败
                 if (!verifyResult)
                 {
@@ -96,7 +96,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                     case HkrtPayEnum.TradeStatus.Success:
                         result.ChannelOrderId = trade_no;
                         var tradeType = HkrtPayEnum.ConvertTradeType(type);
-                        var attach = hkrtPayPaymentService.GetHkrtAttach(resJSON);
+                        var attach = _paymentService.GetAttach(resJSON);
                         attach.TryGetString("out_trade_no", out string out_trade_no);
                         result.PlatformMchOrderId = out_trade_no;
                         switch (tradeType)
@@ -135,7 +135,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             }
         }
 
-        public bool VerifyParams(string resText, JObject jsonParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<bool> VerifyParamsAsync(string resText, JObject jsonParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string trade_no = jsonParams.GetValue("trade_no").ToString();       // 商户订单号
             string total_amount = jsonParams.GetValue("total_amount").ToString();         // 支付金额
@@ -150,7 +150,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 return false;
             }
 
-            HkrtPayIsvParams isvParams = (HkrtPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+            HkrtPayIsvParams isvParams = (HkrtPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             //验签
             string tradeKey = isvParams.AccessKey;

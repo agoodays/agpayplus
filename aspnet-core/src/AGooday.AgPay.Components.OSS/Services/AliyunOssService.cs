@@ -15,16 +15,16 @@ namespace AGooday.AgPay.Components.OSS.Services
     public class AliyunOssService : IOssService
     {
         private readonly ILogger<AliyunOssService> _logger;
-        private readonly ISysConfigService sysConfigService;
+        private readonly ISysConfigService _sysConfigService;
         // ossClient 初始化
-        private readonly OssClient ossClient = null;
+        private readonly OssClient _ossClient = null;
 
         public AliyunOssService(ILogger<AliyunOssService> logger, ISysConfigService sysConfigService)
         {
             _logger = logger;
-            this.sysConfigService = sysConfigService;
+            _sysConfigService = sysConfigService;
             AliyunOssConfig.Oss = JsonConvert.DeserializeObject<AliyunOssConfig.OssConfig>(sysConfigService.GetDBOssConfig().AliyunOssConfig);
-            ossClient = new OssClient(AliyunOssConfig.Oss.Endpoint, AliyunOssConfig.Oss.AccessKeyId, AliyunOssConfig.Oss.AccessKeySecret);
+            _ossClient = new OssClient(AliyunOssConfig.Oss.Endpoint, AliyunOssConfig.Oss.AccessKeyId, AliyunOssConfig.Oss.AccessKeySecret);
         }
 
         public Task<UploadFormParams> GetUploadFormParamsAsync(OssSavePlaceEnum ossSavePlaceEnum, string bizType, string saveDirAndFileName)
@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Components.OSS.Services
                 if (multipartFile.Length > 0)
                 {
                     saveDirAndFileName = saveDirAndFileName.Replace('\\', '/');
-                    ossClient.PutObject(ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? AliyunOssConfig.Oss.PublicBucketName : AliyunOssConfig.Oss.PrivateBucketName
+                    _ossClient.PutObject(ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? AliyunOssConfig.Oss.PublicBucketName : AliyunOssConfig.Oss.PrivateBucketName
                         , saveDirAndFileName, multipartFile.OpenReadStream());
 
                     if (ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC)
@@ -92,8 +92,8 @@ namespace AGooday.AgPay.Components.OSS.Services
             try
             {
                 string bucket = ossSavePlaceEnum == OssSavePlaceEnum.PRIVATE ? AliyunOssConfig.Oss.PrivateBucketName : AliyunOssConfig.Oss.PublicBucketName;
-                //this.ossClient.GetObject(new GetObjectRequest(bucket, source),File.Open(target, FileMode.OpenOrCreate));
-                var ossObject = ossClient.GetObject(new GetObjectRequest(bucket, source));
+                //_ossClient.GetObject(new GetObjectRequest(bucket, source),File.Open(target, FileMode.OpenOrCreate));
+                var ossObject = _ossClient.GetObject(new GetObjectRequest(bucket, source));
                 WriteToFile(target, ossObject.Content);
 
                 return true;

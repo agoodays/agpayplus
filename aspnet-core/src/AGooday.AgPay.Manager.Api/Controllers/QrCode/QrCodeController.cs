@@ -78,9 +78,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpGet, Route("batchIdDistinctCount"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_LIST)]
-        public ApiRes BatchIdDistinctCount()
+        public async Task<ApiRes> BatchIdDistinctCountAsync()
         {
-            string data = _qrCodeService.BatchIdDistinctCount();
+            string data = await _qrCodeService.BatchIdDistinctCountAsync();
             return ApiRes.Ok(data);
         }
 
@@ -92,11 +92,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <exception cref="BizException"></exception>
         [HttpPost, Route(""), MethodLog("新增码牌")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_ADD)]
-        public ApiRes Add(QrCodeAddDto dto)
+        public async Task<ApiRes> AddAsync(QrCodeAddDto dto)
         {
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
-            bool result = _qrCodeService.BatchAdd(dto);
+            bool result = await _qrCodeService.BatchAddAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -111,9 +111,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除码牌")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_DEL)]
-        public ApiRes Delete(string recordId)
+        public async Task<ApiRes> DeleteAsync(string recordId)
         {
-            bool result = _qrCodeService.Remove(recordId);
+            bool result = await _qrCodeService.RemoveAsync(recordId);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_DELETE);
@@ -128,15 +128,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新码牌")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
-        public ApiRes Update(string recordId, QrCodeDto dto)
+        public async Task<ApiRes> UpdateAsync(string recordId, QrCodeDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.QrcId)) // 状态变更
             {
-                var entity = _qrCodeService.GetByIdAsNoTracking(recordId);
+                var entity = await _qrCodeService.GetByIdAsNoTrackingAsync(recordId);
                 entity.State = dto.State.Value;
                 CopyUtil.CopyProperties(entity, dto);
             }
-            bool result = _qrCodeService.Update(dto);
+            bool result = await _qrCodeService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
@@ -151,10 +151,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpPut, Route("bind/{recordId}"), MethodLog("绑定码牌")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
-        public ApiRes Bind(string recordId, QrCodeDto dto)
+        public async Task<ApiRes> BindAsync(string recordId, QrCodeDto dto)
         {
             dto.BindState = CS.YES;
-            bool result = _qrCodeService.Update(dto);
+            bool result = await _qrCodeService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
@@ -169,9 +169,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpPut, Route("unbind/{recordId}"), MethodLog("解绑码牌")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
-        public ApiRes UnBind(string recordId)
+        public async Task<ApiRes> UnBindAsync(string recordId)
         {
-            bool result = _qrCodeService.UnBind(recordId);
+            bool result = await _qrCodeService.UnBindAsync(recordId);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);

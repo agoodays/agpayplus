@@ -48,12 +48,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route("relas/{sysUserId}"), MethodLog("重置用户角色关联信息")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_UPD_ROLE)]
-        public ApiRes Relas(long sysUserId, List<string> entIds)
+        public async Task<ApiRes> RelasAsync(long sysUserId, List<string> entIds)
         {
             if (entIds.Count > 0)
             {
-                _sysUserRoleRelaService.SaveUserRole(sysUserId, entIds);
-                RefAuthentication(new List<long> { sysUserId });
+                await _sysUserRoleRelaService.SaveUserRoleAsync(sysUserId, entIds);
+                await RefAuthenticationAsync(new List<long> { sysUserId });
             }
             return ApiRes.Ok();
         }

@@ -11,17 +11,17 @@ namespace AGooday.AgPay.Agent.Api.MQ
     public class ResetAppConfigMQReceiver : ResetAppConfigMQ.IMQReceiver
     {
         private readonly ILogger<ResetAppConfigMQReceiver> _logger;
-        private readonly IServiceProvider provider;
+        private readonly IServiceProvider _provider;
 
         public ResetAppConfigMQReceiver(ILogger<ResetAppConfigMQReceiver> logger, IServiceProvider provider)
         {
             _logger = logger;
-            this.provider = provider;
+            _provider = provider;
         }
 
         public Task ReceiveAsync(ResetAppConfigMQ.MsgPayload payload)
         {
-            using (var scope = provider.CreateScope())
+            using (var scope = _provider.CreateScope())
             {
                 var sysConfigService = scope.ServiceProvider.GetRequiredService<ISysConfigService>();
                 _logger.LogInformation($"成功接收更新系统配置的订阅通知, msg={JsonConvert.SerializeObject(payload)}");

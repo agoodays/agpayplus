@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
@@ -46,7 +45,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_VIEW)]
         public ApiRes Detail(long recordId)
         {
-            var record = _mchDivisionReceiverGroupService.GetById(recordId, GetCurrentMchNo());
+            var record = _mchDivisionReceiverGroupService.GetByIdAsync(recordId, GetCurrentMchNo());
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -61,27 +60,18 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("新增分账账号组")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_ADD)]
-        public ApiRes Add(MchDivisionReceiverGroupDto dto)
+        public async Task<ApiRes> AddAsync(MchDivisionReceiverGroupDto dto)
         {
             var sysUser = GetCurrentUser().SysUser;
             dto.MchNo = sysUser.BelongInfoId;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
 
-            var result = _mchDivisionReceiverGroupService.Add(dto);
+            var result = await _mchDivisionReceiverGroupService.AddAsync(dto);
             if (result)
             {
                 // 更新其他组为非默认分账组
-                if (dto.AutoDivisionFlag == CS.YES)
-                {
-                    _mchDivisionReceiverGroupService.GetByMchNo(dto.MchNo)
-                        .Where(w => !w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
-                        .ToList().ForEach(w =>
-                        {
-                            w.AutoDivisionFlag = CS.NO;
-                            _mchDivisionReceiverGroupService.Update(w);
-                        });
-                }
+                await _mchDivisionReceiverGroupService.UpdateAutoDivisionFlagAsync(dto);
             }
             return ApiRes.Ok();
         }
@@ -93,23 +83,14 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新分账账号组")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_EDIT)]
-        public ApiRes Update(long recordId, MchDivisionReceiverGroupDto dto)
+        public async Task<ApiRes> UpdateAsync(long recordId, MchDivisionReceiverGroupDto dto)
         {
             dto.MchNo = GetCurrentMchNo();
-            var result = _mchDivisionReceiverGroupService.Update(dto);
+            var result = await _mchDivisionReceiverGroupService.UpdateAsync(dto);
             if (result)
             {
                 // 更新其他组为非默认分账组
-                if (dto.AutoDivisionFlag == CS.YES)
-                {
-                    _mchDivisionReceiverGroupService.GetByMchNo(dto.MchNo)
-                        .Where(w => !w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
-                        .ToList().ForEach(w =>
-                        {
-                            w.AutoDivisionFlag = CS.NO;
-                            _mchDivisionReceiverGroupService.Update(w);
-                        });
-                }
+                await _mchDivisionReceiverGroupService.UpdateAutoDivisionFlagAsync(dto);
             }
             return ApiRes.Ok();
         }
@@ -129,11 +110,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (_mchDivisionReceiverService.IsExistUseReceiverGroup(record.ReceiverGroupId.Value))
+            if (await _mchDivisionReceiverService.IsExistUseReceiverGroupAsync(record.ReceiverGroupId.Value))
             {
                 throw new BizException("该组存在账号，无法删除");
             }
-            _mchDivisionReceiverService.Remove(recordId);
+            await _mchDivisionReceiverService.RemoveAsync(recordId);
             return ApiRes.Ok();
         }
     }

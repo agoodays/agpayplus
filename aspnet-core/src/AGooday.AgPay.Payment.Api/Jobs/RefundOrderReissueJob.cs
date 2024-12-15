@@ -23,54 +23,51 @@ namespace AGooday.AgPay.Payment.Api.Jobs
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public Task Execute(IJobExecutionContext context)
+        public async Task Execute(IJobExecutionContext context)
         {
-            return Task.Run(() =>
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                using (var scope = _serviceScopeFactory.CreateScope())
+                var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
+                var channelOrderReissueService = scope.ServiceProvider.GetService<ChannelOrderReissueService>();
+                int currentPageIndex = 1; //当前页码
+                while (true)
                 {
-                    var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
-                    var channelOrderReissueService = scope.ServiceProvider.GetService<ChannelOrderReissueService>();
-                    int currentPageIndex = 1; //当前页码
-                    while (true)
+                    try
                     {
-                        try
+                        var dto = new RefundOrderQueryDto()
                         {
-                            var dto = new RefundOrderQueryDto()
-                            {
-                                PageNumber = currentPageIndex,
-                                PageSize = QUERY_PAGE_SIZE,
-                                State = (byte)RefundOrderState.STATE_ING
-                            };
-                            var refundOrders = refundOrderService.GetPaginatedData(dto);
+                            PageNumber = currentPageIndex,
+                            PageSize = QUERY_PAGE_SIZE,
+                            State = (byte)RefundOrderState.STATE_ING
+                        };
+                        var refundOrders = await refundOrderService.GetPaginatedDataAsync(dto);
 
-                            if (refundOrders == null || refundOrders.Count == 0)
-                            {
-                                //本次查询无结果, 不再继续查询;
-                                break;
-                            }
-
-                            foreach (var refundOrder in refundOrders)
-                            {
-                                channelOrderReissueService.ProcessRefundOrder(refundOrder);
-                            }
-
-                            //已经到达页码最大量，无需再次查询
-                            if (refundOrders.TotalPages <= currentPageIndex)
-                            {
-                                break;
-                            }
-                            currentPageIndex++;
-                        }
-                        catch (Exception e)
+                        if (refundOrders == null || refundOrders.Count == 0)
                         {
-                            //出现异常，直接退出，避免死循环。
-                            _logger.LogError(e, "error");
+                            //本次查询无结果, 不再继续查询;
                             break;
                         }
+
+                        foreach (var refundOrder in refundOrders)
+                        {
+                            await channelOrderReissueService.ProcessRefundOrderAsync(refundOrder);
+                        }
+
+                        //已经到达页码最大量，无需再次查询
+                        if (refundOrders.TotalPages <= currentPageIndex)
+                        {
+                            break;
+                        }
+                        currentPageIndex++;
+                    }
+                    catch (Exception e)
+                    {
+                        //出现异常，直接退出，避免死循环。
+                        _logger.LogError(e, "error");
+                        break;
                     }
                 }
-            });
+            }
         }
     }
 }

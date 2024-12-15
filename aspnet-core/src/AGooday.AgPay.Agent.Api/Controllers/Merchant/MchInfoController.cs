@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
     [ApiController, Authorize]
     public class MchInfoController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IMchInfoService _mchInfoService;
         private readonly IAgentInfoService _agentInfoService;
         private readonly ISysUserService _sysUserService;
@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _mchInfoService = mchInfoService;
             _agentInfoService = agentInfoService;
             _sysUserService = sysUserService;

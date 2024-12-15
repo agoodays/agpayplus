@@ -53,10 +53,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         /// <returns></returns>
         [HttpPost, Route("api/division/exec")]
         [PermissionAuth(PermCode.PAY.API_DIVISION_EXEC)]
-        public ApiRes Exec()
+        public async Task<ApiRes> ExecAsync()
         {
             //获取参数 & 验签
-            PayOrderDivisionExecRQ bizRQ = GetRQByWithMchSign<PayOrderDivisionExecRQ>();
+            PayOrderDivisionExecRQ bizRQ = await this.GetRQByWithMchSignAsync<PayOrderDivisionExecRQ>();
 
             try
             {
@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                     throw new BizException("mchOrderNo 和 payOrderId不能同时为空");
                 }
 
-                PayOrderDto payOrder = _payOrderService.QueryMchOrder(bizRQ.MchNo, bizRQ.PayOrderId, bizRQ.MchOrderNo);
+                PayOrderDto payOrder = await _payOrderService.QueryMchOrderAsync(bizRQ.MchNo, bizRQ.PayOrderId, bizRQ.MchOrderNo);
                 if (payOrder == null)
                 {
                     throw new BizException("订单不存在");
@@ -85,17 +85,17 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 }
 
                 // 验证账号是否合法
-                this.CheckReceiverList(receiverList, payOrder.IfCode, bizRQ.MchNo, bizRQ.AppId);
+                await CheckReceiverListAsync(receiverList, payOrder.IfCode, bizRQ.MchNo, bizRQ.AppId);
 
                 // 商户配置信息
-                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(bizRQ.MchNo, bizRQ.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(bizRQ.MchNo, bizRQ.AppId);
                 if (mchAppConfigContext == null)
                 {
                     throw new BizException("获取商户应用信息失败");
                 }
 
                 //处理分账请求
-                ChannelRetMsg channelRetMsg = _payOrderDivisionProcessService.ProcessPayOrderDivision(bizRQ.PayOrderId, bizRQ.UseSysAutoDivisionReceivers, receiverList, false);
+                ChannelRetMsg channelRetMsg = await _payOrderDivisionProcessService.ProcessPayOrderDivisionAsync(bizRQ.PayOrderId, bizRQ.UseSysAutoDivisionReceivers, receiverList, false);
 
                 PayOrderDivisionExecRS bizRS = new PayOrderDivisionExecRS();
                 //bizRS.State = (byte)(channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS ? PayOrderDivisionRecordState.STATE_SUCCESS : PayOrderDivisionRecordState.STATE_FAIL);
@@ -135,7 +135,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         /// <param name="mchNo"></param>
         /// <param name="appId"></param>
         /// <exception cref="BizException"></exception>
-        private void CheckReceiverList(List<PayOrderDivisionMQ.CustomerDivisionReceiver> receiverList, string ifCode, string mchNo, string appId)
+        private async Task CheckReceiverListAsync(List<PayOrderDivisionMQ.CustomerDivisionReceiver> receiverList, string ifCode, string mchNo, string appId)
         {
             if (receiverList == null || receiverList.Count == 0)
             {
@@ -178,7 +178,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
             if (!receiverIdSet.IsNotEmptyOrNull())
             {
-                int receiverCount = _mchDivisionReceiverService.GetCount(receiverIdSet, mchNo, appId, ifCode);
+                int receiverCount = await _mchDivisionReceiverService.GetCountAsync(receiverIdSet, mchNo, appId, ifCode);
 
                 if (receiverCount != receiverIdSet.Count)
                 {
@@ -188,7 +188,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
             if (!receiverGroupIdSet.IsNotEmptyOrNull())
             {
-                int receiverGroupCount = _mchDivisionReceiverService.GetCount(receiverGroupIdSet, mchNo);
+                int receiverGroupCount = await _mchDivisionReceiverService.GetCountAsync(receiverGroupIdSet, mchNo);
 
                 if (receiverGroupCount != receiverGroupIdSet.Count)
                 {

@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            _sysUserAuthService.ResetAuthInfo(user.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MGR);
+            await _sysUserAuthService.ResetAuthInfoAsync(user.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MGR);
             return await LogoutAsync();
         }
 

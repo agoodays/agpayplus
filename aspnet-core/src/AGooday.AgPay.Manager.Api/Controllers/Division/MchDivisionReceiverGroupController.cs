@@ -1,7 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
-using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
@@ -93,16 +92,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             if (result)
             {
                 // 更新其他组为非默认分账组
-                if (dto.AutoDivisionFlag == CS.YES)
-                {
-                    _mchDivisionReceiverGroupService.GetByMchNo(dto.MchNo)
-                        .Where(w => !w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
-                        .ToList().ForEach(w =>
-                        {
-                            w.AutoDivisionFlag = CS.NO;
-                            _mchDivisionReceiverGroupService.Update(w);
-                        });
-                }
+                await _mchDivisionReceiverGroupService.UpdateAutoDivisionFlagAsync(dto);
             }
             return ApiRes.Ok();
         }
@@ -114,22 +104,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新分账账号组")]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_GROUP_EDIT)]
-        public ApiRes Update(long recordId, MchDivisionReceiverGroupDto record)
+        public async Task<ApiRes> UpdateAsync(long recordId, MchDivisionReceiverGroupDto dto)
         {
-            var result = _mchDivisionReceiverGroupService.Update(record);
+            var result = await _mchDivisionReceiverGroupService.UpdateAsync(dto);
             if (result)
             {
                 // 更新其他组为非默认分账组
-                if (record.AutoDivisionFlag == CS.YES)
-                {
-                    _mchDivisionReceiverGroupService.GetByMchNo(record.MchNo)
-                        .Where(w => !w.ReceiverGroupId.Equals(record.ReceiverGroupId))
-                        .ToList().ForEach(w =>
-                        {
-                            w.AutoDivisionFlag = CS.NO;
-                            _mchDivisionReceiverGroupService.Update(w);
-                        });
-                }
+                await _mchDivisionReceiverGroupService.UpdateAutoDivisionFlagAsync(dto);
             }
             return ApiRes.Ok();
         }
@@ -149,11 +130,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (_mchDivisionReceiverService.IsExistUseReceiverGroup(record.ReceiverGroupId.Value))
+            if (await _mchDivisionReceiverService.IsExistUseReceiverGroupAsync(record.ReceiverGroupId.Value))
             {
                 throw new BizException("该组存在账号，无法删除");
             }
-            _mchDivisionReceiverService.Remove(recordId);
+            await _mchDivisionReceiverService.RemoveAsync(recordId);
             return ApiRes.Ok();
         }
     }

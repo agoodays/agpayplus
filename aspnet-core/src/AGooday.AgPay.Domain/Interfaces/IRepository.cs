@@ -64,6 +64,11 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="entity"></param>
         void Update(TEntity entity);
         /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="entitys"></param>
+        void UpdateRange(IQueryable<TEntity> entitys);
+        /// <summary>
         /// 更新指定实体的指定列
         /// </summary>
         /// <param name="entity"></param>
@@ -173,6 +178,11 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <param name="entity"></param>
         void Update(TEntity entity);
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="entitys"></param>
+        void UpdateRange(IQueryable<TEntity> entitys);
         /// <summary>
         /// 更新指定实体的指定列
         /// </summary>

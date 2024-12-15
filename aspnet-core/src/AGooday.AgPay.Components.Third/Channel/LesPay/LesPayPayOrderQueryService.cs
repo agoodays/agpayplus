@@ -14,13 +14,13 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
     public class LesPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<LesPayPayOrderQueryService> _logger;
-        private readonly LesPayPaymentService lesPayPaymentService;
+        private readonly LesPayPaymentService _paymentService;
 
         public LesPayPayOrderQueryService(ILogger<LesPayPayOrderQueryService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.lesPayPaymentService = ActivatorUtilities.CreateInstance<LesPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<LesPayPaymentService>(serviceProvider);
         }
 
         public LesPayPayOrderQueryService()
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             return CS.IF_CODE.LESPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
             string payType = LesPayEnum.GetPayWay(payOrder.WayCode);
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
                 reqParams.Add("third_order_id", payOrder.PayOrderId); //订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = lesPayPaymentService.PackageParamAndReq("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

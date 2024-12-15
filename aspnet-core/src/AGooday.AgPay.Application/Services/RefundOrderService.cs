@@ -8,6 +8,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Services
@@ -31,6 +32,15 @@ namespace AGooday.AgPay.Application.Services
             _payOrderRepository = payOrderRepository;
         }
 
+        public Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchRefundNo)
+        {
+            return _refundOrderRepository.IsExistOrderByMchOrderNoAsync(mchNo, mchRefundNo);
+        }
+        public Task<bool> IsExistRefundingOrderAsync(string payOrderId)
+        {
+            return _refundOrderRepository.IsExistRefundingOrderAsync(payOrderId);
+        }
+
         /// <summary>
         /// 查询商户订单
         /// </summary>
@@ -38,28 +48,20 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="mchRefundNo"></param>
         /// <param name="refundOrderId"></param>
         /// <returns></returns>
-        public RefundOrderDto QueryMchOrder(string mchNo, string mchRefundNo, string refundOrderId)
+        public async Task<RefundOrderDto> QueryMchOrderAsync(string mchNo, string mchRefundNo, string refundOrderId)
         {
-            if (string.IsNullOrEmpty(refundOrderId))
-            {
-                var entity = _refundOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.RefundOrderId.Equals(refundOrderId)).FirstOrDefault();
-                return _mapper.Map<RefundOrderDto>(entity);
-            }
-            else if (string.IsNullOrEmpty(mchRefundNo))
-            {
-                var entity = _refundOrderRepository.GetAll().Where(w => w.MchNo.Equals(mchNo) && w.MchRefundNo.Equals(mchRefundNo)).FirstOrDefault();
-                return _mapper.Map<RefundOrderDto>(entity);
-            }
-            else
-            {
-                return null;
-            }
+            var entity = await _refundOrderRepository.GetAllAsNoTracking()
+                .Where(w => w.MchNo.Equals(mchNo)
+                && ((!string.IsNullOrEmpty(refundOrderId) && w.RefundOrderId.Equals(refundOrderId))
+                || (!string.IsNullOrEmpty(mchRefundNo) && w.MchRefundNo.Equals(mchRefundNo))))
+                .FirstOrDefaultAsync();
+            return _mapper.Map<RefundOrderDto>(entity);
         }
 
-        public PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto)
+        public Task<PaginatedList<RefundOrderDto>> GetPaginatedDataAsync(RefundOrderQueryDto dto)
         {
-            var refundOrders = GetRefundOrders(dto).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<RefundOrder>.Create<RefundOrderDto>(refundOrders, _mapper, dto.PageNumber, dto.PageSize);
+            var query = GetRefundOrders(dto).OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<RefundOrder>.CreateAsync<RefundOrderDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
 
@@ -83,15 +85,15 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public JObject Statistics(RefundOrderQueryDto dto)
+        public async Task<JObject> StatisticsAsync(RefundOrderQueryDto dto)
         {
             var refundOrders = GetRefundOrders(dto);
-            var allRefundAmount = refundOrders.Sum(s => s.RefundAmount);
-            var allRefundCount = refundOrders.Count();
+            var allRefundAmount = await refundOrders.SumAsync(s => s.RefundAmount);
+            var allRefundCount = await refundOrders.CountAsync();
             var refund = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
-            var refundFeeAmount = refund.Sum(s => s.RefundFeeAmount);
-            var refundAmount = refund.Sum(s => s.RefundAmount);
-            var refundCount = refund.Count();
+            var refundFeeAmount = await refund.SumAsync(s => s.RefundFeeAmount);
+            var refundAmount = await refund.SumAsync(s => s.RefundAmount);
+            var refundCount = await refund.CountAsync();
             JObject result = new JObject();
             result.Add("allRefundAmount", Decimal.Round(allRefundAmount / 100M, 2, MidpointRounding.AwayFromZero));
             result.Add("allRefundCount", allRefundCount);
@@ -102,21 +104,12 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo)
+        public Task<long> SumSuccessRefundAmountAsync(string payOrderId)
         {
-            return _refundOrderRepository.IsExistOrderByMchOrderNo(mchNo, mchRefundNo);
-        }
-        public bool IsExistRefundingOrder(string payOrderId)
-        {
-            return _refundOrderRepository.IsExistRefundingOrder(payOrderId);
-        }
-
-        public long SumSuccessRefundAmount(string payOrderId)
-        {
-            return _refundOrderRepository.GetAll()
+            return _refundOrderRepository.GetAllAsNoTracking()
                 .Where(w => w.PayOrderId.Equals(payOrderId)
                 && w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
-                .Sum(s => s.RefundAmount);
+                .SumAsync(s => s.RefundAmount);
         }
 
         /// <summary>
@@ -125,7 +118,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="refundOrderId"></param>
         /// <param name="channelOrderNo"></param>
         /// <returns></returns>
-        public bool UpdateInit2Ing(string refundOrderId, string channelOrderNo)
+        public async Task<bool> UpdateInit2IngAsync(string refundOrderId, string channelOrderNo)
         {
             var updateRecord = _refundOrderRepository.GetById(refundOrderId);
             if (updateRecord.State != (byte)RefundOrderState.STATE_INIT)
@@ -136,7 +129,7 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.State = (byte)RefundOrderState.STATE_ING;
             updateRecord.ChannelOrderNo = channelOrderNo;
             _refundOrderRepository.Update(updateRecord);
-            return _refundOrderRepository.SaveChanges(out int _);
+            return await _refundOrderRepository.SaveChangesAsync() > 0;
         }
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款成功】
@@ -144,7 +137,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="refundOrderId"></param>
         /// <param name="channelOrderNo"></param>
         /// <returns></returns>
-        public bool UpdateIng2Success(string refundOrderId, string channelOrderNo)
+        public async Task<bool> UpdateIng2SuccessAsync(string refundOrderId, string channelOrderNo)
         {
             var updateRecord = _refundOrderRepository.GetById(refundOrderId);
             if (updateRecord.State != (byte)RefundOrderState.STATE_ING)
@@ -157,12 +150,12 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.ChannelOrderNo = channelOrderNo;
             updateRecord.SuccessTime = DateTime.Now;
             _refundOrderRepository.Update(updateRecord);
-            if (!_refundOrderRepository.SaveChanges(out int _))
+            if (!(await _refundOrderRepository.SaveChangesAsync() > 0))
             {
                 return false;
             }
             //2. 更新订单表数据（更新退款次数,退款状态,如全额退款更新支付状态为已退款）
-            if (!UpdateRefundAmountAndCount(updateRecord.PayOrderId, updateRecord.RefundAmount, updateRecord.RefundFeeAmount))
+            if (!await UpdateRefundAmountAndCountAsync(updateRecord.PayOrderId, updateRecord.RefundAmount, updateRecord.RefundFeeAmount))
             {
                 throw new BizException("更新订单数据异常");
             }
@@ -175,9 +168,9 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="currentRefundAmount"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public bool UpdateRefundAmountAndCount(string payOrderId, long currentRefundAmount, long currentRefundFeeAmount)
+        public async Task<bool> UpdateRefundAmountAndCountAsync(string payOrderId, long currentRefundAmount, long currentRefundFeeAmount)
         {
-            var payOrder = _payOrderRepository.GetById(payOrderId);
+            var payOrder = await _payOrderRepository.GetByIdAsync(payOrderId);
             // 成功状态的可退款
             if (payOrder.State != (byte)PayOrderState.STATE_SUCCESS)
             {
@@ -194,7 +187,7 @@ namespace AGooday.AgPay.Application.Services
             payOrder.MchFeeAmount = payOrder.MchFeeAmount - currentRefundFeeAmount;
             payOrder.State = payOrder.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_ALL) ? (byte)PayOrderState.STATE_REFUND : payOrder.State; // 更新支付状态是否已退款。 此更新需在refund_state更新之后，如果全额退款则修改支付状态为已退款
             _payOrderRepository.Update(payOrder);
-            return _payOrderRepository.SaveChanges(out int _);
+            return await _refundOrderRepository.SaveChangesAsync() > 0;
         }
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款失败】
@@ -204,7 +197,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="channelErrCode"></param>
         /// <param name="channelErrMsg"></param>
         /// <returns></returns>
-        public bool UpdateIng2Fail(string refundOrderId, string channelOrderNo, string channelErrCode, string channelErrMsg)
+        public async Task<bool> UpdateIng2FailAsync(string refundOrderId, string channelOrderNo, string channelErrCode, string channelErrMsg)
         {
             var updateRecord = _refundOrderRepository.GetById(refundOrderId);
             if (updateRecord.State != (byte)RefundOrderState.STATE_ING)
@@ -217,7 +210,7 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.ErrMsg = channelErrMsg;
             updateRecord.ChannelOrderNo = channelOrderNo;
             _refundOrderRepository.Update(updateRecord);
-            return _refundOrderRepository.SaveChanges(out int _);
+            return await _refundOrderRepository.SaveChangesAsync() > 0;
         }
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款成功/退款失败】
@@ -228,28 +221,28 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="channelErrCode"></param>
         /// <param name="channelErrMsg"></param>
         /// <returns></returns>
-        public bool UpdateIng2SuccessOrFail(string refundOrderId, byte updateState, string channelOrderNo, string channelErrCode, string channelErrMsg)
+        public Task<bool> UpdateIng2SuccessOrFailAsync(string refundOrderId, byte updateState, string channelOrderNo, string channelErrCode, string channelErrMsg)
         {
             if (updateState == (byte)RefundOrderState.STATE_ING)
             {
-                return true;
+                return Task.FromResult(true);
             }
             else if (updateState == (byte)RefundOrderState.STATE_SUCCESS)
             {
-                return UpdateIng2Success(refundOrderId, channelOrderNo);
+                return UpdateIng2SuccessAsync(refundOrderId, channelOrderNo);
             }
             else if (updateState == (byte)RefundOrderState.STATE_FAIL)
             {
-                return UpdateIng2Fail(refundOrderId, channelOrderNo, channelErrCode, channelErrMsg);
+                return UpdateIng2FailAsync(refundOrderId, channelOrderNo, channelErrCode, channelErrMsg);
             }
-            return false;
+            return Task.FromResult(false);
 
         }
         /// <summary>
         /// 更新退款单为 关闭状态
         /// </summary>
         /// <returns></returns>
-        public int UpdateOrderExpired()
+        public Task<int> UpdateOrderExpiredAsync()
         {
             var updateRecords = _refundOrderRepository.GetAll()
                 .Where(w => (new List<byte>() { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
@@ -259,7 +252,7 @@ namespace AGooday.AgPay.Application.Services
                 refundOrder.State = (byte)PayOrderState.STATE_CLOSED;
                 _refundOrderRepository.Update(refundOrder);
             }
-            return _refundOrderRepository.SaveChanges();
+            return _refundOrderRepository.SaveChangesAsync();
         }
     }
 }

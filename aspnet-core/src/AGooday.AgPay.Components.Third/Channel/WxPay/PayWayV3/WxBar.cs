@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
     /// </summary>
     public class WxBar : WxPayPaymentService
     {
-        private readonly IPaymentService wxBar;
+        private readonly IPaymentService _paymentService;
 
         public WxBar(ILogger<WxBar> logger,
             IServiceProvider serviceProvider,
@@ -20,17 +20,17 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.wxBar = serviceProvider.GetService<PayWay.WxBar>(); //serviceProvider.GetServices<IPaymentService>().FirstOrDefault(f => f.GetType().Equals(typeof(PayWay.WxBar)));
+            _paymentService = serviceProvider.GetService<PayWay.WxBar>(); //serviceProvider.GetServices<IPaymentService>().FirstOrDefault(f => f.GetType().Equals(typeof(PayWay.WxBar)));
         }
 
         public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            return wxBar.PreCheck(rq, payOrder);
+            return _paymentService.PreCheck(rq, payOrder);
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return wxBar.Pay(rq, payOrder, mchAppConfigContext);
+            return _paymentService.PayAsync(rq, payOrder, mchAppConfigContext);
         }
     }
 }

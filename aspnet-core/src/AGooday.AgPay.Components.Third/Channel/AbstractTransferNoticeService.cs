@@ -16,9 +16,9 @@ namespace AGooday.AgPay.Components.Third.Channel
     public abstract class AbstractTransferNoticeService : ITransferNoticeService
     {
         protected readonly ILogger<AbstractTransferNoticeService> _logger;
-        protected readonly RequestKit requestKit;
-        protected readonly ChannelCertConfigKit channelCertConfigKit;
-        protected readonly ConfigContextQueryService configContextQueryService;
+        protected readonly RequestKit _requestKit;
+        protected readonly ChannelCertConfigKit _channelCertConfigKit;
+        protected readonly ConfigContextQueryService _configContextQueryService;
 
         protected AbstractTransferNoticeService(ILogger<AbstractTransferNoticeService> logger,
             RequestKit requestKit,
@@ -26,9 +26,9 @@ namespace AGooday.AgPay.Components.Third.Channel
             ConfigContextQueryService configContextQueryService)
         {
             _logger = logger;
-            this.requestKit = requestKit;
-            this.channelCertConfigKit = channelCertConfigKit;
-            this.configContextQueryService = configContextQueryService;
+            _requestKit = requestKit;
+            _channelCertConfigKit = channelCertConfigKit;
+            _configContextQueryService = configContextQueryService;
         }
 
         protected AbstractTransferNoticeService()
@@ -37,9 +37,9 @@ namespace AGooday.AgPay.Components.Third.Channel
 
         public abstract string GetIfCode();
 
-        public abstract Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId);
+        public abstract Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId);
 
-        public abstract ChannelRetMsg DoNotice(HttpRequest request, object parameters, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext);
+        public abstract Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object parameters, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext);
 
         public virtual ActionResult DoNotifyOrderNotExists(HttpRequest request)
         {
@@ -73,14 +73,14 @@ namespace AGooday.AgPay.Components.Third.Channel
             return response;
         }
 
-        protected JObject GetReqParamJSON()
+        protected Task<JObject> GetReqParamJSONAsync()
         {
-            return requestKit.GetReqParamJSON();
+            return _requestKit.GetReqParamJSONAsync();
         }
 
-        protected string GetReqParamFromBody()
+        protected Task<string> GetReqParamFromBodyAsync()
         {
-            return requestKit.GetReqParamFromBody();
+            return _requestKit.GetReqParamFromBodyAsync();
         }
 
         protected string GetCertFilePath(string certFilePath)

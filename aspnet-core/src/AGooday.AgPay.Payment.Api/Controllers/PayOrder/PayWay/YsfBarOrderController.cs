@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
         public async Task<ActionResult<ApiRes>> YsfBarOrderAsync()
         {
             //获取参数 & 验证
-            YsfBarOrderRQ bizRQ = GetRQByWithMchSign<YsfBarOrderRQ>();
+            YsfBarOrderRQ bizRQ = await this.GetRQByWithMchSignAsync<YsfBarOrderRQ>();
 
             // 统一下单接口;
             return await UnifiedOrderAsync(CS.PAY_WAY_CODE.YSF_BAR, bizRQ);// "ALI_BAR";  //支付宝条码支付

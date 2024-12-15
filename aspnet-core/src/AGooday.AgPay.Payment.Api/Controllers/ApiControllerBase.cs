@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
         /// <returns></returns>
         protected T GetRQ<T>() where T : AbstractRQ
         {
-            T bizRQ = GetObject<T>();
+            T bizRQ = this.GetObject<T>();
 
             // [1]. 验证通用字段规则
             // 先清除验证状态
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
         /// <typeparam name="T"></typeparam>
         /// <param name="cls"></param>
         /// <returns></returns>
-        protected T GetRQByWithMchSign<T>() where T : AbstractRQ
+        protected async Task<T> GetRQByWithMchSignAsync<T>() where T : AbstractRQ
         {
             //获取请求RQ, and 通用验证
             T bizRQ = GetRQ<T>();
@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
                 throw new BizException("参数有误！");
             }
 
-            MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
+            MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
 
             if (mchAppConfigContext == null)
             {

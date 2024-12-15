@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【银联商务条码(unionpay)支付】";
             YsfBarOrderRQ bizRQ = (YsfBarOrderRQ)rq;
@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay.PayWay
             // 银联商务 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder, GetNotifyUrl());
 
-            var channelRetMsg = UmsBar(reqParams, logPrefix, mchAppConfigContext);
+            var channelRetMsg = await BarAsync(reqParams, logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }

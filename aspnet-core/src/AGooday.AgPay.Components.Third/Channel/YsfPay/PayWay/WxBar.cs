@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【云闪付条码(wechat)支付】";
             WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay.PayWay
             reqParams.Add("termInfo", JsonConvert.SerializeObject(new { ip = !string.IsNullOrWhiteSpace(payOrder.ClientIp) ? payOrder.ClientIp : "127.0.0.1" })); //终端信息
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/gateway/api/pay/micropay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/gateway/api/pay/micropay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string respCode = resJSON.GetValue("respCode").ToString(); //应答码
             string respMsg = resJSON.GetValue("respMsg").ToString(); //应答信息

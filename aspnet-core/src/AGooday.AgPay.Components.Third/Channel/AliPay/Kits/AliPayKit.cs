@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.Kits
         /// <param name="mchAppConfigContext"></param>
         /// <param name="req"></param>
         /// <param name="model"></param>
-        public static void PutApiIsvInfo<T>(MchAppConfigContext mchAppConfigContext, IAopRequest<T> req, AopObject model) where T : AopResponse
+        public static async Task PutApiIsvInfoAsync<T>(MchAppConfigContext mchAppConfigContext, IAopRequest<T> req, AopObject model) where T : AopResponse
         {
             //不是特约商户， 无需放置此值
             if (!mchAppConfigContext.IsIsvSubMch())
@@ -31,8 +31,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.Kits
             ConfigContextQueryService configContextQueryService = ServiceResolver.GetService<ConfigContextQueryService>();
 
             // 获取支付参数
-            AliPayIsvParams isvParams = (AliPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.ALIPAY);
-            AliPayIsvSubMchParams isvsubMchParams = (AliPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.ALIPAY);
+            AliPayIsvParams isvParams = (AliPayIsvParams)await configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.ALIPAY);
+            AliPayIsvSubMchParams isvsubMchParams = (AliPayIsvSubMchParams)await configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.ALIPAY);
 
             // 子商户信息
             if (req is AlipayTradePayRequest)

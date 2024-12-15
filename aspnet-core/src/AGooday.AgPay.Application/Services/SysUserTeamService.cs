@@ -20,33 +20,33 @@ namespace AGooday.AgPay.Application.Services
             _sysUserTeamRepository = sysUserTeamRepository;
         }
 
-        public override bool Add(SysUserTeamDto dto)
+        public override async Task<bool> AddAsync(SysUserTeamDto dto)
         {
             var entity = _mapper.Map<SysUserTeam>(dto);
-            _sysUserTeamRepository.Add(entity);
-            var result = _sysUserTeamRepository.SaveChanges(out int _);
+            await _sysUserTeamRepository.AddAsync(entity);
+            var result = await _sysUserTeamRepository.SaveChangesAsync() > 0;
             dto.TeamId = entity.TeamId;
             return result;
         }
 
-        public override bool Update(SysUserTeamDto dto)
+        public override async Task<bool> UpdateAsync(SysUserTeamDto dto)
         {
             var renew = _mapper.Map<SysUserTeam>(dto);
             renew.UpdatedAt = DateTime.Now;
             _sysUserTeamRepository.Update(renew);
-            return _sysUserTeamRepository.SaveChanges(out int _);
+            return await _sysUserTeamRepository.SaveChangesAsync() > 0;
         }
 
-        public async Task<PaginatedList<SysUserTeamDto>> GetPaginatedDataAsync(SysUserTeamQueryDto dto)
+        public Task<PaginatedList<SysUserTeamDto>> GetPaginatedDataAsync(SysUserTeamQueryDto dto)
         {
-            var sysUsers = _sysUserTeamRepository.GetAllAsNoTracking()
+            var query = _sysUserTeamRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
                 && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Equals(dto.BelongInfoId))
                 && (string.IsNullOrWhiteSpace(dto.TeamName) || w.TeamName.Contains(dto.TeamName))
                 && (string.IsNullOrWhiteSpace(dto.TeamNo) || w.TeamNo.Equals(dto.TeamNo))
-                && (dto.TeamId.Equals(null) || w.TeamId.Equals(dto.TeamId))
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<SysUserTeam>.CreateAsync<SysUserTeamDto>(sysUsers, _mapper, dto.PageNumber, dto.PageSize);
+                && (dto.TeamId.Equals(null) || w.TeamId.Equals(dto.TeamId)))
+                .OrderByDescending(o => o.CreatedAt);
+            var records = PaginatedList<SysUserTeam>.CreateAsync<SysUserTeamDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

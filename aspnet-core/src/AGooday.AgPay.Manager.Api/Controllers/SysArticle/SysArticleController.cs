@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            _sysArticleService.Remove(recordId);
+            await _sysArticleService.RemoveAsync(recordId);
 
             return ApiRes.Ok();
         }
@@ -90,9 +90,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新文章信息")]
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_EDIT)]
-        public ApiRes Update(long recordId, SysArticleDto dto)
+        public async Task<ApiRes> UpdateAsync(long recordId, SysArticleDto dto)
         {
-            var result = _sysArticleService.Update(dto);
+            var result = await _sysArticleService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);

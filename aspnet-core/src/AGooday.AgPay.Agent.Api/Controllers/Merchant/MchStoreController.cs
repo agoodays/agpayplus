@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
     [ApiController, Authorize]
     public class MchStoreController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IMchStoreService _mchStoreService;
         private readonly IMchInfoService _mchInfoService;
         private readonly ISysConfigService _sysConfigService;
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _mchStoreService = mchStoreService;
             _mchInfoService = mchInfoService;
             _sysConfigService = sysConfigService;
@@ -86,13 +86,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除门店")]
         [PermissionAuth(PermCode.AGENT.ENT_MCH_STORE_DEL)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            _mchStoreService.Remove(recordId);
+            await _mchStoreService.RemoveAsync(recordId);
 
             //// 推送mq到目前节点进行更新数据
-            //var mchStore = _mchStoreService.GetById(recordId);
-            //mqSender.Send(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_STORE, null, null, mchStore.MchNo, null, recordId));
+            //var mchStore = await _mchStoreService.GetByIdAsync(recordId);
+            //await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_STORE, null, null, mchStore.MchNo, null, recordId));
 
             return ApiRes.Ok();
         }
@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
                 sysUser.BindAppId = dto.BindAppId;
                 CopyUtil.CopyProperties(sysUser, dto);
             }
-            var result = _mchStoreService.Update(dto);
+            var result = await _mchStoreService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);

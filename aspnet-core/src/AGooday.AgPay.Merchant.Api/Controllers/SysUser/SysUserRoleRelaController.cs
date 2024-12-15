@@ -60,8 +60,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             }
             if (entIds.Count > 0)
             {
-                _sysUserRoleRelaService.SaveUserRole(sysUserId, entIds);
-                RefAuthentication(new List<long> { sysUserId });
+                await _sysUserRoleRelaService.SaveUserRoleAsync(sysUserId, entIds);
+                await RefAuthenticationAsync(new List<long> { sysUserId });
             }
             return ApiRes.Ok();
         }

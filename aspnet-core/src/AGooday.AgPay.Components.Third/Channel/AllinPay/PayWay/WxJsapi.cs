@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【通联(wechatJs)jsapi支付】";
             JObject reqParams = new JObject();
@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay.PayWay
             reqParams.Add("sub_appid", bizRQ.SubAppId);
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/apiweb/unitorder/pay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/apiweb/unitorder/pay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("retcode").ToString(); //请求响应码
             string msg = resJSON.GetValue("retmsg").ToString(); //响应信息

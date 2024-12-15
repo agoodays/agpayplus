@@ -24,33 +24,33 @@ namespace AGooday.AgPay.Application.Services
             _payWayRepository = payWayRepository;
         }
 
-        public override bool Add(PayWayDto dto)
+        public Task<bool> IsExistPayWayCodeAsync(string wayCode)
         {
-            dto.WayCode = dto.WayCode.ToUpper();
-            var m = _mapper.Map<PayWay>(dto);
-            _payWayRepository.Add(m);
-            return _payWayRepository.SaveChanges(out int _);
+            return _payWayRepository.IsExistPayWayCodeAsync(wayCode);
         }
 
-        public string GetWayTypeByWayCode(string wayCode)
+        public override async Task<bool> AddAsync(PayWayDto dto)
         {
-            var entity = _payWayRepository.GetById(wayCode);
+            dto.WayCode = dto.WayCode.ToUpper();
+            var entity = _mapper.Map<PayWay>(dto);
+            await _payWayRepository.AddAsync(entity);
+            return await _payWayRepository.SaveChangesAsync() > 0;
+        }
+
+        public async Task<string> GetWayTypeByWayCodeAsync(string wayCode)
+        {
+            var entity = await _payWayRepository.GetByIdAsync(wayCode);
             return entity?.WayType ?? PayWayType.OTHER.ToString();
         }
 
-        public bool IsExistPayWayCode(string wayCode)
+        public Task<PaginatedList<T>> GetPaginatedDataAsync<T>(PayWayQueryDto dto)
         {
-            return _payWayRepository.IsExistPayWayCode(wayCode);
-        }
-
-        public PaginatedList<T> GetPaginatedData<T>(PayWayQueryDto dto)
-        {
-            var payWays = _payWayRepository.GetAllAsNoTracking()
+            var query = _payWayRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
                 && (string.IsNullOrWhiteSpace(dto.WayName) || w.WayName.Contains(dto.WayName))
-                && (string.IsNullOrWhiteSpace(dto.WayType) || w.WayType.Equals(dto.WayType))
-                ).OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayWay>.Create<T>(payWays, _mapper, dto.PageNumber, dto.PageSize);
+                && (string.IsNullOrWhiteSpace(dto.WayType) || w.WayType.Equals(dto.WayType)))
+                .OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
+            var records = PaginatedList<PayWay>.CreateAsync<T>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

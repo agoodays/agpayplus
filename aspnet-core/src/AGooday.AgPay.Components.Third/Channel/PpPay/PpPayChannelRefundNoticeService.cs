@@ -31,15 +31,15 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             return CS.IF_CODE.PPPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
-            JObject paramsObj = JObject.Parse(GetReqParamJSON().ToString());
+            JObject paramsObj = await GetReqParamJSONAsync();
             // 获取退款订单 Paypal ID
             string orderId = paramsObj.SelectToken("resource.invoice_id")?.ToString();
             return new Dictionary<string, object>() { { orderId, paramsObj } };
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object @params, RefundOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
 
                 // 查询退款详情以及状态
                 RefundsGetInput refundRequest = new RefundsGetInput(orderId);
-                var response = wrapper.Client.PaymentsController.RefundsGet(refundRequest);
+                var response = await wrapper.Client.PaymentsController.RefundsGetAsync(refundRequest);
 
                 ChannelRetMsg channelRetMsg = ChannelRetMsg.Waiting();
                 channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("ERROR");

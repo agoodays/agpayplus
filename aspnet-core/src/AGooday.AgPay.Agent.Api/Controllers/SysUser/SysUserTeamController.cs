@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            _sysUserTeamService.Remove(recordId);
+            await _sysUserTeamService.RemoveAsync(recordId);
             return ApiRes.Ok();
         }
 
@@ -91,9 +91,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新团队信息")]
         [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_EDIT)]
-        public ApiRes Update(long recordId, SysUserTeamDto dto)
+        public async Task<ApiRes> UpdateAsync(long recordId, SysUserTeamDto dto)
         {
-            var result = _sysUserTeamService.Update(dto);
+            var result = await _sysUserTeamService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);

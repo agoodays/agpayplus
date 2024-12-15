@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
     [ApiController, Authorize]
     public class SysConfigController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly ISysConfigService _sysConfigService;
 
         public SysConfigController(ILogger<SysConfigController> logger,
@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _sysConfigService = sysConfigService;
         }
 
@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
             //{
             //    _sysConfigService.SaveOrUpdate(new SysConfigDto() { ConfigKey = config.Key, ConfigVal = config.Value });
             //}
-            int update = _sysConfigService.UpdateByConfigKey(configs, groupKey, CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
+            int update = await _sysConfigService.UpdateByConfigKeyAsync(configs, groupKey, CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
             if (update <= 0)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");
@@ -140,7 +140,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
 
         private Task UpdateSysConfigMQAsync(string groupKey)
         {
-            return mqSender.SendAsync(ResetAppConfigMQ.Build(groupKey));
+            return _mqSender.SendAsync(ResetAppConfigMQ.Build(groupKey));
         }
     }
 }

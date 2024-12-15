@@ -42,11 +42,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_LIST)]
-        public ApiRes List(byte? state)
+        public async Task<ApiRes> ListAsync(byte? state)
         {
-            var data = _payIfDefineService.GetAllAsNoTracking()
-                .Where(w => !state.HasValue || w.State.Equals(state))
-                .OrderByDescending(o => o.CreatedAt);
+            var data = await _payIfDefineService.PayIfDefineListAsync(state);
             return ApiRes.Ok(data);
         }
 
@@ -91,7 +89,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             {
                 throw new BizException("该支付接口已有服务商或商户配置参数或已发生交易，无法删除！");
             }
-            var result = _payIfDefineService.Remove(ifCode);
+            var result = await _payIfDefineService.RemoveAsync(ifCode);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_DELETE);
@@ -106,7 +104,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPut, Route("{ifCode}"), MethodLog("更新支付接口")]
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
-        public ApiRes Update(string ifCode, PayInterfaceDefineAddOrEditDto dto)
+        public async Task<ApiRes> UpdateAsync(string ifCode, PayInterfaceDefineAddOrEditDto dto)
         {
             JArray jsonArray = new JArray();
             var wayCodes = dto.WayCodeStrs.Split(",");
@@ -117,7 +115,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 jsonArray.Add(jsonObject);
             }
             dto.WayCodes = jsonArray;
-            var result = _payIfDefineService.Update(dto);
+            var result = await _payIfDefineService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);

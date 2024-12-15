@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Application.Interfaces
         Task CreateAsync(AgentInfoCreateDto dto);
         Task RemoveAsync(string recordId);
         Task ModifyAsync(AgentInfoModifyDto dto);
-        bool UpdateById(AgentInfoDto dto);
+        Task<bool> UpdateByIdAsync(AgentInfoDto dto);
         IEnumerable<AgentInfoDto> GetParents(string agentNo);
         Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(AgentInfoQueryDto dto);
         Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(string agentNo, AgentInfoQueryDto dto);

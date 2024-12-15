@@ -44,9 +44,9 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetUmsPayHost4env(UmsPayIsvParams isvParams)
+        public static string GetHost4env(UmsPayIsvParams isvParams)
         {
             return CS.YES == isvParams.Sandbox ? UmsPayConfig.SANDBOX_SERVER_URL : UmsPayConfig.PROD_SERVER_URL;
         }
@@ -73,9 +73,9 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext, bool isBarPay = false)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext, bool isBarPay = false)
         {
-            UmsPayIsvParams isvParams = (UmsPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+            UmsPayIsvParams isvParams = (UmsPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             if (string.IsNullOrWhiteSpace(isvParams?.AppId) || string.IsNullOrWhiteSpace(isvParams?.AppKey))
             {
@@ -83,16 +83,16 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
                 throw new BizException("服务商配置为空。");
             }
 
-            UmsPayIsvSubMchParams isvsubMchParams = (UmsPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            UmsPayIsvSubMchParams isvsubMchParams = (UmsPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
             reqParams.Add(isBarPay ? "merchantCode" : "mid", isvsubMchParams.Mid); //商户号
             reqParams.Add(isBarPay ? "terminalCode" : "tid", isvsubMchParams.Tid); //终端号
 
             // 调起上游接口
-            string url = GetUmsPayHost4env(isvParams) + apiUri;
+            string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = UmsHttpUtil.DoPostJson(url, isvParams.AppId, isvParams.AppKey, reqParams);
+            string resText = await UmsHttpUtil.DoPostJsonAsync(url, isvParams.AppId, isvParams.AppKey, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -167,11 +167,11 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             reqParams.Add("ip", payOrder.ClientIp);
         }
 
-        public ChannelRetMsg UmsBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BarAsync(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/v6/poslink/transaction/pay", reqParams, logPrefix, mchAppConfigContext, true);
+            JObject resJSON = await PackageParamAndReqAsync("/v6/poslink/transaction/pay", reqParams, logPrefix, mchAppConfigContext, true);
             //请求 & 响应成功， 判断业务逻辑
             string errCode = resJSON.GetValue("errCode").ToString(); // 错误代码
             resJSON.TryGetString("errInfo", out string errInfo); // 错误说明

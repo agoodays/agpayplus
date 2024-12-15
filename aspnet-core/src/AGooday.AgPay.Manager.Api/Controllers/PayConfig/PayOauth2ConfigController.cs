@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
 
         [HttpPost, Route("diyList"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_OAUTH2_CONFIG_ADD)]
-        public ApiRes Save(PayOauth2ConfigRequest model)
+        public async Task<ApiRes> SaveAsync(PayOauth2ConfigRequest model)
         {
             string infoType = GetInfoType(model.ConfigMode);
             var data = _payIfConfigService.GetByInfoId(infoType, model.CopySourceInfoId);
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 item.UpdatedUid = userId;
                 item.UpdatedBy = realName;
                 item.UpdatedAt = DateTime.Now;
-                _payIfConfigService.Add(item);
+                await _payIfConfigService.AddAsync(item);
             }
             return ApiRes.Ok();
         }
@@ -104,7 +104,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         public async Task<ApiRes> GetByInfoIdAsync(string configMode, string infoId, string ifCode)
         {
             string infoType = GetInfoType(configMode);
-            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
+            var payInterfaceConfig = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(infoType, infoId, ifCode);
             payInterfaceConfig ??= new PayInterfaceConfigDto()
             {
                 InfoType = infoType,
@@ -161,7 +161,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPost, Route("configParams"), MethodLog("更新Oauth2配置")]
         [PermissionAuth(PermCode.MGR.ENT_ISV_OAUTH2_CONFIG_ADD, PermCode.MGR.ENT_MCH_OAUTH2_CONFIG_ADD)]
-        public ApiRes SaveOrUpdate(PayInterfaceConfigDto dto)
+        public async Task<ApiRes> SaveOrUpdateAsync(PayInterfaceConfigDto dto)
         {
             //添加更新者信息
             long userId = GetCurrentUser().SysUser.SysUserId;
@@ -171,7 +171,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             dto.UpdatedAt = DateTime.Now;
 
             //根据 服务商号、接口类型 获取商户参数配置
-            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(dto.InfoType, dto.InfoId, dto.IfCode);
+            var dbRecoed = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(dto.InfoType, dto.InfoId, dto.IfCode);
             //若配置存在，为saveOrUpdate添加ID，第一次配置添加创建者
             if (dbRecoed != null)
             {
@@ -188,7 +188,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 dto.CreatedBy = realName;
                 dto.CreatedAt = DateTime.Now;
             }
-            var result = _payIfConfigService.SaveOrUpdate(dto);
+            var result = await _payIfConfigService.SaveOrUpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "配置失败");

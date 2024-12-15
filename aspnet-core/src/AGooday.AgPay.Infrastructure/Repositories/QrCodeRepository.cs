@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -11,14 +12,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public QrCode GetByIdAsNoTracking(string recordId)
+        public Task<bool> IsExistBatchIdAsync(string batchId)
         {
-            return GetAllAsNoTracking().FirstOrDefault(w => w.QrcId.Equals(recordId));
+            return GetAllAsNoTracking().AnyAsync(c => c.BatchId.Equals(batchId));
         }
 
-        public bool IsExistBatchId(string batchId)
+        public Task<QrCode> GetByIdAsNoTrackingAsync(string recordId)
         {
-            return GetAllAsNoTracking().Any(c => c.BatchId.Equals(batchId));
+            return GetAllAsNoTracking().FirstOrDefaultAsync(w => w.QrcId.Equals(recordId));
         }
     }
 }

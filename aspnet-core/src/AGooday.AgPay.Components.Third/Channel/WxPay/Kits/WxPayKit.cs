@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.Kits
         /// </summary>
         /// <param name="mchAppConfigContext"></param>
         /// <param name="req"></param>
-        public static void PutApiIsvInfo(MchAppConfigContext mchAppConfigContext, WechatTenpayRequest req)
+        public static async Task PutApiIsvInfoAsync(MchAppConfigContext mchAppConfigContext, WechatTenpayRequest req)
         {
             //不是特约商户， 无需放置此值
             if (!mchAppConfigContext.IsIsvSubMch())
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.Kits
             ConfigContextQueryService configContextQueryService = ServiceResolver.GetService<ConfigContextQueryService>();
 
             WxPayIsvSubMchParams isvsubMchParams =
-                (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                (WxPayIsvSubMchParams)await configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
 
             //req.SubMchId = isvsubMchParams.SubMchId;
             //req.SubAppId = isvsubMchParams.SubMchAppId;

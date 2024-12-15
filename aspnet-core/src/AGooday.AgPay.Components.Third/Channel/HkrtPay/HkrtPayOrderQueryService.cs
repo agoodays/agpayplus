@@ -14,13 +14,13 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
     public class HkrtPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<HkrtPayPayOrderQueryService> _logger;
-        private readonly HkrtPayPaymentService hkrtPayPaymentService;
+        private readonly HkrtPayPaymentService _paymentService;
 
         public HkrtPayPayOrderQueryService(ILogger<HkrtPayPayOrderQueryService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.hkrtPayPaymentService = ActivatorUtilities.CreateInstance<HkrtPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<HkrtPayPaymentService>(serviceProvider);
         }
 
         public HkrtPayPayOrderQueryService()
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             return CS.IF_CODE.HKRTPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             string payType = HkrtPayEnum.GetTradeType(payOrder.WayCode);
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 reqParams.Add("out_trade_no", payOrder.PayOrderId); //服务商交易订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = hkrtPayPaymentService.PackageParamAndReq("/api/v1/pay/polymeric/query", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/v1/pay/polymeric/query", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                                 channelRetMsg = ChannelRetMsg.ConfirmSuccess(trade_no);  //支付成功
                                 channelRetMsg.ChannelOrderId = trade_no;
                                 var tradeType = HkrtPayEnum.ConvertTradeType(type);
-                                var attach = hkrtPayPaymentService.GetHkrtAttach(resJSON);
+                                var attach = _paymentService.GetAttach(resJSON);
                                 attach.TryGetString("out_trade_no", out string out_trade_no);
                                 channelRetMsg.PlatformMchOrderId = out_trade_no;
                                 switch (tradeType)

@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【斗拱(unionpay)jsapi支付】";
             YsfJsapiOrderRQ bizRQ = (YsfJsapiOrderRQ)rq;
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay.PayWay
             reqParams.Add("risk_check_data", riskCheckData);
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/trade/onlinepayment/unionpay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/trade/onlinepayment/unionpay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             var data = resJSON.GetValue("data")?.ToObject<JObject>();
             string respCode = data?.GetValue("resp_code").ToString(); //业务响应码

@@ -6,6 +6,8 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IRefundOrderService : IAgPayService<RefundOrderDto>
     {
+        Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchRefundNo);
+        Task<bool> IsExistRefundingOrderAsync(string payOrderId);
         /// <summary>
         /// 查询商户订单
         /// </summary>
@@ -13,26 +15,24 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="mchRefundNo"></param>
         /// <param name="refundOrderId"></param>
         /// <returns></returns>
-        RefundOrderDto QueryMchOrder(string mchNo, string mchRefundNo, string refundOrderId);
-        PaginatedList<RefundOrderDto> GetPaginatedData(RefundOrderQueryDto dto);
-        JObject Statistics(RefundOrderQueryDto dto);
-        bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo);
-        bool IsExistRefundingOrder(string payOrderId);
-        long SumSuccessRefundAmount(string payOrderId);
+        Task<RefundOrderDto> QueryMchOrderAsync(string mchNo, string mchRefundNo, string refundOrderId);
+        Task<PaginatedList<RefundOrderDto>> GetPaginatedDataAsync(RefundOrderQueryDto dto);
+        Task<JObject> StatisticsAsync(RefundOrderQueryDto dto);
+        Task<long> SumSuccessRefundAmountAsync(string payOrderId);
         /// <summary>
         /// 更新退款单状态 【退款单生成】 --》 【退款中】
         /// </summary>
         /// <param name="refundOrderId"></param>
         /// <param name="channelOrderId"></param>
         /// <returns></returns>
-        bool UpdateInit2Ing(string refundOrderId, string channelOrderId);
+        Task<bool> UpdateInit2IngAsync(string refundOrderId, string channelOrderId);
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款成功】
         /// </summary>
         /// <param name="refundOrderId"></param>
         /// <param name="channelOrderId"></param>
         /// <returns></returns>
-        bool UpdateIng2Success(string refundOrderId, string channelOrderId);
+        Task<bool> UpdateIng2SuccessAsync(string refundOrderId, string channelOrderId);
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款失败】
         /// </summary>
@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="channelErrCode"></param>
         /// <param name="channelErrMsg"></param>
         /// <returns></returns>
-        bool UpdateIng2Fail(string refundOrderId, string channelOrderId, string channelErrCode, string channelErrMsg);
+        Task<bool> UpdateIng2FailAsync(string refundOrderId, string channelOrderId, string channelErrCode, string channelErrMsg);
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款成功/退款失败】
         /// </summary>
@@ -51,11 +51,11 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="channelErrCode"></param>
         /// <param name="channelErrMsg"></param>
         /// <returns></returns>
-        bool UpdateIng2SuccessOrFail(string refundOrderId, byte state, string channelOrderId, string channelErrCode, string channelErrMsg);
+        Task<bool> UpdateIng2SuccessOrFailAsync(string refundOrderId, byte state, string channelOrderId, string channelErrCode, string channelErrMsg);
         /// <summary>
         /// 更新退款单为 关闭状态
         /// </summary>
         /// <returns></returns>
-        int UpdateOrderExpired();
+        Task<int> UpdateOrderExpiredAsync();
     }
 }

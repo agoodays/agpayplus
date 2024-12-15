@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
     /// </summary>
     public class WxPayChannelNoticeService : AbstractChannelNoticeService
     {
-        private readonly IPayOrderService payOrderService;
+        private readonly IPayOrderService _payOrderService;
 
         public WxPayChannelNoticeService(ILogger<WxPayChannelNoticeService> logger,
             IPayOrderService payOrderService,
@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             ConfigContextQueryService configContextQueryService)
             : base(logger, requestKit, configContextQueryService)
         {
-            this.payOrderService = payOrderService;
+            _payOrderService = payOrderService;
         }
 
         public WxPayChannelNoticeService()
@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             return CS.IF_CODE.WXPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -54,28 +54,28 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                 if (!string.IsNullOrEmpty(urlOrderId))
                 {
                     // 获取订单信息
-                    PayOrderDto payOrder = payOrderService.GetById(urlOrderId);
+                    PayOrderDto payOrder = await _payOrderService.GetByIdAsync(urlOrderId);
                     if (payOrder == null)
                     {
                         throw new BizException("订单不存在");
                     }
 
                     //获取支付参数 (缓存数据) 和 商户信息
-                    MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId);
+                    MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId);
                     if (mchAppConfigContext == null)
                     {
                         throw new BizException("获取商户信息失败");
                     }
 
                     // 验签 && 获取订单回调数据
-                    var wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+                    var wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
                     var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
                     /* 微信商户平台发来的通知内容 */
                     var timestamp = request.Headers["Wechatpay-Timestamp"].FirstOrDefault();
                     var nonce = request.Headers["Wechatpay-Nonce"].FirstOrDefault();
                     var signature = request.Headers["Wechatpay-Signature"].FirstOrDefault();
                     var serialNumber = request.Headers["Wechatpay-Serial"].FirstOrDefault();
-                    string webhookJson = GetReqParamFromBody();
+                    string webhookJson = await GetReqParamFromBodyAsync();
 
                     JObject headerJSON = new JObject();
                     headerJSON.Add("Wechatpay-Timestamp", timestamp);
@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                 // V2接口回调
                 else
                 {
-                    string webhookXml = GetReqParamFromBody();
+                    string webhookXml = await GetReqParamFromBodyAsync();
                     if (string.IsNullOrWhiteSpace(webhookXml))
                     {
                         return null;
@@ -131,14 +131,14 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
                 ChannelRetMsg channelResult = new ChannelRetMsg();
                 channelResult.ChannelState = ChannelState.WAITING; // 默认支付中
 
-                var wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+                var wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
 
                 // V2
                 if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion))
@@ -146,7 +146,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     // 获取回调参数
                     //var result = (OrderEvent)@params;
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
-                    string webhookXml = GetReqParamFromBody();
+                    string webhookXml = await GetReqParamFromBodyAsync();
                     var result = client.DeserializeEvent<OrderEvent>(webhookXml);
                     // 验证参数
                     var valid = client.VerifyEventSignature(webhookXml);

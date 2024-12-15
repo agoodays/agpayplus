@@ -52,9 +52,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("{groupKey}"), MethodLog("更新商户配置信息")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_CONFIG_EDIT)]
-        public ApiRes Update(string groupKey, Dictionary<string, string> configs)
+        public async Task<ApiRes> UpdateAsync(string groupKey, Dictionary<string, string> configs)
         {
-            int update = _sysConfigService.UpdateByConfigKey(configs, groupKey, CS.SYS_TYPE.MCH, GetCurrentMchNo());
+            int update = await _sysConfigService.UpdateByConfigKeyAsync(configs, groupKey, CS.SYS_TYPE.MCH, GetCurrentMchNo());
             if (update <= 0)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");
@@ -71,12 +71,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPut, Route("mchLevel"), MethodLog("更改商户级别")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_CONFIG_EDIT)]
-        public ApiRes SetMchLevel(ModifyMchLevel model)
+        public async Task<ApiRes> SetMchLevelAsync(ModifyMchLevel model)
         {
             MchInfoDto dto = new MchInfoDto();
             dto.MchNo = GetCurrentMchNo();
             dto.MchLevel = model.MchLevel;
-            _mchInfoService.UpdateById(dto);
+            await _mchInfoService.UpdateByIdAsync(dto);
             return ApiRes.Ok();
         }
 
@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 throw new BizException("新密码与原密码不能相同！");
             }
             mchInfo.Sipw = BCryptUtil.Hash(opSipw, out _);
-            _mchInfoService.UpdateById(mchInfo);
+            await _mchInfoService.UpdateByIdAsync(mchInfo);
             return ApiRes.Ok();
         }
 

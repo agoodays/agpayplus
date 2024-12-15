@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -52,11 +52,11 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg HkrtBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BarAsync(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/api/v1/pay/polymeric/passivepay", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/api/v1/pay/polymeric/passivepay", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string return_code = resJSON.GetValue("return_code").ToString(); //返回状态码
             resJSON.TryGetString("return_msg", out string return_msg); //返回错误信息
@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                             case HkrtPayEnum.TradeStatus.Success:
                                 channelRetMsg.ChannelOrderId = trade_no;
                                 var tradeType = HkrtPayEnum.ConvertTradeType(type);
-                                var attach = GetHkrtAttach(resJSON);
+                                var attach = GetAttach(resJSON);
                                 attach.TryGetString("out_trade_no", out string out_trade_no);
                                 channelRetMsg.PlatformMchOrderId = out_trade_no;
                                 switch (tradeType)
@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetHkrtPayHost4env(HkrtPayIsvParams isvParams)
+        public static string GetHost4env(HkrtPayIsvParams isvParams)
         {
             return CS.YES == isvParams.Sandbox ? HkrtPayConfig.SANDBOX_SERVER_URL : HkrtPayConfig.PROD_SERVER_URL;
         }
@@ -150,9 +150,9 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
-            HkrtPayIsvParams isvParams = (HkrtPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+            HkrtPayIsvParams isvParams = (HkrtPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             if (isvParams.AgentNo == null)
             {
@@ -160,7 +160,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 throw new BizException("服务商配置为空。");
             }
 
-            HkrtPayIsvSubMchParams isvsubMchParams = (HkrtPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            HkrtPayIsvSubMchParams isvsubMchParams = (HkrtPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             reqParams.Add("accessid", isvParams.AccessId);
             reqParams.Add("merch_no", isvsubMchParams.MerchNo); // 商户号
 
@@ -169,10 +169,10 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             reqParams.Add("sign", HkrtSignUtil.Sign(reqParams, accessKey)); //RSA 签名字符串
 
             // 调起上游接口
-            string url = GetHkrtPayHost4env(isvParams) + apiUri;
+            string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = HkrtHttpUtil.DoPost(url, reqParams);
+            string resText = await HkrtHttpUtil.DoPostAsync(url, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -185,7 +185,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             return resParams;
         }
 
-        public JObject GetHkrtAttach(JObject resParams)
+        public JObject GetAttach(JObject resParams)
         {
             try
             {
@@ -220,7 +220,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
         /// <param name="returnUrl"></param>
         public static void UnifiedParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
-            HkrtPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             string tradeType = HkrtPayEnum.GetTradeType(payOrder.WayCode);
             reqParams.Add("trade_type", tradeType); //支付方式
             reqParams.Add("notify_url", notifyUrl); //支付成功后的通知地址
@@ -235,7 +235,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
         /// <param name="payOrder"></param>
         public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl)
         {
-            HkrtPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             reqParams.Add("notify_url", notifyUrl); //通知地址 接收海科融通通知（支付结果通知）的URL，需做UrlEncode 处理，需要绝对路径，确保海科融通能正确访问，若不需要回调请忽略
         }
 
@@ -244,7 +244,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void HkrtPublicParams(JObject reqParams, PayOrderDto payOrder)
+        public static void PublicParams(JObject reqParams, PayOrderDto payOrder)
         {
             //获取订单类型
             reqParams.Add("out_trade_no", payOrder.PayOrderId); //服务商交易订单号 服务商的交易订单编号（同一服务商下唯一）

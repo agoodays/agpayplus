@@ -31,8 +31,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         private readonly IMapper _mapper;
 
         // 注入总线
+        private readonly IMQSender _mqSender;
         private readonly IMediatorHandler Bus;
-        private readonly IMQSender mqSender;
         private readonly IMemoryCache Cache;
 
         public AgentInfoCommandHandler(IUnitOfWork uow, IMediatorHandler bus, IMapper mapper, IMQSender mqSender, IMemoryCache cache,
@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _mapper = mapper;
             Cache = cache;
             Bus = bus;
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _sysUserRepository = sysUserRepository;
             _agentInfoRepository = agentInfoRepository;
             _isvInfoRepository = isvInfoRepository;
@@ -267,7 +267,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     string updatePwd = request.DefaultPass ? CS.DEFAULT_PWD : Base64Util.DecodeBase64(request.ConfirmPwd);
 
                     // 重置超管密码
-                    _sysUserAuthRepository.ResetAuthInfo(agentAdminUserId, CS.SYS_TYPE.AGENT, null, null, updatePwd);
+                    await _sysUserAuthRepository.ResetAuthInfoAsync(agentAdminUserId, CS.SYS_TYPE.AGENT, null, null, updatePwd);
                     await _sysUserAuthRepository.SaveChangesAsync();
 
                     // 删除超管登录信息
@@ -277,7 +277,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 推送mq删除redis用户认证信息
                 if (removeCacheUserIdList.Count != 0)
                 {
-                    await mqSender.SendAsync(CleanAgentLoginAuthCacheMQ.Build(removeCacheUserIdList));
+                    await _mqSender.SendAsync(CleanAgentLoginAuthCacheMQ.Build(removeCacheUserIdList));
                 }
 
                 // 更新代理商信息
@@ -294,7 +294,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 CommitTransaction();
 
                 // 推送mq到目前节点进行更新数据
-                await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
+                await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
             }
             catch (Exception e)
             {
@@ -358,10 +358,10 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
                 // 推送mq删除redis用户缓存
                 var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
-                await mqSender.SendAsync(CleanAgentLoginAuthCacheMQ.Build(userIdList));
+                await _mqSender.SendAsync(CleanAgentLoginAuthCacheMQ.Build(userIdList));
 
                 // 推送mq到目前节点进行更新数据
-                await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
+                await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));
             }
             catch (Exception e)
             {

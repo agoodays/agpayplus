@@ -21,12 +21,12 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
     public class WxPayTransferService : ITransferService
     {
         private readonly ILogger<WxPayTransferService> _logger;
-        private readonly ConfigContextQueryService configContextQueryService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public WxPayTransferService(ILogger<WxPayTransferService> logger, ConfigContextQueryService configContextQueryService)
         {
             _logger = logger;
-            this.configContextQueryService = configContextQueryService;
+            _configContextQueryService = configContextQueryService;
         }
 
         public WxPayTransferService()
@@ -64,11 +64,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             return null;
         }
 
-        public ChannelRetMsg Transfer(TransferOrderRQ bizRQ, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> TransferAsync(TransferOrderRQ bizRQ, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
-                WxServiceWrapper wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+                WxServiceWrapper wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
 
                 if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion))  // V2
                 {
@@ -93,7 +93,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     }
 
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
-                    var result = client.ExecuteCreatePayMarketingTransfersPromotionTransferAsync(request).Result;
+                    var result = await client.ExecuteCreatePayMarketingTransfersPromotionTransferAsync(request);
                     return ChannelRetMsg.Waiting();
                 }
                 else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))  // V3
@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
                     if (mchAppConfigContext.IsIsvSubMch()) // 特约商户
                     {
-                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
                         CreatePartnerTransferBatchRequest request = new CreatePartnerTransferBatchRequest();
                         request.AppId = wxServiceWrapper.Config.AppId;
@@ -126,7 +126,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                         transferDetail.UserName = transferOrder.AccountName;
                         transferDetail.TransferRemark = transferOrder.TransferDesc;
                         request.TransferDetailList.Add(transferDetail);
-                        var result = client.ExecuteCreatePartnerTransferBatchAsync(request).Result;
+                        var result = await client.ExecuteCreatePartnerTransferBatchAsync(request);
                     }
                     else
                     {
@@ -145,7 +145,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                         transferDetail.TransferRemark = transferOrder.TransferDesc;
                         request.TransferDetailList.Add(transferDetail);
 
-                        var result = client.ExecuteCreateTransferBatchAsync(request).Result;
+                        var result = await client.ExecuteCreateTransferBatchAsync(request);
                     }
                     return ChannelRetMsg.Waiting();
                 }
@@ -161,11 +161,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             }
         }
 
-        public ChannelRetMsg Query(TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
-                WxServiceWrapper wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+                WxServiceWrapper wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
 
                 if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion))  // V2
                 {
@@ -175,7 +175,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     request.PartnerTradeNumber = transferOrder.TransferId;
 
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
-                    var result = client.ExecuteGetPayMarketingTransfersTransferInfoAsync(request).Result;
+                    var result = await client.ExecuteGetPayMarketingTransfersTransferInfoAsync(request);
                     // SUCCESS,明确成功
                     if ("SUCCESS".Equals(result.Status, StringComparison.OrdinalIgnoreCase))
                     {
@@ -200,11 +200,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     GetTransferBatchDetailByOutDetailNumberResponse result;
                     if (mchAppConfigContext.IsIsvSubMch()) // 特约商户
                     {
-                        result = client.ExecuteGetPartnerTransferBatchDetailByOutDetailNumberAsync((GetPartnerTransferBatchDetailByOutDetailNumberRequest)request).Result;
+                        result = await client.ExecuteGetPartnerTransferBatchDetailByOutDetailNumberAsync((GetPartnerTransferBatchDetailByOutDetailNumberRequest)request);
                     }
                     else
                     {
-                        result = client.ExecuteGetTransferBatchDetailByOutDetailNumberAsync(request).Result;
+                        result = await client.ExecuteGetTransferBatchDetailByOutDetailNumberAsync(request);
                     }
 
                     // SUCCESS,明确成功

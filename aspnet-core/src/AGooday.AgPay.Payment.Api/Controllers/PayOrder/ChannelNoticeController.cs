@@ -19,11 +19,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     public class ChannelNoticeController : Controller
     {
         private readonly ILogger<ChannelNoticeController> _logger;
-        private readonly IPayOrderService payOrderService;
-        private readonly IChannelServiceFactory<IChannelNoticeService> channelNoticeServiceFactory;
-        private readonly ConfigContextQueryService configContextQueryService;
-        private readonly PayMchNotifyService payMchNotifyService;
-        private readonly PayOrderProcessService payOrderProcessService;
+        private readonly IPayOrderService _payOrderService;
+        private readonly IChannelServiceFactory<IChannelNoticeService> _channelNoticeServiceFactory;
+        private readonly ConfigContextQueryService _configContextQueryService;
+        private readonly PayMchNotifyService _payMchNotifyService;
+        private readonly PayOrderProcessService _payOrderProcessService;
 
         public ChannelNoticeController(ILogger<ChannelNoticeController> logger,
             IPayOrderService payOrderService,
@@ -33,11 +33,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             PayOrderProcessService payOrderProcessService)
         {
             _logger = logger;
-            this.payOrderService = payOrderService;
-            this.channelNoticeServiceFactory = channelNoticeServiceFactory;
-            this.configContextQueryService = configContextQueryService;
-            this.payMchNotifyService = payMchNotifyService;
-            this.payOrderProcessService = payOrderProcessService;
+            _payOrderService = payOrderService;
+            _channelNoticeServiceFactory = channelNoticeServiceFactory;
+            _configContextQueryService = configContextQueryService;
+            _payMchNotifyService = payMchNotifyService;
+            _payOrderProcessService = payOrderProcessService;
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     return this.ToReturnPage("ifCode is empty");
                 }
                 //查询支付接口是否存在
-                IChannelNoticeService payNotifyService = channelNoticeServiceFactory.GetService(ifCode);
+                IChannelNoticeService payNotifyService = _channelNoticeServiceFactory.GetService(ifCode);
 
                 // 支付通道接口实现不存在
                 if (payNotifyService == null)
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 // 解析订单号 和 请求参数
-                Dictionary<string, object> mutablePair = payNotifyService.ParseParams(Request, urlOrderId, NoticeTypeEnum.DO_RETURN);
+                Dictionary<string, object> mutablePair = await payNotifyService.ParseParamsAsync(Request, urlOrderId, NoticeTypeEnum.DO_RETURN);
                 if (mutablePair == null)
                 {
                     // 解析数据失败， 响应已处理
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 //获取订单号 和 订单数据
-                PayOrderDto payOrder = await payOrderService.GetByIdAsync(payOrderId);
+                PayOrderDto payOrder = await _payOrderService.GetByIdAsync(payOrderId);
 
                 // 订单不存在
                 if (payOrder == null)
@@ -99,10 +99,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 //查询出商户应用的配置信息
-                MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId);
 
                 //调起接口的回调判断
-                ChannelRetMsg notifyResult = payNotifyService.DoNotice(Request, mutablePair.First().Value, payOrder, mchAppConfigContext, NoticeTypeEnum.DO_RETURN);
+                ChannelRetMsg notifyResult = await payNotifyService.DoNoticeAsync(Request, mutablePair.First().Value, payOrder, mchAppConfigContext, NoticeTypeEnum.DO_RETURN);
 
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)
@@ -128,7 +128,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 if (hasReturnUrl)
                 {
                     // 重定向
-                    return Redirect(payMchNotifyService.CreateReturnUrl(payOrder, mchAppConfigContext.MchApp.AppSecret));
+                    return Redirect(_payMchNotifyService.CreateReturnUrl(payOrder, mchAppConfigContext.MchApp.AppSecret));
                 }
                 else
                 {
@@ -174,7 +174,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     return StatusCode((int)HttpStatusCode.BadRequest, "ifCode is empty");
                 }
                 //查询支付接口是否存在
-                IChannelNoticeService payNotifyService = channelNoticeServiceFactory.GetService(ifCode);
+                IChannelNoticeService payNotifyService = _channelNoticeServiceFactory.GetService(ifCode);
 
                 // 支付通道接口实现不存在
                 if (payNotifyService == null)
@@ -184,7 +184,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 // 解析订单号 和 请求参数
-                Dictionary<string, object> mutablePair = payNotifyService.ParseParams(Request, urlOrderId, NoticeTypeEnum.DO_NOTIFY);
+                Dictionary<string, object> mutablePair = await payNotifyService.ParseParamsAsync(Request, urlOrderId, NoticeTypeEnum.DO_NOTIFY);
                 if (mutablePair == null)
                 {
                     // 解析数据失败， 响应已处理
@@ -203,7 +203,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 //获取订单号 和 订单数据
-                PayOrderDto payOrder = await payOrderService.GetByIdAsync(payOrderId);
+                PayOrderDto payOrder = await _payOrderService.GetByIdAsync(payOrderId);
 
                 // 订单不存在
                 if (payOrder == null)
@@ -213,10 +213,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 //查询出商户应用的配置信息
-                MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(payOrder.MchNo, payOrder.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId);
 
                 //调起接口的回调判断
-                ChannelRetMsg notifyResult = payNotifyService.DoNotice(Request, mutablePair.First().Value, payOrder, mchAppConfigContext, NoticeTypeEnum.DO_NOTIFY);
+                ChannelRetMsg notifyResult = await payNotifyService.DoNoticeAsync(Request, mutablePair.First().Value, payOrder, mchAppConfigContext, NoticeTypeEnum.DO_NOTIFY);
 
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)
@@ -232,12 +232,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     //明确成功
                     if (ChannelState.CONFIRM_SUCCESS == notifyResult.ChannelState)
                     {
-                        updateOrderSuccess = payOrderService.UpdateIng2Success(payOrderId, notifyResult.ChannelMchNo, notifyResult.ChannelIsvNo, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.PlatformOrderId, notifyResult.PlatformMchOrderId);
+                        updateOrderSuccess = await _payOrderService.UpdateIng2SuccessAsync(payOrderId, notifyResult.ChannelMchNo, notifyResult.ChannelIsvNo, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.PlatformOrderId, notifyResult.PlatformMchOrderId);
                     }
                     //明确失败
                     else if (ChannelState.CONFIRM_FAIL == notifyResult.ChannelState)
                     {
-                        updateOrderSuccess = payOrderService.UpdateIng2Fail(payOrderId, notifyResult.ChannelMchNo, notifyResult.ChannelIsvNo, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.PlatformOrderId, notifyResult.PlatformMchOrderId, notifyResult.ChannelErrCode, notifyResult.ChannelErrMsg);
+                        updateOrderSuccess = await _payOrderService.UpdateIng2FailAsync(payOrderId, notifyResult.ChannelMchNo, notifyResult.ChannelIsvNo, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.PlatformOrderId, notifyResult.PlatformMchOrderId, notifyResult.ChannelErrCode, notifyResult.ChannelErrMsg);
                     }
                 }
 
@@ -251,7 +251,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 //订单支付成功 其他业务逻辑
                 if (notifyResult.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
-                    payOrderProcessService.ConfirmSuccess(payOrder);
+                    await _payOrderProcessService.ConfirmSuccessAsync(payOrder);
                 }
 
                 _logger.LogInformation($"===== {logPrefix}, 订单通知完成。 payOrderId={payOrderId}, parseState = {notifyResult.ChannelState} =====");
@@ -286,7 +286,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <returns></returns>
         [HttpPost]
         [Route("api/pay/posnotify/{ifCode}")]
-        public async Task<ActionResult> DoPosNotifyAsync(string ifCode)
+        public ActionResult DoPosNotify(string ifCode)
         {
             string logPrefix = $"进入[{ifCode}]POS支付回调：";
             _logger.LogInformation($"===== {logPrefix} =====", logPrefix);

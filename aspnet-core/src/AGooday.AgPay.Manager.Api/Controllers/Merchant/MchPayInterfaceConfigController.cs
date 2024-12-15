@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
     [ApiController, Authorize]
     public class MchPayInterfaceConfigController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IPayInterfaceDefineService _payIfDefineService;
         private readonly IPayInterfaceConfigService _payIfConfigService;
         private readonly IMchAppService _mchAppService;
@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _payIfDefineService = payIfDefineService;
             _payIfConfigService = payIfConfigService;
             _mchAppService = mchAppService;
@@ -54,9 +54,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiRes List(string appId)
+        public async Task<ApiRes> ListAstnc(string appId)
         {
-            var data = _payIfConfigService.SelectAllPayIfConfigListByAppId(appId);
+            var data = await _payIfConfigService.SelectAllPayIfConfigListByAppIdAsync(appId);
             return ApiRes.Ok(data);
         }
 
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_VIEW)]
         public async Task<ApiRes> GetByAppIdAsync(string appId, string ifCode)
         {
-            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP, appId, ifCode);
+            var payInterfaceConfig = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(CS.INFO_TYPE.MCH_APP, appId, ifCode);
             if (payInterfaceConfig != null)
             {
                 // 费率转换为百分比数值
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             dto.UpdatedAt = DateTime.Now;
 
             //根据 商户号、接口类型 获取商户参数配置
-            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.MCH_APP, dto.InfoId, dto.IfCode);
+            var dbRecoed = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(CS.INFO_TYPE.MCH_APP, dto.InfoId, dto.IfCode);
             //若配置存在，为saveOrUpdate添加ID，第一次配置添加创建者
             if (dbRecoed != null)
             {
@@ -138,14 +138,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 dto.CreatedAt = DateTime.Now;
             }
 
-            var result = _payIfConfigService.SaveOrUpdate(dto);
+            var result = await _payIfConfigService.SaveOrUpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "配置失败");
             }
 
             // 推送mq到目前节点进行更新数据
-            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, dto.InfoId));
+            await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, dto.InfoId));
 
             return ApiRes.Ok();
         }
@@ -174,7 +174,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         }
 
         [HttpGet, Route("alipayIsvsubMchAuthUrls/{mchAppId}"), AllowAnonymous, NoLog]
-        public async Task<ApiRes> QueryAlipayIsvsubMchAuthUrl(string mchAppId)
+        public async Task<ApiRes> QueryAlipayIsvsubMchAuthUrlAsync(string mchAppId)
         {
             var mchApp = await _mchAppService.GetByIdAsync(mchAppId);
             var mchInfo = await _mchInfoService.GetByIdAsync(mchApp.MchNo);

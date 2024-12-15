@@ -25,9 +25,9 @@ namespace AGooday.AgPay.Application.Services
             _mchInfoRepository = mchInfoRepository;
         }
 
-        public override bool Update(MchAppDto dto)
+        public override async Task<bool> UpdateAsync(MchAppDto dto)
         {
-            var origin = _mchAppRepository.GetByIdAsNoTracking(dto.AppId);
+            var origin = await _mchAppRepository.GetByIdAsNoTrackingAsync(dto.AppId);
             var entity = _mapper.Map<MchApp>(dto);
             if (string.IsNullOrWhiteSpace(entity.AppSecret))
             {
@@ -39,18 +39,18 @@ namespace AGooday.AgPay.Application.Services
             }
             entity.UpdatedAt = DateTime.Now;
             _mchAppRepository.Update(entity);
-            return _mchAppRepository.SaveChanges(out int _);
+            return await _mchAppRepository.SaveChangesAsync() > 0;
         }
 
-        public MchAppDto GetById(string recordId, string mchNo)
+        public async Task<MchAppDto> GetByIdAsync(string recordId, string mchNo)
         {
-            var entity = _mchAppRepository.GetById(recordId, mchNo);
+            var entity = await _mchAppRepository.GetByIdAsync(recordId, mchNo);
             return _mapper.Map<MchAppDto>(entity);
         }
 
-        public MchAppDto GetByIdAsNoTracking(string recordId, string mchNo)
+        public async Task<MchAppDto> GetByIdAsNoTrackingAsync(string recordId, string mchNo)
         {
-            var entity = _mchAppRepository.GetByIdAsNoTracking(recordId, mchNo);
+            var entity = await _mchAppRepository.GetByIdAsNoTrackingAsync(recordId, mchNo);
             return _mapper.Map<MchAppDto>(entity);
         }
 
@@ -62,33 +62,33 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<MchAppDto> GetByMchNos(IEnumerable<string> mchNos)
         {
-            var mchApps = _mchAppRepository.GetAll().Where(w => mchNos.Contains(w.MchNo));
+            var mchApps = _mchAppRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
             return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
         }
 
         public IEnumerable<MchAppDto> GetByAppIds(IEnumerable<string> appIds)
         {
-            var mchApps = _mchAppRepository.GetAll().Where(w => appIds.Contains(w.AppId));
+            var mchApps = _mchAppRepository.GetAllAsNoTracking().Where(w => appIds.Contains(w.AppId));
             return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
         }
 
-        public async Task<PaginatedList<MchAppDto>> GetPaginatedDataAsync(MchAppQueryDto dto, string agentNo = null)
+        public Task<PaginatedList<MchAppDto>> GetPaginatedDataAsync(MchAppQueryDto dto, string agentNo = null)
         {
-            var mchApps = _mchAppRepository.GetAllAsNoTracking()
+            var query = _mchAppRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
                 && (string.IsNullOrWhiteSpace(dto.AppName) || w.AppName.Contains(dto.AppName))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                ).OrderByDescending(o => o.CreatedAt);
+                && (dto.State.Equals(null) || w.State.Equals(dto.State)))
+                .OrderByDescending(o => o.CreatedAt);
 
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
                 var mchNos = _mchInfoRepository.GetAllAsNoTracking()
                     .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                     && w.AgentNo.Equals(agentNo)).Select(s => s.MchNo);
-                mchApps = mchApps.Where(w => mchNos.Contains(w.MchNo)).OrderByDescending(o => o.CreatedAt);
+                query = query.Where(w => mchNos.Contains(w.MchNo)).OrderByDescending(o => o.CreatedAt);
             }
-            var records = await PaginatedList<MchApp>.CreateAsync<MchAppDto>(mchApps, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<MchApp>.CreateAsync<MchAppDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

@@ -5,22 +5,13 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchPayPassageService : IAgPayService<MchPayPassageDto, long>
     {
+        Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode);
         IEnumerable<MchPayPassageDto> GetMchPayPassageByMchNoAndAppId(string mchNo, string appId);
         IEnumerable<MchPayPassageDto> GetByAppIdAndWayCodesAsNoTracking(string appId, List<string> wayCodes);
-        PaginatedList<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize);
-        /// <summary>
-        /// 根据支付方式查询可用的支付接口列表
-        /// </summary>
-        /// <param name="wayCode"></param>
-        /// <param name="appId"></param>
-        /// <param name="infoType"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        IEnumerable<AvailablePayInterfaceDto> SelectAvailablePayInterfaceList(string wayCode, string appId, string infoType, byte type);
-        void SetMchPassage(string mchNo, string appId, string wayCode, string ifCode, byte state);
-        void SaveOrUpdateBatchSelf(List<MchPayPassageDto> mchPayPassages, string mchNo);
-        MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode);
-        MchPayPassageDto FindMchPayPassage(string mchNo, string appId, string wayCode, long amount, string bankCardType = null);
-        Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode);
+        Task<PaginatedList<AvailablePayInterfaceDto>> SelectAvailablePayInterfaceListAsync(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize);
+        Task<bool> SetMchPassageAsync(string mchNo, string appId, string wayCode, string ifCode, byte state);
+        Task<bool> SaveOrUpdateBatchSelfAsync(List<MchPayPassageDto> mchPayPassages, string mchNo);
+        Task<MchPayPassageDto> FindMchPayPassageAsync(string mchNo, string appId, string wayCode);
+        Task<MchPayPassageDto> FindMchPayPassageAsync(string mchNo, string appId, string wayCode, long amount, string bankCardType = null);
     }
 }

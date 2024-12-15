@@ -25,26 +25,26 @@ namespace AGooday.AgPay.Application.Services
             _sysArticleRepository = sysArticleRepository;
         }
 
-        public override bool Add(SysArticleDto dto)
+        public override async Task<bool> AddAsync(SysArticleDto dto)
         {
             var entity = _mapper.Map<SysArticle>(dto);
-            _sysArticleRepository.Add(entity);
-            var result = _sysArticleRepository.SaveChanges(out int _);
+            await _sysArticleRepository.AddAsync(entity);
+            var result = await _sysArticleRepository.SaveChangesAsync() > 0;
             dto.ArticleId = entity.ArticleId;
             return result;
         }
 
-        public override bool Update(SysArticleDto dto)
+        public override async Task<bool> UpdateAsync(SysArticleDto dto)
         {
             var entity = _mapper.Map<SysArticle>(dto);
             entity.UpdatedAt = DateTime.Now;
             _sysArticleRepository.Update(entity);
-            return _sysArticleRepository.SaveChanges(out int _);
+            return await _sysArticleRepository.SaveChangesAsync() > 0;
         }
 
         public async Task<PaginatedList<SysArticleDto>> GetPaginatedDataAsync(SysArticleQueryDto dto, string agentNo = null)
         {
-            var sysLogs = _sysArticleRepository.GetAllAsNoTracking()
+            var query = _sysArticleRepository.GetAllAsNoTracking()
                 .Where(w => (dto.ArticleId.Equals(null) || w.ArticleId.Equals(dto.ArticleId))
                 && (string.IsNullOrWhiteSpace(dto.Title) || w.Title.Contains(dto.Title) || w.Subtitle.Contains(dto.Title))
                 && (dto.ArticleType.Equals(null) || w.ArticleType.Equals(dto.ArticleType))
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<SysArticle>.CreateAsync<SysArticleDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
+            var records = await PaginatedList<SysArticle>.CreateAsync<SysArticleDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

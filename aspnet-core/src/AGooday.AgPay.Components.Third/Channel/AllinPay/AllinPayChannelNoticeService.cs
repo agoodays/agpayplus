@@ -36,11 +36,11 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             return CS.IF_CODE.ALLINPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
-                JObject @params = GetReqParamJSON();
+                JObject @params = await GetReqParamJSONAsync();
                 string payOrderId = @params.GetValue("cusorderid").ToString();
                 return new Dictionary<string, object>() { { payOrderId, @params } };
             }
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
                 _logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
 
                 // 校验支付回调
-                bool verifyResult = VerifyParams(jsonParams, payOrder, mchAppConfigContext);
+                bool verifyResult = await VerifyParamsAsync(jsonParams, payOrder, mchAppConfigContext);
                 // 验证参数失败
                 if (!verifyResult)
                 {
@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             }
         }
 
-        public bool VerifyParams(JObject jsonParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<bool> VerifyParamsAsync(JObject jsonParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string ordNo = jsonParams.GetValue("cusorderid").ToString();       // 商户订单号
             string amt = jsonParams.GetValue("trxamt").ToString();         // 支付金额
@@ -118,7 +118,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             if (mchAppConfigContext.IsIsvSubMch())
             {
                 // 获取支付参数
-                AllinPayIsvParams isvParams = (AllinPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                AllinPayIsvParams isvParams = (AllinPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
                 if (isvParams.Orgid == null)
                 {
@@ -130,7 +130,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             else
             {
                 // 获取支付参数
-                AllinPayNormalMchParams normalMchParams = (AllinPayNormalMchParams)configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                AllinPayNormalMchParams normalMchParams = (AllinPayNormalMchParams)await _configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
                 publicKey = normalMchParams.PublicKey;
             }
 

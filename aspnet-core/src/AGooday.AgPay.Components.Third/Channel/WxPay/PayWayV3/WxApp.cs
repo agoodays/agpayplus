@@ -27,9 +27,9 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            var wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+            var wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
 
             // 构造函数响应数据
             WxAppOrderRS res = ApiResBuilder.BuildSuccess<WxAppOrderRS>();
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
             CreatePayTransactionAppResponse response;
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                var isvSubMchParams = (WxPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                var isvSubMchParams = (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
                 subMchAppId = isvSubMchParams.SubMchAppId;
                 subMerchantId = isvSubMchParams.SubMchId;
@@ -85,7 +85,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
                 // 调起上游接口：
                 // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
                 // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
-                response = client.ExecuteCreatePayPartnerTransactionAppAsync(request).Result;
+                response = await client.ExecuteCreatePayPartnerTransactionAppAsync(request);
             }
             else
             {
@@ -115,7 +115,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
                 // 调起上游接口：
                 // 1. 如果抛异常，则订单状态为： 生成状态，此时没有查单处理操作。 订单将超时关闭
                 // 2. 接口调用成功， 后续异常需进行捕捉， 如果 逻辑代码出现异常则需要走完正常流程，此时订单状态为： 支付中， 需要查单处理。
-                response = client.ExecuteCreatePayTransactionAppAsync(request).Result;
+                response = await client.ExecuteCreatePayTransactionAppAsync(request);
             }
             if (response.IsSuccessful())
             {

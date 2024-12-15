@@ -23,34 +23,34 @@ namespace AGooday.AgPay.Application.Services
             _sysLogRepository = sysLogRepository;
         }
 
-        public override bool Add(SysLogDto dto)
+        public override async Task<bool> AddAsync(SysLogDto dto)
         {
             var entity = _mapper.Map<SysLog>(dto);
-            _sysLogRepository.Add(entity);
-            var result = _sysLogRepository.SaveChanges(out int _);
+            await _sysLogRepository.AddAsync(entity);
+            var result = await _sysLogRepository.SaveChangesAsync() > 0;
             dto.SysLogId = entity.SysLogId;
             return result;
         }
 
-        public bool RemoveByIds(List<long> recordIds)
+        public async Task<bool> RemoveByIdsAsync(List<long> recordIds)
         {
             foreach (var recordId in recordIds)
             {
                 _sysLogRepository.Remove(recordId);
             }
-            return _sysLogRepository.SaveChanges() > 0;
+            return await _sysLogRepository.SaveChangesAsync() > 0;
         }
 
-        public async Task<PaginatedList<SysLogDto>> GetPaginatedDataAsync(SysLogQueryDto dto)
+        public Task<PaginatedList<SysLogDto>> GetPaginatedDataAsync(SysLogQueryDto dto)
         {
-            var sysLogs = _sysLogRepository.GetAllAsNoTracking()
+            var query = _sysLogRepository.GetAllAsNoTracking()
                 .Where(w => (dto.UserId.Equals(null) || w.UserId.Equals(dto.UserId))
                 && (string.IsNullOrWhiteSpace(dto.UserName) || w.UserName.Contains(dto.UserName))
                 && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<SysLog>.CreateAsync<SysLogDto>(sysLogs, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<SysLog>.CreateAsync<SysLogDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

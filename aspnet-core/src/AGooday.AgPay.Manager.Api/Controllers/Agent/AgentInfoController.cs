@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
     [ApiController, Authorize]
     public class AgentInfoController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IAgentInfoService _agentInfoService;
         private readonly ISysUserService _sysUserService;
 
@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _agentInfoService = agentInfoService;
             _sysUserService = sysUserService;
             _notifications = (DomainNotificationHandler)notifications;

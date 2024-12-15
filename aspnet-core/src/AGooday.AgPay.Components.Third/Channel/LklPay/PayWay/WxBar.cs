@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【拉卡拉条码(wechat)支付】";
             WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
             // 拉卡拉 bar 统一参数赋值
             BarParamsSet(reqParams, payOrder, GetNotifyUrl());
 
-            var channelRetMsg = LklBar(reqParams, logPrefix, mchAppConfigContext);
+            var channelRetMsg = await BarAsync(reqParams, logPrefix, mchAppConfigContext);
             res.ChannelRetMsg = channelRetMsg;
             return res;
         }

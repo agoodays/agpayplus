@@ -18,10 +18,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
     public class ChannelRefundNoticeController : ControllerBase
     {
         private readonly ILogger<ChannelRefundNoticeController> _logger;
-        private readonly IRefundOrderService refundOrderService;
-        private readonly ConfigContextQueryService configContextQueryService;
-        private readonly RefundOrderProcessService refundOrderProcessService;
-        private readonly IChannelServiceFactory<IChannelRefundNoticeService> channelRefundNoticeServiceFactory;
+        private readonly IRefundOrderService _refundOrderService;
+        private readonly ConfigContextQueryService _configContextQueryService;
+        private readonly RefundOrderProcessService _refundOrderProcessService;
+        private readonly IChannelServiceFactory<IChannelRefundNoticeService> _channelRefundNoticeServiceFactory;
 
         public ChannelRefundNoticeController(ILogger<ChannelRefundNoticeController> logger,
             IRefundOrderService refundOrderService,
@@ -30,10 +30,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
             IChannelServiceFactory<IChannelRefundNoticeService> channelRefundNoticeServiceFactory)
         {
             _logger = logger;
-            this.refundOrderService = refundOrderService;
-            this.configContextQueryService = configContextQueryService;
-            this.refundOrderProcessService = refundOrderProcessService;
-            this.channelRefundNoticeServiceFactory = channelRefundNoticeServiceFactory;
+            _refundOrderService = refundOrderService;
+            _configContextQueryService = configContextQueryService;
+            _refundOrderProcessService = refundOrderProcessService;
+            _channelRefundNoticeServiceFactory = channelRefundNoticeServiceFactory;
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 //查询退款接口是否存在
-                IChannelRefundNoticeService refundNotifyService = channelRefundNoticeServiceFactory.GetService(ifCode);
+                IChannelRefundNoticeService refundNotifyService = _channelRefundNoticeServiceFactory.GetService(ifCode);
 
                 // 支付通道接口实现不存在
                 if (refundNotifyService == null)
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 // 解析订单号 和 请求参数
-                Dictionary<string, object> mutablePair = refundNotifyService.ParseParams(Request, urlOrderId, NoticeTypeEnum.DO_NOTIFY);
+                Dictionary<string, object> mutablePair = await refundNotifyService.ParseParamsAsync(Request, urlOrderId, NoticeTypeEnum.DO_NOTIFY);
                 if (mutablePair == null)
                 {
                     // 解析数据失败， 响应已处理
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 //获取订单号 和 订单数据
-                RefundOrderDto refundOrder = await refundOrderService.GetByIdAsync(refundOrderId);
+                RefundOrderDto refundOrder = await _refundOrderService.GetByIdAsync(refundOrderId);
 
                 // 订单不存在
                 if (refundOrder == null)
@@ -99,10 +99,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 }
 
                 //查询出商户应用的配置信息
-                MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(refundOrder.MchNo, refundOrder.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(refundOrder.MchNo, refundOrder.AppId);
 
                 //调起接口的回调判断
-                ChannelRetMsg notifyResult = refundNotifyService.DoNotice(Request, mutablePair.First().Value, refundOrder, mchAppConfigContext, NoticeTypeEnum.DO_NOTIFY);
+                ChannelRetMsg notifyResult = await refundNotifyService.DoNoticeAsync(Request, mutablePair.First().Value, refundOrder, mchAppConfigContext, NoticeTypeEnum.DO_NOTIFY);
 
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                     throw new BizException("处理回调事件异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
                 // 处理退款订单
-                bool updateOrderSuccess = refundOrderProcessService.HandleRefundOrder4Channel(notifyResult, refundOrder);
+                bool updateOrderSuccess = await _refundOrderProcessService.HandleRefundOrder4ChannelAsync(notifyResult, refundOrder);
 
                 // 更新退款订单 异常
                 if (!updateOrderSuccess)

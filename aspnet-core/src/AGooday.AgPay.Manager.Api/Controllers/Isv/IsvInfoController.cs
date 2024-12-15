@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
     [ApiController, Authorize]
     public class IsvInfoController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IIsvInfoService _isvInfoService;
         private readonly IAgentInfoService _agentInfoService;
         private readonly IMchInfoService _mchInfoService;
@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _isvInfoService = isvInfoService;
             _agentInfoService = agentInfoService;
             _mchInfoService = mchInfoService;
@@ -106,17 +106,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             }
 
             // 3.删除当前服务商支付接口配置参数
-            _payInterfaceConfigService.Remove(CS.INFO_TYPE.ISV, isvInfo.IsvNo);
+            await _payInterfaceConfigService.RemoveAsync(CS.INFO_TYPE.ISV, isvInfo.IsvNo);
 
             // 4.删除该服务商
-            var remove = _isvInfoService.Remove(isvNo);
+            var remove = await _isvInfoService.RemoveAsync(isvNo);
             if (!remove)
             {
                 throw new BizException("删除服务商失败");
             }
 
             // 推送mq到目前节点进行更新数据
-            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, isvNo, null, null, null));
+            await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, isvNo, null, null, null));
 
             return ApiRes.Ok();
         }
@@ -130,10 +130,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_EDIT)]
         public async Task<ApiRes> UpdateAsync(string isvNo, IsvInfoDto dto)
         {
-            _isvInfoService.Update(dto);
+            await _isvInfoService.UpdateAsync(dto);
 
             // 推送mq到目前节点进行更新数据
-            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.IsvNo, null, null, null));
+            await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.IsvNo, null, null, null));
 
             return ApiRes.Ok();
         }

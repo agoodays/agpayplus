@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
     /// </summary>
     public class PayOrderReissueMQReceiver : PayOrderReissueMQ.IMQReceiver
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly ILogger<PayOrderReissueMQReceiver> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
             IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _serviceScopeFactory = serviceScopeFactory;
         }
 
@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     int currentCount = payload.Count;
                     currentCount++;
 
-                    PayOrderDto payOrder = payOrderService.GetById(payOrderId);
+                    PayOrderDto payOrder = await payOrderService.GetByIdAsync(payOrderId);
                     if (payOrder == null)
                     {
                         _logger.LogWarning($"查询支付订单为空,payOrderId={payOrderId}");
@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                         return;
                     }
 
-                    ChannelRetMsg channelRetMsg = channelOrderReissueService.ProcessPayOrder(payOrder);
+                    ChannelRetMsg channelRetMsg = await channelOrderReissueService.ProcessPayOrderAsync(payOrder);
 
                     //返回null 可能为接口报错等， 需要再次轮询
                     if (channelRetMsg == null || channelRetMsg.ChannelState == null || channelRetMsg.ChannelState.Equals(ChannelState.WAITING))
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                         //最多查询6次
                         if (currentCount <= 6)
                         {
-                            await mqSender.SendAsync(PayOrderReissueMQ.Build(payOrderId, currentCount), 5); //延迟5s再次查询
+                            await _mqSender.SendAsync(PayOrderReissueMQ.Build(payOrderId, currentCount), 5); //延迟5s再次查询
                         }
                         else
                         {

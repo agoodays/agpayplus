@@ -13,7 +13,7 @@ namespace AGooday.AgPay.Components.Third.Services
     /// </summary>
     public class RefundOrderProcessService
     {
-        private readonly PayMchNotifyService payMchNotifyService;
+        private readonly PayMchNotifyService _payMchNotifyService;
         private readonly IPayOrderService _payOrderService;
         private readonly IRefundOrderService _refundOrderService;
         private readonly IPayOrderProfitService _payOrderProfitService;
@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Components.Third.Services
             IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             IAccountBillService accountBillService)
         {
-            this.payMchNotifyService = payMchNotifyService;
+            _payMchNotifyService = payMchNotifyService;
             _payOrderService = payOrderService;
             _refundOrderService = refundOrderService;
             _payOrderProfitService = payOrderProfitService;
@@ -40,21 +40,21 @@ namespace AGooday.AgPay.Components.Third.Services
         /// </summary>
         /// <param name="channelRetMsg"></param>
         /// <param name="refundOrder"></param>
-        public bool HandleRefundOrder4Channel(ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder)
+        public async Task<bool> HandleRefundOrder4ChannelAsync(ChannelRetMsg channelRetMsg, RefundOrderDto refundOrder)
         {
             bool updateOrderSuccess = true; //默认更新成功
             string refundOrderId = refundOrder.RefundOrderId;
             // 明确退款成功
             if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
             {
-                updateOrderSuccess = _refundOrderService.UpdateIng2Success(refundOrderId, channelRetMsg.ChannelOrderId);
+                updateOrderSuccess = await _refundOrderService.UpdateIng2SuccessAsync(refundOrderId, channelRetMsg.ChannelOrderId);
                 if (updateOrderSuccess)
                 {
-                    this.UpdatePayOrderProfitAndGenAccountBill(refundOrder);
+                    await UpdatePayOrderProfitAndGenAccountBillAsync(refundOrder);
                     // 通知商户系统
                     if (!string.IsNullOrWhiteSpace(refundOrder.NotifyUrl))
                     {
-                        payMchNotifyService.RefundOrderNotify(_refundOrderService.GetById(refundOrderId));
+                        await _payMchNotifyService.RefundOrderNotifyAsync(await _refundOrderService.GetByIdAsync(refundOrderId));
                     }
                 }
             }
@@ -62,11 +62,11 @@ namespace AGooday.AgPay.Components.Third.Services
             else if (channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
             {
                 // 更新为失败状态
-                updateOrderSuccess = _refundOrderService.UpdateIng2Fail(refundOrderId, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
+                updateOrderSuccess = await _refundOrderService.UpdateIng2FailAsync(refundOrderId, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
                 // 通知商户系统
                 if (!string.IsNullOrWhiteSpace(refundOrder.NotifyUrl))
                 {
-                    payMchNotifyService.RefundOrderNotify(_refundOrderService.GetById(refundOrderId));
+                    await _payMchNotifyService.RefundOrderNotifyAsync(await _refundOrderService.GetByIdAsync(refundOrderId));
                 }
             }
             return updateOrderSuccess;
@@ -76,10 +76,10 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 更新支付订单分润并生成账单
         /// </summary>
         /// <param name="refundOrder"></param>
-        public void UpdatePayOrderProfitAndGenAccountBill(RefundOrderDto refundOrder)
+        public async Task UpdatePayOrderProfitAndGenAccountBillAsync(RefundOrderDto refundOrder)
         {
             IPaymentService paymentService = _paymentServiceFactory.GetService(refundOrder.IfCode);
-            var payOrder = _payOrderService.GetById(refundOrder.PayOrderId);
+            var payOrder = await _payOrderService.GetByIdAsync(refundOrder.PayOrderId);
             var payOrderProfits = _payOrderProfitService.GetByPayOrderIdAsNoTracking(refundOrder.PayOrderId);
             var amount = payOrder.Amount - payOrder.RefundAmount;
             var beforeBalance = 0L;
@@ -96,8 +96,8 @@ namespace AGooday.AgPay.Components.Third.Services
                 changeAmount = afterBalance - beforeBalance;
                 payOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, payOrderProfit.FeeRate) ?? 0;
                 payOrderProfit.ProfitAmount = profitAmount;
-                _payOrderProfitService.Update(payOrderProfit);
-                this.GenAccountBill(payOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+                await _payOrderProfitService.UpdateAsync(payOrderProfit);
+                await GenAccountBillAsync(payOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
                 totalProfitAmount += profitAmount;
             }
 
@@ -112,8 +112,8 @@ namespace AGooday.AgPay.Components.Third.Services
             changeAmount = afterBalance - beforeBalance;
             platformInaccountPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
             platformInaccountPayOrderProfit.ProfitAmount = profitAmount;
-            _payOrderProfitService.Update(platformInaccountPayOrderProfit);
-            this.GenAccountBill(platformInaccountPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+            await _payOrderProfitService.UpdateAsync(platformInaccountPayOrderProfit);
+            await GenAccountBillAsync(platformInaccountPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
 
             var platformProfitPayOrderProfit = payOrderProfits
                 .Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM) && w.InfoId.Equals(CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_PROFIT))
@@ -125,11 +125,11 @@ namespace AGooday.AgPay.Components.Third.Services
             changeAmount = afterBalance - beforeBalance;
             platformProfitPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformProfitPayOrderProfit.FeeRate) ?? 0;
             platformProfitPayOrderProfit.ProfitAmount = profitAmount;
-            _payOrderProfitService.Update(platformProfitPayOrderProfit);
-            this.GenAccountBill(platformProfitPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+            await _payOrderProfitService.UpdateAsync(platformProfitPayOrderProfit);
+            await GenAccountBillAsync(platformProfitPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
         }
 
-        private void GenAccountBill(PayOrderProfitDto payOrderProfit, RefundOrderDto refundOrder, long beforeBalance, long afterBalance, long changeAmount)
+        private Task GenAccountBillAsync(PayOrderProfitDto payOrderProfit, RefundOrderDto refundOrder, long beforeBalance, long afterBalance, long changeAmount)
         {
             if (beforeBalance > 0 && changeAmount != 0)
             {
@@ -145,8 +145,9 @@ namespace AGooday.AgPay.Components.Third.Services
                 accountBill.AccountType = (byte)AccountBillAccountType.IN_TRANSIT_ACCOUNT;
                 accountBill.RelaBizOrderType = (byte)AccountBillRelaBizOrderType.REFUND_ORDER;
                 accountBill.RelaBizOrderId = refundOrder.RefundOrderId;
-                _accountBillService.Add(accountBill);
+                return _accountBillService.AddAsync(accountBill);
             }
+            return Task.CompletedTask;
         }
     }
 }

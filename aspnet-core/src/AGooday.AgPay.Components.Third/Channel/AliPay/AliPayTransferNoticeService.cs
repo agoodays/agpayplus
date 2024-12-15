@@ -32,11 +32,11 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             return CS.IF_CODE.ALIPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId)
+        public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId)
         {
             try
             {
-                var paramsJson = GetReqParamJSON();
+                var paramsJson = await GetReqParamJSONAsync();
                 _logger.LogInformation($"【支付宝转账】回调通知参数：{paramsJson}");
 
                 var bizContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(paramsJson["biz_content"].ToString());
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object parameters, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object parameters, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【支付宝转账通知】";
             try
@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 if (mchAppConfigContext.IsIsvSubMch())
                 {
                     // 获取支付参数
-                    var alipayParams = (AliPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                    var alipayParams = (AliPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
                     useCert = alipayParams.UseCert;
                     alipaySignType = alipayParams.SignType;
                     alipayPublicCert = alipayParams.AlipayPublicCert;
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 else
                 {
                     // 获取支付参数
-                    var alipayParams = (AliPayNormalMchParams)configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                    var alipayParams = (AliPayNormalMchParams)await _configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
                     useCert = alipayParams.UseCert;
                     alipaySignType = alipayParams.SignType;
                     alipayPublicCert = alipayParams.AlipayPublicCert;

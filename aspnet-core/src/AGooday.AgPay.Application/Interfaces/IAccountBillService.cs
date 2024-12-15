@@ -5,7 +5,7 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IAccountBillService : IAgPayService<AccountBillDto>
     {
-        void GenAccountBill(string payOrderId);
+        Task GenAccountBillAsync(string payOrderId);
         Task<PaginatedList<AccountBillDto>> GetPaginatedDataAsync(AccountBillQueryDto dto);
     }
 }

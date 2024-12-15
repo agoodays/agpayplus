@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="mchDivisionReceiver"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        ChannelRetMsg Bind(MchDivisionReceiverDto mchDivisionReceiver, MchAppConfigContext mchAppConfigContext);
+        Task<ChannelRetMsg> BindAsync(MchDivisionReceiverDto mchDivisionReceiver, MchAppConfigContext mchAppConfigContext);
 
         /// <summary>
         /// 单次分账 （无需调用完结接口，或自动解冻商户资金)
@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="recordList"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        ChannelRetMsg SingleDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
+        Task<ChannelRetMsg> SingleDivisionAsync(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
 
         /// <summary>
         /// 查询分账结果
@@ -45,6 +45,6 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="recordList"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        Dictionary<long, ChannelRetMsg> QueryDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
+        Task<Dictionary<long, ChannelRetMsg>> QueryDivisionAsync(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
     }
 }

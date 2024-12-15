@@ -23,9 +23,9 @@ namespace AGooday.AgPay.Components.Third.Models
         public string NotifyWebhook { get; private set; }
         public string RefundWebhook { get; private set; }
 
-        public ChannelRetMsg ProcessOrder(string token, PayOrderDto payOrder)
+        public Task<ChannelRetMsg> ProcessOrderAsync(string token, PayOrderDto payOrder)
         {
-            return ProcessOrder(token, payOrder, false);
+            return ProcessOrderAsync(token, payOrder, false);
         }
 
         public static List<string> ProcessOrder(string order)
@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Components.Third.Models
         /// <param name="isCapture"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public ChannelRetMsg ProcessOrder(string token, PayOrderDto payOrder, bool isCapture)
+        public async Task<ChannelRetMsg> ProcessOrderAsync(string token, PayOrderDto payOrder, bool isCapture)
         {
             string ppOrderId = ProcessOrder(payOrder.ChannelOrderNo, token)[0];
             string ppCatptId = ProcessOrder(payOrder.ChannelOrderNo)[1];
@@ -111,7 +111,7 @@ namespace AGooday.AgPay.Components.Third.Models
                         Prefer = "return=representation",
                     };
 
-                    var response = ordersController.OrdersCapture(ordersCaptureInput);
+                    var response = await ordersController.OrdersCaptureAsync(ordersCaptureInput);
 
                     if ((int)response.StatusCode != 201)
                     {

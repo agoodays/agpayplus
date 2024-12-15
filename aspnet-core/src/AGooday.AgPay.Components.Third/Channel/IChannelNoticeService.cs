@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="urlOrderId"></param>
         /// <param name="noticeTypeEnum"></param>
         /// <returns></returns>
-        Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum);
+        Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum);
 
         /// <summary>
         /// 返回需要更新的订单状态 和响应数据
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="mchAppConfigContext"></param>
         /// <param name="noticeTypeEnum"></param>
         /// <returns></returns>
-        ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum);
+        Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum);
 
         /// <summary>
         /// 数据库订单 状态更新异常 (仅异步通知使用)

@@ -11,7 +11,7 @@ namespace AGooday.AgPay.Application.Interfaces
         Task CreateAsync(MchInfoCreateDto dto);
         Task RemoveAsync(string recordId);
         Task ModifyAsync(MchInfoModifyDto dto);
-        bool UpdateById(MchInfoDto dto);
+        Task<bool> UpdateByIdAsync(MchInfoDto dto);
         IEnumerable<MchInfoDto> GetByMchNos(List<string> mchNos);
         IEnumerable<MchInfoDto> GetByIsvNo(string isvNo);
         Task<PaginatedList<MchInfoDto>> GetPaginatedDataAsync(MchInfoQueryDto dto);

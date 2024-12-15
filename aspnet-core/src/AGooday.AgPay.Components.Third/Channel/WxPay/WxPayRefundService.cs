@@ -51,13 +51,13 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
                 ChannelRetMsg channelRetMsg = new ChannelRetMsg();
 
-                WxServiceWrapper wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+                WxServiceWrapper wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
 
                 if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion))  // V2
                 {
@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     if (mchAppConfigContext.IsIsvSubMch())
                     {
                         WxPayIsvSubMchParams isvsubMchParams =
-                            (WxPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                            (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
 
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                         request.SubAppId = isvsubMchParams.SubMchAppId;
@@ -76,7 +76,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
 
                     request.OutRefundNumber = refundOrder.RefundOrderId; // 退款单号
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
-                    var result = client.ExecuteGetPayRefundV2Async(request).Result;
+                    var result = await client.ExecuteGetPayRefundV2Async(request);
 
                     if ("SUCCESS".Equals(result.ResultCode))  // 退款成功
                     {
@@ -95,10 +95,10 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     request.OutRefundNumber = refundOrder.RefundOrderId;
                     if (mchAppConfigContext.IsIsvSubMch())
                     {
-                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                     }
-                    var result = client.ExecuteGetRefundDomesticRefundByOutRefundNumberAsync(request).Result;
+                    var result = await client.ExecuteGetRefundDomesticRefundByOutRefundNumberAsync(request);
                     if (result.IsSuccessful())  // 退款成功
                     {
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
@@ -127,12 +127,12 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
                 ChannelRetMsg channelRetMsg = new ChannelRetMsg();
-                WxServiceWrapper wxServiceWrapper = _configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+                WxServiceWrapper wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
 
                 if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion)) // V2
                 {
@@ -143,7 +143,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     if (mchAppConfigContext.IsIsvSubMch())
                     {
                         WxPayIsvSubMchParams isvsubMchParams =
-                            (WxPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                            (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
 
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                         request.SubAppId = isvsubMchParams.SubMchAppId;
@@ -156,7 +156,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     request.NotifyUrl = GetNotifyUrl(refundOrder.RefundOrderId); // 回调url
 
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
-                    var result = client.ExecuteCreatePayRefundV2Async(request).Result;
+                    var result = await client.ExecuteCreatePayRefundV2Async(request);
 
                     if (result.IsSuccessful()) // 退款发起成功,结果主动查询
                     {
@@ -183,12 +183,12 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
 
                     if (mchAppConfigContext.IsIsvSubMch()) // 特约商户
                     {
-                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                     }
 
                     var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
-                    var result = client.ExecuteCreateRefundDomesticRefundAsync(request).Result;
+                    var result = await client.ExecuteCreateRefundDomesticRefundAsync(request);
                     string status = result.Status;
                     if ("SUCCESS".Equals(status)) // 退款成功
                     {

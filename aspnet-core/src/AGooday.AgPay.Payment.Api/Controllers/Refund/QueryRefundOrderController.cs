@@ -33,24 +33,24 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 
         [HttpPost, Route("api/refund/query")]
         [PermissionAuth(PermCode.PAY.API_REFUND_ORDER_QUERY)]
-        public ApiRes QueryRefundOrder()
+        public async Task<ApiRes> QueryRefundOrderAsync()
         {
             //获取参数 & 验签
-            QueryRefundOrderRQ rq = GetRQByWithMchSign<QueryRefundOrderRQ>();
+            QueryRefundOrderRQ rq = await this.GetRQByWithMchSignAsync<QueryRefundOrderRQ>();
 
             if (StringUtil.IsAllNullOrWhiteSpace(rq.MchRefundNo, rq.RefundOrderId))
             {
                 throw new BizException("mchRefundNo 和 refundOrderId不能同时为空");
             }
 
-            RefundOrderDto refundOrder = _refundOrderService.QueryMchOrder(rq.MchNo, rq.MchRefundNo, rq.RefundOrderId);
+            RefundOrderDto refundOrder = await _refundOrderService.QueryMchOrderAsync(rq.MchNo, rq.MchRefundNo, rq.RefundOrderId);
             if (refundOrder == null)
             {
                 throw new BizException("订单不存在");
             }
 
             QueryRefundOrderRS bizRes = QueryRefundOrderRS.BuildByRefundOrder(refundOrder);
-            return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRes, rq.SignType, (await _configContextQueryService.QueryMchAppAsync(rq.MchNo, rq.AppId)).AppSecret);
         }
     }
 }

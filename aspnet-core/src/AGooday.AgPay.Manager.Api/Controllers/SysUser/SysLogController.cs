@@ -49,10 +49,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpDelete, Route("{selectedIds}"), MethodLog("删除日志信息")]
         [PermissionAuth(PermCode.MGR.ENT_SYS_LOG_DEL)]
-        public ApiRes Delete(string selectedIds)
+        public async Task<ApiRes> DeleteAsync(string selectedIds)
         {
             var ids = selectedIds.Split(",").Select(s => Convert.ToInt64(s)).ToList();
-            var result = _sysLogService.RemoveByIds(ids);
+            var result = await _sysLogService.RemoveByIdsAsync(ids);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_DELETE);

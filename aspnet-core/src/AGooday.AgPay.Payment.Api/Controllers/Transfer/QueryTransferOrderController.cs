@@ -33,24 +33,24 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
 
         [HttpPost, Route("api/transfer/query")]
         [PermissionAuth(PermCode.PAY.API_TRANS_ORDER_QUERY)]
-        public ApiRes QueryTransferOrder()
+        public async Task<ApiRes> QueryTransferOrderAsync()
         {
             //获取参数 & 验签
-            QueryTransferOrderRQ rq = GetRQByWithMchSign<QueryTransferOrderRQ>();
+            QueryTransferOrderRQ rq = await this.GetRQByWithMchSignAsync<QueryTransferOrderRQ>();
 
             if (StringUtil.IsAllNullOrWhiteSpace(rq.MchOrderNo, rq.TransferId))
             {
                 throw new BizException("mchOrderNo 和 transferId不能同时为空");
             }
 
-            TransferOrderDto tansferOrder = _transferOrderService.QueryMchOrder(rq.MchNo, rq.MchOrderNo, rq.TransferId);
+            TransferOrderDto tansferOrder = await _transferOrderService.QueryMchOrderAsync(rq.MchNo, rq.MchOrderNo, rq.TransferId);
             if (tansferOrder == null)
             {
                 throw new BizException("订单不存在");
             }
 
             QueryTransferOrderRS bizRes = QueryTransferOrderRS.BuildByRecord(tansferOrder);
-            return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRes, rq.SignType, (await _configContextQueryService.QueryMchAppAsync(rq.MchNo, rq.AppId)).AppSecret);
         }
     }
 }

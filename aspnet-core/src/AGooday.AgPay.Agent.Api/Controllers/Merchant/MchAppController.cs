@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
     [ApiController, Authorize]
     public class MchAppController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly SysRSA2Config _sysRSA2Config;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _sysRSA2Config = sysRSA2Config.Value;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
@@ -100,11 +100,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_APP_DEL)]
         public async Task<ApiRes> DeleteAsync(string appId)
         {
-            _mchAppService.Remove(appId);
+            await _mchAppService.RemoveAsync(appId);
 
             // 推送mq到目前节点进行更新数据
             var mchApp = await _mchAppService.GetByIdAsync(appId);
-            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, appId));
+            await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, mchApp.MchNo, appId));
 
             return ApiRes.Ok();
         }
@@ -118,13 +118,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_APP_EDIT)]
         public async Task<ApiRes> UpdateAsync(string appId, MchAppDto dto)
         {
-            var result = _mchAppService.Update(dto);
+            var result = await _mchAppService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
             }
             // 推送修改应用消息
-            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, dto.MchNo, dto.AppId));
+            await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, dto.MchNo, dto.AppId));
 
             return ApiRes.Ok();
         }

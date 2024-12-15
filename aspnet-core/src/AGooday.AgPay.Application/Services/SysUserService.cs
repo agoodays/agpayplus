@@ -30,12 +30,11 @@ namespace AGooday.AgPay.Application.Services
             _sysUserTeamRepository = sysUserTeamRepository;
         }
 
-        public override bool Add(SysUserDto dto)
+        public override async Task<bool> AddAsync(SysUserDto dto)
         {
             var entity = _mapper.Map<SysUser>(dto);
-            _sysUserRepository.Add(entity);
-            _sysUserRepository.SaveChanges();
-            var result = _sysUserRepository.SaveChanges(out int _);
+            await _sysUserRepository.AddAsync(entity);
+            var result = await _sysUserRepository.SaveChangesAsync() > 0;
             dto.SysUserId = entity.SysUserId;
             return result;
         }
@@ -57,12 +56,12 @@ namespace AGooday.AgPay.Application.Services
             await Bus.SendCommand(command);
         }
 
-        public override bool Update(SysUserDto dto)
+        public override async Task<bool> UpdateAsync(SysUserDto dto)
         {
             var entity = _mapper.Map<SysUser>(dto);
             entity.UpdatedAt = DateTime.Now;
             _sysUserRepository.Update(entity);
-            return _sysUserRepository.SaveChanges(out int _);
+            return await _sysUserRepository.SaveChangesAsync() > 0;
         }
 
         public async Task ModifyCurrentUserInfoAsync(ModifyCurrentUserInfoDto dto)
@@ -154,7 +153,7 @@ namespace AGooday.AgPay.Application.Services
             var query = _mapper.Map<SysUserQuery>(dto);
             query.CurrentUserId = currentUserId;
             var result = (IQueryable<SysUserQueryResult>)await Bus.SendQuery(query);
-            var records = PaginatedList<SysUserListDto>.Create(result, s =>
+            var records = await PaginatedList<SysUserListDto>.CreateAsync(result, s =>
             {
                 var item = _mapper.Map<SysUserListDto>(s.SysUser);
                 item.TeamName = s.SysUserTeam?.TeamName;

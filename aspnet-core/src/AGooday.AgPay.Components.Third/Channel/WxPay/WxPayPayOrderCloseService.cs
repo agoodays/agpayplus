@@ -20,12 +20,12 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
     public class WxPayPayOrderCloseService : IPayOrderCloseService
     {
         private readonly ILogger<WxPayPayOrderCloseService> _logger;
-        private readonly ConfigContextQueryService configContextQueryService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public WxPayPayOrderCloseService(ILogger<WxPayPayOrderCloseService> logger, ConfigContextQueryService configContextQueryService)
         {
             _logger = logger;
-            this.configContextQueryService = configContextQueryService;
+            _configContextQueryService = configContextQueryService;
         }
 
         public WxPayPayOrderCloseService()
@@ -37,11 +37,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             return CS.IF_CODE.WXPAY;
         }
 
-        public ChannelRetMsg Close(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> CloseAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
-                WxServiceWrapper wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+                WxServiceWrapper wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
 
                 if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion)) // V2
                 {
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     //不是特约商户，无需放置此值
                     if (mchAppConfigContext.IsIsvSubMch())
                     {
-                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
 
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                         request.SubAppId = isvsubMchParams.SubMchAppId;
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     request.OutTradeNumber = payOrder.PayOrderId;
 
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
-                    var result = client.ExecuteClosePayOrderAsync(request).Result;
+                    var result = await client.ExecuteClosePayOrderAsync(request);
 
                     if ("SUCCESS".Equals(result.ResultCode)) //if (result.IsSuccessful()) //关闭订单成功
                     {
@@ -81,20 +81,20 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
                     if (mchAppConfigContext.IsIsvSubMch()) // Sub-merchant
                     {
-                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
                         ClosePayPartnerTransactionRequest request = new ClosePayPartnerTransactionRequest();
                         request.MerchantId = wxServiceWrapper.Config.MchId;
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                         request.OutTradeNumber = payOrder.PayOrderId;
-                        result = client.ExecuteClosePayPartnerTransactionAsync(request).Result;
+                        result = await client.ExecuteClosePayPartnerTransactionAsync(request);
                     }
                     else
                     {
                         ClosePayTransactionRequest request = new ClosePayTransactionRequest();
                         request.MerchantId = wxServiceWrapper.Config.MchId;
                         request.OutTradeNumber = payOrder.PayOrderId;
-                        result = client.ExecuteClosePayTransactionAsync(request).Result;
+                        result = await client.ExecuteClosePayTransactionAsync(request);
                     }
 
                     if (result.IsSuccessful())

@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -11,19 +12,19 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public MchApp GetByIdAsNoTracking(string recordId)
+        public Task<MchApp> GetByIdAsNoTrackingAsync(string recordId)
         {
-            return GetAllAsNoTracking().FirstOrDefault(w => w.AppId.Equals(recordId));
+            return GetAllAsNoTracking().FirstOrDefaultAsync(w => w.AppId.Equals(recordId));
         }
 
-        public MchApp GetById(string recordId, string mchNo)
+        public Task<MchApp> GetByIdAsync(string recordId, string mchNo)
         {
-            return GetAll().FirstOrDefault(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId));
+            return GetAllAsNoTracking().FirstOrDefaultAsync(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId));
         }
 
-        public MchApp GetByIdAsNoTracking(string recordId, string mchNo)
+        public Task<MchApp> GetByIdAsNoTrackingAsync(string recordId, string mchNo)
         {
-            return GetAllAsNoTracking().FirstOrDefault(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId));
+            return GetAllAsNoTracking().FirstOrDefaultAsync(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId));
         }
     }
 }

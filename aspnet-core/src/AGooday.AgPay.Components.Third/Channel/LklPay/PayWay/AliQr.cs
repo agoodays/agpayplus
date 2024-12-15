@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【拉卡拉(alipay)二维码支付】";
             AliQrOrderRQ bizRQ = (AliQrOrderRQ)rq;
@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
             UnifiedParamsSet(reqParams, payOrder, GetNotifyUrl(), GetReturnUrl());
 
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/api/v3/labs/trans/preorder", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/api/v3/labs/trans/preorder", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON?.GetValue("code").ToString(); //请求响应码
             string msg = resJSON?.GetValue("msg").ToString(); //响应信息

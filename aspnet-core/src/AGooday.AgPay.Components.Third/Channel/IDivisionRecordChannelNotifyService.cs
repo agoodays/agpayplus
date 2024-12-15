@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Dictionary<string, object> ParseParams(HttpRequest request);
+        Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request);
 
         /// <summary>
         /// 返回需要更新的记录 <ID, 结果> 状态 和响应数据
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="recordList"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        DivisionChannelNotifyModel DoNotify(HttpRequest request, object parameters, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
+        Task<DivisionChannelNotifyModel> DoNotifyAsync(HttpRequest request, object parameters, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext);
 
         ActionResult DoNotifyOrderNotExists(HttpRequest request);
 

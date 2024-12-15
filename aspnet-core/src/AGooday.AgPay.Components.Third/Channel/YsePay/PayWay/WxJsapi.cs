@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string logPrefix = "【银盛(wechatJs)jsapi支付】";
             SortedDictionary<string, string> reqParams = new SortedDictionary<string, string>();
@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
             reqParams.Add("appid", bizRQ.SubAppId);
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                YsePayIsvParams isvParams = (YsePayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                YsePayIsvParams isvParams = (YsePayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
                 if (isvParams.PartnerId == null)
                 {
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
 
             // 发送请求
             string method = "ysepay.online.weixin.pay", repMethod = "ysepay_online_weixin_pay_response";
-            JObject resJSON = PackageParamAndReq(YsePayConfig.QRCODE_GATEWAY, method, repMethod, reqParams, GetNotifyUrl(), logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync(YsePayConfig.QRCODE_GATEWAY, method, repMethod, reqParams, GetNotifyUrl(), logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             var data = resJSON.GetValue(repMethod)?.ToObject<JObject>();
             string code = data?.GetValue("code").ToString();

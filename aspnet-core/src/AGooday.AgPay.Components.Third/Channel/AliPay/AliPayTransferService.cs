@@ -18,11 +18,11 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
     /// </summary>
     public class AliPayTransferService : ITransferService
     {
-        private readonly ConfigContextQueryService configContextQueryService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public AliPayTransferService(ConfigContextQueryService configContextQueryService)
         {
-            this.configContextQueryService = configContextQueryService;
+            _configContextQueryService = configContextQueryService;
         }
 
         public AliPayTransferService()
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             return null;
         }
 
-        public ChannelRetMsg Transfer(TransferOrderRQ bizRQ, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> TransferAsync(TransferOrderRQ bizRQ, TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
         {
             AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
             AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
@@ -71,10 +71,10 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             request.SetBizModel(model);
 
             //统一放置 isv接口必传信息
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, request, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, request, model);
 
             // 调起支付宝接口
-            AlipayFundTransUniTransferResponse response = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
+            AlipayFundTransUniTransferResponse response = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(request);
 
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             channelRetMsg.ChannelAttach = response.Body;
@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             }
         }
 
-        public ChannelRetMsg Query(TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(TransferOrderDto transferOrder, MchAppConfigContext mchAppConfigContext)
         {
             AlipayFundTransCommonQueryRequest request = new AlipayFundTransCommonQueryRequest();
             AlipayFundTransCommonQueryModel model = new AlipayFundTransCommonQueryModel();
@@ -126,10 +126,10 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             request.SetBizModel(model);
 
             //统一放置 isv接口必传信息
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, request, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, request, model);
 
             // 调起支付宝接口
-            AlipayFundTransCommonQueryResponse response = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
+            AlipayFundTransCommonQueryResponse response = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(request);
 
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             channelRetMsg.ChannelAttach = response.Body;

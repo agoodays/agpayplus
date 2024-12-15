@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Manager.Api.WebSockets
         //应用ID
         private string AppId = "";
 
-        public async Task ProcessWebSocket(WebSocket webSocket, string cid, string appId)
+        public async Task ProcessWebSocketAsync(WebSocket webSocket, string cid, string appId)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Manager.Api.WebSockets
         /// 实现服务器主动推送
         /// </summary>
         /// <param name="message"></param>
-        public async Task SendMessage(string message)
+        public async Task SendMessageAsync(string message)
         {
             var buff = Encoding.UTF8.GetBytes(message);
             var data = new ArraySegment<byte>(buff, 0, buff.Length);
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Manager.Api.WebSockets
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="msg"></param>
-        public async Task SendMsgByAppAndCid(string appId, string cid, string msg)
+        public async Task SendMsgByAppAndCidAsync(string appId, string cid, string msg)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Manager.Api.WebSockets
                 {
                     try
                     {
-                        await item.SendMessage(msg);
+                        await item.SendMessageAsync(msg);
                     }
                     catch (Exception e)
                     {

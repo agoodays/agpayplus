@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     /// </summary>
     public abstract class AbstractPayOrderController : ApiControllerBase
     {
-        protected readonly IMQSender mqSender;
+        protected readonly IMQSender _mqSender;
         protected readonly ILogger<AbstractPayOrderController> _logger;
         protected readonly IChannelServiceFactory<IPaymentService> _paymentServiceFactory;
         protected readonly PayOrderProcessService _payOrderProcessService;
@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             _payOrderService = payOrderService;
             _payOrderProfitService = payOrderProfitService;
             _sysConfigService = sysConfigService;
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                         throw new BizException("订单状态异常");
                     }
 
-                    var wayType = _configContextQueryService.GetWayTypeByWayCode(wayCode);
+                    var wayType = await _configContextQueryService.GetWayTypeByWayCodeAsync(wayCode);
                     payOrder.WayCode = wayCode; // 需要将订单更新 支付方式
                     payOrder.WayType = wayType; // 需要将订单更新 支付类型
                     payOrder.ChannelUser = bizRQ.GetChannelUserId(); //更新渠道用户信息
@@ -140,7 +140,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 //获取支付参数 (缓存数据) 和 商户信息
-                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
                 if (mchAppConfigContext == null)
                 {
                     throw new BizException("获取商户应用信息失败");
@@ -153,7 +153,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 if (isNewOrder && CS.PAY_WAY_CODE.QR_CASHIER.Equals(wayCode))
                 {
                     //生成订单
-                    payOrder = GenPayOrder(bizRQ, mchAppConfigContext, null, null, null);
+                    payOrder = await this.GenPayOrderAsync(bizRQ, mchAppConfigContext, null, null, null);
                     string payOrderId = payOrder.PayOrderId;
                     //订单入库 订单状态： 生成状态  此时没有和任何上游渠道产生交互。
                     await _payOrderService.AddAsync(payOrder);
@@ -175,24 +175,24 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                         qrCashierOrderRS.PayUrl = payUrl;
                     }
 
-                    return PackageApiResByPayOrder(bizRQ, qrCashierOrderRS, payOrder);
+                    return await this.PackageApiResByPayOrderAsync(bizRQ, qrCashierOrderRS, payOrder);
                 }
 
                 // 根据支付方式， 查询出 该商户 可用的支付接口
-                var mchPayPassage = _mchPayPassageService.FindMchPayPassage(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, wayCode, bizRQ.Amount);
+                var mchPayPassage = await _mchPayPassageService.FindMchPayPassageAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, wayCode, bizRQ.Amount);
                 if (mchPayPassage == null)
                 {
                     throw new BizException("商户应用不支持该支付方式");
                 }
 
                 //获取支付接口
-                IPaymentService paymentService = CheckMchWayCodeAndGetService(mchAppConfigContext, mchPayPassage);
+                IPaymentService paymentService = await this.CheckMchWayCodeAndGetServiceAsync(mchAppConfigContext, mchPayPassage);
                 string ifCode = paymentService.GetIfCode();
 
                 //生成订单
                 if (isNewOrder)
                 {
-                    payOrder = GenPayOrder(bizRQ, mchAppConfigContext, ifCode, mchPayPassage, paymentService);
+                    payOrder = await this.GenPayOrderAsync(bizRQ, mchAppConfigContext, ifCode, mchPayPassage, paymentService);
                 }
                 else
                 {
@@ -220,15 +220,15 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 // 生成订单分润
-                GenPayOrderProfit(payOrder, paymentService);
+                await this.GenPayOrderProfitAsync(payOrder, paymentService);
 
                 //调起上游支付接口
-                bizRS = (UnifiedOrderRS)paymentService.Pay(bizRQ, payOrder, mchAppConfigContext);
+                bizRS = (UnifiedOrderRS)await paymentService.PayAsync(bizRQ, payOrder, mchAppConfigContext);
 
                 //处理上游返回数据
-                this.ProcessChannelMsg(bizRS.ChannelRetMsg, payOrder);
+                await this.ProcessChannelMsgAsync(bizRS.ChannelRetMsg, payOrder);
 
-                return PackageApiResByPayOrder(bizRQ, bizRS, payOrder);
+                return await this.PackageApiResByPayOrderAsync(bizRQ, bizRS, payOrder);
             }
             catch (BizException e)
             {
@@ -237,14 +237,14 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             //处理上游返回数据
             catch (ChannelException e)
             {
-                this.ProcessChannelMsg(e.ChannelRetMsg, payOrder);
+                await this.ProcessChannelMsgAsync(e.ChannelRetMsg, payOrder);
 
                 if (e.ChannelRetMsg.ChannelState == ChannelState.SYS_ERROR)
                 {
                     return ApiRes.CustomFail(e.Message);
                 }
 
-                return this.PackageApiResByPayOrder(bizRQ, bizRS, payOrder);
+                return await this.PackageApiResByPayOrderAsync(bizRQ, bizRS, payOrder);
             }
             catch (Exception e)
             {
@@ -253,15 +253,15 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
         }
 
-        private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchAppConfigContext configContext, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
+        private async Task<PayOrderDto> GenPayOrderAsync(UnifiedOrderRQ rq, MchAppConfigContext configContext, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
         {
             MchInfoDto mchInfo = configContext.MchInfo;
             MchAppDto mchApp = configContext.MchApp;
-            MchStoreDto mchStore = _configContextQueryService.QueryMchStore(rq.MchNo, rq.StoreId);
-            AgentInfoDto agentInfo = _configContextQueryService.QueryAgentInfo(configContext);
-            IsvInfoDto isvInfo = _configContextQueryService.QueryIsvInfo(configContext);
-            var wayType = _configContextQueryService.GetWayTypeByWayCode(rq.WayCode);
-            return GenPayOrder(rq, mchInfo, mchApp, mchStore, agentInfo, isvInfo, ifCode, wayType, mchPayPassage, paymentService);
+            MchStoreDto mchStore = await _configContextQueryService.QueryMchStoreAsync(rq.MchNo, rq.StoreId);
+            AgentInfoDto agentInfo = await _configContextQueryService.QueryAgentInfoAsync(configContext);
+            IsvInfoDto isvInfo = await _configContextQueryService.QueryIsvInfoAsync(configContext);
+            var wayType = await _configContextQueryService.GetWayTypeByWayCodeAsync(rq.WayCode);
+            return this.GenPayOrder(rq, mchInfo, mchApp, mchStore, agentInfo, isvInfo, ifCode, wayType, mchPayPassage, paymentService);
         }
 
         private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, MchStoreDto mchStore, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode, string wayType, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
@@ -336,7 +336,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             return payOrder;
         }
 
-        private void GenPayOrderProfit(PayOrderDto payOrder, IPaymentService paymentService)
+        private async Task GenPayOrderProfitAsync(PayOrderDto payOrder, IPaymentService paymentService)
         {
             var payRateConfigs = _payRateConfigService.GetPayRateConfigInfos(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
 
@@ -363,7 +363,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 payOrderProfit.OrderFeeAmount = feeAmount;
                 payOrderProfit.ProfitAmount = profitAmount;
                 payOrderProfit.OrderProfitAmount = profitAmount;
-                _payOrderProfitService.Add(payOrderProfit);
+                await _payOrderProfitService.AddAsync(payOrderProfit);
                 preFeeRate = feeRate;
                 totalProfitAmount += profitAmount;
                 totalProfitRate += profitRate;
@@ -386,7 +386,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrderProfit.ProfitRate = platformProfitRate;
             payOrderProfit.ProfitAmount = platformProfitAmount;
             payOrderProfit.OrderProfitAmount = platformProfitAmount;
-            _payOrderProfitService.Add(payOrderProfit);
+            await _payOrderProfitService.AddAsync(payOrderProfit);
 
             payOrderProfit = new PayOrderProfitDto();
             payOrderProfit.InfoId = CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_PROFIT;
@@ -400,7 +400,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrderProfit.ProfitRate = platformProfitRate - totalProfitRate;
             payOrderProfit.ProfitAmount = platformProfitAmount - totalProfitAmount;
             payOrderProfit.OrderProfitAmount = platformProfitAmount - totalProfitAmount;
-            _payOrderProfitService.Add(payOrderProfit);
+            await _payOrderProfitService.AddAsync(payOrderProfit);
         }
 
         /// <summary>
@@ -410,7 +410,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="mchAppConfigContext"></param>
         /// <param name="mchPayPassage"></param>
         /// <returns></returns>
-        private IPaymentService CheckMchWayCodeAndGetService(MchAppConfigContext mchAppConfigContext, MchPayPassageDto mchPayPassage)
+        private async Task<IPaymentService> CheckMchWayCodeAndGetServiceAsync(MchAppConfigContext mchAppConfigContext, MchPayPassageDto mchPayPassage)
         {
             // 接口代码
             string ifCode = mchPayPassage.IfCode;
@@ -428,7 +428,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             if (mchAppConfigContext.MchType == (byte)MchInfoType.TYPE_NORMAL)//普通商户
             {
 
-                if (_configContextQueryService.QueryNormalMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, ifCode) == null)
+                if (_configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, ifCode) == null)
                 {
                     throw new BizException("商户应用参数未配置");
                 }
@@ -436,12 +436,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             else if (mchAppConfigContext.MchType == (byte)MchInfoType.TYPE_ISVSUB)//特约商户
             {
 
-                if (_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, ifCode) == null)
+                if (await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, ifCode) == null)
                 {
                     throw new BizException("特约商户参数未配置");
                 }
 
-                if (_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, ifCode) == null)
+                if (_configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, ifCode) == null)
                 {
                     throw new BizException("服务商参数未配置");
                 }
@@ -457,7 +457,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="channelRetMsg"></param>
         /// <param name="payOrder"></param>
         /// <exception cref="BizException"></exception>
-        private async void ProcessChannelMsg(ChannelRetMsg channelRetMsg, PayOrderDto payOrder)
+        private async Task ProcessChannelMsgAsync(ChannelRetMsg channelRetMsg, PayOrderDto payOrder)
         {
             //对象为空 || 上游返回状态为空， 则无需操作
             if (channelRetMsg == null || channelRetMsg.ChannelState == null)
@@ -470,22 +470,22 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             //明确成功
             if (ChannelState.CONFIRM_SUCCESS == channelRetMsg.ChannelState)
             {
-                this.UpdateInitOrderStateThrowException((byte)PayOrderState.STATE_SUCCESS, payOrder, channelRetMsg);
+                await this.UpdateInitOrderStateThrowExceptionAsync((byte)PayOrderState.STATE_SUCCESS, payOrder, channelRetMsg);
 
                 //订单支付成功，其他业务逻辑
-                _payOrderProcessService.ConfirmSuccess(payOrder);
+                await _payOrderProcessService.ConfirmSuccessAsync(payOrder);
             }
             //明确失败
             else if (ChannelState.CONFIRM_FAIL == channelRetMsg.ChannelState)
             {
-                this.UpdateInitOrderStateThrowException((byte)PayOrderState.STATE_FAIL, payOrder, channelRetMsg);
+                await this.UpdateInitOrderStateThrowExceptionAsync((byte)PayOrderState.STATE_FAIL, payOrder, channelRetMsg);
             }
             // 上游处理中 || 未知 || 上游接口返回异常  订单为支付中状态
             else if (ChannelState.WAITING == channelRetMsg.ChannelState ||
                 ChannelState.UNKNOWN == channelRetMsg.ChannelState ||
                 ChannelState.API_RET_ERROR == channelRetMsg.ChannelState)
             {
-                this.UpdateInitOrderStateThrowException((byte)PayOrderState.STATE_ING, payOrder, channelRetMsg);
+                await this.UpdateInitOrderStateThrowExceptionAsync((byte)PayOrderState.STATE_ING, payOrder, channelRetMsg);
             }
             // 系统异常：  订单不再处理。  为： 生成状态
             else if (ChannelState.SYS_ERROR == channelRetMsg.ChannelState)
@@ -500,7 +500,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             if (channelRetMsg.IsNeedQuery)
             {
                 //推送到MQ
-                await mqSender.SendAsync(PayOrderReissueMQ.Build(payOrderId, 1), 5);
+                await _mqSender.SendAsync(PayOrderReissueMQ.Build(payOrderId, 1), 5);
             }
         }
 
@@ -511,7 +511,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="payOrder"></param>
         /// <param name="channelRetMsg"></param>
         /// <exception cref="BizException"></exception>
-        private void UpdateInitOrderStateThrowException(byte orderState, PayOrderDto payOrder, ChannelRetMsg channelRetMsg)
+        private async Task UpdateInitOrderStateThrowExceptionAsync(byte orderState, PayOrderDto payOrder, ChannelRetMsg channelRetMsg)
         {
             payOrder.State = orderState;
             payOrder.ChannelOrderNo = channelRetMsg.ChannelOrderId;
@@ -524,7 +524,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 payOrder.ChannelUser = channelRetMsg.ChannelUserId;
             }
 
-            _payOrderProcessService.UpdateIngAndSuccessOrFailByCreatebyOrder(payOrder, channelRetMsg);
+            await _payOrderProcessService.UpdateIngAndSuccessOrFailByCreatebyOrderAsync(payOrder, channelRetMsg);
         }
 
         /// <summary>
@@ -534,7 +534,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         /// <param name="bizRS"></param>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        private ApiRes PackageApiResByPayOrder(UnifiedOrderRQ bizRQ, UnifiedOrderRS bizRS, PayOrderDto payOrder)
+        private async Task<ApiRes> PackageApiResByPayOrderAsync(UnifiedOrderRQ bizRQ, UnifiedOrderRS bizRS, PayOrderDto payOrder)
         {
             // 返回接口数据
             bizRS.PayOrderId = payOrder.PayOrderId;
@@ -547,7 +547,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 bizRS.ErrMsg = bizRS.ChannelRetMsg?.ChannelErrMsg;
             }
 
-            return ApiRes.OkWithSign(bizRS, bizRQ.SignType, _configContextQueryService.QueryMchApp(bizRQ.MchNo, bizRQ.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRS, bizRQ.SignType, (await _configContextQueryService.QueryMchAppAsync(bizRQ.MchNo, bizRQ.AppId)).AppSecret);
         }
     }
 }

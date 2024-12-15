@@ -35,11 +35,11 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             return CS.IF_CODE.SXFPAY;
         }
 
-        public override Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
-                JObject @params = GetReqParamJSON();
+                JObject @params = await GetReqParamJSONAsync();
                 string payOrderId = @params.GetValue("ordNo").ToString();
                 return new Dictionary<string, object>() { { payOrderId, @params } };
             }
@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             }
         }
 
-        public override ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
+        public override async Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
                 _logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
 
                 // 校验支付回调
-                bool verifyResult = VerifyParams(jsonParams, payOrder, mchAppConfigContext);
+                bool verifyResult = await VerifyParamsAsync(jsonParams, payOrder, mchAppConfigContext);
                 // 验证参数失败
                 if (!verifyResult)
                 {
@@ -117,7 +117,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             }
         }
 
-        public bool VerifyParams(JObject jsonParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<bool> VerifyParamsAsync(JObject jsonParams, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             string ordNo = jsonParams.GetValue("ordNo").ToString();       // 商户订单号
             string amt = jsonParams.GetValue("amt").ToString();         // 支付金额
@@ -132,7 +132,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
                 return false;
             }
 
-            SxfPayIsvParams isvParams = (SxfPayIsvParams)configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+            SxfPayIsvParams isvParams = (SxfPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             //验签
             string publicKey = isvParams.PublicKey;

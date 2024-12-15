@@ -17,17 +17,17 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
     /// </summary>
     public class SxfPayRefundService : AbstractRefundService
     {
-        private readonly SxfPayPaymentService sxfpayPaymentService;
+        private readonly SxfPayPaymentService _paymentService;
         public SxfPayRefundService(ILogger<SxfPayRefundService> logger,
-            //[FromKeyedServices(CS.IF_CODE.SXFPAY)] IPaymentService sxfpayPaymentService,
+            //[FromKeyedServices(CS.IF_CODE.SXFPAY)] IPaymentService paymentService,
             IServiceProvider serviceProvider,
             ISysConfigService sysConfigService,
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            //this.sxfpayPaymentService = (SxfPayPaymentService)sxfpayPaymentService;
-            //this.sxfpayPaymentService = (SxfPayPaymentService)serviceProvider.GetRequiredKeyedService<IPaymentService>(CS.IF_CODE.SXFPAY);
-            this.sxfpayPaymentService = ActivatorUtilities.CreateInstance<SxfPayPaymentService>(serviceProvider);
+            //_paymentService = (SxfPayPaymentService)paymentService;
+            //_paymentService = (SxfPayPaymentService)serviceProvider.GetRequiredKeyedService<IPaymentService>(CS.IF_CODE.SXFPAY);
+            _paymentService = ActivatorUtilities.CreateInstance<SxfPayPaymentService>(serviceProvider);
         }
 
         public SxfPayRefundService()
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             return AmountUtil.CalPercentageFee(amount, payOrder.MchOrderFeeAmount, payOrder.Amount);
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
                 reqParams.Add("ordNo", refundOrder.RefundOrderId); // 退款订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = sxfpayPaymentService.PackageParamAndReq("/query/refundQuery", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/query/refundQuery", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -149,7 +149,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -164,7 +164,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
                 reqParams.Add("refundReason", refundOrder.RefundReason); // 退货原因
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = sxfpayPaymentService.PackageParamAndReq("/order/refund", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/order/refund", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

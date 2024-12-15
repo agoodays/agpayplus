@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             AliLiteOrderRQ bizRQ = (AliLiteOrderRQ)rq;
 
@@ -46,10 +46,10 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
             req.SetBizModel(model);
 
             //统一放置 isv接口必传信息
-            AliPayKit.PutApiIsvInfo(mchAppConfigContext, req, model);
+            await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, req, model);
 
             //调起支付宝 （如果异常， 将直接跑出   ChannelException ）
-            AlipayTradeCreateResponse alipayResp = _configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(req);
+            AlipayTradeCreateResponse alipayResp = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(req);
 
             // 构造函数响应数据
             AliLiteOrderRS res = ApiResBuilder.BuildSuccess<AliLiteOrderRS>();

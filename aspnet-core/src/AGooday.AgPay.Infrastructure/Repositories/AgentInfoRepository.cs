@@ -22,22 +22,22 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return GetAllAsNoTracking().AnyAsync(c => c.IsvNo.Equals(isvNo));
         }
 
-        public IEnumerable<AgentInfo> GetAllOrSubAgents(string currentAgentNo)
+        public async Task<IEnumerable<AgentInfo>> GetAllOrSubAgentsAsync(string currentAgentNo)
         {
             if (string.IsNullOrEmpty(currentAgentNo))
             {
                 return GetAllAsNoTracking();
             }
             // 获取当前代理商的所有下级代理商，不包括下级的下级代理商
-            var subAgents = DbSet
+            var agent = await DbSet
                 .Include(a => a.SubAgents)
                 .Where(a => a.AgentNo == currentAgentNo)
-                .FirstOrDefault()?.SubAgents;
+                .FirstOrDefaultAsync();
 
-            return subAgents;
+            return agent?.SubAgents;
         }
 
-        public IEnumerable<AgentInfo> GetAllOrSubAgents(string currentAgentNo, Func<AgentInfo, bool> filter = null)
+        public async Task<IEnumerable<AgentInfo>> GetAllOrSubAgentsAsync(string currentAgentNo, Func<AgentInfo, bool> filter = null)
         {
             if (string.IsNullOrEmpty(currentAgentNo))
             {
@@ -52,10 +52,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             }
 
             // 获取当前代理商的所有下级代理商，不包括下级的下级代理商
-            var subAgents = DbSet
+            var agent = await DbSet
                 .Include(a => a.SubAgents)
                 .Where(a => a.AgentNo == currentAgentNo)
-                .FirstOrDefault()?.SubAgents;
+                .FirstOrDefaultAsync();
+            var subAgents = agent?.SubAgents;
 
             if (subAgents != null)
             {
@@ -72,18 +73,18 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return Enumerable.Empty<AgentInfo>();
         }
 
-        public ICollection<AgentInfo> GetSubAgents(string agentNo)
+        public async Task<ICollection<AgentInfo>> GetSubAgentsAsync(string agentNo)
         {
             // 获取当前代理商的所有下级代理商，不包括下级的下级代理商
-            var subAgents = DbSet
+            var agent = await DbSet
                 .Include(a => a.SubAgents)
                 .Where(a => a.AgentNo == agentNo)
-                .FirstOrDefault()?.SubAgents;
+                .FirstOrDefaultAsync();
 
-            return subAgents;
+            return agent?.SubAgents;
         }
 
-        public IEnumerable<AgentInfo> GetAllOrAllSubAgents(string currentAgentNo, Func<AgentInfo, bool> filter = null)
+        public async Task<IEnumerable<AgentInfo>> GetAllOrAllSubAgentsAsync(string currentAgentNo, Func<AgentInfo, bool> filter = null)
         {
             if (string.IsNullOrEmpty(currentAgentNo))
             {
@@ -98,12 +99,12 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             }
 
             // 获取当前代理商的所有下级代理商，包括下级的下级代理商
-            var subAgents = DbSet
+            var subAgents = await DbSet
                 .Include(a => a.SubAgents)
                 .ThenInclude(subAgent => subAgent.SubAgents) // 包含下级代理商的下级代理商
                 .Where(a => a.AgentNo == currentAgentNo)
                 .SelectMany(a => a.SubAgents) // 使用 SelectMany 扁平化获取所有下级代理商
-                .ToList();
+                .ToListAsync();
 
             if (subAgents != null)
             {

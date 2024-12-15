@@ -20,13 +20,13 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
     public class AliPayDivisionService : IDivisionService
     {
         private readonly ILogger<AliPayDivisionService> _logger;
-        private readonly ConfigContextQueryService configContextQueryService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public AliPayDivisionService(ILogger<AliPayDivisionService> logger,
             ConfigContextQueryService configContextQueryService)
         {
             _logger = logger;
-            this.configContextQueryService = configContextQueryService;
+            _configContextQueryService = configContextQueryService;
         }
 
         public AliPayDivisionService()
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             return false;
         }
 
-        public ChannelRetMsg Bind(MchDivisionReceiverDto mchDivisionReceiver, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BindAsync(MchDivisionReceiverDto mchDivisionReceiver, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 model.OutRequestNo = SeqUtil.GenDivisionBatchId();
 
                 //统一放置 isv接口必传信息
-                AliPayKit.PutApiIsvInfo(mchAppConfigContext, request, model);
+                await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, request, model);
 
                 RoyaltyEntity royaltyEntity = new RoyaltyEntity();
 
@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 royaltyEntity.Memo = mchDivisionReceiver.RelationTypeName; //分账关系描述
                 model.ReceiverList = new List<RoyaltyEntity>() { royaltyEntity };
 
-                AlipayTradeRoyaltyRelationBindResponse alipayResp = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
+                AlipayTradeRoyaltyRelationBindResponse alipayResp = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(request);
 
                 if (!alipayResp.IsError)
                 {
@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             }
         }
 
-        public ChannelRetMsg SingleDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> SingleDivisionAsync(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 model.RoyaltyMode = "sync"; // 综上所述， 目前使用同步调用。
 
                 // 统一放置 isv 接口必传信息
-                AliPayKit.PutApiIsvInfo(mchAppConfigContext, request, model);
+                await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, request, model);
 
                 var reqReceiverList = new List<OpenApiRoyaltyDetailInfoPojo>();
 
@@ -172,7 +172,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 {
                     _logger.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝分账请求：{JsonConvert.SerializeObject(model)}");
                 }
-                var alipayResp = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
+                var alipayResp = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(request);
                 _logger.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝分账响应：{alipayResp.Body}");
                 if (!alipayResp.IsError)
                 {
@@ -201,7 +201,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             }
         }
 
-        public Dictionary<long, ChannelRetMsg> QueryDivision(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext)
+        public async Task<Dictionary<long, ChannelRetMsg>> QueryDivisionAsync(PayOrderDto payOrder, List<PayOrderDivisionRecordDto> recordList, MchAppConfigContext mchAppConfigContext)
         {
             // 创建返回结果
             Dictionary<long, ChannelRetMsg> resultMap = new Dictionary<long, ChannelRetMsg>();
@@ -220,7 +220,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 request.SetBizModel(model);
 
                 // 统一放置 isv 接口必传信息
-                AliPayKit.PutApiIsvInfo(mchAppConfigContext, request, model);
+                await AliPayKit.PutApiIsvInfoAsync(mchAppConfigContext, request, model);
 
                 //结算请求流水号，由商家自定义。32个字符以内，仅可包含字母、数字、下划线。需保证在商户端不重复。
                 model.OutRequestNo = recordList[0].BatchOrderId;
@@ -228,7 +228,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
 
                 // 调起支付宝分账接口
                 _logger.LogInformation($"订单：[{recordList[0].BatchOrderId}], 支付宝查询分账请求：{JsonConvert.SerializeObject(model)}");
-                var alipayResp = configContextQueryService.GetAlipayClientWrapper(mchAppConfigContext).Execute(request);
+                var alipayResp = (await _configContextQueryService.GetAlipayClientWrapperAsync(mchAppConfigContext)).Execute(request);
                 _logger.LogInformation($"订单：[{payOrder.PayOrderId}], 支付宝查询分账响应：{alipayResp.Body}");
 
                 if (!alipayResp.IsError)

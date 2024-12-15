@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
     /// </summary>
     public class YsfPayRefundService : AbstractRefundService
     {
-        private readonly YsfPayPaymentService ysfpayPaymentService;
+        private readonly YsfPayPaymentService _paymentService;
 
         public YsfPayRefundService(ILogger<YsfPayRefundService> logger,
             IServiceProvider serviceProvider,
@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            this.ysfpayPaymentService = ActivatorUtilities.CreateInstance<YsfPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<YsfPayPaymentService>(serviceProvider);
         }
 
         public YsfPayRefundService()
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             return null;
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
                 reqParams.Add("origOrderNo", refundOrder.PayOrderId); // 原交易订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = ysfpayPaymentService.PackageParamAndReq("/gateway/api/pay/refundQuery", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/gateway/api/pay/refundQuery", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
@@ -105,7 +105,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             JObject reqParams = new JObject();
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
                 reqParams.Add("orderType", orderType); // 订单类型
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = ysfpayPaymentService.PackageParamAndReq("/gateway/api/pay/refund", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/gateway/api/pay/refund", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

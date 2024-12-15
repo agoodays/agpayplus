@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             try
             {
                 // WebSocket 推送到前端
-                await _wsChannelUserIdServer.SendMsgByAppAndCid(appId, extParam, channelUserId);
+                await _wsChannelUserIdServer.SendMsgByAppAndCidAsync(appId, extParam, channelUserId);
             }
             catch (Exception e)
             {

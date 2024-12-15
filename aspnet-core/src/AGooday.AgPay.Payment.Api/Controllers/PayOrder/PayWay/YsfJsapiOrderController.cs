@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
         public async Task<ActionResult<ApiRes>> YsfJsapiOrderAsync()
         {
             //获取参数 & 验证
-            YsfJsapiOrderRQ bizRQ = GetRQByWithMchSign<YsfJsapiOrderRQ>();
+            YsfJsapiOrderRQ bizRQ = await this.GetRQByWithMchSignAsync<YsfJsapiOrderRQ>();
 
             // 统一下单接口
             return await UnifiedOrderAsync(CS.PAY_WAY_CODE.YSF_JSAPI, bizRQ);

@@ -49,9 +49,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_PASSAGE_LIST)]
-        public ApiPageRes<MchPayPassagePayWayDto> List(string appId, [FromQuery] PayWayQueryDto dto)
+        public async Task<ApiPageRes<MchPayPassagePayWayDto>> ListAsync(string appId, [FromQuery] PayWayQueryDto dto)
         {
-            var payWays = _payWayService.GetPaginatedData<MchPayPassagePayWayDto>(dto);
+            var payWays = await _payWayService.GetPaginatedDataAsync<MchPayPassagePayWayDto>(dto);
             if (payWays?.Count > 0)
             {
                 // 支付方式代码集合
@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             // 根据支付方式查询可用支付接口列表
-            var result = _mchPayPassageService.SelectAvailablePayInterfaceList(wayCode, appId, CS.INFO_TYPE.MCH_APP, mchInfo.Type, pageNumber, pageSize);
+            var result = await _mchPayPassageService.SelectAvailablePayInterfaceListAsync(wayCode, appId, CS.INFO_TYPE.MCH_APP, mchInfo.Type, pageNumber, pageSize);
             return ApiPageRes<AvailablePayInterfaceDto>.Pages(result);
         }
 
@@ -143,7 +143,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 {
                     return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
                 }
-                _mchPayPassageService.SetMchPassage(mchApp.MchNo, appId, wayCode, ifCode, state);
+                await _mchPayPassageService.SetMchPassageAsync(mchApp.MchNo, appId, wayCode, ifCode, state);
                 return ApiRes.Ok();
             }
             catch (Exception e)
@@ -173,7 +173,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 {
                     return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
                 }
-                _mchPayPassageService.SaveOrUpdateBatchSelf(mchPayPassages, mchApp.MchNo);
+                await _mchPayPassageService.SaveOrUpdateBatchSelfAsync(mchPayPassages, mchApp.MchNo);
                 return ApiRes.Ok();
             }
             catch (Exception)

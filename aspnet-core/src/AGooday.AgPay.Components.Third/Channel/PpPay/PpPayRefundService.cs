@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             return null;
         }
 
-        public override ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext)
         {
             if (refundOrder.ChannelOrderNo == null)
             {
@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             PayPalWrapper wrapper = mchAppConfigContext.GetPaypalWrapper();
 
             RefundsGetInput refundRequest = new RefundsGetInput(refundOrder.PayOrderId);
-            var response = wrapper.Client.PaymentsController.RefundsGet(refundRequest);
+            var response = await wrapper.Client.PaymentsController.RefundsGetAsync(refundRequest);
 
             ChannelRetMsg channelRetMsg = ChannelRetMsg.Waiting();
             channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("ERROR");
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             return channelRetMsg;
         }
 
-        public override ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             if (payOrder.ChannelOrderNo == null)
             {
@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             channelRetMsg.ResponseEntity = PayPalWrapper.TextResp("ERROR");
             try
             {
-                var response = paypalWrapper.Client.PaymentsController.CapturesRefund(request);
+                var response = await paypalWrapper.Client.PaymentsController.CapturesRefundAsync(request);
 
                 if ((int)response.StatusCode == 201)
                 {

@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             TransferOrderDto transferOrder = null;
 
             //获取参数 & 验签
-            TransferOrderRQ bizRQ = GetRQByWithMchSign<TransferOrderRQ>();
+            TransferOrderRQ bizRQ = await this.GetRQByWithMchSignAsync<TransferOrderRQ>();
 
             try
             {
@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 string ifCode = bizRQ.IfCode;
 
                 // 商户订单号是否重复
-                if (_transferOrderService.IsExistOrderByMchOrderNo(mchNo, bizRQ.MchOrderNo))
+                if (await _transferOrderService.IsExistOrderByMchOrderNoAsync(mchNo, bizRQ.MchOrderNo))
                 {
                     throw new BizException($"商户订单[{bizRQ.MchOrderNo}]已存在");
                 }
@@ -76,7 +76,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 }
 
                 // 商户配置信息
-                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
                 if (mchAppConfigContext == null)
                 {
                     throw new BizException("获取商户应用信息失败");
@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                     throw new BizException("该接口不支持该入账方式");
                 }
 
-                transferOrder = GenTransferOrder(bizRQ, mchAppConfigContext, ifCode);
+                transferOrder = await this.GenTransferOrderAsync(bizRQ, mchAppConfigContext, ifCode);
 
                 //预先校验
                 string errMsg = transferService.PreCheck(bizRQ, transferOrder);
@@ -115,10 +115,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 await _transferOrderService.AddAsync(transferOrder);
 
                 // 调起上游接口
-                ChannelRetMsg channelRetMsg = transferService.Transfer(bizRQ, transferOrder, mchAppConfigContext);
+                ChannelRetMsg channelRetMsg = await transferService.TransferAsync(bizRQ, transferOrder, mchAppConfigContext);
 
                 //处理退款单状态
-                this.ProcessChannelMsg(channelRetMsg, transferOrder);
+                await this.ProcessChannelMsgAsync(channelRetMsg, transferOrder);
 
                 TransferOrderRS bizRes = TransferOrderRS.BuildByRecord(transferOrder);
                 return ApiRes.OkWithSign(bizRes, bizRQ.SignType, mchApp.AppSecret);
@@ -131,7 +131,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             catch (ChannelException e)
             {
                 //处理上游返回数据
-                this.ProcessChannelMsg(e.ChannelRetMsg, transferOrder);
+                await this.ProcessChannelMsgAsync(e.ChannelRetMsg, transferOrder);
 
                 if (e.ChannelRetMsg.ChannelState == ChannelState.SYS_ERROR)
                 {
@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 }
 
                 TransferOrderRS bizRes = TransferOrderRS.BuildByRecord(transferOrder);
-                return ApiRes.OkWithSign(bizRes, bizRQ.SignType, _configContextQueryService.QueryMchApp(bizRQ.MchNo, bizRQ.AppId).AppSecret);
+                return ApiRes.OkWithSign(bizRes, bizRQ.SignType, (await _configContextQueryService.QueryMchAppAsync(bizRQ.MchNo, bizRQ.AppId)).AppSecret);
             }
             catch (Exception e)
             {
@@ -148,13 +148,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             }
         }
 
-        private TransferOrderDto GenTransferOrder(TransferOrderRQ rq, MchAppConfigContext configContext, string ifCode)
+        private async Task<TransferOrderDto> GenTransferOrderAsync(TransferOrderRQ rq, MchAppConfigContext configContext, string ifCode)
         {
             MchInfoDto mchInfo = configContext.MchInfo;
             MchAppDto mchApp = configContext.MchApp;
-            AgentInfoDto agentInfo = _configContextQueryService.QueryAgentInfo(configContext);
-            IsvInfoDto isvInfo = _configContextQueryService.QueryIsvInfo(configContext);
-            return GenTransferOrder(rq, mchInfo, mchApp, agentInfo, isvInfo, ifCode);
+            AgentInfoDto agentInfo = await _configContextQueryService.QueryAgentInfoAsync(configContext);
+            IsvInfoDto isvInfo = await _configContextQueryService.QueryIsvInfoAsync(configContext);
+            return this.GenTransferOrder(rq, mchInfo, mchApp, agentInfo, isvInfo, ifCode);
         }
 
         private TransferOrderDto GenTransferOrder(TransferOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode)
@@ -196,7 +196,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         /// <param name="channelRetMsg"></param>
         /// <param name="transferOrder"></param>
         /// <exception cref="BizException"></exception>
-        private void ProcessChannelMsg(ChannelRetMsg channelRetMsg, TransferOrderDto transferOrder)
+        private async Task ProcessChannelMsgAsync(ChannelRetMsg channelRetMsg, TransferOrderDto transferOrder)
         {
             // 对象为空 || 上游返回状态为空， 则无需操作
             if (channelRetMsg == null || channelRetMsg.ChannelState == null)
@@ -209,21 +209,21 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
             // 明确成功
             if (ChannelState.CONFIRM_SUCCESS == channelRetMsg.ChannelState)
             {
-                this.UpdateInitOrderStateThrowException((byte)TransferOrderState.STATE_SUCCESS, transferOrder, channelRetMsg);
-                _payMchNotifyService.TransferOrderNotify(transferOrder);
+                await this.UpdateInitOrderStateThrowExceptionAsync((byte)TransferOrderState.STATE_SUCCESS, transferOrder, channelRetMsg);
+                await _payMchNotifyService.TransferOrderNotifyAsync(transferOrder);
             }
             // 明确失败
             else if (ChannelState.CONFIRM_FAIL == channelRetMsg.ChannelState)
             {
-                this.UpdateInitOrderStateThrowException((byte)TransferOrderState.STATE_FAIL, transferOrder, channelRetMsg);
-                _payMchNotifyService.TransferOrderNotify(transferOrder);
+                await this.UpdateInitOrderStateThrowExceptionAsync((byte)TransferOrderState.STATE_FAIL, transferOrder, channelRetMsg);
+                await _payMchNotifyService.TransferOrderNotifyAsync(transferOrder);
             }
             // 上游处理中 || 未知 || 上游接口返回异常  订单为支付中状态
             else if (ChannelState.WAITING == channelRetMsg.ChannelState ||
                     ChannelState.UNKNOWN == channelRetMsg.ChannelState ||
                     ChannelState.API_RET_ERROR == channelRetMsg.ChannelState)
             {
-                this.UpdateInitOrderStateThrowException((byte)TransferOrderState.STATE_ING, transferOrder, channelRetMsg);
+                await this.UpdateInitOrderStateThrowExceptionAsync((byte)TransferOrderState.STATE_ING, transferOrder, channelRetMsg);
             }
             // 系统异常：  订单不再处理。  为： 生成状态
             else if (ChannelState.SYS_ERROR == channelRetMsg.ChannelState)
@@ -242,20 +242,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
         /// <param name="transferOrder"></param>
         /// <param name="channelRetMsg"></param>
         /// <exception cref="BizException"></exception>
-        private void UpdateInitOrderStateThrowException(byte orderState, TransferOrderDto transferOrder, ChannelRetMsg channelRetMsg)
+        private async Task UpdateInitOrderStateThrowExceptionAsync(byte orderState, TransferOrderDto transferOrder, ChannelRetMsg channelRetMsg)
         {
             transferOrder.State = orderState;
             transferOrder.ChannelOrderNo = channelRetMsg.ChannelOrderId;
             transferOrder.ErrCode = channelRetMsg.ChannelErrCode;
             transferOrder.ErrMsg = channelRetMsg.ChannelErrMsg;
 
-            bool isSuccess = _transferOrderService.UpdateInit2Ing(transferOrder.TransferId);
+            bool isSuccess = await _transferOrderService.UpdateInit2IngAsync(transferOrder.TransferId);
             if (!isSuccess)
             {
                 throw new BizException("更新转账订单异常!");
             }
 
-            isSuccess = _transferOrderService.UpdateIng2SuccessOrFail(transferOrder.TransferId, transferOrder.State,
+            isSuccess = await _transferOrderService.UpdateIng2SuccessOrFailAsync(transferOrder.TransferId, transferOrder.State,
                     channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
             if (!isSuccess)
             {

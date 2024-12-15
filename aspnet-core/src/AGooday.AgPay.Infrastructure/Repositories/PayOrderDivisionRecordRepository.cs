@@ -18,10 +18,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return await GetAllAsNoTracking().FirstOrDefaultAsync(w => w.RecordId.Equals(recordId) && w.MchNo.Equals(mchNo));
         }
 
-        public long SumSuccessDivisionAmount(string payOrderId)
+        public Task<long> SumSuccessDivisionAmountAsync(string payOrderId)
         {
             return DbSet.Where(w => w.PayOrderId.Equals(payOrderId) && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_SUCCESS))
-                .Sum(s => s.CalDivisionAmount);
+                .SumAsync(s => s.CalDivisionAmount);
         }
     }
 }

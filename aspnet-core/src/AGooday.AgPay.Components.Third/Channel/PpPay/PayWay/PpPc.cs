@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay.PayWay
         {
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             PpPcOrderRQ bizRQ = (PpPcOrderRQ)rq;
 
@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay.PayWay
             orderRequest.PurchaseUnits = purchaseUnitRequests;
 
             // 从缓存获取 Paypal 操作工具
-            PayPalWrapper paypalWrapper = _configContextQueryService.GetPaypalWrapper(mchAppConfigContext);
+            PayPalWrapper paypalWrapper = await _configContextQueryService.GetPaypalWrapperAsync(mchAppConfigContext);
 
             OrdersCreateInput request = new OrdersCreateInput
             {

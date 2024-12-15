@@ -66,11 +66,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             }
             if (entIds.Count > 0)
             {
-                _sysRoleEntRelaService.ResetRela(roleId, entIds);
+                await _sysRoleEntRelaService.ResetRelaAsync(roleId, entIds);
 
                 //查询到该角色的人员， 将redis更新
                 var sysUserIdList = _sysUserRoleRelaService.SelectUserIdsByRoleId(roleId).ToList();
-                RefAuthentication(sysUserIdList);
+                await RefAuthenticationAsync(sysUserIdList);
             }
             return ApiRes.Ok();
         }

@@ -59,7 +59,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 }
 
                 // 解析转账单号和请求参数
-                Dictionary<string, object> mutablePair = transferNotifyService.ParseParams(Request, urlOrderId);
+                Dictionary<string, object> mutablePair = await transferNotifyService.ParseParamsAsync(Request, urlOrderId);
                 if (mutablePair == null)
                 {
                     _logger.LogError($"{logPrefix}, mutablePair is null");
@@ -81,10 +81,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 }
 
                 // 查询出商户应用的配置信息
-                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(transferOrder.MchNo, transferOrder.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(transferOrder.MchNo, transferOrder.AppId);
 
                 // 调起接口的回调判断
-                ChannelRetMsg notifyResult = transferNotifyService.DoNotice(Request, mutablePair.First().Value, transferOrder, mchAppConfigContext);
+                ChannelRetMsg notifyResult = await transferNotifyService.DoNoticeAsync(Request, mutablePair.First().Value, transferOrder, mchAppConfigContext);
 
                 // 返回null表明出现异常，无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)
@@ -99,14 +99,14 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                     if (notifyResult.ChannelState == ChannelState.CONFIRM_SUCCESS)
                     {
                         // 转账成功
-                        _transferOrderService.UpdateIng2Success(transferId, notifyResult.ChannelOrderId);
-                        _payMchNotifyService.TransferOrderNotify(await _transferOrderService.GetByIdAsync(transferId));
+                        await _transferOrderService.UpdateIng2SuccessAsync(transferId, notifyResult.ChannelOrderId);
+                        await _payMchNotifyService.TransferOrderNotifyAsync(await _transferOrderService.GetByIdAsync(transferId));
                     }
                     else if (notifyResult.ChannelState == ChannelState.CONFIRM_FAIL)
                     {
                         // 转账失败
-                        _transferOrderService.UpdateIng2Fail(transferId, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.ChannelErrCode);
-                        _payMchNotifyService.TransferOrderNotify(await _transferOrderService.GetByIdAsync(transferId));
+                        await _transferOrderService.UpdateIng2FailAsync(transferId, notifyResult.ChannelOrderId, notifyResult.ChannelUserId, notifyResult.ChannelErrCode);
+                        await _payMchNotifyService.TransferOrderNotifyAsync(await _transferOrderService.GetByIdAsync(transferId));
                     }
                 }
 

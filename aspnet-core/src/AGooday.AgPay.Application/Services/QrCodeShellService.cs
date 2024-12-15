@@ -23,31 +23,31 @@ namespace AGooday.AgPay.Application.Services
             _qrCodeShellRepository = qrCodeShellRepository;
         }
 
-        public override bool Add(QrCodeShellDto dto)
+        public override async Task<bool> AddAsync(QrCodeShellDto dto)
         {
             var entity = _mapper.Map<QrCodeShell>(dto);
             entity.CreatedAt = DateTime.Now;
             entity.UpdatedAt = DateTime.Now;
-            _qrCodeShellRepository.Add(entity);
-            var result = _qrCodeShellRepository.SaveChanges(out int _);
+            await _qrCodeShellRepository.AddAsync(entity);
+            var result = await _qrCodeShellRepository.SaveChangesAsync() > 0;
             dto.Id = entity.Id;
             return result;
         }
 
-        public override bool Update(QrCodeShellDto dto)
+        public override async Task<bool> UpdateAsync(QrCodeShellDto dto)
         {
             var entity = _mapper.Map<QrCodeShell>(dto);
             entity.UpdatedAt = DateTime.Now;
             _qrCodeShellRepository.Update(entity);
-            return _qrCodeShellRepository.SaveChanges(out int _);
+            return await _qrCodeShellRepository.SaveChangesAsync() > 0;
         }
 
         public async Task<PaginatedList<QrCodeShellDto>> GetPaginatedDataAsync(QrCodeShellQueryDto dto)
         {
-            var QrCodeShells = _qrCodeShellRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.ShellAlias) || w.ShellAlias.Contains(dto.ShellAlias))
-                ).OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<QrCodeShell>.CreateAsync<QrCodeShellDto>(QrCodeShells, _mapper, dto.PageNumber, dto.PageSize);
+            var query = _qrCodeShellRepository.GetAllAsNoTracking()
+                .Where(w => string.IsNullOrWhiteSpace(dto.ShellAlias) || w.ShellAlias.Contains(dto.ShellAlias))
+                .OrderByDescending(o => o.CreatedAt);
+            var records = await PaginatedList<QrCodeShell>.CreateAsync<QrCodeShellDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
     }

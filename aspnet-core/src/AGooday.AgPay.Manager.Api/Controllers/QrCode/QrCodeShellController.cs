@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             bool result = await _qrCodeShellService.AddAsync(dto);
-            _qrCodeShellService.Update(dto);
+            await _qrCodeShellService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
@@ -80,9 +80,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpDelete, Route("{recordId}"), MethodLog("删除码牌模板")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_DEL)]
-        public ApiRes Delete(long recordId)
+        public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            bool result = _qrCodeShellService.Remove(recordId);
+            bool result = await _qrCodeShellService.RemoveAsync(recordId);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_DELETE);
@@ -97,9 +97,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         /// <returns></returns>
         [HttpPut, Route("{recordId}"), MethodLog("更新码牌模板")]
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
-        public ApiRes Update(long recordId, QrCodeShellDto dto)
+        public async Task<ApiRes> UpdateAsync(long recordId, QrCodeShellDto dto)
         {
-            bool result = _qrCodeShellService.Update(dto);
+            bool result = await _qrCodeShellService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);

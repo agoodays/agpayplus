@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
     [ApiController, Authorize]
     public class PayInterfaceConfigController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IMchAppService _mchAppService;
         private readonly IMchInfoService _mchInfoService;
         private readonly IAgentInfoService _agentInfoService;
@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
             _agentInfoService = agentInfoService;
@@ -57,10 +57,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("ifCodes"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiRes List(string configMode, string infoId, string ifName, string ifCode)
+        public async Task<ApiRes> ListAsync(string configMode, string infoId, string ifName, string ifCode)
         {
             string infoType = GetInfoType(configMode);
-            var data = _payIfConfigService.PayIfConfigList(infoType, configMode, infoId, ifName, ifCode);
+            var data = await _payIfConfigService.PayIfConfigListAsync(infoType, configMode, infoId, ifName, ifCode);
             return ApiRes.Ok(data);
         }
 
@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         public async Task<ApiRes> GetByInfoIdAsync(string configMode, string infoId, string ifCode)
         {
             string infoType = GetInfoType(configMode);
-            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(infoType, infoId, ifCode);
+            var payInterfaceConfig = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(infoType, infoId, ifCode);
             var payIfDefine = await _payIfDefineService.GetByIdAsync(ifCode);
             payInterfaceConfig = payInterfaceConfig ?? new PayInterfaceConfigDto()
             {
@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                     break;
                 case CS.INFO_TYPE.AGENT:
                     var agentInfo = await _agentInfoService.GetByIdAsync(infoId);
-                    var isvPayInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, agentInfo.IsvNo, ifCode);
+                    var isvPayInterfaceConfig = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(CS.INFO_TYPE.ISV, agentInfo.IsvNo, ifCode);
                     isSupportApplyments.Add(isvPayInterfaceConfig.IsOpenApplyment);
                     isSupportCheckBills.Add(isvPayInterfaceConfig.IsOpenCheckBill);
                     isSupportCashouts.Add(isvPayInterfaceConfig.IsOpenCashout);
@@ -125,7 +125,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                     var mchInfo = await _mchInfoService.GetByIdAsync(mchApp.MchNo);
                     if (!string.IsNullOrEmpty(mchInfo.IsvNo))
                     {
-                        var mchIsvPayInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, mchInfo.IsvNo, ifCode);
+                        var mchIsvPayInterfaceConfig = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(CS.INFO_TYPE.ISV, mchInfo.IsvNo, ifCode);
                         isSupportApplyments.Add(mchIsvPayInterfaceConfig.IsOpenApplyment);
                         isSupportCheckBills.Add(mchIsvPayInterfaceConfig.IsOpenCheckBill);
                         isSupportCashouts.Add(mchIsvPayInterfaceConfig.IsOpenCashout);
@@ -191,7 +191,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
             dto.UpdatedAt = DateTime.Now;
 
             //根据 服务商号、接口类型 获取商户参数配置
-            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(dto.InfoType, dto.InfoId, dto.IfCode);
+            var dbRecoed = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(dto.InfoType, dto.InfoId, dto.IfCode);
             //若配置存在，为saveOrUpdate添加ID，第一次配置添加创建者
             if (dbRecoed != null)
             {
@@ -208,14 +208,14 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                 dto.CreatedBy = realName;
                 dto.CreatedAt = DateTime.Now;
             }
-            var result = _payIfConfigService.SaveOrUpdate(dto);
+            var result = await _payIfConfigService.SaveOrUpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "配置失败");
             }
 
             // 推送mq到目前节点进行更新数据
-            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null, null));
+            await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null, null));
 
             return ApiRes.Ok();
         }

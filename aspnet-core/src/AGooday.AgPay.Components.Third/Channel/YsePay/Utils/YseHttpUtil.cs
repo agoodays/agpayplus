@@ -9,7 +9,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.Utils
         private static readonly string DEFAULT_CHARSET = "UTF-8";
         private static readonly int DEFAULT_TIMEOUT = 60; // 60 秒超时
 
-        public static string DoPostFrom(string url, string reqParams)
+        public static async Task<string> DoPostFromAsync(string url, string reqParams)
         {
             var client = new AgHttpClient(DEFAULT_TIMEOUT, DEFAULT_CHARSET);
             var request = new AgHttpClient.Request()
@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.Utils
             };
             try
             {
-                var response = client.Send(request);
+                var response = await client.SendAsync(request);
                 if (response.IsSuccessStatusCode)
                 {
                     string result = response.Content;

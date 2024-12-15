@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task ClearFailedLoginAttemptsAsync(long userId)
         {
-            await _sysUserLoginAttemptRepository.ClearFailedLoginAttemptsAsync(userId);
+            _sysUserLoginAttemptRepository.ClearFailedLoginAttempts(userId);
             await _sysUserLoginAttemptRepository.SaveChangesAsync();
         }
     }

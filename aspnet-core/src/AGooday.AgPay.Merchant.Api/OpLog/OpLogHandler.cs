@@ -90,7 +90,7 @@ namespace AGooday.AgPay.Merchant.Api.OpLog
                 }
                 model.ElapsedMs = sw.ElapsedMilliseconds;
                 model.CreatedAt = DateTime.Now;
-                _sysLogService.Add(model);
+                await _sysLogService.AddAsync(model);
             }
             catch (Exception ex)
             {

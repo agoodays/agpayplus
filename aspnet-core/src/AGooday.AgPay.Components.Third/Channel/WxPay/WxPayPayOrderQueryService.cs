@@ -19,12 +19,12 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
     public class WxPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<WxPayPayOrderQueryService> _logger;
-        private readonly ConfigContextQueryService configContextQueryService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public WxPayPayOrderQueryService(ILogger<WxPayPayOrderQueryService> logger, ConfigContextQueryService configContextQueryService)
         {
             _logger = logger;
-            this.configContextQueryService = configContextQueryService;
+            _configContextQueryService = configContextQueryService;
         }
 
         public WxPayPayOrderQueryService()
@@ -36,11 +36,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             return CS.IF_CODE.WXPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
-                WxServiceWrapper wxServiceWrapper = configContextQueryService.GetWxServiceWrapper(mchAppConfigContext);
+                WxServiceWrapper wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
 
                 if (CS.PAY_IF_VERSION.WX_V2.Equals(wxServiceWrapper.Config.ApiVersion)) // V2
                 {
@@ -51,7 +51,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     if (mchAppConfigContext.IsIsvSubMch())
                     {
                         WxPayIsvSubMchParams isvsubMchParams =
-                            (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
+                            (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
 
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                         request.SubAppId = isvsubMchParams.SubMchAppId;
@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     request.OutTradeNumber = payOrder.PayOrderId;
 
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
-                    var result = client.ExecuteGetPayOrderAsync(request).Result;
+                    var result = await client.ExecuteGetPayOrderAsync(request);
 
                     string channelState = result.TradeState;
                     string transactionId = result.TransactionId;
@@ -90,13 +90,13 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
                     if (mchAppConfigContext.IsIsvSubMch()) // 特约商户
                     {
-                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+                        WxPayIsvSubMchParams isvsubMchParams = (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
 
                         GetPayPartnerTransactionByOutTradeNumberRequest request = new GetPayPartnerTransactionByOutTradeNumberRequest();
                         request.MerchantId = wxServiceWrapper.Config.MchId;
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                         request.OutTradeNumber = payOrder.PayOrderId;
-                        GetPayPartnerTransactionByOutTradeNumberResponse result = client.ExecuteGetPayPartnerTransactionByOutTradeNumberAsync(request).Result;
+                        GetPayPartnerTransactionByOutTradeNumberResponse result = await client.ExecuteGetPayPartnerTransactionByOutTradeNumberAsync(request);
                         channelState = result.TradeState;
                         transactionId = result.TransactionId;
                     }
@@ -105,7 +105,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                         GetPayTransactionByOutTradeNumberRequest request = new GetPayTransactionByOutTradeNumberRequest();
                         request.MerchantId = wxServiceWrapper.Config.MchId;
                         request.OutTradeNumber = payOrder.PayOrderId;
-                        GetPayTransactionByOutTradeNumberResponse result = client.ExecuteGetPayTransactionByOutTradeNumberAsync(request).Result;
+                        GetPayTransactionByOutTradeNumberResponse result = await client.ExecuteGetPayTransactionByOutTradeNumberAsync(request);
                         channelState = result.TradeState;
                         transactionId = result.TransactionId;
                     }

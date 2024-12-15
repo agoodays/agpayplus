@@ -6,6 +6,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -24,18 +25,18 @@ namespace AGooday.AgPay.Application.Services
             _mchNotifyRecordRepository = mchNotifyRecordRepository;
         }
 
-        public override bool Add(MchNotifyRecordDto dto)
+        public override async Task<bool> AddAsync(MchNotifyRecordDto dto)
         {
             var entity = _mapper.Map<MchNotifyRecord>(dto);
-            _mchNotifyRecordRepository.Add(entity);
-            var result = _mchNotifyRecordRepository.SaveChanges(out int _);
+            await _mchNotifyRecordRepository.AddAsync(entity);
+            var result = await _mchNotifyRecordRepository.SaveChangesAsync() > 0;
             dto.NotifyId = entity.NotifyId;
             return result;
         }
 
-        public async Task<PaginatedList<MchNotifyRecordDto>> GetPaginatedDataAsync(MchNotifyQueryDto dto)
+        public Task<PaginatedList<MchNotifyRecordDto>> GetPaginatedDataAsync(MchNotifyQueryDto dto)
         {
-            var mchNotifyRecords = _mchNotifyRecordRepository.GetAllAsNoTracking()
+            var query = _mchNotifyRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 && (string.IsNullOrWhiteSpace(dto.OrderId) || w.OrderId.Equals(dto.OrderId))
@@ -46,21 +47,8 @@ namespace AGooday.AgPay.Application.Services
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<MchNotifyRecord>.CreateAsync<MchNotifyRecordDto>(mchNotifyRecords, _mapper, dto.PageNumber, dto.PageSize);
+            var records = PaginatedList<MchNotifyRecord>.CreateAsync<MchNotifyRecordDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
-        }
-
-        /// <summary>
-        /// 更改为通知中 & 增加允许重发通知次数
-        /// </summary>
-        /// <param name="notifyId"></param>
-        public void UpdateIngAndAddNotifyCountLimit(long notifyId)
-        {
-            var notify = _mchNotifyRecordRepository.GetById(notifyId);
-            notify.NotifyCountLimit += 1;
-            notify.State = (byte)MchNotifyRecordState.STATE_ING;
-            _mchNotifyRecordRepository.Update(notify);
-            _mchNotifyRecordRepository.SaveChanges();
         }
 
         /// <summary>
@@ -69,11 +57,11 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="orderId"></param>
         /// <param name="orderType"></param>
         /// <returns></returns>
-        public MchNotifyRecordDto FindByOrderAndType(string orderId, byte orderType)
+        public async Task<MchNotifyRecordDto> FindByOrderAndTypeAsync(string orderId, byte orderType)
         {
-            var entity = _mchNotifyRecordRepository.GetAllAsNoTracking()
+            var entity = await _mchNotifyRecordRepository.GetAllAsNoTracking()
                 .Where(w => w.OrderId.Equals(orderId) && w.OrderType.Equals(orderType))
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
             return _mapper.Map<MchNotifyRecordDto>(entity);
         }
 
@@ -82,9 +70,9 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="payOrderId"></param>
         /// <returns></returns>
-        public MchNotifyRecordDto FindByPayOrder(string payOrderId)
+        public Task<MchNotifyRecordDto> FindByPayOrderAsync(string payOrderId)
         {
-            return FindByOrderAndType(payOrderId, (byte)MchNotifyRecordType.TYPE_PAY_ORDER);
+            return FindByOrderAndTypeAsync(payOrderId, (byte)MchNotifyRecordType.TYPE_PAY_ORDER);
         }
 
         /// <summary>
@@ -92,9 +80,9 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        public MchNotifyRecordDto FindByRefundOrder(string orderId)
+        public Task<MchNotifyRecordDto> FindByRefundOrderAsync(string orderId)
         {
-            return FindByOrderAndType(orderId, (byte)MchNotifyRecordType.TYPE_REFUND_ORDER);
+            return FindByOrderAndTypeAsync(orderId, (byte)MchNotifyRecordType.TYPE_REFUND_ORDER);
         }
 
         /// <summary>
@@ -102,9 +90,9 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="transferId"></param>
         /// <returns></returns>
-        public MchNotifyRecordDto FindByTransferOrder(string transferId)
+        public Task<MchNotifyRecordDto> FindByTransferOrder(string transferId)
         {
-            return FindByOrderAndType(transferId, (byte)MchNotifyRecordType.TYPE_TRANSFER_ORDER);
+            return FindByOrderAndTypeAsync(transferId, (byte)MchNotifyRecordType.TYPE_TRANSFER_ORDER);
         }
 
         /// <summary>
@@ -114,7 +102,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="state"></param>
         /// <param name="resResult"></param>
         /// <returns></returns>
-        public int UpdateNotifyResult(long notifyId, byte state, string resResult)
+        public Task<int> UpdateNotifyResultAsync(long notifyId, byte state, string resResult)
         {
             var notify = _mchNotifyRecordRepository.GetById(notifyId);
             notify.State = state;
@@ -122,7 +110,20 @@ namespace AGooday.AgPay.Application.Services
             notify.ResResult = resResult;
             notify.LastNotifyTime = DateTime.Now;
             _mchNotifyRecordRepository.Update(notify);
-            return _mchNotifyRecordRepository.SaveChanges();
+            return _mchNotifyRecordRepository.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 更改为通知中 & 增加允许重发通知次数
+        /// </summary>
+        /// <param name="notifyId"></param>
+        public Task<int> UpdateIngAndAddNotifyCountLimitAsync(long notifyId)
+        {
+            var notify = _mchNotifyRecordRepository.GetById(notifyId);
+            notify.NotifyCountLimit += 1;
+            notify.State = (byte)MchNotifyRecordState.STATE_ING;
+            _mchNotifyRecordRepository.Update(notify);
+            return _mchNotifyRecordRepository.SaveChangesAsync();
         }
     }
 }

@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_LIST, PermCode.MGR.ENT_PAY_ORDER_SEARCH_PAY_WAY)]
-        public ApiPageRes<PayWayDto> List([FromQuery] PayWayQueryDto dto)
+        public async Task<ApiPageRes<PayWayDto>> ListAsync([FromQuery] PayWayQueryDto dto)
         {
-            var data = _payWayService.GetPaginatedData<PayWayDto>(dto);
+            var data = await _payWayService.GetPaginatedDataAsync<PayWayDto>(dto);
             return ApiPageRes<PayWayDto>.Pages(data);
         }
 
@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_ADD)]
         public async Task<ApiRes> AddAsync(PayWayDto dto)
         {
-            if (_payWayService.IsExistPayWayCode(dto.WayCode))
+            if (await _payWayService.IsExistPayWayCodeAsync(dto.WayCode))
             {
                 throw new BizException("支付方式代码已存在");
             }
@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 throw new BizException("该支付方式已有商户配置通道或已发生交易，无法删除！");
             }
 
-            bool result = _payWayService.Remove(wayCode);
+            bool result = await _payWayService.RemoveAsync(wayCode);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_DELETE);
@@ -101,9 +101,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPut, Route("{wayCode}"), MethodLog("更新支付方式")]
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_EDIT)]
-        public ApiRes Update(string wayCode, PayWayDto dto)
+        public async Task<ApiRes> UpdateAsync(string wayCode, PayWayDto dto)
         {
-            bool result = _payWayService.Update(dto);
+            bool result = await _payWayService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);

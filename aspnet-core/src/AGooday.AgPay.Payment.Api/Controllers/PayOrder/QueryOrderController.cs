@@ -19,36 +19,36 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     [Route("api/pay")]
     public class QueryOrderController : ApiControllerBase
     {
-        private readonly IPayOrderService payOrderService;
+        private readonly IPayOrderService _payOrderService;
 
         public QueryOrderController(IPayOrderService payOrderService,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
             : base(requestKit, configContextQueryService)
         {
-            this.payOrderService = payOrderService;
+            _payOrderService = payOrderService;
         }
 
         [HttpPost, Route("query")]
         [PermissionAuth(PermCode.PAY.API_PAY_ORDER_QUERY)]
-        public ActionResult<ApiRes> QueryOrder()
+        public async Task<ActionResult<ApiRes>> QueryOrderAsync()
         {
             //获取参数 & 验签
-            QueryPayOrderRQ rq = GetRQByWithMchSign<QueryPayOrderRQ>();
+            QueryPayOrderRQ rq = await this.GetRQByWithMchSignAsync<QueryPayOrderRQ>();
 
             if (StringUtil.IsAllNullOrWhiteSpace(rq.MchOrderNo, rq.PayOrderId))
             {
                 throw new BizException("mchOrderNo 和 payOrderId不能同时为空");
             }
 
-            PayOrderDto payOrder = payOrderService.QueryMchOrder(rq.MchNo, rq.PayOrderId, rq.MchOrderNo);
+            PayOrderDto payOrder = await _payOrderService.QueryMchOrderAsync(rq.MchNo, rq.PayOrderId, rq.MchOrderNo);
             if (payOrder == null)
             {
                 throw new BizException("订单不存在");
             }
 
             QueryPayOrderRS bizRes = QueryPayOrderRS.BuildByPayOrder(payOrder);
-            return ApiRes.OkWithSign(bizRes, rq.SignType, _configContextQueryService.QueryMchApp(rq.MchNo, rq.AppId).AppSecret);
+            return ApiRes.OkWithSign(bizRes, rq.SignType, (await _configContextQueryService.QueryMchAppAsync(rq.MchNo, rq.AppId)).AppSecret);
         }
     }
 }

@@ -14,13 +14,13 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
     public class LklPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<LklPayPayOrderQueryService> _logger;
-        private readonly LklPayPaymentService lklpayPaymentService;
+        private readonly LklPayPaymentService _paymentService;
 
         public LklPayPayOrderQueryService(ILogger<LklPayPayOrderQueryService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.lklpayPaymentService = ActivatorUtilities.CreateInstance<LklPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<LklPayPaymentService>(serviceProvider);
         }
 
         public LklPayPayOrderQueryService()
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             return CS.IF_CODE.LKLPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             string transType = LklPayEnum.GetTransType(payOrder.WayCode);
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                 reqParams.Add("out_trade_no", payOrder.PayOrderId); //订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = lklpayPaymentService.PackageParamAndReq("/api/v3/labs/query/tradequery", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/v3/labs/query/tradequery", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

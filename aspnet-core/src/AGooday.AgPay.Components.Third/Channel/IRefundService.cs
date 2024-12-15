@@ -41,7 +41,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="payOrder"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
+        Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
 
         /// <summary>
         /// 退款查单接口
@@ -49,6 +49,6 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="refundOrder"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext);
+        Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext);
     }
 }

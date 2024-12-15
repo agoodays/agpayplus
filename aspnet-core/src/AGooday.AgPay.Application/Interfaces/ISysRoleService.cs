@@ -5,9 +5,9 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface ISysRoleService : IAgPayService<SysRoleDto>
     {
-        Task AddAsync(SysRoleCreateDto dto);
-        Task UpdateAsync(SysRoleModifyDto dto);
-        Task RemoveRoleAsync(string roleId);
+        Task<bool> AddAsync(SysRoleCreateDto dto);
+        Task<bool> UpdateAsync(SysRoleModifyDto dto);
+        Task<bool> RemoveRoleAsync(string roleId);
         Task<SysRoleDto> GetByIdAsync(string recordId, string belongInfoId);
         Task<PaginatedList<SysRoleDto>> GetPaginatedDataAsync(SysRoleQueryDto dto);
     }

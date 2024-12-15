@@ -22,23 +22,23 @@ namespace AGooday.AgPay.Application.Services
             _payOrderProfitRepository = payOrderProfitRepository;
         }
 
-        public override bool Add(PayOrderProfitDto dto)
+        public override async Task<bool> AddAsync(PayOrderProfitDto dto)
         {
             var entity = _mapper.Map<PayOrderProfit>(dto);
             entity.CreatedAt = DateTime.Now;
             entity.UpdatedAt = DateTime.Now;
-            _payOrderProfitRepository.Add(entity);
-            var result = _payOrderProfitRepository.SaveChanges(out int _);
+            await _payOrderProfitRepository.AddAsync(entity);
+            var result = await _payOrderProfitRepository.SaveChangesAsync() > 0;
             dto.Id = entity.Id;
             return result;
         }
 
-        public override bool Update(PayOrderProfitDto dto)
+        public override async Task<bool> UpdateAsync(PayOrderProfitDto dto)
         {
             var entity = _mapper.Map<PayOrderProfit>(dto);
             entity.UpdatedAt = DateTime.Now;
             _payOrderProfitRepository.Update(entity);
-            return _payOrderProfitRepository.SaveChanges(out int _);
+            return await _payOrderProfitRepository.SaveChangesAsync() > 0;
         }
 
         public IEnumerable<PayOrderProfitDto> GetByPayOrderIdAsNoTracking(string payOrderId)

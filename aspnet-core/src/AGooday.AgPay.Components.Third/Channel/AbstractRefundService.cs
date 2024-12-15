@@ -43,8 +43,8 @@ namespace AGooday.AgPay.Components.Third.Channel
             return AmountUtil.CalPercentageFee(amount, payOrder.MchFeeRate);
         }
 
-        public abstract ChannelRetMsg Query(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext);
-        public abstract ChannelRetMsg Refund(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
+        public abstract Task<ChannelRetMsg> QueryAsync(RefundOrderDto refundOrder, MchAppConfigContext mchAppConfigContext);
+        public abstract Task<ChannelRetMsg> RefundAsync(RefundOrderRQ bizRQ, RefundOrderDto refundOrder, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
 
         protected string GetNotifyUrl()
         {

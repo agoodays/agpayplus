@@ -8,23 +8,23 @@ namespace AGooday.AgPay.Components.Third.Services
 {
     public class TransferOrderReissueService
     {
-        private readonly ConfigContextQueryService configContextQueryService;
-        private readonly ITransferOrderService transferOrderService;
-        private readonly PayMchNotifyService payMchNotifyService;
-        private readonly IChannelServiceFactory<ITransferService> transferServiceFactory;
         private readonly ILogger<PayOrderProcessService> _logger;
+        private readonly ITransferOrderService _transferOrderService;
+        private readonly IChannelServiceFactory<ITransferService> _transferServiceFactory;
+        private readonly PayMchNotifyService _payMchNotifyService;
+        private readonly ConfigContextQueryService _configContextQueryService;
 
         public TransferOrderReissueService(ILogger<PayOrderProcessService> logger,
-            ConfigContextQueryService configContextQueryService,
             ITransferOrderService transferOrderService,
+            IChannelServiceFactory<ITransferService> transferServiceFactory,
             PayMchNotifyService payMchNotifyService,
-            IChannelServiceFactory<ITransferService> transferServiceFactory)
+            ConfigContextQueryService configContextQueryService)
         {
             _logger = logger;
-            this.configContextQueryService = configContextQueryService;
-            this.transferOrderService = transferOrderService;
-            this.payMchNotifyService = payMchNotifyService;
-            this.transferServiceFactory = transferServiceFactory;
+            _transferOrderService = transferOrderService;
+            _transferServiceFactory = transferServiceFactory;
+            _payMchNotifyService = payMchNotifyService;
+            _configContextQueryService = configContextQueryService;
         }
 
         /// <summary>
@@ -32,14 +32,14 @@ namespace AGooday.AgPay.Components.Third.Services
         /// </summary>
         /// <param name="transferOrder"></param>
         /// <returns></returns>
-        public ChannelRetMsg ProcessOrder(TransferOrderDto transferOrder)
+        public async Task<ChannelRetMsg> ProcessOrderAsync(TransferOrderDto transferOrder)
         {
             try
             {
                 string transferId = transferOrder.TransferId;
 
                 // 查询转账接口是否存在
-                ITransferService transferService = transferServiceFactory.GetService(transferOrder.IfCode);
+                ITransferService transferService = _transferServiceFactory.GetService(transferOrder.IfCode);
 
                 // 支付通道转账接口实现不存在
                 if (transferService == null)
@@ -49,9 +49,9 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
 
                 // 查询出商户应用的配置信息
-                MchAppConfigContext mchAppConfigContext = configContextQueryService.QueryMchInfoAndAppInfo(transferOrder.MchNo, transferOrder.AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(transferOrder.MchNo, transferOrder.AppId);
 
-                ChannelRetMsg channelRetMsg = transferService.Query(transferOrder, mchAppConfigContext);
+                ChannelRetMsg channelRetMsg = await transferService.QueryAsync(transferOrder, mchAppConfigContext);
                 if (channelRetMsg == null)
                 {
                     _logger.LogError("channelRetMsg is null");
@@ -64,15 +64,15 @@ namespace AGooday.AgPay.Components.Third.Services
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
                     // 转账成功
-                    transferOrderService.UpdateIng2Success(transferId, channelRetMsg.ChannelOrderId);
-                    payMchNotifyService.TransferOrderNotify(transferOrderService.GetById(transferId));
+                    await _transferOrderService.UpdateIng2SuccessAsync(transferId, channelRetMsg.ChannelOrderId);
+                    await _payMchNotifyService.TransferOrderNotifyAsync(await _transferOrderService.GetByIdAsync(transferId));
 
                 }
                 else if (channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
                 {
                     // 转账失败
-                    transferOrderService.UpdateIng2Fail(transferId, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
-                    payMchNotifyService.TransferOrderNotify(transferOrderService.GetById(transferId));
+                    await _transferOrderService.UpdateIng2FailAsync(transferId, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
+                    await _payMchNotifyService.TransferOrderNotifyAsync(await _transferOrderService.GetByIdAsync(transferId));
                 }
 
                 return channelRetMsg;

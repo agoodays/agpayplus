@@ -44,9 +44,9 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -54,11 +54,11 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
         }
 
-        public ChannelRetMsg SxfBar(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> BarAsync(JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
             ChannelRetMsg channelRetMsg = new ChannelRetMsg();
             // 发送请求
-            JObject resJSON = PackageParamAndReq("/order/reverseScan", reqParams, logPrefix, mchAppConfigContext);
+            JObject resJSON = await PackageParamAndReqAsync("/order/reverseScan", reqParams, logPrefix, mchAppConfigContext);
             //请求 & 响应成功， 判断业务逻辑
             string code = resJSON.GetValue("code").ToString(); //请求响应码
             string msg = resJSON.GetValue("msg").ToString(); //响应信息
@@ -138,7 +138,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetSxfPayHost4env(SxfPayIsvParams isvParams)
+        public static string GetHost4env(SxfPayIsvParams isvParams)
         {
             return CS.YES == isvParams.Sandbox ? SxfPayConfig.SANDBOX_SERVER_URL : SxfPayConfig.PROD_SERVER_URL;
         }
@@ -152,9 +152,9 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqData, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, JObject reqData, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
-            SxfPayIsvParams isvParams = (SxfPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+            SxfPayIsvParams isvParams = (SxfPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             if (isvParams.OrgId == null)
             {
@@ -162,7 +162,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
                 throw new BizException("服务商配置为空。");
             }
 
-            SxfPayIsvSubMchParams isvsubMchParams = (SxfPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            SxfPayIsvSubMchParams isvsubMchParams = (SxfPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             reqData.Add("mno", isvsubMchParams.Mno); // 商户号
 
             var reqParams = new JObject();//reqData
@@ -178,10 +178,10 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             reqParams.Add("sign", SxfSignUtil.Sign(reqParams, privateKey)); //RSA 签名字符串
 
             // 调起上游接口
-            string url = GetSxfPayHost4env(isvParams) + apiUri;
+            string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = SxfHttpUtil.DoPostJson(url, reqParams);
+            string resText = await SxfHttpUtil.DoPostJsonAsync(url, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -209,7 +209,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
         /// <param name="returnUrl"></param>
         public static void UnifiedParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl, string returnUrl)
         {
-            SxfPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
             reqParams.Add("payType", payType);
             string payWay = SxfPayEnum.GetPayWay(payOrder.WayCode);
@@ -226,7 +226,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
         /// <param name="payOrder"></param>
         public static void BarParamsSet(JObject reqParams, PayOrderDto payOrder, string notifyUrl)
         {
-            SxfPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             string payType = SxfPayEnum.GetPayType(payOrder.WayCode);
             reqParams.Add("payType", payType);
             reqParams.Add("notifyUrl", notifyUrl); //支付结果通知地址不上送则交易成功后，无异步交易结果通知
@@ -237,7 +237,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void SxfPublicParams(JObject reqParams, PayOrderDto payOrder)
+        public static void PublicParams(JObject reqParams, PayOrderDto payOrder)
         {
             reqParams.Add("ordNo", payOrder.PayOrderId); //商户订单号（字母、数字、下划线）需保证在合作方系统中不重复
             reqParams.Add("amt", AmountUtil.ConvertCent2Dollar(payOrder.Amount)); //订单总金额(元)，格式：#########.##

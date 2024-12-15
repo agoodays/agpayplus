@@ -4,6 +4,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -22,26 +23,36 @@ namespace AGooday.AgPay.Application.Services
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
         }
 
-        public override bool Add(PayInterfaceDefineDto dto)
+        public override async Task<bool> AddAsync(PayInterfaceDefineDto dto)
         {
             var entity = _mapper.Map<PayInterfaceDefine>(dto);
             dto.CreatedAt = DateTime.Now;
             dto.UpdatedAt = DateTime.Now;
-            _payInterfaceDefineRepository.Add(entity);
-            return _payInterfaceDefineRepository.SaveChanges(out int _);
+            await _payInterfaceDefineRepository.AddAsync(entity);
+            return await _payInterfaceDefineRepository.SaveChangesAsync() > 0;
         }
 
-        public override bool Update(PayInterfaceDefineDto dto)
+        public override async Task<bool> UpdateAsync(PayInterfaceDefineDto dto)
         {
             var entity = _mapper.Map<PayInterfaceDefine>(dto);
             entity.UpdatedAt = DateTime.Now;
             _payInterfaceDefineRepository.Update(entity);
-            return _payInterfaceDefineRepository.SaveChanges(out int _);
+            return await _payInterfaceDefineRepository.SaveChangesAsync() > 0;
+        }
+
+        public async Task<IEnumerable<PayInterfaceDefineDto>> PayIfDefineListAsync(byte? state)
+        {
+            var entitys = await _payInterfaceDefineRepository.GetAllAsNoTracking()
+                .Where(w => !state.HasValue || w.State.Equals(state))
+                .OrderByDescending(o => o.CreatedAt).ToListAsync();
+
+            var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entitys);
+            return result;
         }
 
         public IEnumerable<PayInterfaceDefineDto> GetByIfCodes(IEnumerable<string> ifCodes)
         {
-            var entitys = _payInterfaceDefineRepository.GetAll()
+            var entitys = _payInterfaceDefineRepository.GetAllAsNoTracking()
                 .Where(w => ifCodes.Contains(w.IfCode)); ;
             var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entitys);
             return result;

@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Components.Third.Channel
     {
         protected readonly ILogger<AbstractChannelNoticeService> _logger;
         protected readonly RequestKit _requestKit;
-        protected ConfigContextQueryService configContextQueryService;
+        protected ConfigContextQueryService _configContextQueryService;
 
         protected AbstractChannelNoticeService(ILogger<AbstractChannelNoticeService> logger,
             RequestKit requestKit,
@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         {
             _logger = logger;
             _requestKit = requestKit;
-            this.configContextQueryService = configContextQueryService;
+            _configContextQueryService = configContextQueryService;
         }
 
         protected AbstractChannelNoticeService()
@@ -34,9 +34,9 @@ namespace AGooday.AgPay.Components.Third.Channel
 
         public abstract string GetIfCode();
 
-        public abstract Dictionary<string, object> ParseParams(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum);
+        public abstract Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum);
 
-        public abstract ChannelRetMsg DoNotice(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum);
+        public abstract Task<ChannelRetMsg> DoNoticeAsync(HttpRequest request, object @params, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext, NoticeTypeEnum noticeTypeEnum);
 
         public virtual ActionResult DoNotifyOrderNotExists(HttpRequest request)
         {
@@ -79,14 +79,14 @@ namespace AGooday.AgPay.Components.Third.Channel
             };
         }
 
-        protected JObject GetReqParamJSON()
+        protected Task<JObject> GetReqParamJSONAsync()
         {
-            return _requestKit.GetReqParamJSON();
+            return _requestKit.GetReqParamJSONAsync();
         }
 
-        protected string GetReqParamFromBody()
+        protected Task<string> GetReqParamFromBodyAsync()
         {
-            return _requestKit.GetReqParamFromBody();
+            return _requestKit.GetReqParamFromBodyAsync();
         }
 
         /// <summary>

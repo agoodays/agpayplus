@@ -4,7 +4,7 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface IRefundOrderRepository : IAgPayRepository<RefundOrder>
     {
-        bool IsExistOrderByMchOrderNo(string mchNo, string mchRefundNo);
-        bool IsExistRefundingOrder(string payOrderId);
+        Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchRefundNo);
+        Task<bool> IsExistRefundingOrderAsync(string payOrderId);
     }
 }

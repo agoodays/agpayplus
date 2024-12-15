@@ -22,11 +22,11 @@ namespace AGooday.AgPay.Application.Services
             _sysUserAuthRepository = sysUserAuthRepository;
         }
 
-        public override bool Add(SysUserAuthDto dto)
+        public override async Task<bool> AddAsync(SysUserAuthDto dto)
         {
             var entity = _mapper.Map<SysUserAuth>(dto);
-            _sysUserAuthRepository.Add(entity);
-            var result = _sysUserAuthRepository.SaveChanges(out int _);
+            await _sysUserAuthRepository.AddAsync(entity);
+            var result = await _sysUserAuthRepository.SaveChangesAsync() > 0;
             dto.AuthId = entity.AuthId;
             return result;
         }
@@ -38,10 +38,10 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public void ResetAuthInfo(long resetUserId, string authLoginUserName, string telphone, string newPwd, string sysType)
+        public async Task ResetAuthInfoAsync(long resetUserId, string authLoginUserName, string telphone, string newPwd, string sysType)
         {
-            _sysUserAuthRepository.ResetAuthInfo(resetUserId, sysType, authLoginUserName, telphone, newPwd);
-            _sysUserAuthRepository.SaveChanges();
+            await _sysUserAuthRepository.ResetAuthInfoAsync(resetUserId, sysType, authLoginUserName, telphone, newPwd);
+            await _sysUserAuthRepository.SaveChangesAsync();
         }
     }
 }

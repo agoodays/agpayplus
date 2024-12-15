@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
     [ApiController, Authorize]
     public class PayOrderDivisionRecordController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
 
         public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger,
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _payOrderDivisionRecordService = payOrderDivisionRecordService;
         }
 
@@ -91,7 +91,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             _payOrderDivisionRecordService.UpdateResendState(record.PayOrderId);
 
             // 重发到MQ
-            await mqSender.SendAsync(PayOrderDivisionMQ.Build(record.PayOrderId, null, null, true));
+            await _mqSender.SendAsync(PayOrderDivisionMQ.Build(record.PayOrderId, null, null, true));
 
             return ApiRes.Ok(record);
         }

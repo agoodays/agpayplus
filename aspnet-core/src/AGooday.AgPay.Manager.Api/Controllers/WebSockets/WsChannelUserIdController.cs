@@ -22,12 +22,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.WebSockets
         /// <param name="cid">客户端自定义ID</param>
         /// <returns></returns>
         [HttpGet, Route("ws/channelUserId/{appId}/{cid}")]
-        public async Task Get(string appId, string cid)
+        public async Task GetAsync(string appId, string cid)
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await _wsChannelUserIdServer.ProcessWebSocket(webSocket, cid, appId);
+                await _wsChannelUserIdServer.ProcessWebSocketAsync(webSocket, cid, appId);
             }
             else
             {

@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
 
         [HttpPost]
         [Route("api/divisionRecordChannelNotify/{ifCode}")]
-        public IActionResult DoNotify([FromRoute] string ifCode)
+        public async Task<IActionResult> DoNotifyAsync([FromRoute] string ifCode)
         {
             string divisionBatchId = null;
             string logPrefix = $"进入[{ifCode}]分账回调";
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 }
 
                 // 解析批次号 和 请求参数
-                Dictionary<string, object> mutablePair = divisionNotifyService.ParseParams(Request);
+                Dictionary<string, object> mutablePair = await divisionNotifyService.ParseParamsAsync(Request);
                 if (mutablePair == null)
                 {
                     _logger.LogError($"{logPrefix}, mutablePair is null");
@@ -82,10 +82,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 }
 
                 //查询出商户应用的配置信息
-                MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(recordList[0].MchNo, recordList[0].AppId);
+                MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(recordList[0].MchNo, recordList[0].AppId);
 
                 //调起接口的回调判断
-                DivisionChannelNotifyModel notifyResult = divisionNotifyService.DoNotify(Request, mutablePair.First().Value, recordList, mchAppConfigContext);
+                DivisionChannelNotifyModel notifyResult = await divisionNotifyService.DoNotifyAsync(Request, mutablePair.First().Value, recordList, mchAppConfigContext);
 
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ApiRes == null)

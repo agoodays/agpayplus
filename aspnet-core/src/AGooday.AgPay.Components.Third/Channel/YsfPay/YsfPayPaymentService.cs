@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             return true;
         }
 
-        public override AbstractRS Pay(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public override Task<AbstractRS> PayAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).Pay(bizRQ, payOrder, mchAppConfigContext);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
@@ -61,9 +61,9 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        public JObject PackageParamAndReq(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
+        public async Task<JObject> PackageParamAndReqAsync(string apiUri, JObject reqParams, string logPrefix, MchAppConfigContext mchAppConfigContext)
         {
-            YsfPayIsvParams isvParams = (YsfPayIsvParams)_configContextQueryService.QueryIsvParams(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+            YsfPayIsvParams isvParams = (YsfPayIsvParams)await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
 
             if (isvParams.SerProvId == null)
             {
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             }
 
             reqParams.Add("serProvId", isvParams.SerProvId); //云闪付服务商标识
-            YsfPayIsvSubMchParams isvsubMchParams = (YsfPayIsvSubMchParams)_configContextQueryService.QueryIsvSubMchParams(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+            YsfPayIsvSubMchParams isvsubMchParams = (YsfPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
             reqParams.Add("merId", isvsubMchParams.MerId); // 商户号
 
             //签名
@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
 
             // 调起上游接口
             _logger.LogInformation($"{logPrefix} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = YsfHttpUtil.DoPostJson(GetYsfpayHost4env(isvParams) + apiUri, reqParams);
+            string resText = await YsfHttpUtil.DoPostJsonAsync(GetHost4env(isvParams) + apiUri, reqParams);
             _logger.LogInformation($"{logPrefix} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
         /// </summary>
         /// <param name="isvParams"></param>
         /// <returns></returns>
-        public static string GetYsfpayHost4env(YsfPayIsvParams isvParams)
+        public static string GetHost4env(YsfPayIsvParams isvParams)
         {
             return CS.YES == isvParams.Sandbox ? YsfPayConfig.SANDBOX_SERVER_URL : YsfPayConfig.PROD_SERVER_URL;
         }
@@ -113,7 +113,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
         {
             string orderType = YsfPayEnum.GetOrderTypeByJSapi(payOrder.WayCode);
             reqParams.Add("orderType", orderType); //订单类型： alipayJs-支付宝， wechatJs-微信支付， upJs-银联二维码
-            YsfPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             reqParams.Add("backUrl", notifyUrl); //交易通知地址
             reqParams.Add("frontUrl", returnUrl); //前台通知地址
         }
@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
         {
             string orderType = YsfPayEnum.GetOrderTypeByBar(payOrder.WayCode);
             reqParams.Add("orderType", orderType); //订单类型： alipay-支付宝， wechat-微信支付， -unionpay银联二维码
-            YsfPublicParams(reqParams, payOrder);
+            PublicParams(reqParams, payOrder);
             // TODO 终端编号暂时写死
             reqParams.Add("termId", "01727367"); // 终端编号
         }
@@ -137,7 +137,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
         /// </summary>
         /// <param name="reqParams"></param>
         /// <param name="payOrder"></param>
-        public static void YsfPublicParams(JObject reqParams, PayOrderDto payOrder)
+        public static void PublicParams(JObject reqParams, PayOrderDto payOrder)
         {
             //获取订单类型
             reqParams.Add("orderNo", payOrder.PayOrderId); //订单号

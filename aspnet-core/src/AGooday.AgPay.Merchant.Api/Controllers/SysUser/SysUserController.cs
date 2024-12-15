@@ -97,7 +97,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
             if (!_notifications.HasNotifications())
             {
                 //如果用户被删除，需要更新redis数据
-                RefAuthentication(new List<long> { recordId });
+                await RefAuthenticationAsync(new List<long> { recordId });
                 return ApiRes.Ok();
             }
             else
@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
                 if (dto.State.HasValue && dto.State.Value.Equals(CS.PUB_DISABLE))
                 {
                     //如果用户被禁用，需要更新redis数据
-                    RefAuthentication(new List<long> { dto.SysUserId.Value });
+                    await RefAuthenticationAsync(new List<long> { dto.SysUserId.Value });
                 }
                 return ApiRes.Ok();
             }

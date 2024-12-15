@@ -14,13 +14,13 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
     public class YsfPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<YsfPayPayOrderQueryService> _logger;
-        private readonly YsfPayPaymentService ysfpayPaymentService;
+        private readonly YsfPayPaymentService _paymentService;
 
         public YsfPayPayOrderQueryService(ILogger<YsfPayPayOrderQueryService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.ysfpayPaymentService = ActivatorUtilities.CreateInstance<YsfPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<YsfPayPaymentService>(serviceProvider);
         }
 
         public YsfPayPayOrderQueryService()
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             return CS.IF_CODE.YSFPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             string orderType = YsfPayEnum.GetOrderTypeByCommon(payOrder.WayCode);
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
                 reqParams.Add("orderType", orderType); //订单类型
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = ysfpayPaymentService.PackageParamAndReq("/gateway/api/pay/queryOrder", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/gateway/api/pay/queryOrder", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

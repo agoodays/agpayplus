@@ -49,12 +49,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// <returns></returns>
         [HttpGet, Route("jump")]
         [PermissionAuth(PermCode.PAY.API_CHANNEL_USER)]
-        public ActionResult Jump()
+        public async Task<ActionResult> JumpAsync()
         {
             //获取请求数据
-            ChannelUserIdRQ rq = GetRQByWithMchSign<ChannelUserIdRQ>();
-            string ifCode = "AUTO".Equals(rq.IfCode, StringComparison.OrdinalIgnoreCase) ? GetIfCodeByUA() : rq.IfCode;
-            string wayCode = GetWayCodeByIfCode(ifCode);
+            ChannelUserIdRQ rq = await this.GetRQByWithMchSignAsync<ChannelUserIdRQ>();
+            string ifCode = "AUTO".Equals(rq.IfCode, StringComparison.OrdinalIgnoreCase) ? this.GetIfCodeByUA() : rq.IfCode;
+            string wayCode = this.GetWayCodeByIfCode(ifCode);
 
             IChannelUserService channelUserService = _channelUserServiceFactory.GetService(ifCode);
 
@@ -80,10 +80,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             string callbackUrl = _sysConfigService.GetDBApplicationConfig().GenMchChannelUserIdApiOauth2RedirectUrlEncode(jsonObject);
 
             //获取商户配置信息
-            MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(rq.MchNo, rq.AppId);
-            string oauth2InfoId = GetOauth2InfoId(ifCode, mchAppConfigContext);
+            MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(rq.MchNo, rq.AppId);
+            string oauth2InfoId = await this.GetOauth2InfoIdAsync(ifCode, mchAppConfigContext);
 
-            string redirectUrl = channelUserService.BuildUserRedirectUrl(callbackUrl, oauth2InfoId, wayCode, mchAppConfigContext);
+            string redirectUrl = await channelUserService.BuildUserRedirectUrlAsync(callbackUrl, oauth2InfoId, wayCode, mchAppConfigContext);
 
             return Redirect(redirectUrl);
         }
@@ -93,7 +93,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("oauth2Callback/{aesData}")]
-        public ActionResult Oauth2Callback(string aesData)
+        public async Task<ActionResult> Oauth2CallbackAsync(string aesData)
         {
             JObject callbackData = JObject.Parse(AgPayUtil.AesDecode(aesData));
 
@@ -113,11 +113,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             }
 
             //获取商户配置信息
-            MchAppConfigContext mchAppConfigContext = _configContextQueryService.QueryMchInfoAndAppInfo(mchNo, appId);
-            string oauth2InfoId = GetOauth2InfoId(ifCode, mchAppConfigContext);
+            MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
+            string oauth2InfoId = await this.GetOauth2InfoIdAsync(ifCode, mchAppConfigContext);
 
             //获取渠道用户ID
-            string channelUserId = channelUserService.GetChannelUserId(GetReqParamJson(), oauth2InfoId, wayCode, mchAppConfigContext);
+            string channelUserId = await channelUserService.GetChannelUserIdAsync(this.GetReqParamJson(), oauth2InfoId, wayCode, mchAppConfigContext);
 
             //同步跳转
             JObject appendParams = new JObject();
@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         [ApiExplorerSettings(IgnoreApi = true), Route("param")]
         public async Task<ActionResult> ParamAsync()
         {
-            var param = await GetReqParamToJsonAsync();
+            var param = await this.GetReqParamToJsonAsync();
             return Ok(param);
         }
 
@@ -167,7 +167,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// 根据支付接口获取支付方式
         /// </summary>
         /// <returns></returns>
-        private static string GetWayCodeByIfCode(string ifCode)
+        private string GetWayCodeByIfCode(string ifCode)
         {
             if (ifCode.Equals(CS.IF_CODE.ALIPAY))
             {
@@ -180,12 +180,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             return null;
         }
 
-        private string GetOauth2InfoId(string ifCode, MchAppConfigContext mchAppConfigContext)
+        private async Task<string> GetOauth2InfoIdAsync(string ifCode, MchAppConfigContext mchAppConfigContext)
         {
             string oauth2InfoId = null;
             if (mchAppConfigContext.IsIsvSubMch())
             {
-                var payInterfaceConfig = _configContextQueryService.QueryIsvPayIfConfig(mchAppConfigContext.MchInfo.IsvNo, ifCode);
+                var payInterfaceConfig = await _configContextQueryService.QueryIsvPayIfConfigAsync(mchAppConfigContext.MchInfo.IsvNo, ifCode);
                 oauth2InfoId = payInterfaceConfig?.Oauth2InfoId;
             }
 

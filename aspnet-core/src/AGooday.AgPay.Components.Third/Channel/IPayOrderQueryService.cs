@@ -21,6 +21,6 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="payOrder"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
+        Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
     }
 }

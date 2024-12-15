@@ -33,10 +33,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiRes List()
+        public async Task<ApiRes> ListAsync()
         {
-            var data = _payIfConfigService.GetPayIfConfigsByMchNo(GetCurrentMchNo())
-                .OrderByDescending(o => o.CreatedAt);
+            var data = await _payIfConfigService.GetPayIfConfigsByMchNoAsync(GetCurrentMchNo());
             return ApiRes.Ok(data);
         }
     }

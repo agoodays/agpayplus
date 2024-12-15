@@ -14,14 +14,14 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
     public class AllinPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<AllinPayPayOrderQueryService> _logger;
-        private readonly AllinPayPaymentService allinpayPaymentService;
+        private readonly AllinPayPaymentService _paymentService;
 
         public AllinPayPayOrderQueryService(ILogger<AllinPayPayOrderQueryService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            //this.allinpayPaymentService = (AllinPayPaymentService)serviceProvider.GetRequiredKeyedService<IPaymentService>(GetIfCode());
-            this.allinpayPaymentService = ActivatorUtilities.CreateInstance<AllinPayPaymentService>(serviceProvider);
+            //_paymentService = (AllinPayPaymentService)serviceProvider.GetRequiredKeyedService<IPaymentService>(GetIfCode());
+            _paymentService = ActivatorUtilities.CreateInstance<AllinPayPaymentService>(serviceProvider);
         }
 
         public AllinPayPayOrderQueryService()
@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             return CS.IF_CODE.ALLINPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             string payType = AllinPayEnum.GetPayType(payOrder.WayCode);
@@ -45,7 +45,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
                 reqParams.Add("trxid", payOrder.ChannelOrderNo);
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = allinpayPaymentService.PackageParamAndReq("/apiweb/tranx/query", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/apiweb/tranx/query", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {

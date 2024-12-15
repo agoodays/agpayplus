@@ -21,7 +21,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
     [ApiController, Authorize]
     public class IsvPayInterfaceConfigController : CommonController
     {
-        private readonly IMQSender mqSender;
+        private readonly IMQSender _mqSender;
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
         public IsvPayInterfaceConfigController(ILogger<IsvPayInterfaceConfigController> logger,
@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             IAuthService authService)
             : base(logger, client, authService)
         {
-            this.mqSender = mqSender;
+            _mqSender = mqSender;
             _payIfConfigService = payIfConfigService;
         }
 
@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_LIST)]
-        public ApiRes List(string isvNo)
+        public async Task<ApiRes> ListAsync(string isvNo)
         {
-            var data = _payIfConfigService.SelectAllPayIfConfigListByIsvNo(CS.INFO_TYPE.ISV, isvNo);
+            var data = await _payIfConfigService.SelectAllPayIfConfigListByIsvNoAsync(CS.INFO_TYPE.ISV, isvNo);
             return ApiRes.Ok(data);
         }
 
@@ -56,9 +56,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         /// <returns></returns>
         [HttpGet, Route("{isvNo}/{ifCode}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_ISV_PAY_CONFIG_VIEW)]
-        public ApiRes GetByIsvNo(string isvNo, string ifCode)
+        public async Task<ApiRes> GetByIsvNoAsync(string isvNo, string ifCode)
         {
-            var payInterfaceConfig = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, isvNo, ifCode);
+            var payInterfaceConfig = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(CS.INFO_TYPE.ISV, isvNo, ifCode);
             if (payInterfaceConfig != null)
             {
                 // 费率转换为百分比数值
@@ -94,7 +94,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             dto.UpdatedAt = DateTime.Now;
 
             //根据 服务商号、接口类型 获取商户参数配置
-            var dbRecoed = _payIfConfigService.GetByInfoIdAndIfCode(CS.INFO_TYPE.ISV, dto.InfoId, dto.IfCode);
+            var dbRecoed = await _payIfConfigService.GetByInfoIdAndIfCodeAsync(CS.INFO_TYPE.ISV, dto.InfoId, dto.IfCode);
             //若配置存在，为saveOrUpdate添加ID，第一次配置添加创建者
             if (dbRecoed != null)
             {
@@ -111,14 +111,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
                 dto.CreatedBy = realName;
                 dto.CreatedAt = DateTime.Now;
             }
-            var result = _payIfConfigService.SaveOrUpdate(dto);
+            var result = await _payIfConfigService.SaveOrUpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "配置失败");
             }
 
             // 推送mq到目前节点进行更新数据
-            await mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null, null));
+            await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO, dto.InfoId, null, null, null));
 
             return ApiRes.Ok();
         }

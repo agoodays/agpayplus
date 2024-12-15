@@ -55,9 +55,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
 
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_VIEW)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var record = _mchDivisionReceiverService.GetById(recordId, GetCurrentMchNo());
+            var record = await _mchDivisionReceiverService.GetByIdAsync(recordId, GetCurrentMchNo());
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -111,13 +111,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         [HttpPut, Route("{recordId}"), MethodLog("更新分账接收账号")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_EDIT)]
-        public ApiRes Update(long recordId, MchDivisionReceiverDto record)
+        public async Task<ApiRes> UpdateAsync(long recordId, MchDivisionReceiverDto record)
         {
             // 改为真实比例
             record.DivisionProfit = record.DivisionProfit / 100;
             if (record.ReceiverGroupId != null)
             {
-                var groupRecord = _mchDivisionReceiverGroupService.FindByIdAndMchNo(record.ReceiverGroupId.Value, GetCurrentMchNo());
+                var groupRecord = await _mchDivisionReceiverGroupService.FindByIdAndMchNoAsync(record.ReceiverGroupId.Value, GetCurrentMchNo());
                 if (record == null)
                 {
                     throw new BizException("账号组不存在");
@@ -125,7 +125,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
                 record.ReceiverGroupId = groupRecord.ReceiverGroupId;
                 record.ReceiverGroupName = groupRecord.ReceiverGroupName;
             }
-            var result = _mchDivisionReceiverService.Update(record);
+            var result = await _mchDivisionReceiverService.UpdateAsync(record);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
@@ -147,7 +147,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            _mchDivisionReceiverService.Remove(recordId);
+            await _mchDivisionReceiverService.RemoveAsync(recordId);
             return ApiRes.Ok();
         }
     }

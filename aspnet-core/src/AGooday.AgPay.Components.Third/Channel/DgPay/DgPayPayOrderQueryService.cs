@@ -14,13 +14,13 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
     public class DgPayPayOrderQueryService : IPayOrderQueryService
     {
         private readonly ILogger<DgPayPayOrderQueryService> _logger;
-        private readonly DgPayPaymentService dgpayPaymentService;
+        private readonly DgPayPaymentService _paymentService;
 
         public DgPayPayOrderQueryService(ILogger<DgPayPayOrderQueryService> logger,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
-            this.dgpayPaymentService = ActivatorUtilities.CreateInstance<DgPayPaymentService>(serviceProvider);
+            _paymentService = ActivatorUtilities.CreateInstance<DgPayPaymentService>(serviceProvider);
         }
 
         public DgPayPayOrderQueryService()
@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             return CS.IF_CODE.DGPAY;
         }
 
-        public ChannelRetMsg Query(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        public async Task<ChannelRetMsg> QueryAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             JObject reqParams = new JObject();
             string transType = DgPayEnum.GetTransType(payOrder.WayCode);
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                 reqParams.Add("org_req_seq_id", payOrder.PayOrderId); //订单号
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
-                JObject resJSON = dgpayPaymentService.PackageParamAndReq("/trade/payment/scanpay/query", reqParams, logPrefix, mchAppConfigContext);
+                JObject resJSON = await _paymentService.PackageParamAndReqAsync("/trade/payment/scanpay/query", reqParams, logPrefix, mchAppConfigContext);
                 _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
