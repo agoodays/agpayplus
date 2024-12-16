@@ -156,7 +156,7 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             string tradeKey = isvParams.AccessKey;
 
             //验签失败
-            if (!HkrtSignUtil.Verify(jsonParams, tradeKey))
+            if (!HkrtPaySignUtil.Verify(jsonParams, tradeKey))
             {
                 _logger.LogInformation($"【海科融通回调】 验签失败！ 回调参数：resParams = {resText}, key = {tradeKey} ");
                 return false;

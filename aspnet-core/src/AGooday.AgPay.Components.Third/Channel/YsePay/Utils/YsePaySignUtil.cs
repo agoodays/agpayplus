@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Components.Third.Channel.YsePay.Utils
 {
-    public class YseSignUtil
+    public class YsePaySignUtil
     {
         // 如果未指明 userId： 那默认值就是：1234567812345678。
         private static string userId = "1234567812345678";

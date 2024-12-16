@@ -2,23 +2,22 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AGooday.AgPay.Components.Third.Channel.DgPay.Utils
+namespace AGooday.AgPay.Components.Third.Channel.SxfPay.Utils
 {
-    public class DgSignUtil
+    public class SxfPaySignUtil
     {
         public static string Sign(JObject reqParams, string privateKey)
         {
             var signString = ConvertSignStringIncludeEmpty(reqParams);
-            var sign = RsaUtil.Sign(signString, privateKey, signType: "RSA2");
+            var sign = RsaUtil.Sign(signString, privateKey);
             return sign;
         }
 
         public static bool Verify(JObject resParams, string publicKey)
         {
             string sign = resParams.GetValue("sign").ToString();
-            string data = resParams.GetValue("data").ToString();
-            var signString = ConvertSignStringIncludeEmpty(JObject.Parse(data));
-            var flag = RsaUtil.Verify(signString, publicKey, sign, signType: "RSA2");
+            var signString = ConvertSignStringIncludeEmpty(resParams);
+            var flag = RsaUtil.Verify(signString, publicKey, sign);
             return flag;
         }
 

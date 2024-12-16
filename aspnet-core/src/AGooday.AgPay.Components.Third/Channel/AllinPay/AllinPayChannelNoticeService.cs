@@ -135,7 +135,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             }
 
             //验签
-            if (!AllinSignUtil.Verify(jsonParams, publicKey))
+            if (!AllinPaySignUtil.Verify(jsonParams, publicKey))
             {
                 _logger.LogInformation($"【通联回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
                 return false;

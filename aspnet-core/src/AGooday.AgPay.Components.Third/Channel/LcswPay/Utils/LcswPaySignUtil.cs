@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Components.Third.Channel.LcswPay.Utils
 {
-    public class LcswSignUtil
+    public class LcswPaySignUtil
     {
         public static string Sign(JObject reqParams, string key)
         {

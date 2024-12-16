@@ -138,7 +138,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             string publicKey = isvParams.PublicKey;
 
             //验签失败
-            if (!SxfSignUtil.Verify(jsonParams, publicKey))
+            if (!SxfPaySignUtil.Verify(jsonParams, publicKey))
             {
                 _logger.LogInformation($"【随行付回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
                 return false;

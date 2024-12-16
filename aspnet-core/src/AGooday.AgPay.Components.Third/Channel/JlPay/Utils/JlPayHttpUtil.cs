@@ -4,9 +4,9 @@ using AGooday.AgPay.Components.Third.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AGooday.AgPay.Components.Third.Channel.DgPay.Utils
+namespace AGooday.AgPay.Components.Third.Channel.JlPay.Utils
 {
-    public class DgHttpUtil
+    public class JlPayHttpUtil
     {
         private static readonly string DEFAULT_CHARSET = "UTF-8";
         private static readonly int DEFAULT_TIMEOUT = 60; // 60 秒超时

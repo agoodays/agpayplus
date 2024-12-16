@@ -105,7 +105,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             string ysfpayPublicKey = isvParams.YsfpayPublicKey;
 
             //验签失败
-            if (!YsfSignUtil.Validate(JObject.FromObject(jsonParams), ysfpayPublicKey))
+            if (!YsfPaySignUtil.Validate(JObject.FromObject(jsonParams), ysfpayPublicKey))
             {
                 _logger.LogInformation($"【云闪付回调】 验签失败！ 回调参数：parameter = {jsonParams}, ysfpayPublicKey={ysfpayPublicKey} ");
                 return false;

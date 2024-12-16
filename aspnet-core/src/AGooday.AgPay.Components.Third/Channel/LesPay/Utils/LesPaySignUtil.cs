@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Components.Third.Channel.LesPay.Utils
 {
-    public class LesSignUtil
+    public class LesPaySignUtil
     {
         public static string Sign(SortedDictionary<string, string> reqParams, string key)
         {

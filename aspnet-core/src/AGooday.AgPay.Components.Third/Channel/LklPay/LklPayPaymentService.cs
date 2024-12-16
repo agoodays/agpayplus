@@ -147,7 +147,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            var (resText, headers) = await LklHttpUtil.DoPostJsonAsync(url, isvParams.AppId, isvParams.SerialNo, isvParams.PrivateCert, reqParams);
+            var (resText, headers) = await LklPayHttpUtil.DoPostJsonAsync(url, isvParams.AppId, isvParams.SerialNo, isvParams.PrivateCert, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -157,7 +157,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
 
             // 验签
             var resParams = JObject.Parse(resText);
-            if (!LklSignUtil.Verify(headers, isvParams.AppId, resText, isvParams.PublicCert))
+            if (!LklPaySignUtil.Verify(headers, isvParams.AppId, resText, isvParams.PublicCert))
             {
                 _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }

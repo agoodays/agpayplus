@@ -185,7 +185,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             }
 
             //验签失败
-            if (!DgSignUtil.Verify(jsonParams, publicKey))
+            if (!DgPaySignUtil.Verify(jsonParams, publicKey))
             {
                 _logger.LogInformation($"【斗拱回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
                 return false;

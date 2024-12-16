@@ -130,7 +130,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             string noticeKey = isvParams.NoticeKey;
 
             //验签失败
-            if (!LesSignUtil.Verify(jsonParams, noticeKey))
+            if (!LesPaySignUtil.Verify(jsonParams, noticeKey))
             {
                 _logger.LogInformation($"【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey}");
                 return false;

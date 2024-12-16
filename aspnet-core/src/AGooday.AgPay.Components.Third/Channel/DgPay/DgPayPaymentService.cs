@@ -183,7 +183,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             //reqData.Add("req_seq_id", Guid.NewGuid().ToString("N")); //同一huifu_id下当天唯一，示例值：rQ20211213111739475651
             reqData.Add("huifu_id", huifuId); // 渠道与一级代理商的直属商户ID；示例值：6666000123123123
 
-            var sign = DgSignUtil.Sign(reqData, privateKey); //RSA 签名字符串
+            var sign = DgPaySignUtil.Sign(reqData, privateKey); //RSA 签名字符串
             var reqParams = new JObject();
             /**
              * 渠道商/商户的huifu_id
@@ -200,7 +200,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             string url = "https://api.huifu.com/v2" + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = await DgHttpUtil.DoPostJsonAsync(url, reqParams);
+            string resText = await DgPayHttpUtil.DoPostJsonAsync(url, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -210,7 +210,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
 
             // 验签
             var resParams = JObject.Parse(resText);
-            if (!DgSignUtil.Verify(resParams, publicKey))
+            if (!DgPaySignUtil.Verify(resParams, publicKey))
             {
                 _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }

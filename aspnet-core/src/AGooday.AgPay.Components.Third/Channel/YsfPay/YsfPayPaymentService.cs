@@ -78,11 +78,11 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             //签名
             string isvPrivateCertFile = ChannelCertConfigKit.GetCertFilePath(isvParams.IsvPrivateCertFile);
             string isvPrivateCertPwd = isvParams.IsvPrivateCertPwd;
-            reqParams.Add("signature", YsfSignUtil.SignBy256(reqParams, isvPrivateCertFile, isvPrivateCertPwd)); //RSA 签名串
+            reqParams.Add("signature", YsfPaySignUtil.SignBy256(reqParams, isvPrivateCertFile, isvPrivateCertPwd)); //RSA 签名串
 
             // 调起上游接口
             _logger.LogInformation($"{logPrefix} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = await YsfHttpUtil.DoPostJsonAsync(GetHost4env(isvParams) + apiUri, reqParams);
+            string resText = await YsfPayHttpUtil.DoPostJsonAsync(GetHost4env(isvParams) + apiUri, reqParams);
             _logger.LogInformation($"{logPrefix} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))

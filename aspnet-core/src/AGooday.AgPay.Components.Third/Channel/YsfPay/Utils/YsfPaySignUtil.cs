@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Components.Third.Channel.YsfPay.Utils
 {
-    public class YsfSignUtil
+    public class YsfPaySignUtil
     {
         public static string SignBy256(JObject jobjParams, string isvPrivateCertFile, string isvPrivateCertPwd)
         {

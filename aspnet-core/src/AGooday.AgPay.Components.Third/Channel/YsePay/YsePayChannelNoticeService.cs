@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             }
 
             //验签失败
-            if (!YseSignUtil.Verify(jsonParams, certFilePath))
+            if (!YsePaySignUtil.Verify(jsonParams, certFilePath))
             {
                 _logger.LogInformation($"【银盛回调】 验签失败！ 回调参数：parameter = {jsonParams}, certFilePath={certFilePath} ");
                 return false;

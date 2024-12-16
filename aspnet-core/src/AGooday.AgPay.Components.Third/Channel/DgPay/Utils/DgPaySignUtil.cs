@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AGooday.AgPay.Components.Third.Channel.JlPay.Utils
+namespace AGooday.AgPay.Components.Third.Channel.DgPay.Utils
 {
-    public class JlSignUtil
+    public class DgPaySignUtil
     {
         public static string Sign(JObject reqParams, string privateKey)
         {

@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = await UmsHttpUtil.DoPostJsonAsync(url, isvParams.AppId, isvParams.AppKey, reqParams);
+            string resText = await UmsPayHttpUtil.DoPostJsonAsync(url, isvParams.AppId, isvParams.AppKey, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))

@@ -151,14 +151,14 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
 
             // 签名
             string tradeKey = isvParams.TradeKey;
-            reqParams.Add("sign", LesSignUtil.Sign(reqParams, tradeKey)); //RSA 签名字符串
+            reqParams.Add("sign", LesPaySignUtil.Sign(reqParams, tradeKey)); //RSA 签名字符串
 
             // 调起上游接口
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             var reqText = string.Join("&", reqParams.Select(s => $"{s.Key}={s.Value}"));
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqText={reqText}");
-            string resText = await LesHttpUtil.DoPostAsync(url, reqText);
+            string resText = await LesPayHttpUtil.DoPostAsync(url, reqText);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resText={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))

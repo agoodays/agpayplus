@@ -158,7 +158,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             }
 
             //验签失败
-            if (!JlSignUtil.Verify(jsonParams, publicKey))
+            if (!JlPaySignUtil.Verify(jsonParams, publicKey))
             {
                 _logger.LogInformation($"【嘉联回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
                 return false;

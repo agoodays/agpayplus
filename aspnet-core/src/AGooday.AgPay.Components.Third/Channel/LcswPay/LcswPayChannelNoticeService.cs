@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             string key = lcswParams.AccessToken;
 
             //验签失败
-            if (!LcswSignUtil.Verify(jsonParams, key))
+            if (!LcswPaySignUtil.Verify(jsonParams, key))
             {
                 _logger.LogInformation($"【利楚扫呗回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={key} ");
                 return false;

@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.Utils
 {
-    public class HkrtSignUtil
+    public class HkrtPaySignUtil
     {
         public static string Sign(JObject reqParams, string key)
         {

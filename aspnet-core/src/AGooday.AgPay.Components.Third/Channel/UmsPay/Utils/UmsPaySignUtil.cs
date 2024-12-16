@@ -3,7 +3,7 @@ using System.Text;
 
 namespace AGooday.AgPay.Components.Third.Channel.UmsPay.Utils
 {
-    public class UmsSignUtil
+    public class UmsPaySignUtil
     {
         public static string GetAuthorization(string appid, string appkey, string timestamp, string nonce, string body)
         {

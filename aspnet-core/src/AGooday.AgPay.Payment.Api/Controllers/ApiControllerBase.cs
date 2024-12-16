@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
         protected async Task<T> GetRQByWithMchSignAsync<T>() where T : AbstractRQ
         {
             //获取请求RQ, and 通用验证
-            T bizRQ = GetRQ<T>();
+            T bizRQ = this.GetRQ<T>();
 
             AbstractMchAppRQ abstractMchAppRQ = bizRQ as AbstractMchAppRQ;
 
@@ -162,11 +162,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             var request = Request;
 
             // 获取 URL 参数
-            var urlParameters = GetUrlParameters(request.Query);
+            var urlParameters = this.GetUrlParameters(request.Query);
             //var urlParameters = request.Query.ToDictionary(x => x.Key, x => GetQueryParameterValue(x.Value));
 
             // 获取请求体参数（JSON 格式）
-            var requestBody = await ReadRequestBodyAsync(request.Body);
+            var requestBody = await this.ReadRequestBodyAsync(request.Body);
             var requestBodyJson = !string.IsNullOrEmpty(requestBody) && !request.HasFormContentType ? JObject.Parse(requestBody) : new JObject();
 
             // 获取表单参数
@@ -181,13 +181,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             return allParameters;
         }
 
-        private static async Task<string> ReadRequestBodyAsync(Stream body)
+        private async Task<string> ReadRequestBodyAsync(Stream body)
         {
             using var reader = new StreamReader(body, Encoding.UTF8, true, 1024, true);
             return await reader.ReadToEndAsync();
         }
 
-        private static Dictionary<string, JToken> GetUrlParameters(IQueryCollection formCollection)
+        private Dictionary<string, JToken> GetUrlParameters(IQueryCollection formCollection)
         {
             var parameters = new Dictionary<string, JToken>();
             foreach (var keyValuePair in formCollection)
@@ -204,7 +204,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             return parameters;
         }
 
-        private static JToken GetQueryParameterValue(string[] values)
+        private JToken GetQueryParameterValue(string[] values)
         {
             if (values.Length > 1)
             {
@@ -216,7 +216,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
             }
         }
 
-        private static Dictionary<string, JToken> GetFormParameters(IFormCollection formCollection)
+        private Dictionary<string, JToken> GetFormParameters(IFormCollection formCollection)
         {
             var parameters = new Dictionary<string, JToken>();
             foreach (var keyValuePair in formCollection)

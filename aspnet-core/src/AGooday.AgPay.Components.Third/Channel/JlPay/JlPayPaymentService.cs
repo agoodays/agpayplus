@@ -159,14 +159,14 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
                 reqParams.Add("term_no", termNo);
             }
             reqParams.Add("nonce_str", Guid.NewGuid().ToString("N"));
-            var sign = JlSignUtil.Sign(reqParams, privateKey); //RSA 签名字符串
+            var sign = JlPaySignUtil.Sign(reqParams, privateKey); //RSA 签名字符串
             reqParams.Add("sign", sign); //加签结果
 
             // 调起上游接口
             string url = GetHost4env(sandbox) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = await JlHttpUtil.DoPostJsonAsync(url, reqParams);
+            string resText = await JlPayHttpUtil.DoPostJsonAsync(url, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -176,7 +176,7 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
 
             // 验签
             var resParams = JObject.Parse(resText);
-            if (!JlSignUtil.Verify(resParams, publicKey))
+            if (!JlPaySignUtil.Verify(resParams, publicKey))
             {
                 _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }

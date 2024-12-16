@@ -174,13 +174,13 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
 
             // 签名
             reqParams.Add("signtype", signType);
-            reqParams.Add("sign", AllinSignUtil.Sign(reqParams, privateKey));
+            reqParams.Add("sign", AllinPaySignUtil.Sign(reqParams, privateKey));
 
             // 调起上游接口
             string url = GetHost4env(sandbox) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = await AllinHttpUtil.DoPostJsonAsync(url, reqParams);
+            string resText = await AllinPayHttpUtil.DoPostJsonAsync(url, reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -190,7 +190,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
 
             // 验签
             var resParams = JObject.Parse(resText);
-            if (!AllinSignUtil.Verify(resParams, publicKey))
+            if (!AllinPaySignUtil.Verify(resParams, publicKey))
             {
                 _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }

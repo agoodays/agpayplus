@@ -143,14 +143,14 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
 
             // 签名
             string key = lcswParams.AccessToken;
-            reqParams.Add("key_sign", LcswSignUtil.Sign(reqParams, key)); // 签名字符串
+            reqParams.Add("key_sign", LcswPaySignUtil.Sign(reqParams, key)); // 签名字符串
 
             // 调起上游接口
             string url = GetHost4env(lcswParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             var reqJSON = JsonConvert.SerializeObject(reqParams);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={reqJSON}");
-            string resText = await LcswHttpUtil.DoPostAsync(url, reqJSON);
+            string resText = await LcswPayHttpUtil.DoPostAsync(url, reqJSON);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -160,7 +160,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
 
             // 验签
             var resParams = JObject.Parse(resText);
-            if (!LcswSignUtil.Verify(resParams, key))
+            if (!LcswPaySignUtil.Verify(resParams, key))
             {
                 _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={reqJSON} resJSON={resText}");
             }

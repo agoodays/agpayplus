@@ -193,7 +193,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             }
             reqParams.Add("biz_content", JsonConvert.SerializeObject(reqData, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.None })); //业务请求参数，具体值参考API文档
 
-            var sign = YseSignUtil.Sign(reqParams, privateKeyFilePath, privateKeyPassword); //SM 签名字符串
+            var sign = YsePaySignUtil.Sign(reqParams, privateKeyFilePath, privateKeyPassword); //SM 签名字符串
             reqParams.Add("sign", HttpUtility.UrlEncode(sign)); //加签结果
             reqData.TryGetValue("biz_content", out string bizContent);
             reqData["biz_content"] = HttpUtility.UrlEncode(bizContent);
@@ -205,7 +205,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             var stopwatch = new Stopwatch();
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} reqText={JsonConvert.SerializeObject(reqParams)} ");
             stopwatch.Restart();
-            string resText = await YseHttpUtil.DoPostFromAsync(url, reqText);
+            string resText = await YsePayHttpUtil.DoPostFromAsync(url, reqText);
             _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} resJSON={resText} time={stopwatch.ElapsedMilliseconds}");
 
             if (string.IsNullOrWhiteSpace(resText))
@@ -215,7 +215,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
 
             // 验签
             var resParams = JObject.Parse(resText);
-            if (!YseSignUtil.Verify(resParams, publicKeyFilePath, repMethod))
+            if (!YsePaySignUtil.Verify(resParams, publicKeyFilePath, repMethod))
             {
                 _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }

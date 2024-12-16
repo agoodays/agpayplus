@@ -5,7 +5,7 @@ using AGooday.AgPay.Components.Third.Utils;
 
 namespace AGooday.AgPay.Components.Third.Channel.LklPay.Utils
 {
-    public class LklSignUtil
+    public class LklPaySignUtil
     {
         public static string GetAuthorizationHeader(string appId, string serialNo, string strBody, string privateKeyCert)
         {

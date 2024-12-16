@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AGooday.AgPay.Components.Third.Channel.SxfPay.Utils
+namespace AGooday.AgPay.Components.Third.Channel.AllinPay.Utils
 {
-    public class SxfSignUtil
+    public class AllinPaySignUtil
     {
         public static string Sign(JObject reqParams, string privateKey)
         {

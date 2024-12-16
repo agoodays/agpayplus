@@ -1,6 +1,6 @@
 ﻿using SKIT.FlurlHttpClient.Wechat.TenpayV3.Utilities;
 
-namespace AGooday.AgPay.Components.Third.Channel.WxPay.Kits
+namespace AGooday.AgPay.Components.Third.Channel.WxPay.Utils
 {
     public class WxPayV3Util
     {
