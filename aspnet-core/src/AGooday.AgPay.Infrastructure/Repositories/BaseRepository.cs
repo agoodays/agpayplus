@@ -10,14 +10,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
     /// 泛型仓储，实现泛型仓储接口
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class Repository<TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
+    public class BaseRepository<TEntity, TPrimaryKey> : IBaseRepository<TEntity, TPrimaryKey>
         where TEntity : class
         where TPrimaryKey : struct
     {
         protected readonly DbContext Db;
         protected readonly DbSet<TEntity> DbSet;
 
-        public Repository(DbContext context)
+        public BaseRepository(DbContext context)
         {
             Db = context;
             DbSet = Db.Set<TEntity>();
@@ -44,6 +44,24 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public virtual async Task AddAsync(TEntity entity)
         {
             await DbSet.AddAsync(entity);
+        }
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public virtual void AddRange(IQueryable<TEntity> entitys)
+        {
+            DbSet.AddRange(entitys);
+        }
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public virtual async Task AddRangeAsync(IQueryable<TEntity> entitys)
+        {
+            await DbSet.AddRangeAsync(entitys);
         }
         /// <summary>
         /// 根据id获取对象
@@ -125,14 +143,14 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression)
         {
             // 获取要更新的属性名称列表
-            var propertyNames = RepositoryExtension<TEntity>.GetPropertyNames(propertyExpression);
+            var propertyNames = BaseRepositoryExtension<TEntity>.GetPropertyNames(propertyExpression);
 
             // 根据主键查找实体
             //var entry = Db.Entry(entity);
             //var keyValues = Db.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties
             //    .Select(x => entry.Property(x.Name).CurrentValue)
             //    .ToArray();
-            var keyValues = RepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+            var keyValues = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
             var existingEntity = DbSet.Find(keyValues);
 
             // 更新实体的指定属性
@@ -156,7 +174,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
         {
             var entitiesToUpdate = DbSet.Where(condition);
-            var properties = RepositoryExtension<TEntity>.GetProperties(propertyExpression);
+            var properties = BaseRepositoryExtension<TEntity>.GetProperties(propertyExpression);
 
             foreach (var entity in entitiesToUpdate)
             {
@@ -209,7 +227,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <param name="propertiesToUpdate"></param>
         public void SaveOrUpdate(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate)
         {
-            var primaryKeyValue = RepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+            var primaryKeyValue = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
             if (primaryKeyValue.Equals(default(TPrimaryKey)))
             {
                 DbSet.Add(entity);
@@ -228,7 +246,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                     {
                         foreach (var property in propertiesToUpdate)
                         {
-                            var propertyName = RepositoryExtension<TEntity>.GetPropertyName(property);
+                            var propertyName = BaseRepositoryExtension<TEntity>.GetPropertyName(property);
                             Db.Entry(existingEntity).Property(propertyName).IsModified = true;
                         }
                     }
@@ -287,13 +305,13 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             GC.SuppressFinalize(this);
         }
     }
-    public class Repository<TEntity> : IRepository<TEntity>
+    public class BaseRepository<TEntity> : IBaseRepository<TEntity>
         where TEntity : class
     {
         protected readonly DbContext Db;
         protected readonly DbSet<TEntity> DbSet;
 
-        public Repository(DbContext context)
+        public BaseRepository(DbContext context)
         {
             Db = context;
             DbSet = Db.Set<TEntity>();
@@ -320,6 +338,24 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public virtual async Task AddAsync(TEntity entity)
         {
             await DbSet.AddAsync(entity);
+        }
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public virtual void AddRange(IQueryable<TEntity> entitys)
+        {
+            DbSet.AddRange(entitys);
+        }
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public virtual async Task AddRangeAsync(IQueryable<TEntity> entitys)
+        {
+            await DbSet.AddRangeAsync(entitys);
         }
         /// <summary>
         /// 根据id获取对象
@@ -403,7 +439,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression)
         {
             // 获取要更新的属性名称列表
-            var propertyNames = RepositoryExtension<TEntity>.GetPropertyNames(propertyExpression);
+            var propertyNames = BaseRepositoryExtension<TEntity>.GetPropertyNames(propertyExpression);
 
             // 根据主键查找实体
             var entry = Db.Entry(entity);
@@ -431,7 +467,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
         {
             var entitiesToUpdate = DbSet.Where(condition);
-            var properties = RepositoryExtension<TEntity>.GetProperties(propertyExpression);
+            var properties = BaseRepositoryExtension<TEntity>.GetProperties(propertyExpression);
 
             foreach (var entity in entitiesToUpdate)
             {
@@ -485,7 +521,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <param name="propertiesToUpdate"></param>
         public void SaveOrUpdate<TPrimaryKey>(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate)
         {
-            var primaryKeyValue = RepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+            var primaryKeyValue = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
             if (primaryKeyValue.Equals(default(TPrimaryKey)))
             {
                 DbSet.Add(entity);
@@ -504,7 +540,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                     {
                         foreach (var property in propertiesToUpdate)
                         {
-                            var propertyName = RepositoryExtension<TEntity>.GetPropertyName(property);
+                            var propertyName = BaseRepositoryExtension<TEntity>.GetPropertyName(property);
                             Db.Entry(existingEntity).Property(propertyName).IsModified = true;
                         }
                     }
@@ -563,10 +599,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             GC.SuppressFinalize(this);
         }
     }
-    public class Repository : IRepository
+    public class BaseRepository : IBaseRepository
     {
         protected readonly DbContext Db;
-        public Repository(DbContext context)
+        public BaseRepository(DbContext context)
         {
             Db = context;
         }
@@ -576,7 +612,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             GC.SuppressFinalize(this);
         }
     }
-    public static class RepositoryExtension<TEntity>
+    public static class BaseRepositoryExtension<TEntity>
         where TEntity : class
     {
         public static object[] GetPrimaryKeyValues(DbContext Db, TEntity entity)

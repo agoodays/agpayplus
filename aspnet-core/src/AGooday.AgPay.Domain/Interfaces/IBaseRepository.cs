@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Domain.Interfaces
     /// <summary>
     /// 定义泛型仓储接口，并继承IDisposable，显式释放资源
     /// </summary>
-    public interface IRepository<TEntity, TPrimaryKey> : IDisposable
+    public interface IBaseRepository<TEntity, TPrimaryKey> : IDisposable
         where TEntity : class
         where TPrimaryKey : struct
     {
@@ -22,6 +22,17 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="entity"></param>
         /// <returns></returns>
         Task AddAsync(TEntity entity);
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="entitys"></param>
+        void AddRange(IQueryable<TEntity> entitys);
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="entitys"></param>
+        /// <returns></returns>
+        Task AddRangeAsync(IQueryable<TEntity> entitys);
         /// <summary>
         /// 根据id获取对象
         /// </summary>
@@ -126,7 +137,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         IQueryable<TEntity> FromSqlInterpolated(FormattableString sql);
         #endregion
     }
-    public interface IRepository<TEntity> : IDisposable
+    public interface IBaseRepository<TEntity> : IDisposable
         where TEntity : class
     {
         EntityEntry<TEntity> DbEntry(TEntity entity);
@@ -135,7 +146,22 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// </summary>
         /// <param name="entity"></param>
         void Add(TEntity entity);
+        /// <summary>
+        /// 添加
+        /// </summary>
+        /// <param name="entity"></param>
         Task AddAsync(TEntity entity);
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="entitys"></param>
+        void AddRange(IQueryable<TEntity> entitys);
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="entitys"></param>
+        /// <returns></returns>
+        Task AddRangeAsync(IQueryable<TEntity> entitys);
         /// <summary>
         /// 根据id获取对象
         /// </summary>
@@ -243,7 +269,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         IQueryable<TEntity> FromSqlInterpolated(FormattableString sql);
         #endregion
     }
-    public interface IRepository : IDisposable
+    public interface IBaseRepository : IDisposable
     {
     }
 }
