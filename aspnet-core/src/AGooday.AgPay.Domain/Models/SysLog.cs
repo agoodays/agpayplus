@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +10,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("系统操作日志表")]
     [Table("t_sys_log")]
-    public class SysLog
+    public class SysLog : AbstractTrackableTimestamps
     {
         /// <summary>
         /// ID
         /// </summary>
         [Comment("ID")]
-        [Key, Required, Column("sys_log_id", TypeName = "bigint")]
+        [Key, Required, Column("sys_log_id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long SysLogId { get; set; }
 
@@ -23,7 +24,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 系统用户ID
         /// </summary>
         [Comment("系统用户ID")]
-        [Column("user_id", TypeName = "bigint")]
+        [Column("user_id", TypeName = "bigint(20)")]
         public long? UserId { get; set; }
 
         /// <summary>
@@ -121,14 +122,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 耗时（毫秒）
         /// </summary>
         [Comment("耗时（毫秒）")]
-        [Column("elapsed_ms", TypeName = "bigint")]
+        [Column("elapsed_ms", TypeName = "bigint(20)")]
         public long? ElapsedMs { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
     }
 }

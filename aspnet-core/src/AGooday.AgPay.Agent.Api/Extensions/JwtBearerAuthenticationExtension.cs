@@ -53,6 +53,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             {
                 new Claim(ClaimTypes.NameIdentifier, tokenModel.SysUserId.ToString()),
                 new Claim(ClaimTypes.Name, tokenModel.LoginUsername),
+                new Claim(ClaimTypes.GivenName, tokenModel.Realname),
                 new Claim(ClaimAttributes.SysUserId,tokenModel.SysUserId.ToString()),
                 new Claim(ClaimAttributes.AvatarUrl,tokenModel.AvatarUrl),
                 new Claim(ClaimAttributes.Realname,tokenModel.Realname),

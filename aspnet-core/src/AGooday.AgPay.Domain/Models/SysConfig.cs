@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,7 +10,7 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("系统配置表")]
     [Table("t_sys_config")]
-    public class SysConfig
+    public class SysConfig : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 配置KEY
@@ -78,14 +79,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 显示顺序
         /// </summary>
         [Comment("显示顺序")]
-        [Required, Column("sort_num", TypeName = "bigint")]
+        [Required, Column("sort_num", TypeName = "bigint(20)")]
         public long SortNum { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

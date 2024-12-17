@@ -176,8 +176,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Anon
             tokenModel.IsAdmin = auth.IsAdmin.ToString();
             tokenModel.SysType = auth.SysType;
             tokenModel.BelongInfoId = auth.BelongInfoId;
-            tokenModel.CreatedAt = auth.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
-            tokenModel.UpdatedAt = auth.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+            tokenModel.CreatedAt = auth.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss");
+            tokenModel.UpdatedAt = auth.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss");
             tokenModel.CacheKey = cacheKey;
             var accessToken = JwtBearerAuthenticationExtension.IssueJwt(_jwtSettings, tokenModel);
 

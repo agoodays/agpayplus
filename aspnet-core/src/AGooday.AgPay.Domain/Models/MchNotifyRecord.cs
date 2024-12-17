@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +10,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("商户通知记录表")]
     [Table("t_mch_notify_record")]
-    public class MchNotifyRecord
+    public class MchNotifyRecord : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 商户通知记录ID
         /// </summary>
         [Comment("商户通知记录ID")]
-        [Key, Required, Column("notify_id", TypeName = "bigint")]
+        [Key, Required, Column("notify_id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long NotifyId { get; set; }
 
@@ -130,19 +131,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("最后一次通知时间")]
         [Column("last_notify_time")]
         public DateTime? LastNotifyTime { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

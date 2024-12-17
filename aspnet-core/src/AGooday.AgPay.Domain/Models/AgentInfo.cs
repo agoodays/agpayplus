@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
+using AGooday.AgPay.Domain.Core.Tracker;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,7 +11,7 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("代理商信息表")]
     [Table("t_agent_info")]
-    public class AgentInfo
+    public class AgentInfo : AbstractTrackableTimestamps, ITrackableUser
     {
         /// <summary>
         /// 代理商号
@@ -113,7 +115,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 初始用户ID（创建代理商时，允许代理商登录的用户）
         /// </summary>
         [Comment("初始用户ID（创建代理商时，允许代理商登录的用户）")]
-        [Column("init_user_id", TypeName = "bigint")]
+        [Column("init_user_id", TypeName = "bigint(20)")]
         public long? InitUserId { get; set; }
 
         /// <summary>
@@ -211,35 +213,35 @@ namespace AGooday.AgPay.Domain.Models
         /// 不可用金额
         /// </summary>
         [Comment("不可用金额")]
-        [Required, Column("un_amount", TypeName = "bigint")]
+        [Required, Column("un_amount", TypeName = "bigint(20)")]
         public long UnAmount { get; set; }
 
         /// <summary>
         /// 钱包余额
         /// </summary>
         [Comment("钱包余额")]
-        [Required, Column("balance_amount", TypeName = "bigint")]
+        [Required, Column("balance_amount", TypeName = "bigint(20)")]
         public long BalanceAmount { get; set; }
 
         /// <summary>
         /// 在途佣金
         /// </summary>
         [Comment("在途佣金")]
-        [Required, Column("audit_profit_amount", TypeName = "bigint")]
+        [Required, Column("audit_profit_amount", TypeName = "bigint(20)")]
         public long AuditProfitAmount { get; set; }
 
         /// <summary>
         /// 冻结金额
         /// </summary>
         [Comment("冻结金额")]
-        [Required, Column("freeze_amount", TypeName = "bigint")]
+        [Required, Column("freeze_amount", TypeName = "bigint(20)")]
         public long FreezeAmount { get; set; }
 
         /// <summary>
         /// 创建者用户ID
         /// </summary>
         [Comment("创建者用户ID")]
-        [Column("created_uid", TypeName = "bigint")]
+        [Column("created_uid", TypeName = "bigint(20)")]
         public long? CreatedUid { get; set; }
 
         /// <summary>
@@ -248,20 +250,6 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("创建者姓名")]
         [Column("created_by", TypeName = "varchar(64)")]
         public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
 
         /// <summary>
         /// 导航属性（上级代理商）

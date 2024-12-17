@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,7 +10,7 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("支付接口定义表")]
     [Table("t_pay_interface_define")]
-    public class PayInterfaceDefine
+    public class PayInterfaceDefine : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 接口代码 全小写  wxpay alipay 
@@ -143,19 +144,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("备注")]
         [Column("remark", TypeName = "varchar(128)")]
         public string Remark { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

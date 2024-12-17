@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +10,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("码牌模板信息表")]
     [Table("t_qr_code_shell")]
-    public class QrCodeShell
+    public class QrCodeShell : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 码牌模板ID
         /// </summary>
         [Comment("码牌模板ID")]
-        [Key, Required, Column("id", TypeName = "bigint")]
+        [Key, Required, Column("id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long Id { get; set; }
 
@@ -53,19 +54,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("所属商户ID / 代理商ID / 0(平台)")]
         [Required, Column("belong_info_id", TypeName = "varchar(64)")]
         public string BelongInfoId { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

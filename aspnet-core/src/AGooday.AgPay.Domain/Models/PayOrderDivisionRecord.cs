@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +10,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("分账记录表")]
     [Table("t_pay_order_division_record")]
-    public class PayOrderDivisionRecord
+    public class PayOrderDivisionRecord : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 分账记录ID
         /// </summary>
         [Comment("分账记录ID")]
-        [Key, Required, Column("record_id", TypeName = "bigint")]
+        [Key, Required, Column("record_id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long RecordId { get; set; }
 
@@ -79,14 +80,14 @@ namespace AGooday.AgPay.Domain.Models
         /// 订单金额,单位分
         /// </summary>
         [Comment("订单金额,单位分")]
-        [Required, Column("pay_order_amount", TypeName = "bigint")]
+        [Required, Column("pay_order_amount", TypeName = "bigint(20)")]
         public long PayOrderAmount { get; set; }
 
         /// <summary>
         /// 订单实际分账金额, 单位：分（订单金额 - 商户手续费 - 已退款金额）
         /// </summary>
         [Comment("订单实际分账金额, 单位：分（订单金额 - 商户手续费 - 已退款金额）")]
-        [Required, Column("pay_order_division_amount", TypeName = "bigint")]
+        [Required, Column("pay_order_division_amount", TypeName = "bigint(20)")]
         public long PayOrderDivisionAmount { get; set; }
 
         /// <summary>
@@ -121,14 +122,14 @@ namespace AGooday.AgPay.Domain.Models
         /// 账号快照》 分账接收者ID
         /// </summary>
         [Comment("账号快照》 分账接收者ID")]
-        [Required, Column("receiver_id", TypeName = "bigint")]
+        [Required, Column("receiver_id", TypeName = "bigint(20)")]
         public long ReceiverId { get; set; }
 
         /// <summary>
         /// 账号快照》 组ID（便于商户接口使用）
         /// </summary>
         [Comment("账号快照》 组ID（便于商户接口使用）")]
-        [Column("receiver_group_id", TypeName = "bigint")]
+        [Column("receiver_group_id", TypeName = "bigint(20)")]
         public long ReceiverGroupId { get; set; }
 
         /// <summary>
@@ -184,21 +185,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 计算该接收方的分账金额,单位分
         /// </summary>
         [Comment("计算该接收方的分账金额,单位分")]
-        [Required, Column("cal_division_amount", TypeName = "bigint")]
+        [Required, Column("cal_division_amount", TypeName = "bigint(20)")]
         public long CalDivisionAmount { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

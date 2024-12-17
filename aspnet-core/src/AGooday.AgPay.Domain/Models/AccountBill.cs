@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +10,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("账户帐单表")]
     [Table("t_account_bill")]
-    public class AccountBill
+    public class AccountBill : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 流水号
         /// </summary>
         [Comment("流水号")]
-        [Key, Required, Column("id", TypeName = "bigint")]
+        [Key, Required, Column("id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long Id { get; set; }
 
@@ -51,21 +52,21 @@ namespace AGooday.AgPay.Domain.Models
         /// 变动前余额,单位分
         /// </summary>
         [Comment("变动前余额,单位分")]
-        [Required, Column("before_balance", TypeName = "bigint")]
+        [Required, Column("before_balance", TypeName = "bigint(20)")]
         public long BeforeBalance { get; set; }
 
         /// <summary>
         /// 变动金额,单位分
         /// </summary>
         [Comment("变动金额,单位分")]
-        [Required, Column("change_amount", TypeName = "bigint")]
+        [Required, Column("change_amount", TypeName = "bigint(20)")]
         public long ChangeAmount { get; set; }
 
         /// <summary>
         /// 变动后余额,单位分
         /// </summary>
         [Comment("变动后余额,单位分")]
-        [Required, Column("after_balance", TypeName = "bigint")]
+        [Required, Column("after_balance", TypeName = "bigint(20)")]
         public long AfterBalance { get; set; }
 
         /// <summary>
@@ -102,19 +103,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("帐单备注")]
         [Column("remark", TypeName = "varchar(128)")]
         public string Remark { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

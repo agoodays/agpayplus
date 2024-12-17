@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,7 +10,7 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("系统角色表")]
     [Table("t_sys_role")]
-    public class SysRole
+    public class SysRole : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 角色ID, ROLE_开头
@@ -38,12 +39,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("所属商户ID / 代理商ID / 0(平台)")]
         [Required, Column("belong_info_id", TypeName = "varchar(64)")]
         public string BelongInfoId { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

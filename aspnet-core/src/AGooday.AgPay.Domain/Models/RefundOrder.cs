@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,7 +10,7 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("退款订单表")]
     [Table("t_refund_order")]
-    public class RefundOrder
+    public class RefundOrder : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 退款订单号（支付系统生成订单号）
@@ -113,7 +114,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 门店ID
         /// </summary>
         [Comment("门店ID")]
-        [Column("store_id", TypeName = "bigint")]
+        [Column("store_id", TypeName = "bigint(20)")]
         public long? StoreId { get; set; }
 
         /// <summary>
@@ -162,21 +163,21 @@ namespace AGooday.AgPay.Domain.Models
         /// 支付金额,单位分
         /// </summary>
         [Comment("支付金额,单位分")]
-        [Required, Column("pay_amount", TypeName = "bigint")]
+        [Required, Column("pay_amount", TypeName = "bigint(20)")]
         public long PayAmount { get; set; }
 
         /// <summary>
         /// 退款金额,单位分
         /// </summary>
         [Comment("退款金额,单位分")]
-        [Required, Column("refund_amount", TypeName = "bigint")]
+        [Required, Column("refund_amount", TypeName = "bigint(20)")]
         public long RefundAmount { get; set; }
 
         /// <summary>
         /// 手续费退还金额,单位分
         /// </summary>
         [Comment("手续费退还金额,单位分")]
-        [Required, Column("refund_fee_amount", TypeName = "bigint")]
+        [Required, Column("refund_fee_amount", TypeName = "bigint(20)")]
         public long RefundFeeAmount { get; set; }
 
         /// <summary>
@@ -262,19 +263,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("退款失效时间（失效后系统更改为退款任务关闭状态）")]
         [Column("expired_time", TypeName = "datetime")]
         public DateTime? ExpiredTime { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

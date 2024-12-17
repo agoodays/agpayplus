@@ -368,7 +368,7 @@ namespace AGooday.AgPay.Application.Services
                 && (new List<byte> { (byte)PayOrderState.STATE_SUCCESS, (byte)PayOrderState.STATE_REFUND }).Contains(w.State)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
                 && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd))
-                .GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
+                .GroupBy(g => g.CreatedAt.Value.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
                 .Select(s => new
                 {
                     GroupDate = s.GroupDate,
@@ -396,7 +396,7 @@ namespace AGooday.AgPay.Application.Services
                 && (new List<byte> { (byte)PayOrderState.STATE_SUCCESS, (byte)PayOrderState.STATE_REFUND }).Contains(w.State)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
                 && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).ToListAsync();
-            var result = payOrders.GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
+            var result = payOrders.GroupBy(g => g.CreatedAt.Value.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
                 .Select(s => new
                 {
                     GroupDate = s.GroupDate,
@@ -421,7 +421,7 @@ namespace AGooday.AgPay.Application.Services
                 && (new List<byte> { (byte)RefundOrderState.STATE_SUCCESS }).Contains(w.State)
                 && (dayStart.Equals(null) || w.CreatedAt >= dayStart)
                 && (dayEnd.Equals(null) || w.CreatedAt <= dayEnd)).ToListAsync();
-            var result = refundOrders.GroupBy(g => g.CreatedAt.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
+            var result = refundOrders.GroupBy(g => g.CreatedAt.Value.ToString("yyyy-MM-dd"), (key, group) => new { GroupDate = key, Items = group.AsEnumerable() })
                 .Select(s => new
                 {
                     GroupDate = s.GroupDate,

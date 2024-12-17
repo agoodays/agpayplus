@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,7 +10,7 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("系统权限表")]
     [Table("t_sys_entitlement")]
-    public class SysEntitlement
+    public class SysEntitlement : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 权限ID[ENT_功能模块_子模块_操作], eg: ENT_ROLE_LIST_ADD
@@ -94,19 +95,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("所属系统： MGR-运营平台, AGENT-代理商中心, MCH-商户中心")]
         [Required, Column("sys_type", TypeName = "varchar(8)")]
         public string SysType { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

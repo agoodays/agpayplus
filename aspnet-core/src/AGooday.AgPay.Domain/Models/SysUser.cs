@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +10,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("系统用户表")]
     [Table("t_sys_user")]
-    public class SysUser
+    public class SysUser : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 系统用户ID
         /// </summary>
         [Comment("系统用户ID")]
-        [Key, Required, Column("sys_user_id", TypeName = "bigint")]
+        [Key, Required, Column("sys_user_id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long SysUserId { get; set; }
 
@@ -107,7 +108,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 团队ID
         /// </summary>
         [Comment("团队ID")]
-        [Column("team_id", TypeName = "bigint")]
+        [Column("team_id", TypeName = "bigint(20)")]
         public long? TeamId { get; set; }
 
         /// <summary>
@@ -137,19 +138,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("所属商户ID / 代理商ID / 0(平台)")]
         [Required, Column("belong_info_id", TypeName = "varchar(64)")]
         public string BelongInfoId { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

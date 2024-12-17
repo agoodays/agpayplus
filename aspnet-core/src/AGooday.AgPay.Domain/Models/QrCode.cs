@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,7 +10,7 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("码牌信息表")]
     [Table("t_qr_code")]
-    public class QrCode
+    public class QrCode : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 码牌ID
@@ -22,7 +23,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 码牌模板ID
         /// </summary>
         [Comment("模板ID")]
-        [Column("qrc_shell_id", TypeName = "int")]
+        [Column("qrc_shell_id", TypeName = "int(11)")]
         public long? QrcShellId { get; set; }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 固定金额
         /// </summary>
         [Comment("固定金额")]
-        [Required, Column("fixed_pay_amount", TypeName = "int")]
+        [Required, Column("fixed_pay_amount", TypeName = "int(11)")]
         public int FixedPayAmount { get; set; }
 
         /// <summary>
@@ -99,7 +100,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 门店ID
         /// </summary>
         [Comment("门店ID")]
-        [Column("store_id", TypeName = "bigint")]
+        [Column("store_id", TypeName = "bigint(20)")]
         public long? StoreId { get; set; }
 
         /// <summary>
@@ -129,19 +130,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("所属商户ID / 代理商ID / 0(平台)")]
         [Required, Column("belong_info_id", TypeName = "varchar(64)")]
         public string BelongInfoId { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

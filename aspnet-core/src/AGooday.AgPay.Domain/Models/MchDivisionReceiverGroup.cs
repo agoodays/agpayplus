@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
+using AGooday.AgPay.Domain.Core.Tracker;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +11,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("分账账号组")]
     [Table("t_mch_division_receiver_group")]
-    public class MchDivisionReceiverGroup
+    public class MchDivisionReceiverGroup : AbstractTrackableTimestamps, ITrackableUser
     {
         /// <summary>
         /// 组ID
         /// </summary>
         [Comment("组ID")]
-        [Key, Required, Column("receiver_group_id", TypeName = "bigint")]
+        [Key, Required, Column("receiver_group_id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long ReceiverGroupId { get; set; }
 
@@ -44,8 +46,8 @@ namespace AGooday.AgPay.Domain.Models
         /// 创建者用户ID
         /// </summary>
         [Comment("创建者用户ID")]
-        [Required, Column("created_uid", TypeName = "bigint")]
-        public long CreatedUid { get; set; }
+        [Column("created_uid", TypeName = "bigint(20)")]
+        public long? CreatedUid { get; set; }
 
         /// <summary>
         /// 创建者姓名
@@ -53,19 +55,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("创建者姓名")]
         [Column("created_by", TypeName = "varchar(64)")]
         public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

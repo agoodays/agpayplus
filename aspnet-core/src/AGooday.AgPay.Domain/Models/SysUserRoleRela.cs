@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 用户ID
         /// </summary>
         [Comment("用户ID")]
-        [Required, Column("user_id", TypeName = "bigint")]
+        [Required, Column("user_id", TypeName = "bigint(20)")]
         public long UserId { get; set; }
 
         /// <summary>

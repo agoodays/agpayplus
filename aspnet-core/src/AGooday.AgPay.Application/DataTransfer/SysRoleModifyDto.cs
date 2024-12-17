@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 更新时间
         /// </summary>
         [BindNever]
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public List<string> EntIds { get; set; }
     }

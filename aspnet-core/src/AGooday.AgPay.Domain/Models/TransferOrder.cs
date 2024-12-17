@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,7 +10,7 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("转账订单表")]
     [Table("t_transfer_order")]
-    public class TransferOrder
+    public class TransferOrder : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 转账订单号
@@ -120,7 +121,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 转账金额,单位分
         /// </summary>
         [Comment("转账金额,单位分")]
-        [Required, Column("amount", TypeName = "bigint")]
+        [Required, Column("amount", TypeName = "bigint(20)")]
         public long Amount { get; set; }
 
         /// <summary>
@@ -220,19 +221,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("转账成功时间")]
         [Column("success_time", TypeName = "datetime")]
         public DateTime? SuccessTime { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

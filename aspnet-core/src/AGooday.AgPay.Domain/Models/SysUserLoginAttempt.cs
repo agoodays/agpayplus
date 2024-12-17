@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 系统用户ID
         /// </summary>
         [Comment("ID")]
-        [Key, Required, Column("id", TypeName = "bigint")]
+        [Key, Required, Column("id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long Id { get; set; }
 
@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 用户ID
         /// </summary>
         [Comment("用户ID")]
-        [Required, Column("user_id", TypeName = "bigint")]
+        [Required, Column("user_id", TypeName = "bigint(20)")]
         public long UserId { get; set; }
 
         /// <summary>

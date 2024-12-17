@@ -1,5 +1,6 @@
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Context;
+using AGooday.AgPay.Infrastructure.Interceptor;
 using AGooday.AgPay.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -45,6 +46,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
                 .UseMySql(connectionString, MySqlServerVersion.LatestSupportedServerVersion)
                 .EnableSensitiveDataLogging()
                 .UseLoggerFactory(loggerFactory)
+                .AddInterceptors(new TimestampInterceptor())
                 .Options;
 
             _dbContext = new AgPayDbContext(_options);
@@ -73,7 +75,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         public void UpdatePropertyTest()
         {
             // 更新符合条件的多个实体的指定列
-            _repository.Update(e => e.SysUserId == 801, e => new { SafeWord = "test", State = (byte)1 });
+            _repository.Update(e => e.SysUserId == 801, e => new { SafeWord = "test", State = (byte)1, CreatedAt = DateTime.Now });
             var reault = _repository.SaveChanges(out int count);
             Assert.IsTrue(reault);
         }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +10,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("支付费率阶梯配置表")]
     [Table("t_pay_rate_level_config")]
-    public class PayRateLevelConfig
+    public class PayRateLevelConfig : AbstractTrackableTimestamps
     {
         /// <summary>
         /// ID
         /// </summary>
         [Comment("ID")]
-        [Key, Required, Column("id", TypeName = "bigint")]
+        [Key, Required, Column("id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long Id { get; set; }
 
@@ -23,7 +24,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 支付费率配置ID
         /// </summary>
         [Comment("支付费率配置ID")]
-        [Required, Column("rate_config_id", TypeName = "bigint")]
+        [Required, Column("rate_config_id", TypeName = "bigint(20)")]
         public long RateConfigId { get; set; }
 
         /// <summary>
@@ -37,28 +38,28 @@ namespace AGooday.AgPay.Domain.Models
         /// 最小金额: 计算时大于此值
         /// </summary>
         [Comment("最小金额: 计算时大于此值")]
-        [Required, Column("min_amount", TypeName = "int")]
+        [Required, Column("min_amount", TypeName = "int(11)")]
         public int MinAmount { get; set; }
 
         /// <summary>
         /// 最大金额: 计算时小于或等于此值
         /// </summary>
         [Comment("最大金额: 计算时小于或等于此值")]
-        [Required, Column("max_amount", TypeName = "int")]
+        [Required, Column("max_amount", TypeName = "int(11)")]
         public int MaxAmount { get; set; }
 
         /// <summary>
         /// 保底费用
         /// </summary>
         [Comment("保底费用")]
-        [Required, Column("min_fee", TypeName = "int")]
+        [Required, Column("min_fee", TypeName = "int(11)")]
         public int MinFee { get; set; }
 
         /// <summary>
         /// 封顶费用
         /// </summary>
         [Comment("封顶费用")]
-        [Required, Column("max_fee", TypeName = "int")]
+        [Required, Column("max_fee", TypeName = "int(11)")]
         public int MaxFee { get; set; }
 
         /// <summary>
@@ -74,19 +75,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("状态: 0-停用, 1-启用")]
         [Required, Column("state", TypeName = "tinyint(6)")]
         public byte State { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

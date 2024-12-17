@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +10,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("支付订单分润表")]
     [Table("t_pay_order_profit")]
-    public class PayOrderProfit
+    public class PayOrderProfit : AbstractTrackableTimestamps
     {
         /// <summary>
         /// ID
         /// </summary>
         [Comment("ID")]
-        [Key, Required, Column("id", TypeName = "bigint")]
+        [Key, Required, Column("id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long Id { get; set; }
 
@@ -65,14 +66,14 @@ namespace AGooday.AgPay.Domain.Models
         /// 手续费(实际手续费),单位分
         /// </summary>
         [Comment("手续费(实际手续费),单位分")]
-        [Required, Column("fee_amount", TypeName = "bigint")]
+        [Required, Column("fee_amount", TypeName = "bigint(20)")]
         public long FeeAmount { get; set; }
 
         /// <summary>
         /// 收单手续费,单位分
         /// </summary>
         [Comment("收单手续费,单位分")]
-        [Required, Column("order_fee_amount", TypeName = "bigint")]
+        [Required, Column("order_fee_amount", TypeName = "bigint(20)")]
         public long OrderFeeAmount { get; set; }
 
         /// <summary>
@@ -85,28 +86,14 @@ namespace AGooday.AgPay.Domain.Models
         /// 分润金额(实际分润),单位分
         /// </summary>
         [Comment("分润金额(实际分润),单位分")]
-        [Required, Column("profit_amount", TypeName = "bigint")]
+        [Required, Column("profit_amount", TypeName = "bigint(20)")]
         public long ProfitAmount { get; set; }
 
         /// <summary>
         /// 收单分润金额,单位分
         /// </summary>
         [Comment("收单分润金额,单位分")]
-        [Required, Column("order_profit_amount", TypeName = "bigint")]
+        [Required, Column("order_profit_amount", TypeName = "bigint(20)")]
         public long OrderProfitAmount { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
+using AGooday.AgPay.Domain.Core.Tracker;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +11,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("支付接口配置参数表")]
     [Table("t_pay_interface_config")]
-    public class PayInterfaceConfig
+    public class PayInterfaceConfig : AbstractTrackableTimestamps, ITrackableUser
     {
         /// <summary>
         /// ID
         /// </summary>
         [Comment("ID")]
-        [Key, Required, Column("id", TypeName = "bigint")]
+        [Key, Required, Column("id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long Id { get; set; }
 
@@ -114,7 +116,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 创建者用户ID
         /// </summary>
         [Comment("创建者用户ID")]
-        [Column("created_uid", TypeName = "bigint")]
+        [Column("created_uid", TypeName = "bigint(20)")]
         public long? CreatedUid { get; set; }
 
         /// <summary>
@@ -125,17 +127,10 @@ namespace AGooday.AgPay.Domain.Models
         public string CreatedBy { get; set; }
 
         /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
         /// 更新者用户ID
         /// </summary>
         [Comment("更新者用户ID")]
-        [Column("updated_uid", TypeName = "bigint")]
+        [Column("updated_uid", TypeName = "bigint(20)")]
         public long? UpdatedUid { get; set; }
 
         /// <summary>
@@ -144,12 +139,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("更新者姓名")]
         [Column("updated_by", TypeName = "varchar(64)")]
         public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,7 +10,7 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Comment("支付订单表")]
     [Table("t_pay_order")]
-    public class PayOrder
+    public class PayOrder : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 支付订单号
@@ -99,7 +100,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 门店ID
         /// </summary>
         [Comment("门店ID")]
-        [Column("store_id", TypeName = "bigint")]
+        [Column("store_id", TypeName = "bigint(20)")]
         public long? StoreId { get; set; }
 
         /// <summary>
@@ -155,7 +156,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 支付金额,单位分
         /// </summary>
         [Comment("支付金额,单位分")]
-        [Required, Column("amount", TypeName = "bigint")]
+        [Required, Column("amount", TypeName = "bigint(20)")]
         public long Amount { get; set; }
 
         /// <summary>
@@ -176,14 +177,14 @@ namespace AGooday.AgPay.Domain.Models
         /// 商户手续费(实际手续费),单位分
         /// </summary>
         [Comment("商户手续费(实际手续费),单位分")]
-        [Required, Column("mch_fee_amount", TypeName = "bigint")]
+        [Required, Column("mch_fee_amount", TypeName = "bigint(20)")]
         public long MchFeeAmount { get; set; }
 
         /// <summary>
         /// 收单手续费,单位分
         /// </summary>
         [Comment("收单手续费,单位分")]
-        [Required, Column("mch_order_fee_amount", TypeName = "bigint")]
+        [Required, Column("mch_order_fee_amount", TypeName = "bigint(20)")]
         public long MchOrderFeeAmount { get; set; }
 
         /// <summary>
@@ -302,14 +303,14 @@ namespace AGooday.AgPay.Domain.Models
         /// 退款次数
         /// </summary>
         [Comment("退款次数")]
-        [Required, Column("refund_times", TypeName = "int")]
+        [Required, Column("refund_times", TypeName = "int(11)")]
         public int RefundTimes { get; set; }
 
         /// <summary>
         /// 退款总金额,单位分
         /// </summary>
         [Comment("退款总金额,单位分")]
-        [Required, Column("refund_amount", TypeName = "bigint")]
+        [Required, Column("refund_amount", TypeName = "bigint(20)")]
         public long RefundAmount { get; set; }
 
         /// <summary>
@@ -381,19 +382,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("订单支付成功时间")]
         [Column("success_time", TypeName = "datetime")]
         public DateTime? SuccessTime { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

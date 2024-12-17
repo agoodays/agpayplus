@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AGooday.AgPay.Domain.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Domain.Models
@@ -9,13 +10,13 @@ namespace AGooday.AgPay.Domain.Models
     /// </summary>
     [Table("t_mch_division_receiver")]
     [Comment("商户分账接收者账号绑定关系表")]
-    public class MchDivisionReceiver
+    public class MchDivisionReceiver : AbstractTrackableTimestamps
     {
         /// <summary>
         /// 分账接收者ID
         /// </summary>
         [Comment("分账接收者ID")]
-        [Key, Required, Column("receiver_id", TypeName = "bigint")]
+        [Key, Required, Column("receiver_id", TypeName = "bigint(20)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//自增列
         public long ReceiverId { get; set; }
 
@@ -30,7 +31,7 @@ namespace AGooday.AgPay.Domain.Models
         /// 组ID（便于商户接口使用）
         /// </summary>
         [Comment("组ID（便于商户接口使用）")]
-        [Required, Column("receiver_group_id", TypeName = "bigint")]
+        [Required, Column("receiver_group_id", TypeName = "bigint(20)")]
         public long ReceiverGroupId { get; set; }
 
         /// <summary>
@@ -144,19 +145,5 @@ namespace AGooday.AgPay.Domain.Models
         [Comment("绑定成功时间")]
         [Column("bind_success_time", TypeName = "datetime")]
         public DateTime? BindSuccessTime { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        [Comment("创建时间")]
-        [Required, Column("created_at", TypeName = "timestamp(6)")]
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [Comment("更新时间")]
-        [Required, Column("updated_at", TypeName = "timestamp(6)")]
-        public DateTime UpdatedAt { get; set; }
     }
 }

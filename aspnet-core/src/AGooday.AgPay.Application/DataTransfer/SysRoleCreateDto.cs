@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 更新时间
         /// </summary>
         [BindNever]
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; } = DateTime.Now;
 
         /// <summary>
         /// 权限信息集合
