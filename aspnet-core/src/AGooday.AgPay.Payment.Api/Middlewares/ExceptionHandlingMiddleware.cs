@@ -51,7 +51,8 @@ namespace AGooday.AgPay.Payment.Api.Middlewares
                 //    //errorResponse.Msg = ex.Message;
                 //    break;
                 case UnauthorizeException:
-                    errorResponse.Code = (int)HttpStatusCode.Unauthorized;
+                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    errorResponse.Code = ApiCode.SUCCESS.GetCode();
                     errorResponse.Msg = "无访问权限";
                     break;
                 case BizException ex:

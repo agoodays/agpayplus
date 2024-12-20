@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
 
                 //查询到该角色的人员， 将redis更新
                 var sysUserIdList = _sysUserRoleRelaService.SelectUserIdsByRoleId(dto.RoleId).ToList();
-                RefAuthentication(sysUserIdList);
+                await RefAuthenticationAsync(sysUserIdList);
             }
             return ApiRes.Ok();
         }

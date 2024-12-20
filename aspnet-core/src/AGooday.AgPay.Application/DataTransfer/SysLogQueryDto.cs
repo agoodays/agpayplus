@@ -36,6 +36,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         public string MethodName { get; set; }
 
         /// <summary>
+        /// 日志类型
+        /// </summary>
+        public byte? LogType { get; set; }
+
+        /// <summary>
         /// 方法描述
         /// </summary>
         [BindNever]

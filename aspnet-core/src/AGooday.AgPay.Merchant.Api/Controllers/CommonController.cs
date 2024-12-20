@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         /// 根据用户ID 删除用户缓存信息
         /// </summary>
         /// <param name="sysUserIdList"></param>
-        protected void DelAuthentication(List<long> sysUserIdList)
+        protected async Task DelAuthenticationAsync(List<long> sysUserIdList)
         {
             if (sysUserIdList == null || sysUserIdList.Count <= 0)
             {
@@ -82,7 +82,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 var redisKeys = redisServer.Keys(defaultDB, CS.GetCacheKeyToken(sysUserId, "*"));
                 foreach (var key in redisKeys)
                 {
-                    redis.KeyDelete(key);
+                    await redis.KeyDeleteAsync(key);
                 }
             }
         }

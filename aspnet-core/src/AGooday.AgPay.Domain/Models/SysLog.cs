@@ -84,6 +84,13 @@ namespace AGooday.AgPay.Domain.Models
         public string MethodName { get; set; }
 
         /// <summary>
+        /// 日志类型
+        /// </summary>
+        [Comment("日志类型")]
+        [Required, Column("log_type", TypeName = "tinyint(6)")]
+        public byte LogType { get; set; }
+
+        /// <summary>
         /// 方法描述
         /// </summary>
         [Comment("方法描述")]

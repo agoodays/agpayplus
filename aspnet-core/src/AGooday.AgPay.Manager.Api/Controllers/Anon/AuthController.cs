@@ -41,6 +41,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         private readonly DomainNotificationHandler _notifications;
 
         private const string AUTH_METHOD_REMARK = "登录认证"; //用户信息认证方法描述
+        private const string SYS_TYPE = CS.SYS_TYPE.MGR; //用户信息认证方法描述
 
         public AuthController(ILogger<AuthController> logger, IOptions<JwtSettings> jwtSettings, IMemoryCache cache, RedisUtil client,
             INotificationHandler<DomainNotification> notifications,
@@ -70,7 +71,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPost, Route("auth/validate"), MethodLog(AUTH_METHOD_REMARK)]
+        [HttpPost, Route("auth/validate"), MethodLog(AUTH_METHOD_REMARK, Type = LogType.Login)]
         public async Task<ApiRes> ValidateAsync(Validate model)
         {
             string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理
@@ -94,14 +95,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 identityType = CS.AUTH_TYPE.TELPHONE; //手机号登录
             }
 
-            var auth = _authService.LoginAuth(account, identityType, CS.SYS_TYPE.MGR);
+            var auth = _authService.LoginAuth(account, identityType, SYS_TYPE);
 
             if (auth == null)
             {
                 //没有该用户信息
                 throw new BizException("用户名/密码错误！");
             }
-            var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
+
+            var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", auth.SysType, auth.BelongInfoId);
             var loginErrorMaxLimit = JsonConvert.DeserializeObject<Dictionary<string, int>>(sysConfig.ConfigVal);
             loginErrorMaxLimit.TryGetValue("limitMinute", out int limitMinute);
             loginErrorMaxLimit.TryGetValue("maxLoginAttempts", out int maxLoginAttempts);
@@ -121,7 +123,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 IdentityType = auth.IdentityType,
                 Identifier = auth.Identifier,
                 IpAddress = IpUtil.GetIP(Request),
-                SysType = CS.SYS_TYPE.MGR,
+                SysType = auth.SysType,
                 AttemptTime = DateTime.Now,
                 Success = false
             };
@@ -183,7 +185,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             });
             await _redis.StringSetAsync(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
 
-            // 删除图形验证码缓存数据
+            // 删除验证码缓存数据
             await _redis.KeyDeleteAsync(codeCacheKey);
 
             if (lastLoginTime != null)
@@ -203,8 +205,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         [HttpGet, Route("auth/vercode"), NoLog]
         public async Task<ApiRes> VercodeAsync()
         {
-            //定义图形验证码的长和宽 // 6位验证码
-            //string code = ImageFactory.CreateCode(6);
+            //定义图形验证码的长和宽 // 4位验证码
+            //string code = ImageFactory.CreateCode(4);
             //string imageBase64Data;
             //using (var picStream = ImageFactory.BuildImage(code, 40, 137, 20, 10))
             //{
@@ -243,12 +245,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         [HttpPost, Route("sms/code"), NoLog]
         public async Task<ApiRes> SendCodeAsync(SmsCode model)
         {
-            if (model.smsType.Equals(CS.SMS_TYPE.REGISTER) && await _sysUserService.IsExistTelphoneAsync(model.phone, CS.SYS_TYPE.MGR))
+            if (model.smsType.Equals(CS.SMS_TYPE.REGISTER) && await _sysUserService.IsExistTelphoneAsync(model.phone, SYS_TYPE))
             {
                 throw new BizException("当前用户已存在！");
             }
 
-            if (model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) && !await _sysUserService.IsExistTelphoneAsync(model.phone, CS.SYS_TYPE.MGR))
+            if (model.smsType.Equals(CS.SMS_TYPE.RETRIEVE)
+                && !await _sysUserService.IsExistTelphoneAsync(model.phone, SYS_TYPE))
             {
                 throw new BizException("用户不存在！");
             }
@@ -256,7 +259,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             var code = SmsVerificationCodeGenerator.GenerateCode(4);
 
             //redis
-            string smsCodeToken = $"{CS.SYS_TYPE.MGR.ToLower()}_{model.smsType}_{model.phone}";
+            string smsCodeToken = $"{SYS_TYPE.ToLower()}_{model.smsType}_{model.phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
             await _redis.StringSetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
 #if !DEBUG
@@ -281,11 +284,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             string phone = Base64Util.DecodeBase64(model.phone);
             string code = Base64Util.DecodeBase64(model.code);
             string newPwd = Base64Util.DecodeBase64(model.newPwd);
-            string smsCodeToken = $"{CS.SYS_TYPE.MGR.ToLower()}_{CS.SMS_TYPE.RETRIEVE}_{phone}";
+            string smsCodeToken = $"{SYS_TYPE.ToLower()}_{CS.SMS_TYPE.RETRIEVE}_{phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 
 #if !DEBUG
-            string cacheCode = await _redis.StringSetAsync(codeCacheKey);
+            string cacheCode = await _redis.StringGetAsync(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
@@ -295,7 +298,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 throw new BizException("验证码有误！");
             }
 #endif
-            var sysUser = await _sysUserService.GetByTelphoneAsync(model.phone, CS.SYS_TYPE.MGR);
+            var sysUser = await _sysUserService.GetByTelphoneAsync(model.phone, SYS_TYPE);
             if (sysUser == null)
             {
                 throw new BizException("用户不存在！");
@@ -304,7 +307,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             {
                 throw new BizException("用户已停用！");
             }
-            var sysUserAuth = await _sysUserAuthService.GetByIdentifierAsync(CS.AUTH_TYPE.TELPHONE, model.phone, CS.SYS_TYPE.MGR);
+            var sysUserAuth = await _sysUserAuthService.GetByIdentifierAsync(CS.AUTH_TYPE.TELPHONE, model.phone, SYS_TYPE);
             if (sysUserAuth == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -314,7 +317,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             {
                 throw new BizException("新密码与原密码相同！");
             }
-            await _sysUserAuthService.ResetAuthInfoAsync(sysUser.SysUserId.Value, null, null, newPwd, CS.SYS_TYPE.MGR);
+            await _sysUserAuthService.ResetAuthInfoAsync(sysUser.SysUserId.Value, null, null, newPwd, SYS_TYPE);
             // 删除短信验证码缓存数据
             await _redis.KeyDeleteAsync(codeCacheKey);
             return ApiRes.Ok();

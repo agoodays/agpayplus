@@ -17,7 +17,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions.AuthContext
         /// <summary>
         /// 
         /// </summary>
-        public static HttpContext Current => _context.HttpContext;
+        public static HttpContext Current => _context?.HttpContext;
         /// <summary>
         /// 
         /// </summary>

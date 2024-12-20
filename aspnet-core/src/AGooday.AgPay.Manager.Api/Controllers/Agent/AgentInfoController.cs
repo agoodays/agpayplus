@@ -26,10 +26,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
 
         private readonly DomainNotificationHandler _notifications;
 
-        public AgentInfoController(IMQSender mqSender, ILogger<AgentInfoController> logger, INotificationHandler<DomainNotification> notifications,
+        public AgentInfoController(IMQSender mqSender, ILogger<AgentInfoController> logger,
+            INotificationHandler<DomainNotification> notifications,
             IAgentInfoService agentInfoService,
-            ISysUserService sysUserService,
             RedisUtil client,
+            ISysUserService sysUserService,
             IAuthService authService)
             : base(logger, client, authService)
         {

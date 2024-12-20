@@ -131,7 +131,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
                 if (dto.ResetPass.HasValue && dto.ResetPass.Value)
                 {
                     // 删除用户redis缓存信息
-                    DelAuthentication(new List<long> { dto.SysUserId.Value });
+                    await DelAuthenticationAsync(new List<long> { dto.SysUserId.Value });
                 }
                 if (dto.State.HasValue && dto.State.Value.Equals(CS.PUB_DISABLE))
                 {

@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 var entIds = currentUser.Authorities.ToList();
 
                 //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-                var sysEnts = _authService.GetEntsBySysType(CS.SYS_TYPE.MCH, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
+                var sysEnts = _authService.GetEntsBySysType(user.SysType, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
 
                 //递归转换为树状结构
                 //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
@@ -76,12 +76,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 //    ContractResolver = new CamelCasePropertyNamesContractResolver()
                 //};
                 var jsonArray = JArray.FromObject(sysEnts);
-                var leftMenuTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
+                var allMenuRouteTree = new TreeDataBuilder(jsonArray, "entId", "pid", "children", "entSort", true).BuildTreeObject();
                 //var user = JObject.FromObject(currentUser.SysUser);
                 //user.Add("entIdList", JArray.FromObject(entIds));
-                //user.Add("allMenuRouteTree", JToken.FromObject(leftMenuTree));
+                //user.Add("allMenuRouteTree", JToken.FromObject(allMenuRouteTree));
+                //1. 所有权限ID集合
                 user.AddExt("entIdList", entIds);
-                user.AddExt("allMenuRouteTree", leftMenuTree);
+                user.AddExt("allMenuRouteTree", allMenuRouteTree);
                 return ApiRes.Ok(user);
             }
             catch (Exception)
@@ -201,7 +202,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            await _sysUserAuthService.ResetAuthInfoAsync(user.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MCH);
+            await _sysUserAuthService.ResetAuthInfoAsync(user.SysUserId, null, null, opUserPwd, user.SysType);
             return await LogoutAsync();
         }
 

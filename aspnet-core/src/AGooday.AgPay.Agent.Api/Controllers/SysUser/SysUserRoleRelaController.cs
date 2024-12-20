@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
             if (entIds.Count > 0)
             {
                 await _sysUserRoleRelaService.SaveUserRoleAsync(sysUserId, entIds);
-                RefAuthentication(new List<long> { sysUserId });
+                await RefAuthenticationAsync(new List<long> { sysUserId });
             }
             return ApiRes.Ok();
         }

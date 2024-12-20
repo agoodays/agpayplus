@@ -45,6 +45,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             _notifications = (DomainNotificationHandler)notifications;
         }
 
+        /// <summary>
+        /// 当前用户信息
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="UnauthorizeException"></exception>
         [HttpGet, Route("user"), NoLog]
         public ApiRes CurrentUserInfo()
         {
@@ -58,7 +63,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                 var entIds = currentUser.Authorities.ToList();
 
                 //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-                var sysEnts = _authService.GetEntsBySysType(CS.SYS_TYPE.MGR, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
+                var sysEnts = _authService.GetEntsBySysType(user.SysType, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
 
                 //递归转换为树状结构
                 //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
@@ -113,7 +118,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         public async Task<ApiRes> ModifyPwdAsync(ModifyPwd model)
         {
             var currentUser = GetCurrentUser();
-            string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码currentUser
+            string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码
             var user = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             bool verified = BCryptUtil.VerifyHash(currentUserPwd, user.Credential);
             //验证当前密码是否正确
@@ -127,7 +132,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            await _sysUserAuthService.ResetAuthInfoAsync(user.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.MGR);
+            await _sysUserAuthService.ResetAuthInfoAsync(user.SysUserId, null, null, opUserPwd, user.SysType);
             return await LogoutAsync();
         }
 

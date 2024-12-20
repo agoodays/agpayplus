@@ -22,7 +22,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         private readonly IServer redisServer;
         private readonly IAuthService _authService;
 
-        public CommonController(ILogger<CommonController> logger, RedisUtil client, IAuthService authService)
+        public CommonController(ILogger<CommonController> logger,
+            RedisUtil client,
+            IAuthService authService)
         {
             _logger = logger;
             defaultDB = client.GetDefaultDB();
@@ -69,7 +71,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         /// 根据用户ID 删除用户缓存信息
         /// </summary>
         /// <param name="sysUserIdList"></param>
-        protected void DelAuthentication(List<long> sysUserIdList)
+        protected async Task DelAuthenticationAsync(List<long> sysUserIdList)
         {
             if (sysUserIdList == null || sysUserIdList.Count <= 0)
             {
@@ -80,7 +82,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                 var redisKeys = redisServer.Keys(defaultDB, CS.GetCacheKeyToken(sysUserId, "*"));
                 foreach (var key in redisKeys)
                 {
-                    redis.KeyDelete(key);
+                    await redis.KeyDeleteAsync(key);
                 }
             }
         }
@@ -89,10 +91,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         /// 根据用户ID 更新缓存中的权限集合， 使得分配实时生效
         /// </summary>
         /// <param name="sysUserIdList"></param>
-        protected void RefAuthentication(List<long> sysUserIdList)
+        protected async Task RefAuthenticationAsync(List<long> sysUserIdList)
         {
             var sysUserMap = _authService.GetUserByIds(sysUserIdList);
-            sysUserIdList.ForEach(sysUserId =>
+            foreach (var sysUserId in sysUserIdList)
             {
                 var redisKeys = redisServer.Keys(defaultDB, CS.GetCacheKeyToken(sysUserId, "*"));
                 foreach (var key in redisKeys)
@@ -101,11 +103,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                     if (!sysUserMap.Any(a => a.SysUserId.Equals(sysUserId))
                     || sysUserMap.Any(a => a.SysUserId.Equals(sysUserId) || a.State.Equals(CS.PUB_DISABLE)))
                     {
-                        redis.KeyDelete(key);
+                        await redis.KeyDeleteAsync(key);
                         continue;
                     }
-
-                    string currentUserJson = redis.StringGet(key);
+                    string currentUserJson = await redis.StringGetAsync(key);
                     var currentUser = JsonConvert.DeserializeObject<CurrentUser>(currentUserJson);
                     if (currentUser == null)
                     {
@@ -118,17 +119,17 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                     if (auth == null || ents?.Count <= 0)
                     {
                         // 当前用户未分配任何菜单权限，需要删除Redis
-                        redis.KeyDelete(key);
+                        await redis.KeyDeleteAsync(key);
                         continue;
                     }
                     currentUser.SysUser = auth;
                     currentUser.Authorities = authorities;
                     currentUserJson = JsonConvert.SerializeObject(currentUser);
                     //保存token  失效时间不变
-                    var cacheExpiry = redis.KeyTimeToLive(key);
-                    redis.StringSet(key, currentUserJson, cacheExpiry, When.Exists);
+                    var cacheExpiry = await redis.KeyTimeToLiveAsync(key);
+                    await redis.StringSetAsync(key, currentUserJson, cacheExpiry, When.Exists);
                 }
-            });
+            }
         }
     }
 }

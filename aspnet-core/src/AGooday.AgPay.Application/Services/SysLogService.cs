@@ -47,6 +47,7 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => (dto.UserId.Equals(null) || w.UserId.Equals(dto.UserId))
                 && (string.IsNullOrWhiteSpace(dto.UserName) || w.UserName.Contains(dto.UserName))
                 && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
+                && (dto.LogType.Equals(null) || w.LogType.Equals(dto.LogType))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);

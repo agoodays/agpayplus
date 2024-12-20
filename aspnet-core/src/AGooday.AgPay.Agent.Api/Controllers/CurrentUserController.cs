@@ -67,7 +67,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                 var entIds = currentUser.Authorities.ToList();
 
                 //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-                var sysEnts = _authService.GetEntsBySysType(CS.SYS_TYPE.AGENT, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
+                var sysEnts = _authService.GetEntsBySysType(user.SysType, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
 
                 //递归转换为树状结构
                 //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
@@ -80,6 +80,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                 //var user = JObject.FromObject(currentUser.SysUser);
                 //user.Add("entIdList", JArray.FromObject(entIds));
                 //user.Add("allMenuRouteTree", JToken.FromObject(allMenuRouteTree));
+                //1. 所有权限ID集合
                 user.AddExt("entIdList", entIds);
                 user.AddExt("allMenuRouteTree", allMenuRouteTree);
                 return ApiRes.Ok(user);
@@ -187,7 +188,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         public async Task<ApiRes> ModifyPwdAsync(ModifyPwd model)
         {
             var currentUser = GetCurrentUser();
-            string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码currentUser
+            string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码
             var user = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
             bool verified = BCryptUtil.VerifyHash(currentUserPwd, user.Credential);
             //验证当前密码是否正确
@@ -201,7 +202,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
             {
                 throw new BizException("新密码与原密码不能相同！");
             }
-            await _sysUserAuthService.ResetAuthInfoAsync(user.SysUserId, null, null, opUserPwd, CS.SYS_TYPE.AGENT);
+            await _sysUserAuthService.ResetAuthInfoAsync(user.SysUserId, null, null, opUserPwd, user.SysType);
             return await LogoutAsync();
         }
 

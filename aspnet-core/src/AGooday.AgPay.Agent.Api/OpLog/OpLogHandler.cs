@@ -5,7 +5,6 @@ using AGooday.AgPay.Agent.Api.Attributes;
 using AGooday.AgPay.Agent.Api.Extensions;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
-using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +45,7 @@ namespace AGooday.AgPay.Agent.Api.OpLog
             {
                 var sysUserId = _context.HttpContext.User.FindFirstValue(ClaimAttributes.SysUserId);
                 var realname = _context.HttpContext.User.FindFirstValue(ClaimAttributes.Realname);
+                var sysType = _context.HttpContext.User.FindFirstValue(ClaimAttributes.SysType);
                 model.UserId = string.IsNullOrWhiteSpace(sysUserId) ? null : Convert.ToInt64(sysUserId);
                 model.UserName = string.IsNullOrWhiteSpace(realname) ? null : realname;
                 string ua = context.HttpContext.Request.Headers.UserAgent;
@@ -57,14 +57,16 @@ namespace AGooday.AgPay.Agent.Api.OpLog
                 model.Device = device;
                 model.BrowserInfo = ua;
                 model.UserIp = IpUtil.GetIP(context?.HttpContext?.Request);
-                model.SysType = CS.SYS_TYPE.AGENT;
+                model.SysType = sysType;
                 model.MethodName = context.ActionDescriptor.DisplayName.Split(" (").First();
                 model.ReqUrl = GetAbsoluteUri(context?.HttpContext?.Request).ToLower();//context.ActionDescriptor.AttributeRouteInfo.Template.ToLower();
                 model.ReqMethod = context.HttpContext.Request.Method.ToLower();
                 model.OptReqParam = args;
                 if (context.ActionDescriptor.EndpointMetadata.Any(m => m.GetType() == typeof(MethodLogAttribute)))
                 {
-                    model.MethodRemark = ((MethodLogAttribute)context.ActionDescriptor.EndpointMetadata.First(m => m.GetType() == typeof(MethodLogAttribute))).Remark;
+                    var methodLogAttribute = (MethodLogAttribute)context.ActionDescriptor.EndpointMetadata.First(m => m.GetType() == typeof(MethodLogAttribute));
+                    model.LogType = (byte)methodLogAttribute.Type;
+                    model.MethodRemark = methodLogAttribute.Remark;
                 }
                 if (actionExecutedContext.Result is ObjectResult result)
                 {
