@@ -197,6 +197,22 @@ OSSNativeInjectorBootStrapper.RegisterServices(services);
 SMSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
+// 从配置中读取 IdWorkerConfig
+var idWorkerConfig = builder.Configuration.GetSection("IdWorkerConfig");
+bool isUseSnowflakeId = idWorkerConfig.GetValue<bool>("IsUseSnowflakeId", false);
+long dataCenterId = idWorkerConfig.GetValue<long>("DataCenterId", 0);
+long machineId = idWorkerConfig.GetValue<long>("MachineId", 0);
+if (isUseSnowflakeId)
+{
+    // 初始化 IdWorker
+    //var idWorker = new IdWorker(dataCenterId, machineId);
+    //typeof(IdWorker).GetField("lazy", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+    //    .SetValue(null, new Lazy<IdWorker>(() => idWorker));
+    IdWorker.Initialize(dataCenterId, machineId);
+}
+// 初始化 SeqUtil
+SeqUtil.Initialize(isUseSnowflakeId);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

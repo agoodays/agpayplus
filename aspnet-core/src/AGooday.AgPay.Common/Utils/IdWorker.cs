@@ -30,8 +30,12 @@
         private long lastStmp = -1L;//上一次时间戳
 
         #region 单例:完全懒汉
-        private static readonly Lazy<IdWorker> lazy = new Lazy<IdWorker>(() => new IdWorker());
-        public static IdWorker Singleton { get { return lazy.Value; } }
+        private static Lazy<IdWorker> lazy = new Lazy<IdWorker>(() => new IdWorker());
+        public static void Initialize(long cid, long mid)
+        {
+            lazy = new Lazy<IdWorker>(() => new IdWorker(cid, mid));
+        }
+        public static IdWorker Instance { get { return lazy.Value; } }
         private IdWorker() { }
         #endregion
 

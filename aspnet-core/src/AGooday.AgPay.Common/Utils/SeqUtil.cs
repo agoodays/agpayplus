@@ -12,7 +12,11 @@
         private const string DIVISION_BATCH_ID_SEQ_PREFIX = "D";
         private const string BILL_ID_SEQ_PREFIX = "B";
 
-        private static readonly bool IS_USE_MP_ID = true;
+        private static bool IS_USE_MP_ID = true;
+        public static void Initialize(bool useSnowflakeId)
+        {
+            IS_USE_MP_ID = useSnowflakeId;
+        }
 
         /// <summary>
         /// 生成支付订单号
@@ -22,7 +26,7 @@
         {
             if (IS_USE_MP_ID)
             {
-                return $"{PAY_ORDER_SEQ_PREFIX}{IdWorker.Singleton.NextId()}";
+                return $"{PAY_ORDER_SEQ_PREFIX}{IdWorker.Instance.NextId()}";
             }
             Random rd = new Random();
             return $"{PAY_ORDER_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
@@ -36,7 +40,7 @@
         {
             if (IS_USE_MP_ID)
             {
-                return $"{REFUND_ORDER_SEQ_PREFIX}{IdWorker.Singleton.NextId()}";
+                return $"{REFUND_ORDER_SEQ_PREFIX}{IdWorker.Instance.NextId()}";
             }
             Random rd = new Random();
             return $"{REFUND_ORDER_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
@@ -50,7 +54,7 @@
         {
             if (IS_USE_MP_ID)
             {
-                return $"{MHO_ORDER_SEQ_PREFIX}{IdWorker.Singleton.NextId()}";
+                return $"{MHO_ORDER_SEQ_PREFIX}{IdWorker.Instance.NextId()}";
             }
             Random rd = new Random();
             return $"{MHO_ORDER_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
@@ -64,7 +68,7 @@
         {
             if (IS_USE_MP_ID)
             {
-                return $"{TRANSFER_ID_SEQ_PREFIX}{IdWorker.Singleton.NextId()}";
+                return $"{TRANSFER_ID_SEQ_PREFIX}{IdWorker.Instance.NextId()}";
             }
             Random rd = new Random();
             return $"{TRANSFER_ID_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
@@ -78,7 +82,7 @@
         {
             if (IS_USE_MP_ID)
             {
-                return $"{DIVISION_BATCH_ID_SEQ_PREFIX}{IdWorker.Singleton.NextId()}";
+                return $"{DIVISION_BATCH_ID_SEQ_PREFIX}{IdWorker.Instance.NextId()}";
             }
             Random rd = new Random();
             return $"{DIVISION_BATCH_ID_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
@@ -92,7 +96,7 @@
         {
             if (IS_USE_MP_ID)
             {
-                return $"{BILL_ID_SEQ_PREFIX}{IdWorker.Singleton.NextId()}";
+                return $"{BILL_ID_SEQ_PREFIX}{IdWorker.Instance.NextId()}";
             }
             Random rd = new Random();
             return $"{BILL_ID_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
