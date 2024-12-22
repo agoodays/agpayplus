@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
                 throw new BizException("”√ªß√˚/√‹¬Î¥ÌŒÛ£°");
             }
 
-            var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", auth.SysType, auth.BelongInfoId);
+            var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
             var loginErrorMaxLimit = JsonConvert.DeserializeObject<Dictionary<string, int>>(sysConfig.ConfigVal);
             loginErrorMaxLimit.TryGetValue("limitMinute", out int limitMinute);
             loginErrorMaxLimit.TryGetValue("maxLoginAttempts", out int maxLoginAttempts);
