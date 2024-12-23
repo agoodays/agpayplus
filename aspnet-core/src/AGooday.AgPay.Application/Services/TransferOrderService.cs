@@ -91,7 +91,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateInit2IngAsync(string transferId)
         {
-            var updateRecord = _transferOrderRepository.GetById(transferId);
+            var updateRecord = await _transferOrderRepository.GetByIdAsync(transferId);
             if (updateRecord.State != (byte)TransferOrderState.STATE_INIT)
             {
                 return false;
@@ -108,7 +108,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateIng2SuccessAsync(string transferId, string channelOrderNo)
         {
-            var updateRecord = _transferOrderRepository.GetById(transferId);
+            var updateRecord = await _transferOrderRepository.GetByIdAsync(transferId);
             if (updateRecord.State != (byte)TransferOrderState.STATE_ING)
             {
                 return false;
@@ -129,7 +129,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateIng2FailAsync(string transferId, string channelOrderNo, string channelErrCode, string channelErrMsg)
         {
-            var updateRecord = _transferOrderRepository.GetById(transferId);
+            var updateRecord = await _transferOrderRepository.GetByIdAsync(transferId);
             if (updateRecord.State != (byte)TransferOrderState.STATE_ING)
             {
                 return false;

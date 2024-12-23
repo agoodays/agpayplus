@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using AGooday.AgPay.AopSdk.Exceptions;
 
 namespace AGooday.AgPay.AopSdk.Nets
@@ -31,7 +32,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             }
             catch (HttpRequestException ex)
             {
-                responseCode = (int)ex.StatusCode;
+                responseCode = (int)(ex.StatusCode ?? HttpStatusCode.BadGateway);
                 throw;
             }
             catch (Exception ex)
@@ -68,7 +69,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             }
             catch (HttpRequestException ex)
             {
-                responseCode = (int)ex.StatusCode;
+                responseCode = (int)(ex.StatusCode ?? HttpStatusCode.BadGateway);
                 throw;
             }
             catch (Exception ex)

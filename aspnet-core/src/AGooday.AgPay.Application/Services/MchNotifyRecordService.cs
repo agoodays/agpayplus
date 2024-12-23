@@ -102,28 +102,28 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="state"></param>
         /// <param name="resResult"></param>
         /// <returns></returns>
-        public Task<int> UpdateNotifyResultAsync(long notifyId, byte state, string resResult)
+        public async Task<int> UpdateNotifyResultAsync(long notifyId, byte state, string resResult)
         {
-            var notify = _mchNotifyRecordRepository.GetById(notifyId);
+            var notify = await _mchNotifyRecordRepository.GetByIdAsync(notifyId);
             notify.State = state;
             notify.NotifyCount += 1;
             notify.ResResult = resResult;
             notify.LastNotifyTime = DateTime.Now;
             _mchNotifyRecordRepository.Update(notify);
-            return _mchNotifyRecordRepository.SaveChangesAsync();
+            return await _mchNotifyRecordRepository.SaveChangesAsync();
         }
 
         /// <summary>
         /// 更改为通知中 & 增加允许重发通知次数
         /// </summary>
         /// <param name="notifyId"></param>
-        public Task<int> UpdateIngAndAddNotifyCountLimitAsync(long notifyId)
+        public async Task<int> UpdateIngAndAddNotifyCountLimitAsync(long notifyId)
         {
-            var notify = _mchNotifyRecordRepository.GetById(notifyId);
+            var notify = await _mchNotifyRecordRepository.GetByIdAsync(notifyId);
             notify.NotifyCountLimit += 1;
             notify.State = (byte)MchNotifyRecordState.STATE_ING;
             _mchNotifyRecordRepository.Update(notify);
-            return _mchNotifyRecordRepository.SaveChangesAsync();
+            return await _mchNotifyRecordRepository.SaveChangesAsync();
         }
     }
 }

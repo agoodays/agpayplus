@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             var currentUser = GetCurrentUser();
             dto.SysUserId = currentUser.SysUser.SysUserId;
             await _sysUserService.ModifyCurrentUserInfoAsync(dto);
-            var userinfo = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
+            var userinfo = await _authService.GetUserAuthInfoByIdAsync(currentUser.SysUser.SysUserId);
             currentUser.SysUser = userinfo;
             //保存redis最新数据
             var currentUserJson = JsonConvert.SerializeObject(currentUser);
@@ -119,7 +119,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         {
             var currentUser = GetCurrentUser();
             string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码
-            var user = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
+            var user = await _authService.GetUserAuthInfoByIdAsync(currentUser.SysUser.SysUserId);
             bool verified = BCryptUtil.VerifyHash(currentUserPwd, user.Credential);
             //验证当前密码是否正确
             if (!verified)

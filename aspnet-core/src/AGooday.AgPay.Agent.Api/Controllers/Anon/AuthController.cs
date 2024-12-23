@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
                 identityType = CS.AUTH_TYPE.TELPHONE; //ÊÖ»úºÅµÇÂ¼
             }
 
-            var auth = _authService.LoginAuth(account, identityType, SYS_TYPE);
+            var auth = await _authService.LoginAuthAsync(account, identityType, SYS_TYPE);
 
             if (auth == null)
             {
@@ -228,7 +228,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             }
 #endif
             byte identityType = CS.AUTH_TYPE.TELPHONE;
-            var auth = _authService.LoginAuth(phone, identityType, SYS_TYPE);
+            var auth = await _authService.LoginAuthAsync(phone, identityType, SYS_TYPE);
 
             if (auth == null)
             {

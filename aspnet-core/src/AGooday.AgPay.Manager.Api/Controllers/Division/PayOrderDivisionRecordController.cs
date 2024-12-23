@@ -96,7 +96,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             }
 
             // 更新订单状态 & 记录状态
-            _payOrderDivisionRecordService.UpdateResendState(record.PayOrderId);
+            await _payOrderDivisionRecordService.UpdateResendStateAsync(record.PayOrderId);
 
             // 重发到MQ
             await _mqSender.SendAsync(PayOrderDivisionMQ.Build(record.PayOrderId, null, null, true));

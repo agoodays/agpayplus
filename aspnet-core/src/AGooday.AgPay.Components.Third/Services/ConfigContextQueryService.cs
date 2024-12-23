@@ -21,14 +21,14 @@ namespace AGooday.AgPay.Components.Third.Services
         private readonly IPayWayService _payWayService;
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
-        public ConfigContextQueryService(IMchStoreService mchStoreService,
+        public ConfigContextQueryService(ConfigContextService configContextService,
+            IMchStoreService mchStoreService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
             IIsvInfoService isvInfoService,
             IPayWayService payWayService,
-            IPayInterfaceConfigService payInterfaceConfigService,
-            ConfigContextService configContextService)
+            IPayInterfaceConfigService payInterfaceConfigService)
         {
             _mchStoreService = mchStoreService;
             _mchAppService = mchAppService;
@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).MchApp;
+                return (await _configContextService.GetMchAppConfigContextAsync(mchNo, mchAppId)).MchApp;
             }
 
             return await _mchAppService.GetByIdAsync(mchAppId, mchNo);
@@ -61,7 +61,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
             if (IsCache())
             {
-                return _configContextService.GetMchInfoConfigContext(mchNo).GetMchStore(storeId.Value);
+                return (await _configContextService.GetMchInfoConfigContextAsync(mchNo)).GetMchStore(storeId.Value);
             }
 
             return await _mchStoreService.GetByIdAsync(storeId.Value, mchNo);
@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId);
+                return await _configContextService.GetMchAppConfigContextAsync(mchNo, mchAppId);
             }
 
             var mchInfo = await _mchInfoService.GetByIdAsync(mchNo);
@@ -117,7 +117,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetNormalMchParamsByIfCode(ifCode);
+                return (await _configContextService.GetMchAppConfigContextAsync(mchNo, mchAppId)).GetNormalMchParamsByIfCode(ifCode);
             }
 
             // 查询商户的所有支持的参数配置
@@ -135,7 +135,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetIsvsubMchParamsByIfCode<IsvSubMchParams>(ifCode);
+                return (await _configContextService.GetMchAppConfigContextAsync(mchNo, mchAppId)).GetIsvsubMchParamsByIfCode<IsvSubMchParams>(ifCode);
             }
 
             // 查询商户的所有支持的参数配置
@@ -153,7 +153,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                IsvConfigContext isvConfigContext = _configContextService.GetIsvConfigContext(isvNo);
+                IsvConfigContext isvConfigContext = await _configContextService.GetIsvConfigContextAsync(isvNo);
                 return isvConfigContext == null ? null : isvConfigContext.GetIsvParamsByIfCode(ifCode);
             }
 
@@ -172,7 +172,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetNormalMchOauth2ParamsByInfoId(mchAppId);
+                return (await _configContextService.GetMchAppConfigContextAsync(mchNo, mchAppId)).GetNormalMchOauth2ParamsByInfoId(mchAppId);
             }
 
             // 查询商户的所有支持的参数配置
@@ -190,7 +190,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                return _configContextService.GetMchAppConfigContext(mchNo, mchAppId).GetIsvsubMchOauth2ParamsByInfoId<IsvSubMchOauth2Params>(mchAppId);
+                return (await _configContextService.GetMchAppConfigContextAsync(mchNo, mchAppId)).GetIsvsubMchOauth2ParamsByInfoId<IsvSubMchOauth2Params>(mchAppId);
             }
 
             // 查询商户的所有支持的参数配置
@@ -208,7 +208,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                IsvConfigContext isvConfigContext = _configContextService.GetIsvConfigContext(isvNo);
+                IsvConfigContext isvConfigContext = await _configContextService.GetIsvConfigContextAsync(isvNo);
                 return isvConfigContext == null ? null : isvConfigContext.GetIsvPayIfConfigByIfCode(ifCode);
             }
 
@@ -227,7 +227,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                IsvConfigContext isvConfigContext = _configContextService.GetIsvConfigContext(isvNo);
+                IsvConfigContext isvConfigContext = await _configContextService.GetIsvConfigContextAsync(isvNo);
                 return isvConfigContext == null ? null : isvConfigContext.GetIsvOauth2ParamsByIfCodeAndInfoId(ifCode + (infoId ?? isvNo));
             }
 
@@ -246,7 +246,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                return _configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetAlipayClientWrapper();
+                return (await _configContextService.GetMchAppConfigContextAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId)).GetAlipayClientWrapper();
             }
 
             if (mchAppConfigContext.IsIsvSubMch())
@@ -265,7 +265,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                return _configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetWxServiceWrapper();
+                return (await _configContextService.GetMchAppConfigContextAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId)).GetWxServiceWrapper();
             }
 
             if (mchAppConfigContext.IsIsvSubMch())
@@ -284,7 +284,7 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             if (IsCache())
             {
-                return _configContextService.GetMchAppConfigContext(mchAppConfigContext.MchNo, mchAppConfigContext.AppId).GetPaypalWrapper();
+                return (await _configContextService.GetMchAppConfigContextAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId)).GetPaypalWrapper();
             }
             PpPayNormalMchParams ppPayNormalMchParams = (PpPayNormalMchParams)await QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.PPPAY); ;
             return PayPalWrapper.BuildPaypalWrapper(ppPayNormalMchParams);

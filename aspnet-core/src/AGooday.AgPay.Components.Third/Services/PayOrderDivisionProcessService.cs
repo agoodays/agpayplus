@@ -149,24 +149,24 @@ namespace AGooday.AgPay.Components.Third.Services
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
                 {
                     //分账成功
-                    _payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_SUCCESS, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelOriginResponse);
+                    await _payOrderDivisionRecordService.UpdateRecordSuccessOrFailAsync(recordList, (byte)PayOrderDivisionRecordState.STATE_SUCCESS, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelOriginResponse);
                 }
                 // 分账失败 ( 明确分账成功 )
                 else if (channelRetMsg.ChannelState == ChannelState.CONFIRM_FAIL)
                 {
                     //分账失败
-                    _payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
+                    await _payOrderDivisionRecordService.UpdateRecordSuccessOrFailAsync(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
                 }
                 // 已受理
                 else if (channelRetMsg.ChannelState == ChannelState.WAITING)
                 {
-                    _payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_ACCEPT, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
+                    await _payOrderDivisionRecordService.UpdateRecordSuccessOrFailAsync(recordList, (byte)PayOrderDivisionRecordState.STATE_ACCEPT, channelRetMsg.ChannelOrderId, channelRetMsg.ChannelErrMsg);
                 }
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{logPrefix}, 调用分账接口异常");
-                _payOrderDivisionRecordService.UpdateRecordSuccessOrFail(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, null, $"系统异常：{e.Message}");
+                await _payOrderDivisionRecordService.UpdateRecordSuccessOrFailAsync(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, null, $"系统异常：{e.Message}");
 
                 channelRetMsg = ChannelRetMsg.ConfirmFail(null, null, e.Message);
             }

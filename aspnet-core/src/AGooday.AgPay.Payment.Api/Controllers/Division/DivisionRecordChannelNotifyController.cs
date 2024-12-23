@@ -104,11 +104,11 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                         // 明确成功
                         if (retMsgItem.ChannelState == ChannelState.CONFIRM_SUCCESS)
                         {
-                            _payOrderDivisionRecordService.UpdateRecordSuccessOrFailBySingleItem(divisionId, (byte)PayOrderDivisionRecordState.STATE_SUCCESS, retMsgItem.ChannelOriginResponse);
+                            await _payOrderDivisionRecordService.UpdateRecordSuccessOrFailBySingleItemAsync(divisionId, (byte)PayOrderDivisionRecordState.STATE_SUCCESS, retMsgItem.ChannelOriginResponse);
                         }
                         else if (retMsgItem.ChannelState == ChannelState.CONFIRM_FAIL) // 明确失败
                         {
-                            _payOrderDivisionRecordService.UpdateRecordSuccessOrFailBySingleItem(divisionId, (byte)PayOrderDivisionRecordState.STATE_FAIL, string.IsNullOrEmpty(retMsgItem.ChannelErrMsg) ? retMsgItem.ChannelOriginResponse : retMsgItem.ChannelErrMsg);
+                            await _payOrderDivisionRecordService.UpdateRecordSuccessOrFailBySingleItemAsync(divisionId, (byte)PayOrderDivisionRecordState.STATE_FAIL, string.IsNullOrEmpty(retMsgItem.ChannelErrMsg) ? retMsgItem.ChannelOriginResponse : retMsgItem.ChannelErrMsg);
                         }
                     }
                 }

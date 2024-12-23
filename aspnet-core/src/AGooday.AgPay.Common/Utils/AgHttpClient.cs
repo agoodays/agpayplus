@@ -98,9 +98,12 @@ namespace AGooday.AgPay.Common.Utils
         {
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(timeout);
-            foreach (var header in request.Headers)
+            if (request.Headers != null)
             {
-                client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                foreach (var header in request.Headers)
+                {
+                    client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                }
             }
 
             var response = new Response();

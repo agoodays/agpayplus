@@ -124,6 +124,8 @@ namespace AGooday.AgPay.Infrastructure.Context
 
             // 设置自定义日志工厂
             optionsBuilder.UseLoggerFactory(_loggerFactory);
+            optionsBuilder.EnableSensitiveDataLogging();
+            optionsBuilder.EnableDetailedErrors();
 
             // 添加拦截器
             optionsBuilder.AddInterceptors(new TimestampInterceptor());

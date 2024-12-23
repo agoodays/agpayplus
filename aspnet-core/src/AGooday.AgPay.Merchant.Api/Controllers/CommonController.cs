@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                     {
                         continue;
                     }
-                    var auth = _authService.GetUserAuthInfoById(currentUser.SysUser.SysUserId);
+                    var auth = await _authService.GetUserAuthInfoByIdAsync(currentUser.SysUser.SysUserId);
                     var authorities = new List<string>();
                     var ents = new List<SysEntitlementDto>();
                     auth?.GetEnts(_authService, out authorities, out ents);

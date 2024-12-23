@@ -109,7 +109,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                         {
                                             byte state = (byte)(ChannelState.CONFIRM_SUCCESS == channelRetMsg.ChannelState ? PayOrderDivisionRecordState.STATE_SUCCESS : PayOrderDivisionRecordState.STATE_FAIL);
                                             // 更新记录状态
-                                            payOrderDivisionRecordService.UpdateRecordSuccessOrFailBySingleItem(record.RecordId.Value, state, channelRetMsg.ChannelErrMsg);
+                                            await payOrderDivisionRecordService.UpdateRecordSuccessOrFailBySingleItemAsync(record.RecordId.Value, state, channelRetMsg.ChannelErrMsg);
                                         }
                                     }
                                 }

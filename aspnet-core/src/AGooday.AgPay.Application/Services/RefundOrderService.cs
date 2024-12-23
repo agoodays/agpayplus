@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateInit2IngAsync(string refundOrderId, string channelOrderNo)
         {
-            var updateRecord = _refundOrderRepository.GetById(refundOrderId);
+            var updateRecord = await _refundOrderRepository.GetByIdAsync(refundOrderId);
             if (updateRecord.State != (byte)RefundOrderState.STATE_INIT)
             {
                 return false;
@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateIng2SuccessAsync(string refundOrderId, string channelOrderNo)
         {
-            var updateRecord = _refundOrderRepository.GetById(refundOrderId);
+            var updateRecord = await _refundOrderRepository.GetByIdAsync(refundOrderId);
             if (updateRecord.State != (byte)RefundOrderState.STATE_ING)
             {
                 return false;
@@ -199,7 +199,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateIng2FailAsync(string refundOrderId, string channelOrderNo, string channelErrCode, string channelErrMsg)
         {
-            var updateRecord = _refundOrderRepository.GetById(refundOrderId);
+            var updateRecord = await _refundOrderRepository.GetByIdAsync(refundOrderId);
             if (updateRecord.State != (byte)RefundOrderState.STATE_ING)
             {
                 return false;

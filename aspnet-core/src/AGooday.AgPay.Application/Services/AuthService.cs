@@ -120,19 +120,19 @@ namespace AGooday.AgPay.Application.Services
             }
         }
 
-        public SysUserAuthInfoDto GetUserAuthInfoById(long userId)
+        public async Task<SysUserAuthInfoDto> GetUserAuthInfoByIdAsync(long userId)
         {
-            var auth = _sysUserAuthRepository.GetAllAsNoTracking()
+            var auth = await _sysUserAuthRepository.GetAllAsNoTracking()
                 .Join(_sysUserAuthRepository.GetAllAsNoTracking<SysUser>(),
                 ua => ua.UserId, ur => ur.SysUserId,
                 (ua, ur) => new { ua, ur })
                 .Where(w => w.ua.UserId == userId)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
-            return auth == null ? null : GetSysUserAuthInfo(auth.ua, auth.ur);
+            return auth == null ? null : await GetSysUserAuthInfoAsync(auth.ua, auth.ur);
         }
 
-        private SysUserAuthInfoDto GetSysUserAuthInfo(SysUserAuth ua, SysUser ur)
+        private async Task<SysUserAuthInfoDto> GetSysUserAuthInfoAsync(SysUserAuth ua, SysUser ur)
         {
             var auth = new SysUserAuthInfoDto
             {
@@ -163,7 +163,7 @@ namespace AGooday.AgPay.Application.Services
 
             if (auth != null && ur.SysType.Equals(CS.SYS_TYPE.MCH))
             {
-                var mch = _mchInfoRepository.GetById(auth.BelongInfoId);
+                var mch = await _mchInfoRepository.GetByIdAsync(auth.BelongInfoId);
                 auth.ShortName = mch.MchShortName;
                 auth.MchType = mch.Type;
                 auth.MchLevel = mch.MchLevel;
@@ -171,7 +171,7 @@ namespace AGooday.AgPay.Application.Services
 
             if (auth != null && ur.SysType.Equals(CS.SYS_TYPE.AGENT))
             {
-                var agent = _agentInfoRepository.GetById(auth.BelongInfoId);
+                var agent = await _agentInfoRepository.GetByIdAsync(auth.BelongInfoId);
                 auth.ShortName = agent.AgentShortName;
             }
 
@@ -206,7 +206,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="identityType"></param>
         /// <param name="sysType"></param>
         /// <returns></returns>
-        public SysUserAuthInfoDto LoginAuth(string identifier, byte identityType, string sysType)
+        public async Task<SysUserAuthInfoDto> LoginAuthAsync(string identifier, byte identityType, string sysType)
         {
             var auth = _sysUserAuthRepository.GetAllAsNoTracking()
                 .Join(_sysUserRepository.GetAllAsNoTracking(),
@@ -215,7 +215,7 @@ namespace AGooday.AgPay.Application.Services
                 .Where(w => w.ua.IdentityType == identityType && w.ua.Identifier.Equals(identifier) && w.ua.SysType.Equals(sysType) && w.ur.State == CS.PUB_USABLE)
                 .FirstOrDefault();
 
-            return auth == null ? null : GetSysUserAuthInfo(auth.ua, auth.ur);
+            return auth == null ? null : await GetSysUserAuthInfoAsync(auth.ua, auth.ur);
         }
     }
 }

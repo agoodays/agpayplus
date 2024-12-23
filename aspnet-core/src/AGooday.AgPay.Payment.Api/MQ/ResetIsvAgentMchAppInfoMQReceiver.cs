@@ -25,19 +25,19 @@ namespace AGooday.AgPay.Payment.Api.MQ
             _logger.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
             if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO)
             {
-                this.ModifyIsvInfo(payload.IsvNo);
+                return this.ModifyIsvInfoAsync(payload.IsvNo);
             }
             else if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO)
             {
-                this.ModifyAgentInfo(payload.MchNo);
+                return this.ModifyAgentInfoAsync(payload.MchNo);
             }
             else if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_INFO)
             {
-                this.ModifyMchInfo(payload.MchNo);
+                return this.ModifyMchInfoAsync(payload.MchNo);
             }
             else if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP)
             {
-                this.ModifyMchApp(payload.MchNo, payload.AppId);
+                return this.ModifyMchAppAsync(payload.MchNo, payload.AppId);
             }
             return Task.CompletedTask;
         }
@@ -46,10 +46,10 @@ namespace AGooday.AgPay.Payment.Api.MQ
         /// 接收 [商户配置信息] 的消息
         /// </summary>
         /// <param name="mchNo"></param>
-        private void ModifyMchInfo(string mchNo)
+        private async Task ModifyMchInfoAsync(string mchNo)
         {
             _logger.LogInformation($"成功接收 [商户配置信息] 的消息, msg={mchNo}");
-            _configContextService.InitMchInfoConfigContext(mchNo);
+            await _configContextService.InitMchInfoConfigContextAsync(mchNo);
             _logger.LogInformation(" [商户配置信息] 已重置");
         }
 
@@ -58,10 +58,10 @@ namespace AGooday.AgPay.Payment.Api.MQ
         /// </summary>
         /// <param name="mchNo"></param>
         /// <param name="appId"></param>
-        private void ModifyMchApp(string mchNo, string appId)
+        private async Task ModifyMchAppAsync(string mchNo, string appId)
         {
             _logger.LogInformation($"成功接收 [商户应用支付参数配置信息] 的消息, mchNo={mchNo}, appId={appId}");
-            _configContextService.InitMchAppConfigContext(mchNo, appId);
+            await _configContextService.InitMchAppConfigContextAsync(mchNo, appId);
             _logger.LogInformation(" [商户应用支付参数配置信息] 已重置");
         }
 
@@ -69,10 +69,10 @@ namespace AGooday.AgPay.Payment.Api.MQ
         /// 重置代理商信息
         /// </summary>
         /// <param name="agentNo"></param>
-        private void ModifyAgentInfo(string agentNo)
+        private async Task ModifyAgentInfoAsync(string agentNo)
         {
             _logger.LogInformation($"成功接收 [代理商信息] 重置, msg={agentNo}");
-            _configContextService.InitAgentConfigContext(agentNo);
+            await _configContextService.InitAgentConfigContextAsync(agentNo);
             _logger.LogInformation("[代理商信息] 已重置");
         }
 
@@ -80,10 +80,10 @@ namespace AGooday.AgPay.Payment.Api.MQ
         /// 重置ISV信息
         /// </summary>
         /// <param name="isvNo"></param>
-        private void ModifyIsvInfo(string isvNo)
+        private async Task ModifyIsvInfoAsync(string isvNo)
         {
             _logger.LogInformation($"成功接收 [ISV信息] 重置, msg={isvNo}");
-            _configContextService.InitIsvConfigContext(isvNo);
+            await _configContextService.InitIsvConfigContextAsync(isvNo);
             _logger.LogInformation("[ISV信息] 已重置");
         }
     }

@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateInit2IngAsync(string payOrderId, PayOrderDto payOrder)
         {
-            var updateRecord = _payOrderRepository.GetById(payOrderId);
+            var updateRecord = await _payOrderRepository.GetByIdAsync(payOrderId);
             if (updateRecord.State != (byte)PayOrderState.STATE_INIT)
             {
                 return false;
@@ -168,7 +168,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateIng2SuccessAsync(string payOrderId, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo)
         {
-            var updateRecord = _payOrderRepository.GetById(payOrderId);
+            var updateRecord = await _payOrderRepository.GetByIdAsync(payOrderId);
             if (updateRecord.State != (byte)PayOrderState.STATE_ING)
             {
                 return false;
@@ -191,7 +191,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateIng2CloseAsync(string payOrderId)
         {
-            var updateRecord = _payOrderRepository.GetById(payOrderId);
+            var updateRecord = await _payOrderRepository.GetByIdAsync(payOrderId);
             if (updateRecord.State != (byte)PayOrderState.STATE_ING)
             {
                 return false;
@@ -216,7 +216,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateIng2FailAsync(string payOrderId, string channelMchNo, string channelIsvNo, string channelOrderNo, string channelUserId, string platformOrderNo, string platformMchOrderNo, string channelErrCode, string channelErrMsg)
         {
-            var updateRecord = _payOrderRepository.GetById(payOrderId);
+            var updateRecord = await _payOrderRepository.GetByIdAsync(payOrderId);
             if (updateRecord.State != (byte)PayOrderState.STATE_ING)
             {
                 return false;
@@ -286,7 +286,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateNotifySentAsync(string orderId)
         {
-            var updateRecord = _payOrderRepository.GetById(orderId);
+            var updateRecord = await _payOrderRepository.GetByIdAsync(orderId);
             updateRecord.NotifyState = CS.YES;
             _payOrderRepository.Update(updateRecord);
             return await _payOrderRepository.SaveChangesAsync() > 0;
@@ -298,7 +298,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdateDivisionStateAsync(PayOrderDto payOrder)
         {
-            var updateRecord = _payOrderRepository.GetById(payOrder.PayOrderId);
+            var updateRecord = await _payOrderRepository.GetByIdAsync(payOrder.PayOrderId);
             if (updateRecord.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_UNHAPPEN)
             {
                 return false;

@@ -14,8 +14,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public Task<bool> IsExistPayWayCodeAsync(string wayCode)
         {
-            //return GetAllAsNoTracking().AnyAsync(c => c.WayCode == wayCode.ToUpper());
-            return GetAllAsNoTracking().AnyAsync(c => string.Equals(c.WayCode, wayCode, StringComparison.OrdinalIgnoreCase));
+            return GetAllAsNoTracking().AnyAsync(c => c.WayCode == wayCode.ToUpper());
+            //return GetAllAsNoTracking().AnyAsync(c => string.Equals(c.WayCode, wayCode, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

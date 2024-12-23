@@ -68,14 +68,14 @@ namespace AGooday.AgPay.Components.Third.Services
         /// </summary>
         /// <param name="mchNo"></param>
         /// <returns></returns>
-        public MchInfoConfigContext GetMchInfoConfigContext(string mchNo)
+        public async Task<MchInfoConfigContext> GetMchInfoConfigContextAsync(string mchNo)
         {
             mchInfoConfigContextMap.TryGetValue(mchNo, out MchInfoConfigContext _mchInfoConfigContext);
 
             //无此数据， 需要初始化
             if (_mchInfoConfigContext == null)
             {
-                InitMchInfoConfigContext(mchNo);
+                await InitMchInfoConfigContextAsync(mchNo);
             }
 
             mchInfoConfigContextMap.TryGetValue(mchNo, out _mchInfoConfigContext);
@@ -88,14 +88,14 @@ namespace AGooday.AgPay.Components.Third.Services
         /// <param name="mchNo"></param>
         /// <param name="appId"></param>
         /// <returns></returns>
-        public MchAppConfigContext GetMchAppConfigContext(string mchNo, string appId)
+        public async Task<MchAppConfigContext> GetMchAppConfigContextAsync(string mchNo, string appId)
         {
             mchAppConfigContextMap.TryGetValue(appId, out MchAppConfigContext _mchAppConfigContext);
 
             //无此数据， 需要初始化
             if (_mchAppConfigContext == null)
             {
-                InitMchAppConfigContext(mchNo, appId);
+                await InitMchAppConfigContextAsync(mchNo, appId);
             }
 
             mchAppConfigContextMap.TryGetValue(appId, out _mchAppConfigContext);
@@ -107,14 +107,14 @@ namespace AGooday.AgPay.Components.Third.Services
         /// </summary>
         /// <param name="agentNo"></param>
         /// <returns></returns>
-        public AgentConfigContext GetAgentConfigContext(string agentNo)
+        public async Task<AgentConfigContext> GetAgentConfigContextAsync(string agentNo)
         {
             agentConfigContextMap.TryGetValue(agentNo, out AgentConfigContext _agentConfigContext);
 
             //无此数据， 需要初始化
             if (_agentConfigContext == null)
             {
-                InitAgentConfigContext(agentNo);
+                await InitAgentConfigContextAsync(agentNo);
             }
             agentConfigContextMap.TryGetValue(agentNo, out _agentConfigContext);
             return _agentConfigContext;
@@ -125,14 +125,14 @@ namespace AGooday.AgPay.Components.Third.Services
         /// </summary>
         /// <param name="isvNo"></param>
         /// <returns></returns>
-        public IsvConfigContext GetIsvConfigContext(string isvNo)
+        public async Task<IsvConfigContext> GetIsvConfigContextAsync(string isvNo)
         {
             isvConfigContextMap.TryGetValue(isvNo, out IsvConfigContext _isvConfigContext);
 
             //无此数据， 需要初始化
             if (_isvConfigContext == null)
             {
-                InitIsvConfigContext(isvNo);
+                await InitIsvConfigContextAsync(isvNo);
             }
             isvConfigContextMap.TryGetValue(isvNo, out _isvConfigContext);
             return _isvConfigContext;
@@ -142,7 +142,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 初始化 [商户配置信息]
         /// </summary>
         /// <param name="mchNo"></param>
-        public void InitMchInfoConfigContext(string mchNo)
+        public async Task InitMchInfoConfigContextAsync(string mchNo)
         {
             // 当前系统不进行缓存
             if (!IsCache())
@@ -151,7 +151,7 @@ namespace AGooday.AgPay.Components.Third.Services
             }
 
             //商户主体信息
-            var mchInfo = _mchInfoService.GetById(mchNo);
+            var mchInfo = await _mchInfoService.GetByIdAsync(mchNo);
             // 查询不到商户主体， 可能已经删除
             if (mchInfo == null)
             {
@@ -204,7 +204,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// </summary>
         /// <param name="mchNo"></param>
         /// <param name="appId"></param>
-        public void InitMchAppConfigContext(string mchNo, string appId)
+        public async Task InitMchAppConfigContextAsync(string mchNo, string appId)
         {
             // 当前系统不进行缓存
             if (!IsCache())
@@ -213,7 +213,7 @@ namespace AGooday.AgPay.Components.Third.Services
             }
 
             // 获取商户的配置信息
-            MchInfoConfigContext mchInfoConfigContext = GetMchInfoConfigContext(mchNo);
+            MchInfoConfigContext mchInfoConfigContext = await GetMchInfoConfigContextAsync(mchNo);
             // 商户信息不存在
             if (mchInfoConfigContext == null)
             {
@@ -221,7 +221,7 @@ namespace AGooday.AgPay.Components.Third.Services
             }
 
             // 查询商户应用信息主体
-            var dbMchApp = _mchAppService.GetById(appId);
+            var dbMchApp = await _mchAppService.GetByIdAsync(appId);
 
             //DB已经删除
             if (dbMchApp == null)
@@ -317,11 +317,11 @@ namespace AGooday.AgPay.Components.Third.Services
                 if (!string.IsNullOrWhiteSpace(mchInfo.AgentNo))
                 {
                     //放置 当前商户的 代理商信息
-                    mchAppConfigContext.AgentConfigContext = GetAgentConfigContext(mchInfo.AgentNo);
+                    mchAppConfigContext.AgentConfigContext = await GetAgentConfigContextAsync(mchInfo.AgentNo);
                 }
 
                 //放置 当前商户的 服务商信息
-                mchAppConfigContext.IsvConfigContext = GetIsvConfigContext(mchInfo.IsvNo);
+                mchAppConfigContext.IsvConfigContext = await GetIsvConfigContextAsync(mchInfo.IsvNo);
             }
 
             mchAppConfigContextMap.TryAdd(appId, mchAppConfigContext);
@@ -331,7 +331,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 初始化 [代理商配置信息]
         /// </summary>
         /// <param name="agentNo"></param>
-        public void InitAgentConfigContext(string agentNo)
+        public async Task InitAgentConfigContextAsync(string agentNo)
         {
             // 当前系统不进行缓存
             if (!IsCache())
@@ -340,7 +340,7 @@ namespace AGooday.AgPay.Components.Third.Services
             }
 
             //代理商主体信息
-            var agentInfo = _agentInfoService.GetById(agentNo);
+            var agentInfo = await _agentInfoService.GetByIdAsync(agentNo);
             // 查询不到代理商主体， 可能已经删除
             if (agentInfo == null)
             {
@@ -363,7 +363,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// 初始化 [ISV支付参数配置信息]
         /// </summary>
         /// <param name="isvNo"></param>
-        public void InitIsvConfigContext(string isvNo)
+        public async Task InitIsvConfigContextAsync(string isvNo)
         {
             // 当前系统不进行缓存
             if (!IsCache())
@@ -382,7 +382,7 @@ namespace AGooday.AgPay.Components.Third.Services
             }
 
             IsvConfigContext isvConfigContext = new IsvConfigContext();
-            var isvInfo = _isvInfoService.GetById(isvNo);
+            var isvInfo = await _isvInfoService.GetByIdAsync(isvNo);
             if (isvInfo == null)
             {
                 foreach (var appId in mchAppIdList)

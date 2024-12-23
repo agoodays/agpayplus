@@ -55,10 +55,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("count"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_REFUND_LIST)]
-        public ApiRes Count([FromQuery] RefundOrderQueryDto dto)
+        public async Task<ApiRes> CountAsync([FromQuery] RefundOrderQueryDto dto)
         {
             dto.BindDateRange();
-            var statistics = _refundOrderService.StatisticsAsync(dto);
+            var statistics = await _refundOrderService.StatisticsAsync(dto);
             return ApiRes.Ok(statistics);
         }
 

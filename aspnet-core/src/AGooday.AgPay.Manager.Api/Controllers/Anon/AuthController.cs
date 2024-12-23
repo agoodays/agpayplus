@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 identityType = CS.AUTH_TYPE.TELPHONE; //ÊÖ»úºÅµÇÂ¼
             }
 
-            var auth = _authService.LoginAuth(account, identityType, SYS_TYPE);
+            var auth = await _authService.LoginAuthAsync(account, identityType, SYS_TYPE);
 
             if (auth == null)
             {

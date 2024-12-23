@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         /// <returns></returns>
         [HttpGet, Route("count"), NoLog]
         [PermissionAuth(PermCode.AGENT.ENT_REFUND_LIST)]
-        public async Task<ApiRes> Count([FromQuery] RefundOrderQueryDto dto)
+        public async Task<ApiRes> CountAsync([FromQuery] RefundOrderQueryDto dto)
         {
             dto.BindDateRange();
             var statistics = await _refundOrderService.StatisticsAsync(dto);

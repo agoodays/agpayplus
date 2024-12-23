@@ -161,14 +161,14 @@ namespace AGooday.AgPay.Application.Services
                     var mchNo = infoId;
                     if (infoType.Equals(CS.INFO_TYPE.MCH_APP))
                     {
-                        MchApp mchApp = _mchAppRepository.GetById(infoId);
+                        MchApp mchApp = await _mchAppRepository.GetByIdAsync(infoId);
                         if (mchApp == null || mchApp.State != CS.YES)
                         {
                             throw new BizException("商户应用不存在");
                         }
                         mchNo = mchApp.MchNo;
                     }
-                    MchInfo mchInfo = _mchInfoRepository.GetById(mchNo);
+                    MchInfo mchInfo = await _mchInfoRepository.GetByIdAsync(mchNo);
                     if (mchInfo == null || mchInfo.State != CS.YES)
                     {
                         throw new BizException("商户不存在");
@@ -187,7 +187,7 @@ namespace AGooday.AgPay.Application.Services
 
                         if (!string.IsNullOrEmpty(mchInfo.AgentNo))
                         {
-                            agentInfo = _agentInfoRepository.GetById(mchInfo.AgentNo);
+                            agentInfo = await _agentInfoRepository.GetByIdAsync(mchInfo.AgentNo);
                             ifCodes = GetAgentIfCodes(agentInfo, isApplyment);
                             isvConfigList = isvConfigList.Where(s => ifCodes.Contains(s.IfCode));
                         }
@@ -210,7 +210,7 @@ namespace AGooday.AgPay.Application.Services
                         }).ToList();
                     return results;
                 case CS.INFO_TYPE.AGENT:
-                    agentInfo = _agentInfoRepository.GetById(infoId);
+                    agentInfo = await _agentInfoRepository.GetByIdAsync(infoId);
                     if (agentInfo == null || agentInfo.State != CS.YES)
                     {
                         throw new BizException("代理商不存在");
