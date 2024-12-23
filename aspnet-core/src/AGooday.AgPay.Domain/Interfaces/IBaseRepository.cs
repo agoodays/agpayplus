@@ -6,7 +6,7 @@ namespace AGooday.AgPay.Domain.Interfaces
     /// <summary>
     /// 定义泛型仓储接口，并继承IDisposable，显式释放资源
     /// </summary>
-    public interface IBaseRepository<TEntity, TPrimaryKey> : IDisposable
+    public interface IBaseRepository<TEntity, TPrimaryKey> : IDisposable, IAsyncDisposable
         where TEntity : class
         where TPrimaryKey : struct
     {
@@ -45,6 +45,8 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="id">主键ID</param>
         /// <returns></returns>
         Task<TEntity> GetByIdAsync(TPrimaryKey id);
+        TEntity GetByIdAsNoTracking(TPrimaryKey id);
+        Task<TEntity> GetByIdAsNoTrackingAsync(TPrimaryKey id);
         /// <summary>
         /// 获取列表
         /// </summary>
@@ -137,7 +139,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         IQueryable<TEntity> FromSqlInterpolated(FormattableString sql);
         #endregion
     }
-    public interface IBaseRepository<TEntity> : IDisposable
+    public interface IBaseRepository<TEntity> : IDisposable, IAsyncDisposable
         where TEntity : class
     {
         EntityEntry<TEntity> DbEntry(TEntity entity);
@@ -175,6 +177,8 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="id"></param>
         /// <returns></returns>
         Task<TEntity> GetByIdAsync<TPrimaryKey>(TPrimaryKey id);
+        TEntity GetByIdAsNoTracking<TPrimaryKey>(TPrimaryKey id);
+        Task<TEntity> GetByIdAsNoTrackingAsync<TPrimaryKey>(TPrimaryKey id);
         /// <summary>
         /// 获取列表
         /// </summary>
@@ -269,7 +273,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         IQueryable<TEntity> FromSqlInterpolated(FormattableString sql);
         #endregion
     }
-    public interface IBaseRepository : IDisposable
+    public interface IBaseRepository : IDisposable, IAsyncDisposable
     {
     }
 }

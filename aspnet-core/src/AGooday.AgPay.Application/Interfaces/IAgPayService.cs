@@ -12,6 +12,8 @@
         Task<bool> UpdateAsync(TDto dto);
         TDto GetById(TPrimaryKey id);
         Task<TDto> GetByIdAsync(TPrimaryKey recordId);
+        TDto GetByIdAsNoTracking(TPrimaryKey recordId);
+        Task<TDto> GetByIdAsNoTrackingAsync(TPrimaryKey recordId);
         IEnumerable<TDto> GetAll();
         IEnumerable<TDto> GetAllAsNoTracking();
     }
@@ -26,6 +28,8 @@
         Task<bool> UpdateAsync(TDto dto);
         TDto GetById<TPrimaryKey>(TPrimaryKey id);
         Task<TDto> GetByIdAsync<TPrimaryKey>(TPrimaryKey recordId);
+        TDto GetByIdAsNoTracking<TPrimaryKey>(TPrimaryKey recordId);
+        Task<TDto> GetByIdAsNoTrackingAsync<TPrimaryKey>(TPrimaryKey recordId);
         IEnumerable<TDto> GetAll();
         IEnumerable<TDto> GetAllAsNoTracking();
     }

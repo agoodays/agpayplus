@@ -26,6 +26,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     {
         protected readonly IMQSender _mqSender;
         protected readonly ILogger<AbstractPayOrderController> _logger;
+        protected readonly IServiceProvider _serviceProvider;
         protected readonly IChannelServiceFactory<IPaymentService> _paymentServiceFactory;
         protected readonly PayOrderProcessService _payOrderProcessService;
         protected readonly IMchPayPassageService _mchPayPassageService;
@@ -36,6 +37,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         protected readonly ISysConfigService _sysConfigService;
 
         protected AbstractPayOrderController(ILogger<AbstractPayOrderController> logger,
+            IServiceProvider serviceProvider,
             IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
@@ -59,6 +61,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             _payOrderProfitService = payOrderProfitService;
             _sysConfigService = sysConfigService;
             _mqSender = mqSender;
+            _serviceProvider = serviceProvider;
         }
 
         /// <summary>
@@ -255,13 +258,26 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
         private async Task<PayOrderDto> GenPayOrderAsync(UnifiedOrderRQ rq, MchAppConfigContext configContext, string ifCode, MchPayPassageDto mchPayPassage, IPaymentService paymentService)
         {
-            MchInfoDto mchInfo = configContext.MchInfo;
-            MchAppDto mchApp = configContext.MchApp;
-            MchStoreDto mchStore = await _configContextQueryService.QueryMchStoreAsync(rq.MchNo, rq.StoreId);
-            AgentInfoDto agentInfo = await _configContextQueryService.QueryAgentInfoAsync(configContext);
-            IsvInfoDto isvInfo = await _configContextQueryService.QueryIsvInfoAsync(configContext);
-            var wayType = await _configContextQueryService.GetWayTypeByWayCodeAsync(rq.WayCode);
-            return this.GenPayOrder(rq, mchInfo, mchApp, mchStore, agentInfo, isvInfo, ifCode, wayType, mchPayPassage, paymentService);
+            //MchInfoDto mchInfo = configContext.MchInfo;
+            //MchAppDto mchApp = configContext.MchApp;
+            //MchStoreDto mchStore = await _configContextQueryService.QueryMchStoreAsync(rq.MchNo, rq.StoreId);
+            //AgentInfoDto agentInfo = await _configContextQueryService.QueryAgentInfoAsync(configContext);
+            //IsvInfoDto isvInfo = await _configContextQueryService.QueryIsvInfoAsync(configContext);
+            //var wayType = await _configContextQueryService.GetWayTypeByWayCodeAsync(rq.WayCode);
+            //return this.GenPayOrder(rq, mchInfo, mchApp, mchStore, agentInfo, isvInfo, ifCode, wayType, mchPayPassage, paymentService);
+
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var configContextQueryService = scope.ServiceProvider.GetRequiredService<ConfigContextQueryService>();
+
+                MchInfoDto mchInfo = configContext.MchInfo;
+                MchAppDto mchApp = configContext.MchApp;
+                MchStoreDto mchStore = await configContextQueryService.QueryMchStoreAsync(rq.MchNo, rq.StoreId);
+                AgentInfoDto agentInfo = await configContextQueryService.QueryAgentInfoAsync(configContext);
+                IsvInfoDto isvInfo = await configContextQueryService.QueryIsvInfoAsync(configContext);
+                var wayType = await configContextQueryService.GetWayTypeByWayCodeAsync(rq.WayCode);
+                return this.GenPayOrder(rq, mchInfo, mchApp, mchStore, agentInfo, isvInfo, ifCode, wayType, mchPayPassage, paymentService);
+            }
         }
 
         private PayOrderDto GenPayOrder(UnifiedOrderRQ rq, MchInfoDto mchInfo, MchAppDto mchApp, MchStoreDto mchStore, AgentInfoDto agentInfo, IsvInfoDto isvInfo, string ifCode, string wayType, MchPayPassageDto mchPayPassage, IPaymentService paymentService)

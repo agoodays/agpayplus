@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 return (await _configContextService.GetMchAppConfigContextAsync(mchNo, mchAppId)).MchApp;
             }
 
-            return await _mchAppService.GetByIdAsync(mchAppId, mchNo);
+            return await _mchAppService.GetByIdAsNoTrackingAsync(mchAppId, mchNo);
         }
 
         public async Task<MchStoreDto> QueryMchStoreAsync(string mchNo, long? storeId)
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 return (await _configContextService.GetMchInfoConfigContextAsync(mchNo)).GetMchStore(storeId.Value);
             }
 
-            return await _mchStoreService.GetByIdAsync(storeId.Value, mchNo);
+            return await _mchStoreService.GetByIdAsNoTrackingAsync(storeId.Value, mchNo);
         }
 
         public async Task<MchAppConfigContext> QueryMchInfoAndAppInfoAsync(string mchNo, string mchAppId)
@@ -74,7 +74,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 return await _configContextService.GetMchAppConfigContextAsync(mchNo, mchAppId);
             }
 
-            var mchInfo = await _mchInfoService.GetByIdAsync(mchNo);
+            var mchInfo = await _mchInfoService.GetByIdAsNoTrackingAsync(mchNo);
             var mchApp = await QueryMchAppAsync(mchNo, mchAppId);
 
             if (mchInfo == null || mchApp == null)
@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 return configContext.AgentConfigContext?.AgentInfo;
             }
 
-            return await _agentInfoService.GetByIdAsync(configContext.MchInfo.AgentNo);
+            return await _agentInfoService.GetByIdAsNoTrackingAsync(configContext.MchInfo.AgentNo);
         }
 
         public async Task<IsvInfoDto> QueryIsvInfoAsync(MchAppConfigContext configContext)
@@ -110,7 +110,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 return configContext.IsvConfigContext?.IsvInfo;
             }
 
-            return await _isvInfoService.GetByIdAsync(configContext.MchInfo.IsvNo);
+            return await _isvInfoService.GetByIdAsNoTrackingAsync(configContext.MchInfo.IsvNo);
         }
 
         public async Task<NormalMchParams> QueryNormalMchParamsAsync(string mchNo, string mchAppId, string ifCode)

@@ -32,6 +32,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         private readonly IQrCodeService _qrCodeService;
 
         public QrCashierController(ILogger<QrCashierController> logger,
+            IServiceProvider serviceProvider,
             IChannelServiceFactory<IChannelUserService> channelUserServiceFactory,
             PayMchNotifyService payMchNotifyService,
             IQrCodeService qrCodeService,
@@ -46,7 +47,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             IMQSender mqSender,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(logger, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
+            : base(logger, serviceProvider, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
         {
             _channelUserServiceFactory = channelUserServiceFactory;
             _payMchNotifyService = payMchNotifyService;

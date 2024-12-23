@@ -19,6 +19,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
     public class YsfJsapiOrderController : AbstractPayOrderController
     {
         public YsfJsapiOrderController(ILogger<YsfJsapiOrderController> logger,
+            IServiceProvider serviceProvider,
             IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
@@ -30,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder.PayWay
             IMQSender mqSender,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(logger, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
+            : base(logger, serviceProvider, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
         {
         }
 

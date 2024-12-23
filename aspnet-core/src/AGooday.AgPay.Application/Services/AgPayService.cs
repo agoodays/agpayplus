@@ -88,6 +88,20 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
+        public virtual TDto GetByIdAsNoTracking(TPrimaryKey id)
+        {
+            var entity = _agPayRepository.GetByIdAsNoTracking(id);
+            var dto = _mapper.Map<TDto>(entity);
+            return dto;
+        }
+
+        public virtual async Task<TDto> GetByIdAsNoTrackingAsync(TPrimaryKey id)
+        {
+            var entity = await _agPayRepository.GetByIdAsNoTrackingAsync(id);
+            var dto = _mapper.Map<TDto>(entity);
+            return dto;
+        }
+
         public virtual IEnumerable<TDto> GetAll()
         {
             var entitys = _agPayRepository.GetAll();
@@ -175,6 +189,20 @@ namespace AGooday.AgPay.Application.Services
         public virtual async Task<TDto> GetByIdAsync<TPrimaryKey>(TPrimaryKey id)
         {
             var entity = await _agPayRepository.GetByIdAsync(id);
+            var dto = _mapper.Map<TDto>(entity);
+            return dto;
+        }
+
+        public virtual TDto GetByIdAsNoTracking<TPrimaryKey>(TPrimaryKey id)
+        {
+            var entity = _agPayRepository.GetByIdAsNoTracking(id);
+            var dto = _mapper.Map<TDto>(entity);
+            return dto;
+        }
+
+        public virtual async Task<TDto> GetByIdAsNoTrackingAsync<TPrimaryKey>(TPrimaryKey id)
+        {
+            var entity = await _agPayRepository.GetByIdAsNoTrackingAsync(id);
             var dto = _mapper.Map<TDto>(entity);
             return dto;
         }

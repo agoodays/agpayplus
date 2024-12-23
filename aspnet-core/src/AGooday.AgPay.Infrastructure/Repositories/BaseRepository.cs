@@ -82,6 +82,34 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return await DbSet.FindAsync(id);
         }
         /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
+        public virtual TEntity GetByIdAsNoTracking(TPrimaryKey id)
+        {
+            // 创建完整的 lambda 表达式 e => e.Id == id
+            Expression<Func<TEntity, bool>> lambda = BaseRepositoryExtension<TEntity>.GetPrimaryKeyExpression(Db, id);
+
+            // 使用 AsNoTracking 禁用更改追踪，并使用编译后的 lambda 表达式进行查找
+            return DbSet.AsNoTracking().FirstOrDefault(lambda);
+        }
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
+        public virtual Task<TEntity> GetByIdAsNoTrackingAsync(TPrimaryKey id)
+        {
+            // 创建完整的 lambda 表达式 e => e.Id == id
+            Expression<Func<TEntity, bool>> lambda = BaseRepositoryExtension<TEntity>.GetPrimaryKeyExpression(Db, id);
+
+            // 使用 AsNoTracking 禁用更改追踪，并使用编译后的 lambda 表达式进行查找
+            return DbSet.AsNoTracking().FirstOrDefaultAsync(lambda);
+        }
+        /// <summary>
         /// 获取列表
         /// </summary>
         /// <returns></returns>
@@ -304,6 +332,12 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             Db.Dispose();
             GC.SuppressFinalize(this);
         }
+
+        public async ValueTask DisposeAsync()
+        {
+            await Db.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
     }
     public class BaseRepository<TEntity> : IBaseRepository<TEntity>
         where TEntity : class
@@ -376,6 +410,34 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public virtual async Task<TEntity> GetByIdAsync<TPrimaryKey>(TPrimaryKey id)
         {
             return await DbSet.FindAsync(id);
+        }
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
+        public virtual TEntity GetByIdAsNoTracking<TPrimaryKey>(TPrimaryKey id)
+        {
+            // 创建完整的 lambda 表达式 e => e.Id == id
+            Expression<Func<TEntity, bool>> lambda = BaseRepositoryExtension<TEntity>.GetPrimaryKeyExpression(Db, id);
+
+            // 使用 AsNoTracking 禁用更改追踪，并使用编译后的 lambda 表达式进行查找
+            return DbSet.AsNoTracking().FirstOrDefault(lambda);
+        }
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
+        public virtual Task<TEntity> GetByIdAsNoTrackingAsync<TPrimaryKey>(TPrimaryKey id)
+        {
+            // 创建完整的 lambda 表达式 e => e.Id == id
+            Expression<Func<TEntity, bool>> lambda = BaseRepositoryExtension<TEntity>.GetPrimaryKeyExpression(Db, id);
+
+            // 使用 AsNoTracking 禁用更改追踪，并使用编译后的 lambda 表达式进行查找
+            return DbSet.AsNoTracking().FirstOrDefaultAsync(lambda);
         }
         /// <summary>
         /// 获取列表
@@ -598,6 +660,12 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             Db.Dispose();
             GC.SuppressFinalize(this);
         }
+
+        public async ValueTask DisposeAsync()
+        {
+            await Db.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
     }
     public class BaseRepository : IBaseRepository
     {
@@ -611,10 +679,41 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             Db.Dispose();
             GC.SuppressFinalize(this);
         }
+
+        public async ValueTask DisposeAsync()
+        {
+            await Db.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
     }
     public static class BaseRepositoryExtension<TEntity>
         where TEntity : class
     {
+        public static Expression<Func<TEntity, bool>> GetPrimaryKeyExpression<TPrimaryKey>(DbContext Db, TPrimaryKey id)
+        {
+            // 获取实体类型信息
+            var entityType = Db.Model.FindEntityType(typeof(TEntity));
+
+            // 获取主键属性
+            var keyProperty = entityType.FindPrimaryKey().Properties.First();
+
+            // 构建参数表达式
+            var parameter = Expression.Parameter(typeof(TEntity), "e");
+
+            // 构建成员访问表达式以访问主键属性
+            var propertyAccess = Expression.MakeMemberAccess(parameter, keyProperty.PropertyInfo);
+
+            // 将主键属性值转换为正确的类型进行比较
+            var constantValue = Expression.Constant(id, typeof(TPrimaryKey));
+
+            // 创建相等表达式 e.Id == id
+            var equalityExpression = Expression.Equal(propertyAccess, Expression.Convert(constantValue, propertyAccess.Type));
+
+            // 创建完整的 lambda 表达式 e => e.Id == id
+            var lambda = Expression.Lambda<Func<TEntity, bool>>(equalityExpression, parameter);
+            return lambda;
+        }
+
         public static object[] GetPrimaryKeyValues(DbContext Db, TEntity entity)
         {
             var entityType = Db.Model.FindEntityType(typeof(TEntity));

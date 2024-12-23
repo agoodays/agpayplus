@@ -23,6 +23,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
     public class UnifiedOrderController : AbstractPayOrderController
     {
         public UnifiedOrderController(ILogger<UnifiedOrderController> logger,
+            IServiceProvider serviceProvider,
             IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
             IMchPayPassageService mchPayPassageService,
@@ -34,7 +35,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             IMQSender mqSender,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(logger, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
+            : base(logger, serviceProvider, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
         {
         }
 

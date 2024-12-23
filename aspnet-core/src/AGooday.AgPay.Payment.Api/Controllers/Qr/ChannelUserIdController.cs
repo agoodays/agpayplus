@@ -26,6 +26,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         private readonly IChannelServiceFactory<IChannelUserService> _channelUserServiceFactory;
 
         public ChannelUserIdController(ILogger<ChannelUserIdController> logger,
+            IServiceProvider serviceProvider,
             IChannelServiceFactory<IChannelUserService> channelUserServiceFactory,
             IChannelServiceFactory<IPaymentService> paymentServiceFactory,
             PayOrderProcessService payOrderProcessService,
@@ -38,7 +39,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             IMQSender mqSender,
             RequestKit requestKit,
             ConfigContextQueryService configContextQueryService)
-            : base(logger, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
+            : base(logger, serviceProvider, paymentServiceFactory, payOrderProcessService, mchPayPassageService, payRateConfigService, payWayService, payOrderService, payOrderProfitService, sysConfigService, mqSender, requestKit, configContextQueryService)
         {
             _channelUserServiceFactory = channelUserServiceFactory;
         }
