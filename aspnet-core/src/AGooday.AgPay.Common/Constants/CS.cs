@@ -1,5 +1,6 @@
 ﻿namespace AGooday.AgPay.Common.Constants
 {
+#pragma warning disable IDE1006
     /// <summary>
     /// Constants 常量对象
     /// </summary>
@@ -83,7 +84,6 @@
             /// </summary>
             public const string AGENT = "AGENT";
         }
-
         public interface PAY_ORDER_PROFIT_INFO_ID
         {
             /// <summary>
@@ -782,4 +782,5 @@
         }
         public static string GetTokenData(byte type, string id) => $"{{type: {type}, id: '{id}'}}";
     }
+#pragma warning restore IDE1006
 }

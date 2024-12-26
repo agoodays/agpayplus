@@ -369,7 +369,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
             await _redis.StringSetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
 #if !DEBUG
-            _smsService.SendVercode(new SmsBizVercodeModel()
+            _smsService.SendVercode(new Components.SMS.Models.SmsBizVercodeModel()
             {
                 Mobile = model.phone,
                 Vercode = code,
