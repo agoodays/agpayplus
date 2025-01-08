@@ -129,7 +129,8 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.State = (byte)RefundOrderState.STATE_ING;
             updateRecord.ChannelOrderNo = channelOrderNo;
             _refundOrderRepository.Update(updateRecord);
-            return await _refundOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _refundOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款成功】
@@ -187,7 +188,8 @@ namespace AGooday.AgPay.Application.Services
             payOrder.MchFeeAmount = payOrder.MchFeeAmount - currentRefundFeeAmount;
             payOrder.State = payOrder.RefundState.Equals((byte)PayOrderRefund.REFUND_STATE_ALL) ? (byte)PayOrderState.STATE_REFUND : payOrder.State; // 更新支付状态是否已退款。 此更新需在refund_state更新之后，如果全额退款则修改支付状态为已退款
             _payOrderRepository.Update(payOrder);
-            return await _refundOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _refundOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款失败】
@@ -210,7 +212,8 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.ErrMsg = channelErrMsg;
             updateRecord.ChannelOrderNo = channelOrderNo;
             _refundOrderRepository.Update(updateRecord);
-            return await _refundOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _refundOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新退款单状态 【退款中】 --》 【退款成功/退款失败】
@@ -244,15 +247,29 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public Task<int> UpdateOrderExpiredAsync()
         {
-            var updateRecords = _refundOrderRepository.GetAll()
+            // 使用 ExecuteUpdate 直接在数据库中批量更新
+            var now = DateTime.Now;
+            var updatedCount = _refundOrderRepository.GetAll()
                 .Where(w => (new List<byte>() { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
-                && w.ExpiredTime < DateTime.Now);
-            foreach (var refundOrder in updateRecords)
-            {
-                refundOrder.State = (byte)PayOrderState.STATE_CLOSED;
-                _refundOrderRepository.Update(refundOrder);
-            }
-            return _refundOrderRepository.SaveChangesAsync();
+                && w.ExpiredTime < DateTime.Now)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(p => p.State, p => (byte)RefundOrderState.STATE_CLOSED)
+                    .SetProperty(p => p.UpdatedAt, now));
+            return updatedCount;
+
+            //var updateRecords = _refundOrderRepository.GetAll()
+            //    .Where(w => (new List<byte>() { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
+            //    && w.ExpiredTime < DateTime.Now);
+            //if (updateRecords.Any())
+            //{
+            //    foreach (var refundOrder in updateRecords)
+            //    {
+            //        refundOrder.State = (byte)RefundOrderState.STATE_CLOSED;
+            //    }
+            //    _refundOrderRepository.UpdateRange(updateRecords);
+            //    return _refundOrderRepository.SaveChangesAsync();
+            //}
+            //return Task.FromResult(0);
         }
     }
 }

@@ -25,14 +25,14 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <summary>
         /// 批量添加
         /// </summary>
-        /// <param name="entitys"></param>
-        void AddRange(IQueryable<TEntity> entitys);
+        /// <param name="entities"></param>
+        void AddRange(IEnumerable<TEntity> entities);
         /// <summary>
         /// 批量添加
         /// </summary>
-        /// <param name="entitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task AddRangeAsync(IQueryable<TEntity> entitys);
+        Task AddRangeAsync(IEnumerable<TEntity> entities);
         /// <summary>
         /// 根据id获取对象
         /// </summary>
@@ -45,7 +45,17 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="id">主键ID</param>
         /// <returns></returns>
         Task<TEntity> GetByIdAsync(TPrimaryKey id);
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
         TEntity GetByIdAsNoTracking(TPrimaryKey id);
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
         Task<TEntity> GetByIdAsNoTrackingAsync(TPrimaryKey id);
         /// <summary>
         /// 获取列表
@@ -79,8 +89,8 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="entitys"></param>
-        void UpdateRange(IQueryable<TEntity> entitys);
+        /// <param name="entities"></param>
+        void UpdateRange(IEnumerable<TEntity> entities);
         /// <summary>
         /// 更新指定实体的指定列
         /// </summary>
@@ -99,10 +109,20 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="id"></param>
         void Remove(TPrimaryKey id);
         /// <summary>
+        /// 删除实体
+        /// </summary>
+        /// <param name="entity">实体</param>
+        void Remove(TEntity entity);
+        /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="entitys"></param>
-        void RemoveRange(IQueryable<TEntity> entitys);
+        /// <param name="entities"></param>
+        void RemoveRange(IEnumerable<TEntity> entities);
+        /// <summary>
+        /// 批量删除指定条件实体
+        /// </summary>
+        /// <param name="condition"></param>
+        void RemoveRange(Expression<Func<TEntity, bool>> condition);
         /// <summary>
         /// 保存或更新
         /// </summary>
@@ -115,6 +135,28 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="entity"></param>
         /// <param name="propertiesToUpdate"></param>
         void SaveOrUpdate(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate);
+        /// <summary>
+        /// 添加或更新
+        /// </summary>
+        /// <param name="entity">实体</param>
+        void AddOrUpdate(TEntity entity);
+        /// <summary>
+        /// 异步添加或更新
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <returns></returns>
+        Task AddOrUpdateAsync(TEntity entity);
+        /// <summary>
+        /// 批量添加或更新
+        /// </summary>
+        /// <param name="entities">实体集合</param>
+        void AddOrUpdateRange(IEnumerable<TEntity> entities);
+        /// <summary>
+        /// 异步批量添加或更新
+        /// </summary>
+        /// <param name="entities">实体集合</param>
+        /// <returns></returns>
+        Task AddOrUpdateRangeAsync(IEnumerable<TEntity> entities);
         /// <summary>
         /// 保存
         /// </summary>
@@ -131,6 +173,11 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="count"></param>
         /// <returns></returns>
         bool SaveChanges(out int count);
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        Task<(bool result, int count)> SaveChangesWithResultAsync();
 
         #region FromSql
         List<T> FromSql<T>(string sql, object parameters = null);
@@ -156,28 +203,40 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <summary>
         /// 批量添加
         /// </summary>
-        /// <param name="entitys"></param>
-        void AddRange(IQueryable<TEntity> entitys);
+        /// <param name="entities"></param>
+        void AddRange(IEnumerable<TEntity> entities);
         /// <summary>
         /// 批量添加
         /// </summary>
-        /// <param name="entitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task AddRangeAsync(IQueryable<TEntity> entitys);
+        Task AddRangeAsync(IEnumerable<TEntity> entities);
         /// <summary>
         /// 根据id获取对象
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">主键ID</param>
         /// <returns></returns>
         TEntity GetById<TPrimaryKey>(TPrimaryKey id);
         /// <summary>
-        /// 
+        /// 根据id获取对象
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
+        Task<TEntity> GetByIdAsync<TPrimaryKey>(TPrimaryKey id);
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="id">主键ID</param>
+        /// <returns></returns>
+        TEntity GetByIdAsNoTracking<TPrimaryKey>(TPrimaryKey id);
+        /// <summary>
+        /// 根据id获取对象
         /// </summary>
         /// <typeparam name="TPrimaryKey"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<TEntity> GetByIdAsync<TPrimaryKey>(TPrimaryKey id);
-        TEntity GetByIdAsNoTracking<TPrimaryKey>(TPrimaryKey id);
         Task<TEntity> GetByIdAsNoTrackingAsync<TPrimaryKey>(TPrimaryKey id);
         /// <summary>
         /// 获取列表
@@ -211,8 +270,8 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="entitys"></param>
-        void UpdateRange(IQueryable<TEntity> entitys);
+        /// <param name="entities"></param>
+        void UpdateRange(IEnumerable<TEntity> entities);
         /// <summary>
         /// 更新指定实体的指定列
         /// </summary>
@@ -231,10 +290,20 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="id"></param>
         void Remove<TPrimaryKey>(TPrimaryKey id);
         /// <summary>
+        /// 删除实体
+        /// </summary>
+        /// <param name="entity">实体</param>
+        void Remove(TEntity entity);
+        /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="entitys"></param>
-        void RemoveRange(IQueryable<TEntity> entitys);
+        /// <param name="entities"></param>
+        void RemoveRange(IEnumerable<TEntity> entities);
+        /// <summary>
+        /// 批量删除指定条件实体
+        /// </summary>
+        /// <param name="condition"></param>
+        void RemoveRange(Expression<Func<TEntity, bool>> condition);
         /// <summary>
         /// 保存或更新
         /// </summary>
@@ -249,6 +318,28 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="entity"></param>
         /// <param name="propertiesToUpdate"></param>
         void SaveOrUpdate<TPrimaryKey>(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate);
+        /// <summary>
+        /// 添加或更新
+        /// </summary>
+        /// <param name="entity">实体</param>
+        void AddOrUpdate(TEntity entity);
+        /// <summary>
+        /// 异步添加或更新
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <returns></returns>
+        Task AddOrUpdateAsync(TEntity entity);
+        /// <summary>
+        /// 批量添加或更新
+        /// </summary>
+        /// <param name="entities">实体集合</param>
+        void AddOrUpdateRange(IEnumerable<TEntity> entities);
+        /// <summary>
+        /// 异步批量添加或更新
+        /// </summary>
+        /// <param name="entities">实体集合</param>
+        /// <returns></returns>
+        Task AddOrUpdateRangeAsync(IEnumerable<TEntity> entities);
         /// <summary>
         /// 保存
         /// </summary>
@@ -265,6 +356,11 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <param name="count"></param>
         /// <returns></returns>
         bool SaveChanges(out int count);
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        Task<(bool result, int count)> SaveChangesWithResultAsync();
 
         #region FromSql
         List<T> FromSql<T>(string sql, object parameters = null);

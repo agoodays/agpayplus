@@ -36,14 +36,16 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<SysRole>(dto);
             await _sysRoleRepository.AddAsync(entity);
-            return await _sysRoleRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysRoleRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<bool> UpdateAsync(SysRoleModifyDto dto)
         {
             var entity = _mapper.Map<SysRole>(dto);
             _sysRoleRepository.Update(entity);
-            return await _sysRoleRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysRoleRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<bool> RemoveRoleAsync(string roleId)
@@ -59,7 +61,8 @@ namespace AGooday.AgPay.Application.Services
             //删除关联表
             _sysRoleEntRelaRepository.RemoveByRoleId(roleId);
 
-            return await _sysRoleEntRelaRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysRoleEntRelaRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<SysRoleDto> GetByIdAsync(string recordId, string belongInfoId)

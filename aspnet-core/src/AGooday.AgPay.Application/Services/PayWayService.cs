@@ -34,7 +34,8 @@ namespace AGooday.AgPay.Application.Services
             dto.WayCode = dto.WayCode.ToUpper();
             var entity = _mapper.Map<PayWay>(dto);
             await _payWayRepository.AddAsync(entity);
-            return await _payWayRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payWayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<string> GetWayTypeByWayCodeAsync(string wayCode)

@@ -30,8 +30,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public void RemoveByMchNo(string mchNo)
         {
-            var entitys = DbSet.Where(w => w.MchNo.Equals(mchNo));
-            RemoveRange(entitys);
+            var entities = DbSet.Where(w => w.MchNo.Equals(mchNo));
+            RemoveRange(entities);
         }
     }
 }

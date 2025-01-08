@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<SysArticle>(dto);
             await _sysArticleRepository.AddAsync(entity);
-            var result = await _sysArticleRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysArticleRepository.SaveChangesWithResultAsync();
             dto.ArticleId = entity.ArticleId;
             return result;
         }
@@ -39,7 +39,9 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mapper.Map<SysArticle>(dto);
             entity.UpdatedAt = DateTime.Now;
             _sysArticleRepository.Update(entity);
-            return await _sysArticleRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysArticleRepository.SaveChangesWithResultAsync();
+            dto.ArticleId = entity.ArticleId;
+            return result;
         }
 
         public async Task<PaginatedList<SysArticleDto>> GetPaginatedDataAsync(SysArticleQueryDto dto, string agentNo = null)

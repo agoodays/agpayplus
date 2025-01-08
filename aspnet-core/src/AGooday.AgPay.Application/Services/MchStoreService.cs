@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<MchStore>(dto);
             await _mchStoreRepository.AddAsync(entity);
-            var result = await _mchStoreRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _mchStoreRepository.SaveChangesWithResultAsync();
             dto.StoreId = entity.StoreId;
             return result;
         }

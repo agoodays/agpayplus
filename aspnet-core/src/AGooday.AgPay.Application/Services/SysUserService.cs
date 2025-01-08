@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<SysUser>(dto);
             await _sysUserRepository.AddAsync(entity);
-            var result = await _sysUserRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysUserRepository.SaveChangesWithResultAsync();
             dto.SysUserId = entity.SysUserId;
             return result;
         }
@@ -61,7 +61,8 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mapper.Map<SysUser>(dto);
             entity.UpdatedAt = DateTime.Now;
             _sysUserRepository.Update(entity);
-            return await _sysUserRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task ModifyCurrentUserInfoAsync(ModifyCurrentUserInfoDto dto)
@@ -95,8 +96,8 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<SysUserDto> GetByBelongInfoIdAsNoTracking(string belongInfoId)
         {
-            var entitys = _sysUserRepository.GetByBelongInfoIdAsNoTracking(belongInfoId);
-            return _mapper.Map<IEnumerable<SysUserDto>>(entitys);
+            var entities = _sysUserRepository.GetByBelongInfoIdAsNoTracking(belongInfoId);
+            return _mapper.Map<IEnumerable<SysUserDto>>(entities);
         }
 
         public async Task<SysUserDto> GetByIdAsync(long recordId, string belongInfoId)

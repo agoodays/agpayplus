@@ -32,7 +32,8 @@ namespace AGooday.AgPay.Application.Services
             } while (await IsExistIsvNoAsync(dto.IsvNo));
             var m = _mapper.Map<IsvInfo>(dto);
             await _isvInfoRepository.AddAsync(m);
-            return await _isvInfoRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _isvInfoRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public override async Task<bool> UpdateAsync(IsvInfoDto dto)
@@ -40,7 +41,8 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mapper.Map<IsvInfo>(dto);
             entity.UpdatedAt = DateTime.Now;
             _isvInfoRepository.Update(entity);
-            return await _isvInfoRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _isvInfoRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public Task<bool> IsExistIsvNoAsync(string isvNo)

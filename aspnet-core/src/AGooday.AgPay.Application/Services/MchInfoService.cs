@@ -67,7 +67,8 @@ namespace AGooday.AgPay.Application.Services
                 entity.Sipw = dto.Sipw;
                 _mchInfoRepository.Update(entity, e => new { e.Sipw, e.UpdatedAt });
             }
-            return await _mchInfoRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _mchInfoRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public Task ModifyAsync(MchInfoModifyDto dto)

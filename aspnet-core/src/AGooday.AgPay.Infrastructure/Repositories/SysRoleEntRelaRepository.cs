@@ -13,8 +13,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public void RemoveByRoleId(string roleId)
         {
-            var entitys = DbSet.Where(w => w.RoleId.Equals(roleId));
-            DbSet.RemoveRange(entitys);
+            var entities = DbSet.Where(w => w.RoleId.Equals(roleId));
+            DbSet.RemoveRange(entities);
         }
     }
 }

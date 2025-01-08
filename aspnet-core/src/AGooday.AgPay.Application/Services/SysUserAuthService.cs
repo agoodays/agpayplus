@@ -26,7 +26,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<SysUserAuth>(dto);
             await _sysUserAuthRepository.AddAsync(entity);
-            var result = await _sysUserAuthRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysUserAuthRepository.SaveChangesWithResultAsync();
             dto.AuthId = entity.AuthId;
             return result;
         }

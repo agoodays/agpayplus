@@ -12,11 +12,6 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
         }
 
-        public async Task<MchStore> GetByIdAsync(long recordId)
-        {
-            return await GetAll().FirstOrDefaultAsync(w => w.StoreId.Equals(recordId));
-        }
-
         public async Task<MchStore> GetByIdAsNoTrackingAsync(long recordId)
         {
             return await GetAllAsNoTracking().FirstOrDefaultAsync(w => w.StoreId.Equals(recordId));

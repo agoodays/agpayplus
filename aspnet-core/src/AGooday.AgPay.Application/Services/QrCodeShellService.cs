@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Application.Services
             entity.CreatedAt = DateTime.Now;
             entity.UpdatedAt = DateTime.Now;
             await _qrCodeShellRepository.AddAsync(entity);
-            var result = await _qrCodeShellRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _qrCodeShellRepository.SaveChangesWithResultAsync();
             dto.Id = entity.Id;
             return result;
         }
@@ -39,7 +39,8 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mapper.Map<QrCodeShell>(dto);
             entity.UpdatedAt = DateTime.Now;
             _qrCodeShellRepository.Update(entity);
-            return await _qrCodeShellRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _qrCodeShellRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<PaginatedList<QrCodeShellDto>> GetPaginatedDataAsync(QrCodeShellQueryDto dto)

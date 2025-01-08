@@ -29,7 +29,8 @@ namespace AGooday.AgPay.Application.Services
             dto.CreatedAt = DateTime.Now;
             dto.UpdatedAt = DateTime.Now;
             await _payInterfaceDefineRepository.AddAsync(entity);
-            return await _payInterfaceDefineRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payInterfaceDefineRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public override async Task<bool> UpdateAsync(PayInterfaceDefineDto dto)
@@ -37,24 +38,25 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mapper.Map<PayInterfaceDefine>(dto);
             entity.UpdatedAt = DateTime.Now;
             _payInterfaceDefineRepository.Update(entity);
-            return await _payInterfaceDefineRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payInterfaceDefineRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<IEnumerable<PayInterfaceDefineDto>> PayIfDefineListAsync(byte? state)
         {
-            var entitys = await _payInterfaceDefineRepository.GetAllAsNoTracking()
+            var entities = await _payInterfaceDefineRepository.GetAllAsNoTracking()
                 .Where(w => !state.HasValue || w.State.Equals(state))
                 .OrderByDescending(o => o.CreatedAt).ToListAsync();
 
-            var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entitys);
+            var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entities);
             return result;
         }
 
         public IEnumerable<PayInterfaceDefineDto> GetByIfCodes(IEnumerable<string> ifCodes)
         {
-            var entitys = _payInterfaceDefineRepository.GetAllAsNoTracking()
+            var entities = _payInterfaceDefineRepository.GetAllAsNoTracking()
                 .Where(w => ifCodes.Contains(w.IfCode)); ;
-            var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entitys);
+            var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entities);
             return result;
         }
     }

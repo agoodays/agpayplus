@@ -345,7 +345,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 _sysUserRepository.RemoveRange(sysUsers);
 
                 // 2.删除当前代理商信息
-                _agentInfoRepository.Remove(agentInfo.AgentNo);
+                _agentInfoRepository.Remove(agentInfo);
 
                 if (!Commit())
                 {

@@ -385,7 +385,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 _sysUserRepository.RemoveRange(sysUsers);
 
                 // 7.删除当前商户
-                _mchInfoRepository.Remove(mchInfo.MchNo);
+                _mchInfoRepository.Remove(mchInfo);
 
                 if (!await CommitAsync())
                 {

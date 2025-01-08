@@ -98,7 +98,8 @@ namespace AGooday.AgPay.Application.Services
             }
             updateRecord.State = (byte)TransferOrderState.STATE_ING;
             _transferOrderRepository.Update(updateRecord);
-            return await _transferOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _transferOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新转账订单状态 【转账中】 --》 【转账成功】
@@ -117,7 +118,8 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.ChannelOrderNo = channelOrderNo;
             updateRecord.SuccessTime = DateTime.Now;
             _transferOrderRepository.Update(updateRecord);
-            return await _transferOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _transferOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新转账订单状态 【转账中】 --》 【转账失败】
@@ -139,7 +141,8 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.ErrMsg = channelErrMsg;
             updateRecord.ChannelOrderNo = channelOrderNo;
             _transferOrderRepository.Update(updateRecord);
-            return await _transferOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _transferOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新转账订单状态 【转账中】 --》 【转账成功/转账失败】

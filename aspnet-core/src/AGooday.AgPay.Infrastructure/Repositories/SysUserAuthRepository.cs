@@ -16,8 +16,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public void RemoveByUserId(long userId, string sysType)
         {
-            var entitys = DbSet.Where(w => w.UserId.Equals(userId) && w.SysType.Equals(sysType));
-            DbSet.RemoveRange(entitys);
+            var entities = DbSet.Where(w => w.UserId.Equals(userId) && w.SysType.Equals(sysType));
+            DbSet.RemoveRange(entities);
         }
 
         public async Task ResetAuthInfoAsync(long userId, string sysType, string loginUserName, string telphone, string newPwd)

@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Application.Services
             entity.CreatedAt = DateTime.Now;
             entity.UpdatedAt = DateTime.Now;
             await _payOrderProfitRepository.AddAsync(entity);
-            var result = await _payOrderProfitRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payOrderProfitRepository.SaveChangesWithResultAsync();
             dto.Id = entity.Id;
             return result;
         }
@@ -38,7 +38,8 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mapper.Map<PayOrderProfit>(dto);
             entity.UpdatedAt = DateTime.Now;
             _payOrderProfitRepository.Update(entity);
-            return await _payOrderProfitRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payOrderProfitRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public IEnumerable<PayOrderProfitDto> GetByPayOrderIdAsNoTracking(string payOrderId)

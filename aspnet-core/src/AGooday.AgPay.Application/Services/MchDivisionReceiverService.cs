@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<MchDivisionReceiver>(dto);
             await _mchDivisionReceiverRepository.AddAsync(entity);
-            var result = await _mchDivisionReceiverRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _mchDivisionReceiverRepository.SaveChangesWithResultAsync();
             dto.ReceiverId = entity.ReceiverId;
             return result;
         }

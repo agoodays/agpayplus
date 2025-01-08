@@ -33,7 +33,8 @@ namespace AGooday.AgPay.Application.Services
             entity.CreatedAt = DateTime.Now;
             entity.UpdatedAt = DateTime.Now;
             await _qrCodeRepository.AddAsync(entity);
-            return await _qrCodeRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _qrCodeRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public override async Task<bool> UpdateAsync(QrCodeDto dto)
@@ -41,7 +42,8 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mapper.Map<QrCode>(dto);
             entity.UpdatedAt = DateTime.Now;
             _qrCodeRepository.Update(entity);
-            return await _qrCodeRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _qrCodeRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<QrCodeDto> GetByIdAsNoTrackingAsync(string recordId)
@@ -66,13 +68,19 @@ namespace AGooday.AgPay.Application.Services
             {
                 throw new BizException("批次号已存在，请重新填写");
             }
-            for (int i = 1; i <= dto.AddNum; i++)
-            {
-                var entity = _mapper.Map<QrCode>(dto);
-                entity.QrcId = $"{dto.BatchId}{i:D4}";
-                await _qrCodeRepository.AddAsync(entity);
-            }
-            return await _qrCodeRepository.SaveChangesAsync() > 0;
+
+            // 使用 Enumerable.Range 和 Select 创建所有实体
+            var entities = Enumerable.Range(1, dto.AddNum)
+                .Select(i =>
+                {
+                    var entity = _mapper.Map<QrCode>(dto);
+                    entity.QrcId = $"{dto.BatchId}{i:D4}";
+                    return entity;
+                }).AsQueryable();
+
+            await _qrCodeRepository.AddRangeAsync(entities);
+            var (result, _) = await _qrCodeRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<bool> UnBindAsync(string recordId)
@@ -83,7 +91,8 @@ namespace AGooday.AgPay.Application.Services
             entity.AppId = null;
             entity.StoreId = null;
             _qrCodeRepository.Update(entity);
-            return await _qrCodeRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _qrCodeRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public Task<PaginatedList<QrCodeDto>> GetPaginatedDataAsync(QrCodeQueryDto dto)

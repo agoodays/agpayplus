@@ -28,7 +28,8 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mapper.Map<SysEntitlement>(dto);
             entity.UpdatedAt = DateTime.Now;
             _sysEntitlementRepository.Update(entity);
-            return await _sysEntitlementRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysEntitlementRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public SysEntitlementDto GetByKeyAsNoTracking(string entId, string sysType)

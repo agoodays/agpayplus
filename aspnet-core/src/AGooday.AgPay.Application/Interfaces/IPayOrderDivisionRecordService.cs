@@ -11,8 +11,8 @@ namespace AGooday.AgPay.Application.Interfaces
         List<PayOrderDivisionRecordDto> GetByBatchOrderId(PayOrderDivisionRecordQueryDto dto);
         Task<PaginatedList<PayOrderDivisionRecordDto>> GetPaginatedDataAsync(PayOrderDivisionRecordQueryDto dto);
         PaginatedList<PayOrderDivisionRecordDto> DistinctBatchOrderIdList(PayOrderDivisionRecordQueryDto dto);
-        Task UpdateRecordSuccessOrFailBySingleItemAsync(long recordId, byte state, string channelRespResult);
-        Task UpdateRecordSuccessOrFailAsync(List<PayOrderDivisionRecordDto> records, byte state, string channelBatchOrderId, string channelRespResult);
-        Task UpdateResendStateAsync(string payOrderId);
+        Task<bool> UpdateRecordSuccessOrFailBySingleItemAsync(long recordId, byte state, string channelRespResult);
+        Task<int> UpdateRecordSuccessOrFailAsync(List<PayOrderDivisionRecordDto> records, byte state, string channelBatchOrderId, string channelRespResult);
+        Task<bool> UpdateResendStateAsync(string payOrderId);
     }
 }

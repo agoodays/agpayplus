@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<PayOrderDivisionRecord>(dto);
             await _payOrderDivisionRecordRepository.AddAsync(entity);
-            var result = await _payOrderDivisionRecordRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payOrderDivisionRecordRepository.SaveChangesWithResultAsync();
             dto.RecordId = entity.RecordId;
             return result;
         }
@@ -118,13 +118,14 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="recordId"></param>
         /// <param name="state"></param>
         /// <param name="channelRespResult"></param>
-        public async Task UpdateRecordSuccessOrFailBySingleItemAsync(long recordId, byte state, string channelRespResult)
+        public async Task<bool> UpdateRecordSuccessOrFailBySingleItemAsync(long recordId, byte state, string channelRespResult)
         {
             var updateRecord = await _payOrderDivisionRecordRepository.GetByIdAsync(recordId);
             updateRecord.State = state;
             updateRecord.ChannelRespResult = state == (byte)PayOrderDivisionRecordState.STATE_SUCCESS ? "" : channelRespResult; // 若明确成功，清空错误信息。;
             _payOrderDivisionRecordRepository.Update(updateRecord);
-            await _payOrderDivisionRecordRepository.SaveChangesAsync();
+            var (result, _) = await _payOrderDivisionRecordRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         /// <summary>
@@ -134,32 +135,48 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="state"></param>
         /// <param name="channelBatchOrderId"></param>
         /// <param name="channelRespResult"></param>
-        public async Task UpdateRecordSuccessOrFailAsync(List<PayOrderDivisionRecordDto> records, byte state, string channelBatchOrderId, string channelRespResult)
+        public Task<int> UpdateRecordSuccessOrFailAsync(List<PayOrderDivisionRecordDto> records, byte state, string channelBatchOrderId, string channelRespResult)
         {
             if (records == null || records.Count == 0)
             {
-                return;
+                return Task.FromResult(0);
             }
             var recordIds = records.Select(s => s.RecordId);
 
-            var updateRecords = _payOrderDivisionRecordRepository.GetAll()
+            // 使用 ExecuteUpdate 直接在数据库中批量更新
+            var now = DateTime.Now;
+            var updatedCount = _payOrderDivisionRecordRepository.GetAll()
                 .Where(w => recordIds.Contains(w.RecordId)
-                && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_WAIT));
-            foreach (var updateRecord in updateRecords)
-            {
-                updateRecord.State = state;
-                updateRecord.ChannelBatchOrderId = channelBatchOrderId;
-                updateRecord.ChannelRespResult = channelRespResult;
-                _payOrderDivisionRecordRepository.Update(updateRecord);
-            }
-            await _payOrderDivisionRecordRepository.SaveChangesAsync();
+                && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_WAIT))
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(p => p.State, p => state)
+                    .SetProperty(p => p.ChannelBatchOrderId, p => channelBatchOrderId)
+                    .SetProperty(p => p.ChannelRespResult, p => channelRespResult)
+                    .SetProperty(p => p.UpdatedAt, now));
+            return updatedCount;
+
+            //var updateRecords = _payOrderDivisionRecordRepository.GetAll()
+            //    .Where(w => recordIds.Contains(w.RecordId)
+            //    && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_WAIT));
+            //if (updateRecords.Any())
+            //{
+            //    foreach (var updateRecord in updateRecords)
+            //    {
+            //        updateRecord.State = state;
+            //        updateRecord.ChannelBatchOrderId = channelBatchOrderId;
+            //        updateRecord.ChannelRespResult = channelRespResult;
+            //    }
+            //    _payOrderDivisionRecordRepository.UpdateRange(updateRecords);
+            //    return _payOrderDivisionRecordRepository.SaveChangesAsync();
+            //}
+            //return Task.FromResult(0);
         }
 
         /// <summary>
         /// 更新分账订单为： 等待分账中的状态
         /// </summary>
         /// <param name="payOrderId"></param>
-        public async Task UpdateResendStateAsync(string payOrderId)
+        public async Task<bool> UpdateResendStateAsync(string payOrderId)
         {
             var updateRecord = _payOrderRepository.GetAll()
                 .Where(w => w.PayOrderId.Equals(payOrderId) && w.DivisionState == (byte)PayOrderDivisionState.DIVISION_STATE_FINISH)
@@ -180,11 +197,12 @@ namespace AGooday.AgPay.Application.Services
             updateRecordByDiv.ChannelRespResult = "";
             updateRecordByDiv.ChannelBatchOrderId = "";
             _payOrderDivisionRecordRepository.Update(updateRecordByDiv);
-            var recordUpdateFlag = await _payOrderDivisionRecordRepository.SaveChangesAsync() > 0;
+            var (recordUpdateFlag, _) = await _payOrderDivisionRecordRepository.SaveChangesWithResultAsync();
             if (!recordUpdateFlag)
             {
                 throw new BizException("更新分账记录状态失败");
             }
+            return recordUpdateFlag;
         }
     }
 }

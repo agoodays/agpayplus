@@ -39,7 +39,8 @@ namespace AGooday.AgPay.Application.Services
             }
             entity.UpdatedAt = DateTime.Now;
             _mchAppRepository.Update(entity);
-            return await _mchAppRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _mchAppRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<MchAppDto> GetByIdAsync(string recordId, string mchNo)

@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<PayInterfaceConfig>(dto);
             await _payInterfaceConfigRepository.AddAsync(entity);
-            var result = await _payInterfaceConfigRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payInterfaceConfigRepository.SaveChangesWithResultAsync();
             dto.Id = entity.Id;
             return result;
         }
@@ -55,17 +55,19 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task<bool> SaveOrUpdateAsync(PayInterfaceConfigDto dto)
         {
-            var m = _mapper.Map<PayInterfaceConfig>(dto);
-            _payInterfaceConfigRepository.SaveOrUpdate(m, dto.Id);
-            return await _payInterfaceConfigRepository.SaveChangesAsync() > 0;
+            var entity = _mapper.Map<PayInterfaceConfig>(dto);
+            await _payInterfaceConfigRepository.AddOrUpdateAsync(entity);
+            var (result, _) = await _payInterfaceConfigRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<bool> RemoveAsync(string infoType, string infoId)
         {
-            var payInterfaceConfig = await _payInterfaceConfigRepository.GetAllAsNoTracking()
+            var payInterfaceConfig = await _payInterfaceConfigRepository.GetAll()
                 .Where(w => w.InfoId.Equals(infoId) && w.InfoType.Equals(infoType)).FirstOrDefaultAsync();
-            _payInterfaceConfigRepository.Remove(payInterfaceConfig.Id);
-            return await _payInterfaceConfigRepository.SaveChangesAsync() > 0;
+            _payInterfaceConfigRepository.Remove(payInterfaceConfig);
+            var (result, _) = await _payInterfaceConfigRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         /// <summary>

@@ -505,10 +505,7 @@ namespace AGooday.AgPay.Application.Services
                 else
                 {
                     var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(entity.Id);
-                    foreach (var payRateLevelConfig in payRateLevelConfigs)
-                    {
-                        _payRateLevelConfigRepository.Remove(payRateLevelConfig.Id);
-                    }
+                    _payRateLevelConfigRepository.RemoveRange(payRateLevelConfigs);
 
                     entity.FeeType = item.FeeType;
                     entity.LevelMode = item.LevelMode;
@@ -550,42 +547,19 @@ namespace AGooday.AgPay.Application.Services
 
         private void DelPayWayCodeRateConfig(string infoId, string ifCode, string configType, string infoType, List<string> delPayWayCodes)
         {
-            foreach (var wayCode in delPayWayCodes)
-            {
-                var entity = _payRateConfigRepository.GetByUniqueKey(configType, infoType, infoId, ifCode, wayCode);
-                if (entity != null)
-                {
-                    _payRateConfigRepository.Remove(entity.Id);
-
-                    _payRateConfigRepository.SaveChanges();
-
-                    var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(entity.Id);
-                    foreach (var payRateLevelConfig in payRateLevelConfigs)
-                    {
-                        _payRateLevelConfigRepository.Remove(payRateLevelConfig.Id);
-                    }
-
-                    _payRateLevelConfigRepository.SaveChanges();
-                }
-            }
+            var payRateConfigs = _payRateConfigRepository.GetByInfoIdAndIfCode(configType, infoType, infoId, ifCode).Where(w => delPayWayCodes.Contains(w.WayCode));
+            DelPayWayCodeRateConfig(payRateConfigs);
         }
 
-        private void DelPayWayCodeRateConfig(List<PayRateConfig> payRateConfigs)
+        private void DelPayWayCodeRateConfig(IQueryable<PayRateConfig> payRateConfigs)
         {
-            foreach (var entity in payRateConfigs)
-            {
-                _payRateConfigRepository.Remove(entity.Id);
+            var ids = payRateConfigs.Select(s => s.Id).ToList();
+            var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigIds(ids);
+            _payRateLevelConfigRepository.RemoveRange(payRateLevelConfigs);
+            _payRateLevelConfigRepository.SaveChanges();
 
-                _payRateConfigRepository.SaveChanges();
-
-                var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(entity.Id);
-                foreach (var payRateLevelConfig in payRateLevelConfigs)
-                {
-                    _payRateLevelConfigRepository.Remove(payRateLevelConfig.Id);
-                }
-
-                _payRateLevelConfigRepository.SaveChanges();
-            }
+            _payRateConfigRepository.RemoveRange(payRateConfigs);
+            _payRateConfigRepository.SaveChanges();
         }
 
         private (bool IsPassed, string Message) PayRateConfigCheck(PayRateConfigSaveDto dto)
@@ -614,7 +588,7 @@ namespace AGooday.AgPay.Application.Services
                         {
                             if (dto.NoCheckRuleFlag.Equals(CS.YES))
                             {
-                                DelPayWayCodeRateConfig(agentRateConfigs.ToList());
+                                DelPayWayCodeRateConfig(agentRateConfigs);
                             }
                             else
                             {
@@ -626,7 +600,7 @@ namespace AGooday.AgPay.Application.Services
                         {
                             if (dto.NoCheckRuleFlag.Equals(CS.YES))
                             {
-                                DelPayWayCodeRateConfig(mchRateConfigs.ToList());
+                                DelPayWayCodeRateConfig(mchRateConfigs);
                             }
                             else
                             {

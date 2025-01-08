@@ -27,18 +27,17 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<SysLog>(dto);
             await _sysLogRepository.AddAsync(entity);
-            var result = await _sysLogRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysLogRepository.SaveChangesWithResultAsync();
             dto.SysLogId = entity.SysLogId;
             return result;
         }
 
         public async Task<bool> RemoveByIdsAsync(List<long> recordIds)
         {
-            foreach (var recordId in recordIds)
-            {
-                _sysLogRepository.Remove(recordId);
-            }
-            return await _sysLogRepository.SaveChangesAsync() > 0;
+            var entities = _sysLogRepository.GetAll().Where(w => recordIds.Contains(w.SysLogId));
+            _sysLogRepository.RemoveRange(entities);
+            var (result, _) = await _sysLogRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public Task<PaginatedList<SysLogDto>> GetPaginatedDataAsync(SysLogQueryDto dto)

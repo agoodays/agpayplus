@@ -25,8 +25,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public void RemoveByUserId(long userId)
         {
-            var entitys = DbSet.Where(w => w.UserId == userId);
-            DbSet.RemoveRange(entitys);
+            var entities = DbSet.Where(w => w.UserId == userId);
+            DbSet.RemoveRange(entities);
         }
     }
 }

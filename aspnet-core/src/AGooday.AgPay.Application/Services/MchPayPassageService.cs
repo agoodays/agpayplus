@@ -15,6 +15,9 @@ namespace AGooday.AgPay.Application.Services
     /// </summary>
     public class MchPayPassageService : AgPayService<MchPayPassageDto, MchPayPassage, long>, IMchPayPassageService
     {
+        // 注入工作单元
+        private readonly IUnitOfWork _uow;
+
         // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IMchPayPassageRepository _mchPayPassageRepository;
 
@@ -24,7 +27,7 @@ namespace AGooday.AgPay.Application.Services
         private readonly IPayRateConfigRepository _payRateConfigRepository;
         private readonly IPayRateLevelConfigRepository _payRateLevelConfigRepository;
 
-        public MchPayPassageService(IMapper mapper, IMediatorHandler bus,
+        public MchPayPassageService(IMapper mapper, IUnitOfWork uow, IMediatorHandler bus,
             IMchPayPassageRepository mchPayPassageRepository,
             IPayRateConfigService payRateConfigService,
             IPayInterfaceDefineRepository payInterfaceDefineRepository,
@@ -33,7 +36,10 @@ namespace AGooday.AgPay.Application.Services
             IPayRateLevelConfigRepository payRateLevelConfigRepository)
             : base(mapper, bus, mchPayPassageRepository)
         {
+            _uow = uow;
+
             _mchPayPassageRepository = mchPayPassageRepository;
+
             _payRateConfigService = payRateConfigService;
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
             _payInterfaceConfigRepository = payInterfaceConfigRepository;
@@ -50,7 +56,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<MchPayPassage>(dto);
             await _mchPayPassageRepository.AddAsync(entity);
-            var result = await _mchPayPassageRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _mchPayPassageRepository.SaveChangesWithResultAsync();
             dto.Id = entity.Id;
             return result;
         }
@@ -149,41 +155,64 @@ namespace AGooday.AgPay.Application.Services
             }
             if (state.Equals(CS.YES))
             {
-                foreach (var item in mchPayPassages.Where(w => !w.IfCode.Equals(ifCode) && w.State.Equals(CS.YES)))
+                var updateRecords = mchPayPassages.Where(w => !w.IfCode.Equals(ifCode) && w.State.Equals(CS.YES));
+                await updateRecords.ForEachAsync(item =>
                 {
                     item.State = CS.NO;
                     item.UpdatedAt = DateTime.Now;
-                    _mchPayPassageRepository.Update(item);
-                }
+                });
+                _mchPayPassageRepository.UpdateRange(updateRecords);
             }
-            return await _mchPayPassageRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _mchPayPassageRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public async Task<bool> SaveOrUpdateBatchSelfAsync(List<MchPayPassageDto> mchPayPassages, string mchNo)
         {
-            var _smchPayPassages = _mchPayPassageRepository.GetAllAsNoTracking()
-                .Where(w => w.MchNo.Equals(mchNo) && mchPayPassages.Select(s => s.Id).Contains(w.Id));
-            foreach (var payPassage in mchPayPassages)
+            await _uow.BeginTransactionAsync();
+            try
             {
-                if (payPassage.State == CS.NO && payPassage.Id == null)
-                {
-                    continue;
-                }
-                // 商户系统配置通道，添加商户号参数
-                if (!string.IsNullOrWhiteSpace(mchNo))
-                {
-                    payPassage.MchNo = mchNo;
-                }
-                payPassage.Rate = payPassage.Rate / 100;
-                var _payPassage = await _smchPayPassages.Where(w => w.Id.Equals(payPassage.Id)).FirstOrDefaultAsync();
-                payPassage.CreatedAt = _payPassage?.CreatedAt ?? DateTime.Now;
-                payPassage.UpdatedAt = payPassage.UpdatedAt ?? DateTime.Now;
-                var m = _mapper.Map<MchPayPassage>(payPassage);
-                _mchPayPassageRepository.SaveOrUpdate(m, payPassage.Id);
-            }
-            return await _mchPayPassageRepository.SaveChangesAsync() > 0;
-        }
+                var entitiesToSaveOrUpdate = new List<MchPayPassage>();
 
+                foreach (var payPassage in mchPayPassages)
+                {
+                    if (payPassage.State == CS.NO && payPassage.Id == null)
+                    {
+                        continue;
+                    }
+
+                    // 商户系统配置通道，添加商户号参数
+                    if (!string.IsNullOrWhiteSpace(mchNo))
+                    {
+                        payPassage.MchNo = mchNo;
+                    }
+
+                    payPassage.Rate = payPassage.Rate / 100;
+                    payPassage.CreatedAt = payPassage.CreatedAt ?? DateTime.Now;
+                    payPassage.UpdatedAt = DateTime.Now;
+
+                    var entity = _mapper.Map<MchPayPassage>(payPassage);
+                    entitiesToSaveOrUpdate.Add(entity);
+                }
+
+                await _mchPayPassageRepository.AddOrUpdateRangeAsync(entitiesToSaveOrUpdate);
+                var (result, _) = await _mchPayPassageRepository.SaveChangesWithResultAsync();
+                if (result)
+                {
+                    await _uow.CommitTransactionAsync();
+                }
+                else
+                {
+                    await _uow.RollbackTransactionAsync();
+                }
+                return result;
+            }
+            catch
+            {
+                await _uow.RollbackTransactionAsync();
+                throw;
+            }
+        }
 
         /// <summary>
         /// 根据应用ID 和 支付方式， 查询出商户可用的支付接口

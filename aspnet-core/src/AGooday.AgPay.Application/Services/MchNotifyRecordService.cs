@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<MchNotifyRecord>(dto);
             await _mchNotifyRecordRepository.AddAsync(entity);
-            var result = await _mchNotifyRecordRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _mchNotifyRecordRepository.SaveChangesWithResultAsync();
             dto.NotifyId = entity.NotifyId;
             return result;
         }

@@ -153,7 +153,8 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.MchOrderFeeAmount = payOrder.MchOrderFeeAmount;
             updateRecord.ChannelUser = payOrder.ChannelUser;
             _payOrderRepository.Update(updateRecord);
-            return await _payOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新订单状态 【支付中】 --》 【支付成功】
@@ -182,7 +183,8 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.PlatformMchOrderNo = platformMchOrderNo;
             updateRecord.SuccessTime = DateTime.Now;
             _payOrderRepository.Update(updateRecord);
-            return await _payOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新订单状态  【支付中】 --》 【订单关闭】
@@ -199,7 +201,8 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.State = (byte)PayOrderState.STATE_CLOSED;
             updateRecord.SuccessTime = DateTime.Now;
             _payOrderRepository.Update(updateRecord);
-            return await _payOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新订单状态 【支付中】 --》 【支付失败】
@@ -231,7 +234,8 @@ namespace AGooday.AgPay.Application.Services
             updateRecord.PlatformOrderNo = platformOrderNo;
             updateRecord.PlatformMchOrderNo = platformMchOrderNo;
             _payOrderRepository.Update(updateRecord);
-            return await _payOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新订单状态 【支付中】 --》 【支付成功/支付失败】
@@ -269,15 +273,29 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public Task<int> UpdateOrderExpiredAsync()
         {
-            var updateRecords = _payOrderRepository.GetAll().Where(
-                w => (new List<byte>() { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }).Contains(w.State)
-                && w.ExpiredTime < DateTime.Now);
-            foreach (var payOrder in updateRecords)
-            {
-                payOrder.State = (byte)PayOrderState.STATE_CLOSED;
-                _payOrderRepository.Update(payOrder);
-            }
-            return _payOrderRepository.SaveChangesAsync();
+            // 使用 ExecuteUpdate 直接在数据库中批量更新
+            var now = DateTime.Now;
+            var updatedCount = _payOrderRepository.GetAll()
+                .Where(w => new byte[] { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }.Contains(w.State)
+                    && w.ExpiredTime < DateTime.Now)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(p => p.State, p => (byte)PayOrderState.STATE_CLOSED)
+                    .SetProperty(p => p.UpdatedAt, now));
+            return updatedCount;
+
+            //var updateRecords = _payOrderRepository.GetAll()
+            //    .Where(w => (new List<byte>() { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }).Contains(w.State)
+            //    && w.ExpiredTime < DateTime.Now);
+            //if (updateRecords.Any())
+            //{
+            //    foreach (var payOrder in updateRecords)
+            //    {
+            //        payOrder.State = (byte)PayOrderState.STATE_CLOSED;
+            //    }
+            //    _payOrderRepository.UpdateRange(updateRecords);
+            //    return _payOrderRepository.SaveChangesAsync();
+            //}
+            //return Task.FromResult(0);
         }
         /// <summary>
         /// 更新订单 通知状态 --> 已发送
@@ -289,7 +307,8 @@ namespace AGooday.AgPay.Application.Services
             var updateRecord = await _payOrderRepository.GetByIdAsync(orderId);
             updateRecord.NotifyState = CS.YES;
             _payOrderRepository.Update(updateRecord);
-            return await _payOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
         /// <summary>
         /// 更新订单表分账状态为： 等待分账任务处理
@@ -305,7 +324,8 @@ namespace AGooday.AgPay.Application.Services
             }
             updateRecord.DivisionState = (byte)PayOrderDivisionState.DIVISION_STATE_WAIT_TASK;
             _payOrderRepository.Update(updateRecord);
-            return await _payOrderRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _payOrderRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         /// <summary>

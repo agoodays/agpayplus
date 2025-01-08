@@ -68,7 +68,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         [TestMethod]
         public void GetAgentsTest()
         {
-            var agentInfos = _repository.GetAll()
+            var agentInfos = _repository.GetAllAsNoTracking()
                 .Include(a => a.ParentAgent)
                 .Include(a => a.SubAgents)
                 .ToList();
@@ -100,7 +100,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         /// <returns>加载了所有上级代理商的 AgentInfo 对象</returns>
         private AgentInfo LoadAgentWithParents(string agentNo)
         {
-            var agent = _repository.GetAll()
+            var agent = _repository.GetAllAsNoTracking()
                 .Include(a => a.ParentAgent)
                 .FirstOrDefault(a => a.AgentNo == agentNo);
 
@@ -152,7 +152,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         /// <returns>加载了所有下级代理商的 AgentInfo 对象</returns>
         private AgentInfo LoadAgentWithSubAgents(string agentNo)
         {
-            var agent = _repository.GetAll()
+            var agent = _repository.GetAllAsNoTracking()
                 .Include(a => a.SubAgents)
                 .FirstOrDefault(a => a.AgentNo == agentNo);
 
@@ -196,7 +196,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         [TestMethod]
         public void GetAgentTest()
         {
-            var agentInfo = _repository.GetAll()
+            var agentInfo = _repository.GetAllAsNoTracking()
             .Include(a => a.ParentAgent)
             .ThenInclude(a => a.ParentAgent) // 加载上级的上级代理商
             .Include(a => a.SubAgents)
@@ -208,7 +208,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         public void GetAgentDetailsTest()
         {
             // 查询所有代理商并加载直接上级代理商和子代理商
-            var allAgentInfos = _repository.GetAll()
+            var allAgentInfos = _repository.GetAllAsNoTracking()
                 .Include(a => a.ParentAgent)
                 .Include(a => a.SubAgents)
                 .ToList();

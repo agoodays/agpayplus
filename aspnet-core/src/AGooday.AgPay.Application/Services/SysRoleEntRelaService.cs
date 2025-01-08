@@ -92,16 +92,12 @@ namespace AGooday.AgPay.Application.Services
             _sysRoleEntRelaRepository.RemoveByRoleId(roleId);
 
             //2. 插入
-            foreach (var entId in entIdList)
+            var entities = entIdList.Select(entId => new SysRoleEntRela()
             {
-                var m = new SysRoleEntRela()
-                {
-                    RoleId = roleId,
-                    EntId = entId,
-                };
-                await _sysRoleEntRelaRepository.AddAsync(m);
-            }
-
+                RoleId = roleId,
+                EntId = entId,
+            }).AsQueryable();
+            await _sysRoleEntRelaRepository.AddRangeAsync(entities);
             return await _sysRoleEntRelaRepository.SaveChangesAsync();
         }
     }

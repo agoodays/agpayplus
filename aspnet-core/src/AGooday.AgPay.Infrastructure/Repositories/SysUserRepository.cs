@@ -72,10 +72,5 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return (await DbSet.FirstAsync(w => w.BelongInfoId.Equals(agentNo) && w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.UserType.Equals(CS.USER_TYPE.ADMIN))).SysUserId;
         }
-
-        public void Remove(SysUser sysUser)
-        {
-            DbSet.Remove(sysUser);
-        }
     }
 }

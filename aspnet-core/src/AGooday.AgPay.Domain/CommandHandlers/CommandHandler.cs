@@ -68,14 +68,29 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             _uow.BeginTransaction();
         }
 
+        public async Task BeginTransactionAsync()
+        {
+            await _uow.BeginTransactionAsync();
+        }
+
         public void CommitTransaction()
         {
             _uow.CommitTransaction();
         }
 
+        public async Task CommitTransactionAsync()
+        {
+            await _uow.CommitTransactionAsync();
+        }
+
         public void RollbackTransaction()
         {
             _uow.RollbackTransaction();
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            await _uow.RollbackTransactionAsync();
         }
 
         //工作单元提交

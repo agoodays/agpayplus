@@ -23,15 +23,29 @@ namespace AGooday.AgPay.Infrastructure.UoW
         {
             _transaction = _dbcontext.Database.BeginTransaction();
         }
+        public async Task BeginTransactionAsync()
+        {
+            _transaction = await _dbcontext.Database.BeginTransactionAsync();
+        }
 
         public void CommitTransaction()
         {
             _transaction.Commit();
         }
 
+        public async Task CommitTransactionAsync()
+        {
+            await _transaction.CommitAsync();
+        }
+
         public void RollbackTransaction()
         {
             _transaction.Rollback();
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            await _transaction.RollbackAsync();
         }
 
         //上下文提交
@@ -49,6 +63,13 @@ namespace AGooday.AgPay.Infrastructure.UoW
         public void Dispose()
         {
             _dbcontext.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await _dbcontext.DisposeAsync();
+            GC.SuppressFinalize(this);
         }
     }
 }

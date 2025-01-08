@@ -65,7 +65,8 @@ namespace AGooday.AgPay.Application.Services
                 entity.Sipw = dto.Sipw;
             entity.UpdatedAt = DateTime.Now;
             _agentInfoRepository.Update(entity, e => new { e.Sipw, e.UpdatedAt });
-            return await _agentInfoRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agentInfoRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public IEnumerable<AgentInfoDto> GetParents(string agentNo)

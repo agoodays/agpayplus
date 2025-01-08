@@ -50,18 +50,18 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public virtual void AddRange(IQueryable<TEntity> entitys)
+        public virtual void AddRange(IEnumerable<TEntity> entities)
         {
-            DbSet.AddRange(entitys);
+            DbSet.AddRange(entities);
         }
         /// <summary>
         /// 批量添加
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public virtual async Task AddRangeAsync(IQueryable<TEntity> entitys)
+        public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities)
         {
-            await DbSet.AddRangeAsync(entitys);
+            await DbSet.AddRangeAsync(entities);
         }
         /// <summary>
         /// 根据id获取对象
@@ -84,7 +84,6 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 根据id获取对象
         /// </summary>
-        /// <typeparam name="TPrimaryKey"></typeparam>
         /// <param name="id">主键ID</param>
         /// <returns></returns>
         public virtual TEntity GetByIdAsNoTracking(TPrimaryKey id)
@@ -98,7 +97,6 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 根据id获取对象
         /// </summary>
-        /// <typeparam name="TPrimaryKey"></typeparam>
         /// <param name="id">主键ID</param>
         /// <returns></returns>
         public virtual Task<TEntity> GetByIdAsNoTrackingAsync(TPrimaryKey id)
@@ -108,6 +106,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
             // 使用 AsNoTracking 禁用更改追踪，并使用编译后的 lambda 表达式进行查找
             return DbSet.AsNoTracking().FirstOrDefaultAsync(lambda);
+        }
+        /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <param name="propertyName">主键名称</param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public virtual async Task<TEntity> GetByIdAsNoTrackingAsync(string propertyName, TPrimaryKey id)
+        {
+            return await DbSet.AsNoTracking().FirstOrDefaultAsync(e => EF.Property<TPrimaryKey>(e, propertyName).Equals(id));
         }
         /// <summary>
         /// 获取列表
@@ -158,10 +166,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="entitys"></param>
-        public virtual void UpdateRange(IQueryable<TEntity> entitys)
+        /// <param name="entities"></param>
+        public virtual void UpdateRange(IEnumerable<TEntity> entities)
         {
-            DbSet.UpdateRange(entitys);
+            DbSet.UpdateRange(entities);
         }
         /// <summary>
         /// 更新指定实体的指定列
@@ -229,12 +237,29 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             DbSet.Remove(DbSet.Find(id));
         }
         /// <summary>
+        /// 删除实体
+        /// </summary>
+        /// <param name="entity">实体</param>
+        public virtual void Remove(TEntity entity)
+        {
+            DbSet.Remove(DbSet.Find(entity));
+        }
+        /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="entitys"></param>
-        public virtual void RemoveRange(IQueryable<TEntity> entitys)
+        /// <param name="entities"></param>
+        public virtual void RemoveRange(IEnumerable<TEntity> entities)
         {
-            DbSet.RemoveRange(entitys);
+            DbSet.RemoveRange(entities);
+        }
+        /// <summary>
+        /// 批量删除指定条件实体
+        /// </summary>
+        /// <param name="condition"></param>
+        public void RemoveRange(Expression<Func<TEntity, bool>> condition)
+        {
+            var entities = DbSet.Where(condition);
+            DbSet.RemoveRange(entities);
         }
         /// <summary>
         /// 保存或更新
@@ -282,6 +307,116 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             }
         }
         /// <summary>
+        /// 添加或更新
+        /// </summary>
+        /// <param name="entity">实体</param>
+        public virtual void AddOrUpdate(TEntity entity)
+        {
+            var keyValues = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+            var existingEntity = DbSet.Find(keyValues);
+
+            if (existingEntity != null)
+            {
+                Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                DbSet.Update(existingEntity);
+            }
+            else
+            {
+                DbSet.Add(entity);
+            }
+        }
+        /// <summary>
+        /// 异步添加或更新
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <returns></returns>
+        public virtual async Task AddOrUpdateAsync(TEntity entity)
+        {
+            var keyValues = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+            var existingEntity = await DbSet.FindAsync(keyValues);
+
+            if (existingEntity != null)
+            {
+                Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                DbSet.Update(existingEntity);
+            }
+            else
+            {
+                await DbSet.AddAsync(entity);
+            }
+        }
+        /// <summary>
+        /// 批量添加或更新
+        /// </summary>
+        /// <param name="entities">实体集合</param>
+        public virtual void AddOrUpdateRange(IEnumerable<TEntity> entities)
+        {
+            var entitiesToAdd = new List<TEntity>();
+            var entitiesToUpdate = new List<TEntity>();
+
+            foreach (var entity in entities)
+            {
+                var keyValues = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+                var existingEntity = DbSet.Find(keyValues);
+
+                if (existingEntity != null)
+                {
+                    Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                    entitiesToUpdate.Add(existingEntity);
+                }
+                else
+                {
+                    entitiesToAdd.Add(entity);
+                }
+            }
+
+            if (entitiesToAdd.Any())
+            {
+                DbSet.AddRange(entitiesToAdd);
+            }
+
+            if (entitiesToUpdate.Any())
+            {
+                DbSet.UpdateRange(entitiesToUpdate);
+            }
+        }
+        /// <summary>
+        /// 异步批量添加或更新
+        /// </summary>
+        /// <param name="entities">实体集合</param>
+        /// <returns></returns>
+        public virtual async Task AddOrUpdateRangeAsync(IEnumerable<TEntity> entities)
+        {
+            var entitiesToAdd = new List<TEntity>();
+            var entitiesToUpdate = new List<TEntity>();
+
+            foreach (var entity in entities)
+            {
+                var keyValues = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+                var existingEntity = await DbSet.FindAsync(keyValues);
+
+                if (existingEntity != null)
+                {
+                    Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                    entitiesToUpdate.Add(existingEntity);
+                }
+                else
+                {
+                    entitiesToAdd.Add(entity);
+                }
+            }
+
+            if (entitiesToAdd.Any())
+            {
+                await DbSet.AddRangeAsync(entitiesToAdd);
+            }
+
+            if (entitiesToUpdate.Any())
+            {
+                DbSet.UpdateRange(entitiesToUpdate);
+            }
+        }
+        /// <summary>
         /// 保存
         /// </summary>
         /// <returns></returns>
@@ -306,6 +441,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             count = Db.SaveChanges();
             return count > 0;
+        }
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        public async Task<(bool result, int count)> SaveChangesWithResultAsync()
+        {
+            var count = await Db.SaveChangesAsync();
+            var result = count > 0;
+            return (result, count);
         }
 
         #region FromSql
@@ -376,20 +521,20 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 批量添加
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public virtual void AddRange(IQueryable<TEntity> entitys)
+        public virtual void AddRange(IEnumerable<TEntity> entities)
         {
-            DbSet.AddRange(entitys);
+            DbSet.AddRange(entities);
         }
         /// <summary>
         /// 批量添加
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public virtual async Task AddRangeAsync(IQueryable<TEntity> entitys)
+        public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities)
         {
-            await DbSet.AddRangeAsync(entitys);
+            await DbSet.AddRangeAsync(entities);
         }
         /// <summary>
         /// 根据id获取对象
@@ -440,6 +585,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return DbSet.AsNoTracking().FirstOrDefaultAsync(lambda);
         }
         /// <summary>
+        /// 根据id获取对象
+        /// </summary>
+        /// <param name="propertyName">主键名称</param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public virtual async Task<TEntity> GetByIdAsNoTrackingAsync<TPrimaryKey>(string propertyName, TPrimaryKey id)
+        {
+            return await DbSet.AsNoTracking().FirstOrDefaultAsync(e => EF.Property<TPrimaryKey>(e, propertyName).Equals(id));
+        }
+        /// <summary>
         /// 获取列表
         /// </summary>
         /// <returns></returns>
@@ -480,7 +635,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 根据对象进行更新
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="entity"></param>
         public virtual void Update(TEntity entity)
         {
             DbSet.Update(entity);
@@ -488,10 +643,10 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="entitys"></param>
-        public virtual void UpdateRange(IQueryable<TEntity> entitys)
+        /// <param name="entities"></param>
+        public virtual void UpdateRange(IEnumerable<TEntity> entities)
         {
-            DbSet.UpdateRange(entitys);
+            DbSet.UpdateRange(entities);
         }
         /// <summary>
         /// 更新指定实体的指定列
@@ -557,24 +712,42 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             DbSet.Remove(DbSet.Find(id));
         }
         /// <summary>
+        /// 删除实体
+        /// </summary>
+        /// <param name="entity">实体</param>
+        public virtual void Remove(TEntity entity)
+        {
+            DbSet.Remove(DbSet.Find(entity));
+        }
+        /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="entitys"></param>
-        public virtual void RemoveRange(IQueryable<TEntity> entitys)
+        /// <param name="entities"></param>
+        public virtual void RemoveRange(IEnumerable<TEntity> entities)
         {
-            DbSet.RemoveRange(entitys);
+            DbSet.RemoveRange(entities);
+        }
+        /// <summary>
+        /// 批量删除指定条件实体
+        /// </summary>
+        /// <param name="condition"></param>
+        public void RemoveRange(Expression<Func<TEntity, bool>> condition)
+        {
+            var entities = DbSet.Where(condition);
+            DbSet.RemoveRange(entities);
         }
         /// <summary>
         /// 保存或更新
         /// </summary>
-        /// <returns></returns>
-        public virtual void SaveOrUpdate<TPrimaryKey>(TEntity obj, TPrimaryKey id)
+        /// <typeparam name="TPrimaryKey"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="id"></param>
+        public virtual void SaveOrUpdate<TPrimaryKey>(TEntity entity, TPrimaryKey id)
         {
-            var entity = DbSet.Find(id);
-            if (id != null && entity != null)
-                Update(obj);
+            if (id != null)
+                Update(entity);
             else
-                Add(obj);
+                Add(entity);
         }
         /// <summary>
         /// 保存或更新
@@ -610,6 +783,116 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             }
         }
         /// <summary>
+        /// 添加或更新
+        /// </summary>
+        /// <param name="entity">实体</param>
+        public virtual void AddOrUpdate(TEntity entity)
+        {
+            var keyValues = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+            var existingEntity = DbSet.Find(keyValues);
+
+            if (existingEntity != null)
+            {
+                Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                DbSet.Update(existingEntity);
+            }
+            else
+            {
+                DbSet.Add(entity);
+            }
+        }
+        /// <summary>
+        /// 异步添加或更新
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <returns></returns>
+        public virtual async Task AddOrUpdateAsync(TEntity entity)
+        {
+            var keyValues = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+            var existingEntity = await DbSet.FindAsync(keyValues);
+
+            if (existingEntity != null)
+            {
+                Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                DbSet.Update(existingEntity);
+            }
+            else
+            {
+                await DbSet.AddAsync(entity);
+            }
+        }
+        /// <summary>
+        /// 批量添加或更新
+        /// </summary>
+        /// <param name="entities">实体集合</param>
+        public virtual void AddOrUpdateRange(IEnumerable<TEntity> entities)
+        {
+            var entitiesToAdd = new List<TEntity>();
+            var entitiesToUpdate = new List<TEntity>();
+
+            foreach (var entity in entities)
+            {
+                var keyValues = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+                var existingEntity = DbSet.Find(keyValues);
+
+                if (existingEntity != null)
+                {
+                    Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                    entitiesToUpdate.Add(existingEntity);
+                }
+                else
+                {
+                    entitiesToAdd.Add(entity);
+                }
+            }
+
+            if (entitiesToAdd.Any())
+            {
+                DbSet.AddRange(entitiesToAdd);
+            }
+
+            if (entitiesToUpdate.Any())
+            {
+                DbSet.UpdateRange(entitiesToUpdate);
+            }
+        }
+        /// <summary>
+        /// 异步批量添加或更新
+        /// </summary>
+        /// <param name="entities">实体集合</param>
+        /// <returns></returns>
+        public virtual async Task AddOrUpdateRangeAsync(IEnumerable<TEntity> entities)
+        {
+            var entitiesToAdd = new List<TEntity>();
+            var entitiesToUpdate = new List<TEntity>();
+
+            foreach (var entity in entities)
+            {
+                var keyValues = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
+                var existingEntity = await DbSet.FindAsync(keyValues);
+
+                if (existingEntity != null)
+                {
+                    Db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                    entitiesToUpdate.Add(existingEntity);
+                }
+                else
+                {
+                    entitiesToAdd.Add(entity);
+                }
+            }
+
+            if (entitiesToAdd.Any())
+            {
+                await DbSet.AddRangeAsync(entitiesToAdd);
+            }
+
+            if (entitiesToUpdate.Any())
+            {
+                DbSet.UpdateRange(entitiesToUpdate);
+            }
+        }
+        /// <summary>
         /// 保存
         /// </summary>
         /// <returns></returns>
@@ -634,6 +917,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             count = Db.SaveChanges();
             return count > 0;
+        }
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <returns></returns>
+        public async Task<(bool result, int count)> SaveChangesWithResultAsync()
+        {
+            var count = await Db.SaveChangesAsync();
+            var result = count > 0;
+            return (result, count);
         }
 
         #region FromSql

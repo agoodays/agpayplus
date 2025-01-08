@@ -16,6 +16,5 @@ namespace AGooday.AgPay.Domain.Interfaces
         Task<SysUser> GetByTelphoneAsync(string telphone, string sysType);
         Task<long> FindMchAdminUserIdAsync(string mchNo);
         Task<long> FindAgentAdminUserIdAsync(string agentNo);
-        void Remove(SysUser sysUser);
     }
 }

@@ -25,11 +25,8 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task<int> SaveUserRoleAsync(long userId, List<string> roleIds)
         {
-            foreach (var roleId in roleIds)
-            {
-                var m = new SysUserRoleRela() { UserId = userId, RoleId = roleId };
-                await _sysUserRoleRelaRepository.AddAsync(m);
-            }
+            var entities = roleIds.Select(roleId => new SysUserRoleRela() { UserId = userId, RoleId = roleId }).AsQueryable();
+            await _sysUserRoleRelaRepository.AddRangeAsync(entities);
             return await _sysUserRoleRelaRepository.SaveChangesAsync();
         }
 

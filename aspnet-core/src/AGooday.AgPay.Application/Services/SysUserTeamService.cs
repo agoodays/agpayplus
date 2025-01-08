@@ -24,7 +24,7 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<SysUserTeam>(dto);
             await _sysUserTeamRepository.AddAsync(entity);
-            var result = await _sysUserTeamRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysUserTeamRepository.SaveChangesWithResultAsync();
             dto.TeamId = entity.TeamId;
             return result;
         }
@@ -34,7 +34,8 @@ namespace AGooday.AgPay.Application.Services
             var renew = _mapper.Map<SysUserTeam>(dto);
             renew.UpdatedAt = DateTime.Now;
             _sysUserTeamRepository.Update(renew);
-            return await _sysUserTeamRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _sysUserTeamRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public Task<PaginatedList<SysUserTeamDto>> GetPaginatedDataAsync(SysUserTeamQueryDto dto)

@@ -28,11 +28,6 @@ namespace AGooday.AgPay.Application.Services
             _agPayRepository = agPayRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
         public virtual bool Add(TDto dto)
         {
             var entity = _mapper.Map<TEntity>(dto);
@@ -45,7 +40,8 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<TEntity>(dto);
             await _agPayRepository.AddAsync(entity);
-            return await _agPayRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public virtual bool Remove(TPrimaryKey id)
@@ -57,7 +53,8 @@ namespace AGooday.AgPay.Application.Services
         public virtual async Task<bool> RemoveAsync(TPrimaryKey id)
         {
             _agPayRepository.Remove(id);
-            return await _agPayRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public virtual bool Update(TDto dto)
@@ -71,7 +68,8 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<TEntity>(dto);
             _agPayRepository.Update(entity);
-            return await _agPayRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public virtual TDto GetById(TPrimaryKey id)
@@ -104,14 +102,19 @@ namespace AGooday.AgPay.Application.Services
 
         public virtual IEnumerable<TDto> GetAll()
         {
-            var entitys = _agPayRepository.GetAll();
-            return _mapper.Map<IEnumerable<TDto>>(entitys);
+            var entities = _agPayRepository.GetAll();
+            return _mapper.Map<IEnumerable<TDto>>(entities);
         }
 
         public virtual IEnumerable<TDto> GetAllAsNoTracking()
         {
-            var entitys = _agPayRepository.GetAllAsNoTracking();
-            return _mapper.Map<IEnumerable<TDto>>(entitys);
+            var entities = _agPayRepository.GetAllAsNoTracking();
+            return _mapper.Map<IEnumerable<TDto>>(entities);
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
     public abstract class AgPayService<TDto, TEntity> : IAgPayService<TDto>
@@ -133,11 +136,6 @@ namespace AGooday.AgPay.Application.Services
             _agPayRepository = agPayRepository;
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
         public virtual bool Add(TDto dto)
         {
             var entity = _mapper.Map<TEntity>(dto);
@@ -150,7 +148,8 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<TEntity>(dto);
             await _agPayRepository.AddAsync(entity);
-            return await _agPayRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public virtual bool Remove<TPrimaryKey>(TPrimaryKey id)
@@ -162,7 +161,8 @@ namespace AGooday.AgPay.Application.Services
         public virtual async Task<bool> RemoveAsync<TPrimaryKey>(TPrimaryKey id)
         {
             _agPayRepository.Remove(id);
-            return await _agPayRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public virtual bool Update(TDto dto)
@@ -176,7 +176,8 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<TEntity>(dto);
             _agPayRepository.Update(entity);
-            return await _agPayRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public virtual TDto GetById<TPrimaryKey>(TPrimaryKey id)
@@ -225,6 +226,11 @@ namespace AGooday.AgPay.Application.Services
 
             //第二种写法 ProjectTo
             //return (_agPayRepository.GetAllAsNoTracking()).ProjectTo<TDto>(_mapper.ConfigurationProvider);
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -28,32 +28,28 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task GenAccountBillAsync(string payOrderId)
         {
-            var payOrderProfits = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId).OrderBy(o => o.Id);
-            var isSaveChanges = false;
-            foreach (var payOrderProfit in payOrderProfits)
-            {
-                if (payOrderProfit.ProfitAmount > 0)
+            var accountBills = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId)
+                .OrderBy(o => o.Id)
+                .Where(w => w.ProfitAmount > 0)
+                .Select(s => new AccountBill
                 {
-                    var accountBill = new AccountBill();
-                    accountBill.BillId = SeqUtil.GenBillId();
-                    accountBill.InfoId = payOrderProfit.InfoId;
-                    accountBill.InfoName = payOrderProfit.InfoName;
-                    accountBill.InfoType = payOrderProfit.InfoType;
-                    accountBill.BeforeBalance = 0;
-                    accountBill.ChangeAmount = payOrderProfit.ProfitAmount;
-                    accountBill.AfterBalance = payOrderProfit.ProfitAmount;
-                    accountBill.BizType = (byte)AccountBillBizType.ORDER_PROFIT_CALCULATE;
-                    accountBill.AccountType = (byte)AccountBillAccountType.IN_TRANSIT_ACCOUNT;
-                    accountBill.RelaBizOrderType = (byte)AccountBillRelaBizOrderType.PAY_ORDER;
-                    accountBill.RelaBizOrderId = payOrderProfit.PayOrderId;
-                    accountBill.CreatedAt = DateTime.Now;
-                    accountBill.UpdatedAt = DateTime.Now;
-                    await _agPayRepository.AddAsync(accountBill);
-                    isSaveChanges = true;
-                }
-            }
-            if (isSaveChanges)
+                    BillId = SeqUtil.GenBillId(),
+                    InfoId = s.InfoId,
+                    InfoName = s.InfoName,
+                    InfoType = s.InfoType,
+                    BeforeBalance = 0,
+                    ChangeAmount = s.ProfitAmount,
+                    AfterBalance = s.ProfitAmount,
+                    BizType = (byte)AccountBillBizType.ORDER_PROFIT_CALCULATE,
+                    AccountType = (byte)AccountBillAccountType.IN_TRANSIT_ACCOUNT,
+                    RelaBizOrderType = (byte)AccountBillRelaBizOrderType.PAY_ORDER,
+                    RelaBizOrderId = s.PayOrderId,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                });
+            if (accountBills.Any())
             {
+                await _agPayRepository.AddRangeAsync(accountBills);
                 await _agPayRepository.SaveChangesAsync();
             }
         }
@@ -64,7 +60,7 @@ namespace AGooday.AgPay.Application.Services
             entity.CreatedAt = DateTime.Now;
             entity.UpdatedAt = DateTime.Now;
             await _agPayRepository.AddAsync(entity);
-            var result = await _agPayRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
             return result;
         }
 
@@ -73,7 +69,8 @@ namespace AGooday.AgPay.Application.Services
             var entity = _mapper.Map<AccountBill>(dto);
             entity.UpdatedAt = DateTime.Now;
             _agPayRepository.Update(entity);
-            return await _agPayRepository.SaveChangesAsync() > 0;
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public Task<PaginatedList<AccountBillDto>> GetPaginatedDataAsync(AccountBillQueryDto dto)

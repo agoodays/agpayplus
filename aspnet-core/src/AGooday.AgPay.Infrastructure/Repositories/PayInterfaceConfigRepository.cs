@@ -26,8 +26,8 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public void RemoveByInfoIds(IQueryable<string> infoIds, string infoType)
         {
-            var entitys = DbSet.Where(w => infoIds.Contains(w.InfoId) && w.InfoType.Equals(infoType));
-            RemoveRange(entitys);
+            var entities = DbSet.Where(w => infoIds.Contains(w.InfoId) && w.InfoType.Equals(infoType));
+            RemoveRange(entities);
         }
     }
 }
