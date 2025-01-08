@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Application.Services
             var agentNos = agents?.Select(s => s.AgentNo);
             var (payOrders, refundOrders) = SelectOrderCount(dto, agentNos: agentNos);
 
-            var payRecords = (await payOrders.ToListAsync()).GroupBy(g => g.CreatedAt.Value.ToString(dto.Format))
+            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.CreatedAt.Value.ToString(dto.Format))
                 .Select(s =>
                 {
                     var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
@@ -119,7 +119,7 @@ namespace AGooday.AgPay.Application.Services
                     };
                 });
 
-            var refundRecords = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+            var refundRecords = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable()
                 .GroupBy(g => g.CreatedAt.Value.ToString(dto.Format))
                 .Select(s => new StatisticResultDto()
                 {
