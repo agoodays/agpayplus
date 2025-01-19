@@ -21,7 +21,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 用户IP
         /// </summary>
-        [BindNever]
         public string UserIp { get; set; }
 
         /// <summary>
@@ -43,7 +42,6 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 方法描述
         /// </summary>
-        [BindNever]
         public string MethodRemark { get; set; }
 
         /// <summary>

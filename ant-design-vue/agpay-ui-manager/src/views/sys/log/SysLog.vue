@@ -3,7 +3,7 @@
     <a-card>
       <AgSearchForm
         :searchData="searchData"
-        :openIsShowMore="false"
+        :openIsShowMore="true"
         :isShowMore="isShowMore"
         :btnLoading="btnLoading"
         @update-search-data="handleSearchFormData"
@@ -13,8 +13,6 @@
           <a-form-item label="" class="table-head-layout">
             <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
-          <ag-text-up :placeholder="'用户ID'" :msg="searchData.userId" v-model="searchData.userId" />
-          <ag-text-up :placeholder="'用户名'" :msg="searchData.userName" v-model="searchData.userName" />
           <a-form-item label="" class="table-head-layout">
             <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
               <a-select-option value="">全部</a-select-option>
@@ -23,6 +21,17 @@
               <a-select-option value="MCH">商户系统</a-select-option>
             </a-select>
           </a-form-item>
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.logType" placeholder="日志类型" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">登录日志</a-select-option>
+              <a-select-option value="1">操作日志</a-select-option>
+            </a-select>
+          </a-form-item>
+          <ag-text-up :placeholder="'用户ID'" :msg="searchData.userId" v-model="searchData.userId" />
+          <ag-text-up :placeholder="'用户名'" :msg="searchData.userName" v-model="searchData.userName" />
+          <ag-text-up :placeholder="'用户IP地址'" :msg="searchData.userIp" v-model="searchData.userIp" />
+          <ag-text-up v-if="isShowMore" :placeholder="'操作描述'" :msg="searchData.methodRemark" v-model="searchData.methodRemark" />
         </template>
       </AgSearchForm>
       <!-- 列表渲染 -->
@@ -51,6 +60,14 @@
             {{ record.sysType === 'MGR' ? '运营平台' :
               record.sysType === 'AGENT' ? '代理商系统' :
               record.sysType === 'MCH' ? '商户系统' : '其他' }}
+          </a-tag>
+        </template><template slot="logTypeSlot" slot-scope="{record}">
+          <a-tag
+            :key="record.logType"
+            :color="record.logType === 0 ? '#87d068' :
+              record.logType === 1 ? '#2db7f5' : '#f50'">
+            {{ record.logType === 0 ? '登录日志' :
+              record.logType === 1 ? '操作日志' : '其他' }}
           </a-tag>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
@@ -180,6 +197,7 @@ const tableColumns = [
   { key: 'userId', dataIndex: 'userId', title: '用户ID', width: 120 },
   { key: 'userIp', dataIndex: 'userIp', title: '用户IP', width: 120 },
   { key: 'sysType', title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
+  { key: 'logType', title: '日志类型', width: 120, scopedSlots: { customRender: 'logTypeSlot' } },
   { key: 'methodRemark', dataIndex: 'methodRemark', title: '操作描述', width: 200, ellipsis: true },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }

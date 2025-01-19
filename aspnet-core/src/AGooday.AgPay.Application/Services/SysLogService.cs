@@ -45,6 +45,8 @@ namespace AGooday.AgPay.Application.Services
             var query = _sysLogRepository.GetAllAsNoTracking()
                 .Where(w => (dto.UserId.Equals(null) || w.UserId.Equals(dto.UserId))
                 && (string.IsNullOrWhiteSpace(dto.UserName) || w.UserName.Contains(dto.UserName))
+                && (string.IsNullOrWhiteSpace(dto.UserIp) || w.UserIp.Contains(dto.UserIp))
+                && (string.IsNullOrWhiteSpace(dto.MethodRemark) || w.MethodRemark.Contains(dto.MethodRemark))
                 && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
                 && (dto.LogType.Equals(null) || w.LogType.Equals(dto.LogType))
                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
