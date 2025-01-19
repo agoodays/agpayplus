@@ -18,7 +18,7 @@ const routes = [
         name: 'user',
         component: UserLayout,
         children: [
-            { path: 'login', name: 'login', component: import('/@/views/user/login.vue') },
+            { path: 'login', name: 'login', component: () => import('/@/views/user/login.vue') },
             { path: 'forget', name: 'forget', component: () => import('/@/views/user/forget.vue') }
         ]
     },
