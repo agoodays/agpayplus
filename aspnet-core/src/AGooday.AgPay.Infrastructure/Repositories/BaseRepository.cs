@@ -462,13 +462,25 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.FromSql(sql);
         }
-        public virtual IQueryable<TEntity> FromSqlRaw(string sql, object parameters = null)
+        public virtual IQueryable<TEntity> FromSqlAsNoTracking(FormattableString sql)
+        {
+            return DbSet.FromSql(sql).AsNoTracking();
+        }
+        public virtual IQueryable<TEntity> FromSqlRaw(string sql, params object[] parameters)
         {
             return DbSet.FromSqlRaw(sql, parameters);
+        }
+        public virtual IQueryable<TEntity> FromSqlRawAsNoTracking(string sql, params object[] parameters)
+        {
+            return DbSet.FromSqlRaw(sql, parameters).AsNoTracking();
         }
         public virtual IQueryable<TEntity> FromSqlInterpolated(FormattableString sql)
         {
             return DbSet.FromSqlInterpolated(sql);
+        }
+        public virtual IQueryable<TEntity> FromSqlInterpolatedAsNoTracking(FormattableString sql)
+        {
+            return DbSet.FromSqlInterpolated(sql).AsNoTracking();
         }
         #endregion
 
@@ -938,13 +950,25 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             return DbSet.FromSql(sql);
         }
-        public virtual IQueryable<TEntity> FromSqlRaw(string sql, object parameters = null)
+        public virtual IQueryable<TEntity> FromSqlAsNoTracking(FormattableString sql)
+        {
+            return DbSet.FromSql(sql).AsNoTracking();
+        }
+        public virtual IQueryable<TEntity> FromSqlRaw(string sql, params object[] parameters)
         {
             return DbSet.FromSqlRaw(sql, parameters);
+        }
+        public virtual IQueryable<TEntity> FromSqlRawAsNoTracking(string sql, params object[] parameters)
+        {
+            return DbSet.FromSqlRaw(sql, parameters).AsNoTracking();
         }
         public virtual IQueryable<TEntity> FromSqlInterpolated(FormattableString sql)
         {
             return DbSet.FromSqlInterpolated(sql);
+        }
+        public virtual IQueryable<TEntity> FromSqlInterpolatedAsNoTracking(FormattableString sql)
+        {
+            return DbSet.FromSqlInterpolated(sql).AsNoTracking();
         }
         #endregion
 

@@ -907,7 +907,7 @@ namespace AGooday.AgPay.Application.Services
                 return null;
             }
             var isvPayRateConfig = _payRateConfigRepository.GetByUniqueKey(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, mchInfo.IsvNo, ifCode, wayCode);
-            var agentInfos = _agentInfoRepository.GetParentAgentsFromSql(mchInfo.AgentNo);
+            var agentInfos = _agentInfoRepository.GetParentAgentsFromSqlAsNoTracking(mchInfo.AgentNo);
             var infoType = CS.INFO_TYPE.AGENT;
             var configType = CS.CONFIG_TYPE.AGENTRATE;
             var infoIds = agentInfos.Select(s => s.AgentNo).ToList();

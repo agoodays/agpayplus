@@ -57,5 +57,12 @@ namespace AGooday.AgPay.Application.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<int> UpdateOrderExpiredAsync();
+        /// <summary>
+        /// 更新支付订单分润并生成账单
+        /// </summary>
+        /// <param name="payOrderProfitDtos"></param>
+        /// <param name="accountBillDtos"></param>
+        /// <returns></returns>
+        Task<int> UpdatePayOrderProfitAndGenAccountBillAsync(List<PayOrderProfitDto> payOrderProfitDtos, List<AccountBillDto> accountBillDtos);
     }
 }

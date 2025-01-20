@@ -182,8 +182,11 @@ namespace AGooday.AgPay.Domain.Interfaces
         #region FromSql
         List<T> FromSql<T>(string sql, object parameters = null);
         IQueryable<TEntity> FromSql(FormattableString sql);
-        IQueryable<TEntity> FromSqlRaw(string sql, object parameters = null);
+        IQueryable<TEntity> FromSqlAsNoTracking(FormattableString sql);
+        IQueryable<TEntity> FromSqlRaw(string sql, params object[] parameters);
+        IQueryable<TEntity> FromSqlRawAsNoTracking(string sql, params object[] parameters);
         IQueryable<TEntity> FromSqlInterpolated(FormattableString sql);
+        IQueryable<TEntity> FromSqlInterpolatedAsNoTracking(FormattableString sql);
         #endregion
     }
     public interface IBaseRepository<TEntity> : IDisposable, IAsyncDisposable
@@ -365,8 +368,11 @@ namespace AGooday.AgPay.Domain.Interfaces
         #region FromSql
         List<T> FromSql<T>(string sql, object parameters = null);
         IQueryable<TEntity> FromSql(FormattableString sql);
-        IQueryable<TEntity> FromSqlRaw(string sql, object parameters = null);
+        IQueryable<TEntity> FromSqlAsNoTracking(FormattableString sql);
+        IQueryable<TEntity> FromSqlRaw(string sql, params object[] parameters);
+        IQueryable<TEntity> FromSqlRawAsNoTracking(string sql, params object[] parameters);
         IQueryable<TEntity> FromSqlInterpolated(FormattableString sql);
+        IQueryable<TEntity> FromSqlInterpolatedAsNoTracking(FormattableString sql);
         #endregion
     }
     public interface IBaseRepository : IDisposable, IAsyncDisposable

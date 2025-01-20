@@ -63,14 +63,14 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<MchPayPassageDto> GetMchPayPassageByMchNoAndAppId(string mchNo, string appId)
         {
-            var mchPayPassages = _mchPayPassageRepository.GetMchPayPassageByMchNoAndAppId(mchNo, appId);
-            return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
+            var records = _mchPayPassageRepository.GetMchPayPassageByMchNoAndAppId(mchNo, appId);
+            return _mapper.Map<IEnumerable<MchPayPassageDto>>(records);
         }
 
         public IEnumerable<MchPayPassageDto> GetByAppIdAndWayCodesAsNoTracking(string appId, List<string> wayCodes)
         {
-            var mchPayPassages = _mchPayPassageRepository.GetByAppIdAndWayCodesAsNoTracking(appId, wayCodes);
-            return _mapper.Map<IEnumerable<MchPayPassageDto>>(mchPayPassages);
+            var records = _mchPayPassageRepository.GetByAppIdAndWayCodesAsNoTracking(appId, wayCodes);
+            return _mapper.Map<IEnumerable<MchPayPassageDto>>(records);
         }
 
         /// <summary>

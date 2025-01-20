@@ -52,6 +52,13 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         }
 
         [TestMethod]
+        public void GetSubAgentsFromSqlAsNoTrackingTest()
+        {
+            var agentInfos = _repository.GetSubAgentsFromSqlAsNoTracking("A1671629955");
+            Assert.IsNotNull(agentInfos);
+        }
+
+        [TestMethod]
         public void GetParentAgentsTest()
         {
             var agentInfos = _repository.GetParentAgents("A1702728742");

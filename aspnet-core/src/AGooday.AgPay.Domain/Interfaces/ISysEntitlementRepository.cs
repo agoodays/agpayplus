@@ -4,7 +4,9 @@ namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface ISysEntitlementRepository : IAgPayRepository<SysEntitlement>
     {
-        SysEntitlement GetByKeyAsNoTracking(string entId, string sysType);
-        SysEntitlement GetByKey(string entId, string sysType);
+        Task<SysEntitlement> GetByKeyAsNoTrackingAsync(string entId, string sysType);
+        Task<SysEntitlement> GetByKeyAsync(string entId, string sysType);
+        IEnumerable<SysEntitlement> GetSubSysEntitlementsFromSqlAsNoTracking(string entId, string sysType);
+        IEnumerable<SysEntitlement> GetParentSysEntitlementsFromSqlAsNoTracking(string entId, string sysType);
     }
 }

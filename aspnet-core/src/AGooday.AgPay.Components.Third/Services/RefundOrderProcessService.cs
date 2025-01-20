@@ -80,6 +80,8 @@ namespace AGooday.AgPay.Components.Third.Services
         {
             IPaymentService paymentService = _paymentServiceFactory.GetService(refundOrder.IfCode);
             var payOrder = await _payOrderService.GetByIdAsync(refundOrder.PayOrderId);
+            var updatePayOrderProfits = new List<PayOrderProfitDto>();
+            var accountBills = new List<AccountBillDto>();
             var payOrderProfits = _payOrderProfitService.GetByPayOrderIdAsNoTracking(refundOrder.PayOrderId);
             var amount = payOrder.Amount - payOrder.RefundAmount;
             var beforeBalance = 0L;
@@ -96,8 +98,8 @@ namespace AGooday.AgPay.Components.Third.Services
                 changeAmount = afterBalance - beforeBalance;
                 payOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, payOrderProfit.FeeRate) ?? 0;
                 payOrderProfit.ProfitAmount = profitAmount;
-                await _payOrderProfitService.UpdateAsync(payOrderProfit);
-                await GenAccountBillAsync(payOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+                updatePayOrderProfits.Add(payOrderProfit);
+                GenAccountBill(accountBills, payOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
                 totalProfitAmount += profitAmount;
             }
 
@@ -112,8 +114,8 @@ namespace AGooday.AgPay.Components.Third.Services
             changeAmount = afterBalance - beforeBalance;
             platformInaccountPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
             platformInaccountPayOrderProfit.ProfitAmount = profitAmount;
-            await _payOrderProfitService.UpdateAsync(platformInaccountPayOrderProfit);
-            await GenAccountBillAsync(platformInaccountPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+            updatePayOrderProfits.Add(platformInaccountPayOrderProfit);
+            GenAccountBill(accountBills, platformInaccountPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
 
             var platformProfitPayOrderProfit = payOrderProfits
                 .Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM) && w.InfoId.Equals(CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_PROFIT))
@@ -125,11 +127,13 @@ namespace AGooday.AgPay.Components.Third.Services
             changeAmount = afterBalance - beforeBalance;
             platformProfitPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformProfitPayOrderProfit.FeeRate) ?? 0;
             platformProfitPayOrderProfit.ProfitAmount = profitAmount;
-            await _payOrderProfitService.UpdateAsync(platformProfitPayOrderProfit);
-            await GenAccountBillAsync(platformProfitPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+            updatePayOrderProfits.Add(platformProfitPayOrderProfit);
+            GenAccountBill(accountBills, platformProfitPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+
+            await _refundOrderService.UpdatePayOrderProfitAndGenAccountBillAsync(updatePayOrderProfits, accountBills);
         }
 
-        private Task GenAccountBillAsync(PayOrderProfitDto payOrderProfit, RefundOrderDto refundOrder, long beforeBalance, long afterBalance, long changeAmount)
+        private void GenAccountBill(List<AccountBillDto> accountBills, PayOrderProfitDto payOrderProfit, RefundOrderDto refundOrder, long beforeBalance, long afterBalance, long changeAmount)
         {
             if (beforeBalance > 0 && changeAmount != 0)
             {
@@ -145,9 +149,8 @@ namespace AGooday.AgPay.Components.Third.Services
                 accountBill.AccountType = (byte)AccountBillAccountType.IN_TRANSIT_ACCOUNT;
                 accountBill.RelaBizOrderType = (byte)AccountBillRelaBizOrderType.REFUND_ORDER;
                 accountBill.RelaBizOrderId = refundOrder.RefundOrderId;
-                return _accountBillService.AddAsync(accountBill);
+                accountBills.Add(accountBill);
             }
-            return Task.CompletedTask;
         }
     }
 }

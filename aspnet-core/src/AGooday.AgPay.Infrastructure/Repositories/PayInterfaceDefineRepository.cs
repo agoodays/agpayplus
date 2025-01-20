@@ -22,14 +22,16 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <returns></returns>
         public IEnumerable<T> SelectAvailablePayInterfaceList<T>(string wayCode, string appId, string infoType, byte mchType)
         {
-            string sql = $@"select pid.if_code IfCode, pid.if_name IfName, pid.config_page_type ConfigPageType, pid.bg_color BgColor, pid.icon Icon, pic.if_params IfParams, pic.if_rate IfRate from t_pay_interface_define pid
-                            inner join t_pay_interface_config pic on pid.if_code = pic.if_code
-                            where JSON_CONTAINS(pid.way_codes, JSON_OBJECT('wayCode', @WayCode))
-                            and pid.state = 1
-                            and pic.state = 1
-                            and pic.info_type = @InfoType
-                            and pic.info_id = @AppId
-                            and (pic.if_params is not null and trim(pic.if_params) != '')";
+            var sql = $"""
+                select pid.if_code IfCode, pid.if_name IfName, pid.config_page_type ConfigPageType, pid.bg_color BgColor, pid.icon Icon, pic.if_params IfParams, pic.if_rate IfRate from t_pay_interface_define pid
+                inner join t_pay_interface_config pic on pid.if_code = pic.if_code
+                where JSON_CONTAINS(pid.way_codes, JSON_OBJECT('wayCode', @WayCode))
+                and pid.state = 1
+                and pic.state = 1
+                and pic.info_type = @InfoType
+                and pic.info_id = @AppId
+                and (pic.if_params is not null and trim(pic.if_params) != '')
+                """;
             switch (mchType)
             {
                 case 1:

@@ -162,32 +162,26 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         }
 
         #region Sql
-        public IEnumerable<AgentInfo> GetSubAgentsFromSql(string agentNo)
+        public IEnumerable<AgentInfo> GetSubAgentsFromSqlAsNoTracking(string agentNo)
         {
-            string sql = $@"WITH RECURSIVE sub_agents AS (
-              SELECT * FROM t_agent_info WHERE agent_no =  @AgentNo
+            FormattableString sql = $@"WITH RECURSIVE sub_agents AS (
+              SELECT * FROM t_agent_info WHERE agent_no = {agentNo}
               UNION ALL
               SELECT t.* FROM t_agent_info t INNER JOIN sub_agents sa ON t.pid = sa.agent_no
             )
             SELECT * FROM sub_agents;";
-            return FromSql<AgentInfo>(sql, new
-            {
-                AgentNo = agentNo
-            });
+            return FromSqlAsNoTracking(sql);
         }
 
-        public IEnumerable<AgentInfo> GetParentAgentsFromSql(string agentNo)
+        public IEnumerable<AgentInfo> GetParentAgentsFromSqlAsNoTracking(string agentNo)
         {
-            string sql = $@"WITH RECURSIVE parent_agents AS (
-              SELECT * FROM t_agent_info WHERE agent_no = @AgentNo
+            FormattableString sql = $@"WITH RECURSIVE parent_agents AS (
+              SELECT * FROM t_agent_info WHERE agent_no = {agentNo}
               UNION ALL
               SELECT t.* FROM t_agent_info t INNER JOIN parent_agents pa ON t.agent_no = pa.pid
             )
             SELECT * FROM parent_agents;";
-            return FromSql<AgentInfo>(sql, new
-            {
-                AgentNo = agentNo
-            });
+            return FromSqlAsNoTracking(sql);
         }
         #endregion
 

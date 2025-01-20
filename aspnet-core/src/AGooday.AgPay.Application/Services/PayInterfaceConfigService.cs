@@ -63,9 +63,9 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task<bool> RemoveAsync(string infoType, string infoId)
         {
-            var payInterfaceConfig = await _payInterfaceConfigRepository.GetAll()
+            var records = await _payInterfaceConfigRepository.GetAll()
                 .Where(w => w.InfoId.Equals(infoId) && w.InfoType.Equals(infoType)).FirstOrDefaultAsync();
-            _payInterfaceConfigRepository.Remove(payInterfaceConfig);
+            _payInterfaceConfigRepository.Remove(records);
             var (result, _) = await _payInterfaceConfigRepository.SaveChangesWithResultAsync();
             return result;
         }
@@ -79,16 +79,16 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<PayInterfaceConfigDto> GetByInfoIdAndIfCodeAsync(string infoType, string infoId, string ifCode)
         {
-            var payInterfaceConfig = await _payInterfaceConfigRepository.GetAllAsNoTracking().Where(w => w.InfoId.Equals(infoId)
+            var records = await _payInterfaceConfigRepository.GetAllAsNoTracking().Where(w => w.InfoId.Equals(infoId)
             && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode)).FirstOrDefaultAsync();
-            return _mapper.Map<PayInterfaceConfigDto>(payInterfaceConfig);
+            return _mapper.Map<PayInterfaceConfigDto>(records);
         }
 
         public IEnumerable<PayInterfaceConfigDto> GetByInfoIdAndIfCodes(string infoType, List<string> infoIds, string ifCode)
         {
-            var payInterfaceConfig = _payInterfaceConfigRepository.GetAllAsNoTracking().Where(w => infoIds.Contains(w.InfoId)
+            var records = _payInterfaceConfigRepository.GetAllAsNoTracking().Where(w => infoIds.Contains(w.InfoId)
             && w.InfoType.Equals(infoType) && w.IfCode.Equals(ifCode));
-            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfig);
+            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(records);
         }
 
         /// <summary>
@@ -99,18 +99,18 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public IEnumerable<PayInterfaceConfigDto> GetByInfoId(string infoType, string infoId)
         {
-            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAllAsNoTracking()
+            var records = _payInterfaceConfigRepository.GetAllAsNoTracking()
                 .Where(w => w.InfoId.Equals(infoId)
                 && w.InfoType.Equals(infoType) && w.State.Equals(CS.PUB_USABLE));
-            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfigs);
+            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(records);
         }
 
         public IEnumerable<PayInterfaceConfigDto> GetPayOauth2ConfigByStartsWithInfoId(string infoType, string infoId)
         {
-            var payInterfaceConfigs = _payInterfaceConfigRepository.GetAllAsNoTracking()
+            var records = _payInterfaceConfigRepository.GetAllAsNoTracking()
                 .Where(w => w.InfoId.StartsWith(infoId)
                 && w.InfoType.Equals(infoType) && w.State.Equals(CS.PUB_USABLE));
-            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(payInterfaceConfigs);
+            return _mapper.Map<IEnumerable<PayInterfaceConfigDto>>(records);
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace AGooday.AgPay.Application.Services
             IQueryable<string> ifCodes;
             if (!string.IsNullOrEmpty(agentInfo.Pid))
             {
-                var agentInfos = _agentInfoRepository.GetParentAgentsFromSql(agentInfo.AgentNo);
+                var agentInfos = _agentInfoRepository.GetParentAgentsFromSqlAsNoTracking(agentInfo.AgentNo);
                 var infoIds = agentInfos.Select(s => s.AgentNo).ToList();
 
                 var agentConfigList = _payInterfaceConfigRepository.GetAllAsNoTracking()

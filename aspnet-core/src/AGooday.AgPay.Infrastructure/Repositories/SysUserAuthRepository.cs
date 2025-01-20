@@ -64,14 +64,13 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return DbSet.FirstOrDefaultAsync(w => w.IdentityType.Equals(identityType) && w.Identifier.Equals(identifier) && w.SysType.Equals(sysType));
         }
 
-        public List<SysUserAuth> GetUserAuths(string identifier, string sysType)
+        public IEnumerable<SysUserAuth> GetUserAuths(string identifier, string sysType)
         {
-            var sql = @"select a.* from t_sys_user_auth a left join t_sys_user u on a.user_id = u.sys_user_id
-        where a.identifier = @Identifier and a.sys_type = @SysType";
-
-            var result = FromSql<SysUserAuth>(sql, new { Identifier = identifier, SysType = sysType });
-
-            return result;
+            FormattableString sql = $"""
+                select a.* from t_sys_user_auth a left join t_sys_user u on a.user_id = u.sys_user_id
+                where a.identifier = {identifier} and a.sys_type = {sysType}
+                """;
+            return FromSql(sql);
         }
     }
 }

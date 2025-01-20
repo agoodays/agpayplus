@@ -59,14 +59,14 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<MchStoreDto> GetByMchNoAsNoTracking(string mchNo)
         {
-            var mchStores = _mchStoreRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
-            return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
+            var records = _mchStoreRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
+            return _mapper.Map<IEnumerable<MchStoreDto>>(records);
         }
 
         public IEnumerable<MchStoreDto> GetByStoreIdsAsNoTracking(IEnumerable<long?> storeIds)
         {
-            var mchStores = _mchStoreRepository.GetAllAsNoTracking().Where(w => storeIds.Contains(w.StoreId));
-            return _mapper.Map<IEnumerable<MchStoreDto>>(mchStores);
+            var records = _mchStoreRepository.GetAllAsNoTracking().Where(w => storeIds.Contains(w.StoreId));
+            return _mapper.Map<IEnumerable<MchStoreDto>>(records);
         }
 
         public Task<PaginatedList<MchStoreListDto>> GetPaginatedDataAsync(MchStoreQueryDto dto, List<long> storeIds = null)

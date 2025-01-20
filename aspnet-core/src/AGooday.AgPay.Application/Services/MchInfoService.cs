@@ -79,14 +79,14 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<MchInfoDto> GetByMchNos(List<string> mchNos)
         {
-            var mchInfos = _mchInfoRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
-            return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
+            var records = _mchInfoRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
+            return _mapper.Map<IEnumerable<MchInfoDto>>(records);
         }
 
         public IEnumerable<MchInfoDto> GetByIsvNo(string isvNo)
         {
-            var mchInfos = _mchInfoRepository.GetAllAsNoTracking().Where(w => w.IsvNo.Equals(isvNo));
-            return _mapper.Map<IEnumerable<MchInfoDto>>(mchInfos);
+            var records = _mchInfoRepository.GetAllAsNoTracking().Where(w => w.IsvNo.Equals(isvNo));
+            return _mapper.Map<IEnumerable<MchInfoDto>>(records);
         }
 
         public Task<PaginatedList<MchInfoDto>> GetPaginatedDataAsync(MchInfoQueryDto dto)

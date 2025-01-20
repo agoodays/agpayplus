@@ -23,13 +23,20 @@ namespace AGooday.AgPay.Application.Services
 
         private readonly IPayOrderRepository _payOrderRepository;
 
+        private readonly IPayOrderProfitRepository _payOrderProfitRepository;
+        private readonly IAccountBillRepository _accountBillRepository;
+
         public RefundOrderService(IMapper mapper, IMediatorHandler bus,
             IRefundOrderRepository refundOrderRepository,
-            IPayOrderRepository payOrderRepository)
+            IPayOrderRepository payOrderRepository, 
+            IPayOrderProfitRepository payOrderProfitRepository, 
+            IAccountBillRepository accountBillRepository)
             : base(mapper, bus, refundOrderRepository)
         {
             _refundOrderRepository = refundOrderRepository;
             _payOrderRepository = payOrderRepository;
+            _payOrderProfitRepository = payOrderProfitRepository;
+            _accountBillRepository = accountBillRepository;
         }
 
         public Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchRefundNo)
@@ -270,6 +277,23 @@ namespace AGooday.AgPay.Application.Services
             //    return _refundOrderRepository.SaveChangesAsync();
             //}
             //return Task.FromResult(0);
+        }
+        /// <summary>
+        /// 更新支付订单分润并生成账单
+        /// </summary>
+        /// <param name="payOrderProfitDtos"></param>
+        /// <param name="accountBillDtos"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatePayOrderProfitAndGenAccountBillAsync(List<PayOrderProfitDto> payOrderProfitDtos, List<AccountBillDto> accountBillDtos)
+        {
+            var payOrderProfits = _mapper.Map<IEnumerable<PayOrderProfit>>(payOrderProfitDtos);
+            _payOrderProfitRepository.UpdateRange(payOrderProfits);
+            if (accountBillDtos.Count > 0)
+            {
+                var accountBills = _mapper.Map<IEnumerable<AccountBill>>(accountBillDtos);
+                await _accountBillRepository.AddRangeAsync(accountBills);
+            }
+            return await _refundOrderRepository.SaveChangesAsync();
         }
     }
 }

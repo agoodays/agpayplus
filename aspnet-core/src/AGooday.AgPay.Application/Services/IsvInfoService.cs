@@ -30,8 +30,8 @@ namespace AGooday.AgPay.Application.Services
             {
                 dto.IsvNo = SeqUtil.GenIsvNo();
             } while (await IsExistIsvNoAsync(dto.IsvNo));
-            var m = _mapper.Map<IsvInfo>(dto);
-            await _isvInfoRepository.AddAsync(m);
+            var entity = _mapper.Map<IsvInfo>(dto);
+            await _isvInfoRepository.AddAsync(entity);
             var (result, _) = await _isvInfoRepository.SaveChangesWithResultAsync();
             return result;
         }

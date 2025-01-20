@@ -44,6 +44,22 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
+        public virtual bool AddRange(IEnumerable<TDto> dtos)
+        {
+            var entitys = _mapper.Map<IEnumerable<TEntity>>(dtos);
+            _agPayRepository.AddRange(entitys);
+            var result = _agPayRepository.SaveChanges(out int _);
+            return result;
+        }
+
+        public virtual async Task<bool> AddRangeAsync(IEnumerable<TDto> dtos)
+        {
+            var entitys = _mapper.Map<IEnumerable<TEntity>>(dtos);
+            await _agPayRepository.AddRangeAsync(entitys);
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
+        }
+
         public virtual bool Remove(TPrimaryKey id)
         {
             _agPayRepository.Remove(id);
@@ -53,6 +69,14 @@ namespace AGooday.AgPay.Application.Services
         public virtual async Task<bool> RemoveAsync(TPrimaryKey id)
         {
             _agPayRepository.Remove(id);
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
+        }
+
+        public virtual async Task<bool> RemoveRangeAsync(IEnumerable<TDto> dtos)
+        {
+            var entitys = _mapper.Map<IEnumerable<TEntity>>(dtos);
+            _agPayRepository.RemoveRange(entitys);
             var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
             return result;
         }
@@ -77,6 +101,14 @@ namespace AGooday.AgPay.Application.Services
             var entity = _agPayRepository.GetById(id);
             var dto = _mapper.Map<TDto>(entity);
             return dto;
+        }
+
+        public virtual async Task<bool> UpdateRangeAsync(IEnumerable<TDto> dtos)
+        {
+            var entitys = _mapper.Map<IEnumerable<TEntity>>(dtos);
+            _agPayRepository.UpdateRange(entitys);
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
         }
 
         public virtual async Task<TDto> GetByIdAsync(TPrimaryKey id)
@@ -152,6 +184,22 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
+        public virtual bool AddRange(IEnumerable<TDto> dtos)
+        {
+            var entitys = _mapper.Map<IEnumerable<TEntity>>(dtos);
+            _agPayRepository.AddRange(entitys);
+            var result = _agPayRepository.SaveChanges(out int _);
+            return result;
+        }
+
+        public virtual async Task<bool> AddRangeAsync(IEnumerable<TDto> dtos)
+        {
+            var entitys = _mapper.Map<IEnumerable<TEntity>>(dtos);
+            await _agPayRepository.AddRangeAsync(entitys);
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
+        }
+
         public virtual bool Remove<TPrimaryKey>(TPrimaryKey id)
         {
             _agPayRepository.Remove(id);
@@ -161,6 +209,14 @@ namespace AGooday.AgPay.Application.Services
         public virtual async Task<bool> RemoveAsync<TPrimaryKey>(TPrimaryKey id)
         {
             _agPayRepository.Remove(id);
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
+        }
+
+        public virtual async Task<bool> RemoveRangeAsync(IEnumerable<TDto> dtos)
+        {
+            var entitys = _mapper.Map<IEnumerable<TEntity>>(dtos);
+            _agPayRepository.RemoveRange(entitys);
             var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
             return result;
         }
@@ -176,6 +232,14 @@ namespace AGooday.AgPay.Application.Services
         {
             var entity = _mapper.Map<TEntity>(dto);
             _agPayRepository.Update(entity);
+            var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
+            return result;
+        }
+
+        public virtual async Task<bool> UpdateRangeAsync(IEnumerable<TDto> dtos)
+        {
+            var entitys = _mapper.Map<IEnumerable<TEntity>>(dtos);
+            _agPayRepository.UpdateRange(entitys);
             var (result, _) = await _agPayRepository.SaveChangesWithResultAsync();
             return result;
         }

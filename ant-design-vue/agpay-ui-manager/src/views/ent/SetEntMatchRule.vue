@@ -28,10 +28,10 @@
       <a-col span="14">
         <p v-if="hasEnt">请选择匹配规则： </p>
         <a-form-model ref="infoFormModel" :model="matchRule" layout="vertical">
-          <a-form-model-item label="" prop="epUserEnt">
+          <a-form-model-item v-if="sysType!=='MCH'" label="" prop="epUserEnt">
             <a-checkbox @change="onEpUserEntChange">拓展员权限</a-checkbox>
           </a-form-model-item>
-          <a-form-model-item label="" prop="userEntRules">
+          <a-form-model-item v-if="sysType==='MCH'" label="" prop="userEntRules">
             <a-checkbox-group v-model="matchRule.userEntRules">
               <a-checkbox value="USER_TYPE_11_INIT">店长默认权限</a-checkbox>
               <a-checkbox value="USER_TYPE_12_INIT">店员默认权限</a-checkbox>
@@ -42,11 +42,11 @@
               <a-checkbox value="STATS">统计报表权限</a-checkbox>
             </a-checkbox-group>
           </a-form-model-item>
-          <a-form-model-item prop="mchType">
+          <a-form-model-item v-if="sysType==='MCH'" prop="mchType">
             <a-checkbox :checked="matchRule.mchType === 1" @change="onMchTypeChange(1)">普通商户特有权限</a-checkbox>
             <a-checkbox :checked="matchRule.mchType === 2" @change="onMchTypeChange(2)">特约商户(服务商模式)特有权限</a-checkbox>
           </a-form-model-item>
-          <a-form-model-item prop="mchLevel">
+          <a-form-model-item v-if="sysType==='MCH'" prop="mchLevelArray">
             <a-checkbox-group v-model="matchRule.mchLevelArray">
               <a-checkbox value="M0">M0商户特有权限</a-checkbox>
               <a-checkbox value="M1">M1商户特有权限</a-checkbox>

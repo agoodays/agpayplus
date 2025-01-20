@@ -356,6 +356,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         {
             var payRateConfigs = _payRateConfigService.GetPayRateConfigInfos(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
 
+            var payOrderProfits = new List<PayOrderProfitDto>(); 
             var payOrderProfit = new PayOrderProfitDto();
             var agentPayRateConfigs = payRateConfigs.Where(w => w.InfoType.Equals(CS.INFO_TYPE.AGENT)).OrderByDescending(o => o.AgentLevel);
             var preFeeRate = payOrder.MchFeeRate;
@@ -379,7 +380,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 payOrderProfit.OrderFeeAmount = feeAmount;
                 payOrderProfit.ProfitAmount = profitAmount;
                 payOrderProfit.OrderProfitAmount = profitAmount;
-                await _payOrderProfitService.AddAsync(payOrderProfit);
+                payOrderProfits.Add(payOrderProfit);
                 preFeeRate = feeRate;
                 totalProfitAmount += profitAmount;
                 totalProfitRate += profitRate;
@@ -402,7 +403,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrderProfit.ProfitRate = platformProfitRate;
             payOrderProfit.ProfitAmount = platformProfitAmount;
             payOrderProfit.OrderProfitAmount = platformProfitAmount;
-            await _payOrderProfitService.AddAsync(payOrderProfit);
+            payOrderProfits.Add(payOrderProfit);
 
             payOrderProfit = new PayOrderProfitDto();
             payOrderProfit.InfoId = CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_PROFIT;
@@ -416,7 +417,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             payOrderProfit.ProfitRate = platformProfitRate - totalProfitRate;
             payOrderProfit.ProfitAmount = platformProfitAmount - totalProfitAmount;
             payOrderProfit.OrderProfitAmount = platformProfitAmount - totalProfitAmount;
-            await _payOrderProfitService.AddAsync(payOrderProfit);
+            payOrderProfits.Add(payOrderProfit);
+            await _payOrderProfitService.AddRangeAsync(payOrderProfits);
         }
 
         /// <summary>

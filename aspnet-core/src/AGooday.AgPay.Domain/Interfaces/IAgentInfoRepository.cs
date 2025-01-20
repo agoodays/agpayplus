@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Domain.Interfaces
         Task<IEnumerable<AgentInfo>> GetAllOrAllSubAgentsAsync(string currentAgentNo, Func<AgentInfo, bool> filter = null);
         ICollection<AgentInfo> GetAllSubAgents(string agentNo);
         IEnumerable<AgentInfo> GetParentAgents(string agentNo);
-        IEnumerable<AgentInfo> GetSubAgentsFromSql(string agentNo);
-        IEnumerable<AgentInfo> GetParentAgentsFromSql(string agentNo);
+        IEnumerable<AgentInfo> GetSubAgentsFromSqlAsNoTracking(string agentNo);
+        IEnumerable<AgentInfo> GetParentAgentsFromSqlAsNoTracking(string agentNo);
     }
 }

@@ -32,41 +32,57 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public SysEntitlementDto GetByKeyAsNoTracking(string entId, string sysType)
+        public async Task<SysEntitlementDto> GetByKeyAsNoTrackingAsync(string entId, string sysType)
         {
-            var entity = _sysEntitlementRepository.GetByKeyAsNoTracking(entId, sysType);
+            var entity = await _sysEntitlementRepository.GetByKeyAsNoTrackingAsync(entId, sysType);
             return _mapper.Map<SysEntitlementDto>(entity);
         }
 
-        public SysEntitlementDto GetByKey(string entId, string sysType)
+        public async Task<SysEntitlementDto> GetByKeyAsync(string entId, string sysType)
         {
-            var entity = _sysEntitlementRepository.GetByKey(entId, sysType);
+            var entity = await _sysEntitlementRepository.GetByKeyAsync(entId, sysType);
             var dto = _mapper.Map<SysEntitlementDto>(entity);
             return dto;
         }
 
         public IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId)
         {
-            var sysEnts = _sysEntitlementRepository.GetAllAsNoTracking()
+            var records = _sysEntitlementRepository.GetAllAsNoTracking()
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
                 && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId)));
-            return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
+            return _mapper.Map<IEnumerable<SysEntitlementDto>>(records);
         }
 
         public IEnumerable<SysEntitlementDto> GetByIds(string sysType, List<string> entIds)
         {
-            var sysEnts = _sysEntitlementRepository.GetAllAsNoTracking()
+            var records = _sysEntitlementRepository.GetAllAsNoTracking()
                 .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
                 && (!(entIds != null && entIds.Count > 0) || entIds.Contains(w.EntId)));
-            return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
+            return _mapper.Map<IEnumerable<SysEntitlementDto>>(records);
         }
 
-        public IEnumerable<SysEntitlementDto> GetSons(string sysType, string pId, string entId)
+        public IEnumerable<SysEntitlementDto> GetBros(string sysType, string pId)
         {
-            var sysEnts = _sysEntitlementRepository.GetAllAsNoTracking()
-                .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
-                && w.Pid.Equals(pId) && !w.EntId.Equals(entId));
-            return _mapper.Map<IEnumerable<SysEntitlementDto>>(sysEnts);
+            var records = _sysEntitlementRepository.GetAllAsNoTracking()
+                .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE) && w.Pid.Equals(pId));
+            return _mapper.Map<IEnumerable<SysEntitlementDto>>(records);
+        }
+
+        public IEnumerable<SysEntitlementDto> GetBros(string sysType, string pId, string entId)
+        {
+            return GetBros(sysType, pId).Where(w => !w.EntId.Equals(entId));
+        }
+
+        public IEnumerable<SysEntitlementDto> GetSubSysEntitlementsFromSql(string entId, string sysType)
+        {
+            var records = _sysEntitlementRepository.GetSubSysEntitlementsFromSqlAsNoTracking(entId, sysType);
+            return _mapper.Map<IEnumerable<SysEntitlementDto>>(records);
+        }
+
+        public IEnumerable<SysEntitlementDto> GetParentSysEntitlementsFromSql(string entId, string sysType)
+        {
+            var records = _sysEntitlementRepository.GetParentSysEntitlementsFromSqlAsNoTracking(entId, sysType);
+            return _mapper.Map<IEnumerable<SysEntitlementDto>>(records);
         }
     }
 }

@@ -44,14 +44,14 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<PayOrderProfitDto> GetByPayOrderIdAsNoTracking(string payOrderId)
         {
-            var payOrderProfits = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId);
-            return _mapper.Map<IEnumerable<PayOrderProfitDto>>(payOrderProfits);
+            var records = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId);
+            return _mapper.Map<IEnumerable<PayOrderProfitDto>>(records);
         }
 
         public IEnumerable<PayOrderProfitDto> GetByPayOrderIdsAsNoTracking(List<string> payOrderIds)
         {
-            var payOrderProfits = _payOrderProfitRepository.GetByPayOrderIdsAsNoTracking(payOrderIds);
-            return _mapper.Map<IEnumerable<PayOrderProfitDto>>(payOrderProfits);
+            var records = _payOrderProfitRepository.GetByPayOrderIdsAsNoTracking(payOrderIds);
+            return _mapper.Map<IEnumerable<PayOrderProfitDto>>(records);
         }
     }
 }

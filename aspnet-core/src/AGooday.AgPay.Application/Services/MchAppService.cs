@@ -57,20 +57,20 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<MchAppDto> GetByMchNoAsNoTracking(string mchNo)
         {
-            var mchApps = _mchAppRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
-            return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
+            var records = _mchAppRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
+            return _mapper.Map<IEnumerable<MchAppDto>>(records);
         }
 
         public IEnumerable<MchAppDto> GetByMchNos(IEnumerable<string> mchNos)
         {
-            var mchApps = _mchAppRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
-            return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
+            var records = _mchAppRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
+            return _mapper.Map<IEnumerable<MchAppDto>>(records);
         }
 
         public IEnumerable<MchAppDto> GetByAppIds(IEnumerable<string> appIds)
         {
-            var mchApps = _mchAppRepository.GetAllAsNoTracking().Where(w => appIds.Contains(w.AppId));
-            return _mapper.Map<IEnumerable<MchAppDto>>(mchApps);
+            var records = _mchAppRepository.GetAllAsNoTracking().Where(w => appIds.Contains(w.AppId));
+            return _mapper.Map<IEnumerable<MchAppDto>>(records);
         }
 
         public Task<PaginatedList<MchAppDto>> GetPaginatedDataAsync(MchAppQueryDto dto, string agentNo = null)

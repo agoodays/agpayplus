@@ -59,9 +59,9 @@ namespace AGooday.AgPay.Application.Services
 
         public IEnumerable<MchDivisionReceiverGroupDto> GetByMchNo(string mchNo)
         {
-            var mchDivisionReceiverGroups = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
+            var records = _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
                 .Where(w => w.MchNo.Equals(mchNo));
-            return _mapper.Map<IEnumerable<MchDivisionReceiverGroupDto>>(mchDivisionReceiverGroups);
+            return _mapper.Map<IEnumerable<MchDivisionReceiverGroupDto>>(records);
         }
 
         public async Task<MchDivisionReceiverGroupDto> FindByIdAndMchNoAsync(long receiverGroupId, string mchNo)

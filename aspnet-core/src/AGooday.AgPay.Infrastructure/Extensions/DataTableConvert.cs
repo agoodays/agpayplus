@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -36,7 +37,6 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             //声明 委托Load<T>的一个实例rowMap
             Load<T> rowMap = null;
 
-
             //从rowMapMethods查找当前T类对应的转换方法，没有则使用Emit构造一个。
             if (!rowMapMethods.ContainsKey(typeof(T)))
             {
@@ -48,7 +48,10 @@ namespace AGooday.AgPay.Infrastructure.Extensions
 
                 for (int index = 0; index < dt.Columns.Count; index++)
                 {
-                    PropertyInfo propertyInfo = typeof(T).GetProperty(dt.Columns[index].ColumnName);
+                    string columnName = dt.Columns[index].ColumnName;
+                    PropertyInfo propertyInfo = typeof(T).GetProperties()
+                        .FirstOrDefault(p => p.GetCustomAttribute<ColumnAttribute>()?.Name == columnName || p.Name == columnName);
+
                     Label endIfLabel = generator.DefineLabel();
                     if (propertyInfo != null && propertyInfo.GetSetMethod() != null)
                     {
@@ -60,7 +63,33 @@ namespace AGooday.AgPay.Infrastructure.Extensions
                         generator.Emit(OpCodes.Ldarg_0);
                         generator.Emit(OpCodes.Ldc_I4, index);
                         generator.Emit(OpCodes.Callvirt, getValueMethod);
-                        generator.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
+
+                        // 添加类型转换逻辑
+                        Type propertyType = propertyInfo.PropertyType;
+                        Type underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+
+                        if (underlyingType.IsEnum)
+                        {
+                            generator.Emit(OpCodes.Unbox_Any, typeof(int));
+                            generator.Emit(OpCodes.Castclass, underlyingType);
+                        }
+                        else if (underlyingType == typeof(Guid))
+                        {
+                            generator.Emit(OpCodes.Unbox_Any, typeof(Guid));
+                        }
+                        else if (underlyingType == typeof(byte) && dt.Columns[index].DataType == typeof(sbyte))
+                        {
+                            generator.Emit(OpCodes.Conv_U1);
+                        }
+                        else if (underlyingType.IsValueType)
+                        {
+                            generator.Emit(OpCodes.Unbox_Any, underlyingType);
+                        }
+                        else
+                        {
+                            generator.Emit(OpCodes.Castclass, underlyingType);
+                        }
+
                         generator.Emit(OpCodes.Callvirt, propertyInfo.GetSetMethod());
                         generator.MarkLabel(endIfLabel);
                     }
