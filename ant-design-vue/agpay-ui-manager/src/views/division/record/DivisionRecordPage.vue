@@ -49,6 +49,21 @@
         rowKey="recordId"
       >
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.calDivisionAmount/100 }}</b></template> <!-- 自定义插槽 -->
+        <!-- 支付接口 -->
+        <template slot="ifCodeSlot" slot-scope="{record}">
+          <a-tooltip placement="bottom" style="font-weight: normal;">
+            <template slot="title">
+              <span class="icon-style" :style="{ backgroundColor: ifDefineList.find(f => f.ifCode === record.ifCode).bgColor }">
+                <img class="icon" :src="ifDefineList.find(f => f.ifCode === record.ifCode).icon" alt="">
+              </span> {{ ifDefineList.find(f => f.ifCode === record.ifCode).ifName }}[{{ ifDefineList.find(f => f.ifCode === record.ifCode).ifCode }}]
+            </template>
+            <span v-if="record.ifCode">
+              <span class="icon-style" :style="{ backgroundColor: ifDefineList.find(f => f.ifCode === record.ifCode).bgColor }">
+                <img class="icon" :src="ifDefineList.find(f => f.ifCode === record.ifCode).icon" alt="">
+              </span> {{ ifDefineList.find(f => f.ifCode === record.ifCode).ifName }}[{{ ifDefineList.find(f => f.ifCode === record.ifCode).ifCode }}]
+            </span>
+          </a-tooltip>
+        </template>
         <template slot="stateSlot" slot-scope="{record}">
 <!--          <a-tag
             :key="record.state"
@@ -86,7 +101,7 @@ const tableColumns = [
   { key: 'calDivisionAmount', title: '分账金额', width: 108, scopedSlots: { customRender: 'amountSlot' } },
   { key: 'batchOrderId', dataIndex: 'batchOrderId', title: '分账批次号', width: 120 },
   { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号', width: 220 },
-  { key: 'ifCode', dataIndex: 'ifCode', title: '接口代码', width: 220 },
+  { key: 'ifCode', title: '支付接口', width: 200, scopedSlots: { customRender: 'ifCodeSlot' } },
   { key: 'payOrderAmount', dataIndex: 'payOrderAmount', title: '订单金额', width: 108, customRender: (text) => (text / 100).toFixed(2) },
   { key: 'payOrderDivisionAmount', dataIndex: 'payOrderDivisionAmount', title: '分账基数', width: 108, customRender: (text) => (text / 100).toFixed(2) },
   { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账号别名', width: 120 },
@@ -131,7 +146,7 @@ export default {
     reqIfDefineListFunc: function () {
       const that = this // 提前保留this
       req.list(API_URL_IFDEFINES_LIST, { 'state': 1 }).then(res => {
-        console.log(res)
+        // console.log(res)
         that.ifDefineList = res
       })
     },

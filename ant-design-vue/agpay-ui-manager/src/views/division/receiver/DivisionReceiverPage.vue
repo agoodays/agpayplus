@@ -51,11 +51,20 @@
           <b v-if="!$access('ENT_DIVISION_RECEIVER_VIEW')">{{ record.receiverId }}</b>
           <a v-if="$access('ENT_DIVISION_RECEIVER_VIEW')" @click="detailFunc(record.receiverId)"><b>{{ record.receiverId }}</b></a>
         </template>
-        <!-- 渠道类型 -->
+        <!-- 支付接口 -->
         <template slot="ifCodeSlot" slot-scope="{record}">
-          <span class="icon-style" :style="{ backgroundColor: ifDefineList.find(f => f.ifCode === record.ifCode).bgColor }">
-            <img class="icon" :src="ifDefineList.find(f => f.ifCode === record.ifCode).icon" alt="">
-          </span> {{ ifDefineList.find(f => f.ifCode === record.ifCode).ifName }}[{{ ifDefineList.find(f => f.ifCode === record.ifCode).ifCode }}]
+          <a-tooltip placement="bottom" style="font-weight: normal;">
+            <template slot="title">
+              <span class="icon-style" :style="{ backgroundColor: ifDefineList.find(f => f.ifCode === record.ifCode).bgColor }">
+                <img class="icon" :src="ifDefineList.find(f => f.ifCode === record.ifCode).icon" alt="">
+              </span> {{ ifDefineList.find(f => f.ifCode === record.ifCode).ifName }}[{{ ifDefineList.find(f => f.ifCode === record.ifCode).ifCode }}]
+            </template>
+            <span v-if="record.ifCode">
+              <span class="icon-style" :style="{ backgroundColor: ifDefineList.find(f => f.ifCode === record.ifCode).bgColor }">
+                <img class="icon" :src="ifDefineList.find(f => f.ifCode === record.ifCode).icon" alt="">
+              </span> {{ ifDefineList.find(f => f.ifCode === record.ifCode).ifName }}[{{ ifDefineList.find(f => f.ifCode === record.ifCode).ifCode }}]
+            </span>
+          </a-tooltip>
         </template>
         <!-- 状态（本系统） -->
         <template slot="stateSlot" slot-scope="{record}">
