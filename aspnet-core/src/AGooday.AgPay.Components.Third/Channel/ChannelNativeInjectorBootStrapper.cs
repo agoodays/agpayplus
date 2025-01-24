@@ -78,27 +78,30 @@ namespace AGooday.AgPay.Components.Third.Channel
             // 注册所有类
             foreach (Type implementationType in targetTypes)
             {
-                string serviceKey;
-                // 查找无参构造函数
-                // ConstructorInfo constructorInfo = implementationType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
-                ConstructorInfo constructor = implementationType.GetConstructor(Type.EmptyTypes);
-                if (constructor != null)
-                {
-                    var instance = Activator.CreateInstance(implementationType);
-                    var getIfCodeMethod = implementationType.GetMethod("GetIfCode");
-                    serviceKey = getIfCodeMethod?.Invoke(instance, null)?.ToString();
-                }
-                else
-                {
-                    // 获取静态属性
-                    PropertyInfo ifCodePropertyInfo = implementationType.GetProperty("IfCode", BindingFlags.Public | BindingFlags.Static);
-                    serviceKey = ifCodePropertyInfo?.GetValue(null)?.ToString();
-                }
+                string serviceKey = GetServiceKey(implementationType);
                 if (!string.IsNullOrEmpty(serviceKey))
                 {
                     services.AddKeyedScoped(serviceType, serviceKey, implementationType);
                     action?.Invoke(implementationType);
                 }
+            }
+        }
+
+        private static string GetServiceKey(Type implementationType)
+        {
+            // 查找无参构造函数
+            ConstructorInfo constructor = implementationType.GetConstructor(Type.EmptyTypes);
+            if (constructor != null)
+            {
+                var instance = Activator.CreateInstance(implementationType);
+                var getIfCodeMethod = implementationType.GetMethod("GetIfCode");
+                return getIfCodeMethod?.Invoke(instance, null)?.ToString();
+            }
+            else
+            {
+                // 获取静态属性
+                PropertyInfo ifCodePropertyInfo = implementationType.GetProperty("IfCode", BindingFlags.Public | BindingFlags.Static);
+                return ifCodePropertyInfo?.GetValue(null)?.ToString();
             }
         }
     }
@@ -111,10 +114,12 @@ namespace AGooday.AgPay.Components.Third.Channel
     public class ChannelServiceFactory<T> : IChannelServiceFactory<T>
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<ChannelServiceFactory<T>> _logger;
 
-        public ChannelServiceFactory(IServiceProvider serviceProvider)
+        public ChannelServiceFactory(IServiceProvider serviceProvider, ILogger<ChannelServiceFactory<T>> logger)
         {
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
 
         public T GetService(object serviceKey)
@@ -123,8 +128,9 @@ namespace AGooday.AgPay.Components.Third.Channel
             {
                 return _serviceProvider.GetRequiredKeyedService<T>(serviceKey);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
+                _logger.LogError(ex, $"Service with key '{serviceKey}' not found.");
                 return default;
             }
         }
