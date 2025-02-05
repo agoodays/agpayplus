@@ -210,7 +210,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 //预先校验
-                string errMsg = paymentService.PreCheck(bizRQ, payOrder);
+                string errMsg = await paymentService.PreCheckAsync(bizRQ, payOrder, mchAppConfigContext);
                 if (!string.IsNullOrWhiteSpace(errMsg))
                 {
                     throw new BizException(errMsg);
@@ -235,7 +235,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
             catch (BizException e)
             {
-                return ApiRes.CustomFail(e.Message);
+                return e.ApiRes;
             }
             //处理上游返回数据
             catch (ChannelException e)

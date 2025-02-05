@@ -85,9 +85,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.PayWay
             return res;
         }
 
-        public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
+        public override Task<string> PreCheckAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return null;
+            return Task.FromResult<string>(null);
         }
     }
 }

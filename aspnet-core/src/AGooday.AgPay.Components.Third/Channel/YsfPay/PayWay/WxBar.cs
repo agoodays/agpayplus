@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay.PayWay
             return res;
         }
 
-        public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
+        public override Task<string> PreCheckAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
             if (string.IsNullOrWhiteSpace(bizRQ.AuthCode))
@@ -86,7 +86,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay.PayWay
                 throw new BizException("用户支付条码[authCode]不可为空");
             }
 
-            return null;
+            return Task.FromResult<string>(null);
         }
     }
 }

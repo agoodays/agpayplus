@@ -49,9 +49,9 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PayAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
-        public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
+        public override Task<string> PreCheckAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
+            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheckAsync(bizRQ, payOrder, mchAppConfigContext);
         }
 
         public async Task<ChannelRetMsg> BarAsync(SortedDictionary<string, string> reqParams, string notifyUrl, string logPrefix, MchAppConfigContext mchAppConfigContext)

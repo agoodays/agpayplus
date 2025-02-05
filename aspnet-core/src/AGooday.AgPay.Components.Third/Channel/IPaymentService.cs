@@ -29,7 +29,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="bizRQ"></param>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder);
+        Task<string> PreCheckAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext);
 
         /// <summary>
         /// 计算手续费

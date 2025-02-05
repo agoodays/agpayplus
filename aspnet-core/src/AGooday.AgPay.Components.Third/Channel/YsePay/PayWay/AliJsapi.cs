@@ -114,7 +114,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
             return res;
         }
 
-        public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
+        public override Task<string> PreCheckAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             AliJsapiOrderRQ bizRQ = (AliJsapiOrderRQ)rq;
             if (string.IsNullOrWhiteSpace(bizRQ.GetChannelUserId()))
@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay.PayWay
                 throw new BizException("[buyerUserId]不可为空");
             }
 
-            return null;
+            return Task.FromResult<string>(null);
         }
     }
 }

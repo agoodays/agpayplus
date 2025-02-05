@@ -23,9 +23,9 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
             _paymentService = serviceProvider.GetService<PayWay.WxBar>(); //serviceProvider.GetServices<IPaymentService>().FirstOrDefault(f => f.GetType().Equals(typeof(PayWay.WxBar)));
         }
 
-        public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
+        public override Task<string> PreCheckAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return _paymentService.PreCheck(rq, payOrder);
+            return _paymentService.PreCheckAsync(rq, payOrder, mchAppConfigContext);
         }
 
         public override Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)

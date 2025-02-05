@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay.PayWay
             return res;
         }
 
-        public override string PreCheck(UnifiedOrderRQ rq, PayOrderDto payOrder)
+        public override Task<string> PreCheckAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             AliBarOrderRQ bizRQ = (AliBarOrderRQ)rq;
             if (string.IsNullOrWhiteSpace(bizRQ.AuthCode))
@@ -92,7 +92,7 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay.PayWay
                 throw new BizException("用户支付条码[authCode]不可为空");
             }
 
-            return null;
+            return Task.FromResult<string>(null);
         }
     }
 }

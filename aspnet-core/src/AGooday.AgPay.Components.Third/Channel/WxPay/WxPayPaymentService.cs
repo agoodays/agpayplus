@@ -61,9 +61,23 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             }
         }
 
-        public override string PreCheck(UnifiedOrderRQ bizRQ, PayOrderDto payOrder)
+        public override async Task<string> PreCheckAsync(UnifiedOrderRQ bizRQ, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            return PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheck(bizRQ, payOrder);
+            // 微信API版本
+            WxServiceWrapper wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
+            string apiVersion = wxServiceWrapper.Config.ApiVersion;
+            if (CS.PAY_IF_VERSION.WX_V2.Equals(apiVersion))
+            {
+                return await PayWayUtil.GetRealPayWayService(this, payOrder.WayCode).PreCheckAsync(bizRQ, payOrder, mchAppConfigContext);
+            }
+            else if (CS.PAY_IF_VERSION.WX_V3.Equals(apiVersion))
+            {
+                return await PayWayUtil.GetRealPayWayV3Service(this, payOrder.WayCode).PreCheckAsync(bizRQ, payOrder, mchAppConfigContext);
+            }
+            else
+            {
+                throw new BizException("不支持的微信支付API版本");
+            }
         }
 
         public async Task<(CreatePayUnifiedOrderRequest request, WxServiceWrapper wxServiceWrapper)> BuildUnifiedOrderRequestAsync(PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
