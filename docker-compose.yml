@@ -1,0 +1,160 @@
+version: '3.8'
+
+services:
+  web-manager:
+    build:
+      context: ./ant-design-vue/agpay-ui-manager # 指向前端manager项目目录
+      dockerfile: Dockerfile
+    container_name: agpay-ui-manager
+    ports:
+      - "8817:80"  # 将宿主机的 8817 端口映射到容器的 80 端口
+    networks:
+      - agpay-plus-network
+
+  web-agent:
+    build:
+      context: ./ant-design-vue/agpay-ui-agent # 指向前端agent项目目录
+      dockerfile: Dockerfile
+    container_name: agpay-ui-agent
+    ports:
+      - "8816:80"  # 将宿主机的 8816 端口映射到容器的 80 端口
+    networks:
+      - agpay-plus-network
+
+  web-merchant:
+    build:
+      context: ./ant-design-vue/agpay-ui-merchant # 指向前端merchant项目目录
+      dockerfile: Dockerfile
+    container_name: agpay-ui-merchant
+    ports:
+      - "8818:80"  # 将宿主机的 8818 端口映射到容器的 80 端口
+    networks:
+      - agpay-plus-network
+
+  api-manager:
+    build:
+      context: ./aspnet-core/src/AGooday.AgPay.Manager.Api # 指向后端manager项目目录
+      dockerfile: Dockerfile
+    container_name: agpay-plus-manager-api
+    ports:
+      - "5817:5817"
+      - "9817:9817"
+    environment:
+      - LANG=C.UTF-8
+      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+      - ASPNETCORE_URLS=https://+:9817;http://+:5817
+      - ASPNETCORE_HTTPS_PORT=9817
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
+      - ConnectionStrings__Default=server=host.docker.internal;port=3306;uid=root;pwd=mysql*;database=agpayplusdb_dev # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
+      - Redis__Default__Connection=agpay-plus-redis:6379
+    volumes:
+      # - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
+      - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - agpay-plus-network
+
+  api-agent:
+    build:
+      context: ./aspnet-core/src/AGooday.AgPay.Agent.Api # 指向后端agent项目目录
+      dockerfile: Dockerfile
+    container_name: agpay-plus-agent-api
+    ports:
+      - "5816:5816"
+      - "9816:9816"
+    environment:
+      - LANG=C.UTF-8
+      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+      - ASPNETCORE_URLS=https://+:9816;http://+:5816
+      - ASPNETCORE_HTTPS_PORT=9816
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
+      - ConnectionStrings__Default=server=host.docker.internal;port=3306;uid=root;pwd=mysql*;database=agpayplusdb_dev # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
+      - Redis__Default__Connection=agpay-plus-redis:6379
+    volumes:
+      # - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
+      - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - agpay-plus-network
+
+  api-merchant:
+    build:
+      context: ./aspnet-core/src/AGooday.AgPay.Merchant.Api # 指向后端merchant项目目录
+      dockerfile: Dockerfile
+    container_name: agpay-plus-merchant-api
+    ports:
+      - "5818:5818"
+      - "9818:9818"
+    environment:
+      - LANG=C.UTF-8
+      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+      - ASPNETCORE_URLS=https://+:9818;http://+:5818
+      - ASPNETCORE_HTTPS_PORT=9818
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
+      - ConnectionStrings__Default=server=host.docker.internal;port=3306;uid=root;pwd=mysql*;database=agpayplusdb_dev # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
+      - Redis__Default__Connection=agpay-plus-redis:6379
+    volumes:
+      # - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
+      - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - agpay-plus-network
+
+  api-payment:
+    build:
+      context: ./aspnet-core/src/AGooday.AgPay.Payment.Api # 指向后端payment项目目录
+      dockerfile: Dockerfile
+    container_name: agpay-plus-payment-api
+    ports:
+      - "5819:5819"
+      - "9819:9819"
+    environment:
+      - LANG=C.UTF-8
+      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+      - ASPNETCORE_URLS=https://+:9819;http://+:5819
+      - ASPNETCORE_HTTPS_PORT=9819
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
+      - ConnectionStrings__Default=server=host.docker.internal;port=3306;uid=root;pwd=mysql*;database=agpayplusdb_dev # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
+      - Redis__Default__Connection=agpay-plus-redis:6379
+    volumes:
+      # - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
+      - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - agpay-plus-network
+
+  redis:
+    image: redis
+    container_name: agpay-plus-redis
+    ports:
+      - "6389:6379" # 将宿主机的 6389 端口映射到容器的 6379 端口
+    networks:
+      - agpay-plus-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: agpay-plus-rabbitmq
+    hostname: agpay-plus-rabbitmq
+    ports:
+      - "15682:15672"
+      - "5682:5672"
+    volumes:
+      - ./aspnet-core/docs/rabbitmq_plugin:/plugins  # 挂载包含插件的本地目录到容器内的/plugins目录
+    networks:
+      - agpay-plus-network
+
+networks:
+  agpay-plus-network:
+    external: true

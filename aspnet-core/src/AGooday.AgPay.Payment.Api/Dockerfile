@@ -1,10 +1,14 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 USER app
 WORKDIR /app
-EXPOSE 5019
-EXPOSE 9019
+EXPOSE 5819
+EXPOSE 9819
+ENV ASPNETCORE_URLS=http://+:5819;https://+:9819
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
