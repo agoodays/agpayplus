@@ -12,7 +12,7 @@ AgPay 是一套适合互联网企业使用的支付系统，支持多渠道服�
 
 开发工具：Visual Studio 2022、SQLyog、WebStorm
 
-接口文档：https://www.yuque.com/xiangyisheng/bhkges/cweewhugp7h7hvml?singleDoc# 《接口文档》
+接口文档：https://www.yuque.com/xiangyisheng/agooday/cweewhugp7h7hvml
 ```
 
 ### 工程结构
@@ -78,6 +78,104 @@ AgPay 是一套适合互联网企业使用的支付系统，支持多渠道服�
 | ![输入图片说明](docs/images/wxpay-page-view.png) | ![输入图片说明](docs/images/wxpay-page-view-remark.png) | ![输入图片说明](docs/images/alipay-page-view.png) | ![输入图片说明](docs/images/ysfpay-page-view.png) |
 | ------------ | ------------ | ------------ | ------------ |
 
+### 项目结构
+```
+agpayplus/
+├── aspnet-core/
+│   ├── docs/
+│   │   ├── sql/
+│   │   │   └── agpayplusinit.sql
+│   │   └── rabbitmq_plugin/
+│   │       └── rabbitmq_delayed_message_exchange-3.13.0.ez
+│   ├── src/
+│   │   ├── AGooday.AgPay.Manager.Api/ (端口：9817)
+│   │   │   ├── wwwroot/
+│   │   │   ├── appsettings.json
+│   │   │   ├── appsettings.Development.json
+│   │   │   ├── AGooday.AgPay.Manager.Api.csproj
+│   │   │   ├── log4net.config
+│   │   │   ├── Program.cs
+│   │   │   ├── Dockerfile
+│   │   │   └── ...
+│   │   ├── AGooday.AgPay.Agent.Api/ (端口：9816)
+│   │   │   ├── wwwroot/
+│   │   │   ├── appsettings.json
+│   │   │   ├── appsettings.Development.json
+│   │   │   ├── AGooday.AgPay.Agent.Api.csproj
+│   │   │   ├── log4net.config
+│   │   │   ├── Program.cs
+│   │   │   ├── Dockerfile
+│   │   │   └── ...
+│   │   ├── AGooday.AgPay.Merchant.Api/ (端口：9818)
+│   │   │   ├── wwwroot/
+│   │   │   ├── appsettings.json
+│   │   │   ├── appsettings.Development.json
+│   │   │   ├── AGooday.AgPay.Merchant.Api.csproj
+│   │   │   ├── log4net.config
+│   │   │   ├── Program.cs
+│   │   │   ├── Dockerfile
+│   │   │   └── ...
+│   │   └── AGooday.AgPay.Payment.Api/ (端口：9819)
+│   │   │   ├── wwwroot/
+│   │   │   │   └── cashier/
+│   │   │   ├── appsettings.json
+│   │   │   ├── appsettings.Development.json
+│   │   │   ├── AGooday.AgPay.Payment.Api.csproj
+│   │   │   ├── log4net.config
+│   │   │   ├── Program.cs
+│   │   │   ├── Dockerfile
+│   │   │   └── ...
+│   │   └── ...
+│   ├── test/
+│   ├── README.md
+│   └── AGooday.AgPay.sln
+├── ant-design-vue/
+│   ├── agpay-ui-manager/ (vue-app 端口：8817)
+│   │   ├── node_modules/
+│   │   ├── public/
+│   │   ├── src/
+│   │   ├── .env
+│   │   ├── .env.development
+│   │   ├── package.json
+│   │   ├── vue.config.js
+│   │   ├── nginx.conf
+│   │   └── Dockerfile
+│   ├── agpay-ui-agent/ (vue-app 端口：8816)
+│   │   ├── node_modules/
+│   │   ├── public/
+│   │   ├── src/
+│   │   ├── .env
+│   │   ├── .env.development
+│   │   ├── package.json
+│   │   ├── vue.config.js
+│   │   ├── nginx.conf
+│   │   └── Dockerfile
+│   ├── agpay-ui-merchant/ (vue-app 端口：8818)
+│   │   ├── node_modules/
+│   │   ├── public/
+│   │   ├── src/
+│   │   ├── .env
+│   │   ├── .env.development
+│   │   ├── package.json
+│   │   ├── vue.config.js
+│   │   ├── nginx.conf
+│   │   └── Dockerfile
+│   ├── agpay-ui-cashier/ (vue-app 端口：8819)
+│   │   ├── node_modules/
+│   │   ├── public/
+│   │   ├── src/
+│   │   ├── .env
+│   │   ├── .env.development
+│   │   ├── package.json
+│   │   └── vue.config.js
+│   └── README.md
+├── docs/
+├── .gitignore
+├── README.md
+├── LICENSE
+└── docker-compose.yml
+```
+
 ### Docker
 ```
 # 创建网络
@@ -123,6 +221,7 @@ root@agpay-plus-rabbitmq:/# exit
 # 重启 RabbitMQ
 docker restart agpay-plus-rabbitmq
 
+# 构建并运行后端容器
 # 构建 Docker 镜像
 agpayplus\aspnet-core> docker build -t agpay-plus-manager-api -f ./src/AGooday.AgPay.Manager.Api/Dockerfile .
 agpayplus\aspnet-core> docker build -t agpay-plus-agent-api -f ./src/AGooday.AgPay.Agent.Api/Dockerfile .
@@ -133,18 +232,45 @@ agpayplus\aspnet-core> docker build -t agpay-plus-payment-api -f ./src/AGooday.A
 docker network connect agpay-plus-network agpay-plus-manager-api
 
 # 生成证书并配置本地计算机
-# https://learn.microsoft.com/zh-cn/aspnet/core/security/docker-https?view=aspnetcore-8.0
+# https://learn.microsoft.com/zh-cn/aspnet/core/security/docker-https?view=aspnetcore-9.0
 # https://www.linkedin.com/pulse/run-aspnet-core-api-docker-https-senthil-kumaran
+# 创建目标目录
+mkdir $env:USERPROFILE\.aspnet\https
+# 生成并导出证书
+# dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\agpayplusapi.pfx -p 123456
 dotnet dev-certs https -ep $env:USERPROFILE\.aspnet\https\agpayplusapi.pfx -p 123456
+# 验证证书是否已正确导出
+ls $env:USERPROFILE\.aspnet\https
+# 在 Linux 或 macOS 上，替换 $env:USERPROFILE（%USERPROFILE%） 为 ~ 并确保你有适当的权限：
+dotnet dev-certs https -ep ~/.aspnet/https/agpayplusapi.pfx -p 123456
+# 信任生成的证书
 dotnet dev-certs https --trust
 
+# 运行容器
+# docker run -d --name agpay-plus-manager-api -p 9817:9817 --network agpay-plus-network agpay-plus-manager-api
 # 使用为 HTTPS 配置的 ASP.NET Core 运行容器镜像
-docker run --rm -it -d --name agpay-plus-manager-api --network agpay-plus-network -p 5817:5017 -p 9817:9017 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9817 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-manager-api
-docker run --rm -it -d --name agpay-plus-agent-api --network agpay-plus-network -p 5816:5016 -p 9816:9016 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9816 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-agent-api
-docker run --rm -it -d --name agpay-plus-merchant-api --network agpay-plus-network -p 5818:5018 -p 9818:9018 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9818 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-merchant-api
-docker run --rm -it -d --name agpay-plus-payment-api --network agpay-plus-network -p 5819:5019 -p 9819:9019 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9819 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-payment-api
+docker run --rm -it -d --name agpay-plus-manager-api --network agpay-plus-network -p 5817:5817 -p 9817:9817 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9817 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-manager-api
+docker run --rm -it -d --name agpay-plus-agent-api --network agpay-plus-network -p 5816:5816 -p 9816:9816 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9816 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-agent-api
+docker run --rm -it -d --name agpay-plus-merchant-api --network agpay-plus-network -p 5818:5818 -p 9818:9818 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9818 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-merchant-api
+docker run --rm -it -d --name agpay-plus-payment-api --network agpay-plus-network -p 5819:5819 -p 9819:9819 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9819 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-payment-api
 
 # 停止并删除当前正在运行的 agpay-plus-manager-api 容器：
 docker stop agpay-plus-manager-api
 docker rm agpay-plus-manager-api
+
+# 构建并运行前端容器
+# 直接拉取所需的基础镜像
+docker pull node:16-alpine
+docker pull nginx:stable-alpine
+
+# 构建 Docker 镜像
+agpayplus\ant-design-vue> docker build -t agpay-ui-manager -f ./agpay-ui-manager/Dockerfile .
+agpayplus\ant-design-vue> docker build -t agpay-ui-agent -f ./agpay-ui-agent/Dockerfile .
+agpayplus\ant-design-vue> docker build -t agpay-ui-merchant -f ./agpay-ui-merchant/Dockerfile .
+
+# 运行容器
+docker run -d --name agpay-ui-manager -p 8817:80 --network agpay-plus-network agpay-ui-manager
+docker run -d --name agpay-ui-agent -p 8816:80 --network agpay-plus-network agpay-ui-agent
+docker run -d --name agpay-ui-merchant -p 8818:80 --network agpay-plus-network agpay-ui-merchant
+
 ```

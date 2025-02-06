@@ -69,16 +69,20 @@ builder.Configuration.GetSection("OSS").Bind(LocalOssConfig.Oss);
 builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
 #endregion
 
-var cors = builder.Configuration.GetSection("Cors").Value;
+#region CORS
+// 从 appsettings.json 中读取 CORS 配置
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+// 添加 CORS 服务
 services.AddCors(o =>
     o.AddPolicy("CorsPolicy",
         builder => builder
-            .WithOrigins(cors.Split(","))
+            .WithOrigins(allowedOrigins)
+            //.AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod()
-            //.AllowAnyOrigin()
             .AllowCredentials()
     ));
+#endregion
 
 services.AddMemoryCache();
 services.AddHttpContextAccessor();
@@ -232,6 +236,8 @@ app.UseStaticFiles();
 
 // 认证 监测用户是否登录
 app.UseAuthentication();
+
+// 启用 CORS 中间件
 app.UseCors("CorsPolicy");
 
 var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();

@@ -196,16 +196,20 @@ services.AddHostedService<QuartzHostedService>();
 OSSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
-var cors = builder.Configuration.GetSection("Cors").Value;
+#region CORS
+// 从 appsettings.json 中读取 CORS 配置
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+// 添加 CORS 服务
 services.AddCors(o =>
     o.AddPolicy("CorsPolicy",
         builder => builder
-            .WithOrigins(cors.Split(","))
+            .WithOrigins(allowedOrigins)
+            //.AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod()
-            //.AllowAnyOrigin()
             .AllowCredentials()
     ));
+#endregion
 
 #region SMS
 SMSNativeInjectorBootStrapper.RegisterServices(services);
@@ -283,6 +287,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+// 启用 CORS 中间件
 app.UseCors("CorsPolicy");
 
 // 授权 监测有没有权限访问后续页面
