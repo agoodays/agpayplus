@@ -34,8 +34,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             try
             {
                 string savePath = ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? LocalOssConfig.Oss.FilePublicPath : LocalOssConfig.Oss.FilePrivatePath;
-                savePath = savePath.Replace("/", @"\");
-
+                
                 if (multipartFile.Length > 0)
                 {
                     var filePath = Path.Combine(savePath, saveDirAndFileName); //Directory.GetCurrentDirectory(), 
@@ -70,7 +69,7 @@ namespace AGooday.AgPay.Components.OSS.Services
                 _logger.LogError(e, e.Message);
             }
 
-            saveDirAndFileName = saveDirAndFileName.Replace(@"\", "/");
+            saveDirAndFileName = saveDirAndFileName.Replace(Path.DirectorySeparatorChar, '/');
 
             // 私有文件 不返回预览文件地址
             if (ossSavePlaceEnum == OssSavePlaceEnum.PRIVATE)

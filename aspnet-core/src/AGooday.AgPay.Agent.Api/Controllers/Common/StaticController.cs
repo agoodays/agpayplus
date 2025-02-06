@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Common
 
         private FileContentResult ImgView(string path, string format)
         {
-            path = Path.Combine(LocalOssConfig.Oss.FilePublicPath.Replace("/", @"\"), path.Replace("/", @"\"));//Directory.GetCurrentDirectory(), 
+            path = Path.Combine(LocalOssConfig.Oss.FilePublicPath, path); // 使用Path.Combine处理路径
             using (var sw = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 var bytes = new byte[sw.Length];
@@ -131,7 +131,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Common
         {
             path = HttpUtility.UrlDecode(path);
             var format = GetFormat(path);
-            var filePath = Path.Combine(LocalOssConfig.Oss.FilePublicPath.Replace("/", @"\"), path.Replace("/", @"\"));
+            var filePath = Path.Combine(LocalOssConfig.Oss.FilePublicPath, path);
 
             FileInfo certFile = new FileInfo(filePath);
             if (certFile.Exists)

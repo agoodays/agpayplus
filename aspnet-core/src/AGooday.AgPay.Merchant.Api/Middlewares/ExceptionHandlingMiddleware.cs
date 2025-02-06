@@ -30,7 +30,8 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            context.Response.ContentType = MediaTypeNames.Application.Json;// 返回json 类型
+            //context.Response.ContentType = MediaTypeNames.Application.Json;// 返回json 类型
+            context.Response.ContentType = "application/json; charset=utf-8"; // 明确指定编码
             var response = context.Response;
 
             ApiRes errorResponse = ApiRes.Fail(ApiCode.SYSTEM_ERROR, exception.Message);
