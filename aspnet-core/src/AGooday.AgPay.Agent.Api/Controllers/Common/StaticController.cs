@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Web;
 using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.OSS.Config;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,168 +11,131 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Common
     [ApiController, Authorize, AllowAnonymous, NoLog]
     public class StaticController : ControllerBase
     {
-        [HttpGet, Route("api/anon/localOssFiles/{*path}")]
-        public ActionResult AllPurpose(string path)
+        [HttpGet]
+        [Route("api/anon/localOssFiles")]
+        [Route("api/anon/localOssFiles/{*path}")]
+        public async Task<ActionResult> AllPurposeAsync(string path = null)
         {
-            try
+            path = GetPathFromRequest(path);
+            if (string.IsNullOrEmpty(path))
             {
-                path = HttpUtility.UrlDecode(path);
-                var format = GetFormat(path);
-                if (IsImage(format))
-                {
-                    return ImgView(path, format);
-                }
-                else
-                {
-                    return Content(path);
-                }
+                return BadRequest("Path is required.");
             }
-            catch (Exception e)
-            {
-                return Content(e.Message);
-            }
+            return await HandleFileRequestAsync(path);
         }
 
         [HttpGet, Route("api/anon/localOssFiles/{folder}/{name}.{format}")]
-        public ActionResult ImgView(string folder, string name, string format)
+        public async Task<ActionResult> FileViewAsync(string folder, string name, string format)
         {
-            try
-            {
-                string path = $"{HttpUtility.UrlDecode(folder)}/{name}.{format}";
-                if (IsImage(format))
-                {
-                    return ImgView(path, format);
-                }
-                else
-                {
-                    return Content(path);
-                }
-            }
-            catch (Exception e)
-            {
-                return Content(e.Message);
-            }
+            string fullPath = $"{HttpUtility.UrlDecode(folder)}/{name}.{format}";
+            return await HandleFileRequestAsync(fullPath);
         }
 
         //[HttpGet, Route("api/anon/localOssFiles/{path:regex(([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?$)}")]
-        //public ActionResult FileView(string path)
+        //public async Task<ActionResult> FileView(string path)
         //{
-        //    try
-        //    {
-        //        path = HttpUtility.UrlDecode(path);
-        //        var format = GetFormat(path);
-        //        if (IsImage(format))
-        //        {
-        //            return ImgView(path, format);
-        //        }
-        //        else
-        //        {
-        //            return Content(path);
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Content(e.Message);
-        //    }
+        //    path = HttpUtility.UrlDecode(path);
+        //    return await HandleFileRequestAsync(path);
         //}
 
-        private FileContentResult ImgView(string path, string format)
+        [HttpGet]
+        [Route("api/anon/getfile")]
+        [Route("api/anon/getfile/{*path}")]
+        public async Task<ActionResult> GetFileAsync(string path)
         {
-            path = Path.Combine(LocalOssConfig.Oss.FilePublicPath, path); // 使用Path.Combine处理路径
-            using (var sw = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            path = GetPathFromRequest(path);
+            if (string.IsNullOrEmpty(path))
             {
-                var bytes = new byte[sw.Length];
-                sw.Read(bytes, 0, bytes.Length);
-                sw.Close();
-                return File(bytes, GetContentType(format));
+                return BadRequest("Path is required.");
             }
-        }
 
-        private static string GetFormat(string path)
-        {
-            return path.Split('.').Length > 0 ? path.Split('.').Last() : string.Empty;
-        }
+            var filePath = GetFullPath(path);
+            var certFile = new FileInfo(filePath);
 
-        private static bool IsImage(string format)
-        {
-            var formats = new List<string> { "jpg", "tiff", "gif", "jfif", "png", "tif", "ico", "jpeg", "wbmp", "fax", "net", "jpe" };
-            return !string.IsNullOrEmpty(format) && formats.Contains(format.ToLower());
-        }
-
-        private static string GetContentType(string format)
-        {
-            var contentType = $"image/{format}";
-            switch (format)
-            {
-                case "jpeg":
-                case "jfif":
-                case "jpe":
-                case "jpg": contentType = "image/jpeg"; break;
-                case "tiff": contentType = "image/tiff"; break;
-                case "gif": contentType = "image/gif"; break;
-                case "png": contentType = "image/png"; break;
-                case "tif": contentType = "image/tiff"; break;
-                case "ico": contentType = "image/x-icon"; break;
-                case "wbmp": contentType = "image/vnd.wap.wbmp"; break;
-                case "fax": contentType = "image/fax"; break;
-                case "net": contentType = "image/pnetvue"; break;
-                case "rp": contentType = "image/vnd.rn-realpix​"; break;
-            }
-            return contentType;
-        }
-
-        [HttpGet, Route("api/anon/get")]
-        public IEnumerable<int> Get()
-        {
-            return Enumerable.Range(1, 5).Select(index => Random.Shared.Next(index, 55)).ToArray();
-        }
-
-        [HttpGet, Route("api/anon/getfile")]
-        public ActionResult GetFile(string path)
-        {
-            path = HttpUtility.UrlDecode(path);
-            var format = GetFormat(path);
-            var filePath = Path.Combine(LocalOssConfig.Oss.FilePublicPath, path);
-
-            FileInfo certFile = new FileInfo(filePath);
             if (certFile.Exists)
             {
-                using (var sw = certFile.Open(FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read))
-                {
-                    var bytes = new byte[sw.Length];
-                    sw.Read(bytes, 0, bytes.Length);
-                    sw.Close();
-                    return File(bytes, GetContentType(format));
-                }
+                return await ReturnFileContentAsync(certFile);
             }
-            else
+
+            var notExistsFile = new FileInfo($"{certFile.FullName}.notexists");
+            if (notExistsFile.Exists)
             {
-                var notexists = new FileInfo(certFile.FullName + ".notexists");
-                if (notexists.Exists)
+                return await ReturnFileContentAsync(notExistsFile);
+            }
+
+            using (var sw = notExistsFile.Create())
+            {
+                return File(Array.Empty<byte>(), MimeTypeResolver.GetMimeType(notExistsFile.FullName));
+            }
+
+            // 如果文件不存在且没有 .notexists 文件，返回 404 Not Found
+            //return NotFound();
+        }
+
+        [HttpGet]
+        [Route("api/anon/getfilecontent")]
+        [Route("api/anon/getfilecontent/{*path}")]
+        public async Task<ActionResult> GetFileContentAsync(string path)
+        {
+            path = GetPathFromRequest(path);
+            if (string.IsNullOrEmpty(path))
+            {
+                return BadRequest("Path is required.");
+            }
+
+            var fullPath = GetFullPath(path);
+            if (!System.IO.File.Exists(fullPath))
+            {
+                return NotFound();
+            }
+
+            return Content(await System.IO.File.ReadAllTextAsync(fullPath, Encoding.UTF8));
+        }
+
+        private async Task<ActionResult> HandleFileRequestAsync(string fullPath)
+        {
+            try
+            {
+                fullPath = GetFullPath(fullPath);
+
+                if (ImageValidator.IsImage(fullPath, out string mimeType))
                 {
-                    using (var sw = notexists.Open(FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read))
-                    {
-                        var bytes = new byte[sw.Length];
-                        sw.Read(bytes, 0, bytes.Length);
-                        sw.Close();
-                        return File(bytes, GetContentType(format));
-                    }
+                    return await ReturnFileContentAsync(new FileInfo(fullPath), mimeType);
                 }
-                using (var sw = notexists.Create())
-                {
-                    var bytes = new byte[sw.Length];
-                    sw.Read(bytes, 0, bytes.Length);
-                    sw.Close();
-                    return File(bytes, GetContentType(format));
-                }
+
+                return Content(fullPath);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
-        [HttpGet, Route("api/anon/getfilecontent")]
-        public string GetFileContent(string path)
+        private async Task<ActionResult> ReturnFileContentAsync(FileInfo fileInfo, string mimeType = null)
         {
-            string merchantCertificatePrivateKey = System.IO.File.ReadAllText(path, Encoding.UTF8);
-            return merchantCertificatePrivateKey;
+            mimeType ??= MimeTypeResolver.GetMimeType(fileInfo.FullName);
+
+            using (var stream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                var bytes = new byte[stream.Length];
+                await stream.ReadExactlyAsync(bytes, 0, bytes.Length);
+                return File(bytes, mimeType);
+            }
+        }
+
+        private string GetPathFromRequest(string path)
+        {
+            // 如果通过路由参数没有获得path，则尝试从查询字符串中获取
+            if (string.IsNullOrEmpty(path))
+            {
+                path = Request.Query["path"].ToString();
+            }
+            return HttpUtility.UrlDecode(path);
+        }
+
+        private string GetFullPath(string relativePath)
+        {
+            return Path.GetFullPath(Path.Combine(LocalOssConfig.Oss.FilePublicPath, relativePath));// 使用Path.Combine处理路径
         }
     }
 }

@@ -356,7 +356,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         {
             var payRateConfigs = _payRateConfigService.GetPayRateConfigInfos(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
 
-            var payOrderProfits = new List<PayOrderProfitDto>(); 
+            var payOrderProfits = new List<PayOrderProfitDto>();
             var payOrderProfit = new PayOrderProfitDto();
             var agentPayRateConfigs = payRateConfigs.Where(w => w.InfoType.Equals(CS.INFO_TYPE.AGENT)).OrderByDescending(o => o.AgentLevel);
             var preFeeRate = payOrder.MchFeeRate;

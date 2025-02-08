@@ -84,10 +84,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
         }
 
         [HttpGet, Route("get")]
-        public IEnumerable<int> Get()
-        {
-            return Enumerable.Range(1, 5).Select(index => Random.Shared.Next(index, 55)).ToArray();
-        }
+        public IEnumerable<int> Get() => Enumerable.Range(1, 5).Select(index => Random.Shared.Next(index, 55)).ToArray();
 
         private static void ValidateFile(string fileName, long fileSize, OssFileConfig ossFileConfig)
         {

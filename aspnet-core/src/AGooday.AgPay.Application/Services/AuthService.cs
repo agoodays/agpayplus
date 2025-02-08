@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Application.Services
         public async Task<SysUserDto> GetUserByIdAsync(long userId)
         {
             var entity = await _sysUserRepository.GetByIdAsync(userId);
-            return  _mapper.Map<SysUserDto>(entity);
+            return _mapper.Map<SysUserDto>(entity);
         }
 
         /// <summary>

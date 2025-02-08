@@ -28,8 +28,8 @@ namespace AGooday.AgPay.Application.Services
 
         public RefundOrderService(IMapper mapper, IMediatorHandler bus,
             IRefundOrderRepository refundOrderRepository,
-            IPayOrderRepository payOrderRepository, 
-            IPayOrderProfitRepository payOrderProfitRepository, 
+            IPayOrderRepository payOrderRepository,
+            IPayOrderProfitRepository payOrderProfitRepository,
             IAccountBillRepository accountBillRepository)
             : base(mapper, bus, refundOrderRepository)
         {

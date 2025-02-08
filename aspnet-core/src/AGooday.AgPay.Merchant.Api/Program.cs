@@ -228,6 +228,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 app.UseHttpsRedirection();
+// 强制HTTPS设置，用于将HTTP请求重定向到HTTPS
 app.UseStaticFiles();
 
 // 认证 监测用户是否登录

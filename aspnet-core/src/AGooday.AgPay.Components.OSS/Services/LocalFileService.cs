@@ -34,7 +34,7 @@ namespace AGooday.AgPay.Components.OSS.Services
             try
             {
                 string savePath = ossSavePlaceEnum == OssSavePlaceEnum.PUBLIC ? LocalOssConfig.Oss.FilePublicPath : LocalOssConfig.Oss.FilePrivatePath;
-                
+
                 if (multipartFile.Length > 0)
                 {
                     var filePath = Path.Combine(savePath, saveDirAndFileName); //Directory.GetCurrentDirectory(), 

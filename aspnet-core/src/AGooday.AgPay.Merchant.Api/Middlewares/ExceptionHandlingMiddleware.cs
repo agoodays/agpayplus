@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Mime;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using Newtonsoft.Json;

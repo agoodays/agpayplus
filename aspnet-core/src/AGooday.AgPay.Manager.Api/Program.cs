@@ -84,7 +84,7 @@ services.AddCors(o =>
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()
-    )); 
+    ));
 #endregion
 
 services.AddMemoryCache();
@@ -248,6 +248,7 @@ app.UseRequestResponseLogging();
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
+// 强制HTTPS设置，用于将HTTP请求重定向到HTTPS
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
