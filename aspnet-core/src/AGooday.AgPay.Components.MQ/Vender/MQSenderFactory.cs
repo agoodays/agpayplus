@@ -5,7 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AGooday.AgPay.Components.MQ.Vender
 {
-    public class MQSenderFactory
+    public interface IMQSenderFactory
+    {
+        IMQSender CreateSender();
+    }
+
+    public class MQSenderFactory : IMQSenderFactory
     {
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
@@ -18,7 +23,7 @@ namespace AGooday.AgPay.Components.MQ.Vender
 
         public IMQSender CreateSender()
         {
-            string mqVender = _configuration[MQVenderCS.MQ_VENDER_KEY];
+            string mqVender = _configuration[MQVenderCS.MQ_VENDER_KEY] ?? throw new InvalidOperationException("MQ vender configuration is missing.");
 
             switch (mqVender)
             {

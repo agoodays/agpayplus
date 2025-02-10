@@ -186,13 +186,36 @@ services.AddNotice(builder.Configuration);
 
 #region RabbitMQ
 services.AddTransient<RabbitMQSender>();
+services.AddSingleton<IMQSenderFactory, MQSenderFactory>();
 services.AddSingleton<IMQSender>(provider =>
 {
-    var mqSenderFactory = new MQSenderFactory(builder.Configuration, provider);
-    return mqSenderFactory.CreateSender();
+    var factory = provider.GetRequiredService<IMQSenderFactory>();
+    return factory.CreateSender();
 });
-services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
-services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
+
+// ¶¯Ì¬×¢²á Receiver
+var receiverTypes = new[]
+{
+    typeof(ResetAppConfigRabbitMQReceiver)
+};
+
+foreach (var type in receiverTypes)
+{
+    services.AddSingleton(typeof(IMQMsgReceiver), type);
+}
+
+var specificReceiverTypes = new[]
+{
+    (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver))
+};
+
+foreach (var (serviceType, implementationType) in specificReceiverTypes)
+{
+    services.AddSingleton(serviceType, implementationType);
+}
+//services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
+//services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
+// ×¢²á HostedService
 services.AddHostedService<MQReceiverHostedService>();
 #endregion
 

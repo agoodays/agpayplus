@@ -124,21 +124,52 @@ services.AddNotice(builder.Configuration);
 
 #region RabbitMQ
 services.AddTransient<RabbitMQSender>();
+services.AddSingleton<IMQSenderFactory, MQSenderFactory>();
 services.AddSingleton<IMQSender>(provider =>
 {
-    var mqSenderFactory = new MQSenderFactory(builder.Configuration, provider);
-    return mqSenderFactory.CreateSender();
+    var factory = provider.GetRequiredService<IMQSenderFactory>();
+    return factory.CreateSender();
 });
-services.AddSingleton<IMQMsgReceiver, PayOrderDivisionRabbitMQReceiver>();
-services.AddSingleton<IMQMsgReceiver, PayOrderMchNotifyRabbitMQReceiver>();
-services.AddSingleton<IMQMsgReceiver, PayOrderReissueRabbitMQReceiver>();
-services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
-services.AddSingleton<IMQMsgReceiver, ResetIsvAgentMchAppInfoRabbitMQReceiver>();
-services.AddSingleton<PayOrderDivisionMQ.IMQReceiver, PayOrderDivisionMQReceiver>();
-services.AddSingleton<PayOrderMchNotifyMQ.IMQReceiver, PayOrderMchNotifyMQReceiver>();
-services.AddSingleton<PayOrderReissueMQ.IMQReceiver, PayOrderReissueMQReceiver>();
-services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
-services.AddSingleton<ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver, ResetIsvAgentMchAppInfoMQReceiver>();
+
+// ¶¯Ì¬×¢²á Receiver
+var receiverTypes = new[]
+{
+    typeof(PayOrderDivisionRabbitMQReceiver),
+    typeof(PayOrderMchNotifyRabbitMQReceiver),
+    typeof(PayOrderReissueRabbitMQReceiver),
+    typeof(ResetAppConfigRabbitMQReceiver),
+    typeof(ResetIsvAgentMchAppInfoRabbitMQReceiver)
+};
+
+foreach (var type in receiverTypes)
+{
+    services.AddSingleton(typeof(IMQMsgReceiver), type);
+}
+
+var specificReceiverTypes = new[]
+{
+    (typeof(PayOrderDivisionMQ.IMQReceiver), typeof(PayOrderDivisionMQReceiver)),
+    (typeof(PayOrderMchNotifyMQ.IMQReceiver), typeof(PayOrderMchNotifyMQReceiver)),
+    (typeof(PayOrderReissueMQ.IMQReceiver), typeof(PayOrderReissueMQReceiver)),
+    (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver)),
+    (typeof(ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver), typeof(ResetIsvAgentMchAppInfoMQReceiver))
+};
+
+foreach (var (serviceType, implementationType) in specificReceiverTypes)
+{
+    services.AddSingleton(serviceType, implementationType);
+}
+//services.AddSingleton<IMQMsgReceiver, PayOrderDivisionRabbitMQReceiver>();
+//services.AddSingleton<IMQMsgReceiver, PayOrderMchNotifyRabbitMQReceiver>();
+//services.AddSingleton<IMQMsgReceiver, PayOrderReissueRabbitMQReceiver>();
+//services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
+//services.AddSingleton<IMQMsgReceiver, ResetIsvAgentMchAppInfoRabbitMQReceiver>();
+//services.AddSingleton<PayOrderDivisionMQ.IMQReceiver, PayOrderDivisionMQReceiver>();
+//services.AddSingleton<PayOrderMchNotifyMQ.IMQReceiver, PayOrderMchNotifyMQReceiver>();
+//services.AddSingleton<PayOrderReissueMQ.IMQReceiver, PayOrderReissueMQReceiver>();
+//services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
+//services.AddSingleton<ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver, ResetIsvAgentMchAppInfoMQReceiver>();
+// ×¢²á HostedService
 services.AddHostedService<MQReceiverHostedService>();
 #endregion
 
