@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Merchant.Api.Attributes;
@@ -28,13 +29,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         private readonly IMchInfoService _mchInfoService;
 
         public MchAppController(ILogger<MchAppController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IOptions<SysRSA2Config> sysRSA2Config,
             IMQSender mqSender,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IMchInfoService mchInfoService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _sysRSA2Config = sysRSA2Config.Value;
@@ -51,7 +52,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_LIST)]
         public async Task<ApiPageRes<MchAppDto>> ListAsync([FromQuery] MchAppQueryDto dto)
         {
-            var mchNo = GetCurrentMchNo();
+            var mchNo = await GetCurrentMchNoAsync();
             dto.MchNo = mchNo;
             var data = await _mchAppService.GetPaginatedDataAsync(dto);
             var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
@@ -76,7 +77,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_APP_ADD)]
         public async Task<ApiRes> AddAsync(MchAppDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.MchNo = sysUser.BelongInfoId;
             dto.AppId = SeqUtil.GenAppId();
             dto.CreatedBy = sysUser.Realname;

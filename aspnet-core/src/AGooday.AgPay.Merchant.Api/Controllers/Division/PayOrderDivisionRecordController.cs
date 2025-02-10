@@ -4,7 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Merchant.Api.Attributes;
@@ -25,11 +25,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
 
         public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
-            IPayOrderDivisionRecordService payOrderDivisionRecordService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IPayOrderDivisionRecordService payOrderDivisionRecordService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _payOrderDivisionRecordService = payOrderDivisionRecordService;
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_LIST)]
         public async Task<ApiPageRes<PayOrderDivisionRecordDto>> ListAsync([FromQuery] PayOrderDivisionRecordQueryDto dto)
         {
-            dto.MchNo = GetCurrentMchNo();
+            dto.MchNo = await GetCurrentMchNoAsync();
             var data = await _payOrderDivisionRecordService.GetPaginatedDataAsync(dto);
             return ApiPageRes<PayOrderDivisionRecordDto>.Pages(data);
         }
@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_VIEW)]
         public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var record = await _payOrderDivisionRecordService.GetByIdAsNoTrackingAsync(recordId, GetCurrentMchNo());
+            var record = await _payOrderDivisionRecordService.GetByIdAsNoTrackingAsync(recordId, await GetCurrentMchNoAsync());
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -76,7 +76,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECORD_RESEND)]
         public async Task<ApiRes> ResendAsync(long recordId)
         {
-            var record = await _payOrderDivisionRecordService.GetByIdAsNoTrackingAsync(recordId, GetCurrentMchNo());
+            var record = await _payOrderDivisionRecordService.GetByIdAsNoTrackingAsync(recordId, await GetCurrentMchNoAsync());
             if (record == null)
             {
                 throw new BizException(ApiCode.SYS_OPERATION_FAIL_SELETE);

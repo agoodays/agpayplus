@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -21,11 +22,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly IMchAppService _mchAppService;
 
         public MchChannelController(ILogger<MchChannelController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchAppService mchAppService,
-            ISysConfigService sysConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysConfigService sysConfigService)
+            : base(logger, cacheService, authService)
         {
             _sysConfigService = sysConfigService;
             _mchAppService = mchAppService;

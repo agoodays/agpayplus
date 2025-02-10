@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -24,11 +25,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Config
         private readonly ISysConfigService _sysConfigService;
 
         public SysConfigController(ILogger<SysConfigController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
-            ISysConfigService sysConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysConfigService sysConfigService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _sysConfigService = sysConfigService;

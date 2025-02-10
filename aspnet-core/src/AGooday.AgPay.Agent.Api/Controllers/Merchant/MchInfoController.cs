@@ -5,7 +5,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Core.Notifications;
 using MediatR;
@@ -30,14 +30,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         private readonly DomainNotificationHandler _notifications;
 
         public MchInfoController(ILogger<MchInfoController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
             INotificationHandler<DomainNotification> notifications,
             IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
-            ISysUserService sysUserService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserService sysUserService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _mchInfoService = mchInfoService;
@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_LIST)]
         public async Task<ApiPageRes<MchInfoDto>> ListAsync([FromQuery] MchInfoQueryDto dto)
         {
-            dto.AgentNo = GetCurrentAgentNo();
+            dto.AgentNo = await GetCurrentAgentNoAsync();
             var data = await _mchInfoService.GetPaginatedDataAsync(dto);
             return ApiPageRes<MchInfoDto>.Pages(data);
         }
@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_INFO_ADD)]
         public async Task<ApiRes> AddAsync(MchInfoCreateDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             var agentNo = sysUser.BelongInfoId;

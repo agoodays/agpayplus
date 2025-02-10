@@ -6,6 +6,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,10 +19,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         private readonly IAgentInfoService _agentInfoService;
 
         public AgentConfigController(ILogger<AgentConfigController> logger,
+            ICacheService cacheService,
             IAgentInfoService agentInfoService,
-            RedisUtil client,
             IAuthService authService)
-            : base(logger, client, authService)
+            : base(logger, cacheService, authService)
         {
             _agentInfoService = agentInfoService;
         }
@@ -36,7 +37,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_CONFIG_EDIT)]
         public async Task<ApiRes> SetAgentSipwAsync(ModifyAgentSipw model)
         {
-            var agentInfo = await _agentInfoService.GetByIdAsync(GetCurrentAgentNo());
+            var agentInfo = await _agentInfoService.GetByIdAsync(await GetCurrentAgentNoAsync());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);
             if (!string.IsNullOrWhiteSpace(agentInfo.Sipw))
             {
@@ -66,7 +67,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         [HttpGet, Route("hasSipwValidate"), NoLog]
         public async Task<ApiRes> HasSipwValidateAsync()
         {
-            var agentInfo = await _agentInfoService.GetByIdAsync(GetCurrentAgentNo());
+            var agentInfo = await _agentInfoService.GetByIdAsync(await GetCurrentAgentNoAsync());
             return ApiRes.Ok(!string.IsNullOrWhiteSpace(agentInfo.Sipw));
         }
     }

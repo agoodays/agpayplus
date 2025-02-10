@@ -2,7 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -20,10 +20,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         private readonly IPayWayService _payWayService;
 
         public PayWayController(ILogger<PayWayController> logger,
-            IPayWayService payWayService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            IPayWayService payWayService)
+            : base(logger, cacheService, authService)
         {
             _payWayService = payWayService;
         }

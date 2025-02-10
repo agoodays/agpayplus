@@ -3,7 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -21,10 +21,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         private readonly ISysUserTeamService _sysUserTeamService;
 
         public SysUserTeamController(ILogger<SysUserTeamController> logger,
-            ISysUserTeamService sysUserTeamService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            ISysUserTeamService sysUserTeamService)
+            : base(logger, cacheService, authService)
         {
             _sysUserTeamService = sysUserTeamService;
         }
@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_ADD)]
         public async Task<ApiRes> AddAsync(SysUserTeamDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             dto.SysType = CS.SYS_TYPE.MGR;

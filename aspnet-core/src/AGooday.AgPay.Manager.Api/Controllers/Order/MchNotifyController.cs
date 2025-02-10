@@ -4,7 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -25,11 +25,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         private readonly IMchNotifyRecordService _mchNotifyService;
 
         public MchNotifyController(ILogger<MchNotifyController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
-            IMchNotifyRecordService mchNotifyService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IMchNotifyRecordService mchNotifyService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _mchNotifyService = mchNotifyService;

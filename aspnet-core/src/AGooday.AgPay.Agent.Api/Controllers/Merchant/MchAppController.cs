@@ -7,6 +7,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Extensions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using Microsoft.AspNetCore.Authorization;
@@ -28,13 +29,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         private readonly IMchInfoService _mchInfoService;
 
         public MchAppController(ILogger<MchAppController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
             IOptions<SysRSA2Config> sysRSA2Config,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IMchInfoService mchInfoService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _sysRSA2Config = sysRSA2Config.Value;
@@ -51,7 +52,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_APP_LIST)]
         public async Task<ApiPageRes<MchAppDto>> ListAsync([FromQuery] MchAppQueryDto dto)
         {
-            var data = await _mchAppService.GetPaginatedDataAsync(dto, GetCurrentAgentNo());
+            var data = await _mchAppService.GetPaginatedDataAsync(dto, await GetCurrentAgentNoAsync());
             var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
             var mchInfos = _mchInfoService.GetByMchNos(mchNos);
             //JArray records = new JArray();
@@ -74,7 +75,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_APP_ADD)]
         public async Task<ApiRes> AddAsync(MchAppDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             dto.AppId = SeqUtil.GenAppId();

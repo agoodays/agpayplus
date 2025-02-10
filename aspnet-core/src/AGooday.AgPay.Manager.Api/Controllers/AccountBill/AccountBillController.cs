@@ -2,7 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -20,10 +20,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.AccountBill
         private readonly IAccountBillService _accountBillService;
 
         public AccountBillController(ILogger<AccountBillController> logger,
-            IAccountBillService accountBillService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            IAccountBillService accountBillService)
+            : base(logger, cacheService, authService)
         {
             _accountBillService = accountBillService;
         }

@@ -10,6 +10,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Models;
@@ -30,13 +31,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
         private readonly IMchAppService _mchAppService;
 
         public MchTransferController(ILogger<MchTransferController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IPayInterfaceConfigService payIfConfigService,
             IPayInterfaceDefineService payIfDefineService,
             IMchAppService mchAppService,
-            ISysConfigService sysConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysConfigService sysConfigService)
+            : base(logger, cacheService, authService)
         {
             _payIfConfigService = payIfConfigService;
             _payIfDefineService = payIfDefineService;
@@ -66,12 +67,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
         public async Task<ApiRes> ChannelUserIdAsync(string appId, string ifCode, string extParam)
         {
             var mchApp = await _mchAppService.GetByIdAsync(appId);
-            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentMchNo()))
+            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(await GetCurrentMchNoAsync()))
             {
                 throw new BizException("商户应用不存在或不可用");
             }
             var param = new JObject();
-            param.Add("mchNo", GetCurrentMchNo());
+            param.Add("mchNo", await GetCurrentMchNoAsync());
             param.Add("appId", appId);
             param.Add("ifCode", ifCode);
             param.Add("extParam", extParam);
@@ -97,12 +98,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
             var mapper = config.CreateMapper();
             var model = mapper.Map<TransferOrderModel, TransferOrderCreateReqModel>(transferOrder);
             var mchApp = await _mchAppService.GetByIdAsync(model.AppId);
-            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(GetCurrentMchNo()))
+            if (mchApp == null || mchApp.State != CS.PUB_USABLE || !mchApp.MchNo.Equals(await GetCurrentMchNoAsync()))
             {
                 throw new BizException("商户应用不存在或不可用");
             }
             TransferOrderCreateRequest request = new TransferOrderCreateRequest();
-            model.MchNo = GetCurrentMchNo();
+            model.MchNo = await GetCurrentMchNoAsync();
             model.AppId = mchApp.AppId;
             model.Currency = "CNY";
             request.SetBizModel(model);

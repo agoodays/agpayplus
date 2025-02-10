@@ -10,6 +10,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -31,14 +32,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         private readonly ISysConfigService _sysConfigService;
 
         public MchDivisionReceiverController(ILogger<MchDivisionReceiverController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchDivisionReceiverService mchDivisionReceiverService,
             IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
-            ISysConfigService sysConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysConfigService sysConfigService)
+            : base(logger, cacheService, authService)
         {
             _mchDivisionReceiverService = mchDivisionReceiverService;
             _mchDivisionReceiverGroupService = mchDivisionReceiverGroupService;

@@ -4,7 +4,7 @@ using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,10 +20,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
 
         public SysUserRoleRelaController(ILogger<SysUserRoleRelaController> logger,
-            ISysUserRoleRelaService sysUserRoleRelaService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, cacheService, authService)
         {
             _sysUserRoleRelaService = sysUserRoleRelaService;
         }

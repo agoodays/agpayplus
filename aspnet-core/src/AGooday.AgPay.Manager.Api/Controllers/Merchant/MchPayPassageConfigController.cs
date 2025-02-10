@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Models;
@@ -27,13 +28,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly IMchInfoService _mchInfoService;
 
         public MchPayPassageConfigController(ILogger<MchPayPassageConfigController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchPayPassageService mchPayPassageServic,
             IPayWayService payWayService,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IMchInfoService mchInfoService)
+            : base(logger, cacheService, authService)
         {
             _mchPayPassageService = mchPayPassageServic;
             _payWayService = payWayService;

@@ -5,6 +5,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -21,10 +22,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         private readonly ISysEntitlementService _sysEntService;
 
         public SysEntController(ILogger<SysEntController> logger,
-            ISysEntitlementService sysEntService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            ISysEntitlementService sysEntService)
+            : base(logger, cacheService, authService)
         {
             _sysEntService = sysEntService;
         }

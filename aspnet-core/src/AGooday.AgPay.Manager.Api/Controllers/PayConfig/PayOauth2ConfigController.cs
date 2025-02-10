@@ -5,6 +5,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Models;
@@ -23,13 +24,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
         public PayOauth2ConfigController(ILogger<PayOauth2ConfigController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
-            IPayInterfaceConfigService payIfConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IPayInterfaceConfigService payIfConfigService)
+            : base(logger, cacheService, authService)
         {
             _mchAppService = mchAppService;
             _mchInfoService = mchInfoService;
@@ -75,8 +76,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
             };
             var infoId = $"{model.InfoId}_LIST_{DateTime.Now:yyyyMMddHHmmss}";
             //添加更新者信息
-            long userId = GetCurrentUser().SysUser.SysUserId;
-            string realName = GetCurrentUser().SysUser.Realname;
+            long userId = await GetCurrentUserIdAsync();
+            string realName = (await GetCurrentUserAsync()).SysUser.Realname;
             foreach (var item in data)
             {
                 item.Id = null;
@@ -164,8 +165,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         public async Task<ApiRes> SaveOrUpdateAsync(PayInterfaceConfigDto dto)
         {
             //添加更新者信息
-            long userId = GetCurrentUser().SysUser.SysUserId;
-            string realName = GetCurrentUser().SysUser.Realname;
+            long userId = await GetCurrentUserIdAsync();
+            string realName = (await GetCurrentUserAsync()).SysUser.Realname;
             dto.UpdatedUid = userId;
             dto.UpdatedBy = realName;
             dto.UpdatedAt = DateTime.Now;

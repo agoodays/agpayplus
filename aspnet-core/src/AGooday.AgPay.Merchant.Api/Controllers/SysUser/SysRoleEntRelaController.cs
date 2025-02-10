@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -24,12 +25,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
 
         public SysRoleEntRelaController(ILogger<SysRoleEntRelaController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             ISysRoleService sysRoleService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, cacheService, authService)
         {
             _sysRoleEntRelaService = sysRoleEntRelaService;
             _sysUserRoleRelaService = sysUserRoleRelaService;
@@ -60,7 +61,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         public async Task<ApiRes> RelasAsync(string roleId, List<string> entIds)
         {
             var role = await _sysRoleService.GetByIdAsync(roleId);
-            if (role == null || !role.SysType.Equals(CS.SYS_TYPE.MCH) || !role.BelongInfoId.Equals(GetCurrentMchNo()))
+            if (role == null || !role.SysType.Equals(CS.SYS_TYPE.MCH) || !role.BelongInfoId.Equals(await GetCurrentMchNoAsync()))
             {
                 ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

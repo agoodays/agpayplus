@@ -1,7 +1,7 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -17,11 +17,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
         public PayInterfaceDefineController(ILogger<PayInterfaceDefineController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IPayInterfaceDefineService payIfDefineService,
-            IPayInterfaceConfigService payIfConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IPayInterfaceConfigService payIfConfigService)
+            : base(logger, cacheService, authService)
         {
             _payIfDefineService = payIfDefineService;
             _payIfConfigService = payIfConfigService;
@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_LIST)]
         public async Task<ApiRes> ListAsync()
         {
-            var data = await _payIfConfigService.GetPayIfConfigsByMchNoAsync(GetCurrentMchNo());
+            var data = await _payIfConfigService.GetPayIfConfigsByMchNoAsync(await GetCurrentMchNoAsync());
             return ApiRes.Ok(data);
         }
     }

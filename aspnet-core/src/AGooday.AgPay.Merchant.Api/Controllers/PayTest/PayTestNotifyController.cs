@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Models;
 using AGooday.AgPay.Merchant.Api.WebSockets;
@@ -19,11 +20,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         private readonly WsPayOrderServer _wsPayOrderServer;
 
         public PayTestNotifyController(ILogger<PayTestNotifyController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchAppService mchAppService,
-            WsPayOrderServer wsPayOrderServer,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            WsPayOrderServer wsPayOrderServer)
+            : base(logger, cacheService, authService)
         {
             _mchAppService = mchAppService;
             _wsPayOrderServer = wsPayOrderServer;

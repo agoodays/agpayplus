@@ -4,7 +4,7 @@ using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Core.Notifications;
 using MediatR;
@@ -27,12 +27,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         private readonly DomainNotificationHandler _notifications;
 
         public AgentInfoController(IMQSender mqSender, ILogger<AgentInfoController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             INotificationHandler<DomainNotification> notifications,
             IAgentInfoService agentInfoService,
-            RedisUtil client,
-            ISysUserService sysUserService,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserService sysUserService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _agentInfoService = agentInfoService;
@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_LIST, PermCode.MGR.ENT_MCH_INFO_ADD, PermCode.MGR.ENT_MCH_INFO_EDIT, PermCode.MGR.ENT_MCH_INFO_VIEW)]
         public async Task<ApiPageRes<AgentInfoDto>> ListAsync([FromQuery] AgentInfoQueryDto dto)
         {
-            dto.Pid = GetCurrentAgentNo();
+            dto.Pid = await GetCurrentAgentNoAsync();
             var data = await _agentInfoService.GetPaginatedDataAsync(dto);
             return ApiPageRes<AgentInfoDto>.Pages(data);
         }
@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_INFO_ADD)]
         public async Task<ApiRes> AddAsync(AgentInfoCreateDto dto)
         {
-            var agentNo = GetCurrentAgentNo();
+            var agentNo = await GetCurrentAgentNoAsync();
             var agentInfo = await _agentInfoService.GetByIdAsync(agentNo);
             dto.Pid = agentInfo.AgentNo;
             dto.IsvNo = agentInfo.IsvNo;

@@ -3,7 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -29,14 +29,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly DomainNotificationHandler _notifications;
 
         public MchInfoController(ILogger<MchInfoController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
             IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
             ISysUserService sysUserService,
-            INotificationHandler<DomainNotification> notifications,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            INotificationHandler<DomainNotification> notifications)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _mchInfoService = mchInfoService;
@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_LIST)]
         public async Task<ApiPageRes<MchInfoDto>> ListAsync([FromQuery] MchInfoQueryDto dto)
         {
-            var currentUser = GetCurrentUser().SysUser;
+            var currentUser = (await GetCurrentUserAsync()).SysUser;
             if (currentUser.UserType.Equals(CS.USER_TYPE.Expand))
             {
                 dto.CreatedUid = currentUser.SysUserId;
@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_ADD)]
         public async Task<ApiRes> AddAsync(MchInfoCreateDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             if (!string.IsNullOrWhiteSpace(dto.AgentNo))

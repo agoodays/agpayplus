@@ -3,7 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -22,11 +22,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         private readonly IMchDivisionReceiverGroupService _mchDivisionReceiverGroupService;
 
         public MchDivisionReceiverGroupController(ILogger<MchDivisionReceiverGroupController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchDivisionReceiverService mchDivisionReceiverService,
-            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService)
+            : base(logger, cacheService, authService)
         {
             _mchDivisionReceiverService = mchDivisionReceiverService;
             _mchDivisionReceiverGroupService = mchDivisionReceiverGroupService;
@@ -36,16 +36,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_LIST)]
         public async Task<ApiPageRes<MchDivisionReceiverGroupDto>> ListAsync([FromQuery] MchDivisionReceiverGroupQueryDto dto)
         {
-            dto.MchNo = GetCurrentMchNo();
+            dto.MchNo = await GetCurrentMchNoAsync();
             var data = await _mchDivisionReceiverGroupService.GetPaginatedDataAsync(dto);
             return ApiPageRes<MchDivisionReceiverGroupDto>.Pages(data);
         }
 
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_VIEW)]
-        public ApiRes Detail(long recordId)
+        public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var record = _mchDivisionReceiverGroupService.GetByIdAsync(recordId, GetCurrentMchNo());
+            var record = _mchDivisionReceiverGroupService.GetByIdAsync(recordId, await GetCurrentMchNoAsync());
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_ADD)]
         public async Task<ApiRes> AddAsync(MchDivisionReceiverGroupDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.MchNo = sysUser.BelongInfoId;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
@@ -85,7 +85,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_EDIT)]
         public async Task<ApiRes> UpdateAsync(long recordId, MchDivisionReceiverGroupDto dto)
         {
-            dto.MchNo = GetCurrentMchNo();
+            dto.MchNo = await GetCurrentMchNoAsync();
             var result = await _mchDivisionReceiverGroupService.UpdateAsync(dto);
             if (result)
             {
@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         public async Task<ApiRes> DeleteAsync(long recordId)
         {
             var record = await _mchDivisionReceiverGroupService.GetByIdAsync(recordId);
-            if (record == null || !record.MchNo.Equals(GetCurrentMchNo()))
+            if (record == null || !record.MchNo.Equals(await GetCurrentMchNoAsync()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

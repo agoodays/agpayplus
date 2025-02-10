@@ -6,7 +6,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -25,10 +25,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         private readonly IRefundOrderService _refundOrderService;
 
         public RefundOrderController(ILogger<RefundOrderController> logger,
-            IRefundOrderService refundOrderService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            IRefundOrderService refundOrderService)
+            : base(logger, cacheService, authService)
         {
             _refundOrderService = refundOrderService;
         }
@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         public async Task<ApiPageRes<RefundOrderDto>> ListAsync([FromQuery] RefundOrderQueryDto dto)
         {
             dto.BindDateRange();
-            dto.AgentNo = GetCurrentAgentNo();
+            dto.AgentNo = await GetCurrentAgentNoAsync();
             var refundOrders = await _refundOrderService.GetPaginatedDataAsync(dto);
             return ApiPageRes<RefundOrderDto>.Pages(refundOrders);
         }
@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
                 throw new BizException($"暂不支持{bizType}导出");
             }
             dto.BindDateRange();
-            dto.AgentNo = GetCurrentAgentNo();
+            dto.AgentNo = await GetCurrentAgentNoAsync();
             // 从数据库中检索需要导出的数据
             var refundOrders = await _refundOrderService.GetPaginatedDataAsync(dto);
 

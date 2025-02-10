@@ -8,6 +8,8 @@ using AGooday.AgPay.Agent.Api.MQ;
 using AGooday.AgPay.Agent.Api.OpLog;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Extensions;
+using AGooday.AgPay.Components.Cache.Options;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
@@ -53,15 +55,12 @@ services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
 services.AddScoped<IOpLogHandler, OpLogHandler>();
 
 #region Redis
-//redis缓存
-var section = builder.Configuration.GetSection("Redis:Default");
-//连接字符串
-string _connectionString = section.GetSection("Connection").Value;
-//实例名称
-string _instanceName = section.GetSection("InstanceName").Value;
-//默认数据库 
-int _defaultDB = int.Parse(section.GetSection("DefaultDB").Value ?? "0");
-services.AddSingleton(new RedisUtil(_connectionString, _instanceName, _defaultDB));
+var redisSettingsSection = builder.Configuration.GetSection("Redis:Default");
+var redisOptions = redisSettingsSection.Get<RedisOptions>();
+
+//services.AddSingleton(new RedisUtil(redisOptions.Connection, redisOptions.InstanceName, redisOptions.DefaultDB));
+
+CacheNativeInjectorBootStrapper.RegisterServices(services, redisOptions);
 #endregion
 
 #region OSS

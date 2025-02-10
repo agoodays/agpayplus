@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -19,10 +20,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         private readonly IPayOrderService _payOrderService;
 
         public MainChartController(ILogger<MainChartController> logger,
-            IPayOrderService payOrderService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            IPayOrderService payOrderService)
+            : base(logger, cacheService, authService)
         {
             _payOrderService = payOrderService;
         }

@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Models;
@@ -21,11 +22,11 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         private readonly ISysConfigService _sysConfigService;
 
         public MchConfigController(ILogger<MchConfigController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchInfoService mchInfoService,
-            ISysConfigService sysConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysConfigService sysConfigService)
+            : base(logger, cacheService, authService)
         {
             _mchInfoService = mchInfoService;
             _sysConfigService = sysConfigService;
@@ -38,9 +39,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route("{groupKey}"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_CONFIG)]
-        public ApiRes GetConfigs(string groupKey)
+        public async Task<ApiRes> GetConfigsAsync(string groupKey)
         {
-            var configList = _sysConfigService.GetByGroupKey(groupKey, CS.SYS_TYPE.MCH, GetCurrentMchNo());
+            var configList = _sysConfigService.GetByGroupKey(groupKey, CS.SYS_TYPE.MCH, await GetCurrentMchNoAsync());
             return ApiRes.Ok(configList);
         }
 
@@ -54,7 +55,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_CONFIG_EDIT)]
         public async Task<ApiRes> UpdateAsync(string groupKey, Dictionary<string, string> configs)
         {
-            int update = await _sysConfigService.UpdateByConfigKeyAsync(configs, groupKey, CS.SYS_TYPE.MCH, GetCurrentMchNo());
+            int update = await _sysConfigService.UpdateByConfigKeyAsync(configs, groupKey, CS.SYS_TYPE.MCH, await GetCurrentMchNoAsync());
             if (update <= 0)
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "更新失败");
@@ -74,7 +75,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         public async Task<ApiRes> SetMchLevelAsync(ModifyMchLevel model)
         {
             MchInfoDto dto = new MchInfoDto();
-            dto.MchNo = GetCurrentMchNo();
+            dto.MchNo = await GetCurrentMchNoAsync();
             dto.MchLevel = model.MchLevel;
             await _mchInfoService.UpdateByIdAsync(dto);
             return ApiRes.Ok();
@@ -90,7 +91,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_CONFIG_EDIT)]
         public async Task<ApiRes> SetMchSipwAsync(ModifyMchSipw model)
         {
-            var mchInfo = await _mchInfoService.GetByIdAsync(GetCurrentMchNo());
+            var mchInfo = await _mchInfoService.GetByIdAsync(await GetCurrentMchNoAsync());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);
             if (!string.IsNullOrWhiteSpace(mchInfo.Sipw))
             {
@@ -119,7 +120,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [HttpGet, Route("hasSipwValidate"), NoLog]
         public async Task<ApiRes> HasSipwValidateAsync()
         {
-            var mchInfo = await _mchInfoService.GetByIdAsync(GetCurrentMchNo());
+            var mchInfo = await _mchInfoService.GetByIdAsync(await GetCurrentMchNoAsync());
             return ApiRes.Ok(!string.IsNullOrWhiteSpace(mchInfo.Sipw));
         }
     }

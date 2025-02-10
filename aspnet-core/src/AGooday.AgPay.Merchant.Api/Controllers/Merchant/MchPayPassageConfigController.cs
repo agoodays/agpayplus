@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Models;
@@ -27,13 +28,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         private readonly IMchInfoService _mchInfoService;
 
         public MchPayPassageConfigController(ILogger<MchPayPassageConfigController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchPayPassageService mchPayPassageServic,
             IPayWayService payWayService,
             IMchAppService mchAppService,
-            IMchInfoService mchInfoService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IMchInfoService mchInfoService)
+            : base(logger, cacheService, authService)
         {
             _mchPayPassageService = mchPayPassageServic;
             _payWayService = payWayService;
@@ -57,9 +58,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
                 // 支付方式代码集合
                 var wayCodes = payWays.Select(s => s.WayCode).ToList();
 
+                var mchNo = await GetCurrentMchNoAsync();
                 // 商户支付通道集合
                 var mchPayPassages = _mchPayPassageService.GetByAppIdAndWayCodesAsNoTracking(appId, wayCodes)
-                    .Where(w => w.MchNo.Equals(GetCurrentMchNo()));
+                    .Where(w => w.MchNo.Equals(mchNo));
 
                 foreach (var payWay in payWays)
                 {
@@ -119,7 +121,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (!payPassage.MchNo.Equals(GetCurrentMchNo()))
+            if (!payPassage.MchNo.Equals(await GetCurrentMchNoAsync()))
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }

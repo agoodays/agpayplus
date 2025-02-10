@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -24,10 +25,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         private readonly IStatisticService _statisticService;
 
         public StatisticController(ILogger<StatisticController> logger,
-            IStatisticService statisticService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            IStatisticService statisticService)
+            : base(logger, cacheService, authService)
         {
             _statisticService = statisticService;
         }
@@ -41,7 +42,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         [PermissionAuth(PermCode.MGR.ENT_ORDER_STATISTIC)]
         public async Task<ApiPageRes<StatisticResultDto>> StatisticsAsync([FromQuery] StatisticQueryDto dto)
         {
-            ChickAuth(dto.Method);
+            await ChickAuthAsync(dto.Method);
             dto.BindDateRange();
             var result = await _statisticService.StatisticsAsync(null, dto);
             return ApiPageRes<StatisticResultDto>.Pages(result);
@@ -56,7 +57,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
         [PermissionAuth(PermCode.MGR.ENT_ORDER_STATISTIC)]
         public async Task<ApiRes> TotalAsync([FromQuery] StatisticQueryDto dto)
         {
-            ChickAuth(dto.Method);
+            await ChickAuthAsync(dto.Method);
             dto.BindDateRange();
             var statistics = await _statisticService.TotalAsync(null, dto);
             return ApiRes.Ok(statistics);
@@ -76,7 +77,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
             {
                 throw new BizException($"暂不支持{bizType}导出");
             }
-            ChickAuth(dto.Method);
+            await ChickAuthAsync(dto.Method);
             dto.BindDateRange();
             // 从数据库中检索需要导出的数据
             var result = await _statisticService.StatisticsAsync(null, dto);
@@ -203,37 +204,38 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
             }
         }
 
-        private void ChickAuth(string method)
+        private async Task ChickAuthAsync(string method)
         {
-            if (method.Equals(StatisticCS.Method.TRANSACTION, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_TRANSACTION))
+            var authorities = (await GetCurrentUserAsync()).Authorities;
+            if (method.Equals(StatisticCS.Method.TRANSACTION, StringComparison.OrdinalIgnoreCase) && !authorities.Contains(PermCode.MGR.ENT_STATISTIC_TRANSACTION))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals(StatisticCS.Method.MCH, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH))
+            if (method.Equals(StatisticCS.Method.MCH, StringComparison.OrdinalIgnoreCase) && !authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals(StatisticCS.Method.STORE, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_STORE))
+            if (method.Equals(StatisticCS.Method.STORE, StringComparison.OrdinalIgnoreCase) && !authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_STORE))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals(StatisticCS.Method.WAY_CODE, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_CODE))
+            if (method.Equals(StatisticCS.Method.WAY_CODE, StringComparison.OrdinalIgnoreCase) && !authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_CODE))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals(StatisticCS.Method.WAY_TYPE, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_TYPE))
+            if (method.Equals(StatisticCS.Method.WAY_TYPE, StringComparison.OrdinalIgnoreCase) && !authorities.Contains(PermCode.MGR.ENT_STATISTIC_MCH_WAY_TYPE))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals(StatisticCS.Method.AGENT, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_AGENT))
+            if (method.Equals(StatisticCS.Method.AGENT, StringComparison.OrdinalIgnoreCase) && !authorities.Contains(PermCode.MGR.ENT_STATISTIC_AGENT))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals(StatisticCS.Method.ISV, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_ISV))
+            if (method.Equals(StatisticCS.Method.ISV, StringComparison.OrdinalIgnoreCase) && !authorities.Contains(PermCode.MGR.ENT_STATISTIC_ISV))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }
-            if (method.Equals(StatisticCS.Method.CHANNEL, StringComparison.OrdinalIgnoreCase) && !GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_STATISTIC_CHANNEL))
+            if (method.Equals(StatisticCS.Method.CHANNEL, StringComparison.OrdinalIgnoreCase) && !authorities.Contains(PermCode.MGR.ENT_STATISTIC_CHANNEL))
             {
                 throw new BizException("当前用户未分配该菜单权限！");
             }

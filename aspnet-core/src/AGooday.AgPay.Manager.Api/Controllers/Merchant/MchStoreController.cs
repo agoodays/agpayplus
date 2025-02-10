@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
@@ -26,14 +27,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly ISysConfigService _sysConfigService;
 
         public MchStoreController(ILogger<MchStoreController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
             IMchStoreService mchStoreService,
             IMchInfoService mchInfoService,
             ISysConfigService sysConfigService,
-            ISysUserService sysUserService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserService sysUserService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _mchStoreService = mchStoreService;
@@ -92,7 +93,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             var mchInfo = await _mchInfoService.GetByIdAsync(dto.MchNo);
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             dto.AgentNo = mchInfo.AgentNo;

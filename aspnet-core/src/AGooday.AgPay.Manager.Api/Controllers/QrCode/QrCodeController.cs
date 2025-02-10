@@ -5,6 +5,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -26,16 +27,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         private readonly IMchStoreService _mchStoreService;
 
         public QrCodeController(ILogger<QrCodeController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IWebHostEnvironment env,
             IQrCodeService qrCodeService,
             IQrCodeShellService qrCodeShellService,
-            RedisUtil client,
-            IAuthService authService,
             ISysConfigService sysConfigService,
             IMchInfoService mchInfoService,
             IMchAppService mchAppService,
             IMchStoreService mchStoreService)
-            : base(logger, client, authService)
+            : base(logger, cacheService, authService)
         {
             _env = env;
             _qrCodeService = qrCodeService;

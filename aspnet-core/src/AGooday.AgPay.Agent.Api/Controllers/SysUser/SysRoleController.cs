@@ -6,6 +6,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,12 +24,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
 
         public SysRoleController(ILogger<SysRoleController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             ISysRoleService sysRoleService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, cacheService, authService)
         {
             _sysRoleService = sysRoleService;
             _sysRoleEntRelaService = sysRoleEntRelaService;
@@ -45,7 +46,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         public async Task<ApiPageRes<SysRoleDto>> ListAsync([FromQuery] SysRoleQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
-            dto.BelongInfoId = GetCurrentAgentNo();
+            dto.BelongInfoId = await GetCurrentAgentNoAsync();
             var data = await _sysRoleService.GetPaginatedDataAsync(dto);
             return ApiPageRes<SysRoleDto>.Pages(data);
         }
@@ -61,11 +62,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         {
             dto.RoleId = $"ROLE_{StringUtil.GetUUID(6)}";
             dto.SysType = CS.SYS_TYPE.AGENT;
-            dto.BelongInfoId = GetCurrentAgentNo();
+            dto.BelongInfoId = await GetCurrentAgentNoAsync();
             await _sysRoleService.AddAsync(dto);
 
             //如果包含： 可分配权限的权限 && EntIds 不为空
-            if (GetCurrentUser().Authorities.Contains(PermCode.AGENT.ENT_UR_ROLE_DIST))
+            if ((await GetCurrentUserAsync()).Authorities.Contains(PermCode.AGENT.ENT_UR_ROLE_DIST))
             {
                 await _sysRoleEntRelaService.ResetRelaAsync(dto.RoleId, dto.EntIds);
             }
@@ -97,7 +98,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         {
             await _sysRoleService.UpdateAsync(dto);
             //如果包含：可分配权限的权限 && EntIds 不为空
-            if (GetCurrentUser().Authorities.Contains(PermCode.AGENT.ENT_UR_ROLE_DIST))
+            if ((await GetCurrentUserAsync()).Authorities.Contains(PermCode.AGENT.ENT_UR_ROLE_DIST))
             {
                 await _sysRoleEntRelaService.ResetRelaAsync(dto.RoleId, dto.EntIds);
 

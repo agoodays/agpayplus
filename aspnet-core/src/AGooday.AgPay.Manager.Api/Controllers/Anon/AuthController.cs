@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.SMS.Extensions;
 using AGooday.AgPay.Components.SMS.Services;
 using AGooday.AgPay.Domain.Core.Notifications;
@@ -16,7 +17,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 {
@@ -28,40 +28,43 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
+        private readonly ICacheService _cacheService;
+        private readonly IAuthService _authService;
+        private readonly IMemoryCache _cache;
         private readonly JwtSettings _jwtSettings;
         private readonly ISysUserService _sysUserService;
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly ISysConfigService _sysConfigService;
         private readonly ISmsService _smsService;
-        private readonly IMemoryCache _cache;
-        private readonly IDatabase _redis;
-        private readonly IAuthService _authService;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
         private const string AUTH_METHOD_REMARK = "登录认证"; //用户信息认证方法描述
         private const string SYS_TYPE = CS.SYS_TYPE.MGR; //用户信息认证方法描述
 
-        public AuthController(ILogger<AuthController> logger, IOptions<JwtSettings> jwtSettings, IMemoryCache cache, RedisUtil client,
-            INotificationHandler<DomainNotification> notifications,
+        public AuthController(ILogger<AuthController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
+            IMemoryCache cache,
+            IOptions<JwtSettings> jwtSettings,
             ISysUserService sysUserService,
             ISysUserAuthService sysUserAuthService,
             ISysUserLoginAttemptService sysUserLoginAttemptService,
             ISysConfigService sysConfigService,
             ISmsServiceFactory smsServiceFactory,
-            IAuthService authService)
+            INotificationHandler<DomainNotification> notifications)
         {
             _logger = logger;
+            _cacheService = cacheService;
+            _authService = authService;
+            _cache = cache;
             _jwtSettings = jwtSettings.Value;
             _sysUserService = sysUserService;
             _sysUserAuthService = sysUserAuthService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _sysConfigService = sysConfigService;
             _smsService = smsServiceFactory.GetService();
-            _cache = cache;
-            _redis = client.GetDatabase();
-            _authService = authService;
             _notifications = (DomainNotificationHandler)notifications;
         }
 
@@ -81,11 +84,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
 
 #if !DEBUG
-            string cacheCode = await _redis.StringGetAsync(codeCacheKey);
+            string cacheCode = await _cacheService.GetAsync<string>(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode, StringComparison.OrdinalIgnoreCase))
             {
                 throw new BizException("验证码有误！");
-            } 
+            }
 #endif
 
             //登录方式， 默认为账号密码登录
@@ -177,16 +180,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             tokenModel.CacheKey = cacheKey;
             var accessToken = JwtBearerAuthenticationExtension.IssueJwt(_jwtSettings, tokenModel);
 
-            var currentUser = JsonConvert.SerializeObject(new CurrentUser
+            var currentUser = new CurrentUser
             {
                 CacheKey = cacheKey,
                 SysUser = auth,
                 Authorities = authorities
-            });
-            await _redis.StringSetAsync(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
+            };
+            await _cacheService.SetAsync(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
 
             // 删除验证码缓存数据
-            await _redis.KeyDeleteAsync(codeCacheKey);
+            await _cacheService.RemoveAsync(codeCacheKey);
 
             if (lastLoginTime != null)
             {
@@ -221,7 +224,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             //redis
             string vercodeToken = Guid.NewGuid().ToString("N");
             string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
-            await _redis.StringSetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
+            await _cacheService.SetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //图片验证码缓存时间: 1分钟
 
             return ApiRes.Ok(new { imageBase64Data, vercodeToken, expireTime = CS.VERCODE_CACHE_TIME });
         }
@@ -261,14 +264,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             //redis
             string smsCodeToken = $"{SYS_TYPE.ToLower()}_{model.smsType}_{model.phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
-            await _redis.StringSetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
+            await _cacheService.SetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
 #if !DEBUG
             _smsService.SendVercode(new Components.SMS.Models.SmsBizVercodeModel()
             {
                 Mobile = model.phone,
                 Vercode = code,
                 SmsType = model.smsType
-            }); 
+            });
 #endif
             return ApiRes.Ok();
         }
@@ -288,7 +291,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 
 #if !DEBUG
-            string cacheCode = await _redis.StringGetAsync(codeCacheKey);
+            string cacheCode = await _cacheService.GetAsync<string>(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
                 throw new BizException("验证码已过期，请重新点击发送验证码！");
@@ -319,7 +322,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             }
             await _sysUserAuthService.ResetAuthInfoAsync(sysUser.SysUserId.Value, null, null, newPwd, SYS_TYPE);
             // 删除短信验证码缓存数据
-            await _redis.KeyDeleteAsync(codeCacheKey);
+            await _cacheService.RemoveAsync(codeCacheKey);
             return ApiRes.Ok();
         }
 

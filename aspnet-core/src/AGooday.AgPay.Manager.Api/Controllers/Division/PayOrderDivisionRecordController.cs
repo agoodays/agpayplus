@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -26,12 +27,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         private readonly IPayOrderDivisionRecordService _payOrderDivisionRecordService;
 
         public PayOrderDivisionRecordController(ILogger<PayOrderDivisionRecordController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
             IMchInfoService mchInfoService,
-            IPayOrderDivisionRecordService payOrderDivisionRecordService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IPayOrderDivisionRecordService payOrderDivisionRecordService)
+            : base(logger, cacheService, authService)
         {
             _mchInfoService = mchInfoService;
             _payOrderDivisionRecordService = payOrderDivisionRecordService;

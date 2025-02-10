@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -22,12 +23,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         private readonly ISysRoleEntRelaService _sysRoleEntRelaService;
         private readonly ISysUserRoleRelaService _sysUserRoleRelaService;
 
-        public SysRoleController(ILogger<SysRoleController> logger, RedisUtil client,
+        public SysRoleController(ILogger<SysRoleController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             ISysRoleService sysRoleService,
             ISysRoleEntRelaService sysRoleEntRelaService,
-            ISysUserRoleRelaService sysUserRoleRelaService,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserRoleRelaService sysUserRoleRelaService)
+            : base(logger, cacheService, authService)
         {
             _sysRoleService = sysRoleService;
             _sysRoleEntRelaService = sysRoleEntRelaService;
@@ -63,7 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             await _sysRoleService.AddAsync(dto);
 
             //如果包含： 可分配权限的权限 && EntIds 不为空
-            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST))
+            if ((await GetCurrentUserAsync()).Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST))
             {
                 await _sysRoleEntRelaService.ResetRelaAsync(dto.RoleId, dto.EntIds);
             }
@@ -95,7 +97,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         {
             await _sysRoleService.UpdateAsync(dto);
             //如果包含： 可分配权限的权限 && EntIds 不为空
-            if (GetCurrentUser().Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST))
+            if ((await GetCurrentUserAsync()).Authorities.Contains(PermCode.MGR.ENT_UR_ROLE_DIST))
             {
                 await _sysRoleEntRelaService.ResetRelaAsync(dto.RoleId, dto.EntIds);
 

@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,16 +19,14 @@ namespace AGooday.AgPay.Agent.Api.Controllers
     {
         private readonly IAgentInfoService _agentInfoService;
         private readonly IPayOrderService _payOrderService;
-        private readonly IAuthService _authService;
 
         public MainChartController(ILogger<MainChartController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IAgentInfoService agentInfoService,
-            IPayOrderService payOrderService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IPayOrderService payOrderService)
+            : base(logger, cacheService, authService)
         {
-            _authService = authService;
             _agentInfoService = agentInfoService;
             _payOrderService = payOrderService;
         }
@@ -40,8 +39,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_CURRENT_INFO)]
         public async Task<ApiRes> AgentInfoAsync()
         {
-            var sysUser = await _authService.GetUserByIdAsync(GetCurrentUser().SysUser.SysUserId);
-            var agentInfo = await _agentInfoService.GetByIdAsync(GetCurrentAgentNo());
+            var sysUser = await _authService.GetUserByIdAsync(await GetCurrentUserIdAsync());
+            var agentInfo = await _agentInfoService.GetByIdAsync(await GetCurrentAgentNoAsync());
             //var jobj = JObject.FromObject(agentInfo);
             //jobj.Add("loginUsername", sysUser.LoginUsername);
             //jobj.Add("realname", sysUser.Realname);
@@ -67,7 +66,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                 default:
                     break;
             }
-            return ApiRes.Ok(await _payOrderService.MainPagePayDayCountAsync(null, GetCurrentAgentNo(), day));
+            return ApiRes.Ok(await _payOrderService.MainPagePayDayCountAsync(null, await GetCurrentAgentNoAsync(), day));
         }
 
         /// <summary>
@@ -78,7 +77,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [PermissionAuth(PermCode.AGENT.ENT_C_MAIN_PAY_TREND_COUNT)]
         public async Task<ApiRes> PayTrendCountAsync(int recentDay)
         {
-            return ApiRes.Ok(await _payOrderService.MainPagePayTrendCountAsync(null, GetCurrentAgentNo(), recentDay));
+            return ApiRes.Ok(await _payOrderService.MainPagePayTrendCountAsync(null, await GetCurrentAgentNoAsync(), recentDay));
         }
 
         /// <summary>
@@ -89,7 +88,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [PermissionAuth(PermCode.AGENT.ENT_C_MAIN_ISV_MCH_COUNT)]
         public async Task<ApiRes> IsvAndMchCountAsync()
         {
-            return ApiRes.Ok(await _payOrderService.MainPageIsvAndMchCountAsync(null, GetCurrentAgentNo()));
+            return ApiRes.Ok(await _payOrderService.MainPageIsvAndMchCountAsync(null, await GetCurrentAgentNoAsync()));
         }
 
         /// <summary>
@@ -106,7 +105,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
                 createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
             }
-            return ApiRes.Ok(await _payOrderService.MainPagePayCountAsync(null, GetCurrentAgentNo(), createdStart, createdEnd));
+            return ApiRes.Ok(await _payOrderService.MainPagePayCountAsync(null, await GetCurrentAgentNoAsync(), createdStart, createdEnd));
         }
 
         /// <summary>
@@ -123,7 +122,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
                 createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
             }
-            return ApiRes.Ok(await _payOrderService.MainPagePayTypeCountAsync(null, GetCurrentAgentNo(), createdStart, createdEnd));
+            return ApiRes.Ok(await _payOrderService.MainPagePayTypeCountAsync(null, await GetCurrentAgentNoAsync(), createdStart, createdEnd));
         }
     }
 }

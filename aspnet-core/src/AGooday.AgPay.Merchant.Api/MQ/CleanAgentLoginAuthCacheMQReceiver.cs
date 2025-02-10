@@ -1,8 +1,7 @@
 ﻿using AGooday.AgPay.Common.Constants;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace AGooday.AgPay.Merchant.Api.MQ
 {
@@ -13,16 +12,13 @@ namespace AGooday.AgPay.Merchant.Api.MQ
     public class CleanAgentLoginAuthCacheMQReceiver : CleanAgentLoginAuthCacheMQ.IMQReceiver
     {
         private readonly ILogger<CleanAgentLoginAuthCacheMQReceiver> _logger;
-        private readonly int defaultDB;
-        private readonly IDatabase redis;
-        private readonly IServer redisServer;
+        private readonly ICacheService _cacheService;
 
-        public CleanAgentLoginAuthCacheMQReceiver(ILogger<CleanAgentLoginAuthCacheMQReceiver> logger, RedisUtil client)
+        public CleanAgentLoginAuthCacheMQReceiver(ILogger<CleanAgentLoginAuthCacheMQReceiver> logger,
+            ICacheService cacheService)
         {
             _logger = logger;
-            defaultDB = client.GetDefaultDB();
-            redis = client.GetDatabase();
-            redisServer = client.GetServer();
+            _cacheService = cacheService;
         }
 
         public async Task ReceiveAsync(CleanAgentLoginAuthCacheMQ.MsgPayload payload)
@@ -38,17 +34,13 @@ namespace AGooday.AgPay.Merchant.Api.MQ
             }
             foreach (long sysUserId in userIdList)
             {
-                var cacheKeyList = redisServer.Keys(defaultDB, CS.GetCacheKeyToken(sysUserId, "*"));
-                if (cacheKeyList == null || !cacheKeyList.Any())
+                var keys = await _cacheService.GetKeysAsync(CS.GetCacheKeyToken(sysUserId, "*"));
+                if (keys == null || !keys.Any())
                 {
                     continue;
                 }
-                foreach (string cacheKey in cacheKeyList)
-                {
-                    // 删除用户Redis信息
-                    await redis.KeyDeleteAsync(cacheKey);
-                    continue;
-                }
+                // 删除用户Redis信息
+                await _cacheService.RemoveAllAsync(keys);
             }
             _logger.LogInformation("无权限登录用户信息已清除");
         }

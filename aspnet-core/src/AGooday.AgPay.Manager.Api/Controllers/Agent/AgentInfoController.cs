@@ -2,7 +2,7 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -27,12 +27,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         private readonly DomainNotificationHandler _notifications;
 
         public AgentInfoController(IMQSender mqSender, ILogger<AgentInfoController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             INotificationHandler<DomainNotification> notifications,
             IAgentInfoService agentInfoService,
-            RedisUtil client,
-            ISysUserService sysUserService,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserService sysUserService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _agentInfoService = agentInfoService;
@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         [PermissionAuth(PermCode.MGR.ENT_AGENT_INFO_ADD)]
         public async Task<ApiRes> AddAsync(AgentInfoCreateDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             await _agentInfoService.CreateAsync(dto);

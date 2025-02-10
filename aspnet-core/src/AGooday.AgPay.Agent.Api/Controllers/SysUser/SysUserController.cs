@@ -6,6 +6,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Domain.Core.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,13 +29,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         private readonly DomainNotificationHandler _notifications;
 
         public SysUserController(ILogger<SysUserController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMemoryCache cache,
             INotificationHandler<DomainNotification> notifications,
             ISysUserService sysUserService,
-            ISysUserLoginAttemptService sysUserLoginAttemptService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserLoginAttemptService sysUserLoginAttemptService)
+            : base(logger, cacheService, authService)
         {
             _sysUserService = sysUserService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
@@ -52,7 +53,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         public async Task<ApiPageRes<SysUserListDto>> ListAsync([FromQuery] SysUserQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
-            dto.BelongInfoId = GetCurrentAgentNo();
+            dto.BelongInfoId = await GetCurrentAgentNoAsync();
             long? currentUserId = null;//GetCurrentUserId();
             var data = await _sysUserService.GetPaginatedDataAsync(dto, currentUserId);
             return ApiPageRes<SysUserListDto>.Pages(data);
@@ -69,7 +70,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         {
             //_cache.Remove("ErrorData");
             dto.SysType = CS.SYS_TYPE.AGENT;
-            dto.BelongInfoId = GetCurrentAgentNo();
+            dto.BelongInfoId = await GetCurrentAgentNoAsync();
             dto.CreatedAt = DateTime.Now;
             dto.UpdatedAt = DateTime.Now;
             await _sysUserService.CreateAsync(dto);
@@ -91,7 +92,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         [PermissionAuth(PermCode.AGENT.ENT_UR_USER_DELETE)]
         public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = await GetCurrentUserIdAsync();
             await _sysUserService.RemoveAsync(recordId, currentUserId, CS.SYS_TYPE.AGENT);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

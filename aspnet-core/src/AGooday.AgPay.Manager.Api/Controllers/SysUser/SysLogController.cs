@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -20,10 +21,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         private readonly ISysLogService _sysLogService;
 
         public SysLogController(ILogger<SysLogController> logger,
-            ISysLogService sysLogService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            ISysLogService sysLogService)
+            : base(logger, cacheService, authService)
         {
             _sysLogService = sysLogService;
         }

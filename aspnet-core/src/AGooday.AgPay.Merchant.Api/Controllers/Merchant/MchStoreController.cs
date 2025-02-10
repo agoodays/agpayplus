@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
@@ -25,13 +26,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         private readonly ISysConfigService _sysConfigService;
 
         public MchStoreController(ILogger<MchStoreController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
             IMchStoreService mchStoreService,
             IMchInfoService mchInfoService,
-            ISysConfigService sysConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysConfigService sysConfigService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _mchStoreService = mchStoreService;
@@ -48,9 +49,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_LIST)]
         public async Task<ApiPageRes<MchStoreListDto>> ListAsync([FromQuery] MchStoreQueryDto dto)
         {
-            dto.MchNo = GetCurrentMchNo();
+            dto.MchNo = await GetCurrentMchNoAsync();
             List<long> storeIds = null;
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             if (sysUser.UserType.Equals(CS.USER_TYPE.DIRECTOR) || sysUser.UserType.Equals(CS.USER_TYPE.CLERK))
             {
                 storeIds = sysUser.BindStoreIds;
@@ -68,7 +69,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_STORE_ADD)]
         public async Task<ApiRes> AddAsync(MchStoreDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.MchNo = sysUser.BelongInfoId;
             if (!await _mchInfoService.IsExistMchNoAsync(dto.MchNo))
             {

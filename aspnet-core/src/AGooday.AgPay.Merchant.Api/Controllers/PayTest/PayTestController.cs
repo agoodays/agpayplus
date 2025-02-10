@@ -10,6 +10,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Models;
@@ -31,12 +32,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         private readonly ISysConfigService _sysConfigService;
 
         public PayTestController(ILogger<PayTestController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchAppService mchAppService,
             IMchPayPassageService mchPayPassageService,
-            ISysConfigService sysConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysConfigService sysConfigService)
+            : base(logger, cacheService, authService)
         {
             _mchAppService = mchAppService;
             _mchPayPassageService = mchPayPassageService;
@@ -50,9 +51,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         /// <returns></returns>
         [HttpGet, Route("payways/{appId}")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_TEST_PAYWAY_LIST)]
-        public ApiRes PayWayList(string appId)
+        public async Task<ApiRes> PayWayListAsync(string appId)
         {
-            var payWays = _mchPayPassageService.GetMchPayPassageByMchNoAndAppId(GetCurrentMchNo(), appId)
+            var payWays = _mchPayPassageService.GetMchPayPassageByMchNoAndAppId(await GetCurrentMchNoAsync(), appId)
                 .Select(s => s.WayCode);
             return ApiRes.Ok(payWays);
         }
@@ -79,7 +80,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             PayOrderCreateRequest request = new PayOrderCreateRequest();
             PayOrderCreateReqModel model = new PayOrderCreateReqModel();
             request.SetBizModel(model);
-            model.MchNo = GetCurrentMchNo(); // 商户号
+            model.MchNo = await GetCurrentMchNoAsync(); // 商户号
             model.AppId = payOrder.AppId;
             model.StoreId = payOrder.StoreId;
             model.MchOrderNo = payOrder.MchOrderNo;

@@ -61,6 +61,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AGooday.AgPay.Common.UnitTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Components.Third", "src\AGooday.AgPay.Components.Third\AGooday.AgPay.Components.Third.csproj", "{F170C1B9-E170-48D0-BD63-96F8923127F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGooday.AgPay.Components.Cache", "src\AGooday.AgPay.Components.Cache\AGooday.AgPay.Components.Cache.csproj", "{6D18E555-F0D0-4E02-AC8A-3B8EDD14449B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -155,6 +157,10 @@ Global
 		{F170C1B9-E170-48D0-BD63-96F8923127F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F170C1B9-E170-48D0-BD63-96F8923127F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F170C1B9-E170-48D0-BD63-96F8923127F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D18E555-F0D0-4E02-AC8A-3B8EDD14449B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D18E555-F0D0-4E02-AC8A-3B8EDD14449B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D18E555-F0D0-4E02-AC8A-3B8EDD14449B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D18E555-F0D0-4E02-AC8A-3B8EDD14449B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -187,6 +193,7 @@ Global
 		{1F22FF7E-AF32-4752-8B6F-D4D6E63D5138} = {9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}
 		{B33DBCF8-17BE-4E7A-A041-7F7D4047A6AB} = {FDF5C7A4-32BC-40E7-82AE-C9B862014B86}
 		{F170C1B9-E170-48D0-BD63-96F8923127F2} = {9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}
+		{6D18E555-F0D0-4E02-AC8A-3B8EDD14449B} = {9EFB39DA-9E90-48F3-ADB2-3E33BFD2F090}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACDADF0F-3F17-4DE0-A322-714493E80E85}

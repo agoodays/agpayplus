@@ -5,6 +5,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Merchant.Api.Attributes;
@@ -29,15 +30,15 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         private readonly ISysConfigService _sysConfigService;
 
         public MchPayInterfaceConfigController(ILogger<MchPayInterfaceConfigController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
             IPayInterfaceDefineService payIfDefineService,
             IPayInterfaceConfigService payIfConfigService,
             IMchAppService mchAppService,
             IMchInfoService mchInfoService,
-            ISysConfigService sysConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysConfigService sysConfigService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _payIfDefineService = payIfDefineService;
@@ -56,7 +57,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_LIST)]
         public async Task<ApiRes> ListAsync(string appId)
         {
-            var mchInfo = await _mchInfoService.GetByIdAsync(GetCurrentMchNo());
+            var mchInfo = await _mchInfoService.GetByIdAsync(await GetCurrentMchNoAsync());
             var data = await _payIfConfigService.SelectAllPayIfConfigListByAppIdAsync(appId);
             foreach (var define in data)
             {
@@ -120,8 +121,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             dto.InfoType = CS.INFO_TYPE.MCH_APP;
             dto.IfRate = dto.IfRate / 100;// 存入真实费率
             //添加更新者信息
-            long userId = GetCurrentUser().SysUser.SysUserId;
-            string realName = GetCurrentUser().SysUser.Realname;
+            long userId = await GetCurrentUserIdAsync();
+            string realName = (await GetCurrentUserAsync()).SysUser.Realname;
             dto.UpdatedUid = userId;
             dto.UpdatedBy = realName;
 
@@ -145,7 +146,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
             }
 
             // 推送mq到目前节点进行更新数据
-            await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, GetCurrentMchNo(), dto.InfoId));
+            await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_MCH_APP, null, null, await GetCurrentMchNoAsync(), dto.InfoId));
 
             return ApiRes.Ok();
         }
@@ -155,7 +156,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         public async Task<ApiRes> QueryAlipayIsvsubMchAuthUrlAsync(string mchAppId)
         {
             var mchApp = await _mchAppService.GetByIdAsync(mchAppId);
-            if (mchApp == null || !mchApp.MchNo.Equals(GetCurrentMchNo()))
+            if (mchApp == null || !mchApp.MchNo.Equals(await GetCurrentMchNoAsync()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
@@ -176,7 +177,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         public async Task<ApiRes> GetIfCodeByAppIdAsync(string appId)
         {
             var mchApp = await _mchAppService.GetByIdAsync(appId);
-            if (mchApp == null || !mchApp.MchNo.Equals(GetCurrentMchNo()))
+            if (mchApp == null || !mchApp.MchNo.Equals(await GetCurrentMchNoAsync()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }

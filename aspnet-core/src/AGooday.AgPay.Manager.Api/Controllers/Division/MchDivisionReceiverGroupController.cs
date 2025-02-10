@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -23,12 +24,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         private readonly IMchDivisionReceiverGroupService _mchDivisionReceiverGroupService;
 
         public MchDivisionReceiverGroupController(ILogger<MchDivisionReceiverGroupController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMchInfoService mchInfoService,
             IMchDivisionReceiverService mchDivisionReceiverService,
-            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IMchDivisionReceiverGroupService mchDivisionReceiverGroupService)
+            : base(logger, cacheService, authService)
         {
             _mchInfoService = mchInfoService;
             _mchDivisionReceiverService = mchDivisionReceiverService;
@@ -84,7 +85,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
 

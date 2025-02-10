@@ -4,7 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -28,14 +28,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         private readonly IPayInterfaceConfigService _payInterfaceConfigService;
 
         public IsvInfoController(ILogger<IsvInfoController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
             IIsvInfoService isvInfoService,
             IAgentInfoService agentInfoService,
             IMchInfoService mchInfoService,
-            IPayInterfaceConfigService payInterfaceConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IPayInterfaceConfigService payInterfaceConfigService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _isvInfoService = isvInfoService;
@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_ADD)]
         public async Task<ApiRes> AddAsync(IsvInfoDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             var result = await _isvInfoService.AddAsync(dto);

@@ -7,13 +7,12 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Domain.Core.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using StackExchange.Redis;
 
 namespace AGooday.AgPay.Agent.Api.Controllers
 {
@@ -21,31 +20,27 @@ namespace AGooday.AgPay.Agent.Api.Controllers
     [ApiController]
     public class CurrentUserController : CommonController
     {
-        private readonly IDatabase _redis;
+        private readonly IMemoryCache _cache;
         private readonly ISysUserService _sysUserService;
         private readonly ISysUserAuthService _sysUserAuthService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
-        private readonly IMemoryCache _cache;
-        private readonly IAuthService _authService;
         // 将领域通知处理程序注入Controller
         private readonly DomainNotificationHandler _notifications;
 
         public CurrentUserController(ILogger<CurrentUserController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMemoryCache cache,
             ISysUserService sysUserService,
             ISysUserAuthService sysUserAuthService,
             ISysUserLoginAttemptService sysUserLoginAttemptService,
-            INotificationHandler<DomainNotification> notifications,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            INotificationHandler<DomainNotification> notifications)
+            : base(logger, cacheService, authService)
         {
+            _cache = cache;
             _sysUserService = sysUserService;
             _sysUserAuthService = sysUserAuthService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
-            _cache = cache;
-            _redis = client.GetDatabase();
-            _authService = authService;
             _notifications = (DomainNotificationHandler)notifications;
         }
 
@@ -55,12 +50,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         /// <returns></returns>
         /// <exception cref="UnauthorizeException"></exception>
         [HttpGet, Route("user"), NoLog]
-        public ApiRes CurrentUserInfo()
+        public async Task<ApiRes> CurrentUserInfoAsync()
         {
             try
             {
                 //当前用户信息
-                var currentUser = GetCurrentUser();
+                var currentUser = await GetCurrentUserAsync();
                 var user = currentUser.SysUser;
 
                 //1. 当前用户所有权限ID集合
@@ -102,18 +97,16 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         public async Task<ApiRes> ScanAsync(string qrcodeNo)
         {
             string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
-            if (!await _redis.KeyExistsAsync(loginQRCacheKey))
+            if (!await _cacheService.ExistsAsync(loginQRCacheKey))
             {
                 throw new BizException("二维码无效，请刷新二维码后重新扫描");
             }
-            string data = await _redis.StringGetAsync(loginQRCacheKey);
-            var qrcodeInfo = JsonConvert.DeserializeObject<dynamic>(string.IsNullOrWhiteSpace(data) ? "{}" : data);
-            if (string.IsNullOrWhiteSpace(data) || qrcodeInfo.qrcodeStatus != CS.QR_CODE_STATUS.WAITING)
+            var qrcodeInfo = await _cacheService.GetAsync<dynamic>(loginQRCacheKey);
+            if (qrcodeInfo == null || qrcodeInfo.qrcodeStatus != CS.QR_CODE_STATUS.WAITING)
             {
                 throw new BizException("二维码状态无效，请刷新二维码后重新扫描");
             }
-            var cacheExpiry = await _redis.KeyTimeToLiveAsync(loginQRCacheKey);
-            await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.SCANNED }), cacheExpiry, When.Exists);
+            await _cacheService.UpdateWithExistingExpiryAsync(loginQRCacheKey, new { qrcodeStatus = CS.QR_CODE_STATUS.SCANNED });
             return ApiRes.Ok();
         }
 
@@ -127,34 +120,32 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         public async Task<ApiRes> ConfirmLoginAsync(string qrcodeNo, bool isConfirm = true)
         {
             string loginQRCacheKey = CS.GetCacheKeyLoginQR(qrcodeNo);
-            if (!await _redis.KeyExistsAsync(loginQRCacheKey))
+            if (!await _cacheService.ExistsAsync(loginQRCacheKey))
             {
                 throw new BizException("二维码无效，请刷新二维码后重新扫描");
             }
-            string qrcodeData = await _redis.StringGetAsync(loginQRCacheKey);
-            var qrcodeInfo = JsonConvert.DeserializeObject<dynamic>(string.IsNullOrWhiteSpace(qrcodeData) ? "{}" : qrcodeData);
-            if (string.IsNullOrWhiteSpace(qrcodeData) || qrcodeInfo.qrcodeStatus != CS.QR_CODE_STATUS.SCANNED)
+            var qrcodeInfo = await _cacheService.GetAsync<dynamic>(loginQRCacheKey);
+            if (qrcodeInfo == null || qrcodeInfo.qrcodeStatus != CS.QR_CODE_STATUS.SCANNED)
             {
                 throw new BizException("二维码状态无效，请刷新二维码后重新扫描");
             }
-            var cacheExpiry = await _redis.KeyTimeToLiveAsync(loginQRCacheKey);
             if (isConfirm)
             {
                 // 获取授权头的值
                 var authorizationHeader = Request.Headers.Authorization;
                 var accessToken = JwtBearerAuthenticationExtension.GetTokenFromAuthorizationHeader(authorizationHeader);
-                var currentUser = GetCurrentUser();
+                var currentUser = await GetCurrentUserAsync();
                 var lastLoginTime = await _sysUserLoginAttemptService.GetLastLoginTimeAsync(currentUser.SysUser.SysUserId);
                 var qrcode = new Dictionary<string, object>();
                 qrcode.Add(CS.ACCESS_TOKEN_NAME, accessToken);
                 qrcode.Add("lastLoginTime", lastLoginTime);
                 qrcode.Add("qrcodeStatus", CS.QR_CODE_STATUS.CONFIRMED);
-                await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(qrcode), cacheExpiry);
+                await _cacheService.UpdateWithExistingExpiryAsync(loginQRCacheKey, qrcode);
                 return ApiRes.Ok();
             }
             else
             {
-                await _redis.StringSetAsync(loginQRCacheKey, JsonConvert.SerializeObject(new { qrcodeStatus = CS.QR_CODE_STATUS.CANCELED }), cacheExpiry);
+                await _cacheService.UpdateWithExistingExpiryAsync(loginQRCacheKey, new { qrcodeStatus = CS.QR_CODE_STATUS.CANCELED });
                 return ApiRes.Ok();
             }
         }
@@ -167,14 +158,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [HttpPut, Route("user"), MethodLog("修改个人信息")]
         public async Task<ApiRes> ModifyCurrentUserInfoAsync(ModifyCurrentUserInfoDto dto)
         {
-            var currentUser = GetCurrentUser();
+            var currentUser = await GetCurrentUserAsync();
             dto.SysUserId = currentUser.SysUser.SysUserId;
             await _sysUserService.ModifyCurrentUserInfoAsync(dto);
             var userinfo = await _authService.GetUserAuthInfoByIdAsync(currentUser.SysUser.SysUserId);
             currentUser.SysUser = userinfo;
             //保存redis最新数据
-            var currentUserJson = JsonConvert.SerializeObject(currentUser);
-            await _redis.StringSetAsync(currentUser.CacheKey, currentUserJson, new TimeSpan(0, 0, CS.TOKEN_TIME));
+            await _cacheService.SetAsync(currentUser.CacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
             return ApiRes.Ok();
         }
 
@@ -187,7 +177,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [HttpPut, Route("modifyPwd"), MethodLog("修改密码")]
         public async Task<ApiRes> ModifyPwdAsync(ModifyPwd model)
         {
-            var currentUser = GetCurrentUser();
+            var currentUser = await GetCurrentUserAsync();
             string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //当前用户登录密码
             var user = await _authService.GetUserAuthInfoByIdAsync(currentUser.SysUser.SysUserId);
             bool verified = BCryptUtil.VerifyHash(currentUserPwd, user.Credential);
@@ -213,8 +203,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [HttpPost, Route("logout"), MethodLog("退出登录")]
         public async Task<ApiRes> LogoutAsync()
         {
-            var currentUser = GetCurrentUser();
-            await _redis.KeyDeleteAsync(currentUser.CacheKey);
+            var currentUser = await GetCurrentUserAsync();
+            await _cacheService.RemoveAsync(currentUser.CacheKey);
             return ApiRes.Ok();
         }
     }

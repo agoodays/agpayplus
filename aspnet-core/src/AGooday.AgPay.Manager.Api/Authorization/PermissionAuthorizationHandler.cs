@@ -1,21 +1,19 @@
 ﻿using System.Security.Claims;
 using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.Models;
 using Microsoft.AspNetCore.Authorization;
-using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace AGooday.AgPay.Manager.Api.Authorization
 {
     public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionAuthorizationRequirement>
     {
-        private readonly IDatabase _redis;
+        private readonly ICacheService _cacheService;
 
-        public PermissionAuthorizationHandler(RedisUtil client)
+        public PermissionAuthorizationHandler(ICacheService cacheService)
         {
-            _redis = client.GetDatabase();
+            _cacheService = cacheService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionAuthorizationRequirement requirement)
@@ -34,13 +32,12 @@ namespace AGooday.AgPay.Manager.Api.Authorization
                 else
                 {
                     var cacheKey = context.User.FindFirstValue(ClaimAttributes.CacheKey);
-                    string currentUserJson = await _redis.StringGetAsync(cacheKey);
-                    if (string.IsNullOrWhiteSpace(currentUserJson))
+                    var currentUser = await _cacheService.GetAsync<CurrentUser>(cacheKey);
+                    if (currentUser == null)
                     {
                         throw new UnauthorizeException();
                         //throw new BizException("登录失效");
                     }
-                    var currentUser = JsonConvert.DeserializeObject<CurrentUser>(currentUserJson);
                     var userIdClaim = context.User.FindFirst(_ => _.Type == ClaimTypes.NameIdentifier).Value;
                     if (userIdClaim != null && currentUser.Authorities.Intersect(requirement.Name).Any())
                     {

@@ -5,7 +5,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,10 +21,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         private readonly ISysUserTeamService _sysUserTeamService;
 
         public SysUserTeamController(ILogger<SysUserTeamController> logger,
-            ISysUserTeamService mchStoreService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            ISysUserTeamService mchStoreService)
+            : base(logger, cacheService, authService)
         {
             _sysUserTeamService = mchStoreService;
         }
@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         public async Task<ApiPageRes<SysUserTeamDto>> ListAsync([FromQuery] SysUserTeamQueryDto dto)
         {
             dto.SysType = CS.SYS_TYPE.AGENT;
-            dto.BelongInfoId = GetCurrentAgentNo();
+            dto.BelongInfoId = await GetCurrentAgentNoAsync();
             var data = await _sysUserTeamService.GetPaginatedDataAsync(dto);
             return ApiPageRes<SysUserTeamDto>.Pages(data);
         }
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         [PermissionAuth(PermCode.AGENT.ENT_UR_TEAM_ADD)]
         public async Task<ApiRes> AddAsync(SysUserTeamDto dto)
         {
-            var sysUser = GetCurrentUser().SysUser;
+            var sysUser = (await GetCurrentUserAsync()).SysUser;
             dto.CreatedBy = sysUser.Realname;
             dto.CreatedUid = sysUser.SysUserId;
             dto.SysType = CS.SYS_TYPE.AGENT;

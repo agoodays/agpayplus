@@ -5,6 +5,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Manager.Api.Attributes;
@@ -25,11 +26,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         private readonly IPayInterfaceConfigService _payIfConfigService;
 
         public IsvPayInterfaceConfigController(ILogger<IsvPayInterfaceConfigController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
-            IPayInterfaceConfigService payIfConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IPayInterfaceConfigService payIfConfigService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _payIfConfigService = payIfConfigService;
@@ -87,8 +88,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
             dto.InfoType = CS.INFO_TYPE.ISV;
             dto.IfRate = dto.IfRate / 100;// 存入真实费率
             //添加更新者信息
-            long userId = GetCurrentUser().SysUser.SysUserId;
-            string realName = GetCurrentUser().SysUser.Realname;
+            long userId = await GetCurrentUserIdAsync();
+            string realName = (await GetCurrentUserAsync()).SysUser.Realname;
             dto.UpdatedUid = userId;
             dto.UpdatedBy = realName;
             dto.UpdatedAt = DateTime.Now;

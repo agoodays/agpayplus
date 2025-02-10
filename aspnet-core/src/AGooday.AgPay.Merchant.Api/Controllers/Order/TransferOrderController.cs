@@ -4,7 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -25,10 +25,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         private readonly ITransferOrderService _transferOrderService;
 
         public TransferOrderController(ILogger<TransferOrderController> logger,
-            ITransferOrderService transferOrderService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ICacheService cacheService,
+            IAuthService authService,
+            ITransferOrderService transferOrderService)
+            : base(logger, cacheService, authService)
         {
             _transferOrderService = transferOrderService;
         }
@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         [PermissionAuth(PermCode.MCH.ENT_TRANSFER_ORDER_LIST)]
         public async Task<ApiPageRes<TransferOrderDto>> ListAsync([FromQuery] TransferOrderQueryDto dto)
         {
-            dto.MchNo = GetCurrentMchNo();
+            dto.MchNo = await GetCurrentMchNoAsync();
             var transferOrders = await _transferOrderService.GetPaginatedDataAsync(dto);
             return ApiPageRes<TransferOrderDto>.Pages(transferOrders);
         }

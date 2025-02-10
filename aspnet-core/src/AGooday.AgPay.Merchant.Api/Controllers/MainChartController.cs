@@ -2,6 +2,7 @@
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +21,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         private readonly IMchInfoService _mchInfoService;
 
         public MainChartController(ILogger<MainChartController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IPayOrderService payOrderService,
             IMchInfoService mchInfoService,
-            ISysUserService sysUserService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserService sysUserService)
+            : base(logger, cacheService, authService)
         {
             _payOrderService = payOrderService;
             _mchInfoService = mchInfoService;
@@ -40,8 +41,8 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [PermissionAuth(PermCode.MCH.ENT_MCH_INFO)]
         public async Task<ApiRes> MchInfoAsync()
         {
-            var sysUser = await _sysUserService.GetByIdAsync(GetCurrentUser().SysUser.SysUserId);
-            var mchInfo = await _mchInfoService.GetByIdAsync(GetCurrentMchNo());
+            var sysUser = await _sysUserService.GetByIdAsync(await GetCurrentUserIdAsync());
+            var mchInfo = await _mchInfoService.GetByIdAsync(await GetCurrentMchNoAsync());
             //var jobj = JObject.FromObject(mchInfo);
             //jobj.Add("loginUsername", sysUser.LoginUsername);
             //jobj.Add("realname", sysUser.Realname);
@@ -67,7 +68,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 default:
                     break;
             }
-            return ApiRes.Ok(await _payOrderService.MainPagePayDayCountAsync(GetCurrentMchNo(), null, day));
+            return ApiRes.Ok(await _payOrderService.MainPagePayDayCountAsync(await GetCurrentMchNoAsync(), null, day));
         }
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
         [PermissionAuth(PermCode.MCH.ENT_C_MAIN_PAY_TREND_COUNT)]
         public async Task<ApiRes> PayTrendCountAsync(int recentDay)
         {
-            return ApiRes.Ok(await _payOrderService.MainPagePayTrendCountAsync(GetCurrentMchNo(), null, recentDay));
+            return ApiRes.Ok(await _payOrderService.MainPagePayTrendCountAsync(await GetCurrentMchNoAsync(), null, recentDay));
         }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
                 createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
             }
-            return ApiRes.Ok(await _payOrderService.MainPagePayCountAsync(GetCurrentMchNo(), null, createdStart, createdEnd));
+            return ApiRes.Ok(await _payOrderService.MainPagePayCountAsync(await GetCurrentMchNoAsync(), null, createdStart, createdEnd));
         }
 
         /// <summary>
@@ -112,7 +113,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers
                 createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
                 createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
             }
-            return ApiRes.Ok(await _payOrderService.MainPagePayTypeCountAsync(GetCurrentMchNo(), null, createdStart, createdEnd));
+            return ApiRes.Ok(await _payOrderService.MainPagePayTypeCountAsync(await GetCurrentMchNoAsync(), null, createdStart, createdEnd));
         }
     }
 }

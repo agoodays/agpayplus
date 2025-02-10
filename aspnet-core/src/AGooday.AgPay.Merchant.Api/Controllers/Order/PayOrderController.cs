@@ -9,6 +9,7 @@ using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Models;
@@ -34,14 +35,14 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         private readonly IMchAppService _mchAppService;
 
         public PayOrderController(ILogger<PayOrderController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IPayOrderService payOrderService,
             IPayWayService payWayService,
             ISysConfigService sysConfigService,
             IMchInfoService mchInfoService,
-            IMchAppService mchAppService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IMchAppService mchAppService)
+            : base(logger, cacheService, authService)
         {
             _payOrderService = payOrderService;
             _payWayService = payWayService;
@@ -60,7 +61,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         public async Task<ApiPageRes<PayOrderDto>> ListAsync([FromQuery] PayOrderQueryDto dto)
         {
             dto.BindDateRange();
-            dto.MchNo = GetCurrentMchNo();
+            dto.MchNo = await GetCurrentMchNoAsync();
             var payOrders = await _payOrderService.GetPaginatedDataAsync(dto);
             // 得到所有支付方式
             Dictionary<string, string> payWayNameMap = new Dictionary<string, string>();
@@ -89,7 +90,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         public async Task<ApiRes> CountAsync([FromQuery] PayOrderQueryDto dto)
         {
             dto.BindDateRange();
-            dto.MchNo = GetCurrentMchNo();
+            dto.MchNo = await GetCurrentMchNoAsync();
             var statistics = await _payOrderService.StatisticsAsync(dto);
             return ApiRes.Ok(statistics);
         }
@@ -109,7 +110,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
                 throw new BizException($"暂不支持{bizType}导出");
             }
             dto.BindDateRange();
-            dto.AgentNo = GetCurrentMchNo();
+            dto.AgentNo = await GetCurrentMchNoAsync();
             // 从数据库中检索需要导出的数据
             var payOrders = await _payOrderService.GetPaginatedDataAsync(dto);
 
@@ -210,7 +211,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (!payOrder.MchNo.Equals(GetCurrentMchNo()))
+            if (!payOrder.MchNo.Equals(await GetCurrentMchNoAsync()))
             {
                 return ApiRes.Fail(ApiCode.SYS_PERMISSION_ERROR);
             }
@@ -228,7 +229,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         public async Task<ApiRes> RefundAsync(string payOrderId, RefundOrderModel refundOrder)
         {
             var payOrder = await _payOrderService.GetByIdAsync(payOrderId);
-            if (payOrder == null || !payOrder.MchNo.Equals(GetCurrentMchNo()))
+            if (payOrder == null || !payOrder.MchNo.Equals(await GetCurrentMchNoAsync()))
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
@@ -240,7 +241,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
             {
                 throw new BizException("退款金额超过订单可退款金额！");
             }
-            var mchInfo = await _mchInfoService.GetByIdAsync(GetCurrentMchNo());
+            var mchInfo = await _mchInfoService.GetByIdAsync(await GetCurrentMchNoAsync());
             if (string.IsNullOrWhiteSpace(mchInfo.Sipw))
             {
                 throw new BizException("当前未设置支付密码，请进入[系统管理-系统配置-安全管理]设置支付密码！");

@@ -4,6 +4,7 @@ using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
@@ -28,13 +29,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         private readonly DomainNotificationHandler _notifications;
 
         public SysUserController(ILogger<SysUserController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMemoryCache cache,
             INotificationHandler<DomainNotification> notifications,
             ISysUserService sysUserService,
-            ISysUserLoginAttemptService sysUserLoginAttemptService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            ISysUserLoginAttemptService sysUserLoginAttemptService)
+            : base(logger, cacheService, authService)
         {
             _sysUserService = sysUserService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
@@ -94,7 +95,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_DELETE)]
         public async Task<ApiRes> DeleteAsync(long recordId)
         {
-            var currentUserId = GetCurrentUserId();
+            var currentUserId = await GetCurrentUserIdAsync();
             await _sysUserService.RemoveAsync(recordId, currentUserId, string.Empty);
             // 是否存在消息通知
             if (!_notifications.HasNotifications())

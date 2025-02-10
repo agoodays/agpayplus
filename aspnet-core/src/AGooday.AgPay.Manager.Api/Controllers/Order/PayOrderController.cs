@@ -9,6 +9,7 @@ using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Manager.Api.Attributes;
 using AGooday.AgPay.Manager.Api.Authorization;
 using AGooday.AgPay.Manager.Api.Models;
@@ -35,15 +36,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         private readonly IMchAppService _mchAppService;
 
         public PayOrderController(ILogger<PayOrderController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IPayOrderService payOrderService,
             IPayOrderProfitService payOrderProfitService,
             IPayWayService payWayService,
             IPayInterfaceDefineService payIfDefineService,
             ISysConfigService sysConfigService,
-            IMchAppService mchAppService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IMchAppService mchAppService)
+            : base(logger, cacheService, authService)
         {
             _payOrderService = payOrderService;
             _payOrderProfitService = payOrderProfitService;

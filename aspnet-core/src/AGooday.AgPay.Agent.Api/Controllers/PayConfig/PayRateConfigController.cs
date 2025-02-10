@@ -4,7 +4,7 @@ using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Models;
-using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Vender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,11 +22,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
         private readonly IPayRateConfigService _payRateConfigService;
 
         public PayRateConfigController(ILogger<PayRateConfigController> logger,
+            ICacheService cacheService,
+            IAuthService authService,
             IMQSender mqSender,
-            IPayRateConfigService payRateConfigService,
-            RedisUtil client,
-            IAuthService authService)
-            : base(logger, client, authService)
+            IPayRateConfigService payRateConfigService)
+            : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _payRateConfigService = payRateConfigService;
