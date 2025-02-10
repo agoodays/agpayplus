@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Domain.CommandHandlers;
+using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
@@ -8,6 +9,10 @@ using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Domain.EventHandlers;
 using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Interfaces;
+using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Domain.Queries.SysUsers;
+using AGooday.AgPay.Domain.Queries;
+using AGooday.AgPay.Domain.QueryHandlers;
 using AGooday.AgPay.Infrastructure.Bus;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Infrastructure.Repositories;
@@ -35,6 +40,7 @@ namespace AGooday.AgPay.Payment.Api.Extensions
         public static void RegisterServices(IServiceCollection services)
         {
             // 注入 应用层Application
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAccountBillService, AccountBillService>();
             services.AddScoped<IAgentInfoService, AgentInfoService>();
             services.AddScoped<IIsvInfoService, IsvInfoService>();
@@ -67,6 +73,7 @@ namespace AGooday.AgPay.Payment.Api.Extensions
             services.AddScoped<ISysUserService, SysUserService>();
             services.AddScoped<ISysUserTeamService, SysUserTeamService>();
             services.AddScoped<ITransferOrderService, TransferOrderService>();
+            services.AddScoped<IStatisticService, StatisticService>();
 
             // 命令总线Domain Bus (Mediator) 中介总线接口
             services.AddScoped<IMediatorHandler, InMemoryBus>();
@@ -84,6 +91,13 @@ namespace AGooday.AgPay.Payment.Api.Extensions
             services.AddScoped<IRequestHandler<RemoveSysUserCommand>, SysUserCommandHandler>();
             services.AddScoped<IRequestHandler<ModifySysUserCommand>, SysUserCommandHandler>();
 
+            services.AddScoped<IRequestHandler<GetByIdQuery<SysUser, long>, SysUser>, SysUserQueryHandler>();
+            services.AddScoped<IRequestHandler<SysUserQuery, IQueryable<SysUserQueryResult>>, SysUserQueryHandler>();
+
+            services.AddScoped<IRequestHandler<CreateAgentInfoCommand>, AgentInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<RemoveAgentInfoCommand>, AgentInfoCommandHandler>();
+            services.AddScoped<IRequestHandler<ModifyAgentInfoCommand>, AgentInfoCommandHandler>();
+
             services.AddScoped<IRequestHandler<CreateMchInfoCommand>, MchInfoCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveMchInfoCommand>, MchInfoCommandHandler>();
             services.AddScoped<IRequestHandler<ModifyMchInfoCommand>, MchInfoCommandHandler>();
@@ -96,6 +110,7 @@ namespace AGooday.AgPay.Payment.Api.Extensions
             });
 
             // 注入 基础设施层 - 数据层
+            //services.AddDbContext<AgPayDbContext>(ServiceLifetime.Scoped);
             services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAgPayRepository, AgPayRepository>();

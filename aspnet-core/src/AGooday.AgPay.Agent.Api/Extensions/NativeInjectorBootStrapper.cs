@@ -9,6 +9,10 @@ using AGooday.AgPay.Domain.Core.Notifications;
 using AGooday.AgPay.Domain.EventHandlers;
 using AGooday.AgPay.Domain.Events.SysUsers;
 using AGooday.AgPay.Domain.Interfaces;
+using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Domain.Queries.SysUsers;
+using AGooday.AgPay.Domain.Queries;
+using AGooday.AgPay.Domain.QueryHandlers;
 using AGooday.AgPay.Infrastructure.Bus;
 using AGooday.AgPay.Infrastructure.Context;
 using AGooday.AgPay.Infrastructure.Repositories;
@@ -37,6 +41,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
         {
             // 注入 应用层Application
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAccountBillService, AccountBillService>();
             services.AddScoped<IAgentInfoService, AgentInfoService>();
             services.AddScoped<IIsvInfoService, IsvInfoService>();
             services.AddScoped<IMchAppService, MchAppService>();
@@ -50,8 +55,11 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<IPayInterfaceDefineService, PayInterfaceDefineService>();
             services.AddScoped<IPayOrderDivisionRecordService, PayOrderDivisionRecordService>();
             services.AddScoped<IPayOrderService, PayOrderService>();
+            services.AddScoped<IPayOrderProfitService, PayOrderProfitService>();
             services.AddScoped<IPayRateConfigService, PayRateConfigService>();
             services.AddScoped<IPayWayService, PayWayService>();
+            services.AddScoped<IQrCodeService, QrCodeService>();
+            services.AddScoped<IQrCodeShellService, QrCodeShellService>();
             services.AddScoped<IRefundOrderService, RefundOrderService>();
             services.AddScoped<ISysArticleService, SysArticleService>();
             services.AddScoped<ISysConfigService, SysConfigService>();
@@ -65,6 +73,7 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<ISysUserService, SysUserService>();
             services.AddScoped<ISysUserTeamService, SysUserTeamService>();
             services.AddScoped<ITransferOrderService, TransferOrderService>();
+            services.AddScoped<IStatisticService, StatisticService>();
 
             // 命令总线Domain Bus (Mediator) 中介总线接口
             services.AddScoped<IMediatorHandler, InMemoryBus>();
@@ -82,6 +91,9 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<IRequestHandler<RemoveSysUserCommand>, SysUserCommandHandler>();
             services.AddScoped<IRequestHandler<ModifySysUserCommand>, SysUserCommandHandler>();
 
+            services.AddScoped<IRequestHandler<GetByIdQuery<SysUser, long>, SysUser>, SysUserQueryHandler>();
+            services.AddScoped<IRequestHandler<SysUserQuery, IQueryable<SysUserQueryResult>>, SysUserQueryHandler>();
+
             services.AddScoped<IRequestHandler<CreateAgentInfoCommand>, AgentInfoCommandHandler>();
             services.AddScoped<IRequestHandler<RemoveAgentInfoCommand>, AgentInfoCommandHandler>();
             services.AddScoped<IRequestHandler<ModifyAgentInfoCommand>, AgentInfoCommandHandler>();
@@ -98,10 +110,11 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             });
 
             // 注入 基础设施层 - 数据层
-            //services.AddDbContext<AgPayDbContext>(ServiceLifetime.Transient);
+            //services.AddDbContext<AgPayDbContext>(ServiceLifetime.Scoped);
             services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAgPayRepository, AgPayRepository>();
+            services.AddScoped<IAccountBillRepository, AccountBillRepository>();
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
@@ -115,9 +128,12 @@ namespace AGooday.AgPay.Agent.Api.Extensions
             services.AddScoped<IPayInterfaceDefineRepository, PayInterfaceDefineRepository>();
             services.AddScoped<IPayOrderDivisionRecordRepository, PayOrderDivisionRecordRepository>();
             services.AddScoped<IPayOrderRepository, PayOrderRepository>();
+            services.AddScoped<IPayOrderProfitRepository, PayOrderProfitRepository>();
             services.AddScoped<IPayRateConfigRepository, PayRateConfigRepository>();
             services.AddScoped<IPayRateLevelConfigRepository, PayRateLevelConfigRepository>();
             services.AddScoped<IPayWayRepository, PayWayRepository>();
+            services.AddScoped<IQrCodeRepository, QrCodeRepository>();
+            services.AddScoped<IQrCodeShellRepository, QrCodeShellRepository>();
             services.AddScoped<IRefundOrderRepository, RefundOrderRepository>();
             services.AddScoped<ISysArticleRepository, SysArticleRepository>();
             services.AddScoped<ISysConfigRepository, SysConfigRepository>();

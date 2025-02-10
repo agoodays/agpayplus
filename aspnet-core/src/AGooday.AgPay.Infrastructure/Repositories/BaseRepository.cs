@@ -176,7 +176,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="propertyExpression"></param>
-        public void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression)
+        public virtual void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression)
         {
             // 获取要更新的属性名称列表
             var propertyNames = BaseRepositoryExtension<TEntity>.GetPropertyNames(propertyExpression);
@@ -207,7 +207,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="propertyExpression"></param>
-        public void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
+        public virtual void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
         {
             var entitiesToUpdate = DbSet.Where(condition);
             var properties = BaseRepositoryExtension<TEntity>.GetProperties(propertyExpression);
@@ -256,7 +256,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 批量删除指定条件实体
         /// </summary>
         /// <param name="condition"></param>
-        public void RemoveRange(Expression<Func<TEntity, bool>> condition)
+        public virtual void RemoveRange(Expression<Func<TEntity, bool>> condition)
         {
             var entities = DbSet.Where(condition);
             DbSet.RemoveRange(entities);
@@ -278,7 +278,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="propertiesToUpdate"></param>
-        public void SaveOrUpdate(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate)
+        public virtual void SaveOrUpdate(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate)
         {
             var primaryKeyValue = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
             if (primaryKeyValue.Equals(default(TPrimaryKey)))
@@ -420,7 +420,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 保存
         /// </summary>
         /// <returns></returns>
-        public int SaveChanges()
+        public virtual int SaveChanges()
         {
             return Db.SaveChanges();
         }
@@ -428,7 +428,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 保存
         /// </summary>
         /// <returns></returns>
-        public Task<int> SaveChangesAsync()
+        public virtual Task<int> SaveChangesAsync()
         {
             return Db.SaveChangesAsync();
         }
@@ -437,7 +437,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// </summary>
         /// <param name="count">影响行数</param>
         /// <returns></returns>
-        public bool SaveChanges(out int count)
+        public virtual bool SaveChanges(out int count)
         {
             count = Db.SaveChanges();
             return count > 0;
@@ -446,7 +446,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 保存
         /// </summary>
         /// <returns></returns>
-        public async Task<(bool result, int count)> SaveChangesWithResultAsync()
+        public virtual async Task<(bool result, int count)> SaveChangesWithResultAsync()
         {
             var count = await Db.SaveChangesAsync();
             var result = count > 0;
@@ -665,7 +665,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="propertyExpression"></param>
-        public void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression)
+        public virtual void Update(TEntity entity, Expression<Func<TEntity, object>> propertyExpression)
         {
             // 获取要更新的属性名称列表
             var propertyNames = BaseRepositoryExtension<TEntity>.GetPropertyNames(propertyExpression);
@@ -693,7 +693,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="propertyExpression"></param>
-        public void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
+        public virtual void Update(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, object>> propertyExpression)
         {
             var entitiesToUpdate = DbSet.Where(condition);
             var properties = BaseRepositoryExtension<TEntity>.GetProperties(propertyExpression);
@@ -743,7 +743,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 批量删除指定条件实体
         /// </summary>
         /// <param name="condition"></param>
-        public void RemoveRange(Expression<Func<TEntity, bool>> condition)
+        public virtual void RemoveRange(Expression<Func<TEntity, bool>> condition)
         {
             var entities = DbSet.Where(condition);
             DbSet.RemoveRange(entities);
@@ -766,7 +766,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="propertiesToUpdate"></param>
-        public void SaveOrUpdate<TPrimaryKey>(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate)
+        public virtual void SaveOrUpdate<TPrimaryKey>(TEntity entity, params Expression<Func<TEntity, object>>[] propertiesToUpdate)
         {
             var primaryKeyValue = BaseRepositoryExtension<TEntity>.GetPrimaryKeyValues(Db, entity);
             if (primaryKeyValue.Equals(default(TPrimaryKey)))
@@ -908,7 +908,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 保存
         /// </summary>
         /// <returns></returns>
-        public int SaveChanges()
+        public virtual int SaveChanges()
         {
             return Db.SaveChanges();
         }
@@ -916,7 +916,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 保存
         /// </summary>
         /// <returns></returns>
-        public Task<int> SaveChangesAsync()
+        public virtual Task<int> SaveChangesAsync()
         {
             return Db.SaveChangesAsync();
         }
@@ -925,7 +925,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// </summary>
         /// <param name="count">影响行数</param>
         /// <returns></returns>
-        public bool SaveChanges(out int count)
+        public virtual bool SaveChanges(out int count)
         {
             count = Db.SaveChanges();
             return count > 0;
@@ -934,7 +934,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// 保存
         /// </summary>
         /// <returns></returns>
-        public async Task<(bool result, int count)> SaveChangesWithResultAsync()
+        public virtual async Task<(bool result, int count)> SaveChangesWithResultAsync()
         {
             var count = await Db.SaveChangesAsync();
             var result = count > 0;

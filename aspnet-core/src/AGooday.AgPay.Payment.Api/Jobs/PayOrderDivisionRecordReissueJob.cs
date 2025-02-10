@@ -15,21 +15,19 @@ namespace AGooday.AgPay.Payment.Api.Jobs
 
         private readonly ILogger<PayOrderDivisionRecordReissueJob> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly IChannelServiceFactory<IDivisionService> _divisionServiceFactory;
 
         public PayOrderDivisionRecordReissueJob(ILogger<PayOrderDivisionRecordReissueJob> logger,
-            IServiceScopeFactory serviceScopeFactory,
-            IChannelServiceFactory<IDivisionService> divisionServiceFactory)
+            IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
-            _divisionServiceFactory = divisionServiceFactory;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
+                var divisionServiceFactory = scope.ServiceProvider.GetService<IChannelServiceFactory<IDivisionService>>();
                 var payOrderService = scope.ServiceProvider.GetService<IPayOrderService>();
                 var payOrderDivisionRecordService = scope.ServiceProvider.GetService<IPayOrderDivisionRecordService>();
                 var configContextQueryService = scope.ServiceProvider.GetService<ConfigContextQueryService>();
@@ -82,7 +80,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                     continue;
                                 }
                                 // 查询分账接口是否存在
-                                IDivisionService divisionService = _divisionServiceFactory.GetService(payOrder.IfCode);
+                                IDivisionService divisionService = divisionServiceFactory.GetService(payOrder.IfCode);
 
                                 if (divisionService == null)
                                 {

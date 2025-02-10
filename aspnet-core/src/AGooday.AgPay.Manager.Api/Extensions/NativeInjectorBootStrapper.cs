@@ -110,7 +110,7 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             });
 
             // 注入 基础设施层 - 数据层
-            //services.AddDbContext<AgPayDbContext>(ServiceLifetime.Transient);
+            //services.AddDbContext<AgPayDbContext>(ServiceLifetime.Scoped);
             services.AddScoped<AgPayDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAgPayRepository, AgPayRepository>();
