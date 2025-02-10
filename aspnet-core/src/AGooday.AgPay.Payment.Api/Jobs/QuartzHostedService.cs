@@ -6,8 +6,9 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     public class QuartzHostedService : IHostedService
     {
         private readonly ISchedulerFactory _schedulerFactory;
-        private readonly IJobFactory _jobFactory;
         private readonly IEnumerable<JobSchedule> _jobSchedules;
+        private readonly IJobFactory _jobFactory;
+        private IScheduler _scheduler;
 
         public QuartzHostedService(
             ISchedulerFactory schedulerFactory,
@@ -18,27 +19,26 @@ namespace AGooday.AgPay.Payment.Api.Jobs
             _jobSchedules = jobSchedules;
             _jobFactory = jobFactory;
         }
-        public IScheduler Scheduler { get; set; }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            Scheduler = await _schedulerFactory.GetScheduler(cancellationToken);
-            Scheduler.JobFactory = _jobFactory;
+            _scheduler = await _schedulerFactory.GetScheduler(cancellationToken);
+            _scheduler.JobFactory = _jobFactory;
 
             foreach (var jobSchedule in _jobSchedules)
             {
                 var job = CreateJob(jobSchedule);
                 var trigger = CreateTrigger(jobSchedule);
 
-                await Scheduler.ScheduleJob(job, trigger, cancellationToken);
+                await _scheduler.ScheduleJob(job, trigger, cancellationToken);
             }
 
-            await Scheduler.Start(cancellationToken);
+            await _scheduler.Start(cancellationToken);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await Scheduler?.Shutdown(cancellationToken);
+            await _scheduler?.Shutdown(cancellationToken);
         }
 
         private static IJobDetail CreateJob(JobSchedule schedule)
