@@ -1,71 +1,72 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-# Ê¹ÓÃ .NET SDK ¾µÏñ×÷Îª¹¹½¨½×¶Î
-# »ù´¡¾µÏñ£ºmcr.microsoft.com/dotnet/aspnet:9.0
+# ä½¿ç”¨ .NET SDK é•œåƒä½œä¸ºæ„å»ºé˜¶æ®µ
+# åŸºç¡€é•œåƒï¼šmcr.microsoft.com/dotnet/aspnet:9.0
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 
-# ÉèÖÃÓïÑÔ»·¾³±äÁ¿ÒÔÖ§³Ö UTF-8 ±àÂë£¬²¢È·±£È«Çò»¯ÉèÖÃ²»±»½ûÓÃ
+# è®¾ç½®è¯­è¨€ç¯å¢ƒå˜é‡ä»¥æ”¯æŒ UTF-8 ç¼–ç ï¼Œå¹¶ç¡®ä¿å…¨çƒåŒ–è®¾ç½®ä¸è¢«ç¦ç”¨
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
-# ÉèÖÃÔËĞĞÓ¦ÓÃµÄÓÃ»§Îª·Ç root ÓÃ»§ 'app'
+# è®¾ç½®è¿è¡Œåº”ç”¨çš„ç”¨æˆ·ä¸ºé root ç”¨æˆ· 'app'
 USER app
 
-# ÉèÖÃ¹¤×÷Ä¿Â¼
+# è®¾ç½®å·¥ä½œç›®å½•
 WORKDIR /app
 
-# ±©Â¶¶Ë¿Ú 5817 ºÍ 9817
+# æš´éœ²ç«¯å£ 5817 å’Œ 9817
 EXPOSE 5817
 EXPOSE 9817
 
-# ÉèÖÃ ASP.NET Core ¼àÌıµÄ URL£¨HTTP ºÍ HTTPS£©
+# è®¾ç½® ASP.NET Core ç›‘å¬çš„ URLï¼ˆHTTP å’Œ HTTPSï¼‰
 ENV ASPNETCORE_URLS=http://+:5817;https://+:9817
 
-# Ê¹ÓÃ .NET SDK ¾µÏñ½øĞĞ¹¹½¨ºÍ·¢²¼
+# ä½¿ç”¨ .NET SDK é•œåƒè¿›è¡Œæ„å»ºå’Œå‘å¸ƒ
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 
-# ÉèÖÃ¹¤×÷Ä¿Â¼
+# è®¾ç½®å·¥ä½œç›®å½•
 WORKDIR /src
 
-# ¸´ÖÆÏîÄ¿ÎÄ¼şµ½ÈİÆ÷ÖĞ
-COPY ["src/AGooday.AgPay.Manager.Api/AGooday.AgPay.Manager.Api.csproj", "src/AGooday.AgPay.Manager.Api/"]
-COPY ["src/AGooday.AgPay.AopSdk/AGooday.AgPay.AopSdk.csproj", "src/AGooday.AgPay.AopSdk/"]
-COPY ["src/AGooday.AgPay.Application/AGooday.AgPay.Application.csproj", "src/AGooday.AgPay.Application/"]
-COPY ["src/AGooday.AgPay.Infrastructure/AGooday.AgPay.Infrastructure.csproj", "src/AGooday.AgPay.Infrastructure/"]
-COPY ["src/AGooday.AgPay.Common/AGooday.AgPay.Common.csproj", "src/AGooday.AgPay.Common/"]
-COPY ["src/AGooday.AgPay.Domain/AGooday.AgPay.Domain.csproj", "src/AGooday.AgPay.Domain/"]
-COPY ["src/AGooday.AgPay.Components.MQ/AGooday.AgPay.Components.MQ.csproj", "src/AGooday.AgPay.Components.MQ/"]
-COPY ["src/AGooday.AgPay.Domain.Core/AGooday.AgPay.Domain.Core.csproj", "src/AGooday.AgPay.Domain.Core/"]
-COPY ["src/AGooday.AgPay.Notice.Email/AGooday.AgPay.Notice.Email.csproj", "src/AGooday.AgPay.Notice.Email/"]
-COPY ["src/AGooday.AgPay.Notice.Core/AGooday.AgPay.Notice.Core.csproj", "src/AGooday.AgPay.Notice.Core/"]
-COPY ["src/AGooday.AgPay.Components.OCR/AGooday.AgPay.Components.OCR.csproj", "src/AGooday.AgPay.Components.OCR/"]
-COPY ["src/AGooday.AgPay.Components.OSS/AGooday.AgPay.Components.OSS.csproj", "src/AGooday.AgPay.Components.OSS/"]
-COPY ["src/AGooday.AgPay.Components.SMS/AGooday.AgPay.Components.SMS.csproj", "src/AGooday.AgPay.Components.SMS/"]
-COPY ["src/AGooday.AgPay.Notice.Sms/AGooday.AgPay.Notice.Sms.csproj", "src/AGooday.AgPay.Notice.Sms/"]
+# å¤åˆ¶é¡¹ç›®æ–‡ä»¶åˆ°å®¹å™¨ä¸­
+COPY ["AGooday.AgPay.Manager.Api/AGooday.AgPay.Manager.Api.csproj", "AGooday.AgPay.Manager.Api/"]
+COPY ["AGooday.AgPay.AopSdk/AGooday.AgPay.AopSdk.csproj", "AGooday.AgPay.AopSdk/"]
+COPY ["AGooday.AgPay.Application/AGooday.AgPay.Application.csproj", "AGooday.AgPay.Application/"]
+COPY ["AGooday.AgPay.Infrastructure/AGooday.AgPay.Infrastructure.csproj", "AGooday.AgPay.Infrastructure/"]
+COPY ["AGooday.AgPay.Domain/AGooday.AgPay.Domain.csproj", "AGooday.AgPay.Domain/"]
+COPY ["AGooday.AgPay.Common/AGooday.AgPay.Common.csproj", "AGooday.AgPay.Common/"]
+COPY ["AGooday.AgPay.Components.MQ/AGooday.AgPay.Components.MQ.csproj", "AGooday.AgPay.Components.MQ/"]
+COPY ["AGooday.AgPay.Domain.Core/AGooday.AgPay.Domain.Core.csproj", "AGooday.AgPay.Domain.Core/"]
+COPY ["AGooday.AgPay.Notice.Email/AGooday.AgPay.Notice.Email.csproj", "AGooday.AgPay.Notice.Email/"]
+COPY ["AGooday.AgPay.Notice.Core/AGooday.AgPay.Notice.Core.csproj", "AGooday.AgPay.Notice.Core/"]
+COPY ["AGooday.AgPay.Components.Cache/AGooday.AgPay.Components.Cache.csproj", "AGooday.AgPay.Components.Cache/"]
+COPY ["AGooday.AgPay.Components.OCR/AGooday.AgPay.Components.OCR.csproj", "AGooday.AgPay.Components.OCR/"]
+COPY ["AGooday.AgPay.Components.OSS/AGooday.AgPay.Components.OSS.csproj", "AGooday.AgPay.Components.OSS/"]
+COPY ["AGooday.AgPay.Components.SMS/AGooday.AgPay.Components.SMS.csproj", "AGooday.AgPay.Components.SMS/"]
+COPY ["AGooday.AgPay.Notice.Sms/AGooday.AgPay.Notice.Sms.csproj", "AGooday.AgPay.Notice.Sms/"]
 
-# »¹Ô­ NuGet °ü
-RUN dotnet restore "./src/AGooday.AgPay.Manager.Api/AGooday.AgPay.Manager.Api.csproj"
+# è¿˜åŸ NuGet åŒ…
+RUN dotnet restore "./AGooday.AgPay.Manager.Api/AGooday.AgPay.Manager.Api.csproj"
 
-# ¸´ÖÆÊ£ÓàµÄÔ´´úÂë
+# å¤åˆ¶å‰©ä½™çš„æºä»£ç 
 COPY . .
 
-# ÉèÖÃ¹¤×÷Ä¿Â¼²¢¹¹½¨ÏîÄ¿
-WORKDIR "/src/src/AGooday.AgPay.Manager.Api"
+# è®¾ç½®å·¥ä½œç›®å½•å¹¶æ„å»ºé¡¹ç›®
+WORKDIR "/src/AGooday.AgPay.Manager.Api"
 RUN dotnet build "./AGooday.AgPay.Manager.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# ·¢²¼½×¶Î£¬»ùÓÚ¹¹½¨½×¶Î´´½¨
+# å‘å¸ƒé˜¶æ®µï¼ŒåŸºäºæ„å»ºé˜¶æ®µåˆ›å»º
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./AGooday.AgPay.Manager.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# ÔËĞĞÊ±½×¶Î£¬»ùÓÚÖ®Ç°¶¨ÒåµÄ»ù´¡¾µÏñ
+# è¿è¡Œæ—¶é˜¶æ®µï¼ŒåŸºäºä¹‹å‰å®šä¹‰çš„åŸºç¡€é•œåƒ
 FROM base AS final
 WORKDIR /app
 
-# ´Ó·¢²¼½×¶Î¸´ÖÆ·¢²¼µÄÎÄ¼şµ½ÔËĞĞÊ±¾µÏñÖĞ
+# ä»å‘å¸ƒé˜¶æ®µå¤åˆ¶å‘å¸ƒçš„æ–‡ä»¶åˆ°è¿è¡Œæ—¶é•œåƒä¸­
 COPY --from=publish /app/publish .
 
-# ÉèÖÃÈë¿Úµã
+# è®¾ç½®å…¥å£ç‚¹
 ENTRYPOINT ["dotnet", "AGooday.AgPay.Manager.Api.dll"]

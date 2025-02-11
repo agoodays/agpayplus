@@ -173,6 +173,7 @@ agpayplus/
 ├── .gitignore
 ├── README.md
 ├── LICENSE
+├── docker-compose-app.yml
 └── docker-compose.yml
 ```
 
@@ -223,10 +224,10 @@ docker restart agpay-plus-rabbitmq
 
 # 构建并运行后端容器
 # 构建 Docker 镜像
-agpayplus\aspnet-core> docker build -t agpay-plus-manager-api -f ./src/AGooday.AgPay.Manager.Api/Dockerfile .
-agpayplus\aspnet-core> docker build -t agpay-plus-agent-api -f ./src/AGooday.AgPay.Agent.Api/Dockerfile .
-agpayplus\aspnet-core> docker build -t agpay-plus-merchant-api -f ./src/AGooday.AgPay.Merchant.Api/Dockerfile .
-agpayplus\aspnet-core> docker build -t agpay-plus-payment-api -f ./src/AGooday.AgPay.Payment.Api/Dockerfile .
+agpayplus\aspnet-core\src> docker build -t agpay-plus-manager-api -f ./AGooday.AgPay.Manager.Api/Dockerfile .
+agpayplus\aspnet-core\src> docker build -t agpay-plus-agent-api -f ./AGooday.AgPay.Agent.Api/Dockerfile .
+agpayplus\aspnet-core\src> docker build -t agpay-plus-merchant-api -f ./AGooday.AgPay.Merchant.Api/Dockerfile .
+agpayplus\aspnet-core\src> docker build -t agpay-plus-payment-api -f ./AGooday.AgPay.Payment.Api/Dockerfile .
 
 # 将运行的容器连接到指定的网络，运行 docker network inspect agpay-plus-network 命令查看容器是否连接到了该网络
 docker network connect agpay-plus-network agpay-plus-manager-api
@@ -273,4 +274,19 @@ docker run -d --name agpay-ui-manager -p 8817:80 --network agpay-plus-network ag
 docker run -d --name agpay-ui-agent -p 8816:80 --network agpay-plus-network agpay-ui-agent
 docker run -d --name agpay-ui-merchant -p 8818:80 --network agpay-plus-network agpay-ui-merchant
 
+```
+
+### Docker Compose
+```
+# 构建并启动服务
+docker-compose -f docker-compose-app.yml up
+# 使用 -d 参数可以在后台运行服务
+docker-compose -f docker-compose-app.yml up -d
+
+# 检查容器状态
+docker-compose ps
+
+# 重新构建并启动服务
+docker-compose -f docker-compose-app.yml build
+docker-compose -f docker-compose-app.yml up -d
 ```
