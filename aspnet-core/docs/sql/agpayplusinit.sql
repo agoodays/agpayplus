@@ -1930,18 +1930,18 @@ INSERT INTO `t_sys_user_auth` (`auth_id`, `user_id`, `identity_type`, `identifie
 
 -- 初始化运营平台系统参数
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `created_at`, `updated_at`) 
-VALUES ('mgrSiteUrl', '运营平台网址(不包含结尾/)', '运营平台网址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'http://127.0.0.1:9217', 'text', 'MGR', '0', 0, NOW(), NOW());
+VALUES ('mgrSiteUrl', '运营平台网址(不包含结尾/)', '运营平台网址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'https://localhost:9817', 'text', 'MGR', '0', 0, NOW(), NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `created_at`, `updated_at`) 
-VALUES ('agentSiteUrl', '代理商平台网址(不包含结尾/)', '代理商平台网址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'https://127.0.0.1:9816', 'text', 'MGR', '0', 0, NOW(), NOW());
+VALUES ('agentSiteUrl', '代理商平台网址(不包含结尾/)', '代理商平台网址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'https://localhost:9816', 'text', 'MGR', '0', 0, NOW(), NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `created_at`, `updated_at`) 
-VALUES ('mchSiteUrl', '商户平台网址(不包含结尾/)', '商户平台网址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'http://127.0.0.1:9218', 'text', 'MGR', '0', 0, NOW(), NOW());
+VALUES ('mchSiteUrl', '商户平台网址(不包含结尾/)', '商户平台网址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'https://localhost:9818', 'text', 'MGR', '0', 0, NOW(), NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `created_at`, `updated_at`) 
-VALUES ('paySiteUrl', '支付网关地址(不包含结尾/)', '支付网关地址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'http://127.0.0.1:9216', 'text', 'MGR', '0', 0, NOW(), NOW());
+VALUES ('paySiteUrl', '支付网关地址(不包含结尾/)', '支付网关地址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'https://localhost:9819', 'text', 'MGR', '0', 0, NOW(), NOW());
 
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `created_at`, `updated_at`) 
 VALUES ('ossUseType', '文件上传服务类型', '文件上传服务类型', 'ossConfig', '文件上传服务', 'localFile', 'radio', 'MGR', '0', 0, NOW(), NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `created_at`, `updated_at`) 
-VALUES ('ossPublicSiteUrl', '公共oss访问地址(不包含结尾/)', '公共oss访问地址(不包含结尾/)', 'ossConfig', '系统应用配置', 'http://127.0.0.1:9217/api/anon/localOssFiles', 'text', 'MGR', '0', 0, NOW(), NOW());
+VALUES ('ossPublicSiteUrl', '公共oss访问地址(不包含结尾/)', '公共oss访问地址(不包含结尾/)', 'ossConfig', '系统应用配置', 'https://localhost:9817/api/anon/localOssFiles', 'text', 'MGR', '0', 0, NOW(), NOW());
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `created_at`, `updated_at`) 
 VALUES ('aliyunOssConfig', '阿里云oss配置', '阿里云oss配置', 'ossConfig', '阿里云oss配置', '{"accessKeyId":"MVqr64GEqjdI6y7xTMVqry7xLTAjsTo1","endpoint":"oss-cn-beijing.aliyuncs.com","expireTime":30000,"publicBucketName":"agpaypublic","privateBucketName":"agpayprivate","accessKeySecret":"q91sDeWVv8GhuoUY95a6x7NAlsMIYo"}', 'text', 'MGR', '0', 0, NOW(), NOW());
 
