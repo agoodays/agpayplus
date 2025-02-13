@@ -1,4 +1,4 @@
-using AGooday.AgPay.Application.DataTransfer;
+ï»¿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
@@ -21,7 +21,7 @@ using Newtonsoft.Json;
 namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 {
     /// <summary>
-    /// ÈÏÖ¤½Ó¿Ú
+    /// è®¤è¯æ¥å£
     /// </summary>
     [Route("api/anon")]
     [ApiController, AllowAnonymous]
@@ -37,11 +37,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly ISysConfigService _sysConfigService;
         private readonly ISmsService _smsService;
-        // ½«ÁìÓòÍ¨Öª´¦Àí³ÌĞò×¢ÈëController
+        // å°†é¢†åŸŸé€šçŸ¥å¤„ç†ç¨‹åºæ³¨å…¥Controller
         private readonly DomainNotificationHandler _notifications;
 
-        private const string AUTH_METHOD_REMARK = "µÇÂ¼ÈÏÖ¤"; //ÓÃ»§ĞÅÏ¢ÈÏÖ¤·½·¨ÃèÊö
-        private const string SYS_TYPE = CS.SYS_TYPE.MGR; //ÓÃ»§ĞÅÏ¢ÈÏÖ¤·½·¨ÃèÊö
+        private const string AUTH_METHOD_REMARK = "ç™»å½•è®¤è¯"; //ç”¨æˆ·ä¿¡æ¯è®¤è¯æ–¹æ³•æè¿°
+        private const string SYS_TYPE = CS.SYS_TYPE.MGR; //ç”¨æˆ·ä¿¡æ¯è®¤è¯æ–¹æ³•æè¿°
 
         public AuthController(ILogger<AuthController> logger,
             ICacheService cacheService,
@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         }
 
         /// <summary>
-        /// ÓÃ»§ĞÅÏ¢ÈÏÖ¤ »ñÈ¡iToken
+        /// ç”¨æˆ·ä¿¡æ¯è®¤è¯ è·å–iToken
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -77,40 +77,40 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         [HttpPost, Route("auth/validate"), MethodLog(AUTH_METHOD_REMARK, Type = LogType.Login)]
         public async Task<ApiRes> ValidateAsync(Validate model)
         {
-            string account = Base64Util.DecodeBase64(model.ia); //ÓÃ»§Ãû i account, ÒÑ×öbase64´¦Àí
-            string ipassport = Base64Util.DecodeBase64(model.ip); //ÃÜÂë i passport, ÒÑ×öbase64´¦Àí
-            string vercode = Base64Util.DecodeBase64(model.vc); //ÑéÖ¤Âë vercode, ÒÑ×öbase64´¦Àí
-            string vercodeToken = Base64Util.DecodeBase64(model.vt); //ÑéÖ¤Âëtoken, vercode token , ÒÑ×öbase64´¦Àí
+            string account = Base64Util.DecodeBase64(model.ia); //ç”¨æˆ·å i account, å·²åšbase64å¤„ç†
+            string ipassport = Base64Util.DecodeBase64(model.ip); //å¯†ç  i passport, å·²åšbase64å¤„ç†
+            string vercode = Base64Util.DecodeBase64(model.vc); //éªŒè¯ç  vercode, å·²åšbase64å¤„ç†
+            string vercodeToken = Base64Util.DecodeBase64(model.vt); //éªŒè¯ç token, vercode token , å·²åšbase64å¤„ç†
             string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
 
 #if !DEBUG
             string cacheCode = await _cacheService.GetAsync<string>(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode) || !cacheCode.Equals(vercode, StringComparison.OrdinalIgnoreCase))
             {
-                throw new BizException("ÑéÖ¤ÂëÓĞÎó£¡");
+                throw new BizException("éªŒè¯ç æœ‰è¯¯ï¼");
             }
 #endif
 
-            //µÇÂ¼·½Ê½£¬ Ä¬ÈÏÎªÕËºÅÃÜÂëµÇÂ¼
+            //ç™»å½•æ–¹å¼ï¼Œ é»˜è®¤ä¸ºè´¦å·å¯†ç ç™»å½•
             byte identityType = CS.AUTH_TYPE.LOGIN_USER_NAME;
             if (RegUtil.IsMobile(account))
             {
-                identityType = CS.AUTH_TYPE.TELPHONE; //ÊÖ»úºÅµÇÂ¼
+                identityType = CS.AUTH_TYPE.TELPHONE; //æ‰‹æœºå·ç™»å½•
             }
 
             var auth = await _authService.LoginAuthAsync(account, identityType, SYS_TYPE);
 
             if (auth == null)
             {
-                //Ã»ÓĞ¸ÃÓÃ»§ĞÅÏ¢
-                throw new BizException("ÓÃ»§Ãû/ÃÜÂë´íÎó£¡");
+                //æ²¡æœ‰è¯¥ç”¨æˆ·ä¿¡æ¯
+                throw new BizException("ç”¨æˆ·å/å¯†ç é”™è¯¯ï¼");
             }
 
             var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
             var loginErrorMaxLimit = JsonConvert.DeserializeObject<Dictionary<string, int>>(sysConfig.ConfigVal);
             loginErrorMaxLimit.TryGetValue("limitMinute", out int limitMinute);
             loginErrorMaxLimit.TryGetValue("maxLoginAttempts", out int maxLoginAttempts);
-            var loginErrorMessage = "ÃÜÂëÊäÈë´íÎó´ÎÊı³¬ÏŞ£¬ÇëÉÔºóÔÙÊÔ£¡";
+            var loginErrorMessage = "å¯†ç è¾“å…¥é”™è¯¯æ¬¡æ•°è¶…é™ï¼Œè¯·ç¨åå†è¯•ï¼";
             (int failedAttempts, DateTime? lastLoginTime) = await _sysUserLoginAttemptService.GetFailedLoginAttemptsAsync(auth.SysUserId, TimeSpan.FromMinutes(limitMinute));
             if (failedAttempts >= maxLoginAttempts && maxLoginAttempts > 0)
             {
@@ -134,21 +134,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             {
                 await _sysUserLoginAttemptService.RecordLoginAttemptAsync(loginAttempt);
                 ++failedAttempts;
-                loginErrorMessage = maxLoginAttempts > 0 ? failedAttempts >= maxLoginAttempts ? loginErrorMessage : $"ÓÃ»§Ãû/ÃÜÂë´íÎó£¬»¹¿É³¢ÊÔ{maxLoginAttempts - failedAttempts}´Î£¬Ê§°Ü½«Ëø¶¨{limitMinute}·ÖÖÓ£¡" : "ÓÃ»§Ãû/ÃÜÂë´íÎó£¡";
-                //Ã»ÓĞ¸ÃÓÃ»§ĞÅÏ¢
+                loginErrorMessage = maxLoginAttempts > 0 ? failedAttempts >= maxLoginAttempts ? loginErrorMessage : $"ç”¨æˆ·å/å¯†ç é”™è¯¯ï¼Œè¿˜å¯å°è¯•{maxLoginAttempts - failedAttempts}æ¬¡ï¼Œå¤±è´¥å°†é”å®š{limitMinute}åˆ†é’Ÿï¼" : "ç”¨æˆ·å/å¯†ç é”™è¯¯ï¼";
+                //æ²¡æœ‰è¯¥ç”¨æˆ·ä¿¡æ¯
                 throw new BizException(loginErrorMessage);
             }
             loginAttempt.Success = true;
             await _sysUserLoginAttemptService.RecordLoginAttemptAsync(loginAttempt);
-            // µÇÂ¼³É¹¦£¬Çå³ıµÇÂ¼³¢ÊÔ¼ÇÂ¼
+            // ç™»å½•æˆåŠŸï¼Œæ¸…é™¤ç™»å½•å°è¯•è®°å½•
             await _sysUserLoginAttemptService.ClearFailedLoginAttemptsAsync(auth.SysUserId);
 
-            //·Ç³¬¼¶¹ÜÀíÔ± && ²»°üº¬×ó²à²Ëµ¥ ½øĞĞ´íÎóÌáÊ¾
+            //éè¶…çº§ç®¡ç†å‘˜ && ä¸åŒ…å«å·¦ä¾§èœå• è¿›è¡Œé”™è¯¯æç¤º
             if (auth.IsAdmin != CS.YES && !await _authService.UserHasLeftMenuAsync(auth.SysUserId, auth.SysType))
             {
                 if (auth.UserType.Equals(CS.USER_TYPE.OPERATOR))
                 {
-                    throw new BizException("µ±Ç°ÓÃ»§Î´·ÖÅäÈÎºÎ²Ëµ¥È¨ÏŞ£¬ÇëÁªÏµ¹ÜÀíÔ±½øĞĞ·ÖÅäºóÔÙµÇÂ¼£¡");
+                    throw new BizException("å½“å‰ç”¨æˆ·æœªåˆ†é…ä»»ä½•èœå•æƒé™ï¼Œè¯·è”ç³»ç®¡ç†å‘˜è¿›è¡Œåˆ†é…åå†ç™»å½•ï¼");
                 }
             }
 
@@ -156,13 +156,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 
             if (ents.Count <= 0)
             {
-                throw new BizException("µ±Ç°ÓÃ»§Î´·ÖÅäÈÎºÎ²Ëµ¥È¨ÏŞ£¬ÇëÁªÏµ¹ÜÀíÔ±½øĞĞ·ÖÅäºóÔÙµÇÂ¼£¡");
+                throw new BizException("å½“å‰ç”¨æˆ·æœªåˆ†é…ä»»ä½•èœå•æƒé™ï¼Œè¯·è”ç³»ç®¡ç†å‘˜è¿›è¡Œåˆ†é…åå†ç™»å½•ï¼");
             }
 
-            //Éú³Étoken
+            //ç”Ÿæˆtoken
             string cacheKey = CS.GetCacheKeyToken(auth.SysUserId, Guid.NewGuid().ToString("N").ToUpper());
 
-            // ·µ»ØÇ°¶Ë accessToken
+            // è¿”å›å‰ç«¯ accessToken
             JwtTokenModel tokenModel = new JwtTokenModel();
             tokenModel.SysUserId = auth.SysUserId.ToString();
             tokenModel.AvatarUrl = auth.AvatarUrl;
@@ -188,7 +188,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             };
             await _cacheService.SetAsync(cacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
 
-            // É¾³ıÑéÖ¤Âë»º´æÊı¾İ
+            // åˆ é™¤éªŒè¯ç ç¼“å­˜æ•°æ®
             await _cacheService.RemoveAsync(codeCacheKey);
 
             if (lastLoginTime != null)
@@ -202,13 +202,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         }
 
         /// <summary>
-        /// Í¼Æ¬ÑéÖ¤Âë
+        /// å›¾ç‰‡éªŒè¯ç 
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("auth/vercode"), NoLog]
         public async Task<ApiRes> VercodeAsync()
         {
-            //¶¨ÒåÍ¼ĞÎÑéÖ¤ÂëµÄ³¤ºÍ¿í // 4Î»ÑéÖ¤Âë
+            //å®šä¹‰å›¾å½¢éªŒè¯ç çš„é•¿å’Œå®½ // 4ä½éªŒè¯ç 
             //string code = ImageFactory.CreateCode(4);
             //string imageBase64Data;
             //using (var picStream = ImageFactory.BuildImage(code, 40, 137, 20, 10))
@@ -224,13 +224,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             //redis
             string vercodeToken = Guid.NewGuid().ToString("N");
             string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
-            await _cacheService.SetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //Í¼Æ¬ÑéÖ¤Âë»º´æÊ±¼ä: 1·ÖÖÓ
+            await _cacheService.SetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.VERCODE_CACHE_TIME)); //å›¾ç‰‡éªŒè¯ç ç¼“å­˜æ—¶é—´: 1åˆ†é’Ÿ
 
             return ApiRes.Ok(new { imageBase64Data, vercodeToken, expireTime = CS.VERCODE_CACHE_TIME });
         }
 
         /// <summary>
-        /// »ñÈ¡Õ¾µãĞÅÏ¢
+        /// è·å–ç«™ç‚¹ä¿¡æ¯
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("siteInfos"), NoLog]
@@ -241,7 +241,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         }
 
         /// <summary>
-        /// ·¢ËÍ¶ÌĞÅÑéÖ¤Âë
+        /// å‘é€çŸ­ä¿¡éªŒè¯ç 
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -250,13 +250,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         {
             if (model.smsType.Equals(CS.SMS_TYPE.REGISTER) && await _sysUserService.IsExistTelphoneAsync(model.phone, SYS_TYPE))
             {
-                throw new BizException("µ±Ç°ÓÃ»§ÒÑ´æÔÚ£¡");
+                throw new BizException("å½“å‰ç”¨æˆ·å·²å­˜åœ¨ï¼");
             }
 
             if (model.smsType.Equals(CS.SMS_TYPE.RETRIEVE)
                 && !await _sysUserService.IsExistTelphoneAsync(model.phone, SYS_TYPE))
             {
-                throw new BizException("ÓÃ»§²»´æÔÚ£¡");
+                throw new BizException("ç”¨æˆ·ä¸å­˜åœ¨ï¼");
             }
 
             var code = SmsVerificationCodeGenerator.GenerateCode(4);
@@ -264,7 +264,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             //redis
             string smsCodeToken = $"{SYS_TYPE.ToLower()}_{model.smsType}_{model.phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
-            await _cacheService.SetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //¶ÌĞÅÑéÖ¤Âë»º´æÊ±¼ä: 1·ÖÖÓ
+            await _cacheService.SetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //çŸ­ä¿¡éªŒè¯ç ç¼“å­˜æ—¶é—´: 1åˆ†é’Ÿ
 #if !DEBUG
             _smsService.SendVercode(new Components.SMS.Models.SmsBizVercodeModel()
             {
@@ -277,11 +277,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         }
 
         /// <summary>
-        /// ÕÒ»ØÃÜÂë
+        /// æ‰¾å›å¯†ç 
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPost, Route("cipher/retrieve"), MethodLog("ÃÜÂëÕÒ»Ø")]
+        [HttpPost, Route("cipher/retrieve"), MethodLog("å¯†ç æ‰¾å›")]
         public async Task<ApiRes> RetrieveAsync(Retrieve model)
         {
             string phone = Base64Util.DecodeBase64(model.phone);
@@ -294,21 +294,21 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             string cacheCode = await _cacheService.GetAsync<string>(codeCacheKey);
             if (string.IsNullOrWhiteSpace(cacheCode))
             {
-                throw new BizException("ÑéÖ¤ÂëÒÑ¹ıÆÚ£¬ÇëÖØĞÂµã»÷·¢ËÍÑéÖ¤Âë£¡");
+                throw new BizException("éªŒè¯ç å·²è¿‡æœŸï¼Œè¯·é‡æ–°ç‚¹å‡»å‘é€éªŒè¯ç ï¼");
             }
             if (!cacheCode.Equals(code))
             {
-                throw new BizException("ÑéÖ¤ÂëÓĞÎó£¡");
+                throw new BizException("éªŒè¯ç æœ‰è¯¯ï¼");
             }
 #endif
             var sysUser = await _sysUserService.GetByTelphoneAsync(model.phone, SYS_TYPE);
             if (sysUser == null)
             {
-                throw new BizException("ÓÃ»§²»´æÔÚ£¡");
+                throw new BizException("ç”¨æˆ·ä¸å­˜åœ¨ï¼");
             }
             if (sysUser.State.Equals(CS.PUB_DISABLE))
             {
-                throw new BizException("ÓÃ»§ÒÑÍ£ÓÃ£¡");
+                throw new BizException("ç”¨æˆ·å·²åœç”¨ï¼");
             }
             var sysUserAuth = await _sysUserAuthService.GetByIdentifierAsync(CS.AUTH_TYPE.TELPHONE, model.phone, SYS_TYPE);
             if (sysUserAuth == null)
@@ -318,16 +318,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             bool verified = BCryptUtil.VerifyHash(newPwd, sysUserAuth.Credential);
             if (verified)
             {
-                throw new BizException("ĞÂÃÜÂëÓëÔ­ÃÜÂëÏàÍ¬£¡");
+                throw new BizException("æ–°å¯†ç ä¸åŸå¯†ç ç›¸åŒï¼");
             }
             await _sysUserAuthService.ResetAuthInfoAsync(sysUser.SysUserId.Value, null, null, newPwd, SYS_TYPE);
-            // É¾³ı¶ÌĞÅÑéÖ¤Âë»º´æÊı¾İ
+            // åˆ é™¤çŸ­ä¿¡éªŒè¯ç ç¼“å­˜æ•°æ®
             await _cacheService.RemoveAsync(codeCacheKey);
             return ApiRes.Ok();
         }
 
         /// <summary>
-        /// »ñÈ¡ÃÜÂë¹æÔò
+        /// è·å–å¯†ç è§„åˆ™
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("cipher/pwdRulesRegexp"), NoLog]
