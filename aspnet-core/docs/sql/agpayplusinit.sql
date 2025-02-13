@@ -196,6 +196,7 @@ CREATE TABLE `t_sys_log` (
   `user_ip` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '用户IP',
   `sys_type` VARCHAR(8) NOT NULL COMMENT '所属系统: MGR-运营平台, AGENT-代理商平台, MCH-商户中心',
   `method_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '方法名',
+  `log_type` tinyint NOT NULL DEFAULT '1' COMMENT '日志类型 0-登录日志, 1-操作日志',
   `method_remark` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '方法描述',
   `req_url` VARCHAR(256) NOT NULL DEFAULT '' COMMENT '请求地址',
   `req_method` VARCHAR(10) NOT NULL DEFAULT '' COMMENT '请求方法',

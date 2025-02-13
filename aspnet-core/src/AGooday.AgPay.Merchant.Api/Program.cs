@@ -235,42 +235,47 @@ services.AddSingleton<WsPayOrderServer>();
 
 var app = builder.Build();
 
-//加入 WebSocket 功能
+// 加入 WebSocket 功能
 app.UseWebSockets(new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromSeconds(30)
 });
 
-// Configure the HTTP request pipeline.
+// 自定义中间件
 app.UseNdc();
-
 app.UseCalculateExecutionTime();
-
 app.UseRequestResponseLogging();
 
+// Swagger 文档（开发环境下）
 //if (app.Environment.IsDevelopment())
 //{
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
-app.UseHttpsRedirection();
-// 强制HTTPS设置，用于将HTTP请求重定向到HTTPS
-app.UseStaticFiles();
 
-// 认证 监测用户是否登录
-app.UseAuthentication();
+// 强制 HTTPS 重定向
+app.UseHttpsRedirection();
+
+// 静态文件服务
+app.UseStaticFiles();
 
 // 启用 CORS 中间件
 app.UseCors("CorsPolicy");
 
+// 认证中间件（检测用户是否登录）
+app.UseAuthentication();
+
+// 配置 HttpContext 访问器
 var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 AuthContextService.Configure(httpContextAccessor);
 
-// 授权 监测有没有权限访问后续页面
+// 授权中间件（检测用户是否有权限访问资源）
 app.UseAuthorization();
 
+// 异常处理中间件（放在路由中间件之前）
 app.UseExceptionHandling();
 
+// 路由映射
 app.MapControllers();
 
 app.Run();

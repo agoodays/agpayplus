@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
-using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Manager.Api.Middlewares
 {
@@ -66,8 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                     break;
             }
             _logger.LogError(exception, $"[{context.TraceIdentifier}] {exception.Message}");
-            var result = JsonConvert.SerializeObject(errorResponse);
-            await response.WriteAsync(result);
+            await response.WriteAsJsonAsync(errorResponse);
         }
     }
 
