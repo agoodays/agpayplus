@@ -227,6 +227,10 @@ root@agpay-plus-rabbitmq:/# exit
 # 重启 RabbitMQ
 docker restart agpay-plus-rabbitmq
 
+# 手动拉取镜像
+docker pull mcr.microsoft.com/dotnet/sdk:9.0
+docker pull mcr.microsoft.com/dotnet/aspnet:9.0
+
 # 构建并运行后端容器
 # 构建 Docker 镜像
 cd agpayplus/aspnet-core/src
@@ -290,7 +294,6 @@ agpayplus\ant-design-vue> docker build --no-cache -t agpay-ui-merchant -f ./agpa
 docker run -d --name agpay-ui-manager -p 8817:80 --network agpay-plus-network agpay-ui-manager
 docker run -d --name agpay-ui-agent -p 8816:80 --network agpay-plus-network agpay-ui-agent
 docker run -d --name agpay-ui-merchant -p 8818:80 --network agpay-plus-network agpay-ui-merchant
-
 ```
 
 ### Docker Compose
