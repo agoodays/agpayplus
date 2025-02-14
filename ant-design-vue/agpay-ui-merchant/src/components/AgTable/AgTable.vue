@@ -25,7 +25,7 @@
           <template #title>
             <span>数据导出</span>
           </template>
-          <span v-if="isShowDownload" @click="downloadData" class="anticon anticon-download pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
+          <span v-if="isShowDownload" @click="downloadData" class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
             <a-icon type="download" />
           </span>
         </a-tooltip>
@@ -35,7 +35,9 @@
             <template #title>
               <span>表格密度</span>
             </template>
-            <i class="bi bi-distribute-vertical pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;" @click.prevent/>
+            <span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
+              <a-icon type="column-height" />
+            </span>
           </a-tooltip>
           <template v-slot:overlay>
             <a-menu class="ant-pro-drop-down menu">
@@ -56,7 +58,9 @@
             <template #title>
               <span>列设置</span>
             </template>
-            <i class="bi bi-layout-sidebar-inset-reverse ant-dropdown-trigger pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"/>
+            <span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
+              <a-icon type="table" />
+            </span>
           </a-tooltip>
 <!--          <a-menu slot="overlay">
             <a-checkbox-group v-model="visibleColumns">
@@ -318,10 +322,10 @@ export default {
     color: rgb(26, 102, 255)
   }
 
-  @font-face {
-    font-family: bootstrap-icons;
-    src: url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.c874e14c.woff2?524846017b983fc8ded9325d94ed40f3) format("woff2"),url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.92f8082b.woff?524846017b983fc8ded9325d94ed40f3) format("woff")
-  }
+// @font-face {
+//   font-family: bootstrap-icons;
+//   src: url(//agooday.oss-cn-beijing.aliyuncs.com/agpay/cdn/s.agpay.com/manager/assets/bootstrap-icons.c874e14c.woff2?524846017b983fc8ded9325d94ed40f3) format("woff2"),url(//agooday.oss-cn-beijing.aliyuncs.com/agpay/cdn/s.agpay.com/manager/assets/bootstrap-icons.92f8082b.woff?524846017b983fc8ded9325d94ed40f3) format("woff")
+// }
 
   .bi {
     display: flex;

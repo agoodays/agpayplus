@@ -7,7 +7,7 @@
     <div class="content-body">
       <div class="content-main" style="justify-content: flex-end;">
         <div class="user-layout-lang">
-        </div>
+            </div>
         <div class="user-layout-content">
 <!--          <div class="top">
             <div class="header">
@@ -42,13 +42,13 @@
           </div>
           <div class="top-list">
             <div class="t-list-item">
-              <img src="https://beian.miit.gov.cn/favicon.ico" alt=""> ICP备案：鄂ICP备19941223号-9
+              <img src="~@/assets/beian.png"> ICP备案：鄂ICP备19941223号-9
             </div>
             <div class="t-list-item">
-              <img src="https://www.pcac.org.cn/eportal/fileDir/pcac/resource/cms/favicon.ico" alt=""> 中国支付清算协会备案编码：W2016091300000019
+              <img src="~@/assets/pcac.png"> 中国支付清算协会备案编码：W2016091300000019
             </div>
             <div class="t-list-item">
-              <img src="https://ythzxfw.miit.gov.cn/favicon.ico" alt=""> 电信增值业务许可证编号：鄂A2-20160913
+              <img src="~@/assets/permit.png"> 电信增值业务许可证编号：鄂A2-20160913
             </div>
           </div>
         </div>
@@ -194,12 +194,12 @@ export default {
 }
 
 .footer-info {
-   padding-bottom: 25px;
-   color: #b3b3b3;
-   font-size: 14px;
-   letter-spacing: 1.5px;
-   text-align: center
- }
+  padding-bottom: 25px;
+  color: #b3b3b3;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  text-align: center
+}
 
 .footer-info span {
   cursor: pointer

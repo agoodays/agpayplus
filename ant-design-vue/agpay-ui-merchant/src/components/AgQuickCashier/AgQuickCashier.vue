@@ -202,7 +202,7 @@ export default {
 
       // switch (this.payMethod) {
       //   case 'sm':
-      //     this.$refs.payQrCode.show({ payDataType: 'codeImgUrl', payData: 'https://pay.s.jeepay.com/api/scan/imgs/0030c5b3c4088731ce0dd4446a2516a0e8a446218277e8b0ea9ac100ce075cc07640eefeddd403efd4b5b132f9446b7b96e013266cdcb0579eccf8dbb77b051137ab4a3ef2b27614316d089f96060c22c966c67fc0f9f2ea922fb593c908eb5282779350e2fd97f8a795fef89a5969e8fa3f2eeb2554e5a80ba4601e9a2522680a23ff98c67ee12c9f977a815440a710650300e8138527e97650fc96042684bd.png' })
+      //     this.$refs.payQrCode.show({ payDataType: 'codeImgUrl', payData: 'https://pay.s.agpay.com/api/scan/imgs/0030c5b3c4088731ce0dd4446a2516a0e8a446218277e8b0ea9ac100ce075cc07640eefeddd403efd4b5b132f9446b7b96e013266cdcb0579eccf8dbb77b051137ab4a3ef2b27614316d089f96060c22c966c67fc0f9f2ea922fb593c908eb5282779350e2fd97f8a795fef89a5969e8fa3f2eeb2554e5a80ba4601e9a2522680a23ff98c67ee12c9f977a815440a710650300e8138527e97650fc96042684bd.png' })
       //     break
       //   case 'fk':
       //   case 'sl':

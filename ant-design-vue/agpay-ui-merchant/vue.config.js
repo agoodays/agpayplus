@@ -32,8 +32,6 @@ const vueConfig = {
         BUILD_DATE: buildDate
       })
     ],
-    // 代码调试
-    devtool: 'source-map',
     // if prod, add externals
     externals: {}
   },
@@ -43,7 +41,6 @@ const vueConfig = {
       .set('@', resolve('src'))
 
     const svgRule = config.module.rule('svg')
-    svgRule.test(/\.(png|jpe?g|gif|svg)(\?.*)?$/)
     svgRule.uses.clear()
     svgRule
       .oneOf('inline')

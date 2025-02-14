@@ -4,49 +4,49 @@
       <img src="~@/assets/logo.svg" style="height: 30px;">
       <img src="@/assets/svg/agpay.svg" alt="agpay" style="width:90px;margin: 5px 0 0 5px">
     </div>
-    <div class="content-body" style="background: url(https://jeepaypublic.oss-cn-beijing.aliyuncs.com/oem/7c9a0ccc-ff3a-47f1-a358-6e5a63333073.jpg) center top / cover no-repeat;">
+    <div class="content-body" :style="backgroundStyle">
       <div class="content-main" style="justify-content: space-between;">
         <div class="banner-content">
           <a-carousel :autoplay="true" v-if="$route.meta.layout === 'userLayout'">
             <div>
-              <img src="https://jeepaypublic.oss-cn-beijing.aliyuncs.com/notice/bfeff7ad-a766-49b3-9017-97a9a2d68645.png">
+              <img src="~@/assets/beijing.svg">
             </div>
             <div>
-              <img src="https://jeepaypublic.oss-cn-beijing.aliyuncs.com/oem/44c40c37-c1ca-4d98-bb54-b9b38f78ff18.png">
+              <img src="~@/assets/beijing2.svg">
             </div>
             <div>
-              <img src="https://www.jeequan.com/jee/images/index/jeepay.jpg">
+              <img src="~@/assets/beijing.png">
             </div>
             <div>
-              <img src="https://www.jeequan.com/jee/images/index/beian.jpg" style="width: 100%; height: 100%; object-fit: cover; display: inline-block;">
+              <img src="~@/assets/beijing2.png">
             </div>
           </a-carousel>
         </div>
         <div class="user-layout-content">
-          <!--          <div class="top">
-                      <div class="header">
-                        <a href="/">
-                          <img src="~@/assets/logo.svg" class="logo" alt="logo">
-                        </a>
-                      </div>
-                      <div class="desc">
-                        <img src="~@/assets/svg/operate.svg" class="logo" alt="logo">
+<!--          <div class="top">
+            <div class="header">
+              <a href="/">
+                <img src="~@/assets/logo.svg" class="logo" alt="logo">
+              </a>
+            </div>
+            <div class="desc">
+              <img src="~@/assets/svg/operate.svg" class="logo" alt="logo">
                         <span>商户系统</span>
-                      </div>
-                    </div>-->
+            </div>
+          </div>-->
 
           <router-view />
 
-          <!--          <div class="footer">
-                      <div class="links">
-                        <a href="_self">帮助</a>
-                        <a href="_self">隐私</a>
-                        <a href="_self">条款</a>
-                      </div>
-                      <div class="copyright">
-                        Copyright &copy; 2021 agooday.com
-                      </div>
-                    </div>-->
+<!--          <div class="footer">
+            <div class="links">
+              <a href="_self">帮助</a>
+              <a href="_self">隐私</a>
+              <a href="_self">条款</a>
+            </div>
+            <div class="copyright">
+              Copyright &copy; {{ currentYear }} agooday.com
+            </div>
+          </div>-->
         </div>
       </div>
       <div class="content-footer" v-if="$route.meta.layout === 'userLayout'">
@@ -56,13 +56,13 @@
           </div>
           <div class="top-list">
             <div class="t-list-item">
-              <img src="https://beian.miit.gov.cn/favicon.ico" alt=""> ICP备案：鄂ICP备19941223号-9
+              <img src="~@/assets/beian.png"> ICP备案：鄂ICP备19941223号-9
             </div>
             <div class="t-list-item">
-              <img src="https://www.pcac.org.cn/eportal/fileDir/pcac/resource/cms/favicon.ico" alt=""> 中国支付清算协会备案编码：W2016091300000019
+              <img src="~@/assets/pcac.png"> 中国支付清算协会备案编码：W2016091300000019
             </div>
             <div class="t-list-item">
-              <img src="https://ythzxfw.miit.gov.cn/favicon.ico" alt=""> 电信增值业务许可证编号：鄂A2-20160913
+              <img src="~@/assets/permit.png"> 电信增值业务许可证编号：鄂A2-20160913
             </div>
           </div>
         </div>
@@ -79,6 +79,16 @@ export default {
   computed: {
     currentYear () {
       return new Date().getFullYear()
+    }
+  },
+  data () {
+    return {
+      backgroundStyle: {
+        backgroundImage: `url(${require('@/assets/svg/backgroundold.svg')})`,
+        backgroundPosition: 'center top',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat'
+      }
     }
   },
   mounted () {
@@ -210,7 +220,7 @@ export default {
 }
 
 .tab .operation-class {
-  color: #b0afb3;
+   color: #b0afb3;
 }
 
 .user-layout-content .main .input-item {

@@ -25,7 +25,7 @@
           <template #title>
             <span>数据导出</span>
           </template>
-          <span v-if="isShowDownload" @click="downloadData" class="anticon anticon-download pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
+          <span v-if="isShowDownload" @click="downloadData" class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
             <a-icon type="download" />
           </span>
         </a-tooltip>
@@ -35,7 +35,9 @@
             <template #title>
               <span>表格密度</span>
             </template>
-            <i class="bi bi-distribute-vertical pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;" @click.prevent/>
+            <span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
+              <a-icon type="column-height" />
+            </span>
           </a-tooltip>
           <template v-slot:overlay>
             <a-menu class="ant-pro-drop-down menu">
@@ -56,7 +58,9 @@
             <template #title>
               <span>列设置</span>
             </template>
-            <i class="bi bi-layout-sidebar-inset-reverse ant-dropdown-trigger pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"/>
+            <span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
+              <a-icon type="table" />
+            </span>
           </a-tooltip>
 <!--          <a-menu slot="overlay">
             <a-checkbox-group v-model="visibleColumns">
@@ -77,7 +81,7 @@
         </a-dropdown>
       </div>
     </div>
-    <slot name="dataStatisticsSlot" v-if="isShowDataStatistics" :countData="countData"></slot>
+    <slot name="dataStatisticsSlot" v-if="isShowDataStatistics"></slot>
     <a-table
       :columns="displayedColumns"
       :size="size"
@@ -95,9 +99,6 @@
         return { style: { 'background-color': index % 2 == 0 ? '#FCFCFC' : '#FFFFFF'} }
       }"
     >
-      <template v-for="colCustom in columnsCustomTitleSlots" :slot="colCustom.title">
-        <slot :name="colCustom.title" :record="colCustom.titleValue"></slot>
-      </template>
       <!-- 自定义列插槽， 参考：https://github.com/feseed/admin-antd-vue/blob/master/src/components/ShTable.vue  -->
       <!--  eslint-disable-next-line -->
       <template v-for="colCustom in columnsCustomSlots" :slot="colCustom.customRender" slot-scope="record">
@@ -122,8 +123,7 @@ export default {
     initData: { type: Boolean, default: true }, // 初始化列表数据， 默认true
     tableColumns: { type: Array, default: null }, // 表格数组列
     reqTableDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
-    reqTableCountFunc: { type: Function, default: () => new Promise(resolve => resolve()) }, // 请求列表数据统计
-    reqDownloadDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据下载
+    reqDownloadDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
     currentChange: { type: Function, default: (v1, v2) => {} }, // 更新当前选择行事件， 默认空函数
     searchData: { type: Object, default: null }, // 搜索条件参数
     pageSize: { type: Number, default: 10 }, // 默认每页条数
@@ -137,7 +137,6 @@ export default {
     return {
       allColumns: this.tableColumns,
       visibleColumns: this.tableColumns.map(column => column.key),
-      countData: {},
       apiResData: { total: 0, records: [] }, // 接口返回数据
       iPage: { pageNumber: 1, pageSize: this.pageSize }, // 默认table 分页/排序请求后端格式
       pagination: { total: 0, current: 1, pageSize: this.pageSize, showSizeChanger: true, showTotal: total => `共${total}条` }, // ATable 分页配置项
@@ -150,10 +149,6 @@ export default {
   },
   // 计算属性
   computed: {
-    columnsCustomTitleSlots () { // 自定义列Title插槽  1. 过滤器仅获取到包含slot属性的元素， 2. 返回slot数组
-      // 获取具有 scopedSlots 中包含 title 属性的数据
-      return this.tableColumns.filter(column => column.scopedSlots && column.scopedSlots.title).map(item => item.scopedSlots)
-    },
     columnsCustomSlots () { // 自定义列插槽  1. 过滤器仅获取到包含slot属性的元素， 2. 返回slot数组
       return this.tableColumns.filter(item => item.scopedSlots).map(item => item.scopedSlots)
     },
@@ -164,7 +159,6 @@ export default {
   mounted () {
     if (this.initData) { // 是否自动加载数据
       this.refTable(true)
-      this.refCountData()
     }
     if (this.isShowAutoRefresh) { // 是否自动刷新数据
       this.startCountdown()
@@ -181,7 +175,6 @@ export default {
             that.countdown = that.defaultCountdown
             // clearInterval(timer)
             that.refTable(false)
-            this.refCountData()
           }
         }
       }, 1000)
@@ -236,15 +229,6 @@ export default {
         this.showLoading = false
         that.$emit('btnLoadClose')
       }) // 关闭loading
-    },
-    // 数据统计
-    refCountData: function () {
-      if (this.isEnableDataStatistics) {
-        const that = this
-        this.reqTableCountFunc(this.searchData).then(res => {
-          that.countData = res
-        })
-      }
     },
 
     // 下载数据
@@ -338,10 +322,10 @@ export default {
     color: rgb(26, 102, 255)
   }
 
-  @font-face {
-    font-family: bootstrap-icons;
-    src: url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.c874e14c.woff2?524846017b983fc8ded9325d94ed40f3) format("woff2"),url(//jeequan.oss-cn-beijing.aliyuncs.com/jeepay/cdn/s.jeepay.com/manager/assets/bootstrap-icons.92f8082b.woff?524846017b983fc8ded9325d94ed40f3) format("woff")
-  }
+// @font-face {
+//   font-family: bootstrap-icons;
+//   src: url(//agooday.oss-cn-beijing.aliyuncs.com/agpay/cdn/s.agpay.com/manager/assets/bootstrap-icons.c874e14c.woff2?524846017b983fc8ded9325d94ed40f3) format("woff2"),url(//agooday.oss-cn-beijing.aliyuncs.com/agpay/cdn/s.agpay.com/manager/assets/bootstrap-icons.92f8082b.woff?524846017b983fc8ded9325d94ed40f3) format("woff")
+// }
 
   .bi {
     display: flex;
