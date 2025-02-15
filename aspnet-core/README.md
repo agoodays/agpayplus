@@ -17,12 +17,14 @@ AGooday.AgPay
     ├── 2.Application Layer(Service)
         └── AGooday.AgPay.Application
     ├── 3.Domain Layer(Domain)
-        └── AGooday.AgPay.Domain
-    ├── 4.Infrastructure Layer
+        ├── AGooday.AgPay.Domain
         └── AGooday.AgPay.Domain.Core
+    ├── 4.Infrastructure Layer
+        └── AGooday.AgPay.Infrastructure
     └── 5.Project.Common Layer
         ├── AGooday.AgPay.AopSdk
         ├── AGooday.AgPay.Common
+		├── AGooday.AgPay.Components.Cache
         ├── AGooday.AgPay.Components.MQ
         ├── AGooday.AgPay.Components.OCR
         ├── AGooday.AgPay.Components.OSS

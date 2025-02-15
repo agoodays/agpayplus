@@ -192,14 +192,14 @@ docker search redis
 docker pull redis
 
 # 运行 redis 容器
-docker run -d --name agpay-plus-redis -p 6389:6379 --network agpay-plus-network redis
+docker run -d --name agpay-plus-redis -p 6379:6379 --network agpay-plus-network redis
 
 # Docker安装RabbitMQ
 # 拉去镜像
 docker pull rabbitmq:management
 
 # 运行 rabbitmq 容器
-docker run -d --hostname agpay-plus-rabbitmq --name agpay-plus-rabbitmq --network agpay-plus-network -p 15682:15672 -p 5682:5672 rabbitmq:3-management
+docker run -d --hostname agpay-plus-rabbitmq --name agpay-plus-rabbitmq --network agpay-plus-network -p 15672:15672 -p 5672:5672 rabbitmq:3-management
 
 # 根据 RabbitMQ 版本下载「rabbitmq_delayed_message_exchange」插件 https://www.rabbitmq.com/community-plugins.html
 # 将刚下载的插件拷贝到容器内的 plugins 目录下
