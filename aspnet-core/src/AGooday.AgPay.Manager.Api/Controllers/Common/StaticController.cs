@@ -133,7 +133,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
             return HttpUtility.UrlDecode(path);
         }
 
-        private string GetFullPath(string relativePath)
+        private static string GetFullPath(string relativePath)
         {
             return Path.GetFullPath(Path.Combine(LocalOssConfig.Oss.FilePublicPath, relativePath));// 使用Path.Combine处理路径
         }

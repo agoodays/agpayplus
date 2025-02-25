@@ -246,8 +246,8 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 获取代理商超管
                 long agentAdminUserId = await _sysUserRepository.FindAgentAdminUserIdAsync(agentInfo.AgentNo);
                 var sysUserAuth = await _sysUserAuthRepository.GetAllAsNoTracking()
-                     .Where(w => w.UserId.Equals(agentAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE))
-                     .FirstOrDefaultAsync();
+                    .Where(w => w.UserId.Equals(agentAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.AGENT) && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE))
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
                 {

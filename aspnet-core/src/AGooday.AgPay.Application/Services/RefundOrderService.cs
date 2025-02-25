@@ -264,6 +264,17 @@ namespace AGooday.AgPay.Application.Services
                     .SetProperty(p => p.UpdatedAt, now));
             return updatedCount;
 
+            //// 使用 ExecuteUpdate 直接在数据库中批量更新
+            //var now = DateTime.Now;
+            //var updatedCount = RelationalQueryableExtensions.ExecuteUpdateAsync(
+            //    _refundOrderRepository.GetAll()
+            //        .Where(w => (new byte[] { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
+            //        && w.ExpiredTime < DateTime.Now),
+            //    s => s
+            //        .SetProperty(p => p.State, p => (byte)RefundOrderState.STATE_CLOSED)
+            //        .SetProperty(p => p.UpdatedAt, now));
+            //return updatedCount;
+
             //var updateRecords = _refundOrderRepository.GetAll()
             //    .Where(w => (new List<byte>() { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
             //    && w.ExpiredTime < DateTime.Now);

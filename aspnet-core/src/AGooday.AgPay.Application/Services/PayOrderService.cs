@@ -283,6 +283,17 @@ namespace AGooday.AgPay.Application.Services
                     .SetProperty(p => p.UpdatedAt, now));
             return updatedCount;
 
+            //// 使用 ExecuteUpdate 直接在数据库中批量更新
+            //var now = DateTime.Now;
+            //var updatedCount = RelationalQueryableExtensions.ExecuteUpdateAsync(
+            //    _payOrderRepository.GetAll()
+            //        .Where(w => new byte[] { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }.Contains(w.State)
+            //            && w.ExpiredTime < DateTime.Now),
+            //    s => s
+            //        .SetProperty(p => p.State, p => (byte)PayOrderState.STATE_CLOSED)
+            //        .SetProperty(p => p.UpdatedAt, now));
+            //return updatedCount;
+
             //var updateRecords = _payOrderRepository.GetAll()
             //    .Where(w => (new List<byte>() { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }).Contains(w.State)
             //    && w.ExpiredTime < DateTime.Now);
@@ -704,7 +715,7 @@ namespace AGooday.AgPay.Application.Services
 #endif
 
             // 返回数据列
-            return payCountMap.OrderBy(o => (int)Enum.Parse(typeof(PayWayType), o.WayType));
+            return payCountMap.OrderBy(o => (int)Enum.Parse<PayWayType>(o.WayType));
         }
     }
 }

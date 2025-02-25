@@ -63,7 +63,8 @@ namespace AGooday.AgPay.Application.Services
         public List<PayOrderDivisionRecordDto> GetByBatchOrderId(PayOrderDivisionRecordQueryDto dto)
         {
             var records = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId)) && (dto.State.Equals(null) || w.State.Equals(dto.State)))
+                .Where(w => (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId)) 
+                    && (dto.State.Equals(null) || w.State.Equals(dto.State)))
                 .OrderBy(o => o.RecordId);
             return _mapper.Map<List<PayOrderDivisionRecordDto>>(records);
         }
@@ -72,17 +73,17 @@ namespace AGooday.AgPay.Application.Services
         {
             var query = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.ReceiverId.Equals(null) || w.ReceiverId.Equals(dto.ReceiverId))
-                && (dto.ReceiverGroupId.Equals(null) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
-                && (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId))
-                && (string.IsNullOrWhiteSpace(dto.PayOrderId) || w.PayOrderId.Equals(dto.PayOrderId))
-                && (string.IsNullOrWhiteSpace(dto.AccNo) || w.AccNo.Equals(dto.AccNo))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                    && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                    && (dto.ReceiverId.Equals(null) || w.ReceiverId.Equals(dto.ReceiverId))
+                    && (dto.ReceiverGroupId.Equals(null) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
+                    && (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId))
+                    && (string.IsNullOrWhiteSpace(dto.PayOrderId) || w.PayOrderId.Equals(dto.PayOrderId))
+                    && (string.IsNullOrWhiteSpace(dto.AccNo) || w.AccNo.Equals(dto.AccNo))
+                    && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+                    && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
+                    && (dto.State.Equals(null) || w.State.Equals(dto.State))
+                    && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                    && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
                 .OrderByDescending(o => o.CreatedAt);
             var records = await PaginatedList<PayOrderDivisionRecord>.CreateAsync<PayOrderDivisionRecordDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
@@ -97,17 +98,18 @@ namespace AGooday.AgPay.Application.Services
         {
             var query = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.ReceiverId.Equals(null) || w.ReceiverId.Equals(dto.ReceiverId))
-                && (dto.ReceiverGroupId.Equals(null) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
-                && (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId))
-                && (string.IsNullOrWhiteSpace(dto.PayOrderId) || w.PayOrderId.Equals(dto.PayOrderId))
-                && (string.IsNullOrWhiteSpace(dto.AccNo) || w.AccNo.Equals(dto.AccNo))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd)
-                ).DistinctBy(d => new { d.BatchOrderId, d.PayOrderId }).OrderByDescending(o => o.CreatedAt);
+                    && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+                    && (dto.ReceiverId.Equals(null) || w.ReceiverId.Equals(dto.ReceiverId))
+                    && (dto.ReceiverGroupId.Equals(null) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
+                    && (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId))
+                    && (string.IsNullOrWhiteSpace(dto.PayOrderId) || w.PayOrderId.Equals(dto.PayOrderId))
+                    && (string.IsNullOrWhiteSpace(dto.AccNo) || w.AccNo.Equals(dto.AccNo))
+                    && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+                    && (dto.State.Equals(null) || w.State.Equals(dto.State))
+                    && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+                    && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                .AsEnumerable() // 将查询结果加载到内存中
+                .DistinctBy(d => new { d.BatchOrderId, d.PayOrderId }).OrderByDescending(o => o.CreatedAt);
             var records = PaginatedList<PayOrderDivisionRecord>.Create<PayOrderDivisionRecordDto>(query, _mapper, dto.PageNumber, dto.PageSize);
             return records;
         }
@@ -147,13 +149,26 @@ namespace AGooday.AgPay.Application.Services
             var now = DateTime.Now;
             var updatedCount = _payOrderDivisionRecordRepository.GetAll()
                 .Where(w => recordIds.Contains(w.RecordId)
-                && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_WAIT))
+                    && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_WAIT))
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(p => p.State, p => state)
                     .SetProperty(p => p.ChannelBatchOrderId, p => channelBatchOrderId)
                     .SetProperty(p => p.ChannelRespResult, p => channelRespResult)
                     .SetProperty(p => p.UpdatedAt, now));
             return updatedCount;
+
+            //// 使用 ExecuteUpdate 直接在数据库中批量更新
+            //var now = DateTime.Now;
+            //var updatedCount = RelationalQueryableExtensions.ExecuteUpdateAsync(
+            //    _payOrderDivisionRecordRepository.GetAll()
+            //        .Where(w => recordIds.Contains(w.RecordId)
+            //        && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_WAIT)),
+            //    s => s
+            //        .SetProperty(p => p.State, p => state)
+            //        .SetProperty(p => p.ChannelBatchOrderId, p => channelBatchOrderId)
+            //        .SetProperty(p => p.ChannelRespResult, p => channelRespResult)
+            //        .SetProperty(p => p.UpdatedAt, now));
+            //return updatedCount;
 
             //var updateRecords = _payOrderDivisionRecordRepository.GetAll()
             //    .Where(w => recordIds.Contains(w.RecordId)
@@ -191,7 +206,8 @@ namespace AGooday.AgPay.Application.Services
             }
 
             var updateRecordByDiv = _payOrderDivisionRecordRepository.GetAll()
-                .Where(w => w.PayOrderId.Equals(payOrderId) && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_FAIL)).FirstOrDefault();
+                .Where(w => w.PayOrderId.Equals(payOrderId) && w.State.Equals((byte)PayOrderDivisionRecordState.STATE_FAIL))
+                .FirstOrDefault();
             updateRecordByDiv.BatchOrderId = SeqUtil.GenDivisionBatchId(); // 重新生成batchOrderId, 避免部分失败导致： out_trade_no重复。
             updateRecordByDiv.State = (byte)PayOrderDivisionRecordState.STATE_WAIT; //待分账
             updateRecordByDiv.ChannelRespResult = "";

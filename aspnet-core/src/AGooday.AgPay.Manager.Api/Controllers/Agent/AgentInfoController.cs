@@ -89,6 +89,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         /// <summary>
         /// 更新代理商信息
         /// </summary>
+        /// <param name="agentNo"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut, Route("{agentNo}"), MethodLog("更新代理商信息")]

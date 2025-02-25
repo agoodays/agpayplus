@@ -277,7 +277,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 long mchAdminUserId = await _sysUserRepository.FindMchAdminUserIdAsync(mchInfo.MchNo);
                 var sysUserAuth = await _sysUserAuthRepository.GetAllAsNoTracking()
                      .Where(w => w.UserId.Equals(mchAdminUserId) && w.SysType.Equals(CS.SYS_TYPE.MCH) && w.IdentityType.Equals(CS.AUTH_TYPE.TELPHONE))
-                     .FirstOrDefaultAsync();
+                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (sysUserAuth != null && !sysUserAuth.Identifier.Equals(request.ContactTel))
                 {
