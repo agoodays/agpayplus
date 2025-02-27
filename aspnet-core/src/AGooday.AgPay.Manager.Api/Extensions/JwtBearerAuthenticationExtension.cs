@@ -15,11 +15,11 @@ namespace AGooday.AgPay.Manager.Api.Extensions
         /// 注册JWT Bearer认证服务的静态扩展方法
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="appSettings">JWT授权的配置项</param>
-        public static void AddJwtBearerAuthentication(this IServiceCollection services, JwtSettings appSettings)
+        /// <param name="jwtSettings">JWT授权的配置项</param>
+        public static void AddJwtBearerAuthentication(this IServiceCollection services, JwtSettings jwtSettings)
         {
             //设置secret，使用应用密钥得到一个加密密钥字节数组
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(jwtSettings.Secret);
             //添加认证服务
             services.AddAuthentication(options =>
             {
@@ -39,8 +39,8 @@ namespace AGooday.AgPay.Manager.Api.Extensions
                     ValidateAudience = true,//是否验证订阅者
                     ValidateLifetime = true,//是否验证失效时间
                     ValidateIssuerSigningKey = true,//是否验证SecurityKey
-                    ValidIssuer = appSettings.Issuer,//颁发者，这两项和前面签发jwt的设置一致
-                    ValidAudience = appSettings.Audience,//订阅者
+                    ValidIssuer = jwtSettings.Issuer,//颁发者，这两项和前面签发jwt的设置一致
+                    ValidAudience = jwtSettings.Audience,//订阅者
                     IssuerSigningKey = new SymmetricSecurityKey(key)//认证秘钥
                 };
             });
@@ -76,16 +76,16 @@ namespace AGooday.AgPay.Manager.Api.Extensions
             return GetJwtAccessToken(jwtSettings, claimsIdentity);
         }
 
-        private static string GetJwtAccessToken(JwtSettings appSettings, ClaimsIdentity claimsIdentity)
+        private static string GetJwtAccessToken(JwtSettings jwtSettings, ClaimsIdentity claimsIdentity)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(jwtSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claimsIdentity,
                 Expires = DateTime.UtcNow.AddDays(7),
-                Issuer = appSettings.Issuer,
-                Audience = appSettings.Audience,
+                Issuer = jwtSettings.Issuer,
+                Audience = jwtSettings.Audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

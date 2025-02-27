@@ -89,8 +89,8 @@ services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 var jwtSettingsSection = builder.Configuration.GetSection("JWT");
 services.Configure<JwtSettings>(jwtSettingsSection);
 // JWT 认证
-var appSettings = jwtSettingsSection.Get<JwtSettings>();
-services.AddJwtBearerAuthentication(appSettings);
+var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
+services.AddJwtBearerAuthentication(jwtSettings);
 
 services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
@@ -239,7 +239,13 @@ if (isUseSnowflakeId)
 // 初始化 SeqUtil
 SeqUtil.Initialize(isUseSnowflakeId);
 
+// 绑定配置
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
 var app = builder.Build();
+
+// 读取配置
+var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 
 // 自定义中间件
 app.UseNdc();
@@ -253,8 +259,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-// 强制 HTTPS 重定向
-app.UseHttpsRedirection();
+// 根据配置决定是否启用 HTTPS 重定向
+if (appSettings.ForceHttpsRedirection)
+{
+    // 强制 HTTPS 重定向
+    app.UseHttpsRedirection();
+}
 
 // 静态文件服务
 app.UseStaticFiles();

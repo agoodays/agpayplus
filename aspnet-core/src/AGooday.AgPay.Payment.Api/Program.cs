@@ -16,6 +16,7 @@ using AGooday.AgPay.Payment.Api.Extensions;
 using AGooday.AgPay.Payment.Api.FilterAttributes;
 using AGooday.AgPay.Payment.Api.Jobs;
 using AGooday.AgPay.Payment.Api.Middlewares;
+using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.MQ;
 using AGooday.AgPay.Payment.Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -252,7 +253,13 @@ if (isUseSnowflakeId)
 // 初始化 SeqUtil
 SeqUtil.Initialize(isUseSnowflakeId);
 
+// 绑定配置
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
 var app = builder.Build();
+
+// 读取配置
+var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 
 // 自定义中间件
 app.UseNdc();
@@ -266,8 +273,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-// 强制 HTTPS 重定向
-app.UseHttpsRedirection();
+// 根据配置决定是否启用 HTTPS 重定向
+if (appSettings.ForceHttpsRedirection)
+{
+    // 强制 HTTPS 重定向
+    app.UseHttpsRedirection();
+}
 
 // 静态文件服务
 app.UseStaticFiles();
