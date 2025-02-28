@@ -2,10 +2,10 @@
 {
     public class Register
     {
-        public string agentName { get; set; }
-        public string phone { get; set; }
-        public string code { get; set; }
-        public string confirmPwd { get; set; }
-        public string inviteCode { get; set; }
+        public string AgentName { get; set; }
+        public string Phone { get; set; }
+        public string Code { get; set; }
+        public string ConfirmPwd { get; set; }
+        public string InviteCode { get; set; }
     }
 }

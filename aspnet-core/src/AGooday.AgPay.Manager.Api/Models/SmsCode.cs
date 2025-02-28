@@ -2,7 +2,7 @@
 {
     public class SmsCode
     {
-        public string phone { get; set; }
-        public string smsType { get; set; }
+        public string Phone { get; set; }
+        public string SmsType { get; set; }
     }
 }

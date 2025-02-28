@@ -5,22 +5,22 @@
         /// <summary>
         /// 账号
         /// </summary>
-        public string ia { get; set; }
+        public string Ia { get; set; }
         /// <summary>
         /// 密码
         /// </summary>
-        public string ip { get; set; }
+        public string Ip { get; set; }
         /// <summary>
         /// 验证码
         /// </summary>
-        public string vc { get; set; }
+        public string Vc { get; set; }
         /// <summary>
         /// 验证码token
         /// </summary>
-        public string vt { get; set; }
+        public string Vt { get; set; }
         /// <summary>
         /// 登录类型： WEB-web登录， APP-app登录， LITE-小程序登录
         /// </summary>
-        public string lt { get; set; }
+        public string Lt { get; set; }
     }
 }

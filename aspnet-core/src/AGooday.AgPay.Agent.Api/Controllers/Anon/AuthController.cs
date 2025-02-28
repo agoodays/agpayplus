@@ -77,10 +77,10 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         [HttpPost, Route("auth/validate"), MethodLog(AUTH_METHOD_REMARK, Type = LogType.Login)]
         public async Task<ApiRes> ValidateAsync(Validate model)
         {
-            string account = Base64Util.DecodeBase64(model.ia); //用户名 i account, 已做base64处理
-            string ipassport = Base64Util.DecodeBase64(model.ip); //密码 i passport, 已做base64处理
-            string vercode = Base64Util.DecodeBase64(model.vc); //验证码 vercode, 已做base64处理
-            string vercodeToken = Base64Util.DecodeBase64(model.vt); //验证码token, vercode token , 已做base64处理
+            string account = Base64Util.DecodeBase64(model.Ia); //用户名 i account, 已做base64处理
+            string ipassport = Base64Util.DecodeBase64(model.Ip); //密码 i passport, 已做base64处理
+            string vercode = Base64Util.DecodeBase64(model.Vc); //验证码 vercode, 已做base64处理
+            string vercodeToken = Base64Util.DecodeBase64(model.Vt); //验证码token, vercode token , 已做base64处理
             string codeCacheKey = CS.GetCacheKeyImgCode(vercodeToken);
 
 #if !DEBUG
@@ -214,8 +214,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         [HttpPost, Route("auth/phoneCode"), MethodLog(AUTH_METHOD_REMARK, Type = LogType.Login)]
         public async Task<ApiRes> PhoneCodeAsync(PhoneCode model)
         {
-            string phone = Base64Util.DecodeBase64(model.phone);
-            string code = Base64Util.DecodeBase64(model.code);
+            string phone = Base64Util.DecodeBase64(model.Phone);
+            string code = Base64Util.DecodeBase64(model.Code);
             string smsCodeToken = $"{SYS_TYPE.ToLower()}_{CS.SMS_TYPE.AUTH}_{phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 
@@ -301,9 +301,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         [HttpPost, Route("register/agentRegister"), MethodLog("代理商注册")]
         public async Task<ApiRes> RegisterAsync(Register model)
         {
-            string phone = Base64Util.DecodeBase64(model.phone);
-            string code = Base64Util.DecodeBase64(model.code);
-            string confirmPwd = Base64Util.DecodeBase64(model.confirmPwd);
+            string phone = Base64Util.DecodeBase64(model.Phone);
+            string code = Base64Util.DecodeBase64(model.Code);
+            string confirmPwd = Base64Util.DecodeBase64(model.ConfirmPwd);
             string smsCodeToken = $"{SYS_TYPE.ToLower()}_{CS.SMS_TYPE.REGISTER}_{phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 
@@ -354,13 +354,13 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         [HttpPost, Route("sms/code"), NoLog]
         public async Task<ApiRes> SendCodeAsync(SmsCode model)
         {
-            if (model.smsType.Equals(CS.SMS_TYPE.REGISTER) && await _sysUserService.IsExistTelphoneAsync(model.phone, SYS_TYPE))
+            if (model.SmsType.Equals(CS.SMS_TYPE.REGISTER) && await _sysUserService.IsExistTelphoneAsync(model.Phone, SYS_TYPE))
             {
                 throw new BizException("当前用户已存在！");
             }
 
-            if ((model.smsType.Equals(CS.SMS_TYPE.RETRIEVE) || model.smsType.Equals(CS.SMS_TYPE.AUTH))
-                && !await _sysUserService.IsExistTelphoneAsync(model.phone, SYS_TYPE))
+            if ((model.SmsType.Equals(CS.SMS_TYPE.RETRIEVE) || model.SmsType.Equals(CS.SMS_TYPE.AUTH))
+                && !await _sysUserService.IsExistTelphoneAsync(model.Phone, SYS_TYPE))
             {
                 throw new BizException("用户不存在！");
             }
@@ -368,7 +368,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             var code = SmsVerificationCodeGenerator.GenerateCode(4);
 
             //redis
-            string smsCodeToken = $"{SYS_TYPE.ToLower()}_{model.smsType}_{model.phone}";
+            string smsCodeToken = $"{SYS_TYPE.ToLower()}_{model.SmsType}_{model.Phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
             await _cacheService.SetAsync(codeCacheKey, code, new TimeSpan(0, 0, CS.SMSCODE_CACHE_TIME)); //短信验证码缓存时间: 1分钟
 #if !DEBUG
@@ -390,9 +390,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         [HttpPost, Route("cipher/retrieve"), MethodLog("密码找回")]
         public async Task<ApiRes> RetrieveAsync(Retrieve model)
         {
-            string phone = Base64Util.DecodeBase64(model.phone);
-            string code = Base64Util.DecodeBase64(model.code);
-            string newPwd = Base64Util.DecodeBase64(model.newPwd);
+            string phone = Base64Util.DecodeBase64(model.Phone);
+            string code = Base64Util.DecodeBase64(model.Code);
+            string newPwd = Base64Util.DecodeBase64(model.NewPwd);
             string smsCodeToken = $"{SYS_TYPE.ToLower()}_{CS.SMS_TYPE.RETRIEVE}_{phone}";
             string codeCacheKey = CS.GetCacheKeySmsCode(smsCodeToken);
 
@@ -407,7 +407,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
                 throw new BizException("验证码有误！");
             }
 #endif
-            var sysUser = await _sysUserService.GetByTelphoneAsync(model.phone, SYS_TYPE);
+            var sysUser = await _sysUserService.GetByTelphoneAsync(model.Phone, SYS_TYPE);
             if (sysUser == null)
             {
                 throw new BizException("用户不存在！");
@@ -416,7 +416,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             {
                 throw new BizException("用户已停用！");
             }
-            var sysUserAuth = await _sysUserAuthService.GetByIdentifierAsync(CS.AUTH_TYPE.TELPHONE, model.phone, SYS_TYPE);
+            var sysUserAuth = await _sysUserAuthService.GetByIdentifierAsync(CS.AUTH_TYPE.TELPHONE, model.Phone, SYS_TYPE);
             if (sysUserAuth == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

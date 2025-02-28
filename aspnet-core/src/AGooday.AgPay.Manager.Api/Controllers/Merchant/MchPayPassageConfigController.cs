@@ -136,12 +136,12 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("更新商户支付通道")]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_ADD)]
-        public async Task<ApiRes> SaveOrUpdateAsync(ReqParams model)
+        public async Task<ApiRes> SaveOrUpdateAsync(ReqParamsModel model)
         {
             try
             {
                 var s = Request.Body;
-                List<MchPayPassageDto> mchPayPassages = JsonConvert.DeserializeObject<List<MchPayPassageDto>>(model.reqParams);
+                List<MchPayPassageDto> mchPayPassages = JsonConvert.DeserializeObject<List<MchPayPassageDto>>(model.ReqParams);
                 if (!(mchPayPassages?.Count > 0))
                 {
                     throw new BizException("操作失败");

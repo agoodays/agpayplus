@@ -2,8 +2,8 @@
 {
     public class Retrieve
     {
-        public string phone { get; set; }
-        public string code { get; set; }
-        public string newPwd { get; set; }
+        public string Phone { get; set; }
+        public string Code { get; set; }
+        public string NewPwd { get; set; }
     }
 }
