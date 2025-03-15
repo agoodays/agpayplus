@@ -206,7 +206,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("auth/vercode"), NoLog]
-        public async Task<ApiRes> VercodeAsync()
+        public async Task<ApiRes> VercodeAsync(int width = 137, int height = 40)
         {
             //定义图形验证码的长和宽 // 4位验证码
             //string code = ImageFactory.CreateCode(4);
@@ -217,7 +217,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
             //    imageBase64Data = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
             //}
             var code = VerificationCodeUtil.RandomVerificationCode(4);
-            var bitmap = VerificationCodeUtil.DrawImage(code, 137, 40, 20);
+            var bitmap = VerificationCodeUtil.DrawImage(code, width, height, 20);
             //var imageBase64Data = $"data:image/jpg;base64,{VerificationCodeUtil.BitmapToBase64String(bitmap)}";
             var imageBase64Data = VerificationCodeUtil.BitmapToImageBase64String(bitmap);
 
@@ -268,9 +268,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
 #if !DEBUG
             _smsService.SendVercode(new Components.SMS.Models.SmsBizVercodeModel()
             {
-                Mobile = model.phone,
+                Mobile = model.Phone,
                 Vercode = code,
-                SmsType = model.smsType
+                SmsType = model.SmsType
             });
 #endif
             return ApiRes.Ok();

@@ -129,6 +129,9 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                 using (var connection = await factory.CreateConnectionAsync())
                 using (var channel = await connection.CreateChannelAsync())
                 {
+                    //var args = new Dictionary<string, object>();
+                    //args.Add("x-max-length", 10000); // 队列最多存储 10000 条消息
+
                     if (mqtype == MQSendTypeEnum.QUEUE && !string.IsNullOrWhiteSpace(queue))
                     {
                         await channel.QueueDeclareAsync(queue, true, false, false, null);
@@ -136,13 +139,13 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
 
                     if (mqtype == MQSendTypeEnum.BROADCAST && !string.IsNullOrWhiteSpace(exchange))
                     {
-                        await channel.ExchangeDeclareAsync(exchange, "fanout");
+                        await channel.ExchangeDeclareAsync(exchange, "fanout", true);
                     }
 
                     var body = Encoding.UTF8.GetBytes(message);
 
                     var properties = new BasicProperties();
-                    properties.Persistent = true;
+                    properties.Persistent = true; // 持久化消息
 
                     await channel.BasicPublishAsync(exchange, routingKey, true, properties, body);
                 }

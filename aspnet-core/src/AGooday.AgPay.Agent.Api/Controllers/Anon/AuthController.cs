@@ -374,9 +374,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
 #if !DEBUG
             _smsService.SendVercode(new Components.SMS.Models.SmsBizVercodeModel()
             {
-                Mobile = model.phone,
+                Mobile = model.Phone,
                 Vercode = code,
-                SmsType = model.smsType
+                SmsType = model.SmsType
             });
 #endif
             return ApiRes.Ok();
