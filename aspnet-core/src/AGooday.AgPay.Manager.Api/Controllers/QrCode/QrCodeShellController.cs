@@ -66,7 +66,6 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             dto.SysType = string.IsNullOrWhiteSpace(dto.SysType) ? CS.SYS_TYPE.MGR : dto.SysType;
             dto.BelongInfoId = CS.BASE_BELONG_INFO_ID.MGR;
             bool result = await _qrCodeShellService.AddAsync(dto);
-            await _qrCodeShellService.UpdateAsync(dto);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_CREATE);
