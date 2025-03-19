@@ -65,6 +65,12 @@ RUN dotnet publish "./AGooday.AgPay.Manager.Api.csproj" -c $BUILD_CONFIGURATION 
 FROM base AS final
 WORKDIR /app
 
+# 创建日志和上传目录
+RUN mkdir -p /app/agpayplus/logs && \
+    mkdir -p /app/agpayplus/upload && \
+    chmod -R 777 /app/agpayplus/logs && \
+    chmod -R 777 /app/agpayplus/upload
+
 # 从发布阶段复制发布的文件到运行时镜像中
 COPY --from=publish /app/publish .
 

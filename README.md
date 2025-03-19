@@ -265,15 +265,15 @@ dotnet dev-certs https --trust
 # docker run --rm -it -d --name agpay-plus-merchant-api --network agpay-plus-network -p 5818:5818 -p 9818:9818 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9818 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-merchant-api
 # docker run --rm -it -d --name agpay-plus-payment-api --network agpay-plus-network -p 5819:5819 -p 9819:9819 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9819 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-payment-api
 # Window
-docker run -d --name agpay-plus-manager-api --network agpay-plus-network -p 5817:5817 -p 9817:9817 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-manager-api
-docker run -d --name agpay-plus-agent-api --network agpay-plus-network -p 5816:5816 -p 9816:9816 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-agent-api
-docker run -d --name agpay-plus-merchant-api --network agpay-plus-network -p 5818:5818 -p 9818:9818 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-merchant-api
-docker run -d --name agpay-plus-payment-api --network agpay-plus-network -p 5819:5819 -p 9819:9819 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-payment-api
+docker run -d --name agpay-plus-manager-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5817:5817 -p 9817:9817 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-manager-api
+docker run -d --name agpay-plus-agent-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5816:5816 -p 9816:9816 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-agent-api
+docker run -d --name agpay-plus-merchant-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5818:5818 -p 9818:9818 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-merchant-api
+docker run -d --name agpay-plus-payment-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5819:5819 -p 9819:9819 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-payment-api
 # Linux
-docker run -d --name agpay-plus-manager-api --network agpay-plus-network -p 5817:5817 -p 9817:9817 -v ${HOME}/.aspnet/https:/https/ agpay-plus-manager-api
-docker run -d --name agpay-plus-agent-api --network agpay-plus-network -p 5816:5816 -p 9816:9816 -v ${HOME}/.aspnet/https:/https/ agpay-plus-agent-api
-docker run -d --name agpay-plus-merchant-api --network agpay-plus-network -p 5818:5818 -p 9818:9818 -v ${HOME}/.aspnet/https:/https/ agpay-plus-merchant-api
-docker run -d --name agpay-plus-payment-api --network agpay-plus-network -p 5819:5819 -p 9819:9819 -v ${HOME}/.aspnet/https:/https/ agpay-plus-payment-api
+docker run -d --name agpay-plus-manager-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5817:5817 -p 9817:9817 -v ${HOME}/.aspnet/https:/https/ agpay-plus-manager-api
+docker run -d --name agpay-plus-agent-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5816:5816 -p 9816:9816 -v ${HOME}/.aspnet/https:/https/ agpay-plus-agent-api
+docker run -d --name agpay-plus-merchant-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5818:5818 -p 9818:9818 -v ${HOME}/.aspnet/https:/https/ agpay-plus-merchant-api
+docker run -d --name agpay-plus-payment-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5819:5819 -p 9819:9819 -v ${HOME}/.aspnet/https:/https/ agpay-plus-payment-api
 
 # 停止并删除当前正在运行的 agpay-plus-manager-api 容器：
 docker stop agpay-plus-manager-api

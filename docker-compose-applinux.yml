@@ -80,6 +80,8 @@ services:
       - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=3306;uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE} # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
       - Redis__Default__Connection=agpay-plus-redis:6379,abortConnect=false,defaultDatabase=1 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
     volumes:
+      - /app/agpayplus/logs:/app/agpayplus/logs 
+      - /app/agpayplus/upload:/app/agpayplus/upload
       - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
       # - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
     networks:
@@ -119,6 +121,8 @@ services:
       - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=3306;uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE} # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
       - Redis__Default__Connection=agpay-plus-redis:6379,abortConnect=false,defaultDatabase=2 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
     volumes:
+      - /app/agpayplus/logs:/app/agpayplus/logs 
+      - /app/agpayplus/upload:/app/agpayplus/upload
       - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
       # - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
     networks:
@@ -158,6 +162,8 @@ services:
       - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=3306;uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE} # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
       - Redis__Default__Connection=agpay-plus-redis:6379,abortConnect=false,defaultDatabase=3 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
     volumes:
+      - /app/agpayplus/logs:/app/agpayplus/logs 
+      - /app/agpayplus/upload:/app/agpayplus/upload
       - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
       # - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
     networks:
@@ -197,6 +203,8 @@ services:
       - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=3306;uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE} # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
       - Redis__Default__Connection=agpay-plus-redis:6379,abortConnect=false,defaultDatabase=4 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
     volumes:
+      - /app/agpayplus/logs:/app/agpayplus/logs 
+      - /app/agpayplus/upload:/app/agpayplus/upload
       - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
       # - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
     networks:
