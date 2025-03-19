@@ -48,6 +48,26 @@
         }
 
         /// <summary>
+        /// 从生成的ID中提取数据中心ID
+        /// </summary>
+        /// <param name="id">生成的ID</param>
+        /// <returns>数据中心ID</returns>
+        public long GetDatacenterId(long id)
+        {
+            return (id >> DATACENTER_LEFT) & MAX_DATACENTER_NUM;
+        }
+
+        /// <summary>
+        /// 从生成的ID中提取机器标识
+        /// </summary>
+        /// <param name="id">生成的ID</param>
+        /// <returns>机器标识</returns>
+        public long GetMachineId(long id)
+        {
+            return (id >> MACHINE_LEFT) & MAX_MACHINE_NUM;
+        }
+
+        /// <summary>
         /// 产生下一个ID
         /// </summary>
         /// <returns></returns>
