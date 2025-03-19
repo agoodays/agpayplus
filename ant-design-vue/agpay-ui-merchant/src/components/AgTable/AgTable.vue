@@ -29,7 +29,7 @@
             <a-icon type="download" />
           </span>
         </a-tooltip>
-<!--        <span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"><a-icon type="column-height" /></span>-->
+        <!--<span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;"><a-icon type="column-height" /></span>-->
         <a-dropdown :trigger="['click']">
           <a-tooltip placement="top">
             <template #title>
@@ -62,7 +62,7 @@
               <a-icon type="table" />
             </span>
           </a-tooltip>
-<!--          <a-menu slot="overlay">
+          <!--<a-menu slot="overlay">
             <a-checkbox-group v-model="visibleColumns">
               <a-menu-item v-for="column in allColumns" :key="column.key">
                 <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title }}</a-checkbox>

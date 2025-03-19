@@ -43,7 +43,7 @@
       >
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.calDivisionAmount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="stateSlot" slot-scope="{record}">
-<!--          <a-tag
+          <!--<a-tag
             :key="record.state"
             :color="record.state === 0?'orange':record.state === 1?'blue':record.state === 2?'volcano':record.state === 3 ? 'purple' : 'volcano'"
           >

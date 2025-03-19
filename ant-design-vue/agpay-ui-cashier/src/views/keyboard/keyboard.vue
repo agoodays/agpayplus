@@ -31,7 +31,7 @@
           :key="index"
           class="keyborad-key"
       >
-        <!--   @click="onKeyboard(it, $event)" -->
+        <!-- @click="onKeyboard(it, $event)" -->
         <div
             ref="number"
             class="number"

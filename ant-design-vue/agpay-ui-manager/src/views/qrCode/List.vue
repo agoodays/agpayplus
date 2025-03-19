@@ -70,7 +70,7 @@
     </a-card>
     <!-- 新增页面组件  -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="queryFunc"/>
-    <Bind  ref="bind" :callbackFunc="queryFunc"/>
+    <Bind ref="bind" :callbackFunc="queryFunc"/>
   </div>
 </template>
 <script>

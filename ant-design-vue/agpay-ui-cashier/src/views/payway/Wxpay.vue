@@ -13,7 +13,7 @@
           <!-- ￥字符 货币的符号-->
           <div class="S">
             <span :style="'color:' + typeColor[payType] + ';'">￥</span>
-<!--            <img src="../../assets/icon/S.svg" alt="" />-->
+            <!--<img src="../../assets/icon/S.svg" alt="" />-->
           </div>
           <!-- 输入框光标 -->
           <!-- <div class="ttt">
@@ -27,9 +27,7 @@
             <div class="input-c-div-1">{{ formatMoney(amount) }}</div>
             <!-- 数字金额后边的光标 -->
             <div class="input-c-div" :style="'background:' + typeColor[payType] + ';border-color:' + typeColor[payType] + ';'"></div>
-            <!--        <div class="input-c-div-del" v-if="amount" @click="clearTheAmount">
-                      <img src="../../assets/icon/delete.svg" alt="" />
-                    </div>-->
+            <!--<div class="input-c-div-del" v-if="amount" @click="clearTheAmount"><img src="../../assets/icon/delete.svg" alt="" /></div>-->
           </div>
           <!-- 手写输入框的提示文字 -->
           <div v-show="!amount" class="placeholder">请输入金额</div>

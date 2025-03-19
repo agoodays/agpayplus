@@ -22,7 +22,7 @@
               <a-select-option :value="'platformMchOrderNo'">用户支付凭证商户单号</a-select-option>
             </a-select>
           </a-form-item>
-<!--            <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />-->
+          <!--<ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />-->
           <ag-text-up v-show="orderNoType==='payOrderId'" :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />
           <ag-text-up v-show="orderNoType==='mchOrderNo'" :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />
           <ag-text-up v-show="orderNoType==='channelOrderNo'" :placeholder="'渠道订单号'" :msg="searchData.channelOrderNo" v-model="searchData.channelOrderNo" />
@@ -376,7 +376,7 @@
             <a-descriptions><a-descriptions-item label="收单手续费"><a-tag color="pink">{{ detailData.mchOrderFeeAmount/100 }}</a-tag></a-descriptions-item></a-descriptions>
           </a-col>
           <a-col :sm="12">
-<!--            <a-descriptions><a-descriptions-item label="商家费率">{{ (detailData.mchFeeRate*100).toFixed(2) }}%</a-descriptions-item></a-descriptions>-->
+            <!--<a-descriptions><a-descriptions-item label="商家费率">{{ (detailData.mchFeeRate*100).toFixed(2) }}%</a-descriptions-item></a-descriptions>-->
             <a-descriptions><a-descriptions-item label="商家费率">{{ detailData.mchFeeRateDesc }}</a-descriptions-item></a-descriptions>
           </a-col>
           <a-col :sm="12">
@@ -610,13 +610,13 @@
             <a-form-model-item label="分润情况" style="display:flex">
               <div v-for="(item, key) in detailData.profitList" :key="key">
                 <span v-if="item.infoType === 'AGENT'">
-                  代理商（{{item.infoName}}）分润：
+                  代理商（{{ item.infoName }}）分润：
                   <a-tag color="green">
                     {{ item.profitAmount/100 }}
                   </a-tag>
                 </span>
                 <span v-if="item.infoId === 'PLATFORM_INACCOUNT'">
-                  平台三方入账 （不扣减代理商分润）：
+                  平台三方入账（不扣减代理商分润）：
                   <a-tag color="green">
                     {{ item.profitAmount/100 }}
                   </a-tag>

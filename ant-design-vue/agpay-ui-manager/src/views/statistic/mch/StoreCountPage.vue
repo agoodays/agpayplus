@@ -30,7 +30,7 @@
       :reqDownloadDataFunc="reqDownloadDataFunc"
       :tableColumns="tableColumns"
       :searchData="searchData"
-      :countInitData="countData"
+      :countInitData="countInitData"
       rowKey="storeId"
       :tableRowCrossColor="true"
     >
@@ -186,7 +186,7 @@ export default {
         mchNo: this.mchNo,
         queryDateRange: this.queryDateRange
       },
-      countData: {
+      countInitData: {
         allAmount: 0.00,
         allCount: 0,
         payAmount: 0.00,

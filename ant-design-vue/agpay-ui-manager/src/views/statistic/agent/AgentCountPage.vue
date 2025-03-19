@@ -32,7 +32,7 @@
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
-        :countInitData="countData"
+        :countInitData="countInitData"
         rowKey="agentNo"
         :tableRowCrossColor="true"
       >
@@ -200,7 +200,7 @@ export default {
         queryDateRange: queryDateRange
       },
       detailQueryDateRange: queryDateRange,
-      countData: {
+      countInitData: {
         allAmount: 0.00,
         allCount: 0,
         payAmount: 0.00,

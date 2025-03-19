@@ -19,7 +19,7 @@
     <div v-if="sysType!=='MCH'">
       <div>
         <span>代理商注册链接：{{ agentRegisterUrl }}</span>
-        <a-button icon="copy" type="link"  @click="copyFunc(agentRegisterUrl)"/>
+        <a-button icon="copy" type="link" @click="copyFunc(agentRegisterUrl)"/>
       </div>
       <div>
         <span>代理商注册二维码：</span>

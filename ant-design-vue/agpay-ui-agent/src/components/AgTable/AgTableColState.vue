@@ -15,7 +15,7 @@
     </template>
 
     <template v-if="showSwitchType">
-<!--      <a-switch class="els" checked-children="启用" un-checked-children="停用" :checked="switchChecked" @change="onChangeInner" />-->
+      <!--<a-switch class="els" checked-children="启用" un-checked-children="停用" :checked="switchChecked" @change="onChangeInner" />-->
       <a-switch class="els" :checked="switchChecked" @change="onChangeInner" />
     </template>
 

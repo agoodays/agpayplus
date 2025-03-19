@@ -16,7 +16,7 @@
         {{ qrcodeStatus === 'scanned' ? '扫码成功请确认登录' : (qrcodeStatus === 'expired' ? '二维码过期请刷新' : (qrcodeStatus === 'confirmed' ? '登录成功' : (qrcodeStatus === 'canceled' ? '用户取消登录请刷新' : ''))) }}
         <div class="tips-img">
           <img v-if="qrcodeStatus === 'scanned' || qrcodeStatus === 'confirmed'" src="@/assets/svg/success.svg">
-          <img v-else src="@/assets/svg/refresh.svg" @click='getQrcodeNo'>
+          <img v-else src="@/assets/svg/refresh.svg" @click="getQrcodeNo">
         </div>
       </div>
       <div v-if="!!qrcodeStatus && qrcodeStatus !== 'waiting'" class="qr-mantle"></div>

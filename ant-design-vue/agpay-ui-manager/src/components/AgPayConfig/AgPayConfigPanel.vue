@@ -48,7 +48,7 @@
           :callbackFunc="refIfCodeList"
           v-if="paramsAndRateTabVal === 'paramsTab'"
         />
-<!--          <div v-if="paramsAndRateTabVal === 'paramsTab'">
+        <!--<div v-if="paramsAndRateTabVal === 'paramsTab'">
           <div>
             {{ currentIfCode }} —— 参数配置
           </div>
@@ -68,7 +68,7 @@
           :config-mode="configMode"
           :callbackFunc="refIfCodeList"
           v-if="paramsAndRateTabVal === 'rateTab'"/>
-<!--          <div v-if="paramsAndRateTabVal === 'rateTab'">
+        <!--<div v-if="paramsAndRateTabVal === 'rateTab'">
           <div>
             {{ currentIfCode }} —— 费率配置
           </div>
@@ -84,7 +84,7 @@
             :ifCode="currentIfCode"
             v-if="paramsAndRateTabVal === 'channelConfigTab'"
           />
-<!--          <div :class="isDrawer?'drawer-btn-center':'btn-center'" v-if="$access(permCode)">
+          <!--<div :class="isDrawer?'drawer-btn-center':'btn-center'" v-if="$access(permCode)">
             <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
             <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
           </div>-->
@@ -178,7 +178,7 @@
       </div>
     </a-tab-pane>
   </a-tabs>
-<!--  <div :class="isDrawer?'drawer-btn-center':'btn-center'" v-if="$access(permCode)">
+  <!--<div :class="isDrawer?'drawer-btn-center':'btn-center'" v-if="$access(permCode)">
     <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
     <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
   </div>-->

@@ -71,7 +71,7 @@
         </a-skeleton>
         <div class="personal-line"></div>
         <a-skeleton active :loading="skeletonIsShow" :paragraph="{ rows: 1 }">
-<!--          <div class="personal-title">
+          <!--<div class="personal-title">
             <img :src="greetImg" alt="">
             <div>
               <p>{{ mainTips.helloTitle }}</p>

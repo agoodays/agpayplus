@@ -15,7 +15,7 @@
               <a-select-option value="">全部</a-select-option>
               <a-select-option value="MGR">运营平台</a-select-option>
               <a-select-option value="AGENT">代理商</a-select-option>
-<!--                <a-select-option value="MCH">商户</a-select-option>-->
+              <!--<a-select-option value="MCH">商户</a-select-option>-->
             </a-select>
           </a-form-item>
           <ag-text-up :placeholder="'所属代理商/商户'" :msg="searchData.belongInfoId" v-model="searchData.belongInfoId" />

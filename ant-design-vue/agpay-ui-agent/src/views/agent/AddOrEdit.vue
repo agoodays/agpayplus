@@ -115,7 +115,7 @@
 
       <!-- 重置密码板块 -->
       <div>
-<!--        <a-row justify="space-between" type="flex">
+        <!--<a-row justify="space-between" type="flex">
           <a-col :span="10">
             <a-form-model-item label="" v-if="resetIsShow">
               重置支付密码：<a-checkbox v-model="sysPassword.resetPayPass"></a-checkbox>

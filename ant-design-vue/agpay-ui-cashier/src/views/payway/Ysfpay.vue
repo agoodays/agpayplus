@@ -13,7 +13,7 @@
           <!-- ￥字符 货币的符号-->
           <div class="S">
             <span :style="'color:' + typeColor[payType] + ';'">￥</span>
-<!--            <img src="../../assets/icon/S.svg" alt="" />-->
+            <!--<img src="../../assets/icon/S.svg" alt="" />-->
           </div>
           <!-- 手写输入框 -->
           <div class="input-c" :style="'color:' + typeColor[payType] + ';'">

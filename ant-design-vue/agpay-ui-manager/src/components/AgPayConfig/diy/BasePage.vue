@@ -1,7 +1,7 @@
 <template>
   <a-form-model ref="infoFormModel" :model="formData" layout="vertical" :rules="rules">
     <a-row :gutter="24">
-<!--      <a-col :span="8" v-if="formData.infoType === 'ISV'">
+      <!--<a-col :span="8" v-if="formData.infoType === 'ISV'">
         <a-form-model-item label="支付接口费率" prop="ifRate">
           <a-input
             v-model="formData.ifRate"

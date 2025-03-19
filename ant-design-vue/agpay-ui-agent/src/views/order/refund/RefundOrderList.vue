@@ -14,9 +14,9 @@
             <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
           <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-          <!--            <ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
-          <!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
-          <!--            <ag-text-up :placeholder="'渠道支付订单号'" :msg="searchData.channelPayOrderNo" v-model="searchData.channelPayOrderNo" />-->
+          <!--<ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
+          <!--<ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
+          <!--<ag-text-up :placeholder="'渠道支付订单号'" :msg="searchData.channelPayOrderNo" v-model="searchData.channelPayOrderNo" />-->
           <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
           <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
           <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
@@ -52,6 +52,7 @@
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
+        :countInitData="countInitData"
         rowKey="refundOrderId"
         :tableRowCrossColor="true"
       >
@@ -401,7 +402,7 @@ export default {
       searchData: {
         queryDateRange: 'today'
       },
-      countData: {
+      countInitData: {
         allRefundAmount: 0.00,
         allRefundCount: 0,
         refundAmount: 0.00,
@@ -436,7 +437,7 @@ export default {
       return req.list(API_URL_REFUND_ORDER_LIST, params)
     },
     reqTableCountFunc: (params) => {
-      return req.count(API_URL_PAY_ORDER_LIST, params)
+      return req.count(API_URL_REFUND_ORDER_LIST, params)
     },
     reqDownloadDataFunc: (params) => {
       req.export(API_URL_REFUND_ORDER_LIST, 'excel', params).then(res => {

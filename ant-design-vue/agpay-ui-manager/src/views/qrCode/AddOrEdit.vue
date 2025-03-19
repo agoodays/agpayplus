@@ -50,7 +50,7 @@
             固定金额
           </a-radio>
         </a-radio-group>
-<!--        <a-input v-if="saveObject.fixedFlag===1" v-model="saveObject.fixedPayAmount" type="number" addon-after="元" style="width: 150px"/>-->
+        <!--<a-input v-if="saveObject.fixedFlag===1" v-model="saveObject.fixedPayAmount" type="number" addon-after="元" style="width: 150px"/>-->
         <span v-if="saveObject.fixedFlag===1"><a-input-number v-model="saveObject.fixedPayAmount" addon-after="元"/>元</span>
       </a-form-model-item>
       <a-form-model-item prop="entryPage" v-if="isAdd">

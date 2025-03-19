@@ -174,7 +174,7 @@
       <a-row :gutter="16">
         <a-col :span="24">
           <a-form-model-item label="支持的支付方式" prop="checkedList">
-<!--            <a-checkbox-group v-model="checkedList" :options="wayCodesOptions" @change="onWayCodesChange" />-->
+            <!--<a-checkbox-group v-model="checkedList" :options="wayCodesOptions" @change="onWayCodesChange" />-->
             <a-checkbox-group v-model="checkedList">
               <a-row v-for="(group, index) in groupedWays" :key="index">
                 <h3>{{ group.name }}</h3>
@@ -212,7 +212,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-model-item label="卡片背景色" prop="bgColor">
-<!--            <a-input style="height: 66px; margin-top: 8px;" v-model="saveObject.bgColor" placeholder="请输入" />-->
+            <!--<a-input style="height: 66px; margin-top: 8px;" v-model="saveObject.bgColor" placeholder="请输入" />-->
             <colorPicker v-model="saveObject.bgColor" style="height: 66px; margin-top: 8px;"/>
           </a-form-model-item>
         </a-col>

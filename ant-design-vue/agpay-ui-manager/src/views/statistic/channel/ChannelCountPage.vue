@@ -31,7 +31,7 @@
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
-        :countInitData="countData"
+        :countInitData="countInitData"
         rowKey="ifCode"
         :tableRowCrossColor="true"
       >
@@ -183,7 +183,7 @@ export default {
         method: 'channel',
         queryDateRange: 'today'
       },
-      countData: {
+      countInitData: {
         allAmount: 0.00,
         allCount: 0,
         payAmount: 0.00,

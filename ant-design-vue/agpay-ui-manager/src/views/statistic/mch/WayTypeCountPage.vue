@@ -39,7 +39,7 @@
       :reqDownloadDataFunc="reqDownloadDataFunc"
       :tableColumns="tableColumns"
       :searchData="searchData"
-      :countInitData="countData"
+      :countInitData="countInitData"
       rowKey="wayType"
       :tableRowCrossColor="true"
     >
@@ -196,7 +196,7 @@ export default {
         queryDateRange: this.queryDateRange,
         wayType: ''
       },
-      countData: {
+      countInitData: {
         allAmount: 0.00,
         allCount: 0,
         payAmount: 0.00,

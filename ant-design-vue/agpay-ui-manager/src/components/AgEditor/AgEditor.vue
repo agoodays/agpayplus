@@ -15,15 +15,15 @@
       :mode="mode"
       @onCreated="handleCreated"
     />
-<!--    <Editor
+    <!--<Editor
         class="ag-editor-box"
         :style="{ 'height': height + 'px' }"
         v-model="valueHtml"
         :defaultConfig="editorConfig"
         :mode="mode"
         @onCreated="handleCreated"
-    />-->
-<!--    <Editor
+    />
+    <Editor
         class="ag-editor-box"
         :style="{ 'height': height + 'px' }"
         v-model="valueHtml"

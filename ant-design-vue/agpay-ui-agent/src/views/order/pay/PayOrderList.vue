@@ -14,8 +14,8 @@
             <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
           <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
-          <!--            <ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
-          <!--            <ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
+          <!--<ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
+          <!--<ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
           <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
           <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
           <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
@@ -71,6 +71,7 @@
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
+        :countInitData="countInitData"
         rowKey="payOrderId"
         :tableRowCrossColor="true"
       >
@@ -336,7 +337,7 @@
             <a-descriptions><a-descriptions-item label="收单手续费"><a-tag color="pink">{{ detailData.mchOrderFeeAmount/100 }}</a-tag></a-descriptions-item></a-descriptions>
           </a-col>
           <a-col :sm="12">
-<!--            <a-descriptions><a-descriptions-item label="商家费率">{{ (detailData.mchFeeRate*100).toFixed(2) }}%</a-descriptions-item></a-descriptions>-->
+            <!--<a-descriptions><a-descriptions-item label="商家费率">{{ (detailData.mchFeeRate*100).toFixed(2) }}%</a-descriptions-item></a-descriptions>-->
             <a-descriptions><a-descriptions-item label="商家费率">{{ detailData.mchFeeRateDesc }}</a-descriptions-item></a-descriptions>
           </a-col>
           <a-col :sm="12">
@@ -594,7 +595,7 @@ export default {
       searchData: {
         queryDateRange: 'today'
       },
-      countData: {
+      countInitData: {
         mchFeeAmount: 0.00,
         failPayAmount: 0.00,
         failPayCount: 0,

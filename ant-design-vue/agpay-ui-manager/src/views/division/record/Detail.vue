@@ -21,7 +21,7 @@
       <a-col :sm="12"><a-descriptions><a-descriptions-item label="系统分账批次号">{{ detailData.batchOrderId }}</a-descriptions-item></a-descriptions></a-col>
       <a-col :sm="12"><a-descriptions><a-descriptions-item label="上游分账批次号">{{ detailData.channelBatchOrderId }}</a-descriptions-item></a-descriptions></a-col>
       <a-col :sm="12"><a-descriptions><a-descriptions-item label="状态">
-<!--        <a-tag :key="detailData.state" :color="detailData.state === 0 ?'orange' : detailData.state === 1 ? 'blue':detailData.state === 2 ? 'volcano' : detailData.state === 3 ? 'purple' : 'volcano'">
+        <!--<a-tag :key="detailData.state" :color="detailData.state === 0 ?'orange' : detailData.state === 1 ? 'blue':detailData.state === 2 ? 'volcano' : detailData.state === 3 ? 'purple' : 'volcano'">
           {{ detailData.state === 0 ? '分账中' : detailData.state === 1 ? '分账成功':detailData.state === 2 ? '分账失败' : detailData.state === 3 ? '已受理' : '未知' }}
         </a-tag>-->
         <a-tag v-if="detailData.state === 0" :key="detailData.state" color="orange">分账中</a-tag>

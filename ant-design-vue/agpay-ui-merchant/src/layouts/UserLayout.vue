@@ -23,7 +23,7 @@
           </a-carousel>
         </div>
         <div class="user-layout-content">
-<!--          <div class="top">
+          <!--<div class="top">
             <div class="header">
               <a href="/">
                 <img src="~@/assets/logo.svg" class="logo" alt="logo">
@@ -37,7 +37,7 @@
 
           <router-view />
 
-<!--          <div class="footer">
+          <!--<div class="footer">
             <div class="links">
               <a href="_self">帮助</a>
               <a href="_self">隐私</a>
