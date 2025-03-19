@@ -81,7 +81,7 @@
         </a-dropdown>
       </div>
     </div>
-    <slot name="dataStatisticsSlot" v-if="isShowDataStatistics"></slot>
+    <slot name="dataStatisticsSlot" v-if="isShowDataStatistics" :countData="countData"></slot>
     <a-table
       :columns="displayedColumns"
       :size="size"
@@ -123,9 +123,11 @@ export default {
     initData: { type: Boolean, default: true }, // 初始化列表数据， 默认true
     tableColumns: { type: Array, default: null }, // 表格数组列
     reqTableDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
-    reqDownloadDataFunc: { type: Function, default: () => () => ({}) }, // 请求列表数据
+    reqTableCountFunc: { type: Function, default: () => () => ({}) }, // 请求统计数据
+    reqDownloadDataFunc: { type: Function, default: () => () => ({}) }, // 请求下载数据
     currentChange: { type: Function, default: (v1, v2) => {} }, // 更新当前选择行事件， 默认空函数
     searchData: { type: Object, default: null }, // 搜索条件参数
+    countInitData: { type: Object, default: null }, // 统计初始化数据
     pageSize: { type: Number, default: 10 }, // 默认每页条数
     rowSelection: { type: Object, default: null }, // checkbox选择
     rowKey: { type: [String, Function], default: 'id' }, // 定义rowKey 如果不定义将会出现（树状结构出问题， checkbox不消失等）
@@ -138,6 +140,7 @@ export default {
       allColumns: this.tableColumns,
       visibleColumns: this.tableColumns.map(column => column.key),
       apiResData: { total: 0, records: [] }, // 接口返回数据
+      countData: this.countInitData,
       iPage: { pageNumber: 1, pageSize: this.pageSize }, // 默认table 分页/排序请求后端格式
       pagination: { total: 0, current: 1, pageSize: this.pageSize, showSizeChanger: true, showTotal: total => `共${total}条` }, // ATable 分页配置项
       countdown: this.defaultCountdown,
@@ -229,6 +232,17 @@ export default {
         this.showLoading = false
         that.$emit('btnLoadClose')
       }) // 关闭loading
+
+      if (this.isEnableDataStatistics) {
+        this.refCountData()
+      }
+    },
+
+    refCountData: function () {
+      const that = this
+      this.reqTableCountFunc(Object.assign({}, this.iPage, this.searchData)).then(res => {
+        that.countData = res
+      })
     },
 
     // 下载数据

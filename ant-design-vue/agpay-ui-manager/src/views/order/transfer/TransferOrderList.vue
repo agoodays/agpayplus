@@ -44,6 +44,7 @@
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
+        :countInitData="{}"
         rowKey="transferId"
         :tableRowCrossColor="true"
       >
@@ -172,7 +173,6 @@ export default {
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)
-      this.$refs.infoTable.refCountData()
     },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
@@ -207,7 +207,6 @@ export default {
     },
     searchFunc: function () { // 点击【查询】按钮点击事件
       this.$refs.infoTable.refTable(true)
-      this.$refs.infoTable.refCountData()
     },
     detailFunc: function (recordId) {
       this.$refs.transferOrderDetail.show(recordId)

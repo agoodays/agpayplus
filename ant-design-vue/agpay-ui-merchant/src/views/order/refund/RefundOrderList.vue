@@ -40,13 +40,14 @@
         :isShowDownload="true"
         :isEnableDataStatistics="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqTableCountFunc="reqTableCountFunc"
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
         rowKey="refundOrderId"
         :tableRowCrossColor="true"
       >
-        <template slot="dataStatisticsSlot">
+        <template slot="dataStatisticsSlot" slot-scope="{countData}">
           <div class="data-statistics" style="background: rgb(250, 250, 250);">
             <div class="statistics-list">
               <div class="item">
@@ -412,7 +413,6 @@ export default {
   computed: {
   },
   mounted () {
-    this.countFunc()
   },
   methods: {
     handleSearchFormData (searchData) {
@@ -427,12 +427,14 @@ export default {
     },
     queryFunc () {
       this.btnLoading = true
-      this.countFunc()
       this.$refs.infoTable.refTable(true)
     },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_REFUND_ORDER_LIST, params)
+    },
+    reqTableCountFunc: (params) => {
+      return req.count(API_URL_REFUND_ORDER_LIST, params)
     },
     reqDownloadDataFunc: (params) => {
       req.export(API_URL_REFUND_ORDER_LIST, 'excel', params).then(res => {
@@ -459,14 +461,7 @@ export default {
       })
     },
     searchFunc: function () { // 点击【查询】按钮点击事件
-      this.countFunc()
       this.$refs.infoTable.refTable(true)
-    },
-    countFunc: function () {
-      const that = this
-      req.count(API_URL_REFUND_ORDER_LIST, this.searchData).then(res => {
-        that.countData = res
-      })
     },
     detailFunc: function (recordId) {
       const that = this

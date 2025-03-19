@@ -27,19 +27,21 @@
         :isShowDownload="true"
         :isEnableDataStatistics="true"
         :reqTableDataFunc="reqTableDataFunc"
+        :reqTableCountFunc="reqTableCountFunc"
         :reqDownloadDataFunc="reqDownloadDataFunc"
         :tableColumns="tableColumns"
         :searchData="searchData"
+        :countInitData="countData"
         rowKey="ifCode"
         :tableRowCrossColor="true"
       >
-        <template slot="dataStatisticsSlot">
+        <template slot="dataStatisticsSlot" slot-scope="{countData}">
           <div class="data-statistics" style="background: rgb(250, 250, 250);">
             <div class="statistics-list">
               <div class="item">
                 <div class="title">总成交金额</div>
                 <div class="amount" style="color: rgb(26, 102, 255);">
-                  <span class="amount-num">{{ (totalData.payAmount).toFixed(2) }}</span>
+                  <span class="amount-num">{{ (countData.payAmount).toFixed(2) }}</span>
                 </div>
               </div>
               <div class="item">
@@ -49,7 +51,7 @@
               <div class="item">
                 <div class="title">总成交笔数</div>
                 <div class="amount">
-                  <span class="amount-num">{{ totalData.payCount }}</span>
+                  <span class="amount-num">{{ countData.payCount }}</span>
                 </div>
               </div>
               <div class="item">
@@ -59,7 +61,7 @@
               <div class="item">
                 <div class="title">总退款金额</div>
                 <div class="amount">
-                  <span class="amount-num">{{ totalData.refundAmount.toFixed(2) }}</span>
+                  <span class="amount-num">{{ countData.refundAmount.toFixed(2) }}</span>
                 </div>
               </div>
               <div class="item">
@@ -69,7 +71,7 @@
               <div class="item">
                 <div class="title">总退款笔数</div>
                 <div class="amount">
-                  <span class="amount-num">{{ totalData.refundCount }}</span>
+                  <span class="amount-num">{{ countData.refundCount }}</span>
                 </div>
               </div>
               <div class="item">
@@ -79,7 +81,7 @@
               <div class="item">
                 <div class="title">支付成功率</div>
                 <div class="amount" style="color: rgb(250, 173, 20);">
-                  <span class="amount-num">{{ (totalData.round*100).toFixed(2) }}%</span>
+                  <span class="amount-num">{{ (countData.round*100).toFixed(2) }}%</span>
                 </div>
               </div>
             </div>
@@ -181,7 +183,7 @@ export default {
         method: 'channel',
         queryDateRange: 'today'
       },
-      totalData: {
+      countData: {
         allAmount: 0.00,
         allCount: 0,
         payAmount: 0.00,
@@ -197,7 +199,6 @@ export default {
   computed: {
   },
   mounted () {
-    this.totalFunc()
   },
   methods: {
     handleSearchFormData (searchData) {
@@ -212,12 +213,14 @@ export default {
     },
     queryFunc () {
       this.btnLoading = true
-      this.totalFunc()
       this.$refs.infoTable.refTable(true)
     },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_ORDER_STATISTIC, params)
+    },
+    reqTableCountFunc: (params) => {
+      return req.total(API_URL_ORDER_STATISTIC, params)
     },
     reqDownloadDataFunc: (params) => {
       req.export(API_URL_ORDER_STATISTIC, 'excel', params).then(res => {
@@ -244,14 +247,7 @@ export default {
       })
     },
     searchFunc: function () { // 点击【查询】按钮点击事件
-      this.totalFunc()
       this.$refs.infoTable.refTable(true)
-    },
-    totalFunc: function () {
-      const that = this
-      req.total(API_URL_ORDER_STATISTIC, this.searchData).then(res => {
-        that.totalData = res
-      })
     }
   }
 }
