@@ -59,7 +59,7 @@
               <span>列设置</span>
             </template>
             <span class="pd-0-20" style="cursor: pointer; font-size: 16px;color: #000;">
-              <a-icon type="table" />
+              <a-icon type="setting" />
             </span>
           </a-tooltip>
           <!--<a-menu slot="overlay">

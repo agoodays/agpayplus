@@ -128,6 +128,84 @@
               </div>
             </div>
           </div>
+          <!-- 成交订单详细 -->
+          <a-modal :visible="detailVisible" footer="" @cancel="detailVisible = false">
+            <div class="modal-title">成交订单详细</div>
+            <div class="modal-describe">创建订单金额/笔数 = 成交订单金额/笔数 + 未付款订单金额/笔数</div>
+            <div class="statistics-list" style="padding-bottom: 55px;">
+              <div class="item">
+                <div class="title">创建订单</div>
+                <a-tooltip placement="top">
+                  <template #title>
+                    <span>
+                      <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </template>
+                  <div class="amount">
+                    <span>
+                      <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </div>
+                </a-tooltip>
+                <div class="detail">
+                  <span>{{ countData.allPayCount }}笔</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">成交订单</div>
+                <a-tooltip placement="top">
+                  <template #title>
+                    <span>
+                      <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </template>
+                  <div class="amount">
+                    <span>
+                      <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </div>
+                </a-tooltip>
+                <div class="detail">
+                  <span>{{ countData.payCount }}笔</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">未付款订单</div>
+                <a-tooltip placement="top">
+                  <template #title>
+                    <span>
+                      <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </template>
+                  <div class="amount">
+                    <span>
+                      <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </div>
+                </a-tooltip>
+                <div class="detail">
+                  <span>{{ countData.failPayCount }}笔</span>
+                </div>
+              </div>
+            </div>
+            <div class="close">
+              <a-button type="primary" @click="detailVisible = false">知道了</a-button>
+            </div>
+          </a-modal>
         </template>
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.amount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundAmountSlot" slot-scope="{record}">￥{{ record.refundAmount/100 }}</template> <!-- 自定义插槽 -->
@@ -184,85 +262,7 @@
     </a-card>
     <!-- 退款弹出框 -->
     <refund-modal ref="refundModalInfo" :callbackFunc="searchFunc"></refund-modal>
-    <!-- 成交订单详细 -->
-    <a-modal :visible="detailVisible" footer="" @cancel="detailVisible = false">
-      <div class="modal-title">成交订单详细</div>
-      <div class="modal-describe">创建订单金额/笔数 = 成交订单金额/笔数 + 未付款订单金额/笔数</div>
-      <div class="statistics-list" style="padding-bottom: 55px;">
-        <div class="item">
-          <div class="title">创建订单</div>
-          <a-tooltip placement="top">
-            <template #title>
-              <span>
-                <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </template>
-            <div class="amount">
-              <span>
-                <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </div>
-          </a-tooltip>
-          <div class="detail">
-            <span>{{ countData.allPayCount }}笔</span>
-          </div>
-        </div>
-        <div class="item">
-          <div class="line"></div>
-          <div class="title"></div>
-        </div>
-        <div class="item">
-          <div class="title">成交订单</div>
-          <a-tooltip placement="top">
-            <template #title>
-              <span>
-                <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </template>
-            <div class="amount">
-              <span>
-                <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </div>
-          </a-tooltip>
-          <div class="detail">
-            <span>{{ countData.payCount }}笔</span>
-          </div>
-        </div>
-        <div class="item">
-          <div class="line"></div>
-          <div class="title"></div>
-        </div>
-        <div class="item">
-          <div class="title">未付款订单</div>
-          <a-tooltip placement="top">
-            <template #title>
-              <span>
-                <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </template>
-            <div class="amount">
-              <span>
-                <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </div>
-          </a-tooltip>
-          <div class="detail">
-            <span>{{ countData.failPayCount }}笔</span>
-          </div>
-        </div>
-      </div>
-      <div class="close">
-        <a-button type="primary" @click="detailVisible = false">知道了</a-button>
-      </div>
-    </a-modal>
-    <!-- 日志详情抽屉 -->
+    <!-- 订单详情抽屉 -->
     <template>
       <a-drawer
         width="50%"
@@ -500,21 +500,25 @@
 
           <a-divider />
           <a-col :sm="12">
-            <a-descriptions><a-descriptions-item label="订单分账模式">
-              <span v-if="detailData.divisionMode == 0">该笔订单不允许分账</span>
-              <span v-else-if="detailData.divisionMode == 1">支付成功按配置自动完成分账</span>
-              <span v-else-if="detailData.divisionMode == 2">商户手动分账(解冻商户金额)</span>
-              <span v-else>未知</span>
-            </a-descriptions-item></a-descriptions>
+            <a-descriptions>
+              <a-descriptions-item label="订单分账模式">
+                <span v-if="detailData.divisionMode == 0">该笔订单不允许分账</span>
+                <span v-else-if="detailData.divisionMode == 1">支付成功按配置自动完成分账</span>
+                <span v-else-if="detailData.divisionMode == 2">商户手动分账(解冻商户金额)</span>
+                <span v-else>未知</span>
+              </a-descriptions-item>
+            </a-descriptions>
           </a-col>
           <a-col :sm="12">
-            <a-descriptions><a-descriptions-item label="分账状态">
-              <a-tag color="blue" v-if="detailData.divisionState == 0">未发生分账</a-tag>
-              <a-tag color="orange" v-else-if="detailData.divisionState == 1">待分账</a-tag>
-              <a-tag color="red" v-else-if="detailData.divisionState == 2">分账处理中</a-tag>
-              <a-tag color="green" v-else-if="detailData.divisionState == 3">任务已结束</a-tag>
-              <a-tag color="#f50" v-else>未知</a-tag>
-            </a-descriptions-item></a-descriptions>
+            <a-descriptions>
+              <a-descriptions-item label="分账状态">
+                <a-tag color="blue" v-if="detailData.divisionState == 0">未发生分账</a-tag>
+                <a-tag color="orange" v-else-if="detailData.divisionState == 1">待分账</a-tag>
+                <a-tag color="red" v-else-if="detailData.divisionState == 2">分账处理中</a-tag>
+                <a-tag color="green" v-else-if="detailData.divisionState == 3">任务已结束</a-tag>
+                <a-tag color="#f50" v-else>未知</a-tag>
+              </a-descriptions-item>
+            </a-descriptions>
           </a-col>
           <a-col :sm="12">
             <a-descriptions><a-descriptions-item label="最新分账发起时间">{{ detailData.divisionLastTime }}</a-descriptions-item></a-descriptions>

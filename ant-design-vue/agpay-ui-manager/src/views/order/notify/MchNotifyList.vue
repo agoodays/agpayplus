@@ -70,7 +70,7 @@
         </template>
       </AgTable>
     </a-card>
-    <!-- 日志详情抽屉 -->
+    <!-- 通知详情抽屉 -->
     <template>
       <a-drawer
         placement="right"

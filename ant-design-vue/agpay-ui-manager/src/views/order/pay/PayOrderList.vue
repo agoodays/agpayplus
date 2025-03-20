@@ -311,7 +311,7 @@
         <a-row justify="space-between" type="flex">
           <a-col :sm="12">
             <a-descriptions>
-              <a-descriptions-item label="所属系统">
+              <a-descriptions-item label="商户类型">
                 {{ detailData.mchType === 1?'普通商户':detailData.mchType === 2?'特约商户':'未知' }}
               </a-descriptions-item>
             </a-descriptions>
@@ -572,21 +572,25 @@
           </a-col>
           <a-divider />
           <a-col :sm="12">
-            <a-descriptions><a-descriptions-item label="订单分账模式">
-              <span v-if="detailData.divisionMode == 0">该笔订单不允许分账</span>
-              <span v-else-if="detailData.divisionMode == 1">支付成功按配置自动完成分账</span>
-              <span v-else-if="detailData.divisionMode == 2">商户手动分账(解冻商户金额)</span>
-              <span v-else>未知</span>
-            </a-descriptions-item></a-descriptions>
+            <a-descriptions>
+              <a-descriptions-item label="订单分账模式">
+                <span v-if="detailData.divisionMode == 0">该笔订单不允许分账</span>
+                <span v-else-if="detailData.divisionMode == 1">支付成功按配置自动完成分账</span>
+                <span v-else-if="detailData.divisionMode == 2">商户手动分账(解冻商户金额)</span>
+                <span v-else>未知</span>
+              </a-descriptions-item>
+            </a-descriptions>
           </a-col>
           <a-col :sm="12">
-            <a-descriptions><a-descriptions-item label="分账状态">
-              <a-tag color="blue" v-if="detailData.divisionState == 0">未发生分账</a-tag>
-              <a-tag color="orange" v-else-if="detailData.divisionState == 1">待分账</a-tag>
-              <a-tag color="red" v-else-if="detailData.divisionState == 2">分账处理中</a-tag>
-              <a-tag color="green" v-else-if="detailData.divisionState == 3">任务已结束</a-tag>
-              <a-tag color="#f50" v-else>未知</a-tag>
-            </a-descriptions-item></a-descriptions>
+            <a-descriptions>
+              <a-descriptions-item label="分账状态">
+                <a-tag color="blue" v-if="detailData.divisionState == 0">未发生分账</a-tag>
+                <a-tag color="orange" v-else-if="detailData.divisionState == 1">待分账</a-tag>
+                <a-tag color="red" v-else-if="detailData.divisionState == 2">分账处理中</a-tag>
+                <a-tag color="green" v-else-if="detailData.divisionState == 3">任务已结束</a-tag>
+                <a-tag color="#f50" v-else>未知</a-tag>
+              </a-descriptions-item>
+            </a-descriptions>
           </a-col>
           <a-col :sm="12">
             <a-descriptions><a-descriptions-item label="最新分账发起时间">{{ detailData.divisionLastTime }}</a-descriptions-item></a-descriptions>

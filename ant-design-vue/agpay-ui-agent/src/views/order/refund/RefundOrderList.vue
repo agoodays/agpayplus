@@ -139,7 +139,7 @@
         </template>
       </AgTable>
     </a-card>
-    <!-- 日志详情抽屉 -->
+    <!-- 订单详情抽屉 -->
     <template>
       <a-drawer
         placement="right"
@@ -154,7 +154,7 @@
         <a-row justify="space-between" type="flex">
           <a-col :sm="12">
             <a-descriptions>
-              <a-descriptions-item label="所属系统">
+              <a-descriptions-item label="商户类型">
                 {{ detailData.mchType === 1?'普通商户':detailData.mchType === 2?'特约商户':'未知' }}
               </a-descriptions-item>
             </a-descriptions>
