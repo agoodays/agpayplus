@@ -132,7 +132,7 @@
         </template>
       </AgTable>
     </a-card>
-    <!-- 日志详情抽屉 -->
+    <!-- 订单详情抽屉 -->
     <template>
       <a-drawer
         width="50%"

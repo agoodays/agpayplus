@@ -128,6 +128,84 @@
               </div>
             </div>
           </div>
+          <!-- 成交订单详细 -->
+          <a-modal :visible="detailVisible" footer="" @cancel="detailVisible = false">
+            <div class="modal-title">成交订单详细</div>
+            <div class="modal-describe">创建订单金额/笔数 = 成交订单金额/笔数 + 未付款订单金额/笔数</div>
+            <div class="statistics-list" style="padding-bottom: 55px;">
+              <div class="item">
+                <div class="title">创建订单</div>
+                <a-tooltip placement="top">
+                  <template #title>
+                    <span>
+                      <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </template>
+                  <div class="amount">
+                    <span>
+                      <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </div>
+                </a-tooltip>
+                <div class="detail">
+                  <span>{{ countData.allPayCount }}笔</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">成交订单</div>
+                <a-tooltip placement="top">
+                  <template #title>
+                    <span>
+                      <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </template>
+                  <div class="amount">
+                    <span>
+                      <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </div>
+                </a-tooltip>
+                <div class="detail">
+                  <span>{{ countData.payCount }}笔</span>
+                </div>
+              </div>
+              <div class="item">
+                <div class="line"></div>
+                <div class="title"></div>
+              </div>
+              <div class="item">
+                <div class="title">未付款订单</div>
+                <a-tooltip placement="top">
+                  <template #title>
+                    <span>
+                      <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </template>
+                  <div class="amount">
+                    <span>
+                      <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
+                      <span>元</span>
+                    </span>
+                  </div>
+                </a-tooltip>
+                <div class="detail">
+                  <span>{{ countData.failPayCount }}笔</span>
+                </div>
+              </div>
+            </div>
+            <div class="close">
+              <a-button type="primary" @click="detailVisible = false">知道了</a-button>
+            </div>
+          </a-modal>
         </template>
         <template slot="amountSlot" slot-scope="{record}"><b>￥{{ record.amount/100 }}</b></template> <!-- 自定义插槽 -->
         <template slot="refundAmountSlot" slot-scope="{record}">￥{{ record.refundAmount/100 }}</template> <!-- 自定义插槽 -->
@@ -184,85 +262,7 @@
     </a-card>
     <!-- 退款弹出框 -->
     <refund-modal ref="refundModalInfo" :callbackFunc="searchFunc"></refund-modal>
-    <!-- 成交订单详细 -->
-    <a-modal :visible="detailVisible" footer="" @cancel="detailVisible = false">
-      <div class="modal-title">成交订单详细</div>
-      <div class="modal-describe">创建订单金额/笔数 = 成交订单金额/笔数 + 未付款订单金额/笔数</div>
-      <div class="statistics-list" style="padding-bottom: 55px;">
-        <div class="item">
-          <div class="title">创建订单</div>
-          <a-tooltip placement="top">
-            <template #title>
-              <span>
-                <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </template>
-            <div class="amount">
-              <span>
-                <span class="amount-num">{{ countData.allPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </div>
-          </a-tooltip>
-          <div class="detail">
-            <span>{{ countData.allPayCount }}笔</span>
-          </div>
-        </div>
-        <div class="item">
-          <div class="line"></div>
-          <div class="title"></div>
-        </div>
-        <div class="item">
-          <div class="title">成交订单</div>
-          <a-tooltip placement="top">
-            <template #title>
-              <span>
-                <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </template>
-            <div class="amount">
-              <span>
-                <span class="amount-num">{{ countData.payAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </div>
-          </a-tooltip>
-          <div class="detail">
-            <span>{{ countData.payCount }}笔</span>
-          </div>
-        </div>
-        <div class="item">
-          <div class="line"></div>
-          <div class="title"></div>
-        </div>
-        <div class="item">
-          <div class="title">未付款订单</div>
-          <a-tooltip placement="top">
-            <template #title>
-              <span>
-                <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </template>
-            <div class="amount">
-              <span>
-                <span class="amount-num">{{ countData.failPayAmount.toFixed(2) }}</span>
-                <span>元</span>
-              </span>
-            </div>
-          </a-tooltip>
-          <div class="detail">
-            <span>{{ countData.failPayCount }}笔</span>
-          </div>
-        </div>
-      </div>
-      <div class="close">
-        <a-button type="primary" @click="detailVisible = false">知道了</a-button>
-      </div>
-    </a-modal>
-    <!-- 日志详情抽屉 -->
+    <!-- 订单详情抽屉 -->
     <template>
       <a-drawer
         width="50%"
