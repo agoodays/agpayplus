@@ -60,7 +60,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
                 string logPrefix = "【处理通联退款回调】";
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
-                _logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
+                _logger.LogInformation("{logPrefix} 回调参数, jsonParams：{jsonParams}", logPrefix, jsonParams);
+                //_logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
 
                 // 校验退款回调
                 bool verifyResult = await VerifyParamsAsync(jsonParams, mchAppConfigContext);
@@ -69,7 +70,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                _logger.LogInformation($"{logPrefix}验证退款通知数据及签名通过");
+                _logger.LogInformation("{logPrefix}验证退款通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix}验证退款通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 var okResponse = TextResp("success");
@@ -107,7 +109,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
 
                 if (isvParams.Orgid == null)
                 {
-                    _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
+                    //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
                 publicKey = isvParams.PublicKey;
@@ -122,7 +125,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             //验签失败
             if (!AllinPaySignUtil.Verify(jsonParams, publicKey))
             {
-                _logger.LogInformation($"【通联回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
+                _logger.LogInformation("【通联回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey}", jsonParams, publicKey);
+                //_logger.LogInformation($"【通联回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey}");
                 return false;
             }
             return true;

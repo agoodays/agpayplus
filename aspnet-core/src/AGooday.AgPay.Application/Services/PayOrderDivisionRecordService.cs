@@ -63,7 +63,7 @@ namespace AGooday.AgPay.Application.Services
         public List<PayOrderDivisionRecordDto> GetByBatchOrderId(PayOrderDivisionRecordQueryDto dto)
         {
             var records = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId)) 
+                .Where(w => (string.IsNullOrWhiteSpace(dto.BatchOrderId) || w.BatchOrderId.Equals(dto.BatchOrderId))
                     && (dto.State.Equals(null) || w.State.Equals(dto.State)))
                 .OrderBy(o => o.RecordId);
             return _mapper.Map<List<PayOrderDivisionRecordDto>>(records);

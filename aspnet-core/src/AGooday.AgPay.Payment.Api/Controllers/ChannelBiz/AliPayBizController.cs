@@ -152,7 +152,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ChannelBiz
             JObject reqJSON = GetReqParamJson();
 
             // 获取到报文信息，然后转发到对应的ctrl
-            _logger.LogInformation($"支付宝应用网关接收消息参数：{reqJSON}");
+            _logger.LogInformation("支付宝应用网关接收消息参数：{reqJSON}", reqJSON);
+            //_logger.LogInformation($"支付宝应用网关接收消息参数：{reqJSON}");
 
             // 分账交易通知
             if ("alipay.trade.order.settle.notify".Equals(reqJSON.GetValue("msg_method").ToString()))

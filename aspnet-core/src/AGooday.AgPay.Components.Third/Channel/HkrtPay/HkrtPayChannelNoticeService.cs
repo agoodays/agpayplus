@@ -65,7 +65,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 string logPrefix = "【处理海科融通支付回调】";
                 // 获取请求参数
                 var resText = @params?.ToString();
-                _logger.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
+                _logger.LogInformation("{logPrefix} 回调参数, resParams：{resText}", logPrefix, resText);
+                //_logger.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
                 var resJson = XmlUtil.ConvertToJson(@params.ToString());
                 var resParams = JObject.Parse(resJson);
 
@@ -76,7 +77,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                _logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
+                _logger.LogInformation("{logPrefix}验证支付通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 JObject resJSON = new JObject();
@@ -141,12 +143,14 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             string total_amount = jsonParams.GetValue("total_amount").ToString();         // 支付金额
             if (string.IsNullOrWhiteSpace(trade_no))
             {
-                _logger.LogInformation($"订单ID为空 [trade_no]={trade_no}");
+                _logger.LogInformation("订单ID为空 [trade_no]={trade_no}", trade_no);
+                //_logger.LogInformation($"订单ID为空 [trade_no]={trade_no}");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(total_amount))
             {
-                _logger.LogInformation($"金额参数为空 [total_amount] :{total_amount}");
+                _logger.LogInformation("金额参数为空 [total_amount] :{total_amount}", total_amount);
+                //_logger.LogInformation($"金额参数为空 [total_amount] :{total_amount}");
                 return false;
             }
 
@@ -158,7 +162,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             //验签失败
             if (!HkrtPaySignUtil.Verify(jsonParams, tradeKey))
             {
-                _logger.LogInformation($"【海科融通回调】 验签失败！ 回调参数：resParams = {resText}, key = {tradeKey} ");
+                _logger.LogInformation("【海科融通回调】 验签失败！ 回调参数：resParams = {resText}, key = {tradeKey}", resText, tradeKey);
+                //_logger.LogInformation($"【海科融通回调】 验签失败！ 回调参数：resParams = {resText}, key = {tradeKey}");
                 return false;
             }
 
@@ -166,7 +171,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             long dbPayAmt = payOrder.Amount;
             if (dbPayAmt != Convert.ToInt64(total_amount))
             {
-                _logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, total_amount={total_amount}, payOrderId={trade_no}");
+                _logger.LogInformation("订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, total_amount={total_amount}, payOrderId={trade_no}", dbPayAmt, total_amount, trade_no);
+                //_logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, total_amount={total_amount}, payOrderId={trade_no}");
                 return false;
             }
             return true;

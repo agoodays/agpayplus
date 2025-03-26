@@ -30,14 +30,14 @@ namespace AGooday.AgPay.AopSdk.Nets
                     responseBody = await response.Content.ReadAsStringAsync();
                 }
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException e)
             {
-                responseCode = (int)(ex.StatusCode ?? HttpStatusCode.BadGateway);
+                responseCode = (int)(e.StatusCode ?? HttpStatusCode.BadGateway);
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw new APIConnectionException($"请求AgPay({request.Url})异常,请检查网络或重试.异常信息:{ex.Message}", ex);
+                throw new APIConnectionException($"请求AgPay({request.Url})异常,请检查网络或重试.异常信息:{e.Message}", e);
             }
 
             return new APIAgPayResponse(responseCode, responseBody, null);
@@ -67,14 +67,14 @@ namespace AGooday.AgPay.AopSdk.Nets
                     responseBody = response.Content.ReadAsStringAsync().Result;
                 }
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException e)
             {
-                responseCode = (int)(ex.StatusCode ?? HttpStatusCode.BadGateway);
+                responseCode = (int)(e.StatusCode ?? HttpStatusCode.BadGateway);
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw new APIConnectionException($"请求AgPay({request.Url})异常,请检查网络或重试.异常信息:{ex.Message}", ex);
+                throw new APIConnectionException($"请求AgPay({request.Url})异常,请检查网络或重试.异常信息:{e.Message}", e);
             }
 
             return new APIAgPayResponse(responseCode, responseBody, null);

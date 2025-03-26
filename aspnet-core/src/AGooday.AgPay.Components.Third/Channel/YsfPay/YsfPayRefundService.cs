@@ -55,7 +55,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/gateway/api/pay/refundQuery", reqParams, logPrefix, mchAppConfigContext);
-                _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("查询订单 refundOrderId:{RefundOrderId}, 返回结果:{resJSON}", refundOrder.RefundOrderId, resJSON);
+                //_logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -73,7 +74,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
                     {
                         //明确退款成功
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                        _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                        _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
+                        //_logger.LogInformation($"{logPrefix} >>> 退款成功");
                     }
                     else if ("01".Equals(origRespCode))
                     {
@@ -81,13 +83,15 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                         channelRetMsg.ChannelErrCode = respCode;
                         channelRetMsg.ChannelErrMsg = respMsg;
-                        _logger.LogInformation($"{logPrefix} >>> 退款失败, {origRespMsg}");
+                        _logger.LogInformation("{logPrefix} >>> 退款失败, {origRespMsg}", logPrefix, origRespMsg);
+                        //_logger.LogInformation($"{logPrefix} >>> 退款失败, {origRespMsg}");
                     }
                     else if ("02".Equals(origRespCode))
                     {
                         //退款中
                         channelRetMsg.ChannelState = ChannelState.WAITING;
-                        _logger.LogInformation($"{logPrefix} >>> 退款中");
+                        _logger.LogInformation("{logPrefix} >>> 退款中", logPrefix);
+                        //_logger.LogInformation($"{logPrefix} >>> 退款中");
                     }
                 }
                 else
@@ -95,7 +99,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN;
                     channelRetMsg.ChannelErrCode = respCode;
                     channelRetMsg.ChannelErrMsg = respMsg;
-                    _logger.LogInformation($"{logPrefix} >>> 请求失败, {respMsg}");
+                    _logger.LogInformation("{logPrefix} >>> 请求失败, {respMsg}", logPrefix, respMsg);
+                    //_logger.LogInformation($"{logPrefix} >>> 请求失败, {respMsg}");
                 }
             }
             catch (Exception)
@@ -121,7 +126,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/gateway/api/pay/refund", reqParams, logPrefix, mchAppConfigContext);
-                _logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("查询订单 payorderId:{PayOrderId}, 返回结果:{resJSON}", payOrder.PayOrderId, resJSON);
+                //_logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -134,14 +140,16 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
                 {
                     // 交易成功
                     channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                    _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                    _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
+                    //_logger.LogInformation($"{logPrefix} >>> 退款成功");
                 }
                 else
                 {
                     channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                     channelRetMsg.ChannelErrCode = respCode;
                     channelRetMsg.ChannelErrMsg = respMsg;
-                    _logger.LogInformation($"{logPrefix} >>> 退款失败, {respMsg}");
+                    _logger.LogInformation("{logPrefix} >>> 退款失败, {respMsg}", logPrefix, respMsg);
+                    //_logger.LogInformation($"{logPrefix} >>> 退款失败, {respMsg}");
                 }
             }
             catch (Exception)

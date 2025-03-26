@@ -105,9 +105,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Common
 
                 return Content(fullPath);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {e.Message}");
             }
         }
 

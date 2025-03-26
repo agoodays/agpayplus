@@ -32,9 +32,9 @@ namespace AGooday.AgPay.Notice.Sms
                     await Task.Delay(1000);
                 }, input.PhoneNumbers, _smsOptions.IntervalSeconds ?? _noticeOptions.IntervalSeconds ?? 10);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                response.ErrMsg = $"短信发送异常:{ex.Message}";
+                response.ErrMsg = $"短信发送异常:{e.Message}";
             }
             return response;
         }

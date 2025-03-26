@@ -94,7 +94,8 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
                 catch (Exception e)
                 {
-                    _logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
+                    _logger.LogInformation(e, "数据库已存在[{OrderId}]消息，本次不再推送。", mchNotifyRecord.OrderId);
+                    //_logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
                     return;
                 }
 
@@ -104,7 +105,7 @@ namespace AGooday.AgPay.Components.Third.Services
             }
             catch (Exception e)
             {
-                _logger.LogInformation(e, $"推送失败！");
+                _logger.LogInformation(e, "推送失败！");
             }
         }
 
@@ -163,7 +164,8 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
                 catch (Exception e)
                 {
-                    _logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
+                    _logger.LogInformation(e, "数据库已存在[{OrderId}]消息，本次不再推送。", mchNotifyRecord.OrderId);
+                    //_logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
                     return;
                 }
 
@@ -232,7 +234,8 @@ namespace AGooday.AgPay.Components.Third.Services
                 }
                 catch (Exception e)
                 {
-                    _logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
+                    _logger.LogInformation(e, "数据库已存在[{OrderId}]消息，本次不再推送。", mchNotifyRecord.OrderId);
+                    //_logger.LogInformation(e, $"数据库已存在[{mchNotifyRecord.OrderId}]消息，本次不再推送。");
                     return;
                 }
 

@@ -59,7 +59,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
                 string logPrefix = "【处理利楚扫呗支付回调】";
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
-                _logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
+                _logger.LogInformation("{logPrefix} 回调参数, jsonParams：{jsonParams}", logPrefix, jsonParams);
+                //_logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
 
                 // 校验支付回调
                 bool verifyResult = await VerifyParamsAsync(jsonParams, payOrder, mchAppConfigContext);
@@ -68,7 +69,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                _logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
+                _logger.LogInformation("{logPrefix}验证支付通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 JObject resJSON = new JObject();
@@ -124,12 +126,14 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             string totalFee = jsonParams.GetValue("total_fee").ToString();         // 支付金额
             if (string.IsNullOrWhiteSpace(terminalTrace))
             {
-                _logger.LogInformation($"订单ID为空 [terminalTrace]={terminalTrace}");
+                _logger.LogInformation("订单ID为空 [terminalTrace]={terminalTrace}", terminalTrace);
+                //_logger.LogInformation($"订单ID为空 [terminalTrace]={terminalTrace}");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(totalFee))
             {
-                _logger.LogInformation($"金额参数为空 [totalFee] :{totalFee}");
+                _logger.LogInformation("金额参数为空 [totalFee] :{totalFee}", totalFee);
+                //_logger.LogInformation($"金额参数为空 [totalFee] :{totalFee}");
                 return false;
             }
 
@@ -141,7 +145,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             //验签失败
             if (!LcswPaySignUtil.Verify(jsonParams, key))
             {
-                _logger.LogInformation($"【利楚扫呗回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={key} ");
+                _logger.LogInformation("【利楚扫呗回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey = {key} ", jsonParams, key);
+                //_logger.LogInformation($"【利楚扫呗回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={key} ");
                 return false;
             }
 
@@ -149,7 +154,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             long dbPayAmt = payOrder.Amount;
             if (dbPayAmt != Convert.ToInt64(totalFee))
             {
-                _logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, totalFee={totalFee}, payOrderId={terminalTrace}");
+                _logger.LogInformation("订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, totalFee={totalFee}, payOrderId={terminalTrace}", dbPayAmt, totalFee, terminalTrace);
+                //_logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, totalFee={totalFee}, payOrderId={terminalTrace}");
                 return false;
             }
             return true;

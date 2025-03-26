@@ -73,7 +73,8 @@ namespace AGooday.AgPay.Components.Third.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"订单[{payOrder.PayOrderId}]自动分账逻辑异常：{e.Message}");
+                _logger.LogError(e, "订单[{PayOrderId}]自动分账逻辑异常：{Message}", payOrder.PayOrderId, e.Message);
+                //_logger.LogError(e, $"订单[{payOrder.PayOrderId}]自动分账逻辑异常：{e.Message}");
             }
         }
 
@@ -82,7 +83,8 @@ namespace AGooday.AgPay.Components.Third.Services
             bool isSuccess = await _payOrderService.UpdateInit2IngAsync(payOrder.PayOrderId, payOrder);
             if (!isSuccess)
             {
-                _logger.LogError($"updateInit2Ing更新异常 payOrderId={payOrder.PayOrderId}");
+                _logger.LogError("updateInit2Ing更新异常 payOrderId={PayOrderId}", payOrder.PayOrderId);
+                //_logger.LogError($"updateInit2Ing更新异常 payOrderId={payOrder.PayOrderId}");
                 throw new BizException("更新订单异常!");
             }
 
@@ -91,7 +93,8 @@ namespace AGooday.AgPay.Components.Third.Services
                     channelRetMsg.ChannelErrCode, channelRetMsg.ChannelErrMsg);
             if (!isSuccess)
             {
-                _logger.LogError($"updateIng2SuccessOrFail更新异常 payOrderId={payOrder.PayOrderId}");
+                _logger.LogError("updateIng2SuccessOrFail更新异常 payOrderId={PayOrderId}", payOrder.PayOrderId);
+                //_logger.LogError($"updateIng2SuccessOrFail更新异常 payOrderId={payOrder.PayOrderId}");
                 throw new BizException("更新订单异常!");
             }
         }

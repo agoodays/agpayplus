@@ -46,7 +46,8 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                         };
                         var pageRecordList = payOrderDivisionRecordService.DistinctBatchOrderIdList(dto);
 
-                        _logger.LogInformation($"处理分账补单任务, 共计{pageRecordList.TotalCount}条");
+                        _logger.LogInformation("处理分账补单任务, 共计{TotalCount}条", pageRecordList.TotalCount);
+                        //_logger.LogInformation($"处理分账补单任务, 共计{pageRecordList.TotalCount}条");
 
                         if (pageRecordList == null || pageRecordList.Count == 0)
                         {
@@ -76,7 +77,8 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                 PayOrderDto payOrder = await payOrderService.GetByIdAsync(batchRecord.PayOrderId);
                                 if (payOrder == null)
                                 {
-                                    _logger.LogError($"支付订单记录不存在：{batchRecord.PayOrderId}");
+                                    _logger.LogError("支付订单记录不存在：{PayOrderId}", batchRecord.PayOrderId);
+                                    //_logger.LogError($"支付订单记录不存在：{batchRecord.PayOrderId}");
                                     continue;
                                 }
                                 // 查询分账接口是否存在
@@ -84,7 +86,8 @@ namespace AGooday.AgPay.Payment.Api.Jobs
 
                                 if (divisionService == null)
                                 {
-                                    _logger.LogError($"查询分账接口不存在：{payOrder.IfCode}");
+                                    _logger.LogError("查询分账接口不存在：{IfCode}", payOrder.IfCode);
+                                    //_logger.LogError($"查询分账接口不存在：{payOrder.IfCode}");
                                     continue;
                                 }
                                 MchAppConfigContext mchAppConfigContext = await configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId);
@@ -111,7 +114,8 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                             }
                             catch (Exception e)
                             {
-                                _logger.LogError(e, $"处理补单任务单条[{batchRecord.BatchOrderId}]异常");
+                                _logger.LogError(e, "处理补单任务单条[{BatchOrderId}]异常", batchRecord.BatchOrderId);
+                                //_logger.LogError(e, $"处理补单任务单条[{batchRecord.BatchOrderId}]异常");
                             }
                         }
 

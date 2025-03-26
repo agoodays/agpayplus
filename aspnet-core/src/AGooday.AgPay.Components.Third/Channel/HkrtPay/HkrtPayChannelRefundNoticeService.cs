@@ -62,7 +62,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 string logPrefix = "【处理海科融通退款回调】";
                 // 获取请求参数
                 var resText = @params?.ToString();
-                _logger.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
+                _logger.LogInformation("{logPrefix} 回调参数, resParams：{resText}", logPrefix, resText);
+                //_logger.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
                 var resJson = XmlUtil.ConvertToJson(resText);
                 var resParams = JObject.Parse(resJson);
 
@@ -73,7 +74,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                _logger.LogInformation($"{logPrefix}验证退款通知数据及签名通过");
+                _logger.LogInformation("{logPrefix}验证退款通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix}验证退款通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 JObject resJSON = new JObject();
@@ -119,7 +121,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             //验签失败
             if (!HkrtPaySignUtil.Verify(jsonParams, tradeKey))
             {
-                _logger.LogInformation($"【海科融通回调】 验签失败！ 回调参数：resParams = {resText}, key = {tradeKey}");
+                _logger.LogInformation("【海科融通回调】 验签失败！ 回调参数：resParams = {resText}, key = {tradeKey}", resText, tradeKey);
+                //_logger.LogInformation($"【海科融通回调】 验签失败！ 回调参数：resParams = {resText}, key = {tradeKey}");
                 return false;
             }
             return true;

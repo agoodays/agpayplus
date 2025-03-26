@@ -151,7 +151,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
 
                 if (isvParams.SysId == null)
                 {
-                    _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
+                    //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
 
@@ -169,7 +170,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
 
                 if (normalMchParams.HuifuId == null)
                 {
-                    _logger.LogError($"商户配置为空：normalMchParams：{JsonConvert.SerializeObject(normalMchParams)}");
+                    _logger.LogError("商户配置为空：normalMchParams：{normalMchParams}", JsonConvert.SerializeObject(normalMchParams));
+                    //_logger.LogError($"商户配置为空：normalMchParams：{JsonConvert.SerializeObject(normalMchParams)}");
                     throw new BizException("商户配置为空。");
                 }
 
@@ -199,9 +201,11 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             // 调起上游接口
             string url = "https://api.huifu.com/v2" + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqJSON={reqParams}", logPrefix, unionId, url, JsonConvert.SerializeObject(reqParams));
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = await DgPayHttpUtil.DoPostJsonAsync(url, reqParams);
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resJSON={resText}", logPrefix, unionId, url, resText);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -212,7 +216,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             var resParams = JObject.Parse(resText);
             if (!DgPaySignUtil.Verify(resParams, publicKey))
             {
-                _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
+                _logger.LogWarning("{logPrefix} 验签失败！ reqJSON={reqParams} resJSON={resText}", logPrefix, JsonConvert.SerializeObject(reqParams), resText);
+                //_logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }
 
             return resParams;

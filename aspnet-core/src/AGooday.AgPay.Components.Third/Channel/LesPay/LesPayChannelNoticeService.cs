@@ -62,7 +62,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
                 string logPrefix = "【处理乐刷支付回调】";
                 // 获取请求参数
                 var resText = @params?.ToString();
-                _logger.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
+                _logger.LogInformation("{logPrefix} 回调参数, resParams：{resText}", logPrefix, resText);
+                //_logger.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
                 var resJson = XmlUtil.ConvertToJson(@params.ToString());
                 var resParams = JObject.Parse(resJson);
 
@@ -73,7 +74,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                _logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
+                _logger.LogInformation("{logPrefix}验证支付通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 var okResponse = TextResp("000000");
@@ -128,12 +130,14 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             string amt = jsonParams.GetValue("amt").ToString();         // 支付金额
             if (string.IsNullOrWhiteSpace(third_order_id))
             {
-                _logger.LogInformation($"订单ID为空 [orderNo]={third_order_id}");
+                _logger.LogInformation("订单ID为空 [orderNo]={third_order_id}", third_order_id);
+                //_logger.LogInformation($"订单ID为空 [orderNo]={third_order_id}");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(amt))
             {
-                _logger.LogInformation($"金额参数为空 [amt] :{amt}");
+                _logger.LogInformation("金额参数为空 [amt] :{amt}", amt);
+                //_logger.LogInformation($"金额参数为空 [amt] :{amt}");
                 return false;
             }
 
@@ -145,7 +149,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             //验签失败
             if (!LesPaySignUtil.Verify(jsonParams, noticeKey))
             {
-                _logger.LogInformation($"【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey} ");
+                _logger.LogInformation("【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey} ", resText, noticeKey);
+                //_logger.LogInformation($"【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey} ");
                 return false;
             }
 
@@ -153,7 +158,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             long dbPayAmt = payOrder.Amount;
             if (dbPayAmt != Convert.ToInt64(amt))
             {
-                _logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={third_order_id}");
+                _logger.LogInformation("订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={third_order_id}", dbPayAmt, amt, third_order_id);
+                //_logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={third_order_id}");
                 return false;
             }
             return true;

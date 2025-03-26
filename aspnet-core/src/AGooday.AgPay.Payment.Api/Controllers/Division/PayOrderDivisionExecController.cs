@@ -122,7 +122,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"系统异常：payOrderId={bizRQ.PayOrderId}");
+                _logger.LogError(e, "系统异常：payOrderId={PayOrderId}", bizRQ.PayOrderId);
+                //_logger.LogError(e, $"系统异常：payOrderId={bizRQ.PayOrderId}");
                 return ApiRes.CustomFail("系统异常");
             }
         }

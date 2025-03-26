@@ -57,7 +57,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 string method = "ysepay.online.trade.refund.query", repMethod = "ysepay_online_trade_refund_query_response";
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync(YsePayConfig.SEARCH_GATEWAY, method, repMethod, reqParams, string.Empty, logPrefix, mchAppConfigContext);
-                _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("查询订单 refundOrderId:{RefundOrderId}, 返回结果:{resJSON}", refundOrder.RefundOrderId, resJSON);
+                //_logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -86,19 +87,22 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
                             channelRetMsg.PlatformOrderId = channelRecvSn;
                             channelRetMsg.PlatformMchOrderId = channelSendSn;
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                            _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                            _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
+                            //_logger.LogInformation($"{logPrefix} >>> 退款成功");
                             break;
                         case YsePayEnum.RefundState.in_process:
                             //退款中
                             channelRetMsg.ChannelState = ChannelState.WAITING;
-                            _logger.LogInformation($"{logPrefix} >>> 退款中");
+                            _logger.LogInformation("{logPrefix} >>> 退款中", logPrefix);
+                            //_logger.LogInformation($"{logPrefix} >>> 退款中");
                             break;
                         case YsePayEnum.RefundState.fail:
                             //明确退款失败
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                             channelRetMsg.ChannelErrCode = subCode;
                             channelRetMsg.ChannelErrMsg = subMsg;
-                            _logger.LogInformation($"{logPrefix} >>> 退款失败, {subMsg}");
+                            _logger.LogInformation("{logPrefix} >>> 退款失败, {subMsg}", logPrefix, subMsg);
+                            //_logger.LogInformation($"{logPrefix} >>> 退款失败, {subMsg}");
                             break;
                     }
                 }
@@ -137,7 +141,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 string method = "ysepay.online.trade.refund", repMethod = "ysepay_online_trade_refund_response";
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync(YsePayConfig.OPENAPI_GATEWAY, method, repMethod, reqParams, GetNotifyUrl(), logPrefix, mchAppConfigContext);
-                _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}", payOrder.PayOrderId, resJSON);
+                //_logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -156,13 +161,15 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
                     //退款成功
                     channelRetMsg.ChannelOrderId = refundsn;
                     channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                    _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                    _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
+                    //_logger.LogInformation($"{logPrefix} >>> 退款成功");
                 }
                 else if ("50000".Equals(code) || "3501".Equals(code))
                 {
                     //退款中
                     channelRetMsg.ChannelState = ChannelState.WAITING;
-                    _logger.LogInformation($"{logPrefix} >>> 退款中");
+                    _logger.LogInformation("{logPrefix} >>> 退款中", logPrefix);
+                    //_logger.LogInformation($"{logPrefix} >>> 退款中");
                 }
                 else
                 {
@@ -170,12 +177,14 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
                     channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                     channelRetMsg.ChannelErrCode = subCode ?? code;
                     channelRetMsg.ChannelErrMsg = subMsg ?? msg;
-                    _logger.LogInformation($"{logPrefix} >>> 退款失败, {subMsg}");
+                    _logger.LogInformation("{logPrefix} >>> 退款失败, {subMsg}", logPrefix, subMsg ?? msg);
+                    //_logger.LogInformation($"{logPrefix} >>> 退款失败, {subMsg}");
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
+                _logger.LogError(e, "{logPrefix}, 异常:{Message}", logPrefix, e.Message);
+                //_logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }
             return channelRetMsg;

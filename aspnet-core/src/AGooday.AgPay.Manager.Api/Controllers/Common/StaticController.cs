@@ -11,6 +11,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
     [ApiController, Authorize, AllowAnonymous, NoLog]
     public class StaticController : ControllerBase
     {
+        protected readonly ILogger<StaticController> _logger;
+
+        protected StaticController(ILogger<StaticController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         [Route("api/anon/localOssFiles")]
         [Route("api/anon/localOssFiles/{*path}")]
@@ -105,9 +112,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
 
                 return Content(fullPath);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                _logger.LogError(e, "Internal server error: {Message}", e.Message);
+                return StatusCode(500, $"Internal server error: {e.Message}");
             }
         }
 

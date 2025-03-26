@@ -36,7 +36,8 @@ namespace AGooday.AgPay.Components.Third.Utils
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, $"请求参数转换异常！ params=[{body}]");
+                    _logger.LogError(e, "请求参数转换异常！ params=[{body}]", body);
+                    //_logger.LogError(e, $"请求参数转换异常！ params=[{body}]");
                     throw new BizException(ApiCode.PARAMS_ERROR, "转换异常");
                 }
             }
@@ -74,7 +75,8 @@ namespace AGooday.AgPay.Components.Third.Utils
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, $"请求参数转换异常！ params=[{body}]");
+                    _logger.LogError(e, "请求参数转换异常！ params=[{body}]", body);
+                    //_logger.LogError(e, $"请求参数转换异常！ params=[{body}]");
                     throw new BizException(ApiCode.PARAMS_ERROR, "转换异常");
                 }
             }

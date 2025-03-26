@@ -1,7 +1,7 @@
-﻿using Quartz.Impl;
-using Quartz.Spi;
+﻿using System.Reflection;
 using Quartz;
-using System.Reflection;
+using Quartz.Impl;
+using Quartz.Spi;
 
 namespace AGooday.AgPay.Payment.Api.Jobs
 {

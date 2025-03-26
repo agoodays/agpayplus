@@ -149,9 +149,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             string url = GetHost4env(lcswParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             var reqJSON = JsonConvert.SerializeObject(reqParams);
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={reqJSON}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqJSON={reqJSON}", logPrefix, unionId, url, reqJSON);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={reqJSON}");
             string resText = await LcswPayHttpUtil.DoPostAsync(url, reqJSON);
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resJSON={resText}", logPrefix, unionId, url, resText);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -162,7 +164,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             var resParams = JObject.Parse(resText);
             if (!LcswPaySignUtil.Verify(resParams, key))
             {
-                _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={reqJSON} resJSON={resText}");
+                _logger.LogWarning("{logPrefix} 验签失败！ reqJSON={reqJSON} resJSON={resText}", logPrefix, reqJSON, resText);
+                //_logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={reqJSON} resJSON={resText}");
             }
 
             return resParams;

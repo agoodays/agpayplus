@@ -54,7 +54,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/v1/pay/polymeric/refundquery", reqParams, logPrefix, mchAppConfigContext);
-                _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("查询订单 refundOrderId:{RefundOrderId}, 返回结果:{resJSON}", refundOrder.RefundOrderId, resJSON);
+                //_logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -99,19 +100,22 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                                         break;
                                 }
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
+                                //_logger.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;
                             case HkrtPayEnum.RefundStatus.Failed:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = error_code;
                                 channelRetMsg.ChannelErrMsg = error_msg;
-                                _logger.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
+                                _logger.LogInformation("{logPrefix} >>> 退款失败, {error_msg}", logPrefix, error_msg);
+                                //_logger.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
                                 break;
                             case HkrtPayEnum.RefundStatus.Refunding:
                                 //退款中
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
-                                _logger.LogInformation($"{logPrefix} >>> 退款中");
+                                _logger.LogInformation("{logPrefix} >>> 退款中", logPrefix);
+                                //_logger.LogInformation($"{logPrefix} >>> 退款中");
                                 break;
                         }
                     }
@@ -151,7 +155,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/v1/pay/polymeric/refund", reqParams, logPrefix, mchAppConfigContext);
-                _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}", refundOrder.RefundOrderId, resJSON);
+                //_logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -196,19 +201,22 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
                                         break;
                                 }
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
+                                //_logger.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;
                             case HkrtPayEnum.RefundStatus.Failed:
                                 //明确退款失败
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = error_code;
                                 channelRetMsg.ChannelErrMsg = error_msg;
-                                _logger.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
+                                _logger.LogInformation("{logPrefix} >>> 退款失败, {error_msg}", logPrefix, error_msg);
+                                //_logger.LogInformation($"{logPrefix} >>> 退款失败, {error_msg}");
                                 break;
                             case HkrtPayEnum.RefundStatus.Refunding:
                                 //退款中
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
-                                _logger.LogInformation($"{logPrefix} >>> 退款中");
+                                _logger.LogInformation("{logPrefix} >>> 退款中", logPrefix);
+                                //_logger.LogInformation($"{logPrefix} >>> 退款中");
                                 break;
                         }
                     }
@@ -216,7 +224,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
+                _logger.LogError(e, "{logPrefix}, 异常:{Message}", logPrefix, e.Message);
+                //_logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }
             return channelRetMsg;

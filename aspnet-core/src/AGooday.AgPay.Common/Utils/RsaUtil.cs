@@ -203,9 +203,9 @@ namespace AGooday.AgPay.Common.Utils
                 byte[] bytes = Encoding.UTF8.GetBytes(data);
                 result = Convert.ToBase64String(engine.ProcessBlock(bytes, 0, bytes.Length));
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                result = ex.Message;
+                result = e.Message;
             }
             return result;
         }
@@ -221,9 +221,9 @@ namespace AGooday.AgPay.Common.Utils
                 byte[] ResultData = engine.ProcessBlock(byteData, 0, byteData.Length);
                 result = Encoding.UTF8.GetString(ResultData);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                result = ex.Message;
+                result = e.Message;
             }
             return result;
         }

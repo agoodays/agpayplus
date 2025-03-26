@@ -96,7 +96,8 @@ namespace AGooday.AgPay.Manager.Api.OpLog
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"操作日志：{JsonConvert.SerializeObject(model)}");
+                _logger.LogError(ex, "操作日志：{model}", JsonConvert.SerializeObject(model));
+                //_logger.LogError(ex, $"操作日志：{JsonConvert.SerializeObject(model)}");
             }
         }
 

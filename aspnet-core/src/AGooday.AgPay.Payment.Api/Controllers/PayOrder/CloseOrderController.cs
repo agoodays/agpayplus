@@ -86,7 +86,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 支付通道接口实现不存在
                 if (closeService == null)
                 {
-                    _logger.LogError($"{payOrder.IfCode} interface not exists!");
+                    _logger.LogError("{IfCode} interface not exists!", payOrder.IfCode);
+                    //_logger.LogError($"{payOrder.IfCode} interface not exists!");
                     return null;
                 }
 
@@ -100,7 +101,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     return null;
                 }
 
-                _logger.LogInformation($"关闭订单[{payOrderId}]结果为：{channelRetMsg}");
+                _logger.LogInformation("关闭订单[{payOrderId}]结果为：{channelRetMsg}", payOrderId, channelRetMsg);
+                //_logger.LogInformation($"关闭订单[{payOrderId}]结果为：{channelRetMsg}");
 
                 // 关闭订单 成功
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
@@ -117,7 +119,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             catch (Exception e)
             {
                 // 关闭订单异常
-                _logger.LogError(e, $"error payOrderId = {payOrder.PayOrderId}");
+                _logger.LogError(e, "error payOrderId = {PayOrderId}", payOrder.PayOrderId);
+                //_logger.LogError(e, $"error payOrderId = {payOrder.PayOrderId}");
                 return null;
             }
 

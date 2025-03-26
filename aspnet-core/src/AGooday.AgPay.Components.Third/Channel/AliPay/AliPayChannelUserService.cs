@@ -81,7 +81,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 oauthUrl = AliPayConfig.SANDBOX_OAUTH_URL;
             }
             string alipayUserRedirectUrl = string.Format(oauthUrl, appId, callbackUrlEncode);
-            _logger.LogInformation($"alipayUserRedirectUrl={alipayUserRedirectUrl}");
+            _logger.LogInformation("alipayUserRedirectUrl={alipayUserRedirectUrl}", alipayUserRedirectUrl);
+            //_logger.LogInformation($"alipayUserRedirectUrl={alipayUserRedirectUrl}");
             return alipayUserRedirectUrl;
         }
 

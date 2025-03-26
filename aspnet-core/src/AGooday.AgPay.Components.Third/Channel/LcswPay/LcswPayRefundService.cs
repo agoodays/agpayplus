@@ -67,7 +67,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/pay/open/queryrefund", reqParams, logPrefix, mchAppConfigContext);
-                _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("查询订单 refundOrderId:{RefundOrderId}, 返回结果:{resJSON}", refundOrder.RefundOrderId, resJSON);
+                //_logger.LogInformation($"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -96,7 +97,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
                                 channelRetMsg.PlatformOrderId = channelTradeNo;
                                 channelRetMsg.PlatformMchOrderId = channelOrderNo;
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                                _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                                _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
+                                //_logger.LogInformation($"{logPrefix} >>> 退款成功");
                                 break;
                             case LcswPayEnum.TradeState.FAIL:
                             case LcswPayEnum.TradeState.NOREFUND:
@@ -104,12 +106,14 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
                                 channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                                 channelRetMsg.ChannelErrCode = resultCode;
                                 channelRetMsg.ChannelErrMsg = returnMsg;
-                                _logger.LogInformation($"{logPrefix} >>> 退款失败, {returnMsg}");
+                                _logger.LogInformation("{logPrefix} >>> 退款失败, {returnMsg}", logPrefix, returnMsg);
+                                //_logger.LogInformation($"{logPrefix} >>> 退款失败, {returnMsg}");
                                 break;
                             case LcswPayEnum.TradeState.REFUNDING:
                                 //退款中
                                 channelRetMsg.ChannelState = ChannelState.WAITING;
-                                _logger.LogInformation($"{logPrefix} >>> 退款中");
+                                _logger.LogInformation("{logPrefix} >>> 退款中", logPrefix);
+                                //_logger.LogInformation($"{logPrefix} >>> 退款中");
                                 break;
                         }
                     }
@@ -168,7 +172,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/pay/open/refund", reqParams, logPrefix, mchAppConfigContext);
-                _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("订单退款 payorderId:{PayOrderId}, 返回结果:{resJSON}", payOrder.PayOrderId, resJSON);
+                //_logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -186,13 +191,15 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
                         resJSON.TryGetString("out_refund_no", out string outRefundNo);// 利楚唯一退款订单号
                         channelRetMsg.ChannelOrderId = outRefundNo;
                         channelRetMsg.ChannelState = ChannelState.WAITING; //退款中
-                        _logger.LogInformation($"{logPrefix} >>> 退款中");
+                        _logger.LogInformation("{logPrefix} >>> 退款中", logPrefix);
+                        //_logger.LogInformation($"{logPrefix} >>> 退款中");
                     }
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
+                _logger.LogError(e, "{logPrefix}, 异常:{Message}", logPrefix, e.Message);
+                //_logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }
             return channelRetMsg;

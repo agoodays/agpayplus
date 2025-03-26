@@ -67,7 +67,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
 
             if (isvParams.SerProvId == null)
             {
-                _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
+                //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -81,9 +82,11 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             reqParams.Add("signature", YsfPaySignUtil.SignBy256(reqParams, isvPrivateCertFile, isvPrivateCertPwd)); //RSA 签名串
 
             // 调起上游接口
-            _logger.LogInformation($"{logPrefix} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation("{logPrefix} reqJSON={reqParams}", logPrefix, JsonConvert.SerializeObject(reqParams));
+            //_logger.LogInformation($"{logPrefix} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = await YsfPayHttpUtil.DoPostJsonAsync(GetHost4env(isvParams) + apiUri, reqParams);
-            _logger.LogInformation($"{logPrefix} resJSON={resText}");
+            _logger.LogInformation("{logPrefix} resJSON={resText}", logPrefix, resText);
+            //_logger.LogInformation($"{logPrefix} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

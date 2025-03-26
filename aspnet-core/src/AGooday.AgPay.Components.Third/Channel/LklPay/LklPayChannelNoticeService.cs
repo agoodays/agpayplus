@@ -60,7 +60,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                 string logPrefix = "【处理拉卡拉支付回调】";
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
-                _logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
+                _logger.LogInformation("{logPrefix} 回调参数, jsonParams：{jsonParams}", logPrefix, jsonParams);
+                //_logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
 
                 // 校验支付回调
                 bool verifyResult = await VerifyParamsAsync(request, jsonParams, payOrder, mchAppConfigContext);
@@ -69,7 +70,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                _logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
+                _logger.LogInformation("{logPrefix}验证支付通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 JObject resJSON = new JObject();
@@ -114,12 +116,14 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             string amt = jsonParams.GetValue("total_amount").ToString();         // 支付金额
             if (string.IsNullOrWhiteSpace(ordNo))
             {
-                _logger.LogInformation($"订单ID为空 [orderNo]={ordNo}");
+                _logger.LogInformation("订单ID为空 [orderNo]={ordNo}", ordNo);
+                //_logger.LogInformation($"订单ID为空 [orderNo]={ordNo}");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(amt))
             {
-                _logger.LogInformation($"金额参数为空 [amt] :{amt}");
+                _logger.LogInformation("金额参数为空 [amt] :{amt}", amt);
+                //_logger.LogInformation($"金额参数为空 [amt] :{amt}");
                 return false;
             }
 
@@ -132,7 +136,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             var headers = request.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault());
             if (!LklPaySignUtil.Verify(headers, isvParams.AppId, jsonParams.ToString(), publicKey))
             {
-                _logger.LogInformation($"【拉卡拉回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
+                _logger.LogInformation("【拉卡拉回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ", jsonParams, publicKey);
+                //_logger.LogInformation($"【拉卡拉回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
                 return false;
             }
 
@@ -140,7 +145,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             long dbPayAmt = payOrder.Amount;
             if (dbPayAmt != Convert.ToInt64(amt))
             {
-                _logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={ordNo}");
+                _logger.LogInformation("订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={ordNo}", dbPayAmt, amt, ordNo);
+                //_logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={ordNo}");
                 return false;
             }
             return true;

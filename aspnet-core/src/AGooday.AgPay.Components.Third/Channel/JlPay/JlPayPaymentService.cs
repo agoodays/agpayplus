@@ -136,7 +136,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
 
                 if (isvParams.OrgCode == null)
                 {
-                    _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
+                    //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
                 JlPayIsvSubMchParams isvsubMchParams = (JlPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
@@ -165,9 +166,11 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             // 调起上游接口
             string url = GetHost4env(sandbox) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqJSON={reqParams}", logPrefix, unionId, url, JsonConvert.SerializeObject(reqParams));
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = await JlPayHttpUtil.DoPostJsonAsync(url, reqParams);
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resJSON={resText}", logPrefix, unionId, url, resText);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -178,7 +181,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             var resParams = JObject.Parse(resText);
             if (!JlPaySignUtil.Verify(resParams, publicKey))
             {
-                _logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
+                _logger.LogWarning("{logPrefix} 验签失败！ reqJSON={reqParams} resJSON={resText}", logPrefix, JsonConvert.SerializeObject(reqParams), resText);
+                //_logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
             }
 
             return resParams;

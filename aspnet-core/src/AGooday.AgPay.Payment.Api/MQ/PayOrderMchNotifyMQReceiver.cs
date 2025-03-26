@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
     public class PayOrderMchNotifyMQReceiver : PayOrderMchNotifyMQ.IMQReceiver
     {
         private readonly IMQSender _mqSender;
-        private readonly ILogger<PayOrderMchNotifyMQReceiver> log;
+        private readonly ILogger<PayOrderMchNotifyMQReceiver> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public PayOrderMchNotifyMQReceiver(ILogger<PayOrderMchNotifyMQReceiver> logger,
@@ -23,7 +23,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
             IServiceScopeFactory serviceScopeFactory)
         {
             _mqSender = mqSender;
-            log = logger;
+            _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
         }
 
@@ -35,18 +35,19 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 var mchNotifyRecordService = scope.ServiceProvider.GetService<IMchNotifyRecordService>();
                 try
                 {
-                    log.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                    _logger.LogInformation("接收商户通知MQ, msg={payload}", JsonConvert.SerializeObject(payload));
+                    //_logger.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
 
                     long notifyId = payload.NotifyId;
                     MchNotifyRecordDto record = await mchNotifyRecordService.GetByIdAsync(notifyId);
                     if (record == null || record.State != (byte)MchNotifyRecordState.STATE_ING)
                     {
-                        log.LogInformation("查询通知记录不存在或状态不是通知中");
+                        _logger.LogInformation("查询通知记录不存在或状态不是通知中");
                         return;
                     }
                     if (record.NotifyCount >= record.NotifyCountLimit)
                     {
-                        log.LogInformation("已达到最大发送次数");
+                        _logger.LogInformation("已达到最大发送次数");
                         return;
                     }
 
@@ -86,7 +87,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     }
                     catch (Exception e)
                     {
-                        log.LogError(e, "http error");
+                        _logger.LogError(e, "http error");
                         res = $"连接[{notifyUrl}]异常:【{e.Message}】";
                     }
 
@@ -121,7 +122,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 }
                 catch (Exception e)
                 {
-                    log.LogError(e, e.Message);
+                    _logger.LogError(e, e.Message);
                     return;
                 }
             }

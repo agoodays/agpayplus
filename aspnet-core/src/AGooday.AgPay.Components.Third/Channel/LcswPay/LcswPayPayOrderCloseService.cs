@@ -57,7 +57,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/pay/open/close", reqParams, logPrefix, mchAppConfigContext);
-                _logger.LogInformation($"关闭订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("关闭订单 payorderId:{PayOrderId}, 返回结果:{resJSON}", payOrder.PayOrderId, resJSON);
+                //_logger.LogInformation($"关闭订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.SysError("【利楚扫呗】请求关闭订单异常");

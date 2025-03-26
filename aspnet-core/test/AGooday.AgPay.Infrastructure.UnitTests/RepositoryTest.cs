@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Infrastructure.UnitTests
         public void GetAllTest()
         {
             var sysUsers = _repository.GetAllAsNoTracking();
-            _logger.LogInformation($"Êä³öSql£º{sysUsers.ToQueryString()}");
+            _logger.LogInformation("Êä³öSql£º{QueryString}", sysUsers.ToQueryString());
             Assert.IsNotNull(sysUsers);
         }
 

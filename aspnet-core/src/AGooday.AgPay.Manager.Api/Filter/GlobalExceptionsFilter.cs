@@ -33,8 +33,9 @@ namespace AGooday.AgPay.Manager.Api.Filter
             context.Result = new InternalServerErrorObjectResult(errorResponse);
 
             //输出错误日志信息
-            //_logger.LogError(json.Message + WriteLog(json.Message, context.Exception));
-            _logger.LogError(context.Exception, $"\r\n【自定义错误】：{errorResponse.Msg} \r\n【异常类型】：{context.Exception.GetType().Name} \r\n【异常信息】：{context.Exception.Message} \r\n【堆栈调用】：{context.Exception.StackTrace}");
+            _logger.LogError(context.Exception, "\r\n【自定义错误】：{Msg} \r\n【异常类型】：{TypeName} \r\n【异常信息】：{ExceptionMessage} \r\n【堆栈调用】：{StackTrace}",
+                errorResponse.Msg, context.Exception.GetType().Name, context.Exception.Message, context.Exception.StackTrace);
+            //_logger.LogError(context.Exception, $"\r\n【自定义错误】：{errorResponse.Msg} \r\n【异常类型】：{context.Exception.GetType().Name} \r\n【异常信息】：{context.Exception.Message} \r\n【堆栈调用】：{context.Exception.StackTrace}");
         }
     }
 

@@ -98,11 +98,11 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                     await channel.BasicConsumeAsync(queueName, false, consumer);
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                //LogUtil<RabbitMQSender>.Error("RabbitMQ消息接收出现异常", ex);
+                //LogUtil<RabbitMQSender>.Error("RabbitMQ消息接收出现异常", e);
                 //throw;
-                _logger.LogError(ex, "RabbitMQ消息接收出现异常");
+                _logger.LogError(e, "RabbitMQ消息接收出现异常");
             }
         }
 

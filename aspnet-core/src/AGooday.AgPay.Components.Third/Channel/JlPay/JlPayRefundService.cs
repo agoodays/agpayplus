@@ -54,7 +54,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/pay/chnquery", reqParams, logPrefix, mchAppConfigContext, false);
-                _logger.LogInformation($"查询订单 refundOrderId:{refundOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("查询订单 refundOrderId:{PayOrderId}, 返回结果:{resJSON}", refundOrder.PayOrderId, resJSON);
+                //_logger.LogInformation($"查询订单 refundOrderId:{refundOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.Waiting(); //支付中
@@ -78,19 +79,22 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
                             //退款成功
                             channelRetMsg.ChannelOrderId = transactionId;
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                            _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                            _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
+                            //_logger.LogInformation($"{logPrefix} >>> 退款成功");
                             break;
                         case JlPayEnum.Status.Failure:
                             //明确退款失败
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                             channelRetMsg.ChannelErrCode = retCode;
                             channelRetMsg.ChannelErrMsg = retMsg;
-                            _logger.LogInformation($"{logPrefix} >>> 退款失败, {retMsg}");
+                            _logger.LogInformation("{logPrefix} >>> 退款失败, {retMsg}", logPrefix, retMsg);
+                            //_logger.LogInformation($"{logPrefix} >>> 退款失败, {retMsg}");
                             break;
                         case JlPayEnum.Status.Pending:
                             //退款中
                             channelRetMsg.ChannelState = ChannelState.WAITING;
-                            _logger.LogInformation($"{logPrefix} >>> 退款中");
+                            _logger.LogInformation("{logPrefix} >>> 退款中", logPrefix);
+                            //_logger.LogInformation($"{logPrefix} >>> 退款中");
                             break;
                     }
                 }
@@ -123,7 +127,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/pay/refund", reqParams, logPrefix, mchAppConfigContext, false);
-                _logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("订单退款 payorderId:{PayOrderId}, 返回结果:{resJSON}", payOrder.PayOrderId, resJSON);
+                //_logger.LogInformation($"订单退款 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
                 if (resJSON == null)
                 {
                     channelRetMsg.ChannelState = ChannelState.UNKNOWN; // 状态不明确
@@ -148,20 +153,23 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
                             //退款成功
                             channelRetMsg.ChannelOrderId = transactionId;
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
-                            _logger.LogInformation($"{logPrefix} >>> 退款成功");
+                            _logger.LogInformation("{logPrefix} >>> 退款成功", logPrefix);
+                            //_logger.LogInformation($"{logPrefix} >>> 退款成功");
                             break;
                         case JlPayEnum.Status.Failure:
                             //明确退款失败
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                             channelRetMsg.ChannelErrCode = retCode;
                             channelRetMsg.ChannelErrMsg = retMsg;
-                            _logger.LogInformation($"{logPrefix} >>> 退款失败, {retMsg}");
+                            _logger.LogInformation("{logPrefix} >>> 退款失败, {retMsg}", logPrefix, retMsg);
+                            //_logger.LogInformation($"{logPrefix} >>> 退款失败, {retMsg}");
                             break;
                         case JlPayEnum.Status.Pending:
                             //退款中
                             channelRetMsg.ChannelOrderId = transactionId;
                             channelRetMsg.ChannelState = ChannelState.WAITING;
-                            _logger.LogInformation($"{logPrefix} >>> 退款中");
+                            _logger.LogInformation("{logPrefix} >>> 退款中", logPrefix);
+                            //_logger.LogInformation($"{logPrefix} >>> 退款中");
                             break;
                     }
                 }
@@ -173,7 +181,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
+                _logger.LogError(e, "{logPrefix}, 异常:{Message}", logPrefix, e.Message);
+                //_logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
                 channelRetMsg.ChannelState = ChannelState.SYS_ERROR; // 系统异常
             }
             return channelRetMsg;

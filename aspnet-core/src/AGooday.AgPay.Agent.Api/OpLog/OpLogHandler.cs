@@ -94,9 +94,10 @@ namespace AGooday.AgPay.Agent.Api.OpLog
                 model.CreatedAt = DateTime.Now;
                 await _sysLogService.AddAsync(model);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                _logger.LogError(ex, $"操作日志：{JsonConvert.SerializeObject(model)}");
+                _logger.LogError(e, "操作日志：{model}", JsonConvert.SerializeObject(model));
+                //_logger.LogError(e, $"操作日志：{JsonConvert.SerializeObject(model)}");
             }
         }
 

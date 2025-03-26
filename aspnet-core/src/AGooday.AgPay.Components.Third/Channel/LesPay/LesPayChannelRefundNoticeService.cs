@@ -62,7 +62,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
                 string logPrefix = "【处理乐刷退款回调】";
                 // 获取请求参数
                 var resText = @params?.ToString();
-                _logger.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
+                _logger.LogInformation("{logPrefix} 回调参数, resParams：{resText}", logPrefix, resText);
+                //_logger.LogInformation($"{logPrefix} 回调参数, resParams：{resText}");
                 var resJson = XmlUtil.ConvertToJson(resText);
                 var resParams = JObject.Parse(resJson);
 
@@ -73,7 +74,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                _logger.LogInformation($"{logPrefix}验证退款通知数据及签名通过");
+                _logger.LogInformation("{logPrefix}验证退款通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix}验证退款通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 var okResponse = TextResp("000000");
@@ -132,7 +134,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             //验签失败
             if (!LesPaySignUtil.Verify(jsonParams, noticeKey))
             {
-                _logger.LogInformation($"【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey}");
+                _logger.LogInformation("【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey}", resText, noticeKey);
+                //_logger.LogInformation($"【乐刷回调】 验签失败！ 回调参数：resParams = {resText}, key = {noticeKey}");
                 return false;
             }
             return true;

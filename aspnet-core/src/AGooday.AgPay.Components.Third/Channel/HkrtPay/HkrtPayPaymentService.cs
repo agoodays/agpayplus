@@ -156,7 +156,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
 
             if (isvParams.AgentNo == null)
             {
-                _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
+                //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -171,9 +172,11 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             // 调起上游接口
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqJSON={reqParams}", logPrefix, unionId, url, JsonConvert.SerializeObject(reqParams));
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = await HkrtPayHttpUtil.DoPostAsync(url, reqParams);
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resJSON={resText}", logPrefix, unionId, url, resText);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -206,7 +209,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             }
             catch (Exception)
             {
-                _logger.LogInformation($"海科融通解析支付宝/微信原生参数异常 resParams={resParams}");
+                _logger.LogInformation("海科融通解析支付宝/微信原生参数异常 resParams={resParams}", resParams);
+                //_logger.LogInformation($"海科融通解析支付宝/微信原生参数异常 resParams={resParams}");
                 return null;
             }
         }

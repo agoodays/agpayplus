@@ -60,7 +60,8 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
+                _logger.LogError(e, "查询订单 payorderId:{PayOrderId}, 异常:{Message}", payOrder.PayOrderId, e.Message);
+                //_logger.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //支付中
             }
         }

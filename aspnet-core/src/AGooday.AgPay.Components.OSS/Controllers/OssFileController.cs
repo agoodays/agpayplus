@@ -46,7 +46,8 @@ namespace AGooday.AgPay.Components.OSS.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"upload error, fileName = {fileName}");
+                _logger.LogError(e, "upload error, bizType = {bizType}, fileName = {fileName}", bizType, fileName);
+                //_logger.LogError(e, $"upload error, fileName = {fileName}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }
@@ -65,10 +66,11 @@ namespace AGooday.AgPay.Components.OSS.Controllers
             {
                 return ApiRes.Fail(ApiCode.SYSTEM_ERROR, "选择文件不存在");
             }
+            string fileName = string.Empty;
             try
             {
                 OssFileConfig ossFileConfig = OssFileConfig.GetOssFileConfigByBizType(bizType);
-                string fileName = file.FileName;
+                fileName = file.FileName;
                 long fileSize = file.Length;
                 ValidateFile(fileName, fileSize, ossFileConfig);
 
@@ -78,7 +80,8 @@ namespace AGooday.AgPay.Components.OSS.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"upload error, fileName = {file.FileName}");
+                _logger.LogError(e, "upload error, bizType = {bizType}, fileName = {fileName}", bizType, fileName);
+                //_logger.LogError(e, $"upload error, fileName = {fileName}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }

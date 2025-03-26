@@ -60,7 +60,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
 
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
-                _logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
+                _logger.LogInformation("{logPrefix} 回调参数, jsonParams：{jsonParams}", logPrefix, jsonParams);
+                //_logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
 
                 // 校验支付回调
                 bool verifyResult = await VerifyParamsAsync(jsonParams, payOrder, mchAppConfigContext);
@@ -69,7 +70,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
                 {
                     throw ResponseException.BuildText("ERROR");
                 }
-                _logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
+                _logger.LogInformation("{logPrefix}验证支付通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 ContentResult okResponse = TextResp("success");
@@ -90,12 +92,14 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             string txnAmt = jsonParams.GetValue("txnAmt").ToString();         // 支付金额
             if (string.IsNullOrWhiteSpace(orderNo))
             {
-                _logger.LogInformation($"订单ID为空 [orderNo]={orderNo}");
+                _logger.LogInformation("订单ID为空 [orderNo]={orderNo}", orderNo);
+                //_logger.LogInformation($"订单ID为空 [orderNo]={orderNo}");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(txnAmt))
             {
-                _logger.LogInformation($"金额参数为空 [txnAmt] :{txnAmt}");
+                _logger.LogInformation("金额参数为空 [txnAmt] :{txnAmt}", txnAmt);
+                //_logger.LogInformation($"金额参数为空 [txnAmt] :{txnAmt}");
                 return false;
             }
 
@@ -107,7 +111,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             //验签失败
             if (!YsfPaySignUtil.Validate(JObject.FromObject(jsonParams), ysfpayPublicKey))
             {
-                _logger.LogInformation($"【云闪付回调】 验签失败！ 回调参数：parameter = {jsonParams}, ysfpayPublicKey={ysfpayPublicKey} ");
+                _logger.LogInformation("【云闪付回调】 验签失败！ 回调参数：parameter = {jsonParams}, ysfpayPublicKey={ysfpayPublicKey} ", jsonParams, ysfpayPublicKey);
+                //_logger.LogInformation($"【云闪付回调】 验签失败！ 回调参数：parameter = {jsonParams}, ysfpayPublicKey={ysfpayPublicKey} ");
                 return false;
             }
 
@@ -115,7 +120,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             long dbPayAmt = payOrder.Amount;
             if (dbPayAmt != Convert.ToInt64(txnAmt))
             {
-                _logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, txnAmt={txnAmt}, payOrderId={orderNo}");
+                _logger.LogInformation("订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, txnAmt={txnAmt}, payOrderId={orderNo}", dbPayAmt, txnAmt, orderNo);
+                //_logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, txnAmt={txnAmt}, payOrderId={orderNo}");
                 return false;
             }
             return true;

@@ -35,7 +35,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
         {
             string divisionBatchId = null;
             string logPrefix = $"进入[{ifCode}]分账回调";
-            _logger.LogInformation($"===== {logPrefix} =====");
+            _logger.LogInformation("===== {logPrefix} =====", logPrefix);
+            //_logger.LogInformation($"===== {logPrefix} =====");
 
             try
             {
@@ -51,7 +52,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 // 支付通道接口实现不存在
                 if (divisionNotifyService == null)
                 {
-                    _logger.LogError($"{logPrefix}, interface not exists");
+                    _logger.LogError("{logPrefix}, interface not exists", logPrefix);
+                    //_logger.LogError($"{logPrefix}, interface not exists");
                     return BadRequest($"[{ifCode}] interface not exists");
                 }
 
@@ -59,13 +61,15 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 Dictionary<string, object> mutablePair = await divisionNotifyService.ParseParamsAsync(Request);
                 if (mutablePair == null)
                 {
-                    _logger.LogError($"{logPrefix}, mutablePair is null");
+                    _logger.LogError("{logPrefix}, mutablePair is null", logPrefix);
+                    //_logger.LogError($"{logPrefix}, mutablePair is null");
                     throw new BizException("解析数据异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 
                 //解析到订单号
                 divisionBatchId = mutablePair.First().Key;
-                _logger.LogInformation($"{logPrefix}, 解析数据为：divisionBatchId:{divisionBatchId}, params:{mutablePair.First().Value}");
+                _logger.LogInformation("{logPrefix}, 解析数据为：divisionBatchId:{divisionBatchId}, params:{params}", logPrefix, divisionBatchId, mutablePair.First().Value);
+                //_logger.LogInformation($"{logPrefix}, 解析数据为：divisionBatchId:{divisionBatchId}, params:{mutablePair.First().Value}");
 
                 // 通过 batchId 查询出列表（ 注意：  需要按照ID 排序！！！！ ）
                 List<PayOrderDivisionRecordDto> recordList = _payOrderDivisionRecordService.GetByBatchOrderId(new PayOrderDivisionRecordQueryDto()
@@ -77,7 +81,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 // 订单不存在
                 if (recordList == null || recordList.Count == 0)
                 {
-                    _logger.LogError($"{logPrefix}, 待处理订单不存在. divisionBatchId={divisionBatchId}");
+                    _logger.LogError("{logPrefix}, 待处理订单不存在. divisionBatchId={divisionBatchId}", logPrefix, divisionBatchId);
+                    //_logger.LogError($"{logPrefix}, 待处理订单不存在. divisionBatchId={divisionBatchId}");
                     return divisionNotifyService.DoNotifyOrderNotExists(Request);
                 }
 
@@ -90,7 +95,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ApiRes == null)
                 {
-                    _logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult}");
+                    _logger.LogError("{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult}", logPrefix, notifyResult);
+                    //_logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult}");
                     throw new BizException("处理回调事件异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 
@@ -113,23 +119,27 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                     }
                 }
 
-                _logger.LogInformation($"===== {logPrefix}, 通知完成。 divisionBatchId={divisionBatchId}, parseState = {notifyResult} =====");
+                _logger.LogInformation("===== {logPrefix}, 通知完成。 divisionBatchId={divisionBatchId}, parseState = {notifyResult} =====", logPrefix, divisionBatchId, notifyResult);
+                //_logger.LogInformation($"===== {logPrefix}, 通知完成。 divisionBatchId={divisionBatchId}, parseState = {notifyResult} =====");
 
                 return notifyResult.ApiRes;
             }
             catch (BizException e)
             {
-                _logger.LogError(e, $"{logPrefix}, divisionBatchId={divisionBatchId}, BizException");
+                _logger.LogError(e, "{logPrefix}, divisionBatchId={divisionBatchId}, BizException", logPrefix, divisionBatchId);
+                //_logger.LogError(e, $"{logPrefix}, divisionBatchId={divisionBatchId}, BizException");
                 return BadRequest(e.Message);
             }
             catch (ResponseException e)
             {
-                _logger.LogError(e, $"{logPrefix}, divisionBatchId={divisionBatchId}, ResponseException");
+                _logger.LogError(e, "{logPrefix}, divisionBatchId={divisionBatchId}, ResponseException", logPrefix, divisionBatchId);
+                //_logger.LogError(e, $"{logPrefix}, divisionBatchId={divisionBatchId}, ResponseException");
                 return e.ResponseEntity;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, divisionBatchId={divisionBatchId}, 系统异常");
+                _logger.LogError(e, "{logPrefix}, divisionBatchId={divisionBatchId}, 系统异常", logPrefix, divisionBatchId);
+                //_logger.LogError(e, $"{logPrefix}, divisionBatchId={divisionBatchId}, 系统异常");
                 return BadRequest(e.Message);
             }
         }

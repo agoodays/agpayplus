@@ -25,7 +25,8 @@ namespace AGooday.AgPay.Payment.Api.Jobs
             {
                 var payOrderService = scope.ServiceProvider.GetService<IPayOrderService>();
                 int updateCount = await payOrderService.UpdateOrderExpiredAsync();
-                _logger.LogInformation($"处理订单超时{updateCount}条.");
+                _logger.LogInformation("处理订单超时{updateCount}条.", updateCount);
+                //_logger.LogInformation($"处理订单超时{updateCount}条.");
             }
         }
     }

@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Components.OCR.Services
         public abstract Task<CardOCRResult> RecognizeCardTextAsync(string imageUrl, string type);
         public abstract Task<string> RecognizeTextAsync(string imageUrl, string type);
 
-        protected static async Task<byte[]> GetImageBytesAsync(string imageUrl)
+        protected async Task<byte[]> GetImageBytesAsync(string imageUrl)
         {
             try
             {
@@ -42,9 +42,9 @@ namespace AGooday.AgPay.Components.OCR.Services
                     return await File.ReadAllBytesAsync(imageUrl);
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine($"Get Image Bytes Error: {ex.Message}");
+                _logger.LogError(e, "Get Image Bytes Error: {Message}", e.Message);
                 return null;
             }
         }

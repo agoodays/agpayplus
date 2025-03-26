@@ -69,10 +69,10 @@ namespace AGooday.AgPay.Components.OCR.Services
 
                 return Task.FromResult(string.Join("\n", detectedTexts));
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
                 // 处理异常
-                _logger.LogError(ex, $"Ocr异常");
+                _logger.LogError(e, "OCR异常");
                 throw;
             }
             finally
@@ -164,10 +164,10 @@ namespace AGooday.AgPay.Components.OCR.Services
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
                 // 处理异常
-                _logger.LogError(ex, $"OCR异常");
+                _logger.LogError(e, "OCR异常");
                 throw;
             }
             finally

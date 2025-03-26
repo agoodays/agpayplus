@@ -66,14 +66,16 @@ namespace AGooday.AgPay.Components.Third.Services
 
             if (payOrder == null)
             {
-                _logger.LogError($"{logPrefix}，订单不存在");
+                _logger.LogError("{logPrefix}，订单不存在", logPrefix);
+                //_logger.LogError($"{logPrefix}，订单不存在");
                 throw new BizException("订单不存在");
             }
 
             // 订单不是成功状态 || 分账状态不正确
             if (payOrder.State != (byte)PayOrderState.STATE_SUCCESS || (payOrder.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_WAIT_TASK && payOrder.DivisionState != (byte)PayOrderDivisionState.DIVISION_STATE_UNHAPPEN))
             {
-                _logger.LogError($"{logPrefix}, 订单状态或分账状态不正确");
+                _logger.LogError("{logPrefix}, 订单状态或分账状态不正确", logPrefix);
+                //_logger.LogError($"{logPrefix}, 订单状态或分账状态不正确");
                 throw new BizException("订单状态或分账状态不正确");
             }
 
@@ -82,7 +84,8 @@ namespace AGooday.AgPay.Components.Third.Services
             bool updPayOrder = await _payOrderService.UpdateAsync(payOrder);
             if (!updPayOrder)
             {
-                _logger.LogError($"{logPrefix}, 更新支付订单为分账处理中异常！");
+                _logger.LogError("{logPrefix}, 更新支付订单为分账处理中异常！", logPrefix);
+                //_logger.LogError($"{logPrefix}, 更新支付订单为分账处理中异常！");
                 throw new BizException("更新支付订单为分账处理中异常");
             }
             // 所有的分账列表
@@ -165,7 +168,8 @@ namespace AGooday.AgPay.Components.Third.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, 调用分账接口异常");
+                _logger.LogError(e, "{logPrefix}, 调用分账接口异常", logPrefix);
+                //_logger.LogError(e, $"{logPrefix}, 调用分账接口异常");
                 await _payOrderDivisionRecordService.UpdateRecordSuccessOrFailAsync(recordList, (byte)PayOrderDivisionRecordState.STATE_FAIL, null, $"系统异常：{e.Message}");
 
                 channelRetMsg = ChannelRetMsg.ConfirmFail(null, null, e.Message);

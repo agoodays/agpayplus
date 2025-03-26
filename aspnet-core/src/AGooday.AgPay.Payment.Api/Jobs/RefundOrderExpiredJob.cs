@@ -25,7 +25,8 @@ namespace AGooday.AgPay.Payment.Api.Jobs
             {
                 var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
                 int updateCount = await refundOrderService.UpdateOrderExpiredAsync();
-                _logger.LogInformation($"处理退款订单超时{updateCount}条.");
+                _logger.LogInformation("处理退款订单超时{updateCount}条.", updateCount);
+                //_logger.LogInformation($"处理退款订单超时{updateCount}条.");
             }
         }
     }

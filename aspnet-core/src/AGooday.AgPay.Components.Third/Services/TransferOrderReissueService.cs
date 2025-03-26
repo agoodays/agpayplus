@@ -44,7 +44,8 @@ namespace AGooday.AgPay.Components.Third.Services
                 // 支付通道转账接口实现不存在
                 if (transferService == null)
                 {
-                    _logger.LogError($"{transferOrder.IfCode} interface not exists!");
+                    _logger.LogError("{IfCode} interface not exists!", transferOrder.IfCode);
+                    //_logger.LogError($"{transferOrder.IfCode} interface not exists!");
                     return null;
                 }
 
@@ -58,7 +59,8 @@ namespace AGooday.AgPay.Components.Third.Services
                     return null;
                 }
 
-                _logger.LogInformation($"补单[{transferId}]查询结果为：{channelRetMsg}", transferId);
+                _logger.LogInformation("补单[{transferId}]查询结果为：{channelRetMsg}", transferId, channelRetMsg);
+                //_logger.LogInformation($"补单[{transferId}]查询结果为：{channelRetMsg}");
 
                 // 查询成功
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
@@ -81,7 +83,8 @@ namespace AGooday.AgPay.Components.Third.Services
             catch (Exception e)
             {
                 //继续下一次迭代查询
-                _logger.LogError(e, $"error transferId = {transferOrder.TransferId}");
+                _logger.LogError(e, "error transferId = {TransferId}", transferOrder.TransferId);
+                //_logger.LogError(e, $"error transferId = {transferOrder.TransferId}");
                 return null;
             }
         }

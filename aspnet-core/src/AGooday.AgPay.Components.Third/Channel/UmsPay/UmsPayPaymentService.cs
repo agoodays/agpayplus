@@ -79,7 +79,8 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
 
             if (string.IsNullOrWhiteSpace(isvParams?.AppId) || string.IsNullOrWhiteSpace(isvParams?.AppKey))
             {
-                _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
+                //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -91,9 +92,11 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             // 调起上游接口
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqJSON={reqParams}", logPrefix, unionId, url, JsonConvert.SerializeObject(reqParams));
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
             string resText = await UmsPayHttpUtil.DoPostJsonAsync(url, isvParams.AppId, isvParams.AppKey, reqParams);
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resJSON={resText}", logPrefix, unionId, url, resText);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

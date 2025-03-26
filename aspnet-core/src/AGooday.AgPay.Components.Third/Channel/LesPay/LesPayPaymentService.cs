@@ -141,7 +141,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
 
             if (isvParams.AgentId == null)
             {
-                _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
+                //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -157,9 +158,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
             var reqText = string.Join("&", reqParams.Select(s => $"{s.Key}={s.Value}"));
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqText={reqText}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqText={reqText}", logPrefix, unionId, url, reqText);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqText={reqText}");
             string resText = await LesPayHttpUtil.DoPostAsync(url, reqText);
-            _logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resText={resText}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resText={resText}", logPrefix, unionId, url, resText);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resText={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

@@ -63,7 +63,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                 string logPrefix = "【处理斗拱支付回调】";
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
-                _logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
+                _logger.LogInformation("{logPrefix} 回调参数, jsonParams：{jsonParams}", logPrefix, jsonParams);
+                //_logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
 
                 // 校验支付回调
                 bool verifyResult = await VerifyParamsAsync(jsonParams, payOrder, mchAppConfigContext);
@@ -72,7 +73,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                 {
                     throw ResponseException.BuildText("ERROR", (int)HttpStatusCode.BadRequest);
                 }
-                _logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
+                _logger.LogInformation("{logPrefix}验证支付通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 JObject resJSON = new JObject();
@@ -149,12 +151,14 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             string transAmt = jsonParams.GetValue("trans_amt").ToString();  // 支付金额
             if (string.IsNullOrWhiteSpace(reqSeqId))
             {
-                _logger.LogInformation($"订单ID为空 [reqSeqId]={reqSeqId}");
+                _logger.LogInformation("订单ID为空 [reqSeqId]={reqSeqId}", reqSeqId);
+                //_logger.LogInformation($"订单ID为空 [reqSeqId]={reqSeqId}");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(transAmt))
             {
-                _logger.LogInformation($"金额参数为空 [amt] :{transAmt}");
+                _logger.LogInformation("金额参数为空 [amt] :{transAmt}", transAmt);
+                //_logger.LogInformation($"金额参数为空 [amt] :{transAmt}");
                 return false;
             }
 
@@ -166,7 +170,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
 
                 if (isvParams.SysId == null)
                 {
-                    _logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
+                    //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
                 publicKey = isvParams.RsaPublicKey;
@@ -177,7 +182,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
 
                 if (normalMchParams.HuifuId == null)
                 {
-                    _logger.LogError($"商户配置为空：normalMchParams：{JsonConvert.SerializeObject(normalMchParams)}");
+                    _logger.LogError("商户配置为空：normalMchParams：{normalMchParams}", JsonConvert.SerializeObject(normalMchParams));
+                    //_logger.LogError($"商户配置为空：normalMchParams：{JsonConvert.SerializeObject(normalMchParams)}");
                     throw new BizException("商户配置为空。");
                 }
 
@@ -187,7 +193,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             //验签失败
             if (!DgPaySignUtil.Verify(jsonParams, publicKey))
             {
-                _logger.LogInformation($"【斗拱回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey} ");
+                _logger.LogInformation("【斗拱回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey = {publicKey}", jsonParams, publicKey);
+                //_logger.LogInformation($"【斗拱回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey = {publicKey}");
                 return false;
             }
 
@@ -195,7 +202,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
             long dbPayAmt = payOrder.Amount;
             if (dbPayAmt != Convert.ToInt64(transAmt))
             {
-                _logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={transAmt}, payOrderId={reqSeqId}");
+                _logger.LogInformation("订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={transAmt}, payOrderId={reqSeqId}", dbPayAmt, transAmt, reqSeqId);
+                //_logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={transAmt}, payOrderId={reqSeqId}");
                 return false;
             }
             return true;

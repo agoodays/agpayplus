@@ -70,7 +70,8 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 异常:{e.Message}");
+                _logger.LogError(e, "查询订单 refundOrderId:{RefundOrderId}, 异常:{Message}", refundOrder.RefundOrderId, e.Message);
+                //_logger.LogError(e, $"查询订单 refundOrderId:{refundOrder.RefundOrderId}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //退款中
             }
         }
@@ -262,7 +263,8 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
+                _logger.LogError(e, "{logPrefix}, 异常:{Message}", logPrefix, e.Message);
+                //_logger.LogError(e, $"{logPrefix}, 异常:{e.Message}");
                 return ChannelRetMsg.Waiting(); //支付中
             }
         }

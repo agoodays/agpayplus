@@ -61,7 +61,8 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
                     if (result.MessageType == WebSocketMessageType.Text && !result.CloseStatus.HasValue)
                     {
                         var msg = Encoding.UTF8.GetString(buffer);
-                        _logger.LogInformation($"Websocket客户端Cid[{this.Cid}], PayOrderId[{this.PayOrderId}]接收异步消息: {msg}.");
+                        _logger.LogInformation("Websocket客户端Cid[{Cid}], PayOrderId[{PayOrderId}]接收异步消息: {msg}.", this.Cid, this.PayOrderId, msg);
+                        //_logger.LogInformation($"Websocket客户端Cid[{this.Cid}], PayOrderId[{this.PayOrderId}]接收异步消息: {msg}.");
                     }
                     else
                     {
@@ -71,16 +72,19 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
                             wsOrderIdMap.TryRemove(this.PayOrderId, out ISet<WsPayOrderServer> wsSet);
                         }
                         this.SubOnlineCount();
-                        _logger.LogInformation($"Websocket客户端Cid[{this.Cid}], PayOrderId[{this.PayOrderId}], 当前在线人数为: {this.GetOnlineClientSize()}");
+                        _logger.LogInformation("Websocket客户端Cid[{Cid}], PayOrderId[{PayOrderId}], 当前在线人数为: {OnlineClientSize}", this.Cid, this.PayOrderId, this.GetOnlineClientSize());
+                        //_logger.LogInformation($"Websocket客户端Cid[{this.Cid}], PayOrderId[{this.PayOrderId}], 当前在线人数为: {this.GetOnlineClientSize()}");
                     }
                 }
                 while (!result.CloseStatus.HasValue);
 
-                _logger.LogInformation($"Websocket客户端Cid[{this.Cid}], PayOrderId[{this.PayOrderId}]连接开启监听！当前在线人数为: {OnlineClientSize}");
+                _logger.LogInformation("Websocket客户端Cid[{Cid}], PayOrderId[{PayOrderId}]连接开启监听！当前在线人数为: {OnlineClientSize}", this.Cid, this.PayOrderId, OnlineClientSize);
+                //_logger.LogInformation($"Websocket客户端Cid[{this.Cid}], PayOrderId[{this.PayOrderId}]连接开启监听！当前在线人数为: {OnlineClientSize}");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Websocket监听异常, 客户端Cid[{this.Cid}], PayOrderId[{this.PayOrderId}]");
+                _logger.LogError(e, "Websocket监听异常, 客户端Cid[{Cid}], PayOrderId[{PayOrderId}]", this.Cid, this.PayOrderId);
+                //_logger.LogError(e, $"Websocket监听异常, 客户端Cid[{this.Cid}], PayOrderId[{this.PayOrderId}]");
             }
         }
 
@@ -107,12 +111,14 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
         {
             try
             {
-                _logger.LogInformation($"推送ws消息到浏览器, PayOrderId={payOrderId}, Msg={msg}");
+                _logger.LogInformation("推送ws消息到浏览器, PayOrderId={payOrderId}, Msg={msg}", payOrderId, msg);
+                //_logger.LogInformation($"推送ws消息到浏览器, PayOrderId={payOrderId}, Msg={msg}");
 
                 var isExist = wsOrderIdMap.TryGetValue(payOrderId, out ISet<WsPayOrderServer> wsSet);
                 if (!isExist)
                 {
-                    _logger.LogInformation($"PayOrderId[{payOrderId}] 无ws监听客户端");
+                    _logger.LogInformation("PayOrderId[{payOrderId}] 无ws监听客户端", payOrderId);
+                    //_logger.LogInformation($"PayOrderId[{payOrderId}] 无ws监听客户端");
                     return;
                 }
 
@@ -124,13 +130,15 @@ namespace AGooday.AgPay.Merchant.Api.WebSockets
                     }
                     catch (Exception e)
                     {
-                        _logger.LogInformation(e, $"推送设备消息时异常, PayOrderId={payOrderId}, Cid={item.Cid}");
+                        _logger.LogInformation(e, "推送设备消息时异常, PayOrderId={payOrderId}, Cid={Cid}", payOrderId, item.Cid);
+                        //_logger.LogInformation(e, $"推送设备消息时异常, PayOrderId={payOrderId}, Cid={item.Cid}");
                     }
                 }
             }
             catch (Exception e)
             {
-                _logger.LogInformation(e, $"推送消息时异常, PayOrderId={payOrderId}");
+                _logger.LogInformation(e, "推送消息时异常, PayOrderId={payOrderId}", payOrderId);
+                //_logger.LogInformation(e, $"推送消息时异常, PayOrderId={payOrderId}");
             }
         }
 

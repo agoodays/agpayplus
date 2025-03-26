@@ -35,36 +35,37 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             ApiRes errorResponse = ApiRes.Fail(ApiCode.SYSTEM_ERROR, exception.Message);
             switch (exception)
             {
-                case ApplicationException ex:
-                    if (ex.Message.Contains("Invalid token"))
+                case ApplicationException e:
+                    if (e.Message.Contains("Invalid token"))
                     {
                         response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                        errorResponse.Msg = ex.Message;
+                        errorResponse.Msg = e.Message;
                         break;
                     }
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    errorResponse.Msg = ex.Message;
+                    errorResponse.Msg = e.Message;
                     break;
-                //case KeyNotFoundException ex:
+                //case KeyNotFoundException e:
                 //    //response.StatusCode = (int)HttpStatusCode.NotFound;
-                //    //errorResponse.Msg = ex.Message;
+                //    //errorResponse.Msg = e.Message;
                 //    break;
                 case UnauthorizeException:
                     response.StatusCode = (int)HttpStatusCode.Unauthorized;
                     errorResponse.Code = ApiCode.SUCCESS.GetCode();
                     errorResponse.Msg = "登录失效";
                     break;
-                case BizException ex:
-                    errorResponse = ex.ApiRes;// 自定义的异常错误信息类型
+                case BizException e:
+                    errorResponse = e.ApiRes;// 自定义的异常错误信息类型
                     //response.StatusCode = (int)HttpStatusCode.OK;
-                    //errorResponse.Msg = ex.Message;
+                    //errorResponse.Msg = e.Message;
                     break;
                 default:
                     //response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     //errorResponse.Msg = "Internal Server errors. Check Logs!";
                     break;
             }
-            _logger.LogError(exception, $"[{context.TraceIdentifier}] {exception.Message}");
+            _logger.LogError(exception, "[{TraceIdentifier}] {Message}", context.TraceIdentifier, exception.Message);
+            //_logger.LogError(exception, $"[{context.TraceIdentifier}] {exception.Message}");
             await response.WriteAsJsonAsync(errorResponse);
         }
     }

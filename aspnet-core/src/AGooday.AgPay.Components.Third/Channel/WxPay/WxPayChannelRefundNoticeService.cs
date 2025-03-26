@@ -101,7 +101,8 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     headerJSON.Add("Wechatpay-Nonce", nonce);
                     headerJSON.Add("Wechatpay-Signature", signature);
                     headerJSON.Add("Wechatpay-Serial", serialNumber);
-                    _logger.LogInformation($"\n【请求头信息】：{headerJSON}\n【加密数据】：{webhookJson}");
+                    _logger.LogInformation("\n【请求头信息】：{headerJSON}\n【加密数据】：{webhookJson}", headerJSON, webhookJson);
+                    //_logger.LogInformation($"\n【请求头信息】：{headerJSON}\n【加密数据】：{webhookJson}");
 
                     var valid = client.VerifyEventSignature(timestamp, nonce, webhookJson, signature, serialNumber);
                     if (!valid.Result)

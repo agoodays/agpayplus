@@ -83,9 +83,9 @@ namespace AGooday.AgPay.Notice.Email
                 }, input.Subject, _emailOptions.IntervalSeconds ?? _noticeOptions.IntervalSeconds ?? 10);
 
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                response.ErrMsg = $"邮件发送异常:{ex.Message}";
+                response.ErrMsg = $"邮件发送异常:{e.Message}";
             }
             return response;
         }

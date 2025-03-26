@@ -128,9 +128,10 @@ namespace AGooday.AgPay.Components.Third.Channel
             {
                 return _serviceProvider.GetRequiredKeyedService<T>(serviceKey);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException e)
             {
-                _logger.LogError(ex, $"Service with key '{serviceKey}' not found.");
+                _logger.LogError(e, "Service with key '{serviceKey}' not found.", serviceKey);
+                //_logger.LogError(e, $"Service with key '{serviceKey}' not found.");
                 return default;
             }
         }

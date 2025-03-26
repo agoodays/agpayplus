@@ -51,7 +51,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         {
             string urlOrderId = payOrderId;
             string logPrefix = $"进入[{ifCode}]支付同步跳转：urlOrderId：[{payOrderId}] ";
-            _logger.LogInformation($"===== {logPrefix} =====");
+            _logger.LogInformation("===== {logPrefix} =====", logPrefix);
+            //_logger.LogInformation($"===== {logPrefix} =====");
 
             try
             {
@@ -65,7 +66,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 支付通道接口实现不存在
                 if (payNotifyService == null)
                 {
-                    _logger.LogError($"{logPrefix}, interface not exists ");
+                    _logger.LogError("{logPrefix}, interface not exists ", logPrefix);
+                    //_logger.LogError($"{logPrefix}, interface not exists ");
                     return this.ToReturnPage($"[{ifCode}] interface not exists");
                 }
 
@@ -74,17 +76,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 if (mutablePair == null)
                 {
                     // 解析数据失败， 响应已处理
-                    _logger.LogError($"{logPrefix}, mutablePair is null ");
+                    _logger.LogError("{logPrefix}, mutablePair is null ", logPrefix);
+                    //_logger.LogError($"{logPrefix}, mutablePair is null ");
                     throw new BizException("解析数据异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 
                 //解析到订单号
                 payOrderId = mutablePair.First().Key;
-                _logger.LogInformation($"{logPrefix}, 解析数据为：payOrderId:{payOrderId}, params:{mutablePair.First().Value}");
+                _logger.LogInformation("{logPrefix}, 解析数据为：payOrderId:{payOrderId}, params:{params}", logPrefix, payOrderId, mutablePair.First().Value);
+                //_logger.LogInformation($"{logPrefix}, 解析数据为：payOrderId:{payOrderId}, params:{mutablePair.First().Value}");
 
                 if (!string.IsNullOrWhiteSpace(urlOrderId) && !urlOrderId.Equals(payOrderId))
                 {
-                    _logger.LogError($"{logPrefix}, 订单号不匹配. urlOrderId={urlOrderId}, payOrderId={payOrderId} ");
+                    _logger.LogError("{logPrefix}, 订单号不匹配. urlOrderId={urlOrderId}, payOrderId={payOrderId}", logPrefix, urlOrderId, payOrderId);
+                    //_logger.LogError($"{logPrefix}, 订单号不匹配. urlOrderId={urlOrderId}, payOrderId={payOrderId}");
                     throw new BizException("订单号不匹配！");
                 }
 
@@ -94,7 +99,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 订单不存在
                 if (payOrder == null)
                 {
-                    _logger.LogError($"{logPrefix}, 订单不存在. payOrderId={payOrderId} ");
+                    _logger.LogError("{logPrefix}, 订单不存在. payOrderId={payOrderId}", logPrefix, payOrderId);
+                    //_logger.LogError($"{logPrefix}, 订单不存在. payOrderId={payOrderId}");
                     return this.ToReturnPage("支付订单不存在");
                 }
 
@@ -107,7 +113,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)
                 {
-                    _logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ");
+                    _logger.LogError("{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ", logPrefix, notifyResult);
+                    //_logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ");
                     throw new BizException("处理回调事件异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 
@@ -122,7 +129,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 }
 
                 bool hasReturnUrl = string.IsNullOrWhiteSpace(payOrder.ReturnUrl);
-                _logger.LogInformation($"===== {logPrefix}, 订单通知完成。 payOrderId={payOrderId}, parseState = {notifyResult.ChannelState}, hasReturnUrl={hasReturnUrl} =====");
+                _logger.LogInformation("===== {logPrefix}, 订单通知完成。 payOrderId={payOrderId}, parseState = {ChannelState}, hasReturnUrl={hasReturnUrl} =====", logPrefix, payOrderId, notifyResult.ChannelState, hasReturnUrl);
+                //_logger.LogInformation($"===== {logPrefix}, 订单通知完成。 payOrderId={payOrderId}, parseState = {notifyResult.ChannelState}, hasReturnUrl={hasReturnUrl} =====");
 
                 //包含通知地址时
                 if (hasReturnUrl)
@@ -138,18 +146,21 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
             catch (BizException e)
             {
-                _logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, BizException");
+                _logger.LogError(e, "{logPrefix}, payOrderId={payOrderId}, BizException", logPrefix, payOrderId);
+                //_logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, BizException");
                 return this.ToReturnPage(e.Message);
             }
             catch (ResponseException e)
             {
-                _logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, ResponseException");
+                _logger.LogError(e, "{logPrefix}, payOrderId={payOrderId}, ResponseException", logPrefix, payOrderId);
+                //_logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, ResponseException");
                 return this.ToReturnPage(e.Message);
 
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, 系统异常");
+                _logger.LogError(e, "{logPrefix}, payOrderId={payOrderId}, 系统异常", logPrefix, payOrderId);
+                //_logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, 系统异常");
                 return this.ToReturnPage(e.Message);
             }
         }
@@ -165,7 +176,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         {
             string urlOrderId = payOrderId;
             string logPrefix = $"进入[{ifCode}]支付回调：urlOrderId：[{payOrderId}] ";
-            _logger.LogInformation($"===== {logPrefix} =====", logPrefix);
+            _logger.LogInformation("===== {logPrefix} =====", logPrefix);
+            //_logger.LogInformation($"===== {logPrefix} =====");
 
             try
             {
@@ -179,7 +191,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 支付通道接口实现不存在
                 if (payNotifyService == null)
                 {
-                    _logger.LogError($"{logPrefix}, interface not exists ");
+                    _logger.LogError("{logPrefix}, interface not exists ", logPrefix);
+                    //_logger.LogError($"{logPrefix}, interface not exists ");
                     return BadRequest($"[{ifCode}] interface not exists");
                 }
 
@@ -188,17 +201,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 if (mutablePair == null)
                 {
                     // 解析数据失败， 响应已处理
-                    _logger.LogError($"{logPrefix}, mutablePair is null ");
+                    _logger.LogError("{logPrefix}, mutablePair is null ", logPrefix);
+                    //_logger.LogError($"{logPrefix}, mutablePair is null ");
                     throw new BizException("解析数据异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 
                 //解析到订单号
                 payOrderId = mutablePair.First().Key;
-                _logger.LogInformation($"{logPrefix}, 解析数据为：payOrderId:{payOrderId}, params:{mutablePair.First().Value}");
+                _logger.LogInformation("{logPrefix}, 解析数据为：payOrderId:{payOrderId}, params:{params}", logPrefix, payOrderId, mutablePair.First().Value);
+                //_logger.LogInformation($"{logPrefix}, 解析数据为：payOrderId:{payOrderId}, params:{mutablePair.First().Value}");
 
                 if (!string.IsNullOrWhiteSpace(urlOrderId) && !urlOrderId.Equals(payOrderId))
                 {
-                    _logger.LogError($"{logPrefix}, 订单号不匹配. urlOrderId={urlOrderId}, payOrderId={payOrderId} ");
+                    _logger.LogError("{logPrefix}, 订单号不匹配. urlOrderId={urlOrderId}, payOrderId={payOrderId} ", logPrefix, urlOrderId, payOrderId);
+                    //_logger.LogError($"{logPrefix}, 订单号不匹配. urlOrderId={urlOrderId}, payOrderId={payOrderId} ");
                     throw new BizException("订单号不匹配！");
                 }
 
@@ -208,7 +224,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 订单不存在
                 if (payOrder == null)
                 {
-                    _logger.LogError($"{logPrefix}, 订单不存在. payOrderId={payOrderId} ");
+                    _logger.LogError("{logPrefix}, 订单不存在. payOrderId={payOrderId} ", logPrefix, payOrderId);
+                    //_logger.LogError($"{logPrefix}, 订单不存在. payOrderId={payOrderId} ");
                     return payNotifyService.DoNotifyOrderNotExists(Request);
                 }
 
@@ -221,7 +238,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)
                 {
-                    _logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ");
+                    _logger.LogError("{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ", logPrefix, notifyResult);
+                    //_logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ");
                     throw new BizException("处理回调事件异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 
@@ -244,7 +262,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                 // 更新订单 异常
                 if (!updateOrderSuccess)
                 {
-                    _logger.LogError($"{logPrefix}, updateOrderSuccess = {updateOrderSuccess} ");
+                    _logger.LogError("{logPrefix}, updateOrderSuccess = {updateOrderSuccess} ", logPrefix, updateOrderSuccess);
+                    //_logger.LogError($"{logPrefix}, updateOrderSuccess = {updateOrderSuccess} ");
                     return payNotifyService.DoNotifyOrderStateUpdateFail(Request);
                 }
 
@@ -254,7 +273,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     await _payOrderProcessService.ConfirmSuccessAsync(payOrder);
                 }
 
-                _logger.LogInformation($"===== {logPrefix}, 订单通知完成。 payOrderId={payOrderId}, parseState = {notifyResult.ChannelState} =====");
+                _logger.LogInformation("===== {logPrefix}, 订单通知完成。 payOrderId={payOrderId}, parseState = {ChannelState} =====", logPrefix, payOrderId, notifyResult.ChannelState);
+                //_logger.LogInformation($"===== {logPrefix}, 订单通知完成。 payOrderId={payOrderId}, parseState = {notifyResult.ChannelState} =====");
 
                 //return StatusCode((int)HttpStatusCode.BadRequest, new
                 //{
@@ -265,17 +285,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
             catch (BizException e)
             {
-                _logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, BizException");
+                _logger.LogError(e, "{logPrefix}, payOrderId={payOrderId}, BizException", logPrefix, payOrderId);
+                //_logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, BizException");
                 return BadRequest(e.Message);
             }
             catch (ResponseException e)
             {
-                _logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, ResponseException");
+                _logger.LogError(e, "{logPrefix}, payOrderId={payOrderId}, ResponseException", logPrefix, payOrderId);
+                //_logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, ResponseException");
                 return e.ResponseEntity;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, 系统异常");
+                _logger.LogError(e, "{logPrefix}, payOrderId={payOrderId}, 系统异常", logPrefix, payOrderId);
+                //_logger.LogError(e, $"{logPrefix}, payOrderId={payOrderId}, 系统异常");
                 return BadRequest(e.Message);
             }
         }
@@ -289,7 +312,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         public ActionResult DoPosNotify(string ifCode)
         {
             string logPrefix = $"进入[{ifCode}]POS支付回调：";
-            _logger.LogInformation($"===== {logPrefix} =====", logPrefix);
+            _logger.LogInformation("===== {logPrefix} =====", logPrefix);
+            //_logger.LogInformation($"===== {logPrefix} =====");
             try
             {
                 if (string.IsNullOrWhiteSpace(ifCode))
@@ -301,17 +325,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             }
             catch (BizException e)
             {
-                _logger.LogError(e, $"{logPrefix}, BizException");
+                _logger.LogError(e, "{logPrefix}, BizException", logPrefix);
+                //_logger.LogError(e, $"{logPrefix}, BizException");
                 return BadRequest(e.Message);
             }
             catch (ResponseException e)
             {
-                _logger.LogError(e, $"{logPrefix}, ResponseException");
+                _logger.LogError(e, "{logPrefix}, ResponseException", logPrefix);
+                //_logger.LogError(e, $"{logPrefix}, ResponseException");
                 return e.ResponseEntity;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{logPrefix}, 系统异常");
+                _logger.LogError(e, "{logPrefix}, 系统异常", logPrefix);
+                //_logger.LogError(e, $"{logPrefix}, 系统异常");
                 return BadRequest(e.Message);
             }
         }

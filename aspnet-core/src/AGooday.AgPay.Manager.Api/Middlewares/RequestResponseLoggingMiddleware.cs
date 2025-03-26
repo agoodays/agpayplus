@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                 try
                 {
                     // 存储请求数据
-                    await RequestDataLog(context);
+                    await RequestDataLogAsync(context);
 
                     using var ms = new MemoryStream();
                     context.Response.Body = ms;
@@ -48,15 +48,16 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                     await _next(context);
 
                     // 存储响应数据
-                    ResponseDataLog(context, ms);
+                    await ResponseDataLogAsync(context, ms);
 
                     ms.Position = 0;
                     await ms.CopyToAsync(originalBody);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
                     // 记录异常
-                    _logger.LogError(ex, $"[{context.TraceIdentifier}] {ex.Message}");
+                    _logger.LogError(e, "[{TraceIdentifier}] {Message}", context.TraceIdentifier, e.Message);
+                    //_logger.LogError(x, $"[{context.TraceIdentifier}] {e.Message}");
                 }
                 finally
                 {
@@ -69,7 +70,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             }
         }
 
-        private async Task RequestDataLog(HttpContext context)
+        private async Task RequestDataLogAsync(HttpContext context)
         {
             var request = context.Request;
             var sr = new StreamReader(request.Body);
@@ -82,15 +83,16 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
                 body = await sr.ReadToEndAsync(),
             };
 
-            _logger.LogInformation($"[{context.TraceIdentifier}] RequestData:{JsonConvert.SerializeObject(content)}");
+            _logger.LogInformation("[{TraceIdentifier}] RequestData: {RequestData}", context.TraceIdentifier, JsonConvert.SerializeObject(content));
+            //_logger.LogInformation($"[{context.TraceIdentifier}] RequestData:{JsonConvert.SerializeObject(content)}");
 
             request.Body.Position = 0;
         }
 
-        private void ResponseDataLog(HttpContext context, MemoryStream ms)
+        private async Task ResponseDataLogAsync(HttpContext context, MemoryStream ms)
         {
             ms.Position = 0;
-            var responseBody = new StreamReader(ms).ReadToEnd();
+            var responseBody = await new StreamReader(ms).ReadToEndAsync();
 
             // 去除 Html
             //var reg = "<[^>]+>";
@@ -98,7 +100,8 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
 
             if (!string.IsNullOrEmpty(responseBody))
             {
-                _logger.LogInformation($"[{context.TraceIdentifier}] ResponseData:{responseBody}");
+                _logger.LogInformation("[{TraceIdentifier}] ResponseData: {ResponseData}", context.TraceIdentifier, responseBody);
+                //_logger.LogInformation($"[{context.TraceIdentifier}] ResponseData:{responseBody}");
             }
         }
     }
