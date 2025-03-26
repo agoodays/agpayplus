@@ -21,9 +21,9 @@ VueRouter.prototype.push = function push (location, onResolve, onReject) {
 Vue.use(VueRouter)
 
 const routes = [
-  {path: '/hub/:agpayToken', name: 'Hub', component: () => import('../views/Hub.vue')}, //自动分发器
+  {path: '/hub/:agpayToken?', name: 'Hub', component: () => import('../views/Hub.vue')}, //自动分发器
   {path: '/error', name: 'Error', component: () => import('../views/Error.vue')},
-  {path: '/oauth2Callback/:agpayToken', name: 'Oauth2Callback', component: () => import('../views/Oauth2Callback.vue')}, //oauth回调地址
+  {path: '/oauth2Callback/:agpayToken?', name: 'Oauth2Callback', component: () => import('../views/Oauth2Callback.vue')}, //oauth回调地址
   {path: '/cashier', name: 'Cashier', component: () => import('../views/Cashier.vue'), //收银台（该地址无意义）
     children: [
         { path: '/cashier/index', name: 'CashierIndex', component: () => import('../views/payway/Index') },

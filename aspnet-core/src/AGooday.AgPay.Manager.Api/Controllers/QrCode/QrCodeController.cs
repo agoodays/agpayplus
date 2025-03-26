@@ -63,11 +63,13 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             var mchInfos = _mchInfoService.GetByMchNos(mchNos);
             var mchApps = _mchAppService.GetByAppIds(appIds);
             var mchStores = _mchStoreService.GetByStoreIdsAsNoTracking(storeIds);
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
             foreach (var item in data)
             {
                 item.AddExt("mchName", mchInfos?.FirstOrDefault(s => s.MchNo == item.MchNo)?.MchName);
                 item.AddExt("appName", mchApps?.FirstOrDefault(s => s.AppId == item.AppId)?.AppName);
                 item.AddExt("storeName", mchStores?.FirstOrDefault(s => s.StoreId == item.StoreId)?.StoreName);
+                item.AddExt("payHostUrl", dbApplicationConfig.PaySiteUrl);
             }
             return ApiPageRes<QrCodeDto>.Pages(data);
         }
