@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Diagnostics;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.LcswPay;
 using AGooday.AgPay.Common.Constants;
@@ -148,12 +149,15 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             // 调起上游接口
             string url = GetHost4env(lcswParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            var reqJSON = JsonConvert.SerializeObject(reqParams);
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqJSON={reqJSON}", logPrefix, unionId, url, reqJSON);
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={reqJSON}");
-            string resText = await LcswPayHttpUtil.DoPostAsync(url, reqJSON);
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resJSON={resText}", logPrefix, unionId, url, resText);
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            var stopwatch = new Stopwatch();
+            var reqJsonData = JsonConvert.SerializeObject(reqParams);
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData}", logPrefix, unionId, url, reqJsonData);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData}");
+            stopwatch.Restart();
+            string resText = await LcswPayHttpUtil.DoPostAsync(url, reqJsonData);
+            var time = stopwatch.ElapsedMilliseconds;
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, reqJsonData, resText, time);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData} resData={resText} time={time}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -164,8 +168,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
             var resParams = JObject.Parse(resText);
             if (!LcswPaySignUtil.Verify(resParams, key))
             {
-                _logger.LogWarning("{logPrefix} 验签失败！ reqJSON={reqJSON} resJSON={resText}", logPrefix, reqJSON, resText);
-                //_logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={reqJSON} resJSON={resText}");
+                _logger.LogWarning("{logPrefix} unionId={unionId} url={url} 验签失败！ reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, reqJsonData, resText, time);
+                //_logger.LogWarning($"{logPrefix} unionId={unionId} url={url} 验签失败！ reqData={reqJsonData} resData={resText} time={time}");
             }
 
             return resParams;

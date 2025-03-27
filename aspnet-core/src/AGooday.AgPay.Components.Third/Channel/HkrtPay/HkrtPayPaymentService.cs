@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Diagnostics;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.HkrtPay;
 using AGooday.AgPay.Common.Constants;
@@ -172,11 +173,15 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             // 调起上游接口
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqJSON={reqParams}", logPrefix, unionId, url, JsonConvert.SerializeObject(reqParams));
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            var stopwatch = new Stopwatch();
+            var reqJsonData = JsonConvert.SerializeObject(reqParams);
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData}", logPrefix, unionId, url, reqJsonData);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData}");
+            stopwatch.Restart();
             string resText = await HkrtPayHttpUtil.DoPostAsync(url, reqParams);
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resJSON={resText}", logPrefix, unionId, url, resText);
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            var time = stopwatch.ElapsedMilliseconds;
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, reqJsonData, resText, time);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData} resData={resText} time={time}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -209,8 +214,8 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay
             }
             catch (Exception)
             {
-                _logger.LogInformation("海科融通解析支付宝/微信原生参数异常 resParams={resParams}", resParams);
-                //_logger.LogInformation($"海科融通解析支付宝/微信原生参数异常 resParams={resParams}");
+                _logger.LogInformation("海科融通解析支付宝/微信原生参数异常 resParams={resParams}", JsonConvert.SerializeObject(resParams));
+                //_logger.LogInformation($"海科融通解析支付宝/微信原生参数异常 resParams={JsonConvert.SerializeObject(resParams)}");
                 return null;
             }
         }

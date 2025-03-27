@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Diagnostics;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.LesPay;
 using AGooday.AgPay.Common.Constants;
@@ -157,12 +158,15 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             // 调起上游接口
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
+            var stopwatch = new Stopwatch();
             var reqText = string.Join("&", reqParams.Select(s => $"{s.Key}={s.Value}"));
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqText={reqText}", logPrefix, unionId, url, reqText);
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqText={reqText}");
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData}", logPrefix, unionId, url, reqText);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqText}");
+            stopwatch.Restart();
             string resText = await LesPayHttpUtil.DoPostAsync(url, reqText);
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resText={resText}", logPrefix, unionId, url, resText);
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resText={resText}");
+            var time = stopwatch.ElapsedMilliseconds;
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, reqText, resText, time);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqText} resData={resText} time={time}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

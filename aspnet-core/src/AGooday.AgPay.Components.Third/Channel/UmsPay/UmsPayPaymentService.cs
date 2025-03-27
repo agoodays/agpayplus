@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Diagnostics;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.UmsPay;
 using AGooday.AgPay.Common.Constants;
@@ -92,11 +93,15 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
             // 调起上游接口
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqJSON={reqParams}", logPrefix, unionId, url, JsonConvert.SerializeObject(reqParams));
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            var stopwatch = new Stopwatch();
+            var reqJsonData = JsonConvert.SerializeObject(reqParams);
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData}", logPrefix, unionId, url, reqJsonData);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData}");
+            stopwatch.Restart();
             string resText = await UmsPayHttpUtil.DoPostJsonAsync(url, isvParams.AppId, isvParams.AppKey, reqParams);
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resJSON={resText}", logPrefix, unionId, url, resText);
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            var time = stopwatch.ElapsedMilliseconds;
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, reqJsonData, resText, time);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData}  resData={resText}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

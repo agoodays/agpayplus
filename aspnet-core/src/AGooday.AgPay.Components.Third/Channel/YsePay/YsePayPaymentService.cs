@@ -204,12 +204,14 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             string unionId = Guid.NewGuid().ToString("N");
             string reqText = string.Join("&", reqParams.Select(s => $"{s.Key}={s.Value}"));
             var stopwatch = new Stopwatch();
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} method={method} reqText={reqParams}", logPrefix, unionId, url, method, JsonConvert.SerializeObject(reqParams));
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} reqText={JsonConvert.SerializeObject(reqParams)}");
+            var reqJsonData = JsonConvert.SerializeObject(reqParams);
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} method={method} reqData={reqData}", logPrefix, unionId, url, method, reqJsonData);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} reqData={reqJsonData}");
             stopwatch.Restart();
             string resText = await YsePayHttpUtil.DoPostFromAsync(url, reqText);
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} method={method} resJSON={resText} time={time}", logPrefix, unionId, url, method, resText, stopwatch.ElapsedMilliseconds);
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} resJSON={resText} time={stopwatch.ElapsedMilliseconds}");
+            var time = stopwatch.ElapsedMilliseconds;
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} method={method} reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, method, reqJsonData, resText, time);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} method={method} reqData={reqJsonData} resData={resText} time={time}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -220,8 +222,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             var resParams = JObject.Parse(resText);
             if (!YsePaySignUtil.Verify(resParams, publicKeyFilePath, repMethod))
             {
-                _logger.LogWarning("{logPrefix} 验签失败！ reqJSON={reqParams} resJSON={resText}", logPrefix, JsonConvert.SerializeObject(reqParams), resText);
-                //_logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
+                _logger.LogWarning("{logPrefix} unionId={unionId} url={url} method={method} 验签失败！ reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, method, reqJsonData, resText, time);
+                //_logger.LogWarning($"{logPrefix} unionId={unionId} url={url} method={method} 验签失败！ reqData={reqJsonData} resJSON={resText} time={time}");
             }
 
             return resParams;

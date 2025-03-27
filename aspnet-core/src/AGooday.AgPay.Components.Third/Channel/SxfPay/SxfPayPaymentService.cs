@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Diagnostics;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.SxfPay;
 using AGooday.AgPay.Common.Constants;
@@ -181,11 +182,15 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             // 调起上游接口
             string url = GetHost4env(isvParams) + apiUri;
             string unionId = Guid.NewGuid().ToString("N");
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqJSON={reqParams}", logPrefix, unionId, url, JsonConvert.SerializeObject(reqParams));
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqJSON={JsonConvert.SerializeObject(reqParams)}");
+            var stopwatch = new Stopwatch();
+            var reqJsonData = JsonConvert.SerializeObject(reqParams);
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData}", logPrefix, unionId, url, reqJsonData);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData}");
+            stopwatch.Restart();
             string resText = await SxfPayHttpUtil.DoPostJsonAsync(url, reqParams);
-            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} resJSON={resText}", logPrefix, unionId, url, resText);
-            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} resJSON={resText}");
+            var time = stopwatch.ElapsedMilliseconds;
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, reqJsonData, resText, time);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData} resData={resText} time={time}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {
@@ -197,8 +202,8 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
             string publicKey = isvParams.PublicKey;
             if (!SxfPaySignUtil.Verify(resParams, publicKey))
             {
-                _logger.LogWarning("{logPrefix} 验签失败！ reqJSON={reqParams} resJSON={resText}", logPrefix, JsonConvert.SerializeObject(reqParams), resText);
-                //_logger.LogWarning($"{logPrefix} 验签失败！ reqJSON={JsonConvert.SerializeObject(reqParams)} resJSON={resText}");
+                _logger.LogWarning("{logPrefix} unionId={unionId} url={url} 验签失败！ reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, reqJsonData, resText, time);
+                //_logger.LogWarning($"{logPrefix} unionId={unionId} url={url} 验签失败！ reqData={reqJsonData} resData={resText} time={time}");
             }
 
             return resParams;
