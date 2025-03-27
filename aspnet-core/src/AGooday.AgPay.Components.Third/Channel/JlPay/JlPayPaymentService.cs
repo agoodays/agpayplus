@@ -137,8 +137,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
 
                 if (isvParams.OrgCode == null)
                 {
-                    _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
-                    //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError("服务商配置为空: isvParams={isvParams}", JsonConvert.SerializeObject(isvParams));
+                    //_logger.LogError($"服务商配置为空: isvParams={JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
                 JlPayIsvSubMchParams isvsubMchParams = (JlPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());

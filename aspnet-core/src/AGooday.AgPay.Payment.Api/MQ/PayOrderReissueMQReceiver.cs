@@ -36,8 +36,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 var channelOrderReissueService = scope.ServiceProvider.GetService<ChannelOrderReissueService>();
                 try
                 {
-                    _logger.LogInformation("接收轮询查单通知MQ, msg={payload}", JsonConvert.SerializeObject(payload));
-                    //_logger.LogInformation($"接收轮询查单通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                    _logger.LogInformation("接收轮询查单通知MQ, 消息: {payload}", JsonConvert.SerializeObject(payload));
+                    //_logger.LogInformation($"接收轮询查单通知MQ, 消息: {JsonConvert.SerializeObject(payload)}");
                     string payOrderId = payload.PayOrderId;
                     int currentCount = payload.Count;
                     currentCount++;
@@ -45,15 +45,15 @@ namespace AGooday.AgPay.Payment.Api.MQ
                     PayOrderDto payOrder = await payOrderService.GetByIdAsync(payOrderId);
                     if (payOrder == null)
                     {
-                        _logger.LogWarning("查询支付订单为空,payOrderId={payOrderId}", payOrderId);
-                        //_logger.LogWarning($"查询支付订单为空,payOrderId={payOrderId}");
+                        _logger.LogWarning("查询支付订单为空 payOrderId={payOrderId}", payOrderId);
+                        //_logger.LogWarning($"查询支付订单为空 payOrderId={payOrderId}");
                         return;
                     }
 
                     if (payOrder.State != (byte)PayOrderState.STATE_ING)
                     {
-                        _logger.LogWarning("订单状态不是支付中,不需查询渠道.payOrderId={payOrderId}", payOrderId);
-                        //_logger.LogWarning($"订单状态不是支付中,不需查询渠道.payOrderId={payOrderId}");
+                        _logger.LogWarning("订单状态不是支付中, 不需查询渠道 payOrderId={payOrderId}", payOrderId);
+                        //_logger.LogWarning($"订单状态不是支付中, 不需查询渠道 payOrderId={payOrderId}");
                         return;
                     }
 

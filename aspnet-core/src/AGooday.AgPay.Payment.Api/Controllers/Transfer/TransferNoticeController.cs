@@ -71,8 +71,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
 
                 // 解析到转账单号
                 transferId = mutablePair.First().Key;
-                _logger.LogInformation("{logPrefix}, 解析数据为：transferId:{transferId}, params:{params}", logPrefix, transferId, mutablePair.First().Key);
-                //_logger.LogInformation($"{logPrefix}, 解析数据为：transferId:{transferId}, params:{mutablePair.First().Key}");
+                _logger.LogInformation("{logPrefix}, 解析数据为：transferId={transferId}, params={params}", logPrefix, transferId, mutablePair.First().Key);
+                //_logger.LogInformation($"{logPrefix}, 解析数据为：transferId={transferId}, params={mutablePair.First().Key}");
 
                 // 获取转账单号和转账单数据
                 TransferOrderDto transferOrder = await _transferOrderService.GetByIdAsync(transferId);
@@ -94,8 +94,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                 // 返回null表明出现异常，无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)
                 {
-                    _logger.LogError("{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult = {notifyResult}", logPrefix, notifyResult);
-                    //_logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult = {notifyResult}");
+                    _logger.LogError("{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult={notifyResult}", logPrefix, notifyResult);
+                    //_logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult={notifyResult}");
                     throw new BizException("处理回调事件异常！"); // 需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
 
@@ -116,8 +116,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Transfer
                     }
                 }
 
-                _logger.LogInformation("===== {logPrefix}, 转账单通知完成。 transferId={transferId}, parseState = {notifyResult.ChannelState} =====", logPrefix, transferId, notifyResult.ChannelState);
-                //_logger.LogInformation($"===== {logPrefix}, 转账单通知完成。 transferId={transferId}, parseState = {notifyResult.ChannelState} =====");
+                _logger.LogInformation("===== {logPrefix}, 转账单通知完成。 transferId={transferId}, parseState={notifyResult.ChannelState} =====", logPrefix, transferId, notifyResult.ChannelState);
+                //_logger.LogInformation($"===== {logPrefix}, 转账单通知完成。 transferId={transferId}, parseState={notifyResult.ChannelState} =====");
 
                 return notifyResult.ResponseEntity;
             }

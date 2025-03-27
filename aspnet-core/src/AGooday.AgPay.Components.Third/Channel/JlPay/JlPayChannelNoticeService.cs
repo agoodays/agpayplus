@@ -62,8 +62,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
                 string logPrefix = "【处理嘉联支付回调】";
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
-                _logger.LogInformation("{logPrefix} 回调参数, jsonParams：{jsonParams}", logPrefix, jsonParams);
-                //_logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
+                _logger.LogInformation("{logPrefix} 回调参数, 报文: {jsonParams}", logPrefix, jsonParams);
+                //_logger.LogInformation($"{logPrefix} 回调参数, 报文: {jsonParams}");
 
                 // 校验支付回调
                 bool verifyResult = await VerifyParamsAsync(jsonParams, payOrder, mchAppConfigContext);
@@ -72,8 +72,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
                 {
                     throw ResponseException.BuildText("ERROR", (int)HttpStatusCode.BadRequest);
                 }
-                _logger.LogInformation("{logPrefix}验证支付通知数据及签名通过", logPrefix);
-                //_logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
+                _logger.LogInformation("{logPrefix} 验证支付通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix} 验证支付通知数据及签名通过");
 
                 //验签成功后判断上游订单状态
                 JObject resJSON = new JObject();
@@ -138,8 +138,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             }
             if (string.IsNullOrWhiteSpace(amt))
             {
-                _logger.LogInformation("金额参数为空 [amt] :{amt}", amt);
-                //_logger.LogInformation($"金额参数为空 [amt] :{amt}");
+                _logger.LogInformation("金额参数为空 [amt]={amt}", amt);
+                //_logger.LogInformation($"金额参数为空 [amt]={amt}");
                 return false;
             }
 
@@ -151,8 +151,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
 
                 if (isvParams.OrgCode == null)
                 {
-                    _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
-                    //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError("服务商配置为空: isvParams={isvParams}", JsonConvert.SerializeObject(isvParams));
+                    //_logger.LogError($"服务商配置为空: isvParams={JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
                 publicKey = isvParams.RsaPublicKey;
@@ -165,8 +165,8 @@ namespace AGooday.AgPay.Components.Third.Channel.JlPay
             //验签失败
             if (!JlPaySignUtil.Verify(jsonParams, publicKey))
             {
-                _logger.LogInformation("【嘉联回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey = {publicKey}", jsonParams, publicKey);
-                //_logger.LogInformation($"【嘉联回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey = {publicKey}");
+                _logger.LogInformation("【嘉联回调】 验签失败！ 回调参数: parameter={jsonParams}, publicKey={publicKey}", jsonParams, publicKey);
+                //_logger.LogInformation($"【嘉联回调】 验签失败！ 回调参数: parameter={jsonParams}, publicKey={publicKey}");
                 return false;
             }
 

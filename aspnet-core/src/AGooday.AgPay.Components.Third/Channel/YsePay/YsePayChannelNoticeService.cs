@@ -62,8 +62,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
                 string logPrefix = "【处理银盛支付回调】";
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
-                _logger.LogInformation("{logPrefix} 回调参数, jsonParams：{jsonParams}", logPrefix, jsonParams);
-                //_logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
+                _logger.LogInformation("{logPrefix} 回调参数, 报文: {jsonParams}", logPrefix, jsonParams);
+                //_logger.LogInformation($"{logPrefix} 回调参数, 报文: {jsonParams}");
 
                 // 校验支付回调
                 bool verifyResult = await VerifyParamsAsync(jsonParams, payOrder, mchAppConfigContext);
@@ -72,8 +72,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
                 {
                     throw ResponseException.BuildText("ERROR", (int)HttpStatusCode.BadRequest);
                 }
-                _logger.LogInformation("{logPrefix}验证支付通知数据及签名通过", logPrefix);
-                //_logger.LogInformation($"{logPrefix}验证支付通知数据及签名通过");
+                _logger.LogInformation("{logPrefix} 验证支付通知数据及签名通过", logPrefix);
+                //_logger.LogInformation($"{logPrefix} 验证支付通知数据及签名通过");
 
                 jsonParams.TryGetString("trade_no", out string tradeNo);//银盛支付交易流水号
                 jsonParams.TryGetString("channel_recv_sn", out string channelRecvSn);//渠道返回流水号	
@@ -114,8 +114,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             }
             if (string.IsNullOrWhiteSpace(totalAmount))
             {
-                _logger.LogInformation("金额参数为空 [amt] :{totalAmount}", totalAmount);
-                //_logger.LogInformation($"金额参数为空 [amt] :{totalAmount}");
+                _logger.LogInformation("金额参数为空 [amt]={totalAmount}", totalAmount);
+                //_logger.LogInformation($"金额参数为空 [amt]={totalAmount}");
                 return false;
             }
 
@@ -127,8 +127,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
 
                 if (isvParams.PartnerId == null)
                 {
-                    _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
-                    //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError("服务商配置为空: isvParams={isvParams}", JsonConvert.SerializeObject(isvParams));
+                    //_logger.LogError($"服务商配置为空: isvParams={JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
                 certFilePath = ChannelCertConfigKit.GetCertFilePath(isvParams.PublicKeyFile);
@@ -141,8 +141,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
             //验签失败
             if (!YsePaySignUtil.Verify(jsonParams, certFilePath))
             {
-                _logger.LogInformation("【银盛回调】 验签失败！ 回调参数：parameter = {jsonParams}, certFilePath={certFilePath}", jsonParams, certFilePath);
-                //_logger.LogInformation($"【银盛回调】 验签失败！ 回调参数：parameter = {jsonParams}, certFilePath={certFilePath}");
+                _logger.LogInformation("【银盛回调】 验签失败！ 回调参数: parameter={jsonParams}, certFilePath={certFilePath}", jsonParams, certFilePath);
+                //_logger.LogInformation($"【银盛回调】 验签失败！ 回调参数: parameter={jsonParams}, certFilePath={certFilePath}");
                 return false;
             }
 

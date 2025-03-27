@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Diagnostics;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.YsfPay;
 using AGooday.AgPay.Common.Constants;
@@ -67,8 +68,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
 
             if (isvParams.SerProvId == null)
             {
-                _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
-                //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError("服务商配置为空: isvParams={isvParams}", JsonConvert.SerializeObject(isvParams));
+                //_logger.LogError($"服务商配置为空: isvParams={JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 
@@ -82,11 +83,17 @@ namespace AGooday.AgPay.Components.Third.Channel.YsfPay
             reqParams.Add("signature", YsfPaySignUtil.SignBy256(reqParams, isvPrivateCertFile, isvPrivateCertPwd)); //RSA 签名串
 
             // 调起上游接口
-            _logger.LogInformation("{logPrefix} reqJSON={reqParams}", logPrefix, JsonConvert.SerializeObject(reqParams));
-            //_logger.LogInformation($"{logPrefix} reqJSON={JsonConvert.SerializeObject(reqParams)}");
-            string resText = await YsfPayHttpUtil.DoPostJsonAsync(GetHost4env(isvParams) + apiUri, reqParams);
-            _logger.LogInformation("{logPrefix} resJSON={resText}", logPrefix, resText);
-            //_logger.LogInformation($"{logPrefix} resJSON={resText}");
+            string url = GetHost4env(isvParams) + apiUri;
+            string unionId = Guid.NewGuid().ToString("N");
+            var stopwatch = new Stopwatch();
+            var reqJsonData = JsonConvert.SerializeObject(reqParams);
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData}", logPrefix, unionId, url, reqJsonData);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData}");
+            stopwatch.Restart();
+            string resText = await YsfPayHttpUtil.DoPostJsonAsync(url, reqParams);
+            var time = stopwatch.ElapsedMilliseconds;
+            _logger.LogInformation("{logPrefix} unionId={unionId} url={url} reqData={reqData} resData={resData} time={time}", logPrefix, unionId, url, reqJsonData, resText, time);
+            //_logger.LogInformation($"{logPrefix} unionId={unionId} url={url} reqData={reqJsonData} resData={resText} time={time}");
 
             if (string.IsNullOrWhiteSpace(resText))
             {

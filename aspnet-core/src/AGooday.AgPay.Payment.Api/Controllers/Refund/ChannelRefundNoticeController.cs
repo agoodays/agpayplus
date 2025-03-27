@@ -83,8 +83,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
 
                 // 解析到订单号
                 refundOrderId = mutablePair.First().Key;
-                _logger.LogInformation("{logPrefix}, 解析数据为：refundOrderId:{refundOrderId}, params:{params}", logPrefix, refundOrderId, mutablePair.First().Value);
-                //_logger.LogInformation($"{logPrefix}, 解析数据为：refundOrderId:{refundOrderId}, params:{mutablePair.First().Value}");
+                _logger.LogInformation("{logPrefix}, 解析数据为：refundOrderId={refundOrderId}, params={params}", logPrefix, refundOrderId, mutablePair.First().Value);
+                //_logger.LogInformation($"{logPrefix}, 解析数据为：refundOrderId={refundOrderId}, params={mutablePair.First().Value}");
 
                 if (!string.IsNullOrWhiteSpace(urlOrderId) && !urlOrderId.Equals(refundOrderId))
                 {
@@ -113,8 +113,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 // 返回null 表明出现异常， 无需处理通知下游等操作。
                 if (notifyResult == null || notifyResult.ChannelState == null || notifyResult.ResponseEntity == null)
                 {
-                    _logger.LogError("{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ", logPrefix, notifyResult);
-                    //_logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult ={notifyResult} ");
+                    _logger.LogError("{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult={notifyResult} ", logPrefix, notifyResult);
+                    //_logger.LogError($"{logPrefix}, 处理回调事件异常  notifyResult data error, notifyResult={notifyResult} ");
                     throw new BizException("处理回调事件异常！"); //需要实现类自行抛出ResponseException, 不应该在这抛此异常。
                 }
                 // 处理退款订单
@@ -123,13 +123,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Refund
                 // 更新退款订单 异常
                 if (!updateOrderSuccess)
                 {
-                    _logger.LogError("{logPrefix}, updateOrderSuccess = {updateOrderSuccess} ", logPrefix, updateOrderSuccess);
+                    _logger.LogError("{logPrefix}, updateOrderSuccess={updateOrderSuccess} ", logPrefix, updateOrderSuccess);
                     //_logger.LogError($"{logPrefix}, updateOrderSuccess = {updateOrderSuccess} ");
                     return refundNotifyService.DoNotifyOrderStateUpdateFail(Request);
                 }
 
-                _logger.LogInformation("===== {logPrefix}, 订单通知完成。 refundOrderId={refundOrderId}, parseState = {notifyResult.ChannelState} =====", logPrefix, refundOrderId, notifyResult.ChannelState);
-                //_logger.LogInformation($"===== {logPrefix}, 订单通知完成。 refundOrderId={refundOrderId}, parseState = {notifyResult.ChannelState} =====");
+                _logger.LogInformation("===== {logPrefix}, 订单通知完成。 refundOrderId={refundOrderId}, parseState={notifyResult.ChannelState} =====", logPrefix, refundOrderId, notifyResult.ChannelState);
+                //_logger.LogInformation($"===== {logPrefix}, 订单通知完成。 refundOrderId={refundOrderId}, parseState={notifyResult.ChannelState} =====");
 
                 return notifyResult.ResponseEntity;
             }

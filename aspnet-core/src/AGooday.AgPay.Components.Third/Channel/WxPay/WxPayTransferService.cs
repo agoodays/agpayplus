@@ -156,7 +156,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "转账异常：");
+                _logger.LogError(e, "转账异常");
                 return ChannelRetMsg.Waiting();
             }
         }
@@ -228,7 +228,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "转账状态查询异常：");
+                _logger.LogError(e, "转账状态查询异常");
                 return ChannelRetMsg.Waiting();
             }
         }

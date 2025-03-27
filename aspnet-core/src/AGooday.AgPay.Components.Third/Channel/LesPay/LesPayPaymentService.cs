@@ -142,8 +142,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
 
             if (isvParams.AgentId == null)
             {
-                _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
-                //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError("服务商配置为空: isvParams={isvParams}", JsonConvert.SerializeObject(isvParams));
+                //_logger.LogError($"服务商配置为空: isvParams={JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 

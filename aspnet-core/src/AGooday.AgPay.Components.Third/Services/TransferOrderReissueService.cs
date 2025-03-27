@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Components.Third.Channel;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
+using Newtonsoft.Json;
 
 namespace AGooday.AgPay.Components.Third.Services
 {
@@ -59,8 +60,8 @@ namespace AGooday.AgPay.Components.Third.Services
                     return null;
                 }
 
-                _logger.LogInformation("补单[{transferId}]查询结果为：{channelRetMsg}", transferId, channelRetMsg);
-                //_logger.LogInformation($"补单[{transferId}]查询结果为：{channelRetMsg}");
+                _logger.LogInformation("补单[{transferId}]查询结果为: {channelRetMsg}", transferId, JsonConvert.SerializeObject(channelRetMsg));
+                //_logger.LogInformation($"补单[{transferId}]查询结果为: {channelRetMsg}");
 
                 // 查询成功
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
@@ -83,8 +84,8 @@ namespace AGooday.AgPay.Components.Third.Services
             catch (Exception e)
             {
                 //继续下一次迭代查询
-                _logger.LogError(e, "error transferId = {TransferId}", transferOrder.TransferId);
-                //_logger.LogError(e, $"error transferId = {transferOrder.TransferId}");
+                _logger.LogError(e, "error transferId={TransferId}", transferOrder.TransferId);
+                //_logger.LogError(e, $"error transferId={transferOrder.TransferId}");
                 return null;
             }
         }

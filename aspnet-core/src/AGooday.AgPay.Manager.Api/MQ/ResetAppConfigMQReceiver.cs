@@ -24,8 +24,8 @@ namespace AGooday.AgPay.Manager.Api.MQ
             using (var scope = _provider.CreateScope())
             {
                 var sysConfigService = scope.ServiceProvider.GetRequiredService<ISysConfigService>();
-                _logger.LogInformation("成功接收更新系统配置的订阅通知, msg={payload}", JsonConvert.SerializeObject(payload));
-                //_logger.LogInformation($"成功接收更新系统配置的订阅通知, msg={JsonConvert.SerializeObject(payload)}");
+                _logger.LogInformation("成功接收更新系统配置的订阅通知, 消息: {payload}", JsonConvert.SerializeObject(payload));
+                //_logger.LogInformation($"成功接收更新系统配置的订阅通知, 消息: {JsonConvert.SerializeObject(payload)}");
                 sysConfigService.InitDBConfig(payload.GroupKey);
                 _logger.LogInformation("系统配置静态属性已重置");
             }

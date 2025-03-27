@@ -60,8 +60,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
                 string logPrefix = "【处理通联支付回调】";
                 // 获取请求参数
                 JObject jsonParams = JObject.FromObject(@params);
-                _logger.LogInformation("{logPrefix} 回调参数, jsonParams：{jsonParams}", logPrefix, jsonParams);
-                //_logger.LogInformation($"{logPrefix} 回调参数, jsonParams：{jsonParams}");
+                _logger.LogInformation("{logPrefix} 回调参数, 报文: {jsonParams}", logPrefix, jsonParams);
+                //_logger.LogInformation($"{logPrefix} 回调参数, 报文: {jsonParams}");
 
                 // 校验支付回调
                 bool verifyResult = await VerifyParamsAsync(jsonParams, payOrder, mchAppConfigContext);
@@ -113,8 +113,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             }
             if (string.IsNullOrWhiteSpace(amt))
             {
-                _logger.LogInformation("金额参数为空 [amt] :{amt}", amt);
-                //_logger.LogInformation($"金额参数为空 [amt] :{amt}");
+                _logger.LogInformation("金额参数为空 [amt]={amt}", amt);
+                //_logger.LogInformation($"金额参数为空 [amt]={amt}");
                 return false;
             }
 
@@ -126,8 +126,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
 
                 if (isvParams.Orgid == null)
                 {
-                    _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
-                    //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError("服务商配置为空: isvParams={isvParams}", JsonConvert.SerializeObject(isvParams));
+                    //_logger.LogError($"服务商配置为空: isvParams={JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
                 publicKey = isvParams.PublicKey;
@@ -142,8 +142,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             //验签
             if (!AllinPaySignUtil.Verify(jsonParams, publicKey))
             {
-                _logger.LogInformation("【通联回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey}", jsonParams, publicKey);
-                //_logger.LogInformation($"【通联回调】 验签失败！ 回调参数：parameter = {jsonParams}, publicKey={publicKey}");
+                _logger.LogInformation("【通联回调】 验签失败, 回调参数：parameter={jsonParams}, publicKey={publicKey}", jsonParams, publicKey);
+                //_logger.LogInformation($"【通联回调】 验签失败, 回调参数：parameter={jsonParams}, publicKey={publicKey}");
                 return false;
             }
 
@@ -151,8 +151,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AllinPay
             long dbPayAmt = payOrder.Amount;
             if (dbPayAmt != Convert.ToInt64(amt))
             {
-                _logger.LogInformation("订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={ordNo}", dbPayAmt, amt, ordNo);
-                //_logger.LogInformation($"订单金额与参数金额不符。 dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={ordNo}");
+                _logger.LogInformation("订单金额与参数金额不符, dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={ordNo}", dbPayAmt, amt, ordNo);
+                //_logger.LogInformation($"订单金额与参数金额不符, dbPayAmt={dbPayAmt}, amt={amt}, payOrderId={ordNo}");
                 return false;
             }
             return true;

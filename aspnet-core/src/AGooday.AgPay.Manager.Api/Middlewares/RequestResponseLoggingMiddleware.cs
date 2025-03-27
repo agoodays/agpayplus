@@ -84,7 +84,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             };
 
             _logger.LogInformation("[{TraceIdentifier}] RequestData: {RequestData}", context.TraceIdentifier, JsonConvert.SerializeObject(content));
-            //_logger.LogInformation($"[{context.TraceIdentifier}] RequestData:{JsonConvert.SerializeObject(content)}");
+            //_logger.LogInformation($"[{context.TraceIdentifier}] RequestData: {JsonConvert.SerializeObject(content)}");
 
             request.Body.Position = 0;
         }
@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Manager.Api.Middlewares
             if (!string.IsNullOrEmpty(responseBody))
             {
                 _logger.LogInformation("[{TraceIdentifier}] ResponseData: {ResponseData}", context.TraceIdentifier, responseBody);
-                //_logger.LogInformation($"[{context.TraceIdentifier}] ResponseData:{responseBody}");
+                //_logger.LogInformation($"[{context.TraceIdentifier}] ResponseData: {responseBody}");
             }
         }
     }

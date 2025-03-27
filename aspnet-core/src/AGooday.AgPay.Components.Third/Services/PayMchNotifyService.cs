@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 if (mchNotifyRecord != null)
                 {
-                    _logger.LogInformation("当前已存在通知消息， 不再发送。");
+                    _logger.LogInformation("当前已存在通知消息，不再发送。");
                     return;
                 }
 
@@ -128,7 +128,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 if (mchNotifyRecord != null)
                 {
-                    _logger.LogInformation("当前已存在通知消息， 不再发送。");
+                    _logger.LogInformation("当前已存在通知消息，不再发送。");
                     return;
                 }
 
@@ -198,7 +198,7 @@ namespace AGooday.AgPay.Components.Third.Services
 
                 if (mchNotifyRecord != null)
                 {
-                    _logger.LogInformation("当前已存在通知消息， 不再发送。");
+                    _logger.LogInformation("当前已存在通知消息，不再发送。");
                     return;
                 }
 
@@ -255,7 +255,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// <param name="payOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(PayOrderDto payOrder, string appSecret, string method, string mediaType, string extParams, out string body)
+        public static string CreateNotifyUrl(PayOrderDto payOrder, string appSecret, string method, string mediaType, string extParams, out string body)
         {
             QueryPayOrderRS queryPayOrderRS = QueryPayOrderRS.BuildByPayOrder(payOrder);
             JObject jsonObject = JObject.FromObject(queryPayOrderRS);
@@ -270,7 +270,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// <param name="refundOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(RefundOrderDto refundOrder, string appSecret, string method, string mediaType, string extParams, out string body)
+        public static string CreateNotifyUrl(RefundOrderDto refundOrder, string appSecret, string method, string mediaType, string extParams, out string body)
         {
             QueryRefundOrderRS queryRefundOrderRS = QueryRefundOrderRS.BuildByRefundOrder(refundOrder);
             JObject jsonObject = JObject.FromObject(queryRefundOrderRS);
@@ -285,7 +285,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// <param name="transferOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateNotifyUrl(TransferOrderDto transferOrder, string appSecret, string method, string mediaType, string extParams, out string body)
+        public static string CreateNotifyUrl(TransferOrderDto transferOrder, string appSecret, string method, string mediaType, string extParams, out string body)
         {
             QueryTransferOrderRS queryTransferOrderRS = QueryTransferOrderRS.BuildByRecord(transferOrder);
             JObject jsonObject = JObject.FromObject(queryTransferOrderRS);
@@ -300,7 +300,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// <param name="payOrder"></param>
         /// <param name="appSecret"></param>
         /// <returns></returns>
-        public string CreateReturnUrl(PayOrderDto payOrder, string appSecret)
+        public static string CreateReturnUrl(PayOrderDto payOrder, string appSecret)
         {
             if (string.IsNullOrWhiteSpace(payOrder.ReturnUrl))
             {

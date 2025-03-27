@@ -27,8 +27,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 var payOrderDivisionProcessService = scope.ServiceProvider.GetService<PayOrderDivisionProcessService>();
                 try
                 {
-                    _logger.LogInformation("接收订单分账通知MQ, msg={payload}", JsonConvert.SerializeObject(payload));
-                    //_logger.LogInformation($"接收订单分账通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                    _logger.LogInformation("接收订单分账通知MQ, 消息: {payload}", JsonConvert.SerializeObject(payload));
+                    //_logger.LogInformation($"接收订单分账通知MQ, 消息: {JsonConvert.SerializeObject(payload)}");
                     await payOrderDivisionProcessService.ProcessPayOrderDivisionAsync(payload.PayOrderId, payload.UseSysAutoDivisionReceivers, payload.ReceiverList, payload.IsResend);
                 }
                 catch (Exception e)

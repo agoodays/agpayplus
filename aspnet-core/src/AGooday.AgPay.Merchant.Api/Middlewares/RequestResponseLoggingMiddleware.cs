@@ -45,7 +45,7 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
                     await _next(context);
 
                     // 存储响应数据
-                    ResponseDataLogAsync(context, ms);
+                    await ResponseDataLogAsync(context, ms);
 
                     ms.Position = 0;
                     await ms.CopyToAsync(originalBody);
@@ -80,8 +80,8 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
                 body = await sr.ReadToEndAsync(),
             };
 
-            _logger.LogInformation("[{TraceIdentifier}] RequestData:{RequestData}", context.TraceIdentifier, JsonConvert.SerializeObject(content));
-            //_logger.LogInformation($"[{context.TraceIdentifier}] RequestData:{JsonConvert.SerializeObject(content)}");
+            _logger.LogInformation("[{TraceIdentifier}] RequestData: {RequestData}", context.TraceIdentifier, JsonConvert.SerializeObject(content));
+            //_logger.LogInformation($"[{context.TraceIdentifier}] RequestData: {JsonConvert.SerializeObject(content)}");
 
             request.Body.Position = 0;
         }
@@ -97,8 +97,8 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
 
             if (!string.IsNullOrEmpty(responseBody))
             {
-                _logger.LogInformation("[{TraceIdentifier}] ResponseData:{ResponseData}", context.TraceIdentifier, responseBody);
-                //_logger.LogInformation($"[{context.TraceIdentifier}] ResponseData:{responseBody}");
+                _logger.LogInformation("[{TraceIdentifier}] ResponseData: {ResponseData}", context.TraceIdentifier, responseBody);
+                //_logger.LogInformation($"[{context.TraceIdentifier}] ResponseData: {responseBody}");
             }
         }
     }

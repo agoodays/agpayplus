@@ -69,8 +69,8 @@ namespace AGooday.AgPay.Components.Third.Services
                     return null;
                 }
 
-                _logger.LogInformation("补单[{payOrderId}]查询结果为：{channelRetMsg}", payOrderId, JsonConvert.SerializeObject(channelRetMsg));
-                //_logger.LogInformation($"补单[{payOrderId}]查询结果为：{JsonConvert.SerializeObject(channelRetMsg)}");
+                _logger.LogInformation("补单[{payOrderId}] 查询结果为: {channelRetMsg}", payOrderId, JsonConvert.SerializeObject(channelRetMsg));
+                //_logger.LogInformation($"补单[{payOrderId}] 查询结果为: {JsonConvert.SerializeObject(channelRetMsg)}");
 
                 // 查询成功
                 if (channelRetMsg.ChannelState == ChannelState.CONFIRM_SUCCESS)
@@ -92,8 +92,8 @@ namespace AGooday.AgPay.Components.Third.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "error payOrderId = {PayOrderId}", payOrder.PayOrderId);
-                //_logger.LogError(e, $"error payOrderId = {payOrder.PayOrderId}");
+                _logger.LogError(e, "error payOrderId={PayOrderId}", payOrder.PayOrderId);
+                //_logger.LogError(e, $"error payOrderId={payOrder.PayOrderId}");
                 return null;
             }
         }
@@ -114,7 +114,7 @@ namespace AGooday.AgPay.Components.Third.Services
                 // 支付通道接口实现不存在
                 if (queryService == null)
                 {
-                    _logger.LogError("退款补单：{IfCode} interface not exists!", refundOrder.IfCode);
+                    _logger.LogError("退款补单: {IfCode} interface not exists!", refundOrder.IfCode);
                     //_logger.LogError($"退款补单：{refundOrder.IfCode} interface not exists!");
                     return null;
                 }
@@ -125,12 +125,12 @@ namespace AGooday.AgPay.Components.Third.Services
                 ChannelRetMsg channelRetMsg = await queryService.QueryAsync(refundOrder, mchAppConfigContext);
                 if (channelRetMsg == null)
                 {
-                    _logger.LogError("退款补单：channelRetMsg is null");
+                    _logger.LogError("退款补单: channelRetMsg is null");
                     return null;
                 }
 
-                _logger.LogInformation("退款补单：[{refundOrderId}]查询结果为：{channelRetMsg}", refundOrderId, channelRetMsg);
-                //_logger.LogInformation($"退款补单：[{refundOrderId}]查询结果为：{channelRetMsg}");
+                _logger.LogInformation("退款补单: [{refundOrderId}] 查询结果为: {channelRetMsg}", refundOrderId, JsonConvert.SerializeObject(channelRetMsg));
+                //_logger.LogInformation($"退款补单: [{refundOrderId}] 查询结果为: {JsonConvert.SerializeObject(channelRetMsg)}");
                 // 根据渠道返回结果，处理退款订单
                 await _refundOrderProcessService.HandleRefundOrder4ChannelAsync(channelRetMsg, refundOrder);
 
@@ -139,8 +139,8 @@ namespace AGooday.AgPay.Components.Third.Services
             catch (Exception e)
             {
                 //继续下一次迭代查询
-                _logger.LogError(e, "退款补单：error refundOrderId = {RefundOrderId}", refundOrder.RefundOrderId);
-                //_logger.LogError(e, $"退款补单：error refundOrderId = {refundOrder.RefundOrderId}");
+                _logger.LogError(e, "退款补单: error refundOrderId={RefundOrderId}", refundOrder.RefundOrderId);
+                //_logger.LogError(e, $"退款补单: error refundOrderId={refundOrder.RefundOrderId}");
                 return null;
             }
         }

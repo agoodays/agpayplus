@@ -66,8 +66,8 @@ namespace AGooday.AgPay.Components.Third.Services
 
             if (payOrder == null)
             {
-                _logger.LogError("{logPrefix}，订单不存在", logPrefix);
-                //_logger.LogError($"{logPrefix}，订单不存在");
+                _logger.LogError("{logPrefix}, 订单不存在", logPrefix);
+                //_logger.LogError($"{logPrefix}, 订单不存在");
                 throw new BizException("订单不存在");
             }
 

@@ -67,15 +67,15 @@ namespace AGooday.AgPay.Components.SMS.Services
                 else
                 {
                     // 短信发送失败
-                    _logger.LogInformation("短信发送失败，请求报文：{request}，响应报文：{response}", JsonConvert.SerializeObject(request), JsonConvert.SerializeObject(response));
-                    //_logger.LogInformation($"短信发送失败，请求报文：{JsonConvert.SerializeObject(request)}，响应报文：{JsonConvert.SerializeObject(response)}");
+                    _logger.LogInformation("短信发送失败, 请求报文: {request}, 响应报文: {response}", JsonConvert.SerializeObject(request), JsonConvert.SerializeObject(response));
+                    //_logger.LogInformation($"短信发送失败, 请求报文: {JsonConvert.SerializeObject(request)}, 响应报文: {JsonConvert.SerializeObject(response)}");
                 }
             }
             catch (Exception e)
             {
                 // 处理异常
-                _logger.LogError(e, "短信发送异常，请求报文：{request}", JsonConvert.SerializeObject(request));
-                //_logger.LogError(e, $"短信发送异常，请求报文：{JsonConvert.SerializeObject(request)}");
+                _logger.LogError(e, "短信发送异常, 请求报文: {request}", JsonConvert.SerializeObject(request));
+                //_logger.LogError(e, $"短信发送异常, 请求报文: {JsonConvert.SerializeObject(request)}");
                 throw;
             }
         }
@@ -105,15 +105,15 @@ namespace AGooday.AgPay.Components.SMS.Services
                 else
                 {
                     // 短信发送失败
-                    _logger.LogInformation("短信发送失败，请求报文：{request}，响应报文：{response}", JsonConvert.SerializeObject(request), JsonConvert.SerializeObject(response));
-                    //_logger.LogInformation($"短信发送失败，请求报文：{JsonConvert.SerializeObject(request)}，响应报文：{JsonConvert.SerializeObject(response)}");
+                    _logger.LogInformation("短信发送失败, 请求报文: {request}, 响应报文: {response}", JsonConvert.SerializeObject(request), JsonConvert.SerializeObject(response));
+                    //_logger.LogInformation($"短信发送失败, 请求报文: {JsonConvert.SerializeObject(request)}, 响应报文: {JsonConvert.SerializeObject(response)}");
                 }
             }
             catch (Exception e)
             {
                 // 处理异常
-                _logger.LogError(e, "短信发送异常，请求报文：{request}", JsonConvert.SerializeObject(request));
-                //_logger.LogError(e, $"短信发送异常，请求报文：{JsonConvert.SerializeObject(request)}");
+                _logger.LogError(e, "短信发送异常, 请求报文: {request}", JsonConvert.SerializeObject(request));
+                //_logger.LogError(e, $"短信发送异常, 请求报文: {JsonConvert.SerializeObject(request)}");
                 throw;
             }
         }

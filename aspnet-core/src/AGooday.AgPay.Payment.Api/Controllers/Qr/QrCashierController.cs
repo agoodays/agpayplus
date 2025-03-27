@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 resOrder.MchOrderNo = payOrder.MchOrderNo;
                 resOrder.MchName = payOrder.MchName;
                 resOrder.Amount = payOrder.Amount;
-                resOrder.ReturnUrl = _payMchNotifyService.CreateReturnUrl(payOrder, (await _configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId)).MchApp.AppSecret);
+                resOrder.ReturnUrl = PayMchNotifyService.CreateReturnUrl(payOrder, (await _configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId)).MchApp.AppSecret);
             }
             else if (type.Equals(CS.TOKEN_DATA_TYPE.QRC_ID))
             {

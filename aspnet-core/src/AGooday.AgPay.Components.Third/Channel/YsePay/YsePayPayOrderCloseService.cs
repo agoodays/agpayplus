@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Components.Third.Channel.YsePay
@@ -51,8 +52,8 @@ namespace AGooday.AgPay.Components.Third.Channel.YsePay
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 string method = "ysepay.online.trade.close", repMethod = "ysepay_online_trade_close_response";
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync(YsePayConfig.SEARCH_GATEWAY, method, repMethod, reqParams, string.Empty, logPrefix, mchAppConfigContext);
-                _logger.LogInformation("关闭订单 payorderId:{PayOrderId}, 返回结果:{resJSON}", payOrder.PayOrderId, resJSON);
-                //_logger.LogInformation($"关闭订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("关闭订单 payorderId={PayOrderId}, 返回结果: {resData}", payOrder.PayOrderId, JsonConvert.SerializeObject(resJSON));
+                //_logger.LogInformation($"关闭订单 payorderId={payOrder.PayOrderId}, 返回结果: {JsonConvert.SerializeObject(resJSON)}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.SysError("【银盛】请求关闭订单异常");

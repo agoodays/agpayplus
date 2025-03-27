@@ -37,7 +37,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             }
             catch (Exception e)
             {
-                throw new APIConnectionException($"请求AgPay({request.Url})异常,请检查网络或重试.异常信息:{e.Message}", e);
+                throw new APIConnectionException($"请求AgPay({request.Url})异常, 请检查网络或重试。异常信息: {e.Message}", e);
             }
 
             return new APIAgPayResponse(responseCode, responseBody, null);
@@ -74,7 +74,7 @@ namespace AGooday.AgPay.AopSdk.Nets
             }
             catch (Exception e)
             {
-                throw new APIConnectionException($"请求AgPay({request.Url})异常,请检查网络或重试.异常信息:{e.Message}", e);
+                throw new APIConnectionException($"请求AgPay({request.Url})异常, 请检查网络或重试。异常信息: {e.Message}", e);
             }
 
             return new APIAgPayResponse(responseCode, responseBody, null);

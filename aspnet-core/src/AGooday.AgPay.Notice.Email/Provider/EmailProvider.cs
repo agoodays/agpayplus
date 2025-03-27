@@ -85,7 +85,7 @@ namespace AGooday.AgPay.Notice.Email
             }
             catch (Exception e)
             {
-                response.ErrMsg = $"邮件发送异常:{e.Message}";
+                response.ErrMsg = $"邮件发送异常: {e.Message}";
             }
             return response;
         }

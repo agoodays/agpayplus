@@ -80,8 +80,8 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay
 
             if (string.IsNullOrWhiteSpace(isvParams?.AppId) || string.IsNullOrWhiteSpace(isvParams?.AppKey))
             {
-                _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
-                //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                _logger.LogError("服务商配置为空: isvParams={isvParams}", JsonConvert.SerializeObject(isvParams));
+                //_logger.LogError($"服务商配置为空: isvParams={JsonConvert.SerializeObject(isvParams)}");
                 throw new BizException("服务商配置为空。");
             }
 

@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "upload error, bizType = {bizType}, fileName = {fileName}", bizType, fileName);
+                _logger.LogError(e, "upload error, bizType={bizType}, fileName={fileName}", bizType, fileName);
                 //_logger.LogError(e, $"upload error, fileName = {fileName}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Components.OSS.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "upload error, bizType = {bizType}, fileName = {fileName}", bizType, fileName);
+                _logger.LogError(e, "upload error, bizType={bizType}, fileName={fileName}", bizType, fileName);
                 //_logger.LogError(e, $"upload error, fileName = {fileName}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }

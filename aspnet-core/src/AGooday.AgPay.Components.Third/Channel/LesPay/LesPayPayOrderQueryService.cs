@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Channel.LesPay.Enumerator;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Components.Third.Channel.LesPay
@@ -45,8 +46,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/cgi-bin/lepos_pay_gateway.cgi", reqParams, logPrefix, mchAppConfigContext);
-                _logger.LogInformation("查询订单 payorderId:{PayOrderId}, 返回结果:{resJSON}", payOrder.PayOrderId, resJSON);
-                //_logger.LogInformation($"查询订单 payorderId:{payOrder.PayOrderId}, 返回结果:{resJSON}");
+                _logger.LogInformation("查询订单 payorderId={PayOrderId}, 返回结果: {resData}", payOrder.PayOrderId, JsonConvert.SerializeObject(resJSON));
+                //_logger.LogInformation($"查询订单 payorderId={payOrder.PayOrderId}, 返回结果: {JsonConvert.SerializeObject(resJSON)}");
                 if (resJSON == null)
                 {
                     return ChannelRetMsg.Waiting(); //支付中
@@ -104,8 +105,8 @@ namespace AGooday.AgPay.Components.Third.Channel.LesPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "查询订单 payorderId:{PayOrderId}, 异常:{Message}", payOrder.PayOrderId, e.Message);
-                //_logger.LogError(e, $"查询订单 payorderId:{payOrder.PayOrderId}, 异常:{e.Message}");
+                _logger.LogError(e, "查询订单 payorderId={PayOrderId}, 异常: {Message}", payOrder.PayOrderId, e.Message);
+                //_logger.LogError(e, $"查询订单 payorderId={payOrder.PayOrderId}, 异常: {e.Message}");
                 return ChannelRetMsg.Waiting(); //支付中
             }
         }

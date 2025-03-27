@@ -152,8 +152,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
 
                 if (isvParams.SysId == null)
                 {
-                    _logger.LogError("服务商配置为空：isvParams：{isvParams}", JsonConvert.SerializeObject(isvParams));
-                    //_logger.LogError($"服务商配置为空：isvParams：{JsonConvert.SerializeObject(isvParams)}");
+                    _logger.LogError("服务商配置为空: isvParams={isvParams}", JsonConvert.SerializeObject(isvParams));
+                    //_logger.LogError($"服务商配置为空: isvParams={JsonConvert.SerializeObject(isvParams)}");
                     throw new BizException("服务商配置为空。");
                 }
 
@@ -171,8 +171,8 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
 
                 if (normalMchParams.HuifuId == null)
                 {
-                    _logger.LogError("商户配置为空：normalMchParams：{normalMchParams}", JsonConvert.SerializeObject(normalMchParams));
-                    //_logger.LogError($"商户配置为空：normalMchParams：{JsonConvert.SerializeObject(normalMchParams)}");
+                    _logger.LogError("商户配置为空: normalMchParams={normalMchParams}", JsonConvert.SerializeObject(normalMchParams));
+                    //_logger.LogError($"商户配置为空: normalMchParams={JsonConvert.SerializeObject(normalMchParams)}");
                     throw new BizException("商户配置为空。");
                 }
 

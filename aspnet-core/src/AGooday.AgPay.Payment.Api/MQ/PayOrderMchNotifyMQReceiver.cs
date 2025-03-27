@@ -35,8 +35,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
                 var mchNotifyRecordService = scope.ServiceProvider.GetService<IMchNotifyRecordService>();
                 try
                 {
-                    _logger.LogInformation("接收商户通知MQ, msg={payload}", JsonConvert.SerializeObject(payload));
-                    //_logger.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+                    _logger.LogInformation("接收商户通知MQ, 消息: {payload}", JsonConvert.SerializeObject(payload));
+                    //_logger.LogInformation($"接收商户通知MQ, 消息: {JsonConvert.SerializeObject(payload)}");
 
                     long notifyId = payload.NotifyId;
                     MchNotifyRecordDto record = await mchNotifyRecordService.GetByIdAsync(notifyId);

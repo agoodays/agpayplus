@@ -22,8 +22,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
 
         public Task ReceiveAsync(ResetIsvAgentMchAppInfoConfigMQ.MsgPayload payload)
         {
-            _logger.LogInformation("接收商户通知MQ, msg={payload}", JsonConvert.SerializeObject(payload));
-            //_logger.LogInformation($"接收商户通知MQ, msg={JsonConvert.SerializeObject(payload)}");
+            _logger.LogInformation("接收商户通知MQ, 消息: {payload}", JsonConvert.SerializeObject(payload));
+            //_logger.LogInformation($"接收商户通知MQ, 消息: {JsonConvert.SerializeObject(payload)}");
             if (payload.ResetType == ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_ISV_INFO)
             {
                 return this.ModifyIsvInfoAsync(payload.IsvNo);
@@ -49,8 +49,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
         /// <param name="mchNo"></param>
         private async Task ModifyMchInfoAsync(string mchNo)
         {
-            _logger.LogInformation("成功接收 [商户配置信息] 的消息, msg={mchNo}", mchNo);
-            //_logger.LogInformation($"成功接收 [商户配置信息] 的消息, msg={mchNo}");
+            _logger.LogInformation("成功接收 [商户配置信息] 的消息, 消息: {mchNo}", mchNo);
+            //_logger.LogInformation($"成功接收 [商户配置信息] 的消息, 消息: {mchNo}");
             await _configContextService.InitMchInfoConfigContextAsync(mchNo);
             _logger.LogInformation(" [商户配置信息] 已重置");
         }
@@ -74,8 +74,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
         /// <param name="agentNo"></param>
         private async Task ModifyAgentInfoAsync(string agentNo)
         {
-            _logger.LogInformation("成功接收 [代理商信息] 重置, msg={agentNo}", agentNo);
-            //_logger.LogInformation($"成功接收 [代理商信息] 重置, msg={agentNo}");
+            _logger.LogInformation("成功接收 [代理商信息] 重置, 消息: {agentNo}", agentNo);
+            //_logger.LogInformation($"成功接收 [代理商信息] 重置, 消息: {agentNo}");
             await _configContextService.InitAgentConfigContextAsync(agentNo);
             _logger.LogInformation("[代理商信息] 已重置");
         }
@@ -86,8 +86,8 @@ namespace AGooday.AgPay.Payment.Api.MQ
         /// <param name="isvNo"></param>
         private async Task ModifyIsvInfoAsync(string isvNo)
         {
-            _logger.LogInformation("成功接收 [ISV信息] 重置, msg={isvNo}", isvNo);
-            //_logger.LogInformation($"成功接收 [ISV信息] 重置, msg={isvNo}");
+            _logger.LogInformation("成功接收 [ISV信息] 重置, 消息: {isvNo}", isvNo);
+            //_logger.LogInformation($"成功接收 [ISV信息] 重置, 消息: {isvNo}");
             await _configContextService.InitIsvConfigContextAsync(isvNo);
             _logger.LogInformation("[ISV信息] 已重置");
         }

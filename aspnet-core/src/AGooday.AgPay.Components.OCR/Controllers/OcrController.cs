@@ -38,8 +38,8 @@ namespace AGooday.AgPay.Components.OCR.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "通用文字识别异常, imageUrl = {imageUrl}, type = {type}", imageUrl, type);
-                //_logger.LogError(e, $"通用文字识别异常, imageUrl = {imageUrl}");
+                _logger.LogError(e, "通用文字识别异常, imageUrl={imageUrl}, type={type}", imageUrl, type);
+                //_logger.LogError(e, $"通用文字识别异常, imageUrl={imageUrl}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }
@@ -61,8 +61,8 @@ namespace AGooday.AgPay.Components.OCR.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "卡证文字识别异常, imageUrl = {imageUrl}, type = {type}", imageUrl, type);
-                //_logger.LogError(e, $"卡证文字识别异常, imageUrl = {imageUrl}");
+                _logger.LogError(e, "卡证文字识别异常, imageUrl={imageUrl}, type={type}", imageUrl, type);
+                //_logger.LogError(e, $"卡证文字识别异常, imageUrl={imageUrl}");
                 throw new BizException(ApiCode.SYSTEM_ERROR, e.Message);
             }
         }

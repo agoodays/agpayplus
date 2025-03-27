@@ -37,8 +37,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             try
             {
                 var paramsJson = await GetReqParamJSONAsync();
-                _logger.LogInformation("【支付宝转账】回调通知参数：{paramsJson}", paramsJson);
-                //_logger.LogInformation($"【支付宝转账】回调通知参数：{paramsJson}");
+                _logger.LogInformation("【支付宝转账】回调通知参数: {paramsJson}", paramsJson);
+                //_logger.LogInformation($"【支付宝转账】回调通知参数: {paramsJson}");
 
                 var bizContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(paramsJson["biz_content"].ToString());
 
@@ -97,8 +97,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 // 验签失败
                 if (!verifyResult)
                 {
-                    _logger.LogError("{logPrefix}，验签失败", logPrefix);
-                    //_logger.LogError($"{logPrefix}，验签失败");
+                    _logger.LogError("{logPrefix}, 验签失败", logPrefix);
+                    //_logger.LogError($"{logPrefix}, 验签失败");
                     throw ResponseException.BuildText("ERROR");
                 }
 

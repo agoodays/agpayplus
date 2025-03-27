@@ -113,7 +113,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "微信退款查询Exception异常: ");
+                _logger.LogError(e, "微信退款查询Exception异常");
                 return ChannelRetMsg.SysError(e.Message);
             }
         }
@@ -213,7 +213,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "微信退款Exception异常: ");
+                _logger.LogError(e, "微信退款Exception异常");
                 return ChannelRetMsg.SysError(e.Message);
             }
         }
