@@ -91,7 +91,7 @@
               <div class="account-settings-info-view">
                 <a-row :gutter="16">
                   <a-col :md="16" :lg="16">
-                    <a-form-model :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesPass">
+                    <a-form-model :label-col="{span: 9}" :wrapper-col="{span: 10}" :rules="rulesSafeWord">
                       <a-form-model-item label="预留信息：" prop="safeWord">
                         <a-input v-model="safeWord" placeholder="请输入新的预留信息" />
                       </a-form-model-item>
@@ -113,7 +113,7 @@
 import AgUpload from '@/components/AgUpload/AgUpload'
 import { getInfo } from '@/api/login'
 import { Base64 } from 'js-base64'
-import { updateUserInfo, updateUserPass, getUserInfo, upload } from '@/api/manage'
+import { getPwdRulesRegexp, updateUserInfo, updateUserPass, getUserInfo, upload } from '@/api/manage'
 import AvatarModal from './AvatarModal'
 import store from '@/store'
 import appConfig from '@/config/appConfig'
@@ -131,6 +131,15 @@ export default {
     AvatarModal, AgUpload
   },
   data () {
+    const passwordRules = {
+      regexpRules: '',
+      errTips: ''
+    }
+    getPwdRulesRegexp().then((res) => {
+      passwordRules.regexpRules = res.regexpRules
+      passwordRules.errTips = res.errTips
+    })
+
     return {
       loading: false, // 上传状态
       size: 10, // 文件大小限制
@@ -158,12 +167,46 @@ export default {
       },
       rulesPass: {
         originalPwd: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
-        newPwd: [{ min: 6, max: 12, required: true, message: '请输入6-12位新密码', trigger: 'blur' }],
-        confirmPwd: [{ required: true, message: '请输入确认新密码', trigger: 'blur' }, {
+        newPwd: [{
+          required: true,
+          trigger: 'blur',
           validator: (rule, value, callBack) => {
-            this.updateObject.newPwd === value ? callBack() : callBack('新密码与确认密码不一致')
+            if (!this.updateObject.newPwd) {
+              callBack('请输入新密码')
+              return
+            }
+            if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+              const regex = new RegExp(passwordRules.regexpRules)
+              const isMatch = regex.test(this.updateObject.newPwd)
+              if (!isMatch) {
+                callBack(passwordRules.errTips)
+              }
+            }
+            callBack()
           }
-        }]
+        }], // 新密码
+        confirmPwd: [{
+          required: true,
+          trigger: 'blur',
+          validator: (rule, value, callBack) => {
+            if (!this.updateObject.confirmPwd) {
+              callBack('请输入确认新密码')
+              return
+            }
+            if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+              const regex = new RegExp(passwordRules.regexpRules)
+              const isMatch = regex.test(this.updateObject.confirmPwd)
+              if (!isMatch) {
+                callBack(passwordRules.errTips)
+              }
+            }
+            this.updateObject.newPwd === this.updateObject.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
+            callBack()
+          }
+        }] // 确认新密码
+      },
+      rulesSafeWord: {
+        safeWord: [{ required: true, message: '请输入预留信息', trigger: 'blur' }]
       }
     }
   },

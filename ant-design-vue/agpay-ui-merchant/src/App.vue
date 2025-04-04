@@ -23,9 +23,9 @@ export default {
   },
   computed: {
     // 全局 loading
-		...mapState([
-			'globalLoading'
-		])
-	}
+    ...mapState([
+      'globalLoading'
+    ])
+  }
 }
 </script>

@@ -9,7 +9,7 @@
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="40%"
   >
-    <a-form-model v-if="visible" ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
+    <a-form-model v-if="visible" ref="infoFormModel" :model="{ ...saveObject, newPwd, ...sysPassword }" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-model-item label="代理商名称" prop="agentName">
@@ -416,6 +416,7 @@ export default {
 
     return {
       passwordLength: 6, // 密码长度
+      passwordRules,
       includeUpperCase: true, // 包含大写字母
       includeNumber: false, // 包含数字
       includeSymbol: false, // 包含符号
@@ -471,34 +472,41 @@ export default {
         isvNo: [{ required: true, validator: checkIsvNo, trigger: 'blur' }],
         contactEmail: [{ required: false, pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/, message: '请输入正确的邮箱地址', trigger: 'blur' }],
         contactTel: [{ required: true, pattern: /^1\d{10}$/, message: '请输入正确的手机号', trigger: 'blur' }],
-        newPwd: [{ required: true, message: '请输入新密码', trigger: 'blur' }, {
+        newPwd: [{
+          required: true,
+          trigger: 'blur',
           validator: (rule, value, callBack) => {
-            if (!this.sysPassword.defaultPass) {
-              if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
-                const regex = new RegExp(passwordRules.regexpRules)
-                const isMatch = regex.test(this.newPwd)
-                if (!isMatch) {
-                  callBack(passwordRules.errTips)
-                }
+            if (!this.newPwd) {
+              callBack('请输入新密码')
+              return
+            }
+            if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+              const regex = new RegExp(passwordRules.regexpRules)
+              const isMatch = regex.test(this.newPwd)
+              if (!isMatch) {
+                callBack(passwordRules.errTips)
               }
             }
             callBack()
           }
         }], // 新密码
-        confirmPwd: [{ required: true, message: '请输入确认新密码', trigger: 'blur' }, {
+        confirmPwd: [{
+          required: true,
+          trigger: 'blur',
           validator: (rule, value, callBack) => {
-            if (!this.sysPassword.defaultPass) {
-              if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
-                const regex = new RegExp(passwordRules.regexpRules)
-                const isMatch = regex.test(this.sysPassword.confirmPwd)
-                if (!isMatch) {
-                  callBack(passwordRules.errTips)
-                }
-              }
-              this.newPwd === this.sysPassword.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
-            } else {
-              callBack()
+            if (!this.sysPassword.confirmPwd) {
+              callBack('请输入确认新密码')
+              return
             }
+            if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+              const regex = new RegExp(passwordRules.regexpRules)
+              const isMatch = regex.test(this.sysPassword.confirmPwd)
+              if (!isMatch) {
+                callBack(passwordRules.errTips)
+              }
+            }
+            this.newPwd === this.sysPassword.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
+            callBack()
           }
         }] // 确认新密码
       }
@@ -534,17 +542,41 @@ export default {
         that.visible = true // 立马展示弹层信息
       }
     },
-    // 随机生成六位数密码
+    // 随机生成密码
     genRandomPassword: function () {
       if (!this.passwordLength) return
 
       let password = ''
       let characters = 'abcdefghijklmnopqrstuvwxyz'
+
+      // 根据用户选择动态添加字符集
       if (this.includeUpperCase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       if (this.includeNumber) characters += '0123456789'
       if (this.includeSymbol) characters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-      for (let i = 0; i < this.passwordLength; i++) {
-        password += characters.charAt(Math.floor(Math.random() * characters.length))
+
+      // 如果密码规则未定义，使用默认逻辑生成密码
+      if (!this.passwordRules.regexpRules) {
+        for (let i = 0; i < this.passwordLength; i++) {
+          password += characters.charAt(Math.floor(Math.random() * characters.length))
+        }
+      } else {
+        // 使用密码规则生成密码
+        const regex = new RegExp(this.passwordRules.regexpRules) // 使用密码规则的正则表达式
+
+        // 提取长度规则（例如 ^.{8,}$ 表示最少 8 位）
+        const lengthMatch = this.passwordRules.regexpRules.match(/\{(\d+),?(\d+)?\}/)
+        const minLength = lengthMatch ? parseInt(lengthMatch[1], 10) : this.passwordLength // 默认最小长度为 6
+        const maxLength = lengthMatch && lengthMatch[2] ? parseInt(lengthMatch[2], 10) : minLength // 如果没有最大长度，则使用最小长度
+
+        const passwordLength = Math.min(maxLength, minLength) // 使用最小长度或最大长度
+
+        // 循环生成密码，直到符合规则
+        do {
+          password = ''
+          for (let i = 0; i < passwordLength; i++) {
+            password += characters.charAt(Math.floor(Math.random() * characters.length))
+          }
+        } while (!regex.test(password)) // 验证生成的密码是否符合规则
       }
 
       this.saveObject.loginPassword = password
@@ -585,14 +617,14 @@ export default {
               that.resetIsShow = true // 展示重置密码板块
               that.sysPassword.resetPayPass = false
               that.sysPassword.resetPass = false
-              that.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
+              that.sysPassword.defaultPass = true // 是否使用默认密码默认为true
               that.resetPassEmpty(that) // 清空密码
             }).catch(res => {
               that.btnLoading = false
               that.resetIsShow = true // 展示重置密码板块
               that.sysPassword.resetPayPass = false
               that.sysPassword.resetPass = false
-              that.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
+              that.sysPassword.defaultPass = true // 是否使用默认密码默认为true
               that.resetPassEmpty(that) // 清空密码
             })
           }
@@ -605,7 +637,7 @@ export default {
       this.sysPassword.resetPayPass = false
       this.sysPassword.resetPass = false
       this.resetPassEmpty(this)
-      this.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
+      this.sysPassword.defaultPass = true // 是否使用默认密码默认为true
     },
     searchFunc: function () { // 点击【查询】按钮点击事件
       this.$refs.infoTable.refTable(true)

@@ -92,8 +92,8 @@ export default {
               if (value < 0.01 || value > this.nowRefundAmount) {
                 callBack('退款金额不能小于0.01，或者大于可退金额')
               }
-							callBack()
-						}
+              callBack()
+            }
          }]
       }
     }
@@ -106,8 +106,8 @@ export default {
   methods: {
     show (recordId) {
       if (this.$refs.refundInfo !== undefined) {
-					this.$refs.refundInfo.resetFields()
-			}
+          this.$refs.refundInfo.resetFields()
+      }
       this.recordId = recordId
       this.visible = true
       this.refund = {}
@@ -118,7 +118,7 @@ export default {
     },
     handleOk (e) {
       this.$refs.refundInfo.validate(valid => {
-				if (valid) {
+        if (valid) {
           this.confirmLoading = true
           const that = this
           // 退款接口

@@ -13,7 +13,7 @@
     <!-- <a-modal :confirmLoading="confirmLoading"> -->
     <a-form-model
       ref="infoFormModel"
-      :model="saveObject"
+      :model="{ ...saveObject, newPwd, ...sysPassword }"
       :rules="rules"
       style="padding-bottom:50px"
       layout="vertical"
@@ -165,36 +165,45 @@
 </template>
 
 <script>
-	import { req, API_URL_SYS_USER_LIST	} from '@/api/manage'
-	import { Base64 } from 'js-base64'
+  import { req, getPwdRulesRegexp, API_URL_SYS_USER_LIST } from '@/api/manage'
+  import { Base64 } from 'js-base64'
 
-	export default {
+  export default {
 
-		props: {
-			callbackFunc: {
-				type: Function,
-				default: () => ({})
-			}
-		},
+    props: {
+      callbackFunc: {
+        type: Function,
+        default: () => ({})
+      }
+    },
 
-		data () {
-			return {
+    data () {
+      const passwordRules = {
+        regexpRules: '',
+        errTips: ''
+      }
+      getPwdRulesRegexp().then((res) => {
+        passwordRules.regexpRules = res.regexpRules
+        passwordRules.errTips = res.errTips
+      })
+      return {
         passwordLength: 6, // 密码长度
+        passwordRules,
         includeUpperCase: true, // 包含大写字母
         includeNumber: false, // 包含数字
         includeSymbol: false, // 包含符号
-				newPwd: '', //  新密码
-				resetIsShow: false, // 重置密码是否展现
-				sysPassword: {
-					resetPass: false, // 重置密码
-					defaultPass: true, // 使用默认密码
-					confirmPwd: '' //  确认密码
-				},
-				loading: false, // 按钮上的loading
-				value: 1, // 单选框默认的值
-				confirmLoading: false, // 显示确定按钮loading图标
-				isAdd: true, // 新增 or 修改页面标识
-				isShow: false, // 是否显示弹层/抽屉
+        newPwd: '', //  新密码
+        resetIsShow: false, // 重置密码是否展现
+        sysPassword: {
+          resetPass: false, // 重置密码
+          defaultPass: true, // 使用默认密码
+          confirmPwd: '' //  确认密码
+        },
+        loading: false, // 按钮上的loading
+        value: 1, // 单选框默认的值
+        confirmLoading: false, // 显示确定按钮loading图标
+        isAdd: true, // 新增 or 修改页面标识
+        isShow: false, // 是否显示弹层/抽屉
         userTypeOptions: [
           { userTypeName: '超级管理员', userType: 1 },
           { userTypeName: '普通操作员', userType: 2 },
@@ -202,171 +211,205 @@
           { userTypeName: '店长', userType: 11 },
           { userTypeName: '店员', userType: 12 }
         ],
-				saveObject: {}, // 数据对象
-				recordId: null, // 更新对象ID
-				rules: {
-					realname: [{
-						required: true,
-						message: '请输入用户姓名',
-						trigger: 'blur'
-					}],
-					telphone: [{
-						required: true,
-						pattern: /^[1][0-9]{10}$/,
-						message: '请输入正确的手机号码',
-						trigger: 'blur'
-					}],
-					userNo: [{
-						required: true,
-						message: '请输入编号',
-						trigger: 'blur'
-					}],
-					loginUsername: [],
-					newPwd: [{
-						required: false,
-						trigger: 'blur'
-					}, {
-						validator: (rule, value, callBack) => {
-							if (!this.sysPassword.defaultPass) {
-								if (this.newPwd.length < 6 || this.newPwd.length >
-									12) {
-									callBack('请输入6-12位新密码')
-								}
-							}
-							callBack()
-						}
-					}], // 新密码
-					confirmPwd: [{
-						required: false,
-						trigger: 'blur'
-					}, {
-						validator: (rule, value, callBack) => {
-							if (!this.sysPassword.defaultPass) {
-								this.newPwd === this.sysPassword.confirmPwd ? callBack()
-									: callBack('新密码与确认密码不一致')
-							} else {
-								callBack()
-							}
-						}
-					}] // 确认新密码
-				}
-			}
-		},
-		created () {},
-		methods: {
-			show (recordId) { // 弹层打开事件
-				if (this.$refs.infoFormModel !== undefined) {
-					this.$refs.infoFormModel.resetFields()
-				}
+        saveObject: {}, // 数据对象
+        recordId: null, // 更新对象ID
+        rules: {
+          realname: [{
+            required: true,
+            message: '请输入用户姓名',
+            trigger: 'blur'
+          }],
+          telphone: [{
+            required: true,
+            pattern: /^[1][0-9]{10}$/,
+            message: '请输入正确的手机号码',
+            trigger: 'blur'
+          }],
+          userNo: [{
+            required: true,
+            message: '请输入编号',
+            trigger: 'blur'
+          }],
+          loginUsername: [],
+          newPwd: [{
+            required: true,
+            trigger: 'blur',
+            validator: (rule, value, callBack) => {
+              if (!this.newPwd) {
+                callBack('请输入新密码')
+                return
+              }
+              if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+                const regex = new RegExp(passwordRules.regexpRules)
+                const isMatch = regex.test(this.newPwd)
+                if (!isMatch) {
+                  callBack(passwordRules.errTips)
+                }
+              }
+              callBack()
+            }
+          }], // 新密码
+          confirmPwd: [{
+            required: true,
+            trigger: 'blur',
+            validator: (rule, value, callBack) => {
+              if (!this.sysPassword.confirmPwd) {
+                callBack('请输入确认新密码')
+                return
+              }
+              if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+                const regex = new RegExp(passwordRules.regexpRules)
+                const isMatch = regex.test(this.sysPassword.confirmPwd)
+                if (!isMatch) {
+                  callBack(passwordRules.errTips)
+                }
+              }
+              this.newPwd === this.sysPassword.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
+              callBack()
+            }
+          }] // 确认新密码
+        }
+      }
+    },
+    created () {},
+    methods: {
+      show (recordId) { // 弹层打开事件
+        if (this.$refs.infoFormModel !== undefined) {
+          this.$refs.infoFormModel.resetFields()
+        }
 
-				this.isAdd = !recordId
-				// 数据恢复为默认数据
-				this.saveObject = {
-					state: 1,
-					sex: 1,
+        this.isAdd = !recordId
+        // 数据恢复为默认数据
+        this.saveObject = {
+          state: 1,
+          sex: 1,
           userType: 1,
           isNotify: 0,
           passwordType: 'default',
           loginPassword: ''
-				}
-				this.rules.loginUsername = []
-				this.confirmLoading = false // 关闭loading
+        }
+        this.rules.loginUsername = []
+        this.confirmLoading = false // 关闭loading
 
-				if (this.isAdd) {
-					this.rules.loginUsername.push({
-						required: true,
-						pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/,
-						message: '请输入字母开头，长度为6-18位的登录名',
-						trigger: 'blur'
-					})
-				}
+        if (this.isAdd) {
+          this.rules.loginUsername.push({
+            required: true,
+            pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/,
+            message: '请输入字母开头，长度为6-18位的登录名',
+            trigger: 'blur'
+          })
+        }
 
-				const that = this
-				if (!this.isAdd) { // 修改信息 延迟展示弹层
-					that.resetIsShow = true // 展示重置密码板块
-					that.recordId = recordId
-					req.getById(API_URL_SYS_USER_LIST, recordId).then(res => {
-						that.saveObject = res
-					})
-					this.isShow = true
-				} else {
-					that.isShow = true // 立马展示弹层信息
-				}
-			},
-      // 随机生成六位数密码
+        const that = this
+        if (!this.isAdd) { // 修改信息 延迟展示弹层
+          that.resetIsShow = true // 展示重置密码板块
+          that.recordId = recordId
+          req.getById(API_URL_SYS_USER_LIST, recordId).then(res => {
+            that.saveObject = res
+          })
+          this.isShow = true
+        } else {
+          that.isShow = true // 立马展示弹层信息
+        }
+      },
+      // 随机生成密码
       genRandomPassword: function () {
         if (!this.passwordLength) return
 
         let password = ''
         let characters = 'abcdefghijklmnopqrstuvwxyz'
+
+        // 根据用户选择动态添加字符集
         if (this.includeUpperCase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         if (this.includeNumber) characters += '0123456789'
         if (this.includeSymbol) characters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-        for (let i = 0; i < this.passwordLength; i++) {
-          password += characters.charAt(Math.floor(Math.random() * characters.length))
+
+        // 如果密码规则未定义，使用默认逻辑生成密码
+        if (!this.passwordRules.regexpRules) {
+          for (let i = 0; i < this.passwordLength; i++) {
+            password += characters.charAt(Math.floor(Math.random() * characters.length))
+          }
+        } else {
+          // 使用密码规则生成密码
+          const regex = new RegExp(this.passwordRules.regexpRules) // 使用密码规则的正则表达式
+
+          // 提取长度规则（例如 ^.{8,}$ 表示最少 8 位）
+          const lengthMatch = this.passwordRules.regexpRules.match(/\{(\d+),?(\d+)?\}/)
+          const minLength = lengthMatch ? parseInt(lengthMatch[1], 10) : this.passwordLength // 默认最小长度为 6
+          const maxLength = lengthMatch && lengthMatch[2] ? parseInt(lengthMatch[2], 10) : minLength // 如果没有最大长度，则使用最小长度
+
+          const passwordLength = Math.min(maxLength, minLength) // 使用最小长度或最大长度
+
+          // 循环生成密码，直到符合规则
+          do {
+            password = ''
+            for (let i = 0; i < passwordLength; i++) {
+              password += characters.charAt(Math.floor(Math.random() * characters.length))
+            }
+          } while (!regex.test(password)) // 验证生成的密码是否符合规则
         }
 
         this.saveObject.loginPassword = password
       },
-			handleOkFunc: function () { // 点击【确认】按钮事件
-				const that = this
-				this.$refs.infoFormModel.validate(valid => {
-					if (valid) { // 验证通过
-						// 请求接口
-						that.loading = true // 打开按钮上的 loading
-						that.confirmLoading = true // 显示loading
-						if (that.isAdd) {
-							req.add(API_URL_SYS_USER_LIST, that.saveObject).then(res => {
-								that.$message.success('新增成功')
-								that.isShow = false
-								that.loading = false
-								that.callbackFunc() // 刷新列表
-							}).catch((res) => {
-								that.confirmLoading = false
-							})
-						} else {
-							that.sysPassword.confirmPwd = Base64.encode(that.sysPassword.confirmPwd)
-							Object.assign(that.saveObject, that.sysPassword) // 拼接对象
-							console.log(that.sysPassword.confirmPwd)
-							req.updateById(API_URL_SYS_USER_LIST, that.recordId, that.saveObject).then(res => {
-								that.$message.success('修改成功')
-								that.isShow = false
-								that.callbackFunc() // 刷新列表
-								that.resetIsShow = false // 取消展示
-								that.sysPassword.resetPass = false
-								that.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
-								that.resetPassEmpty(that) // 清空密码
-							}).catch(res => {
-								that.confirmLoading = false
-								that.resetIsShow = false // 取消展示
-								that.sysPassword.resetPass = false
-								that.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
-								that.resetPassEmpty(that) // 清空密码
-							})
-						}
-					}
-				})
-			},
-			// 点击遮罩层关闭抽屉
-			onClose () {
-				this.isShow = false
-				this.resetIsShow = false // 取消重置密码板块展示
-				this.resetPassEmpty(this) // 清空密码
-				this.sysPassword.resetPass = false // 关闭密码输入
-				this.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
-			},
-			// 使用默认密码重置是否为true
-			isResetPass () {
-				if (!this.sysPassword.defaultPass) {
-					this.newPwd = ''
-					this.sysPassword.confirmPwd = ''
-				}
-			},
-			// 保存后清空密码
-			resetPassEmpty (that) {
-				that.newPwd = ''
-				that.sysPassword.confirmPwd = ''
-			}
-		}
-	}
+      handleOkFunc: function () { // 点击【确认】按钮事件
+        const that = this
+        this.$refs.infoFormModel.validate(valid => {
+          if (valid) { // 验证通过
+            // 请求接口
+            that.loading = true // 打开按钮上的 loading
+            that.confirmLoading = true // 显示loading
+            if (that.isAdd) {
+              req.add(API_URL_SYS_USER_LIST, that.saveObject).then(res => {
+                that.$message.success('新增成功')
+                that.isShow = false
+                that.loading = false
+                that.callbackFunc() // 刷新列表
+              }).catch((res) => {
+                that.confirmLoading = false
+              })
+            } else {
+              that.sysPassword.confirmPwd = Base64.encode(that.sysPassword.confirmPwd)
+              Object.assign(that.saveObject, that.sysPassword) // 拼接对象
+              console.log(that.sysPassword.confirmPwd)
+              req.updateById(API_URL_SYS_USER_LIST, that.recordId, that.saveObject).then(res => {
+                that.$message.success('修改成功')
+                that.isShow = false
+                that.callbackFunc() // 刷新列表
+                that.resetIsShow = false // 取消展示
+                that.sysPassword.resetPass = false
+                that.sysPassword.defaultPass = true // 是否使用默认密码默认为true
+                that.resetPassEmpty(that) // 清空密码
+              }).catch(res => {
+                that.confirmLoading = false
+                that.resetIsShow = false // 取消展示
+                that.sysPassword.resetPass = false
+                that.sysPassword.defaultPass = true // 是否使用默认密码默认为true
+                that.resetPassEmpty(that) // 清空密码
+              })
+            }
+          }
+        })
+      },
+      // 点击遮罩层关闭抽屉
+      onClose () {
+        this.isShow = false
+        this.resetIsShow = false // 取消重置密码板块展示
+        this.resetPassEmpty(this) // 清空密码
+        this.sysPassword.resetPass = false // 关闭密码输入
+        this.sysPassword.defaultPass = true // 是否使用默认密码默认为true
+      },
+      // 使用默认密码重置是否为true
+      isResetPass () {
+        if (!this.sysPassword.defaultPass) {
+          this.newPwd = ''
+          this.sysPassword.confirmPwd = ''
+        }
+      },
+      // 保存后清空密码
+      resetPassEmpty (that) {
+        that.newPwd = ''
+        that.sysPassword.confirmPwd = ''
+      }
+    }
+  }
 </script>

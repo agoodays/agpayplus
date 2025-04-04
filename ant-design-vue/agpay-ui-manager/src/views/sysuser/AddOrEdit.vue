@@ -14,7 +14,7 @@
     <!-- <a-modal :confirmLoading="confirmLoading"> -->
     <a-form-model
       ref="infoFormModel"
-      :model="saveObject"
+      :model="{ ...saveObject, newPwd, ...sysPassword }"
       layout="vertical"
       :rules="rules"
       style="padding-bottom:50px">
@@ -186,7 +186,7 @@
 </template>
 
 <script>
-import { req, API_URL_SYS_USER_LIST, API_URL_UR_TEAM_LIST } from '@/api/manage'
+import { req, getPwdRulesRegexp, API_URL_SYS_USER_LIST, API_URL_UR_TEAM_LIST } from '@/api/manage'
 import { Base64 } from 'js-base64'
 export default {
 
@@ -201,8 +201,18 @@ export default {
       }
       callback()
     }
+    const passwordRules = {
+      regexpRules: '',
+      errTips: ''
+    }
+    getPwdRulesRegexp().then((res) => {
+      passwordRules.regexpRules = res.regexpRules
+      passwordRules.errTips = res.errTips
+    })
+
     return {
       passwordLength: 6, // 密码长度
+      passwordRules,
       includeUpperCase: true, // 包含大写字母
       includeNumber: false, // 包含数字
       includeSymbol: false, // 包含符号
@@ -233,23 +243,41 @@ export default {
         telphone: [{ required: true, pattern: /^[1][0-9]{10}$/, message: '请输入正确的手机号码', trigger: 'blur' }],
         userNo: [{ required: true, message: '请输入编号', trigger: 'blur' }],
         loginUsername: [],
-        newPwd: [{ required: false, trigger: 'blur' }, {
+        newPwd: [{
+          required: true,
+          trigger: 'blur',
           validator: (rule, value, callBack) => {
-            if (!this.sysPassword.defaultPass) {
-              if (this.newPwd.length < 6 || this.newPwd.length > 12) {
-                callBack('请输入6-12位新密码')
+            if (!this.newPwd) {
+              callBack('请输入新密码')
+              return
+            }
+            if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+              const regex = new RegExp(passwordRules.regexpRules)
+              const isMatch = regex.test(this.newPwd)
+              if (!isMatch) {
+                callBack(passwordRules.errTips)
               }
             }
             callBack()
           }
         }], // 新密码
-        confirmPwd: [{ required: false, trigger: 'blur' }, {
+        confirmPwd: [{
+          required: true,
+          trigger: 'blur',
           validator: (rule, value, callBack) => {
-            if (!this.sysPassword.defaultPass) {
-              this.newPwd === this.sysPassword.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
-            } else {
-              callBack()
+            if (!this.sysPassword.confirmPwd) {
+              callBack('请输入确认新密码')
+              return
             }
+            if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
+              const regex = new RegExp(passwordRules.regexpRules)
+              const isMatch = regex.test(this.sysPassword.confirmPwd)
+              if (!isMatch) {
+                callBack(passwordRules.errTips)
+              }
+            }
+            this.newPwd === this.sysPassword.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
+            callBack()
           }
         }] // 确认新密码
       }
@@ -313,17 +341,41 @@ export default {
         that.isShow = true // 立马展示弹层信息
       }
     },
-    // 随机生成六位数密码
+    // 随机生成密码
     genRandomPassword: function () {
       if (!this.passwordLength) return
 
       let password = ''
       let characters = 'abcdefghijklmnopqrstuvwxyz'
+
+      // 根据用户选择动态添加字符集
       if (this.includeUpperCase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       if (this.includeNumber) characters += '0123456789'
       if (this.includeSymbol) characters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-      for (let i = 0; i < this.passwordLength; i++) {
-        password += characters.charAt(Math.floor(Math.random() * characters.length))
+
+      // 如果密码规则未定义，使用默认逻辑生成密码
+      if (!this.passwordRules.regexpRules) {
+        for (let i = 0; i < this.passwordLength; i++) {
+          password += characters.charAt(Math.floor(Math.random() * characters.length))
+        }
+      } else {
+        // 使用密码规则生成密码
+        const regex = new RegExp(this.passwordRules.regexpRules) // 使用密码规则的正则表达式
+
+        // 提取长度规则（例如 ^.{8,}$ 表示最少 8 位）
+        const lengthMatch = this.passwordRules.regexpRules.match(/\{(\d+),?(\d+)?\}/)
+        const minLength = lengthMatch ? parseInt(lengthMatch[1], 10) : this.passwordLength // 默认最小长度为 6
+        const maxLength = lengthMatch && lengthMatch[2] ? parseInt(lengthMatch[2], 10) : minLength // 如果没有最大长度，则使用最小长度
+
+        const passwordLength = Math.min(maxLength, minLength) // 使用最小长度或最大长度
+
+        // 循环生成密码，直到符合规则
+        do {
+          password = ''
+          for (let i = 0; i < passwordLength; i++) {
+            password += characters.charAt(Math.floor(Math.random() * characters.length))
+          }
+        } while (!regex.test(password)) // 验证生成的密码是否符合规则
       }
 
       this.saveObject.loginPassword = password
@@ -353,15 +405,15 @@ export default {
               that.isShow = false
               that.callbackFunc() // 刷新列表
               that.resetIsShow = false // 取消展示
-							that.sysPassword.resetPass = false
-							that.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
-							that.resetPassEmpty(that) // 清空密码
+              that.sysPassword.resetPass = false
+              that.sysPassword.defaultPass = true // 是否使用默认密码默认为true
+              that.resetPassEmpty(that) // 清空密码
             }).catch(res => {
               that.confirmLoading = false
               that.resetIsShow = false // 取消展示
-							that.sysPassword.resetPass = false
-							that.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
-							that.resetPassEmpty(that) // 清空密码
+              that.sysPassword.resetPass = false
+              that.sysPassword.defaultPass = true // 是否使用默认密码默认为true
+              that.resetPassEmpty(that) // 清空密码
             })
           }
         }
@@ -371,9 +423,9 @@ export default {
     onClose () {
       this.isShow = false
       this.resetIsShow = false // 取消重置密码板块展示
-			this.resetPassEmpty(this) // 清空密码
-			this.sysPassword.resetPass = false // 关闭密码输入
-			this.sysPassword.defaultPass = true	// 是否使用默认密码默认为true
+      this.resetPassEmpty(this) // 清空密码
+      this.sysPassword.resetPass = false // 关闭密码输入
+      this.sysPassword.defaultPass = true // 是否使用默认密码默认为true
     },
     // 使用默认密码重置是否为true
     isResetPass () {
@@ -383,10 +435,10 @@ export default {
       }
     },
     // 保存后清空密码
-		resetPassEmpty (that) {
-		that.newPwd = ''
-		that.sysPassword.confirmPwd = ''
-		}
+    resetPassEmpty (that) {
+    that.newPwd = ''
+    that.sysPassword.confirmPwd = ''
+    }
   }
 }
 </script>
