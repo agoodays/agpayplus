@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             }
             return ApiRes.Ok(channelUserId);
 #endif
-            return ApiRes.Ok(channelUserService.GetChannelUserIdAsync(this.GetReqParamJson(), oauth2InfoId, wayCode, mchAppConfigContext));
+            return ApiRes.Ok(await channelUserService.GetChannelUserIdAsync(this.GetReqParamJson(), oauth2InfoId, wayCode, mchAppConfigContext));
         }
 
         /// <summary>
