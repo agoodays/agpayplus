@@ -25,18 +25,25 @@ export const useUserStore = defineStore({
   }),
   getters: {
     getToken(state) {
+      console.log('getToken - Current state:', state);
+      console.log('getToken - Current token:', state.token);
       if (state.token) {
         return state.token;
       }
-      return localRead(LocalStorageKeyConst.USER_TOKEN);
+      const localToken = localRead(LocalStorageKeyConst.USER_TOKEN);
+      console.log('getToken - Local token:', localToken);
+      return localToken || ''; // 确保返回一个默认值
     },
   },
 
   actions: {
     logout() {
-      this.token = '';
-      this.allMenuRouteTree = [];
-      localClear();
+      return new Promise((resolve) => {
+        this.token = '';
+        this.allMenuRouteTree = [];
+        localClear();
+        resolve(); // 确保返回一个 Promise
+      });
     },
     //设置登录信息
     setUserLoginInfo(data) {
@@ -54,10 +61,12 @@ export const useUserStore = defineStore({
       this.sex = data.sex // 性别
     },
     setToken(token, isSaveLocal) {
-      console.log(token)
+      console.log('setToken - New token:', token);
       this.token = token;
+      console.log('setToken - Updated state.token:', this.token);
       if (isSaveLocal) {
-        localSave(LocalStorageKeyConst.USER_TOKEN, token ? token : '');
+        localSave(LocalStorageKeyConst.USER_TOKEN, token || '');
+        console.log('setToken - Token saved to local storage');
       }
     },
   },

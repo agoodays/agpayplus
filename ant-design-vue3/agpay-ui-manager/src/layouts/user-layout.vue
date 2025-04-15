@@ -1,6 +1,6 @@
 <template>
   <div class="content-header">
-    <img src="../assets/vue.svg" class="header-logo">
+    <img src="/@/assets/logo.svg" class="header-logo">
   </div>
   <div class="content-body">
     <div class="content-main" style="justify-content: flex-end;">
@@ -12,17 +12,17 @@
     <div class="content-footer">
       <div class="footer-info">
         <div>
-          <span>Copyright &copy; 2024 吉日科技 版权所有</span>
+          <span>Copyright &copy;2023-{{ currentYear }} 吉日科技 版权所有</span>
         </div>
         <div class="top-list">
           <div class="t-list-item">
-            <img src="https://beian.miit.gov.cn/favicon.ico" alt=""> ICP备案：鄂ICP备19941223号-9
+            <img src="/@/assets/beian.png"> ICP备案：鄂ICP备19941223号-9
           </div>
           <div class="t-list-item">
-            <img src="https://www.pcac.org.cn/eportal/fileDir/pcac/resource/cms/favicon.ico" alt=""> 中国支付清算协会备案编码：W2016091300000019
+            <img src="/@/assets/pcac.png"> 中国支付清算协会备案编码：W2016091300000019
           </div>
           <div class="t-list-item">
-            <img src="https://ythzxfw.miit.gov.cn/favicon.ico" alt=""> 电信增值业务许可证编号：鄂A2-20160913
+            <img src="/@/assets/permit.png"> 电信增值业务许可证编号：鄂A2-20160913
           </div>
         </div>
       </div>
@@ -32,6 +32,8 @@
 
 <script setup>
 import { theme } from 'ant-design-vue';
+import dayjs from 'dayjs';
+const currentYear = dayjs().year();
 
 const { useToken } = theme;
 const { token } = useToken();

@@ -129,7 +129,9 @@ const onFinish = values => {
 
 const loginSuccess = res => {
   const redirect = route.query.redirect;
-  router.push({ path: '/', query: { redirect: redirect } });
+  console.log('loginSuccess', redirect);
+  // 清除验证码
+  router.push({ path: redirect || '/' });
   // 延迟 1 秒显示欢迎信息
   setTimeout(() => {
     notification.success({

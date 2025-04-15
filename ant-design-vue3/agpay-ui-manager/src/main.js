@@ -5,6 +5,9 @@ import './theme/index.less'
 import App from './App.vue'
 import { router } from '/@/router';
 import { store } from '/@/store';
+import Initializer from './bootstrap'
+import { infoBox } from './utils/info-box';
+
 import('./theme/style-blue.less');
 // import { basicApi } from '/@/api/system/basic-api';
 // import { localSave } from '/@/utils/local-util';
@@ -28,7 +31,13 @@ import('./theme/style-blue.less');
 
 const app = createApp(App);
 
+// 初始化本地存储或其他逻辑
+Initializer();
+
 app.use(router).use(store).use(Antd)
+
+// 注册全局方法 infoBox
+app.config.globalProperties.$infoBox = infoBox;
 
 // 注册图标组件
 Object.keys(antIcons).forEach((key) => {
