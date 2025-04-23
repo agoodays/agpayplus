@@ -106,6 +106,22 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Anon
                 throw new BizException("用户名/密码错误！");
             }
 
+            //用户ID
+            var userId = auth.SysUserId;
+
+            var sysUser = await _sysUserService.GetByIdAsync(userId);
+
+            if (sysUser == null)
+            {
+                throw new BizException("用户名/密码错误！");
+            }
+
+            //用户角色状态停用
+            if (CS.PUB_USABLE != sysUser.State)
+            {
+                throw new BizException("用户状态不可登录，请联系管理员！");
+            }
+
             var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
             var loginErrorMaxLimit = JsonConvert.DeserializeObject<Dictionary<string, int>>(sysConfig.ConfigVal);
             loginErrorMaxLimit.TryGetValue("limitMinute", out int limitMinute);

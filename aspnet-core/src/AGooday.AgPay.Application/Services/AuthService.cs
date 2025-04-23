@@ -208,7 +208,7 @@ namespace AGooday.AgPay.Application.Services
                 .Join(_sysUserRepository.GetAllAsNoTracking(),
                 ua => ua.UserId, ur => ur.SysUserId,
                 (ua, ur) => new { ua, ur })
-                .Where(w => w.ua.IdentityType == identityType && w.ua.Identifier.Equals(identifier) && w.ua.SysType.Equals(sysType) && w.ur.State == CS.PUB_USABLE)
+                .Where(w => w.ua.IdentityType == identityType && w.ua.Identifier.Equals(identifier) && w.ua.SysType.Equals(sysType))
                 .FirstOrDefaultAsync();
 
             return auth == null ? null : await GetSysUserAuthInfoAsync(auth.ua, auth.ur);

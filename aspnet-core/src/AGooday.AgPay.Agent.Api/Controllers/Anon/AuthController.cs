@@ -34,6 +34,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
         private readonly JwtSettings _jwtSettings;
         private readonly ISysUserService _sysUserService;
         private readonly ISysUserAuthService _sysUserAuthService;
+        private readonly IAgentInfoService _agentInfoService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly ISysConfigService _sysConfigService;
         private readonly ISmsService _smsService;
@@ -50,6 +51,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             IOptions<JwtSettings> jwtSettings,
             ISysUserService sysUserService,
             ISysUserAuthService sysUserAuthService,
+            IAgentInfoService agentInfoService,
             ISysUserLoginAttemptService sysUserLoginAttemptService,
             ISysConfigService sysConfigService,
             ISmsServiceFactory smsServiceFactory,
@@ -62,6 +64,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             _jwtSettings = jwtSettings.Value;
             _sysUserService = sysUserService;
             _sysUserAuthService = sysUserAuthService;
+            _agentInfoService = agentInfoService;
             _sysUserLoginAttemptService = sysUserLoginAttemptService;
             _sysConfigService = sysConfigService;
             _smsService = smsServiceFactory.GetService();
@@ -99,12 +102,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             }
 
             var auth = await _authService.LoginAuthAsync(account, identityType, SYS_TYPE);
-
-            if (auth == null)
-            {
-                //没有该用户信息
-                throw new BizException("用户名/密码错误！");
-            }
+            
+            await AuthValidateAsync(auth);
 
             var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);
             var loginErrorMaxLimit = JsonConvert.DeserializeObject<Dictionary<string, int>>(sysConfig.ConfigVal);
@@ -143,6 +142,43 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             // 登录成功，清除登录尝试记录
             await _sysUserLoginAttemptService.ClearFailedLoginAttemptsAsync(auth.SysUserId);
             return await AuthAsync(auth, codeCacheKey, lastLoginTime);
+        }
+
+        private async Task AuthValidateAsync(SysUserAuthInfoDto auth, string errMsg = "用户名/密码错误！")
+        {
+            if (auth == null)
+            {
+                //没有该用户信息
+                throw new BizException(errMsg);
+            }
+
+            //用户ID
+            var userId = auth.SysUserId;
+
+            var sysUser = await _sysUserService.GetByIdAsync(userId);
+
+            if (sysUser == null)
+            {
+                throw new BizException("用户名/密码错误！");
+            }
+
+            //用户角色状态停用
+            if (CS.PUB_USABLE != sysUser.State)
+            {
+                throw new BizException("用户状态不可登录，请联系管理员！");
+            }
+
+            var agentInfo = _agentInfoService.GetById(auth.BelongInfoId);
+            if (agentInfo == null)
+            {
+                throw new BizException("所属代理商为空，请联系管理员！");
+            }
+
+            //代理商状态停用
+            if (CS.PUB_USABLE != agentInfo.State)
+            {
+                throw new BizException("代理商状态停用，请联系管理员！");
+            }
         }
 
         private async Task<ApiRes> AuthAsync(SysUserAuthInfoDto auth, string codeCacheKey, DateTime? lastLoginTime = null)
@@ -233,11 +269,8 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             byte identityType = CS.AUTH_TYPE.TELPHONE;
             var auth = await _authService.LoginAuthAsync(phone, identityType, SYS_TYPE);
 
-            if (auth == null)
-            {
-                //没有该用户信息
-                throw new BizException("未绑定手机号！");
-            }
+            await AuthValidateAsync(auth, "未绑定手机号！");
+
             (int failedAttempts, DateTime? lastLoginTime) = await _sysUserLoginAttemptService.GetFailedLoginAttemptsAsync(auth.SysUserId, TimeSpan.FromMinutes(15));
             return await AuthAsync(auth, codeCacheKey, lastLoginTime);
         }
