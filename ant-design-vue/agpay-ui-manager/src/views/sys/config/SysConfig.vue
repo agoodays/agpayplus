@@ -608,14 +608,29 @@ export default {
           const configKey = that.configData[i].configKey
           let configVal = that.configData[i].configVal
           switch (configKey) {
+            case 'ossUseType':
+              configVal = that.ossConfig.ossUseType
+              break
+            case 'ossPublicSiteUrl':
+              configVal = that.ossConfig.ossPublicSiteUrl
+              break
             case 'aliyunOssConfig':
               configVal = JSON.stringify(that.ossConfig.aliyunOssConfig)
+              break
+            case 'smsProviderKey':
+              configVal = that.smsConfig.smsProviderKey
               break
             case 'agpaydxSmsConfig':
               configVal = JSON.stringify(that.smsConfig.agpaydxSmsConfig)
               break
             case 'aliyundySmsConfig':
               configVal = JSON.stringify(that.smsConfig.aliyundySmsConfig)
+              break
+            case 'ocrType':
+              configVal = that.ocrConfig.ocrType
+              break
+            case 'ocrState':
+              configVal = that.ocrConfig.ocrState
               break
             case 'tencentOcrConfig':
               configVal = JSON.stringify(that.ocrConfig.tencentOcrConfig)
