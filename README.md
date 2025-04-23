@@ -179,6 +179,20 @@ agpayplus/
 └── docker-compose.yml
 ```
 
+### 初始化数据库
+初始化数据库，在msyql 8.0.36下创建数据库agpayplusdb，用户agpay，密码123456（数据库和账号密码可自己设定，密码不要过于简单）。
+
+执行项目下 aspnet-core/docs/sql/agpayplusinit.sql ，确保所有语句执行成功。
+
+### 初始账号
+系统部署后初始账号密码。
+
+运营平台
+
+账号：agpayadmin 密码：agpay123
+
+代理商系统和商户系统，默认密码：agpay666
+
 ### Docker
 ```
 # 创建网络
@@ -188,7 +202,7 @@ docker network create agpay-plus-network
 # Docker搜索redis镜像 命令：docker search <镜像名称>
 docker search redis
 
-# Docker拉取镜像 命令：：docker pull <镜像名称>:<版本号>
+# Docker拉取镜像 命令：docker pull <镜像名称>:<版本号>
 docker pull redis
 
 # 运行 redis 容器
