@@ -67,8 +67,9 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay.PayWay
                     string payUrl = alipayClientWrapper.AlipayClient.pageExecute(req, null, HttpMethod.Get.Method).Body;
                     res.CodeImgUrl = _sysConfigService.GetDBApplicationConfig().GenScanImgUrl(payUrl);
                 }
+                // 默认都为 payUrl方式
                 else
-                { // 默认都为 payUrl方式
+                {
                     res.PayUrl = alipayClientWrapper.AlipayClient.pageExecute(req, null, HttpMethod.Get.Method).Body;
                 }
             }

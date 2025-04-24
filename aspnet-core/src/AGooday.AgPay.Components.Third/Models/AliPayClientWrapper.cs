@@ -115,8 +115,8 @@ namespace AGooday.AgPay.Components.Third.Models
             }
             else
             {
-                alipayClient = new DefaultAopClient(sandbox == CS.YES ? AliPayConfig.SANDBOX_SERVER_URL : AliPayConfig.PROD_SERVER_URL
-                    , appId, privateKey, AliPayConfig.FORMAT, "1.0", signType, alipayPublicKey, AliPayConfig.CHARSET,
+                alipayClient = new DefaultAopClient(sandbox == CS.YES ? AliPayConfig.SANDBOX_SERVER_URL : AliPayConfig.PROD_SERVER_URL,
+                    appId, privateKey, AliPayConfig.FORMAT, "1.0", signType, alipayPublicKey, AliPayConfig.CHARSET,
                         false);
             }
             return new AliPayClientWrapper(useCert, alipayClient);
