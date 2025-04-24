@@ -1,4 +1,4 @@
-using AGooday.AgPay.Application.DataTransfer;
+ï»¿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         private readonly IMemoryCache _cache;
         private readonly ISysUserService _sysUserService;
         private readonly ISysUserAuthService _sysUserAuthService;
-        // ½«ÁìÓòÍ¨Öª´¦Àí³ÌĞò×¢ÈëController
+        // å°†é¢†åŸŸé€šçŸ¥å¤„ç†ç¨‹åºæ³¨å…¥Controller
         private readonly DomainNotificationHandler _notifications;
 
         public CurrentUserController(ILogger<CurrentUserController> logger,
@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         }
 
         /// <summary>
-        /// µ±Ç°ÓÃ»§ĞÅÏ¢
+        /// å½“å‰ç”¨æˆ·ä¿¡æ¯
         /// </summary>
         /// <returns></returns>
         /// <exception cref="UnauthorizeException"></exception>
@@ -49,17 +49,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers
         {
             try
             {
-                //µ±Ç°ÓÃ»§ĞÅÏ¢
+                //å½“å‰ç”¨æˆ·ä¿¡æ¯
                 var currentUser = await GetCurrentUserAsync();
                 var user = currentUser.SysUser;
 
-                //1. µ±Ç°ÓÃ»§ËùÓĞÈ¨ÏŞID¼¯ºÏ
+                //1. å½“å‰ç”¨æˆ·æ‰€æœ‰æƒé™IDé›†åˆ
                 var entIds = currentUser.Authorities.ToList();
 
-                //2. ²éÑ¯³öÓÃ»§ËùÓĞ²Ëµ¥¼¯ºÏ (°üº¬×ó²àÏÔÊ¾²Ëµ¥ ºÍ ÆäËûÀàĞÍ²Ëµ¥ )
+                //2. æŸ¥è¯¢å‡ºç”¨æˆ·æ‰€æœ‰èœå•é›†åˆ (åŒ…å«å·¦ä¾§æ˜¾ç¤ºèœå• å’Œ å…¶ä»–ç±»å‹èœå• )
                 var sysEnts = _authService.GetEntsBySysType(user.SysType, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
 
-                //µİ¹é×ª»»ÎªÊ÷×´½á¹¹
+                //é€’å½’è½¬æ¢ä¸ºæ ‘çŠ¶ç»“æ„
                 //JsonConvert.DefaultSettings = () => new JsonSerializerSettings
                 //{
                 //    Formatting = Formatting.Indented,
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                 //var user = JObject.FromObject(currentUser.SysUser);
                 //user.Add("entIdList", JArray.FromObject(entIds));
                 //user.Add("allMenuRouteTree", JToken.FromObject(allMenuRouteTree));
-                //1. ËùÓĞÈ¨ÏŞID¼¯ºÏ
+                //1. æ‰€æœ‰æƒé™IDé›†åˆ
                 user.AddExt("entIdList", entIds);
                 user.AddExt("allMenuRouteTree", allMenuRouteTree);
                 return ApiRes.Ok(user);
@@ -78,17 +78,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             catch (Exception)
             {
                 throw new UnauthorizeException();
-                //throw new BizException("µÇÂ¼Ê§Ğ§");
-                //return ApiRes.CustomFail("µÇÂ¼Ê§Ğ§");
+                //throw new BizException("ç™»å½•å¤±æ•ˆ");
+                //return ApiRes.CustomFail("ç™»å½•å¤±æ•ˆ");
             }
         }
 
         /// <summary>
-        /// ĞŞ¸Ä¸öÈËĞÅÏ¢
+        /// ä¿®æ”¹ä¸ªäººä¿¡æ¯
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("user"), MethodLog("ĞŞ¸Ä¸öÈËĞÅÏ¢")]
+        [HttpPut, Route("user"), MethodLog("ä¿®æ”¹ä¸ªäººä¿¡æ¯")]
         public async Task<ApiRes> ModifyCurrentUserInfoAsync(ModifyCurrentUserInfoDto dto)
         {
             var currentUser = await GetCurrentUserAsync();
@@ -96,44 +96,44 @@ namespace AGooday.AgPay.Manager.Api.Controllers
             await _sysUserService.ModifyCurrentUserInfoAsync(dto);
             var userinfo = await _authService.GetUserAuthInfoByIdAsync(currentUser.SysUser.SysUserId);
             currentUser.SysUser = userinfo;
-            //±£´æredis×îĞÂÊı¾İ
+            //ä¿å­˜redisæœ€æ–°æ•°æ®
             await _cacheService.SetAsync(currentUser.CacheKey, currentUser, new TimeSpan(0, 0, CS.TOKEN_TIME));
             return ApiRes.Ok();
         }
 
         /// <summary>
-        /// ĞŞ¸ÄÃÜÂë
+        /// ä¿®æ”¹å¯†ç 
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
         /// <exception cref="BizException"></exception>
-        [HttpPut, Route("modifyPwd"), MethodLog("ĞŞ¸ÄÃÜÂë")]
+        [HttpPut, Route("modifyPwd"), MethodLog("ä¿®æ”¹å¯†ç ")]
         public async Task<ApiRes> ModifyPwdAsync(ModifyPwd model)
         {
             var currentUser = await GetCurrentUserAsync();
-            string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //µ±Ç°ÓÃ»§µÇÂ¼ÃÜÂë
+            string currentUserPwd = Base64Util.DecodeBase64(model.OriginalPwd); //å½“å‰ç”¨æˆ·ç™»å½•å¯†ç 
             var user = await _authService.GetUserAuthInfoByIdAsync(currentUser.SysUser.SysUserId);
             bool verified = BCryptUtil.VerifyHash(currentUserPwd, user.Credential);
-            //ÑéÖ¤µ±Ç°ÃÜÂëÊÇ·ñÕıÈ·
+            //éªŒè¯å½“å‰å¯†ç æ˜¯å¦æ­£ç¡®
             if (!verified)
             {
-                throw new BizException("Ô­ÃÜÂëÑéÖ¤Ê§°Ü£¡");
+                throw new BizException("åŸå¯†ç éªŒè¯å¤±è´¥ï¼");
             }
             string opUserPwd = Base64Util.DecodeBase64(model.ConfirmPwd);
-            // ÑéÖ¤Ô­ÃÜÂëÓëĞÂÃÜÂëÊÇ·ñÏàÍ¬
+            // éªŒè¯åŸå¯†ç ä¸æ–°å¯†ç æ˜¯å¦ç›¸åŒ
             if (opUserPwd.Equals(currentUserPwd))
             {
-                throw new BizException("ĞÂÃÜÂëÓëÔ­ÃÜÂë²»ÄÜÏàÍ¬£¡");
+                throw new BizException("æ–°å¯†ç ä¸åŸå¯†ç ä¸èƒ½ç›¸åŒï¼");
             }
             await _sysUserAuthService.ResetAuthInfoAsync(user.SysUserId, null, null, opUserPwd, user.SysType);
             return await LogoutAsync();
         }
 
         /// <summary>
-        /// ÍË³öµÇÂ¼
+        /// é€€å‡ºç™»å½•
         /// </summary>
         /// <returns></returns>
-        [HttpPost, Route("logout"), MethodLog("ÍË³öµÇÂ¼")]
+        [HttpPost, Route("logout"), MethodLog("é€€å‡ºç™»å½•")]
         public async Task<ApiRes> LogoutAsync()
         {
             var currentUser = await GetCurrentUserAsync();
