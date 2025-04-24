@@ -78,9 +78,26 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     var client = (WechatTenpayClientV2)wxServiceWrapper.Client;
                     var result = await client.ExecuteGetPayRefundV2Async(request);
 
-                    if ("SUCCESS".Equals(result.ResultCode))  // 退款成功
+                    //V2 退款状态：
+                    //SUCCESS—退款成功
+                    //REFUNDCLOSE—退款关闭，指商户发起退款失败的情况。
+                    //PROCESSING—退款处理中
+                    //CHANGE—退款异常，
+                    string refundState = null;
+                    if ("SUCCESS".Equals(result.ResultCode) && !string.IsNullOrWhiteSpace(result.RefundStatus))
+                    {
+                        refundState = result.RefundStatus;
+                    }
+                    if ("SUCCESS".Equals(refundState)) // 退款成功
                     {
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                    }
+                    // 退款失败
+                    else if ("REFUNDCLOSE".Equals(refundState) || "CHANGE".Equals(refundState))
+                    {
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = refundState;
+                        channelRetMsg.ChannelErrMsg = result.ErrorCodeDescription;
                     }
                     else
                     {
@@ -99,9 +116,16 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                     }
                     var result = await client.ExecuteGetRefundDomesticRefundByOutRefundNumberAsync(request);
-                    if (result.IsSuccessful())  // 退款成功
+                    string status = result.Status;
+                    if ("SUCCESS".Equals(status)) // 退款成功
                     {
                         channelRetMsg.ChannelState = ChannelState.CONFIRM_SUCCESS;
+                    }
+                    // 退款失败 SUCCESS: 退款成功    CLOSED: 退款关闭  PROCESSING: 退款处理中  ABNORMAL: 退款异常
+                    else if ("CLOSED".Equals(status) || "ABNORMAL".Equals(status))
+                    {
+                        channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
+                        channelRetMsg.ChannelErrCode = status;
                     }
                     else
                     {
