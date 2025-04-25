@@ -449,24 +449,24 @@ export default {
 </script>
 
 <style scoped>
-  /*>>> .ant-tabs-top-bar {
+  /*::v-deep(.ant-tabs-top-bar) {
     padding-left: 35vw;
   }*/
 
-  >>> .ant-tabs-nav-wrap {
+  ::v-deep(.ant-tabs-nav-wrap) {
     justify-content: center;
     display: flex;
   }
 
-  >>> .table-page-search-wrapper {
+  ::v-deep(.table-page-search-wrapper) {
     padding: 0;
   }
 
-  >>> .ant-table-wrapper {
+  ::v-deep(.ant-table-wrapper) {
     margin: 0;
   }
 
-  >>> .ant-table-thead > tr > th, >>> .ant-table-tbody > tr > td {
+  ::v-deep(.ant-table-thead > tr > th), ::v-deep(.ant-table-tbody > tr > td) {
     padding: 8px 8px;
   }
 

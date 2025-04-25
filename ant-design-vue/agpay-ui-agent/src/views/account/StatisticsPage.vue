@@ -333,7 +333,7 @@ export default {
     font-size: 37px
   }
 
-  >>> .ant-card-body {
+  ::v-deep(.ant-card-body) {
     height: 100%
   }
 

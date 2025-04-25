@@ -178,11 +178,11 @@ export default {
     color: #000!important
   }
 
-  >>> .ant-card-body {
+  ::v-deep(.ant-card-body) {
     height: 100%
   }
 
-  >>> .ant-form-item{
+  ::v-deep(.ant-form-item){
     margin: 12px 0;
   }
 

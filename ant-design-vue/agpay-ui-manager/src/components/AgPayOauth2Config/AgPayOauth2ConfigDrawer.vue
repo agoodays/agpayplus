@@ -201,16 +201,16 @@ export default {
 </script>
 
 <style scoped>
-  >>> .ant-tabs-bar {
+  ::v-deep(.ant-tabs-bar) {
     border-bottom: 1px solid #f0f2f5;
   }
-  >>> .ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab-active{
+  ::v-deep(.ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab-active){
     border-color: #fff;
   }
-  >>> .ant-collapse-borderless {
+  ::v-deep(.ant-collapse-borderless) {
     background-color: #ffffff;
   }
-  >>> .ant-collapse-borderless > .ant-collapse-item {
+  ::v-deep(.ant-collapse-borderless > .ant-collapse-item) {
     border-bottom: 0px solid #ffffff;
   }
 </style>

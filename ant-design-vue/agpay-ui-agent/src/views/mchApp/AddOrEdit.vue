@@ -237,7 +237,7 @@ export default {
 </script>
 
 <style scoped>
-  >>> .ant-divider-inner-text {
+  ::v-deep(.ant-divider-inner-text) {
     color: rgb(26, 102, 255);
   }
 </style>

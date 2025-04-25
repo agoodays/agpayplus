@@ -211,7 +211,7 @@ export default {
 </script>
 
 <style scoped>
-  >>> .ant-checkbox-wrapper + .ant-checkbox-wrapper {
+  ::v-deep(.ant-checkbox-wrapper + .ant-checkbox-wrapper) {
     margin-left: 0px;
   }
 </style>

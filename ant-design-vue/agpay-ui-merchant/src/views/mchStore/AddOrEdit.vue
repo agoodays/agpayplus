@@ -629,7 +629,7 @@ export default {
     position: relative;
   }
 
-  /*>>> .amap-copyright , >>> .amap-logo {
+  /*::v-deep(.amap-copyright), ::v-deep(.amap-logo) {
     z-index: 2;
   }*/
 
