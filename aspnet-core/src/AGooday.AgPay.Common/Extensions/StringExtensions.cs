@@ -69,5 +69,87 @@ namespace AGooday.AgPay.Common.Extensions
                 _ => input + masks
             };
         }
+
+        /// <summary>
+        /// 智能字符串脱敏
+        /// </summary>
+        public static string IntellectMask(this string input, char mask = '*')
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return input;
+
+            input = input.Trim();
+
+            // 优先处理已知格式
+            if (IsEmail(input))
+                return MaskEmail(input, mask);
+
+            if (IsChineseIdCard(input))
+                return MaskIdCard(input, mask);
+
+            if (IsChineseMobile(input))
+                return MaskMobile(input, mask);
+
+            // 通用脱敏规则
+            return MaskGeneric(input, mask);
+        }
+
+        #region 格式判断
+        private static bool IsEmail(string input)
+        {
+            try
+            {
+                var mailAddress = new System.Net.Mail.MailAddress(input);
+                return mailAddress.Address == input;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool IsChineseMobile(string input) =>
+            Regex.IsMatch(input, @"^1[3-9]\d{9}$");
+
+        private static bool IsChineseIdCard(string input) =>
+            Regex.IsMatch(input, @"^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$");
+        #endregion
+
+        #region 脱敏方法
+        private static string MaskEmail(string input, char mask)
+        {
+            var atIndex = input.IndexOf('@');
+            if (atIndex <= 3) // 处理短用户名
+                return new string(mask, input.Length);
+
+            return input.Substring(0, 3) +
+                   new string(mask, atIndex - 3) +
+                   input.Substring(atIndex);
+        }
+
+        private static string MaskIdCard(string input, char mask) =>
+            Regex.Replace(input, @"(\d{4})\d{10}(\w{4})",
+                m => $"{m.Groups[1]}{new string(mask, 10)}{m.Groups[2]}");
+
+        private static string MaskMobile(string input, char mask) =>
+            Regex.Replace(input, @"(\d{3})\d{4}(\d{4})",
+                $"$1{new string(mask, 4)}$2");
+
+        private static string MaskGeneric(string input, char mask)
+        {
+            // 保留首尾各20%字符（至少1个）
+            int headLength = Math.Max(input.Length / 5, 1);
+            int tailLength = Math.Max(input.Length / 5, 1);
+
+            // 中间掩码部分
+            int maskLength = input.Length - headLength - tailLength;
+            if (maskLength <= 0)
+                return new string(mask, input.Length);
+
+            return input.Substring(0, headLength) +
+                   new string(mask, maskLength) +
+                   input.Substring(input.Length - tailLength);
+        }
+        #endregion
     }
 }
