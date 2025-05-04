@@ -1920,13 +1920,13 @@ VALUES ('ENT_SYS_CONFIG', '系统管理', 'setting', '', 'RouteView', 'ML', 0, 1
 INSERT INTO `t_sys_role` (`role_id`, `role_name`, `sys_type`, `belong_info_id`, `created_at`, `updated_at`) VALUES ('ROLE_ADMIN', '系统管理员', 'MGR', '0', NOW(), NOW());
 INSERT INTO `t_sys_role` (`role_id`, `role_name`, `sys_type`, `belong_info_id`, `created_at`, `updated_at`) VALUES ('ROLE_OP', '普通操作员', 'MGR', '0', NOW(), NOW());
 -- 角色权限关联， [超管]用户 拥有所有权限
--- insert into t_sys_role_ent_rela select '801', ent_id from t_sys_entitlement;
+-- insert into t_sys_role_ent_rela select 'ROLE_ADMIN', ent_id from t_sys_entitlement;
 
 -- 超管用户： agpayadmin / agpay123
 INSERT INTO `t_sys_user` (`sys_user_id`, `login_username`, `realname`, `telphone`, `sex`, `avatar_url`, `user_no`, `user_type`, `state`, `sys_type`, `belong_info_id`, `created_at`,`updated_at`) VALUES (801, 'agpayadmin', '超管', '13000000001', '1', 'https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_m.png', 'D0001', 1, 1, 'MGR', '0', NOW(), NOW());
 INSERT INTO `t_sys_user_auth` (`auth_id`, `user_id`, `identity_type`, `identifier`, `credential`, `salt`, `sys_type`) VALUES (801, '801', '1', 'agpayadmin', '$2a$11$Kx.LaVw2ArNAlbBaZkh9UueiP24R1uXQAzPnhG.6zwY1wxOpmBD3e', 'testkey', 'MGR');
 
--- insert into t_sys_user_role_rela values (801, 801);
+-- insert into t_sys_user_role_rela values (801, 'ROLE_ADMIN');
 
 -- 初始化运营平台系统参数
 INSERT INTO `t_sys_config` (`config_key`, `config_name`, `config_desc`, `group_key`, `group_name`, `config_val`, `type`, `sys_type`, `belong_info_id`, `sort_num`, `created_at`, `updated_at`) 

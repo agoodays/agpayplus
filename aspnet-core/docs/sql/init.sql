@@ -712,13 +712,13 @@ INSERT INTO t_sys_entitlement VALUES('ENT_SYS_CONFIG', '系统管理', 'setting'
 INSERT INTO t_sys_role VALUES ('ROLE_ADMIN', '系统管理员', 'MGR', '0', '2021-05-01');
 INSERT INTO t_sys_role VALUES ('ROLE_OP', '普通操作员', 'MGR', '0', '2021-05-01');
 -- 角色权限关联， [超管]用户 拥有所有权限
--- insert into t_sys_role_ent_rela select '801', ent_id from t_sys_entitlement;
+-- insert into t_sys_role_ent_rela select 'ROLE_ADMIN', ent_id from t_sys_entitlement;
 
 -- 超管用户： agpayadmin / agpay123
 INSERT INTO t_sys_user VALUES (801, 'agpayadmin', '超管', '13000000001', '1', 'https://jeequan.oss-cn-beijing.aliyuncs.com/jeepay/img/defava_m.png', 'D0001', 1, 1, 'MGR', '0', '2020-06-13', '2020-06-13');
 INSERT INTO t_sys_user_auth VALUES (801, '801', '1', 'agpayadmin', '$2a$11$Kx.LaVw2ArNAlbBaZkh9UueiP24R1uXQAzPnhG.6zwY1wxOpmBD3e', 'testkey', 'MGR');
 
--- insert into t_sys_user_role_rela values (801, 801);
+-- insert into t_sys_user_role_rela values (801, 'ROLE_ADMIN');
 
 INSERT INTO `t_sys_config` VALUES ('mgrSiteUrl', '运营平台网址(不包含结尾/)', '运营平台网址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'http://127.0.0.1:9217', 'text', 0, '2021-5-18 14:46:10');
 INSERT INTO `t_sys_config` VALUES ('mchSiteUrl', '商户平台网址(不包含结尾/)', '商户平台网址(不包含结尾/)', 'applicationConfig', '系统应用配置', 'http://127.0.0.1:9218', 'text', 0, '2021-5-18 14:46:10');

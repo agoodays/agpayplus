@@ -456,9 +456,6 @@ namespace AGooday.AgPay.Components.Third.Services
             }
         }
 
-        private static bool IsCache()
-        {
-            return SysConfigService.IS_USE_CACHE;
-        }
+        private static bool IsCache() => SysConfigService.IS_USE_CACHE;
     }
 }

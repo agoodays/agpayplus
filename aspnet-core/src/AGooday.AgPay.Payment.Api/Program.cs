@@ -37,7 +37,8 @@ logging.AddConsole();
 var services = builder.Services;
 var Env = builder.Environment;
 
-services.AddSingleton(new Appsettings(Env.ContentRootPath));
+//services.AddSingleton(new Appsettings(Env.ContentRootPath));
+services.AddSingleton(new Appsettings(builder.Configuration));
 
 //// ×¢ÈëÈÕÖ¾
 //services.AddLogging(config =>

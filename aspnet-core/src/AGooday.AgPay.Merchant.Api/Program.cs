@@ -43,7 +43,8 @@ var Env = builder.Environment;
 //用户信息
 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-services.AddSingleton(new Appsettings(Env.ContentRootPath));
+//services.AddSingleton(new Appsettings(Env.ContentRootPath));
+services.AddSingleton(new Appsettings(builder.Configuration));
 
 //// 注入日志
 //services.AddLogging(config =>
