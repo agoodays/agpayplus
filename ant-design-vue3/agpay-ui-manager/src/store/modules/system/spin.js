@@ -4,8 +4,7 @@
  */
 import { defineStore } from 'pinia';
 
-export const useSpinStore = defineStore({
-  id: 'spin',
+export const useSpinStore = defineStore('spin', {
   state: () => ({
     loading: false,
   }),

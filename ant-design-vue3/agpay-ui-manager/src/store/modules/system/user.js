@@ -6,8 +6,7 @@ import { defineStore } from 'pinia';
 import { localClear, localRead, localSave } from '/@/utils/local-util';
 import LocalStorageKeyConst from '/@/constants/local-storage-key-const';
 
-export const useUserStore = defineStore({
-  id: 'userStore',
+export const useUserStore = defineStore('userStore', {
   state: () => ({
     token: '',
     userName: '', // 真实姓名

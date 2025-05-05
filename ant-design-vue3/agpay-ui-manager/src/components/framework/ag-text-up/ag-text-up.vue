@@ -110,13 +110,13 @@ watch(
   input:active + label,
   input:valid + label {
     color: #fff;
-    background: @ag-theme;
+    background: var(--ant-primary-color);
     transform: translateY(-33px);
   }
 
   input:focus + label:after,
   input:active + label:after {
-    border-top: 4px solid @ag-theme;
+    border-top: 4px solid var(--ant-primary-color);
   }
 
   input:valid {
@@ -133,7 +133,7 @@ watch(
 
   label.active {
     color: #fff;
-    background: @ag-theme;
+    background: var(--ant-primary-color);
     transform: translateY(-33px);
   }
 }

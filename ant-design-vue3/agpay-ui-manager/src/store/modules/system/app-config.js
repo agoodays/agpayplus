@@ -28,8 +28,7 @@ export const getInitializedLanguage = function () {
   return language;
 };
 
-export const useAppConfigStore = defineStore({
-  id: 'appConfig',
+export const useAppConfigStore = defineStore('appConfig', {
   state: () => ({
     // 读取config下的默认配置
     ...state,
