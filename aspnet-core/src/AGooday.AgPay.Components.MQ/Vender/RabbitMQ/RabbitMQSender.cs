@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                     else
                     {
                         var exchange = RabbitMQConfig.FANOUT_EXCHANGE_NAME_PREFIX + msgReceiver.GetMQName();
-                        await channel.ExchangeDeclareAsync(exchange, "fanout");
+                        await channel.ExchangeDeclareAsync(exchange, "fanout", true);
                         var queue = await channel.QueueDeclareAsync();
                         queueName = queue.QueueName;
                         await channel.QueueBindAsync(queueName, exchange, "");
