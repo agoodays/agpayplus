@@ -468,6 +468,17 @@
         /// <param name="smsToken"></param>
         /// <returns></returns>
         public static string GetCacheKeySmsCode(string smsToken) => string.Format(CACHE_KEY_SMS_CODE, smsToken);
+
+        /// <summary>
+        /// 任务分布式锁 缓存key
+        /// </summary>
+        private const string CACHE_KEY_TAKE_LOCK = "TaskLock:Task_{0}";
+        /// <summary>
+        /// 任务分布式锁缓存key
+        /// </summary>
+        /// <param name="taskName"></param>
+        /// <returns></returns>
+        public static string GetCacheKeyTaskLock(string taskName) => string.Format(CACHE_KEY_TAKE_LOCK, taskName);
         #endregion
 
         /// <summary>

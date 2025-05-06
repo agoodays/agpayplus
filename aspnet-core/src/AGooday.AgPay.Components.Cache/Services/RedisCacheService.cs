@@ -154,6 +154,29 @@ namespace AGooday.AgPay.Components.Cache.Services
             await database.KeyDeleteAsync(key);
         }
 
+        public async Task<bool> AcquireLockAsync(string key, string value, TimeSpan expiration)
+        {
+            var existingValue = await _distributedCache.GetStringAsync(key);
+            if (existingValue == null)
+            {
+                await _distributedCache.SetStringAsync(key, value, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = expiration
+                });
+                return await _distributedCache.GetStringAsync(key) == value;
+            }
+            return false;
+        }
+
+        public async Task ReleaseLockAsync(string key, string value)
+        {
+            var currentValue = await _distributedCache.GetStringAsync(key);
+            if (currentValue == value)
+            {
+                await _distributedCache.RemoveAsync(key);
+            }
+        }
+
         public async Task<bool> ExecLockTakeAsync(string lockKey, Func<Task> lockFunc)
         {
             var result = false;

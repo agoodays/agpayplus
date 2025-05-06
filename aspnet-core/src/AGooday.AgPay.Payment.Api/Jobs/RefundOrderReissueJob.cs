@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
+using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.Third.Services;
 using Quartz;
 
@@ -10,64 +11,65 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     /// 补单定时任务(退款单)
     /// </summary>
     [DisallowConcurrentExecution]
-    public class RefundOrderReissueJob : IJob
+    public class RefundOrderReissueJob : AbstractJob
     {
         private static readonly int QUERY_PAGE_SIZE = 100; //每次查询数量
-        private readonly ILogger<RefundOrderReissueJob> _logger;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public RefundOrderReissueJob(ILogger<RefundOrderReissueJob> logger,
-            IServiceScopeFactory serviceScopeFactory)
+            IServiceScopeFactory serviceScopeFactory,
+            ICacheService cacheService)
+            : base(logger, serviceScopeFactory, cacheService)
         {
-            _logger = logger;
-            _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public async Task Execute(IJobExecutionContext context)
+        public override async Task Execute(IJobExecutionContext context)
         {
-            using (var scope = _serviceScopeFactory.CreateScope())
+            await ExecuteLockTakeAsync(context.JobDetail.Key.ToString(), async () =>
             {
-                var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
-                var channelOrderReissueService = scope.ServiceProvider.GetService<ChannelOrderReissueService>();
-                int currentPageIndex = 1; //当前页码
-                while (true)
+                using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    try
+                    var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
+                    var channelOrderReissueService = scope.ServiceProvider.GetService<ChannelOrderReissueService>();
+                    int currentPageIndex = 1; //当前页码
+                    while (true)
                     {
-                        var dto = new RefundOrderQueryDto()
+                        try
                         {
-                            PageNumber = currentPageIndex,
-                            PageSize = QUERY_PAGE_SIZE,
-                            State = (byte)RefundOrderState.STATE_ING
-                        };
-                        var refundOrders = await refundOrderService.GetPaginatedDataAsync(dto);
+                            var dto = new RefundOrderQueryDto()
+                            {
+                                PageNumber = currentPageIndex,
+                                PageSize = QUERY_PAGE_SIZE,
+                                State = (byte)RefundOrderState.STATE_ING
+                            };
+                            var refundOrders = await refundOrderService.GetPaginatedDataAsync(dto);
 
-                        if (refundOrders == null || refundOrders.Count == 0)
+                            if (refundOrders == null || refundOrders.Count == 0)
+                            {
+                                //本次查询无结果, 不再继续查询;
+                                break;
+                            }
+
+                            foreach (var refundOrder in refundOrders)
+                            {
+                                await channelOrderReissueService.ProcessRefundOrderAsync(refundOrder);
+                            }
+
+                            //已经到达页码最大量，无需再次查询
+                            if (refundOrders.TotalPages <= currentPageIndex)
+                            {
+                                break;
+                            }
+                            currentPageIndex++;
+                        }
+                        catch (Exception e)
                         {
-                            //本次查询无结果, 不再继续查询;
+                            //出现异常，直接退出，避免死循环。
+                            _logger.LogError(e, "error");
                             break;
                         }
-
-                        foreach (var refundOrder in refundOrders)
-                        {
-                            await channelOrderReissueService.ProcessRefundOrderAsync(refundOrder);
-                        }
-
-                        //已经到达页码最大量，无需再次查询
-                        if (refundOrders.TotalPages <= currentPageIndex)
-                        {
-                            break;
-                        }
-                        currentPageIndex++;
-                    }
-                    catch (Exception e)
-                    {
-                        //出现异常，直接退出，避免死循环。
-                        _logger.LogError(e, "error");
-                        break;
                     }
                 }
-            }
+            });
         }
     }
 }

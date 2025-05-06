@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Components.Cache.Services;
 using Quartz;
 
 namespace AGooday.AgPay.Payment.Api.Jobs
@@ -7,27 +8,27 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     /// 退款订单过期定时任务
     /// </summary>
     [DisallowConcurrentExecution]
-    public class RefundOrderExpiredJob : IJob
+    public class RefundOrderExpiredJob : AbstractJob
     {
-        private readonly ILogger<RefundOrderExpiredJob> _logger;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
-
         public RefundOrderExpiredJob(ILogger<RefundOrderExpiredJob> logger,
-            IServiceScopeFactory serviceScopeFactory)
+            IServiceScopeFactory serviceScopeFactory,
+            ICacheService cacheService)
+            : base(logger, serviceScopeFactory, cacheService)
         {
-            _logger = logger;
-            _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public async Task Execute(IJobExecutionContext context)
+        public override async Task Execute(IJobExecutionContext context)
         {
-            using (var scope = _serviceScopeFactory.CreateScope())
+            await ExecuteLockTakeAsync(context.JobDetail.Key.ToString(), async () =>
             {
-                var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
-                int updateCount = await refundOrderService.UpdateOrderExpiredAsync();
-                _logger.LogInformation("处理退款订单超时{updateCount}条.", updateCount);
-                //_logger.LogInformation($"处理退款订单超时{updateCount}条.");
-            }
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
+                    int updateCount = await refundOrderService.UpdateOrderExpiredAsync();
+                    _logger.LogInformation("任务 [{JobKey}] 处理退款订单超时{updateCount}条.", context.JobDetail.Key, updateCount);
+                    //_logger.LogInformation($"处理退款订单超时{updateCount}条.");
+                }
+            });
         }
     }
 }

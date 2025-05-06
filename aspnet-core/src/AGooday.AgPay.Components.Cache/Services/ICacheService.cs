@@ -54,6 +54,8 @@
         #region 分布式锁
         Task<bool> AcquireLockAsync(string key, TimeSpan expiration);
         Task ReleaseLockAsync(string key);
+        Task<bool> AcquireLockAsync(string key, string value, TimeSpan expiration);
+        Task ReleaseLockAsync(string key, string value);
         /// <summary>
         /// 异步分布式锁
         /// </summary>
