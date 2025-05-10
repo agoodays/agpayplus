@@ -60,7 +60,7 @@
         public static string ConvertCent2Dollar(long amount, int decimals, MidpointRounding mode) => Decimal.Round((Convert.ToDecimal(amount) / 100M), decimals, mode).ToString("0.00");
 
         /// <summary>
-        /// 将"元"转换成"分"，如：1.00分被转换为100元。
+        /// 将"元"转换成"分"，如：1.00元被转换为100分。
         /// </summary>
         /// <param name="amount">金额</param>
         /// <returns></returns>

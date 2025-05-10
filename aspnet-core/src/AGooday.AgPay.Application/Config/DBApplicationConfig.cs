@@ -37,6 +37,9 @@ namespace AGooday.AgPay.Application.Config
         /// <returns></returns>
         public string GenUniJsapiPayUrl(string data)
         {
+#if DEBUG
+            return $"{"http://localhost:8819"}/pages/hub/default?agpayToken={AgPayUtil.AesEncode(data)}";
+#endif
             return $"{PaySiteUrl}/hub/{AgPayUtil.AesEncode(data)}";
         }
 
@@ -47,6 +50,11 @@ namespace AGooday.AgPay.Application.Config
         /// <returns></returns>
         public string GenOauth2RedirectUrlEncode(string data)
         {
+#if DEBUG
+
+            return URLUtil.EncodeAll($"{"http://localhost:8819"}/pages/oauth2/callback?agpayToken={AgPayUtil.AesEncode(data)}");
+#endif
+        
             return URLUtil.EncodeAll($"{PaySiteUrl}/oauth2Callback/{AgPayUtil.AesEncode(data)}");
         }
 
