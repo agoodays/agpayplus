@@ -30,7 +30,7 @@
 					<view v-for="(key, index) in funKeys" :key="index" class="common del"
 						:class="{ 'hover-but': pressedKey === key }" @touchstart="handleTouchStart(key)"
 						@touchend="handleTouchEnd()">
-						<image v-if="key === 'del'" src="/static/del.svg" class="close-icon" />
+						<image v-if="key === 'del'" src="/static/del.svg" />
 						<text v-else>{{ key }}</text>
 					</view>
 					<view class="common pay" :style="{ backgroundColor: getColor() }"
@@ -364,7 +364,7 @@
 		width: 100%
 	}
 
-	.del uni-image {
+	.del image {
 		width: 2.59375rem;
 		height: 2.15625rem;
 		pointer-events: none
@@ -448,7 +448,7 @@
 		margin-left: .625rem
 	}
 
-	.remark-model .remark-content .remark-content-btn uni-text {
+	.remark-model .remark-content .remark-content-btn text {
 		width: 7.1875rem;
 		height: 2.8125rem;
 		border-radius: .3125rem;

@@ -5,7 +5,7 @@
 		<view class="tips">
 			<view class="tips-title" :style="{ color: getColor() }">欢迎使用聚合收银台</view>
 			<view class="tips-image">
-				<image src="/static/scan.svg" class="close-icon" />
+				<image src="/static/scan.svg" />
 			</view>
 			<button v-if='isLite' class="scan-btn" :style="{ backgroundColor: getColor() }"
 				@click="handleScanCode()">扫码买单</button>
@@ -141,7 +141,7 @@
 		padding-top: 3.125rem
 	}
 
-	.tips uni-image {
+	.tips image {
 		height: 100%;
 		width: 100%
 	}

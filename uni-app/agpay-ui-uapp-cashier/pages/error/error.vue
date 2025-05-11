@@ -2,7 +2,7 @@
 	<view class="mask-wrap">
 		<view class="err-content">
 			<view class="colse-wrap">
-				<image src="/static/error-close.svg" class="close-icon" />
+				<image class="close-icon" src="/static/error-close.svg" />
 			</view>
 			<view class="err-title">
 				{{ errTitle }}

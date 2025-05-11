@@ -1,6 +1,6 @@
 <template>
 	<view class="error">
-		<image src="/static/tip.svg" class="error-icon" />
+		<image class="error-icon" src="/static/tip.svg" />
 		<text class="error-err">{{ errorErr }}</text>
 		<view class="error-msg">
 			<view class="msg">{{ errorMsg }}</view>

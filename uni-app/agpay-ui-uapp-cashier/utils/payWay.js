@@ -1,37 +1,71 @@
 import config from '@/config/index';
 
+/**
+ * 判断当前是否为微信小程序
+ */
 const isWeChatMiniProgram = () => {
-	// 判断是否为微信小程序环境
-	return typeof wx !== 'undefined' && wx.miniProgram;
-}
+	// 使用 uni.getEnv 更加标准化
+	const env = uni.getEnv();
+	return env.platform === 'wechat';
+};
 
+/**
+ * 判断当前是否为支付宝小程序
+ */
 const isAlipayMiniProgram = () => {
-	// 判断是否为支付宝小程序环境
-	return typeof my !== 'undefined' && my.miniProgram;
-}
+	const env = uni.getEnv();
+	return env.platform === 'alipay';
+};
 
-export const getPayWay = () => {	
-	// 判断当前环境
+/**
+ * 获取浏览器 User-Agent 并转为小写
+ */
+const getUserAgent = () => {
+	if (typeof navigator !== 'undefined' && navigator.userAgent) {
+		return navigator.userAgent.toLowerCase();
+	}
+	return '';
+};
+
+/**
+ * 根据 User-Agent 判断浏览器类型
+ */
+const getBrowserType = (userAgent) => {
+	if (userAgent.includes('micromessenger')) {
+		return 'weixin';
+	} else if (userAgent.includes('alipayclient')) {
+		return 'alipay';
+	} else if (userAgent.includes('unionpay') || userAgent.includes('yunhuiyuan') || userAgent.includes('cloudpay')) {
+		return 'yunshanfu';
+	}
+	return 'unknown';
+};
+
+/**
+ * 获取支付方式标识
+ */
+export const getPayWay = () => {
 	if (isWeChatMiniProgram()) {
 		return config.payWay.WXLITE; // 微信小程序
-	} else if (isAlipayMiniProgram()) {
-		return config.payWay.ALILITE; // 支付宝小程序
-	} else {
-		console.log(navigator.userAgent);
-		const userAgent = navigator.userAgent.toLowerCase();
-
-		// 判断当前环境
-		if (userAgent.includes('micromessenger')) {
-			// 微信浏览器
-			return config.payWay.WXJSAPI;
-		} else if (userAgent.includes('alipayclient')) {
-			// 支付宝钱包内置浏览器
-			return config.payWay.ALIJSAPI;
-		} else if (userAgent.includes('unionpay') || userAgent.includes('yunhuiyuan') || userAgent.includes('cloudpay')) {
-			// 云闪付App内置浏览器
-			return config.payWay.YSFJSAPI;
-		}
 	}
-	
-    return null;
-}
+
+	if (isAlipayMiniProgram()) {
+		return config.payWay.ALILITE; // 支付宝小程序
+	}
+
+	// 非小程序环境，检查浏览器类型
+	const userAgent = getUserAgent();
+	const browserType = getBrowserType(userAgent);
+
+	switch (browserType) {
+		case 'weixin':
+			return config.payWay.WXJSAPI; // 微信浏览器
+		case 'alipay':
+			return config.payWay.ALIJSAPI; // 支付宝浏览器
+		case 'yunshanfu':
+			return config.payWay.YSFJSAPI; // 云闪付App内置浏览器
+		default:
+			console.warn('未知浏览器类型，无法确定支付方式', userAgent);
+			return null;
+	}
+};

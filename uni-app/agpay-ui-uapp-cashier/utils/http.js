@@ -3,7 +3,6 @@ const BASE_URL = "https://localhost:9819";
 // 通用请求方法封装
 const request = (url, method, data = {}, cache = false, headers = {}) => {
 	return new Promise((resolve, reject) => {
-
 		// 缓存处理
 		const cacheKey = `${method}:${url}:${JSON.stringify(data)}`;
 		if (cache) {
@@ -29,7 +28,9 @@ const request = (url, method, data = {}, cache = false, headers = {}) => {
 				console.log(resData)
 				// 相应结果不为0， 说明异常
 				if (resData.code !== 0) {
-					uni.reLaunch({ url: "/pages/error/error?message=" + resData.msg });
+					uni.reLaunch({
+						url: "/pages/error/error?message=" + resData.msg
+					});
 					reject(resData);
 				} else {
 					if (cache) {
@@ -39,7 +40,10 @@ const request = (url, method, data = {}, cache = false, headers = {}) => {
 				}
 			},
 			fail: (err) => {
-				uni.showToast({ title: "网络错误", icon: "none" });
+				uni.showToast({
+					title: "网络错误",
+					icon: "none"
+				});
 				reject(err);
 			}
 		});
