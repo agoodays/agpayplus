@@ -29,15 +29,15 @@ const themeColor = {
 
 export default {
 	tokenKey: "agpayToken", //URL传递的token名称
-    tokenValue: "",
-    channelUserId: "",
-    channelUniId: "",
+	tokenValue: "",
+	channelUserId: "",
+	channelUniId: "",
 	payWayEnum: payWayEnum,
 	payWayName: 'payWay',
 	payWay: {},
-	themeColor: themeColor,	
-	isLite() {
-		return this.payWay?.wayCode?.includes('LITE');
+	themeColor: themeColor,
+	get isMiniProgram() {
+		return this.payWay?.wayCode?.includes('LITE') || false;
 	},
 	getColor() {
 		return this.themeColor[this.payWay?.wayType] || this.themeColor.wxpay;

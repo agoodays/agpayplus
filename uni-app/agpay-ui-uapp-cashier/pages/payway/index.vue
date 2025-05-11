@@ -1,56 +1,63 @@
 <template>
-	<view class="content">
-		<!-- 顶部 -->
-		<view class="content-top-bg" :style="{ backgroundColor: getColor() }"></view>
-		<view class="payment">
-			<view class="payment-mchName">付款给 {{ payOrderInfo.mchName }}</view>
-			<view class="payment-divider"></view>
-			<view class="payment-amountTips">付款金额：</view>
-			<view class="payment-amount" :style="{ color: getColor() }">
-				<text class="payment-amount-rmb">￥</text>
-				<text class="payment-amount-value">{{ formatAmount(amount) }}</text>
-			</view>
-		</view>
+	<view class="container">
+		<!-- 自定义头部 -->
+		<CustomHeader v-if='isMiniProgram' title="收银台" :bgColor="getColor()" @header-height="handleHeaderHeight">
+		</CustomHeader>
 
-		<!-- 数字键盘 -->
-		<view class="payment-keyboard">
-			<text class="buyer-remark" @touchstart="this.isShowModel = true">
-				{{ showRemark}} <text :style="{ color: getColor() }">{{ showRemark ? '修改':'添加备注'}}</text>
-			</text>
-			<view class="ag-keyboard">
-				<view class="left">
-					<view v-for="(key, index) in numKeys" :key="index" class="common" :class="{ 
+		<view class="content" :style="{ paddingTop: contentPaddingTop + 'px' }">
+			<!-- 顶部 -->
+			<view class="content-top-bg" :style="{ height: totalTopBgHeight + 'px', backgroundColor: getColor() }">
+			</view>
+			<view class="payment">
+				<view class="payment-mchName">付款给 {{ payOrderInfo.mchName }}</view>
+				<view class="payment-divider"></view>
+				<view class="payment-amountTips">付款金额：</view>
+				<view class="payment-amount" :style="{ color: getColor() }">
+					<text class="payment-amount-rmb">￥</text>
+					<text class="payment-amount-value">{{ formatAmount(amount) }}</text>
+				</view>
+			</view>
+
+			<!-- 数字键盘 -->
+			<view class="payment-keyboard">
+				<text class="buyer-remark" @touchstart="this.isShowModel = true">
+					{{ showRemark}} <text :style="{ color: getColor() }">{{ showRemark ? '修改':'添加备注'}}</text>
+				</text>
+				<view class="ag-keyboard">
+					<view class="left">
+						<view v-for="(key, index) in numKeys" :key="index" class="common" :class="{ 
 						'zero': ['0'].includes(key),
 						'hover-but': pressedKey === key 
 					}" @touchstart="handleTouchStart(key)" @touchend="handleTouchEnd()">
-						{{ key }}
+							{{ key }}
+						</view>
 					</view>
-				</view>
-				<view class="right">
-					<view v-for="(key, index) in funKeys" :key="index" class="common del"
-						:class="{ 'hover-but': pressedKey === key }" @touchstart="handleTouchStart(key)"
-						@touchend="handleTouchEnd()">
-						<image v-if="key === 'del'" src="/static/del.svg" />
-						<text v-else>{{ key }}</text>
+					<view class="right">
+						<view v-for="(key, index) in funKeys" :key="index" class="common del"
+							:class="{ 'hover-but': pressedKey === key }" @touchstart="handleTouchStart(key)"
+							@touchend="handleTouchEnd()">
+							<image v-if="key === 'del'" src="/static/del.svg" />
+							<text v-else>{{ key }}</text>
+						</view>
+						<view class="common pay" :style="{ backgroundColor: getColor() }"
+							:class="{ 'hover-but': pressedKey === 'pay' }" @touchstart="handleTouchStart('pay')"
+							@touchend="handleTouchEnd()">付款</view>
 					</view>
-					<view class="common pay" :style="{ backgroundColor: getColor() }"
-						:class="{ 'hover-but': pressedKey === 'pay' }" @touchstart="handleTouchStart('pay')"
-						@touchend="handleTouchEnd()">付款</view>
 				</view>
 			</view>
-		</view>
 
-		<!-- 备注 -->
-		<view class="remark-model" v-if="isShowModel">
-			<view class="remark-content">
-				<view class="remark-content-title" :style="{ color: getColor() }">
-					添加备注
-				</view>
-				<input placeholder="最多输入12个字" class="remark-content-body" v-model="remark" />
-				<view class="remark-content-btn">
-					<text class="btn-cancel" @touchstart="isShowModel = false">取消</text>
-					<text class="btn-confirm" :style="{ backgroundColor: getColor(), borderColor: getColor() }"
-						@touchstart="handleRemark()">确认</text>
+			<!-- 备注 -->
+			<view class="remark-model" v-if="isShowModel">
+				<view class="remark-content">
+					<view class="remark-content-title" :style="{ color: getColor() }">
+						添加备注
+					</view>
+					<input placeholder="最多输入12个字" class="remark-content-body" v-model="remark" />
+					<view class="remark-content-btn">
+						<text class="btn-cancel" @touchstart="isShowModel = false">取消</text>
+						<text class="btn-confirm" :style="{ backgroundColor: getColor(), borderColor: getColor() }"
+							@touchstart="handleRemark()">确认</text>
+					</view>
 				</view>
 			</view>
 		</view>
@@ -59,6 +66,7 @@
 
 <script>
 	import config from '@/config/index';
+	import * as api from '@/api/index';
 	import {
 		formatThousands
 	} from '@/common/amount';
@@ -77,21 +85,21 @@
 				payOrderInfo: {}, //订单信息
 				channelUserId: '', // 用户ID
 				token: '', // 支付令牌
-				payWay: {}
+				payWay: {},
+				isMiniProgram: false,
+				contentPaddingTop: 0, // 动态计算的 padding-top
+				fixedTopBgHeight: 6.625 * uni.upx2px(16.64*2), // 将 rem 转换为 px，假设 1rem = 37.5px (根据设计稿调整)
 			}
 		},
 		onLoad() {
+			console.log(config);
+			this.isMiniProgram = config.isMiniProgram;
 			this.channelUserId = config.channelUserId; // uni.getStorageSync('channelUserId') || '';
 			// 从本地存储中读取 token 和 platform
 			this.token = config.tokenValue; // uni.getStorageSync(config.tokenKey) || '';
 			this.payWay = config.payWay; // uni.getStorageSync(config.payWayName) || {};
-			console.log(this.payWay);
-
-			// 根据平台加载不同的支付逻辑（可选）
-			this.loadPaymentLogic();
 
 			//获取订单信息 & 调起支付插件
-
 			const that = this;
 			api.getPayOrderInfo({
 				token: config.tokenValue
@@ -111,9 +119,15 @@
 			formattedAmount() {
 				if (!this.amount) return '0.00'
 				return parseFloat(this.amount).toFixed(2);
+			},
+			totalTopBgHeight() {
+				return this.contentPaddingTop + this.fixedTopBgHeight;
 			}
 		},
 		methods: {
+			handleHeaderHeight(height) {
+				this.contentPaddingTop = height; // 根据 CustomHeader 的高度设置 content 的 padding-top
+			},
 			/**
 			 * 获取当前支付方式对应的颜色
 			 */

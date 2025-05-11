@@ -1,17 +1,24 @@
 <template>
-	<view class="content">
-		<!-- 顶部 -->
-		<view class="content-top-bg" :style="{ backgroundColor: getColor() }"></view>
-		<view class="tips">
-			<view class="tips-title" :style="{ color: getColor() }">欢迎使用聚合收银台</view>
-			<view class="tips-image">
-				<image src="/static/scan.svg" />
+	<view class="container">
+		<!-- 自定义头部 -->
+		<CustomHeader v-if='isMiniProgram' title="向商家付款" :bgColor="getColor()" @header-height="handleHeaderHeight">
+		</CustomHeader>
+
+		<view class="content" :style="{ paddingTop: contentPaddingTop + 'px' }">
+			<!-- 顶部 -->
+			<view class="content-top-bg" :style="{ height: totalTopBgHeight + 'px', backgroundColor: getColor() }">
 			</view>
-			<button v-if='isLite' class="scan-btn" :style="{ backgroundColor: getColor() }"
-				@click="handleScanCode()">扫码买单</button>
-			<view v-else class="tips-content">
-				<text>请使用手机</text>
-				<text>扫描聚合收款码进入</text>
+			<view class="tips">
+				<view class="tips-title" :style="{ color: getColor() }">欢迎使用聚合收银台</view>
+				<view class="tips-image">
+					<image src="/static/scan.svg" />
+				</view>
+				<button v-if='isMiniProgram' class="scan-btn" :style="{ backgroundColor: getColor() }"
+					@click="handleScanCode()">扫码买单</button>
+				<view v-else class="tips-content">
+					<text>请使用手机</text>
+					<text>扫描聚合收款码进入</text>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -23,13 +30,23 @@
 	export default {
 		data() {
 			return {
-				isLite: false
+				isMiniProgram: false,
+				contentPaddingTop: 0, // 动态计算的 padding-top
+				fixedTopBgHeight: 6.625 * uni.upx2px(16.64*2), // 将 rem 转换为 px，假设 1rem = 37.5px (根据设计稿调整)
 			};
 		},
 		onLoad(options) {
-			this.isLite = config.isLite();
+			this.isMiniProgram = config.isMiniProgram;
+		},
+		computed: {
+			totalTopBgHeight() {
+				return this.contentPaddingTop + this.fixedTopBgHeight;
+			}
 		},
 		methods: {
+			handleHeaderHeight(height) {
+				this.contentPaddingTop = height; // 根据 CustomHeader 的高度设置 content 的 padding-top
+			},
 			/**
 			 * 获取当前支付方式对应的颜色
 			 */
@@ -84,12 +101,16 @@
 </script>
 
 <style>
+	.container {
+		box-sizing: border-box;
+	}
+
 	.content {
 		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center
+		justify-content: center;
 	}
 
 	.content .content-top-bg {

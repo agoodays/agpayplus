@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<text>正在跳转至收银台...</text>
+		<!-- <text>正在跳转至收银台...</text> -->
 	</view>
 </template>
 
@@ -18,7 +18,6 @@
 		},
 		methods: {
 			redirectToCheckout() {
-				console.log(config);
 				// 获取跳转地址（获取用户ID）
 				api.getRedirectUrl({ wayCode: config.payWay.wayCode, token: config.tokenValue }).then((res) => {
 					console.log(res);

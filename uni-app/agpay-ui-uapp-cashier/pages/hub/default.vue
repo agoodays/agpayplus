@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<text>正在跳转至收银台...</text>
+		<!-- <text>正在跳转至收银台...</text> -->
 	</view>
 </template>
 
@@ -18,7 +18,7 @@
 		methods: {
 			redirectToCheckout() {
 				// 判断当前环境
-				if (config.isLite()) {
+				if (config.isMiniProgram) {
 					// 跳转到小程序页面
 					uni.redirectTo({
 						url: `/pages/hub/lite?${config.tokenKey}=${config.tokenValue}`

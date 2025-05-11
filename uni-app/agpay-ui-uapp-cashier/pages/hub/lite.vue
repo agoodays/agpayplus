@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<text>正在跳转至收银台...</text>
+		<!-- <text>正在跳转至收银台...</text> -->
 	</view>
 </template>
 

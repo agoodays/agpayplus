@@ -1,5 +1,13 @@
 {
 	"pages": [{
+			"path": "pages/index/index",
+			"style": {
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+		}, {
 			"path": "pages/hub/default",
 			"style": {
 				"navigationStyle": "custom",
@@ -27,15 +35,6 @@
 			}
 		},
 		{
-			"path": "pages/oauth2/callback",
-			"style": {
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false
-				}
-			}
-		},
-		{
 			"path": "pages/payway/index",
 			"style": {
 				"navigationStyle": "custom",
@@ -45,7 +44,7 @@
 			}
 		},
 		{
-			"path": "pages/index/index",
+			"path": "pages/oauth2/callback",
 			"style": {
 				"navigationStyle": "custom",
 				"app-plus": {

@@ -22,39 +22,42 @@
 					switch (sysInfo.uniPlatform) {
 						case 'mp-weixin':
 							payWay = config.payWayEnum.WXLITE; // 微信小程序
+							break;
 						case 'mp-alipay':
 							payWay = config.payWayEnum.ALILITE; // 支付宝小程序
+							break;
 						case 'web':
-							const userAgent = sysInfo.ua.toLowerCase();
-							if (userAgent.includes('micromessenger')) {
-								payWay = config.payWayEnum.WXJSAPI; // 微信内置浏览器
-							} else if (userAgent.includes('alipayclient')) {
-								payWay = config.payWayEnum.ALIJSAPI; // 支付宝内置浏览器
-							} else if (userAgent.includes('unionpay') ||
-								userAgent.includes('yunhuiyuan') ||
-								userAgent.includes('cloudpay')) {
-								payWay = config.payWayEnum.YSFJSAPI; // 云闪付内置浏览器
+							const userAgent = sysInfo.ua?.toLowerCase();
+							if (userAgent) {
+								if (userAgent.includes('micromessenger')) {
+									payWay = config.payWayEnum.WXJSAPI; // 微信内置浏览器
+								} else if (userAgent.includes('alipayclient')) {
+									payWay = config.payWayEnum.ALIJSAPI; // 支付宝内置浏览器
+								} else if (userAgent.includes('unionpay') ||
+									userAgent.includes('yunhuiyuan') ||
+									userAgent.includes('cloudpay')) {
+									payWay = config.payWayEnum.YSFJSAPI; // 云闪付内置浏览器
+								}
 							}
+							break;
 						default:
 							console.warn('未知浏览器类型，无法确定支付方式');
+							break;
 					}
 					if (payWay) {
 						config.payWay = payWay;
 						// 将 payWay 暂存到本地
 						uni.setStorageSync(config.payWayName, payWay);
-						console.log(config);
 					} else {
 						this.redirectToIndex();
 					}
 				} catch (e) {
 					console.error('获取设备信息失败', e);
-					return false;
+					this.redirectToIndex();
 				}
-				return true;
 			},
-			// 初始化支付拦截器
 			initToken(e) {
-				let token = uni.getStorageSync(config.tokenKey) || '';				
+				let token = uni.getStorageSync(config.tokenKey) || '';
 				config.tokenValue = token;
 				if (!token) {
 					token = e.query[config.tokenKey] || '';
@@ -63,11 +66,13 @@
 						// 将 token 暂存到本地
 						uni.setStorageSync(config.tokenKey, token);
 					} else {
-						this.redirectToError('获取二维码参数失败，请通过扫描收款二维码进入小程序支付！');
-						return false;
+						if (config.isMiniProgram) {
+							this.redirectToIndex();
+						} else {
+							this.redirectToError('获取二维码参数失败，请通过扫描收款二维码进入小程序支付！');
+						}
 					}
 				}
-				return true;
 			},
 			redirectToError(msg) {
 				uni.redirectTo({
