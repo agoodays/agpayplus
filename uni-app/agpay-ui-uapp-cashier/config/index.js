@@ -1,4 +1,4 @@
-const payWay = {
+const payWayEnum = {
 	WXJSAPI: {
 		wayCode: "WX_JSAPI",
 		wayType: "wxpay"
@@ -28,9 +28,18 @@ const themeColor = {
 }
 
 export default {
-	urlTokenName: "agpayToken", //URL传递的token名称
+	tokenKey: "agpayToken", //URL传递的token名称
+    tokenValue: "",
+    channelUserId: "",
+    channelUniId: "",
+	payWayEnum: payWayEnum,
 	payWayName: 'payWay',
-	payWay: payWay,
-	themeColor: themeColor,
-	cacheToken: ""
+	payWay: {},
+	themeColor: themeColor,	
+	isLite() {
+		return this.payWay?.wayCode?.includes('LITE');
+	},
+	getColor() {
+		return this.themeColor[this.payWay?.wayType] || this.themeColor.wxpay;
+	}
 }

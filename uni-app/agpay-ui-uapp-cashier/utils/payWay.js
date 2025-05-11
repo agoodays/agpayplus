@@ -46,11 +46,11 @@ const getBrowserType = (userAgent) => {
  */
 export const getPayWay = () => {
 	if (isWeChatMiniProgram()) {
-		return config.payWay.WXLITE; // 微信小程序
+		return config.payWayEnum.WXLITE; // 微信小程序
 	}
 
 	if (isAlipayMiniProgram()) {
-		return config.payWay.ALILITE; // 支付宝小程序
+		return config.payWayEnum.ALILITE; // 支付宝小程序
 	}
 
 	// 非小程序环境，检查浏览器类型
@@ -59,11 +59,11 @@ export const getPayWay = () => {
 
 	switch (browserType) {
 		case 'weixin':
-			return config.payWay.WXJSAPI; // 微信浏览器
+			return config.payWayEnum.WXJSAPI; // 微信浏览器
 		case 'alipay':
-			return config.payWay.ALIJSAPI; // 支付宝浏览器
+			return config.payWayEnum.ALIJSAPI; // 支付宝浏览器
 		case 'yunshanfu':
-			return config.payWay.YSFJSAPI; // 云闪付App内置浏览器
+			return config.payWayEnum.YSFJSAPI; // 云闪付App内置浏览器
 		default:
 			console.warn('未知浏览器类型，无法确定支付方式', userAgent);
 			return null;

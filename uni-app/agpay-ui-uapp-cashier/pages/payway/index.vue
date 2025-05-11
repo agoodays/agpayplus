@@ -81,10 +81,10 @@
 			}
 		},
 		onLoad() {
-			this.channelUserId = uni.getStorageSync('channelUserId') || '';
+			this.channelUserId = config.channelUserId; // uni.getStorageSync('channelUserId') || '';
 			// 从本地存储中读取 token 和 platform
-			this.token = uni.getStorageSync(config.urlTokenName) || '';
-			this.payWay = uni.getStorageSync(config.payWayName) || {}; // 默认 H5
+			this.token = config.tokenValue; // uni.getStorageSync(config.tokenKey) || '';
+			this.payWay = config.payWay; // uni.getStorageSync(config.payWayName) || {};
 			console.log(this.payWay);
 
 			// 根据平台加载不同的支付逻辑（可选）
@@ -94,7 +94,7 @@
 
 			const that = this;
 			api.getPayOrderInfo({
-				token: this.token
+				token: config.tokenValue
 			}).then(res => {
 				that.payOrderInfo = res;
 				that.amount = (res.amount / 100) + '';
@@ -114,24 +114,11 @@
 			}
 		},
 		methods: {
-			loadPaymentLogic() {
-				switch (this.payWay.wayType) {
-					case 'wxpay':
-						console.log('加载微信支付逻辑');
-						break;
-					case 'alipay':
-						console.log('加载支付宝支付逻辑');
-						break;
-					default:
-						console.log('加载 H5 支付逻辑');
-						break;
-				}
-			},
 			/**
 			 * 获取当前支付方式对应的颜色
 			 */
 			getColor() {
-				return config.themeColor[this.payWay.wayType];
+				return config.getColor();
 			},
 			/**
 			 * 切换备注弹窗显示状态

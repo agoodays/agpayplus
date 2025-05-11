@@ -19,31 +19,23 @@
 
 <script>
 	import config from '@/config/index';
-	import {
-		getPayWay
-	} from "@/utils/payWay";
 
 	export default {
 		data() {
 			return {
-				isLite: false,
-				payWay: {}
+				isLite: false
 			};
 		},
 		onLoad(options) {
-			this.payWay = getPayWay();
-			this.isLite = this.payWay.wayCode.includes('LITE');
-			// 调用方法进行环境判断与跳转
-			this.redirectToCheckout();
+			this.isLite = config.isLite();
 		},
 		methods: {
 			/**
 			 * 获取当前支付方式对应的颜色
 			 */
 			getColor() {
-				return config.themeColor[this.payWay.wayType];
+				return config.getColor();
 			},
-
 			/**
 			 * 处理扫码事件
 			 */
@@ -57,7 +49,7 @@
 						try {
 							// 解析 URL 参数
 							const url = new URL(scannedUrl);
-							const token = url.searchParams.get(config.urlTokenName);
+							const token = url.searchParams.get(config.tokenKey);
 
 							if (token) {
 								// 跳转到小程序页面
@@ -86,12 +78,7 @@
 						console.error("扫码失败", err);
 					}
 				});
-			},
-
-			handleRetry() {
-				uni.navigateBack();
-			},
-			redirectToCheckout() {}
+			}
 		}
 	}
 </script>

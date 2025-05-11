@@ -2,81 +2,82 @@
 	import config from '@/config/index';
 
 	export default {
-		onLaunch: function() {
-			console.log('App Launch');
-			this.handleRedirectIfNeed();
-			this.initPaymentInterceptor();
+		onLaunch: function(e) {
+			console.log('App Launch', e);
+			this.initPayWay();
 		},
-		onShow: function() {
-			console.log('App Show');
-			this.checkAndRedirectToIndexIfNotMobile();
+		onShow: function(e) {
+			console.log('App Show', e);
+			this.initToken(e);
 		},
-		onHide: function() {
-			console.log('App Hide');
+		onHide: function(e) {
+			console.log('App Hide', e);
 		},
 		methods: {
-			// 检查是否是移动设备
-			checkAndRedirectToIndexIfNotMobile() {
-				let isMobileDevice = false;
+			initPayWay() {
 				try {
-					const res = uni.getSystemInfo();
-					isMobileDevice = ['ios', 'android'].includes(res.platform.toLowerCase());
+					let payWay = null;
+					const sysInfo = uni.getSystemInfoSync();
+					console.log(sysInfo);
+					switch (sysInfo.uniPlatform) {
+						case 'mp-weixin':
+							payWay = config.payWayEnum.WXLITE; // 微信小程序
+						case 'mp-alipay':
+							payWay = config.payWayEnum.ALILITE; // 支付宝小程序
+						case 'web':
+							const userAgent = sysInfo.ua.toLowerCase();
+							if (userAgent.includes('micromessenger')) {
+								payWay = config.payWayEnum.WXJSAPI; // 微信内置浏览器
+							} else if (userAgent.includes('alipayclient')) {
+								payWay = config.payWayEnum.ALIJSAPI; // 支付宝内置浏览器
+							} else if (userAgent.includes('unionpay') ||
+								userAgent.includes('yunhuiyuan') ||
+								userAgent.includes('cloudpay')) {
+								payWay = config.payWayEnum.YSFJSAPI; // 云闪付内置浏览器
+							}
+						default:
+							console.warn('未知浏览器类型，无法确定支付方式');
+					}
+					if (payWay) {
+						config.payWay = payWay;
+						// 将 payWay 暂存到本地
+						uni.setStorageSync(config.payWayName, payWay);
+						console.log(config);
+					} else {
+						this.redirectToIndex();
+					}
 				} catch (e) {
 					console.error('获取设备信息失败', e);
-				}
-				if (!isMobileDevice) {
-					uni.redirectTo({
-						url: '/pages/index/index'
-					});
 					return false;
 				}
 				return true;
 			},
-
 			// 初始化支付拦截器
-			initPaymentInterceptor() {
-				console.log('Init Payment Interceptor');
-				['navigateTo', 'redirectTo'].forEach(method => {
-					uni.addInterceptor(method, {
-						invoke: (args) => {
-							console.log(args);
-							const params = new URLSearchParams(url.split('?')[1] || '');
-
-							if (!params.has(config.urlTokenName)) {
-								uni.redirectTo({
-									url: '/pages/error/index?errInfo=缺少支付令牌'
-								});
-								return false;
-							}
-							return true;
-						},
-						fail: (err) => {
-							console.error('路由跳转失败:', err);
-						}
-					})
-				})
-			},
-
-			// URL 重定向处理（支持多服务商）
-			handleRedirectIfNeed() {
-				const pages = getCurrentPages();
-				const currentPage = pages[pages.length - 1];
-				const route = currentPage.route; // 当前页面路径，如：cashier/xxx/pages/hub/default
-				const fullPath = '/' + route; // 补全成 /cashier/xxx/pages/hub/default
-
-				// 正则匹配：/cashier/xxx/pages/hub/(default|h5|lite)
-				const match = fullPath.match(/^\/cashier\/([^\/]+)\/pages\/hub\/(default|h5|lite)(\/)?$/i);
-
-				if (match) {
-					const tenantId = match[1]; // 提取租户 ID
-					const pageType = match[2]; // 页面类型：default|h5|lite
-					const redirectUrl = `/cashier/pages/hub/${pageType}?tenantId=${encodeURIComponent(tenantId)}`;
-
-					// 跳转到标准页面
-					uni.redirectTo({
-						url: redirectUrl
-					});
+			initToken(e) {
+				let token = uni.getStorageSync(config.tokenKey) || '';				
+				config.tokenValue = token;
+				if (!token) {
+					token = e.query[config.tokenKey] || '';
+					if (token) {
+						config.tokenValue = token;
+						// 将 token 暂存到本地
+						uni.setStorageSync(config.tokenKey, token);
+					} else {
+						this.redirectToError('获取二维码参数失败，请通过扫描收款二维码进入小程序支付！');
+						return false;
+					}
 				}
+				return true;
+			},
+			redirectToError(msg) {
+				uni.redirectTo({
+					url: `/pages/error/index?errInfo=${msg}`
+				});
+			},
+			redirectToIndex() {
+				uni.redirectTo({
+					url: `/pages/index/index`
+				});
 			}
 		}
 	}
