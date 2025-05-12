@@ -21,7 +21,7 @@ const payWayEnum = {
 	}
 }
 
-const themeColor = {
+const themeColorEnum = {
 	wxpay: "#07c160",
 	alipay: "rgb(22, 120, 255)",
 	ysfpay: "#ff534d"
@@ -35,11 +35,11 @@ export default {
 	payWayEnum: payWayEnum,
 	payWayName: 'payWay',
 	payWay: {},
-	themeColor: themeColor,
+	themeColorEnum: themeColorEnum,
 	get isMiniProgram() {
 		return this.payWay?.wayCode?.includes('LITE') || false;
 	},
-	getColor() {
-		return this.themeColor[this.payWay?.wayType] || this.themeColor.wxpay;
+	get themeColor() {
+		return this.themeColorEnum[this.payWay?.wayType] || this.themeColorEnum.wxpay;
 	}
 }
