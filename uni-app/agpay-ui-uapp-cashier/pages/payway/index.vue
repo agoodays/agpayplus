@@ -112,9 +112,7 @@
 					that.handlePayment();
 				}
 			}).catch(res => {
-				uni.redirectTo({
-					url: '/pages/error/index?errInfo=' + res.msg
-				});
+				that.redirectToError(res.msg);
 			});
 		},
 		computed: {
@@ -129,6 +127,11 @@
 		methods: {
 			handleHeaderHeight(height) {
 				this.contentPaddingTop = height; // 根据 CustomHeader 的高度设置 content 的 padding-top
+			},
+			redirectToError(msg) {
+				uni.redirectTo({
+					url: `/pages/error/index?errInfo=${msg}`
+				});
 			},
 			/**
 			 * 切换备注弹窗显示状态
@@ -283,9 +286,7 @@
 						}
 					}
 				}).catch(res => {
-					uni.redirectTo({
-						url: '/pages/error/index?errInfo=' + res.msg
-					});
+					this.redirectToError(res.msg);
 				});
 			},
 			getOrderInfo(data) {
@@ -346,7 +347,7 @@
 		align-items: center;
 		box-sizing: border-box;
 		margin-bottom: .375rem;
-		background: #FFFFFF;
+		background: #fff;
 		border-radius: .3125rem;
 		font-size: 1.4375rem;
 		letter-spacing: .04em;

@@ -1,17 +1,27 @@
 <template>
-	<view class="error">
-		<image class="error-icon" src="/static/tip.svg" />
-		<text class="error-err">{{ errorErr }}</text>
-		<view class="error-msg">
-			<view class="msg">{{ errorMsg }}</view>
+	<view class="container">
+		<!-- 自定义头部 -->
+		<CustomHeader v-if='isMiniProgram' title="" :bgColor="themeColor" @header-height="handleHeaderHeight">
+		</CustomHeader>
+
+		<view class="error" :style="{ paddingTop: paddingTop + 'px' }">
+			<image class="error-icon" src="/static/tip.svg" />
+			<text class="error-err">{{ errorErr }}</text>
+			<view class="error-msg">
+				<view class="msg">{{ errorMsg }}</view>
+			</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	import config from '@/config/index';
+
 	export default {
 		data() {
 			return {
+				isMiniProgram: false,
+				paddingTop: 0,
 				errorErr: '提示',
 				errorMsg: '获取二维码参数失败'
 			};
@@ -20,10 +30,11 @@
 			if (options.errInfo) {
 				this.errorMsg = decodeURIComponent(options.errInfo);
 			}
+			this.isMiniProgram = config.isMiniProgram;
 		},
 		methods: {
-			handleRetry() {
-				uni.navigateBack();
+			handleHeaderHeight(height) {
+				this.paddingTop = height; // 根据 CustomHeader 的高度设置 padding-top
 			}
 		}
 	}

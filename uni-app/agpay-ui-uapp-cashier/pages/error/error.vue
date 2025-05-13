@@ -27,11 +27,6 @@
 			if (options.message) {
 				this.errTips = decodeURIComponent(options.message);
 			}
-		},
-		methods: {
-			handleRetry() {
-				uni.navigateBack();
-			}
 		}
 	}
 </script>

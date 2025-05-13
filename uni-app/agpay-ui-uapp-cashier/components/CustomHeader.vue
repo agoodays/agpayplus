@@ -1,7 +1,7 @@
 <template>
 	<view class="custom-header"
 		:style="{ backgroundColor: bgColor, height: headerHeight + 'px', lineHeight: headerHeight + 'px' }">
-		<text class="header-title">{{ title }}</text>
+		<text class="header-title" :style="{ paddingTop: headerPaddingTop + 'px' }">{{ title }}</text>
 	</view>
 </template>
 
@@ -10,15 +10,16 @@
 		props: {
 			title: {
 				type: String,
-				default: '默认标题'
+				default: '收银台'
 			},
 			bgColor: {
 				type: String,
-				default: '#007AFF'
+				default: '#f8f8f8'
 			}
 		},
 		data() {
 			return {
+				headerPaddingTop: 0,
 				statusBarHeight: 0,
 				navBarHeight: 44 // 默认导航栏高度
 			};
@@ -30,6 +31,7 @@
 		},
 		mounted() {
 			const systemInfo = uni.getSystemInfoSync();
+			this.headerPaddingTop = systemInfo.statusBarHeight / 2;
 			this.statusBarHeight = systemInfo.statusBarHeight;
 			// 向父组件发送自定义事件，通知头部高度
 			this.$emit('header-height', this.headerHeight);

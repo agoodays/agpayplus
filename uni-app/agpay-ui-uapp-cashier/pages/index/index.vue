@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<!-- 自定义头部 -->
-		<CustomHeader title="向商家付款" :bgColor="themeColor" @header-height="handleHeaderHeight">
+		<CustomHeader v-if='isMiniProgram' title="向商家付款" :bgColor="themeColor" @header-height="handleHeaderHeight">
 		</CustomHeader>
 
 		<view class="content" :style="{ paddingTop: contentPaddingTop + 'px' }">
