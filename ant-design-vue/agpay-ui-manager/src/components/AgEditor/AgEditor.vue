@@ -87,7 +87,7 @@ export default {
                 }
                 const data = Object.assign(formParams, { file: file })
                 const formActionUrl = isLocalFile ? upload.form : res.formActionUrl
-                upload.singleFile(formActionUrl, data).then((response) => {
+                upload.singleFile(formActionUrl, isLocalFile, data).then((response) => {
                   const ossFileUrl = isLocalFile ? response : res.ossFileUrl
                   insertFn(ossFileUrl, file.name, ossFileUrl)
                 })
@@ -119,7 +119,7 @@ export default {
                 }
                 const data = Object.assign(formParams, { file: file })
                 const formActionUrl = isLocalFile ? upload.form : res.formActionUrl
-                upload.singleFile(formActionUrl, data).then((response) => {
+                upload.singleFile(formActionUrl, isLocalFile, data).then((response) => {
                   const ossFileUrl = isLocalFile ? response : res.ossFileUrl
                   insertFn(ossFileUrl, ossFileUrl)
                 })

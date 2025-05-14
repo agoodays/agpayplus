@@ -11,9 +11,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Common
     [ApiController, Authorize, AllowAnonymous, NoLog]
     public class StaticController : ControllerBase
     {
-        protected readonly ILogger<StaticController> _logger;
+        private readonly ILogger<StaticController> _logger;
 
-        protected StaticController(ILogger<StaticController> logger)
+        public StaticController(ILogger<StaticController> logger)
         {
             _logger = logger;
         }
