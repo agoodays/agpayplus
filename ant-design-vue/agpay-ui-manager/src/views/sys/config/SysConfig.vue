@@ -611,9 +611,6 @@ export default {
             case 'ossUseType':
               configVal = that.ossConfig.ossUseType
               break
-            case 'ossPublicSiteUrl':
-              configVal = that.ossConfig.ossPublicSiteUrl
-              break
             case 'aliyunOssConfig':
               configVal = JSON.stringify(that.ossConfig.aliyunOssConfig)
               break
