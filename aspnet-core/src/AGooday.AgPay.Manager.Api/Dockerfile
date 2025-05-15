@@ -7,7 +7,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 # 设置语言环境变量以支持 UTF-8 编码，并确保全球化设置不被禁用
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    TZ=Asia/Shanghai
+
+# 设置时区
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 设置运行应用的用户为非 root 用户 'app'
 USER app
