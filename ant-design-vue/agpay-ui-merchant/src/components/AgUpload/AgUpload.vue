@@ -134,7 +134,7 @@ export default {
         }
         const data = Object.assign(formParams, { file: file })
         const formActionUrl = isLocalFile ? props.action : res.formActionUrl
-        upload.singleFile(formActionUrl, data).then((response) => {
+        upload.singleFile(formActionUrl, isLocalFile, data).then((response) => {
           loading.value = false
           const ossFileUrl = isLocalFile ? response : res.ossFileUrl
           fileList.value = getDefaultFileList([ossFileUrl])

@@ -194,15 +194,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             {
                 return ApiRes.CustomFail("参数错误");
             }
+
             var mchNo = rq?.MchNo ?? payOrder?.MchNo;
             var appId = rq?.AppId ?? payOrder?.AppId;
             MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
-            rq.Version = "1.0";
-            rq.SignType = "MD5";
-            rq.ReqTime = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
-            var jsonObject = JObject.FromObject(rq);
-            string sign = AgPayUtil.Sign(jsonObject, rq.SignType, mchAppConfigContext.MchApp.AppSecret);
-            rq.Sign = sign;
+
+            if (rq != null)
+            {
+                rq.Version = "1.0";
+                rq.SignType = "MD5";
+                rq.ReqTime = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+                var jsonObject = JObject.FromObject(rq);
+                string sign = AgPayUtil.Sign(jsonObject, rq.SignType, mchAppConfigContext.MchApp.AppSecret);
+                rq.Sign = sign;
+            }
 
             if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
             {
@@ -227,7 +232,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// <returns></returns>
         private async Task<ApiRes> PackageAlipayPayPackageAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            var wayCode = (rq.WayCode ?? payOrder?.WayCode) ?? this.GetWayCode();
+            var wayCode = (rq?.WayCode ?? payOrder?.WayCode) ?? this.GetWayCode();
             string channelUserId = this.GetReqParamJson().GetValue("channelUserId").ToString();
             AliJsapiOrderRQ bizRQ = new AliJsapiOrderRQ();
             if (rq != null)
@@ -248,7 +253,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// <returns></returns>
         private async Task<ApiRes> PackageWxpayPayPackageAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            var wayCode = (rq.WayCode ?? payOrder?.WayCode) ?? this.GetWayCode();
+            var wayCode = (rq?.WayCode ?? payOrder?.WayCode) ?? this.GetWayCode();
             string openId = this.GetReqParamJson().GetValue("channelUserId").ToString();
             string oauth2InfoId = await this.GetOauth2InfoIdAsync(mchAppConfigContext, wayCode);
             WxPayChannelUserService channelUserService = (WxPayChannelUserService)this.GetServiceByWayCode(wayCode);
