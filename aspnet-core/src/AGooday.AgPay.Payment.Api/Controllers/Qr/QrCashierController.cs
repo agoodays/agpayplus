@@ -235,6 +235,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             var wayCode = (rq?.WayCode ?? payOrder?.WayCode) ?? this.GetWayCode();
             string channelUserId = this.GetReqParamJson().GetValue("channelUserId").ToString();
             AliJsapiOrderRQ bizRQ = new AliJsapiOrderRQ();
+            bizRQ.SignType = "MD5";
             if (rq != null)
             {
                 JObject resJSON = new JObject();
@@ -259,6 +260,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             WxPayChannelUserService channelUserService = (WxPayChannelUserService)this.GetServiceByWayCode(wayCode);
             var (appId, _, _) = await channelUserService.GetOauth2ParamsAsync(oauth2InfoId, wayCode, mchAppConfigContext);
             WxJsapiOrderRQ bizRQ = new WxJsapiOrderRQ();
+            bizRQ.SignType = "MD5";
             bizRQ.Openid = openId;
             bizRQ.SubAppId = appId;
             if (rq != null)

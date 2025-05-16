@@ -9,8 +9,8 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         Task<PaginatedList<PayWayDto>> GetPayWaysByInfoIdAsync(PayWayUsableQueryDto dto);
         JObject GetByInfoIdAndIfCodeJson(string configMode, string infoId, string ifCode);
-        PayRateConfigItem GetPayRateConfigItem(string configType, string infoType, string infoId, string ifCode, string wayCode);
+        Task<PayRateConfigItem> GetPayRateConfigItemAsync(string configType, string infoType, string infoId, string ifCode, string wayCode);
         bool SaveOrUpdate(PayRateConfigSaveDto dto);
-        List<PayRateConfigInfoDto> GetPayRateConfigInfos(string mchNo, string ifCode, string wayCode, long amount, string bankCardType = null);
+        Task<List<PayRateConfigInfoDto>> GetPayRateConfigInfosAsync(string mchNo, string ifCode, string wayCode, long amount, string bankCardType = null);
     }
 }

@@ -7,6 +7,7 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using static AGooday.AgPay.Application.DataTransfer.PayRateConfigSaveDto;
@@ -371,18 +372,18 @@ namespace AGooday.AgPay.Application.Services
             var result = _mapper.Map<List<PayRateConfigDto>>(payRateConfigs);
             foreach (var item in result)
             {
-                var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(item.Id);
+                var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigIdAsNoTracking(item.Id);
                 item.PayRateLevelConfigs = _mapper.Map<List<PayRateLevelConfigDto>>(payRateLevelConfigs);
             }
 
             return result;
         }
 
-        public PayRateConfigItem GetPayRateConfigItem(string configType, string infoType, string infoId, string ifCode, string wayCode)
+        public async Task<PayRateConfigItem> GetPayRateConfigItemAsync(string configType, string infoType, string infoId, string ifCode, string wayCode)
         {
-            var payRateConfig = _payRateConfigRepository.GetByUniqueKey(configType, infoType, infoId, ifCode, wayCode);
+            var payRateConfig = await _payRateConfigRepository.GetByUniqueKeyAsNoTrackingAsync(configType, infoType, infoId, ifCode, wayCode);
 
-            var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(payRateConfig.Id);
+            var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigIdAsNoTracking(payRateConfig.Id);
 
             var result = new PayRateConfigItem()
             {
@@ -899,14 +900,14 @@ namespace AGooday.AgPay.Application.Services
             return feeRate;
         }
 
-        public List<PayRateConfigInfoDto> GetPayRateConfigInfos(string mchNo, string ifCode, string wayCode, long amount, string bankCardType = null)
+        public async Task<List<PayRateConfigInfoDto>> GetPayRateConfigInfosAsync(string mchNo, string ifCode, string wayCode, long amount, string bankCardType = null)
         {
-            var mchInfo = _mchInfoRepository.GetById(mchNo);
+            var mchInfo = await _mchInfoRepository.GetByIdAsNoTrackingAsync(mchNo);
             if (mchInfo == null || mchInfo.Type.Equals(CS.MCH_TYPE_NORMAL))
             {
                 return null;
             }
-            var isvPayRateConfig = _payRateConfigRepository.GetByUniqueKey(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, mchInfo.IsvNo, ifCode, wayCode);
+            var isvPayRateConfig = await _payRateConfigRepository.GetByUniqueKeyAsNoTrackingAsync(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, mchInfo.IsvNo, ifCode, wayCode);
             var agentInfos = _agentInfoRepository.GetParentAgentsFromSqlAsNoTracking(mchInfo.AgentNo);
             var infoType = CS.INFO_TYPE.AGENT;
             var configType = CS.CONFIG_TYPE.AGENTRATE;
@@ -914,7 +915,7 @@ namespace AGooday.AgPay.Application.Services
             var payRateConfigs = _payRateConfigRepository.GetByUniqueKeysAsNoTracking(configType, infoType, ifCode, wayCode, infoIds).ToList();
             payRateConfigs.Add(isvPayRateConfig);
             var ids = payRateConfigs.Select(s => s.Id).ToList();
-            var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigIds(ids);
+            var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigIdsAsNoTracking(ids);
 
             var result = _mapper.Map<List<PayRateConfigInfoDto>>(payRateConfigs);
             foreach (var payRateConfig in result)
@@ -932,12 +933,12 @@ namespace AGooday.AgPay.Application.Services
                     PayRateLevelConfig payRateLevelConfig = null;
                     if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_NORMAL))
                     {
-                        payRateLevelConfig = _payRateLevelConfigs.FirstOrDefault(w => string.IsNullOrEmpty(w.BankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
+                        payRateLevelConfig = await _payRateLevelConfigs.FirstOrDefaultAsync(w => string.IsNullOrEmpty(w.BankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
                     }
 
                     if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_UNIONPAY))
                     {
-                        payRateLevelConfig = _payRateLevelConfigs.FirstOrDefault(w => w.BankCardType.Equals(bankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
+                        payRateLevelConfig = await _payRateLevelConfigs.FirstOrDefaultAsync(w => w.BankCardType.Equals(bankCardType) && w.MinAmount < amount && w.MaxAmount <= amount);
                     }
 
                     if (payRateLevelConfig == null)

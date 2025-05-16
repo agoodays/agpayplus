@@ -355,7 +355,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
         private async Task GenPayOrderProfitAsync(PayOrderDto payOrder, IPaymentService paymentService)
         {
-            var payRateConfigs = _payRateConfigService.GetPayRateConfigInfos(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
+            var payRateConfigs = await _payRateConfigService.GetPayRateConfigInfosAsync(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
             if (payRateConfigs != null)
             {
                 var payOrderProfits = new List<PayOrderProfitDto>();
@@ -449,7 +449,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             if (mchAppConfigContext.MchType == (byte)MchInfoType.TYPE_NORMAL)//普通商户
             {
 
-                if (_configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, ifCode) == null)
+                if (await _configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, ifCode) == null)
                 {
                     throw new BizException("商户应用参数未配置");
                 }
@@ -462,7 +462,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     throw new BizException("特约商户参数未配置");
                 }
 
-                if (_configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, ifCode) == null)
+                if (await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, ifCode) == null)
                 {
                     throw new BizException("服务商参数未配置");
                 }
