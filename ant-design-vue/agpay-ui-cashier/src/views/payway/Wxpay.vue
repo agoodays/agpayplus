@@ -205,15 +205,15 @@ export default {
       // 该函数执行效果慢
       let that = this;
       getPayPackage(this.amount, this.remark).then(res => {
-        if (res.code != '0') {
+        if (res.code && res.code != '0') {
           return alert(res.msg);
         }
 
-        if (res.data.orderState != 1) { //订单不是支付中，说明订单异常
-          return alert(res.data.errMsg);
+        if (res.orderState != 1) { //订单不是支付中，说明订单异常
+          return alert(res.errMsg);
         }
 
-        that.resData = res.data;
+        that.resData = res;
         if (typeof WeixinJSBridge == "undefined") {
           if (document.addEventListener) {
             document.addEventListener('WeixinJSBridgeReady', that.onBridgeReady, false);
@@ -240,9 +240,9 @@ export default {
               // 使用以上方式判断前端返回,微信团队郑重提示：
               //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
               // //重定向
-              if(that.payOrderInfo.returnUrl){
+              if (that.payOrderInfo.returnUrl) {
                 location.href = that.payOrderInfo.returnUrl;
-              }else{
+              } else {
                 alert('支付成功！');
                 window.WeixinJSBridge.call('closeWindow')
               }
