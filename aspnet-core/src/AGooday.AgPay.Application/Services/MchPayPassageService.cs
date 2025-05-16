@@ -114,7 +114,7 @@ namespace AGooday.AgPay.Application.Services
                 foreach (var item in result)
                 {
                     item.IfRate = item.IfRate ?? item.IfRate * 100;
-                    item.PayWayFee = _payRateConfigService.GetPayRateConfigItem(configType, infoType, appId, item.IfCode, wayCode);
+                    item.PayWayFee = await _payRateConfigService.GetPayRateConfigItemAsync(configType, infoType, appId, item.IfCode, wayCode);
                     var payPassage = await mchPayPassages.Where(w => w.IfCode.Equals(item.IfCode)).FirstOrDefaultAsync();
                     if (payPassage != null)
                     {
@@ -260,7 +260,7 @@ namespace AGooday.AgPay.Application.Services
             }
             if (payRateConfig.FeeType.Equals(CS.FEE_TYPE_LEVEL))
             {
-                var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigId(payRateConfig.Id);
+                var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigIdAsNoTracking(payRateConfig.Id);
                 PayRateLevelConfig payRateLevelConfig = null;
                 if (payRateConfig.LevelMode.Equals(CS.LEVEL_MODE_NORMAL))
                 {

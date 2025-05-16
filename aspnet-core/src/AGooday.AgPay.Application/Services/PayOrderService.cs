@@ -277,7 +277,7 @@ namespace AGooday.AgPay.Application.Services
             var now = DateTime.Now;
             var updatedCount = _payOrderRepository.GetAll()
                 .Where(w => new byte[] { (byte)PayOrderState.STATE_INIT, (byte)PayOrderState.STATE_ING }.Contains(w.State)
-                    && w.ExpiredTime < DateTime.Now)
+                    && w.ExpiredTime < now)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(p => p.State, p => (byte)PayOrderState.STATE_CLOSED)
                     .SetProperty(p => p.UpdatedAt, now));
