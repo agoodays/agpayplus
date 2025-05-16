@@ -2086,7 +2086,7 @@ VALUES ('pppay', 'PayPal支付', 1, 0, 1,
 
 INSERT INTO `t_pay_interface_define` (`if_code`, `if_name`, `is_mch_mode`, `is_isv_mode`, `config_page_type`, `isv_params`, `isvsub_mch_params`, `normal_mch_params`, `way_codes`, `icon`, `bg_color`, `state`, `remark`)
 VALUES ('sxfpay', '随行付支付', 0, 1, 1,
-        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"orgId","desc":"机构编号","type":"text","verify":"required"},{"name":"publicKey","desc":"天阙平台公钥","type":"textarea","verify":"required","star":"1"},{"name":"privateKey","desc":"天阙平台私钥","type":"textarea","verify":"required","star":"1"},{"name":"channelNoWx","desc":"微信渠道号[服务商通过海科在(微信)申请的渠道编号]","type":"text","verify":"required"},{"name":"channelNoAli","desc":"支付宝渠道号[服务商自行申请的支付宝渠道号(PID)]","type":"text","verify":"required"}]',
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"orgId","desc":"机构编号","type":"text","verify":"required"},{"name":"publicKey","desc":"天阙平台公钥","type":"textarea","verify":"required","star":"1"},{"name":"privateKey","desc":"天阙平台私钥","type":"textarea","verify":"required","star":"1"},{"name":"channelNoWx","desc":"微信渠道号[服务商通过随行付在(微信)申请的渠道编号]","type":"text","verify":"required"},{"name":"channelNoAli","desc":"支付宝渠道号[服务商自行申请的支付宝渠道号(PID)]","type":"text","verify":"required"}]',
         '[{"name":"mno","desc":"商户编号","type":"text","verify":"required"}]',
         NULL,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "WX_NATIVE"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
@@ -2094,7 +2094,7 @@ VALUES ('sxfpay', '随行付支付', 0, 1, 1,
 
 INSERT INTO `t_pay_interface_define` (`if_code`, `if_name`, `is_mch_mode`, `is_isv_mode`, `config_page_type`, `isv_params`, `isvsub_mch_params`, `normal_mch_params`, `way_codes`, `icon`, `bg_color`, `state`, `remark`)
 VALUES ('lespay', '乐刷支付', 0, 1, 1,
-        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"agentId","desc":"服务商编号","type":"text","verify":"required"},{"name":"tradeKey","desc":"交易密钥","type":"text","verify":"required","star":"1"},{"name":"noticeKey","desc":"异步通知回调密钥","type":"text","verify":"required","star":"1"},{"name":"channelNoWx","desc":"微信渠道号[服务商通过海科在(微信)申请的渠道编号]","type":"text","verify":"required"},{"name":"channelNoAli","desc":"支付宝渠道号[服务商自行申请的支付宝渠道号(PID)]","type":"text","verify":"required"}]',
+        '[{"name":"sandbox","desc":"环境配置","type":"radio","verify":"required","values":"1,0","titles":"沙箱环境,生产环境"},{"name":"agentId","desc":"服务商编号","type":"text","verify":"required"},{"name":"tradeKey","desc":"交易密钥","type":"text","verify":"required","star":"1"},{"name":"noticeKey","desc":"异步通知回调密钥","type":"text","verify":"required","star":"1"},{"name":"channelNoWx","desc":"微信渠道号[服务商通过乐刷在(微信)申请的渠道编号]","type":"text","verify":"required"},{"name":"channelNoAli","desc":"支付宝渠道号[服务商自行申请的支付宝渠道号(PID)]","type":"text","verify":"required"}]',
         '[{"name":"merchantId","desc":"商户编号","type":"text","verify":"required"},{"name":"limitPay","desc":"是否禁止信用卡（默认为不禁用）","type":"radio","verify":"","values":"0,1","titles":"否,是"},{"name":"t0","desc":"t0交易标志（默认为d1）","type":"radio","verify":"required","values":"0,1","titles":"d1交易,d0交易"}]',
         NULL,
         '[{"wayCode": "ALI_BAR"},{"wayCode": "ALI_JSAPI"},{"wayCode": "ALI_QR"},{"wayCode": "WX_BAR"},{"wayCode": "WX_JSAPI"},{"wayCode": "YSF_BAR"},{"wayCode": "YSF_JSAPI"}]',
