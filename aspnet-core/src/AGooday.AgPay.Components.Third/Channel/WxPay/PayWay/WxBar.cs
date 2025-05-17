@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Params.WxPay;
+using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Components.Third.Channel.WxPay.Kits;
 using AGooday.AgPay.Components.Third.Models;
@@ -10,7 +11,6 @@ using AGooday.AgPay.Components.Third.RQRS.PayOrder;
 using AGooday.AgPay.Components.Third.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
-using Newtonsoft.Json;
 using SKIT.FlurlHttpClient.Wechat.TenpayV2;
 using SKIT.FlurlHttpClient.Wechat.TenpayV2.Models;
 
@@ -32,15 +32,15 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWay
         public override async Task<AbstractRS> PayAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
             WxBarOrderRQ bizRQ = (WxBarOrderRQ)rq;
-            var wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext);
+            var wxServiceWrapper = await _configContextQueryService.GetWxServiceWrapperAsync(mchAppConfigContext, CS.PAY_IF_VERSION.WX_V2);
 
             // 微信统一下单请求对象
             var request = new CreatePayMicroPayRequest()
             {
                 OutTradeNumber = payOrder.PayOrderId,// 商户订单号
                 AppId = wxServiceWrapper.Config.AppId,// 微信 AppId
-                Body = payOrder.Subject,// 订单详情,
-                Detail = JsonConvert.DeserializeObject<CreatePayMicroPayRequest.Types.Detail>(payOrder.Body),
+                Body = payOrder.Body,// 订单详情,
+                //Detail = JsonConvert.DeserializeObject<CreatePayMicroPayRequest.Types.Detail>(payOrder.Body),
                 FeeType = "CNY",
                 TotalFee = Convert.ToInt32(payOrder.Amount),
                 ClientIp = payOrder.ClientIp,

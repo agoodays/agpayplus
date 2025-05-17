@@ -261,9 +261,9 @@ namespace AGooday.AgPay.Components.Third.Services
             }
         }
 
-        public async Task<WxServiceWrapper> GetWxServiceWrapperAsync(MchAppConfigContext mchAppConfigContext)
+        public async Task<WxServiceWrapper> GetWxServiceWrapperAsync(MchAppConfigContext mchAppConfigContext, string apiVersion = null)
         {
-            if (IsCache())
+            if (IsCache() && apiVersion == null)
             {
                 return (await _configContextService.GetMchAppConfigContextAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId)).GetWxServiceWrapper();
             }
@@ -271,12 +271,12 @@ namespace AGooday.AgPay.Components.Third.Services
             if (mchAppConfigContext.IsIsvSubMch())
             {
                 WxPayIsvParams wxParams = (WxPayIsvParams)await QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, CS.IF_CODE.WXPAY);
-                return WxServiceWrapper.BuildWxServiceWrapper(wxParams);
+                return WxServiceWrapper.BuildWxServiceWrapper(wxParams, apiVersion);
             }
             else
             {
                 WxPayNormalMchParams wxParams = (WxPayNormalMchParams)await QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
-                return WxServiceWrapper.BuildWxServiceWrapper(wxParams);
+                return WxServiceWrapper.BuildWxServiceWrapper(wxParams, apiVersion);
             }
         }
 

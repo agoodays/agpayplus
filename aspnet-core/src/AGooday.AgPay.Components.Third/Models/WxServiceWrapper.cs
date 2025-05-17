@@ -93,19 +93,19 @@ namespace AGooday.AgPay.Components.Third.Models
             return new WxServiceWrapper(client, config);
         }
 
-        public static WxServiceWrapper BuildWxServiceWrapper(WxPayIsvParams wxpayParams)
+        public static WxServiceWrapper BuildWxServiceWrapper(WxPayIsvParams wxpayParams, string apiVersion = null)
         {
             //放置 wxPayService
             return BuildWxServiceWrapper(wxpayParams.MchId, wxpayParams.AppId,
-                    wxpayParams.AppSecret, wxpayParams.Key, wxpayParams.ApiVersion, wxpayParams.ApiV3Key,
+                    wxpayParams.AppSecret, wxpayParams.Key, apiVersion ?? wxpayParams.ApiVersion, wxpayParams.ApiV3Key,
                     wxpayParams.SerialNo, wxpayParams.Cert, wxpayParams.ApiClientKey);
         }
 
-        public static WxServiceWrapper BuildWxServiceWrapper(WxPayNormalMchParams wxpayParams)
+        public static WxServiceWrapper BuildWxServiceWrapper(WxPayNormalMchParams wxpayParams, string apiVersion = null)
         {
             //放置 wxPayService
             return BuildWxServiceWrapper(wxpayParams.MchId, wxpayParams.AppId,
-                    wxpayParams.AppSecret, wxpayParams.Key, wxpayParams.ApiVersion, wxpayParams.ApiV3Key,
+                    wxpayParams.AppSecret, wxpayParams.Key, apiVersion ?? wxpayParams.ApiVersion, wxpayParams.ApiV3Key,
                     wxpayParams.SerialNo, wxpayParams.Cert, wxpayParams.ApiClientKey);
         }
 
