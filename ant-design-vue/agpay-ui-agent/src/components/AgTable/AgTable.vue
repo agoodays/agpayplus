@@ -65,7 +65,7 @@
           <!--<a-menu slot="overlay">
             <a-checkbox-group v-model="visibleColumns">
               <a-menu-item v-for="column in allColumns" :key="column.key">
-                <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title }}</a-checkbox>
+                <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title || column.scopedSlots.titleValue }}</a-checkbox>
               </a-menu-item>
             </a-checkbox-group>
           </a-menu>-->
@@ -73,7 +73,7 @@
             <a-menu class="ant-pro-drop-down menu">
               <a-checkbox-group v-model="visibleColumns">
                 <a-menu-item v-for="column in allColumns" :key="column.key">
-                  <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title }}</a-checkbox>
+                  <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title || column.scopedSlots.titleValue }}</a-checkbox>
                 </a-menu-item>
               </a-checkbox-group>
             </a-menu>
