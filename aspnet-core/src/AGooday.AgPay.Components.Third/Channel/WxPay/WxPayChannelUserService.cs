@@ -37,9 +37,9 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             return CS.IF_CODE.WXPAY;
         }
 
-        public async Task<string> BuildUserRedirectUrlAsync(string callbackUrlEncode, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
+        public async Task<string> BuildUserRedirectUrlAsync(string callbackUrlEncode, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
-            var (appId, _, oauth2Url) = await GetOauth2ParamsAsync(oauth2InfoId, wayCode, mchAppConfigContext);
+            var (appId, _, oauth2Url) = await this.GetOauth2ParamsAsync(wayCode, mchAppConfigContext);
 
             if (string.IsNullOrEmpty(oauth2Url))
             {
@@ -51,12 +51,12 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             return wxUserRedirectUrl;
         }
 
-        public async Task<string> GetChannelUserIdAsync(JObject reqParams, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
+        public async Task<string> GetChannelUserIdAsync(JObject reqParams, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
                 string code = reqParams.GetValue("code").ToString();
-                var (appId, appSecret, _) = await GetOauth2ParamsAsync(oauth2InfoId, wayCode, mchAppConfigContext);
+                var (appId, appSecret, _) = await this.GetOauth2ParamsAsync(wayCode, mchAppConfigContext);
                 var options = new WechatApiClientOptions()
                 {
                     AppId = appId,
@@ -74,11 +74,14 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
             }
         }
 
-        public async Task<(string appId, string appSecret, string oauth2Url)> GetOauth2ParamsAsync(string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
+        private async Task<(string appId, string appSecret, string oauth2Url)> GetOauth2ParamsAsync(string wayCode, MchAppConfigContext mchAppConfigContext)
         {
             string appId, appSecret, oauth2Url;
             if (mchAppConfigContext.IsIsvSubMch())
             {
+                var payInterfaceConfig = await _configContextQueryService.QueryIsvPayIfConfigAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                var oauth2InfoId = payInterfaceConfig?.Oauth2InfoId;
+
                 var isvOauth2Params = (WxPayIsvOauth2Params)await _configContextQueryService.QueryIsvOauth2ParamsAsync(mchAppConfigContext.MchInfo.IsvNo, oauth2InfoId, GetIfCode());
                 if (isvOauth2Params == null)
                 {

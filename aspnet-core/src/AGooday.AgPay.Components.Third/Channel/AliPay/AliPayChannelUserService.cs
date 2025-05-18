@@ -33,13 +33,15 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             return CS.IF_CODE.ALIPAY;
         }
 
-        public async Task<string> BuildUserRedirectUrlAsync(string callbackUrlEncode, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
+        public async Task<string> BuildUserRedirectUrlAsync(string callbackUrlEncode, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
             string appId;
             byte? sandbox;
 
             if (mchAppConfigContext.IsIsvSubMch())
             {
+                var oauth2InfoId = await this.GetOauth2InfoIdAsync(mchAppConfigContext);
+
                 var isvOauth2Params = (AliPayIsvOauth2Params)await _configContextQueryService.QueryIsvOauth2ParamsAsync(mchAppConfigContext.MchInfo.IsvNo, oauth2InfoId, GetIfCode());
                 if (isvOauth2Params == null)
                 {
@@ -86,7 +88,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
             return alipayUserRedirectUrl;
         }
 
-        public async Task<string> GetChannelUserIdAsync(JObject reqParams, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext)
+        public async Task<string> GetChannelUserIdAsync(JObject reqParams, string wayCode, MchAppConfigContext mchAppConfigContext)
         {
             try
             {
@@ -94,6 +96,8 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
 
                 if (mchAppConfigContext.IsIsvSubMch())
                 {
+                    var oauth2InfoId = await this.GetOauth2InfoIdAsync(mchAppConfigContext);
+
                     var isvOauth2Params = (AliPayIsvOauth2Params)await _configContextQueryService.QueryIsvOauth2ParamsAsync(mchAppConfigContext.MchInfo.IsvNo, oauth2InfoId, GetIfCode());
 
                     if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_LITE))
@@ -112,7 +116,6 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                     {
                         alipayClientWrapper = AliPayClientWrapper.BuildAlipayClientWrapper(isvOauth2Params);
                     }
-
                 }
                 else
                 {
@@ -139,6 +142,18 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
                 _logger.LogError(e, e.Message);
                 return null;
             }
+        }
+
+        private async Task<string> GetOauth2InfoIdAsync(MchAppConfigContext mchAppConfigContext)
+        {
+            string oauth2InfoId = null;
+            if (mchAppConfigContext.IsIsvSubMch())
+            {
+                var payInterfaceConfig = await _configContextQueryService.QueryIsvPayIfConfigAsync(mchAppConfigContext.MchInfo.IsvNo, GetIfCode());
+                oauth2InfoId = payInterfaceConfig?.Oauth2InfoId;
+            }
+
+            return oauth2InfoId;
         }
     }
 }

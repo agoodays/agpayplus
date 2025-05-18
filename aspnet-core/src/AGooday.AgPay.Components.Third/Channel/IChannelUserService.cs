@@ -20,7 +20,7 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="callbackUrlEncode"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        Task<string> BuildUserRedirectUrlAsync(string callbackUrlEncode, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext);
+        Task<string> BuildUserRedirectUrlAsync(string callbackUrlEncode, string wayCode, MchAppConfigContext mchAppConfigContext);
 
         /// <summary>
         /// 获取渠道用户ID
@@ -28,6 +28,6 @@ namespace AGooday.AgPay.Components.Third.Channel
         /// <param name="reqParams"></param>
         /// <param name="mchAppConfigContext"></param>
         /// <returns></returns>
-        Task<string> GetChannelUserIdAsync(JObject reqParams, string oauth2InfoId, string wayCode, MchAppConfigContext mchAppConfigContext);
+        Task<string> GetChannelUserIdAsync(JObject reqParams, string wayCode, MchAppConfigContext mchAppConfigContext);
     }
 }

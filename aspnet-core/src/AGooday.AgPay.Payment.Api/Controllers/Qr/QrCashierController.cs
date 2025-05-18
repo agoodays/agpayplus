@@ -71,14 +71,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             MchAppConfigContext mchAppConfigContext = await this.CommonQueryInfoMchAppConfigContextAsync();
 
             string wayCode = this.GetWayCode();
-            string oauth2InfoId = await this.GetOauth2InfoIdAsync(mchAppConfigContext, wayCode);
             //获取接口并返回数据
             IChannelUserService channelUserService = this.GetServiceByWayCode(wayCode);
-            if (channelUserService == null)
-            {
-                throw new BizException("无此支付通道接口");
-            }
-            return ApiRes.Ok(await channelUserService.BuildUserRedirectUrlAsync(redirectUrlEncode, oauth2InfoId, wayCode, mchAppConfigContext));
+            return ApiRes.Ok(await channelUserService.BuildUserRedirectUrlAsync(redirectUrlEncode, wayCode, mchAppConfigContext));
         }
 
         /// <summary>
@@ -108,9 +103,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = await this.CommonQueryInfoMchAppConfigContextAsync();
-            string oauth2InfoId = await this.GetOauth2InfoIdAsync(mchAppConfigContext, wayCode);
             IChannelUserService channelUserService = this.GetServiceByWayCode(wayCode);
-            return ApiRes.Ok(await channelUserService.GetChannelUserIdAsync(this.GetReqParamJson(), oauth2InfoId, wayCode, mchAppConfigContext));
+            return ApiRes.Ok(await channelUserService.GetChannelUserIdAsync(this.GetReqParamJson(), wayCode, mchAppConfigContext));
         }
 
         /// <summary>
@@ -284,25 +278,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             {
                 return _channelUserServiceFactory.GetService(CS.IF_CODE.WXPAY);
             }
-            return null;
-        }
-
-        private async Task<string> GetOauth2InfoIdAsync(MchAppConfigContext mchAppConfigContext, string wayCode)
-        {
-            // 根据支付方式， 查询出 该商户 可用的支付接口
-            var mchPayPassage = await _mchPayPassageService.FindMchPayPassageAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, wayCode);
-            if (mchPayPassage == null)
+            else
             {
-                throw new BizException("商户应用不支持该支付方式");
+                throw new BizException("无此支付通道接口");
             }
-            string oauth2InfoId = null;
-            if (mchAppConfigContext.IsIsvSubMch())
-            {
-                var payInterfaceConfig = await _configContextQueryService.QueryIsvPayIfConfigAsync(mchAppConfigContext.MchInfo.IsvNo, mchPayPassage.IfCode);
-                oauth2InfoId = payInterfaceConfig?.Oauth2InfoId;
-            }
-
-            return oauth2InfoId;
         }
 
         private (byte type, string id) TokenConvert()
