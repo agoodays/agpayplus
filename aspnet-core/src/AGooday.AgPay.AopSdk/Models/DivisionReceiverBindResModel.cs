@@ -22,7 +22,7 @@ namespace AGooday.AgPay.AopSdk.Models
         /// <summary>
         /// 组ID（便于商户接口使用）
         /// </summary>
-        [JsonProperty("receiverId")]
+        [JsonProperty("receiverGroupId")]
         public long ReceiverGroupId { get; set; }
 
         /// <summary>
