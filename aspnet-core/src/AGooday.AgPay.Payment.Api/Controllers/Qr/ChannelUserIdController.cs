@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 throw new BizException("不支持的客户端");
             }
 
-            if (StringUtil.IsAvailableUrl(rq.RedirectUrl))
+            if (!StringUtil.IsAvailableUrl(rq.RedirectUrl))
             {
                 throw new BizException("跳转地址有误！");
             }
