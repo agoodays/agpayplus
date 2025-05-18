@@ -104,7 +104,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = await this.CommonQueryInfoMchAppConfigContextAsync();
             IChannelUserService channelUserService = this.GetServiceByWayCode(wayCode);
-            return ApiRes.Ok(await channelUserService.GetChannelUserIdAsync(this.GetReqParamJson(), wayCode, mchAppConfigContext));
+            var param = await this.GetReqParamToJsonAsync();
+            return ApiRes.Ok(await channelUserService.GetChannelUserIdAsync(param, wayCode, mchAppConfigContext));
         }
 
         /// <summary>

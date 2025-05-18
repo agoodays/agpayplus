@@ -116,7 +116,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
 
             //获取渠道用户ID
-            string channelUserId = await channelUserService.GetChannelUserIdAsync(this.GetReqParamJson(), wayCode, mchAppConfigContext);
+            var param = await this.GetReqParamToJsonAsync();
+            string channelUserId = await channelUserService.GetChannelUserIdAsync(param, wayCode, mchAppConfigContext);
 
             //同步跳转
             JObject appendParams = new JObject();
