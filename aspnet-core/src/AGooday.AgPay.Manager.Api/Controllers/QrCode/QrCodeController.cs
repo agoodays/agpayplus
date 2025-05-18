@@ -206,7 +206,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             var qrCode = await _qrCodeService.GetByIdAsync(recordId);
             byte[] inArray;
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
-            string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, qrCode.QrcId));
+            string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GenTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, qrCode.QrcId));
             if (qrCode.QrcShellId.HasValue)
             {
                 var qrCodeShell = await _qrCodeShellService.GetByIdAsync(qrCode.QrcShellId.Value);

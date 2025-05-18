@@ -122,6 +122,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     bizRQ.ChannelExtra = payOrder.ChannelExtra;
                     bizRQ.ExtParam = payOrder.ExtParam;
                     bizRQ.DivisionMode = payOrder.DivisionMode;
+                    bizRQ.SignType = "MD5"; // 设置默认签名方式为MD5
                 }
 
                 string mchNo = bizRQ.MchNo;
@@ -166,7 +167,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
                     DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
 
-                    string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID, payOrderId));
+                    string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GenTokenData(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID, payOrderId));
                     if (CS.PAY_DATA_TYPE.CODE_IMG_URL.Equals(qrCashierOrderRQ.PayDataType))
                     {
                         //二维码地址
