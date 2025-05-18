@@ -88,6 +88,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             UnifiedOrderRS bizRS = null;
 
             //是否新订单模式 [  一般接口都为新订单模式，  由于QR_CASHIER支付方式，需要先 在DB插入一个新订单， 导致此处需要特殊判断下。 如果已存在则直接更新，否则为插入。  ]
+            payOrder = !string.IsNullOrWhiteSpace(payOrder?.PayOrderId) ? payOrder : null;
             bool isNewOrder = payOrder == null;
 
             try
