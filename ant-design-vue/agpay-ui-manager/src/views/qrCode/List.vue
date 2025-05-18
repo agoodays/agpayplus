@@ -55,7 +55,7 @@
           <AgTableColState :state="record.state" :showSwitchType="$access('ENT_DEVICE_QRC_EDIT')" :onChange="(state) => { return updateState(record.qrcId, state)}"/>
         </template>
         <template slot="fixedPayAmountSlot" slot-scope="{record}">
-          <span>{{ record.fixedFlag === 0 ? '任意金额': record.fixedPayAmount }}</span>
+          <span>{{ record.fixedFlag === 0 ? '任意金额': (record.fixedPayAmount / 100).toFixed(2) }}</span>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>

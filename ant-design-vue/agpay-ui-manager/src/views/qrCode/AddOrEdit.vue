@@ -184,7 +184,7 @@ export default {
       }
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.recordId = recordId
-        req.getById(API_URL_QRC_LIST, recordId).then(res => { that.saveObject = res })
+        req.getById(API_URL_QRC_LIST, recordId).then(res => { that.saveObject = { ...res, fixedPayAmount: (res.fixedPayAmount / 100).toFixed(2) } })
         this.visible = true
       } else {
         that.visible = true // 立马展示弹层信息
@@ -206,15 +206,15 @@ export default {
         this.$refs.infoFormModel.validate(valid => {
           if (valid) { // 验证通过
             // 请求接口
-
+            const params = { ...that.saveObject, fixedPayAmount: (that.saveObject.fixedPayAmount || 0) * 100 }
             if (that.isAdd) {
-              req.add(API_URL_QRC_LIST, that.saveObject).then(res => {
+              req.add(API_URL_QRC_LIST, params).then(res => {
                 that.$message.success('新增成功')
                 that.visible = false
                 that.callbackFunc() // 刷新列表
               })
             } else {
-              req.updateById(API_URL_QRC_LIST, that.recordId, that.saveObject).then(res => {
+              req.updateById(API_URL_QRC_LIST, that.recordId, params).then(res => {
                 that.$message.success('修改成功')
                 that.visible = false
                 that.callbackFunc() // 刷新列表
