@@ -4,6 +4,8 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Components.Third.Utils;
 using SKIT.FlurlHttpClient;
+using SKIT.FlurlHttpClient.Wechat.TenpayV3;
+using SKIT.FlurlHttpClient.Wechat.TenpayV3.Models;
 using SKIT.FlurlHttpClient.Wechat.TenpayV3.Settings;
 
 namespace AGooday.AgPay.Components.Third.Models
@@ -78,7 +80,8 @@ namespace AGooday.AgPay.Components.Third.Models
                     MerchantV3Secret = apiV3Key,// 微信商户 v3 API 密钥
                     MerchantCertificateSerialNumber = serialNo,// 微信商户证书序列号
                     MerchantCertificatePrivateKey = merchantCertificatePrivateKey,// -----BEGIN PRIVATE KEY-----微信商户证书私钥，即 `apiclient_key.pem` 文件内容-----END PRIVATE KEY-----
-                    PlatformCertificateManager = manager // 证书管理器的具体用法请参阅下文的高级技巧与加密、验签有关的章节
+                    PlatformCertificateManager = manager, // 证书管理器的具体用法请参阅下文的高级技巧与加密、验签有关的章节
+                    AutoDecryptResponseSensitiveProperty = true // 自动解密
                 };
                 config.ApiClientKey = apiClientKey;
                 config.MchPrivateKey = merchantCertificatePrivateKey;
@@ -107,6 +110,20 @@ namespace AGooday.AgPay.Components.Third.Models
             return BuildWxServiceWrapper(wxpayParams.MchId, wxpayParams.AppId,
                     wxpayParams.AppSecret, wxpayParams.Key, apiVersion ?? wxpayParams.ApiVersion, wxpayParams.ApiV3Key,
                     wxpayParams.SerialNo, wxpayParams.Cert, wxpayParams.ApiClientKey);
+        }
+
+        public static async Task InitializeCertificateManagerAsync(WechatTenpayClientV3 client)
+        {
+            var request = new QueryCertificatesRequest() { AlgorithmType = "ALL" };
+            var response = await client.ExecuteQueryCertificatesAsync(request);
+
+            if (!response.IsSuccessful())
+                throw new Exception();
+            //response = client.DecryptResponseSensitiveProperty(response);// 解密
+            foreach (var certificate in response.CertificateList)
+            {
+                client.PlatformCertificateManager.AddEntry(CertificateEntry.Parse(certificate));
+            }
         }
 
         public class WxPayConfig

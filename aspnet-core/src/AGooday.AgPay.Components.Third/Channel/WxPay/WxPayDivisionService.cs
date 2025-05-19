@@ -54,6 +54,9 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                 }
                 else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))
                 {
+                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    await WxServiceWrapper.InitializeCertificateManagerAsync(client);
+
                     AddProfitSharingReceiverRequest request = new AddProfitSharingReceiverRequest();
 
                     request.AppId = wxServiceWrapper.Config.AppId;
@@ -74,8 +77,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                         request.SubMerchantId = isvsubMchParams.SubMchId;
                         request.SubAppId = isvsubMchParams.SubMchAppId;
                     }
-
-                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    client.EncryptRequestSensitiveProperty(request);
                     var response = await client.ExecuteAddProfitSharingReceiverAsync(request);
                     if (response.IsSuccessful())
                     {
@@ -119,6 +121,9 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                 }
                 else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))
                 {
+                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    await WxServiceWrapper.InitializeCertificateManagerAsync(client);
+
                     CreateProfitSharingOrderRequest request = new CreateProfitSharingOrderRequest();
                     request.AppId = wxServiceWrapper.Config.AppId;
                     request.TransactionId = payOrder.ChannelOrderNo;
@@ -163,7 +168,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     {
                         return await DivisionFinishAsync(payOrder, mchAppConfigContext);
                     }
-                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    client.EncryptRequestSensitiveProperty(request);
                     var response = await client.ExecuteCreateProfitSharingOrderAsync(request);
                     if (response.IsSuccessful())
                     {
