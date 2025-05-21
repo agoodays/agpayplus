@@ -11,7 +11,7 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <a-form-item label="" class="table-head-layout">
-            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
           </a-form-item>
           <a-form-item label="" class="table-head-layout">
             <a-select v-model="orderNoType" @change="orderNoTypeChange">
@@ -28,7 +28,16 @@
           <ag-text-up v-show="orderNoType==='channelOrderNo'" :placeholder="'渠道订单号'" :msg="searchData.channelOrderNo" v-model="searchData.channelOrderNo" />
           <ag-text-up v-show="orderNoType==='platformOrderNo'" :placeholder="'用户支付凭证交易单号'" :msg="searchData.platformOrderNo" v-model="searchData.platformOrderNo" />
           <ag-text-up v-show="orderNoType==='platformMchOrderNo'" :placeholder="'用户支付凭证商户单号'" :msg="searchData.platformMchOrderNo" v-model="searchData.platformMchOrderNo" />
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'门店ID'" :msg="searchData.storeId" v-model="searchData.storeId"/>
           <ag-text-up v-if="isShowMore" :placeholder="'门店名称'" :msg="searchData.storeName" v-model="searchData.storeName"/>
           <ag-text-up v-if="isShowMore" :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
@@ -645,8 +654,9 @@ import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_PAY_ORDER_LIST, API_URL_PAYWAYS_LIST, API_URL_IFDEFINES_LIST, req } from '@/api/manage'
+import { API_URL_PAY_ORDER_LIST, API_URL_PAYWAYS_LIST, API_URL_IFDEFINES_LIST, API_URL_MCH_LIST, req } from '@/api/manage'
 import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
@@ -670,7 +680,7 @@ const tableColumns = [
 
 export default {
   name: 'PayOrderList',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, RefundModal },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, AgDateRangePicker, AgTextUp, RefundModal },
   data () {
     return {
       isShowMore: false,
@@ -698,6 +708,10 @@ export default {
     this.initIfDefineList()
   },
   methods: {
+    searchMch (keyword) {
+      // 返回 Promise，数据格式为 [{ mchNo: 'xxx', mchName: 'xxx' }, ...]
+      return req.list(API_URL_MCH_LIST, { mchName: keyword, pageSize: 20 }).then(res => res.records || [])
+    },
     handleSearchFormData (searchData) {
       this.searchData = searchData
       // if (!Object.keys(searchData).length) {

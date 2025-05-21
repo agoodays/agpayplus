@@ -11,7 +11,7 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <a-form-item label="" class="table-head-layout">
-            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
           <ag-text-up :placeholder="'通道代码'" :msg="searchData.ifCode" v-model="searchData.ifCode" />
           <ag-text-up :placeholder="'通道名称'" :msg="searchData.ifName" v-model="searchData.ifName" />

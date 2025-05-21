@@ -11,13 +11,22 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <a-form-item label="" class="table-head-layout">
-            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
+            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
           </a-form-item>
           <ag-text-up :placeholder="'退款/支付/渠道/商户退款订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
           <!--<ag-text-up :placeholder="'退款订单号'" :msg="searchData.refundOrderId" v-model="searchData.refundOrderId" />-->
           <!--<ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->
           <!--<ag-text-up :placeholder="'渠道支付订单号'" :msg="searchData.channelPayOrderNo" v-model="searchData.channelPayOrderNo" />-->
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
           <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
           <a-form-item v-if="isShowMore" label="" class="table-head-layout">
@@ -388,10 +397,11 @@
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_REFUND_ORDER_LIST, API_URL_IFDEFINES_LIST, req } from '@/api/manage'
+import { API_URL_REFUND_ORDER_LIST, API_URL_IFDEFINES_LIST, API_URL_MCH_LIST, req } from '@/api/manage'
 import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
@@ -411,7 +421,7 @@ const tableColumns = [
 
 export default {
   name: 'RefundOrderList',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, AgDateRangePicker, AgTextUp },
   data () {
     return {
       isShowMore: false,
@@ -442,6 +452,10 @@ export default {
     this.initIfDefineList()
   },
   methods: {
+    searchMch (keyword) {
+      // 返回 Promise，数据格式为 [{ mchNo: 'xxx', mchName: 'xxx' }, ...]
+      return req.list(API_URL_MCH_LIST, { mchName: keyword, pageSize: 20 }).then(res => res.records || [])
+    },
     handleSearchFormData (searchData) {
       this.searchData = searchData
     },

@@ -11,13 +11,22 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <a-form-item label="" class="table-head-layout">
-            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
+            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
           </a-form-item>
           <ag-text-up :placeholder="'转账/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
           <!--<ag-text-up :placeholder="'转账订单号'" :msg="searchData.transferId" v-model="searchData.transferId" />-->
           <!--<ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />-->
           <!--<ag-text-up :placeholder="'渠道支付订单号'" :msg="searchData.channelOrderNo" v-model="searchData.channelOrderNo" />-->
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
           <a-form-item label="" class="table-head-layout">
             <a-select v-model="searchData.state" placeholder="转账状态" default-value="">
@@ -129,11 +138,12 @@
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import TransferOrderDetail from './TransferOrderDetail'
-import { API_URL_TRANSFER_ORDER_LIST, req } from '@/api/manage'
+import { API_URL_TRANSFER_ORDER_LIST, API_URL_MCH_LIST, req } from '@/api/manage'
 import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
@@ -152,7 +162,7 @@ const tableColumns = [
 
 export default {
   name: 'TransferOrderList',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, TransferOrderDetail },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, AgDateRangePicker, AgTextUp, TransferOrderDetail },
   data () {
     return {
       isShowMore: false,
@@ -164,6 +174,10 @@ export default {
     }
   },
   methods: {
+    searchMch (keyword) {
+      // 返回 Promise，数据格式为 [{ mchNo: 'xxx', mchName: 'xxx' }, ...]
+      return req.list(API_URL_MCH_LIST, { mchName: keyword, pageSize: 20 }).then(res => res.records || [])
+    },
     handleSearchFormData (searchData) {
       this.searchData = searchData
     },

@@ -10,7 +10,7 @@
       @query-func="queryFunc">
       <template slot="formItem">
         <a-form-item label="" class="table-head-layout">
-          <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+          <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
         </a-form-item>
         <ag-text-up :placeholder="'门店编码'" :msg="searchData.storeId" v-model="searchData.storeId" />
         <ag-text-up :placeholder="'门店名称'" :msg="searchData.storeName" v-model="searchData.storeName" />
