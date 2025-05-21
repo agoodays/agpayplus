@@ -4,7 +4,16 @@
       <div v-if="$access('ENT_DIVISION_RECEIVER_GROUP_LIST')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+            <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
+            <a-form-item label="" class="table-head-layout">
+              <ag-select
+                v-model="searchData.mchNo"
+                :api="searchMch"
+                valueField="mchNo"
+                labelField="mchName"
+                placeholder="商户号（搜索商户名称）"
+              />
+            </a-form-item>
             <ag-text-up :placeholder="'组ID'" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
             <ag-text-up :placeholder="'组名称'" :msg="searchData.receiverGroupName" v-model="searchData.receiverGroupName" />
             <a-form-item label="" class="table-head-layout">
@@ -51,8 +60,9 @@
 </template>
 <script>
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_DIVISION_RECEIVER_GROUP, req } from '@/api/manage'
+import { API_URL_DIVISION_RECEIVER_GROUP, API_URL_MCH_LIST, req } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 
@@ -70,7 +80,7 @@ const tableColumns = [
 
 export default {
   name: 'RolePage',
-  components: { AgTable, AgTableColumns, InfoAddOrEdit, AgTextUp },
+  components: { AgTable, AgTableColumns, AgSelect, InfoAddOrEdit, AgTextUp },
   data () {
     return {
       tableColumns: tableColumns,
@@ -81,6 +91,10 @@ export default {
   mounted () {
   },
   methods: {
+    searchMch (keyword) {
+      // 返回 Promise，数据格式为 [{ mchNo: 'xxx', mchName: 'xxx' }, ...]
+      return req.list(API_URL_MCH_LIST, { mchName: keyword, pageSize: 20 }).then(res => res.records || [])
+    },
 
     // 请求table接口数据
     reqTableDataFunc: (params) => {

@@ -5,9 +5,18 @@
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
             <a-form-item label="" class="table-head-layout">
-              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+              <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
             </a-form-item>
-            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+            <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
+            <a-form-item label="" class="table-head-layout">
+              <ag-select
+                v-model="searchData.mchNo"
+                :api="searchMch"
+                valueField="mchNo"
+                labelField="mchName"
+                placeholder="商户号（搜索商户名称）"
+              />
+            </a-form-item>
             <ag-text-up placeholder="应用AppId" :msg="searchData.appId" v-model="searchData.appId"/>
             <ag-text-up placeholder="支付订单号" :msg="searchData.payOrderId" v-model="searchData.payOrderId"/>
             <ag-text-up placeholder="分账接受者ID" :msg="searchData.receiverId" v-model="searchData.receiverId" />
@@ -91,8 +100,9 @@
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_PAY_ORDER_DIVISION_RECORD_LIST, API_URL_IFDEFINES_LIST, req, resendDivision } from '@/api/manage'
+import { API_URL_PAY_ORDER_DIVISION_RECORD_LIST, API_URL_IFDEFINES_LIST, API_URL_MCH_LIST, req, resendDivision } from '@/api/manage'
 import moment from 'moment'
 import Detail from './Detail'
 
@@ -115,7 +125,7 @@ const tableColumns = [
 ]
 
 export default {
-  components: { AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, Detail },
+  components: { AgTable, AgTableColumns, AgSelect, AgDateRangePicker, AgTextUp, Detail },
   data () {
     return {
       btnLoading: false,
@@ -134,6 +144,10 @@ export default {
     this.reqIfDefineListFunc()
   },
   methods: {
+    searchMch (keyword) {
+      // 返回 Promise，数据格式为 [{ mchNo: 'xxx', mchName: 'xxx' }, ...]
+      return req.list(API_URL_MCH_LIST, { mchName: keyword, pageSize: 20 }).then(res => res.records || [])
+    },
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)
