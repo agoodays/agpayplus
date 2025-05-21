@@ -123,7 +123,7 @@ export default {
           const that = this
           // 退款接口
           const refundPassword = Base64.encode(that.refund.refundPassword)
-          payOrderRefund(that.recordId, that.refund.refundAmount, that.refund.refundReason, refundPassword).then(res => {
+          payOrderRefund(that.recordId, that.refund.refundAmount * 100, that.refund.refundReason, refundPassword).then(res => {
               that.visible = false // 关闭弹窗
               that.confirmLoading = false // 取消按钮转圈
 

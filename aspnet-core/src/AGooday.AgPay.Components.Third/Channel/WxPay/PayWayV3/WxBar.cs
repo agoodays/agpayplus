@@ -20,7 +20,11 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.PayWayV3
             ConfigContextQueryService configContextQueryService)
             : base(logger, serviceProvider, sysConfigService, configContextQueryService)
         {
-            _paymentService = serviceProvider.GetService<PayWay.WxBar>(); //serviceProvider.GetServices<IPaymentService>().FirstOrDefault(f => f.GetType().Equals(typeof(PayWay.WxBar)));
+            //_paymentService = serviceProvider.GetServices<IPaymentService>().FirstOrDefault(f => f.GetType().Equals(typeof(PayWay.WxBar)));
+            //_paymentService = serviceProvider.GetRequiredService<PayWay.WxBar>();
+            //_paymentService = ActivatorUtilities.CreateInstance<PayWay.WxBar>(serviceProvider);
+
+            _paymentService = serviceProvider.GetRequiredKeyedService<IPaymentService>(typeof(PayWay.WxBar).FullName.ToLower());
         }
 
         public override Task<string> PreCheckAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)

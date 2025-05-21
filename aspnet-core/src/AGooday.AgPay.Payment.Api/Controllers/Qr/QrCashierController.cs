@@ -7,7 +7,6 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Components.Third.Channel;
-using AGooday.AgPay.Components.Third.Channel.WxPay;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.PayOrder;
 using AGooday.AgPay.Components.Third.RQRS.PayOrder.PayWay;
@@ -61,27 +60,20 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         [HttpPost, Route("redirectUrl")]
         public async Task<ApiRes> RedirectUrlAsync()
         {
-            (byte type, string id) = this.GetTokenData();
-            (string mchNo, string appId) = await this.GetMchNoAndAppIdAsync(type, id);
-
+            var token = this.GetToken();
             //回调地址
-            string redirectUrlEncode = _sysConfigService.GetDBApplicationConfig().GenOauth2RedirectUrlEncode(CS.GetTokenData(type, id));
+            string redirectUrlEncode = _sysConfigService.GetDBApplicationConfig().GenOauth2RedirectUrlEncode(token);
 #if DEBUG
             return ApiRes.Ok(URLUtil.DecodeAll(redirectUrlEncode));
 #endif
 
             //获取商户配置信息
-            MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
+            MchAppConfigContext mchAppConfigContext = await this.CommonQueryInfoMchAppConfigContextAsync();
 
             string wayCode = this.GetWayCode();
-            string oauth2InfoId = await this.GetOauth2InfoIdAsync(mchAppConfigContext, wayCode);
             //获取接口并返回数据
             IChannelUserService channelUserService = this.GetServiceByWayCode(wayCode);
-            if (channelUserService == null)
-            {
-                throw new BizException("无此支付通道接口");
-            }
-            return ApiRes.Ok(await channelUserService.BuildUserRedirectUrlAsync(redirectUrlEncode, oauth2InfoId, wayCode, mchAppConfigContext));
+            return ApiRes.Ok(await channelUserService.BuildUserRedirectUrlAsync(redirectUrlEncode, wayCode, mchAppConfigContext));
         }
 
         /// <summary>
@@ -91,15 +83,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         [HttpPost, Route("channelUserId")]
         public async Task<ApiRes> ChannelUserIdAsync()
         {
-            (byte type, string id) = this.GetTokenData();
-            (string mchNo, string appId) = await this.GetMchNoAndAppIdAsync(type, id);
-
             string wayCode = this.GetWayCode();
-
-            //获取商户配置信息
-            MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
-            string oauth2InfoId = await this.GetOauth2InfoIdAsync(mchAppConfigContext, wayCode);
-            IChannelUserService channelUserService = this.GetServiceByWayCode(wayCode);
 #if DEBUG
             string channelUserId;
             switch (wayCode)
@@ -116,7 +100,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             }
             return ApiRes.Ok(channelUserId);
 #endif
-            return ApiRes.Ok(await channelUserService.GetChannelUserIdAsync(this.GetReqParamJson(), oauth2InfoId, wayCode, mchAppConfigContext));
+
+            //获取商户配置信息
+            MchAppConfigContext mchAppConfigContext = await this.CommonQueryInfoMchAppConfigContextAsync();
+            IChannelUserService channelUserService = this.GetServiceByWayCode(wayCode);
+            var param = await this.GetReqParamToJsonAsync();
+            return ApiRes.Ok(await channelUserService.GetChannelUserIdAsync(param, wayCode, mchAppConfigContext));
         }
 
         /// <summary>
@@ -126,7 +115,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         [HttpPost, Route("payOrderInfo")]
         public async Task<ApiRes> PayOrderInfoAsync()
         {
-            (byte type, string id) = this.GetTokenData();
+            (byte type, string id) = TokenConvert();
+
             PayOrderInfo resOrder = new PayOrderInfo();
             if (type.Equals(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID))
             {
@@ -160,62 +150,19 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         [HttpPost, Route("pay")]
         public async Task<ApiRes> PayAsync()
         {
-            ApiRes apiRes;
-            UnifiedOrderRQ rq = null;
-            PayOrderDto payOrder = null;
-            (byte type, string id) = this.GetTokenData();
+            //查询订单
+            PayOrderDto payOrder = await this.CommonQueryPayOrderAsync();
+
             string wayCode = this.GetWayCode();
-            if (type.Equals(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID))
-            {
-                //查询订单
-                payOrder = await this.GetPayOrderAsync(id);
-                payOrder.WayCode = wayCode;
-            }
-            else if (type.Equals(CS.TOKEN_DATA_TYPE.QRC_ID))
-            {
-                var qrCode = await this.GetQrCodeAsync(id);
 
-                string amount = this.GetReqParamJson().GetValue("amount").ToString();
-                this.GetReqParamJson().TryGetString("buyerRemark", out string buyerRemark);
-                rq = new UnifiedOrderRQ();
-                rq.MchNo = qrCode.MchNo; // 商户号
-                rq.AppId = qrCode.AppId;
-                rq.StoreId = qrCode.StoreId;
-                rq.MchOrderNo = SeqUtil.GenMhoOrderId();
-                rq.WayCode = wayCode;
-                rq.Amount = AmountUtil.ConvertDollar2Cent(amount);
-                rq.Currency = "CNY";
-                rq.ClientIp = IpUtil.GetIP(Request);
-                rq.Subject = $"静态码支付";
-                rq.Body = $"静态码支付";
-                rq.BuyerRemark = buyerRemark;
-            }
-            else
-            {
-                return ApiRes.CustomFail("参数错误");
-            }
-
-            var mchNo = rq?.MchNo ?? payOrder?.MchNo;
-            var appId = rq?.AppId ?? payOrder?.AppId;
-            MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
-
-            if (rq != null)
-            {
-                rq.Version = "1.0";
-                rq.SignType = "MD5";
-                rq.ReqTime = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
-                var jsonObject = JObject.FromObject(rq);
-                string sign = AgPayUtil.Sign(jsonObject, rq.SignType, mchAppConfigContext.MchApp.AppSecret);
-                rq.Sign = sign;
-            }
-
+            ApiRes apiRes = null;
             if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
             {
-                apiRes = await this.PackageAlipayPayPackageAsync(rq, payOrder, mchAppConfigContext);
+                apiRes = await this.PackageAlipayPayPackageAsync(payOrder);
             }
             else if (wayCode.Equals(CS.PAY_WAY_CODE.WX_JSAPI))
             {
-                apiRes = await this.PackageWxpayPayPackageAsync(rq, payOrder, mchAppConfigContext);
+                apiRes = await this.PackageWxpayPayPackageAsync(payOrder);
             }
             else
             {
@@ -230,21 +177,14 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// </summary>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        private async Task<ApiRes> PackageAlipayPayPackageAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ApiRes> PackageAlipayPayPackageAsync(PayOrderDto payOrder)
         {
-            var wayCode = (rq?.WayCode ?? payOrder?.WayCode) ?? this.GetWayCode();
-            string channelUserId = this.GetReqParamJson().GetValue("channelUserId").ToString();
-            AliJsapiOrderRQ bizRQ = new AliJsapiOrderRQ();
-            bizRQ.SignType = "MD5";
-            if (rq != null)
-            {
-                JObject resJSON = new JObject();
-                resJSON.Add("buyerUserId", channelUserId);
-                rq.ChannelExtra = resJSON.ToString();
-                bizRQ = (AliJsapiOrderRQ)rq.BuildBizRQ();
-            }
-            bizRQ.BuyerUserId = channelUserId;
-            return await this.UnifiedOrderAsync(wayCode, bizRQ, payOrder);
+            var wayCode = this.GetWayCode();
+            string buyerUserId = this.GetChannelUserId();
+            AliJsapiOrderRQ rq = new AliJsapiOrderRQ();
+            this.CommonSetRQ(rq, payOrder);
+            rq.BuyerUserId = buyerUserId;
+            return await this.UnifiedOrderAsync(wayCode, rq, payOrder);
         }
 
         /// <summary>
@@ -252,50 +192,45 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// </summary>
         /// <param name="payOrder"></param>
         /// <returns></returns>
-        private async Task<ApiRes> PackageWxpayPayPackageAsync(UnifiedOrderRQ rq, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
+        private async Task<ApiRes> PackageWxpayPayPackageAsync(PayOrderDto payOrder)
         {
-            var wayCode = (rq?.WayCode ?? payOrder?.WayCode) ?? this.GetWayCode();
-            string openId = this.GetReqParamJson().GetValue("channelUserId").ToString();
-            string oauth2InfoId = await this.GetOauth2InfoIdAsync(mchAppConfigContext, wayCode);
-            WxPayChannelUserService channelUserService = (WxPayChannelUserService)this.GetServiceByWayCode(wayCode);
-            var (appId, _, _) = await channelUserService.GetOauth2ParamsAsync(oauth2InfoId, wayCode, mchAppConfigContext);
-            WxJsapiOrderRQ bizRQ = new WxJsapiOrderRQ();
-            bizRQ.SignType = "MD5";
-            bizRQ.Openid = openId;
-            bizRQ.SubAppId = appId;
-            if (rq != null)
-            {
-                JObject resJSON = new JObject();
-                resJSON.Add("openid", openId);
-                resJSON.Add("subAppId", appId);
-                rq.ChannelExtra = resJSON.ToString();
-                bizRQ = (WxJsapiOrderRQ)rq.BuildBizRQ();
-            }
-            return await this.UnifiedOrderAsync(wayCode, bizRQ, payOrder);
+            var wayCode = this.GetWayCode();
+            string openId = this.GetChannelUserId();
+            WxJsapiOrderRQ rq = new WxJsapiOrderRQ();
+            this.CommonSetRQ(rq, payOrder);
+            rq.Openid = openId;
+            return await this.UnifiedOrderAsync(wayCode, rq, payOrder);
         }
 
-        private async Task<(string mchNo, string appId)> GetMchNoAndAppIdAsync(byte type, string id)
+        /// <summary>
+        /// 赋值通用字段
+        /// </summary>
+        /// <param name="rq"></param>
+        /// <param name="payOrder"></param>
+        private void CommonSetRQ(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
-            switch (type)
+            // 存在订单数据， 不需要处理
+            if (payOrder != null && !string.IsNullOrWhiteSpace(payOrder.PayOrderId))
             {
-                case CS.TOKEN_DATA_TYPE.PAY_ORDER_ID:
-                    var payOrder = await this.GetPayOrderAsync(id);
-                    return (payOrder.MchNo, payOrder.AppId);
-                case CS.TOKEN_DATA_TYPE.QRC_ID:
-                    var qrCode = await this.GetQrCodeAsync(id);
-                    return (qrCode.MchNo, qrCode.AppId);
-                default:
-                    throw new BizException("参数错误");
+                return;
             }
-        }
 
-        private (byte type, string id) GetTokenData()
-        {
-            var token = this.GetToken();
-            JObject tokenData = JObject.Parse(AgPayUtil.AesDecode(token));
-            tokenData.TryGetString("type", out string type);
-            tokenData.TryGetString("id", out string id);
-            return (Convert.ToByte(type), id);
+            string amount = this.GetReqParamJson().GetValue("amount").ToString();
+            this.GetReqParamJson().TryGetString("buyerRemark", out string buyerRemark);
+
+            rq.MchNo = payOrder.MchNo; // 商户号
+            rq.AppId = payOrder.AppId;
+            rq.StoreId = payOrder.StoreId;
+            rq.QrcId = payOrder.QrcId;
+            rq.MchOrderNo = SeqUtil.GenMhoOrderId();
+            //rq.WayCode = wayCode;
+            rq.Amount = AmountUtil.ConvertDollar2Cent(amount);
+            rq.Currency = "CNY";
+            rq.ClientIp = IpUtil.GetIP(Request);
+            rq.Subject = $"静态码支付";
+            rq.Body = $"静态码支付";
+            rq.BuyerRemark = buyerRemark;
+            rq.SignType = "MD5"; // 设置默认签名方式为MD5
         }
 
         private string GetToken()
@@ -308,12 +243,13 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             return this.GetReqParamJson().GetValue("wayCode").ToString();
         }
 
+        private string GetChannelUserId()
+        {
+            return this.GetReqParamJson().GetValue("channelUserId").ToString();
+        }
+
         private async Task<PayOrderDto> GetPayOrderAsync(string payOrderId)
         {
-            //string token = GetToken();
-
-            //string payOrderId = AgPayUtil.AesDecode(token); //解析token
-
             PayOrderDto payOrder = await _payOrderService.GetByIdAsync(payOrderId);
             if (payOrder == null || payOrder.State != (byte)PayOrderState.STATE_INIT)
             {
@@ -343,25 +279,59 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             {
                 return _channelUserServiceFactory.GetService(CS.IF_CODE.WXPAY);
             }
-            return null;
+            else
+            {
+                throw new BizException("无此支付通道接口");
+            }
         }
 
-        private async Task<string> GetOauth2InfoIdAsync(MchAppConfigContext mchAppConfigContext, string wayCode)
+        private (byte type, string id) TokenConvert()
         {
-            // 根据支付方式， 查询出 该商户 可用的支付接口
-            var mchPayPassage = await _mchPayPassageService.FindMchPayPassageAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, wayCode);
-            if (mchPayPassage == null)
-            {
-                throw new BizException("商户应用不支持该支付方式");
-            }
-            string oauth2InfoId = null;
-            if (mchAppConfigContext.IsIsvSubMch())
-            {
-                var payInterfaceConfig = await _configContextQueryService.QueryIsvPayIfConfigAsync(mchAppConfigContext.MchInfo.IsvNo, mchPayPassage.IfCode);
-                oauth2InfoId = payInterfaceConfig?.Oauth2InfoId;
-            }
+            var token = this.GetToken();
+            JObject tokenData = JObject.Parse(AgPayUtil.AesDecode(token));
+            tokenData.TryGetString("type", out string type);
+            tokenData.TryGetString("id", out string id);
+            return (Convert.ToByte(type), id);
+        }
 
-            return oauth2InfoId;
+        /// <summary>
+        /// 通用查询订单信息
+        /// </summary>
+        /// <returns></returns>
+        private async Task<PayOrderDto> CommonQueryPayOrderAsync()
+        {
+            (byte type, string id) = TokenConvert();
+
+            if (type == CS.TOKEN_DATA_TYPE.PAY_ORDER_ID)
+            {
+                //查询订单
+                return await this.GetPayOrderAsync(id);
+            }
+            else if (type.Equals(CS.TOKEN_DATA_TYPE.QRC_ID))
+            {
+                var qrCode = await this.GetQrCodeAsync(id);
+
+                var payOrder = new PayOrderDto();
+                payOrder.MchNo = qrCode.MchNo;
+                payOrder.QrcId = qrCode.QrcId;
+                payOrder.AppId = qrCode.AppId;
+                payOrder.StoreId = qrCode.StoreId;
+                return payOrder;
+            }
+            else
+            {
+                throw new BizException("token类型不正确");
+            }
+        }
+
+        /// <summary>
+        /// 查询配置信息
+        /// </summary>
+        /// <returns></returns>
+        private async Task<MchAppConfigContext> CommonQueryInfoMchAppConfigContextAsync()
+        {
+            var payOrder = await this.CommonQueryPayOrderAsync();
+            return await _configContextQueryService.QueryMchInfoAndAppInfoAsync(payOrder.MchNo, payOrder.AppId);
         }
     }
 }

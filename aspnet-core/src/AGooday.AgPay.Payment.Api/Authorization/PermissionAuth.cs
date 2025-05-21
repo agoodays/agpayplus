@@ -2,7 +2,6 @@
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
-using AGooday.AgPay.Common.Utils;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -40,16 +39,39 @@ namespace AGooday.AgPay.Payment.Api.Authorization
 
         private static string GetMchNoFromRequest(HttpRequest request)
         {
+            // 1. 优先从 QueryString 获取
+            if (request.Query.TryGetValue("mchNo", out var mchNoValues) && !string.IsNullOrWhiteSpace(mchNoValues))
+            {
+                return mchNoValues.ToString();
+            }
+
+            // 2. 再尝试从 Body 获取
             // 从请求体中获取 mchNo，请求体是 JSON 格式，mchNo 是 JSON 对象中的一个属性
             request.EnableBuffering();
-            string requestBody = new StreamReader(request.Body, Encoding.UTF8).ReadToEnd();
-            request.Body.Position = 0;
+            string requestBody;
+            using (var reader = new StreamReader(request.Body, Encoding.UTF8, leaveOpen: true))
+            {
+                requestBody = reader.ReadToEnd();
+                request.Body.Position = 0;
+            }
 
-            // 使用适当的 JSON 解析库解析请求体，并获取 mchNo
-            JObject json = JObject.Parse(requestBody);
-            json.TryGetString("mchNo", out string mchNo);
+            if (!string.IsNullOrWhiteSpace(requestBody))
+            {
+                try
+                {
+                    JObject json = JObject.Parse(requestBody);
+                    if (json.TryGetValue("mchNo", out var mchNoToken))
+                    {
+                        return mchNoToken?.ToString();
+                    }
+                }
+                catch
+                {
+                    // Body 不是 JSON 格式时忽略
+                }
+            }
 
-            return mchNo;
+            return null;
         }
     }
 }

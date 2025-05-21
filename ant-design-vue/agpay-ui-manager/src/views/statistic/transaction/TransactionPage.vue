@@ -254,6 +254,9 @@ export default {
     reqTableDataFunc: (params) => {
       return req.list(API_URL_ORDER_STATISTIC, params)
     },
+    reqTableCountFunc: (params) => {
+      return req.total(API_URL_ORDER_STATISTIC, params)
+    },
     reqDownloadDataFunc: (params) => {
       req.export(API_URL_ORDER_STATISTIC, 'excel', params).then(res => {
         // 将响应体中的二进制数据转换为Blob对象

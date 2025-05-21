@@ -43,11 +43,11 @@ namespace AGooday.AgPay.Application.Config
         /// <summary>
         /// 生成  【jsapi统一收银台】oauth2获取用户ID回调地址
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        public string GenOauth2RedirectUrlEncode(string data)
+        public string GenOauth2RedirectUrlEncode(string token)
         {
-            return URLUtil.EncodeAll($"{PaySiteUrl}/oauth2Callback/{AgPayUtil.AesEncode(data)}");
+            return URLUtil.EncodeAll($"{PaySiteUrl}/oauth2Callback/{token}");
         }
 
         /// <summary>

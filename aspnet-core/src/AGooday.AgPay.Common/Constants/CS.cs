@@ -791,7 +791,7 @@
             public const byte PAY_ORDER_ID = 1;  //支付订单号
             public const byte QRC_ID = 2;  //码牌ID
         }
-        public static string GetTokenData(byte type, string id) => $"{{type: {type}, id: '{id}'}}";
+        public static string GenTokenData(byte type, string id) => $"{{type: {type}, id: '{id}'}}";
     }
 #pragma warning restore IDE1006
 }
