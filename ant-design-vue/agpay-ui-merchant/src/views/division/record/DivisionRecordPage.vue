@@ -5,7 +5,7 @@
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
             <a-form-item label="" class="table-head-layout">
-              <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+              <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
             </a-form-item>
             <ag-text-up placeholder="分账接受者ID" :msg="searchData.receiverId" v-model="searchData.receiverId" />
             <ag-text-up placeholder="分账账号组ID" :msg="searchData.receiverGroupId" v-model="searchData.receiverGroupId" />
