@@ -12,8 +12,18 @@
     :disabled="disabled"
     allowClear
   >
-    <a-select-option v-for="d in data" :key="d[valueField]" :value="d[valueField]">
-      {{ d[labelField] }}
+    <a-select-option
+      v-for="d in data"
+      :key="d[valueField]"
+      :value="d[valueField]"
+      :title="showValue && d[labelField] !== d[valueField] ? (d[labelField] + ' [ ' + d[valueField] + ' ]') : d[labelField]"
+    >
+      <template v-if="showValue && d[labelField] !== d[valueField]">
+        {{ d[labelField] + " [ " + d[valueField] + " ]" }}
+      </template>
+      <template v-else>
+        {{ d[labelField] }}
+      </template>
     </a-select-option>
   </a-select>
 </template>
@@ -27,7 +37,8 @@ export default {
     valueField: { type: String, default: 'value' }, // 选项value字段
     labelField: { type: String, default: 'text' }, // 选项label字段
     placeholder: { type: String, default: '请输入关键字搜索' },
-    disabled: { type: Boolean, default: false } // 新增支持disabled
+    disabled: { type: Boolean, default: false }, // 新增支持disabled
+    showValue: { type: Boolean, default: true } // 新增，是否显示valueField
   },
   data () {
     return {

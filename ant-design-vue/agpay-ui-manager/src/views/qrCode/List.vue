@@ -21,7 +21,7 @@
               :api="searchAgent"
               valueField="agentNo"
               labelField="agentName"
-              placeholder="代理商号号（搜索代理商名称）"
+              placeholder="代理商号（搜索代理商名称）"
             />
           </a-form-item>
           <a-form-item label="" class="table-head-layout">
