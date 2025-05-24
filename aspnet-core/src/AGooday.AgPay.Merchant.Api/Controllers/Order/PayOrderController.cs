@@ -206,7 +206,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         [PermissionAuth(PermCode.MCH.ENT_PAY_ORDER_VIEW)]
         public async Task<ApiRes> DetailAsync(string payOrderId)
         {
-            var payOrder = await _payOrderService.GetByIdAsync(payOrderId);
+            var payOrder = await _payOrderService.GetByIdAsNoTrackingAsync(payOrderId);
             if (payOrder == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

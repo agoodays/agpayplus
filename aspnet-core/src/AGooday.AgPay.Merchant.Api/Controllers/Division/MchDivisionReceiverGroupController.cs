@@ -45,7 +45,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_GROUP_VIEW)]
         public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var record = _mchDivisionReceiverGroupService.GetByIdAsync(recordId, await GetCurrentMchNoAsync());
+            var record = _mchDivisionReceiverGroupService.GetByIdAsNoTrackingAsync(recordId, await GetCurrentMchNoAsync());
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

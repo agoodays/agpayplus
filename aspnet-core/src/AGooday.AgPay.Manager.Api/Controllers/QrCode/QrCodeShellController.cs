@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_SHELL_VIEW, PermCode.MGR.ENT_DEVICE_QRC_SHELL_EDIT)]
         public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var qrCodeShell = await _qrCodeShellService.GetByIdAsync(recordId);
+            var qrCodeShell = await _qrCodeShellService.GetByIdAsNoTrackingAsync(recordId);
             if (qrCodeShell == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

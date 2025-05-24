@@ -49,7 +49,7 @@ namespace AGooday.AgPay.Application.Services
             }
         }
 
-        public async Task<MchDivisionReceiverGroupDto> GetByIdAsync(long recordId, string mchNo)
+        public async Task<MchDivisionReceiverGroupDto> GetByIdAsNoTrackingAsync(long recordId, string mchNo)
         {
             var entity = await _mchDivisionReceiverGroupRepository.GetAllAsNoTracking()
                 .Where(w => w.ReceiverGroupId.Equals(recordId) && w.MchNo.Equals(mchNo))

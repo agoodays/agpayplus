@@ -83,7 +83,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DEL)]
         public async Task<ApiRes> DeleteAsync(string recordId)
         {
-            var sysRole = await _sysRoleService.GetByIdAsync(recordId, await GetCurrentMchNoAsync());
+            var sysRole = await _sysRoleService.GetByIdAsNoTrackingAsync(recordId, await GetCurrentMchNoAsync());
             if (sysRole is null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -123,7 +123,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_EDIT)]
         public async Task<ApiRes> DetailAsync(string recordId)
         {
-            var sysRole = await _sysRoleService.GetByIdAsync(recordId, await GetCurrentMchNoAsync());
+            var sysRole = await _sysRoleService.GetByIdAsNoTrackingAsync(recordId, await GetCurrentMchNoAsync());
             if (sysRole is null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
