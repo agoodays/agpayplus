@@ -131,13 +131,11 @@ export default {
   mounted () {
   },
   methods: {
-    searchAgent (keyword) {
-      // 返回 Promise，数据格式为 [{ mchNo: 'xxx', mchName: 'xxx' }, ...]
-      return req.list(API_URL_AGENT_LIST, { agentName: keyword, pageSize: 20 }).then(res => res.records || [])
+    searchAgent (keyword, iPage) {
+      return req.list(API_URL_AGENT_LIST, { agentName: keyword, ...iPage })
     },
-    searchIsv (keyword) {
-      // 返回 Promise，数据格式为 [{ mchNo: 'xxx', mchName: 'xxx' }, ...]
-      return req.list(API_URL_ISV_LIST, { isvName: keyword, pageSize: 20 }).then(res => res.records || [])
+    searchIsv (keyword, iPage) {
+      return req.list(API_URL_ISV_LIST, { isvName: keyword, ...iPage })
     },
     handleSearchFormData (searchData) {
       this.searchData = searchData

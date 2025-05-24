@@ -452,9 +452,8 @@ export default {
     this.initIfDefineList()
   },
   methods: {
-    searchMch (keyword) {
-      // 返回 Promise，数据格式为 [{ mchNo: 'xxx', mchName: 'xxx' }, ...]
-      return req.list(API_URL_MCH_LIST, { mchName: keyword, pageSize: 20 }).then(res => res.records || [])
+    searchMch (keyword, iPage) {
+      return req.list(API_URL_MCH_LIST, { mchName: keyword, ...iPage })
     },
     handleSearchFormData (searchData) {
       this.searchData = searchData

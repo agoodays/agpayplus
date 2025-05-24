@@ -9,6 +9,7 @@
     :not-found-content="loading ? '加载中...' : '无匹配数据'"
     @search="handleSearch"
     @change="handleChange"
+    @popupScroll="handlePopupScroll"
     :disabled="disabled"
     allowClear
   >
@@ -25,6 +26,9 @@
         {{ d[labelField] }}
       </template>
     </a-select-option>
+    <a-select-option v-if="!hasMore && data.length > 0" key="all-loaded" disabled value="">
+      已加载全部
+    </a-select-option>
   </a-select>
 </template>
 
@@ -38,13 +42,18 @@ export default {
     labelField: { type: String, default: 'text' }, // 选项label字段
     placeholder: { type: String, default: '请输入关键字搜索' },
     disabled: { type: Boolean, default: false }, // 新增支持disabled
-    showValue: { type: Boolean, default: true } // 新增，是否显示valueField
+    showValue: { type: Boolean, default: true }, // 新增，是否显示valueField
+    pageSize: { type: Number, default: 10 } // 默认每页条数
   },
   data () {
     return {
       data: [],
       loading: false,
-      searchTimeout: null // 防抖定时器
+      searchTimeout: null,
+      hasMore: true,
+      lastSearch: '',
+      loadMoreLock: false,
+      iPage: { pageNumber: 1, pageSize: this.pageSize } // 初始化iPage
     }
   },
   methods: {
@@ -54,26 +63,73 @@ export default {
       }
       if (!val) {
         this.data = []
+        this.iPage.pageNumber = 1
+        this.hasMore = true
+        this.lastSearch = ''
         return
       }
       // 300ms防抖
       this.searchTimeout = setTimeout(() => {
         this.loading = true
-        this.api(val).then(list => {
-          if (!list || list.length === 0) {
-            // 没有结果时，直接将输入值作为选项
+        this.iPage.pageNumber = 1
+        this.hasMore = true
+        this.lastSearch = val
+        this.api(val, this.iPage).then(res => {
+          const list = res.records || []
+          this.data = list
+          if (typeof res.hasNext !== 'undefined') {
+            this.hasMore = !!res.hasNext
+          } else {
+            this.hasMore = list.length === this.iPage.pageSize
+          }
+          if (!this.hasMore && list.length === 0) {
             this.data = [{
               [this.valueField]: val,
               [this.labelField]: val
             }]
             this.handleChange(val)
-          } else {
-            this.data = list
           }
         }).finally(() => {
           this.loading = false
         })
       }, 300)
+    },
+    handlePopupScroll (e) {
+      if (!this.hasMore) return
+      const target = e.target
+      if (
+        this.hasMore &&
+        !this.loading &&
+        !this.loadMoreLock &&
+        target.scrollHeight > target.offsetHeight &&
+        target.scrollTop + target.offsetHeight >= target.scrollHeight - 10
+      ) {
+        this.loadMoreLock = true
+        this.loadMore()
+      }
+    },
+    loadMore () {
+      this.loading = true
+      const nextPage = this.iPage.pageNumber + 1
+      this.api(this.lastSearch, { pageNumber: nextPage, pageSize: this.iPage.pageSize }).then(res => {
+        const list = res.records || []
+        const existKeys = new Set(this.data.map(d => d[this.valueField]))
+        const newList = list.filter(d => !existKeys.has(d[this.valueField]))
+        if (newList.length) {
+          this.data = this.data.concat(newList)
+          this.iPage.pageNumber = nextPage
+        }
+        if (typeof res.hasNext !== 'undefined') {
+          this.hasMore = !!res.hasNext
+        } else if (typeof res.total !== 'undefined' && typeof res.current !== 'undefined') {
+          this.hasMore = res.current * this.iPage.pageSize < res.total
+        } else {
+          this.hasMore = newList.length === this.iPage.pageSize
+        }
+      }).finally(() => {
+        this.loading = false
+        this.loadMoreLock = false
+      })
     },
     handleChange (val) {
       this.$emit('input', val)

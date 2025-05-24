@@ -73,9 +73,8 @@ export default {
         that.isShow = true // 立马展示弹层信息
       }
     },
-    searchMch (keyword) {
-      // 返回 Promise，数据格式为 [{ mchNo: 'xxx', mchName: 'xxx' }, ...]
-      return req.list(API_URL_MCH_LIST, { mchName: keyword, pageSize: 20 }).then(res => res.records || [])
+    searchMch (keyword, iPage) {
+      return req.list(API_URL_MCH_LIST, { mchName: keyword, ...iPage })
     },
     handleOkFunc: function () { // 点击【确认】按钮事件
       const that = this
