@@ -131,11 +131,11 @@ export default {
   mounted () {
   },
   methods: {
-    searchAgent (keyword, iPage) {
-      return req.list(API_URL_AGENT_LIST, { agentName: keyword, ...iPage })
+    searchAgent (params) {
+      return req.list(API_URL_AGENT_LIST, params)
     },
-    searchIsv (keyword, iPage) {
-      return req.list(API_URL_ISV_LIST, { isvName: keyword, ...iPage })
+    searchIsv (params) {
+      return req.list(API_URL_ISV_LIST, params)
     },
     handleSearchFormData (searchData) {
       this.searchData = searchData

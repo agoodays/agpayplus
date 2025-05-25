@@ -17,7 +17,14 @@
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="商户号" prop="mchNo">
-            <a-input v-model="saveObject.mchNo" placeholder="请输入" :disabled="!isAdd" />
+            <ag-select
+              v-model="saveObject.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+              :disabled="!isAdd"
+            />
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
@@ -121,13 +128,16 @@
 </template>
 
 <script>
-import { API_URL_MCH_APP, req, getSysRSA2PublicKey } from '@/api/manage'
+import AgSelect from '@/components/AgSelect/AgSelect'
+import { API_URL_MCH_APP, API_URL_MCH_LIST, req, getSysRSA2PublicKey } from '@/api/manage'
 
 export default {
   props: {
     callbackFunc: { type: Function, default: () => () => ({}) }
   },
-
+  components: {
+    AgSelect
+  },
   data () {
     return {
       isAdd: true, // 新增 or 修改
@@ -187,6 +197,9 @@ export default {
       getSysRSA2PublicKey().then(res => {
         that.sysRSA2PublicKey = res
       })
+    },
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
     },
     // 表单提交
     onSubmit () {

@@ -144,8 +144,8 @@ export default {
     this.reqIfDefineListFunc()
   },
   methods: {
-    searchMch (keyword, iPage) {
-      return req.list(API_URL_MCH_LIST, { mchName: keyword, ...iPage })
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
     },
     queryFunc () {
       this.btnLoading = true

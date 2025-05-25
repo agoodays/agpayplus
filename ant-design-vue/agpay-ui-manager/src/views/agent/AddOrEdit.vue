@@ -50,21 +50,27 @@
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-model-item label="上级代理商号" prop="pid">
-            <a-select v-model="saveObject.pid" placeholder="请选择上级代理商" @change="pidChange" :disabled="!isAdd">
-              <a-select-option value="" key="">请选择代理商</a-select-option>
-              <a-select-option v-for="d in agentList" :value="d.agentNo" :key="d.agentNo">
-                {{ d.agentName + " [ ID: " + d.agentNo + " ]" }}
-              </a-select-option>
-            </a-select>
+            <ag-select
+              v-model="saveObject.pid"
+              :api="searchAgent"
+              valueField="agentNo"
+              labelField="agentName"
+              placeholder="代理商号（搜索代理商名称）"
+              @change="pidChange"
+              :disabled="!isAdd"
+            />
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
           <a-form-model-item label="服务商号" prop="isvNo">
-            <a-select v-model="saveObject.isvNo" placeholder="请选择服务商" :disabled="!isAdd || saveObject.pid?.length>0">
-              <a-select-option v-for="d in isvList" :value="d.isvNo" :key="d.isvNo">
-                {{ d.isvName + " [ ID: " + d.isvNo + " ]" }}
-              </a-select-option>
-            </a-select>
+            <ag-select
+              v-model="saveObject.isvNo"
+              :api="searchIsv"
+              valueField="isvNo"
+              labelField="isvName"
+              placeholder="服务商号（搜索服务商名称）"
+              :disabled="!isAdd || saveObject.pid?.length > 0"
+            />
           </a-form-model-item>
         </a-col>
         <a-col :span="10">
@@ -405,6 +411,7 @@
 </template>
 
 <script>
+import AgSelect from '@/components/AgSelect/AgSelect'
 import { API_URL_AGENT_LIST, API_URL_ISV_LIST, req, upload, getPwdRulesRegexp } from '@/api/manage'
 import AgUpload from '@/components/AgUpload/AgUpload'
 import { Base64 } from 'js-base64'
@@ -415,7 +422,7 @@ export default {
     callbackFunc: { type: Function, default: () => () => ({}) }
   },
   components: {
-    AgUpload
+    AgUpload, AgSelect
   },
   data () {
     const checkIsvNo = (rule, value, callback) => { // 校验类型为特约代理商是否选择了服务商
@@ -469,8 +476,6 @@ export default {
       action: upload.form, // 上传文件地址
       imgLabel: '联系人',
       settAccountNoLabel: '个人微信号',
-      agentList: null, // 代理商下拉列表
-      isvList: null, // 服务商下拉列表
       rules: {
         agentName: [{ required: true, message: '请输入代理商名称', trigger: 'blur' }],
         loginUsername: [{ required: true, pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/, message: '请输入字母开头，长度为6-18位的登录名', trigger: 'blur' }],
@@ -552,12 +557,6 @@ export default {
         this.$refs.infoFormModel.resetFields()
       }
       const that = this
-      req.list(API_URL_AGENT_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 代理商下拉选择列表
-        that.agentList = res.records
-      })
-      req.list(API_URL_ISV_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 服务商下拉选择列表
-        that.isvList = res.records
-      })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.resetIsShow = true // 展示重置密码板块
         that.recordId = recordId
@@ -568,6 +567,12 @@ export default {
       } else {
         that.visible = true // 立马展示弹层信息
       }
+    },
+    searchAgent (params) {
+      return req.list(API_URL_AGENT_LIST, params)
+    },
+    searchIsv (params) {
+      return req.list(API_URL_ISV_LIST, params)
     },
     // 随机生成密码
     genRandomPassword: function () {

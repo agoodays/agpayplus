@@ -2,7 +2,6 @@
   <a-modal v-model="isShow" :title=" isAdd ? '新增账号组' : '修改账号组' " @ok="handleOkFunc" :confirmLoading="confirmLoading">
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 6}" :wrapper-col="{span: 15}" :rules="rules">
       <a-form-model-item label="商户号" prop="mchNo">
-        <!-- <a-input v-model="saveObject.mchNo" placeholder="请输入" :disabled="!isAdd" /> -->
         <ag-select
           v-model="saveObject.mchNo"
           :api="searchMch"
@@ -73,8 +72,8 @@ export default {
         that.isShow = true // 立马展示弹层信息
       }
     },
-    searchMch (keyword, iPage) {
-      return req.list(API_URL_MCH_LIST, { mchName: keyword, ...iPage })
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
     },
     handleOkFunc: function () { // 点击【确认】按钮事件
       const that = this

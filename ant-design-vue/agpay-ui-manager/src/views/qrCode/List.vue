@@ -131,11 +131,11 @@ export default {
     this.queryFunc()
   },
   methods: {
-    searchAgent (keyword, iPage) {
-      return req.list(API_URL_AGENT_LIST, { agentName: keyword, ...iPage })
+    searchAgent (params) {
+      return req.list(API_URL_AGENT_LIST, params)
     },
-    searchMch (keyword, iPage) {
-      return req.list(API_URL_MCH_LIST, { mchName: keyword, ...iPage })
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
     },
     handleSearchFormData (searchData) {
       this.searchData = searchData

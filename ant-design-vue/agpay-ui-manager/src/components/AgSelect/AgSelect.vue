@@ -56,6 +56,31 @@ export default {
       iPage: { pageNumber: 1, pageSize: this.pageSize } // 初始化iPage
     }
   },
+  watch: {
+    value: {
+      immediate: true,
+      handler (val) {
+        if (
+          val &&
+          !this.data.some(d => d[this.valueField] === val)
+        ) {
+          const params = { pageNumber: 1, pageSize: 1 }
+          params[this.valueField] = val
+          this.loading = true
+          this.api(params).then(res => {
+            const list = res.records || []
+            if (list.length) {
+              if (!this.data.some(d => d[this.valueField] === val)) {
+                this.data.unshift(list[0])
+              }
+            }
+          }).finally(() => {
+            this.loading = false
+          })
+        }
+      }
+    }
+  },
   methods: {
     handleSearch (val) {
       if (this.searchTimeout) {
@@ -74,7 +99,9 @@ export default {
         this.iPage.pageNumber = 1
         this.hasMore = true
         this.lastSearch = val
-        this.api(val, this.iPage).then(res => {
+        const params = { pageNumber: this.iPage.pageNumber, pageSize: this.iPage.pageSize }
+        params[this.labelField] = val
+        this.api(params).then(res => {
           const list = res.records || []
           this.data = list
           if (typeof res.hasNext !== 'undefined') {
@@ -111,7 +138,9 @@ export default {
     loadMore () {
       this.loading = true
       const nextPage = this.iPage.pageNumber + 1
-      this.api(this.lastSearch, { pageNumber: nextPage, pageSize: this.iPage.pageSize }).then(res => {
+      const params = { pageNumber: nextPage, pageSize: this.iPage.pageSize }
+      params[this.labelField] = this.lastSearch
+      this.api(params).then(res => {
         const list = res.records || []
         const existKeys = new Set(this.data.map(d => d[this.valueField]))
         const newList = list.filter(d => !existKeys.has(d[this.valueField]))
@@ -131,9 +160,11 @@ export default {
         this.loadMoreLock = false
       })
     },
-    handleChange (val) {
-      this.$emit('input', val)
-      this.$emit('change', val)
+    handleChange (value) {
+      // 找到当前选中的数据对象
+      const selected = this.data.find(d => d[this.valueField] === value) || null
+      this.$emit('input', value)
+      this.$emit('change', value, selected)
     }
   },
   beforeDestroy () {

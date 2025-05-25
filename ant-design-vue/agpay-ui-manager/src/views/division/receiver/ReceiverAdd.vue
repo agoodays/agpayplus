@@ -304,8 +304,8 @@ export default {
       that.appSupportIfCodes = [] // 初始化
       that.receiverTableData = [] // 置空表格
     },
-    searchMch (keyword, iPage) {
-      return req.list(API_URL_MCH_LIST, { mchName: keyword, ...iPage })
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
     },
     // 变更 mchNo的事件
     changeMchNo (value) {
