@@ -65,7 +65,7 @@
           placeholder="手机号"
           v-decorator="[
             'mobile',
-            {rules: [{ required: true, pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号！' }], validateTrigger: 'blur'}
+            {rules: [{ required: true, pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号！' }], validateTrigger: 'blur'}
           ]"/>
       </a-form-item>
 
