@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
         public bool IsSupport(string entryType)
         {
             // 支付宝账户
-            if (TransferOrderEntry.ALIPAY_CASH.Equals(entryType))
+            if (TransferOrderEntry.ALIPAY_CASH.Equals(entryType.ToEnum<TransferOrderEntry>()))
             {
                 return true;
             }
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
         {
             AlipayFundTransCommonQueryRequest request = new AlipayFundTransCommonQueryRequest();
             AlipayFundTransCommonQueryModel model = new AlipayFundTransCommonQueryModel();
-            model.ProductCode = TransferOrderEntry.BANK_CARD.Equals(transferOrder.EntryType) ? "TRANS_BANKCARD_NO_PWD" : "TRANS_ACCOUNT_NO_PWD";
+            model.ProductCode = TransferOrderEntry.BANK_CARD.Equals(transferOrder.EntryType.ToEnum<TransferOrderEntry>()) ? "TRANS_BANKCARD_NO_PWD" : "TRANS_ACCOUNT_NO_PWD";
             model.BizScene = "DIRECT_TRANSFER";
             model.OutBizNo = transferOrder.TransferId; // 商户转账唯一订单号
             request.SetBizModel(model);
