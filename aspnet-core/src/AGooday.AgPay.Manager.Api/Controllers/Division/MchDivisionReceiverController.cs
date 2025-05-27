@@ -123,21 +123,28 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         [HttpPut, Route("{recordId}"), MethodLog("更新分账接收账号")]
         [PermissionAuth(PermCode.MGR.ENT_DIVISION_RECEIVER_EDIT)]
-        public async Task<ApiRes> UpdateAsync(long recordId, MchDivisionReceiverDto dto)
+        public async Task<ApiRes> UpdateAsync(long recordId, MchDivisionReceiverModifyDto dto)
         {
+            var record = await _mchDivisionReceiverService.GetByIdAsNoTrackingAsync(recordId);
+            if (record == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            record.ReceiverAlias = dto.ReceiverAlias;
             // 改为真实比例
-            dto.DivisionProfit = dto.DivisionProfit / 100;
+            record.DivisionProfit = dto.DivisionProfit / 100;
+            record.State = dto.State;
             if (dto.ReceiverGroupId != null)
             {
-                var groupRecord = await _mchDivisionReceiverGroupService.FindByIdAndMchNoAsync(dto.ReceiverGroupId.Value, dto.MchNo);
-                if (dto == null)
+                var groupRecord = await _mchDivisionReceiverGroupService.FindByIdAndMchNoAsync(dto.ReceiverGroupId.Value, record.MchNo);
+                if (groupRecord == null)
                 {
                     throw new BizException("账号组不存在");
                 }
-                dto.ReceiverGroupId = groupRecord.ReceiverGroupId;
-                dto.ReceiverGroupName = groupRecord.ReceiverGroupName;
+                record.ReceiverGroupId = groupRecord.ReceiverGroupId;
+                record.ReceiverGroupName = groupRecord.ReceiverGroupName;
             }
-            var result = await _mchDivisionReceiverService.UpdateAsync(dto);
+            var result = await _mchDivisionReceiverService.UpdateAsync(record);
             if (!result)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_UPDATE);
