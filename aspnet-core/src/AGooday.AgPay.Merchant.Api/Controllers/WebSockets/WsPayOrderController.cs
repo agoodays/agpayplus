@@ -30,7 +30,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.WebSockets
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await _wsPayOrderServer.ProcessWebSocket(webSocket, cid, payOrderId);
+                await _wsPayOrderServer.ProcessWebSocketAsync(webSocket, cid, payOrderId);
             }
             else
             {

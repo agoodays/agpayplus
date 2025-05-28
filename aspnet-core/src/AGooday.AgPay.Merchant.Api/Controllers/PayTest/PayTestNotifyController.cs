@@ -52,7 +52,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             msg.Add("errMsg", payOrderNotify.ErrMsg);
 
             //推送到前端
-            await _wsPayOrderServer.SendMsgByOrderIdAsync(payOrderNotify.PayOrderId, msg.ToString(Formatting.None));
+            await WsPayOrderServer.BroadcastToOrderAsync(payOrderNotify.PayOrderId, msg.ToString(Formatting.None));
 
             return Content("SUCCESS");
         }
