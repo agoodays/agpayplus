@@ -358,7 +358,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
         private async Task GenPayOrderProfitAsync(PayOrderDto payOrder, IPaymentService paymentService)
         {
             var payRateConfigs = await _payRateConfigService.GetPayRateConfigInfosAsync(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
-            if (payRateConfigs != null)
+            if (payRateConfigs != null && payRateConfigs.Any())
             {
                 var payOrderProfits = new List<PayOrderProfitDto>();
                 var payOrderProfit = new PayOrderProfitDto();

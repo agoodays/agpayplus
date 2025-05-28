@@ -2,6 +2,7 @@
 using AGooday.AgPay.AopSdk.Exceptions;
 using AGooday.AgPay.AopSdk.Models;
 using AGooday.AgPay.AopSdk.Request;
+using AGooday.AgPay.Application.Config;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
@@ -268,7 +269,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
 
             var mchApp = await _mchAppService.GetByIdAsync(payOrder.AppId);
 
-            var agpayClient = new AgPayClient(_sysConfigService.GetDBApplicationConfig().PaySiteUrl, mchApp.AppSecret);
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+
+#if DEBUG
+            dbApplicationConfig.PaySiteUrl = "https://localhost:9819";
+#endif
+
+            var agpayClient = new AgPayClient(dbApplicationConfig.PaySiteUrl, mchApp.AppSecret);
             try
             {
                 var response = await agpayClient.ExecuteAsync(request);
