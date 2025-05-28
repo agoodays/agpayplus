@@ -117,6 +117,10 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             }
             model.ChannelExtra = extParams.ToString();
 
+#if DEBUG
+            dbApplicationConfig.PaySiteUrl = "https://localhost:9819";
+#endif
+
             var agPayClient = new AgPayClient(dbApplicationConfig.PaySiteUrl, mchApp.AppSecret);
 
             try

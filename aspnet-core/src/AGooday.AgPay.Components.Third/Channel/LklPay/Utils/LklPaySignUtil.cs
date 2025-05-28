@@ -38,9 +38,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.Utils
 
         private static bool Verify(byte[] data, byte[] signature, string publicKeyCert)
         {
-            X509Certificate2 lklcert = new X509Certificate2(publicKeyCert);
-            RSA pub = lklcert.GetRSAPublicKey();
-            bool bol = pub.VerifyData(data, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            var certFilePath = ChannelCertConfigKit.GetCertFilePath(publicKeyCert);
+            var publicKey = LoadPublicKey(certFilePath);
+            bool bol = publicKey.VerifyData(data, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
             return bol;
         }
 

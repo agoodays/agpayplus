@@ -57,13 +57,14 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                 string msg = resJSON?.GetValue("msg").ToString(); //业务响应信息	
                 if ("BBS00000".Equals(code))
                 {
-                    var respData = resJSON.GetValue("req_data").ToObject<JObject>();
+                    var respData = resJSON.GetValue("resp_data").ToObject<JObject>();
                     respData.TryGetString("merchant_no", out string merchantNo);
                     string tradeNo = respData.GetValue("trade_no").ToString();//拉卡拉商户订单号
                     string accTradeNo = respData.GetValue("acc_trade_no").ToString();//拉卡拉商户订单号
                     respData.TryGetString("user_id1", out string userId1);
                     respData.TryGetString("user_id2", out string userId2);
                     string tradeState = respData.GetValue("trade_state").ToString();
+                    respData.TryGetString("trade_state_desc", out string tradeStateDesc);
                     var orderStatus = LklPayEnum.ConvertTradeState(tradeState);
                     switch (orderStatus)
                     {
@@ -75,7 +76,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                             channelRetMsg.PlatformMchOrderId = tradeNo;
                             break;
                         case LklPayEnum.TradeState.FAIL:
-                            channelRetMsg = ChannelRetMsg.ConfirmFail(code, msg);
+                            channelRetMsg = ChannelRetMsg.ConfirmFail(code, tradeStateDesc ?? msg);
                             break;
                     }
                 }
