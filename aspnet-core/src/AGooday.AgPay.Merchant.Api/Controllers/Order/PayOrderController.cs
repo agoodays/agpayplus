@@ -162,6 +162,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
                         value = excelHeader.Key switch
                         {
                             "state" => order.State.ToEnum<PayOrderState>()?.GetDescription() ?? "未知",
+                            "refundState" => order.State.ToEnum<PayOrderRefund>()?.GetDescription() ?? "未知",
                             "amount" or "refundAmount" or "mchFeeAmount" => Convert.ToDecimal(value) / 100,
                             _ => Convert.ToString(value),
                         };
