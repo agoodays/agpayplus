@@ -215,7 +215,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
             //reqParams.Add("remark", payOrder.Body); //商品描述
             reqParams.Add("location_info", new JObject() {
                 { "request_ip", payOrder.ClientIp }
-            }); // 终端信息); //订单标题
+            }); // 终端信息
         }
     }
 }

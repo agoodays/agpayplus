@@ -28,6 +28,16 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.Utils
             return flag;
         }
 
+        public static bool NoticeVerify(Dictionary<string, string> headers, string data, string publicKeyCert)
+        {
+            headers.TryGetValue("Lklapi-Timestamp", out string timeStamp);
+            headers.TryGetValue("Lklapi-Nonce", out string nonceStr);
+            headers.TryGetValue("Lklapi-Signature", out string signature);
+            string resbody = GenNoticeSigned(data, timeStamp, nonceStr);
+            var flag = Verify(Encoding.UTF8.GetBytes(resbody), Convert.FromBase64String(signature), publicKeyCert);
+            return flag;
+        }
+
         private static string Sign(string reqbody, string privateKeyCert)
         {
             var certFilePath = ChannelCertConfigKit.GetCertFilePath(privateKeyCert);
@@ -98,6 +108,12 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay.Utils
         {
             return appId + "\n" + serialNo + "\n" + timeStamp + "\n" + nonceStr + "\n" + strBody + "\n";
         }
+
+        private static string GenNoticeSigned(string strBody, string timeStamp, string nonceStr)
+        {
+            return timeStamp + "\n" + nonceStr + "\n" + strBody + "\n";
+        }
+
 
         /// <summary>
         /// 生成随机12个字符

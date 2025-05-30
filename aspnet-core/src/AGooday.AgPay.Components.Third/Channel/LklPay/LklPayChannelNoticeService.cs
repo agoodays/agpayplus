@@ -137,7 +137,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
 
             //验签失败
             var headers = request.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault());
-            if (!LklPaySignUtil.Verify(headers, isvParams.AppId, jsonParams.ToString(), publicKey))
+            if (!LklPaySignUtil.NoticeVerify(headers, jsonParams.ToString(), publicKey))
             {
                 _logger.LogInformation("【拉卡拉回调】 验签失败！ 回调参数: parameter={jsonParams}, publicKey={publicKey} ", jsonParams, publicKey);
                 //_logger.LogInformation($"【拉卡拉回调】 验签失败！ 回调参数: parameter={jsonParams}, publicKey={publicKey} ");

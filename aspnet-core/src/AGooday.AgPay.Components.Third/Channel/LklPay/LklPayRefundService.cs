@@ -129,6 +129,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                 reqParams.Add("refund_amount", refundOrder.RefundAmount); // 退款金额
                 //reqParams.Add("notify_url", GetNotifyUrl());
                 reqParams.Add("refund_reason", refundOrder.RefundReason); // 退款原因
+                reqParams.Add("location_info", new JObject() {
+                    { "request_ip", refundOrder.ClientIp }
+                }); // 终端信息
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/v3/labs/relation/refund", reqParams, logPrefix, mchAppConfigContext);
