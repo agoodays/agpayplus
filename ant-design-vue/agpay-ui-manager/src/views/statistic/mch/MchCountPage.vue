@@ -11,9 +11,18 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <a-form-item label="" class="table-head-layout">
-            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'商户名称'" :msg="searchData.mchName" v-model="searchData.mchName" />
           <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
           <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
@@ -168,8 +177,9 @@ import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
+import { API_URL_ORDER_STATISTIC, API_URL_MCH_LIST, req } from '@/api/manage'
 import moment from 'moment'
 import InfoDetail from './Detail'
 
@@ -190,7 +200,7 @@ const tableColumns = [
 
 export default {
   name: 'MchCountPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp, InfoDetail },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, AgDateRangePicker, AgTextUp, InfoDetail },
   data () {
     let queryDateRange = 'today'
     if (this.$route.query.queryDate) {
@@ -241,6 +251,9 @@ export default {
   mounted () {
   },
   methods: {
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
+    },
     handleSearchFormData (searchData) {
       this.searchData = searchData
       // if (!Object.keys(searchData).length) {

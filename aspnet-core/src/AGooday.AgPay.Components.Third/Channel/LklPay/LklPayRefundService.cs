@@ -1,6 +1,7 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Channel.LklPay.Enumerator;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
@@ -65,10 +66,11 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                 string msg = resJSON?.GetValue("msg").ToString(); //业务响应信息	
                 if ("BBS00000".Equals(code))
                 {
-                    var respData = resJSON.GetValue("req_data").ToObject<JObject>();
+                    var respData = resJSON.GetValue("resp_data").ToObject<JObject>();
                     string tradeNo = respData.GetValue("trade_no").ToString();//拉卡拉商户订单号
                     string accTradeNo = respData.GetValue("acc_trade_no").ToString();//拉卡拉商户订单号
                     string tradeState = respData.GetValue("trade_state").ToString();
+                    respData.TryGetString("trade_state_desc", out string tradeStateDesc);
                     var orderStatus = LklPayEnum.ConvertTradeState(tradeState);
                     switch (orderStatus)
                     {
@@ -84,7 +86,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                             //明确退款失败
                             channelRetMsg.ChannelState = ChannelState.CONFIRM_FAIL;
                             channelRetMsg.ChannelErrCode = code;
-                            channelRetMsg.ChannelErrMsg = msg;
+                            channelRetMsg.ChannelErrMsg = tradeStateDesc ?? msg;
                             _logger.LogInformation("{logPrefix} >>> 退款失败, {msg}", logPrefix, msg);
                             //_logger.LogInformation($"{logPrefix} >>> 退款失败, {msg}");
                             break;
@@ -127,6 +129,9 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                 reqParams.Add("refund_amount", refundOrder.RefundAmount); // 退款金额
                 //reqParams.Add("notify_url", GetNotifyUrl());
                 reqParams.Add("refund_reason", refundOrder.RefundReason); // 退款原因
+                reqParams.Add("location_info", new JObject() {
+                    { "request_ip", refundOrder.ClientIp }
+                }); // 终端信息
 
                 //封装公共参数 & 签名 & 调起http请求 & 返回响应数据并包装为json格式。
                 JObject resJSON = await _paymentService.PackageParamAndReqAsync("/api/v3/labs/relation/refund", reqParams, logPrefix, mchAppConfigContext);
@@ -141,7 +146,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                 string msg = resJSON?.GetValue("msg").ToString(); //业务响应信息	
                 if ("BBS00000".Equals(code))
                 {
-                    var respData = resJSON.GetValue("req_data").ToObject<JObject>();
+                    var respData = resJSON.GetValue("resp_data").ToObject<JObject>();
                     string tradeNo = respData.GetValue("trade_no").ToString();//拉卡拉商户订单号
                     string accTradeNo = respData.GetValue("acc_trade_no").ToString();//拉卡拉商户订单号
                     channelRetMsg.ChannelOrderId = tradeNo;

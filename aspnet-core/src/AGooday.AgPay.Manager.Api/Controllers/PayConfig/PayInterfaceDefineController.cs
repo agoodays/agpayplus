@@ -132,7 +132,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_PC_IF_DEFINE_VIEW, PermCode.MGR.ENT_PC_IF_DEFINE_EDIT)]
         public async Task<ApiRes> DetailAsync(string ifCode)
         {
-            var payIfDefine = await _payIfDefineService.GetByIdAsync(ifCode);
+            var payIfDefine = await _payIfDefineService.GetByIdAsNoTrackingAsync(ifCode);
             if (payIfDefine == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

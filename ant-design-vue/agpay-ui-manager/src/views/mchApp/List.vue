@@ -10,7 +10,16 @@
         @set-is-show-more="setIsShowMore"
         @query-func="queryFunc">
         <template slot="formItem">
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
+          <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
           <ag-text-up :placeholder="'应用名称'" :msg="searchData.appName" v-model="searchData.appName"/>
           <a-form-item label="" class="table-head-layout">
@@ -71,11 +80,12 @@
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgPayConfigDrawer from '@/components/AgPayConfig/AgPayConfigDrawer'
 import AgPayOauth2ConfigDrawer from '@/components/AgPayOauth2Config/AgPayOauth2ConfigDrawer'
-import { API_URL_MCH_APP, req } from '@/api/manage'
+import { API_URL_MCH_APP, API_URL_MCH_LIST, req } from '@/api/manage'
 import MchAppAddOrEdit from './AddOrEdit'
 import MchPayIfConfigList from './MchPayIfConfigList'
 
@@ -92,7 +102,7 @@ const tableColumns = [
 
 export default {
   name: 'MchAppPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgPayConfigDrawer, AgPayOauth2ConfigDrawer, AgTextUp, MchAppAddOrEdit, MchPayIfConfigList },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, AgPayConfigDrawer, AgPayOauth2ConfigDrawer, AgTextUp, MchAppAddOrEdit, MchPayIfConfigList },
   data () {
     return {
       isShowMore: false,
@@ -108,6 +118,9 @@ export default {
     this.queryFunc()
   },
   methods: {
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
+    },
     handleSearchFormData (searchData) {
       this.searchData = searchData
     },

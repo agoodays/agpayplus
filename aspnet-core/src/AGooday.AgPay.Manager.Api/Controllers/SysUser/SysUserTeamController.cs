@@ -109,7 +109,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         [PermissionAuth(PermCode.MGR.ENT_UR_TEAM_VIEW, PermCode.MGR.ENT_UR_TEAM_EDIT)]
         public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var mchStore = await _sysUserTeamService.GetByIdAsync(recordId);
+            var mchStore = await _sysUserTeamService.GetByIdAsNoTrackingAsync(recordId);
             if (mchStore == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

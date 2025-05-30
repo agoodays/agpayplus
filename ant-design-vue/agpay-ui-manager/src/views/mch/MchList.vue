@@ -11,7 +11,25 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
-          <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.agentNo"
+              :api="searchAgent"
+              valueField="agentNo"
+              labelField="agentName"
+              placeholder="代理商号（搜索代理商名称）"
+            />
+          </a-form-item>
+          <!-- <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.isvNo"
+              :api="searchIsv"
+              valueField="isvNo"
+              labelField="isvName"
+              placeholder="服务商号（搜索服务商名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'商户名称'" :msg="searchData.mchName" v-model="searchData.mchName"/>
           <a-form-item label="" class="table-head-layout">
             <a-select v-model="searchData.state" placeholder="商户状态" default-value="">
@@ -78,9 +96,10 @@
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_MCH_LIST, req, reqLoad } from '@/api/manage'
+import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import InfoDetail from './Detail'
 import MchConfig from './MchConfig'
@@ -100,7 +119,7 @@ const tableColumns = [
 
 export default {
   name: 'MchListPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, InfoAddOrEdit, InfoDetail, MchConfig, AgTextUp },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, InfoAddOrEdit, InfoDetail, MchConfig, AgTextUp },
   data () {
     return {
       isShowMore: false,
@@ -112,6 +131,12 @@ export default {
   mounted () {
   },
   methods: {
+    searchAgent (params) {
+      return req.list(API_URL_AGENT_LIST, params)
+    },
+    searchIsv (params) {
+      return req.list(API_URL_ISV_LIST, params)
+    },
     handleSearchFormData (searchData) {
       this.searchData = searchData
     },

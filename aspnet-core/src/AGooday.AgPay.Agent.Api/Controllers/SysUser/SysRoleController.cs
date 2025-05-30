@@ -118,7 +118,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         [PermissionAuth(PermCode.AGENT.ENT_UR_ROLE_EDIT)]
         public async Task<ApiRes> DetailAsync(string recordId)
         {
-            var sysRole = await _sysRoleService.GetByIdAsync(recordId);
+            var sysRole = await _sysRoleService.GetByIdAsNoTrackingAsync(recordId);
             if (sysRole is null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

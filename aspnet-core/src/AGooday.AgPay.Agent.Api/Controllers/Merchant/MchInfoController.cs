@@ -128,12 +128,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Merchant
         [PermissionAuth(PermCode.AGENT.ENT_MCH_INFO_VIEW, PermCode.AGENT.ENT_MCH_INFO_EDIT)]
         public async Task<ApiRes> DetailAsync(string mchNo)
         {
-            var mchInfo = await _mchInfoService.GetByIdAsync(mchNo);
+            var mchInfo = await _mchInfoService.GetByIdAsNoTrackingAsync(mchNo);
             if (mchInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var sysUser = await _sysUserService.GetByIdAsync(mchInfo.InitUserId.Value);
+            var sysUser = await _sysUserService.GetByIdAsNoTrackingAsync(mchInfo.InitUserId.Value);
             if (sysUser != null)
             {
                 mchInfo.AddExt("loginUsername", sysUser.LoginUsername);

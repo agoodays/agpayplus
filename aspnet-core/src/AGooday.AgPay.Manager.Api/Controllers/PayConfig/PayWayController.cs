@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MGR.ENT_PC_WAY_VIEW, PermCode.MGR.ENT_PC_WAY_EDIT)]
         public async Task<ApiRes> DetailAsync(string wayCode)
         {
-            var payWay = await _payWayService.GetByIdAsync(wayCode);
+            var payWay = await _payWayService.GetByIdAsNoTrackingAsync(wayCode);
             if (payWay == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

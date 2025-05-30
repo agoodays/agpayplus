@@ -33,7 +33,16 @@
               <a-icon slot="suffixIcon" type="sync" />
             </a-range-picker>
           </a-form-item>
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
           <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
         </template>
@@ -179,8 +188,9 @@
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
+import { API_URL_ORDER_STATISTIC, API_URL_MCH_LIST, req } from '@/api/manage'
 import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars
@@ -199,7 +209,7 @@ const tableColumns = [
 
 export default {
   name: 'TransactionPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgTextUp },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, AgTextUp },
   data () {
     // 计算开始时间和结束时间
     const startDate = moment().subtract(1, 'month').startOf('day')
@@ -236,6 +246,9 @@ export default {
   mounted () {
   },
   methods: {
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
+    },
     handleSearchFormData (searchData) {
       this.searchData = searchData
       // if (!Object.keys(searchData).length) {

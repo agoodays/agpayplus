@@ -116,7 +116,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Merchant
         [AllowAnonymous, NoLog]
         public async Task<ApiRes> DetailAsync(long id)
         {
-            var payPassage = await _mchPayPassageService.GetByIdAsync(id);
+            var payPassage = await _mchPayPassageService.GetByIdAsNoTrackingAsync(id);
             if (payPassage == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

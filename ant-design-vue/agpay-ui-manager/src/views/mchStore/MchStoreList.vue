@@ -10,8 +10,17 @@
         @set-is-show-more="setIsShowMore"
         @query-func="queryFunc">
         <template slot="formItem">
+          <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'门店编号'" :msg="searchData.storeId" v-model="searchData.storeId"/>
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
           <ag-text-up :placeholder="'门店名称'" :msg="searchData.storeName" v-model="searchData.storeName"/>
         </template>
       </AgSearchForm>
@@ -57,9 +66,10 @@
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_MCH_STORE, req, reqLoad } from '@/api/manage'
+import { API_URL_MCH_STORE, API_URL_MCH_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import InfoBindAppId from './BindAppId'
 import InfoDetail from './Detail'
@@ -77,7 +87,7 @@ const tableColumns = [
 
 export default {
   name: 'MchStorePage',
-  components: { AgSearchForm, AgTable, AgTextUp, AgTableColumns, InfoAddOrEdit, InfoBindAppId, InfoDetail },
+  components: { AgSearchForm, AgTable, AgSelect, AgTextUp, AgTableColumns, InfoAddOrEdit, InfoBindAppId, InfoDetail },
   data () {
     return {
       isShowMore: false,
@@ -89,6 +99,9 @@ export default {
   mounted () {
   },
   methods: {
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
+    },
     handleSearchFormData (searchData) {
       this.searchData = searchData
     },

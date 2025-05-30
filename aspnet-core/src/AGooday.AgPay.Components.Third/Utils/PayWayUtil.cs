@@ -101,9 +101,13 @@ namespace AGooday.AgPay.Components.Third.Utils
                 }
                 return paymentService;
             }
+            catch (InvalidOperationException)
+            {
+                throw new BizException($"支付接口不支持该支付方式");
+            }
             catch (Exception)
             {
-                return null;
+                throw;
             }
         }
     }

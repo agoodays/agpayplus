@@ -13,27 +13,38 @@ namespace AGooday.AgPay.Components.Third.Channel.HkrtPay.Utils
 
         public static async Task<string> DoPostAsync(string url, JObject reqParams)
         {
-            var client = new AgHttpClient(DEFAULT_TIMEOUT, DEFAULT_CHARSET);
-            var request = new AgHttpClient.Request()
+            if (string.IsNullOrWhiteSpace(url))
+                throw new ArgumentException("URL 不能为空", nameof(url));
+            if (reqParams == null)
+                throw new ArgumentNullException(nameof(reqParams));
+
+            // 使用 using 确保资源释放
+            using (var client = new AgHttpClient(DEFAULT_TIMEOUT, DEFAULT_CHARSET))
             {
-                Url = url,
-                Method = HttpMethod.Post.Method,
-                Content = JsonConvert.SerializeObject(reqParams),
-                ContentType = MediaTypeNames.Application.FormUrlEncoded
-            };
-            try
-            {
-                var response = await client.SendAsync(request);
-                if (response.IsSuccessStatusCode)
+                var request = new AgHttpClient.Request()
                 {
-                    string result = response.Content;
-                    return result;
+                    Url = url,
+                    Method = HttpMethod.Post.Method,
+                    Content = JsonConvert.SerializeObject(reqParams, Formatting.None), // 紧凑 JSON
+                    ContentType = MediaTypeNames.Application.FormUrlEncoded
+                };
+
+                try
+                {
+                    var response = await client.SendAsync(request).ConfigureAwait(false);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string result = response.Content;
+                        return result;
+                    }
+                    return null;
                 }
-                return null;
-            }
-            catch (Exception e)
-            {
-                throw ChannelException.SysError(e.Message);
+                catch (Exception e)
+                {
+                    // 记录详细日志（可选）
+                    LogUtil<HkrtPayHttpUtil>.Error($"请求失败: {url}，{reqParams}", e);
+                    throw ChannelException.SysError($"支付通道请求异常：{e.Message}");
+                }
             }
         }
     }

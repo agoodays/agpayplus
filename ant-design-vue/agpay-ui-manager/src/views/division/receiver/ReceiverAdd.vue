@@ -14,7 +14,16 @@
       <a-row justify="space-between" style="margin-left: -20px; margin-right: -20px; row-gap: 0px;">
         <a-col :span="6" style="padding-left: 20px; padding-right: 20px;">
           <a-form-model-item label="商户号">
-            <a-input v-model="mchNo" placeholder="商户号" @change="changeMchNo"/>
+            <div style="display: flex;">
+              <ag-select
+                v-model="mchNo"
+                :api="searchMch"
+                valueField="mchNo"
+                labelField="mchName"
+                placeholder="商户号（搜索商户名称）"
+                @change="changeMchNo"
+              />
+            </div>
           </a-form-model-item>
         </a-col>
         <a-col :span="6" style="padding-left: 20px; padding-right: 20px;">
@@ -208,9 +217,10 @@
 
 // eslint-disable-next-line no-unused-vars
 import { genRowKey } from '@/utils/util'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import ChannelUserModal from '@/components/ChannelUser/ChannelUserModal'
 import InfoAddOrEdit from '../group/AddOrEdit'
-import { API_URL_MCH_APP, API_URL_DIVISION_RECEIVER, API_URL_DIVISION_RECEIVER_GROUP, req, getIfCodeByAppId } from '@/api/manage'
+import { API_URL_MCH_APP, API_URL_DIVISION_RECEIVER, API_URL_DIVISION_RECEIVER_GROUP, API_URL_MCH_LIST, req, getIfCodeByAppId } from '@/api/manage'
 
 // eslint-disable-next-line no-unused-vars
 const accTableColumns = [
@@ -254,7 +264,7 @@ const relationOptions = [
 ]
 
 export default {
-  components: { InfoAddOrEdit, ChannelUserModal },
+  components: { AgSelect, InfoAddOrEdit, ChannelUserModal },
   props: {
     callbackFunc: {
       type: Function,
@@ -294,10 +304,13 @@ export default {
       that.appSupportIfCodes = [] // 初始化
       that.receiverTableData = [] // 置空表格
     },
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
+    },
     // 变更 mchNo的事件
-    changeMchNo (e) {
+    changeMchNo (value) {
       const that = this // 提前保留this
-      const value = e.target.value
+      // const value = e.target.value
       if (!value) {
         that.reset()
         return

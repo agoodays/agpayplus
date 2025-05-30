@@ -50,7 +50,7 @@
                 {{ d.agentName + " [ ID: " + d.agentNo + " ]" }}
               </a-select-option>
             </a-select>
-            <AgDateRangePicker
+            <ag-date-range-picker
               class="date"
               :value="statistics.params.queryDateRange"
               :options="[

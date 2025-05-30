@@ -22,6 +22,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
     {
         private readonly IMQSender _mqSender;
         private readonly IAgentInfoService _agentInfoService;
+        private readonly IIsvInfoService _isvInfoService;
         private readonly ISysUserService _sysUserService;
 
         private readonly DomainNotificationHandler _notifications;
@@ -29,13 +30,15 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         public AgentInfoController(IMQSender mqSender, ILogger<AgentInfoController> logger,
             ICacheService cacheService,
             IAuthService authService,
-            INotificationHandler<DomainNotification> notifications,
             IAgentInfoService agentInfoService,
-            ISysUserService sysUserService)
+            IIsvInfoService isvInfoService,
+            ISysUserService sysUserService,
+            INotificationHandler<DomainNotification> notifications)
             : base(logger, cacheService, authService)
         {
             _mqSender = mqSender;
             _agentInfoService = agentInfoService;
+            _isvInfoService = isvInfoService;
             _sysUserService = sysUserService;
             _notifications = (DomainNotificationHandler)notifications;
         }
@@ -113,15 +116,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Agent
         [PermissionAuth(PermCode.MGR.ENT_AGENT_INFO_VIEW, PermCode.MGR.ENT_AGENT_INFO_EDIT)]
         public async Task<ApiRes> DetailAsync(string agentNo)
         {
-            var agentInfo = await _agentInfoService.GetByIdAsync(agentNo);
+            var agentInfo = await _agentInfoService.GetByIdAsNoTrackingAsync(agentNo);
             if (agentInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var sysUser = await _sysUserService.GetByIdAsync(agentInfo.InitUserId.Value);
+            var sysUser = await _sysUserService.GetByIdAsNoTrackingAsync(agentInfo.InitUserId.Value);
             if (sysUser != null)
             {
                 agentInfo.AddExt("loginUsername", sysUser.LoginUsername);
+            }
+            if (!string.IsNullOrWhiteSpace(agentInfo.IsvNo))
+            {
+                var isvInfo = await _isvInfoService.GetByIdAsNoTrackingAsync(agentInfo.IsvNo);
+                agentInfo.AddExt("isvName", isvInfo?.IsvName);
             }
             return ApiRes.Ok(agentInfo);
         }

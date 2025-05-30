@@ -147,7 +147,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Isv
         [PermissionAuth(PermCode.MGR.ENT_ISV_INFO_VIEW, PermCode.MGR.ENT_ISV_INFO_EDIT)]
         public async Task<ApiRes> DetailAsync(string isvNo)
         {
-            var isvInfo = await _isvInfoService.GetByIdAsync(isvNo);
+            var isvInfo = await _isvInfoService.GetByIdAsNoTrackingAsync(isvNo);
             if (isvInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

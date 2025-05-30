@@ -78,59 +78,62 @@ namespace AGooday.AgPay.Components.Third.Services
         /// <param name="refundOrder"></param>
         public async Task UpdatePayOrderProfitAndGenAccountBillAsync(RefundOrderDto refundOrder)
         {
-            IPaymentService paymentService = _paymentServiceFactory.GetService(refundOrder.IfCode);
-            var payOrder = await _payOrderService.GetByIdAsync(refundOrder.PayOrderId);
-            var updatePayOrderProfits = new List<PayOrderProfitDto>();
-            var accountBills = new List<AccountBillDto>();
             var payOrderProfits = _payOrderProfitService.GetByPayOrderIdAsNoTracking(refundOrder.PayOrderId);
-            var amount = payOrder.Amount - payOrder.RefundAmount;
-            var beforeBalance = 0L;
-            var profitAmount = 0L;
-            var afterBalance = 0L;
-            var changeAmount = 0L;
-            var totalProfitAmount = 0L;
-            var agentPayOrderProfits = payOrderProfits.Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.AGENT)).OrderBy(o => o.Id);
-            foreach (var payOrderProfit in agentPayOrderProfits)
+            if (payOrderProfits != null && payOrderProfits.Any())
             {
-                beforeBalance = payOrderProfit.ProfitAmount;
-                profitAmount = paymentService?.CalculateProfitAmount(amount, payOrderProfit.ProfitRate) ?? 0;
+                IPaymentService paymentService = _paymentServiceFactory.GetService(refundOrder.IfCode);
+                var payOrder = await _payOrderService.GetByIdAsync(refundOrder.PayOrderId);
+                var updatePayOrderProfits = new List<PayOrderProfitDto>();
+                var accountBills = new List<AccountBillDto>();
+                var amount = payOrder.Amount - payOrder.RefundAmount;
+                var beforeBalance = 0L;
+                var profitAmount = 0L;
+                var afterBalance = 0L;
+                var changeAmount = 0L;
+                var totalProfitAmount = 0L;
+                var agentPayOrderProfits = payOrderProfits.Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.AGENT)).OrderBy(o => o.Id);
+                foreach (var payOrderProfit in agentPayOrderProfits)
+                {
+                    beforeBalance = payOrderProfit.ProfitAmount;
+                    profitAmount = paymentService?.CalculateProfitAmount(amount, payOrderProfit.ProfitRate) ?? 0;
+                    afterBalance = profitAmount;
+                    changeAmount = afterBalance - beforeBalance;
+                    payOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, payOrderProfit.FeeRate) ?? 0;
+                    payOrderProfit.ProfitAmount = profitAmount;
+                    updatePayOrderProfits.Add(payOrderProfit);
+                    GenAccountBill(accountBills, payOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+                    totalProfitAmount += profitAmount;
+                }
+
+                var platformInaccountPayOrderProfit = payOrderProfits
+                    .Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM) && w.InfoId.Equals(CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_INACCOUNT))
+                    .OrderBy(o => o.Id).FirstOrDefault();
+                var isvFeeAmount = paymentService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
+                var platformInaccountProfitAmount = payOrder.MchFeeAmount - isvFeeAmount;
+                beforeBalance = platformInaccountPayOrderProfit.ProfitAmount;
+                profitAmount = platformInaccountProfitAmount;
                 afterBalance = profitAmount;
                 changeAmount = afterBalance - beforeBalance;
-                payOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, payOrderProfit.FeeRate) ?? 0;
-                payOrderProfit.ProfitAmount = profitAmount;
-                updatePayOrderProfits.Add(payOrderProfit);
-                GenAccountBill(accountBills, payOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
-                totalProfitAmount += profitAmount;
+                platformInaccountPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
+                platformInaccountPayOrderProfit.ProfitAmount = profitAmount;
+                updatePayOrderProfits.Add(platformInaccountPayOrderProfit);
+                GenAccountBill(accountBills, platformInaccountPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+
+                var platformProfitPayOrderProfit = payOrderProfits
+                    .Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM) && w.InfoId.Equals(CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_PROFIT))
+                    .OrderBy(o => o.Id).FirstOrDefault();
+                var platformProfitAmount = platformInaccountProfitAmount - totalProfitAmount;
+                beforeBalance = platformProfitPayOrderProfit.ProfitAmount;
+                profitAmount = platformProfitAmount;
+                afterBalance = profitAmount;
+                changeAmount = afterBalance - beforeBalance;
+                platformProfitPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformProfitPayOrderProfit.FeeRate) ?? 0;
+                platformProfitPayOrderProfit.ProfitAmount = profitAmount;
+                updatePayOrderProfits.Add(platformProfitPayOrderProfit);
+                GenAccountBill(accountBills, platformProfitPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
+
+                await _refundOrderService.UpdatePayOrderProfitAndGenAccountBillAsync(updatePayOrderProfits, accountBills);
             }
-
-            var platformInaccountPayOrderProfit = payOrderProfits
-                .Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM) && w.InfoId.Equals(CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_INACCOUNT))
-                .OrderBy(o => o.Id).FirstOrDefault();
-            var isvFeeAmount = paymentService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
-            var platformInaccountProfitAmount = payOrder.MchFeeAmount - isvFeeAmount;
-            beforeBalance = platformInaccountPayOrderProfit.ProfitAmount;
-            profitAmount = platformInaccountProfitAmount;
-            afterBalance = profitAmount;
-            changeAmount = afterBalance - beforeBalance;
-            platformInaccountPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformInaccountPayOrderProfit.FeeRate) ?? 0;
-            platformInaccountPayOrderProfit.ProfitAmount = profitAmount;
-            updatePayOrderProfits.Add(platformInaccountPayOrderProfit);
-            GenAccountBill(accountBills, platformInaccountPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
-
-            var platformProfitPayOrderProfit = payOrderProfits
-                .Where(w => w.InfoType.Equals(CS.PAY_ORDER_PROFIT_INFO_TYPE.PLATFORM) && w.InfoId.Equals(CS.PAY_ORDER_PROFIT_INFO_ID.PLATFORM_PROFIT))
-                .OrderBy(o => o.Id).FirstOrDefault();
-            var platformProfitAmount = platformInaccountProfitAmount - totalProfitAmount;
-            beforeBalance = platformProfitPayOrderProfit.ProfitAmount;
-            profitAmount = platformProfitAmount;
-            afterBalance = profitAmount;
-            changeAmount = afterBalance - beforeBalance;
-            platformProfitPayOrderProfit.FeeAmount = paymentService?.CalculateFeeAmount(amount, platformProfitPayOrderProfit.FeeRate) ?? 0;
-            platformProfitPayOrderProfit.ProfitAmount = profitAmount;
-            updatePayOrderProfits.Add(platformProfitPayOrderProfit);
-            GenAccountBill(accountBills, platformProfitPayOrderProfit, refundOrder, beforeBalance, afterBalance, changeAmount);
-
-            await _refundOrderService.UpdatePayOrderProfitAndGenAccountBillAsync(updatePayOrderProfits, accountBills);
         }
 
         private void GenAccountBill(List<AccountBillDto> accountBills, PayOrderProfitDto payOrderProfit, RefundOrderDto refundOrder, long beforeBalance, long afterBalance, long changeAmount)

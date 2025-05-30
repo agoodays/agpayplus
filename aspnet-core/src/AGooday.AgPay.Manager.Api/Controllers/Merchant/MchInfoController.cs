@@ -24,6 +24,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         private readonly IMQSender _mqSender;
         private readonly IMchInfoService _mchInfoService;
         private readonly IAgentInfoService _agentInfoService;
+        private readonly IIsvInfoService _isvInfoService;
         private readonly ISysUserService _sysUserService;
 
         private readonly DomainNotificationHandler _notifications;
@@ -34,6 +35,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             IMQSender mqSender,
             IMchInfoService mchInfoService,
             IAgentInfoService agentInfoService,
+            IIsvInfoService isvInfoService,
             ISysUserService sysUserService,
             INotificationHandler<DomainNotification> notifications)
             : base(logger, cacheService, authService)
@@ -41,6 +43,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
             _mqSender = mqSender;
             _mchInfoService = mchInfoService;
             _agentInfoService = agentInfoService;
+            _isvInfoService = isvInfoService;
             _sysUserService = sysUserService;
             _notifications = (DomainNotificationHandler)notifications;
         }
@@ -131,15 +134,25 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_INFO_VIEW, PermCode.MGR.ENT_MCH_INFO_EDIT)]
         public async Task<ApiRes> DetailAsync(string mchNo)
         {
-            var mchInfo = await _mchInfoService.GetByIdAsync(mchNo);
+            var mchInfo = await _mchInfoService.GetByIdAsNoTrackingAsync(mchNo);
             if (mchInfo == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            var sysUser = await _sysUserService.GetByIdAsync(mchInfo.InitUserId.Value);
+            var sysUser = await _sysUserService.GetByIdAsNoTrackingAsync(mchInfo.InitUserId.Value);
             if (sysUser != null)
             {
                 mchInfo.AddExt("loginUsername", sysUser.LoginUsername);
+            }
+            if (!string.IsNullOrWhiteSpace(mchInfo.IsvNo))
+            {
+                var isvInfo = await _isvInfoService.GetByIdAsNoTrackingAsync(mchInfo.IsvNo);
+                mchInfo.AddExt("isvName", isvInfo?.IsvName);
+            }
+            if (!string.IsNullOrWhiteSpace(mchInfo.AgentNo))
+            {
+                var agentInfo = await _agentInfoService.GetByIdAsNoTrackingAsync(mchInfo.AgentNo);
+                mchInfo.AddExt("agentName", agentInfo?.AgentName);
             }
             return ApiRes.Ok(mchInfo);
         }

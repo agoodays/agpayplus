@@ -2,6 +2,7 @@
 using AGooday.AgPay.AopSdk.Exceptions;
 using AGooday.AgPay.AopSdk.Models;
 using AGooday.AgPay.AopSdk.Request;
+using AGooday.AgPay.Application.Config;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
@@ -161,6 +162,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
                         value = excelHeader.Key switch
                         {
                             "state" => order.State.ToEnum<PayOrderState>()?.GetDescription() ?? "未知",
+                            "refundState" => order.State.ToEnum<PayOrderRefund>()?.GetDescription() ?? "未知",
                             "amount" or "refundAmount" or "mchFeeAmount" => Convert.ToDecimal(value) / 100,
                             _ => Convert.ToString(value),
                         };
@@ -206,7 +208,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         [PermissionAuth(PermCode.MCH.ENT_PAY_ORDER_VIEW)]
         public async Task<ApiRes> DetailAsync(string payOrderId)
         {
-            var payOrder = await _payOrderService.GetByIdAsync(payOrderId);
+            var payOrder = await _payOrderService.GetByIdAsNoTrackingAsync(payOrderId);
             if (payOrder == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -268,7 +270,13 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
 
             var mchApp = await _mchAppService.GetByIdAsync(payOrder.AppId);
 
-            var agpayClient = new AgPayClient(_sysConfigService.GetDBApplicationConfig().PaySiteUrl, mchApp.AppSecret);
+            DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
+
+#if DEBUG
+            dbApplicationConfig.PaySiteUrl = "https://localhost:9819";
+#endif
+
+            var agpayClient = new AgPayClient(dbApplicationConfig.PaySiteUrl, mchApp.AppSecret);
             try
             {
                 var response = await agpayClient.ExecuteAsync(request);
