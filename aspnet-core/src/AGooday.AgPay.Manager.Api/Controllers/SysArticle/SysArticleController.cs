@@ -110,7 +110,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysArticle
         [PermissionAuth(PermCode.MGR.ENT_NOTICE_VIEW, PermCode.MGR.ENT_NOTICE_EDIT)]
         public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var sysArticle = await _sysArticleService.GetByIdAsync(recordId);
+            var sysArticle = await _sysArticleService.GetByIdAsNoTrackingAsync(recordId);
             if (sysArticle == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

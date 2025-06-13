@@ -139,7 +139,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_APP_VIEW, PermCode.MGR.ENT_MCH_APP_EDIT)]
         public async Task<ApiRes> DetailAsync(string appId)
         {
-            var mchApp = await _mchAppService.GetByIdAsync(appId);
+            var mchApp = await _mchAppService.GetByIdAsNoTrackingAsync(appId);
             if (mchApp == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

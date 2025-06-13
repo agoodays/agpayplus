@@ -67,7 +67,7 @@
         public static long ConvertDollar2Cent(string amount) => ConvertDollar2Cent(Convert.ToDecimal(amount));
 
         /// <summary>
-        /// 将"元"转换成"分"，如：1.00分被转换为100元。
+        /// 将"元"转换成"分"，如：1.00元被转换为100分。
         /// </summary>
         /// <param name="amount">金额</param>
         /// <returns></returns>

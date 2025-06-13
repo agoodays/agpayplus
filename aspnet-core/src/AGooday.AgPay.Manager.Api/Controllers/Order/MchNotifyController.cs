@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         [PermissionAuth(PermCode.MGR.ENT_MCH_NOTIFY_VIEW)]
         public async Task<ApiRes> DetailAsync(long notifyId)
         {
-            var mchNotify = await _mchNotifyService.GetByIdAsync(notifyId);
+            var mchNotify = await _mchNotifyService.GetByIdAsNoTrackingAsync(notifyId);
             if (mchNotify == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

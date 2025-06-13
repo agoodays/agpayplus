@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public async Task<SysRoleDto> GetByIdAsync(string recordId, string belongInfoId)
+        public async Task<SysRoleDto> GetByIdAsNoTrackingAsync(string recordId, string belongInfoId)
         {
             var entity = await _sysRoleRepository.GetAllAsNoTracking().Where(w => w.RoleId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefaultAsync();
             var dto = _mapper.Map<SysRoleDto>(entity);

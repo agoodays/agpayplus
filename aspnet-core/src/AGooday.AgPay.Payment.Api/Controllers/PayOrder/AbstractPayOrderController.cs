@@ -88,6 +88,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             UnifiedOrderRS bizRS = null;
 
             //是否新订单模式 [  一般接口都为新订单模式，  由于QR_CASHIER支付方式，需要先 在DB插入一个新订单， 导致此处需要特殊判断下。 如果已存在则直接更新，否则为插入。  ]
+            payOrder = !string.IsNullOrWhiteSpace(payOrder?.PayOrderId) ? payOrder : null;
             bool isNewOrder = payOrder == null;
 
             try
@@ -122,6 +123,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     bizRQ.ChannelExtra = payOrder.ChannelExtra;
                     bizRQ.ExtParam = payOrder.ExtParam;
                     bizRQ.DivisionMode = payOrder.DivisionMode;
+                    bizRQ.SignType = "MD5"; // 设置默认签名方式为MD5
                 }
 
                 string mchNo = bizRQ.MchNo;
@@ -166,7 +168,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
                     DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
 
-                    string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID, payOrderId));
+                    string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GenTokenData(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID, payOrderId));
                     if (CS.PAY_DATA_TYPE.CODE_IMG_URL.Equals(qrCashierOrderRQ.PayDataType))
                     {
                         //二维码地址
@@ -355,8 +357,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
 
         private async Task GenPayOrderProfitAsync(PayOrderDto payOrder, IPaymentService paymentService)
         {
-            var payRateConfigs = _payRateConfigService.GetPayRateConfigInfos(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
-            if (payRateConfigs != null)
+            var payRateConfigs = await _payRateConfigService.GetPayRateConfigInfosAsync(payOrder.MchNo, payOrder.IfCode, payOrder.WayCode, payOrder.Amount);
+            if (payRateConfigs != null && payRateConfigs.Any())
             {
                 var payOrderProfits = new List<PayOrderProfitDto>();
                 var payOrderProfit = new PayOrderProfitDto();
@@ -449,7 +451,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
             if (mchAppConfigContext.MchType == (byte)MchInfoType.TYPE_NORMAL)//普通商户
             {
 
-                if (_configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, ifCode) == null)
+                if (await _configContextQueryService.QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, ifCode) == null)
                 {
                     throw new BizException("商户应用参数未配置");
                 }
@@ -462,7 +464,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.PayOrder
                     throw new BizException("特约商户参数未配置");
                 }
 
-                if (_configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, ifCode) == null)
+                if (await _configContextQueryService.QueryIsvParamsAsync(mchAppConfigContext.MchInfo.IsvNo, ifCode) == null)
                 {
                     throw new BizException("服务商参数未配置");
                 }

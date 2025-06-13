@@ -2,7 +2,14 @@
   <a-modal v-model="isShow" :title=" isAdd ? '新增账号组' : '修改账号组' " @ok="handleOkFunc" :confirmLoading="confirmLoading">
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 6}" :wrapper-col="{span: 15}" :rules="rules">
       <a-form-model-item label="商户号" prop="mchNo">
-        <a-input v-model="saveObject.mchNo" placeholder="请输入" :disabled="!isAdd" />
+        <ag-select
+          v-model="saveObject.mchNo"
+          :api="searchMch"
+          valueField="mchNo"
+          labelField="mchName"
+          placeholder="商户号（搜索商户名称）"
+          :disabled="!isAdd"
+        />
       </a-form-model-item>
       <a-form-model-item label="组名称：" prop="receiverGroupName">
         <a-input v-model="saveObject.receiverGroupName" />
@@ -21,8 +28,10 @@
 </template>
 
 <script>
-import { API_URL_DIVISION_RECEIVER_GROUP, req } from '@/api/manage'
+import AgSelect from '@/components/AgSelect/AgSelect'
+import { API_URL_DIVISION_RECEIVER_GROUP, API_URL_MCH_LIST, req } from '@/api/manage'
 export default {
+  components: { AgSelect },
   props: {
     callbackFunc: { type: Function, default: () => () => ({}) }
   },
@@ -62,6 +71,9 @@ export default {
       } else {
         that.isShow = true // 立马展示弹层信息
       }
+    },
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
     },
     handleOkFunc: function () { // 点击【确认】按钮事件
       const that = this

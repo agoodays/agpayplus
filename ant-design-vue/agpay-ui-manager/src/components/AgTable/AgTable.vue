@@ -65,7 +65,7 @@
           <!--<a-menu slot="overlay">
             <a-checkbox-group v-model="visibleColumns">
               <a-menu-item v-for="column in allColumns" :key="column.key">
-                <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title }}</a-checkbox>
+                <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title || column.scopedSlots.titleValue }}</a-checkbox>
               </a-menu-item>
             </a-checkbox-group>
           </a-menu>-->
@@ -73,7 +73,7 @@
             <a-menu class="ant-pro-drop-down menu">
               <a-checkbox-group v-model="visibleColumns">
                 <a-menu-item v-for="column in allColumns" :key="column.key">
-                  <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title }}</a-checkbox>
+                  <a-checkbox is-group="" :value="column.key" :key="column.key">{{ column.title || column.scopedSlots.titleValue }}</a-checkbox>
                 </a-menu-item>
               </a-checkbox-group>
             </a-menu>
@@ -99,6 +99,9 @@
         return { style: { 'background-color': index % 2 == 0 ? '#FCFCFC' : '#FFFFFF'} }
       }"
     >
+      <template v-for="colCustom in columnsCustomTitleSlots" :slot="colCustom.title">
+        <slot :name="colCustom.title" :record="colCustom.titleValue"></slot>
+      </template>
       <!-- 自定义列插槽， 参考：https://github.com/feseed/admin-antd-vue/blob/master/src/components/ShTable.vue  -->
       <!--  eslint-disable-next-line -->
       <template v-for="colCustom in columnsCustomSlots" :slot="colCustom.customRender" slot-scope="record">
@@ -152,6 +155,10 @@ export default {
   },
   // 计算属性
   computed: {
+    columnsCustomTitleSlots () { // 自定义列Title插槽  1. 过滤器仅获取到包含slot属性的元素， 2. 返回slot数组
+      // 获取具有 scopedSlots 中包含 title 属性的数据
+      return this.tableColumns.filter(column => column.scopedSlots && column.scopedSlots.title).map(item => item.scopedSlots)
+    },
     columnsCustomSlots () { // 自定义列插槽  1. 过滤器仅获取到包含slot属性的元素， 2. 返回slot数组
       return this.tableColumns.filter(item => item.scopedSlots).map(item => item.scopedSlots)
     },

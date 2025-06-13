@@ -13,35 +13,51 @@ namespace AGooday.AgPay.Components.Third.Channel.UmsPay.Utils
 
         public static async Task<string> DoPostJsonAsync(string url, string appid, string appkey, JObject reqParams)
         {
-            var client = new AgHttpClient(DEFAULT_TIMEOUT, DEFAULT_CHARSET);
-            var body = JsonConvert.SerializeObject(reqParams, Formatting.Indented, new JsonSerializerSettings
+            // 参数校验
+            if (string.IsNullOrWhiteSpace(url))
+                throw new ArgumentException("URL 不能为空", nameof(url));
+            if (string.IsNullOrWhiteSpace(appid))
+                throw new ArgumentException("appid 不能为空", nameof(appid));
+            if (string.IsNullOrWhiteSpace(appkey))
+                throw new ArgumentException("appkey 不能为空", nameof(appkey));
+            if (reqParams == null)
+                throw new ArgumentNullException(nameof(reqParams));
+
+            using (var client = new AgHttpClient(DEFAULT_TIMEOUT, DEFAULT_CHARSET))
             {
-                NullValueHandling = NullValueHandling.Ignore
-            });
-            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");// 请求时间戳，格式：yyyyMMddHHmmss
-            string nonce = Guid.NewGuid().ToString("N");// 随机数
-            var authorization = UmsPaySignUtil.GetAuthorization(appid, appkey, timestamp, nonce, body);
-            var request = new AgHttpClient.Request()
-            {
-                Url = url,
-                Method = HttpMethod.Post.Method,
-                Content = body,
-                ContentType = MediaTypeNames.Application.Json,
-                Headers = new Dictionary<string, string> { { "Authorization", authorization } }
-            };
-            try
-            {
-                var response = await client.SendAsync(request);
-                if (response.IsSuccessStatusCode)
+                // 生成紧凑 JSON（移除缩进）
+                var body = JsonConvert.SerializeObject(reqParams, Formatting.None, new JsonSerializerSettings
                 {
-                    string result = response.Content;
-                    return result;
+                    NullValueHandling = NullValueHandling.Ignore
+                });
+
+                // 生成时间戳和随机数
+                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+                string nonce = Guid.NewGuid().ToString("N"); // 简化随机数生成
+
+                // 生成签名
+                var authorization = UmsPaySignUtil.GetAuthorization(appid, appkey, timestamp, nonce, body);
+
+                var request = new AgHttpClient.Request()
+                {
+                    Url = url,
+                    Method = HttpMethod.Post.Method,
+                    Content = body,
+                    ContentType = MediaTypeNames.Application.Json,
+                    Headers = new Dictionary<string, string> { { "Authorization", authorization } }
+                };
+
+                try
+                {
+                    var response = await client.SendAsync(request).ConfigureAwait(false);
+                    return response.Content; // 始终返回内容
                 }
-                return null;
-            }
-            catch (Exception e)
-            {
-                throw ChannelException.SysError(e.Message);
+                catch (Exception e)
+                {
+                    // 记录脱敏日志（示例）
+                    LogUtil<UmsPayHttpUtil>.Error($"请求失败: {url}，{reqParams}", e);
+                    throw ChannelException.SysError($"支付通道请求异常：{e.Message}");
+                }
             }
         }
     }

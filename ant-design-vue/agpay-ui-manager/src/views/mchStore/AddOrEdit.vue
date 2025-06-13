@@ -13,12 +13,13 @@
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
           <a-form-model-item label="商户号" prop="mchNo" v-if="isAdd">
-            <a-select v-model="saveObject.mchNo" placeholder="请选择商户">
-              <a-select-option value="" key="">请选择商户</a-select-option>
-              <a-select-option v-for="d in mchList" :value="d.mchNo" :key="d.mchNo">
-                {{ d.mchName + " [ ID: " + d.mchNo + " ]" }}
-              </a-select-option>
-            </a-select>
+            <ag-select
+              v-model="saveObject.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -138,6 +139,7 @@
 </template>
 
 <script>
+import AgSelect from '@/components/AgSelect/AgSelect'
 import { API_URL_MCH_STORE, API_URL_MCH_LIST, req, upload, getMapConfig } from '@/api/manage'
 import AgUpload from '@/components/AgUpload/AgUpload'
 import AMapLoader from '@amap/amap-jsapi-loader'
@@ -148,7 +150,7 @@ export default {
     callbackFunc: { type: Function, default: () => () => ({}) }
   },
   components: {
-    AgUpload
+    AgUpload, AgSelect
   },
   data () {
     const checkMchNo = (rule, value, callback) => { // 是否选择了商户
@@ -163,7 +165,6 @@ export default {
       saveObject: {}, // 数据对象
       recordId: null, // 更新对象ID
       visible: false, // 是否显示弹层/抽屉
-      mchList: null, // 商户下拉列表
       polygons: [],
       areasOptions: [],
       areas: [],
@@ -195,9 +196,6 @@ export default {
         this.$refs.infoFormModel.resetFields()
       }
       const that = this
-      req.list(API_URL_MCH_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 商户下拉选择列表
-        that.mchList = res.records
-      })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.recordId = recordId
         req.getById(API_URL_MCH_STORE, recordId).then(res => {
@@ -209,6 +207,9 @@ export default {
         that.visible = true // 立马展示弹层信息
         that.initAMap()
       }
+    },
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
     },
     // DOM初始化完成进行地图初始化
     initAMap: function () {

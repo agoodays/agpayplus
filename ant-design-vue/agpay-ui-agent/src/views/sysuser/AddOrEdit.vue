@@ -242,7 +242,7 @@ export default {
       rules: {
         realname: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }],
         userType: [{ required: true, validator: checkUserType, trigger: 'blur' }],
-        telphone: [{ required: true, pattern: /^[1][0-9]{10}$/, message: '请输入正确的手机号码', trigger: 'blur' }],
+        telphone: [{ required: true, pattern: /^1\d{10}$/, message: '请输入正确的手机号码', trigger: 'blur' }],
         userNo: [{ required: true, message: '请输入编号', trigger: 'blur' }],
         loginUsername: [],
         newPwd: [{

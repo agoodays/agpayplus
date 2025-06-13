@@ -18,6 +18,9 @@ RUN npm install
 # 复制项目文件
 COPY agpay-ui-agent/. .
 
+# 确保 vue-cli-service 是可执行的
+RUN chmod +x ./node_modules/.bin/vue-cli-service
+
 # 构建项目
 RUN npm run build
 

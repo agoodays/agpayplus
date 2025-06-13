@@ -27,7 +27,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.WebSockets
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await _wsChannelUserIdServer.ProcessWebSocketAsync(webSocket, cid, appId);
+                await _wsChannelUserIdServer.ProcessWebSocketAsync(webSocket, cid, (appId, cid));
             }
             else
             {

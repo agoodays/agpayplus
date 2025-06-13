@@ -155,7 +155,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Order
         [PermissionAuth(PermCode.MCH.ENT_TRANSFER_ORDER_VIEW)]
         public async Task<ApiRes> DetailAsync(string transferId)
         {
-            var refundOrder = await _transferOrderService.GetByIdAsync(transferId);
+            var refundOrder = await _transferOrderService.GetByIdAsNoTrackingAsync(transferId);
             if (refundOrder == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);

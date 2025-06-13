@@ -163,21 +163,27 @@
         </a-col>
         <a-col :span="10" v-if="saveObject.type == 2">
           <a-form-model-item label="代理商号" prop="agentNo">
-            <a-select v-model="saveObject.agentNo" placeholder="请选择代理商" @change="agentNoChange" :disabled="!isAdd">
-              <a-select-option value="" key="">请选择代理商</a-select-option>
-              <a-select-option v-for="d in agentList" :value="d.agentNo" :key="d.agentNo">
-                {{ d.agentName + " [ ID: " + d.agentNo + " ]" }}
-              </a-select-option>
-            </a-select>
+            <ag-select
+              v-model="saveObject.agentNo"
+              :api="searchAgent"
+              valueField="agentNo"
+              labelField="agentName"
+              placeholder="代理商号（搜索代理商名称）"
+              @change="agentNoChange"
+              :disabled="!isAdd"
+            />
           </a-form-model-item>
         </a-col>
         <a-col :span="10" v-if="saveObject.type == 2">
           <a-form-model-item label="服务商号" prop="isvNo">
-            <a-select v-model="saveObject.isvNo" placeholder="请选择服务商" :disabled="!isAdd || saveObject.agentNo?.length>0">
-              <a-select-option v-for="d in isvList" :value="d.isvNo" :key="d.isvNo">
-                {{ d.isvName + " [ ID: " + d.isvNo + " ]" }}
-              </a-select-option>
-            </a-select>
+            <ag-select
+              v-model="saveObject.isvNo"
+              :api="searchIsv"
+              valueField="isvNo"
+              labelField="isvName"
+              placeholder="服务商号（搜索服务商名称）"
+              :disabled="!isAdd || saveObject.agentNo?.length > 0"
+            />
           </a-form-model-item>
         </a-col>
       </a-row>
@@ -292,14 +298,14 @@
 </template>
 
 <script>
+import AgSelect from '@/components/AgSelect/AgSelect'
 import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req, getPwdRulesRegexp } from '@/api/manage'
 import { Base64 } from 'js-base64'
 export default {
-
+  components: { AgSelect },
   props: {
     callbackFunc: { type: Function, default: () => () => ({}) }
   },
-
   data () {
     const checkIsvNo = (rule, value, callback) => { // 校验类型为特约商户是否选择了服务商
       if (this.saveObject.type === 2 && !value) {
@@ -335,8 +341,6 @@ export default {
       saveObject: {}, // 数据对象
       recordId: null, // 更新对象ID
       visible: false, // 是否显示弹层/抽屉
-      agentList: null, // 代理商下拉列表
-      isvList: null, // 服务商下拉列表
       refundModeOptions: [
         { label: '平台退款', value: 'plat' },
         { label: '接口退款', value: 'api' }
@@ -413,12 +417,6 @@ export default {
         this.$refs.infoFormModel.resetFields()
       }
       const that = this
-      req.list(API_URL_AGENT_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 代理商下拉选择列表
-        that.agentList = res.records
-      })
-      req.list(API_URL_ISV_LIST, { 'pageSize': -1, 'state': 1 }).then(res => { // 服务商下拉选择列表
-        that.isvList = res.records
-      })
       if (!this.isAdd) { // 修改信息 延迟展示弹层
         that.resetIsShow = true // 展示重置密码板块
         that.recordId = recordId
@@ -429,6 +427,12 @@ export default {
       } else {
         that.visible = true // 立马展示弹层信息
       }
+    },
+    searchAgent (params) {
+      return req.list(API_URL_AGENT_LIST, params)
+    },
+    searchIsv (params) {
+      return req.list(API_URL_ISV_LIST, params)
     },
     // 随机生成密码
     genRandomPassword: function () {
@@ -543,9 +547,9 @@ export default {
         this.saveObject.refundMode = ['plat', 'api']
       }
     },
-    agentNoChange () {
-      if (this.saveObject.agentNo) {
-        this.saveObject.isvNo = this.agentList?.find(a => a.agentNo === this.saveObject.agentNo)?.isvNo
+    agentNoChange (val, selected) {
+      if (selected) {
+        this.saveObject.isvNo = selected?.isvNo
       }
     }
   }

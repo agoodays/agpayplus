@@ -50,7 +50,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.AccountBill
         [PermissionAuth(PermCode.MGR.ENT_ACCOUNT_BILL_VIEW)]
         public async Task<ApiRes> DetailAsync(long id)
         {
-            var accountBill = await _accountBillService.GetByIdAsync(id);
+            var accountBill = await _accountBillService.GetByIdAsNoTrackingAsync(id);
             return ApiRes.Ok(accountBill);
         }
     }

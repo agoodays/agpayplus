@@ -4,7 +4,12 @@
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    TZ=Asia/Shanghai
+
+# 设置时区
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 USER app
 WORKDIR /app
 EXPOSE 5816

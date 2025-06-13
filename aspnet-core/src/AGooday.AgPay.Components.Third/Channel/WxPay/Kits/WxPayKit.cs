@@ -7,6 +7,7 @@ using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.RQRS.Msg;
 using AGooday.AgPay.Components.Third.Services;
 using SKIT.FlurlHttpClient.Wechat.TenpayV3;
+using SKIT.FlurlHttpClient.Wechat.TenpayV3.Models;
 
 namespace AGooday.AgPay.Components.Third.Channel.WxPay.Kits
 {
@@ -82,6 +83,15 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay.Kits
         public static string GenerateXml(string code, string msg)
         {
             return $"<xml><return_code><![CDATA[{code}]]></return_code><return_msg><![CDATA[{msg}]]></return_msg></xml>";
+        }
+
+        public static QueryCertificatesResponse.Types.Certificate GetLatestValidCertificate(QueryCertificatesResponse response)
+        {
+            var now = DateTime.Now;
+            return response.CertificateList
+                .Where(c => c.EffectiveTime <= now && now <= c.ExpireTime)
+                .OrderByDescending(c => c.EffectiveTime)
+                .FirstOrDefault();
         }
     }
 }

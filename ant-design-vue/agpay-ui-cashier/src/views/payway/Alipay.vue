@@ -193,22 +193,21 @@ export default {
     pay: function () {
       let that = this;
       getPayPackage(this.amount, this.remark).then(res => {
-
         //订单创建异常
-        if (res.code != '0') {
+        if (res.code && res.code != '0') {
           return alert(res.msg);
         }
 
-        if (res.data.orderState != 1) { //订单不是支付中，说明订单异常
-          return alert(res.data.errMsg);
+        if (res.orderState != 1) { //订单不是支付中，说明订单异常
+          return alert(res.errMsg);
         }
 
         if (!window.AlipayJSBridge) {
           document.addEventListener('AlipayJSBridgeReady', function () {
-            that.doAlipay(res.data.alipayTradeNo);
+            that.doAlipay(res.alipayTradeNo);
           }, false);
         } else {
-          that.doAlipay(res.data.alipayTradeNo);
+          that.doAlipay(res.alipayTradeNo);
         }
       }).catch(res => {
         that.$router.push({name: config.errorPageRouteName, params: {errInfo: res.msg}})

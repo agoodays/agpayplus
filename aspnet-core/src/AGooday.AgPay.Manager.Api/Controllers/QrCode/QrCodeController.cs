@@ -191,7 +191,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         [PermissionAuth(PermCode.MGR.ENT_DEVICE_QRC_VIEW, PermCode.MGR.ENT_DEVICE_QRC_EDIT)]
         public async Task<ApiRes> DetailAsync(string recordId)
         {
-            var qrCode = await _qrCodeService.GetByIdAsync(recordId);
+            var qrCode = await _qrCodeService.GetByIdAsNoTrackingAsync(recordId);
             if (qrCode == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -206,7 +206,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             var qrCode = await _qrCodeService.GetByIdAsync(recordId);
             byte[] inArray;
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
-            string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GetTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, qrCode.QrcId));
+            string payUrl = dbApplicationConfig.GenUniJsapiPayUrl(CS.GenTokenData(CS.TOKEN_DATA_TYPE.QRC_ID, qrCode.QrcId));
             if (qrCode.QrcShellId.HasValue)
             {
                 var qrCodeShell = await _qrCodeShellService.GetByIdAsync(qrCode.QrcShellId.Value);

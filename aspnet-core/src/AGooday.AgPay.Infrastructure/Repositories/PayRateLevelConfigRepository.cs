@@ -16,9 +16,19 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return DbSet.Where(w => w.RateConfigId.Equals(id));
         }
 
+        public IQueryable<PayRateLevelConfig> GetByRateConfigIdAsNoTracking(long id)
+        {
+            return GetAllAsNoTracking().Where(w => w.RateConfigId.Equals(id));
+        }
+
         public IQueryable<PayRateLevelConfig> GetByRateConfigIds(List<long> ids)
         {
             return DbSet.Where(w => ids.Contains(w.RateConfigId));
+        }
+
+        public IQueryable<PayRateLevelConfig> GetByRateConfigIdsAsNoTracking(List<long> ids)
+        {
+            return GetAllAsNoTracking().Where(w => ids.Contains(w.RateConfigId));
         }
     }
 }

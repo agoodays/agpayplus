@@ -41,7 +41,8 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
         public bool IsSupport(string entryType)
         {
             // 微信仅支持 零钱 和 银行卡入账方式
-            if (TransferOrderEntry.WX_CASH.Equals(entryType) || TransferOrderEntry.BANK_CARD.Equals(entryType))
+            if (TransferOrderEntry.WX_CASH.Equals(entryType.ToEnum<TransferOrderEntry>()) 
+                || TransferOrderEntry.BANK_CARD.Equals(entryType.ToEnum<TransferOrderEntry>()))
             {
                 return true;
             }

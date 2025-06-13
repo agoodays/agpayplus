@@ -35,9 +35,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers
         /// <typeparam name="T"></typeparam>
         /// <param name="cls"></param>
         /// <returns></returns>
-        protected T GetRQ<T>() where T : AbstractRQ
+        protected async Task<T> GetRQAsync<T>() where T : AbstractRQ
         {
-            T bizRQ = this.GetObject<T>();
+            T bizRQ = await this.GetObjectAsync<T>();
 
             // [1]. 验证通用字段规则
             // 先清除验证状态
@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers
         protected async Task<T> GetRQByWithMchSignAsync<T>() where T : AbstractRQ
         {
             //获取请求RQ, and 通用验证
-            T bizRQ = this.GetRQ<T>();
+            T bizRQ = await this.GetRQAsync<T>();
 
             AbstractMchAppRQ abstractMchAppRQ = bizRQ as AbstractMchAppRQ;
 
@@ -128,9 +128,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        protected T GetObject<T>()
+        protected async Task<T> GetObjectAsync<T>()
         {
-            return JsonConvert.DeserializeObject<T>(this.GetReqParamJson().ToString());
+            var param = await this.GetReqParamToJsonAsync();
+            return JsonConvert.DeserializeObject<T>(param.ToString());
         }
 
         /// <summary>

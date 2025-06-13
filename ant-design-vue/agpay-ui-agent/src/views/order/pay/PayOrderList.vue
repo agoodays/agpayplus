@@ -11,7 +11,7 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <a-form-item label="" class="table-head-layout">
-            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
           <ag-text-up :placeholder="'支付/商户/渠道订单号'" :msg="searchData.unionOrderId" v-model="searchData.unionOrderId" />
           <!--<ag-text-up :placeholder="'支付订单号'" :msg="searchData.payOrderId" v-model="searchData.payOrderId" />-->

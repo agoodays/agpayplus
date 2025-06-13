@@ -106,6 +106,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
             model.MchNo = await GetCurrentMchNoAsync();
             model.AppId = mchApp.AppId;
             model.Currency = "CNY";
+            model.Amount = AmountUtil.ConvertDollar2Cent(transferOrder.Amount);
             request.SetBizModel(model);
 
             var agPayClient = new AgPayClient(_sysConfigService.GetDBApplicationConfig().PaySiteUrl, mchApp.AppSecret);

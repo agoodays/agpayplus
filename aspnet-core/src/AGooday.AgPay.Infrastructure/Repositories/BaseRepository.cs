@@ -242,7 +242,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <param name="entity">实体</param>
         public virtual void Remove(TEntity entity)
         {
-            DbSet.Remove(DbSet.Find(entity));
+            DbSet.Remove(entity);
         }
         /// <summary>
         /// 批量删除
@@ -729,7 +729,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         /// <param name="entity">实体</param>
         public virtual void Remove(TEntity entity)
         {
-            DbSet.Remove(DbSet.Find(entity));
+            DbSet.Remove(entity);
         }
         /// <summary>
         /// 批量删除

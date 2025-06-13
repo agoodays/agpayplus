@@ -11,10 +11,28 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <a-form-item label="" class="table-head-layout">
-            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
           </a-form-item>
-          <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <!-- <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
+          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.agentNo"
+              :api="searchAgent"
+              valueField="agentNo"
+              labelField="agentName"
+              placeholder="代理商号（搜索代理商名称）"
+            />
+          </a-form-item>
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId" />
           <ag-text-up :placeholder="'码牌ID'" :msg="searchData.qrcId" v-model="searchData.qrcId" />
         </template>
@@ -55,7 +73,7 @@
           <AgTableColState :state="record.state" :showSwitchType="$access('ENT_DEVICE_QRC_EDIT')" :onChange="(state) => { return updateState(record.qrcId, state)}"/>
         </template>
         <template slot="fixedPayAmountSlot" slot-scope="{record}">
-          <span>{{ record.fixedFlag === 0 ? '任意金额': record.fixedPayAmount }}</span>
+          <span>{{ record.fixedFlag === 0 ? '任意金额': (record.fixedPayAmount / 100).toFixed(2) }}</span>
         </template>
         <template slot="opSlot" slot-scope="{record}">  <!-- 操作列插槽 -->
           <AgTableColumns>
@@ -76,9 +94,10 @@
 <script>
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
 import AgTableColState from '@/components/AgTable/AgTableColState'
-import { API_URL_QRC_LIST, req, reqLoad } from '@/api/manage'
+import { API_URL_QRC_LIST, API_URL_AGENT_LIST, API_URL_MCH_LIST, req, reqLoad } from '@/api/manage'
 import InfoAddOrEdit from './AddOrEdit'
 import Bind from './Bind'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
@@ -98,7 +117,7 @@ const tableColumns = [
 
 export default {
   name: 'PayWayPage',
-  components: { AgSearchForm, AgTable, AgTableColumns, AgTableColState, InfoAddOrEdit, Bind, AgTextUp, AgDateRangePicker },
+  components: { AgSearchForm, AgTable, AgTableColumns, AgTableColState, AgSelect, InfoAddOrEdit, Bind, AgTextUp, AgDateRangePicker },
   data () {
     return {
       isShowMore: false,
@@ -112,6 +131,12 @@ export default {
     this.queryFunc()
   },
   methods: {
+    searchAgent (params) {
+      return req.list(API_URL_AGENT_LIST, params)
+    },
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
+    },
     handleSearchFormData (searchData) {
       this.searchData = searchData
     },

@@ -11,11 +11,20 @@
         @query-func="queryFunc">
         <template slot="formItem">
           <a-form-item label="" class="table-head-layout">
-            <AgDateRangePicker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event"/>
+            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
           </a-form-item>
           <ag-text-up :placeholder="'订单ID'" :msg="searchData.orderId" v-model="searchData.orderId" />
           <ag-text-up :placeholder="'商户订单号'" :msg="searchData.mchOrderNo" v-model="searchData.mchOrderNo" />
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+          <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              valueField="mchNo"
+              labelField="mchName"
+              placeholder="商户号（搜索商户名称）"
+            />
+          </a-form-item>
           <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo" />
           <ag-text-up v-if="isShowMore" :placeholder="'应用AppId'" :msg="searchData.appId" v-model="searchData.appId"/>
           <a-form-item v-if="isShowMore" label="" class="table-head-layout">
@@ -220,91 +229,95 @@
   </div>
 </template>
 <script>
-  import AgSearchForm from '@/components/AgSearch/AgSearchForm'
-  import AgTable from '@/components/AgTable/AgTable'
-  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
-  import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
-  import AgTableColumns from '@/components/AgTable/AgTableColumns'
-  import { API_URL_MCH_NOTIFY_LIST, req, mchNotifyResend } from '@/api/manage'
-  import moment from 'moment'
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
+import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import { API_URL_MCH_NOTIFY_LIST, API_URL_MCH_LIST, req, mchNotifyResend } from '@/api/manage'
+import moment from 'moment'
 
-  // eslint-disable-next-line no-unused-vars
-  const tableColumns = [
-    { key: 'orderId', dataIndex: 'orderId', title: '订单ID', width: 210, fixed: 'left' },
-    { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号', width: 200 },
-    { key: 'state', title: '通知状态', width: 130, scopedSlots: { customRender: 'stateSlot' } },
-    { key: 'orderType', title: '订单类型', width: 130, scopedSlots: { customRender: 'orderTypeSlot' } },
-    { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
-    { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
-  ]
+// eslint-disable-next-line no-unused-vars
+const tableColumns = [
+  { key: 'orderId', dataIndex: 'orderId', title: '订单ID', width: 210, fixed: 'left' },
+  { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号', width: 200 },
+  { key: 'state', title: '通知状态', width: 130, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'orderType', title: '订单类型', width: 130, scopedSlots: { customRender: 'orderTypeSlot' } },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+]
 
-  export default {
-    name: 'MchNotifyList',
-    components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
-    data () {
-      return {
-        isShowMore: false,
-        btnLoading: true,
-        tableColumns: tableColumns,
-        searchData: {
-          queryDateRange: 'today'
-        },
-        createdStart: '', // 选择开始时间
-        createdEnd: '', // 选择结束时间
-        visible: false,
-        detailData: {}
-      }
+export default {
+  name: 'MchNotifyList',
+  components: { AgSearchForm, AgTable, AgSelect, AgTableColumns, AgDateRangePicker, AgTextUp },
+  data () {
+    return {
+      isShowMore: false,
+      btnLoading: true,
+      tableColumns: tableColumns,
+      searchData: {
+        queryDateRange: 'today'
+      },
+      createdStart: '', // 选择开始时间
+      createdEnd: '', // 选择结束时间
+      visible: false,
+      detailData: {}
+    }
+  },
+  computed: {
+  },
+  mounted () {
+  },
+  methods: {
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
     },
-    computed: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
     },
-    mounted () {
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
     },
-    methods: {
-      handleSearchFormData (searchData) {
-        this.searchData = searchData
-      },
-      setIsShowMore (isShowMore) {
-        this.isShowMore = isShowMore
-      },
-      queryFunc () {
-        this.btnLoading = true
-        this.$refs.infoTable.refTable(true)
-      },
-      // 请求table接口数据
-      reqTableDataFunc: (params) => {
-        return req.list(API_URL_MCH_NOTIFY_LIST, params)
-      },
-      searchFunc: function () { // 点击【查询】按钮点击事件
-        this.$refs.infoTable.refTable(true)
-      },
-      detailFunc: function (recordId) {
-        const that = this
-        req.getById(API_URL_MCH_NOTIFY_LIST, recordId).then(res => {
-          that.detailData = res
+    queryFunc () {
+      this.btnLoading = true
+      this.$refs.infoTable.refTable(true)
+    },
+    // 请求table接口数据
+    reqTableDataFunc: (params) => {
+      return req.list(API_URL_MCH_NOTIFY_LIST, params)
+    },
+    searchFunc: function () { // 点击【查询】按钮点击事件
+      this.$refs.infoTable.refTable(true)
+    },
+    detailFunc: function (recordId) {
+      const that = this
+      req.getById(API_URL_MCH_NOTIFY_LIST, recordId).then(res => {
+        that.detailData = res
+      })
+      this.visible = true
+    },
+    moment,
+    onChange (date, dateString) {
+      this.searchData.createdStart = dateString[0] // 开始时间
+      this.searchData.createdEnd = dateString[1] // 结束时间
+    },
+    disabledDate (current) { // 今日之后日期不可选
+      return current && current > moment().endOf('day')
+    },
+    onClose () {
+      this.visible = false
+    },
+    resendFunc (notifyId) { // 重发通知
+      const that = this
+
+      this.$infoBox.confirmPrimary('确认重发通知？', '', () => {
+        mchNotifyResend(notifyId).then(res => {
+          that.$message.success('任务更新成功，请稍后查看最新状态！')
+          that.searchFunc()
         })
-        this.visible = true
-      },
-      moment,
-      onChange (date, dateString) {
-        this.searchData.createdStart = dateString[0] // 开始时间
-        this.searchData.createdEnd = dateString[1] // 结束时间
-      },
-      disabledDate (current) { // 今日之后日期不可选
-        return current && current > moment().endOf('day')
-      },
-      onClose () {
-        this.visible = false
-      },
-      resendFunc (notifyId) { // 重发通知
-        const that = this
-
-        this.$infoBox.confirmPrimary('确认重发通知？', '', () => {
-          mchNotifyResend(notifyId).then(res => {
-            that.$message.success('任务更新成功，请稍后查看最新状态！')
-            that.searchFunc()
-          })
-        })
-      }
+      })
     }
   }
+}
 </script>

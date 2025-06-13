@@ -10,6 +10,7 @@ using AGooday.AgPay.Components.Third.RQRS.Msg;
 using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Ocsp;
 using static AGooday.AgPay.Components.Third.Channel.IChannelNoticeService;
 
 namespace AGooday.AgPay.Components.Third.Channel.LklPay
@@ -82,6 +83,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
 
                 jsonParams.TryGetString("merchant_no", out string merchantNo);
                 string tradeState = jsonParams.GetValue("trade_state").ToString();
+                jsonParams.TryGetString("trade_state_desc", out string tradeStateDesc);
                 string tradeNo = jsonParams.GetValue("trade_no").ToString();//拉卡拉商户订单号
                 string accTradeNo = jsonParams.GetValue("acc_trade_no").ToString();//拉卡拉商户订单号
                 jsonParams.TryGetString("user_id1", out string userId1);
@@ -99,6 +101,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
                         break;
                     case LklPayEnum.TradeState.FAIL:
                         result.ChannelState = ChannelState.CONFIRM_FAIL;
+                        result.ChannelErrMsg = tradeStateDesc;
                         break;
                 }
                 return result;
@@ -134,7 +137,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
 
             //验签失败
             var headers = request.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault());
-            if (!LklPaySignUtil.Verify(headers, isvParams.AppId, jsonParams.ToString(), publicKey))
+            if (!LklPaySignUtil.NoticeVerify(headers, jsonParams.ToString(), publicKey))
             {
                 _logger.LogInformation("【拉卡拉回调】 验签失败！ 回调参数: parameter={jsonParams}, publicKey={publicKey} ", jsonParams, publicKey);
                 //_logger.LogInformation($"【拉卡拉回调】 验签失败！ 回调参数: parameter={jsonParams}, publicKey={publicKey} ");

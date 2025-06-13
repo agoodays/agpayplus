@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 throw new BizException("不支持的客户端");
             }
 
-            if (StringUtil.IsAvailableUrl(rq.RedirectUrl))
+            if (!StringUtil.IsAvailableUrl(rq.RedirectUrl))
             {
                 throw new BizException("跳转地址有误！");
             }
@@ -82,9 +82,8 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(rq.MchNo, rq.AppId);
-            string oauth2InfoId = await this.GetOauth2InfoIdAsync(ifCode, mchAppConfigContext);
 
-            string redirectUrl = await channelUserService.BuildUserRedirectUrlAsync(callbackUrl, oauth2InfoId, wayCode, mchAppConfigContext);
+            string redirectUrl = await channelUserService.BuildUserRedirectUrlAsync(callbackUrl, wayCode, mchAppConfigContext);
 
             return Redirect(redirectUrl);
         }
@@ -115,10 +114,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = await _configContextQueryService.QueryMchInfoAndAppInfoAsync(mchNo, appId);
-            string oauth2InfoId = await this.GetOauth2InfoIdAsync(ifCode, mchAppConfigContext);
 
             //获取渠道用户ID
-            string channelUserId = await channelUserService.GetChannelUserIdAsync(this.GetReqParamJson(), oauth2InfoId, wayCode, mchAppConfigContext);
+            var param = await this.GetReqParamToJsonAsync();
+            string channelUserId = await channelUserService.GetChannelUserIdAsync(param, wayCode, mchAppConfigContext);
 
             //同步跳转
             JObject appendParams = new JObject();
@@ -179,18 +178,6 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
                 return CS.PAY_WAY_CODE.WX_JSAPI;
             }
             return null;
-        }
-
-        private async Task<string> GetOauth2InfoIdAsync(string ifCode, MchAppConfigContext mchAppConfigContext)
-        {
-            string oauth2InfoId = null;
-            if (mchAppConfigContext.IsIsvSubMch())
-            {
-                var payInterfaceConfig = await _configContextQueryService.QueryIsvPayIfConfigAsync(mchAppConfigContext.MchInfo.IsvNo, ifCode);
-                oauth2InfoId = payInterfaceConfig?.Oauth2InfoId;
-            }
-
-            return oauth2InfoId;
         }
     }
 }

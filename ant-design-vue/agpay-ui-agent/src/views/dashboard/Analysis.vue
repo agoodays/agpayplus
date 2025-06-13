@@ -138,19 +138,17 @@
               <span><a style="color: rgb(38, 145, 255);" @click="moreNotice">更多 <a-icon type="right" /></a></span>
             </p>
             <div class="post-list">
-              <template v-for="noticeItem in noticeData">
-                <div :key="noticeItem.articleId" class="post-item" @click="noticeDetailShow(noticeItem.articleId)">
-                  <a-tooltip placement="top" :title="noticeItem.title">
-                    <span class="title">
-                      {{ noticeItem.title }}
-                    </span>
-                  </a-tooltip>
-                  <span>
-                    {{ moment(noticeItem.createdAt).format('YYYY-MM-DD') }}
-                    <a-icon type="right" />
+              <div v-for="noticeItem in noticeData" :key="noticeItem.articleId" class="post-item" @click="noticeDetailShow(noticeItem.articleId)">
+                <a-tooltip placement="top" :title="noticeItem.title">
+                  <span class="title">
+                    {{ noticeItem.title }}
                   </span>
-                </div>
-              </template>
+                </a-tooltip>
+                <span>
+                  {{ moment(noticeItem.createdAt).format('YYYY-MM-DD') }}
+                  <a-icon type="right" />
+                </span>
+              </div>
             </div>
           </div>
         </a-skeleton>
@@ -159,11 +157,9 @@
           <div class="quick-start">
             <p>快速开始</p>
             <ul class="quick-start-ul">
-              <template v-for="menu in quickMenuList">
-                <li :key="menu.entId">
-                  <router-link :to="menu.menuUri" tag="span">{{ menu.entName }}</router-link>
-                </li>
-              </template>
+              <li v-for="menu in quickMenuList" :key="menu.entId">
+                <router-link :to="menu.menuUri" tag="span">{{ menu.entName }}</router-link>
+              </li>
             </ul>
           </div>
         </a-skeleton>
@@ -175,7 +171,7 @@
         <div v-show="!skeletonIsShow" class="echart-title">
           <b>支付方式</b>
           <div class="chart-padding">
-            <AgDateRangePicker
+            <ag-date-range-picker
               :value="searchData.payTypeQueryDateRange"
               :options="[
                 { name: '今天', value: 'today' },
@@ -198,7 +194,7 @@
         <div v-show="!skeletonIsShow" class="echart-title">
           <b>交易统计</b>
           <div class="chart-padding" >
-            <AgDateRangePicker
+            <ag-date-range-picker
               :value="searchData.payCountQueryDateRange"
               :options="[
                 { name: '近7天', value: 'near2now_7' },

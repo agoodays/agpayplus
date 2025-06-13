@@ -65,7 +65,7 @@
           placeholder="手机号"
           v-decorator="[
             'mobile',
-            {rules: [{ required: true, pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号！' }], validateTrigger: 'blur'}
+            {rules: [{ required: true, pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号！' }], validateTrigger: 'blur'}
           ]"/>
       </a-form-item>
 
@@ -176,8 +176,10 @@ export default {
       that.form.validateFields({ force: true }, (err, values) => {
         if (!err) {
           const loginParams = { ...values }
+          loginParams.loginMethod = that.loginMethod
           loginParams.username = values.username
           loginParams.password = values.password
+          loginParams.mobile = values.mobile
           loginParams.vercode = values.usercode
           loginParams.vercodeToken = that.vercodeToken
           that.loginBtnLoadingFlag = true // 登录按钮显示加载loading

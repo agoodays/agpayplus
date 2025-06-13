@@ -4,7 +4,16 @@
       <div v-if="$access('ENT_DIVISION_RECEIVER_LIST')" class="table-page-search-wrapper">
         <a-form layout="inline" class="table-head-ground">
           <div class="table-layer">
-            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" />
+            <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
+            <a-form-item label="" class="table-head-layout">
+              <ag-select
+                v-model="searchData.mchNo"
+                :api="searchMch"
+                valueField="mchNo"
+                labelField="mchName"
+                placeholder="商户号（搜索商户名称）"
+              />
+            </a-form-item>
             <ag-text-up placeholder="应用ID[精准]" :msg="searchData.appId" v-model="searchData.appId" />
             <ag-text-up placeholder="分账接收者ID[精准]" :msg="searchData.receiverId" v-model="searchData.receiverId" />
             <ag-text-up placeholder="接收者账号别名[模糊]" :msg="searchData.receiverAlias" v-model="searchData.receiverAlias" />
@@ -86,8 +95,9 @@
 </template>
 <script>
 import AgTable from '@/components/AgTable/AgTable'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_DIVISION_RECEIVER, API_URL_IFDEFINES_LIST, req } from '@/api/manage'
+import { API_URL_DIVISION_RECEIVER, API_URL_IFDEFINES_LIST, API_URL_MCH_LIST, req } from '@/api/manage'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import ReceiverAdd from './ReceiverAdd'
 import ReceiverEdit from './ReceiverEdit'
@@ -115,7 +125,7 @@ const tableColumns = [
 ]
 
 export default {
-  components: { AgTable, AgTableColumns, AgTextUp, ReceiverAdd, ReceiverEdit, Detail },
+  components: { AgTable, AgTableColumns, AgSelect, AgTextUp, ReceiverAdd, ReceiverEdit, Detail },
   data () {
     return {
       tableColumns: tableColumns,
@@ -129,6 +139,9 @@ export default {
     this.reqIfDefineListFunc()
   },
   methods: {
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
+    },
     // 请求table接口数据
     reqTableDataFunc: (params) => {
       return req.list(API_URL_DIVISION_RECEIVER, params)

@@ -10,12 +10,14 @@
     class="drawer-width">
     <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{span: 6}" :wrapper-col="{span: 18}" :rules="rules">
       <a-form-model-item label="商户号" prop="mchNo">
-        <a-select v-model="saveObject.mchNo" placeholder="请选择商户" @change="mchNoChange">
-          <a-select-option value="" key="">请选择商户</a-select-option>
-          <a-select-option v-for="d in mchList" :value="d.mchNo" :key="d.mchNo">
-            {{ d.mchName + " [ ID: " + d.mchNo + " ]" }}
-          </a-select-option>
-        </a-select>
+        <ag-select
+          v-model="saveObject.mchNo"
+          :api="searchMch"
+          valueField="mchNo"
+          labelField="mchName"
+          placeholder="商户号（搜索商户名称）"
+          @change="mchNoChange"
+        />
       </a-form-model-item>
       <a-form-model-item label="应用" prop="appId">
         <a-select v-model="saveObject.appId" placeholder="请选择应用">
@@ -45,9 +47,11 @@
   </a-drawer>
 </template>
 <script>
+import AgSelect from '@/components/AgSelect/AgSelect'
 import { API_URL_QRC_LIST, API_URL_MCH_LIST, API_URL_MCH_APP, API_URL_MCH_STORE, req } from '@/api/manage'
 
 export default {
+  components: { AgSelect },
   props: {
     callbackFunc: { type: Function, default: () => () => ({}) }
   },
@@ -57,7 +61,6 @@ export default {
       btnLoading: false,
       recordId: null, // 更新对象ID
       saveObject: {}, // 数据对象
-      mchList: null, // 商户下拉列表
       appList: null, // 应用下拉列表
       storeList: null, // 门店下拉列表
       rules: {
@@ -77,14 +80,13 @@ export default {
           that.mchNoChange()
         }
       })
-
-      req.list(API_URL_MCH_LIST, { pageSize: -1, state: 1 }).then(res => { // 下拉选择列表
-        that.mchList = res.records
-      })
       this.visible = true
     },
     onClose () {
       this.visible = false
+    },
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
     },
     mchNoChange () {
       const that = this

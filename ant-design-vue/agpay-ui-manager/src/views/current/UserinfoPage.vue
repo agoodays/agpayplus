@@ -326,7 +326,7 @@ export default {
         }
         const data = Object.assign(formParams, { file: file })
         const formActionUrl = isLocalFile ? upload.avatar : res.formActionUrl
-        upload.singleFile(formActionUrl, data).then((response) => {
+        upload.singleFile(formActionUrl, isLocalFile, data).then((response) => {
           this.loading = false
           const ossFileUrl = isLocalFile ? response : res.ossFileUrl
           // 上传成功回调

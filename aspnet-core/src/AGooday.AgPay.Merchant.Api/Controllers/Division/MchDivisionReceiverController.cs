@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_VIEW)]
         public async Task<ApiRes> DetailAsync(long recordId)
         {
-            var record = await _mchDivisionReceiverService.GetByIdAsync(recordId, await GetCurrentMchNoAsync());
+            var record = await _mchDivisionReceiverService.GetByIdAsNoTrackingAsync(recordId, await GetCurrentMchNoAsync());
             if (record == null)
             {
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
@@ -111,14 +111,21 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Division
         /// <exception cref="BizException"></exception>
         [HttpPut, Route("{recordId}"), MethodLog("更新分账接收账号")]
         [PermissionAuth(PermCode.MCH.ENT_DIVISION_RECEIVER_EDIT)]
-        public async Task<ApiRes> UpdateAsync(long recordId, MchDivisionReceiverDto record)
+        public async Task<ApiRes> UpdateAsync(long recordId, MchDivisionReceiverModifyDto dto)
         {
+            var record = await _mchDivisionReceiverService.GetByIdAsNoTrackingAsync(recordId);
+            if (record == null)
+            {
+                return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
+            }
+            record.ReceiverAlias = dto.ReceiverAlias;
             // 改为真实比例
-            record.DivisionProfit = record.DivisionProfit / 100;
+            record.DivisionProfit = dto.DivisionProfit / 100;
+            record.State = dto.State;
             if (record.ReceiverGroupId != null)
             {
-                var groupRecord = await _mchDivisionReceiverGroupService.FindByIdAndMchNoAsync(record.ReceiverGroupId.Value, await GetCurrentMchNoAsync());
-                if (record == null)
+                var groupRecord = await _mchDivisionReceiverGroupService.FindByIdAndMchNoAsync(dto.ReceiverGroupId.Value, await GetCurrentMchNoAsync());
+                if (groupRecord == null)
                 {
                     throw new BizException("账号组不存在");
                 }

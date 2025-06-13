@@ -54,19 +54,12 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                 }
                 else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))
                 {
+                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    await WxServiceWrapper.InitializeCertificateManagerAsync(client);
+
                     AddProfitSharingReceiverRequest request = new AddProfitSharingReceiverRequest();
 
-                    //放置isv信息
-                    //不是特约商户，无需放置此值
-                    if (mchAppConfigContext.IsIsvSubMch())
-                    {
-                        WxPayIsvSubMchParams isvsubMchParams =
-                                (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.WXPAY);
-
-                        request.SubMerchantId = isvsubMchParams.SubMchId;
-                        request.SubAppId = isvsubMchParams.SubMchAppId;
-                    }
-
+                    request.AppId = wxServiceWrapper.Config.AppId;
                     // 0-个人， 1-商户  (目前仅支持服务商appI获取个人openId, 即： PERSONAL_OPENID， 不支持 PERSONAL_SUB_OPENID )
                     request.Type = mchDivisionReceiver.AccType == 0 ? "PERSONAL_OPENID" : "MERCHANT_ID";
                     request.Account = mchDivisionReceiver.AccNo;
@@ -74,7 +67,17 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     request.RelationType = mchDivisionReceiver.RelationType;
                     request.CustomRelation = mchDivisionReceiver.RelationTypeName;
 
-                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    //放置isv信息
+                    //不是特约商户，无需放置此值
+                    if (mchAppConfigContext.IsIsvSubMch())
+                    {
+                        WxPayIsvSubMchParams isvsubMchParams =
+                                (WxPayIsvSubMchParams)await _configContextQueryService.QueryIsvSubMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, GetIfCode());
+
+                        request.SubMerchantId = isvsubMchParams.SubMchId;
+                        request.SubAppId = isvsubMchParams.SubMchAppId;
+                    }
+                    client.EncryptRequestSensitiveProperty(request);
                     var response = await client.ExecuteAddProfitSharingReceiverAsync(request);
                     if (response.IsSuccessful())
                     {
@@ -118,8 +121,13 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                 }
                 else if (CS.PAY_IF_VERSION.WX_V3.Equals(wxServiceWrapper.Config.ApiVersion))
                 {
+                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    await WxServiceWrapper.InitializeCertificateManagerAsync(client);
+
                     CreateProfitSharingOrderRequest request = new CreateProfitSharingOrderRequest();
+                    request.AppId = wxServiceWrapper.Config.AppId;
                     request.TransactionId = payOrder.ChannelOrderNo;
+                    request.IsUnsplitAmountUnfrozen = true;
 
                     //放置isv信息
                     //不是特约商户，无需放置此值
@@ -160,7 +168,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                     {
                         return await DivisionFinishAsync(payOrder, mchAppConfigContext);
                     }
-                    var client = (WechatTenpayClientV3)wxServiceWrapper.Client;
+                    client.EncryptRequestSensitiveProperty(request);
                     var response = await client.ExecuteCreateProfitSharingOrderAsync(request);
                     if (response.IsSuccessful())
                     {

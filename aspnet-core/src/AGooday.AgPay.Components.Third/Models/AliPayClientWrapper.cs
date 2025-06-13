@@ -115,6 +115,7 @@ namespace AGooday.AgPay.Components.Third.Models
             }
             else
             {
+                // RSA2 加密算法默认生成格式为 PKCS8（Java 适用），如需 PKCS1 格式（非 Java 适用），可使用格式转换。C# 需使用 PKCS1 格式。
                 alipayClient = new DefaultAopClient(sandbox == CS.YES ? AliPayConfig.SANDBOX_SERVER_URL : AliPayConfig.PROD_SERVER_URL,
                     appId, privateKey, AliPayConfig.FORMAT, "1.0", signType, alipayPublicKey, AliPayConfig.CHARSET,
                         false);

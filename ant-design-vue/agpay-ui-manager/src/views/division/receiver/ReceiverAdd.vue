@@ -14,7 +14,16 @@
       <a-row justify="space-between" style="margin-left: -20px; margin-right: -20px; row-gap: 0px;">
         <a-col :span="6" style="padding-left: 20px; padding-right: 20px;">
           <a-form-model-item label="商户号">
-            <a-input v-model="mchNo" placeholder="商户号" @change="changeMchNo"/>
+            <div style="display: flex;">
+              <ag-select
+                v-model="mchNo"
+                :api="searchMch"
+                valueField="mchNo"
+                labelField="mchName"
+                placeholder="商户号（搜索商户名称）"
+                @change="changeMchNo"
+              />
+            </div>
           </a-form-model-item>
         </a-col>
         <a-col :span="6" style="padding-left: 20px; padding-right: 20px;">
@@ -94,7 +103,9 @@
         <!-- 接收方账号 -->
         <template slot="accNoSlot" slot-scope="record">
           <a-input v-model="record.accNo" style="width: 150px"/>
-          <a-button type="link" v-if="record.accType == 0" @click="showChannelUserModal('wxpay', record)">扫码获取</a-button>
+          <a-tooltip title="扫码获取">
+            <a-icon type="qrcode" v-if="record.accType == 0" class="icon-style" @click="showChannelUserModal('wxpay', record)"/>
+          </a-tooltip>
         </template>
 
         <!-- 接收方姓名 -->
@@ -142,7 +153,6 @@
           <div style="color: red; " v-show="record.reqBindState == 2">
             <a-icon type="close-circle" /> 绑定异常
           </div>
-
         </template>
 
         <!-- 账号别名 -->
@@ -161,7 +171,9 @@
         <!-- 接收方账号 -->
         <template slot="accNoSlot" slot-scope="record">
           <a-input v-model="record.accNo" style="width: 150px"/>
-          <a-button type="link" v-if="record.accType == 0" @click="showChannelUserModal('alipay', record)">扫码获取</a-button>
+          <a-tooltip title="扫码获取">
+            <a-icon type="qrcode" v-if="record.accType == 0" class="icon-style" @click="showChannelUserModal('alipay', record)"/>
+          </a-tooltip>
         </template>
 
         <!-- 接收方姓名 -->
@@ -205,20 +217,21 @@
 
 // eslint-disable-next-line no-unused-vars
 import { genRowKey } from '@/utils/util'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import ChannelUserModal from '@/components/ChannelUser/ChannelUserModal'
 import InfoAddOrEdit from '../group/AddOrEdit'
-import { API_URL_MCH_APP, API_URL_DIVISION_RECEIVER, API_URL_DIVISION_RECEIVER_GROUP, req, getIfCodeByAppId } from '@/api/manage'
+import { API_URL_MCH_APP, API_URL_DIVISION_RECEIVER, API_URL_DIVISION_RECEIVER_GROUP, API_URL_MCH_LIST, req, getIfCodeByAppId } from '@/api/manage'
 
 // eslint-disable-next-line no-unused-vars
 const accTableColumns = [
-  { key: 'reqBindState', title: '状态', scopedSlots: { customRender: 'reqBindStateSlot' } },
-  { key: 'receiverAlias', title: '账号别名', scopedSlots: { customRender: 'receiverAliasSlot' } },
-  { key: 'accType', title: '账号类型', scopedSlots: { customRender: 'accTypeSlot' } },
-  { key: 'accNo', title: '接收方账号', width: 300, scopedSlots: { customRender: 'accNoSlot' } },
-  { key: 'accName', title: '接收方姓名', width: 180, scopedSlots: { customRender: 'accNameSlot' } },
-  { key: 'relationType', title: '分账关系', scopedSlots: { customRender: 'relationTypeSlot' } },
+  { key: 'reqBindState', title: '状态', width: 120, scopedSlots: { customRender: 'reqBindStateSlot' } },
+  { key: 'receiverAlias', title: '账号别名', width: 120, scopedSlots: { customRender: 'receiverAliasSlot' } },
+  { key: 'accType', title: '账号类型', width: 120, scopedSlots: { customRender: 'accTypeSlot' } },
+  { key: 'accNo', title: '接收方账号', width: 200, scopedSlots: { customRender: 'accNoSlot' } },
+  { key: 'accName', title: '接收方姓名', width: 200, scopedSlots: { customRender: 'accNameSlot' } },
+  { key: 'relationType', title: '分账关系', width: 200, scopedSlots: { customRender: 'relationTypeSlot' } },
   { key: 'relationTypeName', title: '关系名称', width: 200, scopedSlots: { customRender: 'relationTypeNameSlot' } },
-  { key: 'divisionProfit', title: '默认分账比例', scopedSlots: { customRender: 'divisionProfitSlot' } },
+  { key: 'divisionProfit', title: '默认分账比例', width: 120, scopedSlots: { customRender: 'divisionProfitSlot' } },
   { key: 'op', title: '操作', scopedSlots: { customRender: 'opSlot' } }
 ]
 
@@ -251,7 +264,7 @@ const relationOptions = [
 ]
 
 export default {
-  components: { InfoAddOrEdit, ChannelUserModal },
+  components: { AgSelect, InfoAddOrEdit, ChannelUserModal },
   props: {
     callbackFunc: {
       type: Function,
@@ -291,10 +304,13 @@ export default {
       that.appSupportIfCodes = [] // 初始化
       that.receiverTableData = [] // 置空表格
     },
+    searchMch (params) {
+      return req.list(API_URL_MCH_LIST, params)
+    },
     // 变更 mchNo的事件
-    changeMchNo (e) {
+    changeMchNo (value) {
       const that = this // 提前保留this
-      const value = e.target.value
+      // const value = e.target.value
       if (!value) {
         that.reset()
         return
@@ -422,7 +438,10 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style scoped>
+  ::v-deep(.ant-table-wrapper) {
+    margin: 0;
+  }
   .icon-style {
     border-radius: 5px;
     padding-left: 2px;

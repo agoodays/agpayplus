@@ -37,25 +37,17 @@ namespace AGooday.AgPay.Application.Config
         /// <returns></returns>
         public string GenUniJsapiPayUrl(string data)
         {
-#if DEBUG
-            return $"{"http://localhost:8819"}/cashier/pages/hub/default?agpayToken={AgPayUtil.AesEncode(data)}";
-#endif
-            return $"{PaySiteUrl}/hub/{AgPayUtil.AesEncode(data)}";
+            return $"{PaySiteUrl}/cashier/pages/hub/default?agpayToken={AgPayUtil.AesEncode(data)}";
         }
 
         /// <summary>
         /// 生成  【jsapi统一收银台】oauth2获取用户ID回调地址
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        public string GenOauth2RedirectUrlEncode(string data)
+        public string GenOauth2RedirectUrlEncode(string token)
         {
-#if DEBUG
-
-            return URLUtil.EncodeAll($"{"http://localhost:8819"}/cashier/pages/oauth2/callback?agpayToken={AgPayUtil.AesEncode(data)}");
-#endif
-        
-            return URLUtil.EncodeAll($"{PaySiteUrl}/oauth2Callback/{AgPayUtil.AesEncode(data)}");
+            return URLUtil.EncodeAll($"{PaySiteUrl}/cashier/pages/oauth2/callback?agpayToken={token}");
         }
 
         /// <summary>
