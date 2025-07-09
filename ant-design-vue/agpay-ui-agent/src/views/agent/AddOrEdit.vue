@@ -654,11 +654,6 @@ export default {
       that.newPwd = ''
       that.sysPassword.confirmPwd = ''
     },
-    pidChange () {
-      if (this.saveObject.pid) {
-        this.saveObject.isvNo = this.agentList?.find(a => a.agentNo === this.saveObject.pid)?.isvNo
-      }
-    },
     agentTypeChange () {
       if (this.saveObject.agentType === 2) {
         this.imgLabel = '法人'
