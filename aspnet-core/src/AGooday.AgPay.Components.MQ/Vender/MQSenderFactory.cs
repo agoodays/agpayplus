@@ -2,6 +2,7 @@
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace AGooday.AgPay.Components.MQ.Vender
 {
@@ -28,8 +29,14 @@ namespace AGooday.AgPay.Components.MQ.Vender
             switch (mqVender)
             {
                 case MQVenderCS.RABBIT_MQ:
-                    _configuration.GetSection("MQ:RabbitMQ").Bind(RabbitMQConfig.MQ);
-                    return _serviceProvider.GetRequiredService<RabbitMQSender>();
+                    // 创建配置对象并绑定
+                    var rabbitMQConfig = new RabbitMQConfig();
+                    _configuration.GetSection("MQ:RabbitMQ").Bind(rabbitMQConfig.MQ);
+
+                    // 使用服务提供者创建 RabbitMQSender 实例
+                    return ActivatorUtilities.CreateInstance<RabbitMQSender>(
+                        _serviceProvider,
+                        Options.Create(rabbitMQConfig));
                 default:
                     throw new NotSupportedException("Invalid MQ vender configuration.");
             }
