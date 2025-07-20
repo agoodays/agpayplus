@@ -79,9 +79,9 @@ namespace AGooday.AgPay.Components.Third.Channel
             };
         }
 
-        protected Task<JObject> GetReqParamJSONAsync()
+        protected Task<JObject> GetReqParamJsonAsync()
         {
-            return _requestKit.GetReqParamJSONAsync();
+            return _requestKit.GetReqParamJsonAsync();
         }
 
         protected Task<string> GetReqParamFromBodyAsync()

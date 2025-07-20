@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LcswPay
         {
             try
             {
-                JObject @params = await GetReqParamJSONAsync();
+                JObject @params = await GetReqParamJsonAsync();
                 string payOrderId = @params.GetValue("terminal_trace").ToString();
                 return new Dictionary<string, object>() { { payOrderId, @params } };
             }

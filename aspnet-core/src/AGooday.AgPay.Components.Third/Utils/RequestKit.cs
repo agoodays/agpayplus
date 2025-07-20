@@ -21,29 +21,22 @@ namespace AGooday.AgPay.Components.Third.Utils
 
         public async Task<string> GetReqParamFromBodyAsync()
         {
-            string body = "";
-
-            if (IsConvertJSON())
+            if (!IsConvertJSON()) return string.Empty;
+            try
             {
-                try
-                {
-                    using (StreamReader reader = new StreamReader(_httpContextAccessor.HttpContext.Request.Body, Encoding.UTF8, true, 1024, true))
-                    {
-                        body = await reader.ReadToEndAsync();
-                    }
-
-                    return body;
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "请求参数转换异常！ params=[{body}]", body);
-                    //_logger.LogError(e, $"请求参数转换异常！ params=[{body}]");
-                    throw new BizException(ApiCode.PARAMS_ERROR, "转换异常");
-                }
-            }
-            else
-            {
+                var request = _httpContextAccessor.HttpContext.Request;
+                request.EnableBuffering();
+                request.Body.Seek(0, SeekOrigin.Begin);
+                using var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true);
+                var body = await reader.ReadToEndAsync();
+                request.Body.Seek(0, SeekOrigin.Begin);
                 return body;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "请求参数转换异常！");
+                //_logger.LogError(e, $"请求参数转换异常！");
+                throw new BizException(ApiCode.PARAMS_ERROR, "转换异常");
             }
         }
 
@@ -52,25 +45,16 @@ namespace AGooday.AgPay.Components.Third.Utils
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task<JObject> ReqParam2JSONAsync()
+        public async Task<JObject> ReqParamToJsonAsync()
         {
             JObject returnObject = new JObject();
 
             if (IsConvertJSON())
             {
-                string body = "";
+                var body = await GetReqParamFromBodyAsync();
+                if (string.IsNullOrEmpty(body)) return new JObject();
                 try
                 {
-                    using (StreamReader reader = new StreamReader(_httpContextAccessor.HttpContext.Request.Body, Encoding.UTF8, true, 1024, true))
-                    {
-                        body = await reader.ReadToEndAsync();
-                    }
-
-                    if (string.IsNullOrEmpty(body))
-                    {
-                        return returnObject;
-                    }
-
                     return JObject.Parse(body);
                 }
                 catch (Exception e)
@@ -81,49 +65,43 @@ namespace AGooday.AgPay.Components.Third.Utils
                 }
             }
 
-            Dictionary<string, string> properties = _httpContextAccessor.HttpContext.Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString());
-
-            foreach (KeyValuePair<string, string> entry in properties)
+            var form = _httpContextAccessor.HttpContext.Request.Form;
+            var result = new JObject();
+            foreach (var kv in form)
             {
-                string name = entry.Key;
-                string value = entry.Value;
-
-                if (!name.Contains('['))
+                if (!kv.Key.Contains('['))
                 {
-                    returnObject[name] = value;
-                    continue;
+                    result[kv.Key] = kv.Value.Count > 1 ? JToken.FromObject(kv.Value.ToArray()) : kv.Value.FirstOrDefault();
                 }
-
-                string mainKey = name.Substring(0, name.IndexOf('['));
-                string subKey = name.Substring(name.IndexOf('[') + 1, name.IndexOf(']') - name.IndexOf('[') - 1);
-                JObject subJson = new JObject();
-                if (returnObject[mainKey] != null)
+                else
                 {
-                    subJson = (JObject)returnObject[mainKey];
+                    var mainKey = kv.Key[..kv.Key.IndexOf('[')];
+                    var subKey = kv.Key[(kv.Key.IndexOf('[') + 1)..kv.Key.IndexOf(']')];
+                    var subJson = result[mainKey] as JObject ?? new JObject();
+                    subJson[subKey] = kv.Value.FirstOrDefault();
+                    result[mainKey] = subJson;
                 }
-                subJson[subKey] = value;
-                returnObject[mainKey] = subJson;
             }
-
-            return returnObject;
+            return result;
         }
 
         /// <summary>
         /// 获取json格式的请求参数
         /// </summary>
         /// <returns></returns>
-        public async Task<JObject> GetReqParamJSONAsync()
+        public async Task<JObject> GetReqParamJsonAsync()
         {
             // 将转换好的 reqParam JSON 格式的对象保存在当前请求上下文对象中进行保存
             // 注意：ASP.NET Core 的请求模式为线程池，不会出现不清空或被覆盖的问题
-            var reqParamObject = _httpContextAccessor.HttpContext.Items[REQ_CONTEXT_KEY_PARAMJSON];
-            if (reqParamObject == null)
+            var items = _httpContextAccessor.HttpContext.Items;
+            if (items.TryGetValue(REQ_CONTEXT_KEY_PARAMJSON, out var cached) && cached is JObject cachedJson)
             {
-                var reqParam = await ReqParam2JSONAsync();
-                _httpContextAccessor.HttpContext.Items[REQ_CONTEXT_KEY_PARAMJSON] = reqParam;
-                return reqParam;
+                return cachedJson;
             }
-            return (JObject)reqParamObject;
+
+            var reqJson = await ReqParamToJsonAsync();
+            items[REQ_CONTEXT_KEY_PARAMJSON] = reqJson;
+            return reqJson;
         }
 
         private bool IsConvertJSON()
@@ -148,31 +126,17 @@ namespace AGooday.AgPay.Components.Third.Utils
         /// <returns></returns>
         public string GetClientIp()
         {
-            // 获取客户端 IP 地址
             var request = _httpContextAccessor.HttpContext.Request;
-            var ipAddress = request.Headers["X-Forwarded-For"].ToString();
-            if (string.IsNullOrEmpty(ipAddress) || ipAddress.Equals("unknown", StringComparison.CurrentCultureIgnoreCase))
+            string[] headerKeys = { "X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP" };
+            foreach (var key in headerKeys)
             {
-                ipAddress = request.Headers["Proxy-Client-IP"].ToString();
-            }
-            if (string.IsNullOrEmpty(ipAddress) || ipAddress.Equals("unknown", StringComparison.CurrentCultureIgnoreCase))
-            {
-                ipAddress = request.Headers["WL-Proxy-Client-IP"].ToString();
-            }
-            if (string.IsNullOrEmpty(ipAddress) || ipAddress.Equals("unknown", StringComparison.CurrentCultureIgnoreCase))
-            {
-                ipAddress = request.HttpContext.Connection.RemoteIpAddress.ToString();
-            }
-
-            // 对于通过多个代理的情况，第一个 IP 为客户端真实 IP，多个 IP 按照逗号分割
-            if (!string.IsNullOrEmpty(ipAddress) && ipAddress.Length > 15)
-            {
-                if (ipAddress.IndexOf(',') > 0)
+                var ip = request.Headers[key].ToString();
+                if (!string.IsNullOrEmpty(ip) && !ip.Equals("unknown", StringComparison.OrdinalIgnoreCase))
                 {
-                    ipAddress = ipAddress.Substring(0, ipAddress.IndexOf(','));
+                    return ip.Split(',')[0].Trim();
                 }
             }
-            return ipAddress;
+            return request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
         }
     }
 }

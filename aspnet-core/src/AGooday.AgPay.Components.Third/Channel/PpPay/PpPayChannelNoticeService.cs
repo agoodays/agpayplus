@@ -35,7 +35,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
             // 异步需要从 webhook 中读取，所以这里读取方式不太一样
             if (noticeTypeEnum == NoticeTypeEnum.DO_NOTIFY)
             {
-                JObject paramsObj = await GetReqParamJSONAsync();
+                JObject paramsObj = await GetReqParamJsonAsync();
                 string orderId = paramsObj.SelectToken("resource.purchase_units[0].invoice_id")?.ToString();
                 return new Dictionary<string, object>() { { orderId, paramsObj } };
             }
@@ -47,7 +47,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
                 }
                 try
                 {
-                    JObject paramsObj = JObject.Parse(GetReqParamJSONAsync().ToString());
+                    JObject paramsObj = JObject.Parse(GetReqParamJsonAsync().ToString());
                     return new Dictionary<string, object>() { { urlOrderId, paramsObj } };
                 }
                 catch (Exception e)

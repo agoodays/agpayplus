@@ -10,7 +10,6 @@ using AGooday.AgPay.Components.Third.RQRS.Msg;
 using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Ocsp;
 using static AGooday.AgPay.Components.Third.Channel.IChannelNoticeService;
 
 namespace AGooday.AgPay.Components.Third.Channel.LklPay
@@ -41,7 +40,7 @@ namespace AGooday.AgPay.Components.Third.Channel.LklPay
         {
             try
             {
-                JObject @params = await GetReqParamJSONAsync();
+                JObject @params = await GetReqParamJsonAsync();
                 string payOrderId = @params.GetValue("out_trade_no").ToString();
                 return new Dictionary<string, object>() { { payOrderId, @params } };
             }

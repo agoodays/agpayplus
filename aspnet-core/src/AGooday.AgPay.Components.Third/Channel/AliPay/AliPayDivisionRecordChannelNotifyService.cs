@@ -43,7 +43,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
         {
             try
             {
-                JObject paramsJson = await GetReqParamJSONAsync();
+                JObject paramsJson = await GetReqParamJsonAsync();
                 string batchOrderId = paramsJson["biz_content"]["out_request_no"].ToString(); // 分账批次号
                 return new Dictionary<string, object>() { { batchOrderId, paramsJson } };
             }
