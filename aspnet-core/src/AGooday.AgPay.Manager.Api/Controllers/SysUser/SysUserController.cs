@@ -1,4 +1,4 @@
-using AGooday.AgPay.Application.DataTransfer;
+ï»¿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
 using AGooday.AgPay.Common.Constants;
@@ -16,7 +16,7 @@ using Microsoft.Extensions.Caching.Memory;
 namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
 {
     /// <summary>
-    /// ²Ù×÷Ô±ÁĞ±í
+    /// æ“ä½œå‘˜åˆ—è¡¨
     /// </summary>
     [Route("api/sysUsers")]
     [ApiController, Authorize]
@@ -25,7 +25,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         private readonly ISysUserService _sysUserService;
         private readonly ISysUserLoginAttemptService _sysUserLoginAttemptService;
         private readonly IMemoryCache _cache;
-        // ½«ÁìÓòÍ¨Öª´¦Àí³ÌĞò×¢ÈëController
+        // å°†é¢†åŸŸé€šçŸ¥å¤„ç†ç¨‹åºæ³¨å…¥Controller
         private readonly DomainNotificationHandler _notifications;
 
         public SysUserController(ILogger<SysUserController> logger,
@@ -44,7 +44,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         }
 
         /// <summary>
-        /// ²Ù×÷Ô±ĞÅÏ¢ÁĞ±í
+        /// æ“ä½œå‘˜ä¿¡æ¯åˆ—è¡¨
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -63,11 +63,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         }
 
         /// <summary>
-        /// Ìí¼Ó²Ù×÷Ô±ĞÅÏ¢
+        /// æ·»åŠ æ“ä½œå‘˜ä¿¡æ¯
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, Route(""), MethodLog("Ìí¼Ó²Ù×÷Ô±ĞÅÏ¢")]
+        [HttpPost, Route(""), MethodLog("æ·»åŠ æ“ä½œå‘˜ä¿¡æ¯")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_ADD)]
         public async Task<ApiRes> AddAsync(SysUserCreateDto dto)
         {
@@ -79,7 +79,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             await _sysUserService.CreateAsync(dto);
             //var errorData = _cache.Get("ErrorData");
             //if (errorData == null)
-            // ÊÇ·ñ´æÔÚÏûÏ¢Í¨Öª
+            // æ˜¯å¦å­˜åœ¨æ¶ˆæ¯é€šçŸ¥
             if (!_notifications.HasNotifications())
                 return ApiRes.Ok();
             else
@@ -87,20 +87,20 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         }
 
         /// <summary>
-        /// É¾³ı²Ù×÷Ô±
+        /// åˆ é™¤æ“ä½œå‘˜
         /// </summary>
-        /// <param name="recordId">ÏµÍ³ÓÃ»§ID</param>
+        /// <param name="recordId">ç³»ç»Ÿç”¨æˆ·ID</param>
         /// <returns></returns>
-        [HttpDelete, Route("{recordId}"), MethodLog("É¾³ı²Ù×÷Ô±")]
+        [HttpDelete, Route("{recordId}"), MethodLog("åˆ é™¤æ“ä½œå‘˜")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_DELETE)]
         public async Task<ApiRes> DeleteAsync(long recordId)
         {
             var currentUserId = await GetCurrentUserIdAsync();
             await _sysUserService.RemoveAsync(recordId, currentUserId, string.Empty);
-            // ÊÇ·ñ´æÔÚÏûÏ¢Í¨Öª
+            // æ˜¯å¦å­˜åœ¨æ¶ˆæ¯é€šçŸ¥
             if (!_notifications.HasNotifications())
             {
-                //Èç¹ûÓÃ»§±»É¾³ı£¬ĞèÒª¸üĞÂredisÊı¾İ
+                //å¦‚æœç”¨æˆ·è¢«åˆ é™¤ï¼Œéœ€è¦æ›´æ–°redisæ•°æ®
                 await RefAuthenticationAsync(new List<long> { recordId });
                 return ApiRes.Ok();
             }
@@ -109,11 +109,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         }
 
         /// <summary>
-        /// ¸üĞÂ²Ù×÷Ô±ĞÅÏ¢
+        /// æ›´æ–°æ“ä½œå‘˜ä¿¡æ¯
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut, Route("{recordId}"), MethodLog("ĞŞ¸Ä²Ù×÷Ô±ĞÅÏ¢")]
+        [HttpPut, Route("{recordId}"), MethodLog("ä¿®æ”¹æ“ä½œå‘˜ä¿¡æ¯")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
         public async Task<ApiRes> UpdateAsync(long recordId, SysUserModifyDto dto)
         {
@@ -125,17 +125,17 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
                 CopyUtil.CopyProperties(sysUser, dto);
             }
             await _sysUserService.ModifyAsync(dto);
-            // ÊÇ·ñ´æÔÚÏûÏ¢Í¨Öª
+            // æ˜¯å¦å­˜åœ¨æ¶ˆæ¯é€šçŸ¥
             if (!_notifications.HasNotifications())
             {
                 if (dto.ResetPass.HasValue && dto.ResetPass.Value)
                 {
-                    // É¾³ıÓÃ»§redis»º´æĞÅÏ¢
+                    // åˆ é™¤ç”¨æˆ·redisç¼“å­˜ä¿¡æ¯
                     await DelAuthenticationAsync(new List<long> { dto.SysUserId.Value });
                 }
                 if (dto.State.HasValue && dto.State.Value.Equals(CS.PUB_DISABLE))
                 {
-                    //Èç¹ûÓÃ»§±»½ûÓÃ£¬ĞèÒª¸üĞÂredisÊı¾İ
+                    //å¦‚æœç”¨æˆ·è¢«ç¦ç”¨ï¼Œéœ€è¦æ›´æ–°redisæ•°æ®
                     await RefAuthenticationAsync(new List<long> { dto.SysUserId.Value });
                 }
                 return ApiRes.Ok();
@@ -145,9 +145,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         }
 
         /// <summary>
-        /// ²é¿´²Ù×÷Ô±ĞÅÏ¢
+        /// æŸ¥çœ‹æ“ä½œå‘˜ä¿¡æ¯
         /// </summary>
-        /// <param name="recordId">ÏµÍ³ÓÃ»§ID</param>
+        /// <param name="recordId">ç³»ç»Ÿç”¨æˆ·ID</param>
         /// <returns></returns>
         [HttpGet, Route("{recordId}"), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_EDIT)]
@@ -162,11 +162,11 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
         }
 
         /// <summary>
-        /// ½â³ıµÇÂ¼ÏŞÖÆ
+        /// è§£é™¤ç™»å½•é™åˆ¶
         /// </summary>
-        /// <param name="recordId">ÏµÍ³ÓÃ»§ID</param>
+        /// <param name="recordId">ç³»ç»Ÿç”¨æˆ·ID</param>
         /// <returns></returns>
-        [HttpDelete, Route("loginLimit/{recordId}"), MethodLog("½â³ıµÇÂ¼ÏŞÖÆ")]
+        [HttpDelete, Route("loginLimit/{recordId}"), MethodLog("è§£é™¤ç™»å½•é™åˆ¶")]
         [PermissionAuth(PermCode.MGR.ENT_UR_USER_LOGIN_LIMIT_DELETE)]
         public async Task<ApiRes> RelieveLoginLimitAsync(long recordId)
         {
