@@ -14,6 +14,11 @@ namespace AGooday.AgPay.Domain.Interfaces
         Task<SysUser> GetByUserIdAsync(long sysUserId);
         Task<SysUser> GetByUserIdAsync(long sysUserId, string sysType);
         Task<SysUser> GetByTelphoneAsync(string telphone, string sysType);
+        /// <summary>
+        /// 获取到商户的超管用户ID
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <returns></returns>
         Task<long> FindMchAdminUserIdAsync(string mchNo);
         Task<long> FindAgentAdminUserIdAsync(string agentNo);
     }

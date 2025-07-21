@@ -154,7 +154,7 @@
       </div>
 
       <div v-if="sysPassword.resetPass">
-        <div v-show="!this.sysPassword.defaultPass">
+        <div v-if="!this.sysPassword.defaultPass">
           <a-row justify="space-between" type="flex">
             <a-col :span="10">
               <a-form-model-item label="新密码" prop="newPwd">

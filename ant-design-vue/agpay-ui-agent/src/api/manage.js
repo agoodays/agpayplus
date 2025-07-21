@@ -174,7 +174,7 @@ export function uSysUserRoleRela (sysUserId, roleIdList) {
   return request.request({
     url: 'api/sysUserRoleRelas/relas/' + sysUserId,
     method: 'POST',
-    data: { roleIdListStr: JSON.stringify(roleIdList) }
+    data: { roleIds: roleIdList }
   })
 }
 

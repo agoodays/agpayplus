@@ -107,6 +107,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             {
                 BeginTransaction();
                 await _sysUserRepository.AddAsync(sysUser);
+                await _sysUserRepository.SaveChangesAsync(); // 显式提交用户数据
 
                 #region 添加默认用户认证表
                 //string salt = StringUtil.GetUUID(6); //6位随机数
@@ -201,6 +202,12 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             if (sysUser != null && sysUser.SysType == CS.SYS_TYPE.MCH && sysUser.InitUser)
             {
                 await Bus.RaiseEvent(new DomainNotification("", "系统不允许删除商户默认用户！"));
+                return;
+            }
+            //判断是否删除代理商默认超管（初始用户）
+            if (sysUser != null && sysUser.SysType == CS.SYS_TYPE.AGENT && sysUser.InitUser)
+            {
+                await Bus.RaiseEvent(new DomainNotification("", "系统不允许删除代理商默认用户！"));
                 return;
             }
 

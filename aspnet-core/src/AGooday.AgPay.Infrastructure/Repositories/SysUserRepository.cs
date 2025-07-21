@@ -63,6 +63,11 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return DbSet.FirstOrDefaultAsync(w => w.Telphone.Equals(telphone) && w.SysType.Equals(sysType));
         }
 
+        /// <summary>
+        /// 获取到商户的超管用户ID
+        /// </summary>
+        /// <param name="mchNo"></param>
+        /// <returns></returns>
         public async Task<long> FindMchAdminUserIdAsync(string mchNo)
         {
             return (await DbSet.FirstAsync(w => w.BelongInfoId.Equals(mchNo) && w.SysType.Equals(CS.SYS_TYPE.MCH) && w.UserType.Equals(CS.USER_TYPE.ADMIN))).SysUserId;
