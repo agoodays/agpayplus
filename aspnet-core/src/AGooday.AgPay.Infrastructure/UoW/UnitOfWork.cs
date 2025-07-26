@@ -21,31 +21,34 @@ namespace AGooday.AgPay.Infrastructure.UoW
 
         public void BeginTransaction()
         {
-            _transaction = _dbcontext.Database.BeginTransaction();
+            _transaction ??= _dbcontext.Database.BeginTransaction();
         }
         public async Task BeginTransactionAsync()
         {
-            _transaction = await _dbcontext.Database.BeginTransactionAsync();
+            if (_transaction == null)
+                _transaction = await _dbcontext.Database.BeginTransactionAsync();
         }
 
         public void CommitTransaction()
         {
-            _transaction.Commit();
+            _transaction?.Commit();
         }
 
         public async Task CommitTransactionAsync()
         {
-            await _transaction.CommitAsync();
+            if (_transaction != null)
+                await _transaction.CommitAsync();
         }
 
         public void RollbackTransaction()
         {
-            _transaction.Rollback();
+            _transaction?.Rollback();
         }
 
         public async Task RollbackTransactionAsync()
         {
-            await _transaction.RollbackAsync();
+            if (_transaction != null)
+                await _transaction.RollbackAsync();
         }
 
         //上下文提交
@@ -62,12 +65,15 @@ namespace AGooday.AgPay.Infrastructure.UoW
         //手动回收
         public void Dispose()
         {
+            _transaction?.Dispose();
             _dbcontext.Dispose();
             GC.SuppressFinalize(this);
         }
 
         public async ValueTask DisposeAsync()
         {
+            if (_transaction != null)
+                await _transaction.DisposeAsync();
             await _dbcontext.DisposeAsync();
             GC.SuppressFinalize(this);
         }

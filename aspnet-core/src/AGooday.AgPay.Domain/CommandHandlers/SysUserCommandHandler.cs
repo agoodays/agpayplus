@@ -103,9 +103,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 } while (await _sysUserRepository.IsExistInviteCodeAsync(sysUser.InviteCode));
             }
 
+            BeginTransaction();
             try
             {
-                BeginTransaction();
                 await _sysUserRepository.AddAsync(sysUser);
                 await _sysUserRepository.SaveChangesAsync(); // 显式提交用户数据
 
@@ -211,9 +211,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return;
             }
 
+            BeginTransaction();
             try
             {
-                BeginTransaction();
                 // 删除用户登录信息
                 _sysUserAuthRepository.RemoveByUserId(sysUser.SysUserId, sysUser.SysType);
 
@@ -267,9 +267,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return;
             }
 
+            BeginTransaction();
             try
             {
-                BeginTransaction();
                 //判断是否重置密码
                 if (request.ResetPass)
                 {

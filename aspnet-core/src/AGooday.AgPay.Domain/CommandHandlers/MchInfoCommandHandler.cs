@@ -97,9 +97,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             }
             #endregion
 
+            BeginTransaction();
             try
             {
-                BeginTransaction();
                 #region 插入用户信息
                 // 插入用户信息
                 SysUser sysUser = new SysUser();
@@ -269,9 +269,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     .Select(w => w.SysUserId).ToList();
             }
 
+            BeginTransaction();
             try
             {
-                BeginTransaction();
                 //修改了手机号， 需要修改auth表信息
                 // 获取商户超管
                 long mchAdminUserId = await _sysUserRepository.FindMchAdminUserIdAsync(mchInfo.MchNo);
@@ -359,10 +359,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return;
             }
 
+            BeginTransaction();
             try
             {
-                BeginTransaction();
-
                 // 2.删除当前商户配置的支付通道
                 _mchPayPassageRepository.RemoveByMchNo(request.MchNo);
 
