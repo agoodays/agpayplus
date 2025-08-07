@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Components.Cache.Options;
+﻿using System.Net;
+using AGooday.AgPay.Components.Cache.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -92,7 +93,7 @@ namespace AGooday.AgPay.Components.Cache.Services
             return await database.StringSetAsync(key, valueJson, cacheExpiry, When.Exists);
         }
 
-        public async Task<IEnumerable<string>> GetKeysAsync(string pattern)
+        public IEnumerable<string> GetKeys(string pattern)
         {
             var database = _redisConnection.GetDatabase(_defaultDatabase);
             var endpoints = _redisConnection.GetEndPoints();
@@ -105,6 +106,28 @@ namespace AGooday.AgPay.Components.Cache.Services
                 keys.AddRange(serverKeys.Select(key => key.ToString()));
             }
 
+            return keys;
+        }
+
+        public async Task<IEnumerable<string>> GetKeysAsync(string pattern)
+        {
+            var endpoints = _redisConnection.GetEndPoints();
+            var tasks = endpoints
+                .Select(endpoint => GetKeysFromServerAsync(endpoint, pattern))
+                .ToList();
+
+            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
+            return results.SelectMany(keys => keys).Distinct();
+        }
+
+        private async Task<IEnumerable<string>> GetKeysFromServerAsync(EndPoint endpoint, string pattern)
+        {
+            var server = _redisConnection.GetServer(endpoint);
+            var keys = new List<string>();
+            await foreach (var key in server.KeysAsync(_defaultDatabase, pattern).ConfigureAwait(false))
+            {
+                keys.Add(key.ToString());
+            }
             return keys;
         }
         #endregion
