@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
         {
             try
             {
-                JObject @params = await GetReqParamJSONAsync();
+                JObject @params = await GetReqParamJsonAsync();
                 string payOrderId = @params.GetValue("out_trade_no").ToString();
                 return new Dictionary<string, object>() { { payOrderId, @params } };
             }

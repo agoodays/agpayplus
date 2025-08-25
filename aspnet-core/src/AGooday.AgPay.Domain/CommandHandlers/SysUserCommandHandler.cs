@@ -103,10 +103,11 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 } while (await _sysUserRepository.IsExistInviteCodeAsync(sysUser.InviteCode));
             }
 
+            BeginTransaction();
             try
             {
-                BeginTransaction();
                 await _sysUserRepository.AddAsync(sysUser);
+                await _sysUserRepository.SaveChangesAsync(); // 显式提交用户数据
 
                 #region 添加默认用户认证表
                 //string salt = StringUtil.GetUUID(6); //6位随机数
@@ -203,10 +204,16 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 await Bus.RaiseEvent(new DomainNotification("", "系统不允许删除商户默认用户！"));
                 return;
             }
+            //判断是否删除代理商默认超管（初始用户）
+            if (sysUser != null && sysUser.SysType == CS.SYS_TYPE.AGENT && sysUser.InitUser)
+            {
+                await Bus.RaiseEvent(new DomainNotification("", "系统不允许删除代理商默认用户！"));
+                return;
+            }
 
+            BeginTransaction();
             try
             {
-                BeginTransaction();
                 // 删除用户登录信息
                 _sysUserAuthRepository.RemoveByUserId(sysUser.SysUserId, sysUser.SysType);
 
@@ -260,9 +267,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return;
             }
 
+            BeginTransaction();
             try
             {
-                BeginTransaction();
                 //判断是否重置密码
                 if (request.ResetPass)
                 {

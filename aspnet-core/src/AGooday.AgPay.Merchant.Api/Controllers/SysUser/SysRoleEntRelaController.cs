@@ -7,6 +7,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Merchant.Api.Attributes;
 using AGooday.AgPay.Merchant.Api.Authorization;
+using AGooday.AgPay.Merchant.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,16 +59,16 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route("relas/{roleId}"), MethodLog("重置角色权限关联信息")]
         [PermissionAuth(PermCode.MCH.ENT_UR_ROLE_DIST)]
-        public async Task<ApiRes> RelasAsync(string roleId, List<string> entIds)
+        public async Task<ApiRes> RelasAsync(string roleId, RelasEntModel model)
         {
             var role = await _sysRoleService.GetByIdAsync(roleId);
             if (role == null || !role.SysType.Equals(CS.SYS_TYPE.MCH) || !role.BelongInfoId.Equals(await GetCurrentMchNoAsync()))
             {
                 ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
-            if (entIds.Count > 0)
+            if (model.EntIds.Count > 0)
             {
-                await _sysRoleEntRelaService.ResetRelaAsync(roleId, entIds);
+                await _sysRoleEntRelaService.ResetRelaAsync(roleId, model.EntIds);
 
                 //查询到该角色的人员， 将redis更新
                 var sysUserIdList = _sysUserRoleRelaService.SelectUserIdsByRoleId(roleId).ToList();

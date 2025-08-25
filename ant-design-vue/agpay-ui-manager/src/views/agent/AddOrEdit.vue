@@ -686,9 +686,9 @@ export default {
       that.newPwd = ''
       that.sysPassword.confirmPwd = ''
     },
-    pidChange () {
-      if (this.saveObject.pid) {
-        this.saveObject.isvNo = this.agentList?.find(a => a.agentNo === this.saveObject.pid)?.isvNo
+    pidChange (val, selected) {
+      if (selected) {
+        this.saveObject.isvNo = selected?.isvNo
       }
     },
     agentTypeChange () {

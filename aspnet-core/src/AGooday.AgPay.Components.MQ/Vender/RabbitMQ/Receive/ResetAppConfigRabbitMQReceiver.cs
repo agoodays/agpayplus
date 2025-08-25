@@ -7,6 +7,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive
     /// rabbitMQ消息接收器：仅在vender=rabbitMQ时 && 项目实现IMQReceiver接口时 进行实例化
     /// 业务：更新系统配置参数
     /// </summary>
+    [RabbitMQReceiver]
     public class ResetAppConfigRabbitMQReceiver : IMQMsgReceiver
     {
         private ResetAppConfigMQ.IMQReceiver mqReceiver;

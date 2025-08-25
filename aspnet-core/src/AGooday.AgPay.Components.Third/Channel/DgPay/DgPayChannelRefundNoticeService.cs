@@ -42,7 +42,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
         {
             try
             {
-                JObject @params = await GetReqParamJSONAsync();
+                JObject @params = await GetReqParamJsonAsync();
                 var data = @params.GetValue("resp_data")?.ToObject<JObject>();
                 string refundOrderId = data?.GetValue("req_seq_id")?.ToString();
                 return new Dictionary<string, object>() { { refundOrderId, @params } };

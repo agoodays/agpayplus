@@ -38,7 +38,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
             {
                 return Content("app is not exists");
             }
-            var jsonparams = GetReqParamJson();
+            var jsonparams = await GetReqParamJsonAsync();
             jsonparams.Remove("sign");
 
             if (!AgPayUtil.GetSign(jsonparams, mchApp.AppSecret).Equals(payOrderNotify.Sign, StringComparison.OrdinalIgnoreCase))
@@ -61,23 +61,20 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayTest
         /// 获取json格式的请求参数
         /// </summary>
         /// <returns></returns>
-        private JObject GetReqParamJson()
+        private async Task<JObject> GetReqParamJsonAsync()
         {
             Request.EnableBuffering();
-
-            string body = "";
-            var stream = Request.Body;
-            if (stream != null)
+            string requestBody = "";
+            if (Request.Body.CanSeek)
             {
-                stream.Seek(0, SeekOrigin.Begin);
-                using (var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true))
+                Request.Body.Seek(0, SeekOrigin.Begin);
+                using (var reader = new StreamReader(Request.Body, Encoding.UTF8, true, 1024, true))
                 {
-                    body = reader.ReadToEnd();
+                    requestBody = await reader.ReadToEndAsync();
                 }
-                stream.Seek(0, SeekOrigin.Begin);
+                Request.Body.Seek(0, SeekOrigin.Begin);
             }
-
-            return JObject.Parse(body);
+            return string.IsNullOrWhiteSpace(requestBody) ? new JObject() : JObject.Parse(requestBody);
         }
     }
 }

@@ -19,9 +19,9 @@ namespace AGooday.AgPay.Domain.Validations.SysUsers
                 .NotEmpty().WithMessage("参数错误！")
                 ;
 
-            RuleFor(c => c.SysType)
-                .NotEmpty().WithMessage("参数错误！")
-                ;
+            //RuleFor(c => c.SysType)
+            //    .NotEmpty().WithMessage("参数错误！")
+            //    ;
         }
     }
 }

@@ -1,4 +1,4 @@
-using AGooday.AgPay.Common.Models;
+ï»¿using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Cache.Extensions;
 using AGooday.AgPay.Components.Cache.Options;
@@ -31,11 +31,11 @@ using Newtonsoft.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 var logging = builder.Logging;
-// µ÷ÓÃ ClearProviders ÒÔ´ÓÉú³ÉÆ÷ÖĞÉ¾³ıËùÓĞ ILoggerProvider ÊµÀı
+// è°ƒç”¨ ClearProviders ä»¥ä»ç”Ÿæˆå™¨ä¸­åˆ é™¤æ‰€æœ‰ ILoggerProvider å®ä¾‹
 logging.ClearProviders();
-//// Í¨³££¬ÈÕÖ¾¼¶±ğÓ¦ÔÚÅäÖÃÖĞÖ¸¶¨£¬¶ø²»ÊÇÔÚ´úÂëÖĞÖ¸¶¨¡£
+//// é€šå¸¸ï¼Œæ—¥å¿—çº§åˆ«åº”åœ¨é…ç½®ä¸­æŒ‡å®šï¼Œè€Œä¸æ˜¯åœ¨ä»£ç ä¸­æŒ‡å®šã€‚
 //logging.AddFilter("Microsoft", LogLevel.Warning);
-// Ìí¼Ó¿ØÖÆÌ¨ÈÕÖ¾¼ÇÂ¼Ìá¹©³ÌĞò¡£
+// æ·»åŠ æ§åˆ¶å°æ—¥å¿—è®°å½•æä¾›ç¨‹åºã€‚
 logging.AddConsole();
 
 // Add services to the container.
@@ -45,10 +45,10 @@ var Env = builder.Environment;
 //services.AddSingleton(new Appsettings(Env.ContentRootPath));
 services.AddSingleton(new Appsettings(builder.Configuration));
 
-//ÓÃ»§ĞÅÏ¢
+//ç”¨æˆ·ä¿¡æ¯
 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-//// ×¢ÈëÈÕÖ¾
+//// æ³¨å…¥æ—¥å¿—
 //services.AddLogging(config =>
 //{
 //    //Microsoft.Extensions.Logging.Log4Net.AspNetCore
@@ -73,9 +73,9 @@ builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
 #endregion
 
 #region CORS
-// ´Ó appsettings.json ÖĞ¶ÁÈ¡ CORS ÅäÖÃ
+// ä» appsettings.json ä¸­è¯»å– CORS é…ç½®
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-// Ìí¼Ó CORS ·şÎñ
+// æ·»åŠ  CORS æœåŠ¡
 services.AddCors(o =>
     o.AddPolicy("CorsPolicy",
         builder => builder
@@ -92,7 +92,7 @@ services.AddHttpContextAccessor();
 services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 var jwtSettingsSection = builder.Configuration.GetSection("JWT");
 services.Configure<JwtSettings>(jwtSettingsSection);
-// JWT ÈÏÖ¤
+// JWT è®¤è¯
 var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
 services.AddJwtBearerAuthentication(jwtSettings);
 
@@ -105,13 +105,13 @@ AgPayUtil.AES_KEY = builder.Configuration["AesKey"];
 var sysRSA2Config = sysRSA2Section.Get<SysRSA2Config>();
 AgPayUtil.RSA2_PRIVATE_KEY = sysRSA2Config.PrivateKey;
 
-// Automapper ×¢Èë
+// Automapper æ³¨å…¥
 services.AddAutoMapperSetup();
 
-// Newtonsoft.Json È«²¿ÅäÖÃ 
+// Newtonsoft.Json å…¨éƒ¨é…ç½® 
 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
-    Formatting = Formatting.None,//¸ñÊ½»¯
+    Formatting = Formatting.None,//æ ¼å¼åŒ–
     DateFormatString = "yyyy-MM-dd HH:mm:ss",
     ContractResolver = new CamelCasePropertyNamesContractResolver(),
     NullValueHandling = NullValueHandling.Ignore
@@ -119,9 +119,9 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 
 services.AddControllers(options =>
     {
-        ////Ìí¼ÓÈ«¾ÖÒì³£¹ıÂËÆ÷
+        ////æ·»åŠ å…¨å±€å¼‚å¸¸è¿‡æ»¤å™¨
         //options.Filters.Add<GlobalExceptionsFilter>();
-        //ÈÕÖ¾¹ıÂËÆ÷
+        //æ—¥å¿—è¿‡æ»¤å™¨
         options.Filters.Add<OpLogActionFilter>();
     })
     .AddApplicationPart(typeof(OssFileController).Assembly)
@@ -133,7 +133,7 @@ services.AddControllers(options =>
         options.SerializerSettings.Formatting = Formatting.None;
         //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
         options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
-        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key Ê××Ö·ûĞ¡Ğ´£¨´óÍÕ·å×ªĞ¡ÍÕ·å£©
+        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key é¦–å­—ç¬¦å°å†™ï¼ˆå¤§é©¼å³°è½¬å°é©¼å³°ï¼‰
         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
         options.SerializerSettings.Converters.Add(new BaseModelJsonConverter<BaseModel>());
     });
@@ -151,8 +151,22 @@ services.AddSwaggerGen(options =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = JwtBearerDefaults.AuthenticationScheme,
     });
-    options.OperationFilter<SwaggerSecurityScheme>();
-    //×¢²áÈ«¾ÖÈÏÖ¤£¨ËùÓĞµÄ½Ó¿Ú¶¼¿ÉÒÔÊ¹ÓÃÈÏÖ¤£©
+
+    /**
+     * ä¿®æ”¹é¡¹ç›®æ–‡ä»¶Â .csproj
+     * ç”ŸæˆXMLæ³¨é‡Šæ–‡ä»¶ï¼Œä»¥ä¾¿Swaggerå¯ä»¥è¯»å–
+     * <PropertyGroup>
+     * Â  Â Â <GenerateDocumentationFile>true</GenerateDocumentationFile>
+     * Â  Â Â <NoWarn>$(NoWarn);1591</NoWarn>
+     * </PropertyGroup>
+     * 
+     * é…ç½® Swagger æ³¨é‡Šè·¯å¾„
+     * var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+     * options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+     * options.OperationFilter<SwaggerSecurityScheme>();
+     * **/
+
+    //æ³¨å†Œå…¨å±€è®¤è¯ï¼ˆæ‰€æœ‰çš„æ¥å£éƒ½å¯ä»¥ä½¿ç”¨è®¤è¯ï¼‰
     //options.AddSecurityRequirement(new OpenApiSecurityRequirement()
     //{
     //    {
@@ -173,14 +187,14 @@ services.AddSwaggerGen(options =>
 });
 
 // Adding MediatR for Domain Events
-// ÁìÓòÃüÁî¡¢ÁìÓòÊÂ¼şµÈ×¢Èë
-// ÒıÓÃ°ü MediatR.Extensions.Microsoft.DependencyInjection
-//services.AddMediatR(typeof(MyxxxHandler));//µ¥µ¥×¢ÈëÄ³Ò»¸ö´¦Àí³ÌĞò
-//»ò
-services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());//Ä¿µÄÊÇÎªÁËÉ¨ÃèHandlerµÄÊµÏÖ¶ÔÏó²¢Ìí¼Óµ½IOCµÄÈİÆ÷ÖĞ
+// é¢†åŸŸå‘½ä»¤ã€é¢†åŸŸäº‹ä»¶ç­‰æ³¨å…¥
+// å¼•ç”¨åŒ… MediatR.Extensions.Microsoft.DependencyInjection
+//services.AddMediatR(typeof(MyxxxHandler));//å•å•æ³¨å…¥æŸä¸€ä¸ªå¤„ç†ç¨‹åº
+//æˆ–
+services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());//ç›®çš„æ˜¯ä¸ºäº†æ‰«æHandlerçš„å®ç°å¯¹è±¡å¹¶æ·»åŠ åˆ°IOCçš„å®¹å™¨ä¸­
 
-// .NET Core Ô­ÉúÒÀÀµ×¢Èë
-// µ¥Ğ´Ò»²ãÓÃÀ´Ìí¼ÓÒÀÀµÏî£¬´ÓÕ¹Ê¾²ã Presentation ÖĞ¸ôÀë
+// .NET Core åŸç”Ÿä¾èµ–æ³¨å…¥
+// å•å†™ä¸€å±‚ç”¨æ¥æ·»åŠ ä¾èµ–é¡¹ï¼Œä»å±•ç¤ºå±‚ Presentation ä¸­éš”ç¦»
 NativeInjectorBootStrapper.RegisterServices(services);
 
 services.AddNotice(builder.Configuration);
@@ -194,7 +208,7 @@ services.AddSingleton<IMQSender>(provider =>
     return factory.CreateSender();
 });
 
-// ¶¯Ì¬×¢²á Receiver
+// åŠ¨æ€æ³¨å†Œ Receiver
 var receiverTypes = new[]
 {
     typeof(ResetAppConfigRabbitMQReceiver)
@@ -216,7 +230,7 @@ foreach (var (serviceType, implementationType) in specificReceiverTypes)
 }
 //services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
 //services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
-// ×¢²á HostedService
+// æ³¨å†Œ HostedService
 services.AddHostedService<MQReceiverHostedService>();
 #endregion
 
@@ -232,78 +246,84 @@ OCRNativeInjectorBootStrapper.RegisterServices(services);
 SMSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
-// ´ÓÅäÖÃÖĞ¶ÁÈ¡ IdWorkerConfig
+// ä»é…ç½®ä¸­è¯»å– IdWorkerConfig
 var idWorkerConfig = builder.Configuration.GetSection("IdWorkerConfig");
 bool isUseSnowflakeId = idWorkerConfig.GetValue<bool>("IsUseSnowflakeId", false);
 long dataCenterId = idWorkerConfig.GetValue<long>("DataCenterId", 0);
 long machineId = idWorkerConfig.GetValue<long>("MachineId", 0);
 if (isUseSnowflakeId)
 {
-    // ³õÊ¼»¯ IdWorker
+    // åˆå§‹åŒ– IdWorker
     //var idWorker = new IdWorker(dataCenterId, machineId);
     //typeof(IdWorker).GetField("lazy", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
     //    .SetValue(null, new Lazy<IdWorker>(() => idWorker));
     IdWorker.Initialize(dataCenterId, machineId);
 }
-// ³õÊ¼»¯ SeqUtil
+// åˆå§‹åŒ– SeqUtil
 SeqUtil.Initialize(isUseSnowflakeId);
 
-//¼ÓÈë WebSocket ´¦Àí·şÎñ
+//åŠ å…¥ WebSocket å¤„ç†æœåŠ¡
 services.AddSingleton<WsChannelUserIdServer>();
 
-// °ó¶¨ÅäÖÃ
+// ç»‘å®šé…ç½®
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 var app = builder.Build();
 
-// ¶ÁÈ¡ÅäÖÃ
+// è¯»å–é…ç½®
 var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 
-// ¼ÓÈë WebSocket ¹¦ÄÜ
+// åŠ å…¥ WebSocket åŠŸèƒ½
 app.UseWebSockets(new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromSeconds(30)
 });
 
-// ×Ô¶¨ÒåÖĞ¼ä¼ş
+// è‡ªå®šä¹‰ä¸­é—´ä»¶
 app.UseNdc();
 app.UseCalculateExecutionTime();
 app.UseRequestResponseLogging();
 
-// Swagger ÎÄµµ£¨¿ª·¢»·¾³ÏÂ£©
+// Swagger æ–‡æ¡£ï¼ˆå¼€å‘ç¯å¢ƒä¸‹ï¼‰
 //if (app.Environment.IsDevelopment())
 //{
 app.UseSwagger();
 app.UseSwaggerUI();
+//dotnet add package IGeekFan.AspNetCore.Knife4jUI
+//app.UseKnife4UI(c =>
+//{
+//    c.RoutePrefix = ""; // serve the UI at root --knife4j
+//    c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 Docs");
+//});
 //}
 
-// ¸ù¾İÅäÖÃ¾ö¶¨ÊÇ·ñÆôÓÃ HTTPS ÖØ¶¨Ïò
+// æ ¹æ®é…ç½®å†³å®šæ˜¯å¦å¯ç”¨ HTTPS é‡å®šå‘
 if (appSettings.ForceHttpsRedirection)
 {
-    // Ç¿ÖÆ HTTPS ÖØ¶¨Ïò
+    // å¼ºåˆ¶ HTTPS é‡å®šå‘
     app.UseHttpsRedirection();
 }
 
-// ¾²Ì¬ÎÄ¼ş·şÎñ
+// é™æ€æ–‡ä»¶æœåŠ¡
 app.UseStaticFiles();
 
-// ÆôÓÃ CORS ÖĞ¼ä¼ş
+// å¯ç”¨ CORS ä¸­é—´ä»¶
 app.UseCors("CorsPolicy");
 
-// ÈÏÖ¤ÖĞ¼ä¼ş£¨¼ì²âÓÃ»§ÊÇ·ñµÇÂ¼£©
+// è®¤è¯ä¸­é—´ä»¶ï¼ˆæ£€æµ‹ç”¨æˆ·æ˜¯å¦ç™»å½•ï¼‰
 app.UseAuthentication();
 
-// ÅäÖÃ HttpContext ·ÃÎÊÆ÷
+// é…ç½® HttpContext è®¿é—®å™¨
 var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 AuthContextService.Configure(httpContextAccessor);
 
-// ÊÚÈ¨ÖĞ¼ä¼ş£¨¼ì²âÓÃ»§ÊÇ·ñÓĞÈ¨ÏŞ·ÃÎÊ×ÊÔ´£©
+// æˆæƒä¸­é—´ä»¶ï¼ˆæ£€æµ‹ç”¨æˆ·æ˜¯å¦æœ‰æƒé™è®¿é—®èµ„æºï¼‰
 app.UseAuthorization();
 
-// Òì³£´¦ÀíÖĞ¼ä¼ş£¨·ÅÔÚÂ·ÓÉÖĞ¼ä¼şÖ®Ç°£©
+// å¼‚å¸¸å¤„ç†ä¸­é—´ä»¶ï¼ˆæ”¾åœ¨è·¯ç”±ä¸­é—´ä»¶ä¹‹å‰ï¼‰
 app.UseExceptionHandling();
 
-// Â·ÓÉÓ³Éä
+// è·¯ç”±æ˜ å°„
 app.MapControllers();
 
 app.Run();

@@ -39,7 +39,7 @@ namespace AGooday.AgPay.Components.Third.Channel.SxfPay
         {
             try
             {
-                JObject @params = await GetReqParamJSONAsync();
+                JObject @params = await GetReqParamJsonAsync();
                 string refundOrderId = @params.GetValue("ordNo").ToString();
                 return new Dictionary<string, object>() { { refundOrderId, @params } };
             }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using Microsoft.AspNetCore.Http;
 
 namespace AGooday.AgPay.Common.Utils
@@ -46,12 +43,7 @@ namespace AGooday.AgPay.Common.Utils
             }
 
             // for in memory TestServer or when dealing with default connection info
-            if (connection.RemoteIpAddress == null && connection.LocalIpAddress == null)
-            {
-                return true;
-            }
-
-            return false;
+            return connection.RemoteIpAddress == null && connection.LocalIpAddress == null;
         }
 
 

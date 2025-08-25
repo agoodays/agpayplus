@@ -18,6 +18,11 @@ namespace AGooday.AgPay.Payment.Api.Authorization
 
         public string[] Name { get; set; }
 
+        /// <summary>
+        /// 权限校验逻辑，如果商户没有对应接口的权限则抛出异常。
+        /// </summary>
+        /// <param name="context"></param>
+        /// <exception cref="BizException"></exception>
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             string mchNo = GetMchNoFromRequest(context.HttpContext.Request);
@@ -25,11 +30,15 @@ namespace AGooday.AgPay.Payment.Api.Authorization
             {
                 throw new BizException($"商户号不能为空");
             }
+
             var sysConfigService = context.HttpContext.RequestServices.GetRequiredService<ISysConfigService>();
-            var configVal = sysConfigService.GetByGroupKey("mchApiEnt", CS.SYS_TYPE.MCH, mchNo)
-                .Where(w => w.ConfigKey.Equals("mchApiEntList")).FirstOrDefault().ConfigVal;
-            var merchantPermissions = JsonConvert.DeserializeObject<List<string>>(configVal);
-            if (!merchantPermissions.Intersect(Name).Any())
+            var config = sysConfigService.GetByGroupKey("mchApiEnt", CS.SYS_TYPE.MCH, mchNo)
+                .Where(w => w.ConfigKey.Equals("mchApiEntList")).FirstOrDefault();
+            if (config == null || string.IsNullOrWhiteSpace(config.ConfigVal))
+                throw new BizException("商户未配置接口权限");
+
+            var merchantPermissions = JsonConvert.DeserializeObject<HashSet<string>>(config.ConfigVal);
+            if (!Name.Any(merchantPermissions.Contains))
             {
                 throw new BizException($"商户无此接口[{string.Join(",", Name)}]权限!");
                 //throw new UnauthorizeException();
@@ -37,6 +46,11 @@ namespace AGooday.AgPay.Payment.Api.Authorization
             }
         }
 
+        /// <summary>
+        /// 从请求中获取商户号 商户号优先从 QueryString 获取，如果没有再尝试从 Body 中获取。
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         private static string GetMchNoFromRequest(HttpRequest request)
         {
             // 1. 优先从 QueryString 获取
@@ -48,11 +62,15 @@ namespace AGooday.AgPay.Payment.Api.Authorization
             // 2. 再尝试从 Body 获取
             // 从请求体中获取 mchNo，请求体是 JSON 格式，mchNo 是 JSON 对象中的一个属性
             request.EnableBuffering();
-            string requestBody;
-            using (var reader = new StreamReader(request.Body, Encoding.UTF8, leaveOpen: true))
+            string requestBody = "";
+            if (request.Body.CanSeek)
             {
-                requestBody = reader.ReadToEnd();
-                request.Body.Position = 0;
+                request.Body.Seek(0, SeekOrigin.Begin);
+                using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
+                {
+                    requestBody = reader.ReadToEnd();
+                }
+                request.Body.Seek(0, SeekOrigin.Begin);
             }
 
             if (!string.IsNullOrWhiteSpace(requestBody))

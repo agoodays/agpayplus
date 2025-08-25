@@ -1,6 +1,4 @@
-﻿using AGooday.AgPay.Common.Models;
-
-namespace AGooday.AgPay.Application.DataTransfer
+﻿namespace AGooday.AgPay.Application.DataTransfer
 {
     /// <summary>
     /// 商户分账接收者账号绑定关系表

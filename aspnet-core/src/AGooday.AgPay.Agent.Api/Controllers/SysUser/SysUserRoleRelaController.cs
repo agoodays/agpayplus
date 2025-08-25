@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Agent.Api.Attributes;
 using AGooday.AgPay.Agent.Api.Authorization;
+using AGooday.AgPay.Agent.Api.Models;
 using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
@@ -48,11 +49,11 @@ namespace AGooday.AgPay.Agent.Api.Controllers.SysUser
         /// <returns></returns>
         [HttpPost, Route("relas/{sysUserId}"), MethodLog("重置用户角色关联信息")]
         [PermissionAuth(PermCode.AGENT.ENT_UR_USER_UPD_ROLE)]
-        public async Task<ApiRes> RelasAsync(long sysUserId, List<string> entIds)
+        public async Task<ApiRes> RelasAsync(long sysUserId, RelasRoleModel model)
         {
-            if (entIds.Count > 0)
+            if (model.RoleIds.Count > 0)
             {
-                await _sysUserRoleRelaService.SaveUserRoleAsync(sysUserId, entIds);
+                await _sysUserRoleRelaService.SaveUserRoleAsync(sysUserId, model.RoleIds);
                 await RefAuthenticationAsync(new List<long> { sysUserId });
             }
             return ApiRes.Ok();

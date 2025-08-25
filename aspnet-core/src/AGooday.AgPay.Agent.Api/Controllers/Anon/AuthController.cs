@@ -102,7 +102,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Anon
             }
 
             var auth = await _authService.LoginAuthAsync(account, identityType, SYS_TYPE);
-            
+
             await AuthValidateAsync(auth);
 
             var sysConfig = _sysConfigService.GetByKey("loginErrorMaxLimit", CS.SYS_TYPE.MGR, CS.BASE_BELONG_INFO_ID.MGR);

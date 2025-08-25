@@ -60,7 +60,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         [HttpPost, Route("redirectUrl")]
         public async Task<ApiRes> RedirectUrlAsync()
         {
-            var token = this.GetToken();
+            var token = await this.GetTokenAsync();
             //回调地址
             string redirectUrlEncode = _sysConfigService.GetDBApplicationConfig().GenOauth2RedirectUrlEncode(token);
 #if DEBUG
@@ -70,7 +70,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             //获取商户配置信息
             MchAppConfigContext mchAppConfigContext = await this.CommonQueryInfoMchAppConfigContextAsync();
 
-            string wayCode = this.GetWayCode();
+            string wayCode = await this.GetWayCodeAsync();
             //获取接口并返回数据
             IChannelUserService channelUserService = this.GetServiceByWayCode(wayCode);
             return ApiRes.Ok(await channelUserService.BuildUserRedirectUrlAsync(redirectUrlEncode, wayCode, mchAppConfigContext));
@@ -83,7 +83,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         [HttpPost, Route("channelUserId")]
         public async Task<ApiRes> ChannelUserIdAsync()
         {
-            string wayCode = this.GetWayCode();
+            string wayCode = await this.GetWayCodeAsync();
 #if DEBUG
             string channelUserId;
             switch (wayCode)
@@ -115,7 +115,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         [HttpPost, Route("payOrderInfo")]
         public async Task<ApiRes> PayOrderInfoAsync()
         {
-            (byte type, string id) = TokenConvert();
+            (byte type, string id) = await this.TokenConvertAsync();
 
             PayOrderInfo resOrder = new PayOrderInfo();
             if (type.Equals(CS.TOKEN_DATA_TYPE.PAY_ORDER_ID))
@@ -153,7 +153,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             //查询订单
             PayOrderDto payOrder = await this.CommonQueryPayOrderAsync();
 
-            string wayCode = this.GetWayCode();
+            string wayCode = await this.GetWayCodeAsync();
 
             ApiRes apiRes = null;
             if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
@@ -179,10 +179,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// <returns></returns>
         private async Task<ApiRes> PackageAlipayPayPackageAsync(PayOrderDto payOrder)
         {
-            var wayCode = this.GetWayCode();
-            string buyerUserId = this.GetChannelUserId();
+            var wayCode = await this.GetWayCodeAsync();
+            string buyerUserId = await this.GetChannelUserIdAsync();
             AliJsapiOrderRQ rq = new AliJsapiOrderRQ();
-            this.CommonSetRQ(rq, payOrder);
+            await this.CommonSetRQAsync(rq, payOrder);
             rq.BuyerUserId = buyerUserId;
             return await this.UnifiedOrderAsync(wayCode, rq, payOrder);
         }
@@ -194,10 +194,10 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// <returns></returns>
         private async Task<ApiRes> PackageWxpayPayPackageAsync(PayOrderDto payOrder)
         {
-            var wayCode = this.GetWayCode();
-            string openId = this.GetChannelUserId();
+            var wayCode = await this.GetWayCodeAsync();
+            string openId = await this.GetChannelUserIdAsync();
             WxJsapiOrderRQ rq = new WxJsapiOrderRQ();
-            this.CommonSetRQ(rq, payOrder);
+            await this.CommonSetRQAsync(rq, payOrder);
             rq.Openid = openId;
             return await this.UnifiedOrderAsync(wayCode, rq, payOrder);
         }
@@ -207,16 +207,16 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// </summary>
         /// <param name="rq"></param>
         /// <param name="payOrder"></param>
-        private void CommonSetRQ(UnifiedOrderRQ rq, PayOrderDto payOrder)
+        private async Task CommonSetRQAsync(UnifiedOrderRQ rq, PayOrderDto payOrder)
         {
             // 存在订单数据， 不需要处理
             if (payOrder != null && !string.IsNullOrWhiteSpace(payOrder.PayOrderId))
             {
                 return;
             }
-
-            string amount = this.GetReqParamJson().GetValue("amount").ToString();
-            this.GetReqParamJson().TryGetString("buyerRemark", out string buyerRemark);
+            var json = await this.GetReqParamJsonAsync();
+            string amount = json.GetValue("amount").ToString();
+            json.TryGetString("buyerRemark", out string buyerRemark);
 
             rq.MchNo = payOrder.MchNo; // 商户号
             rq.AppId = payOrder.AppId;
@@ -233,19 +233,19 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             rq.SignType = "MD5"; // 设置默认签名方式为MD5
         }
 
-        private string GetToken()
+        private async Task<string> GetTokenAsync()
         {
-            return this.GetReqParamJson().GetValue("token").ToString();
+            return (await this.GetReqParamJsonAsync()).GetValue("token").ToString();
         }
 
-        private string GetWayCode()
+        private async Task<string> GetWayCodeAsync()
         {
-            return this.GetReqParamJson().GetValue("wayCode").ToString();
+            return (await this.GetReqParamJsonAsync()).GetValue("wayCode").ToString();
         }
 
-        private string GetChannelUserId()
+        private async Task<string> GetChannelUserIdAsync()
         {
-            return this.GetReqParamJson().GetValue("channelUserId").ToString();
+            return (await this.GetReqParamJsonAsync()).GetValue("channelUserId").ToString();
         }
 
         private async Task<PayOrderDto> GetPayOrderAsync(string payOrderId)
@@ -285,9 +285,9 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
             }
         }
 
-        private (byte type, string id) TokenConvert()
+        private async Task<(byte type, string id)> TokenConvertAsync()
         {
-            var token = this.GetToken();
+            var token = await this.GetTokenAsync();
             JObject tokenData = JObject.Parse(AgPayUtil.AesDecode(token));
             tokenData.TryGetString("type", out string type);
             tokenData.TryGetString("id", out string id);
@@ -300,7 +300,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         /// <returns></returns>
         private async Task<PayOrderDto> CommonQueryPayOrderAsync()
         {
-            (byte type, string id) = TokenConvert();
+            (byte type, string id) = await this.TokenConvertAsync();
 
             if (type == CS.TOKEN_DATA_TYPE.PAY_ORDER_ID)
             {

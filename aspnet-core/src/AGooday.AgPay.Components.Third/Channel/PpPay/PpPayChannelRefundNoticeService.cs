@@ -33,7 +33,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
 
         public override async Task<Dictionary<string, object>> ParseParamsAsync(HttpRequest request, string urlOrderId, NoticeTypeEnum noticeTypeEnum)
         {
-            JObject paramsObj = await GetReqParamJSONAsync();
+            JObject paramsObj = await GetReqParamJsonAsync();
             // 获取退款订单 Paypal ID
             string orderId = paramsObj.SelectToken("resource.invoice_id")?.ToString();
             return new Dictionary<string, object>() { { orderId, paramsObj } };

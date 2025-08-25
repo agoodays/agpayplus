@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Components.Third.Channel.AliPay
         {
             try
             {
-                var paramsJson = await GetReqParamJSONAsync();
+                var paramsJson = await GetReqParamJsonAsync();
                 _logger.LogInformation("【支付宝转账】回调通知参数: {paramsJson}", paramsJson);
                 //_logger.LogInformation($"【支付宝转账】回调通知参数: {paramsJson}");
 

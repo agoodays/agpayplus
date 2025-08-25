@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Payment.Api.Middlewares
             var isExcludedPath = excludedPaths.Any(path => requestPath.Contains(path, StringComparison.OrdinalIgnoreCase));
             if (isApiPath && !isExcludedPath)
             {
-                context.Request.EnableBuffering();
+                context.Request.EnableBuffering(); // 允许重新读取body
                 Stream originalBody = context.Response.Body;
 
                 try

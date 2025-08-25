@@ -3,7 +3,7 @@ using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.MQ.Models;
 using Newtonsoft.Json;
 
-namespace AGooday.AgPay.Merchant.Api.MQ
+namespace AGooday.AgPay.Agent.Api.MQ
 {
     /// <summary>
     /// 接收MQ消息

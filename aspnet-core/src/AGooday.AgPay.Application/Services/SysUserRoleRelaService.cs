@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Repositories;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -23,8 +24,16 @@ namespace AGooday.AgPay.Application.Services
             _sysUserRoleRelaRepository = sysUserRoleRelaRepository;
         }
 
+        /// <summary>
+        /// 分配用户角色
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="roleIds"></param>
+        /// <returns></returns>
         public async Task<int> SaveUserRoleAsync(long userId, List<string> roleIds)
         {
+            // 删除用户之前的 角色信息
+            _sysUserRoleRelaRepository.RemoveByUserId(userId);
             var entities = roleIds.Select(roleId => new SysUserRoleRela() { UserId = userId, RoleId = roleId }).AsQueryable();
             await _sysUserRoleRelaRepository.AddRangeAsync(entities);
             return await _sysUserRoleRelaRepository.SaveChangesAsync();

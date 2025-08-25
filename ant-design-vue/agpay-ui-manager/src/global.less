@@ -141,12 +141,13 @@ ul, ol {
 }
 // 滚动条高度 和宽度
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
   height: 10px;
 }
 // 滚动条颜色
 ::-webkit-scrollbar-thumb {
-  background: #B3B3B3;
+  background: rgba(179, 179, 179, 0.8);
+  border-radius: 4px;
 }
 // 滑块区域底色
 ::-webkit-scrollbar-track {
@@ -154,11 +155,11 @@ ul, ol {
 }
 // 滚动条hover色
 ::-webkit-scrollbar-thumb:hover {
-  background: #A6A6A6;
+  background: rgba(166, 166, 166, 0.8);
 }
 // 滚动条选中色
 ::-webkit-scrollbar-thumb:active {
-  background: #8C8C8C;
+  background: rgb(140, 140, 140, 0.8);
 }
 
 // 添加外边框
@@ -457,8 +458,8 @@ ul, ol {
   }
 }
 
-.ant-page-header.has-breadcrumb {
-  padding-top: 14px;
+.ant-page-header{
+  padding: 0 0 0 5px !important
 }
 
 .ant-pro-sider-menu-sider.light .ant-pro-sider-menu-logo {
