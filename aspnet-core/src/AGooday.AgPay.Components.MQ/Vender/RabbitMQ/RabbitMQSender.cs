@@ -153,11 +153,7 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
                             var body = ea.Body.ToArray();
                             var message = Encoding.UTF8.GetString(body);
 
-                            // 创建独立作用域处理消息
-                            using var scope = _serviceProvider.CreateScope();
-                            var receiver = scope.ServiceProvider.GetRequiredService(msgReceiver.GetType()) as IMQMsgReceiver;
-
-                            await receiver.ReceiveMsgAsync(message);
+                            await msgReceiver.ReceiveMsgAsync(message);
                             await channel.BasicAckAsync(ea.DeliveryTag, false);
                         }
                         catch (Exception ex)

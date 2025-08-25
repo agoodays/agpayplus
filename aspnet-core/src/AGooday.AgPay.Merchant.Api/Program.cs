@@ -192,8 +192,7 @@ services.AddSingleton<IMQSender>(provider =>
 var receiverTypes = new[]
 {
     typeof(ResetAppConfigRabbitMQReceiver),
-    typeof(CleanMchLoginAuthCacheRabbitMQReceiver),
-    typeof(CleanAgentLoginAuthCacheRabbitMQReceiver)
+    typeof(CleanMchLoginAuthCacheRabbitMQReceiver)
 };
 
 foreach (var type in receiverTypes)
@@ -203,9 +202,8 @@ foreach (var type in receiverTypes)
 
 var specificReceiverTypes = new[]
 {
-    (typeof(CleanMchLoginAuthCacheMQ.IMQReceiver), typeof(CleanMchLoginAuthCacheMQReceiver)),
-    (typeof(CleanAgentLoginAuthCacheMQ.IMQReceiver), typeof(CleanAgentLoginAuthCacheMQReceiver)),
-    (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver))
+    (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver)),
+    (typeof(CleanMchLoginAuthCacheMQ.IMQReceiver), typeof(CleanMchLoginAuthCacheMQReceiver))
 };
 
 foreach (var (serviceType, implementationType) in specificReceiverTypes)
@@ -214,10 +212,8 @@ foreach (var (serviceType, implementationType) in specificReceiverTypes)
 }
 //services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
 //services.AddSingleton<IMQMsgReceiver, CleanMchLoginAuthCacheRabbitMQReceiver>();
-//services.AddSingleton<IMQMsgReceiver, CleanAgentLoginAuthCacheRabbitMQReceiver>();
-//services.AddSingleton<CleanMchLoginAuthCacheMQ.IMQReceiver, CleanMchLoginAuthCacheMQReceiver>();
-//services.AddSingleton<CleanAgentLoginAuthCacheMQ.IMQReceiver, CleanAgentLoginAuthCacheMQReceiver>();
 //services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
+//services.AddSingleton<CleanMchLoginAuthCacheMQ.IMQReceiver, CleanMchLoginAuthCacheMQReceiver>();
 // зЂВс HostedService
 services.AddHostedService<MQReceiverHostedService>();
 #endregion
