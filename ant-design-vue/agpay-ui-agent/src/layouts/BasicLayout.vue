@@ -27,7 +27,7 @@
     -->
     <template v-slot:headerContentRender>
       <div class="custom-header">
-        <div class="refresh" @click="routeReload()">
+        <div class="ant-pro-global-header-trigger" @click="routeReload()">
           <a-tooltip title="刷新页面">
             <a-icon type="reload" />
           </a-tooltip>

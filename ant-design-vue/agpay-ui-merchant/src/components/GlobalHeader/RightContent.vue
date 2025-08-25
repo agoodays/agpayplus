@@ -1,6 +1,9 @@
 <template>
   <div :class="wrpCls">
-    <avatar-dropdown :menu="showMenu" :current-user="currentUser" :class="prefixCls" />
+    <div style="display: flex; align-items: center; height: 64px;">
+      <a-button type="link" @click="openQuickCashier">快捷收银</a-button>
+      <avatar-dropdown :menu="showMenu" :current-user="currentUser" :class="prefixCls" />
+    </div>
   </div>
 </template>
 
@@ -50,6 +53,11 @@ export default {
       this.currentUser = {
         name: 'dd'
       }
+  },
+  methods: {
+    openQuickCashier () { // 快捷收银
+      this.$openQuickCashierModal()
+    }
   }
 }
 </script>

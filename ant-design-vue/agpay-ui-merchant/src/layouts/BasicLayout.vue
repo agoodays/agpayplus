@@ -27,7 +27,7 @@
     -->
     <template v-slot:headerContentRender>
       <div class="custom-header">
-        <div class="refresh" @click="routeReload()">
+        <div class="ant-pro-global-header-trigger" @click="routeReload()">
           <a-tooltip title="刷新页面">
             <a-icon type="reload" />
           </a-tooltip>
@@ -38,9 +38,6 @@
 
     <template v-slot:rightContentRender>
       <right-content :top-menu="settings.layout === 'topmenu'" :is-mobile="isMobile" :theme="settings.theme" />
-      <div class="ant-pro-global-header-index-right ant-pro-global-header-index-light">
-        <a-button type="link" @click="openQuickCashier">快捷收银</a-button>
-      </div>
     </template>
     <!-- custom footer / 自定义Footer -->
     <template v-slot:footerRender>
@@ -147,9 +144,6 @@ export default {
     routeReload () { // 刷新页面函数
       this.isRouterAlive = false
       this.$nextTick(() => { this.isRouterAlive = true })
-    },
-    openQuickCashier () { // 快捷收银
-      this.$openQuickCashierModal()
     }
   }
 }
