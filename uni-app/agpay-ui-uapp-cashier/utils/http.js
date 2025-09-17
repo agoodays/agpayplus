@@ -1,4 +1,4 @@
-const BASE_URL = "https://localhost:9819";
+import operate from './operate.js'
 
 // 通用请求方法封装
 const request = (url, method, data = {}, cache = false, headers = {}) => {
@@ -14,7 +14,7 @@ const request = (url, method, data = {}, cache = false, headers = {}) => {
 		}
 
 		uni.request({
-			url: BASE_URL + url,
+			url: operate.api() + url,
 			method,
 			data,
 			header: {

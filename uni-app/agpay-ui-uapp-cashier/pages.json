@@ -1,65 +1,23 @@
 {
 	"pages": [{
-			"path": "pages/index/index",
-			"style": {
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false
-				}
-			}
+			"path": "pages/index/index"
 		}, {
-			"path": "pages/hub/default",
-			"style": {
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false
-				}
-			}
+			"path": "pages/hub/default"
 		},
 		{
-			"path": "pages/hub/h5",
-			"style": {
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false
-				}
-			}
+			"path": "pages/hub/h5"
 		},
 		{
-			"path": "pages/hub/lite",
-			"style": {
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false
-				}
-			}
+			"path": "pages/hub/lite"
 		},
 		{
-			"path": "pages/payway/index",
-			"style": {
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false
-				}
-			}
+			"path": "pages/payway/index"
 		},
 		{
-			"path": "pages/oauth2/callback",
-			"style": {
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false
-				}
-			}
+			"path": "pages/oauth2/callback"
 		},
 		{
-			"path": "pages/error/index",
-			"style": {
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false
-				}
-			}
+			"path": "pages/error/index"
 		},
 		{
 			"path": "pages/error/error",
@@ -69,9 +27,13 @@
 		}
 	],
 	"globalStyle": {
+		"navigationStyle": "custom",
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "收银台",
 		"navigationBarBackgroundColor": "#fff",
-		"backgroundColor": "#F8F8F8"
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+			"titleNView": false
+		}
 	}
 }
