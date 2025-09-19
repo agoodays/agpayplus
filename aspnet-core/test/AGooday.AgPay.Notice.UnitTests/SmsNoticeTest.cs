@@ -37,7 +37,7 @@ namespace AGooday.AgPay.Notice.UnitTests
         }
 
         [Fact]
-        public async Task SmsSendShouldBeSucceed()
+        public async Task SmsSendShouldBeSucceedAsync()
         {
             var response = await _SmsProvider.SendAsync(new NoticeSendRequest());
             Assert.True(response.IsSuccess);

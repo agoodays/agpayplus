@@ -138,7 +138,7 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public async Task<List<PayInterfaceDefineDto>> PayIfConfigListAsyncOld(string infoType, string configMode, string infoId, string ifName, string ifCode)
+        public async Task<List<PayInterfaceDefineDto>> PayIfConfigListOldAsync(string infoType, string configMode, string infoId, string ifName, string ifCode)
         {
             bool isApplyment = configMode.EndsWith("Applyment", StringComparison.OrdinalIgnoreCase);
             // 支付定义列表
@@ -260,11 +260,9 @@ namespace AGooday.AgPay.Application.Services
                 case CS.INFO_TYPE.ISV:
                     defineQuery = defineQuery.Where(w => w.IsIsvMode.Equals(CS.YES));
                     break;
-
                 case CS.INFO_TYPE.MCH:
                 case CS.INFO_TYPE.MCH_APP:
                     return await ProcessMchConfigAsync(infoType, infoId, isApplyment, defineQuery, configQuery);
-
                 case CS.INFO_TYPE.AGENT:
                     return await ProcessAgentConfigAsync(infoId, configMode, isApplyment, defineQuery, configQuery);
             }

@@ -36,7 +36,7 @@ namespace AGooday.AgPay.Notice.UnitTests
         }
 
         [Fact]
-        public async Task EmailSendShouldBeSucceed()
+        public async Task EmailSendShouldBeSucceedAsync()
         {
             var response = await _emailProvider.SendAsync("ÓÊ¼þ±êÌâ", new Exception("custom exception"));
             Assert.True(response.IsSuccess);

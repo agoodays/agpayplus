@@ -55,7 +55,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <returns></returns>
         [HttpGet, Route(""), NoLog]
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_CONFIG_LIST)]
-        public async Task<ApiRes> ListAstnc(string appId)
+        public async Task<ApiRes> ListAsync(string appId)
         {
             var data = await _payIfConfigService.SelectAllPayIfConfigListByAppIdAsync(appId);
             return ApiRes.Ok(data);

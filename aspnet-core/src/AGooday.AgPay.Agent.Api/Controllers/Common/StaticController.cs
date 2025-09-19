@@ -32,7 +32,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Common
         }
 
         //[HttpGet, Route("api/anon/localOssFiles/{path:regex(([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?$)}")]
-        //public async Task<ActionResult> FileView(string path)
+        //public async Task<ActionResult> FileViewAsync(string path)
         //{
         //    path = HttpUtility.UrlDecode(path);
         //    return await HandleFileRequestAsync(path);
