@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using AGooday.AgPay.Domain.Models;
 
 namespace AGooday.AgPay.Infrastructure.Extensions
 {

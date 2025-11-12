@@ -6,8 +6,6 @@ using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -51,7 +49,7 @@ namespace AGooday.AgPay.Application.Services
                 .WhereIfNotNull(dto.ArticleId, w => w.ArticleId.Equals(dto.ArticleId))
                 .WhereIfNotEmpty(dto.Title, w => w.Title.Contains(dto.Title) || w.Subtitle.Contains(dto.Title))
                 .WhereIfNotNull(dto.ArticleType.Equals(null), w => w.ArticleType.Equals(dto.ArticleType))
-                .WhereIfNotEmpty(dto.ArticleRange, w => EF.Functions.JsonContains(w.ArticleRange, JArray.FromObject(new string[] { dto.ArticleRange }).ToString(Newtonsoft.Json.Formatting.None)))// w.ArticleRange.Contains(dto.ArticleRange))
+                .WhereJsonContains(dto.ArticleRange, w => w.ArticleRange)// w.ArticleRange.Contains(dto.ArticleRange))
                 .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
                 .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd)
                 .OrderByDescending(o => o.CreatedAt);

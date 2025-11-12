@@ -62,12 +62,84 @@ namespace AGooday.AgPay.Infrastructure.Extensions
         #region JSON 过滤扩展
 
         /// <summary>
+        /// JSON 字段是否包含指定的单个字符串值（自动跳过空值）
+        /// </summary>
+        public static IQueryable<T> WhereJsonContains<T>(
+            this IQueryable<T> query,
+            string value,
+            Expression<Func<T, string>> jsonProperty)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return query;
+
+            return query.WhereJsonContainsAny(new[] { value }, jsonProperty);
+        }
+
+        /// <summary>
+        /// JSON 字段是否包含指定的多个字符串值中的任意一个（OR 逻辑，自动去重、跳过空值）
+        /// </summary>
+        public static IQueryable<T> WhereJsonContainsAny<T>(
+            this IQueryable<T> query,
+            IEnumerable<string> values,
+            Expression<Func<T, string>> jsonProperty)
+        {
+            var cleanValues = values?.Where(v => !string.IsNullOrWhiteSpace(v)).Distinct().ToArray();
+            if (cleanValues == null || cleanValues.Length == 0)
+                return query;
+
+            var parameter = jsonProperty.Parameters[0];
+            var propertyAccess = jsonProperty.Body;
+
+            // 构建：EF.Functions.JsonContains(property, new[] { "A", "B" })
+            var efFunctions = Expression.Constant(EF.Functions);
+            var valueArray = Expression.Constant(cleanValues); // 传 object[] 而非 JSON 字符串
+
+            var jsonContainsMethod = typeof(MySqlDbFunctionsExtensions)
+                .GetMethod("JsonContains", new[] { typeof(DbFunctions), typeof(string), typeof(object) });
+
+            if (jsonContainsMethod == null)
+                throw new InvalidOperationException("EF.Functions.JsonContains not found.");
+
+            var call = Expression.Call(null, jsonContainsMethod, efFunctions, propertyAccess, valueArray);
+            var lambda = Expression.Lambda<Func<T, bool>>(call, parameter);
+
+            return query.Where(lambda);
+        }
+
+        public static IQueryable<T> WhereJsonContainsAsString<T>(
+            this IQueryable<T> query,
+            string value,
+            Expression<Func<T, string>> jsonProperty)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return query;
+            var jsonStr = JArray.FromObject(new[] { value }).ToString(Formatting.None);
+            return WhereJsonContainsAsString(query, new[] { value }, jsonProperty);
+        }
+
+        private static IQueryable<T> WhereJsonContainsAsString<T>(
+            this IQueryable<T> query,
+            string[] values,
+            Expression<Func<T, string>> jsonProperty)
+        {
+            var jsonStr = JArray.FromObject(values).ToString(Formatting.None);
+            var param = jsonProperty.Parameters[0];
+            var body = jsonProperty.Body;
+            var ef = Expression.Constant(EF.Functions);
+            var str = Expression.Constant(jsonStr);
+            var method = typeof(MySqlDbFunctionsExtensions)
+                .GetMethod("JsonContains", new[] { typeof(DbFunctions), typeof(string), typeof(string) });
+            var call = Expression.Call(null, method!, ef, body, str);
+            var lambda = Expression.Lambda<Func<T, bool>>(call, param);
+            return query.Where(lambda);
+        }
+
+        /// <summary>
         /// JSON 数组包含字符串值
         /// </summary>
         public static IQueryable<T> WhereJsonArrayContains<T>(
             this IQueryable<T> query,
-            Expression<Func<T, string>> jsonProperty,
-            string value)
+            string value,
+            Expression<Func<T, string>> jsonProperty)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return query;
@@ -1841,7 +1913,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             CancellationToken cancellationToken = default)
         {
             return EntityFrameworkQueryableExtensions.ToArrayAsync(source, cancellationToken);
-        } 
+        }
         #endregion
     }
 }
